@@ -1,0 +1,1034 @@
+{
+  "common": {
+    "companyName": "KopTup Tech Solutions",
+    "tagline": "Tailored technological innovation",
+    "learnMore": "Learn more",
+    "getStarted": "Get started",
+    "contactUs": "Contact us",
+    "requestQuote": "Request quote",
+    "talkToExpert": "Talk to an expert",
+    "viewDemo": "View demo",
+    "readMore": "Read more",
+    "close": "Close",
+    "submit": "Submit",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  },
+  "nav": {
+    "home": "Home",
+    "services": "Services",
+    "solutions": "Solutions",
+    "pricing": "Pricing",
+    "blog": "Blog",
+    "about": "About",
+    "contact": "Contact",
+    "login": "Sign in",
+    "dashboard": "Dashboard"
+  },
+  "hero": {
+    "title": "We transform your ideas into technology solutions",
+    "subtitle": "We develop custom software, e-commerce, intelligent chatbots, mobile apps and more. Innovation that drives your business.",
+    "cta1": "Explore solutions",
+    "cta2": "Schedule free consultation"
+  },
+  "services": {
+    "title": "Our Services",
+    "subtitle": "Comprehensive technology solutions to boost your business",
+    "ecommerce": {
+      "title": "Custom E-commerce",
+      "description": "Conversion-optimized online stores with payment gateways, inventory, analytics and exceptional UX."
+    },
+    "chatbots": {
+      "title": "Chatbots & Intelligent Agents",
+      "description": "Automate sales, support and 24/7 customer service with conversational AI integrated into your systems."
+    },
+    "integrations": {
+      "title": "API Integrations & Automations",
+      "description": "Connect your tools, automate processes and optimize enterprise workflows."
+    },
+    "custom": {
+      "title": "Custom Software Development",
+      "description": "Custom SaaS, ERP, CRM. From concept to complete implementation."
+    },
+    "mobile": {
+      "title": "Mobile Applications",
+      "description": "Native and cross-platform apps for Android and iOS with intuitive design."
+    },
+    "uxui": {
+      "title": "Conversion-focused UX/UI",
+      "description": "User-centered design that maximizes engagement and business results."
+    },
+    "security": {
+      "title": "Cybersecurity & Support",
+      "description": "Security audits, preventive maintenance and continuous technical support."
+    },
+    "consulting": {
+      "title": "Consulting & Cloud",
+      "description": "Technology strategy, cloud migration and infrastructure optimization."
+    }
+  },
+  "pricing": {
+    "title": "Flexible Plans",
+    "subtitle": "Choose the plan that best fits your needs",
+    "basic": {
+      "name": "Basic",
+      "price": "On request",
+      "description": "Ideal for startups and small businesses",
+      "features": [
+        "Professional landing page",
+        "Simple integrated chatbot",
+        "Hosting included (1 year)",
+        "Custom domain",
+        "Basic SEO",
+        "Email support"
+      ],
+      "deliveryTime": "2-3 weeks"
+    },
+    "professional": {
+      "name": "Professional",
+      "price": "On request",
+      "description": "For growing businesses",
+      "features": [
+        "Complete e-commerce",
+        "Advanced AI chatbot",
+        "Admin dashboard",
+        "3 API integrations",
+        "Analytics and reports",
+        "Optional mobile app",
+        "Priority support"
+      ],
+      "deliveryTime": "6-8 weeks",
+      "popular": true
+    },
+    "enterprise": {
+      "name": "Enterprise",
+      "price": "Custom",
+      "description": "Tailored solutions for large organizations",
+      "features": [
+        "Fully customized solution",
+        "Unlimited API integrations",
+        "Enterprise dashboard",
+        "Guaranteed SLA",
+        "24/7 support",
+        "Strategic consulting",
+        "Migration and training",
+        "Cloud scalability"
+      ],
+      "deliveryTime": "12+ weeks"
+    }
+  },
+  "demos": {
+    "badge": "Interactive Demos",
+    "title": "Try Our Solutions",
+    "subtitle": "Experience interactive demos of our products and services",
+    "interactive": "100% Interactive - No registration needed",
+    "includes": "Includes:",
+    "tryDemo": "Try Demo",
+    "chatbot": {
+      "title": "AI Chatbot Demo",
+      "description": "Create and customize your own intelligent chatbot",
+      "badge": "AI Powered",
+      "features": [
+        "Visual chatbot builder",
+        "Complete design customization",
+        "Document upload for context",
+        "Real-time preview"
+      ]
+    },
+    "ecommerce": {
+      "title": "E-commerce Demo",
+      "description": "Explore a complete and functional online store",
+      "badge": "Interactive",
+      "features": [
+        "Dynamic product catalog",
+        "Functional shopping cart",
+        "Search and filters",
+        "Wishlist system"
+      ]
+    },
+    "custom": {
+      "title": "Need something custom?",
+      "description": "We can create a specific demo for your project. Contact us and tell us what you need.",
+      "button": "Request Custom Demo"
+    }
+  },
+  "demo": {
+    "title": "Check Out Our Interactive Demos",
+    "subtitle": "Explore and try our solutions in action",
+    "uploadPrompt": "Drag files here or click to select",
+    "supportedFormats": "PDF, DOCX, TXT, CSV (max 10MB)",
+    "chatPlaceholder": "Type your question about the documents...",
+    "uploading": "Uploading file...",
+    "processing": "Processing document...",
+    "ready": "Ready to chat",
+    "error": "Error processing file"
+  },
+  "demoEcommerce": {
+    "title": "Demo Store",
+    "searchPlaceholder": "Search products...",
+    "categories": {
+      "all": "All",
+      "electronics": "Electronics",
+      "fashion": "Fashion",
+      "home": "Home",
+      "sports": "Sports"
+    },
+    "addToCart": "Add to Cart",
+    "outOfStock": "Out of Stock",
+    "noProducts": "No products found",
+    "adminPanel": "Admin Panel",
+    "wishlist": "Wishlist",
+    "myWishlist": "My Wishlist",
+    "viewAllProducts": "View All Products",
+    "wishlistEmpty": "Your wishlist is empty",
+    "wishlistEmptyDesc": "Start adding products you love!",
+    "allProducts": "All Products",
+    "searchResults": "Search results for",
+    "productsCategory": "Products in",
+    "banner": {
+      "specialOffer": "Special Offer",
+      "title": "Up to 30% OFF on Selected Items!",
+      "description": "Limited time offer. Don't miss out on amazing deals on electronics, fashion, and home items.",
+      "freeShipping": "Free Shipping Over $100",
+      "priceGuarantee": "Best Price Guarantee"
+    },
+    "sections": {
+      "featured": "Featured Products",
+      "bestsellers": "Bestsellers"
+    },
+    "cart": {
+      "title": "Cart",
+      "empty": "Your cart is empty",
+      "total": "Total",
+      "checkout": "Proceed to Checkout"
+    },
+    "product": {
+      "view": "View Details",
+      "edit": "Edit",
+      "delete": "Delete",
+      "add": "Add Product",
+      "name": "Product name",
+      "price": "Price",
+      "originalPrice": "Original price",
+      "discount": "Discount (%)",
+      "category": "Category",
+      "stock": "Stock",
+      "rating": "Rating",
+      "reviews": "Reviews",
+      "image": "Image URL",
+      "inStock": "In stock",
+      "featured": "Featured",
+      "bestseller": "Bestseller",
+      "new": "New",
+      "save": "Save",
+      "cancel": "Cancel",
+      "deleteConfirm": "Are you sure you want to delete this product?",
+      "deleteWarning": "This action cannot be undone.",
+      "codeRequired": "Validation code required",
+      "enterCode": "Enter admin code",
+      "demoCode": "Demo code: 1010",
+      "invalidCode": "Invalid code. Please try again.",
+      "productAdded": "Product added successfully",
+      "productUpdated": "Product updated successfully",
+      "productDeleted": "Product deleted successfully"
+    }
+  },
+  "adminPanel": {
+    "title": "Admin Dashboard",
+    "demoMode": "Demo Mode",
+    "backToStore": "← Back to Store",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "products": "Products",
+      "orders": "Orders",
+      "customers": "Customers"
+    },
+    "dashboard": {
+      "stats": {
+        "revenue": "Total Revenue",
+        "orders": "Orders",
+        "customers": "Customers",
+        "avgOrderValue": "Avg Order Value"
+      },
+      "recentOrders": "Recent Orders",
+      "recentActivity": "Recent Activity",
+      "viewAll": "View all",
+      "customer": "Customer",
+      "total": "Total",
+      "status": "Status"
+    },
+    "products": {
+      "title": "Product Management",
+      "addProduct": "Add Product",
+      "name": "Name",
+      "category": "Category",
+      "price": "Price",
+      "stock": "Stock",
+      "sales": "Sales",
+      "actions": "Actions",
+      "lowStock": "Low stock"
+    },
+    "orders": {
+      "title": "Order Management",
+      "filterByStatus": "Filter by status",
+      "orderId": "Order #",
+      "items": "items",
+      "shipping": "Shipping",
+      "total": "Total",
+      "status": {
+        "all": "All",
+        "pending": "Pending",
+        "processing": "Processing",
+        "shipped": "Shipped",
+        "delivered": "Delivered",
+        "cancelled": "Cancelled"
+      }
+    },
+    "customers": {
+      "title": "Customer Management",
+      "search": "Search customers...",
+      "name": "Name",
+      "email": "Email",
+      "orders": "Orders",
+      "totalSpent": "Total spent",
+      "lastOrder": "Last order"
+    },
+    "validation": {
+      "title": "Validation Code Required",
+      "description": "This action requires the admin code to continue.",
+      "inputPlaceholder": "Enter code",
+      "demoHint": "Demo code: 1010",
+      "verify": "Verify",
+      "cancel": "Cancel",
+      "error": "Invalid code. Please try again."
+    },
+    "activity": {
+      "newOrder": "New order received",
+      "productUpdated": "Product updated",
+      "newCustomer": "New customer registered",
+      "orderShipped": "Order shipped",
+      "reviewReceived": "New review received"
+    }
+  },
+  "contact": {
+    "title": "Let's talk about your project",
+    "subtitle": "Fill out the form and we'll get in touch",
+    "name": "Full name",
+    "email": "Email",
+    "phone": "Phone",
+    "company": "Company",
+    "message": "Tell us about your project",
+    "service": "Service of interest",
+    "budget": "Estimated budget",
+    "sendMessage": "Send message",
+    "successMessage": "Message sent! We'll contact you soon."
+  },
+  "footer": {
+    "description": "We develop innovative technology solutions that transform businesses.",
+    "services": "Services",
+    "company": "Company",
+    "legal": "Legal",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "cookies": "Cookies",
+    "followUs": "Follow us",
+    "allRightsReserved": "All rights reserved"
+  },
+  "servicesPage": {
+    "hero": {
+      "badge": "Professional Services",
+      "title": "Technology Solutions That Drive Your Business",
+      "subtitle": "We transform ideas into exceptional digital products with cutting-edge technology",
+      "ctaConsult": "Request a Free Consultation",
+      "ctaPricing": "View Plans"
+    },
+    "services": {
+      "ecommerce": {
+        "title": "E-Commerce",
+        "shortDescription": "Powerful and scalable online stores",
+        "description": "We develop complete e-commerce platforms with inventory management, integrated payment gateways, and optimized shopping experiences.",
+        "features": [
+          "Smart shopping cart",
+          "Multiple payment gateway integration",
+          "Real-time inventory management",
+          "Complete admin panel",
+          "Responsive and optimized design",
+          "SEO optimized for products",
+          "Coupons and discounts system",
+          "Analytics and sales reports"
+        ],
+        "price": "From $2,500",
+        "deliveryTime": "4-8 weeks"
+      },
+      "chatbots": {
+        "title": "AI Chatbots",
+        "shortDescription": "Intelligent virtual assistants 24/7",
+        "description": "AI-powered chatbots that automate customer service, sales and technical support using natural language processing.",
+        "features": [
+          "Natural Language Processing (NLP)",
+          "WhatsApp, Telegram, Facebook integration",
+          "Intelligent contextual responses",
+          "Continuous learning",
+          "Multi-channel conversation management",
+          "Analytics dashboard",
+          "CRM integration",
+          "Bot personality customization"
+        ],
+        "price": "From $1,800",
+        "deliveryTime": "3-6 weeks"
+      },
+      "integrations": {
+        "title": "API Integrations",
+        "shortDescription": "Connect your systems and automate processes",
+        "description": "Robust integrations between different platforms and services to automate workflows and sync data in real-time.",
+        "features": [
+          "RESTful and GraphQL APIs",
+          "Webhooks and real-time events",
+          "Bidirectional data sync",
+          "Data transformation and mapping",
+          "Error handling and retries",
+          "Complete API documentation",
+          "OAuth and JWT authentication",
+          "Detailed monitoring and logs"
+        ],
+        "price": "From $1,200",
+        "deliveryTime": "2-4 weeks"
+      },
+      "custom": {
+        "title": "Custom Software",
+        "shortDescription": "Personalized solutions for your business",
+        "description": "We develop custom web applications that perfectly adapt to your business processes and specific needs.",
+        "features": [
+          "Detailed requirements analysis",
+          "Scalable and modular architecture",
+          "Optimized database",
+          "Complete admin panel",
+          "Granular roles and permissions",
+          "Custom reports and dashboards",
+          "Integration with existing systems",
+          "Complete technical documentation"
+        ],
+        "price": "From $3,500",
+        "deliveryTime": "6-12 weeks"
+      },
+      "mobile": {
+        "title": "Mobile Apps",
+        "shortDescription": "Native and hybrid iOS and Android apps",
+        "description": "Cross-platform mobile applications with native performance and exceptional user experience for iOS and Android.",
+        "features": [
+          "Cross-platform development",
+          "Mobile-optimized UI/UX",
+          "Push notifications",
+          "Offline sync",
+          "Native services integration",
+          "Analytics and event tracking",
+          "OTA updates",
+          "App Store and Play Store publication"
+        ],
+        "price": "From $4,000",
+        "deliveryTime": "8-14 weeks"
+      },
+      "uxui": {
+        "title": "UX/UI Design",
+        "shortDescription": "Modern interfaces and intuitive experiences",
+        "description": "User-centered interface design that combines modern aesthetics with intuitive functionality and accessibility.",
+        "features": [
+          "User research",
+          "Interactive wireframes and prototypes",
+          "Design System",
+          "Style guides and components",
+          "Usability testing",
+          "Multi-device responsive design",
+          "WCAG 2.1 accessibility",
+          "Figma/Sketch development handoff"
+        ],
+        "price": "From $1,500",
+        "deliveryTime": "2-4 weeks"
+      },
+      "security": {
+        "title": "Security & Audits",
+        "shortDescription": "Protect your application and data",
+        "description": "Security audits, penetration testing and security improvements to protect your applications and sensitive data.",
+        "features": [
+          "Code and vulnerability audits",
+          "Penetration testing (Pentesting)",
+          "HTTPS/SSL implementation",
+          "Two-factor authentication (2FA)",
+          "Sensitive data encryption",
+          "GDPR and regulatory compliance",
+          "Continuous security monitoring",
+          "Incident response plan"
+        ],
+        "price": "From $1,000",
+        "deliveryTime": "1-3 weeks"
+      },
+      "consulting": {
+        "title": "Consulting & Cloud",
+        "shortDescription": "Cloud architecture and optimization",
+        "description": "Technical consulting for software architecture, cloud migration, infrastructure optimization and DevOps.",
+        "features": [
+          "Scalable application architecture",
+          "AWS, Azure, GCP migration",
+          "CI/CD and automation",
+          "Cloud cost optimization",
+          "Docker/Kubernetes containerization",
+          "Monitoring and observability",
+          "Backup and disaster recovery",
+          "Technical team training"
+        ],
+        "price": "From $150/hour",
+        "deliveryTime": "Variable"
+      }
+    },
+    "process": {
+      "title": "Our Work Process",
+      "subtitle": "A proven process that guarantees exceptional results",
+      "steps": {
+        "consult": {
+          "title": "Initial Consultation",
+          "description": "We discuss your project, objectives and specific needs."
+        },
+        "proposal": {
+          "title": "Proposal & Quote",
+          "description": "We prepare a detailed proposal with scope, timeline and costs."
+        },
+        "design": {
+          "title": "Design & Planning",
+          "description": "We create mockups, architecture and development plan."
+        },
+        "development": {
+          "title": "Development",
+          "description": "We develop your solution with constant updates."
+        },
+        "testing": {
+          "title": "Testing & QA",
+          "description": "Thorough testing to ensure quality and functionality."
+        },
+        "delivery": {
+          "title": "Delivery & Support",
+          "description": "Launch and continuous post-implementation support."
+        }
+      }
+    },
+    "cta": {
+      "title": "Ready to start your project?",
+      "subtitle": "Schedule a free consultation and discover how we can help you achieve your goals",
+      "ctaSchedule": "Schedule Free Consultation",
+      "ctaPricing": "View Pricing"
+    },
+    "features": "Features:",
+    "technologies": "Technologies:",
+    "request": "Request"
+  },
+  "loginPage": {
+    "title": "Welcome back",
+    "subtitle": "Sign in to access your dashboard",
+    "email": "Email",
+    "password": "Password",
+    "remember": "Remember me",
+    "forgotPassword": "Forgot your password?",
+    "loginButton": "Sign In",
+    "loggingIn": "Signing in...",
+    "socialGoogle": "Continue with Google",
+    "socialGithub": "Continue with GitHub",
+    "divider": "Or continue with email",
+    "noAccount": "Don't have an account?",
+    "signUpLink": "Sign up for free",
+    "backHome": "← Back to home",
+    "errorFields": "Please complete all fields"
+  },
+  "registerPage": {
+    "title": "Create your account",
+    "subtitle": "Start tracking your projects today",
+    "name": "Full Name",
+    "email": "Email",
+    "phone": "Phone",
+    "company": "Company",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "agreeTerms": "I agree to the",
+    "termsLink": "terms and conditions",
+    "and": "and",
+    "privacyLink": "privacy policy",
+    "createButton": "Create Account",
+    "creating": "Creating account...",
+    "socialGoogle": "Google",
+    "socialGithub": "GitHub",
+    "divider": "Or sign up with email",
+    "hasAccount": "Already have an account?",
+    "loginLink": "Sign in",
+    "backHome": "← Back to home",
+    "passwordRequirements": "Password requirements:",
+    "reqLength": "At least 8 characters",
+    "reqUppercase": "One uppercase letter",
+    "reqLowercase": "One lowercase letter",
+    "reqNumber": "One number",
+    "errorPasswordMismatch": "Passwords do not match",
+    "errorPasswordLength": "Password must be at least 8 characters",
+    "errorTerms": "You must accept the terms and conditions",
+    "namePlaceholder": "Your name",
+    "emailPlaceholder": "you@email.com",
+    "phonePlaceholder": "+1 234 567 8900",
+    "companyPlaceholder": "Your company",
+    "passwordPlaceholder": "••••••••"
+  },
+  "dashboardPage": {
+    "welcome": "Hello",
+    "subtitle": "Here's your projects summary",
+    "stats": {
+      "activeProjects": "Active Projects",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "pending": "Pending"
+    },
+    "myProjects": "My Projects",
+    "viewAll": "View all",
+    "projectStatus": {
+      "active": "Active",
+      "completed": "Completed",
+      "pending": "Pending"
+    },
+    "dueDate": "Due",
+    "tasksCompleted": "tasks completed",
+    "recentActivity": "Recent Activity",
+    "quickActions": "Quick Actions",
+    "reports": "Reports",
+    "support": "Support",
+    "analytics": "Analytics",
+    "logout": "Sign Out",
+    "redirecting": "Redirecting..."
+  },
+  "homePage": {
+    "stats": {
+      "projects": "Projects Completed",
+      "clients": "Satisfied Clients",
+      "support": "Technical Support",
+      "rating": "Average Rating"
+    },
+    "cta": {
+      "title": "Ready to transform your business?",
+      "subtitle": "Let's talk about your project and discover how we can help you achieve your goals.",
+      "button": "View plans"
+    }
+  },
+  "pricingPage": {
+    "badge": "Plans & Pricing",
+    "hero": {
+      "title": "Choose the Perfect Plan for Your Business",
+      "subtitle": "Transparent pricing with no surprises. Pay only for what you need"
+    },
+    "billing": {
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "save": "Save 17%",
+      "perMonth": "month",
+      "saveAnnually": "Save {percent}% annually"
+    },
+    "plans": {
+      "starter": {
+        "name": "Starter",
+        "description": "Perfect for startups and small projects",
+        "deliveryTime": "2-3 weeks",
+        "support": "Email 48h",
+        "features": {
+          "website5": "Responsive website up to 5 pages",
+          "customDesign": "Custom design",
+          "contactForm": "Contact form",
+          "basicSEO": "Basic SEO optimization",
+          "hosting1year": "Hosting included (1 year)",
+          "ssl": "SSL certificate",
+          "revisions2": "2 revision rounds",
+          "emailSupport": "Email support (48h)",
+          "adminPanel": "Admin panel",
+          "ecommerce": "E-commerce",
+          "apiIntegrations": "API integrations",
+          "prioritySupport": "Priority support"
+        }
+      },
+      "professional": {
+        "name": "Professional",
+        "description": "Ideal for growing businesses",
+        "popular": "Most Popular",
+        "deliveryTime": "4-6 weeks",
+        "support": "Priority 24h",
+        "features": {
+          "website15": "Responsive website up to 15 pages",
+          "advancedDesign": "Advanced custom design",
+          "adminPanel": "CMS admin panel",
+          "blog": "Integrated blog",
+          "basicEcommerce": "Basic e-commerce (up to 50 products)",
+          "advancedSEO": "Advanced SEO optimization",
+          "googleAnalytics": "Google Analytics integration",
+          "hosting1year": "Hosting included (1 year)",
+          "ssl": "SSL certificate",
+          "revisions4": "4 revision rounds",
+          "prioritySupport": "Priority support (24h)",
+          "apiIntegrations": "API integrations (up to 3)",
+          "training": "Training included",
+          "basicChatbot": "Basic chatbot"
+        }
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Complete solutions for large companies",
+        "deliveryTime": "8-12 weeks",
+        "support": "24/7 Dedicated",
+        "features": {
+          "unlimitedPages": "Unlimited pages website",
+          "premiumDesign": "Premium custom design",
+          "advancedAdmin": "Advanced admin panel",
+          "fullEcommerce": "Full e-commerce (unlimited products)",
+          "memberships": "Memberships/subscriptions system",
+          "aiChatbot": "AI chatbot included",
+          "mobileApp": "Mobile app (iOS + Android)",
+          "unlimitedAPI": "Unlimited API integrations",
+          "premiumSEO": "Premium SEO optimization",
+          "dedicatedHosting": "Dedicated hosting included (1 year)",
+          "advancedSSL": "Advanced SSL certificate",
+          "unlimitedRevisions": "Unlimited revisions",
+          "support247": "24/7 dedicated support",
+          "consulting": "Strategic consulting",
+          "sla": "99.9% guaranteed SLA"
+        }
+      }
+    },
+    "stats": {
+      "delivery": "Delivery",
+      "support": "Support"
+    },
+    "ctaButton": "Get Started",
+    "addons": {
+      "title": "Additional Services",
+      "subtitle": "Boost your project with extra features",
+      "items": {
+        "aiChatbot": {
+          "name": "AI Chatbot",
+          "description": "Intelligent virtual assistant 24/7",
+          "duration": "setup + $150/month"
+        },
+        "mobileApp": {
+          "name": "Mobile App",
+          "description": "Native iOS and Android application",
+          "duration": "project"
+        },
+        "memberships": {
+          "name": "Memberships System",
+          "description": "Subscriber management and exclusive content",
+          "duration": "implementation"
+        },
+        "apiIntegration": {
+          "name": "API Integration",
+          "description": "Connect with external services",
+          "duration": "per integration"
+        },
+        "premiumSEO": {
+          "name": "Premium SEO",
+          "description": "Advanced optimization and link building",
+          "duration": "month"
+        },
+        "maintenance": {
+          "name": "Monthly Maintenance",
+          "description": "Updates, backups and support",
+          "duration": "month"
+        }
+      }
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Everything you need to know about our plans",
+      "items": {
+        "hosting": {
+          "question": "What's included in hosting?",
+          "answer": "Hosting includes server space, SSL domain, daily backups, and sufficient bandwidth for normal traffic. After the first year, you can renew or migrate to your own hosting."
+        },
+        "changePlan": {
+          "question": "Can I change my plan later?",
+          "answer": "Yes, you can upgrade your plan at any time. You only pay the prorated difference. We also offer downgrades at the end of the billing period."
+        },
+        "moreFeatures": {
+          "question": "What if I need more pages or features?",
+          "answer": "We can add additional pages or features to any plan. We'll send you a custom quote based on your specific needs."
+        },
+        "sourceCode": {
+          "question": "Do you include the source code?",
+          "answer": "Yes, all our plans include the complete source code and intellectual property rights of the developed project."
+        },
+        "guarantee": {
+          "question": "Do you offer a guarantee?",
+          "answer": "We offer a 30-day guarantee after delivery. If you're not satisfied, we'll work until you are or refund your money."
+        },
+        "payment": {
+          "question": "What's the payment process?",
+          "answer": "We request 50% at project start and 50% upon completion. For large projects, we can split into milestones. We accept transfers, cards, and PayPal."
+        },
+        "training": {
+          "question": "Do you provide training for the system?",
+          "answer": "Yes, all plans include training for the admin panel. Professional and Enterprise plans include more extensive training sessions."
+        },
+        "technologies": {
+          "question": "What technologies do you use?",
+          "answer": "We use modern, proven technologies like React, Next.js, Node.js, PostgreSQL, and AWS. We choose the best technology based on each project's needs."
+        }
+      },
+      "moreQuestions": "Have more questions?",
+      "contactButton": "Talk to Us"
+    },
+    "customPlan": {
+      "title": "Need a custom plan?",
+      "subtitle": "Contact us for a tailored quote according to your specific needs",
+      "button": "Request Custom Quote"
+    }
+  },
+  "blogPage": {
+    "badge": "Blog",
+    "hero": {
+      "title": "Insights on Technology and Development",
+      "subtitle": "Articles, tutorials and trends from the tech world"
+    },
+    "search": "Search articles...",
+    "categories": {
+      "all": "All",
+      "development": "Development",
+      "design": "Design",
+      "ai": "Artificial Intelligence",
+      "business": "Business"
+    },
+    "featured": {
+      "title": "Featured Articles",
+      "subtitle": "The most relevant content of the month"
+    },
+    "allPosts": "All Articles",
+    "postsOf": "Articles in",
+    "postsFound": "articles found",
+    "noResults": {
+      "title": "No articles found",
+      "subtitle": "Try another search or category",
+      "button": "View all articles"
+    },
+    "readMore": "Read more",
+    "readArticle": "Read article",
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "newsletter": {
+      "title": "Subscribe to Our Newsletter",
+      "subtitle": "Get the latest articles, tutorials and news directly in your email",
+      "placeholder": "you@email.com",
+      "button": "Subscribe",
+      "disclaimer": "No spam. Cancel your subscription anytime."
+    }
+  },
+  "aboutPage": {
+    "badge": "About Us",
+    "hero": {
+      "title": "We Transform Ideas into Digital Reality",
+      "subtitle": "We are a team passionate about technology, dedicated to creating innovative solutions that drive our clients' success"
+    },
+    "stats": {
+      "projects": "Projects Completed",
+      "clients": "Satisfied Clients",
+      "experience": "Years of Experience",
+      "satisfaction": "Satisfaction Rate"
+    },
+    "mission": {
+      "title": "Our Mission",
+      "text1": "At KopTup, our mission is to empower businesses through innovative and customized technological solutions. We believe that technology should be accessible, efficient and scalable for everyone.",
+      "text2": "We specialize in turning complex challenges into elegant solutions, combining creativity with technical excellence to deliver products that not only meet but exceed expectations.",
+      "points": {
+        "custom": "Tailored custom solutions",
+        "modern": "Cutting-edge technologies",
+        "support": "Continuous support and maintenance"
+      }
+    },
+    "values": {
+      "title": "Our Values",
+      "subtitle": "The principles that guide every decision and project we undertake",
+      "items": {
+        "innovation": {
+          "title": "Constant Innovation",
+          "description": "We adopt the latest technologies and methodologies to offer cutting-edge solutions."
+        },
+        "excellence": {
+          "title": "Passion for Excellence",
+          "description": "Every project is an opportunity to exceed expectations and create exceptional products."
+        },
+        "creativity": {
+          "title": "Limitless Creativity",
+          "description": "We think outside the box to solve complex problems with elegant solutions."
+        },
+        "transparency": {
+          "title": "Total Transparency",
+          "description": "Clear, honest and constant communication at every stage of the project."
+        },
+        "clientFirst": {
+          "title": "Client at the Center",
+          "description": "Your success is our success. We work as an extension of your team."
+        },
+        "results": {
+          "title": "Measurable Results",
+          "description": "We focus on delivering real value and demonstrable ROI in every project."
+        }
+      }
+    },
+    "team": {
+      "title": "Our Team",
+      "subtitle": "Passionate professionals with experience in cutting-edge technologies",
+      "members": {
+        "carlos": {
+          "name": "Carlos Mendoza",
+          "role": "CEO & Full Stack Developer",
+          "description": "10+ years developing web and mobile solutions for companies of all sizes."
+        },
+        "ana": {
+          "name": "Ana García",
+          "role": "CTO & Backend Architect",
+          "description": "Expert in scalable software architecture and distributed systems."
+        },
+        "laura": {
+          "name": "Laura Martínez",
+          "role": "Lead UX/UI Designer",
+          "description": "Designer with a passion for creating intuitive and beautiful digital experiences."
+        },
+        "roberto": {
+          "name": "Roberto Silva",
+          "role": "AI/ML Engineer",
+          "description": "Specialist in artificial intelligence and natural language processing."
+        }
+      }
+    },
+    "history": {
+      "title": "Our History",
+      "subtitle": "The journey that brought us to where we are today",
+      "milestones": {
+        "2017": {
+          "title": "KopTup Founded",
+          "description": "We started as a boutique web development studio with 2 people."
+        },
+        "2019": {
+          "title": "Service Expansion",
+          "description": "We added mobile development and AI chatbots to our portfolio."
+        },
+        "2021": {
+          "title": "Team Growth",
+          "description": "We reached 10+ professionals specialized in different technologies."
+        },
+        "2023": {
+          "title": "International Clients",
+          "description": "We started working with companies from USA, Spain and Latin America."
+        },
+        "2025": {
+          "title": "AI Leaders",
+          "description": "We became leaders in artificial intelligence solutions."
+        }
+      }
+    },
+    "technologies": {
+      "title": "Technologies We Master",
+      "subtitle": "Modern tech stack for world-class solutions"
+    },
+    "cta": {
+      "title": "Ready to Work Together?",
+      "subtitle": "Join the companies that already trust us to drive their digital transformation",
+      "button1": "Let's Talk About Your Project",
+      "button2": "View Our Services"
+    }
+  },
+  "contactPage": {
+    "badge": "Contact",
+    "hero": {
+      "title": "Let's Talk About Your Project",
+      "subtitle": "We're ready to turn your vision into reality. Schedule a free consultation"
+    },
+    "form": {
+      "title": "Send Us a Message",
+      "subtitle": "Fill out the form and we'll respond within 24 hours",
+      "name": "Full Name",
+      "email": "Email",
+      "phone": "Phone",
+      "company": "Company",
+      "service": "Service of Interest",
+      "budget": "Estimated Budget",
+      "message": "Tell Us About Your Project",
+      "namePlaceholder": "Your name",
+      "emailPlaceholder": "you@email.com",
+      "phonePlaceholder": "+1 234 567 8900",
+      "companyPlaceholder": "Your company",
+      "servicePlaceholder": "Select a service",
+      "budgetPlaceholder": "Select a range",
+      "messagePlaceholder": "Describe your project, objectives and any important details...",
+      "submit": "Send Message",
+      "submitting": "Sending...",
+      "success": {
+        "title": "Message Sent!",
+        "subtitle": "Thanks for contacting us. We'll respond soon."
+      }
+    },
+    "services": {
+      "ecommerce": "E-Commerce",
+      "chatbot": "AI Chatbot",
+      "webDev": "Web Development",
+      "mobileDev": "Mobile Development",
+      "apiIntegrations": "API Integrations",
+      "uxui": "UX/UI Design",
+      "consulting": "Consulting",
+      "other": "Other"
+    },
+    "budgetRanges": {
+      "1": "Less than $1,000",
+      "2": "$1,000 - $5,000",
+      "3": "$5,000 - $10,000",
+      "4": "$10,000 - $25,000",
+      "5": "More than $25,000"
+    },
+    "info": {
+      "email": {
+        "title": "Email",
+        "value": "contact@koptup.com"
+      },
+      "phone": {
+        "title": "Phone",
+        "value": "+57 300 123 4567"
+      },
+      "location": {
+        "title": "Location",
+        "value": "Medellín, Colombia"
+      },
+      "hours": {
+        "title": "Hours",
+        "value": "Mon - Fri: 8am - 6pm"
+      }
+    },
+    "social": {
+      "title": "Follow Us on Social Media"
+    },
+    "schedule": {
+      "title": "Schedule a Call",
+      "subtitle": "Schedule a free 30-minute consultation",
+      "button": "Schedule Now"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Quick answers to common questions",
+      "items": {
+        "time": {
+          "question": "How long does a project take?",
+          "answer": "Depends on scope, but typically 2-12 weeks. We give you precise estimates in the initial consultation."
+        },
+        "guarantee": {
+          "question": "Do you offer a guarantee?",
+          "answer": "Yes, 30-day guarantee and continuous support to ensure your total satisfaction."
+        },
+        "startups": {
+          "question": "Do you work with startups?",
+          "answer": "Absolutely. We have special plans for startups and early-stage companies."
+        }
+      }
+    },
+    "map": {
+      "title": "Medellín, Colombia",
+      "subtitle": "Interactive map coming soon"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "name": "koptup-tech-solutions",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Plataforma web profesional para soluciones tecnológicas a medida",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:build": "docker-compose build",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^1.10.16",
+    "prettier": "^3.0.3",
+    "eslint": "^8.52.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

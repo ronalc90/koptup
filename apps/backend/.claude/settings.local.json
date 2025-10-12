@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run dev)",
+      "Bash(node test-simple.js)",
+      "Bash(npx tsc:*)",
+      "Bash(tasklist)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(netstat:*)",
+      "Bash(curl:*)",
+      "Bash(npx ts-node:*)",
+      "Read(//c/Users/johan albeiro/Documents/Soluciones Tecnologicas KopTup/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
