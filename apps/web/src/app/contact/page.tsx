@@ -15,7 +15,7 @@ import {
   CheckCircleIcon,
   CalendarDaysIcon,
 } from '@heroicons/react/24/outline';
-import { FaWhatsapp, FaLinkedin, FaGithub, FaTwitter } from 'react-icons/fa';
+import { FaWhatsapp, FaLinkedin } from 'react-icons/fa';
 
 export default function ContactPage() {
   const t = useTranslations('contactPage');
@@ -30,6 +30,7 @@ export default function ContactPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isScheduling, setIsScheduling] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,24 +64,46 @@ export default function ContactPage() {
     });
   };
 
+  const handleScheduleCall = () => {
+    setIsScheduling(true);
+
+    // Crear el mailto con ambos destinatarios
+    const recipients = 'ronald@koptup.com,ronalddemiancipagauta@gmail.com';
+    const subject = encodeURIComponent('Solicitud de Agendamiento de Llamada - KopTup');
+    const body = encodeURIComponent(
+      `Hola equipo de KopTup,\n\n` +
+      `Me gustaría agendar una llamada para discutir mis necesidades tecnológicas.\n\n` +
+      `Por favor, confirmen disponibilidad y agendemos una reunión.\n\n` +
+      `Saludos cordiales`
+    );
+
+    // Abrir cliente de email con los datos
+    window.location.href = `mailto:${recipients}?subject=${subject}&body=${body}`;
+
+    // Reset después de un momento
+    setTimeout(() => {
+      setIsScheduling(false);
+    }, 1000);
+  };
+
   const contactInfo = [
     {
       icon: EnvelopeIcon,
       title: t('info.email.title'),
-      content: t('info.email.value'),
-      link: 'mailto:contacto@koptup.com',
+      content: 'ronald@koptup.com',
+      link: 'mailto:ronald@koptup.com',
     },
     {
       icon: PhoneIcon,
       title: t('info.phone.title'),
-      content: t('info.phone.value'),
-      link: 'tel:+573001234567',
+      content: '+57 302 479 4842',
+      link: 'tel:+573024794842',
     },
     {
       icon: MapPinIcon,
       title: t('info.location.title'),
-      content: t('info.location.value'),
-      link: 'https://maps.google.com',
+      content: 'Av. 68 #1-63, Bogotá, Colombia',
+      link: 'https://www.google.com/maps/search/?api=1&query=Av.+68+1-63+Bogota+Colombia',
     },
     {
       icon: ClockIcon,
@@ -357,36 +380,22 @@ export default function ContactPage() {
                   </h3>
                   <div className="flex gap-3">
                     <a
-                      href="https://wa.me/573001234567"
+                      href="https://wa.me/573024794842"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-10 h-10 bg-green-100 dark:bg-green-950 rounded-lg flex items-center justify-center hover:bg-green-200 dark:hover:bg-green-900 transition-colors"
+                      className="w-12 h-12 bg-green-100 dark:bg-green-950 rounded-lg flex items-center justify-center hover:bg-green-200 dark:hover:bg-green-900 transition-colors"
+                      title="WhatsApp"
                     >
-                      <FaWhatsapp className="h-5 w-5 text-green-600 dark:text-green-400" />
+                      <FaWhatsapp className="h-6 w-6 text-green-600 dark:text-green-400" />
                     </a>
                     <a
-                      href="https://linkedin.com"
+                      href="https://www.linkedin.com/company/109543617"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-10 h-10 bg-blue-100 dark:bg-blue-950 rounded-lg flex items-center justify-center hover:bg-blue-200 dark:hover:bg-blue-900 transition-colors"
+                      className="w-12 h-12 bg-blue-100 dark:bg-blue-950 rounded-lg flex items-center justify-center hover:bg-blue-200 dark:hover:bg-blue-900 transition-colors"
+                      title="LinkedIn"
                     >
-                      <FaLinkedin className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                    </a>
-                    <a
-                      href="https://github.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-10 h-10 bg-secondary-100 dark:bg-secondary-800 rounded-lg flex items-center justify-center hover:bg-secondary-200 dark:hover:bg-secondary-700 transition-colors"
-                    >
-                      <FaGithub className="h-5 w-5 text-secondary-700 dark:text-secondary-300" />
-                    </a>
-                    <a
-                      href="https://twitter.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-10 h-10 bg-sky-100 dark:bg-sky-950 rounded-lg flex items-center justify-center hover:bg-sky-200 dark:hover:bg-sky-900 transition-colors"
-                    >
-                      <FaTwitter className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+                      <FaLinkedin className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                     </a>
                   </div>
                 </CardContent>
@@ -402,8 +411,14 @@ export default function ContactPage() {
                   <p className="text-sm text-secondary-700 dark:text-secondary-300 mb-4">
                     {t('schedule.subtitle')}
                   </p>
-                  <Button size="sm" fullWidth variant="primary">
-                    {t('schedule.button')}
+                  <Button
+                    size="sm"
+                    fullWidth
+                    variant="primary"
+                    onClick={handleScheduleCall}
+                    disabled={isScheduling}
+                  >
+                    {isScheduling ? 'Abriendo...' : t('schedule.button')}
                   </Button>
                 </CardContent>
               </Card>
