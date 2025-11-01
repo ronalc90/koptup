@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
@@ -21,6 +22,11 @@ import {
 export default function AboutPage() {
   const t = useTranslations('aboutPage');
   const tc = useTranslations('common');
+
+  // Estado para la sección de tecnologías
+  const [query, setQuery] = useState('');
+  const [activeCat, setActiveCat] = useState<string>('All');
+  const [showAll, setShowAll] = useState(false);
 
   const values = [
     {
@@ -57,32 +63,32 @@ export default function AboutPage() {
 
   const team = [
     {
-      name: t('team.members.carlos.name'),
-      role: t('team.members.carlos.role'),
-      description: t('team.members.carlos.description'),
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400',
-      skills: ['Next.js', 'Node.js', 'AWS', 'React Native'],
+      name: t('team.members.ronald.name'),
+      role: t('team.members.ronald.role'),
+      description: t('team.members.ronald.description'),
+      avatar: 'https://media.licdn.com/dms/image/v2/C4E03AQFkHy4q8806WA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1657683263984?e=1763596800&v=beta&t=GDtxdYIv_fyBVJvzawmB0j75qUPOGyeSLLpUZy_au8M',
+      skills: ['React', 'TypeScript', 'Node.js', 'OpenAI', 'AWS'],
     },
     {
-      name: t('team.members.ana.name'),
-      role: t('team.members.ana.role'),
-      description: t('team.members.ana.description'),
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
-      skills: ['Python', 'Kubernetes', 'PostgreSQL', 'Microservices'],
+      name: t('team.members.johan.name'),
+      role: t('team.members.johan.role'),
+      description: t('team.members.johan.description'),
+      avatar: 'https://media.licdn.com/dms/image/v2/D4E03AQGqt4Us0iMBYg/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1660358992007?e=1763596800&v=beta&t=qLR1IY0Wyo7jg0FtGod92Hn9talz4VyZeO9fGQ-URiU',
+      skills: ['React', 'TypeScript', 'Microservices', 'OpenAI', 'JWT'],
     },
     {
-      name: t('team.members.laura.name'),
-      role: t('team.members.laura.role'),
-      description: t('team.members.laura.description'),
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
-      skills: ['Figma', 'Design Systems', 'User Research', 'Prototyping'],
+      name: t('team.members.juan_vargas.name'),
+      role: t('team.members.juan_vargas.role'),
+      description: t('team.members.juan_vargas.description'),
+      avatar: 'https://media.licdn.com/dms/image/v2/D4E35AQEundRA63ly8A/profile-framedphoto-shrink_400_400/profile-framedphoto-shrink_400_400/0/1709400976543?e=1762639200&v=beta&t=CKKWKLXimiEso9u39XdakYoa30c-8HEBzteWSq4sv88',
+      skills: ['React', 'Angular', 'SQL', 'Azure', 'Microsoft 365'],
     },
     {
-      name: t('team.members.roberto.name'),
-      role: t('team.members.roberto.role'),
-      description: t('team.members.roberto.description'),
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
-      skills: ['Python', 'TensorFlow', 'GPT', 'NLP'],
+      name: t('team.members.juan_pablo.name'),
+      role: t('team.members.juan_pablo.role'),
+      description: t('team.members.juan_pablo.description'),
+      avatar: 'https://media.licdn.com/dms/image/v2/D4E03AQGjzVsXhevmAw/profile-displayphoto-shrink_400_400/B4EZTUjOOLHMAg-/0/1738732791366?e=1763596800&v=beta&t=Iia0DMip2pdv9abyQew4DPRcngwxCO7chjAV8Hzg-YA',
+      skills: ['JavaScript', 'jQuery', 'Microsoft D365', 'SQL Server', 'Docker'],
     },
   ];
 
@@ -93,39 +99,69 @@ export default function AboutPage() {
     { value: '98%', label: t('stats.satisfaction') },
   ];
 
-  const milestones = [
-    {
-      year: '2017',
-      title: t('history.milestones.2017.title'),
-      description: t('history.milestones.2017.description'),
-    },
-    {
-      year: '2019',
-      title: t('history.milestones.2019.title'),
-      description: t('history.milestones.2019.description'),
-    },
-    {
-      year: '2021',
-      title: t('history.milestones.2021.title'),
-      description: t('history.milestones.2021.description'),
-    },
-    {
-      year: '2023',
-      title: t('history.milestones.2023.title'),
-      description: t('history.milestones.2023.description'),
-    },
-    {
-      year: '2025',
-      title: t('history.milestones.2025.title'),
-      description: t('history.milestones.2025.description'),
-    },
-  ];
+ const milestones = [
+  { year: '2019', title: t('history.milestones.2019.title'), description: t('history.milestones.2019.description') },
+  { year: '2021', title: t('history.milestones.2021.title'), description: t('history.milestones.2021.description') },
+  { year: '2022', title: t('history.milestones.2022.title'), description: t('history.milestones.2022.description') },
+  { year: '2023', title: t('history.milestones.2023.title'), description: t('history.milestones.2023.description') },
+  { year: '2025', title: t('history.milestones.2025.title'), description: t('history.milestones.2025.description') }
+];
 
-  const technologies = [
-    'React', 'Next.js', 'Node.js', 'TypeScript', 'Python', 'PostgreSQL',
-    'MongoDB', 'AWS', 'Docker', 'Kubernetes', 'React Native', 'Flutter',
-    'TensorFlow', 'OpenAI', 'Tailwind CSS', 'GraphQL', 'Redis', 'Stripe'
-  ];
+
+
+// highlights = lo que muestras primero y grande
+const highlights = [
+  { name: 'React', level: 'Expert' },
+  { name: 'Node.js', level: 'Expert' },
+  { name: 'PostgreSQL', level: 'Proficient' },
+  { name: 'Docker', level: 'Proficient' },
+  { name: 'TensorFlow', level: 'Proficient' },
+  { name: 'AWS', level: 'Proficient' },
+];
+
+// grouped = mostrado en acordeones / chips
+const grouped = {
+  Frontend: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Sass'],
+  Backend: ['Node.js', 'Express', 'Python', 'Java', '.NET'],
+  DB: ['PostgreSQL', 'MongoDB', 'MySQL', 'Redis'],
+  Cloud: ['AWS', 'Azure', 'Vercel', 'AWS S3'],
+  DevOps: ['Docker', 'Kubernetes', 'CI/CD', 'Git', 'Jenkins'],
+  ML: ['TensorFlow', 'ML/DL', 'NLP', 'Embeddings', 'Semantic Search'],
+  Tools: ['VS Code', 'IntelliJ', 'Postman'],
+};
+
+// Categorías para los filtros
+const categories = ['All', ...Object.keys(grouped)];
+
+// Filtrado de tecnologías basado en búsqueda y categoría activa
+const filtered = useMemo(() => {
+  let result = { ...grouped };
+
+  // Filtrar por categoría activa
+  if (activeCat !== 'All') {
+    result = { [activeCat]: grouped[activeCat as keyof typeof grouped] };
+  }
+
+  // Filtrar por búsqueda de texto
+  if (query.trim()) {
+    const lowerQuery = query.toLowerCase();
+    const newResult: Record<string, string[]> = {};
+
+    Object.entries(result).forEach(([cat, items]) => {
+      const filteredItems = items.filter(item =>
+        item.toLowerCase().includes(lowerQuery)
+      );
+      if (filteredItems.length > 0) {
+        newResult[cat] = filteredItems;
+      }
+    });
+
+    return newResult;
+  }
+
+  return result;
+}, [query, activeCat]);
+
 
   return (
     <>
@@ -339,29 +375,106 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+<section className="section-padding bg-white dark:bg-secondary-950">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-8">
+          <CodeBracketIcon className="h-14 w-14 mx-auto text-primary-600 dark:text-primary-400 mb-3" />
+          <h2 className="text-3xl md:text-4xl font-bold text-secondary-900 dark:text-white mb-2">
+            {t('technologies.title')}
+          </h2>
+          <p className="text-lg text-secondary-600 dark:text-secondary-400 max-w-3xl mx-auto">
+            {t('technologies.subtitle')}
+          </p>
+        </div>
 
-      {/* Technologies Section */}
-      <section className="section-padding bg-white dark:bg-secondary-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <CodeBracketIcon className="h-16 w-16 mx-auto text-primary-600 dark:text-primary-400 mb-4" />
-            <h2 className="text-3xl md:text-5xl font-bold text-secondary-900 dark:text-white mb-4">
-              {t('technologies.title')}
-            </h2>
-            <p className="text-xl text-secondary-600 dark:text-secondary-400 max-w-3xl mx-auto">
-              {t('technologies.subtitle')}
-            </p>
-          </div>
+        {/* Highlights */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+          {highlights.map(h => (
+            <div key={h.name} className="flex items-center gap-3 p-3 border rounded-lg shadow-sm">
+              <div aria-hidden className="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center text-sm">
+                {h.name[0]}
+              </div>
+              <div>
+                <div className="font-medium">{h.name}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">{h.level}</div>
+              </div>
+            </div>
+          ))}
+        </div>
 
-          <div className="flex flex-wrap justify-center gap-3">
-            {technologies.map((tech, index) => (
-              <Badge key={index} variant="secondary" size="lg" className="text-base">
-                {tech}
-              </Badge>
+        {/* Controls */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
+          <input
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="Search technologies..."
+            className="flex-1 px-4 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white placeholder-secondary-400 dark:placeholder-secondary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+          />
+          <div className="flex gap-2 flex-wrap">
+            {categories.map(c => (
+              <button
+                key={c}
+                onClick={() => { setActiveCat(c); setShowAll(false); }}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  activeCat === c
+                    ? 'bg-primary-600 text-white shadow-sm'
+                    : 'border border-secondary-300 dark:border-secondary-700 text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800'
+                }`}
+              >
+                {c}
+              </button>
             ))}
           </div>
         </div>
-      </section>
+
+        {/* Grouped lists */}
+        <div className="space-y-6">
+          {Object.entries(filtered).length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-secondary-600 dark:text-secondary-400">
+                No technologies found matching "{query}"
+              </p>
+            </div>
+          ) : (
+            Object.entries(filtered).map(([cat, items]) => (
+              <Card key={cat} variant="bordered" className="overflow-hidden">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-bold text-secondary-900 dark:text-white">
+                      {cat}{' '}
+                      <span className="text-sm font-normal text-secondary-500 dark:text-secondary-400">
+                        ({items.length})
+                      </span>
+                    </h3>
+                    {items.length > 4 && (
+                      <button
+                        onClick={() => setShowAll(s => !s)}
+                        className="text-sm text-primary-600 dark:text-primary-400 hover:underline font-medium"
+                      >
+                        {showAll ? 'Show less' : 'View all'}
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {(showAll ? items : items.slice(0, 8)).map(it => (
+                      <Badge
+                        key={it}
+                        variant="secondary"
+                        size="lg"
+                        className="text-sm font-medium"
+                      >
+                        {it}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </div>
+      </div>
+    </section>
 
       {/* CTA Section */}
       <section className="section-padding bg-gradient-to-br from-primary-600 to-primary-800 text-white">
