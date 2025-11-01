@@ -72,16 +72,16 @@ export default function MessagesPage() {
   const loadConversations = async () => {
     try {
       const data = await api.getConversations();
-      const normalized =
+      const normalized: Conversation[] =
         Array.isArray(data) && data.length
-          ? data.map((c: any) => ({
+          ? data.map((c: any): Conversation => ({
               id: String(c.id || c._id || `conv-${Date.now()}`),
               title: safeString(c.title || c.name || 'Sin título'),
               projectId: safeString(c.projectId || c.project || ''),
               lastMessage: safeString(c.lastMessage || c.preview || ''),
               lastMessageTime: safeString(c.lastMessageTime || c.updatedAt || new Date().toISOString()),
               unreadCount: Number(c.unreadCount || 0),
-              avatar: safeString(c.avatar || c.image || ''),
+              avatar: safeString(c.avatar || c.image || '') || undefined,
               participants: Array.isArray(c.participants) ? c.participants.map(String) : [],
               status: c.status === 'archived' ? 'archived' : 'active',
             }))
