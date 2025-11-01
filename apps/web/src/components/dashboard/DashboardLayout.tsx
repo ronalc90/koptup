@@ -119,6 +119,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 >
                   <div className="w-8 h-8 rounded-full overflow-hidden bg-primary-100 dark:bg-primary-950">
                     {user?.avatar ? (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold text-sm">
