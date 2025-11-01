@@ -2,7 +2,6 @@
 import React from 'react';
 import { Inter, Poppins } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
-import getRequestConfig from '@/i18n/request';
 import ThemeProvider from '@/components/providers/ThemeProvider';
 import ConditionalLayout from '@/components/layout/ConditionalLayout';
 import ClientToaster from '../components/ClientToaster';
@@ -22,8 +21,19 @@ export const metadata = {
     'Desarrollamos software a medida, e-commerce, chatbots inteligentes, aplicaciones móviles y más. Innovación que impulsa tu negocio.',
 };
 
+// Load messages for default locale (Spanish)
+async function getMessages() {
+  try {
+    return (await import('../../messages/es.json')).default;
+  } catch (error) {
+    console.error('Failed to load messages, using empty object', error);
+    return {};
+  }
+}
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const { locale, messages } = await getRequestConfig();
+  const locale = 'es'; // Default locale
+  const messages = await getMessages();
 
   return (
     <html lang={locale} suppressHydrationWarning>
