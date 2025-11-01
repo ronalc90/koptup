@@ -918,58 +918,62 @@
         }
       }
     },
+    
     "team": {
       "title": "Nuestro Equipo",
       "subtitle": "Profesionales apasionados con experiencia en tecnologías de vanguardia",
       "members": {
-        "carlos": {
-          "name": "Carlos Mendoza",
-          "role": "CEO & Full Stack Developer",
-          "description": "10+ años desarrollando soluciones web y móviles para empresas de todo tamaño."
+        "ronald": {
+          "name": "Ronald Cipagauta",
+          "role": "CEO & Desarrollador Full Stack",
+          "description": "Desarrollador Full Stack con experiencia en frontend, backend e integración de IA. Especializado en construir soluciones escalables con React, Node.js y OpenAI."
         },
-        "ana": {
-          "name": "Ana García",
-          "role": "CTO & Backend Architect",
-          "description": "Experta en arquitectura de software escalable y sistemas distribuidos."
+        "johan": {
+          "name": "Johan Mendieta",
+          "role": "Desarrollador Senior",
+          "description": "Desarrollador de software con experiencia en frontend, backend y arquitectura de microservicios. Liderando soluciones impulsadas por OpenAI con embeddings y búsqueda semántica."
         },
-        "laura": {
-          "name": "Laura Martínez",
-          "role": "Lead UX/UI Designer",
-          "description": "Diseñadora con pasión por crear experiencias digitales intuitivas y hermosas."
+        "juan_vargas": {
+          "name": "Juan Vargas",
+          "role": "Desarrollador Full Stack",
+          "description": "Desarrollador Full Stack especializado en desarrollo de APIs, reportería empresarial e integración en la nube con Microsoft 365 y Azure. Experto en chatbots con IA."
         },
-        "roberto": {
-          "name": "Roberto Silva",
-          "role": "AI/ML Engineer",
-          "description": "Especialista en inteligencia artificial y procesamiento de lenguaje natural."
+        "juan_pablo": {
+          "name": "Juan Pablo Caicedo",
+          "role": "Desarrollador Full Stack",
+          "description": "Desarrollador Full Stack especializado en diseño, desarrollo e implementación de aplicaciones web. Experto en JavaScript, Microsoft D365 y gestión de bases de datos."
         }
       }
+    }
+    ,
+  "history": {
+  "title": "Nuestra Historia",
+  "subtitle": "El camino que nos llevó a donde estamos hoy",
+  "milestones": {
+    "2019": {
+      "title": "Inicios Independientes",
+      "description": "Equipo colombiano colaborando con profesionales en México. Proyectos universitarios y para pequeños negocios."
     },
-    "history": {
-      "title": "Nuestra Historia",
-      "subtitle": "El camino que nos llevó a donde estamos hoy",
-      "milestones": {
-        "2017": {
-          "title": "Fundación de KopTup",
-          "description": "Iniciamos como un estudio boutique de desarrollo web con 2 personas."
-        },
-        "2019": {
-          "title": "Expansión de Servicios",
-          "description": "Agregamos desarrollo móvil y chatbots con IA a nuestro portafolio."
-        },
-        "2021": {
-          "title": "Crecimiento del Equipo",
-          "description": "Llegamos a 10+ profesionales especializados en diferentes tecnologías."
-        },
-        "2023": {
-          "title": "Clientes Internacionales",
-          "description": "Comenzamos a trabajar con empresas de USA, España y Latinoamérica."
-        },
-        "2025": {
-          "title": "Líderes en IA",
-          "description": "Nos convertimos en referentes en soluciones con inteligencia artificial."
-        }
-      }
+    "2021": {
+      "title": "Proyectos de Backend y Sistemas",
+      "description": "Desarrollo en Java y Python para e-commerce. Configuración de clusters y replicación en CentOS. Enfoque técnico en backend."
     },
+    "2022": {
+      "title": "Aplicación de IA",
+      "description": "Modelos de machine learning y deep learning para clientes en Costa Rica. Desarrollo de chatbot para procesos de recursos humanos."
+    },
+    "2023": {
+      "title": "Registro Oficial",
+      "description": "Registro en Cámara de Comercio el 26/03/2023. Formalización de la operación y ampliación de servicios."
+    },
+    "2025": {
+      "title": "Proyecto Sector Salud",
+      "description": "Desarrollo de solución para presentación a la Secretaría de Salud en Colombia."
+    }
+  }
+}
+
+  ,
     "technologies": {
       "title": "Tecnologías que Dominamos",
       "subtitle": "Stack tecnológico moderno para soluciones de clase mundial"

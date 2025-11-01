@@ -872,58 +872,60 @@
         }
       }
     },
-    "team": {
-      "title": "Our Team",
-      "subtitle": "Passionate professionals with experience in cutting-edge technologies",
-      "members": {
-        "carlos": {
-          "name": "Carlos Mendoza",
-          "role": "CEO & Full Stack Developer",
-          "description": "10+ years developing web and mobile solutions for companies of all sizes."
-        },
-        "ana": {
-          "name": "Ana García",
-          "role": "CTO & Backend Architect",
-          "description": "Expert in scalable software architecture and distributed systems."
-        },
-        "laura": {
-          "name": "Laura Martínez",
-          "role": "Lead UX/UI Designer",
-          "description": "Designer with a passion for creating intuitive and beautiful digital experiences."
-        },
-        "roberto": {
-          "name": "Roberto Silva",
-          "role": "AI/ML Engineer",
-          "description": "Specialist in artificial intelligence and natural language processing."
-        }
+     "team": {
+    "title": "Our Team",
+    "subtitle": "Passionate professionals with experience in cutting-edge technologies",
+    "members": {
+      "ronald": {
+        "name": "Ronald Cipagauta",
+        "role": "CEO & Full Stack Developer",
+        "description": "Full Stack developer with expertise in frontend, backend, and AI integration. Specialized in building scalable solutions with React, Node.js, and OpenAI."
+      },
+      "johan": {
+        "name": "Johan Mendieta",
+        "role": "Senior Developer",
+        "description": "Software developer with experience in frontend, backend, and microservices architecture. Leading OpenAI-powered solutions with embeddings and semantic search."
+      },
+      "juan_vargas": {
+        "name": "Juan Vargas",
+        "role": "Full Stack Developer",
+        "description": "Full Stack developer specialized in API development, enterprise reporting, and cloud integration with Microsoft 365 and Azure. Expert in chatbots with AI."
+      },
+      "juan_pablo": {
+        "name": "Juan Pablo Caicedo",
+        "role": "Full Stack Developer",
+        "description": "Full Stack developer specialized in web application design, development and deployment. Expert in JavaScript, Microsoft D365, and database management."
       }
-    },
+    }
+      }
+    ,
     "history": {
-      "title": "Our History",
-      "subtitle": "The journey that brought us to where we are today",
-      "milestones": {
-        "2017": {
-          "title": "KopTup Founded",
-          "description": "We started as a boutique web development studio with 2 people."
-        },
-        "2019": {
-          "title": "Service Expansion",
-          "description": "We added mobile development and AI chatbots to our portfolio."
-        },
-        "2021": {
-          "title": "Team Growth",
-          "description": "We reached 10+ professionals specialized in different technologies."
-        },
-        "2023": {
-          "title": "International Clients",
-          "description": "We started working with companies from USA, Spain and Latin America."
-        },
-        "2025": {
-          "title": "AI Leaders",
-          "description": "We became leaders in artificial intelligence solutions."
-        }
-      }
+  "title": "Our History",
+  "subtitle": "The path that brought us to where we are today",
+  "milestones": {
+    "2019": {
+      "title": "Independent Beginnings",
+      "description": "Colombian development team collaborating with professionals in Mexico. Projects for universities and small businesses."
     },
+    "2021": {
+      "title": "Backend and Systems Projects",
+      "description": "Java and Python development for e-commerce. Cluster setup and replication on CentOS. Backend-focused systems work."
+    },
+    "2022": {
+      "title": "Application of AI",
+      "description": "Machine learning and deep learning solutions for clients in Costa Rica. HR chatbot development for internal workflows."
+    },
+    "2023": {
+      "title": "Official Registration",
+      "description": "Company formally registered on 03/26/2023. Service portfolio expansion and operational consolidation."
+    },
+    "2025": {
+      "title": "Healthcare Sector Project",
+      "description": "Development of a platform to be presented to the Health Secretariat in Colombia."
+    }
+  }
+}
+,
     "technologies": {
       "title": "Technologies We Master",
       "subtitle": "Modern tech stack for world-class solutions"
