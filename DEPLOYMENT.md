@@ -94,7 +94,9 @@ PORT=3001
 # Si usas Atlas, agrégalo manualmente:
 MONGODB_URI=${{MONGO_URL}}
 
-# OpenAI (REQUERIDO para Cuentas Médicas)
+# OpenAI (REQUERIDO SOLO si usas el módulo de Cuentas Médicas)
+# Sin esta key, el servidor arrancará pero las funciones de IA no funcionarán
+# Obtén tu key en: https://platform.openai.com/api-keys
 OPENAI_API_KEY=sk-proj-XXXXXXXXXXXXXXXXXXXXXXXXXX
 OPENAI_MODEL=gpt-4o-mini
 
@@ -342,14 +344,32 @@ Health:   https://tu-app.railway.app/health
    npm install --save @types/express @types/node
    ```
 
-### Problema: OpenAI API falla
+### Problema: "OPENAI_API_KEY environment variable is missing" al iniciar
 
-**Causa:** API Key no configurada o inválida
+**Causa:** El servidor intentaba instanciar OpenAI al arrancar, incluso si no se usaba
+
+**Solución (ya implementada):**
+El código ahora usa "lazy loading" - OpenAI solo se instancia cuando se usa.
+
+**Para usar el módulo de Cuentas Médicas:**
+1. Ve a Railway → Variables
+2. Agrega `OPENAI_API_KEY=sk-proj-TU_KEY_AQUI`
+3. Obtén tu key en: https://platform.openai.com/api-keys
+4. Opcionalmente agrega `OPENAI_MODEL=gpt-4o-mini` (por defecto usa gpt-4o)
+
+**Nota:** Sin OPENAI_API_KEY:
+- ✅ El servidor arrancará correctamente
+- ✅ Todas las demás funcionalidades funcionarán
+- ❌ El módulo de procesamiento de cuentas médicas fallará cuando se use
+
+### Problema: OpenAI API falla durante el procesamiento
+
+**Causa:** API Key inválida o sin créditos
 
 **Solución:**
-1. Verifica que `OPENAI_API_KEY` esté en Railway
-2. Verifica que la key sea válida en https://platform.openai.com/api-keys
-3. Asegúrate de tener créditos en tu cuenta OpenAI
+1. Verifica que la key sea válida en https://platform.openai.com/api-keys
+2. Asegúrate de tener créditos en tu cuenta OpenAI
+3. Verifica el modelo configurado existe: `gpt-4o-mini` o `gpt-4o`
 
 ### Problema: Archivos no se suben
 

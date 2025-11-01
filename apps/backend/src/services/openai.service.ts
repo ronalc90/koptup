@@ -2,9 +2,19 @@
 import OpenAI from 'openai';
 import { logger } from '../utils/logger';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy initialization - only create when needed
+let openai: OpenAI | null = null;
+function getOpenAI(): OpenAI {
+  if (!openai) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY not configured. Please add it to your environment variables.');
+    }
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  }
+  return openai;
+}
 
 export interface DiagnosticoInfo {
   codigo: string;
@@ -279,7 +289,8 @@ export async function extractMedicalDataFromText(
 ): Promise<MedicalDataExtraction[]> {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-      const response = await openai.chat.completions.create({
+      const client = getOpenAI();
+      const response = await client.chat.completions.create({
         model: process.env.OPENAI_MODEL || 'gpt-4o',
         messages: [
           {

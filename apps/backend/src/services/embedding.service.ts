@@ -3,9 +3,19 @@ import { Pinecone } from '@pinecone-database/pinecone';
 import { logger } from '../utils/logger';
 import { db } from '../config/database';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy initialization - only create when needed
+let openai: OpenAI | null = null;
+function getOpenAI(): OpenAI {
+  if (!openai) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY not configured');
+    }
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  }
+  return openai;
+}
 
 let pinecone: Pinecone | null = null;
 
@@ -37,7 +47,8 @@ function chunkText(text: string, chunkSize: number = 1000, overlap: number = 200
  */
 export async function generateEmbeddings(texts: string[]): Promise<number[][]> {
   try {
-    const response = await openai.embeddings.create({
+    const client = getOpenAI();
+    const response = await client.embeddings.create({
       model: 'text-embedding-ada-002',
       input: texts,
     });
