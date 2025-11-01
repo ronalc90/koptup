@@ -171,8 +171,9 @@ export default function MessagesPage() {
   const loadMessages = async (conversationId: string) => {
     try {
       // Try API first if available
-      if (typeof api.getMessages === 'function') {
-        const apiMessages = await api.getMessages(conversationId);
+      const apiAny = api as any;
+      if (apiAny && typeof apiAny.getMessages === 'function') {
+        const apiMessages = await apiAny.getMessages(conversationId);
         if (Array.isArray(apiMessages)) {
           const normalized = apiMessages.map(transformApiMessage);
           setMessages(normalized);
@@ -181,8 +182,8 @@ export default function MessagesPage() {
       }
 
       // If API not available or returned invalid data, try api.getConversationMessages or fallback
-      if (typeof (api as any).getConversationMessages === 'function') {
-        const apiMessages = await (api as any).getConversationMessages(conversationId);
+      if (apiAny && typeof apiAny.getConversationMessages === 'function') {
+        const apiMessages = await apiAny.getConversationMessages(conversationId);
         if (Array.isArray(apiMessages)) {
           const normalized = apiMessages.map(transformApiMessage);
           setMessages(normalized);
