@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { api } from '@/lib/api';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
@@ -47,6 +47,7 @@ export default function MessagesPage() {
 
   useEffect(() => {
     loadConversations();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -54,6 +55,7 @@ export default function MessagesPage() {
       loadMessages(selectedConversation.id);
       markAsRead(selectedConversation.id);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedConversation]);
 
   useEffect(() => {

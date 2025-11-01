@@ -45,6 +45,7 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     loadNotifications();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
