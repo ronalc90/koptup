@@ -40,7 +40,13 @@
       "Bash(git remote add:*)",
       "Bash(git add:*)",
       "Bash(if exist nul del /F nul)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(git commit:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(if not exist \"uploads\\cuentas-medicas\" mkdir \"uploads\\cuentas-medicas\")",
+      "Bash(if not exist \"uploads\\ley100\" mkdir \"uploads\\ley100\")",
+      "Bash(if not exist \"uploads\\exports\" mkdir \"uploads\\exports\")"
     ],
     "deny": [],
     "ask": []

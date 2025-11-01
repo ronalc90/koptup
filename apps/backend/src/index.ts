@@ -60,9 +60,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Robust startup
 const startServer = async () => {
   try {
-    console.log('Comprobando MONGO_URI:', Boolean(process.env.MONGO_URI));
-    if (!process.env.MONGO_URI) {
-      logger.warn('MONGO_URI no definido. Algunas funcionalidades pueden fallar.');
+    console.log('Comprobando MONGODB_URI:', Boolean(process.env.MONGODB_URI));
+    if (!process.env.MONGODB_URI) {
+      logger.warn('MONGODB_URI no definido. Algunas funcionalidades pueden fallar.');
     }
 
     // Conectar a la DB y cargar passport antes de registrar rutas que dependan de modelos
@@ -106,6 +106,7 @@ const startServer = async () => {
         invoicesRoutes,
         messagesRoutes,
         notificationsRoutes,
+        cuentasRoutes,
       ] = await Promise.all([
         import('./routes/auth.routes'),
         import('./routes/document.routes'),
@@ -119,6 +120,7 @@ const startServer = async () => {
         import('./routes/invoices.routes'),
         import('./routes/messages.routes'),
         import('./routes/notifications.routes'),
+        import('./routes/cuentas.routes'),
       ]);
 
       if (authRoutes.default) app.use('/api/auth', authRoutes.default);
@@ -133,6 +135,7 @@ const startServer = async () => {
       if (invoicesRoutes.default) app.use('/api/invoices', invoicesRoutes.default);
       if (messagesRoutes.default) app.use('/api/messages', messagesRoutes.default);
       if (notificationsRoutes.default) app.use('/api/notifications', notificationsRoutes.default);
+      if (cuentasRoutes.default) app.use('/api', cuentasRoutes.default);
 
       logger.info('Rutas registradas');
     } catch (err: any) {

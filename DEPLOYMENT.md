@@ -1,312 +1,420 @@
-# Guía de Despliegue - KopTup
+# Guía de Despliegue - KopTup Platform
 
-## 📋 Pre-requisitos
+Esta guía te ayudará a desplegar tu aplicación en **Vercel** (frontend) y **Railway** (backend).
 
-Antes de desplegar, asegúrate de tener:
+## Tabla de Contenidos
+- [Requisitos Previos](#requisitos-previos)
+- [Parte 1: Desplegar Backend en Railway](#parte-1-desplegar-backend-en-railway)
+- [Parte 2: Desplegar Frontend en Vercel](#parte-2-desplegar-frontend-en-vercel)
+- [Parte 3: Configuración Final](#parte-3-configuración-final)
+- [Troubleshooting](#troubleshooting)
 
-- [ ] Cuenta de AWS con S3 configurado
-- [ ] Cuenta de OpenAI con API key
-- [ ] Cuenta de Vercel (para frontend)
-- [ ] Servidor o VPS (para backend) o uso de Vercel Serverless
-- [ ] Base de datos PostgreSQL en producción (AWS RDS, Neon, Supabase, etc.)
-- [ ] Redis en producción (Redis Labs, AWS ElastiCache, Upstash, etc.)
+---
 
-## 🚀 Despliegue Frontend en Vercel
+## Requisitos Previos
 
-### Opción 1: Desde GitHub (Recomendado)
+### Cuentas necesarias:
+- ✅ Cuenta en GitHub (tu código debe estar en un repositorio)
+- ✅ Cuenta en Railway.app (gratuita)
+- ✅ Cuenta en Vercel.com (gratuita)
+- ✅ MongoDB Atlas (opcional, Railway incluye MongoDB)
+- ✅ API Key de OpenAI (REQUERIDO para Cuentas Médicas)
 
-1. **Conectar Repositorio:**
-   - Ve a [vercel.com](https://vercel.com)
-   - Click en "New Project"
-   - Importa tu repositorio de GitHub
-   - Selecciona el directorio raíz: `apps/web`
+### APIs y Servicios:
+- **OpenAI API Key** - https://platform.openai.com/api-keys
+- **AWS S3** (opcional, para archivos)
+- **Pinecone** (opcional, para RAG)
 
-2. **Configurar Variables de Entorno:**
-   ```
-   NEXT_PUBLIC_API_URL=https://tu-backend.com
-   NEXT_PUBLIC_SITE_URL=https://tu-dominio.vercel.app
-   NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
-   ```
+---
 
-3. **Configurar Build:**
-   - Framework Preset: Next.js
-   - Root Directory: `apps/web`
-   - Build Command: `npm run build` (o dejar default)
-   - Output Directory: `.next` (default)
+## Parte 1: Desplegar Backend en Railway
 
-4. **Deploy:**
-   - Click en "Deploy"
-   - Espera a que termine el build
+### Paso 1: Preparar el Repositorio
 
-### Opción 2: CLI de Vercel
-
-```bash
-# Instalar Vercel CLI
-npm i -g vercel
-
-# Login
-vercel login
-
-# Deploy desde el directorio web
-cd apps/web
-vercel --prod
-```
-
-## 🖥️ Despliegue Backend
-
-### Opción 1: VPS/Cloud Server (Recomendado)
-
-#### En DigitalOcean, AWS EC2, o cualquier VPS:
-
-1. **Conectar al servidor:**
+1. **Asegúrate de que tu código esté en GitHub:**
    ```bash
-   ssh root@tu-servidor-ip
+   git add .
+   git commit -m "Preparar para despliegue en Railway"
+   git push origin main
    ```
 
-2. **Instalar Docker y Docker Compose:**
-   ```bash
-   curl -fsSL https://get.docker.com -o get-docker.sh
-   sh get-docker.sh
+2. **Verifica que existan estos archivos en `apps/backend/`:**
+   - ✅ `Procfile`
+   - ✅ `railway.json`
+   - ✅ `.env.example`
+   - ✅ `package.json` con scripts `build` y `start`
 
-   # Docker Compose
-   sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-   sudo chmod +x /usr/local/bin/docker-compose
-   ```
+### Paso 2: Crear Proyecto en Railway
 
-3. **Clonar repositorio:**
-   ```bash
-   git clone https://github.com/tu-usuario/koptup.git
-   cd koptup
-   ```
+1. Ve a https://railway.app
+2. Click en **"New Project"**
+3. Selecciona **"Deploy from GitHub repo"**
+4. Autoriza Railway para acceder a tu GitHub
+5. Selecciona tu repositorio `Soluciones Tecnologicas KopTup`
+6. Railway detectará automáticamente tu app Node.js
 
-4. **Configurar variables de entorno:**
-   ```bash
-   cp .env.example .env
-   nano .env
-   # Editar con tus credenciales de producción
-   ```
+### Paso 3: Configurar el Directorio Raíz
 
-5. **Iniciar servicios:**
-   ```bash
-   docker-compose up -d
-   ```
+1. En Railway, ve a **Settings**
+2. Encuentra **"Root Directory"**
+3. Establece: `apps/backend`
+4. Guarda los cambios
 
-6. **Verificar logs:**
-   ```bash
-   docker-compose logs -f
-   ```
+### Paso 4: Agregar MongoDB
 
-7. **Configurar Nginx como reverse proxy:**
-   ```bash
-   sudo apt install nginx
-   sudo nano /etc/nginx/sites-available/koptup
-   ```
+**Opción A - MongoDB de Railway (Recomendado para empezar):**
+1. Click en **"New"** → **"Database"** → **"Add MongoDB"**
+2. Railway creará automáticamente una instancia
+3. La variable `MONGO_URL` se agregará automáticamente
 
-   Contenido del archivo:
-   ```nginx
-   server {
-       listen 80;
-       server_name api.tudominio.com;
+**Opción B - MongoDB Atlas (Recomendado para producción):**
+1. Ve a https://www.mongodb.com/cloud/atlas
+2. Crea un cluster gratuito
+3. Obtén tu connection string
+4. Agrégalo manualmente en Railway (ver siguiente paso)
 
-       location / {
-           proxy_pass http://localhost:3001;
-           proxy_http_version 1.1;
-           proxy_set_header Upgrade $http_upgrade;
-           proxy_set_header Connection 'upgrade';
-           proxy_set_header Host $host;
-           proxy_cache_bypass $http_upgrade;
-           proxy_set_header X-Real-IP $remote_addr;
-           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-           proxy_set_header X-Forwarded-Proto $scheme;
-       }
-   }
-   ```
+### Paso 5: Agregar Redis (Opcional, para caché)
 
-   ```bash
-   sudo ln -s /etc/nginx/sites-available/koptup /etc/nginx/sites-enabled/
-   sudo nginx -t
-   sudo systemctl restart nginx
-   ```
+1. Click en **"New"** → **"Database"** → **"Add Redis"**
+2. Railway creará la instancia
+3. La variable `REDIS_URL` se agregará automáticamente
 
-8. **Configurar SSL con Let's Encrypt:**
-   ```bash
-   sudo apt install certbot python3-certbot-nginx
-   sudo certbot --nginx -d api.tudominio.com
-   ```
+### Paso 6: Configurar Variables de Entorno
 
-### Opción 2: Railway.app (Más Fácil)
-
-1. Ve a [railway.app](https://railway.app)
-2. Click en "New Project"
-3. Selecciona "Deploy from GitHub repo"
-4. Selecciona tu repositorio
-5. Configura las variables de entorno
-6. Railway detectará automáticamente Docker y lo desplegará
-
-### Opción 3: Render.com
-
-1. Ve a [render.com](https://render.com)
-2. New → Web Service
-3. Conecta tu repositorio
-4. Configura:
-   - Environment: Docker
-   - Docker Command: (dejar vacío)
-   - Variables de entorno
-5. Deploy
-
-## 🗄️ Base de Datos en Producción
-
-### Opción 1: Neon (Recomendado para proyectos pequeños/medianos)
-
-1. Ve a [neon.tech](https://neon.tech)
-2. Crea un nuevo proyecto
-3. Copia la connection string
-4. Ejecuta el schema:
-   ```bash
-   psql "tu-connection-string" < packages/database/init.sql
-   ```
-
-### Opción 2: Supabase
-
-1. Ve a [supabase.com](https://supabase.com)
-2. New project
-3. Copia la connection string (usar modo "Transaction")
-4. Ejecuta el schema en el SQL Editor
-
-### Opción 3: AWS RDS
-
-1. Crear instancia PostgreSQL en AWS RDS
-2. Configurar security groups
-3. Conectar y ejecutar schema
-
-## 💾 Redis en Producción
-
-### Opción 1: Upstash (Recomendado)
-
-1. Ve a [upstash.com](https://upstash.com)
-2. Create Database
-3. Copia la Redis URL
-4. Actualiza REDIS_URL en tu .env
-
-### Opción 2: Redis Labs
-
-1. Ve a [redis.com](https://redis.com)
-2. Create free database
-3. Copia la connection string
-
-## 📦 Almacenamiento S3
-
-1. **Crear bucket en AWS S3:**
-   - Bucket name: `koptup-uploads-prod`
-   - Region: us-east-1 (o tu preferencia)
-   - Block all public access: OFF (para archivos públicos)
-
-2. **Crear IAM user:**
-   - Permisos: `AmazonS3FullAccess`
-   - Copiar Access Key ID y Secret Access Key
-
-3. **Configurar CORS:**
-   ```json
-   [
-     {
-       "AllowedHeaders": ["*"],
-       "AllowedMethods": ["GET", "PUT", "POST", "DELETE"],
-       "AllowedOrigins": ["https://tu-dominio.com"],
-       "ExposeHeaders": []
-     }
-   ]
-   ```
-
-## 🔐 Variables de Entorno en Producción
-
-Asegúrate de configurar todas estas variables:
+En Railway, ve a **"Variables"** y agrega:
 
 ```env
-# Backend
+# ==============================================
+# REQUERIDAS
+# ==============================================
 NODE_ENV=production
-DATABASE_URL=postgresql://user:pass@host:5432/db
-REDIS_URL=redis://host:6379
-JWT_SECRET=tu_jwt_secret_muy_seguro_minimo_32_caracteres
-JWT_REFRESH_SECRET=otro_secret_diferente_32_caracteres
-AWS_ACCESS_KEY_ID=tu_aws_key
-AWS_SECRET_ACCESS_KEY=tu_aws_secret
-AWS_S3_BUCKET=koptup-uploads-prod
-OPENAI_API_KEY=sk-tu_openai_key
-CORS_ORIGIN=https://tu-dominio.vercel.app,https://www.tu-dominio.com
+PORT=3001
 
-# Frontend (Vercel)
-NEXT_PUBLIC_API_URL=https://api.tu-dominio.com
-NEXT_PUBLIC_SITE_URL=https://tu-dominio.vercel.app
+# MongoDB - Railway lo provee automáticamente como MONGO_URL
+# Si usas Atlas, agrégalo manualmente:
+MONGODB_URI=${{MONGO_URL}}
+
+# OpenAI (REQUERIDO para Cuentas Médicas)
+OPENAI_API_KEY=sk-proj-XXXXXXXXXXXXXXXXXXXXXXXXXX
+OPENAI_MODEL=gpt-4o-mini
+
+# JWT
+JWT_SECRET=tu-secreto-super-seguro-aqui-cambiar
+JWT_EXPIRES_IN=7d
+
+# CORS - Déjalo vacío por ahora, lo configuraremos después
+CORS_ORIGIN=
+
+# ==============================================
+# OPCIONALES
+# ==============================================
+
+# AWS S3 (si usas almacenamiento de archivos)
+AWS_ACCESS_KEY_ID=tu-access-key
+AWS_SECRET_ACCESS_KEY=tu-secret-key
+AWS_REGION=us-east-1
+AWS_S3_BUCKET=tu-bucket
+
+# Redis - Railway lo provee automáticamente
+REDIS_URL=${{REDIS_URL}}
+
+# Google OAuth
+GOOGLE_CLIENT_ID=tu-google-client-id
+GOOGLE_CLIENT_SECRET=tu-google-secret
+GOOGLE_CALLBACK_URL=https://tu-app.railway.app/api/auth/google/callback
+
+# Pinecone (para RAG)
+PINECONE_API_KEY=tu-pinecone-key
+PINECONE_INDEX=tu-index
 ```
 
-## 🔄 Actualizaciones Continuas
+### Paso 7: Desplegar
 
-### Con GitHub Actions (ya configurado):
+1. Railway iniciará el despliegue automáticamente
+2. Espera a que termine (2-5 minutos)
+3. Verifica los logs en la sección **"Deployments"**
+4. Busca mensajes como:
+   - ✅ "MongoDB connected successfully"
+   - ✅ "Servidor escuchando en..."
 
-Cada push a `main` disparará:
-1. Tests automáticos
-2. Build de frontend y backend
-3. Deploy a Vercel (frontend)
-4. Build de Docker images
-5. Push a Docker Hub
+### Paso 8: Obtener la URL del Backend
 
-### Deploy manual:
+1. En Railway, ve a **"Settings"**
+2. Click en **"Generate Domain"**
+3. Copia tu URL (ej: `https://tu-app.railway.app`)
+4. **IMPORTANTE:** Guarda esta URL para el siguiente paso
+
+### Paso 9: Verificar que funciona
 
 ```bash
-# Pull últimos cambios
-git pull origin main
-
-# Rebuild y restart
-docker-compose down
-docker-compose build
-docker-compose up -d
+curl https://tu-app.railway.app/health
 ```
 
-## 📊 Monitoreo
-
-### Configurar Sentry (Errores):
-
-```bash
-npm install @sentry/nextjs @sentry/node
+Deberías ver:
+```json
+{
+  "status": "healthy",
+  "timestamp": "2025-11-01T...",
+  "uptime": 123.456
+}
 ```
 
-### Logs:
+---
 
-- Backend: `docker-compose logs -f backend`
-- Frontend: Vercel Dashboard
+## Parte 2: Desplegar Frontend en Vercel
 
-## ✅ Checklist Pre-Deploy
+### Paso 1: Preparar Vercel
 
-- [ ] Todas las variables de entorno configuradas
-- [ ] Base de datos migrada y seedeada
-- [ ] S3 bucket creado y configurado
-- [ ] Redis funcionando
-- [ ] SSL/TLS configurado
-- [ ] CORS correctamente configurado
-- [ ] Rate limiting apropiado para producción
-- [ ] Backups de base de datos configurados
-- [ ] Monitoreo configurado
-- [ ] DNS apuntando correctamente
-- [ ] Emails de notificación configurados
+1. Ve a https://vercel.com
+2. Click en **"Add New Project"**
+3. Importa tu repositorio de GitHub
+4. Vercel detectará automáticamente Next.js
 
-## 🚨 Troubleshooting
+### Paso 2: Configurar el Proyecto
 
-### Error de CORS:
-- Verificar CORS_ORIGIN en backend
-- Verificar que el frontend use HTTPS
+1. **Root Directory:** `apps/web`
+2. **Framework Preset:** Next.js (detectado automáticamente)
+3. **Build Command:** `npm run build` (por defecto)
+4. **Output Directory:** `.next` (por defecto)
 
-### Error de conexión a DB:
-- Verificar firewall y security groups
-- Verificar connection string
+### Paso 3: Variables de Entorno
 
-### Errores 502:
-- Verificar que el backend esté corriendo
-- Verificar configuración de Nginx
-- Revisar logs del backend
+En Vercel, agrega estas variables:
 
-## 📞 Soporte
+```env
+# URL del backend en Railway (del Paso 1.8)
+NEXT_PUBLIC_API_URL=https://tu-app.railway.app
+```
 
-Si tienes problemas durante el despliegue:
-- Revisar logs: `docker-compose logs -f`
-- GitHub Issues
-- Documentación de cada servicio usado
+**IMPORTANTE:** Asegúrate de que NO tenga una `/` al final.
+
+### Paso 4: Desplegar
+
+1. Click en **"Deploy"**
+2. Espera 2-3 minutos
+3. Vercel te dará una URL (ej: `https://tu-app.vercel.app`)
+
+### Paso 5: Verificar que funciona
+
+1. Abre `https://tu-app.vercel.app` en tu navegador
+2. Verifica que el frontend cargue correctamente
+3. Intenta hacer login o cualquier llamada al backend
+
+---
+
+## Parte 3: Configuración Final
+
+### Paso 1: Actualizar CORS en Railway
+
+Ahora que tienes la URL de Vercel, actualiza el CORS:
+
+1. Ve a Railway → Variables
+2. Actualiza `CORS_ORIGIN`:
+   ```
+   https://tu-app.vercel.app
+   ```
+3. Si quieres permitir múltiples orígenes:
+   ```
+   https://tu-app.vercel.app,https://www.tu-dominio.com
+   ```
+4. Railway re-desplegará automáticamente
+
+### Paso 2: Configurar Dominio Personalizado (Opcional)
+
+**En Vercel:**
+1. Ve a **"Settings"** → **"Domains"**
+2. Agrega tu dominio (ej: `www.koptup.com`)
+3. Configura los DNS según las instrucciones
+
+**En Railway:**
+1. Ve a **"Settings"** → **"Networking"**
+2. Agrega tu dominio (ej: `api.koptup.com`)
+3. Configura los DNS según las instrucciones
+
+**Actualiza las variables:**
+- Railway: `CORS_ORIGIN=https://www.koptup.com`
+- Vercel: `NEXT_PUBLIC_API_URL=https://api.koptup.com`
+
+### Paso 3: Habilitar HTTPS (Automático)
+
+Railway y Vercel proveen SSL automáticamente:
+- ✅ Vercel: Certificado SSL automático
+- ✅ Railway: Certificado SSL automático
+
+### Paso 4: Configurar CI/CD (Auto-Deploy)
+
+**Railway:**
+- Ya configurado: cada push a `main` despliega automáticamente
+
+**Vercel:**
+- Ya configurado: cada push a `main` despliega automáticamente
+
+Para cambiar la rama:
+1. Ve a **Settings** → **Git**
+2. Cambia **Production Branch** según necesites
+
+---
+
+## Verificación Final
+
+### Checklist de Despliegue:
+
+Backend (Railway):
+- [ ] MongoDB conectado
+- [ ] Redis conectado (si lo usas)
+- [ ] OpenAI API Key configurada
+- [ ] `/health` responde correctamente
+- [ ] Logs sin errores
+- [ ] CORS configurado con URL de Vercel
+
+Frontend (Vercel):
+- [ ] Build exitoso
+- [ ] `NEXT_PUBLIC_API_URL` configurada
+- [ ] Sitio carga correctamente
+- [ ] Login funciona
+- [ ] Llamadas al backend funcionan
+
+### URLs Importantes:
+
+```
+Frontend: https://tu-app.vercel.app
+Backend:  https://tu-app.railway.app
+Docs API: https://tu-app.railway.app/api-docs
+Health:   https://tu-app.railway.app/health
+```
+
+---
+
+## Troubleshooting
+
+### Problema: "Network Error" en el frontend
+
+**Causa:** CORS no configurado correctamente
+
+**Solución:**
+1. Verifica `CORS_ORIGIN` en Railway incluye tu URL de Vercel
+2. Asegúrate que NO tenga `/` al final
+3. Verifica que `NEXT_PUBLIC_API_URL` en Vercel sea correcta
+
+### Problema: "MongoDB connection failed"
+
+**Causa:** Variable de entorno incorrecta
+
+**Solución:**
+1. En Railway, verifica que `MONGODB_URI` esté configurada
+2. Si usas el MongoDB de Railway, usa: `MONGODB_URI=${{MONGO_URL}}`
+3. Si usas Atlas, verifica tu connection string
+
+### Problema: Build falla en Railway
+
+**Causa:** TypeScript no compila
+
+**Solución:**
+1. Revisa los logs de build
+2. Verifica que `tsconfig.json` exista
+3. Ejecuta `npm run build` localmente para verificar errores
+
+### Problema: "Cannot find module" en Railway
+
+**Causa:** Dependencias no instaladas
+
+**Solución:**
+1. Verifica que todas las dependencias estén en `dependencies` (no en `devDependencies`)
+2. TypeScript types deben estar en `dependencies` para producción:
+   ```bash
+   npm install --save @types/express @types/node
+   ```
+
+### Problema: OpenAI API falla
+
+**Causa:** API Key no configurada o inválida
+
+**Solución:**
+1. Verifica que `OPENAI_API_KEY` esté en Railway
+2. Verifica que la key sea válida en https://platform.openai.com/api-keys
+3. Asegúrate de tener créditos en tu cuenta OpenAI
+
+### Problema: Archivos no se suben
+
+**Causa:** Almacenamiento efímero en Railway
+
+**Solución:**
+Railway usa almacenamiento efímero. Para persistencia:
+1. Usa AWS S3 (recomendado)
+2. Configura las variables `AWS_*` en Railway
+3. O usa Railway Volumes (beta)
+
+---
+
+## Monitoreo y Logs
+
+### Ver logs en Railway:
+1. Ve a tu proyecto
+2. Click en **"Deployments"**
+3. Selecciona el deployment activo
+4. Los logs aparecen en tiempo real
+
+### Ver logs en Vercel:
+1. Ve a tu proyecto
+2. Click en **"Deployments"**
+3. Selecciona el deployment
+4. Click en **"View Function Logs"**
+
+---
+
+## Costos Estimados
+
+### Tier Gratuito (Desarrollo/MVP):
+- **Vercel:** Gratis (100 GB bandwidth, builds ilimitados)
+- **Railway:** $5 de crédito gratis/mes, luego $5-10/mes
+- **MongoDB Atlas:** Tier gratuito 512MB
+- **Total:** $0-10/mes
+
+### Producción (Tráfico medio):
+- **Vercel:** $20/mes (Pro plan)
+- **Railway:** $20-40/mes (dependiendo del uso)
+- **MongoDB Atlas:** $9-25/mes (Shared cluster)
+- **Total:** $49-85/mes
+
+---
+
+## Próximos Pasos
+
+Después del despliegue:
+
+1. **Configurar Monitoreo:**
+   - Railway: Usa métricas integradas
+   - Vercel: Usa Vercel Analytics
+   - Considera Sentry para error tracking
+
+2. **Backups de Base de Datos:**
+   - MongoDB Atlas: Backups automáticos
+   - Railway: Configura backups manuales
+
+3. **Seguridad:**
+   - Revisa rate limiting
+   - Configura helmet.js correctamente
+   - Usa secrets para keys sensibles
+
+4. **Performance:**
+   - Habilita Redis para caché
+   - Optimiza queries de MongoDB
+   - Usa CDN para assets estáticos
+
+---
+
+## Soporte
+
+Si tienes problemas:
+1. Revisa los logs en Railway/Vercel
+2. Verifica las variables de entorno
+3. Prueba localmente primero
+4. Consulta la documentación:
+   - Railway: https://docs.railway.app
+   - Vercel: https://vercel.com/docs
+
+---
+
+**Última actualización:** 2025-11-01
+
+**Desarrollado por:** KopTup - Soluciones Tecnológicas

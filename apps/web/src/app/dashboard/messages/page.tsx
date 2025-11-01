@@ -64,18 +64,36 @@ export default function MessagesPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const safeString = (value: any) =>
+    typeof value === 'string' ? value : value == null ? '' : JSON.stringify(value);
+
   const loadConversations = async () => {
     try {
-      // Try to fetch from API
       const data = await api.getConversations();
-      setConversations(data);
-      if (data.length > 0) {
-        setSelectedConversation(data[0]);
+      const normalized =
+        Array.isArray(data) && data.length
+          ? data.map((c: any) => ({
+              id: String(c.id || c._id || `conv-${Date.now()}`),
+              title: safeString(c.title || c.name || 'Sin título'),
+              projectId: safeString(c.projectId || c.project || ''),
+              lastMessage: safeString(c.lastMessage || c.preview || ''),
+              lastMessageTime: safeString(c.lastMessageTime || c.updatedAt || new Date().toISOString()),
+              unreadCount: Number(c.unreadCount || 0),
+              avatar: safeString(c.avatar || c.image || ''),
+              participants: Array.isArray(c.participants) ? c.participants.map(String) : [],
+              status: c.status === 'archived' ? 'archived' : 'active',
+            }))
+          : [];
+
+      if (normalized.length > 0) {
+        setConversations(normalized);
+        setSelectedConversation((prev) => prev ?? normalized[0]);
+      } else {
+        throw new Error('No conversations returned from API');
       }
     } catch (error) {
       console.error('Failed to load conversations from API, using fallback data:', error);
 
-      // Fallback to mock data if API fails
       const mockConversations: Conversation[] = [
         {
           id: 'conv-001',
@@ -128,15 +146,49 @@ export default function MessagesPage() {
     }
   };
 
+  const transformApiMessage = (apiMessage: any): Message => {
+    const id = String(apiMessage.id || apiMessage._id || `msg-${Date.now()}`);
+    const senderId = String(apiMessage.senderId || apiMessage.sender || 'unknown');
+    const senderName = safeString(apiMessage.senderName || apiMessage.senderName || apiMessage.sender || 'Desconocido');
+    const content = safeString(apiMessage.content ?? apiMessage.text ?? apiMessage.body ?? '');
+    const timestamp = safeString(apiMessage.timestamp || apiMessage.createdAt || new Date().toISOString());
+    const isOwnMessage = Boolean(apiMessage.isOwnMessage || apiMessage.fromSelf || apiMessage.senderId === 'user-001');
+    const status = (apiMessage.status as Message['status']) || (apiMessage.read ? 'read' : 'sent');
+
+    return {
+      id,
+      senderId,
+      senderName,
+      content,
+      timestamp,
+      isOwnMessage,
+      status,
+    };
+  };
+
   const loadMessages = async (conversationId: string) => {
     try {
-      // Try to fetch from API
-      const data = await api.getConversationById(conversationId);
-      setMessages(data.messages || data);
-    } catch (error) {
-      console.error('Failed to load messages from API, using fallback data:', error);
+      // Try API first if available
+      if (typeof api.getMessages === 'function') {
+        const apiMessages = await api.getMessages(conversationId);
+        if (Array.isArray(apiMessages)) {
+          const normalized = apiMessages.map(transformApiMessage);
+          setMessages(normalized);
+          return;
+        }
+      }
 
-      // Fallback to mock data if API fails
+      // If API not available or returned invalid data, try api.getConversationMessages or fallback
+      if (typeof (api as any).getConversationMessages === 'function') {
+        const apiMessages = await (api as any).getConversationMessages(conversationId);
+        if (Array.isArray(apiMessages)) {
+          const normalized = apiMessages.map(transformApiMessage);
+          setMessages(normalized);
+          return;
+        }
+      }
+
+      // Fallback to mock data
       const mockMessages: Message[] = [
         {
           id: 'msg-001',
@@ -160,7 +212,8 @@ export default function MessagesPage() {
           id: 'msg-003',
           senderId: 'team-001',
           senderName: 'María González - KopTup',
-          content: 'Hemos completado la primera fase del desarrollo que incluye el módulo de autenticación y el dashboard principal.',
+          content:
+            'Hemos completado la primera fase del desarrollo que incluye el módulo de autenticación y el dashboard principal.',
           timestamp: '2025-10-11T09:16:00',
           isOwnMessage: false,
           status: 'read',
@@ -204,25 +257,24 @@ export default function MessagesPage() {
       ];
 
       setMessages(mockMessages);
+    } catch (error) {
+      console.error('Failed to load messages (mock fallback)', error);
+      setMessages([]); // fallback seguro
     }
   };
 
   const markAsRead = async (conversationId: string) => {
     try {
-      // Try to mark as read via API
-      await api.markConversationAsRead(conversationId);
-      setConversations(prev =>
-        prev.map(conv =>
-          conv.id === conversationId ? { ...conv, unreadCount: 0 } : conv
-        )
+      if (typeof api.markConversationAsRead === 'function') {
+        await api.markConversationAsRead(conversationId);
+      }
+      setConversations((prev) =>
+        prev.map((conv) => (conv.id === conversationId ? { ...conv, unreadCount: 0 } : conv))
       );
     } catch (error) {
       console.error('Failed to mark conversation as read via API, updating locally:', error);
-      // Update locally even if API fails
-      setConversations(prev =>
-        prev.map(conv =>
-          conv.id === conversationId ? { ...conv, unreadCount: 0 } : conv
-        )
+      setConversations((prev) =>
+        prev.map((conv) => (conv.id === conversationId ? { ...conv, unreadCount: 0 } : conv))
       );
     }
   };
@@ -241,12 +293,11 @@ export default function MessagesPage() {
       status: 'sent',
     };
 
-    setMessages(prev => [...prev, message]);
+    setMessages((prev) => [...prev, message]);
     setNewMessage('');
 
-    // Update conversation last message
-    setConversations(prev =>
-      prev.map(conv =>
+    setConversations((prev) =>
+      prev.map((conv) =>
         conv.id === selectedConversation.id
           ? { ...conv, lastMessage: messageContent, lastMessageTime: new Date().toISOString() }
           : conv
@@ -254,14 +305,14 @@ export default function MessagesPage() {
     );
 
     try {
-      // Try to send message via API
-      await api.sendMessage({
-        conversationId: selectedConversation.id,
-        content: messageContent,
-      });
+      if (typeof api.sendMessage === 'function') {
+        await api.sendMessage({
+          conversationId: selectedConversation.id,
+          content: messageContent,
+        });
+      }
     } catch (error) {
       console.error('Failed to send message via API:', error);
-      // Message already added optimistically, so we keep it in the UI
     }
   };
 
@@ -301,9 +352,10 @@ export default function MessagesPage() {
     }
   };
 
-  const filteredConversations = conversations.filter(conv =>
-    (conv.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (conv.lastMessage || '').toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredConversations = conversations.filter(
+    (conv) =>
+      (conv.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (conv.lastMessage || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
@@ -319,23 +371,17 @@ export default function MessagesPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">
-            Mensajes
-          </h1>
+          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">Mensajes</h1>
           <p className="text-secondary-600 dark:text-secondary-400">
             Comunícate con el equipo de KopTup sobre tus proyectos
           </p>
         </div>
 
-        {/* Messages Container */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-280px)]">
-          {/* Conversations List */}
           <div className="lg:col-span-1">
             <Card variant="bordered" className="h-full flex flex-col">
               <CardContent className="p-4 flex-1 overflow-hidden flex flex-col">
-                {/* Search */}
                 <div className="mb-4">
                   <div className="relative">
                     <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-secondary-400" />
@@ -349,13 +395,10 @@ export default function MessagesPage() {
                   </div>
                 </div>
 
-                {/* Conversations */}
                 <div className="flex-1 overflow-y-auto space-y-2">
                   {filteredConversations.length === 0 ? (
                     <div className="text-center py-8">
-                      <p className="text-secondary-600 dark:text-secondary-400">
-                        No se encontraron conversaciones
-                      </p>
+                      <p className="text-secondary-600 dark:text-secondary-400">No se encontraron conversaciones</p>
                     </div>
                   ) : (
                     filteredConversations.map((conv) => (
@@ -374,9 +417,7 @@ export default function MessagesPage() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between mb-1">
-                              <h4 className="font-semibold text-sm text-secondary-900 dark:text-white truncate">
-                                {conv.title}
-                              </h4>
+                              <h4 className="font-semibold text-sm text-secondary-900 dark:text-white truncate">{conv.title}</h4>
                               {conv.unreadCount > 0 && (
                                 <Badge variant="secondary" size="sm" className="ml-2 bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300">
                                   {conv.unreadCount}
@@ -384,15 +425,13 @@ export default function MessagesPage() {
                               )}
                             </div>
                             <p className="text-xs text-secondary-600 dark:text-secondary-400 truncate mb-1">
-                              {conv.lastMessage}
+                              {typeof conv.lastMessage === 'string' ? conv.lastMessage : safeString(conv.lastMessage)}
                             </p>
                             <div className="flex items-center justify-between">
                               <Badge variant="secondary" size="sm">
                                 {conv.projectId}
                               </Badge>
-                              <span className="text-xs text-secondary-500">
-                                {formatTime(conv.lastMessageTime)}
-                              </span>
+                              <span className="text-xs text-secondary-500">{formatTime(conv.lastMessageTime)}</span>
                             </div>
                           </div>
                         </div>
@@ -404,19 +443,15 @@ export default function MessagesPage() {
             </Card>
           </div>
 
-          {/* Chat Area */}
           <div className="lg:col-span-2">
             {selectedConversation ? (
               <Card variant="bordered" className="h-full flex flex-col">
-                {/* Chat Header */}
                 <div className="border-b border-secondary-200 dark:border-secondary-700 p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-lg font-semibold text-secondary-900 dark:text-white">
-                        {selectedConversation.title}
-                      </h3>
+                      <h3 className="text-lg font-semibold text-secondary-900 dark:text-white">{selectedConversation.title}</h3>
                       <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                        {selectedConversation.participants.join(', ')}
+                        {selectedConversation.participants?.join(', ') || 'Sin participantes'}
                       </p>
                     </div>
                     <Badge variant="primary" size="sm">
@@ -425,45 +460,41 @@ export default function MessagesPage() {
                   </div>
                 </div>
 
-                {/* Messages */}
                 <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${message.isOwnMessage ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div className={`max-w-[70%] ${message.isOwnMessage ? 'order-2' : 'order-1'}`}>
-                        {!message.isOwnMessage && (
-                          <p className="text-xs font-medium text-secondary-600 dark:text-secondary-400 mb-1">
-                            {message.senderName}
-                          </p>
-                        )}
-                        <div
-                          className={`rounded-lg p-3 ${
-                            message.isOwnMessage
-                              ? 'bg-primary-600 text-white'
-                              : 'bg-secondary-100 dark:bg-secondary-800 text-secondary-900 dark:text-white'
-                          }`}
-                        >
-                          <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                        </div>
-                        <div className={`flex items-center gap-1 mt-1 ${message.isOwnMessage ? 'justify-end' : 'justify-start'}`}>
-                          <span className="text-xs text-secondary-500">
-                            {formatTime(message.timestamp)}
-                          </span>
-                          {message.isOwnMessage && (
-                            <span className="text-secondary-500">
-                              {getMessageStatusIcon(message.status)}
-                            </span>
+                  {messages.map((message) => {
+                    const messageId = String(message?.id || `msg-${Date.now()}`);
+                    const messageContent = typeof message?.content === 'string' ? message.content : safeString(message?.content);
+                    const messageSenderName = safeString(message?.senderName || 'Desconocido');
+                    const messageTimestamp = safeString(message?.timestamp || new Date().toISOString());
+                    const messageIsOwnMessage = Boolean(message?.isOwnMessage);
+                    const messageStatus = message?.status || 'sent';
+
+                    return (
+                      <div key={messageId} className={`flex ${messageIsOwnMessage ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[70%] ${messageIsOwnMessage ? 'order-2' : 'order-1'}`}>
+                          {!messageIsOwnMessage && (
+                            <p className="text-xs font-medium text-secondary-600 dark:text-secondary-400 mb-1">
+                              {messageSenderName}
+                            </p>
                           )}
+                          <div
+                            className={`rounded-lg p-3 ${
+                              messageIsOwnMessage ? 'bg-primary-600 text-white' : 'bg-secondary-100 dark:bg-secondary-800 text-secondary-900 dark:text-white'
+                            }`}
+                          >
+                            <p className="text-sm whitespace-pre-wrap">{messageContent}</p>
+                          </div>
+                          <div className={`flex items-center gap-1 mt-1 ${messageIsOwnMessage ? 'justify-end' : 'justify-start'}`}>
+                            <span className="text-xs text-secondary-500">{formatTime(messageTimestamp)}</span>
+                            {messageIsOwnMessage && <span className="text-secondary-500">{getMessageStatusIcon(messageStatus)}</span>}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                   <div ref={messagesEndRef} />
                 </CardContent>
 
-                {/* Message Input */}
                 <div className="border-t border-secondary-200 dark:border-secondary-700 p-4">
                   <div className="flex items-end gap-2">
                     <button
@@ -482,26 +513,18 @@ export default function MessagesPage() {
                         className="w-full px-4 py-2 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
                       />
                     </div>
-                    <Button
-                      onClick={sendMessage}
-                      disabled={!newMessage.trim()}
-                      className="flex-shrink-0"
-                    >
+                    <Button onClick={sendMessage} disabled={!newMessage.trim()} className="flex-shrink-0">
                       <PaperAirplaneIcon className="h-5 w-5" />
                     </Button>
                   </div>
-                  <p className="text-xs text-secondary-500 mt-2">
-                    Presiona Enter para enviar, Shift + Enter para nueva línea
-                  </p>
+                  <p className="text-xs text-secondary-500 mt-2">Presiona Enter para enviar, Shift + Enter para nueva línea</p>
                 </div>
               </Card>
             ) : (
               <Card variant="bordered" className="h-full flex items-center justify-center">
                 <div className="text-center">
                   <UserCircleIcon className="h-16 w-16 text-secondary-400 mx-auto mb-4" />
-                  <p className="text-secondary-600 dark:text-secondary-400">
-                    Selecciona una conversación para comenzar
-                  </p>
+                  <p className="text-secondary-600 dark:text-secondary-400">Selecciona una conversación para comenzar</p>
                 </div>
               </Card>
             )}
