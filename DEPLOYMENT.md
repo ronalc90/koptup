@@ -287,6 +287,23 @@ Health:   https://tu-app.railway.app/health
 
 ## Troubleshooting
 
+### Problema: "npm ci" falla en Railway con "cannot find package-lock.json"
+
+**Causa:** Railway detectó un Dockerfile y lo está usando en lugar de Nixpacks
+
+**Solución:**
+1. El `Dockerfile` en `apps/backend/` ha sido renombrado a `Dockerfile.backup`
+2. Asegúrate de hacer commit y push de los cambios:
+   ```bash
+   git add .
+   git commit -m "Fix Railway deployment: use Nixpacks instead of Docker"
+   git push origin main
+   ```
+3. Railway automáticamente re-desplegará usando Nixpacks
+4. Verifica en Railway Settings que "Builder" esté en "NIXPACKS"
+
+**Nota:** Si quieres usar Docker en el futuro, necesitas copiar `package-lock.json` a `apps/backend/` o ajustar el Dockerfile para trabajar con el monorepo.
+
 ### Problema: "Network Error" en el frontend
 
 **Causa:** CORS no configurado correctamente
