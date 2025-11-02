@@ -135,7 +135,7 @@ const categories = ['All', ...Object.keys(grouped)];
 
 // Filtrado de tecnologías basado en búsqueda y categoría activa
 const filtered = useMemo(() => {
-  let result = { ...grouped };
+  let result: Record<string, string[]> = { ...grouped };
 
   // Filtrar por categoría activa
   if (activeCat !== 'All') {
@@ -160,6 +160,7 @@ const filtered = useMemo(() => {
   }
 
   return result;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [query, activeCat]);
 
 
@@ -432,7 +433,7 @@ const filtered = useMemo(() => {
           {Object.entries(filtered).length === 0 ? (
             <div className="text-center py-12">
               <p className="text-secondary-600 dark:text-secondary-400">
-                No technologies found matching "{query}"
+                No technologies found matching &quot;{query}&quot;
               </p>
             </div>
           ) : (
