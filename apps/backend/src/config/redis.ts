@@ -59,22 +59,43 @@ export const getRedisClient = async (): Promise<RedisClientType> => {
 };
 
 // Lazy-initialized client for synchronous access (may not be connected)
+// Gracefully handles Redis unavailability for development
 export const redis = {
   get: async (...args: Parameters<RedisClientType['get']>) => {
-    const client = await getRedisClient();
-    return client.get(...args);
+    try {
+      const client = await getRedisClient();
+      return client.get(...args);
+    } catch (err) {
+      logger.warn('Redis unavailable, returning null for GET operation');
+      return null;
+    }
   },
   set: async (...args: Parameters<RedisClientType['set']>) => {
-    const client = await getRedisClient();
-    return client.set(...args);
+    try {
+      const client = await getRedisClient();
+      return client.set(...args);
+    } catch (err) {
+      logger.warn('Redis unavailable, SET operation skipped');
+      return null;
+    }
   },
   setEx: async (...args: Parameters<RedisClientType['setEx']>) => {
-    const client = await getRedisClient();
-    return client.setEx(...args);
+    try {
+      const client = await getRedisClient();
+      return client.setEx(...args);
+    } catch (err) {
+      logger.warn('Redis unavailable, SETEX operation skipped');
+      return null;
+    }
   },
   del: async (...args: Parameters<RedisClientType['del']>) => {
-    const client = await getRedisClient();
-    return client.del(...args);
+    try {
+      const client = await getRedisClient();
+      return client.del(...args);
+    } catch (err) {
+      logger.warn('Redis unavailable, DEL operation skipped');
+      return 0;
+    }
   },
 };
 
