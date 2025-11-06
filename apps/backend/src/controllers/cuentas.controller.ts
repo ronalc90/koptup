@@ -1,6 +1,15 @@
 import { Request, Response } from 'express';
 import { CuentaMedica } from '../models/CuentaMedica';
 import { logger } from '../utils/logger';
+import { procesarCuentaMedicaHibrida } from '../services/cuenta-medica-hybrid.service';
+import {
+  searchCUPS,
+  searchMedicamentos,
+  searchDiagnosticos,
+  searchMaterialesInsumos,
+  calcularTarifaProcedimientos,
+  calcularCostoMedicamentos,
+} from '../services/medical-search.service';
 
 /**
  * Create a new cuenta médica

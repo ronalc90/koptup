@@ -18,6 +18,15 @@ import {
   processCuentasAndGenerateExcel,
   exportExcelFile,
 } from '../controllers/process.controller';
+import {
+  procesarCuentaHibrida,
+  buscarCUPS,
+  buscarMedicamentos,
+  buscarDiagnosticos,
+  buscarMaterialesInsumos,
+  calcularTarifa,
+  calcularCostoMeds,
+} from '../controllers/cuentas-hybrid.controller';
 import { upload, handleUploadError } from '../middleware/upload';
 import multer from 'multer';
 import path from 'path';
@@ -301,5 +310,110 @@ router.post('/process', processCuentasAndGenerateExcel as RequestHandler);
  *           type: string
  */
 router.get('/export', exportExcelFile as RequestHandler);
+
+// ========================================
+// HYBRID PROCESSING ROUTES (DB + OpenAI)
+// ========================================
+
+/**
+ * @swagger
+ * /api/cuentas/procesar-hibrido:
+ *   post:
+ *     tags: [Cuentas Hibridas]
+ *     summary: Process medical bill using hybrid architecture (DB + OpenAI)
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               pdfPath:
+ *                 type: string
+ *               tipoTarifa:
+ *                 type: string
+ *                 enum: [SOAT, ISS2001, ISS2004]
+ */
+router.post('/cuentas/procesar-hibrido', procesarCuentaHibrida as RequestHandler);
+
+/**
+ * @swagger
+ * /api/cuentas/search/cups:
+ *   get:
+ *     tags: [Busqueda]
+ *     summary: Search CUPS codes
+ *     parameters:
+ *       - in: query
+ *         name: codigo
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: descripcion
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: categoria
+ *         schema:
+ *           type: string
+ */
+router.get('/cuentas/search/cups', buscarCUPS as RequestHandler);
+
+/**
+ * @swagger
+ * /api/cuentas/search/medicamentos:
+ *   get:
+ *     tags: [Busqueda]
+ *     summary: Search medications
+ */
+router.get('/cuentas/search/medicamentos', buscarMedicamentos as RequestHandler);
+
+/**
+ * @swagger
+ * /api/cuentas/search/diagnosticos:
+ *   get:
+ *     tags: [Busqueda]
+ *     summary: Search ICD-10 diagnoses
+ */
+router.get('/cuentas/search/diagnosticos', buscarDiagnosticos as RequestHandler);
+
+/**
+ * @swagger
+ * /api/cuentas/search/materiales:
+ *   get:
+ *     tags: [Busqueda]
+ *     summary: Search materials and supplies
+ */
+router.get('/cuentas/search/materiales', buscarMaterialesInsumos as RequestHandler);
+
+/**
+ * @swagger
+ * /api/cuentas/calcular-tarifa:
+ *   post:
+ *     tags: [Calculos]
+ *     summary: Calculate procedure fees
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               codigosCUPS:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               tipoTarifa:
+ *                 type: string
+ */
+router.post('/cuentas/calcular-tarifa', calcularTarifa as RequestHandler);
+
+/**
+ * @swagger
+ * /api/cuentas/calcular-costo-medicamentos:
+ *   post:
+ *     tags: [Calculos]
+ *     summary: Calculate medication costs
+ */
+router.post('/cuentas/calcular-costo-medicamentos', calcularCostoMeds as RequestHandler);
 
 export default router;
