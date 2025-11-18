@@ -189,19 +189,6 @@ class ApiClient {
     return response.data;
   }
 
-  // Blog endpoints
-  async getBlogPosts(params?: { page?: number; limit?: number; locale?: string }) {
-    const response = await this.client.get('/api/blog/posts', { params });
-    return response.data;
-  }
-
-  async getBlogPost(slug: string, locale?: string) {
-    const response = await this.client.get(`/api/blog/posts/${slug}`, {
-      params: { locale },
-    });
-    return response.data;
-  }
-
   // Project management endpoints
   async getDashboardStats() {
     const response = await this.client.get('/api/projects/dashboard/stats');
