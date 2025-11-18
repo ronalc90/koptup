@@ -41,8 +41,12 @@ class ApiClient {
       async (error: AxiosError) => {
         const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
 
-        // Handle 401 errors (token expired)
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        // Don't try to refresh token for login/register endpoints
+        const isAuthEndpoint = originalRequest.url?.includes('/api/auth/login') ||
+                               originalRequest.url?.includes('/api/auth/register');
+
+        // Handle 401 errors (token expired) - but not for auth endpoints
+        if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
           originalRequest._retry = true;
 
           try {

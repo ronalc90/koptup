@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
-import { v4 as uuidv4 } from 'uuid';
 import { validationResult } from 'express-validator';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
-import { db } from '../config/database';
+import Quote from '../models/Quote';
 import { logger } from '../utils/logger';
 
 export const submitQuote = asyncHandler(async (req: Request, res: Response) => {
@@ -11,13 +10,15 @@ export const submitQuote = asyncHandler(async (req: Request, res: Response) => {
     throw new AppError('Validation error', 400);
   }
 
-  const { name, email, phone, company, service, plan, budget, description, requirements } = req.body;
+  const { name, email, service, description } = req.body;
 
-  const id = uuidv4();
-  await db.query(
-    'INSERT INTO quote_requests (id, name, email, phone, company, service, plan, budget, description, requirements) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',
-    [id, name, email, phone || null, company || null, service, plan || null, budget || null, description, JSON.stringify(requirements || {})]
-  );
+  await Quote.create({
+    name,
+    email,
+    service,
+    description,
+    status: 'pending',
+  });
 
   logger.info(`Quote request submitted: ${email}`);
 
