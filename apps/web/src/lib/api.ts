@@ -41,8 +41,12 @@ class ApiClient {
       async (error: AxiosError) => {
         const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
 
-        // Handle 401 errors (token expired)
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        // Don't try to refresh token for login/register endpoints
+        const isAuthEndpoint = originalRequest.url?.includes('/api/auth/login') ||
+                               originalRequest.url?.includes('/api/auth/register');
+
+        // Handle 401 errors (token expired) - but not for auth endpoints
+        if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
           originalRequest._retry = true;
 
           try {
@@ -186,19 +190,6 @@ class ApiClient {
   // Quote request
   async requestQuote(data: any) {
     const response = await this.client.post('/api/quotes', data);
-    return response.data;
-  }
-
-  // Blog endpoints
-  async getBlogPosts(params?: { page?: number; limit?: number; locale?: string }) {
-    const response = await this.client.get('/api/blog/posts', { params });
-    return response.data;
-  }
-
-  async getBlogPost(slug: string, locale?: string) {
-    const response = await this.client.get(`/api/blog/posts/${slug}`, {
-      params: { locale },
-    });
     return response.data;
   }
 

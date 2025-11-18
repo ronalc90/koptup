@@ -7,7 +7,7 @@ import mammoth from 'mammoth';
 import { AuthRequest } from '../types';
 import { AppError, asyncHandler } from '../middleware/errorHandler';
 import { logger } from '../utils/logger';
-import { db } from '../config/database';
+import Document from '../models/Document';
 import { uploadToS3, deleteFromS3 } from '../services/storage.service';
 import { processDocumentEmbeddings } from '../services/embedding.service';
 
@@ -51,20 +51,15 @@ export const uploadDocument = asyncHandler(
       }
 
       // Save document metadata to database
-      await db.query(
-        `INSERT INTO documents (id, user_id, filename, original_filename, file_path, file_size, mime_type, text_content, created_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())`,
-        [
-          documentId,
-          req.user.id,
-          file.filename,
-          file.originalname,
-          fileUrl,
-          file.size,
-          file.mimetype,
-          extractedText,
-        ]
-      );
+      await Document.create({
+        user_id: req.user.id,
+        filename: file.filename,
+        original_filename: file.originalname,
+        file_path: fileUrl,
+        file_size: file.size,
+        mime_type: file.mimetype,
+        text_content: extractedText,
+      });
 
       // Process embeddings asynchronously (don't block response)
       if (extractedText && process.env.OPENAI_API_KEY) {
@@ -101,17 +96,20 @@ export const getDocuments = asyncHandler(
       throw new AppError('Unauthorized', 401);
     }
 
-    const result = await db.query(
-      `SELECT id, filename, original_filename, file_size, mime_type, created_at
-       FROM documents
-       WHERE user_id = $1
-       ORDER BY created_at DESC`,
-      [req.user.id]
-    );
+    const documents = await Document.find({ user_id: req.user.id })
+      .select('_id filename original_filename file_size mime_type created_at')
+      .sort({ created_at: -1 });
 
     res.json({
       success: true,
-      data: result.rows,
+      data: documents.map(doc => ({
+        id: doc._id,
+        filename: doc.filename,
+        original_filename: doc.original_filename,
+        file_size: doc.file_size,
+        mime_type: doc.mime_type,
+        created_at: doc.created_at,
+      })),
     });
   }
 );
@@ -125,16 +123,13 @@ export const deleteDocument = asyncHandler(
     const { id } = req.params;
 
     // Get document
-    const result = await db.query(
-      'SELECT file_path FROM documents WHERE id = $1 AND user_id = $2',
-      [id, req.user.id]
-    );
+    const document = await Document.findOne({ _id: id, user_id: req.user.id });
 
-    if (result.rows.length === 0) {
+    if (!document) {
       throw new AppError('Document not found', 404);
     }
 
-    const filePath = result.rows[0].file_path;
+    const filePath = document.file_path;
 
     // Delete from S3 if applicable
     if (filePath.startsWith('https://')) {
@@ -146,7 +141,7 @@ export const deleteDocument = asyncHandler(
     }
 
     // Delete from database
-    await db.query('DELETE FROM documents WHERE id = $1', [id]);
+    await Document.deleteOne({ _id: id });
 
     logger.info(`Document deleted: ${id} by user ${req.user.email}`);
 

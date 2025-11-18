@@ -100,26 +100,6 @@ CREATE TABLE IF NOT EXISTS quote_requests (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Blog posts table
-CREATE TABLE IF NOT EXISTS blog_posts (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    slug VARCHAR(255) UNIQUE NOT NULL,
-    title_es VARCHAR(500) NOT NULL,
-    title_en VARCHAR(500) NOT NULL,
-    content_es TEXT NOT NULL,
-    content_en TEXT NOT NULL,
-    excerpt_es TEXT,
-    excerpt_en TEXT,
-    author_id UUID REFERENCES users(id) ON DELETE SET NULL,
-    category VARCHAR(100),
-    tags JSONB,
-    featured_image TEXT,
-    is_published BOOLEAN DEFAULT false,
-    published_at TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 -- Admin settings
 CREATE TABLE IF NOT EXISTS settings (
     key VARCHAR(255) PRIMARY KEY,
@@ -137,8 +117,6 @@ CREATE INDEX IF NOT EXISTS idx_chat_sessions_token ON chat_sessions(session_toke
 CREATE INDEX IF NOT EXISTS idx_chat_messages_session_id ON chat_messages(session_id);
 CREATE INDEX IF NOT EXISTS idx_contact_submissions_status ON contact_submissions(status);
 CREATE INDEX IF NOT EXISTS idx_quote_requests_status ON quote_requests(status);
-CREATE INDEX IF NOT EXISTS idx_blog_posts_slug ON blog_posts(slug);
-CREATE INDEX IF NOT EXISTS idx_blog_posts_published ON blog_posts(is_published, published_at DESC);
 
 -- Create updated_at trigger function
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -160,9 +138,6 @@ CREATE TRIGGER update_chat_sessions_updated_at BEFORE UPDATE ON chat_sessions
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_quote_requests_updated_at BEFORE UPDATE ON quote_requests
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_blog_posts_updated_at BEFORE UPDATE ON blog_posts
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Insert default admin user (password: Admin123!)
