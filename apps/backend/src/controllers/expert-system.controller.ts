@@ -93,7 +93,7 @@ export async function procesarConSistemaExperto(req: Request, res: Response) {
         cuentaId,
         resultados,
         resumenGeneral: {
-          archivosProces ados: resultados.length,
+          archivosProcesados: resultados.length,
           totalFacturado: resultados.reduce((sum, r) => sum + r.resultado.resumen.totalFacturado, 0),
           totalGlosado: resultados.reduce((sum, r) => sum + r.resultado.resumen.totalGlosado, 0),
           totalAPagar: resultados.reduce((sum, r) => sum + r.resultado.resumen.totalAPagar, 0),
