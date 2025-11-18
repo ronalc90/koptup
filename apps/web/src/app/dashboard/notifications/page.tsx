@@ -250,7 +250,7 @@ export default function NotificationsPage() {
       message: { variant: 'warning', text: 'Mensaje' },
       system: { variant: 'default', text: 'Sistema' },
     };
-    const badge = badges[type];
+    const badge = badges[type] || { variant: 'default', text: 'Notificación' };
     return <Badge variant={badge.variant} size="sm">{badge.text}</Badge>;
   };
 
