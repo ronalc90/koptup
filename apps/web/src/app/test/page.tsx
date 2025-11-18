@@ -16,10 +16,11 @@ interface TestResult {
   statusCode?: number;
   data?: any;
   error?: string;
+  rawResponse?: string;
   timestamp?: Date;
 }
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'https://koptupbackend-production.up.railway.app';
+const DEFAULT_BACKEND_URL = 'https://koptupbackend-production.up.railway.app';
 
 const endpoints: EndpointTest[] = [
   // Health & System
@@ -184,6 +185,7 @@ const endpoints: EndpointTest[] = [
 ];
 
 export default function TestPage() {
+  const [backendUrl, setBackendUrl] = useState(DEFAULT_BACKEND_URL);
   const [results, setResults] = useState<Record<string, TestResult>>({});
   const [expandedResults, setExpandedResults] = useState<Set<string>>(new Set());
 
@@ -195,7 +197,7 @@ export default function TestPage() {
     }));
 
     try {
-      const url = `${BACKEND_URL}${endpoint.url}`;
+      const url = `${backendUrl}${endpoint.url}`;
       console.log(`Testing ${endpoint.method} ${url}`);
 
       const options: RequestInit = {
@@ -211,7 +213,18 @@ export default function TestPage() {
       }
 
       const response = await fetch(url, options);
-      const data = await response.json();
+      const responseText = await response.text();
+
+      let data: any;
+      let rawResponse: string | undefined;
+
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        // No es JSON, guardar la respuesta raw
+        rawResponse = responseText;
+        data = { error: 'Respuesta no es JSON válido', preview: responseText.substring(0, 200) };
+      }
 
       setResults((prev) => ({
         ...prev,
@@ -219,6 +232,7 @@ export default function TestPage() {
           status: response.ok ? 'success' : 'error',
           statusCode: response.status,
           data,
+          rawResponse,
           timestamp: new Date(),
         },
       }));
@@ -292,9 +306,22 @@ export default function TestPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Panel de Prueba de Endpoints
           </h1>
-          <p className="text-gray-600 mb-4">
-            Backend URL: <code className="bg-gray-100 px-2 py-1 rounded">{BACKEND_URL}</code>
-          </p>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              URL del Backend:
+            </label>
+            <input
+              type="text"
+              value={backendUrl}
+              onChange={(e) => setBackendUrl(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+              placeholder="https://koptupbackend-production.up.railway.app"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Modifica esta URL si necesitas probar contra un backend diferente (local o producción)
+            </p>
+          </div>
 
           <div className="flex gap-4">
             <button
@@ -376,7 +403,7 @@ export default function TestPage() {
                   )}
                 </div>
 
-                {(result.data || result.error) && (
+                {(result.data || result.error || result.rawResponse) && (
                   <div className="p-4 bg-gray-50">
                     <button
                       onClick={() => toggleExpanded(endpoint.name)}
@@ -393,10 +420,20 @@ export default function TestPage() {
                             <p className="text-sm text-red-700">{result.error}</p>
                           </div>
                         )}
-                        {result.data && (
+                        {result.rawResponse && (
+                          <div className="bg-yellow-50 border border-yellow-200 rounded p-3 mb-2">
+                            <p className="text-sm font-semibold text-yellow-800 mb-1">
+                              Respuesta Raw (No JSON):
+                            </p>
+                            <pre className="text-xs text-yellow-900 overflow-x-auto bg-white p-2 rounded max-h-96 overflow-y-auto">
+                              {result.rawResponse}
+                            </pre>
+                          </div>
+                        )}
+                        {result.data && !result.rawResponse && (
                           <div className="bg-white border border-gray-200 rounded p-3">
                             <p className="text-sm font-semibold text-gray-800 mb-2">
-                              Respuesta:
+                              Respuesta JSON:
                             </p>
                             <pre className="text-xs text-gray-700 overflow-x-auto bg-gray-50 p-2 rounded">
                               {JSON.stringify(result.data, null, 2)}
