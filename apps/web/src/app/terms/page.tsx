@@ -13,14 +13,31 @@ import {
   CodeBracketIcon,
 } from '@heroicons/react/24/outline';
 
+interface ContentItem {
+  subtitle?: string;
+  text: string;
+}
+
+interface Section {
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  title: string;
+  content: ContentItem[];
+}
+
+interface AdditionalTerm {
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  title: string;
+  content: string;
+}
+
 export default function TermsPage() {
-  const sections = [
+  const sections: Section[] = [
     {
       icon: DocumentCheckIcon,
       title: '1. Aceptación de los Términos',
       content: [
         {
-          text: 'Al acceder y utilizar los servicios de KopTup - Soluciones Tecnológicas ("KopTup", "nosotros", "nuestro"), usted acepta estar legalmente vinculado por estos Términos y Condiciones. Si no está de acuerdo con alguna parte de estos términos, no debe utilizar nuestros servicios.',
+          text: 'Al acceder y utilizar los servicios de KopTup - Soluciones Tecnológicas (&quot;KopTup&quot;, &quot;nosotros&quot;, &quot;nuestro&quot;), usted acepta estar legalmente vinculado por estos Términos y Condiciones. Si no está de acuerdo con alguna parte de estos términos, no debe utilizar nuestros servicios.',
         },
         {
           text: 'Estos términos se aplican a todos los usuarios, clientes y visitantes de nuestro sitio web y servicios, incluyendo pero no limitado a: desarrollo de software, desarrollo web, aplicaciones móviles, inteligencia artificial, chatbots, e-commerce, consultoría tecnológica y cualquier otro servicio ofrecido por KopTup.',
@@ -146,13 +163,13 @@ export default function TermsPage() {
         },
         {
           subtitle: '7.4 Descargo de Responsabilidad',
-          text: 'Los servicios se proporcionan "tal cual". No garantizamos que el software estará libre de errores o que funcionará sin interrupciones. El cliente es responsable de mantener respaldos adecuados de sus datos.',
+          text: 'Los servicios se proporcionan &quot;tal cual&quot;. No garantizamos que el software estará libre de errores o que funcionará sin interrupciones. El cliente es responsable de mantener respaldos adecuados de sus datos.',
         },
       ],
     },
   ];
 
-  const additionalTerms = [
+  const additionalTerms: AdditionalTerm[] = [
     {
       icon: UserGroupIcon,
       title: '8. Soporte y Mantenimiento',
@@ -213,7 +230,7 @@ export default function TermsPage() {
                     Bienvenido a KopTup
                   </h2>
                   <p className="text-secondary-700 dark:text-secondary-300 mb-4">
-                    Estos Términos y Condiciones ("Términos") constituyen un acuerdo legalmente vinculante entre usted (el "Cliente") y KopTup - Soluciones Tecnológicas ("KopTup", "nosotros" o "la Empresa") con respecto al uso de nuestros servicios de desarrollo de software y consultoría tecnológica.
+                    Estos Términos y Condiciones (&quot;Términos&quot;) constituyen un acuerdo legalmente vinculante entre usted (el &quot;Cliente&quot;) y KopTup - Soluciones Tecnológicas (&quot;KopTup&quot;, &quot;nosotros&quot; o &quot;la Empresa&quot;) con respecto al uso de nuestros servicios de desarrollo de software y consultoría tecnológica.
                   </p>
                   <p className="text-secondary-700 dark:text-secondary-300">
                     Por favor, lea estos términos cuidadosamente antes de contratar nuestros servicios. Al utilizar nuestros servicios, usted confirma que ha leído, comprendido y aceptado estos términos en su totalidad.

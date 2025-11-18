@@ -178,7 +178,7 @@ export default function PrivacyPage() {
                     Introducción
                   </h2>
                   <p className="text-secondary-700 dark:text-secondary-300 mb-4">
-                    KopTup - Soluciones Tecnológicas ("nosotros", "nuestro" o "la empresa") se compromete a proteger la privacidad de nuestros clientes y usuarios. Esta Política de Privacidad describe cómo recopilamos, utilizamos, compartimos y protegemos la información personal cuando utiliza nuestros servicios de desarrollo de software, consultoría tecnológica y soluciones digitales.
+                    KopTup - Soluciones Tecnológicas (&quot;nosotros&quot;, &quot;nuestro&quot; o &quot;la empresa&quot;) se compromete a proteger la privacidad de nuestros clientes y usuarios. Esta Política de Privacidad describe cómo recopilamos, utilizamos, compartimos y protegemos la información personal cuando utiliza nuestros servicios de desarrollo de software, consultoría tecnológica y soluciones digitales.
                   </p>
                   <p className="text-secondary-700 dark:text-secondary-300">
                     Al utilizar nuestros servicios, usted acepta las prácticas descritas en esta política. Si no está de acuerdo con esta política, por favor no utilice nuestros servicios.
@@ -336,7 +336,7 @@ export default function PrivacyPage() {
                 9. Cambios a esta Política
               </h2>
               <p className="text-secondary-700 dark:text-secondary-300 mb-4">
-                Podemos actualizar esta Política de Privacidad periódicamente para reflejar cambios en nuestras prácticas o por otras razones operativas, legales o reglamentarias. La fecha de "Última actualización" en la parte superior indica cuándo se revisó la política por última vez.
+                Podemos actualizar esta Política de Privacidad periódicamente para reflejar cambios en nuestras prácticas o por otras razones operativas, legales o reglamentarias. La fecha de &quot;Última actualización&quot; en la parte superior indica cuándo se revisó la política por última vez.
               </p>
               <p className="text-secondary-700 dark:text-secondary-300">
                 Le notificaremos sobre cambios materiales publicando la nueva política en nuestro sitio web y, cuando sea apropiado, por correo electrónico. Le recomendamos revisar esta política periódicamente.
