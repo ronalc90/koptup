@@ -6,6 +6,7 @@ import {
   markAsRead,
   markAllAsRead,
   deleteNotification,
+  createNewNotification,
 } from '../controllers/notifications.controller';
 
 const router = Router();
@@ -19,6 +20,13 @@ router.use(authenticate);
  * @access  Private
  */
 router.get('/', getNotifications);
+
+/**
+ * @route   POST /api/notifications
+ * @desc    Create a new notification
+ * @access  Private
+ */
+router.post('/', createNewNotification);
 
 /**
  * @route   GET /api/notifications/unread-count
