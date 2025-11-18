@@ -83,8 +83,7 @@ export default function DashboardPage() {
         upcomingDeadlines: [],
       });
     } catch (error) {
-      console.error('Failed to load dashboard data:', error);
-      // En caso de error, mostrar datos vacíos
+      // Silently use empty data when API is unavailable
       setDashboardData({
         orders: { active: 0, pending: 0, completed: 0, total: 0 },
         projects: { active: 0, inProgress: 0, completed: 0, total: 0, avgProgress: 0 },

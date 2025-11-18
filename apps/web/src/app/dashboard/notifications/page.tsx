@@ -58,7 +58,7 @@ export default function NotificationsPage() {
       const data = await api.getNotifications(filter !== 'all' ? filter : undefined, false);
       setNotifications(data);
     } catch (error) {
-      console.error('Failed to load notifications from API, using fallback data:', error);
+      // Silently use fallback data when API is unavailable
 
       // Fallback to mock data if API fails
       const mockNotifications: Notification[] = [
@@ -180,14 +180,10 @@ export default function NotificationsPage() {
     try {
       // Try to mark as read via API
       await api.markNotificationAsRead(id);
-      setNotifications(prev =>
-        prev.map(notif =>
-          notif.id === id ? { ...notif, isRead: true } : notif
-        )
-      );
     } catch (error) {
-      console.error('Failed to mark notification as read via API, updating locally:', error);
-      // Update locally even if API fails
+      // Silently continue if API is unavailable
+    } finally {
+      // Update locally regardless of API response
       setNotifications(prev =>
         prev.map(notif =>
           notif.id === id ? { ...notif, isRead: true } : notif
@@ -200,12 +196,10 @@ export default function NotificationsPage() {
     try {
       // Try to mark all as read via API
       await api.markAllNotificationsAsRead();
-      setNotifications(prev =>
-        prev.map(notif => ({ ...notif, isRead: true }))
-      );
     } catch (error) {
-      console.error('Failed to mark all notifications as read via API, updating locally:', error);
-      // Update locally even if API fails
+      // Silently continue if API is unavailable
+    } finally {
+      // Update locally regardless of API response
       setNotifications(prev =>
         prev.map(notif => ({ ...notif, isRead: true }))
       );
@@ -216,10 +210,10 @@ export default function NotificationsPage() {
     try {
       // Try to delete via API
       await api.deleteNotification(id);
-      setNotifications(prev => prev.filter(notif => notif.id !== id));
     } catch (error) {
-      console.error('Failed to delete notification via API, removing locally:', error);
-      // Remove locally even if API fails
+      // Silently continue if API is unavailable
+    } finally {
+      // Remove locally regardless of API response
       setNotifications(prev => prev.filter(notif => notif.id !== id));
     }
   };
