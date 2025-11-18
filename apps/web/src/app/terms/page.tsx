@@ -13,8 +13,25 @@ import {
   CodeBracketIcon,
 } from '@heroicons/react/24/outline';
 
+interface ContentItem {
+  subtitle?: string;
+  text: string;
+}
+
+interface Section {
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  title: string;
+  content: ContentItem[];
+}
+
+interface AdditionalTerm {
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  title: string;
+  content: string;
+}
+
 export default function TermsPage() {
-  const sections = [
+  const sections: Section[] = [
     {
       icon: DocumentCheckIcon,
       title: '1. Aceptación de los Términos',
@@ -152,7 +169,7 @@ export default function TermsPage() {
     },
   ];
 
-  const additionalTerms = [
+  const additionalTerms: AdditionalTerm[] = [
     {
       icon: UserGroupIcon,
       title: '8. Soporte y Mantenimiento',
