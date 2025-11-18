@@ -63,6 +63,7 @@ export default function DemoPage() {
   const [isChatOpen, setIsChatOpen] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isInitialMount = useRef(true);
 
   // Initialize chatbot hook
   const {
@@ -91,8 +92,12 @@ export default function DemoPage() {
     { id: 'FaComment', icon: FaComment, label: 'Comentario' },
   ];
 
-  // Auto-scroll to bottom when messages change
+  // Auto-scroll to bottom when messages change (but not on initial mount)
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
