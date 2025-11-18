@@ -30,13 +30,13 @@ export async function importarCSV(req: Request, res: Response) {
       batchSize: batchSize || 1000,
     });
 
-    res.json({
+    return res.json({
       success: true,
       data: resultado,
     });
   } catch (error: any) {
     logger.error('Error importando CSV:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error.message || 'Error importando archivo CSV',
     });
@@ -66,13 +66,13 @@ export async function importarExcel(req: Request, res: Response) {
       nombreHoja: nombreHoja,
     });
 
-    res.json({
+    return res.json({
       success: true,
       data: resultado,
     });
   } catch (error: any) {
     logger.error('Error importando Excel:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error.message || 'Error importando archivo Excel',
     });
@@ -87,13 +87,13 @@ export async function obtenerEstadisticas(req: Request, res: Response) {
   try {
     const estadisticas = await cupsSisproService.obtenerEstadisticas();
 
-    res.json({
+    return res.json({
       success: true,
       data: estadisticas,
     });
   } catch (error: any) {
     logger.error('Error obteniendo estadísticas:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error.message,
     });
@@ -108,7 +108,7 @@ export async function obtenerIncompletos(req: Request, res: Response) {
   try {
     const incompletos = await cupsSisproService.buscarCUPSIncompletos();
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         total: incompletos.length,
@@ -117,7 +117,7 @@ export async function obtenerIncompletos(req: Request, res: Response) {
     });
   } catch (error: any) {
     logger.error('Error obteniendo CUPS incompletos:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error.message,
     });
@@ -141,13 +141,13 @@ export async function vectorizarCUPS(req: Request, res: Response) {
       logger.info(`Vectorización completada: ${resultado.procesados} procesados`);
     });
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Vectorización iniciada en background',
     });
   } catch (error: any) {
     logger.error('Error iniciando vectorización:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error.message,
     });
@@ -178,7 +178,7 @@ export async function buscarSemantica(req: Request, res: Response) {
       especialidad,
     });
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         consulta,
@@ -188,7 +188,7 @@ export async function buscarSemantica(req: Request, res: Response) {
     });
   } catch (error: any) {
     logger.error('Error en búsqueda semántica:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error.message,
     });
@@ -215,7 +215,7 @@ export async function buscarSimilares(req: Request, res: Response) {
       umbralSimilaridad: umbralSimilaridad || 0.75,
     });
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         codigoCUPS,
@@ -225,7 +225,7 @@ export async function buscarSimilares(req: Request, res: Response) {
     });
   } catch (error: any) {
     logger.error('Error buscando similares:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error.message,
     });
@@ -240,13 +240,13 @@ export async function obtenerEstadisticasVectorizacion(req: Request, res: Respon
   try {
     const estadisticas = await embeddingsService.obtenerEstadisticasVectorizacion();
 
-    res.json({
+    return res.json({
       success: true,
       data: estadisticas,
     });
   } catch (error: any) {
     logger.error('Error obteniendo estadísticas de vectorización:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error.message,
     });
@@ -266,13 +266,13 @@ export async function revectorizarDesactualizados(req: Request, res: Response) {
       logger.info(`Re-vectorización completada: ${resultado.procesados} procesados`);
     });
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Re-vectorización iniciada en background',
     });
   } catch (error: any) {
     logger.error('Error iniciando re-vectorización:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error.message,
     });
