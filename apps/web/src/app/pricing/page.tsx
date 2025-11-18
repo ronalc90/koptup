@@ -29,7 +29,7 @@ export default function PricingPage() {
       description: t('plans.starter.description'),
       icon: SparklesIcon,
       monthlyPrice: 499,
-      annualPrice: 4990,
+      annualPrice: 4970, // 17% de descuento
       popular: false,
       features: [
         { name: t('plans.starter.features.website5'), included: true },
@@ -53,7 +53,7 @@ export default function PricingPage() {
       description: t('plans.professional.description'),
       icon: RocketLaunchIcon,
       monthlyPrice: 1299,
-      annualPrice: 12990,
+      annualPrice: 12938, // 17% de descuento
       popular: true,
       features: [
         { name: t('plans.professional.features.website15'), included: true },
@@ -79,7 +79,7 @@ export default function PricingPage() {
       description: t('plans.enterprise.description'),
       icon: BuildingOfficeIcon,
       monthlyPrice: 2999,
-      annualPrice: 29990,
+      annualPrice: 29870, // 17% de descuento
       popular: false,
       features: [
         { name: t('plans.enterprise.features.unlimitedPages'), included: true },
@@ -210,30 +210,36 @@ export default function PricingPage() {
             </p>
 
             {/* Billing Toggle */}
-            <div className="inline-flex items-center gap-4 bg-white/10 backdrop-blur-sm rounded-full p-2">
-              <button
-                onClick={() => setBillingPeriod('monthly')}
-                className={`px-6 py-2 rounded-full transition-all ${
-                  billingPeriod === 'monthly'
-                    ? 'bg-white text-primary-600 font-semibold'
-                    : 'text-white hover:text-primary-100'
-                }`}
-              >
-                {t('billing.monthly')}
-              </button>
-              <button
-                onClick={() => setBillingPeriod('annual')}
-                className={`px-6 py-2 rounded-full transition-all ${
-                  billingPeriod === 'annual'
-                    ? 'bg-white text-primary-600 font-semibold'
-                    : 'text-white hover:text-primary-100'
-                }`}
-              >
-                {t('billing.annual')}
-                <span className="ml-2 text-xs bg-green-500 text-white px-2 py-1 rounded-full">
+            <div className="inline-flex flex-col items-center gap-3">
+              <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full p-2">
+                <button
+                  onClick={() => setBillingPeriod('monthly')}
+                  className={`px-8 py-3 rounded-full transition-all duration-300 ${
+                    billingPeriod === 'monthly'
+                      ? 'bg-white text-primary-600 font-semibold shadow-lg'
+                      : 'text-white hover:text-primary-100 hover:bg-white/5'
+                  }`}
+                >
+                  {t('billing.monthly')}
+                </button>
+                <button
+                  onClick={() => setBillingPeriod('annual')}
+                  className={`px-8 py-3 rounded-full transition-all duration-300 relative ${
+                    billingPeriod === 'annual'
+                      ? 'bg-white text-primary-600 font-semibold shadow-lg'
+                      : 'text-white hover:text-primary-100 hover:bg-white/5'
+                  }`}
+                >
+                  {t('billing.annual')}
+                </button>
+              </div>
+              <div className={`flex items-center gap-2 transition-opacity duration-300 ${
+                billingPeriod === 'annual' ? 'opacity-100' : 'opacity-0'
+              }`}>
+                <span className="text-sm font-semibold bg-green-500 text-white px-4 py-1.5 rounded-full shadow-lg">
                   {t('billing.save')}
                 </span>
-              </button>
+              </div>
             </div>
           </div>
         </div>
