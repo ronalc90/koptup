@@ -5,6 +5,7 @@ import {
   getConversationById,
   sendMessage,
   markAsRead,
+  createConversation,
 } from '../controllers/messages.controller';
 
 const router = Router();
@@ -39,5 +40,12 @@ router.post('/send', sendMessage);
  * @access  Private
  */
 router.post('/conversations/:id/read', markAsRead);
+
+/**
+ * @route   POST /api/messages/conversations
+ * @desc    Create new conversation (admin/project_manager only)
+ * @access  Private (Admin)
+ */
+router.post('/conversations', createConversation);
 
 export default router;
