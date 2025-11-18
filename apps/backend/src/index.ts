@@ -29,6 +29,12 @@ process.on('unhandledRejection', (reason) => {
 console.log('index.ts arrancando', new Date().toISOString());
 logger.info('index.ts arrancando');
 
+// Trust proxy for Railway/Vercel (needed for rate limiting and IP detection)
+if (process.env.TRUST_PROXY === 'true') {
+  app.set('trust proxy', true);
+  logger.info('Trust proxy enabled');
+}
+
 // Basic middleware that never fails
 app.use(helmet());
 app.use(cors({
