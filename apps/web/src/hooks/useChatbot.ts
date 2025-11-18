@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+// Use relative API routes that proxy to the backend
+const API_URL = '';
 
 export interface ChatMessage {
   role: 'user' | 'assistant';
