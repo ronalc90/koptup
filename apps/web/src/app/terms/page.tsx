@@ -261,7 +261,7 @@ export default function TermsPage() {
                     </div>
                   </div>
                   <div className="p-6 space-y-6">
-                    {section.content.map((item, idx) => (
+                    {section.content.map((item: ContentItem, idx) => (
                       <div key={idx}>
                         {item.subtitle && (
                           <h3 className="text-lg font-semibold text-secondary-900 dark:text-white mb-2">
