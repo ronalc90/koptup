@@ -72,4 +72,21 @@ const ChatbotSchema = new Schema<IChatbot>(
   }
 );
 
-export const Chatbot = mongoose.model<IChatbot>('Chatbot', ChatbotSchema);
+// Lazy model registration - solo se registra cuando se usa
+let chatbotModel: mongoose.Model<IChatbot> | null = null;
+
+export const getChatbotModel = (): mongoose.Model<IChatbot> => {
+  if (!chatbotModel) {
+    try {
+      // Intentar obtener el modelo si ya existe
+      chatbotModel = mongoose.model<IChatbot>('Chatbot');
+    } catch {
+      // Si no existe, crearlo
+      chatbotModel = mongoose.model<IChatbot>('Chatbot', ChatbotSchema);
+    }
+  }
+  return chatbotModel;
+};
+
+// Exportar para compatibilidad, pero usar getChatbotModel() en servicios
+export const Chatbot = getChatbotModel();
