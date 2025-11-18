@@ -46,7 +46,20 @@
       "Bash(git push:*)",
       "Bash(if not exist \"uploads\\cuentas-medicas\" mkdir \"uploads\\cuentas-medicas\")",
       "Bash(if not exist \"uploads\\ley100\" mkdir \"uploads\\ley100\")",
-      "Bash(if not exist \"uploads\\exports\" mkdir \"uploads\\exports\")"
+      "Bash(if not exist \"uploads\\exports\" mkdir \"uploads\\exports\")",
+      "Bash(npm --version:*)",
+      "Bash(docker --version:*)",
+      "Bash(docker-compose:*)",
+      "Bash(npm config:*)",
+      "Bash(ping:*)",
+      "Bash(brew list:*)",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MWMwYzE3ZGQwZGIwZTM1NWIyZDM0NSIsImVtYWlsIjoidGVzdEBleGFtcGxlLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzYzNDQ1ODAxLCJleHAiOjE3NjM0NDY3MDF9.jmpbrzW_0v9SrIDNfe8WFp-Pcx9gMxuh276mlwFOmT8\":*)",
+      "Bash(__NEW_LINE__ echo \"=== Testing GET /api/documents ===\")",
+      "Bash(__NEW_LINE__ echo \"\")",
+      "Bash(__NEW_LINE__ echo \"=== Testing GET /api/documents (corregido) ===\")",
+      "Bash(python3:*)",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MWMwYzE3ZGQwZGIwZTM1NWIyZDM0NSIsImVtYWlsIjoidGVzdEBleGFtcGxlLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzYzNDQ2MTA3LCJleHAiOjE3NjM0NDcwMDd9.XjzVRtIJGuoHW3WZZyWMrdHn5VQ82XnTOjmciLjTTpE\")",
+      "Bash(echo \"✅ FINAL ENDPOINT TESTS ✅\" echo \"\" curl -s -X GET http://localhost:3001/api/documents -H \"Authorization: Bearer $TOKEN\")"
     ],
     "deny": [],
     "ask": []

@@ -1,59 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// In-memory storage for demo purposes
-// In production, this should use a database or external API
-const sessions = new Map<string, {
-  sessionId: string;
-  messages: Array<{
-    id: string;
-    role: 'user' | 'assistant';
-    content: string;
-    created_at: string;
-  }>;
-  createdAt: string;
-}>();
+const BACKEND_URL = process.env.BACKEND_URL || 'https://koptupbackend-production.up.railway.app';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { sessionId: string } }
+  { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
-    const sessionId = params.sessionId;
+    const { sessionId } = await params;
 
-    if (!sessionId) {
+    console.log(`[Chatbot Info] Fetching info for session: ${sessionId}`);
+    console.log(`[Chatbot Info] Backend URL: ${BACKEND_URL}`);
+
+    const response = await fetch(`${BACKEND_URL}/api/chatbot/info/${sessionId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log(`[Chatbot Info] Response status: ${response.status}`);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`[Chatbot Info] Backend error: ${errorText}`);
       return NextResponse.json(
-        { success: false, error: 'Session ID is required' },
-        { status: 400 }
+        {
+          success: false,
+          error: `Backend error: ${response.status} - ${errorText}`,
+        },
+        { status: response.status }
       );
     }
 
-    // Get or create session
-    let session = sessions.get(sessionId);
-
-    if (!session) {
-      // Create new session
-      session = {
-        sessionId,
-        messages: [],
-        createdAt: new Date().toISOString(),
-      };
-      sessions.set(sessionId, session);
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        sessionId: session.sessionId,
-        messages: session.messages,
-        createdAt: session.createdAt,
-      },
-    });
-  } catch (error) {
-    console.error('Error fetching session info:', error);
+    const data = await response.json();
+    return NextResponse.json(data, { status: response.status });
+  } catch (error: any) {
+    console.error('[Chatbot Info] Error in proxy:', error);
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : 'Internal server error',
+        error: error.message || 'Error al obtener información',
+        details: error.toString(),
       },
       { status: 500 }
     );

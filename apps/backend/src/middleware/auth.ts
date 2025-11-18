@@ -36,6 +36,7 @@ export const authenticate = async (
         id: string;
         email: string;
         role: string;
+        name?: string;
       };
 
       req.user = decoded;
@@ -90,6 +91,7 @@ export const generateAccessToken = (payload: {
   id: string;
   email: string;
   role: string;
+  name?: string;
 }): string => {
   const jwtSecret = process.env.JWT_SECRET!;
   const expiresIn: string = process.env.JWT_EXPIRES_IN || '15m';

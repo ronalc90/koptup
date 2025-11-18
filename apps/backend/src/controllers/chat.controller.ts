@@ -1,23 +1,24 @@
 import { Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
-import { db } from '../config/database';
+import ChatSession from '../models/ChatSession';
+import ChatMessage from '../models/ChatMessage';
 import { logger } from '../utils/logger';
 
 export const createSession = asyncHandler(async (req: Request, res: Response) => {
-  const sessionId = uuidv4();
   const sessionToken = uuidv4();
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
-  await db.query(
-    'INSERT INTO chat_sessions (id, session_token, is_anonymous, expires_at) VALUES ($1, $2, $3, $4)',
-    [sessionId, sessionToken, true, expiresAt]
-  );
+  const session = await ChatSession.create({
+    session_token: sessionToken,
+    is_anonymous: true,
+    expires_at: expiresAt,
+  });
 
   res.json({
     success: true,
     data: {
-      sessionId,
+      sessionId: session._id,
       sessionToken,
       expiresAt,
     },
@@ -25,39 +26,39 @@ export const createSession = asyncHandler(async (req: Request, res: Response) =>
 });
 
 export const sendMessage = asyncHandler(async (req: Request, res: Response) => {
-  const { sessionId, message, documentIds } = req.body;
+  const { sessionId, message } = req.body;
 
   // Verify session exists
-  const sessionResult = await db.query(
-    'SELECT id FROM chat_sessions WHERE id = $1 AND expires_at > NOW()',
-    [sessionId]
-  );
+  const session = await ChatSession.findOne({
+    _id: sessionId,
+    expires_at: { $gt: new Date() },
+  });
 
-  if (sessionResult.rows.length === 0) {
+  if (!session) {
     throw new AppError('Invalid or expired session', 400);
   }
 
   // Save user message
-  const messageId = uuidv4();
-  await db.query(
-    'INSERT INTO chat_messages (id, session_id, role, content, document_ids) VALUES ($1, $2, $3, $4, $5)',
-    [messageId, sessionId, 'user', message, JSON.stringify(documentIds || [])]
-  );
+  const userMessage = await ChatMessage.create({
+    session_id: sessionId,
+    role: 'user',
+    content: message,
+  });
 
   // Generate AI response (placeholder - integrate with OpenAI)
   const aiResponse = `Echo: ${message}`;
 
   // Save AI response
-  const aiMessageId = uuidv4();
-  await db.query(
-    'INSERT INTO chat_messages (id, session_id, role, content) VALUES ($1, $2, $3, $4)',
-    [aiMessageId, sessionId, 'assistant', aiResponse]
-  );
+  const aiMessage = await ChatMessage.create({
+    session_id: sessionId,
+    role: 'assistant',
+    content: aiResponse,
+  });
 
   res.json({
     success: true,
     data: {
-      messageId: aiMessageId,
+      messageId: aiMessage._id,
       response: aiResponse,
     },
   });
@@ -66,13 +67,17 @@ export const sendMessage = asyncHandler(async (req: Request, res: Response) => {
 export const getHistory = asyncHandler(async (req: Request, res: Response) => {
   const { sessionId } = req.params;
 
-  const result = await db.query(
-    'SELECT id, role, content, created_at FROM chat_messages WHERE session_id = $1 ORDER BY created_at ASC',
-    [sessionId]
-  );
+  const messages = await ChatMessage.find({ session_id: sessionId })
+    .select('_id role content created_at')
+    .sort({ created_at: 1 });
 
   res.json({
     success: true,
-    data: result.rows,
+    data: messages.map(msg => ({
+      id: msg._id,
+      role: msg.role,
+      content: msg.content,
+      created_at: msg.created_at,
+    })),
   });
 });

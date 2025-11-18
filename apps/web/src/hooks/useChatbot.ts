@@ -1,158 +1,208 @@
 import { useState, useEffect, useCallback } from 'react';
-import { api } from '@/lib/api';
+
+// Use relative API routes that proxy to the backend
+const API_URL = '';
 
 export interface ChatMessage {
-  id: string;
   role: 'user' | 'assistant';
   content: string;
-  created_at: string;
+  timestamp: Date;
 }
 
-export interface ChatSession {
-  sessionId: string;
-  sessionToken: string;
-  expiresAt: string;
-  messages: ChatMessage[];
+export interface ChatbotConfig {
+  title: string;
+  greeting: string;
+  placeholder: string;
+  textColor: string;
+  headerColor: string;
+  backgroundColor: string;
+  icon: string;
 }
 
-export function useChatbot() {
-  const [sessionId, setSessionId] = useState<string | null>(null);
+export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
+  const [sessionId, setSessionId] = useState<string>('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [config, setConfig] = useState<ChatbotConfig>({
+    title: initialConfig?.title || 'Asistente Virtual',
+    greeting: initialConfig?.greeting || '¡Hola! 👋 Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?',
+    placeholder: initialConfig?.placeholder || 'Escribe tu mensaje aquí...',
+    textColor: initialConfig?.textColor || '#1F2937',
+    headerColor: initialConfig?.headerColor || '#4F46E5',
+    backgroundColor: initialConfig?.backgroundColor || '#FFFFFF',
+    icon: initialConfig?.icon || 'FaComments',
+  });
 
-  // Generate a session ID based on timestamp
-  const generateSessionId = useCallback(() => {
-    return `session-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+  // Generar o recuperar sessionId
+  useEffect(() => {
+    let id = localStorage.getItem('chatbot_session_id');
+    if (!id) {
+      id = `session-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+      localStorage.setItem('chatbot_session_id', id);
+    }
+    setSessionId(id);
+    loadSession(id);
   }, []);
 
-  // Initialize session
-  useEffect(() => {
-    const initSession = async () => {
-      try {
-        // Check if session exists in localStorage
-        const storedSessionId = localStorage.getItem('chatbot_session_id');
-        if (storedSessionId) {
-          setSessionId(storedSessionId);
-          await loadSession(storedSessionId);
-        } else {
-          // Create new session
-          const newSessionId = generateSessionId();
-          setSessionId(newSessionId);
-          localStorage.setItem('chatbot_session_id', newSessionId);
-        }
-      } catch (err) {
-        console.error('Failed to initialize session:', err);
-        // If session initialization fails, create a new one
-        const newSessionId = generateSessionId();
-        setSessionId(newSessionId);
-        localStorage.setItem('chatbot_session_id', newSessionId);
-      }
-    };
-
-    initSession();
-  }, [generateSessionId]);
-
-  // Load session messages
-  const loadSession = async (sid: string) => {
+  // Cargar sesión existente
+  const loadSession = async (id: string) => {
     try {
-      setIsLoading(true);
-      setError(null);
-
-      const response = await fetch(`/api/chatbot/info/${sid}`);
-
-      if (!response.ok) {
-        throw new Error(`Failed to load session: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-
-      if (data.success && data.data) {
-        setMessages(data.data.messages || []);
+      const response = await fetch(`${API_URL}/api/chatbot/info/${id}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data) {
+          setMessages(data.data.messages || []);
+          if (data.data.config) {
+            setConfig(prev => ({ ...prev, ...data.data.config }));
+          }
+        }
       }
     } catch (err) {
       console.error('Error loading session:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load session');
-      // Don't throw, just log - we'll start with empty messages
-      setMessages([]);
+    }
+  };
+
+  // Subir documentos
+  const uploadDocuments = async (files: File[]): Promise<boolean> => {
+    if (!sessionId) {
+      setError('No hay sesión activa');
+      return false;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('sessionId', sessionId);
+      files.forEach(file => {
+        formData.append('files', file);
+      });
+
+      const response = await fetch(`${API_URL}/api/chatbot/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Error subiendo documentos');
+      }
+
+      return true;
+    } catch (err: any) {
+      setError(err.message || 'Error subiendo documentos');
+      return false;
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Send message
-  const sendMessage = async (content: string, documentIds?: string[]) => {
-    if (!sessionId || !content.trim()) {
-      return;
-    }
+  // Enviar mensaje
+  const sendMessage = async (message: string): Promise<void> => {
+    if (!sessionId || !message.trim()) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    // Agregar mensaje del usuario inmediatamente
+    const userMessage: ChatMessage = {
+      role: 'user',
+      content: message,
+      timestamp: new Date(),
+    };
+    setMessages(prev => [...prev, userMessage]);
 
     try {
-      setIsLoading(true);
-      setError(null);
-
-      // Add user message to UI immediately
-      const userMessage: ChatMessage = {
-        id: `temp-${Date.now()}`,
-        role: 'user',
-        content,
-        created_at: new Date().toISOString(),
-      };
-      setMessages(prev => [...prev, userMessage]);
-
-      const response = await fetch('/api/chatbot/message', {
+      const response = await fetch(`${API_URL}/api/chatbot/message`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           sessionId,
-          message: content,
-          documentIds,
+          message,
         }),
       });
 
-      if (!response.ok) {
-        throw new Error(`Failed to send message: ${response.statusText}`);
-      }
-
       const data = await response.json();
 
-      if (data.success && data.data) {
-        // Add assistant response to messages
-        const assistantMessage: ChatMessage = {
-          id: data.data.messageId,
-          role: 'assistant',
-          content: data.data.response,
-          created_at: new Date().toISOString(),
-        };
-        setMessages(prev => [...prev, assistantMessage]);
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Error enviando mensaje');
       }
-    } catch (err) {
-      console.error('Error sending message:', err);
-      setError(err instanceof Error ? err.message : 'Failed to send message');
 
-      // Remove the optimistic user message on error
-      setMessages(prev => prev.slice(0, -1));
+      // Agregar respuesta del asistente
+      const assistantMessage: ChatMessage = {
+        role: 'assistant',
+        content: data.data.message,
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, assistantMessage]);
+    } catch (err: any) {
+      setError(err.message || 'Error enviando mensaje');
+
+      // Agregar mensaje de error
+      const errorMessage: ChatMessage = {
+        role: 'assistant',
+        content: 'Lo siento, hubo un error al procesar tu mensaje. Por favor, intenta de nuevo.',
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Clear session
-  const clearSession = useCallback(() => {
-    localStorage.removeItem('chatbot_session_id');
-    const newSessionId = generateSessionId();
-    setSessionId(newSessionId);
-    setMessages([]);
-    localStorage.setItem('chatbot_session_id', newSessionId);
-  }, [generateSessionId]);
+  // Actualizar configuración
+  const updateConfig = useCallback(async (newConfig: Partial<ChatbotConfig>): Promise<void> => {
+    if (!sessionId) return;
+
+    setConfig(prevConfig => {
+      const updatedConfig = { ...prevConfig, ...newConfig };
+
+      // Enviar al backend de forma asíncrona sin bloquear
+      fetch(`${API_URL}/api/chatbot/config`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId,
+          config: updatedConfig,
+        }),
+      }).catch(err => {
+        console.error('Error updating config:', err);
+      });
+
+      return updatedConfig;
+    });
+  }, [sessionId]);
+
+  // Limpiar mensajes
+  const clearMessages = async (): Promise<void> => {
+    if (!sessionId) return;
+
+    try {
+      await fetch(`${API_URL}/api/chatbot/messages/${sessionId}`, {
+        method: 'DELETE',
+      });
+      setMessages([]);
+    } catch (err) {
+      console.error('Error clearing messages:', err);
+    }
+  };
 
   return {
     sessionId,
     messages,
+    config,
     isLoading,
     error,
+    uploadDocuments,
     sendMessage,
-    clearSession,
+    updateConfig,
+    clearMessages,
   };
 }
