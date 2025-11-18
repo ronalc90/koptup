@@ -165,11 +165,31 @@ router.get('/profile', authenticate, getProfile as RequestHandler);
 router.get(
   '/google',
   async (req, res, next) => {
-    const passport = await getPassport();
-    passport.authenticate('google', {
-      scope: ['profile', 'email'],
-      session: false,
-    })(req, res, next);
+    try {
+      // Check if Google OAuth is configured
+      const clientID = process.env.GOOGLE_CLIENT_ID;
+      const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+
+      if (!clientID || !clientSecret || clientID.includes('tu-google')) {
+        return res.status(503).json({
+          success: false,
+          message: 'Google OAuth is not configured on this server',
+          error: 'Google authentication is currently unavailable. Please contact the administrator or use email/password login.',
+        });
+      }
+
+      const passport = await getPassport();
+      passport.authenticate('google', {
+        scope: ['profile', 'email'],
+        session: false,
+      })(req, res, next);
+    } catch (error: any) {
+      return res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: error.message || 'Failed to initiate Google authentication',
+      });
+    }
   }
 );
 
@@ -186,11 +206,31 @@ router.get(
 router.get(
   '/google/callback',
   async (req, res, next) => {
-    const passport = await getPassport();
-    passport.authenticate('google', {
-      session: false,
-      failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:3002'}/login?error=google_auth_failed`,
-    })(req, res, next);
+    try {
+      // Check if Google OAuth is configured
+      const clientID = process.env.GOOGLE_CLIENT_ID;
+      const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+
+      if (!clientID || !clientSecret || clientID.includes('tu-google')) {
+        return res.status(503).json({
+          success: false,
+          message: 'Google OAuth is not configured on this server',
+          error: 'Google authentication is currently unavailable.',
+        });
+      }
+
+      const passport = await getPassport();
+      passport.authenticate('google', {
+        session: false,
+        failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:3002'}/login?error=google_auth_failed`,
+      })(req, res, next);
+    } catch (error: any) {
+      return res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: error.message || 'Failed to complete Google authentication',
+      });
+    }
   },
   googleCallback as RequestHandler
 );
