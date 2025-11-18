@@ -449,35 +449,135 @@ export default function TestPage() {
           })}
         </div>
 
-        <div className="mt-8 bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">
-            Diagnóstico del Error 500 del Chatbot
-          </h2>
-          <div className="space-y-3 text-sm text-gray-700">
-            <p>
-              <strong>Problema detectado:</strong> El endpoint <code>/api/chatbot/message</code>{' '}
-              está retornando error 500 (Internal Server Error).
-            </p>
-            <p>
-              <strong>Causas posibles:</strong>
-            </p>
-            <ul className="list-disc list-inside ml-4 space-y-1">
-              <li>La variable de entorno <code>OPENAI_API_KEY</code> no está configurada en el backend</li>
-              <li>Problemas de conexión con MongoDB</li>
-              <li>El modelo de Chatbot no está correctamente inicializado</li>
-              <li>Límites de rate en la API de OpenAI</li>
-            </ul>
-            <p>
-              <strong>Solución recomendada:</strong>
-            </p>
-            <ol className="list-decimal list-inside ml-4 space-y-1">
-              <li>Verificar que <code>OPENAI_API_KEY</code> esté configurada en las variables de entorno del backend (Railway)</li>
-              <li>Verificar que <code>MONGODB_URI</code> esté configurada correctamente</li>
-              <li>Revisar los logs del backend en Railway para ver el error exacto</li>
-              <li>Asegurarse de que la carpeta <code>uploads/chatbot/</code> exista y tenga permisos de escritura</li>
-            </ol>
+        {Object.keys(results).length > 0 && (
+          <div className="mt-8 bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">
+              📊 Diagnóstico Automático de Resultados
+            </h2>
+            {(() => {
+              const mongoErrors = Object.entries(results).filter(([_, r]) =>
+                r.data?.error?.includes('buffering timed out') ||
+                r.data?.error?.includes('Operation')
+              );
+              const authErrors = Object.entries(results).filter(([_, r]) =>
+                r.statusCode === 401
+              );
+              const notFound = Object.entries(results).filter(([_, r]) =>
+                r.statusCode === 404
+              );
+              const successful = Object.entries(results).filter(([_, r]) =>
+                r.status === 'success'
+              );
+
+              return (
+                <div className="space-y-4">
+                  {/* Resumen */}
+                  <div className="grid grid-cols-4 gap-4">
+                    <div className="bg-green-50 border border-green-200 rounded p-3">
+                      <div className="text-2xl font-bold text-green-700">{successful.length}</div>
+                      <div className="text-xs text-green-600">Exitosos</div>
+                    </div>
+                    <div className="bg-red-50 border border-red-200 rounded p-3">
+                      <div className="text-2xl font-bold text-red-700">{mongoErrors.length}</div>
+                      <div className="text-xs text-red-600">MongoDB Timeout</div>
+                    </div>
+                    <div className="bg-yellow-50 border border-yellow-200 rounded p-3">
+                      <div className="text-2xl font-bold text-yellow-700">{authErrors.length}</div>
+                      <div className="text-xs text-yellow-600">Auth Requerida</div>
+                    </div>
+                    <div className="bg-gray-50 border border-gray-200 rounded p-3">
+                      <div className="text-2xl font-bold text-gray-700">{notFound.length}</div>
+                      <div className="text-xs text-gray-600">No Encontrados</div>
+                    </div>
+                  </div>
+
+                  {/* MongoDB Error (CRÍTICO) */}
+                  {mongoErrors.length > 0 && (
+                    <div className="bg-red-50 border-l-4 border-red-500 p-4">
+                      <h3 className="text-lg font-bold text-red-800 mb-2">
+                        🔴 PROBLEMA CRÍTICO: MongoDB NO conectado
+                      </h3>
+                      <p className="text-sm text-red-700 mb-2">
+                        <strong>{mongoErrors.length} endpoints</strong> están fallando con timeout de MongoDB.
+                      </p>
+                      <div className="text-sm text-red-900 mb-3">
+                        <strong>Error:</strong> <code className="bg-red-100 px-2 py-1 rounded text-xs">
+                          buffering timed out after 10000ms
+                        </code>
+                      </div>
+                      <div className="bg-white rounded p-3 mb-3">
+                        <p className="text-sm font-semibold text-gray-800 mb-2">Endpoints afectados:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {mongoErrors.slice(0, 8).map(([name]) => (
+                            <span key={name} className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
+                              {name}
+                            </span>
+                          ))}
+                          {mongoErrors.length > 8 && (
+                            <span className="text-xs text-red-600">+{mongoErrors.length - 8} más</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="bg-red-100 rounded p-3">
+                        <p className="text-sm font-bold text-red-900 mb-2">✅ SOLUCIÓN:</p>
+                        <ol className="list-decimal list-inside text-sm text-red-800 space-y-1">
+                          <li>Ve a Railway → Tu proyecto backend → Variables</li>
+                          <li>Verifica que <code className="bg-red-200 px-1 rounded">MONGODB_URI</code> esté configurada</li>
+                          <li>El formato debe ser: <code className="bg-red-200 px-1 rounded text-xs">mongodb+srv://usuario:password@cluster.mongodb.net/database</code></li>
+                          <li>Redeploya el backend después de configurarla</li>
+                          <li>Vuelve a probar los endpoints aquí</li>
+                        </ol>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Auth Errors (ESPERADO) */}
+                  {authErrors.length > 0 && (
+                    <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4">
+                      <h3 className="text-sm font-bold text-yellow-800 mb-1">
+                        ⚠️ Autenticación Requerida (Normal)
+                      </h3>
+                      <p className="text-xs text-yellow-700">
+                        {authErrors.length} endpoints requieren autenticación. Esto es esperado y correcto.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* 404 Errors */}
+                  {notFound.length > 0 && (
+                    <div className="bg-orange-50 border-l-4 border-orange-500 p-4">
+                      <h3 className="text-sm font-bold text-orange-800 mb-1">
+                        🔍 Endpoints No Encontrados
+                      </h3>
+                      <p className="text-xs text-orange-700 mb-2">
+                        {notFound.length} endpoints no existen o la ruta es incorrecta:
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {notFound.map(([name]) => (
+                          <span key={name} className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded">
+                            {name}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Success */}
+                  {successful.length > 0 && (
+                    <div className="bg-green-50 border-l-4 border-green-500 p-4">
+                      <h3 className="text-sm font-bold text-green-800 mb-1">
+                        ✅ Endpoints Funcionando
+                      </h3>
+                      <p className="text-xs text-green-700">
+                        {successful.length} endpoints están respondiendo correctamente.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </div>
-        </div>
+        )}
 
         <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <p className="text-sm text-yellow-800">
