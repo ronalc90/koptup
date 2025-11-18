@@ -99,7 +99,6 @@ const startServer = async () => {
         chatRoutes,
         contactRoutes,
         quoteRoutes,
-        blogRoutes,
         projectRoutes,
         ordersRoutes,
         deliverablesRoutes,
@@ -116,7 +115,6 @@ const startServer = async () => {
         import('./routes/chat.routes'),
         import('./routes/contact.routes'),
         import('./routes/quote.routes'),
-        import('./routes/blog.routes'),
         import('./routes/project.routes'),
         import('./routes/orders.routes'),
         import('./routes/deliverables.routes'),
@@ -134,7 +132,6 @@ const startServer = async () => {
       if (chatRoutes.default) app.use('/api/chat', chatRoutes.default);
       if (contactRoutes.default) app.use('/api/contact', contactRoutes.default);
       if (quoteRoutes.default) app.use('/api/quotes', quoteRoutes.default);
-      if (blogRoutes.default) app.use('/api/blog', blogRoutes.default);
       if (projectRoutes.default) app.use('/api/projects', projectRoutes.default);
       if (ordersRoutes.default) app.use('/api/orders', ordersRoutes.default);
       if (deliverablesRoutes.default) app.use('/api/deliverables', deliverablesRoutes.default);
