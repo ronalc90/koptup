@@ -372,6 +372,18 @@ class ApiClient {
     return response.data;
   }
 
+  async createNotification(data: {
+    type: 'order' | 'project' | 'billing' | 'message' | 'system' | 'deliverable' | 'task';
+    title: string;
+    message: string;
+    actionUrl?: string;
+    metadata?: Record<string, any>;
+    targetUserId?: string;
+  }) {
+    const response = await this.client.post('/api/notifications', data);
+    return response.data;
+  }
+
   // Generic methods
   get<T = any>(url: string, config?: AxiosRequestConfig) {
     return this.client.get<T>(url, config);
