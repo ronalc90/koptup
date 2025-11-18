@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -19,6 +19,7 @@ import {
   FaRobot,
   FaComment
 } from 'react-icons/fa';
+import { useChatbot } from '@/hooks/useChatbot';
 
 type TabType = 'documents' | 'chat' | 'design';
 
@@ -58,9 +59,11 @@ export default function DemoPage() {
     backgroundColor: '#FFFFFF',
     icon: 'FaComments',
   });
-  const [previewMessages, setPreviewMessages] = useState<Array<{text: string, isUser: boolean}>>([]);
   const [previewInput, setPreviewInput] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(true);
+
+  // Use the chatbot hook
+  const { messages, isLoading, sendMessage: sendChatMessage } = useChatbot();
 
   const chatIcons = [
     { id: 'FaComments', icon: FaComments, label: 'Burbujas' },
@@ -86,18 +89,16 @@ export default function DemoPage() {
     setUploadedFiles(uploadedFiles.filter((_, i) => i !== index));
   };
 
-  const handleSendPreviewMessage = () => {
-    if (previewInput.trim()) {
-      setPreviewMessages([...previewMessages, { text: previewInput, isUser: true }]);
+  const handleSendPreviewMessage = async () => {
+    if (previewInput.trim() && !isLoading) {
+      const message = previewInput;
       setPreviewInput('');
 
-      // Simular respuesta del bot
-      setTimeout(() => {
-        setPreviewMessages(prev => [...prev, {
-          text: 'Gracias por tu mensaje. Este es un chatbot de demostración.',
-          isUser: false
-        }]);
-      }, 1000);
+      try {
+        await sendChatMessage(message);
+      } catch (error) {
+        console.error('Error sending message:', error);
+      }
     }
   };
 
@@ -417,33 +418,49 @@ export default function DemoPage() {
                           </div>
 
                           {/* Preview Messages */}
-                          {previewMessages.map((msg, index) => (
+                          {messages.map((msg, index) => (
                             <div
-                              key={index}
-                              className={`flex gap-2 ${msg.isUser ? 'justify-end' : ''}`}
+                              key={msg.id || index}
+                              className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : ''}`}
                             >
-                              {!msg.isUser && (
+                              {msg.role === 'assistant' && (
                                 <div className="w-8 h-8 bg-primary-100 dark:bg-primary-950 rounded-full flex items-center justify-center flex-shrink-0">
                                   <SelectedIcon className="h-4 w-4 text-primary-600 dark:text-primary-400" />
                                 </div>
                               )}
                               <div
                                 className={`rounded-2xl p-3 max-w-[80%] ${
-                                  msg.isUser
+                                  msg.role === 'user'
                                     ? 'rounded-tr-sm'
                                     : 'rounded-tl-sm bg-secondary-100 dark:bg-secondary-700'
                                 }`}
-                                style={msg.isUser ? { backgroundColor: designConfig.headerColor } : {}}
+                                style={msg.role === 'user' ? { backgroundColor: designConfig.headerColor } : {}}
                               >
                                 <p
                                   className="text-sm"
-                                  style={{ color: msg.isUser ? '#FFFFFF' : designConfig.textColor }}
+                                  style={{ color: msg.role === 'user' ? '#FFFFFF' : designConfig.textColor }}
                                 >
-                                  {msg.text}
+                                  {msg.content}
                                 </p>
                               </div>
                             </div>
                           ))}
+
+                          {/* Loading indicator */}
+                          {isLoading && (
+                            <div className="flex gap-2">
+                              <div className="w-8 h-8 bg-primary-100 dark:bg-primary-950 rounded-full flex items-center justify-center flex-shrink-0">
+                                <SelectedIcon className="h-4 w-4 text-primary-600 dark:text-primary-400" />
+                              </div>
+                              <div className="rounded-2xl rounded-tl-sm bg-secondary-100 dark:bg-secondary-700 p-3">
+                                <div className="flex gap-1">
+                                  <div className="w-2 h-2 bg-secondary-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                                  <div className="w-2 h-2 bg-secondary-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                                  <div className="w-2 h-2 bg-secondary-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
 
                         {/* Input */}
@@ -459,7 +476,8 @@ export default function DemoPage() {
                             />
                             <button
                               onClick={handleSendPreviewMessage}
-                              className="p-2 rounded-full transition-colors"
+                              disabled={isLoading || !previewInput.trim()}
+                              className="p-2 rounded-full transition-colors disabled:opacity-50"
                               style={{ backgroundColor: designConfig.headerColor }}
                             >
                               <PaperAirplaneIcon className="h-5 w-5 text-white" />
