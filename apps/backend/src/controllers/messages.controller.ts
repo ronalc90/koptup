@@ -19,7 +19,7 @@ export const getConversations = async (req: AuthRequest, res: Response) => {
     // Buscar conversaciones donde el usuario es participante
     const query: any = {
       'participants.userId': userId,
-      status: { \$ne: 'closed' },
+      status: { $ne: 'closed' },
     };
 
     const conversations = await Conversation.find(query)
@@ -230,10 +230,10 @@ export const markAsRead = async (req: AuthRequest, res: Response) => {
     await Message.updateMany(
       {
         conversationId: conversation._id,
-        'readBy.userId': { \$ne: userId },
+        'readBy.userId': { $ne: userId },
       },
       {
-        \$push: {
+        $push: {
           readBy: {
             userId: new mongoose.Types.ObjectId(userId),
             readAt: new Date(),
