@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 // Use relative API routes that proxy to the backend
 const API_URL = '';
@@ -156,14 +156,14 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
   };
 
   // Actualizar configuración
-  const updateConfig = async (newConfig: Partial<ChatbotConfig>): Promise<void> => {
+  const updateConfig = useCallback(async (newConfig: Partial<ChatbotConfig>): Promise<void> => {
     if (!sessionId) return;
 
-    const updatedConfig = { ...config, ...newConfig };
-    setConfig(updatedConfig);
+    setConfig(prevConfig => {
+      const updatedConfig = { ...prevConfig, ...newConfig };
 
-    try {
-      await fetch(`${API_URL}/api/chatbot/config`, {
+      // Enviar al backend de forma asíncrona sin bloquear
+      fetch(`${API_URL}/api/chatbot/config`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -172,11 +172,13 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
           sessionId,
           config: updatedConfig,
         }),
+      }).catch(err => {
+        console.error('Error updating config:', err);
       });
-    } catch (err) {
-      console.error('Error updating config:', err);
-    }
-  };
+
+      return updatedConfig;
+    });
+  }, [sessionId]);
 
   // Limpiar mensajes
   const clearMessages = async (): Promise<void> => {
