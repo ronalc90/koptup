@@ -1,27 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import {
   BellIcon,
-  ShieldCheckIcon,
   GlobeAltIcon,
   PaintBrushIcon,
-  KeyIcon,
 } from '@heroicons/react/24/outline';
 
 export default function SettingsPage() {
+  const router = useRouter();
   const [settings, setSettings] = useState({
     notifications: {
       email: true,
       push: true,
       sms: false,
-    },
-    privacy: {
-      profileVisible: true,
-      activityTracking: true,
     },
     language: 'es',
     theme: 'light',
@@ -29,22 +25,95 @@ export default function SettingsPage() {
 
   const [saving, setSaving] = useState(false);
 
+  // Load language from cookie on mount
+  useEffect(() => {
+    const currentLocale = document.cookie.match(/(?:^|; )locale=([^;]+)/)?.[1] || 'es';
+    setSettings(prev => ({ ...prev, language: currentLocale }));
+  }, []);
+
+  const handleLanguageChange = (newLanguage: string) => {
+    // Update state
+    setSettings({ ...settings, language: newLanguage });
+
+    // Set cookie
+    document.cookie = `locale=${newLanguage}; path=/; max-age=${31536000}; SameSite=Lax`;
+
+    // Force reload to apply language change
+    setTimeout(() => {
+      router.refresh();
+      window.location.reload();
+    }, 100);
+  };
+
   const handleSave = async () => {
     setSaving(true);
+
+    // Save to localStorage
+    localStorage.setItem('settings', JSON.stringify(settings));
+
     await new Promise(resolve => setTimeout(resolve, 1000));
     setSaving(false);
-    alert('Configuración guardada exitosamente');
+
+    const message = settings.language === 'en'
+      ? 'Settings saved successfully'
+      : 'Configuración guardada exitosamente';
+    alert(message);
   };
+
+  const translations = {
+    es: {
+      title: 'Configuración',
+      subtitle: 'Administra las preferencias de tu cuenta',
+      notifications: 'Notificaciones',
+      emailNotifications: 'Notificaciones por Email',
+      emailDesc: 'Recibir actualizaciones por correo electrónico',
+      pushNotifications: 'Notificaciones Push',
+      pushDesc: 'Recibir notificaciones en el navegador',
+      smsNotifications: 'Notificaciones SMS',
+      smsDesc: 'Recibir mensajes de texto importantes',
+      languageAndAppearance: 'Idioma y Apariencia',
+      language: 'Idioma',
+      theme: 'Tema',
+      light: 'Claro',
+      dark: 'Oscuro',
+      auto: 'Auto',
+      cancel: 'Cancelar',
+      save: 'Guardar Cambios',
+      saving: 'Guardando...',
+    },
+    en: {
+      title: 'Settings',
+      subtitle: 'Manage your account preferences',
+      notifications: 'Notifications',
+      emailNotifications: 'Email Notifications',
+      emailDesc: 'Receive email updates',
+      pushNotifications: 'Push Notifications',
+      pushDesc: 'Receive browser notifications',
+      smsNotifications: 'SMS Notifications',
+      smsDesc: 'Receive important text messages',
+      languageAndAppearance: 'Language & Appearance',
+      language: 'Language',
+      theme: 'Theme',
+      light: 'Light',
+      dark: 'Dark',
+      auto: 'Auto',
+      cancel: 'Cancel',
+      save: 'Save Changes',
+      saving: 'Saving...',
+    },
+  };
+
+  const t = translations[settings.language as 'es' | 'en'];
 
   return (
     <DashboardLayout>
       <div className="space-y-6 max-w-4xl">
         <div>
           <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">
-            Configuración
+            {t.title}
           </h1>
           <p className="text-secondary-600 dark:text-secondary-400">
-            Administra las preferencias de tu cuenta
+            {t.subtitle}
           </p>
         </div>
 
@@ -53,15 +122,15 @@ export default function SettingsPage() {
           <CardHeader>
             <div className="flex items-center gap-3">
               <BellIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-              <CardTitle>Notificaciones</CardTitle>
+              <CardTitle>{t.notifications}</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <label className="flex items-center justify-between p-4 rounded-lg border border-secondary-200 dark:border-secondary-700 cursor-pointer hover:bg-secondary-50 dark:hover:bg-secondary-900">
               <div>
-                <p className="font-medium text-secondary-900 dark:text-white">Notificaciones por Email</p>
+                <p className="font-medium text-secondary-900 dark:text-white">{t.emailNotifications}</p>
                 <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                  Recibir actualizaciones por correo electrónico
+                  {t.emailDesc}
                 </p>
               </div>
               <input
@@ -79,9 +148,9 @@ export default function SettingsPage() {
 
             <label className="flex items-center justify-between p-4 rounded-lg border border-secondary-200 dark:border-secondary-700 cursor-pointer hover:bg-secondary-50 dark:hover:bg-secondary-900">
               <div>
-                <p className="font-medium text-secondary-900 dark:text-white">Notificaciones Push</p>
+                <p className="font-medium text-secondary-900 dark:text-white">{t.pushNotifications}</p>
                 <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                  Recibir notificaciones en el navegador
+                  {t.pushDesc}
                 </p>
               </div>
               <input
@@ -99,9 +168,9 @@ export default function SettingsPage() {
 
             <label className="flex items-center justify-between p-4 rounded-lg border border-secondary-200 dark:border-secondary-700 cursor-pointer hover:bg-secondary-50 dark:hover:bg-secondary-900">
               <div>
-                <p className="font-medium text-secondary-900 dark:text-white">Notificaciones SMS</p>
+                <p className="font-medium text-secondary-900 dark:text-white">{t.smsNotifications}</p>
                 <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                  Recibir mensajes de texto importantes
+                  {t.smsDesc}
                 </p>
               </div>
               <input
@@ -119,86 +188,22 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Privacy */}
-        <Card variant="bordered">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <ShieldCheckIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-              <CardTitle>Privacidad y Seguridad</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <label className="flex items-center justify-between p-4 rounded-lg border border-secondary-200 dark:border-secondary-700 cursor-pointer hover:bg-secondary-50 dark:hover:bg-secondary-900">
-              <div>
-                <p className="font-medium text-secondary-900 dark:text-white">Perfil Público</p>
-                <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                  Permitir que otros usuarios vean tu perfil
-                </p>
-              </div>
-              <input
-                type="checkbox"
-                checked={settings.privacy.profileVisible}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    privacy: { ...settings.privacy, profileVisible: e.target.checked },
-                  })
-                }
-                className="w-5 h-5 rounded border-secondary-300 text-primary-600 focus:ring-primary-500"
-              />
-            </label>
-
-            <label className="flex items-center justify-between p-4 rounded-lg border border-secondary-200 dark:border-secondary-700 cursor-pointer hover:bg-secondary-50 dark:hover:bg-secondary-900">
-              <div>
-                <p className="font-medium text-secondary-900 dark:text-white">Seguimiento de Actividad</p>
-                <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                  Ayudarnos a mejorar tu experiencia
-                </p>
-              </div>
-              <input
-                type="checkbox"
-                checked={settings.privacy.activityTracking}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    privacy: { ...settings.privacy, activityTracking: e.target.checked },
-                  })
-                }
-                className="w-5 h-5 rounded border-secondary-300 text-primary-600 focus:ring-primary-500"
-              />
-            </label>
-
-            <div className="p-4 rounded-lg border border-secondary-200 dark:border-secondary-700">
-              <div className="flex items-center gap-3 mb-3">
-                <KeyIcon className="h-5 w-5 text-secondary-400" />
-                <p className="font-medium text-secondary-900 dark:text-white">Autenticación de Dos Factores</p>
-              </div>
-              <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-3">
-                Agrega una capa extra de seguridad a tu cuenta
-              </p>
-              <Button variant="outline" size="sm">
-                Configurar 2FA
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Language & Theme */}
         <Card variant="bordered">
           <CardHeader>
             <div className="flex items-center gap-3">
               <GlobeAltIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-              <CardTitle>Idioma y Apariencia</CardTitle>
+              <CardTitle>{t.languageAndAppearance}</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-secondary-900 dark:text-white mb-2">
-                Idioma
+                {t.language}
               </label>
               <select
                 value={settings.language}
-                onChange={(e) => setSettings({ ...settings, language: e.target.value })}
+                onChange={(e) => handleLanguageChange(e.target.value)}
                 className="w-full px-4 py-2 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:ring-2 focus:ring-primary-500"
               >
                 <option value="es">Español</option>
@@ -208,7 +213,7 @@ export default function SettingsPage() {
 
             <div>
               <label className="block text-sm font-medium text-secondary-900 dark:text-white mb-2">
-                Tema
+                {t.theme}
               </label>
               <div className="grid grid-cols-3 gap-3">
                 <button
@@ -219,7 +224,7 @@ export default function SettingsPage() {
                       : 'border-secondary-200 dark:border-secondary-700'
                   }`}
                 >
-                  <p className="font-medium text-secondary-900 dark:text-white">Claro</p>
+                  <p className="font-medium text-secondary-900 dark:text-white">{t.light}</p>
                 </button>
                 <button
                   onClick={() => setSettings({ ...settings, theme: 'dark' })}
@@ -229,7 +234,7 @@ export default function SettingsPage() {
                       : 'border-secondary-200 dark:border-secondary-700'
                   }`}
                 >
-                  <p className="font-medium text-secondary-900 dark:text-white">Oscuro</p>
+                  <p className="font-medium text-secondary-900 dark:text-white">{t.dark}</p>
                 </button>
                 <button
                   onClick={() => setSettings({ ...settings, theme: 'auto' })}
@@ -239,7 +244,7 @@ export default function SettingsPage() {
                       : 'border-secondary-200 dark:border-secondary-700'
                   }`}
                 >
-                  <p className="font-medium text-secondary-900 dark:text-white">Auto</p>
+                  <p className="font-medium text-secondary-900 dark:text-white">{t.auto}</p>
                 </button>
               </div>
             </div>
@@ -248,9 +253,9 @@ export default function SettingsPage() {
 
         {/* Save Button */}
         <div className="flex justify-end gap-3">
-          <Button variant="outline">Cancelar</Button>
+          <Button variant="outline">{t.cancel}</Button>
           <Button onClick={handleSave} disabled={saving}>
-            {saving ? 'Guardando...' : 'Guardar Cambios'}
+            {saving ? t.saving : t.save}
           </Button>
         </div>
       </div>
