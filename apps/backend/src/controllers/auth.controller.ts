@@ -81,6 +81,7 @@ export const login = asyncHandler(async (req: AuthRequest, res: Response) => {
     id: user._id.toString(),
     email: user.email,
     role: user.role,
+    name: user.name,
   });
 
   const refreshToken = generateRefreshToken({
@@ -143,6 +144,7 @@ export const refreshToken = asyncHandler(
       id: user._id.toString(),
       email: user.email,
       role: user.role,
+      name: user.name,
     });
 
     res.json({
@@ -211,6 +213,7 @@ export const googleCallback = asyncHandler(
       id: user.id,
       email: user.email,
       role: user.role,
+      name: user.name,
     });
 
     const refreshToken = generateRefreshToken({
