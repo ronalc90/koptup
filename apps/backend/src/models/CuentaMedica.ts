@@ -13,7 +13,9 @@ export interface IArchivoSubido {
 
 export interface ICuentaMedica extends Document {
   nombre: string;
+  numeroCuenta?: string;
   archivos: IArchivoSubido[];
+  metadata?: any;
   createdAt: Date;
   updatedAt: Date;
   userId?: string; // Optional: link to user who created it
@@ -37,7 +39,15 @@ const CuentaMedicaSchema = new Schema<ICuentaMedica>(
       required: true,
       trim: true,
     },
+    numeroCuenta: {
+      type: String,
+      required: false,
+    },
     archivos: [ArchivoSubidoSchema],
+    metadata: {
+      type: Schema.Types.Mixed,
+      required: false,
+    },
     userId: {
       type: String,
       required: false,
