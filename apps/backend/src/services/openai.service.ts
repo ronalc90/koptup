@@ -4,7 +4,7 @@ import { logger } from '../utils/logger';
 
 // Lazy initialization - only create when needed
 let openai: OpenAI | null = null;
-function getOpenAI(): OpenAI {
+export function getOpenAI(): OpenAI {
   if (!openai) {
     if (!process.env.OPENAI_API_KEY) {
       throw new Error('OPENAI_API_KEY not configured. Please add it to your environment variables.');

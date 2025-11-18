@@ -9,7 +9,7 @@ import { sistemaExperto } from '../services/expert-system.service';
 import { excelExpertService } from '../services/excel-expert.service';
 import { motorReglas } from '../services/expert-rules.service';
 import { logger } from '../utils/logger';
-import CuentaMedica from '../models/CuentaMedica';
+import { CuentaMedica } from '../models/CuentaMedica';
 
 /**
  * POST /api/expert/procesar
@@ -49,12 +49,12 @@ export async function procesarConSistemaExperto(req: Request, res: Response) {
     const resultados = [];
 
     for (const archivo of cuenta.archivos) {
-      if (!archivo.habilitado) {
-        logger.info(`Archivo ${archivo.nombreOriginal} deshabilitado, omitiendo...`);
+      if (!archivo.enabled) {
+        logger.info(`Archivo ${archivo.originalName} deshabilitado, omitiendo...`);
         continue;
       }
 
-      const rutaPDF = archivo.rutaArchivo;
+      const rutaPDF = archivo.path;
 
       // Verificar que el archivo existe
       try {
@@ -73,7 +73,7 @@ export async function procesarConSistemaExperto(req: Request, res: Response) {
       });
 
       resultados.push({
-        archivo: archivo.nombreOriginal,
+        archivo: archivo.originalName,
         resultado,
       });
     }
@@ -87,7 +87,7 @@ export async function procesarConSistemaExperto(req: Request, res: Response) {
     };
     await cuenta.save();
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         cuentaId,
@@ -103,7 +103,7 @@ export async function procesarConSistemaExperto(req: Request, res: Response) {
     });
   } catch (error: any) {
     logger.error('Error procesando con sistema experto:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error.message || 'Error procesando cuenta médica',
     });
@@ -137,7 +137,7 @@ export async function generarExcelExperto(req: Request, res: Response) {
     }
 
     // Procesar archivos y generar resultado
-    const archivos = cuenta.archivos.filter((a) => a.habilitado);
+    const archivos = cuenta.archivos.filter((a) => a.enabled);
     if (archivos.length === 0) {
       return res.status(400).json({
         success: false,
@@ -146,7 +146,7 @@ export async function generarExcelExperto(req: Request, res: Response) {
     }
 
     // Procesar primer archivo (o combinar múltiples si es necesario)
-    const rutaPDF = archivos[0].rutaArchivo;
+    const rutaPDF = archivos[0].path;
 
     const resultado = await sistemaExperto.procesarFacturaMedica(rutaPDF, {
       nroRadicacion: nroRadicacion || `RAD-${cuentaId}`,
@@ -165,10 +165,10 @@ export async function generarExcelExperto(req: Request, res: Response) {
     res.setHeader('Content-Disposition', `attachment; filename="${nombreArchivo}"`);
     res.setHeader('Content-Length', buffer.length);
 
-    res.send(buffer);
+    return res.send(buffer);
   } catch (error: any) {
     logger.error('Error generando Excel:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error.message || 'Error generando Excel',
     });
@@ -202,7 +202,7 @@ export async function procesarYDescargarExcel(req: Request, res: Response) {
     }
 
     // Obtener archivos habilitados
-    const archivos = cuenta.archivos.filter((a) => a.habilitado);
+    const archivos = cuenta.archivos.filter((a) => a.enabled);
     if (archivos.length === 0) {
       return res.status(400).json({
         success: false,
@@ -211,7 +211,7 @@ export async function procesarYDescargarExcel(req: Request, res: Response) {
     }
 
     // Procesar
-    const rutaPDF = archivos[0].rutaArchivo;
+    const rutaPDF = archivos[0].path;
     const resultado = await sistemaExperto.procesarFacturaMedica(rutaPDF, {
       nroRadicacion: nroRadicacion || `RAD-${cuentaId}`,
       fechaRadicacion: new Date(),
@@ -242,10 +242,10 @@ export async function procesarYDescargarExcel(req: Request, res: Response) {
     res.setHeader('Content-Disposition', `attachment; filename="${nombreArchivo}"`);
     res.setHeader('Content-Length', buffer.length);
 
-    res.send(buffer);
+    return res.send(buffer);
   } catch (error: any) {
     logger.error('Error en procesar y descargar:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error.message || 'Error procesando cuenta',
     });
@@ -259,13 +259,13 @@ export async function procesarYDescargarExcel(req: Request, res: Response) {
 export async function obtenerConfiguracion(req: Request, res: Response) {
   try {
     const config = motorReglas.obtenerConfiguracion();
-    res.json({
+    return res.json({
       success: true,
       data: config,
     });
   } catch (error: any) {
     logger.error('Error obteniendo configuración:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error.message,
     });
@@ -281,14 +281,14 @@ export async function actualizarConfiguracion(req: Request, res: Response) {
     const nuevaConfig = req.body;
     motorReglas.actualizarConfiguracion(nuevaConfig);
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Configuración actualizada exitosamente',
       data: motorReglas.obtenerConfiguracion(),
     });
   } catch (error: any) {
     logger.error('Error actualizando configuración:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error.message,
     });
@@ -315,13 +315,13 @@ export async function obtenerEstadisticas(req: Request, res: Response) {
       configuracionActual: motorReglas.obtenerConfiguracion(),
     };
 
-    res.json({
+    return res.json({
       success: true,
       data: estadisticas,
     });
   } catch (error: any) {
     logger.error('Error obteniendo estadísticas:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error.message,
     });
