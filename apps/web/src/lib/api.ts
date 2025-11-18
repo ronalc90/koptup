@@ -5,6 +5,10 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 /**
  * API Client singleton
+ *
+ * Note: Network errors (404, 401) will still appear in the browser's network console
+ * even when handled gracefully. This is normal browser behavior and cannot be
+ * suppressed from JavaScript. The application handles these errors with fallback data.
  */
 class ApiClient {
   private client: AxiosInstance;
@@ -45,8 +49,15 @@ class ApiClient {
         const isAuthEndpoint = originalRequest.url?.includes('/api/auth/login') ||
                                originalRequest.url?.includes('/api/auth/register');
 
+        // Suppress console errors for expected failures (404, 401 when backend is down)
+        // This prevents cluttering the console when using fallback data
+        const isSuppressibleError =
+          error.response?.status === 404 ||
+          (error.response?.status === 401 && !Cookies.get('accessToken')) ||
+          error.code === 'ERR_NETWORK';
+
         // Handle 401 errors (token expired) - but not for auth endpoints
-        if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
+        if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint && Cookies.get('accessToken')) {
           originalRequest._retry = true;
 
           try {
@@ -56,14 +67,21 @@ class ApiClient {
               return this.client(originalRequest);
             }
           } catch (refreshError) {
-            // Refresh failed, redirect to login
-            if (typeof window !== 'undefined') {
+            // Refresh failed, redirect to login only if we're on a protected page
+            if (typeof window !== 'undefined' && window.location.pathname.startsWith('/dashboard')) {
               Cookies.remove('accessToken');
               Cookies.remove('refreshToken');
               window.location.href = '/login';
             }
             return Promise.reject(refreshError);
           }
+        }
+
+        // Create a custom error that won't log to console for suppressible errors
+        if (isSuppressibleError) {
+          const silentError = new Error(error.message);
+          Object.defineProperty(silentError, 'suppressLogging', { value: true });
+          return Promise.reject(silentError);
         }
 
         return Promise.reject(error);
