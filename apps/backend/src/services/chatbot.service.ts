@@ -3,9 +3,10 @@
  * Permite crear chatbots que responden basándose en documentos subidos
  */
 
+import mongoose from 'mongoose';
 import { getOpenAI } from './openai.service';
 import { extractTextFromPDF } from './pdf.service';
-import { Chatbot, IChatbot } from '../models/Chatbot';
+import { getChatbotModel, IChatbot } from '../models/Chatbot';
 import { logger } from '../utils/logger';
 import fs from 'fs/promises';
 
@@ -26,27 +27,46 @@ export interface ChatResponse {
 
 class ChatbotService {
   /**
+   * Verifica que MongoDB esté conectado
+   */
+  private async ensureConnection(): Promise<void> {
+    if (mongoose.connection.readyState !== 1) {
+      throw new Error('Database connection not ready. Please try again in a moment.');
+    }
+  }
+
+  /**
    * Crea o recupera una sesión de chatbot
    */
   async getOrCreateSession(sessionId: string, config?: ChatbotConfig): Promise<IChatbot> {
-    let chatbot = await Chatbot.findOne({ sessionId });
+    try {
+      await this.ensureConnection();
 
-    if (!chatbot) {
-      chatbot = new Chatbot({
-        sessionId,
-        config: config || {},
-        documents: [],
-        messages: [],
-      });
-      await chatbot.save();
-      logger.info(`Nueva sesión de chatbot creada: ${sessionId}`);
-    } else if (config) {
-      // Actualizar configuración si se proporciona
-      chatbot.config = { ...chatbot.config, ...config };
-      await chatbot.save();
+      const Chatbot = getChatbotModel();
+      let chatbot = await Chatbot.findOne({ sessionId }).maxTimeMS(5000).exec();
+
+      if (!chatbot) {
+        chatbot = new Chatbot({
+          sessionId,
+          config: config || {},
+          documents: [],
+          messages: [],
+        });
+        await chatbot.save();
+        logger.info(`Nueva sesión de chatbot creada: ${sessionId}`);
+      } else if (config) {
+        // Actualizar configuración si se proporciona
+        chatbot.config = { ...chatbot.config, ...config };
+        await chatbot.save();
+      }
+
+      return chatbot;
+    } catch (error: any) {
+      if (error.message && error.message.includes('buffering timed out')) {
+        throw new Error('Database connection not ready. Please try again in a moment.');
+      }
+      throw error;
     }
-
-    return chatbot;
   }
 
   /**
@@ -231,7 +251,8 @@ Instrucciones:
    * Elimina todos los mensajes de la sesión (reset del chat)
    */
   async clearMessages(sessionId: string): Promise<{ success: boolean }> {
-    const chatbot = await Chatbot.findOne({ sessionId });
+    const Chatbot = getChatbotModel();
+    const chatbot = await Chatbot.findOne({ sessionId }).exec();
     if (chatbot) {
       chatbot.messages = [];
       await chatbot.save();
@@ -243,7 +264,8 @@ Instrucciones:
    * Elimina todos los documentos de la sesión
    */
   async clearDocuments(sessionId: string): Promise<{ success: boolean }> {
-    const chatbot = await Chatbot.findOne({ sessionId });
+    const Chatbot = getChatbotModel();
+    const chatbot = await Chatbot.findOne({ sessionId }).exec();
     if (chatbot) {
       // Eliminar archivos físicos
       for (const doc of chatbot.documents) {

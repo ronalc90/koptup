@@ -63,7 +63,7 @@ export default function DemoPage() {
   const [isChatOpen, setIsChatOpen] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const isInitialMount = useRef(true);
+  const previousMessagesLength = useRef(0);
 
   // Initialize chatbot hook
   const {
@@ -91,14 +91,7 @@ export default function DemoPage() {
     { id: 'FaComment', icon: FaComment, label: 'Comentario' },
   ];
 
-  // Auto-scroll to bottom when messages change (but not on initial mount)
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  // No auto-scroll - usuario controla el scroll manualmente
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -195,6 +188,11 @@ export default function DemoPage() {
                     {/* Upload Area */}
                     <div className="border-2 border-dashed border-secondary-300 dark:border-secondary-700 rounded-lg p-6 sm:p-8 text-center hover:border-primary-500 dark:hover:border-primary-500 transition-colors">
                       <input
+                        ref={(input) => {
+                          if (input) {
+                            (window as any).chatbotFileInput = input;
+                          }
+                        }}
                         type="file"
                         id="file-upload"
                         multiple
@@ -202,8 +200,11 @@ export default function DemoPage() {
                         onChange={handleFileUpload}
                         className="hidden"
                       />
-                      <label
-                        htmlFor="file-upload"
+                      <div
+                        onClick={() => {
+                          const input = document.getElementById('file-upload') as HTMLInputElement;
+                          input?.click();
+                        }}
                         className="cursor-pointer flex flex-col items-center gap-3 sm:gap-4"
                       >
                         <DocumentArrowUpIcon className="h-12 w-12 sm:h-16 sm:w-16 text-secondary-400" />
@@ -215,8 +216,18 @@ export default function DemoPage() {
                             PDF, DOCX, TXT, CSV (máx. 10MB por archivo)
                           </p>
                         </div>
-                        <Button variant="outline" className="text-sm">Seleccionar Archivos</Button>
-                      </label>
+                        <Button
+                          variant="outline"
+                          className="text-sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const input = document.getElementById('file-upload') as HTMLInputElement;
+                            input?.click();
+                          }}
+                        >
+                          Seleccionar Archivos
+                        </Button>
+                      </div>
                     </div>
 
                     {/* Upload Status */}
