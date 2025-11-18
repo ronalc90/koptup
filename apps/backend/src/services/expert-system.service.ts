@@ -115,7 +115,8 @@ export class SistemaExpertoService {
       // PASO 1: Extraer texto del PDF
       // ================================================================
       logger.info('Paso 1/5: Extrayendo texto del PDF...');
-      const textoPDF = await extractTextFromPDF(pdfPath);
+      const extractedData = await extractTextFromPDF(pdfPath);
+      const textoPDF = extractedData.text;
 
       // ================================================================
       // PASO 2: Extraer datos estructurados con OpenAI
@@ -307,8 +308,8 @@ Responde ÚNICAMENTE con JSON válido siguiendo esta estructura:
 
     for (const proc of datos.procedimientos) {
       // Buscar CUPS en BD
-      const cups = await searchCUPS(proc.codigoCUPS);
-      let cupsEncontrado = cups && cups.length > 0 ? cups[0] : null;
+      const cups = await searchCUPS({ codigo: proc.codigoCUPS });
+      let cupsEncontrado = cups && cups.items && cups.items.length > 0 ? cups.items[0] : null;
 
       // Calcular tarifa según manual
       const manualTarifario = opciones.manualTarifario || 'ISS2004';
@@ -339,11 +340,11 @@ Responde ÚNICAMENTE con JSON válido siguiendo esta estructura:
     // Validar diagnósticos
     const diagnosticosValidados = [];
     for (const diag of datos.diagnosticos) {
-      const diagEnBD = await searchDiagnosticos(diag.codigoCIE10);
+      const diagEnBD = await searchDiagnosticos({ codigoCIE10: diag.codigoCIE10 });
       diagnosticosValidados.push({
         ...diag,
-        validado: diagEnBD && diagEnBD.length > 0,
-        diagnosticoEnBD: diagEnBD && diagEnBD.length > 0 ? diagEnBD[0] : null,
+        validado: diagEnBD && diagEnBD.items && diagEnBD.items.length > 0,
+        diagnosticoEnBD: diagEnBD && diagEnBD.items && diagEnBD.items.length > 0 ? diagEnBD.items[0] : null,
       });
     }
 
