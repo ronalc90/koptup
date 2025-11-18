@@ -459,16 +459,17 @@ export default function ContactPage() {
 
       {/* Map Section */}
       <section className="h-96 bg-secondary-200 dark:bg-secondary-800">
-        <div className="w-full h-full flex items-center justify-center">
-          <div className="text-center">
-            <MapPinIcon className="h-16 w-16 mx-auto text-secondary-400 dark:text-secondary-600 mb-4" />
-            <p className="text-secondary-600 dark:text-secondary-400">
-              {t('map.title')}
-            </p>
-            <p className="text-sm text-secondary-500 dark:text-secondary-500 mt-2">
-              {t('map.subtitle')}
-            </p>
-          </div>
+        <div className="w-full h-full">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.9146859817846!2d-74.11588!3d4.609572!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f9e8f8f8f8f8f%3A0x8f8f8f8f8f8f8f8f!2sAv.%2068%20%231-63%2C%20Bogot%C3%A1%2C%20Colombia!5e0!3m2!1ses!2sco!4v1234567890123!5m2!1ses!2sco"
+            width="100%"
+            height="100%"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="Ubicación de KopTup en Bogotá, Colombia"
+          />
         </div>
       </section>
     </>
