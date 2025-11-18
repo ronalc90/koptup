@@ -17,10 +17,10 @@ export const getInvoices = async (req: AuthRequest, res: Response) => {
 
     const query: any = { userId };
     if (status && status !== 'all') query.status = status;
-    if (startDate) query.issueDate = { \$gte: new Date(startDate as string) };
+    if (startDate) query.issueDate = { $gte: new Date(startDate as string) };
     if (endDate) {
       query.issueDate = query.issueDate || {};
-      query.issueDate.\$lte = new Date(endDate as string);
+      query.issueDate.$lte = new Date(endDate as string);
     }
 
     const invoices = await Invoice.find(query)

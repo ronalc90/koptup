@@ -104,11 +104,10 @@ const startServer = async () => {
         contactRoutes,
         quoteRoutes,
         projectRoutes,
-        // ordersRoutes,
-        // deliverablesRoutes,
-        // invoicesRoutes,
-        // messagesRoutes,
-        // notificationsRoutes,
+        ordersRoutes,
+        deliverablesRoutes,
+        invoicesRoutes,
+        messagesRoutes,
         cuentasRoutes,
         expertSystemRoutes,
         cupsRoutes,
@@ -120,11 +119,10 @@ const startServer = async () => {
         import('./routes/contact.routes'),
         import('./routes/quote.routes'),
         import('./routes/project.routes'),
-        // import('./routes/orders.routes'),
-        // import('./routes/deliverables.routes'),
-        // import('./routes/invoices.routes'),
-        // import('./routes/messages.routes'),
-        // import('./routes/notifications.routes'),
+        import('./routes/orders.routes'),
+        import('./routes/deliverables.routes'),
+        import('./routes/invoices.routes'),
+        import('./routes/messages.routes'),
         import('./routes/cuentas.routes'),
         import('./routes/expert-system.routes'),
         import('./routes/cups.routes'),
@@ -137,11 +135,10 @@ const startServer = async () => {
       if (contactRoutes.default) app.use('/api/contact', contactRoutes.default);
       if (quoteRoutes.default) app.use('/api/quotes', quoteRoutes.default);
       if (projectRoutes.default) app.use('/api/projects', projectRoutes.default);
-      // if (ordersRoutes.default) app.use('/api/orders', ordersRoutes.default);
-      // if (deliverablesRoutes.default) app.use('/api/deliverables', deliverablesRoutes.default);
-      // if (invoicesRoutes.default) app.use('/api/invoices', invoicesRoutes.default);
-      // if (messagesRoutes.default) app.use('/api/messages', messagesRoutes.default);
-      // if (notificationsRoutes.default) app.use('/api/notifications', notificationsRoutes.default);
+      if (ordersRoutes.default) app.use('/api/orders', ordersRoutes.default);
+      if (deliverablesRoutes.default) app.use('/api/deliverables', deliverablesRoutes.default);
+      if (invoicesRoutes.default) app.use('/api/invoices', invoicesRoutes.default);
+      if (messagesRoutes.default) app.use('/api/messages', messagesRoutes.default);
       if (cuentasRoutes.default) app.use('/api', cuentasRoutes.default);
       if (expertSystemRoutes.default) app.use('/api/expert', expertSystemRoutes.default);
       if (cupsRoutes.default) app.use('/api/cups', cupsRoutes.default);
