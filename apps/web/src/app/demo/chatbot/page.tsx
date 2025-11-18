@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -19,6 +19,7 @@ import {
   FaRobot,
   FaComment
 } from 'react-icons/fa';
+import { useChatbot } from '@/hooks/useChatbot';
 
 type TabType = 'documents' | 'chat' | 'design';
 
@@ -46,7 +47,7 @@ export default function DemoPage() {
   const tc = useTranslations('common');
 
   const [activeTab, setActiveTab] = useState<TabType>('documents');
-  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [chatConfig, setChatConfig] = useState<ChatConfig>({
     greeting: '¡Hola! 👋 Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?',
     title: 'Asistente Virtual',
@@ -58,9 +59,29 @@ export default function DemoPage() {
     backgroundColor: '#FFFFFF',
     icon: 'FaComments',
   });
-  const [previewMessages, setPreviewMessages] = useState<Array<{text: string, isUser: boolean}>>([]);
   const [previewInput, setPreviewInput] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Initialize chatbot hook
+  const {
+    messages,
+    isLoading,
+    error,
+    uploadDocuments,
+    sendMessage,
+    updateConfig,
+    clearMessages,
+  } = useChatbot({
+    title: chatConfig.title,
+    greeting: chatConfig.greeting,
+    placeholder: chatConfig.placeholder,
+    textColor: designConfig.textColor,
+    headerColor: designConfig.headerColor,
+    backgroundColor: designConfig.backgroundColor,
+    icon: designConfig.icon,
+  });
 
   const chatIcons = [
     { id: 'FaComments', icon: FaComments, label: 'Burbujas' },
@@ -70,15 +91,39 @@ export default function DemoPage() {
     { id: 'FaComment', icon: FaComment, label: 'Comentario' },
   ];
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Update chatbot config when design/chat config changes
+  useEffect(() => {
+    updateConfig({
+      title: chatConfig.title,
+      greeting: chatConfig.greeting,
+      placeholder: chatConfig.placeholder,
+      textColor: designConfig.textColor,
+      headerColor: designConfig.headerColor,
+      backgroundColor: designConfig.backgroundColor,
+      icon: designConfig.icon,
+    });
+  }, [chatConfig, designConfig, updateConfig]);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      const newFiles: UploadedFile[] = Array.from(files).map(file => ({
-        name: file.name,
-        size: file.size,
-        type: file.type,
-      }));
+      const newFiles = Array.from(files);
       setUploadedFiles([...uploadedFiles, ...newFiles]);
+
+      // Upload to backend
+      setIsUploading(true);
+      const success = await uploadDocuments(newFiles);
+      setIsUploading(false);
+
+      if (!success) {
+        // Remove files if upload failed
+        setUploadedFiles(prev => prev.filter(f => !newFiles.includes(f)));
+      }
     }
   };
 
@@ -86,18 +131,11 @@ export default function DemoPage() {
     setUploadedFiles(uploadedFiles.filter((_, i) => i !== index));
   };
 
-  const handleSendPreviewMessage = () => {
-    if (previewInput.trim()) {
-      setPreviewMessages([...previewMessages, { text: previewInput, isUser: true }]);
+  const handleSendPreviewMessage = async () => {
+    if (previewInput.trim() && !isLoading) {
+      const message = previewInput;
       setPreviewInput('');
-
-      // Simular respuesta del bot
-      setTimeout(() => {
-        setPreviewMessages(prev => [...prev, {
-          text: 'Gracias por tu mensaje. Este es un chatbot de demostración.',
-          isUser: false
-        }]);
-      }, 1000);
+      await sendMessage(message);
     }
   };
 
@@ -190,6 +228,24 @@ export default function DemoPage() {
                       </label>
                     </div>
 
+                    {/* Upload Status */}
+                    {isUploading && (
+                      <div className="p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
+                        <p className="text-sm text-blue-800 dark:text-blue-200">
+                          Subiendo documentos...
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Error Display */}
+                    {error && (
+                      <div className="p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">
+                        <p className="text-sm text-red-800 dark:text-red-200">
+                          {error}
+                        </p>
+                      </div>
+                    )}
+
                     {/* Uploaded Files List */}
                     {uploadedFiles.length > 0 && (
                       <div className="space-y-2">
@@ -278,6 +334,20 @@ export default function DemoPage() {
                           placeholder="Ej: Escribe tu mensaje..."
                         />
                       </div>
+
+                      {/* Clear Messages Button */}
+                      {messages.length > 0 && (
+                        <div className="pt-4 border-t border-secondary-200 dark:border-secondary-700">
+                          <Button
+                            variant="outline"
+                            onClick={() => clearMessages()}
+                            className="w-full text-red-600 hover:text-red-700 hover:border-red-300 dark:text-red-400 dark:hover:text-red-300"
+                          >
+                            <TrashIcon className="h-4 w-4 mr-2" />
+                            Limpiar Conversación
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -416,34 +486,53 @@ export default function DemoPage() {
                             </div>
                           </div>
 
-                          {/* Preview Messages */}
-                          {previewMessages.map((msg, index) => (
+                          {/* Real Messages from Chatbot */}
+                          {messages.map((msg, index) => (
                             <div
                               key={index}
-                              className={`flex gap-1.5 sm:gap-2 ${msg.isUser ? 'justify-end' : ''}`}
+                              className={`flex gap-1.5 sm:gap-2 ${msg.role === 'user' ? 'justify-end' : ''}`}
                             >
-                              {!msg.isUser && (
+                              {msg.role === 'assistant' && (
                                 <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary-100 dark:bg-primary-950 rounded-full flex items-center justify-center flex-shrink-0">
                                   <SelectedIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-600 dark:text-primary-400" />
                                 </div>
                               )}
                               <div
                                 className={`rounded-2xl p-2.5 sm:p-3 max-w-[80%] ${
-                                  msg.isUser
+                                  msg.role === 'user'
                                     ? 'rounded-tr-sm'
                                     : 'rounded-tl-sm bg-secondary-100 dark:bg-secondary-700'
                                 }`}
-                                style={msg.isUser ? { backgroundColor: designConfig.headerColor } : {}}
+                                style={msg.role === 'user' ? { backgroundColor: designConfig.headerColor } : {}}
                               >
                                 <p
                                   className="text-xs sm:text-sm"
-                                  style={{ color: msg.isUser ? '#FFFFFF' : designConfig.textColor }}
+                                  style={{ color: msg.role === 'user' ? '#FFFFFF' : designConfig.textColor }}
                                 >
-                                  {msg.text}
+                                  {msg.content}
                                 </p>
                               </div>
                             </div>
                           ))}
+
+                          {/* Loading Indicator */}
+                          {isLoading && (
+                            <div className="flex gap-1.5 sm:gap-2">
+                              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary-100 dark:bg-primary-950 rounded-full flex items-center justify-center flex-shrink-0">
+                                <SelectedIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-600 dark:text-primary-400" />
+                              </div>
+                              <div className="bg-secondary-100 dark:bg-secondary-700 rounded-2xl rounded-tl-sm p-2.5 sm:p-3">
+                                <div className="flex gap-1">
+                                  <div className="w-2 h-2 bg-secondary-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                                  <div className="w-2 h-2 bg-secondary-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                                  <div className="w-2 h-2 bg-secondary-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Auto-scroll anchor */}
+                          <div ref={messagesEndRef} />
                         </div>
 
                         {/* Input */}
@@ -455,11 +544,13 @@ export default function DemoPage() {
                               onChange={(e) => setPreviewInput(e.target.value)}
                               onKeyPress={(e) => e.key === 'Enter' && handleSendPreviewMessage()}
                               placeholder={chatConfig.placeholder}
-                              className="flex-1 px-3 sm:px-4 py-2 border border-secondary-300 dark:border-secondary-600 rounded-full text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                              disabled={isLoading}
+                              className="flex-1 px-3 sm:px-4 py-2 border border-secondary-300 dark:border-secondary-600 rounded-full text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                             <button
                               onClick={handleSendPreviewMessage}
-                              className="p-2 rounded-full transition-colors flex-shrink-0"
+                              disabled={isLoading || !previewInput.trim()}
+                              className="p-2 rounded-full transition-colors flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
                               style={{ backgroundColor: designConfig.headerColor }}
                             >
                               <PaperAirplaneIcon className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
