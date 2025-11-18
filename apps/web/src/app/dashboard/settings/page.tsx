@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTheme } from 'next-themes';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -13,6 +14,7 @@ import {
 
 export default function SettingsPage() {
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
   const [settings, setSettings] = useState({
     notifications: {
       email: true,
@@ -25,11 +27,12 @@ export default function SettingsPage() {
 
   const [saving, setSaving] = useState(false);
 
-  // Load language from cookie on mount
+  // Load language from cookie and theme on mount
   useEffect(() => {
     const currentLocale = document.cookie.match(/(?:^|; )locale=([^;]+)/)?.[1] || 'es';
-    setSettings(prev => ({ ...prev, language: currentLocale }));
-  }, []);
+    const currentTheme = theme === 'system' ? 'auto' : (theme || 'light');
+    setSettings(prev => ({ ...prev, language: currentLocale, theme: currentTheme }));
+  }, [theme]);
 
   const handleLanguageChange = (newLanguage: string) => {
     // Update state
@@ -217,7 +220,10 @@ export default function SettingsPage() {
               </label>
               <div className="grid grid-cols-3 gap-3">
                 <button
-                  onClick={() => setSettings({ ...settings, theme: 'light' })}
+                  onClick={() => {
+                    setTheme('light');
+                    setSettings({ ...settings, theme: 'light' });
+                  }}
                   className={`p-4 rounded-lg border-2 transition-all ${
                     settings.theme === 'light'
                       ? 'border-primary-500 bg-primary-50 dark:bg-primary-950'
@@ -227,7 +233,10 @@ export default function SettingsPage() {
                   <p className="font-medium text-secondary-900 dark:text-white">{t.light}</p>
                 </button>
                 <button
-                  onClick={() => setSettings({ ...settings, theme: 'dark' })}
+                  onClick={() => {
+                    setTheme('dark');
+                    setSettings({ ...settings, theme: 'dark' });
+                  }}
                   className={`p-4 rounded-lg border-2 transition-all ${
                     settings.theme === 'dark'
                       ? 'border-primary-500 bg-primary-50 dark:bg-primary-950'
@@ -237,9 +246,12 @@ export default function SettingsPage() {
                   <p className="font-medium text-secondary-900 dark:text-white">{t.dark}</p>
                 </button>
                 <button
-                  onClick={() => setSettings({ ...settings, theme: 'auto' })}
+                  onClick={() => {
+                    setTheme('system');
+                    setSettings({ ...settings, theme: 'auto' });
+                  }}
                   className={`p-4 rounded-lg border-2 transition-all ${
-                    settings.theme === 'auto'
+                    settings.theme === 'auto' || settings.theme === 'system'
                       ? 'border-primary-500 bg-primary-50 dark:bg-primary-950'
                       : 'border-secondary-200 dark:border-secondary-700'
                   }`}
