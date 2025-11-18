@@ -107,6 +107,7 @@ const startServer = async () => {
         messagesRoutes,
         notificationsRoutes,
         cuentasRoutes,
+        expertSystemRoutes,
       ] = await Promise.all([
         import('./routes/auth.routes'),
         import('./routes/document.routes'),
@@ -121,6 +122,7 @@ const startServer = async () => {
         import('./routes/messages.routes'),
         import('./routes/notifications.routes'),
         import('./routes/cuentas.routes'),
+        import('./routes/expert-system.routes'),
       ]);
 
       if (authRoutes.default) app.use('/api/auth', authRoutes.default);
@@ -136,6 +138,7 @@ const startServer = async () => {
       if (messagesRoutes.default) app.use('/api/messages', messagesRoutes.default);
       if (notificationsRoutes.default) app.use('/api/notifications', notificationsRoutes.default);
       if (cuentasRoutes.default) app.use('/api', cuentasRoutes.default);
+      if (expertSystemRoutes.default) app.use('/api/expert', expertSystemRoutes.default);
 
       logger.info('Rutas registradas');
     } catch (err: any) {
