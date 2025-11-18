@@ -72,7 +72,6 @@ export default function DemoPage() {
     error,
     uploadDocuments,
     sendMessage,
-    updateConfig,
     clearMessages,
   } = useChatbot({
     title: chatConfig.title,
@@ -100,19 +99,6 @@ export default function DemoPage() {
     }
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
-
-  // Update chatbot config when design/chat config changes
-  useEffect(() => {
-    updateConfig({
-      title: chatConfig.title,
-      greeting: chatConfig.greeting,
-      placeholder: chatConfig.placeholder,
-      textColor: designConfig.textColor,
-      headerColor: designConfig.headerColor,
-      backgroundColor: designConfig.backgroundColor,
-      icon: designConfig.icon,
-    });
-  }, [chatConfig, designConfig, updateConfig]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
