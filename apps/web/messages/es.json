@@ -20,7 +20,6 @@
     "services": "Servicios",
     "solutions": "Soluciones",
     "pricing": "Planes",
-    "blog": "Blog",
     "about": "Nosotros",
     "contact": "Contacto",
     "login": "Iniciar sesión",
@@ -701,7 +700,7 @@
           "website15": "Sitio web responsive hasta 15 páginas",
           "advancedDesign": "Diseño personalizado avanzado",
           "adminPanel": "Panel de administración CMS",
-          "blog": "Blog integrado",
+          "blog": "Sistema de blog incluido",
           "basicEcommerce": "E-commerce básico (hasta 50 productos)",
           "advancedSEO": "Optimización SEO avanzada",
           "googleAnalytics": "Integración con Google Analytics",
@@ -823,46 +822,6 @@
       "title": "¿Necesitas un plan personalizado?",
       "subtitle": "Contáctanos para una cotización a medida según tus necesidades específicas",
       "button": "Solicitar Cotización Personalizada"
-    }
-  },
-  "blogPage": {
-    "badge": "Blog",
-    "hero": {
-      "title": "Insights sobre Tecnología y Desarrollo",
-      "subtitle": "Artículos, tutoriales y tendencias del mundo tech"
-    },
-    "search": "Buscar artículos...",
-    "categories": {
-      "all": "Todos",
-      "development": "Desarrollo",
-      "design": "Diseño",
-      "ai": "Inteligencia Artificial",
-      "business": "Negocios"
-    },
-    "featured": {
-      "title": "Artículos Destacados",
-      "subtitle": "Los contenidos más relevantes del mes"
-    },
-    "allPosts": "Todos los Artículos",
-    "postsOf": "Artículos de",
-    "postsFound": "artículos encontrados",
-    "noResults": {
-      "title": "No se encontraron artículos",
-      "subtitle": "Intenta con otra búsqueda o categoría",
-      "button": "Ver todos los artículos"
-    },
-    "readMore": "Leer más",
-    "readArticle": "Leer artículo",
-    "pagination": {
-      "previous": "Anterior",
-      "next": "Siguiente"
-    },
-    "newsletter": {
-      "title": "Suscríbete a Nuestro Newsletter",
-      "subtitle": "Recibe los últimos artículos, tutoriales y novedades directamente en tu email",
-      "placeholder": "tu@email.com",
-      "button": "Suscribirse",
-      "disclaimer": "Sin spam. Cancela tu suscripción en cualquier momento."
     }
   },
   "aboutPage": {

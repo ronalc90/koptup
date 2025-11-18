@@ -3,41 +3,23 @@ import { authenticate } from '../middleware/auth';
 import {
   getConversations,
   getConversationById,
+  createConversation,
   sendMessage,
   markAsRead,
 } from '../controllers/messages.controller';
 
 const router = Router();
 
-// Todas las rutas requieren autenticación
+// All routes require authentication
 router.use(authenticate);
 
-/**
- * @route   GET /api/messages/conversations
- * @desc    Get all conversations for authenticated user
- * @access  Private
- */
+// Conversation routes
 router.get('/conversations', getConversations);
-
-/**
- * @route   GET /api/messages/conversations/:id
- * @desc    Get conversation by ID with all messages
- * @access  Private
- */
+router.post('/conversations', createConversation);
 router.get('/conversations/:id', getConversationById);
-
-/**
- * @route   POST /api/messages/send
- * @desc    Send new message
- * @access  Private
- */
-router.post('/send', sendMessage);
-
-/**
- * @route   POST /api/messages/conversations/:id/read
- * @desc    Mark conversation as read
- * @access  Private
- */
 router.post('/conversations/:id/read', markAsRead);
+
+// Message routes
+router.post('/send', sendMessage);
 
 export default router;

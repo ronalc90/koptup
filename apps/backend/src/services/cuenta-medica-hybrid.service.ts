@@ -117,7 +117,8 @@ export async function procesarCuentaMedicaHibrida(
   try {
     // 1. Extraer texto del PDF
     logger.info('Extrayendo texto del PDF...');
-    const pdfText = await extractTextFromPDF(pdfPath);
+    const extractedData = await extractTextFromPDF(pdfPath);
+    const pdfText = extractedData.text;
 
     if (!pdfText || pdfText.trim().length === 0) {
       throw new Error('No se pudo extraer texto del PDF');

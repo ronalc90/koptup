@@ -20,7 +20,6 @@
     "services": "Services",
     "solutions": "Solutions",
     "pricing": "Pricing",
-    "blog": "Blog",
     "about": "About",
     "contact": "Contact",
     "login": "Sign in",
@@ -656,7 +655,7 @@
           "website15": "Responsive website up to 15 pages",
           "advancedDesign": "Advanced custom design",
           "adminPanel": "CMS admin panel",
-          "blog": "Integrated blog",
+          "blog": "Blog system included",
           "basicEcommerce": "Basic e-commerce (up to 50 products)",
           "advancedSEO": "Advanced SEO optimization",
           "googleAnalytics": "Google Analytics integration",
@@ -778,46 +777,6 @@
       "title": "Need a custom plan?",
       "subtitle": "Contact us for a tailored quote according to your specific needs",
       "button": "Request Custom Quote"
-    }
-  },
-  "blogPage": {
-    "badge": "Blog",
-    "hero": {
-      "title": "Insights on Technology and Development",
-      "subtitle": "Articles, tutorials and trends from the tech world"
-    },
-    "search": "Search articles...",
-    "categories": {
-      "all": "All",
-      "development": "Development",
-      "design": "Design",
-      "ai": "Artificial Intelligence",
-      "business": "Business"
-    },
-    "featured": {
-      "title": "Featured Articles",
-      "subtitle": "The most relevant content of the month"
-    },
-    "allPosts": "All Articles",
-    "postsOf": "Articles in",
-    "postsFound": "articles found",
-    "noResults": {
-      "title": "No articles found",
-      "subtitle": "Try another search or category",
-      "button": "View all articles"
-    },
-    "readMore": "Read more",
-    "readArticle": "Read article",
-    "pagination": {
-      "previous": "Previous",
-      "next": "Next"
-    },
-    "newsletter": {
-      "title": "Subscribe to Our Newsletter",
-      "subtitle": "Get the latest articles, tutorials and news directly in your email",
-      "placeholder": "you@email.com",
-      "button": "Subscribe",
-      "disclaimer": "No spam. Cancel your subscription anytime."
     }
   },
   "aboutPage": {

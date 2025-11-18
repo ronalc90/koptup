@@ -32,8 +32,12 @@ logger.info('index.ts arrancando');
 // Basic middleware that never fails
 app.use(helmet());
 app.use(cors({
-  origin: process.env.CORS_ORIGIN?.split(',') || '*',
+  origin: process.env.NODE_ENV === 'production'
+    ? (process.env.CORS_ORIGIN?.split(',') || false)
+    : ['http://localhost:3000', 'http://localhost:3001'],
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(compression());
 app.use(express.json({ limit: '10mb' }));
@@ -99,28 +103,30 @@ const startServer = async () => {
         chatRoutes,
         contactRoutes,
         quoteRoutes,
-        blogRoutes,
         projectRoutes,
         ordersRoutes,
         deliverablesRoutes,
         invoicesRoutes,
         messagesRoutes,
-        notificationsRoutes,
         cuentasRoutes,
+        expertSystemRoutes,
+        cupsRoutes,
+        chatbotRoutes,
       ] = await Promise.all([
         import('./routes/auth.routes'),
         import('./routes/document.routes'),
         import('./routes/chat.routes'),
         import('./routes/contact.routes'),
         import('./routes/quote.routes'),
-        import('./routes/blog.routes'),
         import('./routes/project.routes'),
         import('./routes/orders.routes'),
         import('./routes/deliverables.routes'),
         import('./routes/invoices.routes'),
         import('./routes/messages.routes'),
-        import('./routes/notifications.routes'),
         import('./routes/cuentas.routes'),
+        import('./routes/expert-system.routes'),
+        import('./routes/cups.routes'),
+        import('./routes/chatbot.routes'),
       ]);
 
       if (authRoutes.default) app.use('/api/auth', authRoutes.default);
@@ -128,14 +134,15 @@ const startServer = async () => {
       if (chatRoutes.default) app.use('/api/chat', chatRoutes.default);
       if (contactRoutes.default) app.use('/api/contact', contactRoutes.default);
       if (quoteRoutes.default) app.use('/api/quotes', quoteRoutes.default);
-      if (blogRoutes.default) app.use('/api/blog', blogRoutes.default);
       if (projectRoutes.default) app.use('/api/projects', projectRoutes.default);
       if (ordersRoutes.default) app.use('/api/orders', ordersRoutes.default);
       if (deliverablesRoutes.default) app.use('/api/deliverables', deliverablesRoutes.default);
       if (invoicesRoutes.default) app.use('/api/invoices', invoicesRoutes.default);
       if (messagesRoutes.default) app.use('/api/messages', messagesRoutes.default);
-      if (notificationsRoutes.default) app.use('/api/notifications', notificationsRoutes.default);
       if (cuentasRoutes.default) app.use('/api', cuentasRoutes.default);
+      if (expertSystemRoutes.default) app.use('/api/expert', expertSystemRoutes.default);
+      if (cupsRoutes.default) app.use('/api/cups', cupsRoutes.default);
+      if (chatbotRoutes.default) app.use('/api/chatbot', chatbotRoutes.default);
 
       logger.info('Rutas registradas');
     } catch (err: any) {
