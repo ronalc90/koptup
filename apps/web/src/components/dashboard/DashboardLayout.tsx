@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
 import {
   HomeIcon,
   ShoppingBagIcon,
@@ -25,13 +24,38 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
+const translations = {
+  es: {
+    dashboard: 'Dashboard',
+    myOrders: 'Mis Pedidos',
+    projects: 'Proyectos',
+    deliverables: 'Entregables',
+    billing: 'Facturación',
+    messages: 'Mensajes',
+    myProfile: 'Mi Perfil',
+    settings: 'Configuración',
+    logout: 'Cerrar sesión',
+  },
+  en: {
+    dashboard: 'Dashboard',
+    myOrders: 'My Orders',
+    projects: 'Projects',
+    deliverables: 'Deliverables',
+    billing: 'Billing',
+    messages: 'Messages',
+    myProfile: 'My Profile',
+    settings: 'Settings',
+    logout: 'Logout',
+  },
+};
+
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const t = useTranslations('dashboardPage');
   const [user, setUser] = useState<any>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifications, setNotifications] = useState(0);
+  const [language, setLanguage] = useState<'es' | 'en'>('es');
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -40,6 +64,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       return;
     }
     setUser(JSON.parse(userData));
+
+    // Load language from cookie
+    const currentLocale = document.cookie.match(/(?:^|; )locale=([^;]+)/)?.[1] || 'es';
+    setLanguage(currentLocale as 'es' | 'en');
+
     // Simular notificaciones
     setNotifications(3);
   }, [router]);
@@ -50,13 +79,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     router.push('/');
   };
 
+  const t = translations[language];
+
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-    { name: 'Mis Pedidos', href: '/dashboard/orders', icon: ShoppingBagIcon },
-    { name: 'Proyectos', href: '/dashboard/projects', icon: FolderIcon },
-    { name: 'Entregables', href: '/dashboard/deliverables', icon: DocumentTextIcon },
-    { name: 'Facturación', href: '/dashboard/billing', icon: CreditCardIcon },
-    { name: 'Mensajes', href: '/dashboard/messages', icon: ChatBubbleLeftRightIcon },
+    { name: t.dashboard, href: '/dashboard', icon: HomeIcon },
+    { name: t.myOrders, href: '/dashboard/orders', icon: ShoppingBagIcon },
+    { name: t.projects, href: '/dashboard/projects', icon: FolderIcon },
+    { name: t.deliverables, href: '/dashboard/deliverables', icon: DocumentTextIcon },
+    { name: t.billing, href: '/dashboard/billing', icon: CreditCardIcon },
+    { name: t.messages, href: '/dashboard/messages', icon: ChatBubbleLeftRightIcon },
   ];
 
   const isActive = (href: string) => {
@@ -135,7 +166,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <button
                   onClick={handleLogout}
                   className="p-2 rounded-lg text-secondary-600 dark:text-secondary-400 hover:bg-secondary-100 dark:hover:bg-secondary-800"
-                  title="Cerrar sesión"
+                  title={t.logout}
                 >
                   <ArrowRightOnRectangleIcon className="h-5 w-5" />
                 </button>
@@ -183,7 +214,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800"
               >
                 <UserCircleIcon className="h-5 w-5 flex-shrink-0" />
-                <span>Mi Perfil</span>
+                <span>{t.myProfile}</span>
               </Link>
               <Link
                 href="/dashboard/settings"
@@ -191,7 +222,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800"
               >
                 <Cog6ToothIcon className="h-5 w-5 flex-shrink-0" />
-                <span>Configuración</span>
+                <span>{t.settings}</span>
               </Link>
             </div>
           </nav>

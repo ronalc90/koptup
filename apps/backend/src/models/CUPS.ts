@@ -10,6 +10,11 @@ export interface ICUPS extends Document {
   tarifaISS2004?: number; // Tarifa ISS 2004
   uvr?: number; // Unidad de Valor Relativo
   activo: boolean;
+
+  // Embeddings para búsqueda semántica
+  embedding?: number[]; // Vector de 1536 dimensiones (OpenAI text-embedding-3-small)
+  embeddingGenerado?: Date; // Fecha de generación del embedding
+
   metadata?: {
     requiereAutorizacion?: boolean;
     duracionPromedio?: number; // minutos
@@ -73,6 +78,13 @@ const CUPSSchema = new Schema<ICUPS>(
       type: Boolean,
       default: true,
       index: true,
+    },
+    embedding: {
+      type: [Number],
+      select: false, // No incluir por defecto en consultas
+    },
+    embeddingGenerado: {
+      type: Date,
     },
     metadata: {
       requiereAutorizacion: Boolean,
