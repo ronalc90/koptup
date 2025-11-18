@@ -74,9 +74,9 @@ const toggleLanguage = () => {
   return (
     <nav
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
+        'fixed top-0 left-0 right-0 z-[100] transition-all duration-300',
         scrolled
-          ? 'bg-white/95 dark:bg-secondary-900/95 backdrop-blur-md shadow-md'
+          ? 'bg-white/98 dark:bg-secondary-900/98 backdrop-blur-lg shadow-lg'
           : 'bg-transparent'
       )}
     >
@@ -170,7 +170,7 @@ const toggleLanguage = () => {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white dark:bg-secondary-900 border-t border-secondary-200 dark:border-secondary-700">
+        <div className="md:hidden bg-white dark:bg-secondary-900 border-t border-secondary-200 dark:border-secondary-700 backdrop-blur-lg shadow-lg">
           <div className="px-4 py-4 space-y-2">
             {navigation.map((item) => (
               <Link
