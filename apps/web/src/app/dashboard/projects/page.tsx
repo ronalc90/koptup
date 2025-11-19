@@ -30,123 +30,54 @@ export default function ProjectsPage() {
       // Cargar proyectos desde la API
       const projectsData = await api.getUserProjects();
 
-      // Si no hay proyectos, usar datos mock para demostración
-      if (projectsData.length === 0) {
-        const mockProjects = [
-        {
-          id: 'PROJ-001',
-          name: 'Plataforma E-commerce',
-          description: 'Desarrollo completo de tienda online con pasarela de pagos',
-          status: 'active',
-          progress: 75,
-          startDate: '2025-09-01',
-          endDate: '2025-11-20',
-          manager: 'Carlos Rodríguez',
-          teamSize: 5,
-          budget: 15000,
-          spent: 11250,
-          phases: [
-            { name: 'Planeación', status: 'completed', progress: 100, dueDate: '2025-09-10' },
-            { name: 'Desarrollo', status: 'in_progress', progress: 80, dueDate: '2025-10-30' },
-            { name: 'QA', status: 'pending', progress: 0, dueDate: '2025-11-10' },
-            { name: 'Entrega', status: 'pending', progress: 0, dueDate: '2025-11-20' },
-          ],
-          milestones: [
-            { name: 'Diseño UI/UX completado', date: '2025-09-15', status: 'completed' },
-            { name: 'Backend API funcional', date: '2025-10-05', status: 'completed' },
-            { name: 'Integración de pagos', date: '2025-10-25', status: 'in_progress' },
-            { name: 'Testing completo', date: '2025-11-10', status: 'pending' },
-          ],
-          deliverables: [
-            { name: 'Mockups de diseño', status: 'approved', date: '2025-09-12' },
-            { name: 'Prototipo funcional', status: 'approved', date: '2025-09-28' },
-            { name: 'Beta version', status: 'in_review', date: '2025-10-15' },
-          ],
-        },
-        {
-          id: 'PROJ-002',
-          name: 'Portal de Clientes',
-          description: 'Dashboard personalizado para clientes con reportes y analytics',
-          status: 'active',
-          progress: 45,
-          startDate: '2025-10-01',
-          endDate: '2025-12-10',
-          manager: 'María González',
-          teamSize: 3,
-          budget: 8500,
-          spent: 3825,
-          phases: [
-            { name: 'Planeación', status: 'completed', progress: 100, dueDate: '2025-10-08' },
-            { name: 'Desarrollo', status: 'in_progress', progress: 30, dueDate: '2025-11-20' },
-            { name: 'QA', status: 'pending', progress: 0, dueDate: '2025-12-01' },
-            { name: 'Entrega', status: 'pending', progress: 0, dueDate: '2025-12-10' },
-          ],
-          milestones: [
-            { name: 'Arquitectura definida', date: '2025-10-05', status: 'completed' },
-            { name: 'Dashboard de reportes', date: '2025-10-30', status: 'in_progress' },
-            { name: 'Integración con API', date: '2025-11-15', status: 'pending' },
-          ],
-          deliverables: [
-            { name: 'Documento de requisitos', status: 'approved', date: '2025-10-03' },
-            { name: 'Wireframes', status: 'approved', date: '2025-10-10' },
-          ],
-        },
-        {
-          id: 'PROJ-003',
-          name: 'App Móvil iOS/Android',
-          description: 'Aplicación nativa para gestión de pedidos',
-          status: 'planning',
-          progress: 15,
-          startDate: '2025-10-15',
-          endDate: '2026-01-30',
-          manager: 'Juan Pérez',
-          teamSize: 4,
-          budget: 18000,
-          spent: 2700,
-          phases: [
-            { name: 'Planeación', status: 'in_progress', progress: 60, dueDate: '2025-10-30' },
-            { name: 'Desarrollo', status: 'pending', progress: 0, dueDate: '2026-01-10' },
-            { name: 'QA', status: 'pending', progress: 0, dueDate: '2026-01-20' },
-            { name: 'Entrega', status: 'pending', progress: 0, dueDate: '2026-01-30' },
-          ],
-          milestones: [
-            { name: 'Discovery completado', date: '2025-10-20', status: 'in_progress' },
-            { name: 'Prototipo aprobado', date: '2025-10-28', status: 'pending' },
-          ],
-          deliverables: [
-            { name: 'Research inicial', status: 'in_review', date: '2025-10-18' },
-          ],
-        },
-        ];
-        setProjects(mockProjects);
-        setSelectedProject(mockProjects[0]);
-      } else {
-        // Formatear proyectos de la API
-        const formattedProjects = projectsData.map((p: any) => ({
-          id: p.id,
-          name: p.name,
-          description: p.description || 'Sin descripción',
-          status: p.status || 'active',
-          progress: p.progress || 0,
-          startDate: p.start_date || new Date().toISOString().split('T')[0],
-          endDate: p.end_date || 'Sin fecha',
-          manager: p.manager_name || 'Sin asignar',
-          teamSize: p.team_size || 1,
-          budget: 0,
-          spent: 0,
-          phases: [
-            { name: 'Planeación', status: 'completed', progress: 100, dueDate: p.start_date },
-            { name: 'Desarrollo', status: 'in_progress', progress: p.progress || 0, dueDate: p.end_date },
-            { name: 'QA', status: 'pending', progress: 0, dueDate: p.end_date },
-            { name: 'Entrega', status: 'pending', progress: 0, dueDate: p.end_date },
-          ],
-          milestones: [],
-          deliverables: [],
-        }));
-        setProjects(formattedProjects);
-        if (formattedProjects.length > 0) {
-          setSelectedProject(formattedProjects[0]);
-        }
+      // Formatear proyectos de la API
+      const formattedProjects = projectsData.map((p: any) => ({
+        id: p._id || p.id,
+        name: p.name,
+        description: p.description || 'Sin descripción',
+        status: p.status || 'active',
+        progress: p.progress || 0,
+        startDate: p.start_date ? new Date(p.start_date).toISOString().split('T')[0] : 'Sin fecha',
+        endDate: p.end_date ? new Date(p.end_date).toISOString().split('T')[0] : 'Sin fecha',
+        manager: p.manager_name || 'Sin asignar',
+        teamSize: p.team_size || 0,
+        budget: p.budget || 0,
+        spent: p.actual_hours ? (p.actual_hours / (p.estimated_hours || 1)) * (p.budget || 0) : 0,
+        totalTasks: p.total_tasks || 0,
+        completedTasks: p.completed_tasks || 0,
+        phases: [
+          {
+            name: 'Planeación',
+            status: p.progress > 0 ? 'completed' : 'in_progress',
+            progress: p.progress > 0 ? 100 : 50,
+            dueDate: p.start_date ? new Date(p.start_date).toISOString().split('T')[0] : 'Sin fecha'
+          },
+          {
+            name: 'Desarrollo',
+            status: p.progress > 0 && p.progress < 100 ? 'in_progress' : p.progress === 100 ? 'completed' : 'pending',
+            progress: p.progress || 0,
+            dueDate: p.end_date ? new Date(p.end_date).toISOString().split('T')[0] : 'Sin fecha'
+          },
+          {
+            name: 'QA',
+            status: p.progress > 80 ? 'in_progress' : 'pending',
+            progress: p.progress > 80 ? (p.progress - 80) * 5 : 0,
+            dueDate: p.end_date ? new Date(p.end_date).toISOString().split('T')[0] : 'Sin fecha'
+          },
+          {
+            name: 'Entrega',
+            status: p.status === 'completed' ? 'completed' : 'pending',
+            progress: p.status === 'completed' ? 100 : 0,
+            dueDate: p.end_date ? new Date(p.end_date).toISOString().split('T')[0] : 'Sin fecha'
+          },
+        ],
+        milestones: [],
+        deliverables: [],
+      }));
+
+      setProjects(formattedProjects);
+      if (formattedProjects.length > 0) {
+        setSelectedProject(formattedProjects[0]);
       }
     } catch (error) {
       console.error('Failed to load projects:', error);
@@ -200,10 +131,27 @@ export default function ProjectsPage() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Projects List */}
-          <div className="lg:col-span-1 space-y-4">
-            {projects.map((project) => (
+        {projects.length === 0 ? (
+          <Card variant="bordered">
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <div className="text-center">
+                <h3 className="text-xl font-semibold text-secondary-900 dark:text-white mb-2">
+                  No tienes proyectos activos
+                </h3>
+                <p className="text-secondary-600 dark:text-secondary-400 mb-6">
+                  Comienza solicitando un nuevo proyecto para ver su progreso aquí
+                </p>
+                <Button asChild>
+                  <Link href="/contact?type=new-project">Solicitar Nuevo Proyecto</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Projects List */}
+            <div className="lg:col-span-1 space-y-4">
+              {projects.map((project) => (
               <Card
                 key={project.id}
                 variant="bordered"
@@ -461,8 +409,8 @@ export default function ProjectsPage() {
                 </Button>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );

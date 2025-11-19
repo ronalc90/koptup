@@ -3,6 +3,7 @@ import { seedCUPS } from './cups.seed';
 import { seedCIE10 } from './cie10.seed';
 import { seedTarifarios } from './tarifarios.seed';
 import { seedReglasAuditoria } from './reglas-auditoria.seed';
+import { seedProjects } from './projects.seed';
 
 export async function runAllSeeds() {
   try {
@@ -12,6 +13,7 @@ export async function runAllSeeds() {
     await seedCIE10();
     await seedTarifarios();
     await seedReglasAuditoria();
+    await seedProjects();
 
     console.log('\n✅ Todos los seeds completados exitosamente!');
   } catch (error) {
