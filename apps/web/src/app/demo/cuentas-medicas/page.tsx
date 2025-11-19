@@ -126,18 +126,41 @@ export default function CuentasMedicasPage() {
         return;
       }
 
-      // TODO: Implementar procesamiento con IA
-      // 1. Crear cuenta básica con nombre
-      // 2. Subir archivos al servidor
-      // 3. Procesar archivos con IA para extraer datos
-      // 4. Crear factura, atenciones, procedimientos
+      // Crear FormData para enviar archivos
+      const formData = new FormData();
+      formData.append('nombreCuenta', nombreCuenta);
 
-      alert('Funcionalidad en desarrollo.\n\nSe creará la cuenta y se procesarán los archivos:\n' +
-            archivosSubidos.map(f => `- ${f.name}`).join('\n'));
+      // Agregar todos los archivos
+      archivosSubidos.forEach((file) => {
+        formData.append('files', file);
+      });
 
+      // Enviar al backend
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+      const response = await fetch(`${API_BASE}/auditoria/procesar-archivos`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al procesar archivos');
+      }
+
+      const result = await response.json();
+
+      alert(`✅ Cuenta creada exitosamente!\n\n` +
+            `Factura: ${result.data.factura.numeroFactura}\n` +
+            `Archivos procesados: ${result.data.archivosProcessed.total}\n\n` +
+            `Puede ver los detalles en el listado de facturas.`);
+
+      // Limpiar formulario
       setMostrarModalCrear(false);
       setNombreCuenta('');
       setArchivosSubidos([]);
+
+      // Recargar estadísticas
+      await cargarEstadisticas();
     } catch (error: any) {
       alert('Error al crear cuenta: ' + error.message);
     } finally {
