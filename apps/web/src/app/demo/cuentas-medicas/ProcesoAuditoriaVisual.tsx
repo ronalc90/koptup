@@ -157,19 +157,37 @@ const PasoProceso: React.FC<PasoProcesoProps> = ({
   );
 };
 
+interface DocumentoSubido {
+  nombre: string;
+  tipo: 'excel' | 'pdf';
+  tamaño: string;
+  estado: 'procesado' | 'procesando' | 'pendiente';
+}
+
 interface ProcesoAuditoriaVisualProps {
   facturaId?: string;
   enEjecucion?: boolean;
   onFinalizar?: (resultado: any) => void;
+  documentos?: DocumentoSubido[];
 }
 
 export default function ProcesoAuditoriaVisual({
   facturaId,
   enEjecucion = false,
   onFinalizar,
+  documentos = [],
 }: ProcesoAuditoriaVisualProps) {
   const [pasoActual, setPasoActual] = useState(0);
   const [resultadosAuditoria, setResultadosAuditoria] = useState<any>(null);
+  const [documentosProcesados, setDocumentosProcesados] = useState<DocumentoSubido[]>(
+    documentos.length > 0
+      ? documentos
+      : [
+          { nombre: 'RIPS_Factura_2024.xlsx', tipo: 'excel', tamaño: '245 KB', estado: 'pendiente' },
+          { nombre: 'Autorizaciones_Pacientes.pdf', tipo: 'pdf', tamaño: '1.2 MB', estado: 'pendiente' },
+          { nombre: 'Soportes_Medicos.pdf', tipo: 'pdf', tamaño: '3.5 MB', estado: 'pendiente' },
+        ]
+  );
 
   const pasos: PasoProcesoProps[] = [
     {
@@ -314,6 +332,20 @@ export default function ProcesoAuditoriaVisual({
 
   useEffect(() => {
     if (enEjecucion && pasoActual < pasos.length) {
+      // Marcar documento como procesando en el paso 0
+      if (pasoActual === 0) {
+        setDocumentosProcesados((prev) =>
+          prev.map((doc) => ({ ...doc, estado: 'procesando' as const }))
+        );
+      }
+
+      // Marcar documentos como procesados después del paso 0
+      if (pasoActual === 1) {
+        setDocumentosProcesados((prev) =>
+          prev.map((doc) => ({ ...doc, estado: 'procesado' as const }))
+        );
+      }
+
       const timer = setTimeout(() => {
         setPasoActual((prev) => prev + 1);
       }, 2000); // Simular tiempo de procesamiento
@@ -358,6 +390,66 @@ export default function ProcesoAuditoriaVisual({
             <span className="font-bold text-white">
               {pasoActual}/{pasos.length} pasos
             </span>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Documentos Cargados */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <DocumentTextIcon className="h-6 w-6 text-blue-600" />
+            Documentos Cargados ({documentosProcesados.length})
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {documentosProcesados.map((doc, idx) => (
+              <div
+                key={idx}
+                className={`flex items-center justify-between p-4 rounded-lg border-2 transition-all ${
+                  doc.estado === 'procesado'
+                    ? 'bg-green-50 border-green-500'
+                    : doc.estado === 'procesando'
+                    ? 'bg-blue-50 border-blue-500 animate-pulse'
+                    : 'bg-gray-50 border-gray-300'
+                }`}
+              >
+                <div className="flex items-center gap-3 flex-1">
+                  {doc.tipo === 'excel' ? (
+                    <TableCellsIcon className="h-8 w-8 text-green-600" />
+                  ) : (
+                    <DocumentTextIcon className="h-8 w-8 text-red-600" />
+                  )}
+                  <div>
+                    <p className="font-semibold text-gray-900">{doc.nombre}</p>
+                    <p className="text-sm text-gray-600">
+                      {doc.tipo === 'excel' ? 'Excel RIPS/Factura' : 'PDF Soportes'} • {doc.tamaño}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {doc.estado === 'procesado' && (
+                    <Badge className="bg-green-100 text-green-800">
+                      <CheckCircleIcon className="h-4 w-4 mr-1" />
+                      Procesado
+                    </Badge>
+                  )}
+                  {doc.estado === 'procesando' && (
+                    <Badge className="bg-blue-100 text-blue-800">
+                      <CpuChipIcon className="h-4 w-4 mr-1 animate-spin" />
+                      Procesando...
+                    </Badge>
+                  )}
+                  {doc.estado === 'pendiente' && (
+                    <Badge className="bg-gray-100 text-gray-800">
+                      <ClockIcon className="h-4 w-4 mr-1" />
+                      Pendiente
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
