@@ -47,10 +47,16 @@ export default function ChatbotPreviewPage() {
     sendMessage,
   } = useChatbot(config);
 
-  // Auto-scroll to bottom when new messages arrive
+  const [hasScrolled, setHasScrolled] = useState(false);
+
+  // Auto-scroll to bottom when new messages arrive (but not on initial load)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (messages.length > 0 && hasScrolled) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    } else if (messages.length > 0) {
+      setHasScrolled(true);
+    }
+  }, [messages, hasScrolled]);
 
   const handleSendMessage = async () => {
     if (inputMessage.trim() && !isLoading) {
@@ -108,7 +114,7 @@ export default function ChatbotPreviewPage() {
       </div>
 
       {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 max-w-4xl mx-auto w-full">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto w-full">
         <div className="space-y-4">
           {/* Greeting Message */}
           <div className="flex gap-3">
@@ -123,7 +129,7 @@ export default function ChatbotPreviewPage() {
                 <SelectedIcon className="h-5 w-5 text-primary-600 dark:text-primary-400" />
               )}
             </div>
-            <div className="bg-secondary-100 dark:bg-secondary-700 rounded-2xl rounded-tl-sm p-4 max-w-[80%]">
+            <div className="bg-secondary-100 dark:bg-secondary-700 rounded-2xl rounded-tl-sm p-4 max-w-[85%] sm:max-w-[75%]">
               <p className="text-base" style={{ color: config.textColor }}>
                 {config.greeting}
               </p>
@@ -149,7 +155,7 @@ export default function ChatbotPreviewPage() {
                   )}
                 </div>
               )}
-              <div className="flex flex-col max-w-[80%]">
+              <div className="flex flex-col max-w-[85%] sm:max-w-[75%]">
                 <div
                   className={`rounded-2xl p-4 ${
                     msg.role === 'user'
@@ -159,7 +165,7 @@ export default function ChatbotPreviewPage() {
                   style={msg.role === 'user' ? { backgroundColor: config.headerColor } : {}}
                 >
                   <p
-                    className="text-base whitespace-pre-wrap"
+                    className="text-base whitespace-pre-wrap break-words"
                     style={{ color: msg.role === 'user' ? '#FFFFFF' : config.textColor }}
                   >
                     {msg.content}
@@ -208,8 +214,8 @@ export default function ChatbotPreviewPage() {
               <div className="w-10 h-10 bg-red-100 dark:bg-red-950 rounded-full flex items-center justify-center flex-shrink-0">
                 <span className="text-red-600 dark:text-red-400">!</span>
               </div>
-              <div className="bg-red-50 dark:bg-red-950 rounded-2xl rounded-tl-sm p-4 max-w-[80%] border border-red-200 dark:border-red-800">
-                <p className="text-base text-red-800 dark:text-red-200">
+              <div className="bg-red-50 dark:bg-red-950 rounded-2xl rounded-tl-sm p-4 max-w-[85%] sm:max-w-[75%] border border-red-200 dark:border-red-800">
+                <p className="text-base text-red-800 dark:text-red-200 break-words">
                   {error}
                 </p>
               </div>
@@ -221,8 +227,8 @@ export default function ChatbotPreviewPage() {
       </div>
 
       {/* Input Area */}
-      <div className="border-t border-secondary-200 dark:border-secondary-700 bg-white dark:bg-secondary-900 px-4 py-4">
-        <div className="max-w-4xl mx-auto w-full flex gap-3">
+      <div className="border-t border-secondary-200 dark:border-secondary-700 bg-white dark:bg-secondary-900 px-4 sm:px-6 lg:px-8 py-4">
+        <div className="max-w-7xl mx-auto w-full flex gap-3">
           <input
             type="text"
             value={inputMessage}
