@@ -121,4 +121,27 @@ export const auditoriaAPI = {
     if (!response.ok) throw new Error('Error al obtener estadísticas');
     return response.json();
   },
+
+  // Auditoría Paso a Paso
+  async iniciarAuditoriaPasoPaso(facturaId: string) {
+    const response = await fetch(`${API_BASE}/auditoria/facturas/${facturaId}/auditar-paso-a-paso`, {
+      method: 'POST',
+    });
+    if (!response.ok) throw new Error('Error al iniciar auditoría paso a paso');
+    return response.json();
+  },
+
+  async avanzarPaso(sesionId: string) {
+    const response = await fetch(`${API_BASE}/auditoria/sesion/${sesionId}/siguiente`, {
+      method: 'POST',
+    });
+    if (!response.ok) throw new Error('Error al avanzar paso');
+    return response.json();
+  },
+
+  async obtenerSesion(sesionId: string) {
+    const response = await fetch(`${API_BASE}/auditoria/sesion/${sesionId}`);
+    if (!response.ok) throw new Error('Error al obtener sesión');
+    return response.json();
+  },
 };
