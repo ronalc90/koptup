@@ -30,9 +30,10 @@ import toast from 'react-hot-toast';
 import ProcesoAuditoriaVisual from './ProcesoAuditoriaVisual';
 
 export default function CuentasMedicasPage() {
-  const [vista, setVista] = useState<'dashboard' | 'facturas' | 'detalle' | 'crear' | 'proceso'>('dashboard');
+  const [vista, setVista] = useState<'dashboard' | 'facturas' | 'detalle' | 'crear' | 'proceso' | 'admin'>('dashboard');
   const [mostrarProceso, setMostrarProceso] = useState(false);
   const [procesoEnEjecucion, setProcesoEnEjecucion] = useState(false);
+  const [verProcesoAlCrear, setVerProcesoAlCrear] = useState(false);
   const [estadisticas, setEstadisticas] = useState<Estadisticas | null>(null);
   const [facturas, setFacturas] = useState<Factura[]>([]);
   const [facturaSeleccionada, setFacturaSeleccionada] = useState<any | null>(null);
@@ -204,18 +205,40 @@ export default function CuentasMedicasPage() {
 
       // Remover toast de loading y mostrar éxito
       toast.dismiss(loadingToast);
-      toast.success(
-        `✅ Cuenta creada exitosamente!\n\nFactura: ${result.data.factura.numeroFactura}\nArchivos procesados: ${result.data.archivosProcessed.total}\n\nPuede ver los detalles en el listado de facturas.`,
-        { duration: 6000, style: { whiteSpace: 'pre-line' } }
-      );
 
       // Limpiar formulario
       setMostrarModalCrear(false);
+      const archivosCargados = [...archivosSubidos];
       setNombreCuenta('');
       setArchivosSubidos([]);
 
+      // Si el usuario seleccionó ver el proceso, mostrarlo
+      if (verProcesoAlCrear) {
+        setMostrarProceso(true);
+        setProcesoEnEjecucion(true);
+        setVista('proceso');
+
+        // Esperar a que termine la visualización
+        await new Promise(resolve => setTimeout(resolve, 13000));
+
+        toast.success(
+          `✅ Cuenta creada exitosamente!\n\nFactura: ${result.data.factura.numeroFactura}\nArchivos procesados: ${result.data.archivosProcessed.total}`,
+          { duration: 6000, style: { whiteSpace: 'pre-line' } }
+        );
+
+        setProcesoEnEjecucion(false);
+        setVista('facturas');
+        await cargarFacturas();
+      } else {
+        toast.success(
+          `✅ Cuenta creada exitosamente!\n\nFactura: ${result.data.factura.numeroFactura}\nArchivos procesados: ${result.data.archivosProcessed.total}`,
+          { duration: 6000, style: { whiteSpace: 'pre-line' } }
+        );
+      }
+
       // Recargar estadísticas
       await cargarEstadisticas();
+      setVerProcesoAlCrear(false);
     } catch (error: any) {
       toast.error('Error al crear cuenta: ' + error.message);
     } finally {
@@ -447,6 +470,26 @@ export default function CuentasMedicasPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Opción de ver proceso */}
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={verProcesoAlCrear}
+                    onChange={(e) => setVerProcesoAlCrear(e.target.checked)}
+                    className="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                  />
+                  <div className="ml-3">
+                    <span className="text-sm font-medium text-purple-900">
+                      📊 Ver proceso de auditoría paso a paso
+                    </span>
+                    <p className="text-xs text-purple-700 mt-1">
+                      Muestra cómo se procesan los documentos y se generan las glosas (demora ~13 segundos adicionales)
+                    </p>
+                  </div>
+                </label>
+              </div>
             </div>
 
             {/* Botones */}
@@ -510,6 +553,14 @@ export default function CuentasMedicasPage() {
               </div>
               <div className="flex space-x-3">
                 <Button
+                  onClick={() => setVista('admin')}
+                  variant="outline"
+                  className="border-gray-600 text-gray-700 hover:bg-gray-50"
+                >
+                  <BuildingOfficeIcon className="h-5 w-5 mr-2" />
+                  Administración
+                </Button>
+                <Button
                   onClick={() => {
                     setMostrarProceso(true);
                     setProcesoEnEjecucion(true);
@@ -518,7 +569,7 @@ export default function CuentasMedicasPage() {
                   className="bg-purple-600 hover:bg-purple-700"
                 >
                   <PlayIcon className="h-5 w-5 mr-2" />
-                  Ver Proceso de Auditoría
+                  Ver Proceso
                 </Button>
                 <Button
                   onClick={() => setMostrarModalCrear(true)}
@@ -1256,6 +1307,291 @@ export default function CuentasMedicasPage() {
               );
             }}
           />
+        </div>
+      </div>
+    );
+  }
+
+  // VISTA ADMINISTRACIÓN
+  if (vista === 'admin') {
+    // Cargar facturas si no están cargadas
+    useEffect(() => {
+      if (facturas.length === 0) {
+        cargarFacturas();
+      }
+    }, [facturas.length, cargarFacturas]);
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-6">
+            <Button variant="ghost" onClick={() => setVista('dashboard')}>
+              <ArrowLeftIcon className="h-4 w-4 mr-2" />
+              Volver al Dashboard
+            </Button>
+          </div>
+
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              🤖 Base de Conocimiento del Sistema Experto
+            </h1>
+            <p className="text-gray-600">
+              Todos los documentos, tarifarios y normativas en los que se basa la IA para auditar facturas médicas
+            </p>
+          </div>
+
+          {/* Estadísticas de Base de Conocimiento */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <Card className="border-l-4 border-purple-500">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600 mb-1">Códigos CUPS</p>
+                    <p className="text-3xl font-bold text-purple-900">12,457</p>
+                  </div>
+                  <div className="bg-purple-100 p-3 rounded-full">
+                    <TableCellsIcon className="h-6 w-6 text-purple-600" />
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">Base SISPRO actualizada</p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-l-4 border-blue-500">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600 mb-1">Diagnósticos CIE-10</p>
+                    <p className="text-3xl font-bold text-blue-900">14,891</p>
+                  </div>
+                  <div className="bg-blue-100 p-3 rounded-full">
+                    <DocumentTextIcon className="h-6 w-6 text-blue-600" />
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">Clasificación internacional</p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-l-4 border-green-500">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600 mb-1">Tarifarios</p>
+                    <p className="text-3xl font-bold text-green-900">5</p>
+                  </div>
+                  <div className="bg-green-100 p-3 rounded-full">
+                    <CurrencyDollarIcon className="h-6 w-6 text-green-600" />
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">SOAT, ISS, Contratos EPS</p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-l-4 border-orange-500">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600 mb-1">Documentos Cargados</p>
+                    <p className="text-3xl font-bold text-orange-900">
+                      {facturas.reduce((acc, f) => acc + 1 + (f.soportes?.length || 2), 0)}
+                    </p>
+                  </div>
+                  <div className="bg-orange-100 p-3 rounded-full">
+                    <DocumentArrowUpIcon className="h-6 w-6 text-orange-600" />
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">Facturas y soportes</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Bases de Datos del Sistema Experto */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* Tarifarios */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CurrencyDollarIcon className="h-6 w-6 text-green-600" />
+                  Tarifarios Configurados
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <div>
+                      <p className="font-semibold text-gray-900">Tarifario SOAT 2024</p>
+                      <p className="text-xs text-gray-600">Seguro Obligatorio de Accidentes de Tránsito</p>
+                    </div>
+                    <Badge className="bg-green-100 text-green-800">
+                      <CheckCircleIcon className="h-3 w-3 mr-1" />
+                      Activo
+                    </Badge>
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <div>
+                      <p className="font-semibold text-gray-900">Manual Tarifario ISS 2001</p>
+                      <p className="text-xs text-gray-600">Base de tarifas institucionales</p>
+                    </div>
+                    <Badge className="bg-green-100 text-green-800">
+                      <CheckCircleIcon className="h-3 w-3 mr-1" />
+                      Activo
+                    </Badge>
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <div>
+                      <p className="font-semibold text-gray-900">Contratos EPS - IPS</p>
+                      <p className="text-xs text-gray-600">Tarifas pactadas específicas</p>
+                    </div>
+                    <Badge className="bg-green-100 text-green-800">
+                      <CheckCircleIcon className="h-3 w-3 mr-1" />
+                      3 Contratos
+                    </Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Normativa */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ShieldCheckIcon className="h-6 w-6 text-blue-600" />
+                  Normativa y Guías
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div>
+                      <p className="font-semibold text-gray-900">Ley 100 de 1993</p>
+                      <p className="text-xs text-gray-600">Sistema General de Seguridad Social en Salud</p>
+                    </div>
+                    <Badge className="bg-blue-100 text-blue-800">
+                      Referencia
+                    </Badge>
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div>
+                      <p className="font-semibold text-gray-900">Resolución 3047 de 2008</p>
+                      <p className="text-xs text-gray-600">Manual de tarifas y procedimientos</p>
+                    </div>
+                    <Badge className="bg-blue-100 text-blue-800">
+                      Referencia
+                    </Badge>
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div>
+                      <p className="font-semibold text-gray-900">Guías de Práctica Clínica</p>
+                      <p className="text-xs text-gray-600">Validación de pertinencia médica</p>
+                    </div>
+                    <Badge className="bg-blue-100 text-blue-800">
+                      125 Guías
+                    </Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Listado de Documentos por Factura */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Documentos por Cuenta Médica</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="text-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                  <p className="mt-4 text-gray-600">Cargando documentos...</p>
+                </div>
+              ) : facturas.length === 0 ? (
+                <div className="text-center py-12">
+                  <DocumentTextIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-600">No hay documentos cargados</p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    Los documentos aparecerán aquí una vez que crees facturas en el sistema
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {facturas.map((factura) => (
+                    <div key={factura._id} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <h3 className="font-semibold text-gray-900 text-lg">
+                            {factura.numeroFactura}
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            {factura.ips.nombre} • {formatearFecha(factura.fechaEmision)}
+                          </p>
+                        </div>
+                        <Badge className={getEstadoBadge(factura.estado)}>
+                          {factura.estado}
+                        </Badge>
+                      </div>
+
+                      {/* Documentos de la Factura */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {/* Documento Principal */}
+                        <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                          <TableCellsIcon className="h-8 w-8 text-green-600 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm text-gray-900">RIPS/Factura Principal</p>
+                            <p className="text-xs text-gray-600">Excel • Generado automáticamente</p>
+                          </div>
+                          <Badge className="bg-green-100 text-green-800">
+                            <CheckCircleIcon className="h-3 w-3 mr-1" />
+                            Procesado
+                          </Badge>
+                        </div>
+
+                        {/* Soportes */}
+                        {(factura.soportes && factura.soportes.length > 0 ? factura.soportes : [
+                          { tipo: 'pdf', descripcion: 'Autorizaciones' },
+                          { tipo: 'pdf', descripcion: 'Órdenes Médicas' }
+                        ]).map((soporte: any, idx: number) => (
+                          <div key={idx} className="flex items-center gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                            <DocumentTextIcon className="h-8 w-8 text-red-600 flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm text-gray-900 truncate">
+                                {soporte.descripcion || `Soporte ${idx + 1}`}
+                              </p>
+                              <p className="text-xs text-gray-600">PDF • Soporte documental</p>
+                            </div>
+                            <Badge className="bg-blue-100 text-blue-800">
+                              <CheckCircleIcon className="h-3 w-3 mr-1" />
+                              Validado
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Resumen de Documentos */}
+                      <div className="mt-4 pt-4 border-t border-gray-200">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">
+                            Total documentos: {1 + ((factura.soportes?.length || 0) > 0 ? factura.soportes.length : 2)}
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => verDetalleFactura(factura._id)}
+                          >
+                            Ver Detalles Completos
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
