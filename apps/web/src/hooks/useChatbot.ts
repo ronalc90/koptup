@@ -28,6 +28,7 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploadedDocuments, setUploadedDocuments] = useState<string[]>([]);
   const [config, setConfig] = useState<ChatbotConfig>({
     title: initialConfig?.title || 'Asistente Virtual',
     greeting: initialConfig?.greeting || '¡Hola! 👋 Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?',
@@ -63,6 +64,10 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
           if (data.data.config) {
             setConfig(prev => ({ ...prev, ...data.data.config }));
           }
+          // Extract documents if available
+          if (data.data.documents) {
+            setUploadedDocuments(data.data.documents);
+          }
         }
       }
     } catch (err) {
@@ -97,6 +102,10 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'Error subiendo documentos');
       }
+
+      // Add uploaded file names to the list
+      const fileNames = files.map(f => f.name);
+      setUploadedDocuments(prev => [...prev, ...fileNames]);
 
       return true;
     } catch (err: any) {
@@ -208,6 +217,7 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
     config,
     isLoading,
     error,
+    uploadedDocuments,
     uploadDocuments,
     sendMessage,
     updateConfig,
