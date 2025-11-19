@@ -19,6 +19,7 @@ import {
   XMarkIcon,
   CheckIcon,
 } from '@heroicons/react/24/outline';
+import * as contentService from '@/services/contentManagerService';
 
 interface Template {
   id: number;
@@ -46,6 +47,9 @@ export default function GestorContenido() {
   const [tone, setTone] = useState<'formal' | 'técnico' | 'persuasivo'>('formal');
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showVersions, setShowVersions] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [generatedVersions, setGeneratedVersions] = useState<contentService.ContentVersion[]>([]);
 
   const templates: Template[] = [
     {
@@ -101,35 +105,101 @@ export default function GestorContenido() {
     { id: 3, title: 'Descripción Software AI', type: 'Descripción de Producto', date: '2024-01-26', favorite: true },
   ];
 
-  const versions = [
-    { id: 1, version: 'v1.3', date: '2024-01-28 14:30', tone: 'Formal' },
-    { id: 2, version: 'v1.2', date: '2024-01-28 10:15', tone: 'Persuasivo' },
-    { id: 3, version: 'v1.1', date: '2024-01-27 16:45', tone: 'Formal' },
-  ];
-
   const selectTemplate = (template: Template) => {
     setSelectedTemplate(template);
     setContent('');
     setPreviewContent('');
+    setError(null);
     setView('editor');
   };
 
-  const improveText = () => {
-    // Simulación de mejora de texto con IA
-    setPreviewContent(content + '\n\n[Texto mejorado por IA con mejor gramática y estilo profesional]');
+  const improveText = async () => {
+    if (!content.trim() || !selectedTemplate) {
+      setError('Por favor escribe algo de contenido primero');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const templateId = contentService.getTemplateId(selectedTemplate.name);
+      const improved = await contentService.improveContent(content, templateId);
+      setPreviewContent(improved);
+    } catch (err: any) {
+      setError(err.message || 'Error al mejorar el texto');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const changeTone = (newTone: 'formal' | 'técnico' | 'persuasivo') => {
+  const changeToneHandler = async (newTone: 'formal' | 'técnico' | 'persuasivo') => {
+    if (!content.trim() || !selectedTemplate) {
+      setError('Por favor escribe algo de contenido primero');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
     setTone(newTone);
-    setPreviewContent(content + `\n\n[Texto adaptado al tono ${newTone}]`);
+
+    try {
+      const templateId = contentService.getTemplateId(selectedTemplate.name);
+      const adapted = await contentService.changeTone(content, newTone, templateId);
+      setPreviewContent(adapted);
+    } catch (err: any) {
+      setError(err.message || 'Error al cambiar el tono');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const adjustWordCount = (targetWords: number) => {
-    setPreviewContent(content + `\n\n[Texto ajustado a aproximadamente ${targetWords} palabras]`);
+  const adjustWordCount = async (targetWords: number) => {
+    if (!content.trim() || !selectedTemplate) {
+      setError('Por favor escribe algo de contenido primero');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const templateId = contentService.getTemplateId(selectedTemplate.name);
+      const adjusted = await contentService.adjustLength(content, targetWords, templateId);
+      setPreviewContent(adjusted);
+    } catch (err: any) {
+      setError(err.message || 'Error al ajustar la longitud');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const generateVersions = () => {
-    setShowVersions(true);
+  const generateVersionsHandler = async () => {
+    if (!content.trim() || !selectedTemplate) {
+      setError('Por favor escribe algo de contenido primero');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const templateId = contentService.getTemplateId(selectedTemplate.name);
+      const versions = await contentService.generateVersions(content, templateId, 3);
+      setGeneratedVersions(versions);
+      setShowVersions(true);
+    } catch (err: any) {
+      setError(err.message || 'Error al generar versiones');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadVersion = (version: contentService.ContentVersion) => {
+    setContent(version.content);
+    setPreviewContent(version.content);
+    setTone(version.tone);
+    setShowVersions(false);
   };
 
   if (view === 'templates') {
@@ -250,11 +320,12 @@ export default function GestorContenido() {
 
             <div className="flex items-center gap-3">
               <button
-                onClick={generateVersions}
-                className="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-2 text-sm font-medium"
+                onClick={generateVersionsHandler}
+                disabled={loading}
+                className="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <ClockIcon className="w-4 h-4" />
-                Versiones
+                Versiones {generatedVersions.length > 0 && `(${generatedVersions.length})`}
               </button>
               <div className="relative">
                 <button
@@ -329,10 +400,27 @@ export default function GestorContenido() {
                 <SparklesIcon className="w-5 h-5 text-pink-600" />
                 <h3 className="font-semibold text-slate-900 dark:text-white">Herramientas IA</h3>
               </div>
+
+              {error && (
+                <div className="mb-3 p-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-800 rounded-lg">
+                  <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+                </div>
+              )}
+
+              {loading && (
+                <div className="mb-3 p-3 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-800 rounded-lg">
+                  <p className="text-sm text-blue-800 dark:text-blue-200 flex items-center gap-2">
+                    <ArrowPathIcon className="w-4 h-4 animate-spin" />
+                    Procesando con IA...
+                  </p>
+                </div>
+              )}
+
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={improveText}
-                  className="px-4 py-2 bg-white dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-sm font-medium flex items-center gap-2"
+                  disabled={loading}
+                  className="px-4 py-2 bg-white dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-sm font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <SparklesIcon className="w-4 h-4" />
                   Mejorar Texto
@@ -341,8 +429,9 @@ export default function GestorContenido() {
                   {(['formal', 'técnico', 'persuasivo'] as const).map((toneOption) => (
                     <button
                       key={toneOption}
-                      onClick={() => changeTone(toneOption)}
-                      className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                      onClick={() => changeToneHandler(toneOption)}
+                      disabled={loading}
+                      className={`px-3 py-1 rounded text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                         tone === toneOption
                           ? 'bg-pink-600 text-white'
                           : 'hover:bg-slate-100 dark:hover:bg-slate-700'
@@ -354,19 +443,22 @@ export default function GestorContenido() {
                 </div>
                 <button
                   onClick={() => adjustWordCount(200)}
-                  className="px-4 py-2 bg-white dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-sm font-medium"
+                  disabled={loading}
+                  className="px-4 py-2 bg-white dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Ajustar a 200 palabras
                 </button>
                 <button
                   onClick={() => adjustWordCount(500)}
-                  className="px-4 py-2 bg-white dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-sm font-medium"
+                  disabled={loading}
+                  className="px-4 py-2 bg-white dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Ajustar a 500 palabras
                 </button>
                 <button
-                  onClick={generateVersions}
-                  className="px-4 py-2 bg-white dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-sm font-medium flex items-center gap-2"
+                  onClick={generateVersionsHandler}
+                  disabled={loading}
+                  className="px-4 py-2 bg-white dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-sm font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ArrowPathIcon className="w-4 h-4" />
                   Generar Versiones
@@ -448,30 +540,42 @@ export default function GestorContenido() {
               </div>
 
               <div className="p-6">
-                <div className="space-y-3">
-                  {versions.map((version) => (
-                    <div
-                      key={version.id}
-                      className="p-4 border-2 border-slate-200 dark:border-slate-800 rounded-xl hover:border-pink-500 transition-all cursor-pointer"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="font-semibold text-slate-900 dark:text-white mb-1">
-                            {version.version}
+                {generatedVersions.length === 0 ? (
+                  <div className="text-center py-8 text-slate-500">
+                    No hay versiones generadas aún. Usa el botón "Generar Versiones" para crear variaciones de tu contenido.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {generatedVersions.map((version, index) => (
+                      <div
+                        key={index}
+                        className="p-4 border-2 border-slate-200 dark:border-slate-800 rounded-xl hover:border-pink-500 transition-all"
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <div className="font-semibold text-slate-900 dark:text-white mb-1">
+                              {version.version}
+                            </div>
+                            <div className="text-sm text-slate-600 dark:text-slate-400">
+                              {new Date(version.timestamp).toLocaleString('es-ES')} • Tono: {version.tone.charAt(0).toUpperCase() + version.tone.slice(1)}
+                            </div>
                           </div>
-                          <div className="text-sm text-slate-600 dark:text-slate-400">
-                            {version.date} • Tono: {version.tone}
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => loadVersion(version)}
+                              className="px-3 py-1 bg-pink-100 dark:bg-pink-950 text-pink-600 dark:text-pink-400 rounded-lg hover:bg-pink-200 dark:hover:bg-pink-900 transition-colors text-sm font-medium"
+                            >
+                              Cargar
+                            </button>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <button className="px-3 py-1 bg-pink-100 dark:bg-pink-950 text-pink-600 dark:text-pink-400 rounded-lg hover:bg-pink-200 dark:hover:bg-pink-900 transition-colors text-sm font-medium">
-                            Restaurar
-                          </button>
+                        <div className="text-sm text-slate-600 dark:text-slate-400 line-clamp-3">
+                          {version.content}
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
