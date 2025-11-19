@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import Link from 'next/link';
+import { useAutoContrast } from '@/hooks/useAutoContrast';
 import {
   ArrowLeftIcon,
   DocumentTextIcon,
@@ -42,6 +43,19 @@ export default function CuentasMedicasPage() {
   const [nombreCuenta, setNombreCuenta] = useState('');
   const [cuentaActual, setCuentaActual] = useState<any>(null);
   const [archivosSubidos, setArchivosSubidos] = useState<any[]>([]);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const modalHeaderRef = useRef<HTMLDivElement>(null);
+
+  // Hook para detectar automáticamente el contraste en los headers
+  const { textColor: headerTextColor } = useAutoContrast(headerRef, {
+    lightColor: '#ffffff',
+    darkColor: '#1f2937',
+  });
+
+  const { textColor: modalHeaderTextColor } = useAutoContrast(modalHeaderRef, {
+    lightColor: '#ffffff',
+    darkColor: '#1f2937',
+  });
 
   useEffect(() => {
     cargarEstadisticas();
@@ -269,9 +283,17 @@ export default function CuentasMedicasPage() {
     return (
       <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] p-4 overflow-y-auto">
         <div className="bg-white rounded-lg max-w-2xl w-full my-8 shadow-2xl">
-          <div className="p-6">
-            <h2 className="text-2xl font-bold mb-2">Nueva Cuenta de Auditoría</h2>
-            <p className="text-gray-600 text-sm mb-6">
+          <div className="p-6" ref={modalHeaderRef}>
+            <h2
+              className="text-2xl font-bold mb-2 transition-colors"
+              style={{ color: modalHeaderTextColor }}
+            >
+              Nueva Cuenta de Auditoría
+            </h2>
+            <p
+              className="text-sm mb-6 transition-colors"
+              style={{ color: modalHeaderTextColor, opacity: 0.8 }}
+            >
               Ingrese un nombre y suba los documentos. El sistema extraerá automáticamente la información.
             </p>
 
@@ -438,7 +460,7 @@ export default function CuentasMedicasPage() {
           <ModalCrearFactura />
 
           {/* Header */}
-          <div className="mb-8">
+          <div className="mb-8" ref={headerRef}>
             <Link href="/demo">
               <Button variant="ghost" className="mb-4">
                 <ArrowLeftIcon className="h-4 w-4 mr-2" />
@@ -448,10 +470,16 @@ export default function CuentasMedicasPage() {
 
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                <h1
+                  className="text-4xl font-bold mb-2 transition-colors"
+                  style={{ color: headerTextColor }}
+                >
                   🏥 Auditoría de Cuentas Médicas
                 </h1>
-                <p className="text-gray-600">
+                <p
+                  className="transition-colors"
+                  style={{ color: headerTextColor, opacity: 0.8 }}
+                >
                   Sistema experto con IA para auditoría automática de facturas de salud
                 </p>
               </div>
