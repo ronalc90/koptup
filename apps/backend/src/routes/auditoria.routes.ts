@@ -109,6 +109,26 @@ router.get('/facturas/:id', auditoriaController.obtenerFacturaPorId);
 
 /**
  * @swagger
+ * /api/auditoria/facturas/{id}:
+ *   delete:
+ *     tags: [Auditoría]
+ *     summary: Eliminar factura y todos sus datos relacionados
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Factura eliminada exitosamente
+ *       404:
+ *         description: Factura no encontrada
+ */
+router.delete('/facturas/:id', auditoriaController.eliminarFactura);
+
+/**
+ * @swagger
  * /api/auditoria/facturas/{id}/auditar:
  *   post:
  *     tags: [Auditoría]

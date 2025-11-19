@@ -556,6 +556,50 @@ class AuditoriaController {
   }
 
   /**
+   * Eliminar factura y todos sus datos relacionados
+   */
+  async eliminarFactura(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+
+      // Buscar la factura
+      const factura = await Factura.findById(id);
+      if (!factura) {
+        return res.status(404).json({
+          success: false,
+          message: 'Factura no encontrada',
+        });
+      }
+
+      // Eliminar procedimientos asociados
+      await Procedimiento.deleteMany({ facturaId: id });
+
+      // Eliminar atenciones asociadas
+      await Atencion.deleteMany({ facturaId: id });
+
+      // Eliminar glosas asociadas
+      await Glosa.deleteMany({ facturaId: id });
+
+      // Eliminar soportes documentales asociados
+      await SoporteDocumental.deleteMany({ facturaId: id });
+
+      // Eliminar la factura
+      await Factura.findByIdAndDelete(id);
+
+      res.json({
+        success: true,
+        message: 'Factura y datos relacionados eliminados exitosamente',
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: 'Error al eliminar factura',
+        error: error.message,
+      });
+    }
+  }
+
+  /**
    * Iniciar auditoría paso a paso
    */
   async iniciarAuditoriaPasoPaso(req: Request, res: Response) {
