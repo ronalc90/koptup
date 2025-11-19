@@ -422,147 +422,270 @@ export default function ProcesoAuditoriaVisual({
     },
     {
       numero: 3,
+      titulo: 'Validación de Medicamentos SISMED - Nueva EPS',
+      descripcion:
+        'Valida precios de medicamentos contra tarifario SISMED y específicamente contra precios negociados con Nueva EPS. Verifica PBS, autorizaciones CTC y cantidades prescritas.',
+      icono: <ShieldCheckIcon className="h-6 w-6 text-pink-600" />,
+      datosUsados: [
+        'Nombre Medicamento (DCI)',
+        'Cantidad Prescrita',
+        'Precio Facturado',
+        'Precio SISMED',
+        'Precio Nueva EPS',
+        'Estado PBS',
+        'Autorización CTC',
+      ],
+      estado: pasoActual > 2 ? 'completado' : pasoActual === 2 ? 'en-proceso' : 'pendiente',
+      duracion: '1.2s',
+      datosExtraidos: pasoActual > 2 ? [
+        {
+          campo: 'Medicamento',
+          valor: 'Amoxicilina 500mg x 21 tabletas',
+          origen: 'RIPS_Factura_2024.xlsx',
+          ubicacion: 'Hoja "AM" (Medicamentos), Columna "medicamento", Fila 5',
+          explicacion: 'Antibiótico prescrito para tratamiento de infección respiratoria',
+        },
+        {
+          campo: 'Precio Facturado',
+          valor: '$11,340 ($540/tableta)',
+          origen: 'RIPS_Factura_2024.xlsx',
+          ubicacion: 'Hoja "AM", Columna "valor_total", Fila 5',
+          explicacion: 'Precio total cobrado por la IPS por el medicamento',
+        },
+        {
+          campo: 'Precio SISMED Máximo',
+          valor: '$450/tableta = $9,450 total',
+          origen: 'Base de Datos SISMED',
+          ubicacion: 'Tabla "medicamentos_sismed", medicamento_id="AMX500"',
+          explicacion: 'Precio máximo regulado por el gobierno para este medicamento',
+        },
+        {
+          campo: 'Precio Nueva EPS',
+          valor: '$390/tableta = $8,190 total',
+          origen: 'Contrato Nueva EPS-IPS 2024',
+          ubicacion: 'Tabla "tarifario_medicamentos_nueva_eps", medicamento_id="AMX500"',
+          explicacion: 'Precio negociado entre Nueva EPS y proveedores (13% menor que SISMED)',
+        },
+        {
+          campo: 'Glosa por Sobrecosto',
+          valor: '$3,150 (Facturado $11,340 - Nueva EPS $8,190)',
+          origen: 'Calculado por el sistema',
+          ubicacion: 'Se genera glosa automática',
+          explicacion: 'La IPS facturó $540/tab cuando Nueva EPS solo autoriza $390/tab',
+        },
+        {
+          campo: 'Medicamento Alto Costo',
+          valor: 'Enoxaparina 40mg x 7 jeringas',
+          origen: 'RIPS_Factura_2024.xlsx',
+          ubicacion: 'Hoja "AM", Fila 12',
+          explicacion: 'Anticoagulante para prevención de trombosis post-quirúrgica',
+        },
+        {
+          campo: 'Autorización CTC',
+          valor: 'NO REQUERIDA (PBS: SÍ)',
+          origen: 'Base de Datos PBS',
+          ubicacion: 'Tabla "pbs_medicamentos", medicamento_id="ENOX40"',
+          explicacion: 'Este medicamento está en el PBS, no requiere autorización especial',
+        },
+      ] : undefined,
+      procesoDetallado: pasoActual > 2 ? [
+        'Se extraen todos los medicamentos del RIPS hoja "AM" (Medicamentos)',
+        'Para cada medicamento se identifica el nombre genérico (DCI) y presentación',
+        'Se consulta el precio máximo SISMED en la base de datos del gobierno',
+        'Se consulta el precio específico negociado con Nueva EPS',
+        'Se compara: Precio Facturado vs Precio Nueva EPS (prioritario) vs Precio SISMED (máximo)',
+        'Si Precio Facturado > Precio Nueva EPS: Se calcula glosa por diferencia',
+        'Si Precio Facturado > Precio SISMED: Se marca como glosa automática 100%',
+        'Se verifica si el medicamento está en PBS (Plan de Beneficios en Salud)',
+        'Si NO está en PBS, se verifica que exista autorización del CTC',
+        'Se valida que la cantidad prescrita no exceda la cantidad autorizada',
+        'Medicamentos de alto costo (>$1,000,000) requieren CTC obligatorio',
+      ] : undefined,
+      resultados:
+        pasoActual > 2
+          ? [
+              { label: 'Medicamentos validados', valor: '23/23', tipo: 'exito' },
+              { label: 'Sobrecosto vs Nueva EPS', valor: '5 medicamentos', tipo: 'advertencia' },
+              { label: 'Sobrecosto vs SISMED', valor: '2 medicamentos', tipo: 'error' },
+              { label: 'Sin autorización CTC', valor: '1 medicamento', tipo: 'error' },
+              { label: 'Total glosas medicamentos', valor: '$4,850,000', tipo: 'error' },
+            ]
+          : undefined,
+    },
+    {
+      numero: 4,
       titulo: 'Validación de Autorizaciones',
       descripcion:
-        'Verifica que cada procedimiento cuente con autorización vigente y que los datos coincidan (número, vigencia, cantidad).',
+        'Verifica que cada procedimiento y medicamento cuente con autorización vigente y que los datos coincidan (número, vigencia, cantidad).',
       icono: <ShieldCheckIcon className="h-6 w-6 text-green-600" />,
       datosUsados: [
         'Número de Autorización',
         'Fecha de Vigencia',
         'Cantidad Autorizada',
         'Procedimientos Solicitados',
+        'Medicamentos Autorizados',
       ],
-      estado: pasoActual > 2 ? 'completado' : pasoActual === 2 ? 'en-proceso' : 'pendiente',
+      estado: pasoActual > 3 ? 'completado' : pasoActual === 3 ? 'en-proceso' : 'pendiente',
       duracion: '0.8s',
       resultados:
-        pasoActual > 2
+        pasoActual > 3
           ? [
-              { label: 'Con autorización', valor: '42', tipo: 'exito' },
-              { label: 'Sin autorización', valor: '5', tipo: 'error' },
+              { label: 'Procedimientos con autorización', valor: '42/47', tipo: 'exito' },
+              { label: 'Procedimientos sin autorización', valor: '5', tipo: 'error' },
+              { label: 'Medicamentos con autorización', valor: '22/23', tipo: 'exito' },
+              { label: 'Medicamentos sin autorización', valor: '1', tipo: 'error' },
               { label: 'Autorizaciones vencidas', valor: '2', tipo: 'error' },
             ]
           : undefined,
     },
     {
-      numero: 4,
+      numero: 5,
       titulo: 'Detección de Duplicidades',
       descripcion:
-        'Identifica procedimientos duplicados para el mismo paciente en la misma fecha, evitando facturación doble.',
+        'Identifica procedimientos y medicamentos duplicados para el mismo paciente en la misma fecha, evitando facturación doble.',
       icono: <ExclamationTriangleIcon className="h-6 w-6 text-orange-600" />,
       datosUsados: [
         'Código CUPS',
+        'Medicamentos',
         'Documento Paciente',
         'Fecha del Procedimiento',
         'Número de Autorización',
       ],
-      estado: pasoActual > 3 ? 'completado' : pasoActual === 3 ? 'en-proceso' : 'pendiente',
-      duracion: '0.4s',
-      resultados:
-        pasoActual > 3
-          ? [
-              { label: 'Duplicados encontrados', valor: '3', tipo: 'error' },
-              { label: 'Valor duplicado', valor: '$2,450,000', tipo: 'error' },
-            ]
-          : undefined,
-    },
-    {
-      numero: 5,
-      titulo: 'Validación de Pertinencia Médica',
-      descripcion:
-        'Verifica que los procedimientos sean coherentes con los diagnósticos según guías de práctica clínica y normativa vigente.',
-      icono: <CpuChipIcon className="h-6 w-6 text-indigo-600" />,
-      datosUsados: [
-        'Diagnóstico CIE-10',
-        'Código CUPS',
-        'Guías de Práctica Clínica',
-        'Normativa Vigente',
-      ],
       estado: pasoActual > 4 ? 'completado' : pasoActual === 4 ? 'en-proceso' : 'pendiente',
-      duracion: '1.5s',
+      duracion: '0.4s',
       resultados:
         pasoActual > 4
           ? [
-              { label: 'Procedimientos pertinentes', valor: '44', tipo: 'exito' },
-              { label: 'Incoherencias detectadas', valor: '3', tipo: 'advertencia' },
+              { label: 'Duplicados CUPS encontrados', valor: '3', tipo: 'error' },
+              { label: 'Duplicados medicamentos', valor: '1', tipo: 'error' },
+              { label: 'Valor duplicado total', valor: '$2,850,000', tipo: 'error' },
             ]
           : undefined,
     },
     {
       numero: 6,
+      titulo: 'Validación de Pertinencia Médica',
+      descripcion:
+        'Verifica que los procedimientos y medicamentos sean coherentes con los diagnósticos según guías de práctica clínica y normativa vigente.',
+      icono: <CpuChipIcon className="h-6 w-6 text-indigo-600" />,
+      datosUsados: [
+        'Diagnóstico CIE-10',
+        'Código CUPS',
+        'Medicamentos Prescritos',
+        'Guías de Práctica Clínica',
+        'Normativa Vigente',
+      ],
+      estado: pasoActual > 5 ? 'completado' : pasoActual === 5 ? 'en-proceso' : 'pendiente',
+      duracion: '1.5s',
+      resultados:
+        pasoActual > 5
+          ? [
+              { label: 'Procedimientos pertinentes', valor: '44/47', tipo: 'exito' },
+              { label: 'Medicamentos pertinentes', valor: '21/23', tipo: 'exito' },
+              { label: 'Incoherencias detectadas', valor: '5', tipo: 'advertencia' },
+            ]
+          : undefined,
+    },
+    {
+      numero: 7,
       titulo: 'Generación de Glosas y Excel Final',
       descripcion:
-        'Se generan automáticamente las glosas basadas en las inconsistencias encontradas, y se construye el archivo Excel con el reporte completo de auditoría.',
+        'Se generan automáticamente las glosas basadas en todas las inconsistencias encontradas (tarifas, medicamentos, autorizaciones, pertinencia), y se construye el archivo Excel con el reporte completo.',
       icono: <ChartBarIcon className="h-6 w-6 text-red-600" />,
       datosUsados: [
-        'Diferencias de Tarifa',
+        'Diferencias de Tarifa CUPS',
+        'Diferencias de Tarifa Medicamentos',
         'Procedimientos sin Autorización',
+        'Medicamentos sin Autorización',
         'Duplicidades',
         'Incoherencias Médicas',
       ],
-      estado: pasoActual > 5 ? 'completado' : pasoActual === 5 ? 'en-proceso' : 'pendiente',
+      estado: pasoActual > 6 ? 'completado' : pasoActual === 6 ? 'en-proceso' : 'pendiente',
       duracion: '0.6s',
       datosExtraidos: pasoActual > 5 ? [
         {
-          campo: 'Glosa #1 - Sobrecosto Tarifario',
+          campo: 'Glosa #1 - Sobrecosto CUPS',
           valor: 'CUPS 890201: $30.000',
           origen: 'Resultado del Paso 2 (Consulta de Tarifarios)',
-          ubicacion: 'Se escribe en Excel → Hoja "Glosas", Fila 2',
+          ubicacion: 'Se escribe en Excel → Hoja "Glosas CUPS", Fila 2',
           explicacion: 'La IPS facturó $250.000 pero el contrato permite máximo $220.000',
         },
         {
-          campo: 'Glosa #2 - Sin Autorización',
+          campo: 'Glosa #2 - Medicamento Amoxicilina',
+          valor: 'Amoxicilina 500mg: $3.150',
+          origen: 'Resultado del Paso 3 (Validación Medicamentos SISMED - Nueva EPS)',
+          ubicacion: 'Se escribe en Excel → Hoja "Glosas Medicamentos", Fila 2',
+          explicacion: 'IPS facturó $540/tab vs $390/tab Nueva EPS (21 tabs = $3.150 de glosa)',
+        },
+        {
+          campo: 'Glosa #3 - Medicamento Sin CTC',
+          valor: 'Rituximab 500mg: $4.200.000',
+          origen: 'Resultado del Paso 3 (Validación Medicamentos)',
+          ubicacion: 'Se escribe en Excel → Hoja "Glosas Medicamentos", Fila 3',
+          explicacion: 'Medicamento de alto costo NO PBS sin autorización CTC requerida',
+        },
+        {
+          campo: 'Glosa #4 - Sin Autorización',
           valor: 'CUPS 890301: $450.000',
-          origen: 'Resultado del Paso 3 (Validación de Autorizaciones)',
-          ubicacion: 'Se escribe en Excel → Hoja "Glosas", Fila 3',
+          origen: 'Resultado del Paso 4 (Validación de Autorizaciones)',
+          ubicacion: 'Se escribe en Excel → Hoja "Glosas CUPS", Fila 3',
           explicacion: 'Procedimiento no tiene autorización vigente de la EPS',
         },
         {
-          campo: 'Glosa #3 - Duplicidad',
+          campo: 'Glosa #5 - Duplicidad',
           valor: 'CUPS 890201 (2da vez mismo día): $250.000',
-          origen: 'Resultado del Paso 4 (Detección de Duplicidades)',
-          ubicacion: 'Se escribe en Excel → Hoja "Glosas", Fila 4',
+          origen: 'Resultado del Paso 5 (Detección de Duplicidades)',
+          ubicacion: 'Se escribe en Excel → Hoja "Glosas CUPS", Fila 4',
           explicacion: 'Mismo procedimiento facturado 2 veces para el mismo paciente el mismo día',
         },
         {
           campo: 'Valor Total Facturado',
-          valor: '$100.000.000',
-          origen: 'Suma de todos los procedimientos (Paso 1)',
+          valor: '$100.000.000 (CUPS: $65M + Medicamentos: $35M)',
+          origen: 'Suma de todos los procedimientos y medicamentos (Paso 1)',
           ubicacion: 'Se escribe en Excel → Hoja "Resumen", Celda B2',
-          explicacion: 'Suma total de todos los procedimientos de la factura',
+          explicacion: 'Suma total de todos los procedimientos y medicamentos de la factura',
         },
         {
           campo: 'Total Glosas',
-          valor: '$15.750.000',
-          origen: 'Suma de todas las glosas generadas',
+          valor: '$20.600.000 (CUPS: $15.75M + Medicamentos: $4.85M)',
+          origen: 'Suma de todas las glosas generadas (CUPS + Medicamentos)',
           ubicacion: 'Se escribe en Excel → Hoja "Resumen", Celda B3',
-          explicacion: 'Suma de todos los valores objetados/glosados',
+          explicacion: 'Suma de todos los valores objetados (procedimientos y medicamentos)',
         },
         {
           campo: 'Valor Aceptado',
-          valor: '$84.250.000',
+          valor: '$79.400.000',
           origen: 'Calculado: Total Facturado - Total Glosas',
           ubicacion: 'Se escribe en Excel → Hoja "Resumen", Celda B4',
-          explicacion: 'Valor que la EPS debe pagar después de aplicar las glosas',
+          explicacion: 'Valor que Nueva EPS debe pagar después de aplicar las glosas',
         },
       ] : undefined,
       procesoDetallado: pasoActual > 5 ? [
-        'Se recopilan todas las inconsistencias detectadas en los pasos 2-5',
+        'Se recopilan todas las inconsistencias detectadas en los pasos 2-6',
         'Para cada inconsistencia se crea una glosa con: tipo, código, descripción, valor y justificación',
-        'Se crea un nuevo archivo Excel con múltiples hojas: "Resumen", "Glosas", "Detalle Procedimientos", "Facturas Originales"',
-        'Hoja "Resumen": Se escriben totales, estadísticas y gráficos de la auditoría',
-        'Hoja "Glosas": Se listan todas las glosas una por una con su detalle completo',
-        'Hoja "Detalle Procedimientos": Se copian todos los procedimientos del RIPS original + columnas adicionales con resultados de validación',
-        'Hoja "Facturas Originales": Se preserva una copia de los datos originales del RIPS',
-        'Se aplican formatos, colores y filtros para facilitar la lectura',
-        'Se generan gráficos automáticos: distribución de glosas por tipo, valor glosado vs aceptado, etc.',
-        'Se guarda el archivo con nombre: "Auditoria_[NumFactura]_[Fecha].xlsx"',
+        'GLOSAS CUPS: Sobrecostos tarifarios, sin autorizaciones, duplicidades, incoherencias médicas',
+        'GLOSAS MEDICAMENTOS: Sobrecostos vs Nueva EPS, sobrecostos vs SISMED, sin autorizaciones CTC, NO PBS',
+        'Se crea un nuevo archivo Excel con múltiples hojas: "Resumen", "Glosas CUPS", "Glosas Medicamentos", "Detalle Procedimientos", "Detalle Medicamentos", "Facturas Originales"',
+        'Hoja "Resumen": Se escriben totales por categoría (CUPS vs Medicamentos), estadísticas y gráficos de la auditoría',
+        'Hoja "Glosas CUPS": Todas las glosas de procedimientos CUPS con tarifas Nueva EPS',
+        'Hoja "Glosas Medicamentos": Todas las glosas de medicamentos con precios Nueva EPS y SISMED',
+        'Hoja "Detalle Procedimientos": RIPS original + columnas de validación (tarifa Nueva EPS, diferencia, estado)',
+        'Hoja "Detalle Medicamentos": Medicamentos RIPS + validación (precio Nueva EPS, precio SISMED, PBS, CTC)',
+        'Hoja "Facturas Originales": Copia de los datos originales del RIPS sin modificaciones',
+        'Se aplican formatos, colores y filtros para facilitar la lectura (rojo=glosa, verde=aprobado, amarillo=advertencia)',
+        'Se generan gráficos automáticos: distribución de glosas por tipo, CUPS vs Medicamentos, valor glosado vs aceptado',
+        'Se guarda el archivo con nombre: "Auditoria_NuevaEPS_[NumFactura]_[Fecha].xlsx"',
       ] : undefined,
       resultados:
         pasoActual > 5
           ? [
-              { label: 'Glosas generadas', valor: '18', tipo: 'advertencia' },
-              { label: 'Total glosado', valor: '$15,750,000', tipo: 'error' },
-              { label: 'Valor aceptado', valor: '$84,250,000', tipo: 'exito' },
+              { label: 'Glosas CUPS generadas', valor: '13', tipo: 'advertencia' },
+              { label: 'Glosas Medicamentos generadas', valor: '5', tipo: 'advertencia' },
+              { label: 'Total glosas', valor: '18', tipo: 'advertencia' },
+              { label: 'Glosado CUPS', valor: '$15,750,000', tipo: 'error' },
+              { label: 'Glosado Medicamentos', valor: '$4,850,000', tipo: 'error' },
+              { label: 'Total glosado', valor: '$20,600,000', tipo: 'error' },
+              { label: 'Valor aceptado Nueva EPS', valor: '$79,400,000', tipo: 'exito' },
             ]
           : undefined,
     },
@@ -572,10 +695,11 @@ export default function ProcesoAuditoriaVisual({
   const iconosPorPaso: { [key: number]: React.ReactNode } = {
     1: <DocumentTextIcon className="h-6 w-6 text-blue-600" />,
     2: <CalculatorIcon className="h-6 w-6 text-purple-600" />,
-    3: <ShieldCheckIcon className="h-6 w-6 text-green-600" />,
-    4: <ExclamationTriangleIcon className="h-6 w-6 text-orange-600" />,
-    5: <CpuChipIcon className="h-6 w-6 text-indigo-600" />,
-    6: <ChartBarIcon className="h-6 w-6 text-red-600" />,
+    3: <ShieldCheckIcon className="h-6 w-6 text-pink-600" />,
+    4: <ShieldCheckIcon className="h-6 w-6 text-green-600" />,
+    5: <ExclamationTriangleIcon className="h-6 w-6 text-orange-600" />,
+    6: <CpuChipIcon className="h-6 w-6 text-indigo-600" />,
+    7: <ChartBarIcon className="h-6 w-6 text-red-600" />,
   };
 
   // Fusionar pasos del backend con la estructura estática
@@ -697,9 +821,9 @@ export default function ProcesoAuditoriaVisual({
       if (pasoActual === pasos.length - 1) {
         // Auditoría completada
         const resultado = {
-          totalGlosas: 15750000,
-          valorAceptado: 84250000,
-          glosas: 18,
+          totalGlosas: 20600000, // 15.75M CUPS + 4.85M Medicamentos
+          valorAceptado: 79400000, // 100M - 20.6M
+          glosas: 18, // 13 CUPS + 5 Medicamentos
         };
         setResultadosAuditoria(resultado);
         if (onFinalizar) {
