@@ -23,6 +23,33 @@ router.post('/facturas', auditoriaController.crearFactura);
 
 /**
  * @swagger
+ * /api/auditoria/procesar-archivos:
+ *   post:
+ *     tags: [Auditoría]
+ *     summary: Procesar archivos y crear factura automáticamente
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nombreCuenta:
+ *                 type: string
+ *                 description: Nombre de la cuenta médica
+ *               files:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *     responses:
+ *       201:
+ *         description: Factura creada y archivos procesados
+ */
+router.post('/procesar-archivos', upload.array('files', 10), auditoriaController.procesarArchivos);
+
+/**
+ * @swagger
  * /api/auditoria/facturas:
  *   get:
  *     tags: [Auditoría]
