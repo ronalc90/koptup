@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
@@ -57,10 +57,6 @@ export default function CuentasMedicasPage() {
     darkColor: '#1f2937',
   });
 
-  useEffect(() => {
-    cargarEstadisticas();
-  }, []);
-
   const cargarEstadisticas = async () => {
     try {
       setLoading(true);
@@ -74,7 +70,7 @@ export default function CuentasMedicasPage() {
     }
   };
 
-  const cargarFacturas = async () => {
+  const cargarFacturas = useCallback(async () => {
     try {
       setLoading(true);
       const response = await auditoriaAPI.obtenerFacturas(filtros);
@@ -84,7 +80,18 @@ export default function CuentasMedicasPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filtros]);
+
+  useEffect(() => {
+    cargarEstadisticas();
+  }, []);
+
+  // Cargar facturas cuando cambia la vista a 'facturas'
+  useEffect(() => {
+    if (vista === 'facturas' && facturas.length === 0) {
+      cargarFacturas();
+    }
+  }, [vista, facturas.length, cargarFacturas]);
 
   const verDetalleFactura = async (facturaId: string) => {
     try {
@@ -701,12 +708,6 @@ export default function CuentasMedicasPage() {
 
   // VISTA LISTADO DE FACTURAS
   if (vista === 'facturas') {
-    useEffect(() => {
-      if (facturas.length === 0) {
-        cargarFacturas();
-      }
-    }, []);
-
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
         <div className="max-w-7xl mx-auto">
