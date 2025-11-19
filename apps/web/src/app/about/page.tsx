@@ -69,27 +69,6 @@ export default function AboutPage() {
       avatar: 'https://media.licdn.com/dms/image/v2/C4E03AQFkHy4q8806WA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1657683263984?e=1763596800&v=beta&t=GDtxdYIv_fyBVJvzawmB0j75qUPOGyeSLLpUZy_au8M',
       skills: ['React', 'TypeScript', 'Node.js', 'OpenAI', 'AWS'],
     },
-    {
-      name: t('team.members.johan.name'),
-      role: t('team.members.johan.role'),
-      description: t('team.members.johan.description'),
-      avatar: 'https://media.licdn.com/dms/image/v2/D4E03AQGqt4Us0iMBYg/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1660358992007?e=1763596800&v=beta&t=qLR1IY0Wyo7jg0FtGod92Hn9talz4VyZeO9fGQ-URiU',
-      skills: ['React', 'TypeScript', 'Microservices', 'OpenAI', 'JWT'],
-    },
-    {
-      name: t('team.members.juan_vargas.name'),
-      role: t('team.members.juan_vargas.role'),
-      description: t('team.members.juan_vargas.description'),
-      avatar: 'https://media.licdn.com/dms/image/v2/D4E35AQEundRA63ly8A/profile-framedphoto-shrink_400_400/profile-framedphoto-shrink_400_400/0/1709400976543?e=1762639200&v=beta&t=CKKWKLXimiEso9u39XdakYoa30c-8HEBzteWSq4sv88',
-      skills: ['React', 'Angular', 'SQL', 'Azure', 'Microsoft 365'],
-    },
-    {
-      name: t('team.members.juan_pablo.name'),
-      role: t('team.members.juan_pablo.role'),
-      description: t('team.members.juan_pablo.description'),
-      avatar: 'https://media.licdn.com/dms/image/v2/D4E03AQGjzVsXhevmAw/profile-displayphoto-shrink_400_400/B4EZTUjOOLHMAg-/0/1738732791366?e=1763596800&v=beta&t=Iia0DMip2pdv9abyQew4DPRcngwxCO7chjAV8Hzg-YA',
-      skills: ['JavaScript', 'jQuery', 'Microsoft D365', 'SQL Server', 'Docker'],
-    },
   ];
 
   const stats = [
@@ -296,9 +275,9 @@ const filtered = useMemo(() => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="flex justify-center">
             {team.map((member, index) => (
-              <Card key={index} variant="bordered" className="text-center hover:shadow-large transition-shadow">
+              <Card key={index} variant="bordered" className="text-center hover:shadow-large transition-shadow max-w-md w-full">
                 <CardContent className="p-6">
                   <div className="w-32 h-32 rounded-full overflow-hidden mx-auto mb-4 ring-4 ring-primary-100 dark:ring-primary-950">
                     <div
