@@ -42,6 +42,14 @@ export const auditoriaAPI = {
     return response.json();
   },
 
+  async eliminarFactura(id: string) {
+    const response = await fetch(`${API_BASE}/auditoria/facturas/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Error al eliminar factura');
+    return response.json();
+  },
+
   async ejecutarAuditoria(facturaId: string): Promise<{ success: boolean; data: ResultadoAuditoria }> {
     const response = await fetch(`${API_BASE}/auditoria/facturas/${facturaId}/auditar`, {
       method: 'POST',
