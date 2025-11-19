@@ -24,6 +24,7 @@ import {
   DocumentArrowUpIcon,
   TableCellsIcon,
   ShieldCheckIcon,
+  TrashIcon,
 } from '@heroicons/react/24/outline';
 import { auditoriaAPI } from './api';
 import { Factura, Estadisticas, ResultadoAuditoria } from './tipos-auditoria';
@@ -154,6 +155,28 @@ export default function CuentasMedicasPage() {
       toast.success('Excel descargado exitosamente');
     } catch (error: any) {
       toast.error('Error al generar Excel: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const eliminarFactura = async (facturaId: string, numeroFactura: string) => {
+    const confirmar = window.confirm(
+      `¿Está seguro de que desea eliminar la factura ${numeroFactura}? Esta acción no se puede deshacer.`
+    );
+
+    if (!confirmar) return;
+
+    try {
+      setLoading(true);
+      await auditoriaAPI.eliminarFactura(facturaId);
+      toast.success('Factura eliminada exitosamente');
+
+      // Actualizar la lista de facturas
+      await cargarFacturas();
+      await cargarEstadisticas();
+    } catch (error: any) {
+      toast.error('Error al eliminar factura: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -984,6 +1007,14 @@ export default function CuentasMedicasPage() {
                               Excel
                             </Button>
                           )}
+                          <Button
+                            onClick={() => eliminarFactura(factura._id, factura.numeroFactura)}
+                            variant="outline"
+                            size="sm"
+                            className="text-red-600 border-red-600 hover:bg-red-50"
+                          >
+                            <TrashIcon className="h-4 w-4" />
+                          </Button>
                         </div>
                       </div>
                     </div>
@@ -1572,13 +1603,23 @@ export default function CuentasMedicasPage() {
                           <span className="text-gray-600">
                             Total documentos: {1 + ((factura.soportes?.length || 0) > 0 ? factura.soportes.length : 2)}
                           </span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => verDetalleFactura(factura._id)}
-                          >
-                            Ver Detalles Completos
-                          </Button>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => verDetalleFactura(factura._id)}
+                            >
+                              Ver Detalles Completos
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => eliminarFactura(factura._id, factura.numeroFactura)}
+                              className="text-red-600 border-red-600 hover:bg-red-50"
+                            >
+                              <TrashIcon className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </div>
