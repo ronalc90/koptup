@@ -53,6 +53,27 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
     loadSession(id);
   }, []);
 
+  // Update config when initialConfig changes (including restrictedTopics)
+  useEffect(() => {
+    if (sessionId && initialConfig) {
+      const newConfig = {
+        title: initialConfig.title || config.title,
+        greeting: initialConfig.greeting || config.greeting,
+        placeholder: initialConfig.placeholder || config.placeholder,
+        textColor: initialConfig.textColor || config.textColor,
+        headerColor: initialConfig.headerColor || config.headerColor,
+        backgroundColor: initialConfig.backgroundColor || config.backgroundColor,
+        icon: initialConfig.icon || config.icon,
+        fontFamily: initialConfig.fontFamily || config.fontFamily,
+        customIconUrl: initialConfig.customIconUrl,
+        restrictedTopics: initialConfig.restrictedTopics || [],
+      };
+
+      setConfig(newConfig);
+      updateConfig(newConfig);
+    }
+  }, [sessionId, initialConfig?.restrictedTopics, initialConfig?.title, initialConfig?.greeting, initialConfig?.placeholder, initialConfig?.textColor, initialConfig?.headerColor, initialConfig?.backgroundColor, initialConfig?.icon, initialConfig?.fontFamily, initialConfig?.customIconUrl]);
+
   // Cargar sesión existente
   const loadSession = async (id: string) => {
     try {

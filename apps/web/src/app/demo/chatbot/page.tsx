@@ -137,6 +137,18 @@ export default function DemoPage() {
     document.head.appendChild(link);
   }, []);
 
+  // Sync uploadedFiles with uploadedDocuments from backend on page load
+  useEffect(() => {
+    if (uploadedDocuments.length > 0 && uploadedFiles.length === 0) {
+      // Create File objects from document names (for display purposes)
+      const files = uploadedDocuments.map(docName => {
+        // Create a mock File object for display
+        return new File([], docName, { type: 'application/octet-stream' });
+      });
+      setUploadedFiles(files);
+    }
+  }, [uploadedDocuments]);
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
