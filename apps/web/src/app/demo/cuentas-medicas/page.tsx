@@ -25,6 +25,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { auditoriaAPI } from './api';
 import { Factura, Estadisticas, ResultadoAuditoria } from './tipos-auditoria';
+import toast from 'react-hot-toast';
 
 export default function CuentasMedicasPage() {
   const [vista, setVista] = useState<'dashboard' | 'facturas' | 'detalle' | 'crear'>('dashboard');
@@ -51,8 +52,9 @@ export default function CuentasMedicasPage() {
       setLoading(true);
       const response = await auditoriaAPI.obtenerEstadisticas();
       setEstadisticas(response.data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al cargar estadísticas:', error);
+      toast.error('No se pudieron cargar las estadísticas. Verifique que el servidor esté corriendo.');
     } finally {
       setLoading(false);
     }
@@ -87,13 +89,18 @@ export default function CuentasMedicasPage() {
     try {
       setLoading(true);
       const response = await auditoriaAPI.ejecutarAuditoria(facturaId);
-      alert(`Auditoría completada!\n\nTotal glosas: $${response.data.totalGlosas.toLocaleString('es-CO')}\nValor aceptado: $${response.data.valorAceptado.toLocaleString('es-CO')}`);
+
+      // Mostrar notificación de éxito con información detallada
+      toast.success(
+        `Auditoría completada exitosamente!\n\nTotal glosas: $${response.data.totalGlosas.toLocaleString('es-CO')}\nValor aceptado: $${response.data.valorAceptado.toLocaleString('es-CO')}`,
+        { duration: 6000, style: { whiteSpace: 'pre-line' } }
+      );
 
       // Recargar detalle
       await verDetalleFactura(facturaId);
       await cargarEstadisticas();
     } catch (error: any) {
-      alert('Error al ejecutar auditoría: ' + error.message);
+      toast.error('Error al ejecutar auditoría: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -103,8 +110,9 @@ export default function CuentasMedicasPage() {
     try {
       setLoading(true);
       await auditoriaAPI.descargarExcel(facturaId);
+      toast.success('Excel descargado exitosamente');
     } catch (error: any) {
-      alert('Error al generar Excel: ' + error.message);
+      toast.error('Error al generar Excel: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -116,13 +124,15 @@ export default function CuentasMedicasPage() {
 
       // Validar nombre
       if (!nombreCuenta.trim()) {
-        alert('Por favor ingrese un nombre para la cuenta');
+        toast.error('Por favor ingrese un nombre para la cuenta');
+        setLoading(false);
         return;
       }
 
       // Validar archivos
       if (archivosSubidos.length === 0) {
-        alert('Por favor suba al menos un archivo (Excel/RIPS o PDF)');
+        toast.error('Por favor suba al menos un archivo (Excel/RIPS o PDF)');
+        setLoading(false);
         return;
       }
 
@@ -135,6 +145,9 @@ export default function CuentasMedicasPage() {
         formData.append('files', file);
       });
 
+      // Mostrar notificación de procesamiento
+      const loadingToast = toast.loading('Procesando archivos y creando cuenta...');
+
       // Enviar al backend
       const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
       const response = await fetch(`${API_BASE}/auditoria/procesar-archivos`, {
@@ -144,15 +157,18 @@ export default function CuentasMedicasPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
+        toast.dismiss(loadingToast);
         throw new Error(errorData.message || 'Error al procesar archivos');
       }
 
       const result = await response.json();
 
-      alert(`✅ Cuenta creada exitosamente!\n\n` +
-            `Factura: ${result.data.factura.numeroFactura}\n` +
-            `Archivos procesados: ${result.data.archivosProcessed.total}\n\n` +
-            `Puede ver los detalles en el listado de facturas.`);
+      // Remover toast de loading y mostrar éxito
+      toast.dismiss(loadingToast);
+      toast.success(
+        `✅ Cuenta creada exitosamente!\n\nFactura: ${result.data.factura.numeroFactura}\nArchivos procesados: ${result.data.archivosProcessed.total}\n\nPuede ver los detalles en el listado de facturas.`,
+        { duration: 6000, style: { whiteSpace: 'pre-line' } }
+      );
 
       // Limpiar formulario
       setMostrarModalCrear(false);
@@ -162,26 +178,24 @@ export default function CuentasMedicasPage() {
       // Recargar estadísticas
       await cargarEstadisticas();
     } catch (error: any) {
-      alert('Error al crear cuenta: ' + error.message);
+      toast.error('Error al crear cuenta: ' + error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const importarDesdeExcel = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const importarDesdeExcel = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    try {
-      setLoading(true);
-      alert('Funcionalidad de importación en desarrollo.\nPor ahora, use la creación manual de facturas.');
-      // TODO: Implementar parser de RIPS/Excel
-    } catch (error: any) {
-      alert('Error al importar: ' + error.message);
-    } finally {
-      setLoading(false);
-      event.target.value = '';
-    }
+    // Abrir modal de creación con el archivo pre-cargado
+    setArchivosSubidos([file]);
+    setMostrarModalCrear(true);
+    event.target.value = '';
+
+    toast.success('Archivo cargado. Complete el nombre de la cuenta para continuar.', {
+      duration: 4000,
+    });
   };
 
   const formatearMoneda = (valor: number) => {
