@@ -58,26 +58,20 @@ export default function MessagesPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedConversation]);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   const safeString = (value: any) =>
     typeof value === 'string' ? value : value == null ? '' : JSON.stringify(value);
 
   const loadConversations = async () => {
     try {
+      setLoading(true);
       const data = await api.getConversations();
+
       const normalized: Conversation[] =
-        Array.isArray(data) && data.length
+        Array.isArray(data) && data.length > 0
           ? data.map((c: any): Conversation => ({
               id: String(c.id || c._id || `conv-${Date.now()}`),
               title: safeString(c.title || c.name || 'Sin título'),
-              projectId: safeString(c.projectId || c.project || ''),
+              projectId: safeString(c.projectId || c.project?.id || c.project || ''),
               lastMessage: safeString(c.lastMessage || c.preview || ''),
               lastMessageTime: safeString(c.lastMessageTime || c.updatedAt || new Date().toISOString()),
               unreadCount: Number(c.unreadCount || 0),
@@ -87,62 +81,13 @@ export default function MessagesPage() {
             }))
           : [];
 
+      setConversations(normalized);
       if (normalized.length > 0) {
-        setConversations(normalized);
         setSelectedConversation((prev) => prev ?? normalized[0]);
-      } else {
-        throw new Error('No conversations returned from API');
       }
     } catch (error) {
-      console.error('Failed to load conversations from API, using fallback data:', error);
-
-      const mockConversations: Conversation[] = [
-        {
-          id: 'conv-001',
-          title: 'Sistema de gestión de inventario',
-          projectId: 'PRJ-001',
-          lastMessage: 'Hemos completado la primera fase del desarrollo',
-          lastMessageTime: '2025-10-11T10:30:00',
-          unreadCount: 3,
-          participants: ['Cliente', 'Equipo KopTup'],
-          status: 'active',
-        },
-        {
-          id: 'conv-002',
-          title: 'Aplicación móvil iOS/Android',
-          projectId: 'PRJ-002',
-          lastMessage: 'Necesitamos aclaración sobre los requisitos de la pantalla de login',
-          lastMessageTime: '2025-10-10T15:45:00',
-          unreadCount: 1,
-          participants: ['Cliente', 'Equipo KopTup'],
-          status: 'active',
-        },
-        {
-          id: 'conv-003',
-          title: 'Website corporativo',
-          projectId: 'PRJ-003',
-          lastMessage: 'Perfecto, procedemos con el diseño aprobado',
-          lastMessageTime: '2025-10-09T09:20:00',
-          unreadCount: 0,
-          participants: ['Cliente', 'Equipo KopTup'],
-          status: 'active',
-        },
-        {
-          id: 'conv-004',
-          title: 'Soporte - Actualización de módulo',
-          projectId: 'ORD-001',
-          lastMessage: 'La actualización se implementará este fin de semana',
-          lastMessageTime: '2025-10-08T14:10:00',
-          unreadCount: 0,
-          participants: ['Cliente', 'Soporte KopTup'],
-          status: 'active',
-        },
-      ];
-
-      setConversations(mockConversations);
-      if (mockConversations.length > 0) {
-        setSelectedConversation(mockConversations[0]);
-      }
+      console.error('Failed to load conversations from API:', error);
+      setConversations([]);
     } finally {
       setLoading(false);
     }
@@ -150,11 +95,22 @@ export default function MessagesPage() {
 
   const transformApiMessage = (apiMessage: any): Message => {
     const id = String(apiMessage.id || apiMessage._id || `msg-${Date.now()}`);
-    const senderId = String(apiMessage.senderId || apiMessage.sender || 'unknown');
-    const senderName = safeString(apiMessage.senderName || apiMessage.senderName || apiMessage.sender || 'Desconocido');
+    const senderId = String(apiMessage.senderId || apiMessage.sender?._id || apiMessage.sender || 'unknown');
+    const senderName = safeString(
+      apiMessage.senderName ||
+      apiMessage.sender?.name ||
+      apiMessage.sender?.email ||
+      apiMessage.sender ||
+      'Desconocido'
+    );
     const content = safeString(apiMessage.content ?? apiMessage.text ?? apiMessage.body ?? '');
     const timestamp = safeString(apiMessage.timestamp || apiMessage.createdAt || new Date().toISOString());
-    const isOwnMessage = Boolean(apiMessage.isOwnMessage || apiMessage.fromSelf || apiMessage.senderId === 'user-001');
+    const isOwnMessage = Boolean(
+      apiMessage.isOwnMessage ||
+      apiMessage.fromSelf ||
+      apiMessage.isOwn ||
+      senderId === 'current-user'
+    );
     const status = (apiMessage.status as Message['status']) || (apiMessage.read ? 'read' : 'sent');
 
     return {
@@ -170,115 +126,31 @@ export default function MessagesPage() {
 
   const loadMessages = async (conversationId: string) => {
     try {
-      // Try API first if available
-      const apiAny = api as any;
-      if (apiAny && typeof apiAny.getMessages === 'function') {
-        const apiMessages = await apiAny.getMessages(conversationId);
-        if (Array.isArray(apiMessages)) {
-          const normalized = apiMessages.map(transformApiMessage);
-          setMessages(normalized);
-          return;
-        }
+      const conversationData = await api.getConversationById(conversationId);
+
+      // Extract messages from conversation data
+      const apiMessages = conversationData?.messages || [];
+
+      if (Array.isArray(apiMessages) && apiMessages.length > 0) {
+        const normalized = apiMessages.map(transformApiMessage);
+        setMessages(normalized);
+      } else {
+        setMessages([]);
       }
-
-      // If API not available or returned invalid data, try api.getConversationMessages or fallback
-      if (apiAny && typeof apiAny.getConversationMessages === 'function') {
-        const apiMessages = await apiAny.getConversationMessages(conversationId);
-        if (Array.isArray(apiMessages)) {
-          const normalized = apiMessages.map(transformApiMessage);
-          setMessages(normalized);
-          return;
-        }
-      }
-
-      // Fallback to mock data
-      const mockMessages: Message[] = [
-        {
-          id: 'msg-001',
-          senderId: 'user-001',
-          senderName: 'Juan Pérez',
-          content: 'Hola, quisiera saber el estado del proyecto',
-          timestamp: '2025-10-11T09:00:00',
-          isOwnMessage: true,
-          status: 'read',
-        },
-        {
-          id: 'msg-002',
-          senderId: 'team-001',
-          senderName: 'María González - KopTup',
-          content: 'Buen día, con gusto te informo sobre el avance del proyecto.',
-          timestamp: '2025-10-11T09:15:00',
-          isOwnMessage: false,
-          status: 'read',
-        },
-        {
-          id: 'msg-003',
-          senderId: 'team-001',
-          senderName: 'María González - KopTup',
-          content:
-            'Hemos completado la primera fase del desarrollo que incluye el módulo de autenticación y el dashboard principal.',
-          timestamp: '2025-10-11T09:16:00',
-          isOwnMessage: false,
-          status: 'read',
-        },
-        {
-          id: 'msg-004',
-          senderId: 'user-001',
-          senderName: 'Juan Pérez',
-          content: 'Excelente, ¿cuándo podré ver una demo?',
-          timestamp: '2025-10-11T09:20:00',
-          isOwnMessage: true,
-          status: 'read',
-        },
-        {
-          id: 'msg-005',
-          senderId: 'team-001',
-          senderName: 'María González - KopTup',
-          content: 'Podemos agendar una reunión para mañana a las 10:00 AM para mostrarte la demo en vivo.',
-          timestamp: '2025-10-11T09:25:00',
-          isOwnMessage: false,
-          status: 'read',
-        },
-        {
-          id: 'msg-006',
-          senderId: 'team-001',
-          senderName: 'María González - KopTup',
-          content: 'Te enviaré el link de la videollamada por correo.',
-          timestamp: '2025-10-11T09:26:00',
-          isOwnMessage: false,
-          status: 'read',
-        },
-        {
-          id: 'msg-007',
-          senderId: 'user-001',
-          senderName: 'Juan Pérez',
-          content: 'Perfecto, allí estaré. Gracias!',
-          timestamp: '2025-10-11T10:30:00',
-          isOwnMessage: true,
-          status: 'delivered',
-        },
-      ];
-
-      setMessages(mockMessages);
     } catch (error) {
-      console.error('Failed to load messages (mock fallback)', error);
-      setMessages([]); // fallback seguro
+      console.error('Failed to load messages from API:', error);
+      setMessages([]);
     }
   };
 
   const markAsRead = async (conversationId: string) => {
     try {
-      if (typeof api.markConversationAsRead === 'function') {
-        await api.markConversationAsRead(conversationId);
-      }
+      await api.markConversationAsRead(conversationId);
       setConversations((prev) =>
         prev.map((conv) => (conv.id === conversationId ? { ...conv, unreadCount: 0 } : conv))
       );
     } catch (error) {
-      console.error('Failed to mark conversation as read via API, updating locally:', error);
-      setConversations((prev) =>
-        prev.map((conv) => (conv.id === conversationId ? { ...conv, unreadCount: 0 } : conv))
-      );
+      console.error('Failed to mark conversation as read:', error);
     }
   };
 
@@ -286,9 +158,12 @@ export default function MessagesPage() {
     if (!newMessage.trim() || !selectedConversation) return;
 
     const messageContent = newMessage;
-    const message: Message = {
-      id: `msg-${Date.now()}`,
-      senderId: 'user-001',
+    setNewMessage('');
+
+    // Optimistic UI update - add message immediately
+    const optimisticMessage: Message = {
+      id: `msg-temp-${Date.now()}`,
+      senderId: 'current-user',
       senderName: 'Tú',
       content: messageContent,
       timestamp: new Date().toISOString(),
@@ -296,9 +171,9 @@ export default function MessagesPage() {
       status: 'sent',
     };
 
-    setMessages((prev) => [...prev, message]);
-    setNewMessage('');
+    setMessages((prev) => [...prev, optimisticMessage]);
 
+    // Update conversation preview
     setConversations((prev) =>
       prev.map((conv) =>
         conv.id === selectedConversation.id
@@ -308,14 +183,25 @@ export default function MessagesPage() {
     );
 
     try {
-      if (typeof api.sendMessage === 'function') {
-        await api.sendMessage({
-          conversationId: selectedConversation.id,
-          content: messageContent,
-        });
+      const response = await api.sendMessage({
+        conversationId: selectedConversation.id,
+        content: messageContent,
+      });
+
+      // Update the optimistic message with the real one from API
+      if (response) {
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === optimisticMessage.id ? transformApiMessage(response) : msg
+          )
+        );
       }
     } catch (error) {
-      console.error('Failed to send message via API:', error);
+      console.error('Failed to send message:', error);
+      // Remove optimistic message on error
+      setMessages((prev) => prev.filter((msg) => msg.id !== optimisticMessage.id));
+      // Restore the message in the input
+      setNewMessage(messageContent);
     }
   };
 
