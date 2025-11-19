@@ -1,6 +1,8 @@
 import { Factura, ResultadoAuditoria, Estadisticas, Tarifario } from './tipos-auditoria';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+// Asegurarse de que siempre use /api
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE = API_URL.endsWith('/api') ? API_URL : `${API_URL}/api`;
 
 export const auditoriaAPI = {
   // Facturas
