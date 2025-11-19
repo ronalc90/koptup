@@ -91,6 +91,7 @@ export default function DemoPage() {
     messages,
     isLoading,
     error,
+    uploadedDocuments,
     uploadDocuments,
     sendMessage,
     clearMessages,
@@ -219,23 +220,21 @@ export default function DemoPage() {
 ></iframe>`;
   };
 
-  const getPreviewUrl = () => {
-    const params = new URLSearchParams({
-      title: chatConfig.title,
-      greeting: chatConfig.greeting,
-      placeholder: chatConfig.placeholder,
-      textColor: designConfig.textColor,
-      headerColor: designConfig.headerColor,
-      backgroundColor: designConfig.backgroundColor,
-      icon: designConfig.icon,
-      fontFamily: typographyConfig.fontFamily,
-    });
+  const savePreviewConfig = () => {
+    const previewData = {
+      chatConfig,
+      designConfig,
+      typographyConfig,
+      restrictionsConfig,
+      uploadedDocuments,
+    };
 
-    if (designConfig.customIconUrl) {
-      params.append('customIconUrl', designConfig.customIconUrl);
-    }
+    sessionStorage.setItem('chatbot_preview_config', JSON.stringify(previewData));
+  };
 
-    return `/demo/chatbot/preview?${params.toString()}`;
+  const handleOpenPreview = () => {
+    savePreviewConfig();
+    window.open('/demo/chatbot/preview', '_blank');
   };
 
   const copyEmbedCode = () => {
@@ -268,15 +267,14 @@ export default function DemoPage() {
           </p>
 
           {/* Preview Button */}
-          <Link
-            href={getPreviewUrl()}
-            target="_blank"
+          <button
+            onClick={handleOpenPreview}
             className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors shadow-lg hover:shadow-xl"
           >
             <EyeIcon className="h-5 w-5" />
             Abrir Preview en Pantalla Completa
             <ArrowTopRightOnSquareIcon className="h-4 w-4" />
-          </Link>
+          </button>
         </div>
 
         {/* Main Grid */}
@@ -725,15 +723,14 @@ export default function DemoPage() {
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <Link
-                          href={getPreviewUrl()}
-                          target="_blank"
+                        <button
+                          onClick={handleOpenPreview}
                           className="flex items-center justify-center gap-2 px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors"
                         >
                           <EyeIcon className="h-5 w-5" />
                           Ver Preview
                           <ArrowTopRightOnSquareIcon className="h-4 w-4" />
-                        </Link>
+                        </button>
 
                         <button
                           onClick={copyEmbedCode}

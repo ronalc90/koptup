@@ -34,24 +34,57 @@ export default function ChatbotPreviewPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [inputMessage, setInputMessage] = useState('');
   const [showSidebar, setShowSidebar] = useState(true);
+  const [previewDocuments, setPreviewDocuments] = useState<string[]>([]);
 
-  // Get config from URL params or use defaults
-  const config: Partial<ChatbotConfig> = {
-    title: searchParams.get('title') || 'Asistente Virtual',
-    greeting: searchParams.get('greeting') || '¡Hola! 👋 Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?',
-    placeholder: searchParams.get('placeholder') || 'Escribe tu mensaje aquí...',
-    textColor: searchParams.get('textColor') || '#1F2937',
-    headerColor: searchParams.get('headerColor') || '#4F46E5',
-    backgroundColor: searchParams.get('backgroundColor') || '#FFFFFF',
-    icon: searchParams.get('icon') || 'FaComments',
-    fontFamily: searchParams.get('fontFamily') || 'Inter',
-    customIconUrl: searchParams.get('customIconUrl') || undefined,
+  // Get config from sessionStorage or URL params (for embed) or use defaults
+  const getConfig = (): Partial<ChatbotConfig> => {
+    // Try to get from sessionStorage first
+    if (typeof window !== 'undefined') {
+      const storedConfig = sessionStorage.getItem('chatbot_preview_config');
+      if (storedConfig) {
+        try {
+          const data = JSON.parse(storedConfig);
+          // Set documents from stored config
+          setPreviewDocuments(data.uploadedDocuments || []);
+          return {
+            title: data.chatConfig?.title || 'Asistente Virtual',
+            greeting: data.chatConfig?.greeting || '¡Hola! 👋 Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?',
+            placeholder: data.chatConfig?.placeholder || 'Escribe tu mensaje aquí...',
+            textColor: data.designConfig?.textColor || '#1F2937',
+            headerColor: data.designConfig?.headerColor || '#4F46E5',
+            backgroundColor: data.designConfig?.backgroundColor || '#FFFFFF',
+            icon: data.designConfig?.icon || 'FaComments',
+            fontFamily: data.typographyConfig?.fontFamily || 'Inter',
+            customIconUrl: data.designConfig?.customIconUrl,
+            restrictedTopics: data.restrictionsConfig?.restrictedTopics || [],
+          };
+        } catch (e) {
+          console.error('Error parsing stored config:', e);
+        }
+      }
+    }
+
+    // Fallback to URL params (for embed usage)
+    return {
+      title: searchParams.get('title') || 'Asistente Virtual',
+      greeting: searchParams.get('greeting') || '¡Hola! 👋 Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?',
+      placeholder: searchParams.get('placeholder') || 'Escribe tu mensaje aquí...',
+      textColor: searchParams.get('textColor') || '#1F2937',
+      headerColor: searchParams.get('headerColor') || '#4F46E5',
+      backgroundColor: searchParams.get('backgroundColor') || '#FFFFFF',
+      icon: searchParams.get('icon') || 'FaComments',
+      fontFamily: searchParams.get('fontFamily') || 'Inter',
+      customIconUrl: searchParams.get('customIconUrl') || undefined,
+    };
   };
+
+  const config = getConfig();
 
   const {
     messages,
     isLoading,
     error,
+    uploadedDocuments,
     sendMessage,
   } = useChatbot(config);
 
@@ -172,11 +205,11 @@ export default function ChatbotPreviewPage() {
                 <div className="pt-4 border-t border-gray-200">
                   <h3 className="text-sm font-medium text-gray-700 mb-3">Documentos Cargados</h3>
                   <div className="space-y-2">
-                    {messages.some(m => (m as any).source) ? (
-                      Array.from(new Set(messages.filter(m => (m as any).source).map(m => (m as any).source))).map((source, idx) => (
+                    {(previewDocuments.length > 0 || uploadedDocuments.length > 0) ? (
+                      [...new Set([...previewDocuments, ...uploadedDocuments])].map((doc, idx) => (
                         <div key={idx} className="flex items-center gap-2 bg-blue-50 p-2 rounded-lg">
                           <DocumentTextIcon className="h-5 w-5 text-blue-600 flex-shrink-0" />
-                          <span className="text-sm text-blue-900 truncate">{source}</span>
+                          <span className="text-sm text-blue-900 truncate">{doc}</span>
                         </div>
                       ))
                     ) : (
