@@ -144,4 +144,32 @@ export const auditoriaAPI = {
     if (!response.ok) throw new Error('Error al obtener sesión');
     return response.json();
   },
+
+  // Procesamiento de PDFs de Facturas Médicas con Extracción Real
+  async procesarFacturasPDF(formData: FormData) {
+    const response = await fetch(`${API_BASE}/auditoria/procesar-facturas-pdf`, {
+      method: 'POST',
+      body: formData,
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error al procesar PDFs');
+    }
+    return response.json();
+  },
+
+  async descargarExcelAuditoriaMedica(facturaId: string) {
+    const response = await fetch(`${API_BASE}/auditoria/facturas/${facturaId}/excel-auditoria-medica`);
+    if (!response.ok) throw new Error('Error al generar Excel de auditoría médica');
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Auditoria_NuevaEPS_${facturaId}_${Date.now()}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  },
 };

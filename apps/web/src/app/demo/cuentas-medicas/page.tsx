@@ -929,21 +929,8 @@ Total de guías implementadas: 125`
       // Mostrar notificación de procesamiento
       const loadingToast = toast.loading('Procesando archivos y creando cuenta...');
 
-      // Enviar al backend
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-      const API_BASE = API_URL.endsWith('/api') ? API_URL : `${API_URL}/api`;
-      const response = await fetch(`${API_BASE}/auditoria/procesar-archivos`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        toast.dismiss(loadingToast);
-        throw new Error(errorData.message || 'Error al procesar archivos');
-      }
-
-      const result = await response.json();
+      // Enviar al backend usando procesamiento real de PDFs
+      const result = await auditoriaAPI.procesarFacturasPDF(formData);
 
       // Remover toast de loading y mostrar éxito
       toast.dismiss(loadingToast);

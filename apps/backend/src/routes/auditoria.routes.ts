@@ -1,5 +1,6 @@
 import express from 'express';
 import auditoriaController, { upload } from '../controllers/auditoria.controller';
+import auditoriaMedicaController from '../controllers/auditoria-medica.controller';
 
 const router = express.Router();
 
@@ -47,6 +48,62 @@ router.post('/facturas', auditoriaController.crearFactura);
  *         description: Factura creada y archivos procesados
  */
 router.post('/procesar-archivos', upload.array('files', 10), auditoriaController.procesarArchivos);
+
+/**
+ * @swagger
+ * /api/auditoria/procesar-facturas-pdf:
+ *   post:
+ *     tags: [Auditoría Médica]
+ *     summary: Procesar PDFs de facturas médicas (Nueva EPS) con extracción real
+ *     description: Extrae datos de PDFs de facturas médicas, calcula glosas según tarifario Nueva EPS y genera Excel completo con 8 pestañas
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nombreCuenta:
+ *                 type: string
+ *                 description: Nombre de la cuenta médica
+ *               files:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *                 description: PDFs de factura y/o historia clínica
+ *     responses:
+ *       201:
+ *         description: Factura procesada y auditada exitosamente con datos reales del PDF
+ */
+router.post('/procesar-facturas-pdf', upload.array('files', 10), auditoriaMedicaController.procesarFacturasPDF);
+
+/**
+ * @swagger
+ * /api/auditoria/facturas/{id}/excel-auditoria-medica:
+ *   get:
+ *     tags: [Auditoría Médica]
+ *     summary: Descargar Excel de auditoría médica con 8 pestañas
+ *     description: Genera Excel completo con FACTURACION, PROCEDIMIENTOS, GLOSAS, AUTORIZACIONES, PACIENTE, DIAGNOSTICOS, FECHAS, RESUMEN
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la factura
+ *     responses:
+ *       200:
+ *         description: Excel de auditoría médica generado
+ *         content:
+ *           application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       404:
+ *         description: Factura no encontrada
+ */
+router.get('/facturas/:id/excel-auditoria-medica', auditoriaMedicaController.descargarExcelAuditoria);
 
 /**
  * @swagger
