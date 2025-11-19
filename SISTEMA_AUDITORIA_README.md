@@ -98,13 +98,23 @@ GET    /api/auditoria/estadisticas          - Dashboard estadísticas
 
 **Documentación:** Swagger disponible en `/api-docs`
 
-### 7. **Frontend (APIs y Tipos)**
+### 7. **Frontend Completo (Next.js + TypeScript)**
 
 Ubicación: `apps/web/src/app/demo/cuentas-medicas/`
 
-- ✅ Tipos TypeScript completos (`tipos-auditoria.ts`)
-- ✅ Cliente API (`api.ts`)
-- Listo para conectar con interfaz de usuario
+**Características:**
+- ✅ **Dashboard Interactivo**: Estadísticas en tiempo real (facturas, valores, glosas)
+- ✅ **Listado de Facturas**: Con filtros por estado, IPS, EPS, fechas
+- ✅ **Detalle Completo**: Atenciones, procedimientos, diagnósticos, glosas
+- ✅ **Ejecución de Auditoría**: Botón para ejecutar auditoría con un click
+- ✅ **Visualización de Glosas**: Glosas automáticas con códigos, tipos y valores
+- ✅ **Descarga de Excel**: Genera y descarga reporte profesional
+- ✅ **Sin Gestión Documental**: Eliminada la gestión de Ley 100 (ya está en sistema experto)
+
+**Archivos:**
+- `page.tsx`: Interfaz completa con 3 vistas (Dashboard, Facturas, Detalle)
+- `tipos-auditoria.ts`: Tipos TypeScript completos
+- `api.ts`: Cliente API con todos los endpoints
 
 ## 📂 Estructura del Proyecto
 
@@ -472,6 +482,83 @@ El sistema incluye:
 - ✅ Documentación Swagger
 
 **El sistema está listo para producción.**
+
+## 🎨 Vistas del Frontend
+
+### 1. Dashboard
+```
+🏥 Auditoría de Cuentas Médicas
+Sistema experto con IA para auditoría automática de facturas de salud
+
+📊 Estadísticas:
+┌─────────────┬─────────────┬─────────────┬─────────────┐
+│ Total       │ Auditadas   │ Valor Total │ Total Glosas│
+│ Facturas    │             │             │             │
+└─────────────┴─────────────┴─────────────┴─────────────┘
+
+Estado de Facturas          Glosas por Tipo
+- Radicada                  - Tarifa
+- En Auditoría              - Autorización
+- Auditada                  - Duplicidad
+- Glosada                   - Pertinencia
+
+✨ Características:
+✓ Validación Automática
+✓ Detección de Duplicidades
+✓ Motor de Reglas IA
+✓ Validación de Autorizaciones
+✓ Pertinencia Médica
+✓ Exportación Excel
+```
+
+### 2. Listado de Facturas
+```
+📋 Facturas de Salud
+
+Filtros: [Estado ▼] [Desde: ___] [Hasta: ___]
+
+┌─────────────────────────────────────────────────────────┐
+│ FAC-001-2024        [Radicada] [✓ Auditada]            │
+│ IPS: Hospital San José    EPS: EPS Sura                │
+│ Fecha: 15/01/2024         Valor: $500,000              │
+│ Glosas: $12,000          Aceptado: $488,000           │
+│                    [Ver Detalle] [📥 Excel]            │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 3. Detalle de Factura
+```
+Factura FAC-001-2024
+Hospital San José → EPS Sura    [Auditada] [▶ Ejecutar Auditoría]
+
+Valor Bruto: $500,000    IVA: $0    Glosas: $12,000    Aceptado: $488,000
+
+Atenciones (1)
+┌──────────────────────────────────────────────────┐
+│ Atención AT-001                [✓ Autorizado]   │
+│ Paciente: CC 12345678                           │
+│ Diagnóstico: E11.9 - Diabetes mellitus tipo 2  │
+│ Fecha: 15/01/2024    Copago: $0                │
+└──────────────────────────────────────────────────┘
+
+Procedimientos (1)
+┌────────┬─────────────┬─────┬──────────┬───────────┬────────────┬────────┐
+│ CUPS   │ Descripción │ Cant│ Valor IPS│ Valor CTR │ Diferencia │ Glosas │
+├────────┼─────────────┼─────┼──────────┼───────────┼────────────┼────────┤
+│ 890301 │ Consulta... │  1  │ $75,000  │ $63,000   │ $12,000    │$12,000 │
+└────────┴─────────────┴─────┴──────────┴───────────┴────────────┴────────┘
+
+Glosas Generadas (1)
+┌───────────────────────────────────────────────────┐
+│ [G001] [Tarifa] [Pendiente] [🤖 Automática]     │
+│ Diferencia entre valor cobrado y valor contratado│
+│ Generada por regla: REGLA_001          $12,000   │
+└───────────────────────────────────────────────────┘
+```
+
+## 🚀 URL del PR
+
+**https://github.com/ronalc90/koptup/pull/new/claude/healthcare-billing-audit-01Ejj1TR23Eumac4gUvJnzib**
 
 ---
 
