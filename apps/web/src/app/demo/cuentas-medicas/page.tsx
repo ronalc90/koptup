@@ -170,6 +170,271 @@ Multiplicadores según nivel de complejidad:
 - Nivel IV: 1.8x`
     },
     {
+      id: 'medicamentos',
+      nombre: 'Tarifario de Medicamentos SISMED',
+      tipo: 'tarifario',
+      descripcion: 'Precios regulados de medicamentos - Diferenciado por EPS',
+      activo: true,
+      registros: 850,
+      contenido: `# Tarifario de Medicamentos - SISMED 2024
+Sistema de Información de Precios de Medicamentos
+
+**Total: 850 medicamentos más usados**
+Precios diferenciados por EPS según negociación
+
+---
+
+## ANTIBIÓTICOS
+
+### Penicilinas
+**Amoxicilina 500mg tableta**
+- Precio SISMED máximo: $450/tableta
+- EPS Salud Total: $420/tab | Nueva EPS: $390/tab | Compensar: $435/tab
+- PBS: SÍ | Autorización: NO
+
+**Amoxicilina + Ácido Clavulánico 875/125mg**
+- Precio SISMED máximo: $2,850/tableta
+- EPS Salud Total: $2,700/tab | Nueva EPS: $2,600/tab | Compensar: $2,750/tab
+- PBS: SÍ | Autorización: NO
+
+### Cefalosporinas
+**Ceftriaxona 1g inyectable**
+- Precio SISMED máximo: $4,500/ampolla
+- EPS Salud Total: $4,200 | Nueva EPS: $4,000 | Compensar: $4,300
+- PBS: SÍ | Autorización: NO | Uso: Hospitalario
+
+**Cefazolina 1g inyectable (profilaxis)**
+- Precio SISMED máximo: $5,200/ampolla
+- EPS Salud Total: $4,900 | Nueva EPS: $4,700 | Compensar: $5,000
+- PBS: SÍ | Autorización: NO
+
+### Quinolonas
+**Ciprofloxacina 500mg tableta**
+- Precio SISMED máximo: $1,200/tableta
+- EPS Salud Total: $1,100 | Nueva EPS: $1,050 | Compensar: $1,150
+- PBS: SÍ | Autorización: NO
+
+**Levofloxacina 500mg tableta**
+- Precio SISMED máximo: $2,800/tableta
+- EPS Salud Total: $2,650 | Nueva EPS: $2,500 | Compensar: $2,700
+- PBS: SÍ | Autorización: NO
+
+### Alto Costo
+**Vancomicina 500mg inyectable**
+- Precio SISMED máximo: $28,500/ampolla
+- EPS Salud Total: $27,000 | Nueva EPS: $25,800 | Compensar: $27,500
+- PBS: SÍ | Autorización: SÍ (alto costo)
+
+---
+
+## ANALGÉSICOS
+
+**Acetaminofén 500mg tableta**
+- Precio SISMED máximo: $180/tableta
+- EPS Salud Total: $165 | Nueva EPS: $150 | Compensar: $170
+- PBS: SÍ | Autorización: NO
+
+**Ibuprofeno 400mg tableta**
+- Precio SISMED máximo: $280/tableta
+- EPS Salud Total: $260 | Nueva EPS: $240 | Compensar: $270
+- PBS: SÍ | Autorización: NO
+
+**Diclofenaco 75mg inyectable**
+- Precio SISMED máximo: $1,500/ampolla
+- EPS Salud Total: $1,400 | Nueva EPS: $1,350 | Compensar: $1,450
+- PBS: SÍ | Autorización: NO
+
+**Tramadol 50mg cápsula**
+- Precio SISMED máximo: $850/cápsula
+- EPS Salud Total: $800 | Nueva EPS: $750 | Compensar: $820
+- PBS: SÍ | Autorización: Prescripción especial
+
+**Morfina 10mg inyectable**
+- Precio SISMED máximo: $3,500/ampolla
+- EPS Salud Total: $3,300 | Nueva EPS: $3,150 | Compensar: $3,400
+- PBS: SÍ | Autorización: SÍ (medicamento controlado)
+
+---
+
+## CARDIOVASCULARES
+
+**Enalapril 10mg tableta**
+- Precio SISMED máximo: $380/tableta
+- EPS Salud Total: $360 | Nueva EPS: $340 | Compensar: $370
+- PBS: SÍ | Autorización: NO
+
+**Losartán 50mg tableta**
+- Precio SISMED máximo: $520/tableta
+- EPS Salud Total: $490 | Nueva EPS: $460 | Compensar: $505
+- PBS: SÍ | Autorización: NO
+
+**Amlodipino 5mg tableta**
+- Precio SISMED máximo: $280/tableta
+- EPS Salud Total: $260 | Nueva EPS: $245 | Compensar: $270
+- PBS: SÍ | Autorización: NO
+
+**Atenolol 50mg tableta**
+- Precio SISMED máximo: $320/tableta
+- EPS Salud Total: $300 | Nueva EPS: $280 | Compensar: $310
+- PBS: SÍ | Autorización: NO
+
+**Enoxaparina 40mg jeringa (profilaxis trombosis)**
+- Precio SISMED máximo: $18,500/jeringa
+- EPS Salud Total: $17,500 | Nueva EPS: $16,800 | Compensar: $18,000
+- PBS: SÍ | Autorización: NO
+
+**Enoxaparina 60mg jeringa**
+- Precio SISMED máximo: $25,000/jeringa
+- EPS Salud Total: $23,500 | Nueva EPS: $22,500 | Compensar: $24,200
+- PBS: SÍ | Autorización: NO
+
+---
+
+## DIABETES
+
+**Metformina 850mg tableta**
+- Precio SISMED máximo: $380/tableta
+- EPS Salud Total: $360 | Nueva EPS: $340 | Compensar: $370
+- PBS: SÍ | Autorización: NO
+
+**Insulina NPH 100UI/mL frasco 10mL**
+- Precio SISMED máximo: $45,000/frasco
+- EPS Salud Total: $42,500 | Nueva EPS: $40,500 | Compensar: $43,500
+- PBS: SÍ | Autorización: NO
+
+**Insulina Cristalina 100UI/mL frasco 10mL**
+- Precio SISMED máximo: $38,000/frasco
+- EPS Salud Total: $36,000 | Nueva EPS: $34,500 | Compensar: $37,000
+- PBS: SÍ | Autorización: NO
+
+---
+
+## GASTROINTESTINALES
+
+**Omeprazol 20mg cápsula**
+- Precio SISMED máximo: $420/cápsula
+- EPS Salud Total: $400 | Nueva EPS: $380 | Compensar: $410
+- PBS: SÍ | Autorización: NO
+
+**Ranitidina 50mg inyectable**
+- Precio SISMED máximo: $1,800/ampolla
+- EPS Salud Total: $1,700 | Nueva EPS: $1,650 | Compensar: $1,750
+- PBS: SÍ | Autorización: NO
+
+**Ondansetrón 4mg inyectable (náusea/vómito)**
+- Precio SISMED máximo: $4,500/ampolla
+- EPS Salud Total: $4,250 | Nueva EPS: $4,000 | Compensar: $4,350
+- PBS: SÍ | Autorización: NO
+
+---
+
+## SOLUCIONES PARENTERALES
+
+**Solución Salina 0.9% 1000mL**
+- Precio SISMED máximo: $3,500/bolsa
+- EPS Salud Total: $3,300 | Nueva EPS: $3,150 | Compensar: $3,400
+- PBS: SÍ | Autorización: NO
+
+**Lactato de Ringer 1000mL**
+- Precio SISMED máximo: $3,800/bolsa
+- EPS Salud Total: $3,600 | Nueva EPS: $3,400 | Compensar: $3,700
+- PBS: SÍ | Autorización: NO
+
+**Dextrosa 5% 1000mL**
+- Precio SISMED máximo: $3,200/bolsa
+- EPS Salud Total: $3,000 | Nueva EPS: $2,850 | Compensar: $3,100
+- PBS: SÍ | Autorización: NO
+
+---
+
+## MEDICAMENTOS DE ALTO COSTO (Requieren autorización CTC)
+
+**Rituximab 500mg inyectable**
+- Precio SISMED máximo: $3,850,000/frasco
+- EPS Salud Total: $3,650,000 | Nueva EPS: $3,500,000 | Compensar: $3,750,000
+- PBS: SÍ | Autorización: SÍ (CTC)
+- Uso: Linfoma, artritis reumatoide severa
+
+**Trastuzumab 440mg inyectable**
+- Precio SISMED máximo: $4,200,000/frasco
+- EPS Salud Total: $4,000,000 | Nueva EPS: $3,850,000 | Compensar: $4,100,000
+- PBS: SÍ | Autorización: SÍ (CTC)
+- Uso: Cáncer de mama HER2+
+
+**Bevacizumab 400mg inyectable**
+- Precio SISMED máximo: $2,800,000/frasco
+- EPS Salud Total: $2,650,000 | Nueva EPS: $2,550,000 | Compensar: $2,725,000
+- PBS: SÍ | Autorización: SÍ (CTC)
+- Uso: Cáncer colorrectal metastásico
+
+**Infliximab 100mg inyectable**
+- Precio SISMED máximo: $1,850,000/frasco
+- EPS Salud Total: $1,750,000 | Nueva EPS: $1,680,000 | Compensar: $1,800,000
+- PBS: SÍ | Autorización: SÍ (CTC)
+- Uso: Artritis reumatoide, Crohn
+
+---
+
+## 🚨 CRITERIOS DE GLOSA POR MEDICAMENTOS
+
+### Glosa Automática (100% del valor):
+1. ❌ Medicamento NO autorizado por la EPS
+2. ❌ Precio superior al máximo SISMED + 10%
+3. ❌ Medicamento No PBS sin autorización CTC
+4. ❌ Cantidad prescrita excede la autorizada
+5. ❌ Medicamento vencido o sin registro INVIMA
+6. ❌ Prescripción por marca comercial (debe ser por DCI - nombre genérico)
+
+### Glosa Parcial:
+1. ⚠️ Precio superior al contractual (se acepta precio contractual)
+2. ⚠️ Cantidad parcialmente autorizada (se acepta lo autorizado)
+
+### Requieren Justificación Médica Estricta:
+1. 📋 Antibióticos de 3ra generación
+2. 📋 Medicamentos de alto costo
+3. 📋 Medicamentos controlados (opioides, benzodiacepinas)
+4. 📋 Combinaciones de medicamentos con misma acción
+
+---
+
+## 💡 EJEMPLOS DE GLOSAS COMUNES
+
+**Caso 1: Sobrecosto**
+- Facturado: Amoxicilina 500mg x 21 tab = $11,000 ($524/tab)
+- Precio máximo SISMED: $450/tab = $9,450
+- **GLOSA**: $1,550 (Sobrecosto de $74/tableta)
+
+**Caso 2: Sin autorización**
+- Facturado: Rituximab 500mg = $3,850,000
+- Sin autorización CTC
+- **GLOSA**: $3,850,000 (100%)
+
+**Caso 3: Cantidad excedida**
+- Autorizado: Tramadol x 10 cápsulas
+- Facturado: Tramadol x 30 cápsulas
+- **GLOSA**: 20 cápsulas ($16,000)
+
+---
+
+**IMPORTANTE - Diferencias por EPS**:
+
+Las **EPS negocian precios diferentes** con proveedores:
+- **Nueva EPS**: Generalmente tiene mejores precios (6-10% más bajo)
+- **EPS Compensar**: Precios intermedios
+- **EPS Salud Total**: Precios similares al SISMED
+
+🔍 **La IA del sistema compara**:
+1. Precio facturado vs Precio máximo SISMED
+2. Precio facturado vs Precio negociado con la EPS específica
+3. Si medicamento requiere autorización
+4. Si cantidad está dentro de lo autorizado
+
+**Fuentes**:
+- SISMED - Ministerio de Salud
+- Contratos EPS-IPS 2024
+- Actualización: Enero 2024`
+    },
+    {
       id: 'contrato_salud_total',
       nombre: 'Contrato EPS Salud Total',
       tipo: 'tarifario',
