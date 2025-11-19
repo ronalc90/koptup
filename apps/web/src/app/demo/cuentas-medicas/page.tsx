@@ -23,6 +23,7 @@ import {
   PlusIcon,
   DocumentArrowUpIcon,
   TableCellsIcon,
+  ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 import { auditoriaAPI } from './api';
 import { Factura, Estadisticas, ResultadoAuditoria } from './tipos-auditoria';
