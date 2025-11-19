@@ -31,6 +31,8 @@ import { auditoriaAPI } from './api';
 import { Factura, Estadisticas, ResultadoAuditoria } from './tipos-auditoria';
 import toast from 'react-hot-toast';
 import ProcesoAuditoriaVisual from './ProcesoAuditoriaVisual';
+import { CUPS_COMPLETO } from './contenido-cups-completo';
+import { CIE10_COMPLETO } from './contenido-cie10-completo';
 
 // Tipo para documentos de la base de conocimiento
 interface DocumentoConocimiento {
@@ -77,34 +79,7 @@ export default function CuentasMedicasPage() {
       descripcion: 'Base SISPRO actualizada con 12,457 códigos de procedimientos',
       activo: true,
       registros: 12457,
-      contenido: `# Códigos CUPS - Clasificación Única de Procedimientos en Salud
-
-## Consultas
-890201 | Consulta de primera vez por medicina general | $35,000
-890202 | Consulta de primera vez por medicina especializada | $50,000
-890203 | Consulta de urgencias | $45,000
-890301 | Consulta de control por medicina general | $30,000
-890302 | Consulta de control por medicina especializada | $45,000
-890701 | Consulta odontológica de primera vez | $28,000
-
-## Procedimientos Diagnósticos
-870201 | Radiografía de tórax PA y lateral | $65,000
-870301 | Tomografía axial computarizada simple | $450,000
-871501 | Ecografía obstétrica | $85,000
-902210 | Hemograma completo | $18,000
-902316 | Proteína C reactiva | $25,000
-
-## Procedimientos Quirúrgicos
-331101 | Apendicectomía | $2,500,000
-331102 | Colecistectomía laparoscópica | $3,200,000
-662201 | Cesárea | $2,800,000
-
-## Hospitalización
-980101 | Día cama hospitalización general | $450,000
-980201 | Día cama UCI adultos | $1,200,000
-980301 | Día cama UCI pediátrica | $1,400,000
-
-Total de códigos en base de datos: 12,457`
+      contenido: CUPS_COMPLETO
     },
     {
       id: 'cie10',
@@ -113,47 +88,7 @@ Total de códigos en base de datos: 12,457`
       descripcion: 'Clasificación internacional de enfermedades - 14,891 diagnósticos',
       activo: true,
       registros: 14891,
-      contenido: `# CIE-10 - Clasificación Internacional de Enfermedades (10ª Revisión)
-
-## A00-B99: Enfermedades infecciosas y parasitarias
-A09 | Diarrea y gastroenteritis de presunto origen infeccioso
-A41.9 | Septicemia no especificada
-B34.9 | Infección viral no especificada
-
-## C00-D48: Neoplasias
-C50.9 | Neoplasia maligna de mama, parte no especificada
-C61 | Tumor maligno de la próstata
-D12.6 | Colon, sigmoide
-
-## E00-E90: Enfermedades endocrinas, nutricionales y metabólicas
-E11.9 | Diabetes mellitus tipo 2, sin mención de complicación
-E66.9 | Obesidad no especificada
-E78.5 | Hiperlipidemia no especificada
-
-## I00-I99: Enfermedades del sistema circulatorio
-I10 | Hipertensión esencial (primaria)
-I21.9 | Infarto agudo del miocardio sin otra especificación
-I50.9 | Insuficiencia cardíaca no especificada
-
-## J00-J99: Enfermedades del sistema respiratorio
-J18.9 | Neumonía no especificada
-J44.0 | Enfermedad pulmonar obstructiva crónica con infección respiratoria aguda
-J45.9 | Asma no especificada
-
-## K00-K93: Enfermedades del sistema digestivo
-K29.7 | Gastritis no especificada
-K35.8 | Apendicitis aguda, otra y la no especificada
-K80.2 | Cálculo de la vesícula biliar sin colecistitis
-
-## N00-N99: Enfermedades del sistema genitourinario
-N39.0 | Infección de vías urinarias, sitio no especificado
-N18.9 | Enfermedad renal crónica no especificada
-
-## O00-O99: Embarazo, parto y puerperio
-O80 | Parto único espontáneo
-O82 | Parto único por cesárea
-
-Total de códigos en base de datos: 14,891`
+      contenido: CIE10_COMPLETO
     },
     {
       id: 'soat',
@@ -1082,6 +1017,8 @@ Total de guías implementadas: 125`
 
   // MODAL DE VISUALIZACIÓN DE DOCUMENTO
   const ModalDocumento = () => {
+    const [searchTerm, setSearchTerm] = useState('');
+
     useEffect(() => {
       if (mostrarModalDocumento) {
         document.body.style.overflow = 'hidden';
@@ -1093,13 +1030,32 @@ Total de guías implementadas: 125`
       };
     }, [mostrarModalDocumento]);
 
+    useEffect(() => {
+      // Limpiar búsqueda al cambiar de documento
+      setSearchTerm('');
+    }, [documentoSeleccionado]);
+
     if (!mostrarModalDocumento || !documentoSeleccionado) return null;
+
+    // Filtrar contenido basado en búsqueda
+    const getFilteredContent = () => {
+      if (!searchTerm.trim()) return documentoSeleccionado.contenido;
+
+      const lines = documentoSeleccionado.contenido?.split('\n') || [];
+      const filtered = lines.filter(line =>
+        line.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+      return filtered.length > 0
+        ? filtered.join('\n')
+        : 'No se encontraron resultados para la búsqueda';
+    };
 
     return (
       <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] p-4 overflow-y-auto">
-        <div className="bg-white rounded-lg max-w-4xl w-full my-8 shadow-2xl max-h-[90vh] flex flex-col">
+        <div className="bg-white rounded-lg max-w-6xl w-full my-8 shadow-2xl max-h-[90vh] flex flex-col">
           <div className="p-6 border-b border-gray-200 flex-shrink-0">
-            <div className="flex items-start justify-between">
+            <div className="flex items-start justify-between mb-4">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">
                   {documentoSeleccionado.nombre}
@@ -1107,7 +1063,7 @@ Total de guías implementadas: 125`
                 <p className="text-sm text-gray-600">{documentoSeleccionado.descripcion}</p>
                 {documentoSeleccionado.registros && (
                   <Badge className="mt-2 bg-blue-100 text-blue-800">
-                    {documentoSeleccionado.registros.toLocaleString()} registros
+                    {documentoSeleccionado.registros.toLocaleString()} registros totales
                   </Badge>
                 )}
               </div>
@@ -1118,17 +1074,32 @@ Total de guías implementadas: 125`
                 <XCircleIcon className="h-6 w-6" />
               </button>
             </div>
+
+            {/* Buscador */}
+            <div className="relative">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Buscar en el documento (código CUPS, diagnóstico CIE-10, descripción, tarifa, etc)..."
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
           </div>
 
           <div className="p-6 overflow-y-auto flex-1">
             <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-              <pre className="whitespace-pre-wrap text-sm text-gray-800 font-mono">
-                {documentoSeleccionado.contenido || 'No hay contenido disponible'}
+              <pre className="whitespace-pre-wrap text-sm text-gray-800 font-mono leading-relaxed">
+                {getFilteredContent() || 'No hay contenido disponible'}
               </pre>
             </div>
           </div>
 
-          <div className="p-6 border-t border-gray-200 flex justify-end gap-3 flex-shrink-0">
+          <div className="p-6 border-t border-gray-200 flex justify-between items-center gap-3 flex-shrink-0">
+            <p className="text-sm text-gray-600">
+              {searchTerm ? `🔍 Filtrado por: "${searchTerm}"` : '📄 Mostrando todo el contenido'}
+            </p>
             <Button
               variant="outline"
               onClick={() => setMostrarModalDocumento(false)}
