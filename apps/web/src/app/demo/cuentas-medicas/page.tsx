@@ -19,12 +19,15 @@ import {
   CalendarIcon,
   BuildingOfficeIcon,
   MagnifyingGlassIcon,
+  PlusIcon,
+  DocumentArrowUpIcon,
+  TableCellsIcon,
 } from '@heroicons/react/24/outline';
 import { auditoriaAPI } from './api';
 import { Factura, Estadisticas, ResultadoAuditoria } from './tipos-auditoria';
 
 export default function CuentasMedicasPage() {
-  const [vista, setVista] = useState<'dashboard' | 'facturas' | 'detalle'>('dashboard');
+  const [vista, setVista] = useState<'dashboard' | 'facturas' | 'detalle' | 'crear'>('dashboard');
   const [estadisticas, setEstadisticas] = useState<Estadisticas | null>(null);
   const [facturas, setFacturas] = useState<Factura[]>([]);
   const [facturaSeleccionada, setFacturaSeleccionada] = useState<any | null>(null);
@@ -33,6 +36,18 @@ export default function CuentasMedicasPage() {
     estado: '',
     desde: '',
     hasta: '',
+  });
+  const [mostrarModalCrear, setMostrarModalCrear] = useState(false);
+  const [nuevaFactura, setNuevaFactura] = useState({
+    numeroFactura: '',
+    fechaEmision: new Date().toISOString().split('T')[0],
+    ips: { nit: '', nombre: '', codigo: '' },
+    eps: { nit: '', nombre: '', codigo: '' },
+    numeroContrato: '',
+    regimen: 'Contributivo' as const,
+    valorBruto: 0,
+    iva: 0,
+    valorTotal: 0,
   });
 
   useEffect(() => {
@@ -103,6 +118,63 @@ export default function CuentasMedicasPage() {
     }
   };
 
+  const crearFactura = async () => {
+    try {
+      setLoading(true);
+
+      // Validar campos obligatorios
+      if (!nuevaFactura.numeroFactura || !nuevaFactura.ips.nombre || !nuevaFactura.eps.nombre) {
+        alert('Por favor complete los campos obligatorios');
+        return;
+      }
+
+      const response = await auditoriaAPI.crearFactura(nuevaFactura);
+
+      alert('Factura creada exitosamente!');
+      setMostrarModalCrear(false);
+      setNuevaFactura({
+        numeroFactura: '',
+        fechaEmision: new Date().toISOString().split('T')[0],
+        ips: { nit: '', nombre: '', codigo: '' },
+        eps: { nit: '', nombre: '', codigo: '' },
+        numeroContrato: '',
+        regimen: 'Contributivo',
+        valorBruto: 0,
+        iva: 0,
+        valorTotal: 0,
+      });
+
+      // Recargar facturas y estadísticas
+      await cargarFacturas();
+      await cargarEstadisticas();
+
+      // Ir al detalle de la nueva factura
+      if (response.data) {
+        await verDetalleFactura(response.data._id);
+      }
+    } catch (error: any) {
+      alert('Error al crear factura: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const importarDesdeExcel = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setLoading(true);
+      alert('Funcionalidad de importación en desarrollo.\nPor ahora, use la creación manual de facturas.');
+      // TODO: Implementar parser de RIPS/Excel
+    } catch (error: any) {
+      alert('Error al importar: ' + error.message);
+    } finally {
+      setLoading(false);
+      event.target.value = '';
+    }
+  };
+
   const formatearMoneda = (valor: number) => {
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
@@ -132,11 +204,200 @@ export default function CuentasMedicasPage() {
     return estilos[estado] || 'bg-gray-100 text-gray-800';
   };
 
+  // MODAL DE CREAR FACTURA
+  const ModalCrearFactura = () => {
+    if (!mostrarModalCrear) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="p-6">
+            <h2 className="text-2xl font-bold mb-4">Nueva Factura</h2>
+
+            <div className="space-y-4">
+              {/* Número de Factura */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Número de Factura *
+                </label>
+                <input
+                  type="text"
+                  value={nuevaFactura.numeroFactura}
+                  onChange={(e) => setNuevaFactura({ ...nuevaFactura, numeroFactura: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="Ej: FAC-001-2024"
+                />
+              </div>
+
+              {/* Fecha */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Fecha de Emisión *
+                </label>
+                <input
+                  type="date"
+                  value={nuevaFactura.fechaEmision}
+                  onChange={(e) => setNuevaFactura({ ...nuevaFactura, fechaEmision: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* IPS */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    NIT IPS *
+                  </label>
+                  <input
+                    type="text"
+                    value={nuevaFactura.ips.nit}
+                    onChange={(e) => setNuevaFactura({ ...nuevaFactura, ips: { ...nuevaFactura.ips, nit: e.target.value } })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="900123456"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Nombre IPS *
+                  </label>
+                  <input
+                    type="text"
+                    value={nuevaFactura.ips.nombre}
+                    onChange={(e) => setNuevaFactura({ ...nuevaFactura, ips: { ...nuevaFactura.ips, nombre: e.target.value } })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="Hospital San José"
+                  />
+                </div>
+              </div>
+
+              {/* EPS */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    NIT EPS *
+                  </label>
+                  <input
+                    type="text"
+                    value={nuevaFactura.eps.nit}
+                    onChange={(e) => setNuevaFactura({ ...nuevaFactura, eps: { ...nuevaFactura.eps, nit: e.target.value } })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="900654321"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Nombre EPS *
+                  </label>
+                  <input
+                    type="text"
+                    value={nuevaFactura.eps.nombre}
+                    onChange={(e) => setNuevaFactura({ ...nuevaFactura, eps: { ...nuevaFactura.eps, nombre: e.target.value } })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="EPS Sura"
+                  />
+                </div>
+              </div>
+
+              {/* Régimen */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Régimen
+                </label>
+                <select
+                  value={nuevaFactura.regimen}
+                  onChange={(e) => setNuevaFactura({ ...nuevaFactura, regimen: e.target.value as any })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="Contributivo">Contributivo</option>
+                  <option value="Subsidiado">Subsidiado</option>
+                  <option value="Particular">Particular</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </div>
+
+              {/* Valores */}
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Valor Bruto
+                  </label>
+                  <input
+                    type="number"
+                    value={nuevaFactura.valorBruto}
+                    onChange={(e) => {
+                      const bruto = parseFloat(e.target.value) || 0;
+                      setNuevaFactura({
+                        ...nuevaFactura,
+                        valorBruto: bruto,
+                        valorTotal: bruto + nuevaFactura.iva,
+                      });
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    IVA
+                  </label>
+                  <input
+                    type="number"
+                    value={nuevaFactura.iva}
+                    onChange={(e) => {
+                      const iva = parseFloat(e.target.value) || 0;
+                      setNuevaFactura({
+                        ...nuevaFactura,
+                        iva,
+                        valorTotal: nuevaFactura.valorBruto + iva,
+                      });
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Valor Total
+                  </label>
+                  <input
+                    type="number"
+                    value={nuevaFactura.valorTotal}
+                    disabled
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Botones */}
+            <div className="flex justify-end space-x-3 mt-6">
+              <Button
+                variant="outline"
+                onClick={() => setMostrarModalCrear(false)}
+                disabled={loading}
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={crearFactura}
+                disabled={loading}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                {loading ? 'Creando...' : 'Crear Factura'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // VISTA DASHBOARD
   if (vista === 'dashboard') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
         <div className="max-w-7xl mx-auto">
+          {/* Modal */}
+          <ModalCrearFactura />
+
           {/* Header */}
           <div className="mb-8">
             <Link href="/demo">
@@ -155,16 +416,25 @@ export default function CuentasMedicasPage() {
                   Sistema experto con IA para auditoría automática de facturas de salud
                 </p>
               </div>
-              <Button
-                onClick={() => {
-                  cargarFacturas();
-                  setVista('facturas');
-                }}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                <ClipboardDocumentListIcon className="h-5 w-5 mr-2" />
-                Ver Facturas
-              </Button>
+              <div className="flex space-x-3">
+                <Button
+                  onClick={() => setMostrarModalCrear(true)}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <PlusIcon className="h-5 w-5 mr-2" />
+                  Nueva Factura
+                </Button>
+                <Button
+                  onClick={() => {
+                    cargarFacturas();
+                    setVista('facturas');
+                  }}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <ClipboardDocumentListIcon className="h-5 w-5 mr-2" />
+                  Ver Facturas
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -373,6 +643,9 @@ export default function CuentasMedicasPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
         <div className="max-w-7xl mx-auto">
+          {/* Modal */}
+          <ModalCrearFactura />
+
           <div className="mb-6">
             <Button variant="ghost" onClick={() => setVista('dashboard')}>
               <ArrowLeftIcon className="h-4 w-4 mr-2" />
@@ -384,13 +657,38 @@ export default function CuentasMedicasPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>📋 Facturas de Salud</CardTitle>
-                <Button
-                  onClick={cargarFacturas}
-                  variant="outline"
-                  disabled={loading}
-                >
-                  {loading ? 'Cargando...' : 'Actualizar'}
-                </Button>
+                <div className="flex space-x-2">
+                  <label className="cursor-pointer">
+                    <input
+                      type="file"
+                      accept=".xlsx,.xls,.csv"
+                      onChange={importarDesdeExcel}
+                      className="hidden"
+                    />
+                    <Button
+                      as="span"
+                      variant="outline"
+                      className="border-purple-600 text-purple-600 hover:bg-purple-50"
+                    >
+                      <DocumentArrowUpIcon className="h-4 w-4 mr-2" />
+                      Importar Excel
+                    </Button>
+                  </label>
+                  <Button
+                    onClick={() => setMostrarModalCrear(true)}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    <PlusIcon className="h-4 w-4 mr-2" />
+                    Nueva Factura
+                  </Button>
+                  <Button
+                    onClick={cargarFacturas}
+                    variant="outline"
+                    disabled={loading}
+                  >
+                    {loading ? 'Cargando...' : 'Actualizar'}
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
