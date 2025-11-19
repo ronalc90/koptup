@@ -130,64 +130,64 @@ class AuditoriaMedicaController {
         };
       } else {
         factura = new Factura({
-        numeroFactura: numeroFactura,
-        fechaEmision: this.parsearFecha(datosFactura.fechaFactura) || new Date(),
-        fechaRadicacion: this.parsearFecha(datosFactura.fechaRadicacion) || new Date(),
-        ips: {
-          nit: datosFactura.tipoDocumentoIPS || '860007336-1',
-          nombre: 'COLSUBSIDIO',
-          codigo: datosFactura.tipoDocumentoIPS?.split('-')[0] || '',
-        },
-        eps: {
-          nit: '900156264',
-          nombre: 'NUEVA EPS',
-          codigo: 'NUEVAEPS',
-        },
-        numeroContrato: 'NUEVA EPS EVENTO CLINICAS',
-        regimen: datosFactura.regimen || 'Contributivo',
-        valorBruto: datosFactura.valorBrutoFactura || datosFactura.valorIPS,
-        iva: datosFactura.valorIVA || 0,
-        valorTotal: datosFactura.valorNetoFactura || datosFactura.valorIPS,
-        estado: 'Auditada',
-        auditoriaCompletada: true,
-        fechaAuditoria: new Date(),
-        totalGlosas: resultadoGlosas.valorGlosaAdmitiva,
-        valorAceptado: resultadoGlosas.valorAPagar,
-        observaciones: resultadoGlosas.observacion,
-      });
+          numeroFactura: numeroFactura,
+          fechaEmision: this.parsearFecha(datosFactura.fechaFactura) || new Date(),
+          fechaRadicacion: this.parsearFecha(datosFactura.fechaRadicacion) || new Date(),
+          ips: {
+            nit: datosFactura.tipoDocumentoIPS || '860007336-1',
+            nombre: 'COLSUBSIDIO',
+            codigo: datosFactura.tipoDocumentoIPS?.split('-')[0] || '',
+          },
+          eps: {
+            nit: '900156264',
+            nombre: 'NUEVA EPS',
+            codigo: 'NUEVAEPS',
+          },
+          numeroContrato: 'NUEVA EPS EVENTO CLINICAS',
+          regimen: datosFactura.regimen || 'Contributivo',
+          valorBruto: datosFactura.valorBrutoFactura || datosFactura.valorIPS,
+          iva: datosFactura.valorIVA || 0,
+          valorTotal: datosFactura.valorNetoFactura || datosFactura.valorIPS,
+          estado: 'Auditada',
+          auditoriaCompletada: true,
+          fechaAuditoria: new Date(),
+          totalGlosas: resultadoGlosas.valorGlosaAdmitiva,
+          valorAceptado: resultadoGlosas.valorAPagar,
+          observaciones: resultadoGlosas.observacion,
+        });
 
         await factura.save();
         console.log(`✅ Factura guardada con ID: ${factura._id}`);
 
         // 5. CREAR ATENCIÓN
         atencion = new Atencion({
-        facturaId: factura._id,
-        numeroAtencion: datosFactura.nroAutNvo || `AT-${Date.now()}`,
-        numeroAutorizacion: datosFactura.autorizacion || '',
-        fechaAutorizacion: this.parsearFecha(datosFactura.fechaIngreso) || new Date(),
-        paciente: {
-          tipoDocumento: datosFactura.tipoDocumentoPaciente || 'RC',
-          numeroDocumento: datosFactura.numeroDocumento || '',
-          nombres: datosFactura.nombrePaciente?.split(' ').slice(0, 2).join(' ') || '',
-          apellidos: datosFactura.nombrePaciente?.split(' ').slice(2).join(' ') || '',
-          edad: this.calcularEdad(datosFactura.fechaIngreso) || 1,
-          sexo: 'M',
-        },
-        diagnosticoPrincipal: {
-          codigoCIE10: datosFactura.diagnosticoPrincipal || '',
-          descripcion: this.obtenerDescripcionCIE10(datosFactura.diagnosticoPrincipal),
-        },
-        diagnosticosSecundarios: [],
-        fechaInicio: this.parsearFecha(datosFactura.fechaIngreso) || new Date(),
-        fechaFin: this.parsearFecha(datosFactura.fechaEgreso) || new Date(),
-        copago: datosFactura.copago || 0,
-        cuotaModeradora: datosFactura.cmo || 0,
-        procedimientos: [],
-        soportes: [],
-        tieneAutorizacion: !!datosFactura.autorizacion,
-        autorizacionValida: !!datosFactura.autorizacion,
-        pertinenciaValidada: true,
-      });
+          facturaId: factura._id,
+          numeroAtencion: datosFactura.nroAutNvo || `AT-${Date.now()}`,
+          numeroAutorizacion: datosFactura.autorizacion || '',
+          fechaAutorizacion: this.parsearFecha(datosFactura.fechaIngreso) || new Date(),
+          paciente: {
+            tipoDocumento: datosFactura.tipoDocumentoPaciente || 'RC',
+            numeroDocumento: datosFactura.numeroDocumento || '',
+            nombres: datosFactura.nombrePaciente?.split(' ').slice(0, 2).join(' ') || '',
+            apellidos: datosFactura.nombrePaciente?.split(' ').slice(2).join(' ') || '',
+            edad: this.calcularEdad(datosFactura.fechaIngreso) || 1,
+            sexo: 'M',
+          },
+          diagnosticoPrincipal: {
+            codigoCIE10: datosFactura.diagnosticoPrincipal || '',
+            descripcion: this.obtenerDescripcionCIE10(datosFactura.diagnosticoPrincipal),
+          },
+          diagnosticosSecundarios: [],
+          fechaInicio: this.parsearFecha(datosFactura.fechaIngreso) || new Date(),
+          fechaFin: this.parsearFecha(datosFactura.fechaEgreso) || new Date(),
+          copago: datosFactura.copago || 0,
+          cuotaModeradora: datosFactura.cmo || 0,
+          procedimientos: [],
+          soportes: [],
+          tieneAutorizacion: !!datosFactura.autorizacion,
+          autorizacionValida: !!datosFactura.autorizacion,
+          pertinenciaValidada: true,
+        });
 
         await atencion.save();
         console.log(`✅ Atención guardada con ID: ${atencion._id}`);
