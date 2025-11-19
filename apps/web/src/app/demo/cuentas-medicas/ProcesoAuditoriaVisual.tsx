@@ -16,6 +16,14 @@ import {
   ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
 
+interface DatoExtraido {
+  campo: string;
+  valor: string;
+  origen: string; // De qué archivo sale
+  ubicacion: string; // Qué sección/hoja del archivo
+  explicacion: string; // Por qué se necesita este dato
+}
+
 interface PasoProcesoProps {
   numero: number;
   titulo: string;
@@ -25,6 +33,8 @@ interface PasoProcesoProps {
   estado: 'pendiente' | 'en-proceso' | 'completado';
   duracion?: string;
   resultados?: { label: string; valor: string; tipo?: 'exito' | 'advertencia' | 'error' }[];
+  datosExtraidos?: DatoExtraido[];
+  procesoDetallado?: string[]; // Pasos detallados de qué hace
 }
 
 const PasoProceso: React.FC<PasoProcesoProps> = ({
@@ -36,6 +46,8 @@ const PasoProceso: React.FC<PasoProcesoProps> = ({
   estado,
   duracion,
   resultados,
+  datosExtraidos,
+  procesoDetallado,
 }) => {
   const [expandido, setExpandido] = useState(false);
 
@@ -99,6 +111,63 @@ const PasoProceso: React.FC<PasoProcesoProps> = ({
           {/* Detalles Expandibles */}
           {expandido && (
             <div className="mt-4 space-y-4 border-t pt-4">
+              {/* Datos Extraídos de Archivos */}
+              {datosExtraidos && datosExtraidos.length > 0 && (
+                <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                  <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <DocumentTextIcon className="h-5 w-5 text-blue-600" />
+                    Datos Extraídos de los Archivos
+                  </h4>
+                  <div className="space-y-3">
+                    {datosExtraidos.map((dato, idx) => (
+                      <div key={idx} className="bg-white rounded-lg p-3 border border-blue-300">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-semibold text-gray-900">{dato.campo}:</span>
+                              <span className="text-blue-700 font-bold">{dato.valor}</span>
+                            </div>
+                            <div className="text-xs text-gray-600 space-y-1">
+                              <div className="flex items-center gap-1">
+                                <TableCellsIcon className="h-3 w-3" />
+                                <span className="font-medium">Origen:</span>
+                                <span className="text-blue-600">{dato.origen}</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <ArrowRightIcon className="h-3 w-3" />
+                                <span className="font-medium">Ubicación:</span>
+                                <span>{dato.ubicacion}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-xs bg-yellow-50 border-l-2 border-yellow-400 p-2 rounded">
+                          <span className="font-medium text-yellow-800">💡 Por qué:</span>
+                          <span className="text-yellow-900 ml-1">{dato.explicacion}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Proceso Detallado */}
+              {procesoDetallado && procesoDetallado.length > 0 && (
+                <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-4">
+                  <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <CpuChipIcon className="h-5 w-5 text-purple-600" />
+                    ¿Qué hace este paso?
+                  </h4>
+                  <ol className="space-y-2 list-decimal list-inside">
+                    {procesoDetallado.map((paso, idx) => (
+                      <li key={idx} className="text-sm text-gray-700 bg-white p-2 rounded border border-purple-200">
+                        {paso}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+
               {/* Datos Utilizados */}
               <div>
                 <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
@@ -206,6 +275,72 @@ export default function ProcesoAuditoriaVisual({
       ],
       estado: pasoActual > 0 ? 'completado' : pasoActual === 0 ? 'en-proceso' : 'pendiente',
       duracion: '0.5s',
+      datosExtraidos: pasoActual > 0 ? [
+        {
+          campo: 'Número de Factura',
+          valor: 'FAC-2024-001',
+          origen: 'RIPS_Factura_2024.xlsx',
+          ubicacion: 'Hoja "AF" (Factura), Columna "num_fac", Fila 2',
+          explicacion: 'Identificador único de la factura para rastreo y auditoría',
+        },
+        {
+          campo: 'NIT IPS',
+          valor: '900.123.456-7',
+          origen: 'RIPS_Factura_2024.xlsx',
+          ubicacion: 'Hoja "AF", Columna "cod_ips", Fila 2',
+          explicacion: 'Identifica la IPS que factura para validar contratos y tarifas',
+        },
+        {
+          campo: 'Código EPS',
+          valor: 'EPS001',
+          origen: 'RIPS_Factura_2024.xlsx',
+          ubicacion: 'Hoja "AF", Columna "cod_eps", Fila 2',
+          explicacion: 'Identifica la EPS pagadora para aplicar el tarifario correcto',
+        },
+        {
+          campo: 'Documento Paciente',
+          valor: '1234567890',
+          origen: 'RIPS_Factura_2024.xlsx',
+          ubicacion: 'Hoja "US" (Usuarios), Columna "num_doc", Fila 3',
+          explicacion: 'Identifica al paciente para validar autorización y duplicidades',
+        },
+        {
+          campo: 'Código CUPS',
+          valor: '890201',
+          origen: 'RIPS_Factura_2024.xlsx',
+          ubicacion: 'Hoja "AP" (Procedimientos), Columna "cod_cups", Fila 5',
+          explicacion: 'Código del procedimiento para consultar tarifario y pertinencia',
+        },
+        {
+          campo: 'Valor Facturado',
+          valor: '$250.000',
+          origen: 'RIPS_Factura_2024.xlsx',
+          ubicacion: 'Hoja "AP", Columna "valor_total", Fila 5',
+          explicacion: 'Valor cobrado por la IPS a comparar contra tarifario contractual',
+        },
+        {
+          campo: 'Número de Autorización',
+          valor: 'AUT-20240115-001',
+          origen: 'Autorizaciones_Pacientes.pdf',
+          ubicacion: 'Página 1, Campo "N° Autorización"',
+          explicacion: 'Valida que el procedimiento esté autorizado por la EPS',
+        },
+        {
+          campo: 'Diagnóstico CIE-10',
+          valor: 'J18.9',
+          origen: 'RIPS_Factura_2024.xlsx',
+          ubicacion: 'Hoja "AC" (Consultas), Columna "diag_prin", Fila 4',
+          explicacion: 'Diagnóstico principal para validar pertinencia del procedimiento',
+        },
+      ] : undefined,
+      procesoDetallado: pasoActual > 0 ? [
+        'Se lee el archivo Excel RIPS en todas sus hojas (AF=Factura, US=Usuarios, AC=Consultas, AP=Procedimientos)',
+        'Se extraen los datos principales: identificadores, códigos, valores y fechas',
+        'Se leen los archivos PDF de autorizaciones usando OCR para extraer números de autorización',
+        'Se valida que cada dato requerido esté presente y tenga el formato correcto',
+        'Se cruzan los datos entre hojas para asegurar coherencia (ej: paciente en US debe existir en AP)',
+        'Se genera un registro estructurado con todos los datos listos para las validaciones',
+      ] : undefined,
       resultados:
         pasoActual > 0
           ? [
@@ -230,6 +365,44 @@ export default function ProcesoAuditoriaVisual({
       ],
       estado: pasoActual > 1 ? 'completado' : pasoActual === 1 ? 'en-proceso' : 'pendiente',
       duracion: '1.2s',
+      datosExtraidos: pasoActual > 1 ? [
+        {
+          campo: 'Código CUPS',
+          valor: '890201 - Consulta Medicina General',
+          origen: 'Del paso anterior (RIPS_Factura_2024.xlsx)',
+          ubicacion: 'Previamente extraído de Hoja "AP", Fila 5',
+          explicacion: 'Se usa para buscar el valor en el tarifario contractual',
+        },
+        {
+          campo: 'Tarifa Contrato EPS',
+          valor: '$220.000',
+          origen: 'Base de Datos - Tarifario EPS001',
+          ubicacion: 'Tabla "tarifarios", Campo "valor_contrato" para CUPS 890201',
+          explicacion: 'Valor máximo que la EPS debe pagar según contrato con la IPS',
+        },
+        {
+          campo: 'Valor Facturado IPS',
+          valor: '$250.000',
+          origen: 'Del paso anterior (RIPS_Factura_2024.xlsx)',
+          ubicacion: 'Previamente extraído de Hoja "AP", Fila 5',
+          explicacion: 'Valor que la IPS está cobrando por el procedimiento',
+        },
+        {
+          campo: 'Diferencia (Posible Glosa)',
+          valor: '$30.000 (12% de sobrecosto)',
+          origen: 'Calculado: Valor Facturado - Tarifa Contrato',
+          ubicacion: 'Cálculo: $250.000 - $220.000 = $30.000',
+          explicacion: 'La IPS cobra más de lo permitido, se marca para posible glosa',
+        },
+      ] : undefined,
+      procesoDetallado: pasoActual > 1 ? [
+        'Para cada procedimiento extraído (código CUPS), se consulta en la base de datos de tarifarios',
+        'Se identifica el contrato vigente entre la IPS y la EPS en la fecha de facturación',
+        'Se obtiene el valor contractual para ese código CUPS específico',
+        'Se compara el valor facturado vs el valor del contrato',
+        'Si hay diferencia, se calcula el porcentaje de sobrecosto o descuento',
+        'Se marca para glosa si el valor facturado excede el contractual en más del 5%',
+      ] : undefined,
       resultados:
         pasoActual > 1
           ? [
@@ -307,9 +480,9 @@ export default function ProcesoAuditoriaVisual({
     },
     {
       numero: 6,
-      titulo: 'Generación de Glosas',
+      titulo: 'Generación de Glosas y Excel Final',
       descripcion:
-        'Se generan automáticamente las glosas basadas en las inconsistencias encontradas, calculando el valor a glosar.',
+        'Se generan automáticamente las glosas basadas en las inconsistencias encontradas, y se construye el archivo Excel con el reporte completo de auditoría.',
       icono: <ChartBarIcon className="h-6 w-6 text-red-600" />,
       datosUsados: [
         'Diferencias de Tarifa',
@@ -319,6 +492,62 @@ export default function ProcesoAuditoriaVisual({
       ],
       estado: pasoActual > 5 ? 'completado' : pasoActual === 5 ? 'en-proceso' : 'pendiente',
       duracion: '0.6s',
+      datosExtraidos: pasoActual > 5 ? [
+        {
+          campo: 'Glosa #1 - Sobrecosto Tarifario',
+          valor: 'CUPS 890201: $30.000',
+          origen: 'Resultado del Paso 2 (Consulta de Tarifarios)',
+          ubicacion: 'Se escribe en Excel → Hoja "Glosas", Fila 2',
+          explicacion: 'La IPS facturó $250.000 pero el contrato permite máximo $220.000',
+        },
+        {
+          campo: 'Glosa #2 - Sin Autorización',
+          valor: 'CUPS 890301: $450.000',
+          origen: 'Resultado del Paso 3 (Validación de Autorizaciones)',
+          ubicacion: 'Se escribe en Excel → Hoja "Glosas", Fila 3',
+          explicacion: 'Procedimiento no tiene autorización vigente de la EPS',
+        },
+        {
+          campo: 'Glosa #3 - Duplicidad',
+          valor: 'CUPS 890201 (2da vez mismo día): $250.000',
+          origen: 'Resultado del Paso 4 (Detección de Duplicidades)',
+          ubicacion: 'Se escribe en Excel → Hoja "Glosas", Fila 4',
+          explicacion: 'Mismo procedimiento facturado 2 veces para el mismo paciente el mismo día',
+        },
+        {
+          campo: 'Valor Total Facturado',
+          valor: '$100.000.000',
+          origen: 'Suma de todos los procedimientos (Paso 1)',
+          ubicacion: 'Se escribe en Excel → Hoja "Resumen", Celda B2',
+          explicacion: 'Suma total de todos los procedimientos de la factura',
+        },
+        {
+          campo: 'Total Glosas',
+          valor: '$15.750.000',
+          origen: 'Suma de todas las glosas generadas',
+          ubicacion: 'Se escribe en Excel → Hoja "Resumen", Celda B3',
+          explicacion: 'Suma de todos los valores objetados/glosados',
+        },
+        {
+          campo: 'Valor Aceptado',
+          valor: '$84.250.000',
+          origen: 'Calculado: Total Facturado - Total Glosas',
+          ubicacion: 'Se escribe en Excel → Hoja "Resumen", Celda B4',
+          explicacion: 'Valor que la EPS debe pagar después de aplicar las glosas',
+        },
+      ] : undefined,
+      procesoDetallado: pasoActual > 5 ? [
+        'Se recopilan todas las inconsistencias detectadas en los pasos 2-5',
+        'Para cada inconsistencia se crea una glosa con: tipo, código, descripción, valor y justificación',
+        'Se crea un nuevo archivo Excel con múltiples hojas: "Resumen", "Glosas", "Detalle Procedimientos", "Facturas Originales"',
+        'Hoja "Resumen": Se escriben totales, estadísticas y gráficos de la auditoría',
+        'Hoja "Glosas": Se listan todas las glosas una por una con su detalle completo',
+        'Hoja "Detalle Procedimientos": Se copian todos los procedimientos del RIPS original + columnas adicionales con resultados de validación',
+        'Hoja "Facturas Originales": Se preserva una copia de los datos originales del RIPS',
+        'Se aplican formatos, colores y filtros para facilitar la lectura',
+        'Se generan gráficos automáticos: distribución de glosas por tipo, valor glosado vs aceptado, etc.',
+        'Se guarda el archivo con nombre: "Auditoria_[NumFactura]_[Fecha].xlsx"',
+      ] : undefined,
       resultados:
         pasoActual > 5
           ? [
@@ -330,8 +559,8 @@ export default function ProcesoAuditoriaVisual({
     },
   ];
 
-  useEffect(() => {
-    if (enEjecucion && pasoActual < pasos.length) {
+  const avanzarPaso = () => {
+    if (pasoActual < pasos.length) {
       // Marcar documento como procesando en el paso 0
       if (pasoActual === 0) {
         setDocumentosProcesados((prev) =>
@@ -346,14 +575,10 @@ export default function ProcesoAuditoriaVisual({
         );
       }
 
-      const timer = setTimeout(() => {
-        setPasoActual((prev) => prev + 1);
-      }, 2000); // Simular tiempo de procesamiento
-
-      return () => clearTimeout(timer);
+      setPasoActual((prev) => prev + 1);
     }
 
-    if (enEjecucion && pasoActual === pasos.length && onFinalizar) {
+    if (pasoActual === pasos.length - 1) {
       // Auditoría completada
       const resultado = {
         totalGlosas: 15750000,
@@ -361,9 +586,20 @@ export default function ProcesoAuditoriaVisual({
         glosas: 18,
       };
       setResultadosAuditoria(resultado);
-      onFinalizar(resultado);
+      if (onFinalizar) {
+        onFinalizar(resultado);
+      }
     }
-  }, [enEjecucion, pasoActual, pasos.length, onFinalizar]);
+  };
+
+  useEffect(() => {
+    // Ya no avanza automáticamente, solo prepara el estado inicial
+    if (enEjecucion && pasoActual === 0) {
+      setDocumentosProcesados((prev) =>
+        prev.map((doc) => ({ ...doc, estado: 'pendiente' as const }))
+      );
+    }
+  }, [enEjecucion]);
 
   return (
     <div className="space-y-6">
@@ -460,6 +696,19 @@ export default function ProcesoAuditoriaVisual({
           <PasoProceso key={idx} {...paso} />
         ))}
       </div>
+
+      {/* Botón Siguiente - Solo visible cuando hay un paso en proceso o completado y no ha terminado */}
+      {enEjecucion && pasoActual < pasos.length && (
+        <div className="flex justify-center">
+          <button
+            onClick={avanzarPaso}
+            className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-all transform hover:scale-105 flex items-center gap-3 text-lg"
+          >
+            {pasoActual === 0 ? 'Iniciar Auditoría' : 'Continuar al Siguiente Paso'}
+            <ArrowRightIcon className="h-6 w-6" />
+          </button>
+        </div>
+      )}
 
       {/* Resumen Final */}
       {pasoActual === pasos.length && resultadosAuditoria && (

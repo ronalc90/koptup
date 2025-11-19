@@ -409,6 +409,7 @@ export default function ProjectsPage() {
                 </Button>
               </div>
             </div>
+          )}
           </div>
         )}
       </div>
