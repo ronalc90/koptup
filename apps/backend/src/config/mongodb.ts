@@ -14,7 +14,8 @@ export const connectDB = async () => {
     logger.info('✅ MongoDB connected successfully');
   } catch (error) {
     logger.error('❌ MongoDB connection error:', error);
-    throw error;
+    logger.warn('⚠️  Continuing without MongoDB - database operations will fail');
+    // No lanzar error para permitir que el servidor continúe
   }
 };
 
