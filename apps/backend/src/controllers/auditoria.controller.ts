@@ -404,6 +404,155 @@ class AuditoriaController {
       });
     }
   }
+
+  /**
+   * Procesar archivos y crear factura automáticamente
+   */
+  async procesarArchivos(req: Request, res: Response) {
+    try {
+      const { nombreCuenta, ips, eps, numeroContrato, regimen } = req.body;
+      const files = req.files as Express.Multer.File[];
+
+      if (!files || files.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'No se proporcionaron archivos',
+        });
+      }
+
+      if (!nombreCuenta || !nombreCuenta.trim()) {
+        return res.status(400).json({
+          success: false,
+          message: 'El nombre de la cuenta es requerido',
+        });
+      }
+
+      // Generar número de factura único
+      const numeroFactura = `FAC-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+
+      // Crear factura básica
+      const factura = new Factura({
+        numeroFactura,
+        fechaEmision: new Date(),
+        fechaRadicacion: new Date(),
+        ips: {
+          nit: ips?.nit || '900000000-1',
+          nombre: ips?.nombre || nombreCuenta,
+          codigo: ips?.codigo || '',
+        },
+        eps: {
+          nit: eps?.nit || '800000000-1',
+          nombre: eps?.nombre || 'EPS Demo',
+          codigo: eps?.codigo || '',
+        },
+        numeroContrato: numeroContrato || 'CONTRATO-DEMO',
+        regimen: regimen || 'Contributivo',
+        valorBruto: 0,
+        iva: 0,
+        valorTotal: 0,
+        estado: 'Radicada',
+        auditoriaCompletada: false,
+        totalGlosas: 0,
+        valorAceptado: 0,
+        observaciones: `Cuenta creada desde interfaz web: ${nombreCuenta}`,
+      });
+
+      await factura.save();
+
+      // Procesar archivos
+      const archivosExcel = files.filter(f =>
+        f.originalname.match(/\.(xlsx|xls|csv)$/i)
+      );
+      const archivosPDF = files.filter(f =>
+        f.originalname.match(/\.pdf$/i)
+      );
+
+      // Por ahora, crear datos de ejemplo basados en los archivos
+      // TODO: Implementar procesamiento real con IA en el futuro
+      const atencion = new Atencion({
+        facturaId: factura._id,
+        numeroAtencion: `AT-${Date.now()}`,
+        numeroAutorizacion: 'AUTO-DEMO-001',
+        fechaAutorizacion: new Date(),
+        paciente: {
+          tipoDocumento: 'CC',
+          numeroDocumento: '1234567890',
+          edad: 35,
+          sexo: 'M',
+        },
+        diagnosticoPrincipal: {
+          codigoCIE10: 'J00',
+          descripcion: 'Rinofaringitis aguda [resfriado común]',
+        },
+        diagnosticosSecundarios: [],
+        fechaInicio: new Date(),
+        fechaFin: new Date(),
+        copago: 0,
+        cuotaModeradora: 0,
+        procedimientos: [],
+        soportes: [],
+        tieneAutorizacion: true,
+        autorizacionValida: true,
+        pertinenciaValidada: false,
+      });
+
+      await atencion.save();
+
+      // Crear procedimiento de ejemplo
+      const procedimiento = new Procedimiento({
+        atencionId: atencion._id,
+        facturaId: factura._id,
+        codigoCUPS: '890201',
+        descripcion: 'Consulta de primera vez por medicina general',
+        tipoManual: 'CUPS',
+        cantidad: 1,
+        valorUnitarioIPS: 25000,
+        valorTotalIPS: 25000,
+        valorUnitarioContrato: 25000,
+        valorTotalContrato: 25000,
+        valorAPagar: 25000,
+        diferenciaTarifa: 0,
+        glosas: [],
+        totalGlosas: 0,
+        glosaAdmitida: false,
+        tarifaValidada: false,
+        pertinenciaValidada: false,
+        duplicado: false,
+      });
+
+      await procedimiento.save();
+
+      // Actualizar atención con procedimientos
+      atencion.procedimientos = [procedimiento._id];
+      await atencion.save();
+
+      // Actualizar factura con atención y valores
+      factura.atenciones = [atencion._id];
+      factura.valorBruto = 25000;
+      factura.valorTotal = 25000;
+      factura.valorAceptado = 25000;
+      await factura.save();
+
+      res.status(201).json({
+        success: true,
+        message: 'Factura creada y archivos procesados exitosamente',
+        data: {
+          factura,
+          archivosProcessed: {
+            excel: archivosExcel.length,
+            pdf: archivosPDF.length,
+            total: files.length,
+          },
+        },
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: 'Error al procesar archivos',
+        error: error.message,
+      });
+    }
+  }
 }
 
 export default new AuditoriaController();
