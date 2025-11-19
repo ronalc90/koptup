@@ -31,6 +31,17 @@ import { Factura, Estadisticas, ResultadoAuditoria } from './tipos-auditoria';
 import toast from 'react-hot-toast';
 import ProcesoAuditoriaVisual from './ProcesoAuditoriaVisual';
 
+// Tipo para documentos de la base de conocimiento
+interface DocumentoConocimiento {
+  id: string;
+  nombre: string;
+  tipo: 'tarifario' | 'normativa' | 'guia' | 'cups' | 'cie10';
+  descripcion: string;
+  activo: boolean;
+  registros?: number;
+  contenido?: string;
+}
+
 export default function CuentasMedicasPage() {
   const [vista, setVista] = useState<'dashboard' | 'facturas' | 'detalle' | 'crear' | 'proceso' | 'admin'>('dashboard');
   const [mostrarProceso, setMostrarProceso] = useState(false);
@@ -50,8 +61,83 @@ export default function CuentasMedicasPage() {
   const [nombreCuenta, setNombreCuenta] = useState('');
   const [cuentaActual, setCuentaActual] = useState<any>(null);
   const [archivosSubidos, setArchivosSubidos] = useState<any[]>([]);
+  const [documentoSeleccionado, setDocumentoSeleccionado] = useState<DocumentoConocimiento | null>(null);
+  const [mostrarModalDocumento, setMostrarModalDocumento] = useState(false);
+  const [mostrarFlujo, setMostrarFlujo] = useState(false);
   const headerRef = useRef<HTMLDivElement>(null);
   const modalHeaderRef = useRef<HTMLDivElement>(null);
+
+  // Estado para documentos de la base de conocimiento
+  const [documentosConocimiento, setDocumentosConocimiento] = useState<DocumentoConocimiento[]>([
+    {
+      id: 'cups',
+      nombre: 'Códigos CUPS',
+      tipo: 'cups',
+      descripcion: 'Base SISPRO actualizada con 12,457 códigos de procedimientos',
+      activo: true,
+      registros: 12457,
+      contenido: 'Sistema de clasificación de procedimientos médicos y quirúrgicos. Incluye códigos como:\n\n890201 - Consulta Medicina General\n890301 - Consulta Medicina Especializada\n890701 - Consulta Odontología\n...\n\nTotal: 12,457 procedimientos clasificados'
+    },
+    {
+      id: 'cie10',
+      nombre: 'Diagnósticos CIE-10',
+      tipo: 'cie10',
+      descripcion: 'Clasificación internacional de enfermedades - 14,891 diagnósticos',
+      activo: true,
+      registros: 14891,
+      contenido: 'Clasificación Internacional de Enfermedades versión 10. Incluye:\n\nA00-B99: Enfermedades infecciosas y parasitarias\nC00-D48: Neoplasias\nE00-E90: Enfermedades endocrinas\nJ00-J99: Enfermedades del sistema respiratorio\nJ18.9 - Neumonía no especificada\n...\n\nTotal: 14,891 códigos de diagnóstico'
+    },
+    {
+      id: 'soat',
+      nombre: 'Tarifario SOAT 2024',
+      tipo: 'tarifario',
+      descripcion: 'Seguro Obligatorio de Accidentes de Tránsito',
+      activo: true,
+      contenido: '# Tarifario SOAT 2024\n\n## Consultas\n- 890201: $35,000\n- 890301: $50,000\n\n## Procedimientos Quirúrgicos\n- 331101: $2,500,000\n- 331102: $1,800,000\n\n## Hospitalización\n- Día cama UCI: $1,200,000\n- Día cama general: $450,000\n\nVigencia: Enero 2024 - Diciembre 2024'
+    },
+    {
+      id: 'iss',
+      nombre: 'Manual Tarifario ISS 2001',
+      tipo: 'tarifario',
+      descripcion: 'Base de tarifas institucionales',
+      activo: true,
+      contenido: '# Manual Tarifario ISS 2001\n\n## Consulta Externa\n- CUPS 890201: $25,000 (Base)\n- CUPS 890301: $40,000 (Especializada)\n\n## Procedimientos\n- Laboratorio clínico: $15,000 - $80,000\n- Imagenología básica: $50,000 - $200,000\n- Cirugía menor: $150,000 - $500,000\n\nTarifas base sujetas a multiplicadores según nivel de complejidad'
+    },
+    {
+      id: 'contratos',
+      nombre: 'Contratos EPS - IPS',
+      tipo: 'tarifario',
+      descripcion: 'Tarifas pactadas específicas - 3 contratos activos',
+      activo: true,
+      registros: 3,
+      contenido: '# Contratos Vigentes EPS-IPS\n\n## Contrato 1: EPS Salud Total - IPS San José\n- Consulta general: $30,000\n- Consulta especializada: $45,000\n- Vigencia: 2024\n\n## Contrato 2: EPS Nueva EPS - IPS San José  \n- Consulta general: $28,000\n- Consulta especializada: $42,000\n- Vigencia: 2024\n\n## Contrato 3: EPS Compensar - IPS San José\n- Consulta general: $32,000\n- Consulta especializada: $48,000\n- Vigencia: 2024'
+    },
+    {
+      id: 'ley100',
+      nombre: 'Ley 100 de 1993',
+      tipo: 'normativa',
+      descripcion: 'Sistema General de Seguridad Social en Salud',
+      activo: true,
+      contenido: '# Ley 100 de 1993\n\n## Sistema General de Seguridad Social en Salud\n\n### Artículos Relevantes:\n\n**Art. 156**: Características del Plan Obligatorio de Salud\n- Debe cubrir todas las contingencias\n- Servicios de promoción y prevención\n- Atención médica especializada\n\n**Art. 182**: Facturación de servicios\n- Las IPS deben presentar facturación detallada\n- Soportes de autorización\n- Historia clínica cuando sea requerida\n\n**Art. 227**: Glosas y devoluciones\n- Procedimientos para objeción de cuentas\n- Plazos de respuesta\n- Mecanismos de conciliación'
+    },
+    {
+      id: 'res3047',
+      nombre: 'Resolución 3047 de 2008',
+      tipo: 'normativa',
+      descripcion: 'Manual de tarifas y procedimientos',
+      activo: true,
+      contenido: '# Resolución 3047 de 2008\n\n## Manual de Tarifas Mínimas\n\n### Consultas\n- Medicina general: Tarifa mínima $22,000\n- Medicina especializada: Tarifa mínima $35,000\n- Odontología: Tarifa mínima $28,000\n\n### Procedimientos\n- Cada procedimiento debe facturarse según tarifa SOAT o ISS\n- Se permite incremento hasta 30% según nivel de complejidad\n- Requiere justificación médica documentada\n\n### Documentación Requerida\n- Orden médica\n- Autorización EPS\n- Consentimiento informado\n- Registro en historia clínica'
+    },
+    {
+      id: 'guias',
+      nombre: 'Guías de Práctica Clínica',
+      tipo: 'guia',
+      descripcion: 'Validación de pertinencia médica - 125 guías',
+      activo: true,
+      registros: 125,
+      contenido: '# Guías de Práctica Clínica\n\n## Enfermedades Respiratorias\n\n### Neumonía (CIE-10: J18.9)\n**Procedimientos Pertinentes:**\n- Radiografía de tórax (CUPS: 870201)\n- Hemograma completo (CUPS: 902210)\n- Proteína C reactiva (CUPS: 902316)\n- Hospitalización según gravedad\n\n**No Pertinente:**\n- TAC cerebral simple (sin indicación)\n- Resonancia magnética sin justificación\n\n## Enfermedades Cardiovasculares\n\n### Hipertensión Arterial (CIE-10: I10)\n**Procedimientos Pertinentes:**\n- Electrocardiograma (CUPS: 890701)\n- Perfil lipídico (CUPS: 902234)\n- Ecocardiograma según evolución\n\n... (125 guías en total)'
+    }
+  ]);
 
   // Hook para detectar automáticamente el contraste en los headers
   const { textColor: headerTextColor } = useAutoContrast(headerRef, {
@@ -312,6 +398,25 @@ export default function CuentasMedicasPage() {
     return estilos[estado] || 'bg-gray-100 text-gray-800';
   };
 
+  // Función para toggle de activación de documento
+  const toggleDocumento = (id: string) => {
+    setDocumentosConocimiento(prev =>
+      prev.map(doc =>
+        doc.id === id ? { ...doc, activo: !doc.activo } : doc
+      )
+    );
+    const doc = documentosConocimiento.find(d => d.id === id);
+    if (doc) {
+      toast.success(`${doc.nombre} ${doc.activo ? 'desactivado' : 'activado'}`);
+    }
+  };
+
+  // Función para ver documento
+  const verDocumento = (doc: DocumentoConocimiento) => {
+    setDocumentoSeleccionado(doc);
+    setMostrarModalDocumento(true);
+  };
+
   // MODAL DE CREAR FACTURA (Simplificado)
   const ModalCrearFactura = () => {
     // Control del scroll del body cuando el modal está abierto
@@ -537,6 +642,126 @@ export default function CuentasMedicasPage() {
               </Button>
             </div>
           </div>
+        </div>
+      </div>
+    );
+  };
+
+  // MODAL DE VISUALIZACIÓN DE DOCUMENTO
+  const ModalDocumento = () => {
+    useEffect(() => {
+      if (mostrarModalDocumento) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = 'unset';
+      }
+      return () => {
+        document.body.style.overflow = 'unset';
+      };
+    }, [mostrarModalDocumento]);
+
+    if (!mostrarModalDocumento || !documentoSeleccionado) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] p-4 overflow-y-auto">
+        <div className="bg-white rounded-lg max-w-4xl w-full my-8 shadow-2xl max-h-[90vh] flex flex-col">
+          <div className="p-6 border-b border-gray-200 flex-shrink-0">
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  {documentoSeleccionado.nombre}
+                </h2>
+                <p className="text-sm text-gray-600">{documentoSeleccionado.descripcion}</p>
+                {documentoSeleccionado.registros && (
+                  <Badge className="mt-2 bg-blue-100 text-blue-800">
+                    {documentoSeleccionado.registros.toLocaleString()} registros
+                  </Badge>
+                )}
+              </div>
+              <button
+                onClick={() => setMostrarModalDocumento(false)}
+                className="text-gray-400 hover:text-gray-600 ml-4"
+              >
+                <XCircleIcon className="h-6 w-6" />
+              </button>
+            </div>
+          </div>
+
+          <div className="p-6 overflow-y-auto flex-1">
+            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+              <pre className="whitespace-pre-wrap text-sm text-gray-800 font-mono">
+                {documentoSeleccionado.contenido || 'No hay contenido disponible'}
+              </pre>
+            </div>
+          </div>
+
+          <div className="p-6 border-t border-gray-200 flex justify-end gap-3 flex-shrink-0">
+            <Button
+              variant="outline"
+              onClick={() => setMostrarModalDocumento(false)}
+            >
+              Cerrar
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // DIAGRAMA DE FLUJO DEL PROCESO
+  const DiagramaFlujo = () => {
+    const pasos = [
+      { num: 1, titulo: 'Carga de Documentos', desc: 'Excel RIPS + PDFs soportes', icono: '📄', color: 'bg-blue-100 border-blue-500' },
+      { num: 2, titulo: 'Extracción de Datos', desc: 'IA extrae: códigos CUPS, CIE-10, valores, autorizaciones', icono: '🔍', color: 'bg-purple-100 border-purple-500' },
+      { num: 3, titulo: 'Consulta Tarifarios', desc: 'SOAT, ISS, Contratos EPS-IPS', icono: '💰', color: 'bg-green-100 border-green-500' },
+      { num: 4, titulo: 'Validación Autorizaciones', desc: 'Verifica números, vigencia, cantidades', icono: '✅', color: 'bg-yellow-100 border-yellow-500' },
+      { num: 5, titulo: 'Detección Duplicidades', desc: 'Identifica cobros duplicados', icono: '⚠️', color: 'bg-orange-100 border-orange-500' },
+      { num: 6, titulo: 'Pertinencia Médica', desc: 'Valida coherencia diagnóstico-procedimiento', icono: '🩺', color: 'bg-indigo-100 border-indigo-500' },
+      { num: 7, titulo: 'Generación de Glosas', desc: 'Crea glosas automáticas con justificación', icono: '📋', color: 'bg-red-100 border-red-500' },
+      { num: 8, titulo: 'Reporte Excel', desc: 'Excel completo: resumen, glosas, detalles', icono: '📊', color: 'bg-green-100 border-green-500' },
+    ];
+
+    return (
+      <div className="bg-white rounded-lg p-6 border-2 border-gray-300">
+        <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+          <ChartBarIcon className="h-6 w-6 text-blue-600" />
+          Flujo del Proceso de Auditoría Médica
+        </h3>
+
+        <div className="space-y-4">
+          {pasos.map((paso, idx) => (
+            <div key={paso.num}>
+              <div className={`flex items-center gap-4 p-4 border-2 rounded-lg ${paso.color}`}>
+                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white border-2 border-current flex items-center justify-center font-bold text-lg">
+                  {paso.num}
+                </div>
+                <div className="flex-shrink-0 text-3xl">{paso.icono}</div>
+                <div className="flex-1">
+                  <h4 className="font-bold text-gray-900">{paso.titulo}</h4>
+                  <p className="text-sm text-gray-700">{paso.desc}</p>
+                </div>
+              </div>
+              {idx < pasos.length - 1 && (
+                <div className="flex justify-center py-2">
+                  <div className="text-gray-400 text-2xl">↓</div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 bg-blue-50 border-2 border-blue-300 rounded-lg p-4">
+          <h4 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
+            <CpuChipIcon className="h-5 w-5" />
+            Tecnología Utilizada
+          </h4>
+          <ul className="text-sm text-blue-800 space-y-1">
+            <li>• <strong>OCR + NLP</strong>: Extracción inteligente de datos de PDFs y Excel</li>
+            <li>• <strong>Base de Datos</strong>: CUPS (12,457), CIE-10 (14,891), Tarifarios (5)</li>
+            <li>• <strong>Motor de Reglas</strong>: 9 reglas de auditoría configurables</li>
+            <li>• <strong>IA Generativa</strong>: Justificación automática de glosas</li>
+            <li>• <strong>Tiempo Promedio</strong>: 15-20 segundos por cuenta completa</li>
+          </ul>
         </div>
       </div>
     );
@@ -1370,6 +1595,9 @@ export default function CuentasMedicasPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 p-6">
         <div className="max-w-7xl mx-auto">
+          {/* Modales */}
+          <ModalDocumento />
+
           <div className="mb-6">
             <Button variant="ghost" onClick={() => setVista('dashboard')}>
               <ArrowLeftIcon className="h-4 w-4 mr-2" />
@@ -1453,95 +1681,95 @@ export default function CuentasMedicasPage() {
           </div>
 
           {/* Bases de Datos del Sistema Experto */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            {/* Tarifarios */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CurrencyDollarIcon className="h-6 w-6 text-green-600" />
-                  Tarifarios Configurados
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <div>
-                      <p className="font-semibold text-gray-900">Tarifario SOAT 2024</p>
-                      <p className="text-xs text-gray-600">Seguro Obligatorio de Accidentes de Tránsito</p>
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TableCellsIcon className="h-6 w-6 text-purple-600" />
+                Documentos de Base de Conocimiento
+              </CardTitle>
+              <p className="text-sm text-gray-600 mt-2">
+                Haz clic en cualquier documento para ver su contenido. Usa el toggle para activar/desactivar su uso en auditorías.
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {documentosConocimiento.map((doc) => (
+                  <div
+                    key={doc.id}
+                    className={`flex items-center justify-between p-4 rounded-lg border-2 transition-all cursor-pointer hover:shadow-md ${
+                      doc.activo
+                        ? 'bg-green-50 border-green-300 hover:bg-green-100'
+                        : 'bg-gray-50 border-gray-300 hover:bg-gray-100'
+                    }`}
+                    onClick={() => verDocumento(doc)}
+                  >
+                    <div className="flex items-center gap-4 flex-1">
+                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                        doc.tipo === 'tarifario' ? 'bg-green-100' :
+                        doc.tipo === 'normativa' ? 'bg-blue-100' :
+                        doc.tipo === 'guia' ? 'bg-indigo-100' :
+                        doc.tipo === 'cups' ? 'bg-purple-100' :
+                        'bg-blue-100'
+                      }`}>
+                        {doc.tipo === 'tarifario' && <CurrencyDollarIcon className="h-6 w-6 text-green-600" />}
+                        {doc.tipo === 'normativa' && <ShieldCheckIcon className="h-6 w-6 text-blue-600" />}
+                        {doc.tipo === 'guia' && <DocumentTextIcon className="h-6 w-6 text-indigo-600" />}
+                        {doc.tipo === 'cups' && <TableCellsIcon className="h-6 w-6 text-purple-600" />}
+                        {doc.tipo === 'cie10' && <DocumentTextIcon className="h-6 w-6 text-blue-600" />}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-900 flex items-center gap-2">
+                          {doc.nombre}
+                          {doc.registros && (
+                            <Badge className="bg-gray-100 text-gray-700 text-xs">
+                              {doc.registros.toLocaleString()} registros
+                            </Badge>
+                          )}
+                        </p>
+                        <p className="text-sm text-gray-600">{doc.descripcion}</p>
+                      </div>
                     </div>
-                    <Badge className="bg-green-100 text-green-800">
-                      <CheckCircleIcon className="h-3 w-3 mr-1" />
-                      Activo
-                    </Badge>
-                  </div>
 
-                  <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <div>
-                      <p className="font-semibold text-gray-900">Manual Tarifario ISS 2001</p>
-                      <p className="text-xs text-gray-600">Base de tarifas institucionales</p>
+                    <div className="flex items-center gap-3 ml-4" onClick={(e) => e.stopPropagation()}>
+                      <label className="flex items-center cursor-pointer">
+                        <div className="relative">
+                          <input
+                            type="checkbox"
+                            checked={doc.activo}
+                            onChange={() => toggleDocumento(doc.id)}
+                            className="sr-only"
+                          />
+                          <div className={`block w-14 h-8 rounded-full transition-colors ${
+                            doc.activo ? 'bg-green-500' : 'bg-gray-300'
+                          }`}></div>
+                          <div className={`absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform ${
+                            doc.activo ? 'transform translate-x-6' : ''
+                          }`}></div>
+                        </div>
+                      </label>
+                      <Badge className={doc.activo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700'}>
+                        {doc.activo ? (
+                          <>
+                            <CheckCircleIcon className="h-3 w-3 mr-1" />
+                            Activo
+                          </>
+                        ) : (
+                          <>
+                            <XCircleIcon className="h-3 w-3 mr-1" />
+                            Inactivo
+                          </>
+                        )}
+                      </Badge>
                     </div>
-                    <Badge className="bg-green-100 text-green-800">
-                      <CheckCircleIcon className="h-3 w-3 mr-1" />
-                      Activo
-                    </Badge>
                   </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-                  <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <div>
-                      <p className="font-semibold text-gray-900">Contratos EPS - IPS</p>
-                      <p className="text-xs text-gray-600">Tarifas pactadas específicas</p>
-                    </div>
-                    <Badge className="bg-green-100 text-green-800">
-                      <CheckCircleIcon className="h-3 w-3 mr-1" />
-                      3 Contratos
-                    </Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Normativa */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ShieldCheckIcon className="h-6 w-6 text-blue-600" />
-                  Normativa y Guías
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <div>
-                      <p className="font-semibold text-gray-900">Ley 100 de 1993</p>
-                      <p className="text-xs text-gray-600">Sistema General de Seguridad Social en Salud</p>
-                    </div>
-                    <Badge className="bg-blue-100 text-blue-800">
-                      Referencia
-                    </Badge>
-                  </div>
-
-                  <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <div>
-                      <p className="font-semibold text-gray-900">Resolución 3047 de 2008</p>
-                      <p className="text-xs text-gray-600">Manual de tarifas y procedimientos</p>
-                    </div>
-                    <Badge className="bg-blue-100 text-blue-800">
-                      Referencia
-                    </Badge>
-                  </div>
-
-                  <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <div>
-                      <p className="font-semibold text-gray-900">Guías de Práctica Clínica</p>
-                      <p className="text-xs text-gray-600">Validación de pertinencia médica</p>
-                    </div>
-                    <Badge className="bg-blue-100 text-blue-800">
-                      125 Guías
-                    </Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Diagrama de Flujo */}
+          <div className="mb-8">
+            <DiagramaFlujo />
           </div>
 
           {/* Listado de Documentos por Factura */}
