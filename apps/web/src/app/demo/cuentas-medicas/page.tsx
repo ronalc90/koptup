@@ -27,9 +27,12 @@ import {
 import { auditoriaAPI } from './api';
 import { Factura, Estadisticas, ResultadoAuditoria } from './tipos-auditoria';
 import toast from 'react-hot-toast';
+import ProcesoAuditoriaVisual from './ProcesoAuditoriaVisual';
 
 export default function CuentasMedicasPage() {
-  const [vista, setVista] = useState<'dashboard' | 'facturas' | 'detalle' | 'crear'>('dashboard');
+  const [vista, setVista] = useState<'dashboard' | 'facturas' | 'detalle' | 'crear' | 'proceso'>('dashboard');
+  const [mostrarProceso, setMostrarProceso] = useState(false);
+  const [procesoEnEjecucion, setProcesoEnEjecucion] = useState(false);
   const [estadisticas, setEstadisticas] = useState<Estadisticas | null>(null);
   const [facturas, setFacturas] = useState<Factura[]>([]);
   const [facturaSeleccionada, setFacturaSeleccionada] = useState<any | null>(null);
@@ -106,9 +109,20 @@ export default function CuentasMedicasPage() {
     }
   };
 
-  const ejecutarAuditoria = async (facturaId: string) => {
+  const ejecutarAuditoria = async (facturaId: string, verProceso: boolean = false) => {
     try {
       setLoading(true);
+
+      // Si se solicita ver el proceso, mostrar la visualización
+      if (verProceso) {
+        setMostrarProceso(true);
+        setProcesoEnEjecucion(true);
+        setVista('proceso');
+
+        // Esperar a que termine la visualización (simulado)
+        await new Promise(resolve => setTimeout(resolve, 13000)); // 6 pasos x 2s + buffer
+      }
+
       const response = await auditoriaAPI.ejecutarAuditoria(facturaId);
 
       // Mostrar notificación de éxito con información detallada
@@ -124,6 +138,10 @@ export default function CuentasMedicasPage() {
       toast.error('Error al ejecutar auditoría: ' + error.message);
     } finally {
       setLoading(false);
+      setProcesoEnEjecucion(false);
+      if (mostrarProceso) {
+        setTimeout(() => setVista('detalle'), 2000);
+      }
     }
   };
 
@@ -491,6 +509,17 @@ export default function CuentasMedicasPage() {
                 </p>
               </div>
               <div className="flex space-x-3">
+                <Button
+                  onClick={() => {
+                    setMostrarProceso(true);
+                    setProcesoEnEjecucion(true);
+                    setVista('proceso');
+                  }}
+                  className="bg-purple-600 hover:bg-purple-700"
+                >
+                  <PlayIcon className="h-5 w-5 mr-2" />
+                  Ver Proceso de Auditoría
+                </Button>
                 <Button
                   onClick={() => setMostrarModalCrear(true)}
                   className="bg-green-600 hover:bg-green-700"
@@ -946,14 +975,24 @@ export default function CuentasMedicasPage() {
                     {factura.estado}
                   </Badge>
                   {!factura.auditoriaCompletada ? (
-                    <Button
-                      onClick={() => ejecutarAuditoria(factura._id)}
-                      disabled={loading}
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
-                      <PlayIcon className="h-5 w-5 mr-2" />
-                      {loading ? 'Ejecutando...' : 'Ejecutar Auditoría'}
-                    </Button>
+                    <>
+                      <Button
+                        onClick={() => ejecutarAuditoria(factura._id, true)}
+                        disabled={loading}
+                        className="bg-purple-600 hover:bg-purple-700"
+                      >
+                        <ChartBarIcon className="h-5 w-5 mr-2" />
+                        Ver Proceso Paso a Paso
+                      </Button>
+                      <Button
+                        onClick={() => ejecutarAuditoria(factura._id)}
+                        disabled={loading}
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        <PlayIcon className="h-5 w-5 mr-2" />
+                        {loading ? 'Ejecutando...' : 'Ejecutar Rápido'}
+                      </Button>
+                    </>
                   ) : (
                     <Button
                       onClick={() => descargarExcel(factura._id)}
@@ -1190,6 +1229,33 @@ export default function CuentasMedicasPage() {
               </CardContent>
             </Card>
           )}
+        </div>
+      </div>
+    );
+  }
+
+  // VISTA PROCESO DE AUDITORÍA
+  if (vista === 'proceso') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 p-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="mb-6">
+            <Button variant="ghost" onClick={() => setVista('dashboard')}>
+              <ArrowLeftIcon className="h-4 w-4 mr-2" />
+              Volver al Dashboard
+            </Button>
+          </div>
+
+          <ProcesoAuditoriaVisual
+            enEjecucion={procesoEnEjecucion}
+            onFinalizar={(resultado) => {
+              setProcesoEnEjecucion(false);
+              toast.success(
+                `¡Proceso completado!\n\nAhora puedes crear una factura y ejecutar una auditoría real.`,
+                { duration: 5000, style: { whiteSpace: 'pre-line' } }
+              );
+            }}
+          />
         </div>
       </div>
     );
