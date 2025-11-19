@@ -38,17 +38,9 @@ export default function CuentasMedicasPage() {
     hasta: '',
   });
   const [mostrarModalCrear, setMostrarModalCrear] = useState(false);
-  const [nuevaFactura, setNuevaFactura] = useState({
-    numeroFactura: '',
-    fechaEmision: new Date().toISOString().split('T')[0],
-    ips: { nit: '', nombre: '', codigo: '' },
-    eps: { nit: '', nombre: '', codigo: '' },
-    numeroContrato: '',
-    regimen: 'Contributivo' as const,
-    valorBruto: 0,
-    iva: 0,
-    valorTotal: 0,
-  });
+  const [nombreCuenta, setNombreCuenta] = useState('');
+  const [cuentaActual, setCuentaActual] = useState<any>(null);
+  const [archivosSubidos, setArchivosSubidos] = useState<any[]>([]);
 
   useEffect(() => {
     cargarEstadisticas();
@@ -122,38 +114,32 @@ export default function CuentasMedicasPage() {
     try {
       setLoading(true);
 
-      // Validar campos obligatorios
-      if (!nuevaFactura.numeroFactura || !nuevaFactura.ips.nombre || !nuevaFactura.eps.nombre) {
-        alert('Por favor complete los campos obligatorios');
+      // Validar nombre
+      if (!nombreCuenta.trim()) {
+        alert('Por favor ingrese un nombre para la cuenta');
         return;
       }
 
-      const response = await auditoriaAPI.crearFactura(nuevaFactura);
-
-      alert('Factura creada exitosamente!');
-      setMostrarModalCrear(false);
-      setNuevaFactura({
-        numeroFactura: '',
-        fechaEmision: new Date().toISOString().split('T')[0],
-        ips: { nit: '', nombre: '', codigo: '' },
-        eps: { nit: '', nombre: '', codigo: '' },
-        numeroContrato: '',
-        regimen: 'Contributivo',
-        valorBruto: 0,
-        iva: 0,
-        valorTotal: 0,
-      });
-
-      // Recargar facturas y estadísticas
-      await cargarFacturas();
-      await cargarEstadisticas();
-
-      // Ir al detalle de la nueva factura
-      if (response.data) {
-        await verDetalleFactura(response.data._id);
+      // Validar archivos
+      if (archivosSubidos.length === 0) {
+        alert('Por favor suba al menos un archivo (Excel/RIPS o PDF)');
+        return;
       }
+
+      // TODO: Implementar procesamiento con IA
+      // 1. Crear cuenta básica con nombre
+      // 2. Subir archivos al servidor
+      // 3. Procesar archivos con IA para extraer datos
+      // 4. Crear factura, atenciones, procedimientos
+
+      alert('Funcionalidad en desarrollo.\n\nSe creará la cuenta y se procesarán los archivos:\n' +
+            archivosSubidos.map(f => `- ${f.name}`).join('\n'));
+
+      setMostrarModalCrear(false);
+      setNombreCuenta('');
+      setArchivosSubidos([]);
     } catch (error: any) {
-      alert('Error al crear factura: ' + error.message);
+      alert('Error al crear cuenta: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -204,165 +190,160 @@ export default function CuentasMedicasPage() {
     return estilos[estado] || 'bg-gray-100 text-gray-800';
   };
 
-  // MODAL DE CREAR FACTURA
+  // MODAL DE CREAR FACTURA (Simplificado)
   const ModalCrearFactura = () => {
     if (!mostrarModalCrear) return null;
+
+    const handleFileSelect = (files: FileList | null) => {
+      if (!files) return;
+      const newFiles = Array.from(files);
+      setArchivosSubidos([...archivosSubidos, ...newFiles]);
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+      e.preventDefault();
+      handleFileSelect(e.dataTransfer.files);
+    };
+
+    const handleDragOver = (e: React.DragEvent) => {
+      e.preventDefault();
+    };
+
+    const removeFile = (index: number) => {
+      setArchivosSubidos(archivosSubidos.filter((_, i) => i !== index));
+    };
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
           <div className="p-6">
-            <h2 className="text-2xl font-bold mb-4">Nueva Factura</h2>
+            <h2 className="text-2xl font-bold mb-2">Nueva Cuenta de Auditoría</h2>
+            <p className="text-gray-600 text-sm mb-6">
+              Ingrese un nombre y suba los documentos. El sistema extraerá automáticamente la información.
+            </p>
 
-            <div className="space-y-4">
-              {/* Número de Factura */}
+            <div className="space-y-6">
+              {/* Nombre de la Cuenta */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Número de Factura *
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Nombre de la Cuenta *
                 </label>
                 <input
                   type="text"
-                  value={nuevaFactura.numeroFactura}
-                  onChange={(e) => setNuevaFactura({ ...nuevaFactura, numeroFactura: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder="Ej: FAC-001-2024"
+                  value={nombreCuenta}
+                  onChange={(e) => setNombreCuenta(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Ej: Cuenta Hospital San José - Enero 2024"
+                  autoFocus
                 />
               </div>
 
-              {/* Fecha */}
+              {/* Área de Carga de Archivos */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Fecha de Emisión *
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Documentos *
                 </label>
-                <input
-                  type="date"
-                  value={nuevaFactura.fechaEmision}
-                  onChange={(e) => setNuevaFactura({ ...nuevaFactura, fechaEmision: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              {/* IPS */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    NIT IPS *
-                  </label>
-                  <input
-                    type="text"
-                    value={nuevaFactura.ips.nit}
-                    onChange={(e) => setNuevaFactura({ ...nuevaFactura, ips: { ...nuevaFactura.ips, nit: e.target.value } })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="900123456"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nombre IPS *
-                  </label>
-                  <input
-                    type="text"
-                    value={nuevaFactura.ips.nombre}
-                    onChange={(e) => setNuevaFactura({ ...nuevaFactura, ips: { ...nuevaFactura.ips, nombre: e.target.value } })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="Hospital San José"
-                  />
-                </div>
-              </div>
-
-              {/* EPS */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    NIT EPS *
-                  </label>
-                  <input
-                    type="text"
-                    value={nuevaFactura.eps.nit}
-                    onChange={(e) => setNuevaFactura({ ...nuevaFactura, eps: { ...nuevaFactura.eps, nit: e.target.value } })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="900654321"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nombre EPS *
-                  </label>
-                  <input
-                    type="text"
-                    value={nuevaFactura.eps.nombre}
-                    onChange={(e) => setNuevaFactura({ ...nuevaFactura, eps: { ...nuevaFactura.eps, nombre: e.target.value } })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="EPS Sura"
-                  />
-                </div>
-              </div>
-
-              {/* Régimen */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Régimen
-                </label>
-                <select
-                  value={nuevaFactura.regimen}
-                  onChange={(e) => setNuevaFactura({ ...nuevaFactura, regimen: e.target.value as any })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                <div
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+                  className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors"
                 >
-                  <option value="Contributivo">Contributivo</option>
-                  <option value="Subsidiado">Subsidiado</option>
-                  <option value="Particular">Particular</option>
-                  <option value="Otro">Otro</option>
-                </select>
+                  <DocumentArrowUpIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-sm text-gray-600 mb-2">
+                    Arrastre archivos aquí o haga clic para seleccionar
+                  </p>
+                  <p className="text-xs text-gray-500 mb-4">
+                    Formatos: Excel (.xlsx, .xls, .csv) para RIPS/Facturas, PDF para soportes
+                  </p>
+                  <input
+                    type="file"
+                    id="file-upload"
+                    multiple
+                    accept=".xlsx,.xls,.csv,.pdf"
+                    onChange={(e) => handleFileSelect(e.target.files)}
+                    className="hidden"
+                  />
+                  <label htmlFor="file-upload">
+                    <Button
+                      as="span"
+                      variant="outline"
+                      className="cursor-pointer"
+                    >
+                      <PlusIcon className="h-4 w-4 mr-2" />
+                      Seleccionar Archivos
+                    </Button>
+                  </label>
+                </div>
               </div>
 
-              {/* Valores */}
-              <div className="grid grid-cols-3 gap-4">
+              {/* Lista de Archivos Subidos */}
+              {archivosSubidos.length > 0 && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Valor Bruto
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Archivos Seleccionados ({archivosSubidos.length})
                   </label>
-                  <input
-                    type="number"
-                    value={nuevaFactura.valorBruto}
-                    onChange={(e) => {
-                      const bruto = parseFloat(e.target.value) || 0;
-                      setNuevaFactura({
-                        ...nuevaFactura,
-                        valorBruto: bruto,
-                        valorTotal: bruto + nuevaFactura.iva,
-                      });
-                    }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  />
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {archivosSubidos.map((file, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+                      >
+                        <div className="flex items-center space-x-3 flex-1">
+                          {file.name.endsWith('.pdf') ? (
+                            <DocumentTextIcon className="h-5 w-5 text-red-500" />
+                          ) : (
+                            <TableCellsIcon className="h-5 w-5 text-green-500" />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 truncate">
+                              {file.name}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {(file.size / 1024).toFixed(1)} KB
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => removeFile(index)}
+                          className="ml-4 text-red-600 hover:text-red-700"
+                        >
+                          <XCircleIcon className="h-5 w-5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    IVA
-                  </label>
-                  <input
-                    type="number"
-                    value={nuevaFactura.iva}
-                    onChange={(e) => {
-                      const iva = parseFloat(e.target.value) || 0;
-                      setNuevaFactura({
-                        ...nuevaFactura,
-                        iva,
-                        valorTotal: nuevaFactura.valorBruto + iva,
-                      });
-                    }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Valor Total
-                  </label>
-                  <input
-                    type="number"
-                    value={nuevaFactura.valorTotal}
-                    disabled
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100"
-                  />
+              )}
+
+              {/* Información */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <svg
+                      className="h-5 w-5 text-blue-400"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-blue-800">
+                      ¿Qué archivos debo subir?
+                    </h3>
+                    <div className="mt-2 text-sm text-blue-700">
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>Excel/RIPS con facturas, atenciones y procedimientos</li>
+                        <li>PDFs de soportes (autorizaciones, órdenes médicas, etc.)</li>
+                        <li>Puede subir múltiples archivos a la vez</li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -371,17 +352,21 @@ export default function CuentasMedicasPage() {
             <div className="flex justify-end space-x-3 mt-6">
               <Button
                 variant="outline"
-                onClick={() => setMostrarModalCrear(false)}
+                onClick={() => {
+                  setMostrarModalCrear(false);
+                  setNombreCuenta('');
+                  setArchivosSubidos([]);
+                }}
                 disabled={loading}
               >
                 Cancelar
               </Button>
               <Button
                 onClick={crearFactura}
-                disabled={loading}
-                className="bg-blue-600 hover:bg-blue-700"
+                disabled={loading || !nombreCuenta.trim() || archivosSubidos.length === 0}
+                className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Creando...' : 'Crear Factura'}
+                {loading ? 'Procesando...' : `Crear y Procesar (${archivosSubidos.length} archivo${archivosSubidos.length !== 1 ? 's' : ''})`}
               </Button>
             </div>
           </div>
