@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname,useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -8,6 +8,7 @@ import { useTheme } from 'next-themes';
 import { Bars3Icon, XMarkIcon, MoonIcon, SunIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 import Button from '@/components/ui/Button';
+import { useAutoContrast } from '@/hooks/useAutoContrast';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -19,6 +20,13 @@ export default function Navbar() {
   const t = useTranslations();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const navRef = useRef<HTMLDivElement>(null);
+
+  // Hook para detectar automáticamente el contraste
+  const { textColor, isDarkBackground } = useAutoContrast(navRef, {
+    lightColor: '#ffffff',
+    darkColor: '#1f2937', // gray-800
+  });
 
  useEffect(() => {
   setMounted(true);
@@ -74,12 +82,16 @@ const toggleLanguage = () => {
 
   return (
     <nav
+      ref={navRef}
       className={cn(
         'fixed top-0 left-0 right-0 z-[100] transition-all duration-300',
         scrolled
           ? 'bg-white/98 dark:bg-secondary-900/98 backdrop-blur-lg shadow-lg'
           : 'bg-transparent'
       )}
+      style={{
+        color: textColor,
+      }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
@@ -88,7 +100,10 @@ const toggleLanguage = () => {
             <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">K</span>
             </div>
-            <span className="font-display font-bold text-xl text-secondary-900 dark:text-white">
+            <span
+              className="font-display font-bold text-xl transition-colors"
+              style={{ color: textColor }}
+            >
               KopTup
             </span>
           </Link>
@@ -103,8 +118,11 @@ const toggleLanguage = () => {
                   'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
                   isActive(item.href)
                     ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950'
-                    : 'text-secondary-700 dark:text-secondary-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-secondary-100 dark:hover:bg-secondary-800'
+                    : 'hover:text-primary-600 dark:hover:text-primary-400 hover:bg-secondary-100 dark:hover:bg-secondary-800'
                 )}
+                style={{
+                  color: isActive(item.href) ? undefined : textColor
+                }}
               >
                 {item.name}
               </Link>
@@ -116,7 +134,8 @@ const toggleLanguage = () => {
             {/* Language Toggle */}
             <button
               onClick={toggleLanguage}
-              className="flex items-center gap-1 px-3 py-2 rounded-lg text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors"
+              className="flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors"
+              style={{ color: textColor }}
               aria-label="Toggle language"
               title={currentLocale === 'es' ? 'Cambiar a inglés' : 'Switch to Spanish'}
             >
@@ -128,7 +147,8 @@ const toggleLanguage = () => {
             {mounted && (
               <button
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="p-2 rounded-lg text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors"
+                className="p-2 rounded-lg hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors"
+                style={{ color: textColor }}
                 aria-label="Toggle theme"
               >
                 {theme === 'dark' ? (
@@ -157,7 +177,8 @@ const toggleLanguage = () => {
           {/* Mobile menu button */}
           <button
             type="button"
-            className="md:hidden p-2 rounded-lg text-secondary-700 dark:text-secondary-300"
+            className="md:hidden p-2 rounded-lg transition-colors"
+            style={{ color: textColor }}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? (
