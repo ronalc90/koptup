@@ -1,4 +1,6 @@
 import { Request, Response } from 'express';
+import * as fs from 'fs';
+import * as path from 'path';
 import Factura from '../models/Factura';
 import Atencion from '../models/Atencion';
 import Procedimiento from '../models/Procedimiento';
@@ -214,8 +216,14 @@ class AuditoriaMedicaController {
 
       // Guardar Excel temporalmente para descarga
       const excelBuffer = await excelFacturaMedicaService.obtenerBuffer(workbook);
-      const excelPath = `uploads/cuentas-medicas/auditoria_${factura._id}.xlsx`;
-      const fs = require('fs');
+
+      // Crear carpeta si no existe
+      const uploadsDir = path.join(process.cwd(), 'uploads', 'cuentas-medicas');
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+
+      const excelPath = path.join(uploadsDir, `auditoria_${factura._id}.xlsx`);
       fs.writeFileSync(excelPath, excelBuffer);
 
       console.log(`✅ Excel generado en: ${excelPath}`);
@@ -254,7 +262,7 @@ class AuditoriaMedicaController {
             observacion: g.observacion,
           })),
           excel: {
-            path: excelPath,
+            path: `uploads/cuentas-medicas/auditoria_${factura._id}.xlsx`,
             filename: `auditoria_${factura._id}.xlsx`,
           },
           archivosProcessed: {
