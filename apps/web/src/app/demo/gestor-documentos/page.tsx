@@ -38,6 +38,7 @@ interface Document {
   summary?: string;
   keywords?: string[];
   entities?: string[];
+  url?: string;
 }
 
 type ViewType = 'all' | 'favorites' | 'recent' | 'trash' | 'settings' | 'folder';
@@ -51,94 +52,78 @@ export default function GestorDocumentos() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
   const [documents, setDocuments] = useState<Document[]>([
-    // Favoritos (3)
-    { id: 1, name: 'Reporte_Financiero_Q1_2024.pdf', type: 'PDF', size: '2.4 MB', date: '2024-01-15', thumbnail: '📊', favorite: true, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Q1'], summary: 'Análisis financiero Q1 2024', keywords: ['finanzas', 'ingresos'], entities: ['Balance', 'Estado'] },
-    { id: 2, name: 'Propuesta_Marketing_2024.pdf', type: 'PDF', size: '1.8 MB', date: '2024-01-22', thumbnail: '📈', favorite: true, deleted: false, folder: 'Marketing', tags: ['Marketing', 'Proyectos'], summary: 'Propuesta de campaña digital', keywords: ['marketing', 'campaña'], entities: ['Plan', 'KPIs'] },
-    { id: 3, name: 'Contrato_Principal_ABC.docx', type: 'Word', size: '856 KB', date: '2024-01-20', thumbnail: '📄', favorite: true, deleted: false, folder: 'Legal', tags: ['Contratos', 'Legal'], summary: 'Contrato principal ABC Corp', keywords: ['contrato', 'legal'], entities: ['ABC Corp', 'Términos'] },
+    // Favoritos (3) - Documentos reales de internet
+    { id: 1, name: 'ISO_27001_Information_Security.pdf', type: 'PDF', size: '2.4 MB', date: '2024-01-15', thumbnail: '🔒', favorite: true, deleted: false, folder: 'Legal', tags: ['Seguridad', 'ISO'], summary: 'Estándar internacional para sistemas de gestión de seguridad de la información', keywords: ['ISO', 'seguridad', 'información'], entities: ['ISO 27001', 'SGSI'], url: 'https://www.iso.org/standard/27001' },
+    { id: 2, name: 'GDPR_Compliance_Guide.pdf', type: 'PDF', size: '1.8 MB', date: '2024-01-22', thumbnail: '⚖️', favorite: true, deleted: false, folder: 'Legal', tags: ['GDPR', 'Legal'], summary: 'Guía completa de cumplimiento del Reglamento General de Protección de Datos', keywords: ['GDPR', 'privacidad', 'datos'], entities: ['UE', 'Datos Personales'], url: 'https://gdpr.eu/wp-content/uploads/2019/01/Our-GDPR-framework.pdf' },
+    { id: 3, name: 'Financial_Report_Template.pdf', type: 'PDF', size: '856 KB', date: '2024-01-20', thumbnail: '📊', favorite: true, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Reportes'], summary: 'Plantilla profesional para reportes financieros corporativos', keywords: ['finanzas', 'reportes'], entities: ['Balance', 'Estado Financiero'], url: 'https://www.worldbank.org/content/dam/doingbusiness/media/Annual-Reports/English/DB2020-report_web-version.pdf' },
 
-    // Recientes (8 totales incluyendo favoritos = 5 más)
-    { id: 4, name: 'Informe_Mensual_Enero.pdf', type: 'PDF', size: '1.2 MB', date: '2024-01-28', thumbnail: '📋', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Reportes'], summary: 'Informe financiero de enero', keywords: ['informe', 'mensual'], entities: ['Ingresos', 'Gastos'] },
-    { id: 5, name: 'Plan_Estrategico_2024.pptx', type: 'PowerPoint', size: '5.6 MB', date: '2024-01-27', thumbnail: '🎯', favorite: false, deleted: false, folder: 'Marketing', tags: ['Estrategia', 'Presentaciones'], summary: 'Plan estratégico anual', keywords: ['estrategia', 'objetivos'], entities: ['Metas', 'KPIs'] },
-    { id: 6, name: 'Nomina_Enero_2024.xlsx', type: 'Excel', size: '890 KB', date: '2024-01-26', thumbnail: '📊', favorite: false, deleted: false, folder: 'RRHH', tags: ['RRHH', 'Nómina'], summary: 'Nómina del mes de enero', keywords: ['nómina', 'salarios'], entities: ['Empleados', 'Pagos'] },
-    { id: 7, name: 'Politicas_Seguridad.pdf', type: 'PDF', size: '2.1 MB', date: '2024-01-25', thumbnail: '🔒', favorite: false, deleted: false, folder: 'Legal', tags: ['Legal', 'Políticas'], summary: 'Políticas de seguridad empresarial', keywords: ['seguridad', 'políticas'], entities: ['Normativas', 'Procedimientos'] },
-    { id: 8, name: 'Presupuesto_Q1.xlsx', type: 'Excel', size: '1.4 MB', date: '2024-01-24', thumbnail: '💰', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Presupuesto'], summary: 'Presupuesto primer trimestre', keywords: ['presupuesto', 'Q1'], entities: ['Ingresos', 'Egresos'] },
+    // Recientes (8 totales incluyendo favoritos = 5 más) - Documentos reales
+    { id: 4, name: 'Marketing_Strategy_Guide.pdf', type: 'PDF', size: '1.2 MB', date: '2024-01-28', thumbnail: '📈', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing', 'Estrategia'], summary: 'Guía completa de estrategias de marketing digital modernas', keywords: ['marketing', 'digital', 'estrategia'], entities: ['SEO', 'Redes Sociales'], url: 'https://business.adobe.com/resources/reports/digital-trends.html' },
+    { id: 5, name: 'Employee_Handbook_Template.pdf', type: 'PDF', size: '5.6 MB', date: '2024-01-27', thumbnail: '👥', favorite: false, deleted: false, folder: 'RRHH', tags: ['RRHH', 'Manual'], summary: 'Manual completo para empleados con políticas y procedimientos', keywords: ['empleados', 'políticas', 'procedimientos'], entities: ['Recursos Humanos', 'Políticas'], url: 'https://www.shrm.org/resourcesandtools/tools-and-samples/how-to-guides/pages/howtocreateanemployeehandbook.aspx' },
+    { id: 6, name: 'Project_Management_Best_Practices.pdf', type: 'PDF', size: '890 KB', date: '2024-01-26', thumbnail: '🎯', favorite: false, deleted: false, folder: 'Marketing', tags: ['Proyectos', 'Gestión'], summary: 'Mejores prácticas de gestión de proyectos según PMI', keywords: ['proyectos', 'gestión', 'PMI'], entities: ['PMBOK', 'Metodologías'], url: 'https://www.pmi.org/-/media/pmi/documents/public/pdf/learning/thought-leadership/pulse/pulse-of-the-profession-2020.pdf' },
+    { id: 7, name: 'Cybersecurity_Framework.pdf', type: 'PDF', size: '2.1 MB', date: '2024-01-25', thumbnail: '🔐', favorite: false, deleted: false, folder: 'Legal', tags: ['Seguridad', 'IT'], summary: 'Framework de ciberseguridad del NIST para protección empresarial', keywords: ['ciberseguridad', 'NIST', 'protección'], entities: ['Framework', 'Controles'], url: 'https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.04162018.pdf' },
+    { id: 8, name: 'Annual_Budget_Template.pdf', type: 'PDF', size: '1.4 MB', date: '2024-01-24', thumbnail: '💰', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Presupuesto'], summary: 'Plantilla profesional para presupuestos anuales corporativos', keywords: ['presupuesto', 'finanzas', 'planificación'], entities: ['Ingresos', 'Gastos'], url: 'https://www.score.org/resource/business-budget-template' },
 
     // Papelera (3)
     { id: 9, name: 'Borrador_Antiguo_2023.docx', type: 'Word', size: '245 KB', date: '2023-12-15', thumbnail: '📝', favorite: false, deleted: true, folder: 'Marketing', tags: ['Borradores'], summary: 'Borrador obsoleto 2023', keywords: ['borrador'], entities: [] },
     { id: 10, name: 'Datos_Prueba_Test.xlsx', type: 'Excel', size: '128 KB', date: '2023-12-10', thumbnail: '🧪', favorite: false, deleted: true, folder: 'Finanzas', tags: ['Test'], summary: 'Datos de prueba', keywords: ['test'], entities: [] },
     { id: 11, name: 'Documento_Duplicado.pdf', type: 'PDF', size: '567 KB', date: '2023-12-05', thumbnail: '📄', favorite: false, deleted: true, folder: 'Legal', tags: ['Duplicados'], summary: 'Documento duplicado', keywords: ['duplicado'], entities: [] },
 
-    // Más documentos para completar carpetas
-    // Finanzas (24 total = 3 ya creados + 21 más)
-    { id: 12, name: 'Balance_General_2023.pdf', type: 'PDF', size: '1.8 MB', date: '2024-01-10', thumbnail: '📊', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas'], summary: 'Balance general del año 2023', keywords: ['balance'], entities: [] },
-    { id: 13, name: 'Flujo_Caja_Diciembre.xlsx', type: 'Excel', size: '1.1 MB', date: '2024-01-09', thumbnail: '💵', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas'], summary: 'Flujo de caja diciembre', keywords: ['flujo', 'caja'], entities: [] },
-    { id: 14, name: 'Auditoria_Interna_Q4.pdf', type: 'PDF', size: '3.2 MB', date: '2024-01-08', thumbnail: '🔍', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Auditoría'], summary: 'Auditoría Q4', keywords: ['auditoría'], entities: [] },
-    { id: 15, name: 'Costos_Operativos_2024.xlsx', type: 'Excel', size: '980 KB', date: '2024-01-07', thumbnail: '📉', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas'], summary: 'Costos operativos', keywords: ['costos'], entities: [] },
-    { id: 16, name: 'Proyecciones_Financieras.pptx', type: 'PowerPoint', size: '4.5 MB', date: '2024-01-06', thumbnail: '📈', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas'], summary: 'Proyecciones financieras', keywords: ['proyecciones'], entities: [] },
-    { id: 17, name: 'Ingresos_por_Producto.xlsx', type: 'Excel', size: '1.3 MB', date: '2024-01-05', thumbnail: '💰', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas'], summary: 'Ingresos por producto', keywords: ['ingresos'], entities: [] },
-    { id: 18, name: 'Gastos_Mensuales_Enero.pdf', type: 'PDF', size: '890 KB', date: '2024-01-04', thumbnail: '📋', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas'], summary: 'Gastos mensuales', keywords: ['gastos'], entities: [] },
-    { id: 19, name: 'Cuentas_por_Cobrar.xlsx', type: 'Excel', size: '1.5 MB', date: '2024-01-03', thumbnail: '🧾', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas'], summary: 'Cuentas por cobrar', keywords: ['cuentas'], entities: [] },
-    { id: 20, name: 'Cuentas_por_Pagar.xlsx', type: 'Excel', size: '1.4 MB', date: '2024-01-02', thumbnail: '💳', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas'], summary: 'Cuentas por pagar', keywords: ['pagar'], entities: [] },
-    { id: 21, name: 'Rentabilidad_2023.pdf', type: 'PDF', size: '2.1 MB', date: '2023-12-28', thumbnail: '📊', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas'], summary: 'Análisis de rentabilidad', keywords: ['rentabilidad'], entities: [] },
-    { id: 22, name: 'ROI_Inversiones.xlsx', type: 'Excel', size: '1.2 MB', date: '2023-12-27', thumbnail: '📈', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas'], summary: 'ROI de inversiones', keywords: ['ROI'], entities: [] },
-    { id: 23, name: 'Estados_Financieros_Q4.pdf', type: 'PDF', size: '3.8 MB', date: '2023-12-26', thumbnail: '📄', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas'], summary: 'Estados financieros Q4', keywords: ['estados'], entities: [] },
-    { id: 24, name: 'Indicadores_Financieros.xlsx', type: 'Excel', size: '1.1 MB', date: '2023-12-25', thumbnail: '📊', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas'], summary: 'Indicadores financieros', keywords: ['indicadores'], entities: [] },
-    { id: 25, name: 'Presupuesto_Anual_2024.xlsx', type: 'Excel', size: '2.3 MB', date: '2023-12-24', thumbnail: '💰', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas'], summary: 'Presupuesto anual', keywords: ['presupuesto'], entities: [] },
-    { id: 26, name: 'Plan_Tesoreria.pdf', type: 'PDF', size: '1.7 MB', date: '2023-12-23', thumbnail: '🏦', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas'], summary: 'Plan de tesorería', keywords: ['tesorería'], entities: [] },
-    { id: 27, name: 'Analisis_Costos_Beneficios.xlsx', type: 'Excel', size: '1.4 MB', date: '2023-12-22', thumbnail: '⚖️', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas'], summary: 'Análisis costo-beneficio', keywords: ['análisis'], entities: [] },
-    { id: 28, name: 'Conciliacion_Bancaria.pdf', type: 'PDF', size: '890 KB', date: '2023-12-21', thumbnail: '🏧', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas'], summary: 'Conciliación bancaria', keywords: ['conciliación'], entities: [] },
-    { id: 29, name: 'Ratios_Financieros.xlsx', type: 'Excel', size: '980 KB', date: '2023-12-20', thumbnail: '📐', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas'], summary: 'Ratios financieros', keywords: ['ratios'], entities: [] },
-    { id: 30, name: 'Punto_Equilibrio.pdf', type: 'PDF', size: '1.2 MB', date: '2023-12-19', thumbnail: '🎯', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas'], summary: 'Análisis punto de equilibrio', keywords: ['equilibrio'], entities: [] },
-    { id: 31, name: 'Margen_Contribucion.xlsx', type: 'Excel', size: '1.1 MB', date: '2023-12-18', thumbnail: '📊', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas'], summary: 'Margen de contribución', keywords: ['margen'], entities: [] },
-    { id: 32, name: 'Capital_Trabajo.pdf', type: 'PDF', size: '1.5 MB', date: '2023-12-17', thumbnail: '💼', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas'], summary: 'Capital de trabajo', keywords: ['capital'], entities: [] },
+    // Más documentos - Finanzas (documentos reales)
+    { id: 12, name: 'GAAP_Accounting_Principles.pdf', type: 'PDF', size: '1.8 MB', date: '2024-01-10', thumbnail: '📊', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Contabilidad'], summary: 'Principios de contabilidad generalmente aceptados (GAAP)', keywords: ['GAAP', 'contabilidad'], entities: ['Principios Contables'], url: 'https://www.fasb.org/standards' },
+    { id: 13, name: 'Cash_Flow_Analysis_Guide.pdf', type: 'PDF', size: '1.1 MB', date: '2024-01-09', thumbnail: '💵', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Análisis'], summary: 'Guía completa de análisis de flujo de caja', keywords: ['flujo', 'caja', 'análisis'], entities: ['Cash Flow'], url: 'https://www.investopedia.com/terms/c/cashflow.asp' },
+    { id: 14, name: 'Internal_Audit_Standards.pdf', type: 'PDF', size: '3.2 MB', date: '2024-01-08', thumbnail: '🔍', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Auditoría'], summary: 'Estándares internacionales de auditoría interna', keywords: ['auditoría', 'estándares'], entities: ['IIA', 'IPPF'], url: 'https://www.theiia.org/en/standards/what-are-the-standards/' },
+    { id: 15, name: 'Cost_Accounting_Methods.pdf', type: 'PDF', size: '980 KB', date: '2024-01-07', thumbnail: '📉', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Costos'], summary: 'Métodos modernos de contabilidad de costos', keywords: ['costos', 'contabilidad'], entities: ['ABC', 'Variable Costing'], url: 'https://www.accountingtools.com/articles/cost-accounting.html' },
+    { id: 16, name: 'Financial_Forecasting_Models.pdf', type: 'PDF', size: '4.5 MB', date: '2024-01-06', thumbnail: '📈', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Proyecciones'], summary: 'Modelos de proyección financiera empresarial', keywords: ['proyecciones', 'modelos'], entities: ['Forecasting'], url: 'https://corporatefinanceinstitute.com/resources/knowledge/modeling/financial-forecast/' },
+    { id: 17, name: 'Revenue_Recognition_Standards.pdf', type: 'PDF', size: '1.3 MB', date: '2024-01-05', thumbnail: '💰', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Ingresos'], summary: 'Estándares de reconocimiento de ingresos (ASC 606)', keywords: ['ingresos', 'reconocimiento'], entities: ['ASC 606', 'IFRS 15'], url: 'https://www.pwc.com/us/en/cfodirect/publications/accounting-guides/pwc-revenue-recognition-guide.html' },
+    { id: 18, name: 'Expense_Management_Best_Practices.pdf', type: 'PDF', size: '890 KB', date: '2024-01-04', thumbnail: '📋', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Gastos'], summary: 'Mejores prácticas en gestión de gastos corporativos', keywords: ['gastos', 'gestión'], entities: ['Control de Gastos'], url: 'https://www.gartner.com/en/finance/trends/expense-management' },
+    { id: 19, name: 'Accounts_Receivable_Management.pdf', type: 'PDF', size: '1.5 MB', date: '2024-01-03', thumbnail: '🧾', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Cuentas'], summary: 'Gestión efectiva de cuentas por cobrar', keywords: ['cuentas', 'cobrar'], entities: ['A/R', 'DSO'], url: 'https://www.oracle.com/financial-services/receivables-management/' },
+    { id: 20, name: 'Accounts_Payable_Automation.pdf', type: 'PDF', size: '1.4 MB', date: '2024-01-02', thumbnail: '💳', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'AP'], summary: 'Automatización de cuentas por pagar', keywords: ['pagar', 'automatización'], entities: ['A/P', 'Automation'], url: 'https://www.sap.com/products/financial-management/accounts-payable.html' },
+    { id: 21, name: 'Profitability_Analysis_Framework.pdf', type: 'PDF', size: '2.1 MB', date: '2023-12-28', thumbnail: '📊', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Rentabilidad'], summary: 'Framework para análisis de rentabilidad empresarial', keywords: ['rentabilidad', 'análisis'], entities: ['Profitability'], url: 'https://www.mckinsey.com/capabilities/strategy-and-corporate-finance/our-insights' },
+    { id: 22, name: 'ROI_Calculation_Methods.pdf', type: 'PDF', size: '1.2 MB', date: '2023-12-27', thumbnail: '📈', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'ROI'], summary: 'Métodos de cálculo de retorno de inversión', keywords: ['ROI', 'inversión'], entities: ['Return on Investment'], url: 'https://hbr.org/2014/03/a-refresher-on-return-on-investment' },
+    { id: 23, name: 'Financial_Statements_Guide.pdf', type: 'PDF', size: '3.8 MB', date: '2023-12-26', thumbnail: '📄', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Estados'], summary: 'Guía completa de estados financieros', keywords: ['estados', 'financieros'], entities: ['Balance Sheet', 'Income Statement'], url: 'https://www.investopedia.com/terms/f/financial-statements.asp' },
+    { id: 24, name: 'KPI_Financial_Metrics.pdf', type: 'PDF', size: '1.1 MB', date: '2023-12-25', thumbnail: '📊', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'KPIs'], summary: 'Indicadores clave de desempeño financiero', keywords: ['indicadores', 'KPIs'], entities: ['Financial KPIs'], url: 'https://www.klipfolio.com/resources/kpi-examples/finance' },
+    { id: 25, name: 'Budgeting_Process_Guide.pdf', type: 'PDF', size: '2.3 MB', date: '2023-12-24', thumbnail: '💰', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Presupuesto'], summary: 'Guía del proceso de presupuestación empresarial', keywords: ['presupuesto', 'planificación'], entities: ['Budget Planning'], url: 'https://www.cfo.com/budgeting/2021/01/best-practices-in-budgeting/' },
+    { id: 26, name: 'Treasury_Management_Strategies.pdf', type: 'PDF', size: '1.7 MB', date: '2023-12-23', thumbnail: '🏦', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Tesorería'], summary: 'Estrategias modernas de gestión de tesorería', keywords: ['tesorería', 'gestión'], entities: ['Cash Management'], url: 'https://www.jpmorgan.com/solutions/treasury-payments' },
+    { id: 27, name: 'Cost_Benefit_Analysis_Framework.pdf', type: 'PDF', size: '1.4 MB', date: '2023-12-22', thumbnail: '⚖️', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Análisis'], summary: 'Framework de análisis costo-beneficio', keywords: ['análisis', 'costos'], entities: ['CBA'], url: 'https://www.cdc.gov/policy/polaris/economics/cost-benefit/index.html' },
+    { id: 28, name: 'Bank_Reconciliation_Process.pdf', type: 'PDF', size: '890 KB', date: '2023-12-21', thumbnail: '🏧', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Conciliación'], summary: 'Proceso de conciliación bancaria efectiva', keywords: ['conciliación', 'bancaria'], entities: ['Bank Rec'], url: 'https://quickbooks.intuit.com/r/bookkeeping/bank-reconciliation/' },
+    { id: 29, name: 'Financial_Ratios_Analysis.pdf', type: 'PDF', size: '980 KB', date: '2023-12-20', thumbnail: '📐', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Ratios'], summary: 'Análisis de ratios financieros clave', keywords: ['ratios', 'análisis'], entities: ['Financial Ratios'], url: 'https://corporatefinanceinstitute.com/resources/knowledge/finance/financial-ratios/' },
+    { id: 30, name: 'Break_Even_Analysis.pdf', type: 'PDF', size: '1.2 MB', date: '2023-12-19', thumbnail: '🎯', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Análisis'], summary: 'Análisis de punto de equilibrio empresarial', keywords: ['equilibrio', 'break-even'], entities: ['Break Even Point'], url: 'https://www.investopedia.com/terms/b/breakevenanalysis.asp' },
+    { id: 31, name: 'Contribution_Margin_Analysis.pdf', type: 'PDF', size: '1.1 MB', date: '2023-12-18', thumbnail: '📊', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Margen'], summary: 'Análisis de margen de contribución', keywords: ['margen', 'contribución'], entities: ['Contribution Margin'], url: 'https://www.accountingtools.com/articles/contribution-margin.html' },
+    { id: 32, name: 'Working_Capital_Management.pdf', type: 'PDF', size: '1.5 MB', date: '2023-12-17', thumbnail: '💼', favorite: false, deleted: false, folder: 'Finanzas', tags: ['Finanzas', 'Capital'], summary: 'Gestión efectiva del capital de trabajo', keywords: ['capital', 'trabajo'], entities: ['Working Capital'], url: 'https://www.investopedia.com/terms/w/workingcapital.asp' },
 
-    // Legal (12 total = 2 ya creados + 10 más)
-    { id: 33, name: 'Acuerdos_Confidencialidad.pdf', type: 'PDF', size: '670 KB', date: '2024-01-12', thumbnail: '🔐', favorite: false, deleted: false, folder: 'Legal', tags: ['Legal'], summary: 'Acuerdos de confidencialidad', keywords: ['confidencialidad'], entities: [] },
-    { id: 34, name: 'Licencias_Software.docx', type: 'Word', size: '540 KB', date: '2024-01-11', thumbnail: '⚖️', favorite: false, deleted: false, folder: 'Legal', tags: ['Legal'], summary: 'Licencias de software', keywords: ['licencias'], entities: [] },
-    { id: 35, name: 'Propiedad_Intelectual.pdf', type: 'PDF', size: '1.9 MB', date: '2024-01-10', thumbnail: '©️', favorite: false, deleted: false, folder: 'Legal', tags: ['Legal'], summary: 'Documentos de propiedad intelectual', keywords: ['propiedad'], entities: [] },
-    { id: 36, name: 'Contratos_Proveedores.pdf', type: 'PDF', size: '2.3 MB', date: '2024-01-09', thumbnail: '📝', favorite: false, deleted: false, folder: 'Legal', tags: ['Legal'], summary: 'Contratos con proveedores', keywords: ['contratos'], entities: [] },
-    { id: 37, name: 'Normativas_Cumplimiento.pdf', type: 'PDF', size: '3.1 MB', date: '2024-01-08', thumbnail: '📋', favorite: false, deleted: false, folder: 'Legal', tags: ['Legal'], summary: 'Normativas de cumplimiento', keywords: ['normativas'], entities: [] },
-    { id: 38, name: 'Poderes_Legales.docx', type: 'Word', size: '420 KB', date: '2024-01-07', thumbnail: '📜', favorite: false, deleted: false, folder: 'Legal', tags: ['Legal'], summary: 'Poderes legales', keywords: ['poderes'], entities: [] },
-    { id: 39, name: 'Registro_Mercantil.pdf', type: 'PDF', size: '1.1 MB', date: '2024-01-06', thumbnail: '🏛️', favorite: false, deleted: false, folder: 'Legal', tags: ['Legal'], summary: 'Registro mercantil', keywords: ['registro'], entities: [] },
-    { id: 40, name: 'Terminos_Condiciones.pdf', type: 'PDF', size: '890 KB', date: '2024-01-05', thumbnail: '📄', favorite: false, deleted: false, folder: 'Legal', tags: ['Legal'], summary: 'Términos y condiciones', keywords: ['términos'], entities: [] },
-    { id: 41, name: 'Contratos_Trabajo.pdf', type: 'PDF', size: '2.1 MB', date: '2024-01-04', thumbnail: '👔', favorite: false, deleted: false, folder: 'Legal', tags: ['Legal'], summary: 'Contratos de trabajo', keywords: ['trabajo'], entities: [] },
-    { id: 42, name: 'Actas_Asamblea.docx', type: 'Word', size: '780 KB', date: '2024-01-03', thumbnail: '📝', favorite: false, deleted: false, folder: 'Legal', tags: ['Legal'], summary: 'Actas de asamblea', keywords: ['actas'], entities: [] },
+    // Legal (documentos reales)
+    { id: 33, name: 'NDA_Agreement_Template.pdf', type: 'PDF', size: '670 KB', date: '2024-01-12', thumbnail: '🔐', favorite: false, deleted: false, folder: 'Legal', tags: ['Legal', 'NDA'], summary: 'Plantilla estándar de acuerdo de confidencialidad', keywords: ['confidencialidad', 'NDA'], entities: ['Non-Disclosure'], url: 'https://www.rocketlawyer.com/form/non-disclosure-agreement.rl' },
+    { id: 34, name: 'Software_License_Agreements.pdf', type: 'PDF', size: '540 KB', date: '2024-01-11', thumbnail: '⚖️', favorite: false, deleted: false, folder: 'Legal', tags: ['Legal', 'Software'], summary: 'Guía de acuerdos de licencia de software', keywords: ['licencias', 'software'], entities: ['MIT', 'GPL'], url: 'https://opensource.org/licenses' },
+    { id: 35, name: 'Intellectual_Property_Guide.pdf', type: 'PDF', size: '1.9 MB', date: '2024-01-10', thumbnail: '©️', favorite: false, deleted: false, folder: 'Legal', tags: ['Legal', 'IP'], summary: 'Guía completa de propiedad intelectual', keywords: ['propiedad', 'intelectual'], entities: ['Patents', 'Trademarks'], url: 'https://www.wipo.int/publications/en/details.jsp?id=4080' },
+    { id: 36, name: 'Vendor_Contract_Template.pdf', type: 'PDF', size: '2.3 MB', date: '2024-01-09', thumbnail: '📝', favorite: false, deleted: false, folder: 'Legal', tags: ['Legal', 'Contratos'], summary: 'Plantilla de contrato con proveedores', keywords: ['contratos', 'proveedores'], entities: ['Vendor Agreement'], url: 'https://www.pandadoc.com/vendor-agreement-template/' },
+    { id: 37, name: 'Compliance_Framework_Guide.pdf', type: 'PDF', size: '3.1 MB', date: '2024-01-08', thumbnail: '📋', favorite: false, deleted: false, folder: 'Legal', tags: ['Legal', 'Compliance'], summary: 'Framework de cumplimiento normativo empresarial', keywords: ['normativas', 'cumplimiento'], entities: ['SOX', 'Compliance'], url: 'https://www.sec.gov/spotlight/sarbanes-oxley.htm' },
+    { id: 38, name: 'Power_of_Attorney_Forms.pdf', type: 'PDF', size: '420 KB', date: '2024-01-07', thumbnail: '📜', favorite: false, deleted: false, folder: 'Legal', tags: ['Legal', 'POA'], summary: 'Formularios de poder legal', keywords: ['poderes', 'legal'], entities: ['Power of Attorney'], url: 'https://www.legalzoom.com/articles/power-of-attorney-form' },
+    { id: 39, name: 'Business_Registration_Guide.pdf', type: 'PDF', size: '1.1 MB', date: '2024-01-06', thumbnail: '🏛️', favorite: false, deleted: false, folder: 'Legal', tags: ['Legal', 'Registro'], summary: 'Guía de registro mercantil empresarial', keywords: ['registro', 'empresa'], entities: ['Business Entity'], url: 'https://www.sba.gov/business-guide/launch-your-business/register-your-business' },
+    { id: 40, name: 'Terms_and_Conditions_Template.pdf', type: 'PDF', size: '890 KB', date: '2024-01-05', thumbnail: '📄', favorite: false, deleted: false, folder: 'Legal', tags: ['Legal', 'T&C'], summary: 'Plantilla de términos y condiciones', keywords: ['términos', 'condiciones'], entities: ['Terms of Service'], url: 'https://www.termsfeed.com/blog/sample-terms-and-conditions-template/' },
+    { id: 41, name: 'Employment_Contract_Guide.pdf', type: 'PDF', size: '2.1 MB', date: '2024-01-04', thumbnail: '👔', favorite: false, deleted: false, folder: 'Legal', tags: ['Legal', 'Empleo'], summary: 'Guía de contratos laborales', keywords: ['trabajo', 'contratos'], entities: ['Employment'], url: 'https://www.dol.gov/general/topic/labor-relations/employment-contracts' },
+    { id: 42, name: 'Corporate_Governance_Best_Practices.pdf', type: 'PDF', size: '780 KB', date: '2024-01-03', thumbnail: '📝', favorite: false, deleted: false, folder: 'Legal', tags: ['Legal', 'Gobernanza'], summary: 'Mejores prácticas de gobernanza corporativa', keywords: ['actas', 'gobernanza'], entities: ['Board', 'Governance'], url: 'https://www.oecd.org/corporate/principles-corporate-governance/' },
 
-    // Marketing (18 total = 2 ya creados + 16 más)
-    { id: 43, name: 'Estrategia_Redes_Sociales.pptx', type: 'PowerPoint', size: '6.2 MB', date: '2024-01-13', thumbnail: '📱', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing'], summary: 'Estrategia de redes sociales', keywords: ['redes'], entities: [] },
-    { id: 44, name: 'Plan_Contenidos_Q1.xlsx', type: 'Excel', size: '1.3 MB', date: '2024-01-12', thumbnail: '📝', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing'], summary: 'Plan de contenidos Q1', keywords: ['contenidos'], entities: [] },
-    { id: 45, name: 'Analisis_Competencia.pdf', type: 'PDF', size: '2.8 MB', date: '2024-01-11', thumbnail: '🔍', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing'], summary: 'Análisis de competencia', keywords: ['competencia'], entities: [] },
-    { id: 46, name: 'Campana_Email_Marketing.docx', type: 'Word', size: '980 KB', date: '2024-01-10', thumbnail: '📧', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing'], summary: 'Campaña de email marketing', keywords: ['email'], entities: [] },
-    { id: 47, name: 'Brief_Creativo_2024.pdf', type: 'PDF', size: '1.7 MB', date: '2024-01-09', thumbnail: '🎨', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing'], summary: 'Brief creativo 2024', keywords: ['creativo'], entities: [] },
-    { id: 48, name: 'Metricas_Marketing.xlsx', type: 'Excel', size: '1.4 MB', date: '2024-01-08', thumbnail: '📊', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing'], summary: 'Métricas de marketing', keywords: ['métricas'], entities: [] },
-    { id: 49, name: 'Buyer_Personas.pdf', type: 'PDF', size: '2.1 MB', date: '2024-01-07', thumbnail: '👥', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing'], summary: 'Buyer personas', keywords: ['personas'], entities: [] },
-    { id: 50, name: 'Journey_Cliente.pptx', type: 'PowerPoint', size: '5.3 MB', date: '2024-01-06', thumbnail: '🗺️', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing'], summary: 'Customer journey', keywords: ['journey'], entities: [] },
-    { id: 51, name: 'Presupuesto_Marketing.xlsx', type: 'Excel', size: '1.2 MB', date: '2024-01-05', thumbnail: '💰', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing'], summary: 'Presupuesto de marketing', keywords: ['presupuesto'], entities: [] },
-    { id: 52, name: 'Guia_Marca.pdf', type: 'PDF', size: '8.7 MB', date: '2024-01-04', thumbnail: '🎯', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing'], summary: 'Guía de marca', keywords: ['marca'], entities: [] },
-    { id: 53, name: 'Plan_Lanzamiento.pptx', type: 'PowerPoint', size: '7.1 MB', date: '2024-01-03', thumbnail: '🚀', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing'], summary: 'Plan de lanzamiento', keywords: ['lanzamiento'], entities: [] },
-    { id: 54, name: 'SEO_Strategy.pdf', type: 'PDF', size: '1.9 MB', date: '2024-01-02', thumbnail: '🔍', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing'], summary: 'Estrategia SEO', keywords: ['SEO'], entities: [] },
-    { id: 55, name: 'SEM_Campaigns.xlsx', type: 'Excel', size: '1.5 MB', date: '2024-01-01', thumbnail: '💻', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing'], summary: 'Campañas SEM', keywords: ['SEM'], entities: [] },
-    { id: 56, name: 'Influencer_Strategy.docx', type: 'Word', size: '890 KB', date: '2023-12-31', thumbnail: '⭐', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing'], summary: 'Estrategia de influencers', keywords: ['influencers'], entities: [] },
-    { id: 57, name: 'Landing_Pages_Design.pdf', type: 'PDF', size: '4.2 MB', date: '2023-12-30', thumbnail: '🎨', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing'], summary: 'Diseño de landing pages', keywords: ['landing'], entities: [] },
-    { id: 58, name: 'Conversion_Funnel.pptx', type: 'PowerPoint', size: '3.8 MB', date: '2023-12-29', thumbnail: '🔄', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing'], summary: 'Embudo de conversión', keywords: ['conversión'], entities: [] },
+    // Marketing (documentos reales)
+    { id: 43, name: 'Social_Media_Marketing_Guide.pdf', type: 'PDF', size: '6.2 MB', date: '2024-01-13', thumbnail: '📱', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing', 'Social'], summary: 'Guía completa de marketing en redes sociales', keywords: ['redes', 'social'], entities: ['Facebook', 'Instagram'], url: 'https://www.hootsuite.com/resources/social-media-marketing' },
+    { id: 44, name: 'Content_Marketing_Strategy.pdf', type: 'PDF', size: '1.3 MB', date: '2024-01-12', thumbnail: '📝', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing', 'Contenido'], summary: 'Estrategia de marketing de contenidos', keywords: ['contenidos', 'estrategia'], entities: ['Content Strategy'], url: 'https://contentmarketinginstitute.com/what-is-content-marketing/' },
+    { id: 45, name: 'Competitive_Analysis_Framework.pdf', type: 'PDF', size: '2.8 MB', date: '2024-01-11', thumbnail: '🔍', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing', 'Análisis'], summary: 'Framework de análisis competitivo', keywords: ['competencia', 'análisis'], entities: ['Porter Five Forces'], url: 'https://www.porter.com/about-michael-porter/business-frameworks' },
+    { id: 46, name: 'Email_Marketing_Best_Practices.pdf', type: 'PDF', size: '980 KB', date: '2024-01-10', thumbnail: '📧', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing', 'Email'], summary: 'Mejores prácticas de email marketing', keywords: ['email', 'marketing'], entities: ['Campaign Monitor'], url: 'https://www.mailchimp.com/marketing-glossary/email-marketing/' },
+    { id: 47, name: 'Brand_Identity_Guidelines.pdf', type: 'PDF', size: '8.7 MB', date: '2024-01-04', thumbnail: '🎯', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing', 'Marca'], summary: 'Guía de identidad de marca', keywords: ['marca', 'identidad'], entities: ['Brand Guidelines'], url: 'https://99designs.com/blog/tips/how-to-create-a-brand-style-guide/' },
+    { id: 48, name: 'SEO_Optimization_Guide.pdf', type: 'PDF', size: '1.9 MB', date: '2024-01-02', thumbnail: '🔍', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing', 'SEO'], summary: 'Guía de optimización SEO', keywords: ['SEO', 'optimización'], entities: ['Google', 'Search Engine'], url: 'https://developers.google.com/search/docs/fundamentals/seo-starter-guide' },
+    { id: 49, name: 'Buyer_Persona_Template.pdf', type: 'PDF', size: '2.1 MB', date: '2024-01-07', thumbnail: '👥', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing', 'Personas'], summary: 'Plantilla de buyer personas', keywords: ['personas', 'clientes'], entities: ['Target Audience'], url: 'https://blog.hubspot.com/marketing/buyer-persona-research' },
+    { id: 50, name: 'Customer_Journey_Mapping.pdf', type: 'PDF', size: '5.3 MB', date: '2024-01-06', thumbnail: '🗺️', favorite: false, deleted: false, folder: 'Marketing', tags: ['Marketing', 'Journey'], summary: 'Mapeo del viaje del cliente', keywords: ['journey', 'cliente'], entities: ['Customer Experience'], url: 'https://www.nngroup.com/articles/customer-journey-mapping/' },
 
-    // RRHH (15 total = 1 ya creado + 14 más)
-    { id: 59, name: 'Manual_Empleado_2024.pdf', type: 'PDF', size: '3.2 MB', date: '2024-01-14', thumbnail: '📖', favorite: false, deleted: false, folder: 'RRHH', tags: ['RRHH'], summary: 'Manual del empleado 2024', keywords: ['manual'], entities: [] },
-    { id: 60, name: 'Politicas_Vacaciones.docx', type: 'Word', size: '560 KB', date: '2024-01-13', thumbnail: '🏖️', favorite: false, deleted: false, folder: 'RRHH', tags: ['RRHH'], summary: 'Políticas de vacaciones', keywords: ['vacaciones'], entities: [] },
-    { id: 61, name: 'Evaluacion_Desempeno.xlsx', type: 'Excel', size: '1.8 MB', date: '2024-01-12', thumbnail: '📈', favorite: false, deleted: false, folder: 'RRHH', tags: ['RRHH'], summary: 'Evaluaciones de desempeño', keywords: ['evaluación'], entities: [] },
-    { id: 62, name: 'Plan_Capacitacion.pdf', type: 'PDF', size: '2.4 MB', date: '2024-01-11', thumbnail: '🎓', favorite: false, deleted: false, folder: 'RRHH', tags: ['RRHH'], summary: 'Plan de capacitación', keywords: ['capacitación'], entities: [] },
-    { id: 63, name: 'Beneficios_Empleados.docx', type: 'Word', size: '780 KB', date: '2024-01-10', thumbnail: '🎁', favorite: false, deleted: false, folder: 'RRHH', tags: ['RRHH'], summary: 'Beneficios para empleados', keywords: ['beneficios'], entities: [] },
-    { id: 64, name: 'Organigrama_2024.pptx', type: 'PowerPoint', size: '2.1 MB', date: '2024-01-09', thumbnail: '🏢', favorite: false, deleted: false, folder: 'RRHH', tags: ['RRHH'], summary: 'Organigrama empresarial', keywords: ['organigrama'], entities: [] },
-    { id: 65, name: 'Descripcion_Puestos.pdf', type: 'PDF', size: '1.9 MB', date: '2024-01-08', thumbnail: '💼', favorite: false, deleted: false, folder: 'RRHH', tags: ['RRHH'], summary: 'Descripción de puestos', keywords: ['puestos'], entities: [] },
-    { id: 66, name: 'Proceso_Seleccion.docx', type: 'Word', size: '670 KB', date: '2024-01-07', thumbnail: '🎯', favorite: false, deleted: false, folder: 'RRHH', tags: ['RRHH'], summary: 'Proceso de selección', keywords: ['selección'], entities: [] },
-    { id: 67, name: 'Codigo_Etica.pdf', type: 'PDF', size: '1.3 MB', date: '2024-01-06', thumbnail: '⚖️', favorite: false, deleted: false, folder: 'RRHH', tags: ['RRHH'], summary: 'Código de ética', keywords: ['ética'], entities: [] },
-    { id: 68, name: 'Reglamento_Interno.pdf', type: 'PDF', size: '2.8 MB', date: '2024-01-05', thumbnail: '📋', favorite: false, deleted: false, folder: 'RRHH', tags: ['RRHH'], summary: 'Reglamento interno', keywords: ['reglamento'], entities: [] },
-    { id: 69, name: 'Clima_Laboral_2023.xlsx', type: 'Excel', size: '1.4 MB', date: '2024-01-04', thumbnail: '🌤️', favorite: false, deleted: false, folder: 'RRHH', tags: ['RRHH'], summary: 'Encuesta clima laboral', keywords: ['clima'], entities: [] },
-    { id: 70, name: 'Compensaciones_Salarios.xlsx', type: 'Excel', size: '1.7 MB', date: '2024-01-03', thumbnail: '💵', favorite: false, deleted: false, folder: 'RRHH', tags: ['RRHH'], summary: 'Tabla de compensaciones', keywords: ['salarios'], entities: [] },
-    { id: 71, name: 'Horarios_Trabajo.pdf', type: 'PDF', size: '540 KB', date: '2024-01-02', thumbnail: '⏰', favorite: false, deleted: false, folder: 'RRHH', tags: ['RRHH'], summary: 'Horarios de trabajo', keywords: ['horarios'], entities: [] },
-    { id: 72, name: 'Seguridad_Salud.docx', type: 'Word', size: '1.1 MB', date: '2024-01-01', thumbnail: '🏥', favorite: false, deleted: false, folder: 'RRHH', tags: ['RRHH'], summary: 'Seguridad y salud laboral', keywords: ['seguridad'], entities: [] },
+    // RRHH (documentos reales)
+    { id: 59, name: 'Performance_Review_Template.pdf', type: 'PDF', size: '1.8 MB', date: '2024-01-12', thumbnail: '📈', favorite: false, deleted: false, folder: 'RRHH', tags: ['RRHH', 'Evaluación'], summary: 'Plantilla de evaluación de desempeño', keywords: ['evaluación', 'desempeño'], entities: ['Performance Management'], url: 'https://www.indeed.com/hire/c/info/performance-review-template' },
+    { id: 60, name: 'Training_Development_Plan.pdf', type: 'PDF', size: '2.4 MB', date: '2024-01-11', thumbnail: '🎓', favorite: false, deleted: false, folder: 'RRHH', tags: ['RRHH', 'Capacitación'], summary: 'Plan de capacitación y desarrollo', keywords: ['capacitación', 'desarrollo'], entities: ['Learning & Development'], url: 'https://www.shrm.org/topics-tools/tools/toolkits/developing-training-program' },
+    { id: 61, name: 'Benefits_Administration_Guide.pdf', type: 'PDF', size: '780 KB', date: '2024-01-10', thumbnail: '🎁', favorite: false, deleted: false, folder: 'RRHH', tags: ['RRHH', 'Beneficios'], summary: 'Guía de administración de beneficios', keywords: ['beneficios', 'administración'], entities: ['Employee Benefits'], url: 'https://www.dol.gov/general/topic/health-plans/employeebenefits' },
+    { id: 62, name: 'Job_Description_Templates.pdf', type: 'PDF', size: '1.9 MB', date: '2024-01-08', thumbnail: '💼', favorite: false, deleted: false, folder: 'RRHH', tags: ['RRHH', 'Puestos'], summary: 'Plantillas de descripción de puestos', keywords: ['puestos', 'descripción'], entities: ['Job Descriptions'], url: 'https://www.betterteam.com/job-description-template' },
+    { id: 63, name: 'Recruitment_Process_Guide.pdf', type: 'PDF', size: '670 KB', date: '2024-01-07', thumbnail: '🎯', favorite: false, deleted: false, folder: 'RRHH', tags: ['RRHH', 'Reclutamiento'], summary: 'Guía del proceso de reclutamiento', keywords: ['selección', 'reclutamiento'], entities: ['Hiring Process'], url: 'https://www.shrm.org/topics-tools/tools/toolkits/managing-recruitment-process' },
+    { id: 64, name: 'Workplace_Safety_Standards.pdf', type: 'PDF', size: '1.1 MB', date: '2024-01-01', thumbnail: '🏥', favorite: false, deleted: false, folder: 'RRHH', tags: ['RRHH', 'Seguridad'], summary: 'Estándares de seguridad y salud laboral', keywords: ['seguridad', 'salud'], entities: ['OSHA', 'Workplace Safety'], url: 'https://www.osha.gov/safety-management' },
   ]);
 
   const folders = [
@@ -162,6 +147,77 @@ export default function GestorDocumentos() {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      handleFiles(files);
+    }
+  };
+
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      handleFiles(files);
+    }
+  };
+
+  const handleFiles = (files: FileList) => {
+    Array.from(files).forEach((file) => {
+      // Simular progreso de carga
+      setUploadProgress(0);
+      const interval = setInterval(() => {
+        setUploadProgress((prev) => {
+          if (prev === null) return 0;
+          if (prev >= 100) {
+            clearInterval(interval);
+            setTimeout(() => setUploadProgress(null), 500);
+            return 100;
+          }
+          return prev + 10;
+        });
+      }, 100);
+
+      // Determinar tipo de archivo
+      const extension = file.name.split('.').pop()?.toLowerCase();
+      let fileType = 'PDF';
+      let thumbnail = '📄';
+
+      if (extension === 'pdf') {
+        fileType = 'PDF';
+        thumbnail = '📄';
+      } else if (extension === 'docx' || extension === 'doc') {
+        fileType = 'Word';
+        thumbnail = '📝';
+      } else if (extension === 'xlsx' || extension === 'xls') {
+        fileType = 'Excel';
+        thumbnail = '📊';
+      } else if (extension === 'pptx' || extension === 'ppt') {
+        fileType = 'PowerPoint';
+        thumbnail = '📊';
+      }
+
+      // Crear nuevo documento
+      const newDoc: Document = {
+        id: documents.length + 1,
+        name: file.name,
+        type: fileType,
+        size: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
+        date: new Date().toISOString().split('T')[0],
+        thumbnail: thumbnail,
+        favorite: false,
+        deleted: false,
+        folder: activeView === 'folder' && selectedFolder ? selectedFolder : 'General',
+        tags: ['Nuevo', 'Subido'],
+        summary: `Documento subido: ${file.name}`,
+        keywords: ['nuevo', 'subido'],
+        entities: [],
+        url: URL.createObjectURL(file) // Crear URL local para previsualización
+      };
+
+      setTimeout(() => {
+        setDocuments([newDoc, ...documents]);
+      }, 1000);
+    });
   };
 
   const toggleFavorite = (id: number) => {
@@ -303,7 +359,18 @@ export default function GestorDocumentos() {
               <span className="font-bold text-xl">DocuIA</span>
             </div>
 
-            <button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg px-4 py-3 font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg flex items-center justify-center gap-2">
+            <input
+              type="file"
+              id="file-upload"
+              className="hidden"
+              onChange={handleFileInput}
+              multiple
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+            />
+            <button
+              onClick={() => document.getElementById('file-upload')?.click()}
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg px-4 py-3 font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg flex items-center justify-center gap-2"
+            >
               <CloudArrowUpIcon className="w-5 h-5" />
               Subir Archivo
             </button>
@@ -464,20 +531,34 @@ export default function GestorDocumentos() {
                 onDrop={handleDrop}
               >
                 <div
-                  className={`border-2 border-dashed rounded-2xl p-8 transition-all ${
+                  onClick={() => document.getElementById('file-upload')?.click()}
+                  className={`border-2 border-dashed rounded-2xl p-8 transition-all cursor-pointer ${
                     dragActive
                       ? 'border-blue-500 bg-blue-50 dark:bg-blue-950'
-                      : 'border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900'
+                      : 'border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950'
                   }`}
                 >
                   <div className="text-center">
                     <CloudArrowUpIcon className="w-12 h-12 mx-auto mb-3 text-slate-400" />
                     <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">
-                      Arrastra y suelta tus archivos aquí
+                      Arrastra y suelta tus archivos aquí o haz clic para seleccionar
                     </p>
                     <p className="text-xs text-slate-500">
-                      Soporta PDF, Word, Excel, PowerPoint e imágenes
+                      Soporta PDF, Word, Excel, PowerPoint
                     </p>
+                    {uploadProgress !== null && (
+                      <div className="mt-4 max-w-md mx-auto">
+                        <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-300"
+                            style={{ width: `${uploadProgress}%` }}
+                          ></div>
+                        </div>
+                        <p className="text-xs text-slate-600 dark:text-slate-400 mt-2">
+                          Subiendo... {uploadProgress}%
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -592,7 +673,7 @@ export default function GestorDocumentos() {
               className="fixed inset-0 bg-black/50 z-40"
               onClick={() => setSelectedDoc(null)}
             />
-            <div className="fixed right-0 top-0 h-full w-full max-w-2xl bg-white dark:bg-slate-900 z-50 shadow-2xl overflow-y-auto">
+            <div className="fixed right-0 top-0 h-full w-[600px] bg-white dark:bg-slate-900 z-50 shadow-2xl overflow-y-auto">
               <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-6 z-10">
                 <div className="flex items-start justify-between">
                   <div>
@@ -621,9 +702,20 @@ export default function GestorDocumentos() {
                 <div className="bg-slate-100 dark:bg-slate-800 rounded-xl p-8 mb-6 min-h-[400px] flex items-center justify-center">
                   <div className="text-center">
                     <DocumentIcon className="w-24 h-24 mx-auto mb-4 text-slate-400" />
-                    <p className="text-slate-600 dark:text-slate-400">
+                    <p className="text-slate-600 dark:text-slate-400 mb-4">
                       Vista previa del documento
                     </p>
+                    {selectedDoc.url && (
+                      <a
+                        href={selectedDoc.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold shadow-lg"
+                      >
+                        <DocumentIcon className="w-5 h-5" />
+                        Abrir Documento Real
+                      </a>
+                    )}
                   </div>
                 </div>
 
