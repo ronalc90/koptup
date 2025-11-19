@@ -90,9 +90,9 @@ export default function CuentasMedicasPage() {
     cargarEstadisticas();
   }, []);
 
-  // Cargar facturas cuando cambia la vista a 'facturas'
+  // Cargar facturas cuando cambia la vista a 'facturas' o 'admin'
   useEffect(() => {
-    if (vista === 'facturas' && facturas.length === 0) {
+    if ((vista === 'facturas' || vista === 'admin') && facturas.length === 0) {
       cargarFacturas();
     }
   }, [vista, facturas.length, cargarFacturas]);
@@ -1315,13 +1315,6 @@ export default function CuentasMedicasPage() {
 
   // VISTA ADMINISTRACIÓN
   if (vista === 'admin') {
-    // Cargar facturas si no están cargadas
-    useEffect(() => {
-      if (facturas.length === 0) {
-        cargarFacturas();
-      }
-    }, [facturas.length, cargarFacturas]);
-
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 p-6">
         <div className="max-w-7xl mx-auto">
