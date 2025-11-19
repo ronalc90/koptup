@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   ChartBarIcon,
   ArrowTrendingUpIcon,
@@ -32,6 +32,42 @@ export default function DashboardEjecutivo() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedDate, setSelectedDate] = useState('Enero 2024');
   const [activeView, setActiveView] = useState<ViewType>('dashboard');
+
+  // Estados de configuración
+  const [darkMode, setDarkMode] = useState(false);
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [autoExport, setAutoExport] = useState(true);
+  const [showSaveSuccess, setShowSaveSuccess] = useState(false);
+
+  // Cargar preferencias desde localStorage al montar
+  useEffect(() => {
+    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+    const savedEmailNotif = localStorage.getItem('emailNotifications') !== 'false';
+    const savedAutoExport = localStorage.getItem('autoExport') !== 'false';
+
+    setDarkMode(savedDarkMode);
+    setEmailNotifications(savedEmailNotif);
+    setAutoExport(savedAutoExport);
+  }, []);
+
+  // Aplicar dark mode al documento
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
+
+  // Función para guardar cambios
+  const handleSaveChanges = () => {
+    localStorage.setItem('darkMode', darkMode.toString());
+    localStorage.setItem('emailNotifications', emailNotifications.toString());
+    localStorage.setItem('autoExport', autoExport.toString());
+
+    setShowSaveSuccess(true);
+    setTimeout(() => setShowSaveSuccess(false), 3000);
+  };
 
   // Datos KPI
   const kpis = [
@@ -590,6 +626,21 @@ export default function DashboardEjecutivo() {
 
   const renderConfiguracionView = () => (
     <div className="space-y-6">
+      {/* Mensaje de éxito */}
+      {showSaveSuccess && (
+        <div className="bg-green-50 dark:bg-green-950 border-2 border-green-500 rounded-xl p-4 flex items-center gap-3 animate-fade-in">
+          <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+            <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <div>
+            <h4 className="font-semibold text-green-700 dark:text-green-400">Cambios guardados exitosamente</h4>
+            <p className="text-sm text-green-600 dark:text-green-500">Tus preferencias han sido actualizadas</p>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
         <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
           Configuración de la Empresa
@@ -602,7 +653,7 @@ export default function DashboardEjecutivo() {
             <input
               type="text"
               defaultValue="KopTup Tech Solutions"
-              className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
           <div>
@@ -612,7 +663,7 @@ export default function DashboardEjecutivo() {
             <input
               type="text"
               defaultValue="900.123.456-7"
-              className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
           <div>
@@ -622,7 +673,7 @@ export default function DashboardEjecutivo() {
             <input
               type="email"
               defaultValue="contacto@koptup.com"
-              className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
           <div>
@@ -632,7 +683,7 @@ export default function DashboardEjecutivo() {
             <input
               type="tel"
               defaultValue="+57 (1) 234 5678"
-              className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
           <div className="lg:col-span-2">
@@ -642,7 +693,7 @@ export default function DashboardEjecutivo() {
             <input
               type="text"
               defaultValue="Calle 100 #20-50, Bogotá, Colombia"
-              className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
         </div>
@@ -653,41 +704,88 @@ export default function DashboardEjecutivo() {
           Preferencias del Sistema
         </h3>
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+          {/* Toggle Notificaciones por Email */}
+          <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
             <div>
               <h4 className="font-semibold text-slate-900 dark:text-white">Notificaciones por Email</h4>
-              <p className="text-sm text-slate-500">Recibir alertas y reportes por correo</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Recibir alertas y reportes por correo</p>
             </div>
-            <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-purple-600">
-              <span className="translate-x-6 inline-block h-4 w-4 transform rounded-full bg-white transition" />
+            <button
+              onClick={() => setEmailNotifications(!emailNotifications)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                emailNotifications ? 'bg-purple-600' : 'bg-slate-300 dark:bg-slate-600'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  emailNotifications ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
             </button>
           </div>
-          <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+
+          {/* Toggle Modo Oscuro */}
+          <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
             <div>
               <h4 className="font-semibold text-slate-900 dark:text-white">Modo Oscuro</h4>
-              <p className="text-sm text-slate-500">Interfaz con tema oscuro</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Interfaz con tema oscuro</p>
             </div>
-            <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-slate-300">
-              <span className="translate-x-1 inline-block h-4 w-4 transform rounded-full bg-white transition" />
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                darkMode ? 'bg-purple-600' : 'bg-slate-300 dark:bg-slate-600'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  darkMode ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
             </button>
           </div>
-          <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+
+          {/* Toggle Exportación Automática */}
+          <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
             <div>
               <h4 className="font-semibold text-slate-900 dark:text-white">Exportación Automática</h4>
-              <p className="text-sm text-slate-500">Generar reportes mensuales automáticamente</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Generar reportes mensuales automáticamente</p>
             </div>
-            <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-purple-600">
-              <span className="translate-x-6 inline-block h-4 w-4 transform rounded-full bg-white transition" />
+            <button
+              onClick={() => setAutoExport(!autoExport)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                autoExport ? 'bg-purple-600' : 'bg-slate-300 dark:bg-slate-600'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  autoExport ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
             </button>
           </div>
         </div>
       </div>
 
       <div className="flex justify-end gap-3">
-        <button className="px-6 py-3 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors font-semibold">
+        <button
+          onClick={() => {
+            // Recargar desde localStorage para deshacer cambios
+            const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+            const savedEmailNotif = localStorage.getItem('emailNotifications') !== 'false';
+            const savedAutoExport = localStorage.getItem('autoExport') !== 'false';
+
+            setDarkMode(savedDarkMode);
+            setEmailNotifications(savedEmailNotif);
+            setAutoExport(savedAutoExport);
+          }}
+          className="px-6 py-3 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors font-semibold"
+        >
           Cancelar
         </button>
-        <button className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all font-semibold shadow-lg">
+        <button
+          onClick={handleSaveChanges}
+          className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all font-semibold shadow-lg hover:shadow-xl"
+        >
           Guardar Cambios
         </button>
       </div>
@@ -754,12 +852,29 @@ export default function DashboardEjecutivo() {
                   <input
                     type="text"
                     placeholder="Buscar..."
-                    className="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                 </div>
               </div>
 
               <div className="flex items-center gap-4 ml-6">
+                {/* Botón de modo oscuro rápido */}
+                <button
+                  onClick={() => setDarkMode(!darkMode)}
+                  className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                  title={darkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+                >
+                  {darkMode ? (
+                    <svg className="w-6 h-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-6 h-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                  )}
+                </button>
+
                 <button className="relative p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                   <BellIcon className="w-6 h-6 text-slate-600 dark:text-slate-400" />
                   <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
@@ -770,7 +885,7 @@ export default function DashboardEjecutivo() {
                   <select
                     value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
-                    className="bg-transparent text-sm font-medium focus:outline-none"
+                    className="bg-transparent text-sm font-medium text-slate-900 dark:text-white focus:outline-none"
                   >
                     <option>Enero 2024</option>
                     <option>Febrero 2024</option>
@@ -781,7 +896,7 @@ export default function DashboardEjecutivo() {
                 <div className="flex items-center gap-3 pl-4 border-l border-slate-200 dark:border-slate-700">
                   <div className="text-right">
                     <div className="text-sm font-semibold text-slate-900 dark:text-white">CEO</div>
-                    <div className="text-xs text-slate-500">Ejecutivo</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">Ejecutivo</div>
                   </div>
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-semibold">
                     JD
