@@ -21,6 +21,11 @@ import {
   TagIcon,
   SparklesIcon,
   EyeIcon,
+  CheckCircleIcon,
+  CreditCardIcon,
+  MapPinIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolidIcon, StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 
@@ -219,6 +224,25 @@ export default function EcommerceDemoPage() {
   const [showViewModal, setShowViewModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
+  // Checkout states
+  const [checkoutStep, setCheckoutStep] = useState<'cart' | 'shipping' | 'payment' | 'confirmation' | null>(null);
+  const [shippingInfo, setShippingInfo] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    zipCode: '',
+    country: 'USA',
+  });
+  const [paymentInfo, setPaymentInfo] = useState({
+    cardNumber: '',
+    cardName: '',
+    expiryDate: '',
+    cvv: '',
+  });
+  const [orderNumber, setOrderNumber] = useState('');
+
   const categories = [
     { id: 'all', label: t('categories.all') },
     { id: 'electronics', label: t('categories.electronics') },
@@ -285,16 +309,84 @@ export default function EcommerceDemoPage() {
   const cartTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const cartItemsCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  const ProductCard = ({ product }: { product: Product }) => (
-    <Card key={product.id} variant="bordered" className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-      <CardContent className="p-0">
-        {/* Product Image */}
-        <div className="relative aspect-square overflow-hidden bg-secondary-100 dark:bg-secondary-800 group">
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-          />
+  // Shipping cost calculation
+  const shippingCost = cartTotal >= 100 ? 0 : cartTotal > 0 ? 15 : 0;
+  const tax = cartTotal * 0.08; // 8% tax
+  const finalTotal = cartTotal + shippingCost + tax;
+
+  const startCheckout = () => {
+    setCheckoutStep('shipping');
+    setIsCartOpen(false);
+  };
+
+  const proceedToPayment = () => {
+    if (!shippingInfo.fullName || !shippingInfo.email || !shippingInfo.address || !shippingInfo.city || !shippingInfo.zipCode) {
+      alert('Please fill all shipping information fields');
+      return;
+    }
+    setCheckoutStep('payment');
+  };
+
+  const completeOrder = () => {
+    if (!paymentInfo.cardNumber || !paymentInfo.cardName || !paymentInfo.expiryDate || !paymentInfo.cvv) {
+      alert('Please fill all payment information fields');
+      return;
+    }
+    // Generate order number
+    const orderNum = 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    setOrderNumber(orderNum);
+    setCheckoutStep('confirmation');
+  };
+
+  const resetCheckout = () => {
+    setCheckoutStep(null);
+    setCartItems([]);
+    setShippingInfo({
+      fullName: '',
+      email: '',
+      phone: '',
+      address: '',
+      city: '',
+      zipCode: '',
+      country: 'USA',
+    });
+    setPaymentInfo({
+      cardNumber: '',
+      cardName: '',
+      expiryDate: '',
+      cvv: '',
+    });
+  };
+
+  const ProductCard = ({ product }: { product: Product }) => {
+    const [justAdded, setJustAdded] = useState(false);
+
+    const handleAddToCart = (product: Product) => {
+      addToCart(product);
+      setJustAdded(true);
+      setTimeout(() => setJustAdded(false), 2000);
+    };
+
+    return (
+      <Card key={product.id} variant="bordered" className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative">
+        <CardContent className="p-0">
+          {/* Added to Cart Animation */}
+          {justAdded && (
+            <div className="absolute inset-0 bg-green-500/90 z-20 flex items-center justify-center animate-fade-in-out">
+              <div className="text-white text-center">
+                <CheckCircleIcon className="h-16 w-16 mx-auto mb-2" />
+                <p className="font-bold text-lg">Added to Cart!</p>
+              </div>
+            </div>
+          )}
+
+          {/* Product Image */}
+          <div className="relative aspect-square overflow-hidden bg-secondary-100 dark:bg-secondary-800 group">
+            <img
+              src={product.image}
+              alt={product.name}
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            />
 
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-2">
@@ -384,10 +476,11 @@ export default function EcommerceDemoPage() {
               </p>
             </div>
             <Button
-              onClick={() => addToCart(product)}
+              onClick={() => handleAddToCart(product)}
               disabled={!product.inStock}
               variant={product.inStock ? 'primary' : 'outline'}
               size="sm"
+              className="transition-all duration-300 hover:scale-105"
             >
               {product.inStock ? t('addToCart') : t('outOfStock')}
             </Button>
@@ -395,7 +488,8 @@ export default function EcommerceDemoPage() {
         </div>
       </CardContent>
     </Card>
-  );
+    );
+  };
 
   const ProductModal = ({ product }: { product: Product }) => {
     return (
@@ -766,17 +860,39 @@ export default function EcommerceDemoPage() {
 
             {/* Cart Footer */}
             {cartItems.length > 0 && (
-              <div className="p-6 border-t border-secondary-200 dark:border-secondary-800">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-lg font-semibold text-secondary-900 dark:text-white">
-                    {t('cart.total')}
-                  </span>
-                  <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                    ${cartTotal.toFixed(2)}
-                  </span>
+              <div className="p-6 border-t border-secondary-200 dark:border-secondary-800 space-y-3">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-secondary-600 dark:text-secondary-400">Subtotal</span>
+                    <span className="font-medium text-secondary-900 dark:text-white">
+                      ${cartTotal.toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-secondary-600 dark:text-secondary-400">Shipping</span>
+                    <span className="font-medium text-secondary-900 dark:text-white">
+                      {shippingCost === 0 ? 'FREE' : `$${shippingCost.toFixed(2)}`}
+                    </span>
+                  </div>
+                  {cartTotal >= 100 && (
+                    <div className="flex items-center gap-2 text-xs text-green-600 dark:text-green-400">
+                      <TruckIcon className="h-4 w-4" />
+                      <span>Free shipping on orders over $100!</span>
+                    </div>
+                  )}
+                  <div className="border-t border-secondary-200 dark:border-secondary-700 pt-2 mt-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-semibold text-secondary-900 dark:text-white">
+                        Total
+                      </span>
+                      <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                        ${(cartTotal + shippingCost).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <Button className="w-full" size="lg">
-                  {t('cart.checkout')}
+                <Button onClick={startCheckout} className="w-full" size="lg">
+                  Proceed to Checkout
                 </Button>
               </div>
             )}
@@ -787,6 +903,381 @@ export default function EcommerceDemoPage() {
       {/* View Modal */}
       {showViewModal && selectedProduct && (
         <ProductModal product={selectedProduct} />
+      )}
+
+      {/* Checkout Modal */}
+      {checkoutStep && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-secondary-900 rounded-2xl max-w-4xl w-full my-8">
+            {/* Progress Steps */}
+            <div className="px-8 pt-8 pb-6">
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-2">
+                  {['shipping', 'payment', 'confirmation'].map((step, idx) => (
+                    <div key={step} className="flex items-center">
+                      <div className={`flex items-center gap-2 ${
+                        checkoutStep === step
+                          ? 'text-primary-600 dark:text-primary-400'
+                          : idx < ['shipping', 'payment', 'confirmation'].indexOf(checkoutStep)
+                          ? 'text-green-600 dark:text-green-400'
+                          : 'text-secondary-400 dark:text-secondary-600'
+                      }`}>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold border-2 ${
+                          checkoutStep === step
+                            ? 'bg-primary-600 dark:bg-primary-500 border-primary-600 text-white'
+                            : idx < ['shipping', 'payment', 'confirmation'].indexOf(checkoutStep)
+                            ? 'bg-green-600 dark:bg-green-500 border-green-600 text-white'
+                            : 'bg-white dark:bg-secondary-800 border-secondary-300 dark:border-secondary-600'
+                        }`}>
+                          {idx < ['shipping', 'payment', 'confirmation'].indexOf(checkoutStep) ? (
+                            <CheckCircleIcon className="h-6 w-6" />
+                          ) : (
+                            idx + 1
+                          )}
+                        </div>
+                        <span className="hidden sm:inline font-medium capitalize">{step}</span>
+                      </div>
+                      {idx < 2 && (
+                        <div className={`w-16 h-1 mx-2 ${
+                          idx < ['shipping', 'payment', 'confirmation'].indexOf(checkoutStep)
+                            ? 'bg-green-600'
+                            : 'bg-secondary-300 dark:bg-secondary-600'
+                        }`} />
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setCheckoutStep(null)}
+                  className="p-2 hover:bg-secondary-100 dark:hover:bg-secondary-800 rounded-lg transition-colors"
+                >
+                  <XMarkIcon className="h-6 w-6" />
+                </button>
+              </div>
+
+              {/* Shipping Information Step */}
+              {checkoutStep === 'shipping' && (
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3 mb-6">
+                    <MapPinIcon className="h-8 w-8 text-primary-600" />
+                    <div>
+                      <h2 className="text-2xl font-bold text-secondary-900 dark:text-white">Shipping Information</h2>
+                      <p className="text-sm text-secondary-600 dark:text-secondary-400">Enter your delivery details</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                        Full Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={shippingInfo.fullName}
+                        onChange={(e) => setShippingInfo({ ...shippingInfo, fullName: e.target.value })}
+                        className="w-full px-4 py-3 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="John Doe"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                        Email *
+                      </label>
+                      <input
+                        type="email"
+                        value={shippingInfo.email}
+                        onChange={(e) => setShippingInfo({ ...shippingInfo, email: e.target.value })}
+                        className="w-full px-4 py-3 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="john@example.com"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                        Phone
+                      </label>
+                      <input
+                        type="tel"
+                        value={shippingInfo.phone}
+                        onChange={(e) => setShippingInfo({ ...shippingInfo, phone: e.target.value })}
+                        className="w-full px-4 py-3 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="+1 (555) 123-4567"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                        Country *
+                      </label>
+                      <select
+                        value={shippingInfo.country}
+                        onChange={(e) => setShippingInfo({ ...shippingInfo, country: e.target.value })}
+                        className="w-full px-4 py-3 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      >
+                        <option value="USA">United States</option>
+                        <option value="Canada">Canada</option>
+                        <option value="Mexico">Mexico</option>
+                        <option value="UK">United Kingdom</option>
+                      </select>
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                        Address *
+                      </label>
+                      <input
+                        type="text"
+                        value={shippingInfo.address}
+                        onChange={(e) => setShippingInfo({ ...shippingInfo, address: e.target.value })}
+                        className="w-full px-4 py-3 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="123 Main Street, Apt 4B"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                        City *
+                      </label>
+                      <input
+                        type="text"
+                        value={shippingInfo.city}
+                        onChange={(e) => setShippingInfo({ ...shippingInfo, city: e.target.value })}
+                        className="w-full px-4 py-3 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="New York"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                        ZIP Code *
+                      </label>
+                      <input
+                        type="text"
+                        value={shippingInfo.zipCode}
+                        onChange={(e) => setShippingInfo({ ...shippingInfo, zipCode: e.target.value })}
+                        className="w-full px-4 py-3 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="10001"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 pt-4">
+                    <Button
+                      onClick={() => setCheckoutStep(null)}
+                      variant="outline"
+                      className="flex items-center gap-2"
+                    >
+                      <ArrowLeftIcon className="h-5 w-5" />
+                      Back to Cart
+                    </Button>
+                    <Button
+                      onClick={proceedToPayment}
+                      className="flex-1 flex items-center justify-center gap-2"
+                    >
+                      Continue to Payment
+                      <ArrowRightIcon className="h-5 w-5" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Payment Information Step */}
+              {checkoutStep === 'payment' && (
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3 mb-6">
+                    <CreditCardIcon className="h-8 w-8 text-primary-600" />
+                    <div>
+                      <h2 className="text-2xl font-bold text-secondary-900 dark:text-white">Payment Information</h2>
+                      <p className="text-sm text-secondary-600 dark:text-secondary-400">Enter your card details</p>
+                    </div>
+                  </div>
+
+                  {/* Order Summary */}
+                  <div className="bg-secondary-50 dark:bg-secondary-800 rounded-lg p-6 mb-6">
+                    <h3 className="font-semibold text-secondary-900 dark:text-white mb-4">Order Summary</h3>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-secondary-600 dark:text-secondary-400">Subtotal ({cartItemsCount} items)</span>
+                        <span className="font-medium text-secondary-900 dark:text-white">${cartTotal.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-secondary-600 dark:text-secondary-400">Shipping</span>
+                        <span className="font-medium text-secondary-900 dark:text-white">
+                          {shippingCost === 0 ? 'FREE' : `$${shippingCost.toFixed(2)}`}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-secondary-600 dark:text-secondary-400">Tax (8%)</span>
+                        <span className="font-medium text-secondary-900 dark:text-white">${tax.toFixed(2)}</span>
+                      </div>
+                      <div className="border-t border-secondary-200 dark:border-secondary-700 pt-2 mt-2">
+                        <div className="flex justify-between">
+                          <span className="text-lg font-bold text-secondary-900 dark:text-white">Total</span>
+                          <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
+                            ${finalTotal.toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                        Card Number *
+                      </label>
+                      <input
+                        type="text"
+                        value={paymentInfo.cardNumber}
+                        onChange={(e) => setPaymentInfo({ ...paymentInfo, cardNumber: e.target.value })}
+                        className="w-full px-4 py-3 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="1234 5678 9012 3456"
+                        maxLength={19}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                        Cardholder Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={paymentInfo.cardName}
+                        onChange={(e) => setPaymentInfo({ ...paymentInfo, cardName: e.target.value })}
+                        className="w-full px-4 py-3 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="John Doe"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                          Expiry Date *
+                        </label>
+                        <input
+                          type="text"
+                          value={paymentInfo.expiryDate}
+                          onChange={(e) => setPaymentInfo({ ...paymentInfo, expiryDate: e.target.value })}
+                          className="w-full px-4 py-3 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                          placeholder="MM/YY"
+                          maxLength={5}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                          CVV *
+                        </label>
+                        <input
+                          type="text"
+                          value={paymentInfo.cvv}
+                          onChange={(e) => setPaymentInfo({ ...paymentInfo, cvv: e.target.value })}
+                          className="w-full px-4 py-3 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                          placeholder="123"
+                          maxLength={4}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 pt-4">
+                    <Button
+                      onClick={() => setCheckoutStep('shipping')}
+                      variant="outline"
+                      className="flex items-center gap-2"
+                    >
+                      <ArrowLeftIcon className="h-5 w-5" />
+                      Back
+                    </Button>
+                    <Button
+                      onClick={completeOrder}
+                      className="flex-1 flex items-center justify-center gap-2"
+                    >
+                      Complete Order
+                      <CheckCircleIcon className="h-5 w-5" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Confirmation Step */}
+              {checkoutStep === 'confirmation' && (
+                <div className="text-center py-8">
+                  <div className="mb-6">
+                    <div className="w-20 h-20 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <CheckCircleIcon className="h-12 w-12 text-green-600 dark:text-green-400" />
+                    </div>
+                    <h2 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">
+                      Order Confirmed!
+                    </h2>
+                    <p className="text-secondary-600 dark:text-secondary-400">
+                      Thank you for your purchase
+                    </p>
+                  </div>
+
+                  <div className="bg-secondary-50 dark:bg-secondary-800 rounded-lg p-6 mb-6 text-left">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                      <div>
+                        <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">Order Number</p>
+                        <p className="text-lg font-bold text-secondary-900 dark:text-white">{orderNumber}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">Order Total</p>
+                        <p className="text-lg font-bold text-primary-600 dark:text-primary-400">
+                          ${finalTotal.toFixed(2)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">Shipping To</p>
+                        <p className="font-medium text-secondary-900 dark:text-white">{shippingInfo.fullName}</p>
+                        <p className="text-sm text-secondary-600 dark:text-secondary-400">{shippingInfo.address}</p>
+                        <p className="text-sm text-secondary-600 dark:text-secondary-400">
+                          {shippingInfo.city}, {shippingInfo.zipCode}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">Contact</p>
+                        <p className="font-medium text-secondary-900 dark:text-white">{shippingInfo.email}</p>
+                        {shippingInfo.phone && (
+                          <p className="text-sm text-secondary-600 dark:text-secondary-400">{shippingInfo.phone}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="border-t border-secondary-200 dark:border-secondary-700 pt-4">
+                      <h3 className="font-semibold text-secondary-900 dark:text-white mb-3">Order Items</h3>
+                      <div className="space-y-2">
+                        {cartItems.map((item) => (
+                          <div key={item.id} className="flex justify-between text-sm">
+                            <span className="text-secondary-700 dark:text-secondary-300">
+                              {item.name} × {item.quantity}
+                            </span>
+                            <span className="font-medium text-secondary-900 dark:text-white">
+                              ${(item.price * item.quantity).toFixed(2)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 rounded-lg py-3 px-4">
+                      <TruckIcon className="h-5 w-5" />
+                      <span className="text-sm font-medium">
+                        Estimated delivery: {new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <p className="text-sm text-secondary-600 dark:text-secondary-400">
+                      A confirmation email has been sent to {shippingInfo.email}
+                    </p>
+                  </div>
+
+                  <div className="flex gap-3 pt-6">
+                    <Button
+                      onClick={resetCheckout}
+                      className="flex-1"
+                    >
+                      Continue Shopping
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
