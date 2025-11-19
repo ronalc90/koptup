@@ -1381,21 +1381,28 @@ Total de guías implementadas: 125`
   const DiagramaFlujo = () => {
     const pasos = [
       { num: 1, titulo: 'Carga de Documentos', desc: 'Excel RIPS + PDFs soportes', icono: '📄', color: 'bg-blue-100 border-blue-500' },
-      { num: 2, titulo: 'Extracción de Datos', desc: 'IA extrae: códigos CUPS, CIE-10, valores, autorizaciones', icono: '🔍', color: 'bg-purple-100 border-purple-500' },
-      { num: 3, titulo: 'Consulta Tarifarios', desc: 'SOAT, ISS, Contratos EPS-IPS', icono: '💰', color: 'bg-green-100 border-green-500' },
-      { num: 4, titulo: 'Validación Autorizaciones', desc: 'Verifica números, vigencia, cantidades', icono: '✅', color: 'bg-yellow-100 border-yellow-500' },
-      { num: 5, titulo: 'Detección Duplicidades', desc: 'Identifica cobros duplicados', icono: '⚠️', color: 'bg-orange-100 border-orange-500' },
-      { num: 6, titulo: 'Pertinencia Médica', desc: 'Valida coherencia diagnóstico-procedimiento', icono: '🩺', color: 'bg-indigo-100 border-indigo-500' },
-      { num: 7, titulo: 'Generación de Glosas', desc: 'Crea glosas automáticas con justificación', icono: '📋', color: 'bg-red-100 border-red-500' },
-      { num: 8, titulo: 'Reporte Excel', desc: 'Excel completo: resumen, glosas, detalles', icono: '📊', color: 'bg-green-100 border-green-500' },
+      { num: 2, titulo: 'Extracción de Datos', desc: 'IA extrae: códigos CUPS, CIE-10, medicamentos, valores, autorizaciones', icono: '🔍', color: 'bg-purple-100 border-purple-500' },
+      { num: 3, titulo: 'Consulta Tarifarios CUPS', desc: 'Contrato Nueva EPS, SOAT, ISS (Nueva EPS prioritario)', icono: '💰', color: 'bg-green-100 border-green-500' },
+      { num: 4, titulo: 'Validación Medicamentos SISMED', desc: 'Compara vs precios Nueva EPS | Verifica PBS, autorizaciones CTC, cantidades', icono: '💊', color: 'bg-pink-100 border-pink-500' },
+      { num: 5, titulo: 'Validación Autorizaciones', desc: 'Verifica números, vigencia, cantidades (CUPS + medicamentos)', icono: '✅', color: 'bg-yellow-100 border-yellow-500' },
+      { num: 6, titulo: 'Detección Duplicidades', desc: 'Identifica cobros duplicados (procedimientos + medicamentos)', icono: '⚠️', color: 'bg-orange-100 border-orange-500' },
+      { num: 7, titulo: 'Pertinencia Médica', desc: 'Valida coherencia diagnóstico-procedimiento-medicamento', icono: '🩺', color: 'bg-indigo-100 border-indigo-500' },
+      { num: 8, titulo: 'Generación de Glosas', desc: 'Crea glosas: sobrecosto tarifas, sobrecosto medicamentos, pertinencia', icono: '📋', color: 'bg-red-100 border-red-500' },
+      { num: 9, titulo: 'Reporte Excel', desc: 'Excel: resumen, glosas CUPS, glosas medicamentos, detalles', icono: '📊', color: 'bg-green-100 border-green-500' },
     ];
 
     return (
       <div className="bg-white rounded-lg p-6 border-2 border-gray-300">
         <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
           <ChartBarIcon className="h-6 w-6 text-blue-600" />
-          Flujo del Proceso de Auditoría Médica
+          Flujo del Proceso de Auditoría Médica - Nueva EPS
         </h3>
+
+        <div className="mb-4 bg-green-50 border-2 border-green-300 rounded-lg p-3">
+          <p className="text-sm text-green-900 font-semibold">
+            🎯 <strong>EPS Configurada:</strong> Nueva EPS | Todos los tarifarios y precios se comparan contra el contrato Nueva EPS-IPS
+          </p>
+        </div>
 
         <div className="space-y-4">
           {pasos.map((paso, idx) => (
@@ -1425,11 +1432,23 @@ Total de guías implementadas: 125`
             Tecnología Utilizada
           </h4>
           <ul className="text-sm text-blue-800 space-y-1">
-            <li>• <strong>OCR + NLP</strong>: Extracción inteligente de datos de PDFs y Excel</li>
-            <li>• <strong>Base de Datos</strong>: CUPS (12,457), CIE-10 (14,891), Tarifarios (5)</li>
-            <li>• <strong>Motor de Reglas</strong>: 9 reglas de auditoría configurables</li>
-            <li>• <strong>IA Generativa</strong>: Justificación automática de glosas</li>
-            <li>• <strong>Tiempo Promedio</strong>: 15-20 segundos por cuenta completa</li>
+            <li>• <strong>OCR + NLP</strong>: Extracción inteligente de datos de PDFs y Excel (RIPS + medicamentos)</li>
+            <li>• <strong>Base de Datos</strong>: CUPS (12,457), CIE-10 (14,891), Medicamentos SISMED (850), Tarifarios Nueva EPS</li>
+            <li>• <strong>Motor de Reglas</strong>: 12 reglas de auditoría (CUPS + medicamentos) configurables</li>
+            <li>• <strong>IA Generativa</strong>: Justificación automática de glosas con argumentación legal</li>
+            <li>• <strong>Validación Medicamentos</strong>: Compara precio facturado vs Nueva EPS, verifica PBS, CTC</li>
+            <li>• <strong>Tiempo Promedio</strong>: 15-20 segundos por cuenta completa (con medicamentos)</li>
+          </ul>
+        </div>
+
+        <div className="mt-4 bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4">
+          <h4 className="font-bold text-yellow-900 mb-2">⚠️ Validaciones Críticas de Medicamentos</h4>
+          <ul className="text-sm text-yellow-900 space-y-1">
+            <li>• <strong>Precio</strong>: Facturado ≤ Precio Nueva EPS (generalmente 6-10% menor que SISMED)</li>
+            <li>• <strong>PBS</strong>: Medicamentos No PBS requieren autorización CTC obligatoria</li>
+            <li>• <strong>Alto Costo</strong>: Rituximab, Trastuzumab, etc. requieren CTC + justificación</li>
+            <li>• <strong>Cantidad</strong>: No puede exceder cantidad autorizada</li>
+            <li>• <strong>Prescripción</strong>: Debe ser por DCI (nombre genérico), no marca comercial</li>
           </ul>
         </div>
       </div>
