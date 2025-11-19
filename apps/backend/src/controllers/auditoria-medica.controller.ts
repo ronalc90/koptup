@@ -1,0 +1,442 @@
+import { Request, Response } from 'express';
+import Factura from '../models/Factura';
+import Atencion from '../models/Atencion';
+import Procedimiento from '../models/Procedimiento';
+import Glosa from '../models/Glosa';
+import pdfExtractorService from '../services/pdf-extractor.service';
+import glosaCalculatorService from '../services/glosa-calculator.service';
+import excelFacturaMedicaService from '../services/excel-factura-medica.service';
+
+class AuditoriaMedicaController {
+  /**
+   * Procesar archivos PDF y crear factura con auditoría completa
+   */
+  async procesarFacturasPDF(req: Request, res: Response) {
+    try {
+      const { nombreCuenta } = req.body;
+      const files = req.files as Express.Multer.File[];
+
+      if (!files || files.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'No se proporcionaron archivos',
+        });
+      }
+
+      console.log(`📂 Procesando ${files.length} archivos para cuenta: ${nombreCuenta}`);
+
+      // Separar archivos por tipo
+      const archivosFactura = files.filter(
+        (f) =>
+          f.originalname.toLowerCase().includes('factura') ||
+          f.originalname.toLowerCase().includes('detalle')
+      );
+
+      const archivosHistoriaClinica = files.filter(
+        (f) =>
+          f.originalname.toLowerCase().includes('historia') ||
+          f.originalname.toLowerCase().includes('hc')
+      );
+
+      if (archivosFactura.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'No se encontró archivo de factura',
+        });
+      }
+
+      // 1. EXTRAER DATOS DEL PDF DE FACTURA
+      console.log('📄 Paso 1: Extrayendo datos del PDF de factura...');
+      const archivoFactura = archivosFactura[0];
+      const datosFactura = await pdfExtractorService.extraerDatosFactura(archivoFactura.path);
+
+      console.log('✅ Datos extraídos de la factura:');
+      console.log(`   - Factura: ${datosFactura.nroFactura}`);
+      console.log(`   - Paciente: ${datosFactura.nombrePaciente}`);
+      console.log(`   - Procedimiento: ${datosFactura.codigoProcedimiento} - ${datosFactura.nombreProcedimiento}`);
+      console.log(`   - Valor IPS: $${datosFactura.valorIPS.toLocaleString('es-CO')}`);
+      console.log(`   - Diagnóstico: ${datosFactura.diagnosticoPrincipal}`);
+
+      // 2. EXTRAER DATOS DE HISTORIA CLÍNICA (si existe)
+      if (archivosHistoriaClinica.length > 0) {
+        console.log('📋 Paso 2: Extrayendo datos de historia clínica...');
+        const archivoHC = archivosHistoriaClinica[0];
+        const datosHC = await pdfExtractorService.extraerDatosHistoriaClinica(archivoHC.path);
+
+        // Complementar datos de la factura con la historia clínica
+        if (datosHC.diagnosticoPrincipal && !datosFactura.diagnosticoPrincipal) {
+          datosFactura.diagnosticoPrincipal = datosHC.diagnosticoPrincipal;
+        }
+        if (datosHC.autorizacion && !datosFactura.autorizacion) {
+          datosFactura.autorizacion = datosHC.autorizacion;
+        }
+      }
+
+      // 3. CALCULAR GLOSAS CON TARIFARIO NUEVA EPS
+      console.log('💰 Paso 3: Calculando glosas con tarifario Nueva EPS...');
+      const resultadoGlosas = glosaCalculatorService.calcularGlosas(datosFactura);
+
+      console.log('📊 Resultado de la auditoría:');
+      console.log(`   - Valor a pagar: $${resultadoGlosas.valorAPagar.toLocaleString('es-CO')}`);
+      console.log(`   - Glosa admitiva: $${resultadoGlosas.valorGlosaAdmitiva.toLocaleString('es-CO')}`);
+      console.log(`   - Cantidad de glosas: ${resultadoGlosas.glosas.length}`);
+      console.log(`   - Observación: ${resultadoGlosas.observacion}`);
+
+      // 4. CREAR FACTURA EN LA BASE DE DATOS
+      console.log('💾 Paso 4: Guardando en base de datos...');
+      const numeroFactura = datosFactura.nroFactura || `FAC-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+
+      const factura = new Factura({
+        numeroFactura: numeroFactura,
+        fechaEmision: this.parsearFecha(datosFactura.fechaFactura) || new Date(),
+        fechaRadicacion: this.parsearFecha(datosFactura.fechaRadicacion) || new Date(),
+        ips: {
+          nit: datosFactura.tipoDocumentoIPS || '860007336-1',
+          nombre: 'COLSUBSIDIO',
+          codigo: datosFactura.tipoDocumentoIPS?.split('-')[0] || '',
+        },
+        eps: {
+          nit: '900156264',
+          nombre: 'NUEVA EPS',
+          codigo: 'NUEVAEPS',
+        },
+        numeroContrato: 'NUEVA EPS EVENTO CLINICAS',
+        regimen: datosFactura.regimen || 'Contributivo',
+        valorBruto: datosFactura.valorBrutoFactura || datosFactura.valorIPS,
+        iva: datosFactura.valorIVA || 0,
+        valorTotal: datosFactura.valorNetoFactura || datosFactura.valorIPS,
+        estado: 'Auditada',
+        auditoriaCompletada: true,
+        fechaAuditoria: new Date(),
+        totalGlosas: resultadoGlosas.valorGlosaAdmitiva,
+        valorAceptado: resultadoGlosas.valorAPagar,
+        observaciones: resultadoGlosas.observacion,
+      });
+
+      await factura.save();
+      console.log(`✅ Factura guardada con ID: ${factura._id}`);
+
+      // 5. CREAR ATENCIÓN
+      const atencion = new Atencion({
+        facturaId: factura._id,
+        numeroAtencion: datosFactura.nroAutNvo || `AT-${Date.now()}`,
+        numeroAutorizacion: datosFactura.autorizacion || '',
+        fechaAutorizacion: this.parsearFecha(datosFactura.fechaIngreso) || new Date(),
+        paciente: {
+          tipoDocumento: datosFactura.tipoDocumentoPaciente || 'RC',
+          numeroDocumento: datosFactura.numeroDocumento || '',
+          nombres: datosFactura.nombrePaciente?.split(' ').slice(0, 2).join(' ') || '',
+          apellidos: datosFactura.nombrePaciente?.split(' ').slice(2).join(' ') || '',
+          edad: this.calcularEdad(datosFactura.fechaIngreso) || 1,
+          sexo: 'M',
+        },
+        diagnosticoPrincipal: {
+          codigoCIE10: datosFactura.diagnosticoPrincipal || '',
+          descripcion: this.obtenerDescripcionCIE10(datosFactura.diagnosticoPrincipal),
+        },
+        diagnosticosSecundarios: [],
+        fechaInicio: this.parsearFecha(datosFactura.fechaIngreso) || new Date(),
+        fechaFin: this.parsearFecha(datosFactura.fechaEgreso) || new Date(),
+        copago: datosFactura.copago || 0,
+        cuotaModeradora: datosFactura.cmo || 0,
+        procedimientos: [],
+        soportes: [],
+        tieneAutorizacion: !!datosFactura.autorizacion,
+        autorizacionValida: !!datosFactura.autorizacion,
+        pertinenciaValidada: true,
+      });
+
+      await atencion.save();
+      console.log(`✅ Atención guardada con ID: ${atencion._id}`);
+
+      // 6. CREAR PROCEDIMIENTO
+      const procedimiento = new Procedimiento({
+        atencionId: atencion._id,
+        facturaId: factura._id,
+        codigoCUPS: datosFactura.codigoProcedimiento || datosFactura.matrizLiquidacion,
+        descripcion: datosFactura.nombreProcedimiento || '',
+        tipoManual: 'CUPS',
+        cantidad: datosFactura.cant || 1,
+        valorUnitarioIPS: datosFactura.valorIPS,
+        valorTotalIPS: datosFactura.valorIPS * (datosFactura.cant || 1),
+        valorUnitarioContrato: resultadoGlosas.valorAPagar,
+        valorTotalContrato: resultadoGlosas.valorAPagar * (datosFactura.cant || 1),
+        valorAPagar: resultadoGlosas.valorAPagar,
+        diferenciaTarifa: datosFactura.valorIPS - resultadoGlosas.valorAPagar,
+        glosas: [],
+        totalGlosas: resultadoGlosas.valorGlosaAdmitiva,
+        glosaAdmitida: resultadoGlosas.valorGlosaAdmitiva > 0,
+        tarifaValidada: true,
+        pertinenciaValidada: true,
+        duplicado: false,
+      });
+
+      await procedimiento.save();
+      console.log(`✅ Procedimiento guardado con ID: ${procedimiento._id}`);
+
+      // 7. CREAR GLOSAS
+      for (const glosaData of resultadoGlosas.glosas) {
+        const glosa = new Glosa({
+          facturaId: factura._id,
+          procedimientoId: procedimiento._id,
+          tipo: glosaData.tipo,
+          codigo: glosaData.codigo,
+          descripcion: glosaData.observacion,
+          valorGlosado: glosaData.valorTotalGlosa,
+          estado: 'Generada',
+          esAutomatica: glosaData.automatica,
+          fechaGeneracion: new Date(),
+          justificacion: glosaData.observacion,
+        });
+
+        await glosa.save();
+        procedimiento.glosas.push(glosa._id);
+      }
+
+      await procedimiento.save();
+      console.log(`✅ ${resultadoGlosas.glosas.length} glosa(s) creada(s)`);
+
+      // 8. ACTUALIZAR REFERENCIAS
+      atencion.procedimientos = [procedimiento._id];
+      await atencion.save();
+
+      factura.atenciones = [atencion._id];
+      await factura.save();
+
+      // 9. GENERAR EXCEL DE AUDITORÍA
+      console.log('📊 Paso 5: Generando Excel de auditoría...');
+      const workbook = await excelFacturaMedicaService.generarExcelCompleto(
+        datosFactura,
+        resultadoGlosas.glosas,
+        resultadoGlosas.valorAPagar,
+        resultadoGlosas.valorGlosaAdmitiva
+      );
+
+      // Guardar Excel temporalmente para descarga
+      const excelBuffer = await excelFacturaMedicaService.obtenerBuffer(workbook);
+      const excelPath = `uploads/cuentas-medicas/auditoria_${factura._id}.xlsx`;
+      const fs = require('fs');
+      fs.writeFileSync(excelPath, excelBuffer);
+
+      console.log(`✅ Excel generado en: ${excelPath}`);
+
+      // RESPUESTA FINAL
+      res.status(201).json({
+        success: true,
+        message: 'Factura procesada y auditada exitosamente',
+        data: {
+          factura: {
+            _id: factura._id,
+            numeroFactura: factura.numeroFactura,
+            valorBruto: factura.valorBruto,
+            valorTotal: factura.valorTotal,
+            totalGlosas: factura.totalGlosas,
+            valorAceptado: factura.valorAceptado,
+            estado: factura.estado,
+            auditoriaCompletada: factura.auditoriaCompletada,
+          },
+          atencion: {
+            numeroAtencion: atencion.numeroAtencion,
+            paciente: atencion.paciente,
+            diagnostico: atencion.diagnosticoPrincipal,
+          },
+          procedimiento: {
+            codigoCUPS: procedimiento.codigoCUPS,
+            descripcion: procedimiento.descripcion,
+            valorIPS: procedimiento.valorUnitarioIPS,
+            valorContrato: procedimiento.valorUnitarioContrato,
+            diferencia: procedimiento.diferenciaTarifa,
+          },
+          glosas: resultadoGlosas.glosas.map((g) => ({
+            codigo: g.codigo,
+            tipo: g.tipo,
+            valor: g.valorTotalGlosa,
+            observacion: g.observacion,
+          })),
+          excel: {
+            path: excelPath,
+            filename: `auditoria_${factura._id}.xlsx`,
+          },
+          archivosProcessed: {
+            factura: archivosFactura.length,
+            historiaClinica: archivosHistoriaClinica.length,
+            total: files.length,
+          },
+        },
+      });
+    } catch (error: any) {
+      console.error('❌ Error procesando factura:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al procesar archivos',
+        error: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+      });
+    }
+  }
+
+  /**
+   * Descargar Excel de auditoría de una factura
+   */
+  async descargarExcelAuditoria(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+
+      // Buscar factura
+      const factura = await Factura.findById(id);
+      if (!factura) {
+        return res.status(404).json({
+          success: false,
+          message: 'Factura no encontrada',
+        });
+      }
+
+      // Buscar atención y procedimientos
+      const atencion = await Atencion.findOne({ facturaId: id }).populate('procedimientos');
+      const procedimientos = await Procedimiento.find({ facturaId: id }).populate('glosas');
+      const glosas = await Glosa.find({ facturaId: id });
+
+      if (!atencion || procedimientos.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Datos de factura incompletos',
+        });
+      }
+
+      // Reconstruir DatosFacturaPDF para generar Excel
+      const datosFactura: any = {
+        nroFactura: factura.numeroFactura,
+        fechaFactura: factura.fechaEmision?.toLocaleDateString('es-CO') || '',
+        fechaRadicacion: factura.fechaRadicacion?.toLocaleDateString('es-CO') || '',
+        valorBrutoFactura: factura.valorBruto,
+        valorIVA: factura.iva,
+        valorNetoFactura: factura.valorTotal,
+        tipoDocumentoIPS: factura.ips.nit,
+        nombrePaciente: `${atencion.paciente.nombres} ${atencion.paciente.apellidos}`,
+        numeroDocumento: atencion.paciente.numeroDocumento,
+        tipoDocumentoPaciente: atencion.paciente.tipoDocumento,
+        diagnosticoPrincipal: atencion.diagnosticoPrincipal.codigoCIE10,
+        codigoProcedimiento: procedimientos[0].codigoCUPS,
+        nombreProcedimiento: procedimientos[0].descripcion,
+        valorIPS: procedimientos[0].valorUnitarioIPS,
+        cant: procedimientos[0].cantidad,
+        regimen: factura.regimen,
+        autorizacion: atencion.numeroAutorizacion,
+        fechaIngreso: atencion.fechaInicio?.toLocaleDateString('es-CO') || '',
+        fechaEgreso: atencion.fechaFin?.toLocaleDateString('es-CO') || '',
+        cmo: atencion.cuotaModeradora,
+        copago: atencion.copago,
+        vlrBrutoFact: factura.valorBruto,
+        vlrNetoFact: factura.valorTotal,
+        netoDigitado: factura.valorTotal,
+        dif: 0,
+        docValorIPS: factura.valorBruto,
+        dacto: 0,
+        totales: factura.valorTotal,
+      };
+
+      // Convertir glosas
+      const glosasFormateadas = glosas.map((g: any) => ({
+        codigo: g.codigo,
+        tipo: g.tipo,
+        codigoProcedimiento: procedimientos[0].codigoCUPS,
+        descripcionProcedimiento: procedimientos[0].descripcion,
+        valorIPS: procedimientos[0].valorUnitarioIPS,
+        valorContrato: procedimientos[0].valorUnitarioContrato,
+        diferencia: g.valorGlosado,
+        cantidad: procedimientos[0].cantidad,
+        valorTotalGlosa: g.valorGlosado,
+        observacion: g.descripcion,
+        automatica: g.esAutomatica,
+      }));
+
+      // Generar Excel
+      const workbook = await excelFacturaMedicaService.generarExcelCompleto(
+        datosFactura,
+        glosasFormateadas,
+        factura.valorAceptado,
+        factura.totalGlosas
+      );
+
+      const buffer = await excelFacturaMedicaService.obtenerBuffer(workbook);
+
+      // Enviar archivo
+      res.setHeader(
+        'Content-Type',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      );
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename=Auditoria_NuevaEPS_${factura.numeroFactura}_${Date.now()}.xlsx`
+      );
+
+      res.send(buffer);
+    } catch (error: any) {
+      console.error('Error generando Excel:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al generar Excel',
+        error: error.message,
+      });
+    }
+  }
+
+  /**
+   * Parsear fecha en formato DD/MM/YYYY o similar a Date
+   */
+  private parsearFecha(fechaStr: string): Date | null {
+    if (!fechaStr) return null;
+
+    try {
+      const partes = fechaStr.split(/[\/\-\.]/);
+      if (partes.length === 3) {
+        // Asumir DD/MM/YYYY
+        const dia = parseInt(partes[0]);
+        const mes = parseInt(partes[1]) - 1; // Meses en JS son 0-11
+        const anio = parseInt(partes[2]);
+
+        return new Date(anio, mes, dia);
+      }
+    } catch (error) {
+      console.warn(`No se pudo parsear fecha: ${fechaStr}`);
+    }
+
+    return null;
+  }
+
+  /**
+   * Calcular edad aproximada desde una fecha
+   */
+  private calcularEdad(fechaStr: string): number {
+    const fecha = this.parsearFecha(fechaStr);
+    if (!fecha) return 0;
+
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - fecha.getFullYear();
+    const mesActual = hoy.getMonth();
+    const mesNacimiento = fecha.getMonth();
+
+    if (mesActual < mesNacimiento || (mesActual === mesNacimiento && hoy.getDate() < fecha.getDate())) {
+      edad--;
+    }
+
+    return edad;
+  }
+
+  /**
+   * Obtener descripción de un código CIE-10 (simplificado)
+   */
+  private obtenerDescripcionCIE10(codigo: string): string {
+    const descripciones: Record<string, string> = {
+      Q659: 'DEFORMIDAD CONGENITA DE LA CADERA, NO ESPECIFICADA',
+      J00: 'Rinofaringitis aguda [resfriado común]',
+      J18: 'Neumonía, organismo no especificado',
+      J189: 'Neumonía no especificada',
+      // Agregar más según necesidad
+    };
+
+    return descripciones[codigo] || `Diagnóstico ${codigo}`;
+  }
+}
+
+export default new AuditoriaMedicaController();
