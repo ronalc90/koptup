@@ -258,4 +258,67 @@ router.patch('/glosas/:id', auditoriaController.actualizarGlosa);
  */
 router.get('/estadisticas', auditoriaController.obtenerEstadisticas);
 
+/**
+ * @swagger
+ * /api/auditoria/facturas/{id}/auditar-paso-a-paso:
+ *   post:
+ *     tags: [Auditoría]
+ *     summary: Iniciar auditoría paso a paso con control manual
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la factura
+ *     responses:
+ *       200:
+ *         description: Sesión de auditoría iniciada
+ *       404:
+ *         description: Factura no encontrada
+ */
+router.post('/facturas/:id/auditar-paso-a-paso', auditoriaController.iniciarAuditoriaPasoPaso);
+
+/**
+ * @swagger
+ * /api/auditoria/sesion/{sesionId}/siguiente:
+ *   post:
+ *     tags: [Auditoría]
+ *     summary: Avanzar al siguiente paso en la auditoría
+ *     parameters:
+ *       - in: path
+ *         name: sesionId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la sesión de auditoría
+ *     responses:
+ *       200:
+ *         description: Paso ejecutado exitosamente
+ *       404:
+ *         description: Sesión no encontrada
+ */
+router.post('/sesion/:sesionId/siguiente', auditoriaController.avanzarPasoAuditoria);
+
+/**
+ * @swagger
+ * /api/auditoria/sesion/{sesionId}:
+ *   get:
+ *     tags: [Auditoría]
+ *     summary: Obtener estado actual de la sesión de auditoría
+ *     parameters:
+ *       - in: path
+ *         name: sesionId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la sesión de auditoría
+ *     responses:
+ *       200:
+ *         description: Estado de la sesión
+ *       404:
+ *         description: Sesión no encontrada
+ */
+router.get('/sesion/:sesionId', auditoriaController.obtenerSesionAuditoria);
+
 export default router;
