@@ -36,6 +36,7 @@ export default function CuentasMedicasPage() {
   const [mostrarProceso, setMostrarProceso] = useState(false);
   const [procesoEnEjecucion, setProcesoEnEjecucion] = useState(false);
   const [verProcesoAlCrear, setVerProcesoAlCrear] = useState(false);
+  const [facturaIdProceso, setFacturaIdProceso] = useState<string | null>(null); // Para rastrear factura en proceso
   const [estadisticas, setEstadisticas] = useState<Estadisticas | null>(null);
   const [facturas, setFacturas] = useState<Factura[]>([]);
   const [facturaSeleccionada, setFacturaSeleccionada] = useState<any | null>(null);
@@ -116,16 +117,17 @@ export default function CuentasMedicasPage() {
     try {
       setLoading(true);
 
-      // Si se solicita ver el proceso, mostrar la visualización
+      // Si se solicita ver el proceso, mostrar la visualización paso a paso
       if (verProceso) {
         setMostrarProceso(true);
         setProcesoEnEjecucion(true);
+        setFacturaIdProceso(facturaId); // Guardar factura para el proceso
         setVista('proceso');
-
-        // Esperar a que termine la visualización (simulado)
-        await new Promise(resolve => setTimeout(resolve, 13000)); // 6 pasos x 2s + buffer
+        setLoading(false);
+        return; // No ejecutar automáticamente, dejar que el usuario controle
       }
 
+      // Ejecución rápida sin visualización
       const response = await auditoriaAPI.ejecutarAuditoria(facturaId);
 
       // Mostrar notificación de éxito con información detallada
@@ -141,10 +143,6 @@ export default function CuentasMedicasPage() {
       toast.error('Error al ejecutar auditoría: ' + error.message);
     } finally {
       setLoading(false);
-      setProcesoEnEjecucion(false);
-      if (mostrarProceso) {
-        setTimeout(() => setVista('detalle'), 2000);
-      }
     }
   };
 
@@ -1331,13 +1329,35 @@ export default function CuentasMedicasPage() {
           </div>
 
           <ProcesoAuditoriaVisual
+            facturaId={facturaIdProceso || undefined}
             enEjecucion={procesoEnEjecucion}
-            onFinalizar={(resultado) => {
+            usarBackend={!!facturaIdProceso} // Usar backend solo si hay facturaId
+            onFinalizar={async (resultado) => {
               setProcesoEnEjecucion(false);
-              toast.success(
-                `¡Proceso completado!\n\nAhora puedes crear una factura y ejecutar una auditoría real.`,
-                { duration: 5000, style: { whiteSpace: 'pre-line' } }
-              );
+
+              if (facturaIdProceso) {
+                // Proceso real completado
+                toast.success(
+                  `¡Auditoría completada!\n\nTotal glosas: $${resultado.totalGlosas.toLocaleString('es-CO')}\nValor aceptado: $${resultado.valorAceptado.toLocaleString('es-CO')}`,
+                  { duration: 6000, style: { whiteSpace: 'pre-line' } }
+                );
+
+                // Recargar datos
+                await verDetalleFactura(facturaIdProceso);
+                await cargarEstadisticas();
+
+                // Volver a la vista de detalle
+                setTimeout(() => {
+                  setVista('detalle');
+                  setFacturaIdProceso(null);
+                }, 2000);
+              } else {
+                // Demo completado
+                toast.success(
+                  `¡Proceso completado!\n\nAhora puedes crear una factura y ejecutar una auditoría real.`,
+                  { duration: 5000, style: { whiteSpace: 'pre-line' } }
+                );
+              }
             }}
           />
         </div>
