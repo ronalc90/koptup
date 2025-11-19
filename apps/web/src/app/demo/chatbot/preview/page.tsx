@@ -9,7 +9,8 @@ import {
   DocumentTextIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  Cog6ToothIcon
+  Cog6ToothIcon,
+  TrashIcon
 } from '@heroicons/react/24/outline';
 import {
   FaRegCommentDots,
@@ -35,9 +36,19 @@ export default function ChatbotPreviewPage() {
   const [inputMessage, setInputMessage] = useState('');
   const [showSidebar, setShowSidebar] = useState(true);
   const [previewDocuments, setPreviewDocuments] = useState<string[]>([]);
+  const [config, setConfig] = useState<Partial<ChatbotConfig>>({
+    title: 'Asistente Virtual',
+    greeting: '¡Hola! 👋 Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?',
+    placeholder: 'Escribe tu mensaje aquí...',
+    textColor: '#1F2937',
+    headerColor: '#4F46E5',
+    backgroundColor: '#FFFFFF',
+    icon: 'FaComments',
+    fontFamily: 'Inter',
+  });
 
-  // Get config from sessionStorage or URL params (for embed) or use defaults
-  const getConfig = (): Partial<ChatbotConfig> => {
+  // Load config from sessionStorage or URL params on mount
+  useEffect(() => {
     // Try to get from sessionStorage first
     if (typeof window !== 'undefined') {
       const storedConfig = sessionStorage.getItem('chatbot_preview_config');
@@ -46,7 +57,7 @@ export default function ChatbotPreviewPage() {
           const data = JSON.parse(storedConfig);
           // Set documents from stored config
           setPreviewDocuments(data.uploadedDocuments || []);
-          return {
+          setConfig({
             title: data.chatConfig?.title || 'Asistente Virtual',
             greeting: data.chatConfig?.greeting || '¡Hola! 👋 Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?',
             placeholder: data.chatConfig?.placeholder || 'Escribe tu mensaje aquí...',
@@ -57,7 +68,8 @@ export default function ChatbotPreviewPage() {
             fontFamily: data.typographyConfig?.fontFamily || 'Inter',
             customIconUrl: data.designConfig?.customIconUrl,
             restrictedTopics: data.restrictionsConfig?.restrictedTopics || [],
-          };
+          });
+          return;
         } catch (e) {
           console.error('Error parsing stored config:', e);
         }
@@ -65,7 +77,7 @@ export default function ChatbotPreviewPage() {
     }
 
     // Fallback to URL params (for embed usage)
-    return {
+    setConfig({
       title: searchParams.get('title') || 'Asistente Virtual',
       greeting: searchParams.get('greeting') || '¡Hola! 👋 Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?',
       placeholder: searchParams.get('placeholder') || 'Escribe tu mensaje aquí...',
@@ -75,10 +87,8 @@ export default function ChatbotPreviewPage() {
       icon: searchParams.get('icon') || 'FaComments',
       fontFamily: searchParams.get('fontFamily') || 'Inter',
       customIconUrl: searchParams.get('customIconUrl') || undefined,
-    };
-  };
-
-  const config = getConfig();
+    });
+  }, [searchParams]);
 
   const {
     messages,
@@ -86,6 +96,7 @@ export default function ChatbotPreviewPage() {
     error,
     uploadedDocuments,
     sendMessage,
+    clearMessages,
   } = useChatbot(config);
 
   // Scroll to bottom only when user sends a message (manual scroll)
@@ -217,6 +228,19 @@ export default function ChatbotPreviewPage() {
                     )}
                   </div>
                 </div>
+
+                {/* Clear Chat Button */}
+                {messages.length > 0 && (
+                  <div className="pt-4 border-t border-gray-200">
+                    <button
+                      onClick={() => clearMessages()}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 border border-red-200 hover:border-red-300 rounded-lg transition-colors"
+                    >
+                      <TrashIcon className="h-4 w-4" />
+                      <span className="text-sm font-medium">Limpiar Conversación</span>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}
