@@ -263,14 +263,15 @@ export default function CuentasMedicasPage() {
                     onChange={(e) => handleFileSelect(e.target.files)}
                     className="hidden"
                   />
-                  <label htmlFor="file-upload">
+                  <label htmlFor="file-upload" className="cursor-pointer">
                     <Button
-                      as="span"
+                      asChild
                       variant="outline"
-                      className="cursor-pointer"
                     >
-                      <PlusIcon className="h-4 w-4 mr-2" />
-                      Seleccionar Archivos
+                      <span>
+                        <PlusIcon className="h-4 w-4 mr-2" />
+                        Seleccionar Archivos
+                      </span>
                     </Button>
                   </label>
                 </div>
