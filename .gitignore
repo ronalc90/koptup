@@ -53,3 +53,4 @@ temp/
 # Windows reserved names
 nul
 **/nul
+test-pdfs/
