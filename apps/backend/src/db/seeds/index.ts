@@ -3,6 +3,7 @@ import { seedCUPS } from './cups.seed';
 import { seedCIE10 } from './cie10.seed';
 import { seedTarifarios } from './tarifarios.seed';
 import { seedReglasAuditoria } from './reglas-auditoria.seed';
+import { seedProjects } from './projects.seed';
 import { seedConvenios } from './convenios.seed';
 import { seedCuotasModeradoras } from './cuotas-moderadoras.seed';
 import { seedEPS } from './eps.seed';
@@ -27,6 +28,7 @@ export async function runAllSeeds() {
     console.log('─────────────────────────────────────');
     await seedTarifarios();
     await seedReglasAuditoria();
+    await seedProjects();
 
     // Entidades (EPS e IPS)
     console.log('\n🏥 FASE 3: Entidades (EPS e IPS)');
@@ -53,6 +55,7 @@ export async function runAllSeeds() {
     console.log('   - CIE-10: 24 diagnósticos');
     console.log('   - Tarifarios: 5 tarifarios');
     console.log('   - Reglas de Auditoría: 9 reglas');
+    console.log('   - Proyectos: 5 proyectos de ejemplo');
     console.log('   - EPS: 6 entidades');
     console.log('   - IPS: 3 instituciones');
     console.log('   - Convenios: 6 convenios');
