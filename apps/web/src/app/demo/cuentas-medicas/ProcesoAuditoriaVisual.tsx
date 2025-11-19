@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
+import { auditoriaAPI } from './api';
+import toast from 'react-hot-toast';
 import {
   CheckCircleIcon,
   ArrowRightIcon,
@@ -238,6 +240,7 @@ interface ProcesoAuditoriaVisualProps {
   enEjecucion?: boolean;
   onFinalizar?: (resultado: any) => void;
   documentos?: DocumentoSubido[];
+  usarBackend?: boolean; // Nueva prop para controlar si usa backend real o datos estáticos
 }
 
 export default function ProcesoAuditoriaVisual({
@@ -245,9 +248,14 @@ export default function ProcesoAuditoriaVisual({
   enEjecucion = false,
   onFinalizar,
   documentos = [],
+  usarBackend = false, // Por defecto usa datos estáticos para compatibilidad
 }: ProcesoAuditoriaVisualProps) {
   const [pasoActual, setPasoActual] = useState(0);
   const [resultadosAuditoria, setResultadosAuditoria] = useState<any>(null);
+  const [sesionId, setSesionId] = useState<string | null>(null);
+  const [pasosBackend, setPasosBackend] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [documentosProcesados, setDocumentosProcesados] = useState<DocumentoSubido[]>(
     documentos.length > 0
       ? documentos
@@ -258,7 +266,8 @@ export default function ProcesoAuditoriaVisual({
         ]
   );
 
-  const pasos: PasoProcesoProps[] = [
+  // Definir pasos estáticos (estructura base)
+  const pasosEstaticos: PasoProcesoProps[] = [
     {
       numero: 1,
       titulo: 'Carga y Validación de Datos',
@@ -559,35 +568,143 @@ export default function ProcesoAuditoriaVisual({
     },
   ];
 
-  const avanzarPaso = () => {
-    if (pasoActual < pasos.length) {
-      // Marcar documento como procesando en el paso 0
-      if (pasoActual === 0) {
-        setDocumentosProcesados((prev) =>
-          prev.map((doc) => ({ ...doc, estado: 'procesando' as const }))
-        );
+  // Iconos para cada paso
+  const iconosPorPaso: { [key: number]: React.ReactNode } = {
+    1: <DocumentTextIcon className="h-6 w-6 text-blue-600" />,
+    2: <CalculatorIcon className="h-6 w-6 text-purple-600" />,
+    3: <ShieldCheckIcon className="h-6 w-6 text-green-600" />,
+    4: <ExclamationTriangleIcon className="h-6 w-6 text-orange-600" />,
+    5: <CpuChipIcon className="h-6 w-6 text-indigo-600" />,
+    6: <ChartBarIcon className="h-6 w-6 text-red-600" />,
+  };
+
+  // Fusionar pasos del backend con la estructura estática
+  const pasos: PasoProcesoProps[] = usarBackend && pasosBackend.length > 0
+    ? pasosBackend.map((pasoBackend: any, idx: number) => {
+        // Usar el paso estático como base
+        const pasoEstatico = pasosEstaticos[idx] || {};
+
+        // Fusionar con datos del backend
+        return {
+          ...pasoEstatico,
+          numero: pasoBackend.numero,
+          titulo: pasoBackend.titulo || pasoEstatico.titulo,
+          descripcion: pasoBackend.descripcion || pasoEstatico.descripcion,
+          estado: pasoBackend.estado,
+          icono: iconosPorPaso[pasoBackend.numero] || pasoEstatico.icono,
+          datosUsados: pasoBackend.datosUsados || pasoEstatico.datosUsados,
+          datosExtraidos: pasoBackend.datosExtraidos,
+          procesoDetallado: pasoBackend.procesoDetallado,
+          resultados: pasoBackend.resultados,
+          duracion: pasoBackend.duracion ? `${(pasoBackend.duracion / 1000).toFixed(1)}s` : undefined,
+        };
+      })
+    : pasosEstaticos;
+
+  // Iniciar sesión cuando se monta el componente con backend
+  useEffect(() => {
+    const iniciarSesion = async () => {
+      if (usarBackend && facturaId && enEjecucion && !sesionId) {
+        try {
+          setLoading(true);
+          const response = await auditoriaAPI.iniciarAuditoriaPasoPaso(facturaId);
+          setSesionId(response.data._id);
+          setError(null);
+        } catch (err: any) {
+          console.error('Error iniciando sesión:', err);
+          setError(err.message);
+          toast.error('Error al iniciar auditoría paso a paso');
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    iniciarSesion();
+  }, [usarBackend, facturaId, enEjecucion, sesionId]);
+
+  const avanzarPaso = async () => {
+    if (usarBackend && sesionId) {
+      // Modo con backend real
+      try {
+        setLoading(true);
+
+        // Marcar documentos como procesando en el primer paso
+        if (pasoActual === 0) {
+          setDocumentosProcesados((prev) =>
+            prev.map((doc) => ({ ...doc, estado: 'procesando' as const }))
+          );
+        }
+
+        // Llamar al backend para avanzar el paso
+        const response = await auditoriaAPI.avanzarPaso(sesionId);
+        const sesionData = response.data;
+
+        // Actualizar el paso actual basado en la respuesta del servidor
+        setPasoActual(sesionData.pasoActual);
+
+        // Actualizar los pasos del backend para mostrar datos reales
+        setPasosBackend(sesionData.pasos || []);
+
+        // Marcar documentos como procesados después del primer paso
+        if (sesionData.pasoActual >= 1) {
+          setDocumentosProcesados((prev) =>
+            prev.map((doc) => ({ ...doc, estado: 'procesado' as const }))
+          );
+        }
+
+        // Si la auditoría está completada, guardar resultado final
+        if (sesionData.estado === 'completada' && sesionData.resultadoFinal) {
+          const resultado = {
+            totalGlosas: sesionData.resultadoFinal.totalGlosas,
+            valorAceptado: sesionData.resultadoFinal.valorAceptado,
+            glosas: sesionData.resultadoFinal.cantidadGlosas,
+          };
+          setResultadosAuditoria(resultado);
+          if (onFinalizar) {
+            onFinalizar(resultado);
+          }
+        }
+
+        setError(null);
+      } catch (err: any) {
+        console.error('Error avanzando paso:', err);
+        setError(err.message);
+        toast.error('Error al avanzar paso');
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      // Modo estático original (para demos)
+      if (pasoActual < pasos.length) {
+        // Marcar documento como procesando en el paso 0
+        if (pasoActual === 0) {
+          setDocumentosProcesados((prev) =>
+            prev.map((doc) => ({ ...doc, estado: 'procesando' as const }))
+          );
+        }
+
+        // Marcar documentos como procesados después del paso 0
+        if (pasoActual === 1) {
+          setDocumentosProcesados((prev) =>
+            prev.map((doc) => ({ ...doc, estado: 'procesado' as const }))
+          );
+        }
+
+        setPasoActual((prev) => prev + 1);
       }
 
-      // Marcar documentos como procesados después del paso 0
-      if (pasoActual === 1) {
-        setDocumentosProcesados((prev) =>
-          prev.map((doc) => ({ ...doc, estado: 'procesado' as const }))
-        );
-      }
-
-      setPasoActual((prev) => prev + 1);
-    }
-
-    if (pasoActual === pasos.length - 1) {
-      // Auditoría completada
-      const resultado = {
-        totalGlosas: 15750000,
-        valorAceptado: 84250000,
-        glosas: 18,
-      };
-      setResultadosAuditoria(resultado);
-      if (onFinalizar) {
-        onFinalizar(resultado);
+      if (pasoActual === pasos.length - 1) {
+        // Auditoría completada
+        const resultado = {
+          totalGlosas: 15750000,
+          valorAceptado: 84250000,
+          glosas: 18,
+        };
+        setResultadosAuditoria(resultado);
+        if (onFinalizar) {
+          onFinalizar(resultado);
+        }
       }
     }
   };

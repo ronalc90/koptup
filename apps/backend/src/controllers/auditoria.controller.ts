@@ -6,6 +6,7 @@ import Glosa from '../models/Glosa';
 import SoporteDocumental from '../models/SoporteDocumental';
 import Tarifario from '../models/Tarifario';
 import auditoriaService from '../services/auditoria.service';
+import auditoriaPasoPasoService from '../services/auditoria-paso-a-paso.service';
 import excelService from '../services/excel-auditoria.service';
 import cupsLookupService from '../services/cups-lookup.service';
 import multer from 'multer';
@@ -549,6 +550,82 @@ class AuditoriaController {
       res.status(500).json({
         success: false,
         message: 'Error al procesar archivos',
+        error: error.message,
+      });
+    }
+  }
+
+  /**
+   * Iniciar auditoría paso a paso
+   */
+  async iniciarAuditoriaPasoPaso(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+
+      const factura = await Factura.findById(id);
+      if (!factura) {
+        return res.status(404).json({
+          success: false,
+          message: 'Factura no encontrada',
+        });
+      }
+
+      const sesion = await auditoriaPasoPasoService.iniciarSesion(id);
+
+      res.json({
+        success: true,
+        message: 'Sesión de auditoría paso a paso iniciada',
+        data: sesion,
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: 'Error al iniciar sesión de auditoría',
+        error: error.message,
+      });
+    }
+  }
+
+  /**
+   * Avanzar al siguiente paso en la auditoría
+   */
+  async avanzarPasoAuditoria(req: Request, res: Response) {
+    try {
+      const { sesionId } = req.params;
+
+      const sesion = await auditoriaPasoPasoService.avanzarPaso(sesionId);
+
+      res.json({
+        success: true,
+        message: 'Paso ejecutado exitosamente',
+        data: sesion,
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: 'Error al avanzar paso',
+        error: error.message,
+      });
+    }
+  }
+
+  /**
+   * Obtener estado de la sesión de auditoría
+   */
+  async obtenerSesionAuditoria(req: Request, res: Response) {
+    try {
+      const { sesionId } = req.params;
+
+      const sesion = await auditoriaPasoPasoService.obtenerSesion(sesionId);
+
+      res.json({
+        success: true,
+        data: sesion,
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: 'Error al obtener sesión',
         error: error.message,
       });
     }
