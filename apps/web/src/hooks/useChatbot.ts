@@ -7,6 +7,7 @@ export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  source?: string; // PDF or document source
 }
 
 export interface ChatbotConfig {
@@ -17,6 +18,9 @@ export interface ChatbotConfig {
   headerColor: string;
   backgroundColor: string;
   icon: string;
+  fontFamily?: string;
+  customIconUrl?: string;
+  restrictedTopics?: string[];
 }
 
 export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
@@ -32,6 +36,9 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
     headerColor: initialConfig?.headerColor || '#4F46E5',
     backgroundColor: initialConfig?.backgroundColor || '#FFFFFF',
     icon: initialConfig?.icon || 'FaComments',
+    fontFamily: initialConfig?.fontFamily || 'Inter',
+    customIconUrl: initialConfig?.customIconUrl,
+    restrictedTopics: initialConfig?.restrictedTopics || [],
   });
 
   // Generar o recuperar sessionId
@@ -138,6 +145,7 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
         role: 'assistant',
         content: data.data.message,
         timestamp: new Date(),
+        source: data.data.source, // Include source from backend
       };
       setMessages(prev => [...prev, assistantMessage]);
     } catch (err: any) {
