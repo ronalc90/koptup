@@ -21,7 +21,6 @@ import {
   ExclamationTriangleIcon,
   LightBulbIcon,
 } from '@heroicons/react/24/outline';
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function DashboardEjecutivo() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -73,12 +72,12 @@ export default function DashboardEjecutivo() {
 
   // Datos para gráfico de líneas (Ingresos)
   const revenueData = [
-    { month: 'Ene', ingresos: 850000, gastos: 620000 },
-    { month: 'Feb', ingresos: 920000, gastos: 680000 },
-    { month: 'Mar', ingresos: 1050000, gastos: 720000 },
-    { month: 'Abr', ingresos: 980000, gastos: 700000 },
-    { month: 'May', ingresos: 1120000, gastos: 750000 },
-    { month: 'Jun', ingresos: 1245890, gastos: 840000 },
+    { month: 'Ene', ingresos: 85, gastos: 62 },
+    { month: 'Feb', ingresos: 92, gastos: 68 },
+    { month: 'Mar', ingresos: 105, gastos: 72 },
+    { month: 'Abr', ingresos: 98, gastos: 70 },
+    { month: 'May', ingresos: 112, gastos: 75 },
+    { month: 'Jun', ingresos: 125, gastos: 84 },
   ];
 
   // Datos para gráfico de barras (Desempeño por área)
@@ -278,38 +277,84 @@ export default function DashboardEjecutivo() {
               <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
                 Ingresos por Mes
               </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={revenueData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                  <XAxis dataKey="month" stroke="#64748b" />
-                  <YAxis stroke="#64748b" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#1e293b',
-                      border: 'none',
-                      borderRadius: '8px',
-                      color: '#fff',
-                    }}
-                  />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="ingresos"
+              <div className="h-80">
+                <svg viewBox="0 0 600 300" className="w-full h-full">
+                  {/* Grid lines */}
+                  {[0, 1, 2, 3, 4].map((i) => (
+                    <line
+                      key={i}
+                      x1="50"
+                      y1={50 + i * 50}
+                      x2="550"
+                      y2={50 + i * 50}
+                      stroke="#e2e8f0"
+                      strokeDasharray="3,3"
+                    />
+                  ))}
+
+                  {/* Y-axis labels */}
+                  {[125, 100, 75, 50, 25, 0].map((val, i) => (
+                    <text key={i} x="30" y={55 + i * 50} fill="#64748b" fontSize="12">
+                      {val}k
+                    </text>
+                  ))}
+
+                  {/* X-axis labels */}
+                  {revenueData.map((data, i) => (
+                    <text key={i} x={85 + i * 80} y="280" fill="#64748b" fontSize="12">
+                      {data.month}
+                    </text>
+                  ))}
+
+                  {/* Ingresos line */}
+                  <polyline
+                    points={revenueData
+                      .map((d, i) => `${100 + i * 80},${250 - d.ingresos * 1.6}`)
+                      .join(' ')}
+                    fill="none"
                     stroke="#8b5cf6"
-                    strokeWidth={3}
-                    name="Ingresos"
-                    dot={{ fill: '#8b5cf6', r: 5 }}
+                    strokeWidth="3"
                   />
-                  <Line
-                    type="monotone"
-                    dataKey="gastos"
+                  {revenueData.map((d, i) => (
+                    <circle
+                      key={i}
+                      cx={100 + i * 80}
+                      cy={250 - d.ingresos * 1.6}
+                      r="5"
+                      fill="#8b5cf6"
+                    />
+                  ))}
+
+                  {/* Gastos line */}
+                  <polyline
+                    points={revenueData
+                      .map((d, i) => `${100 + i * 80},${250 - d.gastos * 1.6}`)
+                      .join(' ')}
+                    fill="none"
                     stroke="#f59e0b"
-                    strokeWidth={3}
-                    name="Gastos"
-                    dot={{ fill: '#f59e0b', r: 5 }}
+                    strokeWidth="3"
                   />
-                </LineChart>
-              </ResponsiveContainer>
+                  {revenueData.map((d, i) => (
+                    <circle
+                      key={i}
+                      cx={100 + i * 80}
+                      cy={250 - d.gastos * 1.6}
+                      r="5"
+                      fill="#f59e0b"
+                    />
+                  ))}
+
+                  {/* Legend */}
+                  <circle cx="200" cy="20" r="5" fill="#8b5cf6" />
+                  <text x="210" y="25" fill="#64748b" fontSize="12">
+                    Ingresos
+                  </text>
+                  <circle cx="300" cy="20" r="5" fill="#f59e0b" />
+                  <text x="310" y="25" fill="#64748b" fontSize="12">
+                    Gastos
+                  </text>
+                </svg>
+              </div>
             </div>
 
             {/* Performance Bar Chart */}
@@ -317,22 +362,46 @@ export default function DashboardEjecutivo() {
               <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
                 Desempeño por Área
               </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={performanceData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                  <XAxis dataKey="area" stroke="#64748b" />
-                  <YAxis stroke="#64748b" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#1e293b',
-                      border: 'none',
-                      borderRadius: '8px',
-                      color: '#fff',
-                    }}
-                  />
-                  <Bar dataKey="desempeño" fill="#3b82f6" radius={[8, 8, 0, 0]} name="Desempeño %" />
-                </BarChart>
-              </ResponsiveContainer>
+              <div className="h-80">
+                <svg viewBox="0 0 600 300" className="w-full h-full">
+                  {/* Grid lines */}
+                  {[0, 1, 2, 3, 4].map((i) => (
+                    <line
+                      key={i}
+                      x1="50"
+                      y1={50 + i * 50}
+                      x2="550"
+                      y2={50 + i * 50}
+                      stroke="#e2e8f0"
+                      strokeDasharray="3,3"
+                    />
+                  ))}
+
+                  {/* Y-axis labels */}
+                  {[100, 80, 60, 40, 20, 0].map((val, i) => (
+                    <text key={i} x="20" y={55 + i * 50} fill="#64748b" fontSize="12">
+                      {val}
+                    </text>
+                  ))}
+
+                  {/* Bars */}
+                  {performanceData.map((data, i) => (
+                    <g key={i}>
+                      <rect
+                        x={80 + i * 90}
+                        y={250 - data.desempeño * 2}
+                        width="60"
+                        height={data.desempeño * 2}
+                        fill="#3b82f6"
+                        rx="8"
+                      />
+                      <text x={85 + i * 90} y="280" fill="#64748b" fontSize="11">
+                        {data.area}
+                      </text>
+                    </g>
+                  ))}
+                </svg>
+              </div>
             </div>
           </div>
 
@@ -343,27 +412,58 @@ export default function DashboardEjecutivo() {
               <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
                 Distribución de Ventas por Categoría
               </h3>
-              <div className="flex items-center justify-center">
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={salesDistribution}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={100}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {salesDistribution.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
+              <div className="flex items-center justify-center mb-6">
+                <svg viewBox="0 0 200 200" className="w-64 h-64">
+                  {/* Donut segments */}
+                  <circle
+                    cx="100"
+                    cy="100"
+                    r="80"
+                    fill="none"
+                    stroke="#8b5cf6"
+                    strokeWidth="40"
+                    strokeDasharray="175.93 351.86"
+                    strokeDashoffset="0"
+                    transform="rotate(-90 100 100)"
+                  />
+                  <circle
+                    cx="100"
+                    cy="100"
+                    r="80"
+                    fill="none"
+                    stroke="#3b82f6"
+                    strokeWidth="40"
+                    strokeDasharray="146.61 351.86"
+                    strokeDashoffset="-175.93"
+                    transform="rotate(-90 100 100)"
+                  />
+                  <circle
+                    cx="100"
+                    cy="100"
+                    r="80"
+                    fill="none"
+                    stroke="#10b981"
+                    strokeWidth="40"
+                    strokeDasharray="115.19 351.86"
+                    strokeDashoffset="-322.54"
+                    transform="rotate(-90 100 100)"
+                  />
+                  <circle
+                    cx="100"
+                    cy="100"
+                    r="80"
+                    fill="none"
+                    stroke="#f59e0b"
+                    strokeWidth="40"
+                    strokeDasharray="78.54 351.86"
+                    strokeDashoffset="-437.73"
+                    transform="rotate(-90 100 100)"
+                  />
+                  {/* Center hole */}
+                  <circle cx="100" cy="100" r="60" fill="white" className="dark:fill-slate-900" />
+                </svg>
               </div>
-              <div className="grid grid-cols-2 gap-3 mt-4">
+              <div className="grid grid-cols-2 gap-3">
                 {salesDistribution.map((item, index) => (
                   <div key={index} className="flex items-center gap-2">
                     <div
