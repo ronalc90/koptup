@@ -283,6 +283,20 @@ export default function ChatbotPreviewPage() {
               </div>
               <h1 className="text-xl font-semibold text-white">{config.title}</h1>
             </div>
+            {/* Clear Chat Button - visible on mobile */}
+            {messages.length > 0 && (
+              <button
+                onClick={() => {
+                  if (confirm('¿Estás seguro de que deseas limpiar la conversación?')) {
+                    clearMessages();
+                  }
+                }}
+                className="p-2 hover:bg-white/20 rounded-lg transition-colors group"
+                title="Limpiar conversación"
+              >
+                <TrashIcon className="h-5 w-5 text-white" />
+              </button>
+            )}
           </div>
 
           {/* Messages Container */}
