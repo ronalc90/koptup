@@ -166,21 +166,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Demo Section */}
-      <section className="section-padding bg-gradient-to-br from-primary-600 to-primary-800 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            {t('demo.title')}
-          </h2>
-          <p className="text-xl mb-10 max-w-3xl mx-auto opacity-90">
-            {t('demo.subtitle')}
-          </p>
-          <Button size="lg" variant="outline" className="bg-white text-primary-600 hover:bg-primary-50" asChild>
-            <Link href="/demo">{t('common.viewDemo')}</Link>
-          </Button>
-        </div>
-      </section>
-
       {/* CTA Section */}
       <section className="section-padding bg-white dark:bg-secondary-950">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
