@@ -25,6 +25,7 @@ import {
   TableCellsIcon,
   ShieldCheckIcon,
   TrashIcon,
+  CpuChipIcon,
 } from '@heroicons/react/24/outline';
 import { auditoriaAPI } from './api';
 import { Factura, Estadisticas, ResultadoAuditoria } from './tipos-auditoria';
