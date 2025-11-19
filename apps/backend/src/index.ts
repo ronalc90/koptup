@@ -113,6 +113,7 @@ const startServer = async () => {
         cupsRoutes,
         chatbotRoutes,
         auditoriaRoutes,
+        contentManagerRoutes,
       ] = await Promise.all([
         import('./routes/auth.routes'),
         import('./routes/document.routes'),
@@ -129,6 +130,7 @@ const startServer = async () => {
         import('./routes/cups.routes'),
         import('./routes/chatbot.routes'),
         import('./routes/auditoria.routes'),
+        import('./routes/content-manager.routes'),
       ]);
 
       if (authRoutes.default) app.use('/api/auth', authRoutes.default);
@@ -146,6 +148,7 @@ const startServer = async () => {
       if (cupsRoutes.default) app.use('/api/cups', cupsRoutes.default);
       if (chatbotRoutes.default) app.use('/api/chatbot', chatbotRoutes.default);
       if (auditoriaRoutes.default) app.use('/api/auditoria', auditoriaRoutes.default);
+      if (contentManagerRoutes.default) app.use('/api/content', contentManagerRoutes.default);
 
       logger.info('Rutas registradas');
     } catch (err: any) {
