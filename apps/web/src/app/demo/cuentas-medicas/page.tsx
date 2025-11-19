@@ -77,7 +77,34 @@ export default function CuentasMedicasPage() {
       descripcion: 'Base SISPRO actualizada con 12,457 códigos de procedimientos',
       activo: true,
       registros: 12457,
-      contenido: 'Sistema de clasificación de procedimientos médicos y quirúrgicos. Incluye códigos como:\n\n890201 - Consulta Medicina General\n890301 - Consulta Medicina Especializada\n890701 - Consulta Odontología\n...\n\nTotal: 12,457 procedimientos clasificados'
+      contenido: `# Códigos CUPS - Clasificación Única de Procedimientos en Salud
+
+## Consultas
+890201 | Consulta de primera vez por medicina general | $35,000
+890202 | Consulta de primera vez por medicina especializada | $50,000
+890203 | Consulta de urgencias | $45,000
+890301 | Consulta de control por medicina general | $30,000
+890302 | Consulta de control por medicina especializada | $45,000
+890701 | Consulta odontológica de primera vez | $28,000
+
+## Procedimientos Diagnósticos
+870201 | Radiografía de tórax PA y lateral | $65,000
+870301 | Tomografía axial computarizada simple | $450,000
+871501 | Ecografía obstétrica | $85,000
+902210 | Hemograma completo | $18,000
+902316 | Proteína C reactiva | $25,000
+
+## Procedimientos Quirúrgicos
+331101 | Apendicectomía | $2,500,000
+331102 | Colecistectomía laparoscópica | $3,200,000
+662201 | Cesárea | $2,800,000
+
+## Hospitalización
+980101 | Día cama hospitalización general | $450,000
+980201 | Día cama UCI adultos | $1,200,000
+980301 | Día cama UCI pediátrica | $1,400,000
+
+Total de códigos en base de datos: 12,457`
     },
     {
       id: 'cie10',
@@ -86,7 +113,47 @@ export default function CuentasMedicasPage() {
       descripcion: 'Clasificación internacional de enfermedades - 14,891 diagnósticos',
       activo: true,
       registros: 14891,
-      contenido: 'Clasificación Internacional de Enfermedades versión 10. Incluye:\n\nA00-B99: Enfermedades infecciosas y parasitarias\nC00-D48: Neoplasias\nE00-E90: Enfermedades endocrinas\nJ00-J99: Enfermedades del sistema respiratorio\nJ18.9 - Neumonía no especificada\n...\n\nTotal: 14,891 códigos de diagnóstico'
+      contenido: `# CIE-10 - Clasificación Internacional de Enfermedades (10ª Revisión)
+
+## A00-B99: Enfermedades infecciosas y parasitarias
+A09 | Diarrea y gastroenteritis de presunto origen infeccioso
+A41.9 | Septicemia no especificada
+B34.9 | Infección viral no especificada
+
+## C00-D48: Neoplasias
+C50.9 | Neoplasia maligna de mama, parte no especificada
+C61 | Tumor maligno de la próstata
+D12.6 | Colon, sigmoide
+
+## E00-E90: Enfermedades endocrinas, nutricionales y metabólicas
+E11.9 | Diabetes mellitus tipo 2, sin mención de complicación
+E66.9 | Obesidad no especificada
+E78.5 | Hiperlipidemia no especificada
+
+## I00-I99: Enfermedades del sistema circulatorio
+I10 | Hipertensión esencial (primaria)
+I21.9 | Infarto agudo del miocardio sin otra especificación
+I50.9 | Insuficiencia cardíaca no especificada
+
+## J00-J99: Enfermedades del sistema respiratorio
+J18.9 | Neumonía no especificada
+J44.0 | Enfermedad pulmonar obstructiva crónica con infección respiratoria aguda
+J45.9 | Asma no especificada
+
+## K00-K93: Enfermedades del sistema digestivo
+K29.7 | Gastritis no especificada
+K35.8 | Apendicitis aguda, otra y la no especificada
+K80.2 | Cálculo de la vesícula biliar sin colecistitis
+
+## N00-N99: Enfermedades del sistema genitourinario
+N39.0 | Infección de vías urinarias, sitio no especificado
+N18.9 | Enfermedad renal crónica no especificada
+
+## O00-O99: Embarazo, parto y puerperio
+O80 | Parto único espontáneo
+O82 | Parto único por cesárea
+
+Total de códigos en base de datos: 14,891`
     },
     {
       id: 'soat',
@@ -94,7 +161,34 @@ export default function CuentasMedicasPage() {
       tipo: 'tarifario',
       descripcion: 'Seguro Obligatorio de Accidentes de Tránsito',
       activo: true,
-      contenido: '# Tarifario SOAT 2024\n\n## Consultas\n- 890201: $35,000\n- 890301: $50,000\n\n## Procedimientos Quirúrgicos\n- 331101: $2,500,000\n- 331102: $1,800,000\n\n## Hospitalización\n- Día cama UCI: $1,200,000\n- Día cama general: $450,000\n\nVigencia: Enero 2024 - Diciembre 2024'
+      contenido: `# Tarifario SOAT 2024
+Vigencia: Enero 2024 - Diciembre 2024
+
+## Consultas
+CUPS 890201 | Consulta medicina general | $35,000
+CUPS 890301 | Consulta medicina especializada | $50,000
+CUPS 890203 | Consulta de urgencias | $45,000
+
+## Procedimientos Diagnósticos
+CUPS 870201 | Radiografía de tórax | $65,000
+CUPS 870301 | TAC simple | $450,000
+CUPS 902210 | Hemograma completo | $18,000
+CUPS 902316 | Proteína C reactiva | $25,000
+
+## Procedimientos Quirúrgicos
+CUPS 331101 | Apendicectomía | $2,500,000
+CUPS 331102 | Colecistectomía laparoscópica | $3,200,000
+
+## Hospitalización
+CUPS 980101 | Día cama hospitalización general | $450,000
+CUPS 980201 | Día cama UCI adultos | $1,200,000
+CUPS 980301 | Día cama UCI pediátrica | $1,400,000
+
+## Transporte
+- Ambulancia básica: $150,000
+- Ambulancia medicalizada: $350,000
+
+Nota: Estos valores son aplicables únicamente para atenciones derivadas de accidentes de tránsito.`
     },
     {
       id: 'iss',
@@ -102,16 +196,165 @@ export default function CuentasMedicasPage() {
       tipo: 'tarifario',
       descripcion: 'Base de tarifas institucionales',
       activo: true,
-      contenido: '# Manual Tarifario ISS 2001\n\n## Consulta Externa\n- CUPS 890201: $25,000 (Base)\n- CUPS 890301: $40,000 (Especializada)\n\n## Procedimientos\n- Laboratorio clínico: $15,000 - $80,000\n- Imagenología básica: $50,000 - $200,000\n- Cirugía menor: $150,000 - $500,000\n\nTarifas base sujetas a multiplicadores según nivel de complejidad'
+      contenido: `# Manual Tarifario ISS 2001
+Base para cálculo de tarifas institucionales
+
+## Consulta Externa
+CUPS 890201 | Consulta medicina general | $25,000 (Base)
+CUPS 890301 | Consulta medicina especializada | $40,000
+CUPS 890701 | Consulta odontología | $28,000
+
+## Procedimientos Diagnósticos
+CUPS 870201 | Radiografía simple | $45,000
+CUPS 902210 | Hemograma | $15,000
+CUPS 902316 | PCR | $20,000
+
+## Laboratorio Clínico
+- Básico: $15,000 - $25,000
+- Medio: $25,000 - $50,000
+- Complejo: $50,000 - $80,000
+
+## Imagenología
+- Básica (rayos X): $45,000 - $80,000
+- Media (ecografías): $80,000 - $150,000
+- Compleja (TAC, RM): $200,000 - $500,000
+
+## Cirugía
+- Menor: $150,000 - $500,000
+- Intermedia: $500,000 - $1,500,000
+- Mayor: $1,500,000 - $5,000,000
+
+## Hospitalización
+- Día cama general: $300,000
+- Día cama UCI: $900,000
+
+Multiplicadores según nivel de complejidad:
+- Nivel I: 1.0x
+- Nivel II: 1.3x
+- Nivel III: 1.5x
+- Nivel IV: 1.8x`
     },
     {
-      id: 'contratos',
-      nombre: 'Contratos EPS - IPS',
+      id: 'contrato_salud_total',
+      nombre: 'Contrato EPS Salud Total',
       tipo: 'tarifario',
-      descripcion: 'Tarifas pactadas específicas - 3 contratos activos',
+      descripcion: 'IPS San José - Vigencia 2024',
       activo: true,
-      registros: 3,
-      contenido: '# Contratos Vigentes EPS-IPS\n\n## Contrato 1: EPS Salud Total - IPS San José\n- Consulta general: $30,000\n- Consulta especializada: $45,000\n- Vigencia: 2024\n\n## Contrato 2: EPS Nueva EPS - IPS San José  \n- Consulta general: $28,000\n- Consulta especializada: $42,000\n- Vigencia: 2024\n\n## Contrato 3: EPS Compensar - IPS San José\n- Consulta general: $32,000\n- Consulta especializada: $48,000\n- Vigencia: 2024'
+      contenido: `# Contrato EPS Salud Total - IPS San José
+Código Contrato: ST-2024-001
+Vigencia: 01/01/2024 - 31/12/2024
+IPS: Hospital San José de Barranquilla
+NIT IPS: 900.123.456-7
+
+## Consultas
+CUPS 890201 | Consulta medicina general | $30,000
+CUPS 890301 | Consulta medicina especializada | $45,000
+CUPS 890701 | Consulta odontología | $28,000
+CUPS 890203 | Consulta urgencias | $42,000
+
+## Procedimientos Diagnósticos
+CUPS 870201 | Radiografía tórax | $60,000
+CUPS 870301 | TAC simple | $420,000
+CUPS 871501 | Ecografía obstétrica | $80,000
+CUPS 902210 | Hemograma | $16,000
+CUPS 902316 | PCR | $22,000
+
+## Procedimientos Quirúrgicos
+CUPS 331101 | Apendicectomía | $2,300,000
+CUPS 331102 | Colecistectomía laparoscópica | $3,000,000
+CUPS 662201 | Cesárea | $2,600,000
+
+## Hospitalización
+CUPS 980101 | Día cama general | $420,000
+CUPS 980201 | Día cama UCI | $1,100,000
+
+## Condiciones Especiales
+- Tiempo máximo de radicación: 30 días
+- Plazo de pago: 45 días
+- Glosa técnica: Máximo 10%
+- Auditoría: Concurrente y retrospectiva`
+    },
+    {
+      id: 'contrato_nueva_eps',
+      nombre: 'Contrato Nueva EPS',
+      tipo: 'tarifario',
+      descripcion: 'IPS San José - Vigencia 2024',
+      activo: false,
+      contenido: `# Contrato Nueva EPS - IPS San José
+Código Contrato: NE-2024-045
+Vigencia: 01/01/2024 - 31/12/2024
+IPS: Hospital San José de Barranquilla
+NIT IPS: 900.123.456-7
+
+## Consultas
+CUPS 890201 | Consulta medicina general | $28,000
+CUPS 890301 | Consulta medicina especializada | $42,000
+CUPS 890701 | Consulta odontología | $26,000
+CUPS 890203 | Consulta urgencias | $40,000
+
+## Procedimientos Diagnósticos
+CUPS 870201 | Radiografía tórax | $58,000
+CUPS 870301 | TAC simple | $400,000
+CUPS 871501 | Ecografía obstétrica | $75,000
+CUPS 902210 | Hemograma | $15,000
+CUPS 902316 | PCR | $20,000
+
+## Procedimientos Quirúrgicos
+CUPS 331101 | Apendicectomía | $2,200,000
+CUPS 331102 | Colecistectomía laparoscópica | $2,900,000
+CUPS 662201 | Cesárea | $2,500,000
+
+## Hospitalización
+CUPS 980101 | Día cama general | $400,000
+CUPS 980201 | Día cama UCI | $1,050,000
+
+## Condiciones Especiales
+- Tiempo máximo de radicación: 25 días
+- Plazo de pago: 60 días
+- Glosa técnica: Máximo 8%
+- Auditoría: Concurrente
+- Descuento por pronto pago: 2% a 30 días`
+    },
+    {
+      id: 'contrato_compensar',
+      nombre: 'Contrato EPS Compensar',
+      tipo: 'tarifario',
+      descripcion: 'IPS San José - Vigencia 2024',
+      activo: true,
+      contenido: `# Contrato EPS Compensar - IPS San José
+Código Contrato: CP-2024-078
+Vigencia: 01/01/2024 - 31/12/2024
+IPS: Hospital San José de Barranquilla
+NIT IPS: 900.123.456-7
+
+## Consultas
+CUPS 890201 | Consulta medicina general | $32,000
+CUPS 890301 | Consulta medicina especializada | $48,000
+CUPS 890701 | Consulta odontología | $30,000
+CUPS 890203 | Consulta urgencias | $44,000
+
+## Procedimientos Diagnósticos
+CUPS 870201 | Radiografía tórax | $62,000
+CUPS 870301 | TAC simple | $440,000
+CUPS 871501 | Ecografía obstétrica | $85,000
+CUPS 902210 | Hemograma | $17,000
+CUPS 902316 | PCR | $23,000
+
+## Procedimientos Quirúrgicos
+CUPS 331101 | Apendicectomía | $2,400,000
+CUPS 331102 | Colecistectomía laparoscópica | $3,100,000
+CUPS 662201 | Cesárea | $2,700,000
+
+## Hospitalización
+CUPS 980101 | Día cama general | $430,000
+CUPS 980201 | Día cama UCI | $1,150,000
+
+## Condiciones Especiales
+- Tiempo máximo de radicación: 30 días
+- Plazo de pago: 50 días
+- Glosa técnica: Máximo 12%
+- Auditoría: Retrospectiva
+- Bonificación por calidad: Hasta 5%`
     },
     {
       id: 'ley100',
@@ -119,7 +362,48 @@ export default function CuentasMedicasPage() {
       tipo: 'normativa',
       descripcion: 'Sistema General de Seguridad Social en Salud',
       activo: true,
-      contenido: '# Ley 100 de 1993\n\n## Sistema General de Seguridad Social en Salud\n\n### Artículos Relevantes:\n\n**Art. 156**: Características del Plan Obligatorio de Salud\n- Debe cubrir todas las contingencias\n- Servicios de promoción y prevención\n- Atención médica especializada\n\n**Art. 182**: Facturación de servicios\n- Las IPS deben presentar facturación detallada\n- Soportes de autorización\n- Historia clínica cuando sea requerida\n\n**Art. 227**: Glosas y devoluciones\n- Procedimientos para objeción de cuentas\n- Plazos de respuesta\n- Mecanismos de conciliación'
+      contenido: `# Ley 100 de 1993
+Sistema General de Seguridad Social en Salud
+
+## LIBRO SEGUNDO - SISTEMA GENERAL DE SEGURIDAD SOCIAL EN SALUD
+
+### ARTÍCULO 152. Objeto
+El Sistema General de Seguridad Social en Salud tiene por objeto regular el servicio público esencial de salud y crear condiciones de acceso en toda la población al servicio en todos los niveles de atención.
+
+### ARTÍCULO 156. Características del Plan Obligatorio de Salud (POS)
+El Plan Obligatorio de Salud deberá:
+- Cubrir todas las enfermedades de alto costo
+- Incluir servicios de promoción y prevención
+- Garantizar atención médica especializada
+- Cubrir medicamentos esenciales
+- Incluir hospitalización y cirugía
+
+### ARTÍCULO 182. Facturación de Servicios
+Las IPS deberán presentar:
+- Facturación detallada de todos los servicios prestados
+- Soportes de autorización de la EPS
+- Historia clínica cuando sea requerida
+- Registro de medicamentos e insumos utilizados
+- Firmas y sellos de los profesionales que atendieron
+
+### ARTÍCULO 227. Glosas y Devoluciones
+Procedimientos para la objeción de cuentas:
+- La EPS tiene 30 días para objetar las cuentas
+- La IPS tiene 20 días para responder las glosas
+- Se debe crear un comité de conciliación
+- Las glosas deben estar debidamente justificadas
+- Existe un mecanismo de apelación ante la Superintendencia
+
+### ARTÍCULO 228. Oportunidad en el Pago
+- Las EPS deberán pagar a las IPS dentro de los 30 días siguientes a la radicación de la cuenta
+- Si no hay pago oportuno, se generan intereses moratorios
+- Las IPS pueden acudir a mecanismos de cobro coactivo
+
+### ARTÍCULO 245. Sanciones
+Por incumplimiento se pueden imponer:
+- Multas hasta de 5.000 salarios mínimos
+- Suspensión de la licencia
+- Revocatoria de la autorización`
     },
     {
       id: 'res3047',
@@ -127,7 +411,56 @@ export default function CuentasMedicasPage() {
       tipo: 'normativa',
       descripcion: 'Manual de tarifas y procedimientos',
       activo: true,
-      contenido: '# Resolución 3047 de 2008\n\n## Manual de Tarifas Mínimas\n\n### Consultas\n- Medicina general: Tarifa mínima $22,000\n- Medicina especializada: Tarifa mínima $35,000\n- Odontología: Tarifa mínima $28,000\n\n### Procedimientos\n- Cada procedimiento debe facturarse según tarifa SOAT o ISS\n- Se permite incremento hasta 30% según nivel de complejidad\n- Requiere justificación médica documentada\n\n### Documentación Requerida\n- Orden médica\n- Autorización EPS\n- Consentimiento informado\n- Registro en historia clínica'
+      contenido: `# Resolución 3047 de 2008
+Manual de Tarifas Mínimas y Procedimientos
+
+## CAPÍTULO I - DISPOSICIONES GENERALES
+
+### Artículo 1. Objeto
+Establecer el manual de tarifas mínimas para los servicios de salud del Plan Obligatorio de Salud.
+
+### Artículo 2. Tarifas Mínimas - Consultas
+- Medicina general: $22,000 (tarifa mínima)
+- Medicina especializada: $35,000 (tarifa mínima)
+- Odontología: $28,000 (tarifa mínima)
+- Urgencias: $30,000 (tarifa mínima)
+
+## CAPÍTULO II - PROCEDIMIENTOS
+
+### Artículo 5. Base de Facturación
+Todo procedimiento debe facturarse según:
+- Tarifario SOAT vigente, o
+- Manual Tarifario ISS 2001, o
+- Contrato específico EPS-IPS
+
+Se permite incremento hasta 30% según nivel de complejidad de la IPS.
+
+### Artículo 8. Justificación Médica
+Todo procedimiento requiere:
+- Justificación médica documentada
+- Diagnóstico CIE-10 que lo soporte
+- Pertinencia clínica según guías de práctica
+
+## CAPÍTULO III - DOCUMENTACIÓN REQUERIDA
+
+### Artículo 12. Soportes Obligatorios
+Para facturar cualquier servicio se requiere:
+- Orden médica firmada y sellada
+- Autorización de la EPS (cuando aplique)
+- Consentimiento informado del paciente
+- Registro completo en historia clínica
+- Evolución médica que justifique el procedimiento
+
+### Artículo 15. Glosas por Documentación
+La falta de cualquier soporte genera glosa del 100% del procedimiento.
+
+## CAPÍTULO IV - MEDICAMENTOS E INSUMOS
+
+### Artículo 18. Facturación de Medicamentos
+- Solo se pueden facturar medicamentos del POS
+- Debe existir prescripción médica
+- Cantidad y dosis deben estar justificadas
+- Se debe facturar según precio SISMED`
     },
     {
       id: 'guias',
@@ -136,7 +469,106 @@ export default function CuentasMedicasPage() {
       descripcion: 'Validación de pertinencia médica - 125 guías',
       activo: true,
       registros: 125,
-      contenido: '# Guías de Práctica Clínica\n\n## Enfermedades Respiratorias\n\n### Neumonía (CIE-10: J18.9)\n**Procedimientos Pertinentes:**\n- Radiografía de tórax (CUPS: 870201)\n- Hemograma completo (CUPS: 902210)\n- Proteína C reactiva (CUPS: 902316)\n- Hospitalización según gravedad\n\n**No Pertinente:**\n- TAC cerebral simple (sin indicación)\n- Resonancia magnética sin justificación\n\n## Enfermedades Cardiovasculares\n\n### Hipertensión Arterial (CIE-10: I10)\n**Procedimientos Pertinentes:**\n- Electrocardiograma (CUPS: 890701)\n- Perfil lipídico (CUPS: 902234)\n- Ecocardiograma según evolución\n\n... (125 guías en total)'
+      contenido: `# Guías de Práctica Clínica
+Ministerio de Salud y Protección Social
+
+## ENFERMEDADES RESPIRATORIAS
+
+### Neumonía Adquirida en la Comunidad (CIE-10: J18.9)
+
+**Diagnóstico - Procedimientos Pertinentes:**
+CUPS 870201 | Radiografía de tórax PA y lateral | OBLIGATORIO
+CUPS 902210 | Hemograma completo | OBLIGATORIO
+CUPS 902316 | Proteína C reactiva | RECOMENDADO
+CUPS 902502 | Hemocultivos x2 | Si criterios de severidad
+
+**Criterios de Hospitalización:**
+- Frecuencia respiratoria ≥30/min
+- PaO2/FiO2 <250
+- Infiltrados multilobares
+- Confusión/desorientación
+- Uremia >20 mg/dl
+
+CUPS 980101 | Hospitalización general | Si 1-2 criterios
+CUPS 980201 | UCI | Si ≥3 criterios o shock
+
+**NO PERTINENTE (genera glosa):**
+CUPS 870301 | TAC cerebral simple | Sin indicación neurológica
+CUPS 871601 | Resonancia magnética | Sin justificación
+
+---
+
+## ENFERMEDADES CARDIOVASCULARES
+
+### Hipertensión Arterial Esencial (CIE-10: I10)
+
+**Diagnóstico Inicial - Procedimientos Pertinentes:**
+CUPS 890201 | Consulta medicina general | Primera vez
+CUPS 890701 | Electrocardiograma | OBLIGATORIO
+CUPS 902234 | Perfil lipídico | OBLIGATORIO
+CUPS 902629 | Creatinina | OBLIGATORIO
+CUPS 902632 | Glicemia | OBLIGATORIO
+
+**Seguimiento:**
+CUPS 890301 | Consulta cada 3-6 meses
+CUPS 871401 | Ecocardiograma | Si soplos o criterios de HVI
+
+**NO PERTINENTE:**
+CUPS 870301 | TAC sin justificación
+
+---
+
+## ENFERMEDADES DIGESTIVAS
+
+### Apendicitis Aguda (CIE-10: K35.8)
+
+**Diagnóstico - Procedimientos Pertinentes:**
+CUPS 871501 | Ecografía abdominal | OBLIGATORIO
+CUPS 902210 | Hemograma | OBLIGATORIO
+CUPS 902316 | PCR | RECOMENDADO
+
+**Tratamiento:**
+CUPS 331101 | Apendicectomía | OBLIGATORIO
+CUPS 980101 | Hospitalización 2-3 días | Post-quirúrgico
+
+---
+
+## EMBARAZO Y PARTO
+
+### Parto por Cesárea (CIE-10: O82)
+
+**Indicaciones Médicas Pertinentes:**
+- Desproporción cefalopélvica
+- Sufrimiento fetal agudo
+- Presentación anómala
+- Cesárea iterativa (≥2 previas)
+- Placenta previa
+
+CUPS 662201 | Cesárea | Solo con indicación médica
+CUPS 980101 | Hospitalización 3-4 días
+
+**NO PERTINENTE (genera glosa):**
+- Cesárea sin indicación médica documentada
+- Cesárea por solicitud materna sin justificación
+
+---
+
+## CRITERIOS GENERALES DE PERTINENCIA
+
+### Imagenología
+- **TAC**: Solo si rayos X no es concluyente
+- **Resonancia**: Solo si TAC no es suficiente
+- Debe existir indicación médica específica
+
+### Laboratorios
+- Máximo 1 perfil completo cada 6 meses
+- Pruebas especializadas solo con justificación
+
+### Hospitalización
+- Debe cumplir criterios de severidad
+- Justificación diaria en evolución médica
+
+Total de guías implementadas: 125`
     }
   ]);
 
