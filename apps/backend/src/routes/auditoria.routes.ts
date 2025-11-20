@@ -398,4 +398,92 @@ router.post('/sesion/:sesionId/siguiente', auditoriaController.avanzarPasoAudito
  */
 router.get('/sesion/:sesionId', auditoriaController.obtenerSesionAuditoria);
 
+/**
+ * @swagger
+ * /api/auditoria/aprendizaje/feedback/{decisionId}:
+ *   post:
+ *     tags: [Sistema de Aprendizaje]
+ *     summary: Agregar feedback humano a una decisión de la IA
+ *     description: Permite a los administradores calificar decisiones de la IA con score 0-100 y comentarios
+ *     parameters:
+ *       - in: path
+ *         name: decisionId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la decisión de la IA
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - scoreHumano
+ *               - comentario
+ *             properties:
+ *               scoreHumano:
+ *                 type: number
+ *                 minimum: 0
+ *                 maximum: 100
+ *                 description: Puntuación de la decisión (0-100)
+ *                 example: 85
+ *               comentario:
+ *                 type: string
+ *                 description: Comentario en lenguaje natural explicando la calificación
+ *                 example: "La IA identificó correctamente el código CUPS pero el valor calculado fue menor al esperado"
+ *               valorCorrecto:
+ *                 type: object
+ *                 description: Valor correcto si la IA se equivocó (opcional)
+ *     responses:
+ *       200:
+ *         description: Feedback agregado exitosamente
+ *       400:
+ *         description: Datos de entrada inválidos
+ */
+router.post('/aprendizaje/feedback/:decisionId', auditoriaController.agregarFeedbackDecision);
+
+/**
+ * @swagger
+ * /api/auditoria/aprendizaje/estadisticas:
+ *   get:
+ *     tags: [Sistema de Aprendizaje]
+ *     summary: Obtener estadísticas de calibración del sistema
+ *     description: Muestra cómo está aprendiendo el sistema - scores, errores comunes, recomendaciones
+ *     responses:
+ *       200:
+ *         description: Estadísticas de aprendizaje
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalDecisiones:
+ *                   type: number
+ *                 decisionesConFeedback:
+ *                   type: number
+ *                 scorePromedioGlobal:
+ *                   type: number
+ *                 porcentajeFeedback:
+ *                   type: number
+ *                 porTipo:
+ *                   type: object
+ *                 erroresComunes:
+ *                   type: array
+ */
+router.get('/aprendizaje/estadisticas', auditoriaController.obtenerEstadisticasAprendizaje);
+
+/**
+ * @swagger
+ * /api/auditoria/aprendizaje/reporte:
+ *   get:
+ *     tags: [Sistema de Aprendizaje]
+ *     summary: Generar reporte de calibración completo
+ *     description: Reporte detallado del estado del sistema de aprendizaje con recomendaciones
+ *     responses:
+ *       200:
+ *         description: Reporte de calibración generado
+ */
+router.get('/aprendizaje/reporte', auditoriaController.generarReporteCalibracion);
+
 export default router;
