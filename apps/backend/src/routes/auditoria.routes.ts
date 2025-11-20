@@ -107,6 +107,67 @@ router.post('/procesar-modular', upload.array('files', 10), auditoriaModularCont
 
 /**
  * @swagger
+ * /api/auditoria/proceso/{procesoId}/detalle:
+ *   get:
+ *     tags: [Auditoría Modular - Ver Detalle]
+ *     summary: 📋 VER DETALLE COMPLETO del proceso de auditoría
+ *     description: |
+ *       Retorna ABSOLUTAMENTE TODO el proceso paso a paso:
+ *       - Texto exacto extraído de los PDFs
+ *       - Imágenes procesadas (base64 para mostrar en UI)
+ *       - Cada decisión tomada campo por campo con su razonamiento
+ *       - Comparaciones entre métodos de extracción
+ *       - Cálculos de glosas con fórmulas y justificaciones
+ *       - Decisión final de la IA con fundamentos completos
+ *       - Timeline completo del proceso
+ *     parameters:
+ *       - in: path
+ *         name: procesoId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID del proceso de auditoría
+ *         example: proceso_1763641564365_abc123
+ *     responses:
+ *       200:
+ *         description: Detalle completo del proceso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     numeroFactura:
+ *                       type: string
+ *                     imagenes:
+ *                       type: array
+ *                       description: Imágenes procesadas del PDF
+ *                     textoExtraido:
+ *                       type: array
+ *                       description: Texto raw extraído del PDF
+ *                     timeline:
+ *                       type: array
+ *                       description: Pasos del proceso cronológicamente
+ *                     decisionesCampos:
+ *                       type: array
+ *                       description: Decisión para cada campo extraído
+ *                     glosas:
+ *                       type: array
+ *                       description: Cálculos de glosas con justificación
+ *                     decisionFinal:
+ *                       type: object
+ *                       description: Decisión final de la IA
+ *       404:
+ *         description: Proceso no encontrado
+ */
+router.get('/proceso/:procesoId/detalle', auditoriaModularController.obtenerDetalleCompleto);
+
+/**
+ * @swagger
  * /api/auditoria/facturas/{id}/calificar:
  *   get:
  *     tags: [Sistema de Aprendizaje]

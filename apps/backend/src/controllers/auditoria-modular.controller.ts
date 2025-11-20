@@ -14,6 +14,7 @@
 import { Request, Response } from 'express';
 import documentIngestionService from '../services/modules/document-ingestion.service';
 import aiVisionExtractorService from '../services/modules/ai-vision-extractor.service';
+import auditTrackerService from '../services/audit-tracker.service';
 import Factura from '../models/Factura';
 import Atencion from '../models/Atencion';
 import Procedimiento from '../models/Procedimiento';
@@ -44,19 +45,106 @@ class AuditoriaModularController {
       const archivoFactura = files[0];
 
       // ═══════════════════════════════════════════════════════
+      // INICIAR TRACKING DEL PROCESO
+      // ═══════════════════════════════════════════════════════
+      const procesoId = auditTrackerService.iniciarProceso(
+        `FACTURA-${Date.now()}`,
+        files
+      );
+
+      // ═══════════════════════════════════════════════════════
       // MÓDULO A: INGESTA DE DOCUMENTOS
       // ═══════════════════════════════════════════════════════
+      const inicioIngesta = Date.now();
       const resultadoIngesta = await documentIngestionService.procesarDocumento(
         archivoFactura.path
       );
+      const duracionIngesta = Date.now() - inicioIngesta;
+
+      // Registrar paso de ingesta
+      auditTrackerService.registrarPaso(
+        procesoId,
+        'INGESTA',
+        'Procesamiento de documentos y normalización de imágenes',
+        {
+          archivoOriginal: archivoFactura.originalname,
+          extension: resultadoIngesta.extension,
+          paginas: resultadoIngesta.totalPaginas,
+        },
+        {
+          tipo: resultadoIngesta.tipoDocumentoPrincipal,
+          confianza: resultadoIngesta.confianzaDeteccion,
+        },
+        {
+          confianza: resultadoIngesta.confianzaDeteccion,
+          duracionMs: duracionIngesta,
+        }
+      );
+
+      // Registrar imágenes procesadas
+      for (const pagina of resultadoIngesta.paginas) {
+        auditTrackerService.registrarImagenProcesada(
+          procesoId,
+          pagina.numeroPagina,
+          pagina.imagenBase64,
+          pagina.ancho,
+          pagina.alto,
+          pagina.calidad
+        );
+      }
 
       // ═══════════════════════════════════════════════════════
       // MÓDULO B: EXTRACCIÓN INTELIGENTE CON AI VISION
       // ═══════════════════════════════════════════════════════
+      const inicioExtraccion = Date.now();
       const datosExtraidos = await aiVisionExtractorService.extraerDatosCompletos(
         resultadoIngesta.paginas,
         resultadoIngesta.tipoDocumentoPrincipal
       );
+      const duracionExtraccion = Date.now() - inicioExtraccion;
+
+      // Registrar paso de extracción
+      auditTrackerService.registrarPaso(
+        procesoId,
+        'EXTRACCION',
+        'Extracción de 80-100 campos con GPT-4o Vision',
+        {
+          tipoDocumento: resultadoIngesta.tipoDocumentoPrincipal,
+          paginasAnalizadas: resultadoIngesta.totalPaginas,
+          modelo: 'gpt-4o',
+        },
+        {
+          camposExtraidos: datosExtraidos.metadatos.camposExtraidos,
+          camposVacios: datosExtraidos.metadatos.camposVacios,
+          camposCriticos: datosExtraidos.metadatos.camposCriticos,
+        },
+        {
+          confianza: datosExtraidos.metadatos.confianzaExtraccion,
+          duracionMs: duracionExtraccion,
+          alertas: datosExtraidos.metadatos.camposCriticos,
+        }
+      );
+
+      // Registrar decisión para cada campo extraído
+      const camposImportantes = [
+        'numeroFactura', 'nombrePaciente', 'numeroDocumentoPaciente',
+        'codigoProcedimiento', 'nombreProcedimiento', 'valorTotalIPS',
+        'diagnosticoPrincipal', 'numeroAutorizacion', 'copago', 'cuotaModeradora'
+      ];
+
+      for (const campo of camposImportantes) {
+        const valor = (datosExtraidos as any)[campo];
+        if (valor !== undefined && valor !== null) {
+          auditTrackerService.registrarDecisionCampo(procesoId, {
+            campo,
+            valorOriginalPDF: `[Extraído de imagen con GPT-4o Vision]`,
+            valorFinal: valor,
+            metodoSeleccionado: 'VISION',
+            confianzaFinal: datosExtraidos.metadatos.confianzaExtraccion,
+            razon: `Campo extraído directamente de la imagen del PDF usando GPT-4o Vision con análisis semántico`,
+          });
+        }
+      }
 
       // ═══════════════════════════════════════════════════════
       // MOSTRAR RESULTADOS DE EXTRACCIÓN
@@ -131,6 +219,7 @@ class AuditoriaModularController {
         // Crear factura
         facturaGuardada = new Factura({
           numeroFactura: datosExtraidos.numeroFactura || `FAC-${Date.now()}`,
+          procesoAuditoriaId: procesoId, // Guardar referencia al proceso
           fechaEmision: this.parsearFecha(datosExtraidos.fechaFactura) || new Date(),
           fechaRadicacion: this.parsearFecha(datosExtraidos.fechaRadicacion) || new Date(),
           ips: {
@@ -230,14 +319,24 @@ class AuditoriaModularController {
         facturaGuardada = {
           _id: `TEMP-${Date.now()}`,
           numeroFactura: datosExtraidos.numeroFactura,
+          procesoAuditoriaId: procesoId,
         };
       }
+
+      // ═══════════════════════════════════════════════════════
+      // FINALIZAR PROCESO DE TRACKING
+      // ═══════════════════════════════════════════════════════
+      auditTrackerService.finalizarProceso(procesoId, 'COMPLETADO');
+
+      // Obtener resumen del proceso
+      const resumenProceso = auditTrackerService.generarResumen(procesoId);
 
       // Retornar respuesta
       res.status(201).json({
         success: true,
         message: 'Documento procesado exitosamente con sistema modular',
         data: {
+          procesoId, // ID del proceso para ver detalle completo
           ingesta: {
             tipo: resultadoIngesta.tipoDocumentoPrincipal,
             paginas: resultadoIngesta.totalPaginas,
@@ -256,8 +355,10 @@ class AuditoriaModularController {
             paciente: datosExtraidos.nombrePaciente,
             diagnostico: datosExtraidos.diagnosticoPrincipal,
             procedimiento: datosExtraidos.codigoProcedimiento,
+            procesoAuditoriaId: procesoId, // Para ver detalle
           },
           datosCompletos: datosExtraidos,
+          resumenProceso, // Resumen del proceso completo
         },
       });
     } catch (error: any) {
@@ -266,6 +367,137 @@ class AuditoriaModularController {
       res.status(500).json({
         success: false,
         message: 'Error al procesar documento',
+        error: error.message,
+      });
+    }
+  }
+
+  /**
+   * 📋 VER DETALLE COMPLETO: Muestra TODO el proceso paso a paso
+   *
+   * Retorna:
+   * - Texto exacto extraído de los PDFs
+   * - Imágenes procesadas (base64)
+   * - Cada decisión tomada campo por campo
+   * - Comparaciones entre métodos
+   * - Cálculos de glosas
+   * - Decisión final de la IA
+   * - Timeline completo del proceso
+   */
+  async obtenerDetalleCompleto(req: Request, res: Response) {
+    try {
+      const { procesoId } = req.params;
+
+      // Obtener proceso completo
+      const proceso = auditTrackerService.obtenerProceso(procesoId);
+
+      if (!proceso) {
+        return res.status(404).json({
+          success: false,
+          message: 'Proceso no encontrado',
+        });
+      }
+
+      // Formatear para UI
+      const detalleCompleto = {
+        // Información general
+        numeroFactura: proceso.numeroFactura,
+        timestampInicio: proceso.timestampInicio,
+        timestampFin: proceso.timestampFin,
+        duracionTotal: proceso.duracionTotalMs,
+        estado: proceso.estado,
+
+        // ARCHIVOS ORIGINALES
+        archivosOriginales: proceso.archivosOriginales,
+
+        // IMÁGENES PROCESADAS (para mostrar en UI)
+        imagenes: proceso.imagenesProcessadas.map(img => ({
+          pagina: img.numeroPagina,
+          imagen: `data:image/png;base64,${img.imagenBase64}`,
+          dimensiones: `${img.ancho}x${img.alto}`,
+          calidad: img.calidad,
+        })),
+
+        // TEXTO RAW EXTRAÍDO
+        textoExtraido: proceso.textoRawPDF,
+
+        // TIMELINE DE PASOS
+        timeline: proceso.pasos.map(paso => ({
+          timestamp: paso.timestamp,
+          tipo: paso.tipo,
+          descripcion: paso.descripcion,
+          duracion: paso.duracionMs ? `${paso.duracionMs}ms` : 'N/A',
+          confianza: paso.confianza ? `${paso.confianza}%` : 'N/A',
+          alertas: paso.alertas || [],
+          datos: paso.datos,
+          resultado: paso.resultado,
+        })),
+
+        // DECISIONES POR CAMPO
+        decisionesCampos: proceso.decisionesCampos.map(dec => ({
+          campo: dec.campo,
+          textoOriginalPDF: dec.valorOriginalPDF,
+          valorExtraidoRegex: dec.valorExtraidoRegex,
+          valorExtraidoVision: dec.valorExtraidoVision,
+          valorFinal: dec.valorFinal,
+          metodoSeleccionado: dec.metodoSeleccionado,
+          confianza: {
+            regex: dec.confianzaRegex,
+            vision: dec.confianzaVision,
+            final: dec.confianzaFinal,
+          },
+          razon: dec.razon,
+          alternativasConsideradas: dec.alternativasConsideradas || [],
+        })),
+
+        // COMPARACIONES ENTRE MÉTODOS
+        comparaciones: proceso.comparaciones,
+
+        // CÁLCULOS DE GLOSAS
+        glosas: proceso.calculosGlosas.map(glosa => ({
+          codigo: glosa.codigoGlosa,
+          tipo: glosa.tipo,
+          descripcion: glosa.descripcion,
+          calculo: {
+            valorFacturado: glosa.valorFacturado,
+            valorContrato: glosa.valorContrato,
+            diferencia: glosa.diferencia,
+            valorGlosado: glosa.valorGlosado,
+            formula: glosa.formula,
+          },
+          justificacion: glosa.justificacion,
+        })),
+
+        // DECISIÓN FINAL DE LA IA
+        decisionFinal: proceso.decisionFinalIA ? {
+          veredicto: proceso.decisionFinalIA.veredicto,
+          valores: {
+            pagar: proceso.decisionFinalIA.valorAPagar,
+            glosa: proceso.decisionFinalIA.valorGlosa,
+          },
+          confianza: proceso.decisionFinalIA.confianza,
+          razonamiento: proceso.decisionFinalIA.razonamiento,
+          fundamentos: {
+            medico: proceso.decisionFinalIA.fundamentoMedico,
+            financiero: proceso.decisionFinalIA.fundamentoFinanciero,
+            administrativo: proceso.decisionFinalIA.fundamentoAdministrativo,
+          },
+          alertas: proceso.decisionFinalIA.alertas || [],
+          correcciones: proceso.decisionFinalIA.correccionesRealizadas || [],
+        } : null,
+
+        // ERRORES (si hubo)
+        errores: proceso.errores || [],
+      };
+
+      res.json({
+        success: true,
+        data: detalleCompleto,
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: 'Error al obtener detalle del proceso',
         error: error.message,
       });
     }
@@ -299,11 +531,18 @@ class AuditoriaModularController {
         factura.numeroFactura
       );
 
+      // Obtener proceso completo si existe
+      let procesoCompleto = null;
+      if ((factura as any).procesoAuditoriaId) {
+        procesoCompleto = auditTrackerService.obtenerProceso((factura as any).procesoAuditoriaId);
+      }
+
       res.json({
         success: true,
         data: {
           factura,
           decisiones,
+          procesoCompleto, // Incluir proceso completo
         },
       });
     } catch (error: any) {
