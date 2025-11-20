@@ -281,8 +281,8 @@ Responde ÚNICAMENTE con un objeto JSON válido con esta estructura exacta:
           ],
         },
       ],
-      max_tokens: 2000,
-      temperature: 0,
+      max_tokens: 3000, // Aumentado para permitir análisis más detallado
+      temperature: 0,  // Temperatura baja para precisión máxima
     });
 
     // 4. Parsear respuesta JSON

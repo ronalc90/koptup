@@ -12,6 +12,7 @@
 
 import OpenAI from 'openai';
 import { DatosFacturaPDF } from '../types/factura.types';
+import sistemaAprendizajeService from './sistema-aprendizaje.service';
 
 /**
  * Contexto completo para que la IA tome la decisión
@@ -203,8 +204,9 @@ Debes responder en formato JSON estructurado.`
       const completion = await this.openai.chat.completions.create({
         model: 'gpt-4o',
         messages: messages,
-        max_tokens: 4000,
-        temperature: 0.1, // Baja temperatura para decisiones consistentes
+        max_tokens: 6000, // Aumentado para permitir análisis y justificación completa
+        temperature: 0.1, // Baja temperatura para decisiones consistentes y precisas
+        timeout: 120000,  // 2 minutos de timeout para análisis exhaustivo
       });
 
       const respuesta = completion.choices[0].message.content || '{}';
@@ -232,6 +234,9 @@ Debes responder en formato JSON estructurado.`
 
       // Mostrar resultado
       this.mostrarDecisionFinal(decisionFinal);
+
+      // 📚 REGISTRAR DECISIÓN PARA APRENDIZAJE CONTINUO
+      await this.registrarDecisionParaAprendizaje(decisionFinal, contexto);
 
       return decisionFinal;
 
@@ -470,6 +475,50 @@ Opciones:
 
     console.log('═══════════════════════════════════════════════════════');
     console.log('');
+  }
+
+  /**
+   * Registrar decisión en el sistema de aprendizaje
+   */
+  private async registrarDecisionParaAprendizaje(
+    decision: DecisionFinalIA,
+    contexto: ContextoAuditoria
+  ): Promise<void> {
+    try {
+      const decisionId = `decision_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+
+      await sistemaAprendizajeService.registrarDecision({
+        id: decisionId,
+        timestamp: decision.metadatos.timestamp,
+
+        // Contexto de la decisión
+        contexto: {
+          numeroFactura: decision.datosConfirmados.nroFactura || 'N/A',
+          paciente: decision.datosConfirmados.nombrePaciente || 'N/A',
+          diagnostico: decision.datosConfirmados.diagnosticoPrincipal || 'N/A',
+          codigoCUPS: decision.datosConfirmados.codigoProcedimiento || 'N/A',
+          valorFacturado: decision.datosConfirmados.valorIPS || 0,
+        },
+
+        // Decisión tomada por la IA
+        decision: {
+          tipo: 'APROBACION',
+          valorDecidido: {
+            veredicto: decision.decisionFinal.veredicto,
+            valorAPagar: decision.decisionFinal.valorAPagar,
+            valorGlosa: decision.decisionFinal.valorGlosa,
+            porcentajeGlosa: decision.decisionFinal.porcentajeGlosa,
+          },
+          confianzaIA: decision.metadatos.confianzaDecision,
+          razonamiento: decision.decisionFinal.justificacion.resumenEjecutivo,
+        },
+      });
+
+      console.log(`📚 Decisión ${decisionId} registrada para aprendizaje continuo`);
+    } catch (error) {
+      console.error('⚠️  Error al registrar decisión para aprendizaje:', error);
+      // No lanzar error para no interrumpir el flujo principal
+    }
   }
 }
 
