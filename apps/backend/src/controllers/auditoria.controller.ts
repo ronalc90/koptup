@@ -344,6 +344,25 @@ class AuditoriaController {
    */
   async obtenerEstadisticas(req: Request, res: Response) {
     try {
+      // Verificar si MongoDB está conectado
+      const mongoose = require('mongoose');
+      const mongoConnected = mongoose.connection.readyState === 1;
+
+      if (!mongoConnected) {
+        // Retornar datos mock cuando MongoDB no está disponible
+        return res.json({
+          success: true,
+          data: {
+            totalFacturas: 0,
+            facturasAuditadas: 0,
+            estadoPorFactura: [],
+            totales: { valorTotal: 0, totalGlosas: 0, valorAceptado: 0 },
+            glosasPorTipo: [],
+          },
+          note: 'MongoDB no conectado - mostrando datos vacíos'
+        });
+      }
+
       const { desde, hasta } = req.query;
 
       const query: any = {};
