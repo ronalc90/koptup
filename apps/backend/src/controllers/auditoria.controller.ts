@@ -9,6 +9,7 @@ import auditoriaService from '../services/auditoria.service';
 import auditoriaPasoPasoService from '../services/auditoria-paso-a-paso.service';
 import excelService from '../services/excel-auditoria.service';
 import cupsLookupService from '../services/cups-lookup.service';
+import sistemaAprendizajeService from '../services/sistema-aprendizaje.service';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
@@ -689,6 +690,107 @@ class AuditoriaController {
       res.status(500).json({
         success: false,
         message: 'Error al obtener sesión',
+        error: error.message,
+      });
+    }
+  }
+
+  /**
+   * 📚 SISTEMA DE APRENDIZAJE: Agregar feedback humano a una decisión de la IA
+   *
+   * Endpoint para que los administradores califiquen las decisiones de la IA
+   * con un score de 0-100 y comentarios en lenguaje natural
+   */
+  async agregarFeedbackDecision(req: Request, res: Response) {
+    try {
+      const { decisionId } = req.params;
+      const { scoreHumano, comentario, valorCorrecto } = req.body;
+
+      // Validación
+      if (scoreHumano === undefined || scoreHumano < 0 || scoreHumano > 100) {
+        return res.status(400).json({
+          success: false,
+          message: 'El score debe estar entre 0 y 100',
+        });
+      }
+
+      if (!comentario || !comentario.trim()) {
+        return res.status(400).json({
+          success: false,
+          message: 'El comentario es requerido',
+        });
+      }
+
+      await sistemaAprendizajeService.agregarFeedback(
+        decisionId,
+        scoreHumano,
+        comentario,
+        valorCorrecto
+      );
+
+      res.json({
+        success: true,
+        message: 'Feedback agregado exitosamente',
+        data: {
+          decisionId,
+          scoreHumano,
+          comentario,
+        },
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: 'Error al agregar feedback',
+        error: error.message,
+      });
+    }
+  }
+
+  /**
+   * 📊 SISTEMA DE APRENDIZAJE: Obtener estadísticas de calibración
+   *
+   * Muestra cómo está aprendiendo el sistema:
+   * - Score promedio de decisiones
+   * - Errores más comunes
+   * - Recomendaciones de mejora
+   */
+  async obtenerEstadisticasAprendizaje(req: Request, res: Response) {
+    try {
+      const estadisticas = await sistemaAprendizajeService.obtenerEstadisticas();
+
+      res.json({
+        success: true,
+        data: estadisticas,
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: 'Error al obtener estadísticas de aprendizaje',
+        error: error.message,
+      });
+    }
+  }
+
+  /**
+   * 📋 SISTEMA DE APRENDIZAJE: Generar reporte de calibración
+   *
+   * Reporte completo del estado del sistema de aprendizaje
+   */
+  async generarReporteCalibracion(req: Request, res: Response) {
+    try {
+      const reporte = await sistemaAprendizajeService.generarReporteCallibracion();
+
+      res.json({
+        success: true,
+        data: {
+          reporte,
+          timestamp: new Date(),
+        },
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: 'Error al generar reporte de calibración',
         error: error.message,
       });
     }
