@@ -100,14 +100,29 @@ class ValidacionDualService {
   }
 
   /**
-   * Validación con IA (simulada por ahora, se puede integrar con OpenAI/Claude)
+   * Validación con IA usando Claude 3.5 Sonnet (el mejor modelo disponible)
    */
   private async validarConIA(
     datosFactura: DatosFacturaPDF,
     validacionExperto: ValidacionExpertoResult
   ): Promise<ValidacionIAResult> {
-    // TODO: Integrar con API de IA real (OpenAI, Anthropic Claude, etc.)
-    // Por ahora, retornamos una validación simulada inteligente
+    console.log('🤖 Validando con Claude 3.5 Sonnet...');
+
+    // Intentar validación con Claude API
+    try {
+      const Anthropic = require('@anthropic-ai/sdk');
+      const apiKey = process.env.ANTHROPIC_API_KEY;
+
+      if (apiKey) {
+        return await this.validarConClaude(datosFactura, validacionExperto, apiKey);
+      } else {
+        console.log('⚠️  ANTHROPIC_API_KEY no configurada, usando validación heurística avanzada');
+      }
+    } catch (error) {
+      console.log('⚠️  Error al usar Claude API, usando validación heurística:', error);
+    }
+
+    // Fallback: Validación heurística avanzada (sin API)
 
     const anomalias: ValidacionIAResult['anomaliasDetectadas'] = [];
 
@@ -161,6 +176,129 @@ class ValidacionDualService {
       recomendacion,
       confianzaGlobal
     };
+  }
+
+  /**
+   * Validación con Claude 3.5 Sonnet API
+   */
+  private async validarConClaude(
+    datosFactura: DatosFacturaPDF,
+    validacionExperto: ValidacionExpertoResult,
+    apiKey: string
+  ): Promise<ValidacionIAResult> {
+    const Anthropic = require('@anthropic-ai/sdk');
+    const anthropic = new Anthropic({ apiKey });
+
+    // Construir prompt detallado para análisis médico
+    const prompt = `Eres un auditor médico experto especializado en el sistema de salud colombiano y específicamente en Nueva EPS.
+
+Tu tarea es analizar esta factura médica y proporcionar una validación inteligente que complemente el sistema experto de tarifarios.
+
+**DATOS DE LA FACTURA:**
+- Número de Factura: ${datosFactura.numeroFactura}
+- Paciente: ${datosFactura.nombrePaciente} (${datosFactura.tipoDocumentoPaciente} ${datosFactura.numeroDocumento})
+- Diagnóstico Principal: ${datosFactura.diagnosticoPrincipal}
+- Código CUPS Procedimiento: ${datosFactura.codigoProcedimiento}
+- Descripción Procedimiento: ${datosFactura.descripcionProcedimiento}
+- Cantidad: ${datosFactura.cant}
+- Valor IPS Facturado: $${datosFactura.valorIPS}
+
+**VALIDACIÓN DEL SISTEMA EXPERTO (Tarifario Nueva EPS):**
+- Valor Contractual Nueva EPS: $${validacionExperto.valorAPagar}
+- Glosa Calculada: $${validacionExperto.valorGlosaAdmitiva}
+- Observación: ${validacionExperto.observacion}
+
+**TU ANÁLISIS DEBE INCLUIR:**
+
+1. **Coherencia Clínica**: ¿El procedimiento CUPS ${datosFactura.codigoProcedimiento} es coherente con el diagnóstico CIE-10 ${datosFactura.diagnosticoPrincipal}? ¿Es apropiado desde el punto de vista médico?
+
+2. **Pertinencia Médica**: ¿Este procedimiento es pertinente para la condición del paciente? ¿Existen alternativas más apropiadas?
+
+3. **Valoración de Precio**: ¿El valor facturado de $${datosFactura.valorIPS} es razonable comparado con el valor contractual de $${validacionExperto.valorAPagar}? ¿La diferencia está justificada?
+
+4. **Detección de Anomalías**: Identifica cualquier anomalía:
+   - Precios inusuales (muy altos o muy bajos)
+   - Cantidades sospechosas
+   - Incompatibilidades diagnóstico-procedimiento
+   - Códigos CUPS o CIE-10 incorrectos
+
+5. **Recomendación Final**: APROBAR, GLOSAR, o REVISAR (requiere auditor humano)
+
+**FORMATO DE RESPUESTA (JSON):**
+Responde ÚNICAMENTE con un objeto JSON válido con esta estructura:
+
+{
+  "coherenciaClinica": {
+    "esCoherente": true/false,
+    "confianza": 0-100,
+    "razonamiento": "explicación detallada"
+  },
+  "pertinenciaMedica": {
+    "esPertinente": true/false,
+    "confianza": 0-100,
+    "razonamiento": "explicación",
+    "alternativas": ["procedimiento1", "procedimiento2"] // opcional
+  },
+  "valoracionPrecio": {
+    "valorEsperadoMin": número,
+    "valorEsperadoMax": número,
+    "valorPromedio": número,
+    "confianza": 0-100,
+    "razonamiento": "análisis del precio"
+  },
+  "anomaliasDetectadas": [
+    {
+      "tipo": "precio_inusual|cantidad_sospechosa|diagnostico_incompatible|codigo_incorrecto",
+      "severidad": "baja|media|alta",
+      "descripcion": "descripción de la anomalía",
+      "sugerencia": "recomendación"
+    }
+  ],
+  "recomendacion": "APROBAR|GLOSAR|REVISAR",
+  "confianzaGlobal": 0-100
+}`;
+
+    try {
+      console.log('📡 Llamando a Claude 3.5 Sonnet API...');
+
+      const message = await anthropic.messages.create({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 2048,
+        temperature: 0,
+        messages: [{
+          role: 'user',
+          content: prompt
+        }]
+      });
+
+      // Extraer el contenido de la respuesta
+      const content = message.content[0];
+      if (content.type !== 'text') {
+        throw new Error('Respuesta no es texto');
+      }
+
+      // Parsear JSON de la respuesta
+      const respuestaTexto = content.text;
+
+      // Extraer JSON de la respuesta (puede venir con texto adicional)
+      const jsonMatch = respuestaTexto.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error('No se encontró JSON en la respuesta de Claude');
+      }
+
+      const resultado: ValidacionIAResult = JSON.parse(jsonMatch[0]);
+
+      console.log('✅ Validación con Claude completada');
+      console.log(`   - Recomendación: ${resultado.recomendacion}`);
+      console.log(`   - Confianza: ${resultado.confianzaGlobal}%`);
+      console.log(`   - Anomalías detectadas: ${resultado.anomaliasDetectadas.length}`);
+
+      return resultado;
+
+    } catch (error) {
+      console.error('❌ Error al llamar a Claude API:', error);
+      throw error; // Re-lanzar para que se use el fallback heurístico
+    }
   }
 
   /**
