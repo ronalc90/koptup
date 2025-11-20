@@ -100,26 +100,26 @@ class ValidacionDualService {
   }
 
   /**
-   * Validación con IA usando Claude 3.5 Sonnet (el mejor modelo disponible)
+   * Validación con IA usando GPT-4o (el mejor modelo disponible)
    */
   private async validarConIA(
     datosFactura: DatosFacturaPDF,
     validacionExperto: ValidacionExpertoResult
   ): Promise<ValidacionIAResult> {
-    console.log('🤖 Validando con Claude 3.5 Sonnet...');
+    console.log('🤖 Validando con GPT-4o...');
 
-    // Intentar validación con Claude API
+    // Intentar validación con GPT-4o API
     try {
-      const Anthropic = require('@anthropic-ai/sdk');
-      const apiKey = process.env.ANTHROPIC_API_KEY;
+      const OpenAI = require('openai').default;
+      const apiKey = process.env.OPENAI_API_KEY;
 
       if (apiKey) {
-        return await this.validarConClaude(datosFactura, validacionExperto, apiKey);
+        return await this.validarConGPT4o(datosFactura, validacionExperto, apiKey);
       } else {
-        console.log('⚠️  ANTHROPIC_API_KEY no configurada, usando validación heurística avanzada');
+        console.log('⚠️  OPENAI_API_KEY no configurada, usando validación heurística avanzada');
       }
     } catch (error) {
-      console.log('⚠️  Error al usar Claude API, usando validación heurística:', error);
+      console.log('⚠️  Error al usar GPT-4o API, usando validación heurística:', error);
     }
 
     // Fallback: Validación heurística avanzada (sin API)
@@ -179,15 +179,15 @@ class ValidacionDualService {
   }
 
   /**
-   * Validación con Claude 3.5 Sonnet API
+   * Validación con GPT-4o API
    */
-  private async validarConClaude(
+  private async validarConGPT4o(
     datosFactura: DatosFacturaPDF,
     validacionExperto: ValidacionExpertoResult,
     apiKey: string
   ): Promise<ValidacionIAResult> {
-    const Anthropic = require('@anthropic-ai/sdk');
-    const anthropic = new Anthropic({ apiKey });
+    const OpenAI = require('openai').default;
+    const openai = new OpenAI({ apiKey });
 
     // Construir prompt detallado para análisis médico
     const prompt = `Eres un auditor médico experto especializado en el sistema de salud colombiano y específicamente en Nueva EPS.
@@ -259,36 +259,30 @@ Responde ÚNICAMENTE con un objeto JSON válido con esta estructura:
 }`;
 
     try {
-      console.log('📡 Llamando a Claude 3.5 Sonnet API...');
+      console.log('📡 Llamando a GPT-4o API...');
 
-      const message = await anthropic.messages.create({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 2048,
-        temperature: 0,
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4o',
         messages: [{
           role: 'user',
           content: prompt
-        }]
+        }],
+        max_tokens: 2048,
+        temperature: 0,
       });
 
       // Extraer el contenido de la respuesta
-      const content = message.content[0];
-      if (content.type !== 'text') {
-        throw new Error('Respuesta no es texto');
-      }
-
-      // Parsear JSON de la respuesta
-      const respuestaTexto = content.text;
+      const respuestaTexto = completion.choices[0].message.content || '{}';
 
       // Extraer JSON de la respuesta (puede venir con texto adicional)
       const jsonMatch = respuestaTexto.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
-        throw new Error('No se encontró JSON en la respuesta de Claude');
+        throw new Error('No se encontró JSON en la respuesta de GPT-4o');
       }
 
       const resultado: ValidacionIAResult = JSON.parse(jsonMatch[0]);
 
-      console.log('✅ Validación con Claude completada');
+      console.log('✅ Validación con GPT-4o completada');
       console.log(`   - Recomendación: ${resultado.recomendacion}`);
       console.log(`   - Confianza: ${resultado.confianzaGlobal}%`);
       console.log(`   - Anomalías detectadas: ${resultado.anomaliasDetectadas.length}`);
@@ -296,7 +290,7 @@ Responde ÚNICAMENTE con un objeto JSON válido con esta estructura:
       return resultado;
 
     } catch (error) {
-      console.error('❌ Error al llamar a Claude API:', error);
+      console.error('❌ Error al llamar a GPT-4o API:', error);
       throw error; // Re-lanzar para que se use el fallback heurístico
     }
   }

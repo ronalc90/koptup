@@ -9,6 +9,7 @@ import pdfExtractorService from '../services/pdf-extractor.service';
 import glosaCalculatorService from '../services/glosa-calculator.service';
 import excelFacturaMedicaService from '../services/excel-factura-medica.service';
 import validacionDualService from '../services/validacion-dual.service';
+import extraccionDualService from '../services/extraccion-dual.service';
 
 class AuditoriaMedicaController {
   /**
@@ -48,10 +49,13 @@ class AuditoriaMedicaController {
         });
       }
 
-      // 1. EXTRAER DATOS DEL PDF DE FACTURA
-      console.log('📄 Paso 1: Extrayendo datos del PDF de factura...');
+      // 1. EXTRAER DATOS DEL PDF DE FACTURA CON DOBLE VALIDACIÓN (REGEX + GPT-4o Vision)
+      console.log('📄 Paso 1: Extrayendo datos del PDF con doble validación (REGEX + GPT-4o Vision)...');
       const archivoFactura = archivosFactura[0];
-      const datosFactura = await pdfExtractorService.extraerDatosFactura(archivoFactura.path);
+      const resultadoExtraccion = await extraccionDualService.extraerConDobleValidacion(archivoFactura.path);
+
+      // Usar datos finales (resultado de la comparación y arbitraje)
+      const datosFactura = resultadoExtraccion.datosFinales;
 
       console.log('✅ Datos extraídos de la factura:');
       console.log(`   - Factura: ${datosFactura.nroFactura}`);
@@ -59,6 +63,13 @@ class AuditoriaMedicaController {
       console.log(`   - Procedimiento: ${datosFactura.codigoProcedimiento} - ${datosFactura.nombreProcedimiento}`);
       console.log(`   - Valor IPS: $${datosFactura.valorIPS.toLocaleString('es-CO')}`);
       console.log(`   - Diagnóstico: ${datosFactura.diagnosticoPrincipal}`);
+
+      // Mostrar reporte de extracción dual
+      if (resultadoExtraccion.comparacion.discrepancias > 0) {
+        console.log('\n⚠️  DISCREPANCIAS DETECTADAS EN EXTRACCIÓN:');
+        const reporte = extraccionDualService.generarReporteComparacion(resultadoExtraccion);
+        console.log(reporte);
+      }
 
       // 2. EXTRAER DATOS DE HISTORIA CLÍNICA (si existe)
       if (archivosHistoriaClinica.length > 0) {
