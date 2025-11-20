@@ -169,6 +169,13 @@ const startServer = async () => {
       console.log('Servidor iniciado correctamente', `http://localhost:${PORT}`);
     });
 
+    // Aumentar timeout del servidor para permitir análisis IA exhaustivo
+    // "aunque se demore un rato" - el usuario prioriza precisión sobre velocidad
+    server.timeout = 300000; // 5 minutos
+    server.keepAliveTimeout = 310000; // Ligeramente mayor que timeout
+    server.headersTimeout = 320000; // Ligeramente mayor que keepAliveTimeout
+    logger.info('Timeouts del servidor configurados para análisis IA extenso (5 min)');
+
     const shutdown = (signal: string) => {
       logger.info(`Recibido ${signal}, cerrando...`);
       server.close(() => {
