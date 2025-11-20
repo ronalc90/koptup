@@ -1,6 +1,7 @@
 import express from 'express';
 import auditoriaController, { upload } from '../controllers/auditoria.controller';
 import auditoriaMedicaController from '../controllers/auditoria-medica.controller';
+import auditoriaModularController from '../controllers/auditoria-modular.controller';
 
 const router = express.Router();
 
@@ -77,6 +78,54 @@ router.post('/procesar-archivos', upload.array('files', 10), auditoriaController
  *         description: Factura procesada y auditada exitosamente con datos reales del PDF
  */
 router.post('/procesar-facturas-pdf', upload.array('files', 10), auditoriaMedicaController.procesarFacturasPDF);
+
+/**
+ * @swagger
+ * /api/auditoria/procesar-modular:
+ *   post:
+ *     tags: [Auditoría Modular - NUEVO SISTEMA]
+ *     summary: 🚀 Procesar documento con sistema modular completo (80+ campos)
+ *     description: Sistema completamente rediseñado con arquitectura modular de 7 módulos - Extrae 80-100 campos con máxima precisión usando GPT-4o Vision
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               files:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *                 description: PDF, imagen, escaneo - cualquier formato
+ *     responses:
+ *       201:
+ *         description: Documento procesado con sistema modular - Extracción completa de 80+ campos
+ */
+router.post('/procesar-modular', upload.array('files', 10), auditoriaModularController.procesarDocumentoCompleto);
+
+/**
+ * @swagger
+ * /api/auditoria/facturas/{id}/calificar:
+ *   get:
+ *     tags: [Sistema de Aprendizaje]
+ *     summary: Obtener detalle de factura para calificar decisiones IA
+ *     description: Retorna factura completa con todas las decisiones IA para que el usuario pueda calificarlas
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la factura
+ *     responses:
+ *       200:
+ *         description: Detalle de factura con decisiones IA
+ *       404:
+ *         description: Factura no encontrada
+ */
+router.get('/facturas/:id/calificar', auditoriaModularController.obtenerDetalleParaCalificar);
 
 /**
  * @swagger
