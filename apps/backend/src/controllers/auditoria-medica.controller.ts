@@ -16,7 +16,7 @@ class AuditoriaMedicaController {
   /**
    * Procesar archivos PDF y crear factura con auditoría completa
    */
-  async procesarFacturasPDF(req: Request, res: Response) {
+  procesarFacturasPDF = async (req: Request, res: Response) => {
     try {
       const { nombreCuenta } = req.body;
       const files = req.files as Express.Multer.File[];
@@ -147,6 +147,32 @@ class AuditoriaMedicaController {
       console.log('💾 Paso 4: Guardando en base de datos con valores confirmados por IA...');
       const numeroFactura = datosFinalesConfirmados.nroFactura || `FAC-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
+      // Mapear veredicto de IA a estado válido de Factura
+      const mapearVeredictoAEstado = (veredicto: string): 'Radicada' | 'En Auditoría' | 'Auditada' | 'Glosada' | 'Aceptada' | 'Pagada' | 'Rechazada' => {
+        const mappings: Record<string, 'Radicada' | 'En Auditoría' | 'Auditada' | 'Glosada' | 'Aceptada' | 'Pagada' | 'Rechazada'> = {
+          'APROBADO': 'Aceptada',
+          'REQUIERE_REVISION_HUMANA': 'En Auditoría',
+          'RECHAZADO': 'Rechazada',
+          'GLOSADO': 'Glosada',
+        };
+        return mappings[veredicto] || 'En Auditoría';
+      };
+
+      const estadoFactura = mapearVeredictoAEstado(decisionFinalIA.decisionFinal.veredicto);
+
+      // Mapear tipo de glosa a valores válidos del schema
+      const mapearTipoGlosa = (tipoOriginal: string): 'Tarifa' | 'Soporte' | 'Pertinencia' | 'Duplicidad' | 'Autorización' | 'Facturación' | 'Otro' => {
+        const mappings: Record<string, 'Tarifa' | 'Soporte' | 'Pertinencia' | 'Duplicidad' | 'Autorización' | 'Facturación' | 'Otro'> = {
+          'DIFERENCIA_TARIFA': 'Tarifa',
+          'FALTA_SOPORTE': 'Soporte',
+          'FALTA_PERTINENCIA': 'Pertinencia',
+          'DUPLICIDAD': 'Duplicidad',
+          'FALTA_AUTORIZACION': 'Autorización',
+          'ERROR_FACTURACION': 'Facturación',
+        };
+        return mappings[tipoOriginal] || 'Otro';
+      };
+
       // Verificar si MongoDB está conectado
       const mongoose = require('mongoose');
       const mongoConnected = mongoose.connection.readyState === 1;
@@ -165,7 +191,7 @@ class AuditoriaMedicaController {
           valorTotal: datosFinalesConfirmados.valorIPS || 0,
           totalGlosas: valorFinalGlosa,
           valorAceptado: valorFinalAPagar,
-          estado: decisionFinalIA.decisionFinal.veredicto,
+          estado: estadoFactura,
           auditoriaCompletada: !decisionFinalIA.decisionFinal.requiereRevisionHumana,
           observacionesIA: decisionFinalIA.decisionFinal.justificacion.resumenEjecutivo,
         };
@@ -191,8 +217,16 @@ class AuditoriaMedicaController {
           diferenciaTarifa: (datosFinalesConfirmados.valorIPS || 0) - valorFinalAPagar,
         };
       } else {
+        // Verificar si ya existe factura con ese número y agregar sufijo si es necesario
+        let numeroFacturaFinal = numeroFactura;
+        const facturaExistente = await Factura.findOne({ numeroFactura: numeroFacturaFinal });
+        if (facturaExistente) {
+          console.log(`⚠️  Factura ${numeroFacturaFinal} ya existe. Agregando sufijo...`);
+          numeroFacturaFinal = `${numeroFacturaFinal}-${Date.now()}`;
+        }
+
         factura = new Factura({
-          numeroFactura: numeroFactura,
+          numeroFactura: numeroFacturaFinal,
           fechaEmision: this.parsearFecha(datosFinalesConfirmados.fechaFactura) || new Date(),
           fechaRadicacion: this.parsearFecha(datosFinalesConfirmados.fechaRadicacion) || new Date(),
           ips: {
@@ -210,7 +244,7 @@ class AuditoriaMedicaController {
           valorBruto: datosFinalesConfirmados.valorIPS || 0,
           iva: datosFinalesConfirmados.valorIVA || 0,
           valorTotal: datosFinalesConfirmados.valorIPS || 0,
-          estado: decisionFinalIA.decisionFinal.veredicto,
+          estado: estadoFactura,
           auditoriaCompletada: !decisionFinalIA.decisionFinal.requiereRevisionHumana,
           fechaAuditoria: new Date(),
           totalGlosas: valorFinalGlosa,
@@ -284,14 +318,16 @@ class AuditoriaMedicaController {
           const glosa = new Glosa({
             facturaId: factura._id,
             procedimientoId: procedimiento._id,
-            tipo: glosaData.tipo,
+            atencionId: atencion._id,
+            tipo: mapearTipoGlosa(glosaData.tipo),
             codigo: glosaData.codigo,
             descripcion: glosaData.observacion,
             valorGlosado: glosaData.valorTotalGlosa,
-            estado: 'Generada',
-            esAutomatica: glosaData.automatica,
+            estado: 'Pendiente',
+            generadaAutomaticamente: glosaData.automatica,
             fechaGeneracion: new Date(),
             justificacion: glosaData.observacion,
+            requiereSoporte: false,
           });
 
           await glosa.save();
@@ -390,7 +426,7 @@ class AuditoriaMedicaController {
   /**
    * Descargar Excel de auditoría de una factura
    */
-  async descargarExcelAuditoria(req: Request, res: Response) {
+  descargarExcelAuditoria = async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
 
