@@ -14,7 +14,7 @@ import * as path from 'path';
 import OpenAI from 'openai';
 import pdfExtractorService from './pdf-extractor.service';
 import { DatosFacturaPDF } from '../types/factura.types';
-const pdf = require('pdf-poppler');
+const { pdfToPng } = require('pdf-to-png-converter');
 
 /**
  * Resultado de extracción con metadatos de confianza
@@ -327,7 +327,7 @@ Responde ÚNICAMENTE con un objeto JSON válido con esta estructura exacta:
   }
 
   /**
-   * Convertir PDF a imagen usando pdf-poppler
+   * Convertir PDF a imagen usando pdf-to-png-converter
    */
   private async convertirPDFaImagen(pdfPath: string): Promise<string> {
     const outputDir = path.join(process.cwd(), 'uploads', 'temp-images');
@@ -337,25 +337,25 @@ Responde ÚNICAMENTE con un objeto JSON válido con esta estructura exacta:
       fs.mkdirSync(outputDir, { recursive: true });
     }
 
-    const opts = {
-      format: 'png',
-      out_dir: outputDir,
-      out_prefix: `pdf_${Date.now()}`,
-      page: 1, // Solo la primera página
-    };
-
     try {
-      await pdf.convert(pdfPath, opts);
+      // Convertir primera página del PDF a PNG
+      const pngPages = await pdfToPng(pdfPath, {
+        disableFontFace: false,
+        useSystemFonts: false,
+        viewportScale: 2.0,
+        outputFolder: outputDir,
+        outputFileMask: `pdf_${Date.now()}`,
+        pagesToProcess: [1], // Solo primera página
+      });
 
-      // Buscar la imagen generada
-      const files = fs.readdirSync(outputDir);
-      const imagenGenerada = files.find(f => f.startsWith(opts.out_prefix) && f.endsWith('.png'));
-
-      if (!imagenGenerada) {
-        throw new Error('No se generó la imagen del PDF');
+      if (!pngPages || pngPages.length === 0) {
+        throw new Error('No se pudo convertir el PDF a imagen');
       }
 
-      return path.join(outputDir, imagenGenerada);
+      // La imagen se guarda automáticamente en outputFolder
+      // Retornar la ruta completa
+      const imagePath = pngPages[0].path;
+      return imagePath;
     } catch (error) {
       console.error('❌ Error al convertir PDF a imagen:', error);
       throw error;
