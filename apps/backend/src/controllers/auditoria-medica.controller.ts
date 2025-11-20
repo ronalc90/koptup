@@ -10,6 +10,7 @@ import glosaCalculatorService from '../services/glosa-calculator.service';
 import excelFacturaMedicaService from '../services/excel-factura-medica.service';
 import validacionDualService from '../services/validacion-dual.service';
 import extraccionDualService from '../services/extraccion-dual.service';
+import auditorIAFinalService from '../services/auditor-ia-final.service';
 
 class AuditoriaMedicaController {
   /**
@@ -96,33 +97,55 @@ class AuditoriaMedicaController {
       console.log(`   - Cantidad de glosas: ${resultadoGlosas.glosas.length}`);
       console.log(`   - Observación: ${resultadoGlosas.observacion}`);
 
-      // 3.5. VALIDACIÓN DUAL: SISTEMA EXPERTO + IA
-      console.log('🤖 Paso 3.5: Ejecutando validación dual (Sistema Experto + IA)...');
-      const validacionExpertoResult = {
-        glosas: resultadoGlosas.glosas,
-        valorAPagar: resultadoGlosas.valorAPagar,
-        valorGlosaAdmitiva: resultadoGlosas.valorGlosaAdmitiva,
-        observacion: resultadoGlosas.observacion,
-        confianza: 100 as const,
-      };
+      // 3.5. 🤖 AUDITOR IA FINAL: TOMA LA DECISIÓN DEFINITIVA
+      console.log('🤖 Paso 3.5: AUDITOR IA FINAL - Análisis y decisión definitiva...');
 
-      const resultadoValidacionDual = await validacionDualService.validarConSistemasDuales(
-        datosFactura,
-        validacionExpertoResult
-      );
+      // Preparar discrepancias para la IA
+      const discrepancias = resultadoExtraccion.comparacion.camposComparados
+        .filter(c => !c.coincide)
+        .map(c => ({
+          campo: c.campo,
+          valorRegex: c.valorRegex,
+          valorVision: c.valorVision,
+        }));
 
-      console.log('✅ Validación dual completada:');
-      console.log(`   - Decisión: ${resultadoValidacionDual.decision.tipoDecision}`);
-      console.log(`   - Confianza: ${resultadoValidacionDual.decision.nivelConfianza}%`);
-      console.log(`   - Requiere revisión humana: ${resultadoValidacionDual.decision.requiereRevisionHumana ? 'SÍ ⚠️' : 'NO ✅'}`);
+      const decisionFinalIA = await auditorIAFinalService.tomarDecisionFinal({
+        extraccionRegex: {
+          datos: resultadoExtraccion.extraccionRegex,
+          confianza: resultadoExtraccion.extraccionRegex.metadatos.confianza,
+        },
+        extraccionVision: {
+          datos: resultadoExtraccion.extraccionVision,
+          confianza: resultadoExtraccion.extraccionVision.metadatos.confianza,
+        },
+        discrepancias,
+        sistemaExperto: {
+          valorIPSFacturado: datosFactura.valorIPS || 0,
+          valorContratoNuevaEPS: resultadoGlosas.valorAPagar,
+          glosaCalculada: resultadoGlosas.valorGlosaAdmitiva,
+          observacion: resultadoGlosas.observacion,
+        },
+        imagenPDFBase64: resultadoExtraccion.imagenPDFBase64,
+      });
 
-      // Generar y mostrar reporte de validación dual
-      const reporteValidacion = validacionDualService.generarReporte(resultadoValidacionDual);
-      console.log('\n' + reporteValidacion + '\n');
+      // USAR LOS DATOS CONFIRMADOS POR LA IA (no los de extracción)
+      const datosFinalesConfirmados = decisionFinalIA.datosConfirmados;
 
-      // 4. CREAR FACTURA EN LA BASE DE DATOS
-      console.log('💾 Paso 4: Guardando en base de datos...');
-      const numeroFactura = datosFactura.nroFactura || `FAC-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+      // USAR LOS VALORES DECIDIDOS POR LA IA (no los del sistema experto)
+      const valorFinalAPagar = decisionFinalIA.decisionFinal.valorAPagar;
+      const valorFinalGlosa = decisionFinalIA.decisionFinal.valorGlosa;
+
+      console.log('');
+      console.log('✅ DECISIÓN FINAL TOMADA POR LA IA:');
+      console.log(`   💵 Valor a pagar: $${valorFinalAPagar.toLocaleString('es-CO')}`);
+      console.log(`   📉 Glosa: $${valorFinalGlosa.toLocaleString('es-CO')} (${decisionFinalIA.decisionFinal.porcentajeGlosa}%)`);
+      console.log(`   🎯 Veredicto: ${decisionFinalIA.decisionFinal.veredicto}`);
+      console.log(`   📊 Confianza IA: ${decisionFinalIA.metadatos.confianzaDecision}%`);
+      console.log('');
+
+      // 4. CREAR FACTURA EN LA BASE DE DATOS (CON VALORES DECIDIDOS POR LA IA)
+      console.log('💾 Paso 4: Guardando en base de datos con valores confirmados por IA...');
+      const numeroFactura = datosFinalesConfirmados.nroFactura || `FAC-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
       // Verificar si MongoDB está conectado
       const mongoose = require('mongoose');
@@ -134,45 +157,48 @@ class AuditoriaMedicaController {
 
       if (!mongoConnected) {
         console.log('⚠️  MongoDB no conectado - continuando sin guardar en DB');
-        // Crear objetos mock para continuar con el proceso
+        // Crear objetos mock para continuar con el proceso (usando valores de IA)
         factura = {
           _id: `TEMP-${Date.now()}`,
           numeroFactura,
-          valorBruto: datosFactura.valorBrutoFactura || datosFactura.valorIPS,
-          valorTotal: datosFactura.valorNetoFactura || datosFactura.valorIPS,
-          totalGlosas: resultadoGlosas.valorGlosaAdmitiva,
-          valorAceptado: resultadoGlosas.valorAPagar,
-          estado: 'Auditada',
-          auditoriaCompletada: true,
+          valorBruto: datosFinalesConfirmados.valorIPS || 0,
+          valorTotal: datosFinalesConfirmados.valorIPS || 0,
+          totalGlosas: valorFinalGlosa,
+          valorAceptado: valorFinalAPagar,
+          estado: decisionFinalIA.decisionFinal.veredicto,
+          auditoriaCompletada: !decisionFinalIA.decisionFinal.requiereRevisionHumana,
+          observacionesIA: decisionFinalIA.decisionFinal.justificacion.resumenEjecutivo,
         };
 
         atencion = {
-          numeroAtencion: datosFactura.nroAutNvo || `AT-${Date.now()}`,
+          numeroAtencion: datosFinalesConfirmados.nroAutNvo || `AT-${Date.now()}`,
           paciente: {
-            nombres: datosFactura.nombrePaciente?.split(' ').slice(0, 2).join(' ') || '',
-            apellidos: datosFactura.nombrePaciente?.split(' ').slice(2).join(' ') || '',
+            nombres: datosFinalesConfirmados.nombrePaciente?.split(' ').slice(0, 2).join(' ') || '',
+            apellidos: datosFinalesConfirmados.nombrePaciente?.split(' ').slice(2).join(' ') || '',
+            tipoDocumento: datosFinalesConfirmados.tipoDocumentoPaciente,
+            numeroDocumento: datosFinalesConfirmados.numeroDocumento,
           },
           diagnosticoPrincipal: {
-            codigoCIE10: datosFactura.diagnosticoPrincipal,
+            codigoCIE10: datosFinalesConfirmados.diagnosticoPrincipal,
           },
         };
 
         procedimiento = {
-          codigoCUPS: datosFactura.codigoProcedimiento,
-          descripcion: datosFactura.nombreProcedimiento,
-          valorUnitarioIPS: datosFactura.valorIPS,
-          valorUnitarioContrato: resultadoGlosas.valorAPagar,
-          diferenciaTarifa: datosFactura.valorIPS - resultadoGlosas.valorAPagar,
+          codigoCUPS: datosFinalesConfirmados.codigoProcedimiento,
+          descripcion: datosFinalesConfirmados.nombreProcedimiento,
+          valorUnitarioIPS: datosFinalesConfirmados.valorIPS,
+          valorUnitarioContrato: valorFinalAPagar,
+          diferenciaTarifa: (datosFinalesConfirmados.valorIPS || 0) - valorFinalAPagar,
         };
       } else {
         factura = new Factura({
           numeroFactura: numeroFactura,
-          fechaEmision: this.parsearFecha(datosFactura.fechaFactura) || new Date(),
-          fechaRadicacion: this.parsearFecha(datosFactura.fechaRadicacion) || new Date(),
+          fechaEmision: this.parsearFecha(datosFinalesConfirmados.fechaFactura) || new Date(),
+          fechaRadicacion: this.parsearFecha(datosFinalesConfirmados.fechaRadicacion) || new Date(),
           ips: {
-            nit: datosFactura.tipoDocumentoIPS || '860007336-1',
+            nit: datosFinalesConfirmados.tipoDocumentoIPS || '860007336-1',
             nombre: 'COLSUBSIDIO',
-            codigo: datosFactura.tipoDocumentoIPS?.split('-')[0] || '',
+            codigo: datosFinalesConfirmados.tipoDocumentoIPS?.split('-')[0] || '',
           },
           eps: {
             nit: '900156264',
@@ -180,16 +206,16 @@ class AuditoriaMedicaController {
             codigo: 'NUEVAEPS',
           },
           numeroContrato: 'NUEVA EPS EVENTO CLINICAS',
-          regimen: datosFactura.regimen || 'Contributivo',
-          valorBruto: datosFactura.valorBrutoFactura || datosFactura.valorIPS,
-          iva: datosFactura.valorIVA || 0,
-          valorTotal: datosFactura.valorNetoFactura || datosFactura.valorIPS,
-          estado: 'Auditada',
-          auditoriaCompletada: true,
+          regimen: datosFinalesConfirmados.regimen || 'Contributivo',
+          valorBruto: datosFinalesConfirmados.valorIPS || 0,
+          iva: datosFinalesConfirmados.valorIVA || 0,
+          valorTotal: datosFinalesConfirmados.valorIPS || 0,
+          estado: decisionFinalIA.decisionFinal.veredicto,
+          auditoriaCompletada: !decisionFinalIA.decisionFinal.requiereRevisionHumana,
           fechaAuditoria: new Date(),
-          totalGlosas: resultadoGlosas.valorGlosaAdmitiva,
-          valorAceptado: resultadoGlosas.valorAPagar,
-          observaciones: resultadoGlosas.observacion,
+          totalGlosas: valorFinalGlosa,
+          valorAceptado: valorFinalAPagar,
+          observaciones: `${decisionFinalIA.decisionFinal.justificacion.resumenEjecutivo}\n\nFundamento Médico: ${decisionFinalIA.decisionFinal.justificacion.fundamentoMedico}\n\nFundamento Financiero: ${decisionFinalIA.decisionFinal.justificacion.fundamentoFinanciero}`,
         });
 
         await factura.save();

@@ -65,10 +65,14 @@ interface ResultadoExtraccionDual {
     requiereRevisionHumana: boolean;
     razonamiento: string;
   };
+
+  // Imagen del PDF para análisis del Auditor IA Final
+  imagenPDFBase64?: string;
 }
 
 class ExtraccionDualService {
   private openai: OpenAI | null = null;
+  private ultimaImagenBase64: string | undefined;
 
   constructor() {
     const apiKey = process.env.OPENAI_API_KEY;
@@ -186,6 +190,9 @@ class ExtraccionDualService {
     // 2. Leer imagen como base64
     const imageBuffer = fs.readFileSync(imagePath);
     const base64Image = imageBuffer.toString('base64');
+
+    // Guardar para el Auditor IA Final
+    this.ultimaImagenBase64 = base64Image;
 
     // 3. Llamar a GPT-4o Vision con prompt detallado
     const prompt = `Eres un experto en extracción de datos de facturas médicas colombianas.
@@ -477,6 +484,7 @@ Responde ÚNICAMENTE con un objeto JSON válido con esta estructura exacta:
         requiereRevisionHumana,
         razonamiento,
       },
+      imagenPDFBase64: this.ultimaImagenBase64,
     };
   }
 
