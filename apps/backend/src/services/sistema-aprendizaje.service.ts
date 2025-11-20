@@ -285,6 +285,19 @@ ${decision.feedback?.comentario ? `\nNota importante: ${decision.feedback.coment
   }
 
   /**
+   * Obtener decisiones de una factura específica
+   */
+  async obtenerDecisionesFactura(numeroFactura: string): Promise<DecisionIA[]> {
+    const archivos = fs.readdirSync(this.decisionesPath);
+    const decisiones: DecisionIA[] = archivos
+      .filter(f => f.endsWith('.json'))
+      .map(f => JSON.parse(fs.readFileSync(path.join(this.decisionesPath, f), 'utf-8')))
+      .filter(d => d.contexto.numeroFactura === numeroFactura);
+
+    return decisiones;
+  }
+
+  /**
    * Obtener estadísticas de aprendizaje
    */
   async obtenerEstadisticas(): Promise<any> {
