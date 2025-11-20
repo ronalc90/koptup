@@ -8,6 +8,7 @@ import Glosa from '../models/Glosa';
 import pdfExtractorService from '../services/pdf-extractor.service';
 import glosaCalculatorService from '../services/glosa-calculator.service';
 import excelFacturaMedicaService from '../services/excel-factura-medica.service';
+import validacionDualService from '../services/validacion-dual.service';
 
 class AuditoriaMedicaController {
   /**
@@ -83,6 +84,30 @@ class AuditoriaMedicaController {
       console.log(`   - Glosa admitiva: $${resultadoGlosas.valorGlosaAdmitiva.toLocaleString('es-CO')}`);
       console.log(`   - Cantidad de glosas: ${resultadoGlosas.glosas.length}`);
       console.log(`   - Observación: ${resultadoGlosas.observacion}`);
+
+      // 3.5. VALIDACIÓN DUAL: SISTEMA EXPERTO + IA
+      console.log('🤖 Paso 3.5: Ejecutando validación dual (Sistema Experto + IA)...');
+      const validacionExpertoResult = {
+        glosas: resultadoGlosas.glosas,
+        valorAPagar: resultadoGlosas.valorAPagar,
+        valorGlosaAdmitiva: resultadoGlosas.valorGlosaAdmitiva,
+        observacion: resultadoGlosas.observacion,
+        confianza: 100 as const,
+      };
+
+      const resultadoValidacionDual = await validacionDualService.validarConSistemasDuales(
+        datosFactura,
+        validacionExpertoResult
+      );
+
+      console.log('✅ Validación dual completada:');
+      console.log(`   - Decisión: ${resultadoValidacionDual.decision.tipoDecision}`);
+      console.log(`   - Confianza: ${resultadoValidacionDual.decision.nivelConfianza}%`);
+      console.log(`   - Requiere revisión humana: ${resultadoValidacionDual.decision.requiereRevisionHumana ? 'SÍ ⚠️' : 'NO ✅'}`);
+
+      // Generar y mostrar reporte de validación dual
+      const reporteValidacion = validacionDualService.generarReporte(resultadoValidacionDual);
+      console.log('\n' + reporteValidacion + '\n');
 
       // 4. CREAR FACTURA EN LA BASE DE DATOS
       console.log('💾 Paso 4: Guardando en base de datos...');
