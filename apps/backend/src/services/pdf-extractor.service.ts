@@ -283,9 +283,20 @@ class PDFExtractorService {
    * Extrae código CUPS del procedimiento
    */
   private extraerCodigoCUPS(texto: string): string {
-    // Buscar código CUPS (usualmente 6 dígitos)
-    const match = texto.match(/\b(\d{6})\b/);
-    return match ? match[1] : '';
+    // Buscar todos los códigos de 6 dígitos
+    const matches = texto.match(/\b(\d{6})\b/g);
+
+    console.log('🔍 Códigos de 6 dígitos encontrados:', matches);
+
+    if (!matches || matches.length === 0) return '';
+
+    // Filtrar códigos CUPS válidos (deben empezar con 8 o 9)
+    const codigosValidos = matches.filter(codigo => codigo.startsWith('8') || codigo.startsWith('9'));
+
+    console.log('✅ Códigos CUPS válidos (empiezan con 8 o 9):', codigosValidos);
+
+    // Retornar el primer código válido, o el primero encontrado si no hay válidos
+    return codigosValidos.length > 0 ? codigosValidos[0] : matches[0];
   }
 
   /**
@@ -321,7 +332,20 @@ class PDFExtractorService {
    * Extrae número de documento del paciente
    */
   private extraerNumeroDocumento(texto: string): string {
-    const match = texto.match(/(?:N[uú]mero\s*de\s*(?:Identificaci[oó]n|documento)|Identificaci[oó]n)[:\s]+([\d]+)/i);
+    // Intentar múltiples patrones
+    let match = texto.match(/(?:N[uú]mero\s*de\s*(?:Identificaci[oó]n|documento)|Identificaci[oó]n)[:\s]+([\d]+)/i);
+
+    if (!match) {
+      // Buscar "CC" o "RC" seguido de número
+      match = texto.match(/(?:CC|RC|TI)[:\s]+([\d]+)/i);
+    }
+
+    if (!match) {
+      // Buscar cualquier secuencia de 7-10 dígitos después de tipo de documento
+      match = texto.match(/(?:CC|RC|TI|CE)\s+([\d]{7,10})/i);
+    }
+
+    console.log('📄 Número de documento extraído:', match ? match[1] : 'NO ENCONTRADO');
     return match ? match[1] : '';
   }
 
@@ -329,19 +353,27 @@ class PDFExtractorService {
    * Extrae nombre completo del paciente
    */
   private extraerNombrePaciente(texto: string): string {
-    // Buscar "Nombre del Paciente" o "APELLIDOS DEL PACIENTE NOMBRES DEL PACIENTE"
-    let match = texto.match(/Nombre\s*del\s*[Pp]aciente[:\s]+([A-ZÁÉÍÓÚ][A-ZÁÉÍÓÚa-záéíóú\s]+?)(?:\s+Fecha|Tipo|Sexo|$)/i);
+    // Intentar múltiples patrones
+    let match = texto.match(/Nombre\s*del\s*[Pp]aciente[:\s]+([A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑa-záéíóúñ\s]+?)(?:\s+Fecha|Tipo|Sexo|Documento|$)/i);
 
     if (!match) {
       // Intentar formato "APELLIDOS NOMBRES"
-      const apellidos = texto.match(/APELLIDOS\s*DEL\s*PACIENTE[:\s]+([A-ZÁÉÍÓÚ]+)/i);
-      const nombres = texto.match(/NOMBRES\s*DEL\s*PACIENTE[:\s]+([A-ZÁÉÍÓÚ\s]+)/i);
+      const apellidos = texto.match(/APELLIDOS\s*DEL\s*PACIENTE[:\s]+([A-ZÁÉÍÓÚÑ\s]+?)(?:\s+NOMBRES|$)/i);
+      const nombres = texto.match(/NOMBRES\s*DEL\s*PACIENTE[:\s]+([A-ZÁÉÍÓÚÑ\s]+?)(?:\s+Fecha|Tipo|$)/i);
 
       if (apellidos && nombres) {
-        return `${nombres[1].trim()} ${apellidos[1].trim()}`;
+        const nombreCompleto = `${nombres[1].trim()} ${apellidos[1].trim()}`;
+        console.log('👤 Nombre del paciente extraído (formato APELLIDOS/NOMBRES):', nombreCompleto);
+        return nombreCompleto;
       }
     }
 
+    if (!match) {
+      // Buscar nombre después de "Paciente:"
+      match = texto.match(/Paciente[:\s]+([A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑa-záéíóúñ\s]{5,50}?)(?:\s+(?:CC|RC|TI|Documento)|$)/i);
+    }
+
+    console.log('👤 Nombre del paciente extraído:', match ? match[1].trim() : 'NO ENCONTRADO');
     return match ? match[1].trim() : '';
   }
 
@@ -374,8 +406,34 @@ class PDFExtractorService {
    * Extrae diagnóstico principal (código CIE-10)
    */
   private extraerDiagnosticoPrincipal(texto: string): string {
-    // Buscar código CIE-10 (letra seguida de 2-3 dígitos, opcionalmente seguido de .número)
-    const match = texto.match(/\b([A-Z]\d{2,3}(?:\.\d)?)\b/);
+    // Primero buscar cerca de "Diagnóstico Principal" o "Dx Principal"
+    let match = texto.match(/(?:Diagn[oó]stico\s*Principal|Dx\s*Principal|Diagnostico\s*de\s*ingreso)[:\s]+([A-Z]\d{2,3}(?:\.\d)?)/i);
+
+    if (!match) {
+      // Buscar todos los códigos CIE-10 y filtrar los más probables
+      const matches = texto.match(/\b([A-Z]\d{2,3}(?:\.\d)?)\b/g);
+      console.log('🏥 Códigos CIE-10 encontrados:', matches);
+
+      if (matches && matches.length > 0) {
+        // Filtrar códigos que no son CIE-10 comunes (evitar códigos como V03 que son de vehículos)
+        // Priorizar códigos que empiezan con letras comunes en diagnósticos médicos
+        const codigosValidos = matches.filter(codigo => {
+          const letra = codigo.charAt(0);
+          // Priorizar diagnósticos médicos comunes (A-U excepto V para vehículos)
+          return ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U'].includes(letra);
+        });
+
+        console.log('✅ Códigos CIE-10 válidos (diagnósticos médicos):', codigosValidos);
+
+        if (codigosValidos.length > 0) {
+          return codigosValidos[0];
+        }
+
+        return matches[0];
+      }
+    }
+
+    console.log('🏥 Diagnóstico principal extraído:', match ? match[1] : 'NO ENCONTRADO');
     return match ? match[1] : '';
   }
 
