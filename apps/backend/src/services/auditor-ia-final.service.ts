@@ -206,7 +206,6 @@ Debes responder en formato JSON estructurado.`
         messages: messages,
         max_tokens: 6000, // Aumentado para permitir análisis y justificación completa
         temperature: 0.1, // Baja temperatura para decisiones consistentes y precisas
-        timeout: 120000,  // 2 minutos de timeout para análisis exhaustivo
       });
 
       const respuesta = completion.choices[0].message.content || '{}';
