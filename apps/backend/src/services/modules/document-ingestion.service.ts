@@ -161,7 +161,7 @@ class DocumentIngestionService {
         useSystemFonts: false,
         viewportScale: 3.0, // Alta resolución para mejor OCR
         outputFolder: this.tempDir,
-        outputFileMask: `pdf_${Date.now()}_page`,
+        outputFileMaskFunc: (pageNumber: number) => `pdf_${Date.now()}_page_${pageNumber}`,
         pagesToProcess: [-1], // Todas las páginas
       });
 

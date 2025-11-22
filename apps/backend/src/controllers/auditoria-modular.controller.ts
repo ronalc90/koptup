@@ -234,7 +234,7 @@ class AuditoriaModularController {
       }
 
       // Retornar respuesta
-      res.status(201).json({
+      return res.status(201).json({
         success: true,
         message: 'Documento procesado exitosamente con sistema modular',
         data: {
@@ -263,7 +263,7 @@ class AuditoriaModularController {
     } catch (error: any) {
       console.error('❌ Error en procesamiento modular:', error);
 
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error al procesar documento',
         error: error.message,
@@ -299,7 +299,7 @@ class AuditoriaModularController {
         factura.numeroFactura
       );
 
-      res.json({
+      return res.json({
         success: true,
         data: {
           factura,
@@ -307,7 +307,7 @@ class AuditoriaModularController {
         },
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error al obtener detalle',
         error: error.message,

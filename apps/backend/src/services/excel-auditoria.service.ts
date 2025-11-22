@@ -483,8 +483,8 @@ class ExcelAuditoriaService {
   /**
    * Retorna el Excel como buffer para descarga
    */
-  async obtenerBuffer(workbook: ExcelJS.Workbook): Promise<Buffer> {
-    return await workbook.xlsx.writeBuffer() as Buffer;
+  async obtenerBuffer(workbook: ExcelJS.Workbook) {
+    return await workbook.xlsx.writeBuffer();
   }
 }
 
