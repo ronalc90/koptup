@@ -259,7 +259,7 @@ async function testPDFProcessing() {
     // Guardar Excel
     const excelPath = '/home/user/koptup/test-pdfs/auditoria_S9033866630_test.xlsx';
     const buffer = await excelFacturaMedicaService.obtenerBuffer(workbook);
-    fs.writeFileSync(excelPath, buffer);
+    fs.writeFileSync(excelPath, Buffer.from(buffer));
 
     console.log(`✅ Excel generado exitosamente en: ${excelPath}`);
     console.log('');

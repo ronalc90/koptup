@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
+import Image from 'next/image';
 import Card, { CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
@@ -382,10 +383,11 @@ export default function EcommerceDemoPage() {
 
           {/* Product Image */}
           <div className="relative aspect-square overflow-hidden bg-secondary-100 dark:bg-secondary-800 group">
-            <img
+            <Image
               src={product.image}
               alt={product.name}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              fill
+              className="object-cover group-hover:scale-110 transition-transform duration-500"
             />
 
           {/* Badges */}
@@ -501,11 +503,12 @@ export default function EcommerceDemoPage() {
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <img
+              <div className="relative h-64">
+                <Image
                   src={product.image}
                   alt={product.name}
-                  className="w-full h-64 object-cover rounded-lg"
+                  fill
+                  className="object-cover rounded-lg"
                 />
               </div>
 
@@ -818,11 +821,14 @@ export default function EcommerceDemoPage() {
                       key={item.id}
                       className="flex gap-4 p-4 bg-secondary-50 dark:bg-secondary-800 rounded-lg"
                     >
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-20 h-20 object-cover rounded-lg"
-                      />
+                      <div className="relative w-20 h-20">
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          fill
+                          className="object-cover rounded-lg"
+                        />
+                      </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-secondary-900 dark:text-white mb-1">
                           {item.name}

@@ -11,7 +11,7 @@
  */
 
 import OpenAI from 'openai';
-import { DatosFacturaPDF } from '../types/factura.types';
+import { DatosFacturaPDF } from './pdf-extractor.service';
 import sistemaAprendizajeService from './sistema-aprendizaje.service';
 
 /**

@@ -542,7 +542,7 @@ export default function GestorContenido() {
               <div className="p-6">
                 {generatedVersions.length === 0 ? (
                   <div className="text-center py-8 text-slate-500">
-                    No hay versiones generadas aún. Usa el botón "Generar Versiones" para crear variaciones de tu contenido.
+                    No hay versiones generadas aún. Usa el botón &quot;Generar Versiones&quot; para crear variaciones de tu contenido.
                   </div>
                 ) : (
                   <div className="space-y-3">

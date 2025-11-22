@@ -364,12 +364,12 @@ class AuditoriaMedicaController {
       }
 
       const excelPath = path.join(uploadsDir, `auditoria_${factura._id}.xlsx`);
-      fs.writeFileSync(excelPath, excelBuffer);
+      fs.writeFileSync(excelPath, Buffer.from(excelBuffer));
 
       console.log(`✅ Excel generado en: ${excelPath}`);
 
       // RESPUESTA FINAL
-      res.status(201).json({
+      return res.status(201).json({
         success: true,
         message: 'Factura procesada y auditada exitosamente',
         data: {
@@ -414,7 +414,7 @@ class AuditoriaMedicaController {
       });
     } catch (error: any) {
       console.error('❌ Error procesando factura:', error);
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error al procesar archivos',
         error: error.message,
@@ -518,10 +518,10 @@ class AuditoriaMedicaController {
         `attachment; filename=Auditoria_NuevaEPS_${factura.numeroFactura}_${Date.now()}.xlsx`
       );
 
-      res.send(buffer);
+      return res.send(buffer);
     } catch (error: any) {
       console.error('Error generando Excel:', error);
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error al generar Excel',
         error: error.message,

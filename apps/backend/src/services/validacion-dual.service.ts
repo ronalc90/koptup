@@ -195,11 +195,11 @@ class ValidacionDualService {
 Tu tarea es analizar esta factura médica y proporcionar una validación inteligente que complemente el sistema experto de tarifarios.
 
 **DATOS DE LA FACTURA:**
-- Número de Factura: ${datosFactura.numeroFactura}
+- Número de Factura: ${datosFactura.nroFactura}
 - Paciente: ${datosFactura.nombrePaciente} (${datosFactura.tipoDocumentoPaciente} ${datosFactura.numeroDocumento})
 - Diagnóstico Principal: ${datosFactura.diagnosticoPrincipal}
 - Código CUPS Procedimiento: ${datosFactura.codigoProcedimiento}
-- Descripción Procedimiento: ${datosFactura.descripcionProcedimiento}
+- Descripción Procedimiento: ${datosFactura.nombreProcedimiento}
 - Cantidad: ${datosFactura.cant}
 - Valor IPS Facturado: $${datosFactura.valorIPS}
 
