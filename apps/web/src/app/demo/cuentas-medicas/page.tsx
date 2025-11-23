@@ -34,6 +34,9 @@ import ProcesoAuditoriaVisual from './ProcesoAuditoriaVisual';
 import { CUPS_COMPLETO } from './contenido-cups-completo';
 import { CIE10_COMPLETO } from './contenido-cie10-completo';
 
+// API URL Configuration
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
 // Tipo para documentos de la base de conocimiento
 interface DocumentoConocimiento {
   id: string;
@@ -816,7 +819,7 @@ Total de guías implementadas: 125`
   useEffect(() => {
     const cargarConfiguracion = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/documentos-conocimiento/config');
+        const response = await fetch(`${API_URL}/api/documentos-conocimiento/config`);
         if (response.ok) {
           const configs = await response.json();
 
@@ -830,11 +833,11 @@ Total de guías implementadas: 125`
             );
           } else {
             // Si no hay configuraciones, inicializar con valores por defecto
-            await fetch('http://localhost:3001/api/documentos-conocimiento/config/inicializar', {
+            await fetch(`${API_URL}/api/documentos-conocimiento/config/inicializar`, {
               method: 'POST',
             });
             // Recargar configuración después de inicializar
-            const responseReload = await fetch('http://localhost:3001/api/documentos-conocimiento/config');
+            const responseReload = await fetch(`${API_URL}/api/documentos-conocimiento/config`);
             if (responseReload.ok) {
               const configsReload = await responseReload.json();
               if (configsReload && configsReload.data) {
@@ -1078,7 +1081,7 @@ Total de guías implementadas: 125`
       );
 
       // Persistir en el backend
-      const response = await fetch(`http://localhost:3001/api/documentos-conocimiento/config/${id}`, {
+      const response = await fetch(`${API_URL}/api/documentos-conocimiento/config/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
