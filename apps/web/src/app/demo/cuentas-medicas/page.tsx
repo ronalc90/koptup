@@ -2343,7 +2343,7 @@ Total de guías implementadas: 125`
                   <div>
                     <p className="text-sm text-gray-600 mb-1">Documentos Cargados</p>
                     <p className="text-3xl font-bold text-orange-900">
-                      {facturas.reduce((acc, f) => acc + 1 + (f.soportes?.length || 2), 0)}
+                      {facturas.length}
                     </p>
                   </div>
                   <div className="bg-orange-100 p-3 rounded-full">
