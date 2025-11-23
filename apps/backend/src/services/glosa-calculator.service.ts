@@ -40,13 +40,30 @@ export interface GlosaCalculada {
 class GlosaCalculatorService {
   /**
    * Calcula glosas para una factura basándose en el tarifario de Nueva EPS
+   * Soporta tanto facturas con un solo procedimiento como con múltiples procedimientos
    */
   calcularGlosas(datosFactura: DatosFacturaPDF): {
     valorAPagar: number;
     valorGlosaAdmitiva: number;
     glosas: GlosaCalculada[];
     observacion: string;
+    procedimientosDetallados?: Array<{
+      codigoCUPS: string;
+      descripcion: string;
+      cantidad: number;
+      valorIPS: number;
+      valorContrato: number;
+      valorAPagar: number;
+      glosa: number;
+    }>;
   } {
+    // Si hay un array de procedimientos, procesar TODOS
+    if (datosFactura.procedimientos && Array.isArray(datosFactura.procedimientos) && datosFactura.procedimientos.length > 0) {
+      console.log(`\n💰 Procesando ${datosFactura.procedimientos.length} procedimientos...`);
+      return this.calcularGlosasMultiples(datosFactura.procedimientos);
+    }
+
+    // Comportamiento original para un solo procedimiento (retrocompatibilidad)
     const glosas: GlosaCalculada[] = [];
     const codigoCUPS = datosFactura.codigoProcedimiento || datosFactura.matrizLiquidacion;
 
@@ -140,6 +157,163 @@ class GlosaCalculatorService {
         observacion: 'Valor dentro del tarifario contractual Nueva EPS',
       };
     }
+  }
+
+  /**
+   * Calcula glosas para MÚLTIPLES procedimientos (cuando se extraen varios de un PDF)
+   */
+  private calcularGlosasMultiples(procedimientos: any[]): {
+    valorAPagar: number;
+    valorGlosaAdmitiva: number;
+    glosas: GlosaCalculada[];
+    observacion: string;
+    procedimientosDetallados: Array<{
+      codigoCUPS: string;
+      descripcion: string;
+      cantidad: number;
+      valorIPS: number;
+      valorContrato: number;
+      valorAPagar: number;
+      glosa: number;
+    }>;
+  } {
+    const todasLasGlosas: GlosaCalculada[] = [];
+    const procedimientosDetallados: Array<{
+      codigoCUPS: string;
+      descripcion: string;
+      cantidad: number;
+      valorIPS: number;
+      valorContrato: number;
+      valorAPagar: number;
+      glosa: number;
+    }> = [];
+
+    let valorTotalAPagar = 0;
+    let valorTotalGlosa = 0;
+    let contadorGlosas = 0;
+    let contadorSinGlosa = 0;
+
+    for (const proc of procedimientos) {
+      const codigoCUPS = proc.codigoProcedimiento;
+      const valorUnitarioIPS = proc.valorUnitario || 0;
+      const cantidad = proc.cant || 1;
+      const descripcion = proc.nombreProcedimiento || 'Procedimiento no especificado';
+
+      if (!codigoCUPS) {
+        console.log(`   ⚠️  Procedimiento sin código CUPS, omitiendo...`);
+        continue;
+      }
+
+      // Buscar tarifa en el tarifario
+      const tarifaNuevaEPS = TARIFARIO_NUEVA_EPS[codigoCUPS];
+
+      if (!tarifaNuevaEPS) {
+        // No está en tarifario - aplicar descuento estándar 30%
+        const valorAPagar = Math.round(valorUnitarioIPS * 0.7);
+        const diferencia = valorUnitarioIPS - valorAPagar;
+        const glosaTotal = diferencia * cantidad;
+
+        todasLasGlosas.push({
+          codigo: '202',
+          tipo: 'DIFERENCIA_TARIFA',
+          codigoProcedimiento: codigoCUPS,
+          descripcionProcedimiento: descripcion,
+          valorIPS: valorUnitarioIPS,
+          valorContrato: valorAPagar,
+          diferencia: diferencia,
+          cantidad: cantidad,
+          valorTotalGlosa: glosaTotal,
+          observacion: `202 - SE GLOSA ${descripcion} POR DIFERENCIA DE TARIFA (código no en tarifario, se aplica 30% descuento estándar) - Admiva`,
+          automatica: true,
+        });
+
+        procedimientosDetallados.push({
+          codigoCUPS,
+          descripcion,
+          cantidad,
+          valorIPS: valorUnitarioIPS,
+          valorContrato: valorAPagar,
+          valorAPagar: valorAPagar * cantidad,
+          glosa: glosaTotal,
+        });
+
+        valorTotalAPagar += valorAPagar * cantidad;
+        valorTotalGlosa += glosaTotal;
+        contadorGlosas++;
+
+        console.log(`   ❌ ${codigoCUPS} - GLOSA $${diferencia.toLocaleString('es-CO')} (no en tarifario, -30%)`);
+      } else {
+        // Está en tarifario - comparar precios
+        const valorContratoNuevaEPS = tarifaNuevaEPS.valor;
+
+        if (valorUnitarioIPS > valorContratoNuevaEPS) {
+          // Hay diferencia - GENERAR GLOSA
+          const diferencia = valorUnitarioIPS - valorContratoNuevaEPS;
+          const glosaTotal = diferencia * cantidad;
+
+          todasLasGlosas.push({
+            codigo: '202',
+            tipo: 'DIFERENCIA_TARIFA',
+            codigoProcedimiento: codigoCUPS,
+            descripcionProcedimiento: tarifaNuevaEPS.descripcion,
+            valorIPS: valorUnitarioIPS,
+            valorContrato: valorContratoNuevaEPS,
+            diferencia: diferencia,
+            cantidad: cantidad,
+            valorTotalGlosa: glosaTotal,
+            observacion: `202 - SE GLOSA ${tarifaNuevaEPS.descripcion} POR DIFERENCIA DE TARIFA. IPS facturó $${valorUnitarioIPS.toLocaleString('es-CO')} pero el contrato Nueva EPS permite máximo $${valorContratoNuevaEPS.toLocaleString('es-CO')} - Admiva`,
+            automatica: true,
+          });
+
+          procedimientosDetallados.push({
+            codigoCUPS,
+            descripcion: tarifaNuevaEPS.descripcion,
+            cantidad,
+            valorIPS: valorUnitarioIPS,
+            valorContrato: valorContratoNuevaEPS,
+            valorAPagar: valorContratoNuevaEPS * cantidad,
+            glosa: glosaTotal,
+          });
+
+          valorTotalAPagar += valorContratoNuevaEPS * cantidad;
+          valorTotalGlosa += glosaTotal;
+          contadorGlosas++;
+
+          console.log(`   ❌ ${codigoCUPS} - GLOSA $${diferencia.toLocaleString('es-CO')} (IPS: $${valorUnitarioIPS.toLocaleString('es-CO')} vs Contrato: $${valorContratoNuevaEPS.toLocaleString('es-CO')})`);
+        } else {
+          // Valor dentro del tarifario - SIN GLOSA
+          procedimientosDetallados.push({
+            codigoCUPS,
+            descripcion: tarifaNuevaEPS.descripcion,
+            cantidad,
+            valorIPS: valorUnitarioIPS,
+            valorContrato: valorUnitarioIPS,
+            valorAPagar: valorUnitarioIPS * cantidad,
+            glosa: 0,
+          });
+
+          valorTotalAPagar += valorUnitarioIPS * cantidad;
+          contadorSinGlosa++;
+
+          console.log(`   ✅ ${codigoCUPS} - SIN GLOSA (valor dentro del tarifario)`);
+        }
+      }
+    }
+
+    console.log(`\n📊 Resumen de auditoría:`);
+    console.log(`   - Total procedimientos: ${procedimientos.length}`);
+    console.log(`   - Con glosa: ${contadorGlosas}`);
+    console.log(`   - Sin glosa: ${contadorSinGlosa}`);
+    console.log(`   - Valor total a pagar: $${valorTotalAPagar.toLocaleString('es-CO')}`);
+    console.log(`   - Glosa total: $${valorTotalGlosa.toLocaleString('es-CO')}`);
+
+    return {
+      valorAPagar: valorTotalAPagar,
+      valorGlosaAdmitiva: valorTotalGlosa,
+      glosas: todasLasGlosas,
+      observacion: `Auditoría de ${procedimientos.length} procedimientos: ${contadorGlosas} con glosa, ${contadorSinGlosa} sin glosa. Glosa total: $${valorTotalGlosa.toLocaleString('es-CO')}`,
+      procedimientosDetallados,
+    };
   }
 
   /**

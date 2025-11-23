@@ -10,7 +10,16 @@ class ExcelFacturaMedicaService {
     datosFactura: DatosFacturaPDF,
     glosas: GlosaCalculada[],
     valorAPagar: number,
-    valorGlosaTotal: number
+    valorGlosaTotal: number,
+    procedimientosDetallados?: Array<{
+      codigoCUPS: string;
+      descripcion: string;
+      cantidad: number;
+      valorIPS: number;
+      valorContrato: number;
+      valorAPagar: number;
+      glosa: number;
+    }>
   ): Promise<ExcelJS.Workbook> {
     const workbook = new ExcelJS.Workbook();
 
@@ -20,7 +29,7 @@ class ExcelFacturaMedicaService {
 
     // Crear las 8 pestañas
     await this.crearPestanaFacturacion(workbook, datosFactura);
-    await this.crearPestanaProcedimientos(workbook, datosFactura, valorAPagar);
+    await this.crearPestanaProcedimientos(workbook, datosFactura, valorAPagar, procedimientosDetallados);
     await this.crearPestanaGlosas(workbook, datosFactura, glosas);
     await this.crearPestanaAutorizaciones(workbook, datosFactura);
     await this.crearPestanaPaciente(workbook, datosFactura);
@@ -94,7 +103,16 @@ class ExcelFacturaMedicaService {
   private async crearPestanaProcedimientos(
     workbook: ExcelJS.Workbook,
     datos: DatosFacturaPDF,
-    valorAPagar: number
+    valorAPagar: number,
+    procedimientosDetallados?: Array<{
+      codigoCUPS: string;
+      descripcion: string;
+      cantidad: number;
+      valorIPS: number;
+      valorContrato: number;
+      valorAPagar: number;
+      glosa: number;
+    }>
   ) {
     const sheet = workbook.addWorksheet('PROCEDIMIENTOS');
 
@@ -132,47 +150,96 @@ class ExcelFacturaMedicaService {
     };
     sheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' };
 
-    // Calcular valor de glosa admitiva
-    const valorGlosaAdmitiva = datos.valorIPS - valorAPagar;
+    // Si hay procedimientos detallados, agregar UNA FILA POR CADA UNO
+    if (procedimientosDetallados && procedimientosDetallados.length > 0) {
+      console.log(`📊 Agregando ${procedimientosDetallados.length} procedimientos al Excel...`);
 
-    // Agregar datos
-    sheet.addRow({
-      codigoProcedimiento: datos.codigoProcedimiento,
-      nombreProcedimiento: datos.nombreProcedimiento,
-      mapiss: datos.mapiss || '',
-      cantParagr: datos.cantParagr || 1,
-      matricUno: datos.matricUno || '',
-      matrizLiquidacion: datos.matrizLiquidacion,
-      valorIPS: datos.valorIPS,
-      cant: datos.cant || 1,
-      valorAPagar: valorAPagar,
-      valorNotaCredito: datos.valorNotaCredito || 0,
-      gestionGlosas: datos.gestionGlosas || '',
-      valorGlosaAdmitiva: valorGlosaAdmitiva,
-      valorGlosaAuditoria: datos.valorGlosaAuditoria || 0,
-      estado: datos.estado || 'UNILA',
-      categoria: datos.categoria || '',
-      tipoLiquidacion: datos.tipoLiquidacion || '',
-      valor: valorAPagar,
-      subServicioContratado: datos.subServicioContratado || '',
-      uvr: datos.uvr || 0,
-      regimen: datos.regimen || 'CONTRIBUTIVO',
-      convenioPaC: datos.convenioPaC || '',
-      tipoDocumentoIPS2: datos.tipoDocumentoIPS2,
-    });
+      let rowNumber = 2; // Empezar desde la fila 2 (después del encabezado)
 
-    // Formato de moneda
-    this.aplicarFormatoMoneda(sheet, 'G2:M2');
-    this.aplicarFormatoMoneda(sheet, 'Q2:Q2');
+      procedimientosDetallados.forEach((proc) => {
+        sheet.addRow({
+          codigoProcedimiento: proc.codigoCUPS,
+          nombreProcedimiento: proc.descripcion,
+          mapiss: '',
+          cantParagr: proc.cantidad,
+          matricUno: '',
+          matrizLiquidacion: proc.codigoCUPS,
+          valorIPS: proc.valorIPS,
+          cant: proc.cantidad,
+          valorAPagar: proc.valorAPagar,
+          valorNotaCredito: 0,
+          gestionGlosas: '',
+          valorGlosaAdmitiva: proc.glosa,
+          valorGlosaAuditoria: 0,
+          estado: 'UNILA',
+          categoria: '',
+          tipoLiquidacion: '',
+          valor: proc.valorAPagar,
+          subServicioContratado: '',
+          uvr: 0,
+          regimen: datos.regimen || 'CONTRIBUTIVO',
+          convenioPaC: '',
+          tipoDocumentoIPS2: datos.tipoDocumentoIPS2 || '',
+        });
 
-    // Resaltar glosa si existe
-    if (valorGlosaAdmitiva > 0) {
-      sheet.getCell('L2').fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FFFF6666' },
-      };
-      sheet.getCell('L2').font = { bold: true, color: { argb: 'FFFFFFFF' } };
+        // Formato de moneda para esta fila
+        this.aplicarFormatoMoneda(sheet, `G${rowNumber}:M${rowNumber}`);
+        this.aplicarFormatoMoneda(sheet, `Q${rowNumber}:Q${rowNumber}`);
+
+        // Resaltar glosa si existe
+        if (proc.glosa > 0) {
+          sheet.getCell(`L${rowNumber}`).fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFFF6666' },
+          };
+          sheet.getCell(`L${rowNumber}`).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+        }
+
+        rowNumber++;
+      });
+    } else {
+      // Comportamiento original: un solo procedimiento
+      const valorGlosaAdmitiva = datos.valorIPS - valorAPagar;
+
+      sheet.addRow({
+        codigoProcedimiento: datos.codigoProcedimiento,
+        nombreProcedimiento: datos.nombreProcedimiento,
+        mapiss: datos.mapiss || '',
+        cantParagr: datos.cantParagr || 1,
+        matricUno: datos.matricUno || '',
+        matrizLiquidacion: datos.matrizLiquidacion,
+        valorIPS: datos.valorIPS,
+        cant: datos.cant || 1,
+        valorAPagar: valorAPagar,
+        valorNotaCredito: datos.valorNotaCredito || 0,
+        gestionGlosas: datos.gestionGlosas || '',
+        valorGlosaAdmitiva: valorGlosaAdmitiva,
+        valorGlosaAuditoria: datos.valorGlosaAuditoria || 0,
+        estado: datos.estado || 'UNILA',
+        categoria: datos.categoria || '',
+        tipoLiquidacion: datos.tipoLiquidacion || '',
+        valor: valorAPagar,
+        subServicioContratado: datos.subServicioContratado || '',
+        uvr: datos.uvr || 0,
+        regimen: datos.regimen || 'CONTRIBUTIVO',
+        convenioPaC: datos.convenioPaC || '',
+        tipoDocumentoIPS2: datos.tipoDocumentoIPS2,
+      });
+
+      // Formato de moneda
+      this.aplicarFormatoMoneda(sheet, 'G2:M2');
+      this.aplicarFormatoMoneda(sheet, 'Q2:Q2');
+
+      // Resaltar glosa si existe
+      if (valorGlosaAdmitiva > 0) {
+        sheet.getCell('L2').fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFFF6666' },
+        };
+        sheet.getCell('L2').font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      }
     }
   }
 
