@@ -54,7 +54,7 @@ export default function DetalleRadicadoPage() {
       liquidado: { variant: 'success', label: '✅ Liquidado' },
       con_glosas: { variant: 'warning', label: '⚠️ Con Glosas' },
       finalizado: { variant: 'success', label: '✅ Finalizado' },
-      rechazado: { variant: 'destructive', label: '❌ Rechazado' },
+      rechazado: { variant: 'danger', label: '❌ Rechazado' },
     };
     return badges[estado] || { variant: 'secondary', label: estado };
   };
@@ -306,7 +306,7 @@ export default function DetalleRadicadoPage() {
                       <p className="font-medium">{consulta.sistema.toUpperCase()}</p>
                       <p className="text-sm text-gray-600">{consulta.url}</p>
                     </div>
-                    <Badge variant={consulta.exitosa ? 'success' : 'destructive'}>
+                    <Badge variant={consulta.exitosa ? 'success' : 'danger'}>
                       {consulta.exitosa ? '✅ Exitosa' : '❌ Fallida'}
                     </Badge>
                   </div>
