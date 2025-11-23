@@ -106,6 +106,183 @@ class ExtraccionDualService {
   }
 
   /**
+   * Procesa PDF grande usando chunking y consolida resultados
+   */
+  private async procesarConChunking(chunks: string[], pdfPath: string): Promise<ExtraccionConConfianza> {
+    const todosLosProcedimientos: any[] = [];
+    const todosDiagnosticos: Set<string> = new Set();
+    let datosBase: any = null;
+    let confianzaTotal = 0;
+
+    for (let i = 0; i < chunks.length; i++) {
+      console.log(`   📄 Procesando chunk ${i + 1}/${chunks.length} (${chunks[i].length} caracteres)...`);
+
+      try {
+        const resultado = await this.extraerDeChunk(chunks[i], i + 1);
+
+        // Guardar datos base del primer chunk (factura, paciente, etc.)
+        if (i === 0) {
+          datosBase = resultado;
+        }
+
+        // Consolidar procedimientos de todos los chunks
+        if (resultado.procedimientos && Array.isArray(resultado.procedimientos)) {
+          todosLosProcedimientos.push(...resultado.procedimientos);
+        }
+
+        // Consolidar diagnósticos
+        if (resultado.diagnosticoPrincipal) todosDiagnosticos.add(resultado.diagnosticoPrincipal);
+        if (resultado.diagnosticoRelacionado1) todosDiagnosticos.add(resultado.diagnosticoRelacionado1);
+        if (resultado.diagnosticoRelacionado2) todosDiagnosticos.add(resultado.diagnosticoRelacionado2);
+
+        confianzaTotal += resultado.confianzaExtraccion || 0;
+      } catch (error: any) {
+        console.log(`   ⚠️  Error procesando chunk ${i + 1}: ${error.message}`);
+      }
+    }
+
+    // Calcular valor total sumando todos los procedimientos
+    const valorTotal = todosLosProcedimientos.reduce((sum, proc) => {
+      return sum + (proc.valorUnitario * proc.cant || 0);
+    }, 0);
+
+    const diagnosticosArray = Array.from(todosDiagnosticos);
+    const confianzaPromedio = Math.round(confianzaTotal / chunks.length);
+
+    console.log(`   ✅ Consolidación completada: ${todosLosProcedimientos.length} procedimientos, ${diagnosticosArray.length} diagnósticos`);
+
+    // Consolidar datos
+    const datosConsolidados = {
+      ...datosBase,
+      procedimientos: todosLosProcedimientos,
+      diagnosticoPrincipal: diagnosticosArray[0] || '',
+      diagnosticoRelacionado1: diagnosticosArray[1] || '',
+      diagnosticoRelacionado2: diagnosticosArray[2] || '',
+      valorIPS: valorTotal,
+      confianzaExtraccion: confianzaPromedio,
+      // Usar primer procedimiento para compatibilidad
+      codigoProcedimiento: todosLosProcedimientos[0]?.codigoProcedimiento || '',
+      nombreProcedimiento: todosLosProcedimientos[0]?.nombreProcedimiento || '',
+      cant: todosLosProcedimientos[0]?.cant || 0,
+    };
+
+    const camposExtraidos = 6 + todosLosProcedimientos.length;
+
+    return {
+      ...datosConsolidados,
+      metadatos: {
+        metodo: 'IA',
+        confianza: confianzaPromedio,
+        tiempoExtraccion: 0,
+        camposExtraidos,
+        camposVacios: 0,
+      },
+    };
+  }
+
+  /**
+   * Extrae datos de un chunk individual
+   */
+  private async extraerDeChunk(textoChunk: string, numeroChunk: number): Promise<any> {
+    const prompt = `Eres un experto en extracción de datos de facturas médicas colombianas.
+
+Analiza el siguiente FRAGMENTO de una factura médica y extrae TODOS los procedimientos que encuentres.
+
+**IMPORTANTE:**
+- Este es el chunk ${numeroChunk} de un documento más grande
+- Extrae TODOS los procedimientos que veas en este fragmento
+- Formato colombiano: punto (.) = miles, coma (,) = decimales
+- Devuelve números sin separadores: "38.586,00" → 38586
+
+TEXTO DEL FRAGMENTO:
+${textoChunk}
+
+Responde ÚNICAMENTE con un objeto JSON:
+{
+  "nroFactura": "valor",
+  "nombrePaciente": "valor",
+  "numeroDocumento": "valor",
+  "procedimientos": [
+    {
+      "codigoProcedimiento": "valor",
+      "nombreProcedimiento": "valor",
+      "cant": numero,
+      "valorUnitario": numero
+    }
+  ],
+  "diagnosticoPrincipal": "valor",
+  "diagnosticoRelacionado1": "valor",
+  "diagnosticoRelacionado2": "valor",
+  "confianzaExtraccion": numero_0_a_100
+}`;
+
+    // Llamar a OpenAI con retry logic
+    let response;
+    let retries = 0;
+    const maxRetries = 3;
+
+    while (retries <= maxRetries) {
+      try {
+        response = await this.openai!.chat.completions.create({
+          model: 'gpt-4o',
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: 4000,
+          temperature: 0,
+        });
+        break;
+      } catch (error: any) {
+        if (error?.status === 429 && retries < maxRetries) {
+          const waitTime = Math.pow(2, retries) * 2000;
+          console.log(`   ⏳ Rate limit (chunk ${numeroChunk}), esperando ${waitTime/1000}s...`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+          retries++;
+        } else {
+          throw error;
+        }
+      }
+    }
+
+    const contenido = response!.choices[0].message.content || '{}';
+    const jsonMatch = contenido.match(/\{[\s\S]*\}/);
+
+    if (!jsonMatch) {
+      return { procedimientos: [], confianzaExtraccion: 0 };
+    }
+
+    return JSON.parse(jsonMatch[0]);
+  }
+
+  /**
+   * Divide texto largo en chunks inteligentes sin cortar líneas
+   */
+  private dividirEnChunks(texto: string, tamañoMaxChunk: number = 80000): string[] {
+    if (texto.length <= tamañoMaxChunk) {
+      return [texto];
+    }
+
+    const chunks: string[] = [];
+    const lineas = texto.split('\n');
+    let chunkActual = '';
+
+    for (const linea of lineas) {
+      // Si agregar esta línea excede el tamaño, guardar chunk actual y empezar uno nuevo
+      if (chunkActual.length + linea.length > tamañoMaxChunk && chunkActual.length > 0) {
+        chunks.push(chunkActual);
+        chunkActual = linea + '\n';
+      } else {
+        chunkActual += linea + '\n';
+      }
+    }
+
+    // Agregar el último chunk
+    if (chunkActual.length > 0) {
+      chunks.push(chunkActual);
+    }
+
+    return chunks;
+  }
+
+  /**
    * Extracción con IA usando texto del PDF
    */
   private async extraerConIA(pdfPath: string): Promise<ExtraccionConConfianza> {
@@ -120,8 +297,15 @@ class ExtraccionDualService {
 
     console.log(`📄 Texto extraído del PDF (${textoPDF.length} caracteres)`);
 
-    // Usar TODO el texto del PDF - GPT-4o puede manejar hasta 128k tokens
-    // Si el PDF es MUY grande (>400k chars), lo dividiremos en chunks
+    // Si el PDF es muy grande, dividirlo en chunks
+    const chunks = this.dividirEnChunks(textoPDF, 80000);
+
+    if (chunks.length > 1) {
+      console.log(`📦 PDF dividido en ${chunks.length} chunks para procesamiento`);
+      return await this.procesarConChunking(chunks, pdfPath);
+    }
+
+    // Si es pequeño, procesarlo directamente
     const textoParaIA = textoPDF;
 
     // Debug: Mostrar fragmento del texto para verificar extracción
