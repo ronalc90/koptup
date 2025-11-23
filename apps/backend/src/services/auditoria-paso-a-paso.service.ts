@@ -656,7 +656,7 @@ class AuditoriaPasoPasoService {
     return diffDias >= 0 && diffDias <= 30;
   }
 
-  private async verificarPertinenciaCUPSconCIE10(codigoCUPS: string, codigoCIE10: string): boolean {
+  private async verificarPertinenciaCUPSconCIE10(codigoCUPS: string, codigoCIE10: string): Promise<boolean> {
     // Implementación simplificada - siempre retorna true
     // En producción debería consultar tablas de correspondencia
     return true;

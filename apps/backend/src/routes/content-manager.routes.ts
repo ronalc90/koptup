@@ -64,13 +64,13 @@ router.post(
         template: template as ContentTemplate,
       });
 
-      res.json({
+      return res.json({
         success: true,
         data: { content: improvedContent },
       });
     } catch (error: any) {
       logger.error('Error in /improve:', error);
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: error.message || 'Failed to improve content',
       });
@@ -137,13 +137,13 @@ router.post(
         template: template as ContentTemplate,
       });
 
-      res.json({
+      return res.json({
         success: true,
         data: { content: adaptedContent, tone },
       });
     } catch (error: any) {
       logger.error('Error in /change-tone:', error);
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: error.message || 'Failed to change tone',
       });
@@ -209,13 +209,13 @@ router.post(
         template: template as ContentTemplate,
       });
 
-      res.json({
+      return res.json({
         success: true,
         data: { content: adjustedContent, targetWords },
       });
     } catch (error: any) {
       logger.error('Error in /adjust-length:', error);
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: error.message || 'Failed to adjust length',
       });
@@ -282,13 +282,13 @@ router.post(
         numVersions: numVersions ? parseInt(numVersions) : undefined,
       });
 
-      res.json({
+      return res.json({
         success: true,
         data: { versions },
       });
     } catch (error: any) {
       logger.error('Error in /generate-versions:', error);
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: error.message || 'Failed to generate versions',
       });
@@ -347,13 +347,13 @@ router.post(
         userInput
       );
 
-      res.json({
+      return res.json({
         success: true,
         data: { content: generatedContent },
       });
     } catch (error: any) {
       logger.error('Error in /generate:', error);
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: error.message || 'Failed to generate content',
       });

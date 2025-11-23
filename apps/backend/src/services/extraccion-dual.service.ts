@@ -12,8 +12,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import OpenAI from 'openai';
-import pdfExtractorService from './pdf-extractor.service';
-import { DatosFacturaPDF } from '../types/factura.types';
+import pdfExtractorService, { DatosFacturaPDF } from './pdf-extractor.service';
 const { pdfToPng } = require('pdf-to-png-converter');
 
 /**
