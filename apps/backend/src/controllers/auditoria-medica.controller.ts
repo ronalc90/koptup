@@ -31,10 +31,14 @@ class AuditoriaMedicaController {
       console.log(`📂 Procesando ${files.length} archivos para cuenta: ${nombreCuenta}`);
 
       // Separar archivos por tipo
-      const archivosFactura = files.filter(
+      let archivosFactura = files.filter(
         (f) =>
           f.originalname.toLowerCase().includes('factura') ||
-          f.originalname.toLowerCase().includes('detalle')
+          f.originalname.toLowerCase().includes('detalle') ||
+          f.originalname.toLowerCase().includes('fact') ||
+          f.originalname.toLowerCase().includes('recibo') ||
+          f.originalname.toLowerCase().includes('cuenta') ||
+          f.originalname.toLowerCase().includes('cobro')
       );
 
       const archivosHistoriaClinica = files.filter(
@@ -43,10 +47,16 @@ class AuditoriaMedicaController {
           f.originalname.toLowerCase().includes('hc')
       );
 
+      // Si no se encuentra archivo con palabras clave de factura, usar el primer archivo
+      if (archivosFactura.length === 0 && files.length > 0) {
+        console.log('⚠️  No se encontró archivo con nombre de factura, usando primer archivo...');
+        archivosFactura = [files[0]];
+      }
+
       if (archivosFactura.length === 0) {
         return res.status(400).json({
           success: false,
-          message: 'No se encontró archivo de factura',
+          message: 'No se proporcionaron archivos válidos',
         });
       }
 
