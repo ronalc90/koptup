@@ -520,8 +520,8 @@ class ExcelFacturaMedicaService {
   /**
    * Obtiene el buffer del workbook para enviar al cliente
    */
-  async obtenerBuffer(workbook: ExcelJS.Workbook): Promise<Buffer> {
-    return (await workbook.xlsx.writeBuffer()) as Buffer;
+  async obtenerBuffer(workbook: ExcelJS.Workbook) {
+    return await workbook.xlsx.writeBuffer();
   }
 }
 

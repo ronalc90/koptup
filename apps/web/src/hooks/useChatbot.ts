@@ -57,14 +57,14 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
   useEffect(() => {
     if (sessionId && initialConfig) {
       const newConfig = {
-        title: initialConfig.title || config.title,
-        greeting: initialConfig.greeting || config.greeting,
-        placeholder: initialConfig.placeholder || config.placeholder,
-        textColor: initialConfig.textColor || config.textColor,
-        headerColor: initialConfig.headerColor || config.headerColor,
-        backgroundColor: initialConfig.backgroundColor || config.backgroundColor,
-        icon: initialConfig.icon || config.icon,
-        fontFamily: initialConfig.fontFamily || config.fontFamily,
+        title: initialConfig.title || 'Asistente Virtual',
+        greeting: initialConfig.greeting || '¡Hola! 👋 Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?',
+        placeholder: initialConfig.placeholder || 'Escribe tu mensaje aquí...',
+        textColor: initialConfig.textColor || '#1F2937',
+        headerColor: initialConfig.headerColor || '#4F46E5',
+        backgroundColor: initialConfig.backgroundColor || '#FFFFFF',
+        icon: initialConfig.icon || 'FaComments',
+        fontFamily: initialConfig.fontFamily || 'Inter',
         customIconUrl: initialConfig.customIconUrl,
         restrictedTopics: initialConfig.restrictedTopics || [],
       };
@@ -72,7 +72,7 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
       setConfig(newConfig);
       updateConfig(newConfig);
     }
-  }, [sessionId, initialConfig?.restrictedTopics, initialConfig?.title, initialConfig?.greeting, initialConfig?.placeholder, initialConfig?.textColor, initialConfig?.headerColor, initialConfig?.backgroundColor, initialConfig?.icon, initialConfig?.fontFamily, initialConfig?.customIconUrl]);
+  }, [sessionId, initialConfig, updateConfig]);
 
   // Cargar sesión existente
   const loadSession = async (id: string) => {

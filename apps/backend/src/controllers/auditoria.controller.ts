@@ -54,13 +54,13 @@ class AuditoriaController {
       const factura = new Factura(req.body);
       await factura.save();
 
-      res.status(201).json({
+      return res.status(201).json({
         success: true,
         message: 'Factura creada exitosamente',
         data: factura,
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error al crear factura',
         error: error.message,
@@ -92,7 +92,7 @@ class AuditoriaController {
 
       const total = await Factura.countDocuments(query);
 
-      res.json({
+      return res.json({
         success: true,
         data: facturas,
         pagination: {
@@ -103,7 +103,7 @@ class AuditoriaController {
         },
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error al obtener facturas',
         error: error.message,
@@ -132,7 +132,7 @@ class AuditoriaController {
       const procedimientos = await Procedimiento.find({ facturaId: id }).populate('glosas');
       const glosas = await Glosa.find({ facturaId: id });
 
-      res.json({
+      return res.json({
         success: true,
         data: {
           factura,
@@ -142,7 +142,7 @@ class AuditoriaController {
         },
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error al obtener factura',
         error: error.message,
@@ -172,13 +172,13 @@ class AuditoriaController {
       // Ejecutar auditoría
       const resultado = await auditoriaService.ejecutarAuditoria(id);
 
-      res.json({
+      return res.json({
         success: true,
         message: 'Auditoría ejecutada exitosamente',
         data: resultado,
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error al ejecutar auditoría',
         error: error.message,
@@ -213,9 +213,9 @@ class AuditoriaController {
         `attachment; filename=Auditoria_${factura.numeroFactura}_${Date.now()}.xlsx`
       );
 
-      res.send(buffer);
+      return res.send(buffer);
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error al generar Excel',
         error: error.message,
@@ -260,13 +260,13 @@ class AuditoriaController {
         });
       }
 
-      res.status(201).json({
+      return res.status(201).json({
         success: true,
         message: 'Soporte cargado exitosamente',
         data: soporte,
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error al subir soporte',
         error: error.message,
@@ -287,12 +287,12 @@ class AuditoriaController {
 
       const tarifarios = await Tarifario.find(query).sort({ vigenciaInicio: -1 });
 
-      res.json({
+      return res.json({
         success: true,
         data: tarifarios,
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error al obtener tarifarios',
         error: error.message,
@@ -326,13 +326,13 @@ class AuditoriaController {
         valorAceptado: (await Factura.findById(glosa.facturaId))!.valorTotal - totalGlosas,
       });
 
-      res.json({
+      return res.json({
         success: true,
         message: 'Glosa actualizada exitosamente',
         data: glosa,
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error al actualizar glosa',
         error: error.message,
@@ -407,7 +407,7 @@ class AuditoriaController {
         },
       ]);
 
-      res.json({
+      return res.json({
         success: true,
         data: {
           totalFacturas,
@@ -418,7 +418,7 @@ class AuditoriaController {
         },
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error al obtener estadísticas',
         error: error.message,
@@ -554,7 +554,7 @@ class AuditoriaController {
       factura.valorAceptado = 25000;
       await factura.save();
 
-      res.status(201).json({
+      return res.status(201).json({
         success: true,
         message: 'Factura creada y archivos procesados exitosamente',
         data: {
@@ -567,7 +567,7 @@ class AuditoriaController {
         },
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error al procesar archivos',
         error: error.message,
@@ -606,12 +606,12 @@ class AuditoriaController {
       // Eliminar la factura
       await Factura.findByIdAndDelete(id);
 
-      res.json({
+      return res.json({
         success: true,
         message: 'Factura y datos relacionados eliminados exitosamente',
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error al eliminar factura',
         error: error.message,
@@ -636,13 +636,13 @@ class AuditoriaController {
 
       const sesion = await auditoriaPasoPasoService.iniciarSesion(id);
 
-      res.json({
+      return res.json({
         success: true,
         message: 'Sesión de auditoría paso a paso iniciada',
         data: sesion,
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error al iniciar sesión de auditoría',
         error: error.message,
@@ -659,13 +659,13 @@ class AuditoriaController {
 
       const sesion = await auditoriaPasoPasoService.avanzarPaso(sesionId);
 
-      res.json({
+      return res.json({
         success: true,
         message: 'Paso ejecutado exitosamente',
         data: sesion,
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error al avanzar paso',
         error: error.message,
@@ -682,12 +682,12 @@ class AuditoriaController {
 
       const sesion = await auditoriaPasoPasoService.obtenerSesion(sesionId);
 
-      res.json({
+      return res.json({
         success: true,
         data: sesion,
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error al obtener sesión',
         error: error.message,
@@ -728,7 +728,7 @@ class AuditoriaController {
         valorCorrecto
       );
 
-      res.json({
+      return res.json({
         success: true,
         message: 'Feedback agregado exitosamente',
         data: {
@@ -738,7 +738,7 @@ class AuditoriaController {
         },
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error al agregar feedback',
         error: error.message,
@@ -758,12 +758,12 @@ class AuditoriaController {
     try {
       const estadisticas = await sistemaAprendizajeService.obtenerEstadisticas();
 
-      res.json({
+      return res.json({
         success: true,
         data: estadisticas,
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error al obtener estadísticas de aprendizaje',
         error: error.message,
@@ -780,7 +780,7 @@ class AuditoriaController {
     try {
       const reporte = await sistemaAprendizajeService.generarReporteCallibracion();
 
-      res.json({
+      return res.json({
         success: true,
         data: {
           reporte,
@@ -788,7 +788,7 @@ class AuditoriaController {
         },
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error al generar reporte de calibración',
         error: error.message,

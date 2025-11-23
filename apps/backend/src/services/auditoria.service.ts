@@ -227,7 +227,7 @@ class AuditoriaService {
   private async verificarPertinenciaCUPSconCIE10(
     codigoCUPS: string,
     codigoCIE10: string
-  ): boolean {
+  ): Promise<boolean> {
     // Implementación simplificada
     // En producción, esto debería usar tablas de correspondencia o IA
     const cups = await CUPS.findOne({ codigo: codigoCUPS });

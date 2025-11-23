@@ -53,13 +53,13 @@ export const getNotifications = async (req: AuthRequest, res: Response) => {
       metadata: notif.metadata,
     }));
 
-    res.json({
+    return res.json({
       success: true,
       data: formattedNotifications,
     });
   } catch (error) {
     console.error('Get notifications error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error al obtener notificaciones',
     });
@@ -83,7 +83,7 @@ export const getUnreadCount = async (req: AuthRequest, res: Response) => {
       isRead: false,
     });
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         count: unreadCount,
@@ -92,7 +92,7 @@ export const getUnreadCount = async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     console.error('Get unread count error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error al obtener contador de no leídas',
     });
@@ -128,7 +128,7 @@ export const markAsRead = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         id: notification._id.toString(),
@@ -139,7 +139,7 @@ export const markAsRead = async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     console.error('Mark notification as read error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error al marcar notificación como leída',
     });
@@ -166,7 +166,7 @@ export const markAllAsRead = async (req: AuthRequest, res: Response) => {
       }
     );
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         userId,
@@ -177,7 +177,7 @@ export const markAllAsRead = async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     console.error('Mark all as read error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error al marcar todas como leídas',
     });
@@ -209,13 +209,13 @@ export const deleteNotification = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Notificación eliminada exitosamente',
     });
   } catch (error) {
     console.error('Delete notification error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error al eliminar notificación',
     });
@@ -264,7 +264,7 @@ export const createNewNotification = async (req: AuthRequest, res: Response) => 
       metadata,
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       data: {
         id: notification._id.toString(),
@@ -280,7 +280,7 @@ export const createNewNotification = async (req: AuthRequest, res: Response) => 
     });
   } catch (error) {
     console.error('Create notification error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error al crear notificación',
     });

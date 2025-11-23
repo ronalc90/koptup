@@ -10,6 +10,8 @@ export interface IAtencion extends Document {
   paciente: {
     tipoDocumento: string;
     numeroDocumento: string; // Hasheado o enmascarado en producción
+    nombres?: string;
+    apellidos?: string;
     edad?: number;
     sexo?: 'M' | 'F' | 'Otro';
   };
@@ -73,6 +75,8 @@ const AtencionSchema = new Schema<IAtencion>(
     paciente: {
       tipoDocumento: { type: String, required: true },
       numeroDocumento: { type: String, required: true, index: true },
+      nombres: String,
+      apellidos: String,
       edad: Number,
       sexo: {
         type: String,
