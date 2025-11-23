@@ -6,10 +6,10 @@ import liquidacionService, {
   CrearRadicadoData,
   ResultadoLiquidacion,
 } from '@/services/liquidacion.service';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
-import { Badge } from '@/components/ui/Badge';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
+import Input from '@/components/ui/Input';
+import Badge from '@/components/ui/Badge';
 import Link from 'next/link';
 
 export default function LiquidacionPage() {

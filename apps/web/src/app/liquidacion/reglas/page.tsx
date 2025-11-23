@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import reglasService, { Regla, CrearReglaData } from '@/services/reglas.service';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/Textarea';
-import { Badge } from '@/components/ui/Badge';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
+import Input from '@/components/ui/Input';
+import Textarea from '@/components/ui/Textarea';
+import Badge from '@/components/ui/Badge';
 
 export default function ReglasPage() {
   const [reglas, setReglas] = useState<Regla[]>([]);
