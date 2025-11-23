@@ -31,13 +31,18 @@ class AuditoriaMedicaController {
       console.log(`📂 Procesando ${files.length} archivos para cuenta: ${nombreCuenta}`);
 
       // 1. ANALIZAR TODOS LOS ARCHIVOS Y CLASIFICARLOS POR CONTENIDO
-      console.log('📄 Paso 1: Analizando archivos y clasificando por contenido con IA...');
+      console.log('📄 Paso 1: Analizando TODOS los archivos y extrayendo datos con IA...');
 
-      let archivoFactura: Express.Multer.File | null = null;
-      let resultadoExtraccion: any = null;
+      const archivosFacturas: Array<{
+        archivo: Express.Multer.File;
+        resultado: any;
+        datos: any;
+      }> = [];
       const archivosHistoriaClinica: Express.Multer.File[] = [];
+      const todosProcedimientos: any[] = [];
+      const todosDiagnosticos: Set<string> = new Set();
 
-      // Intentar extraer datos de cada archivo para clasificarlo automáticamente
+      // Intentar extraer datos de TODOS los archivos
       for (const file of files) {
         try {
           console.log(`   📄 Analizando: ${file.originalname}`);
@@ -48,32 +53,50 @@ class AuditoriaMedicaController {
                                     resultado.datosFinales.codigoProcedimiento ||
                                     resultado.datosFinales.valorIPS > 0;
 
-          if (tieneDatosFactura && !archivoFactura) {
-            console.log(`   ✅ Clasificado como FACTURA (encontrados: factura=${!!resultado.datosFinales.nroFactura}, procedimiento=${!!resultado.datosFinales.codigoProcedimiento}, valor=${resultado.datosFinales.valorIPS})`);
-            archivoFactura = file;
-            resultadoExtraccion = resultado;
-          } else if (!tieneDatosFactura) {
+          if (tieneDatosFactura) {
+            console.log(`   ✅ FACTURA/PROCEDIMIENTO encontrado (factura=${resultado.datosFinales.nroFactura || 'N/A'}, procedimiento=${resultado.datosFinales.codigoProcedimiento || 'N/A'}, valor=${resultado.datosFinales.valorIPS})`);
+            archivosFacturas.push({
+              archivo: file,
+              resultado: resultado,
+              datos: resultado.datosFinales
+            });
+
+            // Agregar procedimiento a la lista consolidada
+            if (resultado.datosFinales.codigoProcedimiento) {
+              todosProcedimientos.push(resultado.datosFinales);
+            }
+
+            // Agregar diagnósticos a la lista consolidada
+            if (resultado.datosFinales.diagnosticoPrincipal) {
+              todosDiagnosticos.add(resultado.datosFinales.diagnosticoPrincipal);
+            }
+          } else {
             console.log(`   📋 Clasificado como HISTORIA CLÍNICA/SOPORTE`);
             archivosHistoriaClinica.push(file);
-          } else {
-            console.log(`   ⏭️  Archivo adicional de factura ignorado (ya se encontró una factura)`);
           }
-        } catch (error) {
+        } catch (error: any) {
           console.log(`   ⚠️  Error al analizar ${file.originalname}: ${error.message}`);
           archivosHistoriaClinica.push(file);
         }
       }
 
       // Validar que se encontró al menos un archivo con datos de factura
-      if (!archivoFactura || !resultadoExtraccion) {
+      if (archivosFacturas.length === 0) {
         return res.status(400).json({
           success: false,
           message: 'No se encontraron datos de factura en ninguno de los archivos. Asegúrate de subir al menos un archivo con información de facturación.',
         });
       }
 
-      // Usar datos finales
-      const datosFactura = resultadoExtraccion.datosFinales;
+      console.log(`\n📊 Resumen de análisis:`);
+      console.log(`   - Archivos con datos de factura/procedimientos: ${archivosFacturas.length}`);
+      console.log(`   - Total procedimientos encontrados: ${todosProcedimientos.length}`);
+      console.log(`   - Historias clínicas/soportes: ${archivosHistoriaClinica.length}`);
+
+      // Usar la primera factura como base, pero consolidar datos de todas
+      const facturaBase = archivosFacturas[0];
+      const datosFactura = facturaBase.datos;
+      const resultadoExtraccion = facturaBase.resultado;
 
       console.log('✅ Datos extraídos de la factura:');
       console.log(`   - Factura: ${datosFactura.nroFactura}`);
@@ -417,7 +440,8 @@ class AuditoriaMedicaController {
             filename: `auditoria_${factura._id}.xlsx`,
           },
           archivosProcessed: {
-            factura: archivoFactura ? 1 : 0,
+            facturas: archivosFacturas.length,
+            procedimientos: todosProcedimientos.length,
             historiaClinica: archivosHistoriaClinica.length,
             total: files.length,
           },
