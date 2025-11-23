@@ -1737,7 +1737,7 @@ Total de guías implementadas: 125`
                       className="hidden"
                     />
                     <Button
-                      as="span"
+                      type="button"
                       variant="outline"
                       className="border-purple-600 text-purple-600 hover:bg-purple-50"
                     >
