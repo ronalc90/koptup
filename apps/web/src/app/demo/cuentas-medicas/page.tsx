@@ -1117,9 +1117,11 @@ Total de guías implementadas: 125`
     // Control del scroll del body cuando el modal está abierto
     useEffect(() => {
       if (mostrarModalCrear) {
+        console.log('✅ Modal de Nueva Factura abierto');
         // Deshabilitar scroll del body
         document.body.style.overflow = 'hidden';
       } else {
+        console.log('❌ Modal de Nueva Factura cerrado');
         // Rehabilitar scroll del body
         document.body.style.overflow = 'unset';
       }
@@ -1130,7 +1132,12 @@ Total de guías implementadas: 125`
       };
     }, [mostrarModalCrear]);
 
-    if (!mostrarModalCrear) return null;
+    if (!mostrarModalCrear) {
+      console.log('🚫 Modal no se renderiza (mostrarModalCrear =', mostrarModalCrear, ')');
+      return null;
+    }
+
+    console.log('🎨 Renderizando modal de Nueva Factura');
 
     const handleFileSelect = (files: FileList | null) => {
       if (!files) return;
@@ -1570,8 +1577,12 @@ Total de guías implementadas: 125`
                   Ver Proceso
                 </Button>
                 <Button
-                  onClick={() => setMostrarModalCrear(true)}
+                  onClick={() => {
+                    console.log('🔘 Click en Nueva Factura - Abriendo modal');
+                    setMostrarModalCrear(true);
+                  }}
                   className="bg-green-600 hover:bg-green-700"
+                  type="button"
                 >
                   <PlusIcon className="h-5 w-5 mr-2" />
                   Nueva Factura
@@ -1821,8 +1832,12 @@ Total de guías implementadas: 125`
                     </Button>
                   </label>
                   <Button
-                    onClick={() => setMostrarModalCrear(true)}
+                    onClick={() => {
+                      console.log('🔘 Click en Nueva Factura - Abriendo modal');
+                      setMostrarModalCrear(true);
+                    }}
                     className="bg-green-600 hover:bg-green-700"
+                    type="button"
                   >
                     <PlusIcon className="h-4 w-4 mr-2" />
                     Nueva Factura
