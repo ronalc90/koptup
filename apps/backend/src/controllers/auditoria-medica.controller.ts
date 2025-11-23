@@ -101,8 +101,18 @@ class AuditoriaMedicaController {
       console.log('✅ Datos extraídos de la factura:');
       console.log(`   - Factura: ${datosFactura.nroFactura}`);
       console.log(`   - Paciente: ${datosFactura.nombrePaciente}`);
-      console.log(`   - Procedimiento: ${datosFactura.codigoProcedimiento} - ${datosFactura.nombreProcedimiento}`);
-      console.log(`   - Valor IPS: $${datosFactura.valorIPS.toLocaleString('es-CO')}`);
+
+      // Mostrar TODOS los procedimientos encontrados
+      if (datosFactura.procedimientos && datosFactura.procedimientos.length > 0) {
+        console.log(`   - Procedimientos encontrados: ${datosFactura.procedimientos.length}`);
+        datosFactura.procedimientos.forEach((proc: any, idx: number) => {
+          console.log(`     ${idx + 1}. ${proc.codigoProcedimiento} - ${proc.nombreProcedimiento} (Cant: ${proc.cant}, Valor: $${proc.valorUnitario?.toLocaleString('es-CO')})`);
+        });
+      } else {
+        console.log(`   - Procedimiento: ${datosFactura.codigoProcedimiento} - ${datosFactura.nombreProcedimiento}`);
+      }
+
+      console.log(`   - Valor Total IPS: $${datosFactura.valorIPS.toLocaleString('es-CO')}`);
       console.log(`   - Diagnóstico: ${datosFactura.diagnosticoPrincipal}`);
       console.log(`   - Confianza IA: ${resultadoExtraccion.decision.nivelConfianza}%`);
 
