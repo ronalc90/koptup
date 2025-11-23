@@ -332,36 +332,84 @@ class AuditoriaMedicaController {
         await atencion.save();
         console.log(`✅ Atención guardada con ID: ${atencion._id}`);
 
-        // 6. CREAR PROCEDIMIENTO
-        procedimiento = new Procedimiento({
-          atencionId: atencion._id,
-          facturaId: factura._id,
-          codigoCUPS: datosFactura.codigoProcedimiento || datosFactura.matrizLiquidacion,
-          descripcion: datosFactura.nombreProcedimiento || '',
-          tipoManual: 'CUPS',
-          cantidad: datosFactura.cant || 1,
-          valorUnitarioIPS: datosFactura.valorIPS,
-          valorTotalIPS: datosFactura.valorIPS * (datosFactura.cant || 1),
-          valorUnitarioContrato: resultadoGlosas.valorAPagar,
-          valorTotalContrato: resultadoGlosas.valorAPagar * (datosFactura.cant || 1),
-          valorAPagar: resultadoGlosas.valorAPagar,
-          diferenciaTarifa: datosFactura.valorIPS - resultadoGlosas.valorAPagar,
-          glosas: [],
-          totalGlosas: resultadoGlosas.valorGlosaAdmitiva,
-          glosaAdmitida: resultadoGlosas.valorGlosaAdmitiva > 0,
-          tarifaValidada: true,
-          pertinenciaValidada: true,
-          duplicado: false,
-        });
+        // 6. CREAR PROCEDIMIENTOS (todos si hay múltiples)
+        const procedimientosIds: any[] = [];
 
-        await procedimiento.save();
-        console.log(`✅ Procedimiento guardado con ID: ${procedimiento._id}`);
+        if (resultadoGlosas.procedimientosDetallados && resultadoGlosas.procedimientosDetallados.length > 0) {
+          // Hay múltiples procedimientos - guardar TODOS
+          console.log(`💾 Guardando ${resultadoGlosas.procedimientosDetallados.length} procedimientos...`);
+
+          for (const procDetallado of resultadoGlosas.procedimientosDetallados) {
+            const procedimientoNuevo = new Procedimiento({
+              atencionId: atencion._id,
+              facturaId: factura._id,
+              codigoCUPS: procDetallado.codigoCUPS,
+              descripcion: procDetallado.descripcion,
+              tipoManual: 'CUPS',
+              cantidad: procDetallado.cantidad,
+              valorUnitarioIPS: procDetallado.valorIPS,
+              valorTotalIPS: procDetallado.valorIPS * procDetallado.cantidad,
+              valorUnitarioContrato: procDetallado.valorContrato,
+              valorTotalContrato: procDetallado.valorContrato * procDetallado.cantidad,
+              valorAPagar: procDetallado.valorAPagar,
+              diferenciaTarifa: procDetallado.glosa,
+              glosas: [],
+              totalGlosas: procDetallado.glosa,
+              glosaAdmitida: procDetallado.glosa > 0,
+              tarifaValidada: true,
+              pertinenciaValidada: true,
+              duplicado: false,
+            });
+
+            await procedimientoNuevo.save();
+            procedimientosIds.push(procedimientoNuevo._id);
+
+            console.log(`   ✅ ${procDetallado.codigoCUPS} - $${procDetallado.valorIPS.toLocaleString('es-CO')} (glosa: $${procDetallado.glosa.toLocaleString('es-CO')})`);
+          }
+
+          procedimiento = procedimientosIds[0]; // Para retrocompatibilidad, asignar el primero
+          console.log(`✅ ${procedimientosIds.length} procedimientos guardados en BD`);
+        } else {
+          // Un solo procedimiento (comportamiento original)
+          procedimiento = new Procedimiento({
+            atencionId: atencion._id,
+            facturaId: factura._id,
+            codigoCUPS: datosFactura.codigoProcedimiento || datosFactura.matrizLiquidacion,
+            descripcion: datosFactura.nombreProcedimiento || '',
+            tipoManual: 'CUPS',
+            cantidad: datosFactura.cant || 1,
+            valorUnitarioIPS: datosFactura.valorIPS,
+            valorTotalIPS: datosFactura.valorIPS * (datosFactura.cant || 1),
+            valorUnitarioContrato: resultadoGlosas.valorAPagar,
+            valorTotalContrato: resultadoGlosas.valorAPagar * (datosFactura.cant || 1),
+            valorAPagar: resultadoGlosas.valorAPagar,
+            diferenciaTarifa: datosFactura.valorIPS - resultadoGlosas.valorAPagar,
+            glosas: [],
+            totalGlosas: resultadoGlosas.valorGlosaAdmitiva,
+            glosaAdmitida: resultadoGlosas.valorGlosaAdmitiva > 0,
+            tarifaValidada: true,
+            pertinenciaValidada: true,
+            duplicado: false,
+          });
+
+          await procedimiento.save();
+          procedimientosIds.push(procedimiento._id);
+          console.log(`✅ Procedimiento guardado con ID: ${procedimiento._id}`);
+        }
 
         // 7. CREAR GLOSAS
+        let contadorGlosas = 0;
         for (const glosaData of resultadoGlosas.glosas) {
+          // Encontrar el procedimiento correspondiente a esta glosa
+          const procIndex = resultadoGlosas.procedimientosDetallados?.findIndex(
+            p => p.codigoCUPS === glosaData.codigoProcedimiento
+          ) ?? 0;
+
+          const procedimientoIdParaGlosa = procedimientosIds[procIndex >= 0 ? procIndex : 0];
+
           const glosa = new Glosa({
             facturaId: factura._id,
-            procedimientoId: procedimiento._id,
+            procedimientoId: procedimientoIdParaGlosa,
             atencionId: atencion._id,
             tipo: mapearTipoGlosa(glosaData.tipo),
             codigo: glosaData.codigo,
@@ -375,14 +423,20 @@ class AuditoriaMedicaController {
           });
 
           await glosa.save();
-          procedimiento.glosas.push(glosa._id);
+          contadorGlosas++;
+
+          // Agregar glosa al procedimiento correspondiente
+          const proc = await Procedimiento.findById(procedimientoIdParaGlosa);
+          if (proc) {
+            proc.glosas.push(glosa._id);
+            await proc.save();
+          }
         }
 
-        await procedimiento.save();
-        console.log(`✅ ${resultadoGlosas.glosas.length} glosa(s) creada(s)`);
+        console.log(`✅ ${contadorGlosas} glosa(s) creada(s)`);
 
         // 8. ACTUALIZAR REFERENCIAS
-        atencion.procedimientos = [procedimiento._id];
+        atencion.procedimientos = procedimientosIds;
         await atencion.save();
 
         factura.atenciones = [atencion._id];
@@ -395,7 +449,8 @@ class AuditoriaMedicaController {
         datosFactura,
         resultadoGlosas.glosas,
         resultadoGlosas.valorAPagar,
-        resultadoGlosas.valorGlosaAdmitiva
+        resultadoGlosas.valorGlosaAdmitiva,
+        resultadoGlosas.procedimientosDetallados // Pasar los procedimientos detallados
       );
 
       // Guardar Excel temporalmente para descarga

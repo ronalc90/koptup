@@ -106,18 +106,79 @@ class ExtraccionDualService {
   }
 
   /**
+   * Valida y sanitiza un procedimiento extraído
+   */
+  private validarProcedimiento(proc: any): { valido: boolean; errores: string[]; procedimientoSanitizado?: any } {
+    const errores: string[] = [];
+
+    // Validar código de procedimiento
+    if (!proc.codigoProcedimiento || typeof proc.codigoProcedimiento !== 'string') {
+      errores.push('Código de procedimiento faltante o inválido');
+    } else if (proc.codigoProcedimiento.trim().length === 0) {
+      errores.push('Código de procedimiento vacío');
+    }
+
+    // Validar cantidad
+    const cantidad = Number(proc.cant);
+    if (isNaN(cantidad) || cantidad <= 0 || cantidad > 10000) {
+      errores.push(`Cantidad inválida: ${proc.cant} (debe ser > 0 y <= 10000)`);
+    }
+
+    // Validar valor unitario
+    const valorUnitario = Number(proc.valorUnitario);
+    if (isNaN(valorUnitario) || valorUnitario < 0 || valorUnitario > 100000000) {
+      errores.push(`Valor unitario inválido: ${proc.valorUnitario} (debe ser >= 0 y <= 100M)`);
+    }
+
+    // Validar nombre de procedimiento
+    if (!proc.nombreProcedimiento || typeof proc.nombreProcedimiento !== 'string') {
+      // No es crítico, pero advertir
+      proc.nombreProcedimiento = proc.nombreProcedimiento || 'Procedimiento sin descripción';
+    }
+
+    if (errores.length > 0) {
+      return { valido: false, errores };
+    }
+
+    // Sanitizar y normalizar datos
+    const procedimientoSanitizado = {
+      codigoProcedimiento: String(proc.codigoProcedimiento).trim().toUpperCase(),
+      nombreProcedimiento: String(proc.nombreProcedimiento).trim(),
+      cant: Math.round(cantidad), // Redondear cantidad a entero
+      valorUnitario: Math.round(valorUnitario), // Redondear valor a entero
+    };
+
+    return { valido: true, errores: [], procedimientoSanitizado };
+  }
+
+  /**
    * Deduplica procedimientos basándose en código y valor
+   * Ahora con validación integrada
    */
   private deduplicarProcedimientos(procedimientos: any[]): any[] {
     const vistos = new Map<string, any>();
+    let procedimientosInvalidos = 0;
 
     for (const proc of procedimientos) {
+      // Validar procedimiento
+      const { valido, errores, procedimientoSanitizado } = this.validarProcedimiento(proc);
+
+      if (!valido) {
+        console.log(`   ⚠️  Procedimiento inválido omitido: ${errores.join(', ')}`);
+        procedimientosInvalidos++;
+        continue;
+      }
+
       // Crear clave única basada en código + valor + cantidad
-      const clave = `${proc.codigoProcedimiento}_${proc.valorUnitario}_${proc.cant}`;
+      const clave = `${procedimientoSanitizado!.codigoProcedimiento}_${procedimientoSanitizado!.valorUnitario}_${procedimientoSanitizado!.cant}`;
 
       if (!vistos.has(clave)) {
-        vistos.set(clave, proc);
+        vistos.set(clave, procedimientoSanitizado);
       }
+    }
+
+    if (procedimientosInvalidos > 0) {
+      console.log(`   🔍 ${procedimientosInvalidos} procedimientos inválidos fueron omitidos`);
     }
 
     return Array.from(vistos.values());
@@ -125,12 +186,15 @@ class ExtraccionDualService {
 
   /**
    * Procesa PDF grande usando chunking y consolida resultados
+   * Ahora con manejo robusto de errores y fallbacks
    */
   private async procesarConChunking(chunks: string[], pdfPath: string): Promise<ExtraccionConConfianza> {
     const todosLosProcedimientos: any[] = [];
     const todosDiagnosticos: Set<string> = new Set();
     let datosBase: any = null;
     let confianzaTotal = 0;
+    let chunksExitosos = 0;
+    let chunksFallidos = 0;
 
     for (let i = 0; i < chunks.length; i++) {
       console.log(`   📄 Procesando chunk ${i + 1}/${chunks.length} (${chunks[i].length} caracteres)...`);
@@ -138,26 +202,82 @@ class ExtraccionDualService {
       try {
         const resultado = await this.extraerDeChunk(chunks[i], i + 1);
 
+        // Validar que el resultado tenga estructura mínima válida
+        if (!resultado || typeof resultado !== 'object') {
+          throw new Error('Resultado de extracción inválido (no es un objeto)');
+        }
+
         // Guardar datos base del primer chunk (factura, paciente, etc.)
         if (i === 0) {
           datosBase = resultado;
+          console.log(`   📋 Datos base extraídos: Factura=${resultado.nroFactura || 'N/A'}, Paciente=${resultado.nombrePaciente || 'N/A'}`);
         }
 
         // Consolidar procedimientos de todos los chunks
         if (resultado.procedimientos && Array.isArray(resultado.procedimientos)) {
+          const procValidos = resultado.procedimientos.length;
           todosLosProcedimientos.push(...resultado.procedimientos);
+          console.log(`   ✅ ${procValidos} procedimientos extraídos de chunk ${i + 1}`);
+        } else {
+          console.log(`   ⚠️  Chunk ${i + 1} no contiene procedimientos`);
         }
 
         // Consolidar diagnósticos
-        if (resultado.diagnosticoPrincipal) todosDiagnosticos.add(resultado.diagnosticoPrincipal);
-        if (resultado.diagnosticoRelacionado1) todosDiagnosticos.add(resultado.diagnosticoRelacionado1);
-        if (resultado.diagnosticoRelacionado2) todosDiagnosticos.add(resultado.diagnosticoRelacionado2);
+        if (resultado.diagnosticoPrincipal) {
+          todosDiagnosticos.add(resultado.diagnosticoPrincipal);
+        }
+        if (resultado.diagnosticoRelacionado1) {
+          todosDiagnosticos.add(resultado.diagnosticoRelacionado1);
+        }
+        if (resultado.diagnosticoRelacionado2) {
+          todosDiagnosticos.add(resultado.diagnosticoRelacionado2);
+        }
 
-        confianzaTotal += resultado.confianzaExtraccion || 0;
+        // Acumular confianza
+        const confianzaChunk = resultado.confianzaExtraccion || 0;
+        if (confianzaChunk >= 0 && confianzaChunk <= 100) {
+          confianzaTotal += confianzaChunk;
+          chunksExitosos++;
+        } else {
+          console.log(`   ⚠️  Confianza de chunk ${i + 1} fuera de rango: ${confianzaChunk}`);
+        }
+
       } catch (error: any) {
-        console.log(`   ⚠️  Error procesando chunk ${i + 1}: ${error.message}`);
+        chunksFallidos++;
+        console.log(`   ❌ Error procesando chunk ${i + 1}: ${error.message}`);
+
+        // Si es el primer chunk y falla, intentar rescatar datos básicos
+        if (i === 0 && !datosBase) {
+          console.log(`   🔄 Intentando recuperar datos básicos del chunk 1...`);
+          try {
+            datosBase = {
+              nroFactura: this.extraerNumeroFacturaPorRegex(chunks[i]),
+              nombrePaciente: '',
+              numeroDocumento: '',
+              procedimientos: [],
+              diagnosticoPrincipal: '',
+            };
+            console.log(`   ✅ Datos básicos recuperados por regex`);
+          } catch (recoveryError) {
+            console.log(`   ⚠️  No se pudieron recuperar datos básicos`);
+          }
+        }
+
+        // Continuar con el siguiente chunk en lugar de fallar completamente
+        continue;
       }
     }
+
+    // Validar que se procesó al menos un chunk exitosamente
+    if (chunksExitosos === 0) {
+      throw new Error(`Todos los chunks fallaron (${chunksFallidos}/${chunks.length}). No se pudo extraer ningún dato.`);
+    }
+
+    console.log(`\n📊 Resumen de procesamiento por chunks:`);
+    console.log(`   - Chunks exitosos: ${chunksExitosos}/${chunks.length}`);
+    console.log(`   - Chunks fallidos: ${chunksFallidos}/${chunks.length}`);
+    console.log(`   - Tasa de éxito: ${Math.round((chunksExitosos / chunks.length) * 100)}%`);
+  }
 
     // Deduplicar procedimientos (pueden repetirse por el overlap)
     const procedimientosUnicos = this.deduplicarProcedimientos(todosLosProcedimientos);
@@ -210,11 +330,33 @@ class ExtraccionDualService {
 
 Analiza el siguiente FRAGMENTO de una factura médica y extrae TODOS los procedimientos que encuentres.
 
-**IMPORTANTE:**
-- Este es el chunk ${numeroChunk} de un documento más grande
-- Extrae TODOS los procedimientos que veas en este fragmento
-- Formato colombiano: punto (.) = miles, coma (,) = decimales
-- Devuelve números sin separadores: "38.586,00" → 38586
+**INSTRUCCIONES CRÍTICAS - LEER TABLAS COMPLETAS:**
+
+1. FORMATO DE TABLA: Las facturas tienen tablas con columnas:
+   ITEM | CÓDIGO | DESCRIPCIÓN | CANTIDAD | VALOR UNITARIO | % IMP | VALOR TOTAL
+
+2. EXTRACCIÓN COMPLETA:
+   - NO omitas ninguna fila de la tabla
+   - Lee TODAS las líneas numeradas (1, 2, 3, 4, ..., 50+)
+   - Si ves "TOTAL LÍNEAS: 54", debes extraer las 54 líneas
+   - Continúa leyendo hasta encontrar "SUBTOTAL" o "TOTAL LÍNEAS"
+
+3. CÓDIGOS VÁLIDOS:
+   - CUPS: 6 dígitos (ej: 890602, 735301, 897011)
+   - Códigos internos: alfanuméricos (ej: 10A002, 129A02)
+   - Medicamentos: numéricos largos (ej: 19934768-2, 20013906-1)
+   - Insumos: numéricos cortos (ej: 104358, 25700)
+   - TODOS son válidos - NO filtres por tipo de código
+
+4. FORMATO COLOMBIANO:
+   - Punto (.) = separador de miles
+   - Coma (,) = separador decimal
+   - Convierte a número sin separadores: "38.586,00" → 38586
+
+5. CHUNK ${numeroChunk}:
+   - Este es un fragmento de un documento más grande
+   - Extrae TODO lo que veas en este fragmento
+   - Los procedimientos se consolidarán después
 
 TEXTO DEL FRAGMENTO:
 ${textoChunk}
@@ -226,17 +368,19 @@ Responde ÚNICAMENTE con un objeto JSON:
   "numeroDocumento": "valor",
   "procedimientos": [
     {
-      "codigoProcedimiento": "valor",
-      "nombreProcedimiento": "valor",
-      "cant": numero,
-      "valorUnitario": numero
+      "codigoProcedimiento": "codigo_tal_cual_aparece_en_tabla",
+      "nombreProcedimiento": "descripción_completa",
+      "cant": numero_cantidad,
+      "valorUnitario": numero_sin_separadores
     }
   ],
   "diagnosticoPrincipal": "valor",
   "diagnosticoRelacionado1": "valor",
   "diagnosticoRelacionado2": "valor",
   "confianzaExtraccion": numero_0_a_100
-}`;
+}
+
+RECUERDA: Extrae TODAS las filas de la tabla, no solo algunas. Si hay 50 procedimientos, devuelve los 50.`;
 
     // Llamar a OpenAI con retry logic
     let response;
@@ -248,7 +392,7 @@ Responde ÚNICAMENTE con un objeto JSON:
         response = await this.openai!.chat.completions.create({
           model: 'gpt-4o',
           messages: [{ role: 'user', content: prompt }],
-          max_tokens: 4000,
+          max_tokens: 8000, // Aumentado para soportar 50+ procedimientos por chunk
           temperature: 0,
         });
         break;
@@ -272,6 +416,31 @@ Responde ÚNICAMENTE con un objeto JSON:
     }
 
     return JSON.parse(jsonMatch[0]);
+  }
+
+  /**
+   * Fallback: Extraer número de factura usando regex (cuando IA falla)
+   */
+  private extraerNumeroFacturaPorRegex(texto: string): string {
+    // Intentar varios patrones de número de factura
+    const patrones = [
+      /FACTURA\s*(?:No\.?|N[°ºª]\.?|#)?\s*([A-Z0-9\-]+)/i,
+      /FACTURA\s+ELECTR[OÓ]NICA.*?No\.?\s*([A-Z0-9\-]+)/i,
+      /N[°ºª]\.?\s*FACTURA:?\s*([A-Z0-9\-]+)/i,
+      /FV(\d+)/,  // Patrón común: FV694326
+      /FEHM(\d+)/, // Patrón común: FEHM716251
+    ];
+
+    for (const patron of patrones) {
+      const match = texto.match(patron);
+      if (match && match[1]) {
+        console.log(`   🎯 Número de factura encontrado por regex: ${match[1]}`);
+        return match[1].trim();
+      }
+    }
+
+    console.log(`   ⚠️  No se pudo encontrar número de factura con regex`);
+    return '';
   }
 
   /**
@@ -326,13 +495,44 @@ Responde ÚNICAMENTE con un objeto JSON:
    */
   private async extraerConIA(pdfPath: string): Promise<ExtraccionConConfianza> {
     if (!this.openai) {
-      throw new Error('OpenAI no está configurado');
+      throw new Error('OpenAI no está configurado - Falta OPENAI_API_KEY en variables de entorno');
+    }
+
+    // Validar que el archivo existe y es legible
+    if (!fs.existsSync(pdfPath)) {
+      throw new Error(`Archivo PDF no encontrado: ${pdfPath}`);
+    }
+
+    const stats = fs.statSync(pdfPath);
+    if (stats.size === 0) {
+      throw new Error(`Archivo PDF vacío: ${pdfPath}`);
+    }
+
+    if (stats.size > 50 * 1024 * 1024) {  // 50MB
+      console.log(`   ⚠️  Archivo PDF muy grande (${Math.round(stats.size / 1024 / 1024)}MB). Esto puede tardar varios minutos.`);
     }
 
     // 1. Extraer texto del PDF
-    const dataBuffer = fs.readFileSync(pdfPath);
-    const pdfData = await pdfParse(dataBuffer);
-    const textoPDF = pdfData.text;
+    let dataBuffer: Buffer;
+    let pdfData: any;
+    let textoPDF: string;
+
+    try {
+      dataBuffer = fs.readFileSync(pdfPath);
+      pdfData = await pdfParse(dataBuffer);
+      textoPDF = pdfData.text;
+    } catch (error: any) {
+      throw new Error(`Error al leer PDF: ${error.message}. El archivo podría estar corrupto o protegido.`);
+    }
+
+    // Validar que se extrajo texto
+    if (!textoPDF || textoPDF.trim().length === 0) {
+      throw new Error(`No se pudo extraer texto del PDF. El archivo podría ser solo imágenes o estar corrupto.`);
+    }
+
+    if (textoPDF.length < 50) {
+      console.log(`   ⚠️  Texto extraído muy corto (${textoPDF.length} caracteres). Verificar calidad del PDF.`);
+    }
 
     console.log(`📄 Texto extraído del PDF (${textoPDF.length} caracteres)`);
 
