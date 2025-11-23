@@ -577,7 +577,7 @@ export default function GestorDocumentos() {
                   {getFilteredDocuments().map((doc) => (
                     <div
                       key={doc.id}
-                      onClick={() => !activeView !== 'trash' && setSelectedDoc(doc)}
+                      onClick={() => activeView !== 'trash' && setSelectedDoc(doc)}
                       className={`bg-white dark:bg-slate-900 rounded-xl border-2 transition-all cursor-pointer hover:shadow-lg ${
                         compareMode && selectedDocs.includes(doc.id)
                           ? 'border-blue-500 shadow-lg'
