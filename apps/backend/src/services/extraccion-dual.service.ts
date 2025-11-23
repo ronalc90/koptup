@@ -62,7 +62,7 @@ class ExtraccionDualService {
     const apiKey = process.env.OPENAI_API_KEY;
     if (apiKey) {
       this.openai = new OpenAI({ apiKey });
-      console.log('✅ OpenAI GPT-4 inicializado para extracción con IA');
+      console.log('✅ OpenAI GPT-4o inicializado para extracción con IA');
     } else {
       console.log('⚠️  OPENAI_API_KEY no configurada');
     }
@@ -120,11 +120,12 @@ class ExtraccionDualService {
 
     console.log(`📄 Texto extraído del PDF (${textoPDF.length} caracteres)`);
 
-    // Limitar texto para evitar rate limits (max 20000 caracteres ≈ 5000 tokens)
+    // GPT-4o puede manejar hasta 128k tokens, así que no truncamos
+    // Solo limitamos en casos extremos (>100k chars ≈ 25k tokens)
     let textoParaIA = textoPDF;
-    if (textoPDF.length > 20000) {
-      console.log(`⚠️  Texto muy largo (${textoPDF.length} chars), truncando a 20000 caracteres para evitar rate limits`);
-      textoParaIA = textoPDF.substring(0, 20000);
+    if (textoPDF.length > 100000) {
+      console.log(`⚠️  Texto muy largo (${textoPDF.length} chars), truncando a 100000 caracteres`);
+      textoParaIA = textoPDF.substring(0, 100000);
     }
 
     // Debug: Mostrar fragmento del texto para verificar extracción
@@ -244,14 +245,14 @@ TEXTO DE LA FACTURA:
 ${textoParaIA}`;
 
     const response = await this.openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
+      model: 'gpt-4o', // GPT-4o: más rápido, más tokens, mejores límites
       messages: [
         {
           role: 'user',
           content: prompt,
         },
       ],
-      max_tokens: 3000,
+      max_tokens: 4000,
       temperature: 0, // Temperatura baja para precisión máxima
     });
 
