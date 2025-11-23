@@ -391,7 +391,7 @@ export default function ReglasPage() {
                     </Button>
                     <Button
                       size="sm"
-                      variant={regla.activa ? 'outline' : 'default'}
+                      variant={regla.activa ? 'outline' : 'primary'}
                       onClick={() => handleToggle(regla.id)}
                     >
                       {regla.activa ? 'Desactivar' : 'Activar'}
