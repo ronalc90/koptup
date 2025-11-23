@@ -1,6 +1,9 @@
 /**
  * MÓDULO A: INGESTA DE DOCUMENTOS
  *
+ * ⚠️  DEPRECADO: Este módulo requiere pdf-to-png-converter que es incompatible con Node v18
+ * Solo se usa en auditoria-modular.controller.ts que no está en el flujo principal
+ *
  * Responsable de recibir y procesar cualquier tipo de documento:
  * - PDFs (multipágina)
  * - Imágenes (JPG, PNG)
@@ -16,7 +19,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { pdfToPng } from 'pdf-to-png-converter';
+// import { pdfToPng } from 'pdf-to-png-converter'; // DEPRECADO: Incompatible con Node v18
 import sharp from 'sharp';
 
 /**
@@ -150,8 +153,15 @@ class DocumentIngestionService {
 
   /**
    * Procesar archivo PDF (multipágina)
+   * ⚠️  DEPRECADO: Requiere pdf-to-png-converter incompatible con Node v18
    */
   private async procesarPDF(rutaPDF: string): Promise<PaginaProcesada[]> {
+    throw new Error(
+      'procesarPDF está deprecado: pdf-to-png-converter es incompatible con Node v18. ' +
+      'Use el servicio extraccion-dual.service.ts en su lugar.'
+    );
+
+    /* CÓDIGO DEPRECADO - Comentado por incompatibilidad con Node v18
     console.log('📄 Procesando PDF multipágina...');
 
     try {
@@ -188,6 +198,7 @@ class DocumentIngestionService {
       console.error('❌ Error al procesar PDF:', error);
       throw new Error(`Error al procesar PDF: ${error}`);
     }
+    */
   }
 
   /**
