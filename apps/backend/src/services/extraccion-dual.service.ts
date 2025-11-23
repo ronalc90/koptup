@@ -106,6 +106,222 @@ class ExtraccionDualService {
   }
 
   /**
+   * Deduplica procedimientos basándose en código y valor
+   */
+  private deduplicarProcedimientos(procedimientos: any[]): any[] {
+    const vistos = new Map<string, any>();
+
+    for (const proc of procedimientos) {
+      // Crear clave única basada en código + valor + cantidad
+      const clave = `${proc.codigoProcedimiento}_${proc.valorUnitario}_${proc.cant}`;
+
+      if (!vistos.has(clave)) {
+        vistos.set(clave, proc);
+      }
+    }
+
+    return Array.from(vistos.values());
+  }
+
+  /**
+   * Procesa PDF grande usando chunking y consolida resultados
+   */
+  private async procesarConChunking(chunks: string[], pdfPath: string): Promise<ExtraccionConConfianza> {
+    const todosLosProcedimientos: any[] = [];
+    const todosDiagnosticos: Set<string> = new Set();
+    let datosBase: any = null;
+    let confianzaTotal = 0;
+
+    for (let i = 0; i < chunks.length; i++) {
+      console.log(`   📄 Procesando chunk ${i + 1}/${chunks.length} (${chunks[i].length} caracteres)...`);
+
+      try {
+        const resultado = await this.extraerDeChunk(chunks[i], i + 1);
+
+        // Guardar datos base del primer chunk (factura, paciente, etc.)
+        if (i === 0) {
+          datosBase = resultado;
+        }
+
+        // Consolidar procedimientos de todos los chunks
+        if (resultado.procedimientos && Array.isArray(resultado.procedimientos)) {
+          todosLosProcedimientos.push(...resultado.procedimientos);
+        }
+
+        // Consolidar diagnósticos
+        if (resultado.diagnosticoPrincipal) todosDiagnosticos.add(resultado.diagnosticoPrincipal);
+        if (resultado.diagnosticoRelacionado1) todosDiagnosticos.add(resultado.diagnosticoRelacionado1);
+        if (resultado.diagnosticoRelacionado2) todosDiagnosticos.add(resultado.diagnosticoRelacionado2);
+
+        confianzaTotal += resultado.confianzaExtraccion || 0;
+      } catch (error: any) {
+        console.log(`   ⚠️  Error procesando chunk ${i + 1}: ${error.message}`);
+      }
+    }
+
+    // Deduplicar procedimientos (pueden repetirse por el overlap)
+    const procedimientosUnicos = this.deduplicarProcedimientos(todosLosProcedimientos);
+    console.log(`   🔄 Deduplicación: ${todosLosProcedimientos.length} → ${procedimientosUnicos.length} procedimientos únicos`);
+
+    // Calcular valor total sumando todos los procedimientos únicos
+    const valorTotal = procedimientosUnicos.reduce((sum, proc) => {
+      return sum + (proc.valorUnitario * proc.cant || 0);
+    }, 0);
+
+    const diagnosticosArray = Array.from(todosDiagnosticos);
+    const confianzaPromedio = Math.round(confianzaTotal / chunks.length);
+
+    console.log(`   ✅ Consolidación completada: ${procedimientosUnicos.length} procedimientos, ${diagnosticosArray.length} diagnósticos`);
+
+    // Consolidar datos
+    const datosConsolidados = {
+      ...datosBase,
+      procedimientos: procedimientosUnicos,
+      diagnosticoPrincipal: diagnosticosArray[0] || '',
+      diagnosticoRelacionado1: diagnosticosArray[1] || '',
+      diagnosticoRelacionado2: diagnosticosArray[2] || '',
+      valorIPS: valorTotal,
+      confianzaExtraccion: confianzaPromedio,
+      // Usar primer procedimiento para compatibilidad
+      codigoProcedimiento: procedimientosUnicos[0]?.codigoProcedimiento || '',
+      nombreProcedimiento: procedimientosUnicos[0]?.nombreProcedimiento || '',
+      cant: procedimientosUnicos[0]?.cant || 0,
+    };
+
+    const camposExtraidos = 6 + procedimientosUnicos.length;
+
+    return {
+      ...datosConsolidados,
+      metadatos: {
+        metodo: 'IA',
+        confianza: confianzaPromedio,
+        tiempoExtraccion: 0,
+        camposExtraidos,
+        camposVacios: 0,
+      },
+    };
+  }
+
+  /**
+   * Extrae datos de un chunk individual
+   */
+  private async extraerDeChunk(textoChunk: string, numeroChunk: number): Promise<any> {
+    const prompt = `Eres un experto en extracción de datos de facturas médicas colombianas.
+
+Analiza el siguiente FRAGMENTO de una factura médica y extrae TODOS los procedimientos que encuentres.
+
+**IMPORTANTE:**
+- Este es el chunk ${numeroChunk} de un documento más grande
+- Extrae TODOS los procedimientos que veas en este fragmento
+- Formato colombiano: punto (.) = miles, coma (,) = decimales
+- Devuelve números sin separadores: "38.586,00" → 38586
+
+TEXTO DEL FRAGMENTO:
+${textoChunk}
+
+Responde ÚNICAMENTE con un objeto JSON:
+{
+  "nroFactura": "valor",
+  "nombrePaciente": "valor",
+  "numeroDocumento": "valor",
+  "procedimientos": [
+    {
+      "codigoProcedimiento": "valor",
+      "nombreProcedimiento": "valor",
+      "cant": numero,
+      "valorUnitario": numero
+    }
+  ],
+  "diagnosticoPrincipal": "valor",
+  "diagnosticoRelacionado1": "valor",
+  "diagnosticoRelacionado2": "valor",
+  "confianzaExtraccion": numero_0_a_100
+}`;
+
+    // Llamar a OpenAI con retry logic
+    let response;
+    let retries = 0;
+    const maxRetries = 3;
+
+    while (retries <= maxRetries) {
+      try {
+        response = await this.openai!.chat.completions.create({
+          model: 'gpt-4o',
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: 4000,
+          temperature: 0,
+        });
+        break;
+      } catch (error: any) {
+        if (error?.status === 429 && retries < maxRetries) {
+          const waitTime = Math.pow(2, retries) * 2000;
+          console.log(`   ⏳ Rate limit (chunk ${numeroChunk}), esperando ${waitTime/1000}s...`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+          retries++;
+        } else {
+          throw error;
+        }
+      }
+    }
+
+    const contenido = response!.choices[0].message.content || '{}';
+    const jsonMatch = contenido.match(/\{[\s\S]*\}/);
+
+    if (!jsonMatch) {
+      return { procedimientos: [], confianzaExtraccion: 0 };
+    }
+
+    return JSON.parse(jsonMatch[0]);
+  }
+
+  /**
+   * Divide texto largo en chunks con overlapping (asolapamiento) para no perder datos
+   */
+  private dividirEnChunks(texto: string, tamañoMaxChunk: number = 80000): string[] {
+    if (texto.length <= tamañoMaxChunk) {
+      return [texto];
+    }
+
+    const chunks: string[] = [];
+    const lineas = texto.split('\n');
+    const overlap = 10000; // 10k caracteres de overlap entre chunks
+
+    let indiceLineaInicio = 0;
+
+    while (indiceLineaInicio < lineas.length) {
+      let chunkActual = '';
+      let indiceLineaFin = indiceLineaInicio;
+
+      // Agregar líneas hasta alcanzar el tamaño máximo
+      while (indiceLineaFin < lineas.length && chunkActual.length < tamañoMaxChunk) {
+        chunkActual += lineas[indiceLineaFin] + '\n';
+        indiceLineaFin++;
+      }
+
+      chunks.push(chunkActual);
+
+      // Retroceder para crear overlap
+      if (indiceLineaFin < lineas.length) {
+        // Retroceder aproximadamente 'overlap' caracteres
+        let caracteresRetrocedidos = 0;
+        let lineasRetrocedidas = 0;
+
+        while (caracteresRetrocedidos < overlap && (indiceLineaFin - lineasRetrocedidas - 1) > indiceLineaInicio) {
+          lineasRetrocedidas++;
+          caracteresRetrocedidos += lineas[indiceLineaFin - lineasRetrocedidas].length;
+        }
+
+        indiceLineaInicio = indiceLineaFin - lineasRetrocedidas;
+      } else {
+        break;
+      }
+    }
+
+    console.log(`   📦 Chunks creados con overlap de ~10k caracteres entre cada uno`);
+    return chunks;
+  }
+
+  /**
    * Extracción con IA usando texto del PDF
    */
   private async extraerConIA(pdfPath: string): Promise<ExtraccionConConfianza> {
@@ -120,13 +336,16 @@ class ExtraccionDualService {
 
     console.log(`📄 Texto extraído del PDF (${textoPDF.length} caracteres)`);
 
-    // GPT-4o puede manejar hasta 128k tokens, así que no truncamos
-    // Solo limitamos en casos extremos (>100k chars ≈ 25k tokens)
-    let textoParaIA = textoPDF;
-    if (textoPDF.length > 100000) {
-      console.log(`⚠️  Texto muy largo (${textoPDF.length} chars), truncando a 100000 caracteres`);
-      textoParaIA = textoPDF.substring(0, 100000);
+    // Si el PDF es muy grande, dividirlo en chunks
+    const chunks = this.dividirEnChunks(textoPDF, 80000);
+
+    if (chunks.length > 1) {
+      console.log(`📦 PDF dividido en ${chunks.length} chunks para procesamiento`);
+      return await this.procesarConChunking(chunks, pdfPath);
     }
+
+    // Si es pequeño, procesarlo directamente
+    const textoParaIA = textoPDF;
 
     // Debug: Mostrar fragmento del texto para verificar extracción
     if (textoPDF.includes('Valor Unitario') || textoPDF.includes('Vlr. Unitario')) {
@@ -244,17 +463,37 @@ Responde ÚNICAMENTE con un objeto JSON válido con esta estructura exacta:
 TEXTO DE LA FACTURA:
 ${textoParaIA}`;
 
-    const response = await this.openai.chat.completions.create({
-      model: 'gpt-4o', // GPT-4o: más rápido, más tokens, mejores límites
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-      max_tokens: 4000,
-      temperature: 0, // Temperatura baja para precisión máxima
-    });
+    // Llamar a OpenAI con retry logic para rate limits
+    let response;
+    let retries = 0;
+    const maxRetries = 3;
+
+    while (retries <= maxRetries) {
+      try {
+        response = await this.openai.chat.completions.create({
+          model: 'gpt-4o', // GPT-4o: más rápido, más tokens, mejores límites
+          messages: [
+            {
+              role: 'user',
+              content: prompt,
+            },
+          ],
+          max_tokens: 4000,
+          temperature: 0, // Temperatura baja para precisión máxima
+        });
+        break; // Si tuvo éxito, salir del loop
+      } catch (error: any) {
+        if (error?.status === 429 && retries < maxRetries) {
+          // Rate limit - esperar y reintentar
+          const waitTime = Math.pow(2, retries) * 2000; // 2s, 4s, 8s
+          console.log(`⏳ Rate limit alcanzado, esperando ${waitTime/1000}s antes de reintentar (intento ${retries + 1}/${maxRetries})...`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+          retries++;
+        } else {
+          throw error; // Si no es rate limit o ya se acabaron los reintentos, lanzar el error
+        }
+      }
+    }
 
     // 3. Parsear respuesta JSON
     const contenido = response.choices[0].message.content || '{}';
