@@ -42,6 +42,14 @@ export interface DatosFacturaPDF {
   convenioPaC: string;
   tipoDocumentoIPS2: string;
 
+  // SECCIÓN 2.1: MÚLTIPLES PROCEDIMIENTOS (opcional - para facturas con varios procedimientos)
+  procedimientos?: Array<{
+    codigoProcedimiento: string;
+    nombreProcedimiento: string;
+    cant: number;
+    valorUnitario: number;
+  }>;
+
   // SECCIÓN 3: DETALLE DE GLOSAS
   codigoDevolucion: string;
   cantGlosada: number;

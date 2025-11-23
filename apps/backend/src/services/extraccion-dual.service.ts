@@ -277,7 +277,6 @@ class ExtraccionDualService {
     console.log(`   - Chunks exitosos: ${chunksExitosos}/${chunks.length}`);
     console.log(`   - Chunks fallidos: ${chunksFallidos}/${chunks.length}`);
     console.log(`   - Tasa de éxito: ${Math.round((chunksExitosos / chunks.length) * 100)}%`);
-  }
 
     // Deduplicar procedimientos (pueden repetirse por el overlap)
     const procedimientosUnicos = this.deduplicarProcedimientos(todosLosProcedimientos);
