@@ -186,16 +186,31 @@ class ExtraccionDualService {
 
   /**
    * Procesa PDF grande usando chunking y consolida resultados
-   * Ahora con manejo robusto de errores y fallbacks
+   * HÍBRIDO: Usa REGEX para procedimientos (confiable) + IA para metadatos
    */
   private async procesarConChunking(chunks: string[], pdfPath: string): Promise<ExtraccionConConfianza> {
     const todosLosProcedimientos: any[] = [];
+    const procedimientosRegex: any[] = [];
     const todosDiagnosticos: Set<string> = new Set();
     let datosBase: any = null;
     let confianzaTotal = 0;
     let chunksExitosos = 0;
     let chunksFallidos = 0;
 
+    // PASO 1: Extraer procedimientos con REGEX de todos los chunks (más confiable)
+    console.log(`\n🔬 PASO 1: Extracción REGEX de procedimientos de todos los chunks...`);
+    for (let i = 0; i < chunks.length; i++) {
+      const procChunk = this.extraerTablaProcedimientos(chunks[i]);
+      if (procChunk.length > 0) {
+        procedimientosRegex.push(...procChunk);
+        console.log(`   ✅ Chunk ${i + 1}: ${procChunk.length} procedimientos por REGEX`);
+      }
+    }
+
+    console.log(`   🎯 Total REGEX antes de deduplicar: ${procedimientosRegex.length} procedimientos`);
+
+    // PASO 2: Extraer metadatos con IA (factura, paciente, diagnósticos)
+    console.log(`\n🤖 PASO 2: Extracción IA de metadatos...`);
     for (let i = 0; i < chunks.length; i++) {
       console.log(`   📄 Procesando chunk ${i + 1}/${chunks.length} (${chunks[i].length} caracteres)...`);
 
@@ -213,13 +228,11 @@ class ExtraccionDualService {
           console.log(`   📋 Datos base extraídos: Factura=${resultado.nroFactura || 'N/A'}, Paciente=${resultado.nombrePaciente || 'N/A'}`);
         }
 
-        // Consolidar procedimientos de todos los chunks
-        if (resultado.procedimientos && Array.isArray(resultado.procedimientos)) {
+        // Si REGEX no encontró procedimientos, usar los de IA como fallback
+        if (procedimientosRegex.length === 0 && resultado.procedimientos && Array.isArray(resultado.procedimientos)) {
           const procValidos = resultado.procedimientos.length;
           todosLosProcedimientos.push(...resultado.procedimientos);
-          console.log(`   ✅ ${procValidos} procedimientos extraídos de chunk ${i + 1}`);
-        } else {
-          console.log(`   ⚠️  Chunk ${i + 1} no contiene procedimientos`);
+          console.log(`   ⚠️  Usando procedimientos de IA como fallback: ${procValidos} procedimientos`);
         }
 
         // Consolidar diagnósticos
@@ -269,7 +282,7 @@ class ExtraccionDualService {
     }
 
     // Validar que se procesó al menos un chunk exitosamente
-    if (chunksExitosos === 0) {
+    if (chunksExitosos === 0 && procedimientosRegex.length === 0) {
       throw new Error(`Todos los chunks fallaron (${chunksFallidos}/${chunks.length}). No se pudo extraer ningún dato.`);
     }
 
@@ -278,36 +291,47 @@ class ExtraccionDualService {
     console.log(`   - Chunks fallidos: ${chunksFallidos}/${chunks.length}`);
     console.log(`   - Tasa de éxito: ${Math.round((chunksExitosos / chunks.length) * 100)}%`);
 
-    // Deduplicar procedimientos (pueden repetirse por el overlap)
-    const procedimientosUnicos = this.deduplicarProcedimientos(todosLosProcedimientos);
-    console.log(`   🔄 Deduplicación: ${todosLosProcedimientos.length} → ${procedimientosUnicos.length} procedimientos únicos`);
+    // PASO 3: Consolidar procedimientos (priorizar REGEX sobre IA)
+    console.log(`\n🔀 PASO 3: Consolidación de procedimientos...`);
+
+    let procedimientosFinales: any[];
+    if (procedimientosRegex.length > 0) {
+      console.log(`   ✅ Usando procedimientos REGEX (más confiables): ${procedimientosRegex.length} extraídos`);
+      procedimientosFinales = this.deduplicarProcedimientos(procedimientosRegex);
+      console.log(`   🔄 Deduplicación REGEX: ${procedimientosRegex.length} → ${procedimientosFinales.length} procedimientos únicos`);
+    } else {
+      console.log(`   ⚠️  REGEX no encontró procedimientos, usando IA como fallback`);
+      procedimientosFinales = this.deduplicarProcedimientos(todosLosProcedimientos);
+      console.log(`   🔄 Deduplicación IA: ${todosLosProcedimientos.length} → ${procedimientosFinales.length} procedimientos únicos`);
+    }
 
     // Calcular valor total sumando todos los procedimientos únicos
-    const valorTotal = procedimientosUnicos.reduce((sum, proc) => {
+    const valorTotal = procedimientosFinales.reduce((sum, proc) => {
       return sum + (proc.valorUnitario * proc.cant || 0);
     }, 0);
 
     const diagnosticosArray = Array.from(todosDiagnosticos);
-    const confianzaPromedio = Math.round(confianzaTotal / chunks.length);
+    const confianzaPromedio = procedimientosRegex.length > 0 ? 95 : Math.round(confianzaTotal / Math.max(chunks.length, 1));
 
-    console.log(`   ✅ Consolidación completada: ${procedimientosUnicos.length} procedimientos, ${diagnosticosArray.length} diagnósticos`);
+    console.log(`   ✅ Consolidación completada: ${procedimientosFinales.length} procedimientos, ${diagnosticosArray.length} diagnósticos`);
+    console.log(`   💰 Valor total calculado: ${valorTotal.toLocaleString('es-CO')}`);
 
     // Consolidar datos
     const datosConsolidados = {
       ...datosBase,
-      procedimientos: procedimientosUnicos,
+      procedimientos: procedimientosFinales,
       diagnosticoPrincipal: diagnosticosArray[0] || '',
       diagnosticoRelacionado1: diagnosticosArray[1] || '',
       diagnosticoRelacionado2: diagnosticosArray[2] || '',
       valorIPS: valorTotal,
       confianzaExtraccion: confianzaPromedio,
       // Usar primer procedimiento para compatibilidad
-      codigoProcedimiento: procedimientosUnicos[0]?.codigoProcedimiento || '',
-      nombreProcedimiento: procedimientosUnicos[0]?.nombreProcedimiento || '',
-      cant: procedimientosUnicos[0]?.cant || 0,
+      codigoProcedimiento: procedimientosFinales[0]?.codigoProcedimiento || '',
+      nombreProcedimiento: procedimientosFinales[0]?.nombreProcedimiento || '',
+      cant: procedimientosFinales[0]?.cant || 0,
     };
 
-    const camposExtraidos = 6 + procedimientosUnicos.length;
+    const camposExtraidos = 6 + procedimientosFinales.length;
 
     return {
       ...datosConsolidados,
@@ -443,6 +467,131 @@ RECUERDA: Extrae TODAS las filas de la tabla, no solo algunas. Si hay 50 procedi
   }
 
   /**
+   * NUEVO: Convierte número en formato colombiano a número JavaScript
+   * Formato colombiano: punto (.) = miles, coma (,) = decimal
+   * Ejemplos: "38.586,00" → 38586, "1.234.567,89" → 1234567.89
+   */
+  private parseNumeroColombiano(numStr: string): number {
+    if (!numStr || typeof numStr !== 'string') {
+      return 0;
+    }
+
+    try {
+      // Eliminar espacios
+      let limpio = numStr.trim();
+
+      // Eliminar puntos (separadores de miles)
+      limpio = limpio.replace(/\./g, '');
+
+      // Reemplazar coma (separador decimal) por punto
+      limpio = limpio.replace(/,/g, '.');
+
+      // Parsear como float
+      const resultado = parseFloat(limpio);
+
+      return isNaN(resultado) ? 0 : resultado;
+    } catch (error) {
+      console.log(`   ⚠️  Error parseando número colombiano: "${numStr}"`);
+      return 0;
+    }
+  }
+
+  /**
+   * NUEVO: Extrae tabla de procedimientos usando REGEX (más confiable que IA para datos estructurados)
+   * Formato esperado: ITEM | CÓDIGO | DESCRIPCIÓN | CANTIDAD | VALOR UNITARIO | % IMP | VALOR TOTAL
+   * Ejemplo: "1    890602    CUIDADO MANEJO...    4.00    70,000.00    0.00    280,000.00"
+   */
+  private extraerTablaProcedimientos(texto: string): any[] {
+    const procedimientos: any[] = [];
+
+    console.log(`\n🔍 Extrayendo procedimientos con REGEX (método estructurado)...`);
+
+    // PATRÓN 1: Filas con estructura completa (más específico)
+    // Captura: ITEM CÓDIGO DESCRIPCIÓN CANTIDAD VALOR_UNITARIO %IMP VALOR_TOTAL
+    const patron1 = /^(\d{1,4})\s+([A-Z0-9\-]{4,})\s+(.+?)\s+(\d+(?:[.,]\d+)?)\s+([\d.,]+)\s+([\d.,]+)\s+([\d.,]+)\s*$/gm;
+
+    // PATRÓN 2: Filas más flexibles (para casos donde faltan columnas)
+    const patron2 = /^(\d{1,4})\s+([A-Z0-9\-]{4,})\s+(.+?)\s+(\d+(?:[.,]\d+)?)\s+([\d.,]+)/gm;
+
+    let match;
+    let contadorPatron1 = 0;
+    let contadorPatron2 = 0;
+
+    // Intentar patrón 1 (más específico)
+    while ((match = patron1.exec(texto)) !== null) {
+      const [, item, codigo, descripcion, cantidad, valorUnitario, porcentajeImp, valorTotal] = match;
+
+      // Validar que el código tenga longitud mínima
+      if (codigo.length < 4) continue;
+
+      // Parsear números en formato colombiano
+      const cantidadNum = this.parseNumeroColombiano(cantidad);
+      const valorUnitarioNum = this.parseNumeroColombiano(valorUnitario);
+      const valorTotalNum = this.parseNumeroColombiano(valorTotal);
+
+      // Validar que los valores tengan sentido
+      if (valorUnitarioNum > 0 && cantidadNum > 0) {
+        procedimientos.push({
+          item: parseInt(item),
+          codigoProcedimiento: codigo.trim().toUpperCase(),
+          nombreProcedimiento: descripcion.trim(),
+          cant: Math.round(cantidadNum),
+          valorUnitario: Math.round(valorUnitarioNum),
+        });
+        contadorPatron1++;
+      }
+    }
+
+    console.log(`   ✅ Patrón 1 (completo): ${contadorPatron1} procedimientos extraídos`);
+
+    // Si el patrón 1 no encontró suficientes, intentar patrón 2
+    if (contadorPatron1 < 5) {
+      console.log(`   🔄 Intentando con patrón 2 (más flexible)...`);
+
+      while ((match = patron2.exec(texto)) !== null) {
+        const [, item, codigo, descripcion, cantidad, valorUnitario] = match;
+
+        if (codigo.length < 4) continue;
+
+        const cantidadNum = this.parseNumeroColombiano(cantidad);
+        const valorUnitarioNum = this.parseNumeroColombiano(valorUnitario);
+
+        if (valorUnitarioNum > 0 && cantidadNum > 0) {
+          // Verificar que no sea duplicado del patrón 1
+          const yaExiste = procedimientos.some(p =>
+            p.item === parseInt(item) &&
+            p.codigoProcedimiento === codigo.trim().toUpperCase()
+          );
+
+          if (!yaExiste) {
+            procedimientos.push({
+              item: parseInt(item),
+              codigoProcedimiento: codigo.trim().toUpperCase(),
+              nombreProcedimiento: descripcion.trim(),
+              cant: Math.round(cantidadNum),
+              valorUnitario: Math.round(valorUnitarioNum),
+            });
+            contadorPatron2++;
+          }
+        }
+      }
+
+      console.log(`   ✅ Patrón 2 (flexible): ${contadorPatron2} procedimientos adicionales`);
+    }
+
+    // Ordenar por número de item
+    procedimientos.sort((a, b) => a.item - b.item);
+
+    console.log(`   🎯 TOTAL REGEX: ${procedimientos.length} procedimientos extraídos de la tabla`);
+
+    if (procedimientos.length > 0) {
+      console.log(`   📋 Rango de items: ${procedimientos[0].item} - ${procedimientos[procedimientos.length - 1].item}`);
+    }
+
+    return procedimientos;
+  }
+
+  /**
    * Divide texto largo en chunks con overlapping (asolapamiento) para no perder datos
    */
   private dividirEnChunks(texto: string, tamañoMaxChunk: number = 80000): string[] {
@@ -542,6 +691,10 @@ RECUERDA: Extrae TODAS las filas de la tabla, no solo algunas. Si hay 50 procedi
       console.log(`📦 PDF dividido en ${chunks.length} chunks para procesamiento`);
       return await this.procesarConChunking(chunks, pdfPath);
     }
+
+    // HÍBRIDO: Si es pequeño, intentar REGEX primero para procedimientos
+    console.log(`\n🔬 Intentando extracción REGEX de procedimientos...`);
+    const procedimientosRegex = this.extraerTablaProcedimientos(textoPDF);
 
     // Si es pequeño, procesarlo directamente
     const textoParaIA = textoPDF;
@@ -703,12 +856,35 @@ ${textoParaIA}`;
     }
 
     const datosExtraidos = JSON.parse(jsonMatch[0]);
-    const confianzaExtraccion = datosExtraidos.confianzaExtraccion || 50;
+    let confianzaExtraccion = datosExtraidos.confianzaExtraccion || 50;
+
+    // 3.5. HÍBRIDO: Si REGEX encontró procedimientos, usarlos en lugar de los de IA
+    let procedimientosFinales: any[];
+    if (procedimientosRegex.length > 0) {
+      console.log(`   ✅ Usando ${procedimientosRegex.length} procedimientos REGEX (más confiables que IA)`);
+      procedimientosFinales = procedimientosRegex;
+      confianzaExtraccion = 95; // Mayor confianza con REGEX
+
+      // Calcular valor total con procedimientos REGEX
+      const valorTotalRegex = procedimientosFinales.reduce((sum, proc) => {
+        return sum + (proc.valorUnitario * proc.cant || 0);
+      }, 0);
+
+      datosExtraidos.valorIPS = valorTotalRegex;
+      datosExtraidos.procedimientos = procedimientosFinales;
+      console.log(`   💰 Valor total recalculado con REGEX: ${valorTotalRegex.toLocaleString('es-CO')}`);
+    } else {
+      console.log(`   ⚠️  REGEX no encontró procedimientos, usando IA como fallback`);
+      procedimientosFinales = datosExtraidos.procedimientos || [];
+    }
 
     // 4. Crear objeto completo con valores por defecto
     const datoCompletos: any = {
       // Valores extraídos por IA
       ...datosExtraidos,
+
+      // Usar procedimientos finales (REGEX o IA)
+      procedimientos: procedimientosFinales,
 
       // Campos adicionales con valores por defecto
       nroRadicacion: datosExtraidos.nroFactura || '',
