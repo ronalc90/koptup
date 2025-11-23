@@ -42,6 +42,31 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
     restrictedTopics: initialConfig?.restrictedTopics || [],
   });
 
+  // Actualizar configuración (declared before use in useEffect)
+  const updateConfig = useCallback(async (newConfig: Partial<ChatbotConfig>): Promise<void> => {
+    if (!sessionId) return;
+
+    setConfig(prevConfig => {
+      const updatedConfig = { ...prevConfig, ...newConfig };
+
+      // Enviar al backend de forma asíncrona sin bloquear
+      fetch(`${API_URL}/api/chatbot/config`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId,
+          config: updatedConfig,
+        }),
+      }).catch(err => {
+        console.error('Error updating config:', err);
+      });
+
+      return updatedConfig;
+    });
+  }, [sessionId]);
+
   // Generar o recuperar sessionId
   useEffect(() => {
     let id = localStorage.getItem('chatbot_session_id');
@@ -192,31 +217,6 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
       setIsLoading(false);
     }
   };
-
-  // Actualizar configuración
-  const updateConfig = useCallback(async (newConfig: Partial<ChatbotConfig>): Promise<void> => {
-    if (!sessionId) return;
-
-    setConfig(prevConfig => {
-      const updatedConfig = { ...prevConfig, ...newConfig };
-
-      // Enviar al backend de forma asíncrona sin bloquear
-      fetch(`${API_URL}/api/chatbot/config`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          sessionId,
-          config: updatedConfig,
-        }),
-      }).catch(err => {
-        console.error('Error updating config:', err);
-      });
-
-      return updatedConfig;
-    });
-  }, [sessionId]);
 
   // Limpiar mensajes
   const clearMessages = async (): Promise<void> => {
