@@ -10,6 +10,7 @@ export interface Radicado {
   eps: string;
   numeroFactura?: string;
   valorTotal?: number;
+  tipoAtencion?: string;
   rango: number;
   estado: 'pendiente' | 'en_proceso' | 'validado' | 'liquidado' | 'con_glosas' | 'finalizado' | 'rechazado';
   numDocumentos: number;
