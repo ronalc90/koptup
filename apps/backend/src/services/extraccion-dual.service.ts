@@ -120,10 +120,30 @@ class ExtraccionDualService {
 
     console.log(`📄 Texto extraído del PDF (${textoPDF.length} caracteres)`);
 
+    // Debug: Mostrar fragmento del texto para verificar extracción
+    if (textoPDF.includes('Valor Unitario') || textoPDF.includes('Vlr. Unitario')) {
+      const lineas = textoPDF.split('\n');
+      const lineaValor = lineas.find(l => l.includes('Valor Unitario') || l.includes('Vlr. Unitario'));
+      if (lineaValor) {
+        console.log(`🔍 DEBUG - Línea con Valor Unitario encontrada: "${lineaValor}"`);
+      }
+    }
+
     // 2. Llamar a GPT-4 para extraer datos estructurados
     const prompt = `Eres un experto en extracción de datos de facturas médicas colombianas.
 
 Analiza el siguiente texto de una factura médica y extrae EXACTAMENTE los siguientes campos:
+
+**FORMATO DE NÚMEROS COLOMBIANO - MUY IMPORTANTE:**
+- En Colombia, el PUNTO (.) se usa como separador de miles
+- La COMA (,) se usa como separador decimal
+- Ejemplo: "38.586,00" = treinta y ocho mil quinientos ochenta y seis pesos
+- Ejemplo: "1.234.567,89" = un millón doscientos treinta y cuatro mil quinientos sesenta y siete pesos con 89 centavos
+- Al extraer valores monetarios, convierte el número eliminando puntos de miles y convirtiendo coma a punto decimal
+- Ejemplo: Si ves "38.586,00" en el PDF, devuelve el número como 38586.00
+- Ejemplo: Si ves "1.234.567,89" en el PDF, devuelve el número como 1234567.89
+- NUNCA confundas el punto de miles con punto decimal
+- Lee CUIDADOSAMENTE cada dígito del número
 
 **DATOS DE LA FACTURA:**
 - nroFactura: Número de factura
@@ -152,7 +172,7 @@ Analiza el siguiente texto de una factura médica y extrae EXACTAMENTE los sigui
 - diagnosticoRelacionado2: Segundo diagnóstico relacionado si existe
 
 **DATOS FINANCIEROS:**
-- valorIPS: Valor facturado por la IPS (número)
+- valorIPS: Valor facturado por la IPS. Busca "Valor Unitario", "Vlr. Unitario", "Valor Base" o similar. COPIA EXACTAMENTE los dígitos que ves, sin cambiarlos.
 - copago: Valor de copago
 - cmo: Cuota moderadora
 
@@ -165,7 +185,12 @@ Analiza el siguiente texto de una factura médica y extrae EXACTAMENTE los sigui
 - Los códigos CIE-10 son letra seguida de números (ej: Q659, J18, I10)
 - NO confundir códigos de vehículos (V03) con diagnósticos médicos
 - Si un campo no se encuentra, devuelve cadena vacía "" o 0 para números
-- Extrae los valores EXACTOS del texto, sin inventar datos
+- EXTRAE los valores EXACTOS del texto - NO CAMBIES NINGÚN DÍGITO
+- RECUERDA: Formato colombiano usa punto (.) para miles y coma (,) para decimales
+- COPIA los números dígito por dígito - NO los interpretes ni cambies
+- Si ves "38.586", NO lo cambies a "33.886" ni a ningún otro número
+- Lee cada dígito individualmente: 3-8-5-8-6, no 3-3-8-8-6
+- VERIFICA cada número TRES veces antes de extraerlo, comparando dígito por dígito con el texto original
 
 **FORMATO DE RESPUESTA:**
 Responde ÚNICAMENTE con un objeto JSON válido con esta estructura exacta:
