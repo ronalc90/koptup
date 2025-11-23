@@ -10,6 +10,8 @@ import {
   calcularTarifaProcedimientos,
   calcularCostoMedicamentos,
 } from '../services/medical-search.service';
+import fs from 'fs/promises';
+import path from 'path';
 
 /**
  * Create a new cuenta médica
@@ -125,7 +127,8 @@ export async function deleteCuenta(req: Request, res: Response): Promise<void> {
   try {
     const { id } = req.params;
 
-    const cuenta = await CuentaMedica.findByIdAndDelete(id);
+    // Find cuenta first to get file paths before deleting
+    const cuenta = await CuentaMedica.findById(id);
 
     if (!cuenta) {
       res.status(404).json({
@@ -135,7 +138,23 @@ export async function deleteCuenta(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    // TODO: Optionally delete associated files from disk
+    // Delete associated files from disk
+    if (cuenta.archivos && cuenta.archivos.length > 0) {
+      const deletePromises = cuenta.archivos.map(async (archivo) => {
+        try {
+          const filePath = path.resolve(archivo.path);
+          await fs.unlink(filePath);
+          logger.info(`Archivo físico eliminado: ${filePath}`);
+        } catch (err: any) {
+          // Log error but don't fail the entire operation
+          logger.warn(`No se pudo eliminar archivo ${archivo.path}: ${err.message}`);
+        }
+      });
+      await Promise.allSettled(deletePromises);
+    }
+
+    // Delete cuenta from database
+    await CuentaMedica.findByIdAndDelete(id);
     logger.info(`Cuenta médica eliminada: ${id}`);
 
     res.status(200).json({

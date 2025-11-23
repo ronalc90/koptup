@@ -488,8 +488,10 @@ class AuditoriaController {
         f.originalname.match(/\.pdf$/i)
       );
 
-      // Por ahora, crear datos de ejemplo basados en los archivos
-      // TODO: Implementar procesamiento real con IA en el futuro
+      // NOTA: Sistema actual genera datos de ejemplo para demostración
+      // El procesamiento real con IA de los PDFs debe ser implementado
+      // utilizando los servicios en /services/auditoria-*.service.ts
+      // Ver: auditoria-paso-a-paso.service.ts para la lógica completa
       const atencion = new Atencion({
         facturaId: factura._id,
         numeroAtencion: `AT-${Date.now()}`,
