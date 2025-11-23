@@ -120,13 +120,9 @@ class ExtraccionDualService {
 
     console.log(`📄 Texto extraído del PDF (${textoPDF.length} caracteres)`);
 
-    // GPT-4o puede manejar hasta 128k tokens, así que no truncamos
-    // Solo limitamos en casos extremos (>100k chars ≈ 25k tokens)
-    let textoParaIA = textoPDF;
-    if (textoPDF.length > 100000) {
-      console.log(`⚠️  Texto muy largo (${textoPDF.length} chars), truncando a 100000 caracteres`);
-      textoParaIA = textoPDF.substring(0, 100000);
-    }
+    // Usar TODO el texto del PDF - GPT-4o puede manejar hasta 128k tokens
+    // Si el PDF es MUY grande (>400k chars), lo dividiremos en chunks
+    const textoParaIA = textoPDF;
 
     // Debug: Mostrar fragmento del texto para verificar extracción
     if (textoPDF.includes('Valor Unitario') || textoPDF.includes('Vlr. Unitario')) {
@@ -244,17 +240,37 @@ Responde ÚNICAMENTE con un objeto JSON válido con esta estructura exacta:
 TEXTO DE LA FACTURA:
 ${textoParaIA}`;
 
-    const response = await this.openai.chat.completions.create({
-      model: 'gpt-4o', // GPT-4o: más rápido, más tokens, mejores límites
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-      max_tokens: 4000,
-      temperature: 0, // Temperatura baja para precisión máxima
-    });
+    // Llamar a OpenAI con retry logic para rate limits
+    let response;
+    let retries = 0;
+    const maxRetries = 3;
+
+    while (retries <= maxRetries) {
+      try {
+        response = await this.openai.chat.completions.create({
+          model: 'gpt-4o', // GPT-4o: más rápido, más tokens, mejores límites
+          messages: [
+            {
+              role: 'user',
+              content: prompt,
+            },
+          ],
+          max_tokens: 4000,
+          temperature: 0, // Temperatura baja para precisión máxima
+        });
+        break; // Si tuvo éxito, salir del loop
+      } catch (error: any) {
+        if (error?.status === 429 && retries < maxRetries) {
+          // Rate limit - esperar y reintentar
+          const waitTime = Math.pow(2, retries) * 2000; // 2s, 4s, 8s
+          console.log(`⏳ Rate limit alcanzado, esperando ${waitTime/1000}s antes de reintentar (intento ${retries + 1}/${maxRetries})...`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+          retries++;
+        } else {
+          throw error; // Si no es rate limit o ya se acabaron los reintentos, lanzar el error
+        }
+      }
+    }
 
     // 3. Parsear respuesta JSON
     const contenido = response.choices[0].message.content || '{}';
