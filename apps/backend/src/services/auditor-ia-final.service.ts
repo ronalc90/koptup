@@ -201,12 +201,31 @@ Debes responder en formato JSON estructurado.`
         ];
       }
 
-      const completion = await this.openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: messages,
-        max_tokens: 6000, // Aumentado para permitir análisis y justificación completa
-        temperature: 0.1, // Baja temperatura para decisiones consistentes y precisas
-      });
+      // Retry logic para manejar rate limits (429)
+      let retries = 0;
+      const maxRetries = 3;
+      let completion;
+
+      while (retries <= maxRetries) {
+        try {
+          completion = await this.openai.chat.completions.create({
+            model: 'gpt-4o',
+            messages: messages,
+            max_tokens: 6000, // Aumentado para permitir análisis y justificación completa
+            temperature: 0.1, // Baja temperatura para decisiones consistentes y precisas
+          });
+          break; // Éxito, salir del loop
+        } catch (error: any) {
+          if (error?.status === 429 && retries < maxRetries) {
+            const waitTime = Math.pow(2, retries) * 2000; // 2s, 4s, 8s
+            console.log(`   ⏳ Rate limit en Auditor IA Final, esperando ${waitTime/1000}s antes de reintentar (intento ${retries + 1}/${maxRetries})...`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+            retries++;
+          } else {
+            throw error; // Error diferente o se agotaron los reintentos
+          }
+        }
+      }
 
       const respuesta = completion.choices[0].message.content || '{}';
 
