@@ -120,6 +120,13 @@ class ExtraccionDualService {
 
     console.log(`📄 Texto extraído del PDF (${textoPDF.length} caracteres)`);
 
+    // Limitar texto para evitar rate limits (max 20000 caracteres ≈ 5000 tokens)
+    let textoParaIA = textoPDF;
+    if (textoPDF.length > 20000) {
+      console.log(`⚠️  Texto muy largo (${textoPDF.length} chars), truncando a 20000 caracteres para evitar rate limits`);
+      textoParaIA = textoPDF.substring(0, 20000);
+    }
+
     // Debug: Mostrar fragmento del texto para verificar extracción
     if (textoPDF.includes('Valor Unitario') || textoPDF.includes('Vlr. Unitario')) {
       const lineas = textoPDF.split('\n');
@@ -160,11 +167,15 @@ Analiza el siguiente texto de una factura médica y extrae EXACTAMENTE los sigui
 - edad: Edad del paciente (número)
 - sexo: Sexo (M/F)
 
-**DATOS DEL PROCEDIMIENTO:**
-- codigoProcedimiento: Código CUPS del procedimiento (6 dígitos que empiezan con 8 o 9)
-- nombreProcedimiento: Descripción del procedimiento
-- descripcionProcedimiento: Descripción completa
-- cant: Cantidad de procedimientos realizados
+**DATOS DE PROCEDIMIENTOS:**
+- procedimientos: Array con TODOS los procedimientos encontrados en la factura
+  - Cada procedimiento debe tener:
+    - codigoProcedimiento: Código CUPS (6 dígitos que empiezan con 8 o 9, o códigos de 5-6 dígitos)
+    - nombreProcedimiento: Descripción del procedimiento
+    - cant: Cantidad
+    - valorUnitario: Valor unitario del procedimiento
+- Si hay MÚLTIPLES procedimientos, devuelve TODOS en el array
+- NO omitas ningún procedimiento que encuentres
 
 **DATOS CLÍNICOS:**
 - diagnosticoPrincipal: Código CIE-10 del diagnóstico principal (formato: letra + 2-3 números)
@@ -204,14 +215,21 @@ Responde ÚNICAMENTE con un objeto JSON válido con esta estructura exacta:
   "numeroDocumento": "valor",
   "edad": numero,
   "sexo": "valor",
-  "codigoProcedimiento": "valor",
-  "nombreProcedimiento": "valor",
-  "descripcionProcedimiento": "valor",
-  "cant": numero,
+  "procedimientos": [
+    {
+      "codigoProcedimiento": "valor",
+      "nombreProcedimiento": "valor",
+      "cant": numero,
+      "valorUnitario": numero
+    }
+  ],
+  "codigoProcedimiento": "primer_procedimiento",
+  "nombreProcedimiento": "descripcion_primer_procedimiento",
+  "cant": cantidad_primer_procedimiento,
   "diagnosticoPrincipal": "valor",
   "diagnosticoRelacionado1": "valor",
   "diagnosticoRelacionado2": "valor",
-  "valorIPS": numero,
+  "valorIPS": suma_total_de_todos_los_procedimientos,
   "valorBrutoFactura": numero,
   "valorNetoFactura": numero,
   "valorIVA": numero,
@@ -223,7 +241,7 @@ Responde ÚNICAMENTE con un objeto JSON válido con esta estructura exacta:
 }
 
 TEXTO DE LA FACTURA:
-${textoPDF}`;
+${textoParaIA}`;
 
     const response = await this.openai.chat.completions.create({
       model: 'gpt-4-turbo-preview',
