@@ -1117,11 +1117,9 @@ Total de guías implementadas: 125`
     // Control del scroll del body cuando el modal está abierto
     useEffect(() => {
       if (mostrarModalCrear) {
-        console.log('✅ Modal de Nueva Factura abierto');
         // Deshabilitar scroll del body
         document.body.style.overflow = 'hidden';
       } else {
-        console.log('❌ Modal de Nueva Factura cerrado');
         // Rehabilitar scroll del body
         document.body.style.overflow = 'unset';
       }
@@ -1132,12 +1130,7 @@ Total de guías implementadas: 125`
       };
     }, [mostrarModalCrear]);
 
-    if (!mostrarModalCrear) {
-      console.log('🚫 Modal no se renderiza (mostrarModalCrear =', mostrarModalCrear, ')');
-      return null;
-    }
-
-    console.log('🎨 Renderizando modal de Nueva Factura');
+    if (!mostrarModalCrear) return null;
 
     const handleFileSelect = (files: FileList | null) => {
       if (!files) return;
@@ -1577,10 +1570,7 @@ Total de guías implementadas: 125`
                   Ver Proceso
                 </Button>
                 <Button
-                  onClick={() => {
-                    console.log('🔘 Click en Nueva Factura - Abriendo modal');
-                    setMostrarModalCrear(true);
-                  }}
+                  onClick={() => setMostrarModalCrear(true)}
                   className="bg-green-600 hover:bg-green-700"
                   type="button"
                 >
@@ -1832,10 +1822,7 @@ Total de guías implementadas: 125`
                     </Button>
                   </label>
                   <Button
-                    onClick={() => {
-                      console.log('🔘 Click en Nueva Factura - Abriendo modal');
-                      setMostrarModalCrear(true);
-                    }}
+                    onClick={() => setMostrarModalCrear(true)}
                     className="bg-green-600 hover:bg-green-700"
                     type="button"
                   >
