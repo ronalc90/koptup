@@ -182,11 +182,11 @@ const startServer = async () => {
     });
 
     // Aumentar timeout del servidor para permitir análisis IA exhaustivo
-    // "aunque se demore un rato" - el usuario prioriza precisión sobre velocidad
-    server.timeout = 300000; // 5 minutos
-    server.keepAliveTimeout = 310000; // Ligeramente mayor que timeout
-    server.headersTimeout = 320000; // Ligeramente mayor que keepAliveTimeout
-    logger.info('Timeouts del servidor configurados para análisis IA extenso (5 min)');
+    // Con chunking, PDFs grandes pueden tardar 10+ minutos
+    server.timeout = 900000; // 15 minutos (para procesar múltiples PDFs con chunking)
+    server.keepAliveTimeout = 910000; // Ligeramente mayor que timeout
+    server.headersTimeout = 920000; // Ligeramente mayor que keepAliveTimeout
+    logger.info('Timeouts del servidor configurados para análisis IA extenso (15 min)');
 
     const shutdown = (signal: string) => {
       logger.info(`Recibido ${signal}, cerrando...`);
