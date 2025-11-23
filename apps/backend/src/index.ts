@@ -115,6 +115,7 @@ const startServer = async () => {
         auditoriaRoutes,
         contentManagerRoutes,
         notificationsRoutes,
+        documentoConocimientoConfigRoutes,
       ] = await Promise.all([
         import('./routes/auth.routes'),
         import('./routes/document.routes'),
@@ -133,6 +134,7 @@ const startServer = async () => {
         import('./routes/auditoria.routes'),
         import('./routes/content-manager.routes'),
         import('./routes/notifications.routes'),
+        import('./routes/documentoConocimientoConfig.routes'),
       ]);
 
       if (authRoutes.default) app.use('/api/auth', authRoutes.default);
@@ -152,6 +154,7 @@ const startServer = async () => {
       if (auditoriaRoutes.default) app.use('/api/auditoria', auditoriaRoutes.default);
       if (contentManagerRoutes.default) app.use('/api/content', contentManagerRoutes.default);
       if (notificationsRoutes.default) app.use('/api/notifications', notificationsRoutes.default);
+      if (documentoConocimientoConfigRoutes.default) app.use('/api/documentos-conocimiento', documentoConocimientoConfigRoutes.default);
 
       logger.info('Rutas registradas');
     } catch (err: any) {

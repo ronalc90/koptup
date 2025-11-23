@@ -439,7 +439,7 @@ Las **EPS negocian precios diferentes** con proveedores:
       nombre: 'Contrato EPS Salud Total',
       tipo: 'tarifario',
       descripcion: 'IPS San José - Vigencia 2024',
-      activo: true,
+      activo: false,
       contenido: `# Contrato EPS Salud Total - IPS San José
 Código Contrato: ST-2024-001
 Vigencia: 01/01/2024 - 31/12/2024
@@ -479,7 +479,7 @@ CUPS 980201 | Día cama UCI | $1,100,000
       nombre: 'Contrato Nueva EPS',
       tipo: 'tarifario',
       descripcion: 'IPS San José - Vigencia 2024',
-      activo: false,
+      activo: true,
       contenido: `# Contrato Nueva EPS - IPS San José
 Código Contrato: NE-2024-045
 Vigencia: 01/01/2024 - 31/12/2024
@@ -520,7 +520,7 @@ CUPS 980201 | Día cama UCI | $1,050,000
       nombre: 'Contrato EPS Compensar',
       tipo: 'tarifario',
       descripcion: 'IPS San José - Vigencia 2024',
-      activo: true,
+      activo: false,
       contenido: `# Contrato EPS Compensar - IPS San José
 Código Contrato: CP-2024-078
 Vigencia: 01/01/2024 - 31/12/2024
@@ -812,6 +812,50 @@ Total de guías implementadas: 125`
     cargarEstadisticas();
   }, []);
 
+  // Cargar configuración de documentos de conocimiento desde el backend
+  useEffect(() => {
+    const cargarConfiguracion = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/api/documentos-conocimiento/config');
+        if (response.ok) {
+          const configs = await response.json();
+
+          // Actualizar el estado de los documentos según la configuración del backend
+          if (configs && configs.length > 0) {
+            setDocumentosConocimiento(prev =>
+              prev.map(doc => {
+                const config = configs.find((c: any) => c.documento_id === doc.id);
+                return config ? { ...doc, activo: config.activo } : doc;
+              })
+            );
+          } else {
+            // Si no hay configuraciones, inicializar con valores por defecto
+            await fetch('http://localhost:3001/api/documentos-conocimiento/config/inicializar', {
+              method: 'POST',
+            });
+            // Recargar configuración después de inicializar
+            const responseReload = await fetch('http://localhost:3001/api/documentos-conocimiento/config');
+            if (responseReload.ok) {
+              const configsReload = await responseReload.json();
+              if (configsReload && configsReload.data) {
+                setDocumentosConocimiento(prev =>
+                  prev.map(doc => {
+                    const config = configsReload.data.find((c: any) => c.documento_id === doc.id);
+                    return config ? { ...doc, activo: config.activo } : doc;
+                  })
+                );
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error al cargar configuración de documentos:', error);
+      }
+    };
+
+    cargarConfiguracion();
+  }, []);
+
   // Cargar facturas cuando cambia la vista a 'facturas' o 'admin'
   useEffect(() => {
     if ((vista === 'facturas' || vista === 'admin') && facturas.length === 0) {
@@ -1019,15 +1063,43 @@ Total de guías implementadas: 125`
   };
 
   // Función para toggle de activación de documento
-  const toggleDocumento = (id: string) => {
-    setDocumentosConocimiento(prev =>
-      prev.map(doc =>
-        doc.id === id ? { ...doc, activo: !doc.activo } : doc
-      )
-    );
+  const toggleDocumento = async (id: string) => {
     const doc = documentosConocimiento.find(d => d.id === id);
-    if (doc) {
-      toast.success(`${doc.nombre} ${doc.activo ? 'desactivado' : 'activado'}`);
+    if (!doc) return;
+
+    const nuevoEstado = !doc.activo;
+
+    try {
+      // Actualizar optimísticamente en el frontend
+      setDocumentosConocimiento(prev =>
+        prev.map(d =>
+          d.id === id ? { ...d, activo: nuevoEstado } : d
+        )
+      );
+
+      // Persistir en el backend
+      const response = await fetch(`http://localhost:3001/api/documentos-conocimiento/config/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ activo: nuevoEstado }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al actualizar configuración');
+      }
+
+      toast.success(`${doc.nombre} ${nuevoEstado ? 'activado' : 'desactivado'}`);
+    } catch (error) {
+      console.error('Error al actualizar documento:', error);
+      // Revertir cambio en caso de error
+      setDocumentosConocimiento(prev =>
+        prev.map(d =>
+          d.id === id ? { ...d, activo: !nuevoEstado } : d
+        )
+      );
+      toast.error('Error al actualizar configuración del documento');
     }
   };
 
