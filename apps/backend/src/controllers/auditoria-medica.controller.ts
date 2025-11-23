@@ -417,7 +417,7 @@ class AuditoriaMedicaController {
             filename: `auditoria_${factura._id}.xlsx`,
           },
           archivosProcessed: {
-            factura: archivosFactura.length,
+            factura: archivoFactura ? 1 : 0,
             historiaClinica: archivosHistoriaClinica.length,
             total: files.length,
           },
