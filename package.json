@@ -19,9 +19,9 @@
     "clean": "turbo run clean && rm -rf node_modules"
   },
   "devDependencies": {
-    "turbo": "^1.10.16",
+    "eslint": "^8.52.0",
     "prettier": "^3.0.3",
-    "eslint": "^8.52.0"
+    "turbo": "^1.10.16"
   },
   "engines": {
     "node": ">=18.0.0",
