@@ -192,7 +192,7 @@ export async function subirDocumentos(req: Request, res: Response): Promise<void
 
     // Agregar documentos
     const nuevosDocumentos = files.map((file) => ({
-      tipo: this.determinarTipoDocumento(file.originalname),
+      tipo: determinarTipoDocumento(file.originalname),
       filename: file.filename,
       originalName: file.originalname,
       path: file.path,
@@ -223,26 +223,28 @@ export async function subirDocumentos(req: Request, res: Response): Promise<void
       error: error.message,
     });
   }
+}
 
-  // Método auxiliar para determinar tipo de documento
-  determinarTipoDocumento(filename: string): 'factura' | 'historia_clinica' | 'autorizacion' | 'soporte' | 'otro' {
-    const lower = filename.toLowerCase();
+/**
+ * Función auxiliar para determinar tipo de documento
+ */
+function determinarTipoDocumento(filename: string): 'factura' | 'historia_clinica' | 'autorizacion' | 'soporte' | 'otro' {
+  const lower = filename.toLowerCase();
 
-    if (lower.includes('factura') || lower.includes('fact')) {
-      return 'factura';
-    }
-    if (lower.includes('historia') || lower.includes('hc') || lower.includes('clinica')) {
-      return 'historia_clinica';
-    }
-    if (lower.includes('autorizacion') || lower.includes('aut') || lower.includes('permiso')) {
-      return 'autorizacion';
-    }
-    if (lower.includes('soporte') || lower.includes('evolucion') || lower.includes('nota')) {
-      return 'soporte';
-    }
-
-    return 'otro';
+  if (lower.includes('factura') || lower.includes('fact')) {
+    return 'factura';
   }
+  if (lower.includes('historia') || lower.includes('hc') || lower.includes('clinica')) {
+    return 'historia_clinica';
+  }
+  if (lower.includes('autorizacion') || lower.includes('aut') || lower.includes('permiso')) {
+    return 'autorizacion';
+  }
+  if (lower.includes('soporte') || lower.includes('evolucion') || lower.includes('nota')) {
+    return 'soporte';
+  }
+
+  return 'otro';
 }
 
 /**
