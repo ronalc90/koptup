@@ -125,6 +125,17 @@ class ExtraccionDualService {
 
 Analiza el siguiente texto de una factura médica y extrae EXACTAMENTE los siguientes campos:
 
+**FORMATO DE NÚMEROS COLOMBIANO - MUY IMPORTANTE:**
+- En Colombia, el PUNTO (.) se usa como separador de miles
+- La COMA (,) se usa como separador decimal
+- Ejemplo: "38.586,00" = treinta y ocho mil quinientos ochenta y seis pesos
+- Ejemplo: "1.234.567,89" = un millón doscientos treinta y cuatro mil quinientos sesenta y siete pesos con 89 centavos
+- Al extraer valores monetarios, convierte el número eliminando puntos de miles y convirtiendo coma a punto decimal
+- Ejemplo: Si ves "38.586,00" en el PDF, devuelve el número como 38586.00
+- Ejemplo: Si ves "1.234.567,89" en el PDF, devuelve el número como 1234567.89
+- NUNCA confundas el punto de miles con punto decimal
+- Lee CUIDADOSAMENTE cada dígito del número
+
 **DATOS DE LA FACTURA:**
 - nroFactura: Número de factura
 - fechaFactura: Fecha de emisión (formato DD/MM/YYYY)
@@ -166,6 +177,8 @@ Analiza el siguiente texto de una factura médica y extrae EXACTAMENTE los sigui
 - NO confundir códigos de vehículos (V03) con diagnósticos médicos
 - Si un campo no se encuentra, devuelve cadena vacía "" o 0 para números
 - Extrae los valores EXACTOS del texto, sin inventar datos
+- RECUERDA: Formato colombiano usa punto (.) para miles y coma (,) para decimales
+- VERIFICA cada número dos veces antes de extraerlo
 
 **FORMATO DE RESPUESTA:**
 Responde ÚNICAMENTE con un objeto JSON válido con esta estructura exacta:
