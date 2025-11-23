@@ -2500,10 +2500,10 @@ Total de guías implementadas: 125`
                         </div>
 
                         {/* Soportes */}
-                        {(factura.soportes && factura.soportes.length > 0 ? factura.soportes : [
+                        {[
                           { tipo: 'pdf', descripcion: 'Autorizaciones' },
                           { tipo: 'pdf', descripcion: 'Órdenes Médicas' }
-                        ]).map((soporte: any, idx: number) => (
+                        ].map((soporte: any, idx: number) => (
                           <div key={idx} className="flex items-center gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
                             <DocumentTextIcon className="h-8 w-8 text-red-600 flex-shrink-0" />
                             <div className="flex-1 min-w-0">
@@ -2524,7 +2524,7 @@ Total de guías implementadas: 125`
                       <div className="mt-4 pt-4 border-t border-gray-200">
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-gray-600">
-                            Total documentos: {1 + ((factura.soportes?.length || 0) > 0 ? factura.soportes.length : 2)}
+                            Total documentos: 3
                           </span>
                           <div className="flex items-center gap-2">
                             <Button

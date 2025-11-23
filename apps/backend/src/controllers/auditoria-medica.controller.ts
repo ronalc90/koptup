@@ -50,12 +50,12 @@ class AuditoriaMedicaController {
         });
       }
 
-      // 1. EXTRAER DATOS DEL PDF DE FACTURA CON DOBLE VALIDACIÓN (REGEX + GPT-4o Vision)
-      console.log('📄 Paso 1: Extrayendo datos del PDF con doble validación (REGEX + GPT-4o Vision)...');
+      // 1. EXTRAER DATOS DEL PDF DE FACTURA CON IA
+      console.log('📄 Paso 1: Extrayendo datos del PDF con IA...');
       const archivoFactura = archivosFactura[0];
       const resultadoExtraccion = await extraccionDualService.extraerConDobleValidacion(archivoFactura.path);
 
-      // Usar datos finales (resultado de la comparación y arbitraje)
+      // Usar datos finales
       const datosFactura = resultadoExtraccion.datosFinales;
 
       console.log('✅ Datos extraídos de la factura:');
@@ -64,13 +64,7 @@ class AuditoriaMedicaController {
       console.log(`   - Procedimiento: ${datosFactura.codigoProcedimiento} - ${datosFactura.nombreProcedimiento}`);
       console.log(`   - Valor IPS: $${datosFactura.valorIPS.toLocaleString('es-CO')}`);
       console.log(`   - Diagnóstico: ${datosFactura.diagnosticoPrincipal}`);
-
-      // Mostrar reporte de extracción dual
-      if (resultadoExtraccion.comparacion.discrepancias > 0) {
-        console.log('\n⚠️  DISCREPANCIAS DETECTADAS EN EXTRACCIÓN:');
-        const reporte = extraccionDualService.generarReporteComparacion(resultadoExtraccion);
-        console.log(reporte);
-      }
+      console.log(`   - Confianza IA: ${resultadoExtraccion.decision.nivelConfianza}%`);
 
       // 2. EXTRAER DATOS DE HISTORIA CLÍNICA (si existe)
       if (archivosHistoriaClinica.length > 0) {
