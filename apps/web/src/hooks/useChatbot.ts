@@ -70,9 +70,22 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
       };
 
       setConfig(newConfig);
-      updateConfig(newConfig);
+
+      // Update backend config
+      fetch(`${API_URL}/api/chatbot/config`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId,
+          config: newConfig,
+        }),
+      }).catch(err => {
+        console.error('Error updating config:', err);
+      });
     }
-  }, [sessionId, initialConfig, updateConfig]);
+  }, [sessionId, initialConfig]);
 
   // Cargar sesión existente
   const loadSession = async (id: string) => {
