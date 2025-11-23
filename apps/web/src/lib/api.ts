@@ -1,5 +1,18 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig } from 'axios';
 import Cookies from 'js-cookie';
+import type {
+  RegisterData,
+  ContactFormData,
+  QuoteRequestData,
+  CreateProjectData,
+  UpdateProjectData,
+  CreateTaskData,
+  UpdateTaskData,
+  CreateOrderData,
+  UploadDeliverableData,
+  CreateInvoiceData,
+  PayInvoiceData,
+} from '@/types/api.types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -142,7 +155,7 @@ class ApiClient {
     }
   }
 
-  async register(data: any) {
+  async register(data: RegisterData) {
     const response = await this.client.post('/api/auth/register', data);
     return response.data;
   }
@@ -200,13 +213,13 @@ class ApiClient {
   }
 
   // Contact form
-  async submitContactForm(data: any) {
+  async submitContactForm(data: ContactFormData) {
     const response = await this.client.post('/api/contact', data);
     return response.data;
   }
 
   // Quote request
-  async requestQuote(data: any) {
+  async requestQuote(data: QuoteRequestData) {
     const response = await this.client.post('/api/quotes', data);
     return response.data;
   }
@@ -237,12 +250,12 @@ class ApiClient {
     return response.data.data;
   }
 
-  async createProject(data: any) {
+  async createProject(data: CreateProjectData) {
     const response = await this.client.post('/api/projects', data);
     return response.data.data;
   }
 
-  async updateProject(id: string, data: any) {
+  async updateProject(id: string, data: UpdateProjectData) {
     const response = await this.client.put(`/api/projects/${id}`, data);
     return response.data.data;
   }
@@ -251,12 +264,12 @@ class ApiClient {
     await this.client.delete(`/api/projects/${id}`);
   }
 
-  async createTask(projectId: string, data: any) {
+  async createTask(projectId: string, data: CreateTaskData) {
     const response = await this.client.post(`/api/projects/${projectId}/tasks`, data);
     return response.data.data;
   }
 
-  async updateTask(id: string, data: any) {
+  async updateTask(id: string, data: UpdateTaskData) {
     const response = await this.client.put(`/api/projects/tasks/${id}`, data);
     return response.data.data;
   }
@@ -272,7 +285,7 @@ class ApiClient {
     return response.data.data;
   }
 
-  async createOrder(data: any) {
+  async createOrder(data: CreateOrderData) {
     const response = await this.client.post('/api/orders', data);
     return response.data.data;
   }
@@ -293,7 +306,7 @@ class ApiClient {
     return response.data.data;
   }
 
-  async uploadDeliverable(data: any) {
+  async uploadDeliverable(data: UploadDeliverableData) {
     const response = await this.client.post('/api/deliverables', data);
     return response.data.data;
   }
@@ -319,12 +332,12 @@ class ApiClient {
     return response.data.data;
   }
 
-  async createInvoice(data: any) {
+  async createInvoice(data: CreateInvoiceData) {
     const response = await this.client.post('/api/invoices', data);
     return response.data.data;
   }
 
-  async payInvoice(id: string, paymentData: any) {
+  async payInvoice(id: string, paymentData: PayInvoiceData) {
     const response = await this.client.post(`/api/invoices/${id}/pay`, paymentData);
     return response.data;
   }
