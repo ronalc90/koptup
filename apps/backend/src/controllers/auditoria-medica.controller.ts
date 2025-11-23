@@ -30,40 +30,47 @@ class AuditoriaMedicaController {
 
       console.log(`📂 Procesando ${files.length} archivos para cuenta: ${nombreCuenta}`);
 
-      // Separar archivos por tipo
-      let archivosFactura = files.filter(
-        (f) =>
-          f.originalname.toLowerCase().includes('factura') ||
-          f.originalname.toLowerCase().includes('detalle') ||
-          f.originalname.toLowerCase().includes('fact') ||
-          f.originalname.toLowerCase().includes('recibo') ||
-          f.originalname.toLowerCase().includes('cuenta') ||
-          f.originalname.toLowerCase().includes('cobro')
-      );
+      // 1. ANALIZAR TODOS LOS ARCHIVOS Y CLASIFICARLOS POR CONTENIDO
+      console.log('📄 Paso 1: Analizando archivos y clasificando por contenido con IA...');
 
-      const archivosHistoriaClinica = files.filter(
-        (f) =>
-          f.originalname.toLowerCase().includes('historia') ||
-          f.originalname.toLowerCase().includes('hc')
-      );
+      let archivoFactura: Express.Multer.File | null = null;
+      let resultadoExtraccion: any = null;
+      const archivosHistoriaClinica: Express.Multer.File[] = [];
 
-      // Si no se encuentra archivo con palabras clave de factura, usar el primer archivo
-      if (archivosFactura.length === 0 && files.length > 0) {
-        console.log('⚠️  No se encontró archivo con nombre de factura, usando primer archivo...');
-        archivosFactura = [files[0]];
+      // Intentar extraer datos de cada archivo para clasificarlo automáticamente
+      for (const file of files) {
+        try {
+          console.log(`   📄 Analizando: ${file.originalname}`);
+          const resultado = await extraccionDualService.extraerConDobleValidacion(file.path);
+
+          // Clasificar según el contenido: Si tiene datos de factura, es una factura
+          const tieneDatosFactura = resultado.datosFinales.nroFactura ||
+                                    resultado.datosFinales.codigoProcedimiento ||
+                                    resultado.datosFinales.valorIPS > 0;
+
+          if (tieneDatosFactura && !archivoFactura) {
+            console.log(`   ✅ Clasificado como FACTURA (encontrados: factura=${!!resultado.datosFinales.nroFactura}, procedimiento=${!!resultado.datosFinales.codigoProcedimiento}, valor=${resultado.datosFinales.valorIPS})`);
+            archivoFactura = file;
+            resultadoExtraccion = resultado;
+          } else if (!tieneDatosFactura) {
+            console.log(`   📋 Clasificado como HISTORIA CLÍNICA/SOPORTE`);
+            archivosHistoriaClinica.push(file);
+          } else {
+            console.log(`   ⏭️  Archivo adicional de factura ignorado (ya se encontró una factura)`);
+          }
+        } catch (error) {
+          console.log(`   ⚠️  Error al analizar ${file.originalname}: ${error.message}`);
+          archivosHistoriaClinica.push(file);
+        }
       }
 
-      if (archivosFactura.length === 0) {
+      // Validar que se encontró al menos un archivo con datos de factura
+      if (!archivoFactura || !resultadoExtraccion) {
         return res.status(400).json({
           success: false,
-          message: 'No se proporcionaron archivos válidos',
+          message: 'No se encontraron datos de factura en ninguno de los archivos. Asegúrate de subir al menos un archivo con información de facturación.',
         });
       }
-
-      // 1. EXTRAER DATOS DEL PDF DE FACTURA CON IA
-      console.log('📄 Paso 1: Extrayendo datos del PDF con IA...');
-      const archivoFactura = archivosFactura[0];
-      const resultadoExtraccion = await extraccionDualService.extraerConDobleValidacion(archivoFactura.path);
 
       // Usar datos finales
       const datosFactura = resultadoExtraccion.datosFinales;
