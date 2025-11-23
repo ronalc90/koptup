@@ -76,7 +76,7 @@ Crea un archivo `.env` en `apps/backend/` basado en `.env.example`:
 
 ```env
 # REQUIRED para el módulo de Cuentas Médicas
-OPENAI_API_KEY=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
+OPENAI_API_KEY=sk-proj-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 OPENAI_MODEL=gpt-4o-mini
 
 # Base de datos
