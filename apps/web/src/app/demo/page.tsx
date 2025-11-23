@@ -141,9 +141,7 @@ export default function DemosPage() {
 
   const handleCodeSubmit = () => {
     setError('');
-    console.log('Código ingresado:', accessCode);
     if (accessCode === '2020') {
-      console.log('Navegando a /demo/cuentas-medicas');
       router.push('/demo/cuentas-medicas');
     } else {
       setError('Código inválido. Por favor intente nuevamente.');

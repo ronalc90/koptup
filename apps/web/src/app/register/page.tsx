@@ -98,10 +98,8 @@ export default function RegisterPage() {
     if (provider === 'google') {
       // Redirect to backend Google OAuth endpoint
       window.location.href = api.getGoogleOAuthURL();
-    } else if (provider === 'github') {
-      // GitHub OAuth (to be implemented)
-      console.log('GitHub OAuth not implemented yet');
     }
+    // GitHub OAuth (to be implemented)
   };
 
   const passwordRequirements = [
