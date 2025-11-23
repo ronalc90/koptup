@@ -8,13 +8,37 @@ import Conversation from '../models/Conversation';
 import Message from '../models/Message';
 import { connectDB } from '../config/mongodb';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 
 const seedDashboard = async () => {
   try {
     console.log('🌱 Iniciando seed de datos del dashboard...');
 
+    // SECURITY: Prevent seeding in production
+    if (process.env.NODE_ENV === 'production') {
+      console.error('❌ ERROR: Cannot run seed script in production environment!');
+      console.error('❌ Set NODE_ENV to "development" or "test" to run this script.');
+      process.exit(1);
+    }
+
     // Conectar a MongoDB
     await connectDB();
+
+    // SECURITY: Use environment variables for passwords or generate random ones
+    const adminPassword = process.env.SEED_ADMIN_PASSWORD || crypto.randomBytes(16).toString('hex');
+    const clientPassword = process.env.SEED_CLIENT_PASSWORD || crypto.randomBytes(16).toString('hex');
+
+    if (!process.env.SEED_ADMIN_PASSWORD) {
+      console.warn('⚠️  WARNING: SEED_ADMIN_PASSWORD not set. Generated random password for admin.');
+      console.log(`📝 Admin password: ${adminPassword}`);
+      console.log('💡 Set SEED_ADMIN_PASSWORD in .env to use a custom password.');
+    }
+
+    if (!process.env.SEED_CLIENT_PASSWORD) {
+      console.warn('⚠️  WARNING: SEED_CLIENT_PASSWORD not set. Generated random password for client.');
+      console.log(`📝 Client password: ${clientPassword}`);
+      console.log('💡 Set SEED_CLIENT_PASSWORD in .env to use a custom password.');
+    }
 
     // Crear usuarios de prueba
     const adminUser = await User.findOneAndUpdate(
@@ -22,7 +46,7 @@ const seedDashboard = async () => {
       {
         name: 'Admin KopTup',
         email: 'admin@koptup.com',
-        password: await bcrypt.hash('admin123', 10),
+        password: await bcrypt.hash(adminPassword, 10),
         role: 'admin',
       },
       { upsert: true, new: true }
@@ -33,7 +57,7 @@ const seedDashboard = async () => {
       {
         name: 'Juan Pérez',
         email: 'cliente@example.com',
-        password: await bcrypt.hash('cliente123', 10),
+        password: await bcrypt.hash(clientPassword, 10),
         role: 'client',
       },
       { upsert: true, new: true }
