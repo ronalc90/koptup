@@ -106,6 +106,24 @@ class ExtraccionDualService {
   }
 
   /**
+   * Deduplica procedimientos basándose en código y valor
+   */
+  private deduplicarProcedimientos(procedimientos: any[]): any[] {
+    const vistos = new Map<string, any>();
+
+    for (const proc of procedimientos) {
+      // Crear clave única basada en código + valor + cantidad
+      const clave = `${proc.codigoProcedimiento}_${proc.valorUnitario}_${proc.cant}`;
+
+      if (!vistos.has(clave)) {
+        vistos.set(clave, proc);
+      }
+    }
+
+    return Array.from(vistos.values());
+  }
+
+  /**
    * Procesa PDF grande usando chunking y consolida resultados
    */
   private async procesarConChunking(chunks: string[], pdfPath: string): Promise<ExtraccionConConfianza> {
@@ -141,32 +159,36 @@ class ExtraccionDualService {
       }
     }
 
-    // Calcular valor total sumando todos los procedimientos
-    const valorTotal = todosLosProcedimientos.reduce((sum, proc) => {
+    // Deduplicar procedimientos (pueden repetirse por el overlap)
+    const procedimientosUnicos = this.deduplicarProcedimientos(todosLosProcedimientos);
+    console.log(`   🔄 Deduplicación: ${todosLosProcedimientos.length} → ${procedimientosUnicos.length} procedimientos únicos`);
+
+    // Calcular valor total sumando todos los procedimientos únicos
+    const valorTotal = procedimientosUnicos.reduce((sum, proc) => {
       return sum + (proc.valorUnitario * proc.cant || 0);
     }, 0);
 
     const diagnosticosArray = Array.from(todosDiagnosticos);
     const confianzaPromedio = Math.round(confianzaTotal / chunks.length);
 
-    console.log(`   ✅ Consolidación completada: ${todosLosProcedimientos.length} procedimientos, ${diagnosticosArray.length} diagnósticos`);
+    console.log(`   ✅ Consolidación completada: ${procedimientosUnicos.length} procedimientos, ${diagnosticosArray.length} diagnósticos`);
 
     // Consolidar datos
     const datosConsolidados = {
       ...datosBase,
-      procedimientos: todosLosProcedimientos,
+      procedimientos: procedimientosUnicos,
       diagnosticoPrincipal: diagnosticosArray[0] || '',
       diagnosticoRelacionado1: diagnosticosArray[1] || '',
       diagnosticoRelacionado2: diagnosticosArray[2] || '',
       valorIPS: valorTotal,
       confianzaExtraccion: confianzaPromedio,
       // Usar primer procedimiento para compatibilidad
-      codigoProcedimiento: todosLosProcedimientos[0]?.codigoProcedimiento || '',
-      nombreProcedimiento: todosLosProcedimientos[0]?.nombreProcedimiento || '',
-      cant: todosLosProcedimientos[0]?.cant || 0,
+      codigoProcedimiento: procedimientosUnicos[0]?.codigoProcedimiento || '',
+      nombreProcedimiento: procedimientosUnicos[0]?.nombreProcedimiento || '',
+      cant: procedimientosUnicos[0]?.cant || 0,
     };
 
-    const camposExtraidos = 6 + todosLosProcedimientos.length;
+    const camposExtraidos = 6 + procedimientosUnicos.length;
 
     return {
       ...datosConsolidados,
@@ -253,7 +275,7 @@ Responde ÚNICAMENTE con un objeto JSON:
   }
 
   /**
-   * Divide texto largo en chunks inteligentes sin cortar líneas
+   * Divide texto largo en chunks con overlapping (asolapamiento) para no perder datos
    */
   private dividirEnChunks(texto: string, tamañoMaxChunk: number = 80000): string[] {
     if (texto.length <= tamañoMaxChunk) {
@@ -262,23 +284,40 @@ Responde ÚNICAMENTE con un objeto JSON:
 
     const chunks: string[] = [];
     const lineas = texto.split('\n');
-    let chunkActual = '';
+    const overlap = 10000; // 10k caracteres de overlap entre chunks
 
-    for (const linea of lineas) {
-      // Si agregar esta línea excede el tamaño, guardar chunk actual y empezar uno nuevo
-      if (chunkActual.length + linea.length > tamañoMaxChunk && chunkActual.length > 0) {
-        chunks.push(chunkActual);
-        chunkActual = linea + '\n';
+    let indiceLineaInicio = 0;
+
+    while (indiceLineaInicio < lineas.length) {
+      let chunkActual = '';
+      let indiceLineaFin = indiceLineaInicio;
+
+      // Agregar líneas hasta alcanzar el tamaño máximo
+      while (indiceLineaFin < lineas.length && chunkActual.length < tamañoMaxChunk) {
+        chunkActual += lineas[indiceLineaFin] + '\n';
+        indiceLineaFin++;
+      }
+
+      chunks.push(chunkActual);
+
+      // Retroceder para crear overlap
+      if (indiceLineaFin < lineas.length) {
+        // Retroceder aproximadamente 'overlap' caracteres
+        let caracteresRetrocedidos = 0;
+        let lineasRetrocedidas = 0;
+
+        while (caracteresRetrocedidos < overlap && (indiceLineaFin - lineasRetrocedidas - 1) > indiceLineaInicio) {
+          lineasRetrocedidas++;
+          caracteresRetrocedidos += lineas[indiceLineaFin - lineasRetrocedidas].length;
+        }
+
+        indiceLineaInicio = indiceLineaFin - lineasRetrocedidas;
       } else {
-        chunkActual += linea + '\n';
+        break;
       }
     }
 
-    // Agregar el último chunk
-    if (chunkActual.length > 0) {
-      chunks.push(chunkActual);
-    }
-
+    console.log(`   📦 Chunks creados con overlap de ~10k caracteres entre cada uno`);
     return chunks;
   }
 
