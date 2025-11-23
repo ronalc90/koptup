@@ -210,11 +210,33 @@ class ExtraccionDualService {
 
 Analiza el siguiente FRAGMENTO de una factura médica y extrae TODOS los procedimientos que encuentres.
 
-**IMPORTANTE:**
-- Este es el chunk ${numeroChunk} de un documento más grande
-- Extrae TODOS los procedimientos que veas en este fragmento
-- Formato colombiano: punto (.) = miles, coma (,) = decimales
-- Devuelve números sin separadores: "38.586,00" → 38586
+**INSTRUCCIONES CRÍTICAS - LEER TABLAS COMPLETAS:**
+
+1. FORMATO DE TABLA: Las facturas tienen tablas con columnas:
+   ITEM | CÓDIGO | DESCRIPCIÓN | CANTIDAD | VALOR UNITARIO | % IMP | VALOR TOTAL
+
+2. EXTRACCIÓN COMPLETA:
+   - NO omitas ninguna fila de la tabla
+   - Lee TODAS las líneas numeradas (1, 2, 3, 4, ..., 50+)
+   - Si ves "TOTAL LÍNEAS: 54", debes extraer las 54 líneas
+   - Continúa leyendo hasta encontrar "SUBTOTAL" o "TOTAL LÍNEAS"
+
+3. CÓDIGOS VÁLIDOS:
+   - CUPS: 6 dígitos (ej: 890602, 735301, 897011)
+   - Códigos internos: alfanuméricos (ej: 10A002, 129A02)
+   - Medicamentos: numéricos largos (ej: 19934768-2, 20013906-1)
+   - Insumos: numéricos cortos (ej: 104358, 25700)
+   - TODOS son válidos - NO filtres por tipo de código
+
+4. FORMATO COLOMBIANO:
+   - Punto (.) = separador de miles
+   - Coma (,) = separador decimal
+   - Convierte a número sin separadores: "38.586,00" → 38586
+
+5. CHUNK ${numeroChunk}:
+   - Este es un fragmento de un documento más grande
+   - Extrae TODO lo que veas en este fragmento
+   - Los procedimientos se consolidarán después
 
 TEXTO DEL FRAGMENTO:
 ${textoChunk}
@@ -226,17 +248,19 @@ Responde ÚNICAMENTE con un objeto JSON:
   "numeroDocumento": "valor",
   "procedimientos": [
     {
-      "codigoProcedimiento": "valor",
-      "nombreProcedimiento": "valor",
-      "cant": numero,
-      "valorUnitario": numero
+      "codigoProcedimiento": "codigo_tal_cual_aparece_en_tabla",
+      "nombreProcedimiento": "descripción_completa",
+      "cant": numero_cantidad,
+      "valorUnitario": numero_sin_separadores
     }
   ],
   "diagnosticoPrincipal": "valor",
   "diagnosticoRelacionado1": "valor",
   "diagnosticoRelacionado2": "valor",
   "confianzaExtraccion": numero_0_a_100
-}`;
+}
+
+RECUERDA: Extrae TODAS las filas de la tabla, no solo algunas. Si hay 50 procedimientos, devuelve los 50.`;
 
     // Llamar a OpenAI con retry logic
     let response;
@@ -248,7 +272,7 @@ Responde ÚNICAMENTE con un objeto JSON:
         response = await this.openai!.chat.completions.create({
           model: 'gpt-4o',
           messages: [{ role: 'user', content: prompt }],
-          max_tokens: 4000,
+          max_tokens: 8000, // Aumentado para soportar 50+ procedimientos por chunk
           temperature: 0,
         });
         break;
