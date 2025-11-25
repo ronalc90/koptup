@@ -1,0 +1,22 @@
+{
+  "id": "decision_1763879984934_dstx7",
+  "timestamp": "2025-11-23T06:39:44.933Z",
+  "contexto": {
+    "numeroFactura": "S9033866630",
+    "paciente": "THIAGO GABRIEL SAPUYRES",
+    "diagnostico": "No especificado",
+    "codigoCUPS": "890281",
+    "valorFacturado": 33886
+  },
+  "decision": {
+    "tipo": "APROBACION",
+    "valorDecidido": {
+      "veredicto": "GLOSADO",
+      "valorAPagar": 12510,
+      "valorGlosa": 21376,
+      "porcentajeGlosa": 63.06
+    },
+    "confianzaIA": 85,
+    "razonamiento": "Se glosa la factura debido a la diferencia significativa entre el valor facturado y el tarifario contractual."
+  }
+}

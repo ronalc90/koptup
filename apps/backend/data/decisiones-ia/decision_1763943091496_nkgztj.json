@@ -1,0 +1,22 @@
+{
+  "id": "decision_1763943091496_nkgztj",
+  "timestamp": "2025-11-24T00:11:31.495Z",
+  "contexto": {
+    "numeroFactura": "FEHM716251",
+    "paciente": "DIANA CAROLINA SANCHEZ LASSO",
+    "diagnostico": "J159",
+    "codigoCUPS": "735301",
+    "valorFacturado": 2753798
+  },
+  "decision": {
+    "tipo": "APROBACION",
+    "valorDecidido": {
+      "veredicto": "APROBADO_PARCIAL",
+      "valorAPagar": 1928908,
+      "valorGlosa": 824890,
+      "porcentajeGlosa": 29.95
+    },
+    "confianzaIA": 95,
+    "razonamiento": "Se aprueba parcialmente la factura aplicando la glosa calculada por el sistema experto debido a discrepancias tarifarias."
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "decision_1763939142410_ino6f4",
+  "timestamp": "2025-11-23T23:05:42.408Z",
+  "contexto": {
+    "numeroFactura": "FEHM716251",
+    "paciente": "DIANA CAROLINA SANCHEZ LASSO",
+    "diagnostico": "O470",
+    "codigoCUPS": "735301",
+    "valorFacturado": 4579967
+  },
+  "decision": {
+    "tipo": "APROBACION",
+    "valorDecidido": {
+      "veredicto": "APROBADO_PARCIAL",
+      "valorAPagar": 2744557,
+      "valorGlosa": 1835410,
+      "porcentajeGlosa": 40.08
+    },
+    "confianzaIA": 95,
+    "razonamiento": "Se aprueba parcialmente la factura aplicando la glosa correspondiente al exceso sobre el tarifario contractual."
+  }
+}

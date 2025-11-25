@@ -1,0 +1,22 @@
+{
+  "id": "decision_1763884349641_9s136",
+  "timestamp": "2025-11-23T07:52:29.640Z",
+  "contexto": {
+    "numeroFactura": "FEHM716251",
+    "paciente": "DIANA CAROLINA SANCHEZ LASSO",
+    "diagnostico": "A98",
+    "codigoCUPS": "735301",
+    "valorFacturado": 1262420
+  },
+  "decision": {
+    "tipo": "APROBACION",
+    "valorDecidido": {
+      "veredicto": "REQUIERE_REVISION_HUMANA",
+      "valorAPagar": 0,
+      "valorGlosa": 1262420,
+      "porcentajeGlosa": 100
+    },
+    "confianzaIA": 95,
+    "razonamiento": "La factura presenta incoherencias clínicas significativas y un valor facturado que excede el tarifario contractual."
+  }
+}

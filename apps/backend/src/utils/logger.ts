@@ -1,6 +1,20 @@
 import winston from 'winston';
 import path from 'path';
 
+// Helper para serializar objetos con referencias circulares
+const safeStringify = (obj: any): string => {
+  const seen = new WeakSet();
+  return JSON.stringify(obj, (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (seen.has(value)) {
+        return '[Circular]';
+      }
+      seen.add(value);
+    }
+    return value;
+  }, 2);
+};
+
 const logFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.errors({ stack: true }),
@@ -14,7 +28,11 @@ const consoleFormat = winston.format.combine(
   winston.format.printf(({ timestamp, level, message, ...meta }) => {
     let metaStr = '';
     if (Object.keys(meta).length > 0) {
-      metaStr = JSON.stringify(meta, null, 2);
+      try {
+        metaStr = safeStringify(meta);
+      } catch (error) {
+        metaStr = '[Error serializing metadata]';
+      }
     }
     return `${timestamp} [${level}]: ${message} ${metaStr}`;
   })

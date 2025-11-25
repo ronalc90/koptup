@@ -1,0 +1,22 @@
+{
+  "id": "decision_1763944798599_eliufp",
+  "timestamp": "2025-11-24T00:39:58.598Z",
+  "contexto": {
+    "numeroFactura": "FEHM716251",
+    "paciente": "ANA MARIA DIAZ LIZCANO",
+    "diagnostico": "undefined",
+    "codigoCUPS": "735301",
+    "valorFacturado": 4579967
+  },
+  "decision": {
+    "tipo": "APROBACION",
+    "valorDecidido": {
+      "veredicto": "REQUIERE_REVISION_HUMANA",
+      "valorAPagar": 0,
+      "valorGlosa": 0,
+      "porcentajeGlosa": 0
+    },
+    "confianzaIA": 70,
+    "razonamiento": "La factura requiere revisión humana debido a la falta de diagnóstico CIE-10, lo que impide verificar la coherencia y pertinencia del procedimiento."
+  }
+}
