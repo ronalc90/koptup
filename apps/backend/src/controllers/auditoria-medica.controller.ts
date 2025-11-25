@@ -10,6 +10,8 @@ import glosaCalculatorService from '../services/glosa-calculator.service';
 import excelFacturaMedicaService from '../services/excel-factura-medica.service';
 import validacionDualService from '../services/validacion-dual.service';
 import extraccionDualService from '../services/extraccion-dual.service';
+import extraccionOptimizadaService from '../services/extraccion-optimizada.service';
+import extraccionEspecializadaService from '../services/extraccion-especializada.service';
 import auditorIAFinalService from '../services/auditor-ia-final.service';
 
 class AuditoriaMedicaController {
@@ -30,110 +32,96 @@ class AuditoriaMedicaController {
 
       console.log(`📂 Procesando ${files.length} archivos para cuenta: ${nombreCuenta}`);
 
-      // 1. ANALIZAR TODOS LOS ARCHIVOS Y CLASIFICARLOS POR CONTENIDO
-      console.log('📄 Paso 1: Analizando TODOS los archivos y extrayendo datos con IA...');
+      // 1. PROCESAR TODOS LOS ARCHIVOS CON EXTRACCIÓN ESPECIALIZADA
+      console.log('📄 Paso 1: Procesamiento especializado por tipo de documento...');
 
-      const archivosFacturas: Array<{
-        archivo: Express.Multer.File;
-        resultado: any;
-        datos: any;
-      }> = [];
-      const archivosHistoriaClinica: Express.Multer.File[] = [];
       const todosProcedimientos: any[] = [];
       const todosDiagnosticos: Set<string> = new Set();
 
-      // Intentar extraer datos de TODOS los archivos
-      for (const file of files) {
-        try {
-          console.log(`   📄 Analizando: ${file.originalname}`);
-          const resultado = await extraccionDualService.extraerConDobleValidacion(file.path);
+      // Preparar archivos para extracción especializada
+      const archivosParaProcesar = files.map(f => ({
+        path: f.path,
+        nombre: f.originalname,
+      }));
 
-          // Clasificar según el contenido: Si tiene datos de factura, es una factura
-          const tieneDatosFactura = resultado.datosFinales.nroFactura ||
-                                    resultado.datosFinales.codigoProcedimiento ||
-                                    resultado.datosFinales.valorIPS > 0;
+      console.log(`   📊 Total de archivos: ${archivosParaProcesar.length}`);
 
-          if (tieneDatosFactura) {
-            console.log(`   ✅ FACTURA/PROCEDIMIENTO encontrado (factura=${resultado.datosFinales.nroFactura || 'N/A'}, procedimiento=${resultado.datosFinales.codigoProcedimiento || 'N/A'}, valor=${resultado.datosFinales.valorIPS})`);
-            archivosFacturas.push({
-              archivo: file,
-              resultado: resultado,
-              datos: resultado.datosFinales
-            });
+      // 2. EXTRACCIÓN ESPECIALIZADA BATCH
+      console.log('\n🚀 Paso 2: Extracción especializada BATCH...');
 
-            // Agregar procedimiento a la lista consolidada
-            if (resultado.datosFinales.codigoProcedimiento) {
-              todosProcedimientos.push(resultado.datosFinales);
-            }
+      const resultadosBatch = await extraccionEspecializadaService.extraerBatch(archivosParaProcesar);
 
-            // Agregar diagnósticos a la lista consolidada
-            if (resultado.datosFinales.diagnosticoPrincipal) {
-              todosDiagnosticos.add(resultado.datosFinales.diagnosticoPrincipal);
-            }
-          } else {
-            console.log(`   📋 Clasificado como HISTORIA CLÍNICA/SOPORTE`);
-            archivosHistoriaClinica.push(file);
-          }
-        } catch (error: any) {
-          console.log(`   ⚠️  Error al analizar ${file.originalname}: ${error.message}`);
-          archivosHistoriaClinica.push(file);
-        }
-      }
+      // Filtrar solo facturas (ignorar historias clínicas por ahora)
+      const facturas = resultadosBatch.filter(r => r.tipoDetectado === 'FACTURA');
+      const historiasClinicas = resultadosBatch.filter(r => r.tipoDetectado === 'HISTORIA_CLINICA');
 
-      // Validar que se encontró al menos un archivo con datos de factura
-      if (archivosFacturas.length === 0) {
+      console.log(`\n📊 Clasificación automática:`);
+      console.log(`   - Facturas: ${facturas.length}`);
+      console.log(`   - Historias Clínicas: ${historiasClinicas.length}`);
+
+      if (facturas.length === 0) {
         return res.status(400).json({
           success: false,
-          message: 'No se encontraron datos de factura en ninguno de los archivos. Asegúrate de subir al menos un archivo con información de facturación.',
+          message: 'No se encontraron facturas en los archivos subidos. Por favor sube al menos un archivo de factura.',
         });
       }
 
-      console.log(`\n📊 Resumen de análisis:`);
-      console.log(`   - Archivos con datos de factura/procedimientos: ${archivosFacturas.length}`);
-      console.log(`   - Total procedimientos encontrados: ${todosProcedimientos.length}`);
-      console.log(`   - Historias clínicas/soportes: ${archivosHistoriaClinica.length}`);
+      // Usar la primera factura como base
+      const facturaBase = facturas[0];
+      const datosFactura: any = facturaBase.datos;
 
-      // Usar la primera factura como base, pero consolidar datos de todas
-      const facturaBase = archivosFacturas[0];
-      const datosFactura = facturaBase.datos;
-      const resultadoExtraccion = facturaBase.resultado;
+      console.log('✅ Datos extraídos especializado:');
+      console.log(`   - Factura: ${datosFactura.numeroFactura}`);
+      console.log(`   - Paciente: ${datosFactura.paciente.nombre}`);
+      console.log(`   - Documento: ${datosFactura.paciente.documento}`);
 
-      console.log('✅ Datos extraídos de la factura:');
-      console.log(`   - Factura: ${datosFactura.nroFactura}`);
-      console.log(`   - Paciente: ${datosFactura.nombrePaciente}`);
-
-      // Mostrar TODOS los procedimientos encontrados
-      if (datosFactura.procedimientos && datosFactura.procedimientos.length > 0) {
-        console.log(`   - Procedimientos encontrados: ${datosFactura.procedimientos.length}`);
-        datosFactura.procedimientos.forEach((proc: any, idx: number) => {
-          console.log(`     ${idx + 1}. ${proc.codigoProcedimiento} - ${proc.nombreProcedimiento} (Cant: ${proc.cant}, Valor: $${proc.valorUnitario?.toLocaleString('es-CO')})`);
-        });
-      } else {
-        console.log(`   - Procedimiento: ${datosFactura.codigoProcedimiento} - ${datosFactura.nombreProcedimiento}`);
-      }
-
-      console.log(`   - Valor Total IPS: $${datosFactura.valorIPS.toLocaleString('es-CO')}`);
-      console.log(`   - Diagnóstico: ${datosFactura.diagnosticoPrincipal}`);
-      console.log(`   - Confianza IA: ${resultadoExtraccion.decision.nivelConfianza}%`);
-
-      // 2. EXTRAER DATOS DE HISTORIA CLÍNICA (si existe)
-      if (archivosHistoriaClinica.length > 0) {
-        console.log('📋 Paso 2: Extrayendo datos de historia clínica...');
-        const archivoHC = archivosHistoriaClinica[0];
-        const datosHC = await pdfExtractorService.extraerDatosHistoriaClinica(archivoHC.path);
-
-        // Complementar datos de la factura con la historia clínica
-        if (datosHC.diagnosticoPrincipal && !datosFactura.diagnosticoPrincipal) {
-          datosFactura.diagnosticoPrincipal = datosHC.diagnosticoPrincipal;
-        }
-        if (datosHC.autorizacion && !datosFactura.autorizacion) {
-          datosFactura.autorizacion = datosHC.autorizacion;
+      // Consolidar procedimientos de todas las facturas
+      for (const factura of facturas) {
+        const datos: any = factura.datos;
+        if (datos.procedimientos && Array.isArray(datos.procedimientos)) {
+          datos.procedimientos.forEach((proc: any) => {
+            todosProcedimientos.push({
+              codigoProcedimiento: proc.codigo,
+              nombreProcedimiento: proc.descripcion,
+              cant: proc.cantidad,
+              valorUnitario: proc.valorUnitario,
+            });
+          });
         }
       }
+
+      console.log(`   - Procedimientos encontrados: ${todosProcedimientos.length}`);
+      todosProcedimientos.forEach((proc: any, idx: number) => {
+        console.log(`     ${idx + 1}. ${proc.codigoProcedimiento} - ${proc.nombreProcedimiento} (Cant: ${proc.cant}, Valor: $${proc.valorUnitario?.toLocaleString('es-CO')})`);
+      });
+
+      // Agregar diagnóstico
+      if (datosFactura.diagnostico) {
+        todosDiagnosticos.add(datosFactura.diagnostico);
+      }
+
+      console.log(`   - Valor Total: $${datosFactura.valorTotalFactura.toLocaleString('es-CO')}`);
+      console.log(`   - Diagnóstico: ${datosFactura.diagnostico}`);
+      console.log(`   - Confianza: ${facturaBase.confianza}%`);
+      console.log(`   - Método: ${facturaBase.metodo}`);
+
+      // Adaptar datos al formato antiguo para compatibilidad
+      const datosFacturaAdaptados = {
+        nroFactura: datosFactura.numeroFactura,
+        nombrePaciente: datosFactura.paciente.nombre,
+        numeroDocumento: datosFactura.paciente.documento,
+        diagnosticoPrincipal: datosFactura.diagnostico,
+        valorIPS: datosFactura.valorTotalFactura,
+        procedimientos: todosProcedimientos,
+        codigoProcedimiento: todosProcedimientos[0]?.codigoProcedimiento || '',
+        nombreProcedimiento: todosProcedimientos[0]?.nombreProcedimiento || '',
+        cant: todosProcedimientos[0]?.cant || 0,
+        fecha: datosFactura.fecha,
+      };
 
       // 3. CALCULAR GLOSAS CON TARIFARIO NUEVA EPS
       console.log('💰 Paso 3: Calculando glosas con tarifario Nueva EPS...');
-      const resultadoGlosas = glosaCalculatorService.calcularGlosas(datosFactura);
+      const resultadoGlosas = glosaCalculatorService.calcularGlosas(datosFacturaAdaptados);
 
       console.log('📊 Resultado de la auditoría:');
       console.log(`   - Valor a pagar: $${resultadoGlosas.valorAPagar.toLocaleString('es-CO')}`);
@@ -144,32 +132,22 @@ class AuditoriaMedicaController {
       // 3.5. 🤖 AUDITOR IA FINAL: TOMA LA DECISIÓN DEFINITIVA
       console.log('🤖 Paso 3.5: AUDITOR IA FINAL - Análisis y decisión definitiva...');
 
-      // Preparar discrepancias para la IA
-      const discrepancias = resultadoExtraccion.comparacion.camposComparados
-        .filter(c => !c.coincide)
-        .map(c => ({
-          campo: c.campo,
-          valorRegex: c.valorRegex,
-          valorVision: c.valorVision,
-        }));
-
       const decisionFinalIA = await auditorIAFinalService.tomarDecisionFinal({
         extraccionRegex: {
-          datos: resultadoExtraccion.extraccionRegex,
-          confianza: resultadoExtraccion.extraccionRegex.metadatos.confianza,
+          datos: datosFacturaAdaptados,
+          confianza: facturaBase.confianza,
         },
         extraccionVision: {
-          datos: resultadoExtraccion.extraccionVision,
-          confianza: resultadoExtraccion.extraccionVision.metadatos.confianza,
+          datos: datosFacturaAdaptados,
+          confianza: facturaBase.confianza,
         },
-        discrepancias,
+        discrepancias: [], // No hay discrepancias en el nuevo sistema
         sistemaExperto: {
-          valorIPSFacturado: datosFactura.valorIPS || 0,
+          valorIPSFacturado: datosFacturaAdaptados.valorIPS || 0,
           valorContratoNuevaEPS: resultadoGlosas.valorAPagar,
           glosaCalculada: resultadoGlosas.valorGlosaAdmitiva,
           observacion: resultadoGlosas.observacion,
         },
-        imagenPDFBase64: resultadoExtraccion.imagenPDFBase64,
       });
 
       // USAR LOS DATOS CONFIRMADOS POR LA IA (no los de extracción)
@@ -245,11 +223,12 @@ class AuditoriaMedicaController {
           paciente: {
             nombres: datosFinalesConfirmados.nombrePaciente?.split(' ').slice(0, 2).join(' ') || '',
             apellidos: datosFinalesConfirmados.nombrePaciente?.split(' ').slice(2).join(' ') || '',
-            tipoDocumento: datosFinalesConfirmados.tipoDocumentoPaciente,
-            numeroDocumento: datosFinalesConfirmados.numeroDocumento,
+            tipoDocumento: datosFinalesConfirmados.tipoDocumentoPaciente || 'CC',
+            numeroDocumento: datosFinalesConfirmados.numeroDocumento || 'SIN-DOCUMENTO',
           },
           diagnosticoPrincipal: {
-            codigoCIE10: datosFinalesConfirmados.diagnosticoPrincipal,
+            codigoCIE10: datosFinalesConfirmados.diagnosticoPrincipal || 'Z00.0',
+            descripcion: this.obtenerDescripcionCIE10(datosFinalesConfirmados.diagnosticoPrincipal || 'Z00.0'),
           },
         };
 
@@ -302,20 +281,20 @@ class AuditoriaMedicaController {
         // 5. CREAR ATENCIÓN
         atencion = new Atencion({
           facturaId: factura._id,
-          numeroAtencion: datosFactura.nroAutNvo || `AT-${Date.now()}`,
-          numeroAutorizacion: datosFactura.autorizacion || '',
-          fechaAutorizacion: this.parsearFecha(datosFactura.fechaIngreso) || new Date(),
+          numeroAtencion: datosFacturaAdaptados.nroAutNvo || `AT-${Date.now()}`,
+          numeroAutorizacion: datosFacturaAdaptados.autorizacion || '',
+          fechaAutorizacion: this.parsearFecha(datosFacturaAdaptados.fecha) || new Date(),
           paciente: {
-            tipoDocumento: datosFactura.tipoDocumentoPaciente || 'RC',
-            numeroDocumento: datosFactura.numeroDocumento || '',
-            nombres: datosFactura.nombrePaciente?.split(' ').slice(0, 2).join(' ') || '',
-            apellidos: datosFactura.nombrePaciente?.split(' ').slice(2).join(' ') || '',
-            edad: this.calcularEdad(datosFactura.fechaIngreso) || 1,
+            tipoDocumento: datosFinalesConfirmados.tipoDocumentoPaciente || 'CC',
+            numeroDocumento: datosFacturaAdaptados.numeroDocumento || 'SIN-DOCUMENTO',
+            nombres: datosFacturaAdaptados.nombrePaciente?.split(' ').slice(0, 2).join(' ') || '',
+            apellidos: datosFacturaAdaptados.nombrePaciente?.split(' ').slice(2).join(' ') || '',
+            edad: this.calcularEdad(datosFacturaAdaptados.fecha) || 1,
             sexo: 'M',
           },
           diagnosticoPrincipal: {
-            codigoCIE10: datosFactura.diagnosticoPrincipal || '',
-            descripcion: this.obtenerDescripcionCIE10(datosFactura.diagnosticoPrincipal),
+            codigoCIE10: datosFacturaAdaptados.diagnosticoPrincipal || 'Z00.0',
+            descripcion: this.obtenerDescripcionCIE10(datosFacturaAdaptados.diagnosticoPrincipal || 'Z00.0'),
           },
           diagnosticosSecundarios: [],
           fechaInicio: this.parsearFecha(datosFactura.fechaIngreso) || new Date(),
@@ -505,10 +484,9 @@ class AuditoriaMedicaController {
             filename: `auditoria_${factura._id}.xlsx`,
           },
           archivosProcessed: {
-            facturas: archivosFacturas.length,
-            procedimientos: todosProcedimientos.length,
-            historiaClinica: archivosHistoriaClinica.length,
             total: files.length,
+            procedimientos: todosProcedimientos.length,
+            metodo: facturaBase.metodo,
           },
         },
       });

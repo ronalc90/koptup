@@ -1,0 +1,22 @@
+{
+  "id": "decision_1763944224003_ycl638",
+  "timestamp": "2025-11-24T00:30:24.002Z",
+  "contexto": {
+    "numeroFactura": "FEHM716251",
+    "paciente": "ANA MARIA DIAZ LIZCANO",
+    "diagnostico": "No especificado",
+    "codigoCUPS": "735301",
+    "valorFacturado": 4579967
+  },
+  "decision": {
+    "tipo": "APROBACION",
+    "valorDecidido": {
+      "veredicto": "GLOSADO",
+      "valorAPagar": 2443852,
+      "valorGlosa": 2136115,
+      "porcentajeGlosa": 46.64
+    },
+    "confianzaIA": 70,
+    "razonamiento": "La factura es glosada debido a la falta de diagnóstico y el exceso en el valor facturado sobre el tarifario contractual."
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "decision_1763888330528_vi4bvc",
+  "timestamp": "2025-11-23T08:58:50.527Z",
+  "contexto": {
+    "numeroFactura": "FEHM716251",
+    "paciente": "DIANA CAROLINA SANCHEZ LASSO",
+    "diagnostico": "O470",
+    "codigoCUPS": "735301",
+    "valorFacturado": 4579967
+  },
+  "decision": {
+    "tipo": "APROBACION",
+    "valorDecidido": {
+      "veredicto": "APROBADO_PARCIAL",
+      "valorAPagar": 3205977,
+      "valorGlosa": 1373990,
+      "porcentajeGlosa": 30
+    },
+    "confianzaIA": 95,
+    "razonamiento": "Se aprueba parcialmente la factura aplicando un descuento del 30% por no estar el código en el tarifario."
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "decision_1763885103512_7hky5",
+  "timestamp": "2025-11-23T08:05:03.511Z",
+  "contexto": {
+    "numeroFactura": "FEHM716251",
+    "paciente": "DIANA CAROLINA SANCHEZ LASSO",
+    "diagnostico": "A98",
+    "codigoCUPS": "735301",
+    "valorFacturado": 1262420
+  },
+  "decision": {
+    "tipo": "APROBACION",
+    "valorDecidido": {
+      "veredicto": "GLOSADO",
+      "valorAPagar": 883694,
+      "valorGlosa": 378726,
+      "porcentajeGlosa": 30
+    },
+    "confianzaIA": 85,
+    "razonamiento": "La factura es glosada debido a incoherencia entre diagnóstico y procedimiento, y ajuste tarifario."
+  }
+}
