@@ -63,7 +63,9 @@
       "Bash(tree:*)",
       "Bash(lsof:*)",
       "Bash(kill:*)",
-      "Bash(xargs kill -9)"
+      "Bash(xargs kill -9)",
+      "Bash(export MONGODB_URI=\"mongodb://mongo:QTaKycIfxXPWhlXWuRkzTzHxtCFBreSM@trolley.proxy.rlwy.net:11709/koptup?authSource=admin\")",
+      "Bash(xattr:*)"
     ],
     "deny": [],
     "ask": []

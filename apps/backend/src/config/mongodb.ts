@@ -10,7 +10,10 @@ export const connectDB = async () => {
   }
 
   try {
-    await mongoose.connect(MONGODB_URI);
+    await mongoose.connect(MONGODB_URI, {
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    });
     logger.info('✅ MongoDB connected successfully');
   } catch (error) {
     logger.error('❌ MongoDB connection error:', error);
@@ -29,7 +32,11 @@ mongoose.connection.on('error', (err) => {
 });
 
 mongoose.connection.on('disconnected', () => {
-  logger.warn('MongoDB disconnected');
+  logger.warn('MongoDB disconnected - attempting to reconnect...');
+});
+
+mongoose.connection.on('reconnected', () => {
+  logger.info('MongoDB reconnected successfully');
 });
 
 // Graceful shutdown

@@ -27,12 +27,24 @@ export interface ChatResponse {
 
 class ChatbotService {
   /**
-   * Verifica que MongoDB esté conectado
+   * Verifica que MongoDB esté conectado con reintentos
    */
   private async ensureConnection(): Promise<void> {
-    if (mongoose.connection.readyState !== 1) {
-      throw new Error('Database connection not ready. Please try again in a moment.');
+    const maxRetries = 3;
+    const retryDelay = 1000; // 1 segundo
+
+    for (let i = 0; i < maxRetries; i++) {
+      if (mongoose.connection.readyState === 1) {
+        return; // Conectado
+      }
+
+      if (i < maxRetries - 1) {
+        logger.warn(`MongoDB not ready (readyState: ${mongoose.connection.readyState}), retrying in ${retryDelay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, retryDelay));
+      }
     }
+
+    throw new Error('Database connection not ready. Please try again in a moment.');
   }
 
   /**
@@ -124,6 +136,40 @@ class ChatbotService {
     const chatbot = await this.getOrCreateSession(sessionId);
     const openai = getOpenAI();
 
+    // Verificar temas restringidos ANTES de procesar
+    const restrictedTopics = chatbot.config.restrictedTopics || [];
+    if (restrictedTopics.length > 0) {
+      const messageToCheck = userMessage.toLowerCase();
+      const foundRestrictedTopic = restrictedTopics.find(topic =>
+        messageToCheck.includes(topic.toLowerCase())
+      );
+
+      if (foundRestrictedTopic) {
+        const restrictionMessage = `Lo siento, no puedo responder sobre temas relacionados con "${foundRestrictedTopic}". Este es un tema restringido en esta conversación. ¿Hay algo más en lo que pueda ayudarte?`;
+
+        // Guardar mensaje del usuario
+        chatbot.messages.push({
+          role: 'user',
+          content: userMessage,
+          timestamp: new Date(),
+        });
+
+        // Guardar respuesta de restricción
+        chatbot.messages.push({
+          role: 'assistant',
+          content: restrictionMessage,
+          timestamp: new Date(),
+        });
+
+        await chatbot.save();
+
+        return {
+          message: restrictionMessage,
+          sessionId,
+        };
+      }
+    }
+
     // Guardar mensaje del usuario
     chatbot.messages.push({
       role: 'user',
@@ -146,6 +192,14 @@ class ChatbotService {
       }));
 
     try {
+      // Construir restricciones para el prompt
+      const restrictionsText = restrictedTopics.length > 0
+        ? `\n\n⚠️ TEMAS RESTRINGIDOS (NO responder sobre estos temas):
+${restrictedTopics.map(topic => `- ${topic}`).join('\n')}
+
+Si el usuario pregunta sobre alguno de estos temas, indica amablemente que no puedes ayudar con eso.`
+        : '';
+
       // Crear el prompt del sistema
       const systemPrompt = documentContext
         ? `Eres ${chatbot.config.title}, un asistente virtual inteligente y útil.
@@ -160,7 +214,7 @@ Instrucciones:
 - Si la pregunta no está relacionada con los documentos, responde de forma general pero amigable
 - Sé cortés, profesional y servicial
 - Si no tienes información suficiente en los documentos, indica que no tienes esa información específica
-- Menciona de qué documento obtuviste la información cuando sea apropiado`
+- Menciona de qué documento obtuviste la información cuando sea apropiado${restrictionsText}`
         : `Eres ${chatbot.config.title}, un asistente virtual inteligente y útil.
 
 El usuario aún no ha subido documentos, así que responde de forma general a sus preguntas.
@@ -168,7 +222,7 @@ El usuario aún no ha subido documentos, así que responde de forma general a su
 Instrucciones:
 - Responde SIEMPRE en español de forma clara y concisa
 - Sé cortés, profesional y servicial
-- Puedes sugerirle al usuario que suba documentos para que puedas ayudarle mejor con información específica`;
+- Puedes sugerirle al usuario que suba documentos para que puedas ayudarle mejor con información específica${restrictionsText}`;
 
       // Llamar a OpenAI
       const completion = await openai.chat.completions.create({

@@ -36,3 +36,14 @@ export const uploadRateLimiter = rateLimit({
     message: 'Too many upload requests, please try again later.',
   },
 });
+
+export const chatbotRateLimiter = rateLimit({
+  windowMs: 60000, // 1 minute
+  max: 60, // 60 peticiones por minuto (1 por segundo en promedio)
+  message: {
+    success: false,
+    message: 'Too many chatbot requests, please slow down.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});

@@ -9,7 +9,7 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import { logger } from './utils/logger';
 import { errorHandler } from './middleware/errorHandler';
-import { rateLimiter } from './middleware/rateLimiter';
+import { rateLimiter, chatbotRateLimiter } from './middleware/rateLimiter';
 
 const app: Express = express();
 const PORT = Number(process.env.PORT ?? 3001);
@@ -43,7 +43,16 @@ app.use(compression());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(morgan('combined', { stream: { write: (message) => logger.info(message.trim()) } }));
-app.use('/api/', rateLimiter);
+
+// Rate limiters: chatbot tiene su propio rate limiter más permisivo
+app.use('/api/chatbot', chatbotRateLimiter);
+app.use('/api/', (req, res, next) => {
+  // Excluir /api/chatbot del rate limiter general
+  if (req.path.startsWith('/chatbot')) {
+    return next();
+  }
+  return rateLimiter(req, res, next);
+});
 
 // Health and docs (swagger spec can be built later)
 app.get('/health', (_req: Request, res: Response) => {
