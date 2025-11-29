@@ -25,6 +25,9 @@ export interface IChatbot extends Document {
     headerColor: string;
     backgroundColor: string;
     icon: string;
+    fontFamily?: string;
+    customIconUrl?: string;
+    restrictedTopics?: string[];
   };
   documents: IChatbotDocument[];
   messages: IChatMessage[];
@@ -63,6 +66,9 @@ const ChatbotSchema = new Schema<IChatbot>(
       headerColor: { type: String, default: '#4F46E5' },
       backgroundColor: { type: String, default: '#FFFFFF' },
       icon: { type: String, default: 'FaComments' },
+      fontFamily: { type: String, default: 'Inter' },
+      customIconUrl: { type: String },
+      restrictedTopics: { type: [String], default: [] },
     },
     documents: [ChatbotDocumentSchema],
     messages: [ChatMessageSchema],
