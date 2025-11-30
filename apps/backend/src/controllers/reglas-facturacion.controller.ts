@@ -128,7 +128,7 @@ export async function obtenerReglas(req: Request, res: Response): Promise<void> 
       interpretacion: regla.reglaInterpretada
         ? {
             confianza: regla.reglaInterpretada.confianza,
-            explicacion: regla.reglaInterpretada.explicacion,
+            explicacion: (regla.reglaInterpretada as any).explicacion || '',
             accion: regla.reglaInterpretada.accion.tipo,
           }
         : null,

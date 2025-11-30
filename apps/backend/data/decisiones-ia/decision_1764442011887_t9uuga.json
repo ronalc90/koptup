@@ -1,0 +1,22 @@
+{
+  "id": "decision_1764442011887_t9uuga",
+  "timestamp": "2025-11-29T18:46:51.886Z",
+  "contexto": {
+    "numeroFactura": "S9033866630",
+    "paciente": "N/A",
+    "diagnostico": "N/A",
+    "codigoCUPS": "0000890281",
+    "valorFacturado": 33886
+  },
+  "decision": {
+    "tipo": "APROBACION",
+    "valorDecidido": {
+      "veredicto": "APROBADO_PARCIAL",
+      "valorAPagar": 27010,
+      "valorGlosa": 6876,
+      "porcentajeGlosa": 20.3
+    },
+    "confianzaIA": 85,
+    "razonamiento": "Se aprueba parcialmente la factura aplicando una glosa por exceso en el valor facturado respecto al tarifario contractual."
+  }
+}
