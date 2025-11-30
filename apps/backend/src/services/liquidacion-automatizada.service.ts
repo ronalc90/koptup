@@ -308,10 +308,16 @@ class LiquidacionAutomatizadaService {
 
       glosas.push({
         codigo: datosFactura.codigoProcedimiento || 'N/A',
+        tipo: 'DIFERENCIA_TARIFA',
+        codigoProcedimiento: datosFactura.codigoProcedimiento || 'N/A',
+        descripcionProcedimiento: datosFactura.nombreProcedimiento || '',
+        valorIPS,
+        valorContrato: valorContratado,
         cantidad: 1,
         diferencia: diferencia,
         valorTotalGlosa: diferencia,
         observacion: `Valor IPS ($${valorIPS.toLocaleString()}) supera valor contratado ($${valorContratado.toLocaleString()})`,
+        automatica: true,
       });
     }
 
@@ -319,10 +325,16 @@ class LiquidacionAutomatizadaService {
     if (!radicado.autorizacion?.encontrada && radicado.valorTotal && radicado.valorTotal > 50000) {
       glosas.push({
         codigo: datosFactura.codigoProcedimiento || 'N/A',
+        tipo: 'SIN_AUTORIZACION',
+        codigoProcedimiento: datosFactura.codigoProcedimiento || 'N/A',
+        descripcionProcedimiento: datosFactura.nombreProcedimiento || '',
+        valorIPS,
+        valorContrato: valorContratado,
         cantidad: 1,
         diferencia: valorIPS,
         valorTotalGlosa: valorIPS,
         observacion: 'Servicio sin autorización válida (valor > $50,000 requiere autorización)',
+        automatica: true,
       });
     }
 
@@ -408,7 +420,7 @@ class LiquidacionAutomatizadaService {
       await fs.mkdir('./uploads/exports', { recursive: true });
 
       const buffer = await excelFacturaMedicaService.obtenerBuffer(workbook);
-      await fs.writeFile(rutaCompleta, buffer);
+      await fs.writeFile(rutaCompleta, buffer as any);
 
       logger.info(`📊 Excel generado exitosamente: ${rutaCompleta}`);
 

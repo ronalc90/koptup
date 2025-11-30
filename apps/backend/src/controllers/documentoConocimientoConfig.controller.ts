@@ -13,10 +13,10 @@ export const getConfiguracion = async (req: Request, res: Response) => {
       return res.json([]);
     }
 
-    res.json(configuraciones);
+    return res.json(configuraciones);
   } catch (error: any) {
     console.error('Error al obtener configuración de documentos:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error al obtener configuración de documentos',
       error: error.message,
@@ -55,14 +55,14 @@ export const toggleDocumento = async (req: Request, res: Response) => {
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Configuración actualizada correctamente',
       data: config,
     });
   } catch (error: any) {
     console.error('Error al actualizar configuración de documento:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error al actualizar configuración de documento',
       error: error.message,

@@ -117,11 +117,13 @@ class AuditoriaMedicaController {
         nombreProcedimiento: todosProcedimientos[0]?.nombreProcedimiento || '',
         cant: todosProcedimientos[0]?.cant || 0,
         fecha: datosFactura.fecha,
-      };
+        nroAutNvo: datosFactura.autorizacion || '',
+        autorizacion: datosFactura.autorizacion || '',
+      } as any;
 
       // 3. CALCULAR GLOSAS CON TARIFARIO NUEVA EPS
       console.log('💰 Paso 3: Calculando glosas con tarifario Nueva EPS...');
-      const resultadoGlosas = glosaCalculatorService.calcularGlosas(datosFacturaAdaptados);
+      const resultadoGlosas = glosaCalculatorService.calcularGlosas(datosFacturaAdaptados as any);
 
       console.log('📊 Resultado de la auditoría:');
       console.log(`   - Valor a pagar: $${resultadoGlosas.valorAPagar.toLocaleString('es-CO')}`);
@@ -134,11 +136,11 @@ class AuditoriaMedicaController {
 
       const decisionFinalIA = await auditorIAFinalService.tomarDecisionFinal({
         extraccionRegex: {
-          datos: datosFacturaAdaptados,
+          datos: datosFacturaAdaptados as any,
           confianza: facturaBase.confianza,
         },
         extraccionVision: {
-          datos: datosFacturaAdaptados,
+          datos: datosFacturaAdaptados as any,
           confianza: facturaBase.confianza,
         },
         discrepancias: [], // No hay discrepancias en el nuevo sistema
