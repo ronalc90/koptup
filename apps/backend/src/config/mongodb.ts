@@ -11,14 +11,20 @@ export const connectDB = async () => {
 
   try {
     await mongoose.connect(MONGODB_URI, {
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 30000, // Aumentar timeout a 30 segundos
       socketTimeoutMS: 45000,
+      maxPoolSize: 10,
+      minPoolSize: 2,
+      retryWrites: true,
+      retryReads: true,
     });
     logger.info('✅ MongoDB connected successfully');
+    logger.info(`📊 MongoDB host: ${mongoose.connection.host}`);
   } catch (error) {
     logger.error('❌ MongoDB connection error:', error);
-    logger.warn('⚠️  Continuing without MongoDB - database operations will fail');
+    logger.warn('⚠️  Will retry connection automatically...');
     // No lanzar error para permitir que el servidor continúe
+    // Mongoose intentará reconectar automáticamente
   }
 };
 

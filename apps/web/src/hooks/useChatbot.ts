@@ -23,12 +23,6 @@ export interface ChatbotConfig {
   restrictedTopics?: string[];
 }
 
-// Detectar si estamos en modo demo
-const isDemoMode = () => {
-  if (typeof window === 'undefined') return false;
-  return window.location.pathname.startsWith('/demo/chatbot');
-};
-
 export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
   const [sessionId, setSessionId] = useState<string>('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -48,62 +42,41 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
     restrictedTopics: initialConfig?.restrictedTopics || [],
   });
 
-  // Actualizar configuración (declared before use in useEffect)
+  // Actualizar configuración
   const updateConfig = useCallback(async (newConfig: Partial<ChatbotConfig>): Promise<void> => {
     if (!sessionId) return;
 
     setConfig(prevConfig => {
       const updatedConfig = { ...prevConfig, ...newConfig };
 
-      // En modo demo, solo guardar en sessionStorage
-      if (isDemoMode()) {
-        const demoData = {
+      // Enviar al backend de forma asíncrona sin bloquear
+      fetch(`${API_URL}/api/chatbot/config`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId,
           config: updatedConfig,
-          messages,
-          uploadedDocuments,
-        };
-        sessionStorage.setItem('chatbot_demo_data', JSON.stringify(demoData));
-      } else {
-        // Enviar al backend de forma asíncrona sin bloquear
-        fetch(`${API_URL}/api/chatbot/config`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            sessionId,
-            config: updatedConfig,
-          }),
-        }).catch(err => {
-          console.error('Error updating config:', err);
-        });
-      }
+        }),
+      }).catch(err => {
+        console.error('Error updating config:', err);
+      });
 
       return updatedConfig;
     });
-  }, [sessionId, messages, uploadedDocuments]);
+  }, [sessionId]);
 
   // Generar o recuperar sessionId
   useEffect(() => {
-    if (isDemoMode()) {
-      // En modo demo, SIEMPRE limpiar y empezar de cero
-      sessionStorage.removeItem('chatbot_demo_data');
-      const id = `demo-session-${Date.now()}`;
-      setSessionId(id);
-
-      // NO cargar datos antiguos - siempre empezar limpio
-      setMessages([]);
-      setUploadedDocuments([]);
-    } else {
-      // Modo normal: usar localStorage y backend
-      let id = localStorage.getItem('chatbot_session_id');
-      if (!id) {
-        id = `session-${Date.now()}-${Math.random().toString(36).substring(7)}`;
-        localStorage.setItem('chatbot_session_id', id);
-      }
-      setSessionId(id);
-      loadSession(id);
+    // Usar localStorage y backend
+    let id = localStorage.getItem('chatbot_session_id');
+    if (!id) {
+      id = `session-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+      localStorage.setItem('chatbot_session_id', id);
     }
+    setSessionId(id);
+    loadSession(id);
   }, []);
 
   // Ref para rastrear si ya se inicializó el config
@@ -111,7 +84,6 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
   const lastConfigString = useRef('');
 
   // Update config when initialConfig changes (including restrictedTopics)
-  // Solo actualizar si realmente cambió el contenido de initialConfig
   useEffect(() => {
     if (!sessionId || !initialConfig) return;
 
@@ -132,18 +104,14 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
 
     // Solo actualizar si el config realmente cambió
     if (lastConfigString.current === newConfigString) {
-      return; // No hacer nada si no cambió
+      return;
     }
 
     lastConfigString.current = newConfigString;
-
     setConfig(newConfig);
 
-    // SOLO enviar al backend si:
-    // 1. Ya está inicializado
-    // 2. NO estamos en modo demo
-    // 3. Ya pasó el primer render (configInitialized)
-    if (configInitialized.current && !isDemoMode()) {
+    // SOLO enviar al backend después de la inicialización
+    if (configInitialized.current) {
       // Debounce: esperar 500ms antes de enviar al backend para evitar múltiples llamadas
       const timeoutId = setTimeout(() => {
         fetch(`${API_URL}/api/chatbot/config`, {
@@ -199,26 +167,6 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
     setError(null);
 
     try {
-      if (isDemoMode()) {
-        // Modo demo: solo simular subida
-        const fileNames = files.map(f => f.name);
-        setUploadedDocuments(prev => {
-          const updated = [...prev, ...fileNames];
-          // Guardar en sessionStorage
-          const demoData = {
-            config,
-            messages,
-            uploadedDocuments: updated,
-          };
-          sessionStorage.setItem('chatbot_demo_data', JSON.stringify(demoData));
-          return updated;
-        });
-
-        setIsLoading(false);
-        return true;
-      }
-
-      // Modo normal: subir al backend
       const formData = new FormData();
       formData.append('sessionId', sessionId);
       files.forEach(file => {
@@ -265,53 +213,6 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
     setMessages(prev => [...prev, userMessage]);
 
     try {
-      if (isDemoMode()) {
-        // Modo demo: Usar respuesta simulada sin backend
-        // Simular delay de red
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // Respuesta simulada basada en el contexto
-        let responseMessage = '¡Hola! 👋 Soy tu asistente virtual de demostración. ';
-
-        if (uploadedDocuments.length > 0) {
-          responseMessage += `He revisado los ${uploadedDocuments.length} documento(s) que subiste: ${uploadedDocuments.slice(0, 3).join(', ')}${uploadedDocuments.length > 3 ? ', y más...' : ''}. `;
-        }
-
-        responseMessage += 'Actualmente estoy en modo demostración, por lo que mis respuestas son simuladas. En producción, usaría inteligencia artificial avanzada para responder a tus preguntas basándome en los documentos que subas. ';
-
-        if (message.toLowerCase().includes('hola') || message.toLowerCase().includes('hi')) {
-          responseMessage = '¡Hola! 👋 Es un placer saludarte. Estoy aquí para ayudarte. ¿En qué puedo asistirte hoy?';
-        } else if (message.toLowerCase().includes('gracias')) {
-          responseMessage = '¡De nada! 😊 Siempre es un placer ayudarte. ¿Hay algo más en lo que pueda asistirte?';
-        } else if (message.includes('?')) {
-          responseMessage = `Entiendo que preguntas: "${message}". En modo producción, analizaría los documentos que has subido para darte una respuesta precisa. Por ahora, te recomiendo probar subiendo documentos PDF o TXT para ver cómo funcionaría el sistema completo.`;
-        }
-
-        // Agregar respuesta del asistente
-        const assistantMessage: ChatMessage = {
-          role: 'assistant',
-          content: responseMessage,
-          timestamp: new Date(),
-          source: uploadedDocuments.length > 0 ? uploadedDocuments[0] : undefined,
-        };
-
-        setMessages(prev => {
-          const updated = [...prev, assistantMessage];
-          // Guardar en sessionStorage para modo demo
-          const demoData = {
-            config,
-            messages: updated,
-            uploadedDocuments,
-          };
-          sessionStorage.setItem('chatbot_demo_data', JSON.stringify(demoData));
-          return updated;
-        });
-
-        setIsLoading(false);
-        return;
-      }
-
-      // Modo normal: enviar al backend
       const response = await fetch(`${API_URL}/api/chatbot/message`, {
         method: 'POST',
         headers: {
@@ -334,7 +235,7 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
         role: 'assistant',
         content: data.data.message,
         timestamp: new Date(),
-        source: data.data.source, // Include source from backend
+        source: data.data.source,
       };
       setMessages(prev => [...prev, assistantMessage]);
     } catch (err: any) {
@@ -357,22 +258,10 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
     if (!sessionId) return;
 
     try {
-      if (isDemoMode()) {
-        // Modo demo: solo limpiar del sessionStorage
-        setMessages([]);
-        const demoData = {
-          config,
-          messages: [],
-          uploadedDocuments,
-        };
-        sessionStorage.setItem('chatbot_demo_data', JSON.stringify(demoData));
-      } else {
-        // Modo normal: limpiar del backend
-        await fetch(`${API_URL}/api/chatbot/messages/${sessionId}`, {
-          method: 'DELETE',
-        });
-        setMessages([]);
-      }
+      await fetch(`${API_URL}/api/chatbot/messages/${sessionId}`, {
+        method: 'DELETE',
+      });
+      setMessages([]);
     } catch (err) {
       console.error('Error clearing messages:', err);
     }
