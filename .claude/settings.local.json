@@ -76,7 +76,10 @@
       "Bash(mongosh --version:*)",
       "Bash(npm start)",
       "Bash(ls:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(npm i:*)",
+      "Bash(vercel:*)",
+      "Bash(git config:*)"
     ],
     "deny": [],
     "ask": []
