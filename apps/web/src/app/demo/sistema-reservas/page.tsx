@@ -287,7 +287,11 @@ export default function SistemaReservas() {
                     </div>
                   </div>
                   <button
-                    onClick={() => startBooking(service)}
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      startBooking(service);
+                    }}
                     className="w-full bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-lg px-4 py-3 font-semibold hover:from-orange-700 hover:to-amber-700 transition-all shadow-lg"
                   >
                     Reservar ahora
@@ -300,7 +304,11 @@ export default function SistemaReservas() {
           {/* Admin Access Button */}
           <div className="mt-12 text-center">
             <button
-              onClick={() => setView('admin')}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                setView('admin');
+              }}
               className="px-6 py-3 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors font-semibold"
             >
               Panel de Administración
@@ -319,7 +327,11 @@ export default function SistemaReservas() {
           {/* Header */}
           <div className="mb-8">
             <button
-              onClick={() => setView('public')}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                setView('public');
+              }}
               className="text-orange-600 dark:text-orange-400 hover:underline mb-4"
             >
               ← Volver a servicios
@@ -605,7 +617,11 @@ export default function SistemaReservas() {
 
               <div className="mt-6 flex gap-3">
                 <button
-                  onClick={() => setView('public')}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setView('public');
+                  }}
                   className="flex-1 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-lg px-6 py-3 font-semibold hover:from-orange-700 hover:to-amber-700 transition-all"
                 >
                   Volver al Inicio
@@ -625,7 +641,11 @@ export default function SistemaReservas() {
         {/* Header */}
         <div className="mb-8">
           <button
-            onClick={() => setView('public')}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              setView('public');
+            }}
             className="text-orange-600 dark:text-orange-400 hover:underline mb-4"
           >
             ← Volver a vista pública
