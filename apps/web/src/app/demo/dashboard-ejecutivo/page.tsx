@@ -39,6 +39,11 @@ export default function DashboardEjecutivo() {
   const [autoExport, setAutoExport] = useState(true);
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
 
+  // Estados para búsqueda y notificaciones
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+
   // Cargar preferencias desde localStorage al montar
   useEffect(() => {
     const savedDarkMode = localStorage.getItem('darkMode') === 'true';
@@ -861,8 +866,79 @@ export default function DashboardEjecutivo() {
                   <input
                     type="text"
                     placeholder="Buscar..."
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setShowSearchResults(e.target.value.length > 0);
+                    }}
+                    onFocus={() => searchQuery.length > 0 && setShowSearchResults(true)}
                     className="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
+                  {showSearchResults && (
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-slate-200 dark:border-slate-700 z-50 max-h-96 overflow-y-auto">
+                      <div className="p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                            Resultados de búsqueda
+                          </h3>
+                          <button
+                            onClick={() => {
+                              setShowSearchResults(false);
+                              setSearchQuery('');
+                            }}
+                            className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                          >
+                            <XMarkIcon className="w-4 h-4" />
+                          </button>
+                        </div>
+                        {searchQuery.trim() === '' ? (
+                          <p className="text-sm text-slate-500">Escribe para buscar...</p>
+                        ) : (
+                          <div className="space-y-2">
+                            <button
+                              onClick={() => {
+                                setActiveView('dashboard');
+                                setShowSearchResults(false);
+                                setSearchQuery('');
+                              }}
+                              className="w-full p-3 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg cursor-pointer text-left"
+                            >
+                              <div className="text-sm font-medium text-slate-900 dark:text-white">
+                                Dashboard Principal
+                              </div>
+                              <div className="text-xs text-slate-500">Vista principal con métricas</div>
+                            </button>
+                            <button
+                              onClick={() => {
+                                setActiveView('finanzas');
+                                setShowSearchResults(false);
+                                setSearchQuery('');
+                              }}
+                              className="w-full p-3 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg cursor-pointer text-left"
+                            >
+                              <div className="text-sm font-medium text-slate-900 dark:text-white">
+                                Finanzas
+                              </div>
+                              <div className="text-xs text-slate-500">Gráficos y reportes financieros</div>
+                            </button>
+                            <button
+                              onClick={() => {
+                                setActiveView('clientes');
+                                setShowSearchResults(false);
+                                setSearchQuery('');
+                              }}
+                              className="w-full p-3 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg cursor-pointer text-left"
+                            >
+                              <div className="text-sm font-medium text-slate-900 dark:text-white">
+                                Clientes
+                              </div>
+                              <div className="text-xs text-slate-500">Gestión de clientes</div>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -884,10 +960,84 @@ export default function DashboardEjecutivo() {
                   )}
                 </button>
 
-                <button className="relative p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                  <BellIcon className="w-6 h-6 text-slate-600 dark:text-slate-400" />
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                </button>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowNotifications(!showNotifications)}
+                    className="relative p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                  >
+                    <BellIcon className="w-6 h-6 text-slate-600 dark:text-slate-400" />
+                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                  </button>
+
+                  {showNotifications && (
+                    <div className="absolute top-full right-0 mt-2 w-96 bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-slate-200 dark:border-slate-700 z-50">
+                      <div className="p-4 border-b border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                            Notificaciones
+                          </h3>
+                          <button
+                            onClick={() => setShowNotifications(false)}
+                            className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                          >
+                            <XMarkIcon className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                      <div className="max-h-96 overflow-y-auto">
+                        <div className="p-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer border-b border-slate-100 dark:border-slate-700">
+                          <div className="flex gap-3">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                            <div className="flex-1">
+                              <div className="text-sm font-medium text-slate-900 dark:text-white">
+                                Nuevo reporte financiero disponible
+                              </div>
+                              <div className="text-xs text-slate-500 mt-1">Hace 5 minutos</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="p-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer border-b border-slate-100 dark:border-slate-700">
+                          <div className="flex gap-3">
+                            <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                            <div className="flex-1">
+                              <div className="text-sm font-medium text-slate-900 dark:text-white">
+                                Meta de ventas alcanzada
+                              </div>
+                              <div className="text-xs text-slate-500 mt-1">Hace 1 hora</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="p-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer border-b border-slate-100 dark:border-slate-700">
+                          <div className="flex gap-3">
+                            <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2"></div>
+                            <div className="flex-1">
+                              <div className="text-sm font-medium text-slate-900 dark:text-white">
+                                Actualización de sistema programada
+                              </div>
+                              <div className="text-xs text-slate-500 mt-1">Hace 2 horas</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="p-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer">
+                          <div className="flex gap-3">
+                            <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
+                            <div className="flex-1">
+                              <div className="text-sm font-medium text-slate-900 dark:text-white">
+                                Nuevo cliente registrado
+                              </div>
+                              <div className="text-xs text-slate-500 mt-1">Hace 3 horas</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="p-3 border-t border-slate-200 dark:border-slate-700">
+                        <button className="w-full text-center text-sm font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400">
+                          Ver todas las notificaciones
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 <div className="flex items-center gap-2 px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg">
                   <CalendarIcon className="w-5 h-5 text-slate-600 dark:text-slate-400" />
