@@ -42,27 +42,13 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
     restrictedTopics: initialConfig?.restrictedTopics || [],
   });
 
-  // Actualizar configuración
+  // Actualizar configuración (solo local, no envía al backend)
   const updateConfig = useCallback(async (newConfig: Partial<ChatbotConfig>): Promise<void> => {
     if (!sessionId) return;
 
     setConfig(prevConfig => {
       const updatedConfig = { ...prevConfig, ...newConfig };
-
-      // Enviar al backend de forma asíncrona sin bloquear
-      fetch(`${API_URL}/api/chatbot/config`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          sessionId,
-          config: updatedConfig,
-        }),
-      }).catch(err => {
-        console.error('Error updating config:', err);
-      });
-
+      // Solo actualizar estado local
       return updatedConfig;
     });
   }, [sessionId]);
@@ -112,23 +98,9 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
 
     // SOLO enviar al backend después de la inicialización
     if (configInitialized.current) {
-      // Debounce: esperar 500ms antes de enviar al backend para evitar múltiples llamadas
-      const timeoutId = setTimeout(() => {
-        fetch(`${API_URL}/api/chatbot/config`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            sessionId,
-            config: newConfig,
-          }),
-        }).catch(err => {
-          console.error('Error updating config:', err);
-        });
-      }, 500);
-
-      return () => clearTimeout(timeoutId);
+      // NO enviar al backend en cada cambio - solo actualizar estado local
+      // El backend se actualizará cuando el usuario envíe un mensaje
+      console.log('Config updated locally');
     } else {
       configInitialized.current = true;
     }
