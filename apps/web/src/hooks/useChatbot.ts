@@ -139,20 +139,28 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
 
     setConfig(newConfig);
 
-    // Solo enviar al backend después de la inicialización (excepto en modo demo)
+    // SOLO enviar al backend si:
+    // 1. Ya está inicializado
+    // 2. NO estamos en modo demo
+    // 3. Ya pasó el primer render (configInitialized)
     if (configInitialized.current && !isDemoMode()) {
-      fetch(`${API_URL}/api/chatbot/config`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          sessionId,
-          config: newConfig,
-        }),
-      }).catch(err => {
-        console.error('Error updating config:', err);
-      });
+      // Debounce: esperar 500ms antes de enviar al backend para evitar múltiples llamadas
+      const timeoutId = setTimeout(() => {
+        fetch(`${API_URL}/api/chatbot/config`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            sessionId,
+            config: newConfig,
+          }),
+        }).catch(err => {
+          console.error('Error updating config:', err);
+        });
+      }, 500);
+
+      return () => clearTimeout(timeoutId);
     } else {
       configInitialized.current = true;
     }

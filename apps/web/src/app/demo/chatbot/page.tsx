@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -86,16 +86,8 @@ export default function DemoPage() {
   const [embedCopied, setEmbedCopied] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Initialize chatbot hook
-  const {
-    messages,
-    isLoading,
-    error,
-    uploadedDocuments,
-    uploadDocuments,
-    sendMessage,
-    clearMessages,
-  } = useChatbot({
+  // Memoize chatbot config to prevent unnecessary re-renders and API calls
+  const chatbotConfig = useMemo(() => ({
     title: chatConfig.title,
     greeting: chatConfig.greeting,
     placeholder: chatConfig.placeholder,
@@ -106,7 +98,29 @@ export default function DemoPage() {
     fontFamily: typographyConfig.fontFamily,
     customIconUrl: designConfig.customIconUrl,
     restrictedTopics: restrictionsConfig.restrictedTopics,
-  });
+  }), [
+    chatConfig.title,
+    chatConfig.greeting,
+    chatConfig.placeholder,
+    designConfig.textColor,
+    designConfig.headerColor,
+    designConfig.backgroundColor,
+    designConfig.icon,
+    typographyConfig.fontFamily,
+    designConfig.customIconUrl,
+    restrictionsConfig.restrictedTopics,
+  ]);
+
+  // Initialize chatbot hook with memoized config
+  const {
+    messages,
+    isLoading,
+    error,
+    uploadedDocuments,
+    uploadDocuments,
+    sendMessage,
+    clearMessages,
+  } = useChatbot(chatbotConfig);
 
   const chatIcons = [
     { id: 'FaComments', icon: FaComments, label: 'Burbujas' },
