@@ -50,6 +50,12 @@ export default function GestorDocumentos() {
   const [showSimilarityModal, setShowSimilarityModal] = useState(false);
   const [similarityExplanation, setSimilarityExplanation] = useState('');
   const [loadingSimilarity, setLoadingSimilarity] = useState(false);
+  const [settings, setSettings] = useState({
+    autoProcess: true,
+    semanticSearchEnabled: true,
+    autoTagging: true,
+  });
+  const [settingsSaved, setSettingsSaved] = useState(false);
 
   const {
     documents,
@@ -235,6 +241,18 @@ export default function GestorDocumentos() {
     { id: 'settings', name: 'Configuración', icon: Cog6ToothIcon, count: null },
   ];
 
+  const toggleSetting = (key: keyof typeof settings) => {
+    setSettings(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  const saveSettings = () => {
+    setSettingsSaved(true);
+    setTimeout(() => setSettingsSaved(false), 3000);
+  };
+
   const renderSettingsView = () => (
     <div className="space-y-6">
       <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
@@ -247,28 +265,73 @@ export default function GestorDocumentos() {
               <h4 className="font-semibold text-slate-900 dark:text-white">Procesamiento IA Automático</h4>
               <p className="text-sm text-slate-500">Analizar documentos con IA al subirlos</p>
             </div>
-            <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-blue-600">
-              <span className="translate-x-6 inline-block h-4 w-4 transform rounded-full bg-white transition" />
-            </div>
+            <button
+              onClick={() => toggleSetting('autoProcess')}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                settings.autoProcess ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-600'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  settings.autoProcess ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
           </div>
           <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
             <div>
               <h4 className="font-semibold text-slate-900 dark:text-white">Búsqueda Semántica</h4>
               <p className="text-sm text-slate-500">Habilitar búsqueda por significado con IA</p>
             </div>
-            <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-blue-600">
-              <span className="translate-x-6 inline-block h-4 w-4 transform rounded-full bg-white transition" />
-            </div>
+            <button
+              onClick={() => toggleSetting('semanticSearchEnabled')}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                settings.semanticSearchEnabled ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-600'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  settings.semanticSearchEnabled ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
           </div>
           <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
             <div>
               <h4 className="font-semibold text-slate-900 dark:text-white">Etiquetado Automático</h4>
               <p className="text-sm text-slate-500">Generar tags automáticamente con IA</p>
             </div>
-            <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-blue-600">
-              <span className="translate-x-6 inline-block h-4 w-4 transform rounded-full bg-white transition" />
-            </div>
+            <button
+              onClick={() => toggleSetting('autoTagging')}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                settings.autoTagging ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-600'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  settings.autoTagging ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
           </div>
+        </div>
+
+        <div className="mt-6 flex items-center justify-between">
+          <div className="text-sm text-slate-600 dark:text-slate-400">
+            {settingsSaved ? (
+              <span className="text-green-600 dark:text-green-400 font-medium">
+                ✓ Configuración guardada
+              </span>
+            ) : (
+              <span>Actualiza tu configuración aquí</span>
+            )}
+          </div>
+          <button
+            onClick={saveSettings}
+            className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all"
+          >
+            Guardar Cambios
+          </button>
         </div>
       </div>
 
@@ -292,6 +355,32 @@ export default function GestorDocumentos() {
           <p className="text-sm text-slate-500 mt-4">{stats.total} documentos guardados</p>
         </div>
       )}
+
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
+        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
+          Resumen de Configuración
+        </h3>
+        <div className="space-y-3">
+          <div className="flex items-center gap-3 text-sm">
+            <div className={`w-2 h-2 rounded-full ${settings.autoProcess ? 'bg-green-500' : 'bg-slate-400'}`}></div>
+            <span className="text-slate-700 dark:text-slate-300">
+              Procesamiento IA: <strong>{settings.autoProcess ? 'Activado' : 'Desactivado'}</strong>
+            </span>
+          </div>
+          <div className="flex items-center gap-3 text-sm">
+            <div className={`w-2 h-2 rounded-full ${settings.semanticSearchEnabled ? 'bg-green-500' : 'bg-slate-400'}`}></div>
+            <span className="text-slate-700 dark:text-slate-300">
+              Búsqueda Semántica: <strong>{settings.semanticSearchEnabled ? 'Activada' : 'Desactivada'}</strong>
+            </span>
+          </div>
+          <div className="flex items-center gap-3 text-sm">
+            <div className={`w-2 h-2 rounded-full ${settings.autoTagging ? 'bg-green-500' : 'bg-slate-400'}`}></div>
+            <span className="text-slate-700 dark:text-slate-300">
+              Etiquetado Automático: <strong>{settings.autoTagging ? 'Activado' : 'Desactivado'}</strong>
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 

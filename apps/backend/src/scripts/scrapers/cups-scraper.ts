@@ -245,14 +245,14 @@ async function importToDatabase(cupsData: CUPSData[]) {
               metadata: {
                 requiereAutorizacion: false,
                 duracionPromedio: 0,
-                nivelComplejidad: 'medio',
+                nivelComplejidad: 'medio' as 'medio',
                 requiereQuirofano: false,
               },
             },
           },
           upsert: true,
         },
-      }));
+      }) as any);
 
       const result = await CUPS.bulkWrite(operations);
 
