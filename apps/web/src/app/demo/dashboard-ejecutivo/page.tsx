@@ -875,7 +875,7 @@ export default function DashboardEjecutivo() {
                     className="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                   {showSearchResults && (
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-slate-200 dark:border-slate-700 z-50 max-h-96 overflow-y-auto">
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-slate-200 dark:border-slate-700 max-h-96 overflow-y-auto" style={{ zIndex: 9999 }}>
                       <div className="p-4">
                         <div className="flex items-center justify-between mb-3">
                           <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
@@ -970,7 +970,7 @@ export default function DashboardEjecutivo() {
                   </button>
 
                   {showNotifications && (
-                    <div className="absolute top-full right-0 mt-2 w-96 bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-slate-200 dark:border-slate-700 z-50">
+                    <div className="absolute top-full right-0 mt-2 w-96 bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-slate-200 dark:border-slate-700" style={{ zIndex: 9999 }}>
                       <div className="p-4 border-b border-slate-200 dark:border-slate-700">
                         <div className="flex items-center justify-between">
                           <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
@@ -1031,7 +1031,13 @@ export default function DashboardEjecutivo() {
                         </div>
                       </div>
                       <div className="p-3 border-t border-slate-200 dark:border-slate-700">
-                        <button className="w-full text-center text-sm font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400">
+                        <button
+                          onClick={() => {
+                            setShowNotifications(false);
+                            alert('Esta funcionalidad mostraría la página completa de notificaciones');
+                          }}
+                          className="w-full text-center text-sm font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400"
+                        >
                           Ver todas las notificaciones
                         </button>
                       </div>
