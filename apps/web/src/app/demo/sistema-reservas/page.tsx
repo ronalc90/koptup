@@ -44,6 +44,11 @@ export default function SistemaReservas() {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [bookingStep, setBookingStep] = useState(1);
+  const [dateFilter, setDateFilter] = useState<string>('all');
+  const [serviceFilter, setServiceFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [selectedBookingId, setSelectedBookingId] = useState<number | null>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
 
   const services: Service[] = [
     {
@@ -80,7 +85,7 @@ export default function SistemaReservas() {
     },
   ];
 
-  const bookings: Booking[] = [
+  const [bookings, setBookings] = useState<Booking[]>([
     {
       id: 1,
       service: 'Consulta Médica General',
@@ -121,7 +126,38 @@ export default function SistemaReservas() {
       time: '09:00',
       status: 'cancelado',
     },
-  ];
+  ]);
+
+  const updateBookingStatus = (bookingId: number, newStatus: 'confirmado' | 'pendiente' | 'cancelado') => {
+    setBookings(bookings.map(booking =>
+      booking.id === bookingId ? { ...booking, status: newStatus } : booking
+    ));
+  };
+
+  const getFilteredBookings = () => {
+    return bookings.filter(booking => {
+      if (statusFilter !== 'all' && booking.status !== statusFilter) return false;
+      if (serviceFilter !== 'all' && booking.service !== serviceFilter) return false;
+      if (dateFilter !== 'all') {
+        const today = new Date();
+        const bookingDate = new Date(booking.date);
+
+        if (dateFilter === 'today') {
+          if (bookingDate.toDateString() !== today.toDateString()) return false;
+        } else if (dateFilter === 'week') {
+          const weekFromNow = new Date(today);
+          weekFromNow.setDate(weekFromNow.getDate() + 7);
+          if (bookingDate < today || bookingDate > weekFromNow) return false;
+        } else if (dateFilter === 'month') {
+          if (bookingDate.getMonth() !== today.getMonth() ||
+              bookingDate.getFullYear() !== today.getFullYear()) return false;
+        }
+      }
+      return true;
+    });
+  };
+
+  const selectedBooking = bookings.find(b => b.id === selectedBookingId);
 
   const timeSlots = [
     '08:00', '08:30', '09:00', '09:30', '10:00', '10:30',
@@ -609,27 +645,46 @@ export default function SistemaReservas() {
               <FunnelIcon className="w-5 h-5 text-slate-500" />
               <span className="font-semibold">Filtros:</span>
             </div>
-            <select className="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg">
-              <option>Todas las fechas</option>
-              <option>Hoy</option>
-              <option>Esta semana</option>
-              <option>Este mes</option>
+            <select
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+              className="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg"
+            >
+              <option value="all">Todas las fechas</option>
+              <option value="today">Hoy</option>
+              <option value="week">Esta semana</option>
+              <option value="month">Este mes</option>
             </select>
-            <select className="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg">
-              <option>Todos los servicios</option>
+            <select
+              value={serviceFilter}
+              onChange={(e) => setServiceFilter(e.target.value)}
+              className="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg"
+            >
+              <option value="all">Todos los servicios</option>
               {services.map((service) => (
-                <option key={service.id}>{service.name}</option>
+                <option key={service.id} value={service.name}>{service.name}</option>
               ))}
             </select>
-            <select className="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg">
-              <option>Todos los estados</option>
-              <option>Confirmado</option>
-              <option>Pendiente</option>
-              <option>Cancelado</option>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg"
+            >
+              <option value="all">Todos los estados</option>
+              <option value="confirmado">Confirmado</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="cancelado">Cancelado</option>
             </select>
-            <button className="ml-auto px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center gap-2">
+            <button
+              onClick={() => {
+                setDateFilter('all');
+                setServiceFilter('all');
+                setStatusFilter('all');
+              }}
+              className="ml-auto px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center gap-2"
+            >
               <ArrowPathIcon className="w-5 h-5" />
-              Actualizar
+              Limpiar Filtros
             </button>
           </div>
         </div>
@@ -661,41 +716,194 @@ export default function SistemaReservas() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                {bookings.map((booking) => (
-                  <tr key={booking.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-amber-400 rounded-full flex items-center justify-center text-white font-semibold">
-                          {booking.client.charAt(0)}
-                        </div>
-                        <span className="font-medium">{booking.client}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-slate-600 dark:text-slate-400">
-                      {booking.service}
-                    </td>
-                    <td className="px-6 py-4 text-slate-600 dark:text-slate-400">
-                      {booking.date}
-                    </td>
-                    <td className="px-6 py-4 text-slate-600 dark:text-slate-400">
-                      {booking.time}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(booking.status)}`}>
-                        {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <button className="text-orange-600 hover:text-orange-700 text-sm font-medium">
-                        Ver Detalles
-                      </button>
+                {getFilteredBookings().length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
+                      No se encontraron reservas con los filtros seleccionados
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  getFilteredBookings().map((booking) => (
+                    <tr key={booking.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-amber-400 rounded-full flex items-center justify-center text-white font-semibold">
+                            {booking.client.charAt(0)}
+                          </div>
+                          <span className="font-medium">{booking.client}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-slate-600 dark:text-slate-400">
+                        {booking.service}
+                      </td>
+                      <td className="px-6 py-4 text-slate-600 dark:text-slate-400">
+                        {booking.date}
+                      </td>
+                      <td className="px-6 py-4 text-slate-600 dark:text-slate-400">
+                        {booking.time}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(booking.status)}`}>
+                          {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <button
+                          onClick={() => {
+                            setSelectedBookingId(booking.id);
+                            setShowDetailModal(true);
+                          }}
+                          className="text-orange-600 hover:text-orange-700 text-sm font-medium"
+                        >
+                          Ver Detalles
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
         </div>
+
+        {/* Detail Modal */}
+        {showDetailModal && selectedBooking && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+                    Detalles de la Reserva
+                  </h2>
+                  <button
+                    onClick={() => {
+                      setShowDetailModal(false);
+                      setSelectedBookingId(null);
+                    }}
+                    className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                  >
+                    <XMarkIcon className="w-6 h-6" />
+                  </button>
+                </div>
+
+                <div className="space-y-6">
+                  {/* Client Info */}
+                  <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-slate-800 dark:to-slate-800 rounded-xl p-6">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-amber-400 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                        {selectedBooking.client.charAt(0)}
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                          {selectedBooking.client}
+                        </h3>
+                        <p className="text-slate-600 dark:text-slate-400">Cliente</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="flex items-center gap-2">
+                        <PhoneIcon className="w-4 h-4 text-slate-500" />
+                        <span>+57 300 123 4567</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <EnvelopeIcon className="w-4 h-4 text-slate-500" />
+                        <span>cliente@email.com</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Service Info */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-slate-900 dark:text-white">Información del Servicio</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <div className="text-sm text-slate-500">Servicio</div>
+                        <div className="font-semibold">{selectedBooking.service}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-slate-500">Fecha</div>
+                        <div className="font-semibold">{selectedBooking.date}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-slate-500">Hora</div>
+                        <div className="font-semibold">{selectedBooking.time}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-slate-500">Estado</div>
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(selectedBooking.status)}`}>
+                          {selectedBooking.status.charAt(0).toUpperCase() + selectedBooking.status.slice(1)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Status Actions */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-slate-900 dark:text-white">Cambiar Estado</h4>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => {
+                          updateBookingStatus(selectedBooking.id, 'confirmado');
+                          setShowDetailModal(false);
+                        }}
+                        disabled={selectedBooking.status === 'confirmado'}
+                        className={`flex-1 px-4 py-3 rounded-lg font-semibold transition-all ${
+                          selectedBooking.status === 'confirmado'
+                            ? 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed'
+                            : 'bg-green-600 text-white hover:bg-green-700'
+                        }`}
+                      >
+                        ✓ Confirmar
+                      </button>
+                      <button
+                        onClick={() => {
+                          updateBookingStatus(selectedBooking.id, 'pendiente');
+                          setShowDetailModal(false);
+                        }}
+                        disabled={selectedBooking.status === 'pendiente'}
+                        className={`flex-1 px-4 py-3 rounded-lg font-semibold transition-all ${
+                          selectedBooking.status === 'pendiente'
+                            ? 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed'
+                            : 'bg-yellow-600 text-white hover:bg-yellow-700'
+                        }`}
+                      >
+                        ⏳ Pendiente
+                      </button>
+                      <button
+                        onClick={() => {
+                          updateBookingStatus(selectedBooking.id, 'cancelado');
+                          setShowDetailModal(false);
+                        }}
+                        disabled={selectedBooking.status === 'cancelado'}
+                        className={`flex-1 px-4 py-3 rounded-lg font-semibold transition-all ${
+                          selectedBooking.status === 'cancelado'
+                            ? 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed'
+                            : 'bg-red-600 text-white hover:bg-red-700'
+                        }`}
+                      >
+                        ✕ Cancelar
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Notes Section */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-slate-900 dark:text-white">Notas</h4>
+                    <textarea
+                      className="w-full px-4 py-3 bg-slate-100 dark:bg-slate-800 rounded-lg resize-none"
+                      rows={4}
+                      placeholder="Agregar notas sobre la reserva..."
+                    ></textarea>
+                    <button className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors">
+                      Guardar Notas
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
