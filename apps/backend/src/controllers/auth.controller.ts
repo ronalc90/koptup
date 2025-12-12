@@ -225,7 +225,7 @@ export const googleCallback = asyncHandler(
     await redis.setEx(`refresh_token:${user.id}`, 7 * 24 * 60 * 60, refreshToken);
 
     // Redirect to frontend with tokens
-    const frontendURL = process.env.FRONTEND_URL || 'http://localhost:3002';
+    const frontendURL = process.env.FRONTEND_URL || 'http://localhost:3000';
     res.redirect(
       `${frontendURL}/auth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}`
     );
