@@ -1,0 +1,31 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="240" fill="url(#gradient1)"/>
+
+  <!-- Medical Cross Icon -->
+  <path d="M256 140C256 129.954 247.046 121 237 121H218C207.954 121 199 129.954 199 140V199H140C129.954 199 121 207.954 121 218V237C121 247.046 129.954 256 140 256H199V315C199 325.046 207.954 334 218 334H237C247.046 334 256 325.046 256 315V256H315C325.046 256 334 247.046 334 237V218C334 207.954 325.046 199 315 199H256V140Z" fill="white"/>
+
+  <!-- AI Circuit Pattern -->
+  <g opacity="0.3">
+    <circle cx="160" cy="160" r="8" fill="white"/>
+    <circle cx="352" cy="160" r="8" fill="white"/>
+    <circle cx="160" cy="352" r="8" fill="white"/>
+    <circle cx="352" cy="352" r="8" fill="white"/>
+    <line x1="160" y1="160" x2="200" y2="200" stroke="white" stroke-width="2"/>
+    <line x1="352" y1="160" x2="312" y2="200" stroke="white" stroke-width="2"/>
+    <line x1="160" y1="352" x2="200" y2="312" stroke="white" stroke-width="2"/>
+    <line x1="352" y1="352" x2="312" y2="312" stroke="white" stroke-width="2"/>
+  </g>
+
+  <!-- Letter K integrated -->
+  <path d="M370 180L410 140M370 220L410 260" stroke="white" stroke-width="12" stroke-linecap="round"/>
+  <line x1="370" y1="140" x2="370" y2="260" stroke="white" stroke-width="12" stroke-linecap="round"/>
+
+  <!-- Gradient Definition -->
+  <defs>
+    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1E40AF;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>

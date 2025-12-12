@@ -1,0 +1,68 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Gradient -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+
+  <!-- Grid Pattern -->
+  <g opacity="0.1">
+    <line x1="0" y1="105" x2="1200" y2="105" stroke="white" stroke-width="1"/>
+    <line x1="0" y1="210" x2="1200" y2="210" stroke="white" stroke-width="1"/>
+    <line x1="0" y1="315" x2="1200" y2="315" stroke="white" stroke-width="1"/>
+    <line x1="0" y1="420" x2="1200" y2="420" stroke="white" stroke-width="1"/>
+    <line x1="0" y1="525" x2="1200" y2="525" stroke="white" stroke-width="1"/>
+    <line x1="200" y1="0" x2="200" y2="630" stroke="white" stroke-width="1"/>
+    <line x1="400" y1="0" x2="400" y2="630" stroke="white" stroke-width="1"/>
+    <line x1="600" y1="0" x2="600" y2="630" stroke="white" stroke-width="1"/>
+    <line x1="800" y1="0" x2="800" y2="630" stroke="white" stroke-width="1"/>
+    <line x1="1000" y1="0" x2="1000" y2="630" stroke="white" stroke-width="1"/>
+  </g>
+
+  <!-- Logo Circle (top left) -->
+  <circle cx="150" cy="120" r="60" fill="white" opacity="0.95"/>
+  <path d="M150 90C150 84.4772 145.523 80 140 80H130C124.477 80 120 84.4772 120 90V120H90C84.4772 120 80 124.477 80 130V140C80 145.523 84.4772 150 90 150H120V180C120 185.523 124.477 190 130 190H140C145.523 190 150 185.523 150 180V150H180C185.523 150 190 145.523 190 140V130C190 124.477 185.523 120 180 120H150V90Z" fill="url(#logoGradient)"/>
+
+  <!-- Main Title -->
+  <text x="600" y="240" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="white" text-anchor="middle">
+    KopTup
+  </text>
+
+  <!-- Subtitle 1 -->
+  <text x="600" y="310" font-family="Arial, sans-serif" font-size="48" font-weight="600" fill="white" text-anchor="middle">
+    Auditoría Médica con IA
+  </text>
+
+  <!-- Subtitle 2 -->
+  <text x="600" y="370" font-family="Arial, sans-serif" font-size="36" font-weight="normal" fill="rgba(255,255,255,0.9)" text-anchor="middle">
+    Gestión de Glosas | Facturación en Salud
+  </text>
+
+  <!-- Badge -->
+  <rect x="440" y="410" width="320" height="50" rx="25" fill="rgba(255,255,255,0.2)"/>
+  <text x="600" y="443" font-family="Arial, sans-serif" font-size="28" font-weight="500" fill="white" text-anchor="middle">
+    Para IPS y Hospitales
+  </text>
+
+  <!-- Website -->
+  <text x="600" y="530" font-family="Arial, sans-serif" font-size="32" font-weight="normal" fill="rgba(255,255,255,0.8)" text-anchor="middle">
+    www.koptup.com
+  </text>
+
+  <!-- Decorative medical icons -->
+  <g opacity="0.15">
+    <!-- Heartbeat line -->
+    <path d="M50 550 L100 550 L120 520 L140 580 L160 550 L200 550" stroke="white" stroke-width="3" fill="none"/>
+    <path d="M1000 550 L1050 550 L1070 520 L1090 580 L1110 550 L1150 550" stroke="white" stroke-width="3" fill="none"/>
+  </g>
+
+  <!-- Gradients -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#2563EB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1E40AF;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1E40AF;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>

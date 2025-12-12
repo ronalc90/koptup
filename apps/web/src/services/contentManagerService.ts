@@ -1,6 +1,7 @@
 // Service for Content Manager API calls
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_PREFIX = '/api';
 
 export type ContentTone = 'formal' | 'técnico' | 'persuasivo';
 
@@ -27,7 +28,7 @@ export function getTemplateId(templateName: string): ContentTemplate {
 }
 
 export async function improveContent(content: string, template: ContentTemplate): Promise<string> {
-  const response = await fetch(`${API_BASE_URL}/content/improve`, {
+  const response = await fetch(`${API_BASE_URL}${API_PREFIX}/content/improve`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -49,7 +50,7 @@ export async function changeTone(
   tone: ContentTone,
   template: ContentTemplate
 ): Promise<string> {
-  const response = await fetch(`${API_BASE_URL}/content/change-tone`, {
+  const response = await fetch(`${API_BASE_URL}${API_PREFIX}/content/change-tone`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -71,7 +72,7 @@ export async function adjustLength(
   targetWords: number,
   template: ContentTemplate
 ): Promise<string> {
-  const response = await fetch(`${API_BASE_URL}/content/adjust-length`, {
+  const response = await fetch(`${API_BASE_URL}${API_PREFIX}/content/adjust-length`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -93,7 +94,7 @@ export async function generateVersions(
   template: ContentTemplate,
   numVersions: number = 3
 ): Promise<ContentVersion[]> {
-  const response = await fetch(`${API_BASE_URL}/content/generate-versions`, {
+  const response = await fetch(`${API_BASE_URL}${API_PREFIX}/content/generate-versions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -114,7 +115,7 @@ export async function generateFromTemplate(
   template: ContentTemplate,
   userInput: string
 ): Promise<string> {
-  const response = await fetch(`${API_BASE_URL}/content/generate`, {
+  const response = await fetch(`${API_BASE_URL}${API_PREFIX}/content/generate`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

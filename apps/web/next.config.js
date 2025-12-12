@@ -9,7 +9,7 @@ const nextConfig = {
 
   // Image optimization
   images: {
-    domains: ['localhost', 'koptup-uploads.s3.amazonaws.com'],
+    domains: ['localhost', 'koptup-uploads.s3.amazonaws.com', 'images.unsplash.com'],
     formats: ['image/avif', 'image/webp'],
   },
 

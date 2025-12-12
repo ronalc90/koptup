@@ -1,0 +1,49 @@
+# robots.txt para KopTup - Auditoría Médica con IA
+# https://www.koptup.com/robots.txt
+
+User-agent: *
+Allow: /
+Allow: /demo/*
+Disallow: /dashboard/*
+Disallow: /admin/*
+Disallow: /api/*
+Disallow: /login
+Disallow: /register
+Disallow: /*?*sessionId=*
+Disallow: /*?*token=*
+
+# Permitir rastreadores de motores de búsqueda principales
+User-agent: Googlebot
+Allow: /
+Allow: /demo/*
+Disallow: /dashboard/*
+Disallow: /api/*
+
+User-agent: Bingbot
+Allow: /
+Allow: /demo/*
+Disallow: /dashboard/*
+Disallow: /api/*
+
+# Bloquear bots maliciosos
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+# Velocidad de rastreo (1 página cada 10 segundos)
+Crawl-delay: 10
+
+# Sitemap
+Sitemap: https://www.koptup.com/sitemap.xml
+Sitemap: https://koptup.com/sitemap.xml
+
+# Información de contacto
+# Contact: support@koptup.com
