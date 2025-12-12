@@ -75,7 +75,8 @@
       "Bash(mongo --version:*)",
       "Bash(mongosh --version:*)",
       "Bash(npm start)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(test:*)"
     ],
     "deny": [],
     "ask": []

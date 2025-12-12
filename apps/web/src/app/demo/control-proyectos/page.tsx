@@ -19,8 +19,11 @@ import {
   BellIcon,
   Cog6ToothIcon,
   ChartPieIcon,
+  TrashIcon,
+  PencilIcon,
+  DocumentDuplicateIcon,
 } from '@heroicons/react/24/outline';
-import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
+import { StarIcon as StarIconSolid, BellAlertIcon } from '@heroicons/react/24/solid';
 
 interface Task {
   id: number;
@@ -31,9 +34,16 @@ interface Task {
   priority: 'alta' | 'media' | 'baja';
   tags: string[];
   column: string;
-  comments: number;
+  comments: Comment[];
   attachments: number;
   checklist: { item: string; done: boolean }[];
+}
+
+interface Comment {
+  id: number;
+  author: string;
+  text: string;
+  timestamp: string;
 }
 
 interface Project {
@@ -43,16 +53,34 @@ interface Project {
   favorite: boolean;
 }
 
+interface Notification {
+  id: number;
+  title: string;
+  message: string;
+  time: string;
+  read: boolean;
+}
+
 export default function ControlProyectos() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [view, setView] = useState<'board' | 'project' | 'calendar'>('board');
+  const [view, setView] = useState<'board' | 'project' | 'calendar' | 'favorites' | 'notifications' | 'settings'>('board');
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
+  const [showNewProjectModal, setShowNewProjectModal] = useState(false);
+  const [showNewTaskModal, setShowNewTaskModal] = useState<string | null>(null);
+  const [newComment, setNewComment] = useState('');
+  const [taskMenuOpen, setTaskMenuOpen] = useState<number | null>(null);
 
-  const [projects] = useState<Project[]>([
+  const [projects, setProjects] = useState<Project[]>([
     { id: 1, name: 'Desarrollo Web', color: 'bg-blue-500', favorite: true },
     { id: 2, name: 'Marketing Digital', color: 'bg-green-500', favorite: false },
     { id: 3, name: 'Diseño UI/UX', color: 'bg-purple-500', favorite: true },
     { id: 4, name: 'App Mobile', color: 'bg-orange-500', favorite: false },
+  ]);
+
+  const [notifications, setNotifications] = useState<Notification[]>([
+    { id: 1, title: 'Nueva tarea asignada', message: 'Carlos R. te asignó "Implementar API REST"', time: 'Hace 2 horas', read: false },
+    { id: 2, title: 'Comentario nuevo', message: 'María G. comentó en "Diseñar Homepage"', time: 'Hace 4 horas', read: false },
+    { id: 3, title: 'Tarea completada', message: 'Pedro L. completó "Testing de Integración"', time: 'Hace 1 día', read: true },
   ]);
 
   const [tasks, setTasks] = useState<Task[]>([
@@ -65,7 +93,9 @@ export default function ControlProyectos() {
       priority: 'alta',
       tags: ['Diseño', 'Frontend'],
       column: 'todo',
-      comments: 3,
+      comments: [
+        { id: 1, author: 'María G.', text: 'Iniciando con los wireframes', timestamp: 'Hace 3 horas' }
+      ],
       attachments: 2,
       checklist: [
         { item: 'Wireframes aprobados', done: true },
@@ -82,7 +112,9 @@ export default function ControlProyectos() {
       priority: 'alta',
       tags: ['Backend', 'API'],
       column: 'progress',
-      comments: 5,
+      comments: [
+        { id: 1, author: 'Carlos R.', text: 'Ya terminé los endpoints de usuarios, ahora voy con productos.', timestamp: 'Hace 2 horas' }
+      ],
       attachments: 1,
       checklist: [
         { item: 'Diseño de base de datos', done: true },
@@ -100,7 +132,7 @@ export default function ControlProyectos() {
       priority: 'media',
       tags: ['DevOps', 'Deploy'],
       column: 'progress',
-      comments: 2,
+      comments: [],
       attachments: 0,
       checklist: [
         { item: 'GitHub Actions configurado', done: true },
@@ -116,7 +148,7 @@ export default function ControlProyectos() {
       priority: 'media',
       tags: ['Testing', 'QA'],
       column: 'review',
-      comments: 1,
+      comments: [],
       attachments: 1,
       checklist: [
         { item: 'Casos de prueba definidos', done: true },
@@ -133,7 +165,7 @@ export default function ControlProyectos() {
       priority: 'baja',
       tags: ['Docs', 'UX'],
       column: 'done',
-      comments: 0,
+      comments: [],
       attachments: 3,
       checklist: [
         { item: 'Guía de inicio rápido', done: true },
@@ -150,7 +182,7 @@ export default function ControlProyectos() {
       priority: 'alta',
       tags: ['Performance', 'Frontend'],
       column: 'todo',
-      comments: 4,
+      comments: [],
       attachments: 0,
       checklist: [
         { item: 'Análisis de performance', done: false },
@@ -215,6 +247,306 @@ export default function ControlProyectos() {
       return dueDate < today && t.column !== 'done';
     });
   };
+
+  const toggleFavorite = (projectId: number) => {
+    setProjects(projects.map(p =>
+      p.id === projectId ? { ...p, favorite: !p.favorite } : p
+    ));
+  };
+
+  const addNewProject = (name: string, color: string) => {
+    const newProject: Project = {
+      id: projects.length + 1,
+      name,
+      color,
+      favorite: false,
+    };
+    setProjects([...projects, newProject]);
+    setShowNewProjectModal(false);
+  };
+
+  const addNewTask = (columnId: string, title: string, description: string) => {
+    const newTask: Task = {
+      id: tasks.length + 1,
+      title,
+      description,
+      assignee: 'Sin asignar',
+      dueDate: new Date().toISOString().split('T')[0],
+      priority: 'media',
+      tags: [],
+      column: columnId,
+      comments: [],
+      attachments: 0,
+      checklist: [],
+    };
+    setTasks([...tasks, newTask]);
+    setShowNewTaskModal(null);
+  };
+
+  const deleteTask = (taskId: number) => {
+    setTasks(tasks.filter(t => t.id !== taskId));
+    setTaskMenuOpen(null);
+    setSelectedTask(null);
+  };
+
+  const duplicateTask = (task: Task) => {
+    const newTask: Task = {
+      ...task,
+      id: tasks.length + 1,
+      title: `${task.title} (copia)`,
+    };
+    setTasks([...tasks, newTask]);
+    setTaskMenuOpen(null);
+  };
+
+  const toggleChecklistItem = (taskId: number, itemIndex: number) => {
+    setTasks(tasks.map(task => {
+      if (task.id === taskId) {
+        const newChecklist = [...task.checklist];
+        newChecklist[itemIndex] = { ...newChecklist[itemIndex], done: !newChecklist[itemIndex].done };
+        return { ...task, checklist: newChecklist };
+      }
+      return task;
+    }));
+
+    if (selectedTask && selectedTask.id === taskId) {
+      const updatedTask = tasks.find(t => t.id === taskId);
+      if (updatedTask) {
+        const newChecklist = [...updatedTask.checklist];
+        newChecklist[itemIndex] = { ...newChecklist[itemIndex], done: !newChecklist[itemIndex].done };
+        setSelectedTask({ ...updatedTask, checklist: newChecklist });
+      }
+    }
+  };
+
+  const addComment = () => {
+    if (!selectedTask || !newComment.trim()) return;
+
+    const comment: Comment = {
+      id: selectedTask.comments.length + 1,
+      author: 'Usuario Actual',
+      text: newComment,
+      timestamp: 'Justo ahora',
+    };
+
+    setTasks(tasks.map(task =>
+      task.id === selectedTask.id
+        ? { ...task, comments: [...task.comments, comment] }
+        : task
+    ));
+
+    setSelectedTask({
+      ...selectedTask,
+      comments: [...selectedTask.comments, comment],
+    });
+
+    setNewComment('');
+  };
+
+  const markNotificationAsRead = (notifId: number) => {
+    setNotifications(notifications.map(n =>
+      n.id === notifId ? { ...n, read: true } : n
+    ));
+  };
+
+  // Notifications View
+  if (view === 'notifications') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-8">
+        <div className="max-w-4xl mx-auto">
+          <button
+            onClick={() => setView('board')}
+            className="text-teal-600 dark:text-teal-400 hover:underline mb-6"
+          >
+            ← Volver al tablero
+          </button>
+
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Notificaciones</h2>
+              <button
+                onClick={() => setNotifications(notifications.map(n => ({ ...n, read: true })))}
+                className="text-sm text-teal-600 dark:text-teal-400 hover:underline"
+              >
+                Marcar todas como leídas
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {notifications.map((notif) => (
+                <div
+                  key={notif.id}
+                  onClick={() => markNotificationAsRead(notif.id)}
+                  className={`p-4 rounded-lg cursor-pointer transition-colors ${
+                    notif.read
+                      ? 'bg-slate-50 dark:bg-slate-800'
+                      : 'bg-teal-50 dark:bg-teal-950 border-l-4 border-teal-600'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <BellAlertIcon className={`w-5 h-5 mt-0.5 ${notif.read ? 'text-slate-400' : 'text-teal-600'}`} />
+                    <div className="flex-1">
+                      <h3 className={`font-semibold mb-1 ${notif.read ? 'text-slate-700 dark:text-slate-300' : 'text-slate-900 dark:text-white'}`}>
+                        {notif.title}
+                      </h3>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">
+                        {notif.message}
+                      </p>
+                      <p className="text-xs text-slate-500">{notif.time}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Favorites View
+  if (view === 'favorites') {
+    const favoriteTasks = tasks.filter(t =>
+      projects.find(p => p.favorite && p.name === 'Desarrollo Web') // Simplificado
+    );
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-8">
+        <div className="max-w-6xl mx-auto">
+          <button
+            onClick={() => setView('board')}
+            className="text-teal-600 dark:text-teal-400 hover:underline mb-6"
+          >
+            ← Volver al tablero
+          </button>
+
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-8">Proyectos Favoritos</h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {projects.filter(p => p.favorite).map((project) => (
+              <div key={project.id} className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-4 h-4 ${project.color} rounded-full`} />
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">{project.name}</h3>
+                  </div>
+                  <button
+                    onClick={() => toggleFavorite(project.id)}
+                    className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                  >
+                    <StarIconSolid className="w-6 h-6 text-yellow-500" />
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    {tasks.filter(t => t.column !== 'done').length} tareas activas
+                  </p>
+                  <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full ${project.color} rounded-full transition-all`}
+                      style={{ width: `${getTotalProgress()}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Settings View
+  if (view === 'settings') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-8">
+        <div className="max-w-4xl mx-auto">
+          <button
+            onClick={() => setView('board')}
+            className="text-teal-600 dark:text-teal-400 hover:underline mb-6"
+          >
+            ← Volver al tablero
+          </button>
+
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-8">Configuración</h2>
+
+          <div className="space-y-6">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Proyectos</h3>
+              <div className="space-y-3">
+                {projects.map((project) => (
+                  <div key={project.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-4 h-4 ${project.color} rounded-full`} />
+                      <span className="font-medium">{project.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => toggleFavorite(project.id)}
+                        className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                      >
+                        {project.favorite ? (
+                          <StarIconSolid className="w-5 h-5 text-yellow-500" />
+                        ) : (
+                          <StarIcon className="w-5 h-5 text-slate-400" />
+                        )}
+                      </button>
+                      <button className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                        <PencilIcon className="w-5 h-5 text-slate-500" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Notificaciones</h3>
+              <div className="space-y-4">
+                <label className="flex items-center justify-between">
+                  <span className="text-slate-700 dark:text-slate-300">Nuevas tareas asignadas</span>
+                  <input type="checkbox" defaultChecked className="w-5 h-5 text-teal-600 rounded" />
+                </label>
+                <label className="flex items-center justify-between">
+                  <span className="text-slate-700 dark:text-slate-300">Comentarios en mis tareas</span>
+                  <input type="checkbox" defaultChecked className="w-5 h-5 text-teal-600 rounded" />
+                </label>
+                <label className="flex items-center justify-between">
+                  <span className="text-slate-700 dark:text-slate-300">Tareas próximas a vencer</span>
+                  <input type="checkbox" defaultChecked className="w-5 h-5 text-teal-600 rounded" />
+                </label>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Preferencias</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    Vista predeterminada
+                  </label>
+                  <select className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800">
+                    <option>Tablero Kanban</option>
+                    <option>Vista de Proyecto</option>
+                    <option>Calendario</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    Idioma
+                  </label>
+                  <select className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800">
+                    <option>Español</option>
+                    <option>English</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (view === 'project') {
     return (
@@ -375,7 +707,10 @@ export default function ControlProyectos() {
               <span className="font-bold text-xl">ProyectHub</span>
             </div>
 
-            <button className="w-full bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-lg px-4 py-3 font-semibold hover:from-teal-700 hover:to-cyan-700 transition-all shadow-lg flex items-center justify-center gap-2">
+            <button
+              onClick={() => setShowNewProjectModal(true)}
+              className="w-full bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-lg px-4 py-3 font-semibold hover:from-teal-700 hover:to-cyan-700 transition-all shadow-lg flex items-center justify-center gap-2"
+            >
               <PlusIcon className="w-5 h-5" />
               Nuevo Proyecto
             </button>
@@ -401,16 +736,29 @@ export default function ControlProyectos() {
             </div>
 
             <div className="border-t border-slate-200 dark:border-slate-800 pt-4 mt-4">
-              <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors">
+              <button
+                onClick={() => setView('favorites')}
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors"
+              >
                 <StarIcon className="w-5 h-5" />
                 <span className="text-sm font-medium">Favoritos</span>
               </button>
-              <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors">
+              <button
+                onClick={() => setView('notifications')}
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors"
+              >
                 <BellIcon className="w-5 h-5" />
                 <span className="text-sm font-medium">Notificaciones</span>
-                <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">3</span>
+                {notifications.filter(n => !n.read).length > 0 && (
+                  <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                    {notifications.filter(n => !n.read).length}
+                  </span>
+                )}
               </button>
-              <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors">
+              <button
+                onClick={() => setView('settings')}
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors"
+              >
                 <Cog6ToothIcon className="w-5 h-5" />
                 <span className="text-sm font-medium">Configuración</span>
               </button>
@@ -471,7 +819,10 @@ export default function ControlProyectos() {
                           {tasks.filter(t => t.column === column.id).length}
                         </span>
                       </h2>
-                      <button className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors">
+                      <button
+                        onClick={() => setShowNewTaskModal(column.id)}
+                        className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors"
+                      >
                         <PlusIcon className="w-5 h-5 text-slate-500" />
                       </button>
                     </div>
@@ -493,9 +844,42 @@ export default function ControlProyectos() {
                             <h3 className="font-semibold text-slate-900 dark:text-white flex-1">
                               {task.title}
                             </h3>
-                            <button className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors">
-                              <EllipsisVerticalIcon className="w-5 h-5 text-slate-400" />
-                            </button>
+                            <div className="relative">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setTaskMenuOpen(taskMenuOpen === task.id ? null : task.id);
+                                }}
+                                className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors"
+                              >
+                                <EllipsisVerticalIcon className="w-5 h-5 text-slate-400" />
+                              </button>
+
+                              {taskMenuOpen === task.id && (
+                                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 z-10">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      duplicateTask(task);
+                                    }}
+                                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                                  >
+                                    <DocumentDuplicateIcon className="w-4 h-4" />
+                                    Duplicar
+                                  </button>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      deleteTask(task.id);
+                                    }}
+                                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 transition-colors"
+                                  >
+                                    <TrashIcon className="w-4 h-4" />
+                                    Eliminar
+                                  </button>
+                                </div>
+                              )}
+                            </div>
                           </div>
 
                           <p className="text-sm text-slate-600 dark:text-slate-400 mb-3 line-clamp-2">
@@ -530,10 +914,10 @@ export default function ControlProyectos() {
 
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3 text-slate-500 text-sm">
-                              {task.comments > 0 && (
+                              {task.comments.length > 0 && (
                                 <div className="flex items-center gap-1">
                                   <ChatBubbleLeftRightIcon className="w-4 h-4" />
-                                  <span>{task.comments}</span>
+                                  <span>{task.comments.length}</span>
                                 </div>
                               )}
                               {task.attachments > 0 && (
@@ -566,6 +950,141 @@ export default function ControlProyectos() {
           </div>
         </main>
       </div>
+
+      {/* New Project Modal */}
+      {showNewProjectModal && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 z-40"
+            onClick={() => setShowNewProjectModal(false)}
+          />
+          <div className="fixed inset-0 flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-6 w-full max-w-md">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Nuevo Proyecto</h3>
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                addNewProject(
+                  formData.get('name') as string,
+                  formData.get('color') as string
+                );
+              }}>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                      Nombre del proyecto
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      required
+                      className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      placeholder="Ej: Desarrollo Web"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                      Color
+                    </label>
+                    <select
+                      name="color"
+                      required
+                      className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    >
+                      <option value="bg-blue-500">Azul</option>
+                      <option value="bg-green-500">Verde</option>
+                      <option value="bg-purple-500">Morado</option>
+                      <option value="bg-orange-500">Naranja</option>
+                      <option value="bg-red-500">Rojo</option>
+                      <option value="bg-pink-500">Rosa</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="flex gap-3 mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setShowNewProjectModal(false)}
+                    className="flex-1 px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 px-4 py-2 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-lg hover:from-teal-700 hover:to-cyan-700 transition-all"
+                  >
+                    Crear Proyecto
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* New Task Modal */}
+      {showNewTaskModal && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 z-40"
+            onClick={() => setShowNewTaskModal(null)}
+          />
+          <div className="fixed inset-0 flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-6 w-full max-w-md">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Nueva Tarea</h3>
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                addNewTask(
+                  showNewTaskModal,
+                  formData.get('title') as string,
+                  formData.get('description') as string
+                );
+              }}>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                      Título
+                    </label>
+                    <input
+                      type="text"
+                      name="title"
+                      required
+                      className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      placeholder="Ej: Implementar login"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                      Descripción
+                    </label>
+                    <textarea
+                      name="description"
+                      rows={3}
+                      className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      placeholder="Describe la tarea..."
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-3 mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setShowNewTaskModal(null)}
+                    className="flex-1 px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 px-4 py-2 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-lg hover:from-teal-700 hover:to-cyan-700 transition-all"
+                  >
+                    Crear Tarea
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Task Detail Modal */}
       {selectedTask && (
@@ -653,8 +1172,8 @@ export default function ControlProyectos() {
                       <input
                         type="checkbox"
                         checked={item.done}
-                        readOnly
-                        className="w-5 h-5 text-teal-600 rounded"
+                        onChange={() => toggleChecklistItem(selectedTask.id, i)}
+                        className="w-5 h-5 text-teal-600 rounded cursor-pointer"
                       />
                       <span className={item.done ? 'line-through text-slate-400' : ''}>
                         {item.item}
@@ -667,32 +1186,43 @@ export default function ControlProyectos() {
               {/* Comments */}
               <div>
                 <h3 className="font-bold text-slate-900 dark:text-white mb-3">
-                  Comentarios ({selectedTask.comments})
+                  Comentarios ({selectedTask.comments.length})
                 </h3>
                 <div className="space-y-3">
-                  <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                    <div className="flex items-start gap-3 mb-2">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white text-sm font-semibold">
-                        CR
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-semibold text-sm">Carlos R.</span>
-                          <span className="text-xs text-slate-500">Hace 2 horas</span>
+                  {selectedTask.comments.map((comment) => (
+                    <div key={comment.id} className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                      <div className="flex items-start gap-3 mb-2">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white text-sm font-semibold">
+                          {comment.author.split(' ').map(n => n[0]).join('')}
                         </div>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">
-                          Ya terminé los endpoints de usuarios, ahora voy con productos.
-                        </p>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-semibold text-sm">{comment.author}</span>
+                            <span className="text-xs text-slate-500">{comment.timestamp}</span>
+                          </div>
+                          <p className="text-sm text-slate-600 dark:text-slate-400">
+                            {comment.text}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
                 <div className="mt-3">
                   <textarea
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
                     placeholder="Agregar un comentario..."
                     className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500"
                     rows={3}
                   />
+                  <button
+                    onClick={addComment}
+                    disabled={!newComment.trim()}
+                    className="mt-2 px-4 py-2 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-lg hover:from-teal-700 hover:to-cyan-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Agregar Comentario
+                  </button>
                 </div>
               </div>
 
@@ -723,8 +1253,8 @@ export default function ControlProyectos() {
                     <div className="w-2 h-2 rounded-full bg-teal-600 mt-2" />
                     <div className="flex-1">
                       <p className="text-sm">
-                        <span className="font-semibold">Carlos R.</span> movió esta tarea a{' '}
-                        <span className="font-semibold">En Progreso</span>
+                        <span className="font-semibold">{selectedTask.assignee}</span> movió esta tarea a{' '}
+                        <span className="font-semibold">{columns.find(c => c.id === selectedTask.column)?.title}</span>
                       </p>
                       <p className="text-xs text-slate-500">Hace 3 horas</p>
                     </div>
