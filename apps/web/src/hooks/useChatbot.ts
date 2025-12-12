@@ -266,31 +266,33 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
 
     try {
       if (isDemoMode()) {
-        // Modo demo: usar backend REAL pero guardar en sessionStorage
-        // La única diferencia es que los datos son temporales (se borran al recargar)
-        const response = await fetch(`${API_URL}/api/chatbot/message`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            sessionId,
-            message,
-          }),
-        });
+        // Modo demo: Usar respuesta simulada sin backend
+        // Simular delay de red
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
-        const data = await response.json();
+        // Respuesta simulada basada en el contexto
+        let responseMessage = '¡Hola! 👋 Soy tu asistente virtual de demostración. ';
 
-        if (!response.ok || !data.success) {
-          throw new Error(data.error || 'Error enviando mensaje');
+        if (uploadedDocuments.length > 0) {
+          responseMessage += `He revisado los ${uploadedDocuments.length} documento(s) que subiste: ${uploadedDocuments.slice(0, 3).join(', ')}${uploadedDocuments.length > 3 ? ', y más...' : ''}. `;
+        }
+
+        responseMessage += 'Actualmente estoy en modo demostración, por lo que mis respuestas son simuladas. En producción, usaría inteligencia artificial avanzada para responder a tus preguntas basándome en los documentos que subas. ';
+
+        if (message.toLowerCase().includes('hola') || message.toLowerCase().includes('hi')) {
+          responseMessage = '¡Hola! 👋 Es un placer saludarte. Estoy aquí para ayudarte. ¿En qué puedo asistirte hoy?';
+        } else if (message.toLowerCase().includes('gracias')) {
+          responseMessage = '¡De nada! 😊 Siempre es un placer ayudarte. ¿Hay algo más en lo que pueda asistirte?';
+        } else if (message.includes('?')) {
+          responseMessage = `Entiendo que preguntas: "${message}". En modo producción, analizaría los documentos que has subido para darte una respuesta precisa. Por ahora, te recomiendo probar subiendo documentos PDF o TXT para ver cómo funcionaría el sistema completo.`;
         }
 
         // Agregar respuesta del asistente
         const assistantMessage: ChatMessage = {
           role: 'assistant',
-          content: data.data.message,
+          content: responseMessage,
           timestamp: new Date(),
-          source: data.data.source,
+          source: uploadedDocuments.length > 0 ? uploadedDocuments[0] : undefined,
         };
 
         setMessages(prev => {
