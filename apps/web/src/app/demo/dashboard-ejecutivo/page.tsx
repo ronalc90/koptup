@@ -26,7 +26,7 @@ import {
   BuildingOfficeIcon,
 } from '@heroicons/react/24/outline';
 
-type ViewType = 'dashboard' | 'finanzas' | 'clientes' | 'configuracion';
+type ViewType = 'dashboard' | 'finanzas' | 'clientes' | 'configuracion' | 'notificaciones';
 
 export default function DashboardEjecutivo() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -797,6 +797,126 @@ export default function DashboardEjecutivo() {
     </div>
   );
 
+  const renderNotificacionesView = () => (
+    <div>
+      <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">
+        Todas las Notificaciones
+      </h2>
+
+      <div className="space-y-4">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6 border-l-4 border-blue-500">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+              <ChartBarIcon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+                Nuevo reporte financiero disponible
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400 mb-3">
+                El reporte financiero del mes de enero ya está listo para revisión. Incluye análisis de ventas, gastos y proyecciones.
+              </p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-slate-500">Hace 5 minutos</span>
+                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                  Ver Reporte
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6 border-l-4 border-green-500">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+              <ArrowTrendingUpIcon className="w-6 h-6 text-green-600 dark:text-green-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+                Meta de ventas alcanzada
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400 mb-3">
+                ¡Felicitaciones! El equipo de ventas ha superado la meta mensual con un 15% de incremento respecto al mes anterior.
+              </p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-slate-500">Hace 1 hora</span>
+                <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">
+                  Ver Detalles
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6 border-l-4 border-yellow-500">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center">
+              <Cog6ToothIcon className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+                Actualización de sistema programada
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400 mb-3">
+                Se realizará un mantenimiento del sistema el próximo sábado de 2:00 AM a 6:00 AM. El servicio estará temporalmente no disponible.
+              </p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-slate-500">Hace 2 horas</span>
+                <button className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-sm font-medium">
+                  Más Información
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6 border-l-4 border-purple-500">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
+              <UsersIcon className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+                Nuevo cliente registrado
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400 mb-3">
+                Un nuevo cliente se ha registrado en la plataforma: Empresa ABC S.A. - Plan Enterprise.
+              </p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-slate-500">Hace 3 horas</span>
+                <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium">
+                  Ver Cliente
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6 border-l-4 border-slate-500">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
+              <BellIcon className="w-6 h-6 text-slate-600 dark:text-slate-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+                Reunión de equipo programada
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400 mb-3">
+                Recordatorio: Reunión trimestral de equipo mañana a las 10:00 AM en la sala de conferencias principal.
+              </p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-slate-500">Hace 5 horas</span>
+                <button className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors text-sm font-medium">
+                  Agregar al Calendario
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       {/* Sidebar */}
@@ -1034,7 +1154,7 @@ export default function DashboardEjecutivo() {
                         <button
                           onClick={() => {
                             setShowNotifications(false);
-                            alert('Esta funcionalidad mostraría la página completa de notificaciones');
+                            setActiveView('notificaciones');
                           }}
                           className="w-full text-center text-sm font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400"
                         >
@@ -1078,6 +1198,7 @@ export default function DashboardEjecutivo() {
           {activeView === 'finanzas' && renderFinanzasView()}
           {activeView === 'clientes' && renderClientesView()}
           {activeView === 'configuracion' && renderConfiguracionView()}
+          {activeView === 'notificaciones' && renderNotificacionesView()}
         </main>
       </div>
     </div>
