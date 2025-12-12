@@ -127,6 +127,7 @@ const startServer = async () => {
         documentoConocimientoConfigRoutes,
         reglasFacturacionRoutes,
         liquidacionRoutes,
+        testRoutes,
       ] = await Promise.all([
         import('./routes/auth.routes'),
         import('./routes/document.routes'),
@@ -148,6 +149,7 @@ const startServer = async () => {
         import('./routes/documentoConocimientoConfig.routes'),
         import('./routes/reglas-facturacion.routes'),
         import('./routes/liquidacion.routes'),
+        import('./routes/test.routes'),
       ]);
 
       if (authRoutes.default) app.use('/api/auth', authRoutes.default);
@@ -170,6 +172,7 @@ const startServer = async () => {
       if (documentoConocimientoConfigRoutes.default) app.use('/api/documentos-conocimiento', documentoConocimientoConfigRoutes.default);
       if (reglasFacturacionRoutes.default) app.use('/api/reglas-facturacion', reglasFacturacionRoutes.default);
       if (liquidacionRoutes.default) app.use('/api/liquidacion', liquidacionRoutes.default);
+      if (testRoutes.default) app.use('/api/test', testRoutes.default);
 
       logger.info('Rutas registradas');
     } catch (err: any) {
