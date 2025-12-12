@@ -44,6 +44,13 @@ export default function DashboardEjecutivo() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
 
+  // Estados para modales de notificaciones
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [showSalesDetailModal, setShowSalesDetailModal] = useState(false);
+  const [showMaintenanceModal, setShowMaintenanceModal] = useState(false);
+  const [showClientModal, setShowClientModal] = useState(false);
+  const [showCalendarModal, setShowCalendarModal] = useState(false);
+
   // Cargar preferencias desde localStorage al montar
   useEffect(() => {
     const savedDarkMode = localStorage.getItem('darkMode') === 'true';
@@ -818,7 +825,10 @@ export default function DashboardEjecutivo() {
               </p>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-slate-500">Hace 5 minutos</span>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                <button
+                  onClick={() => setShowReportModal(true)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                >
                   Ver Reporte
                 </button>
               </div>
@@ -840,7 +850,10 @@ export default function DashboardEjecutivo() {
               </p>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-slate-500">Hace 1 hora</span>
-                <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">
+                <button
+                  onClick={() => setShowSalesDetailModal(true)}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                >
                   Ver Detalles
                 </button>
               </div>
@@ -862,7 +875,10 @@ export default function DashboardEjecutivo() {
               </p>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-slate-500">Hace 2 horas</span>
-                <button className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-sm font-medium">
+                <button
+                  onClick={() => setShowMaintenanceModal(true)}
+                  className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-sm font-medium"
+                >
                   Más Información
                 </button>
               </div>
@@ -884,7 +900,10 @@ export default function DashboardEjecutivo() {
               </p>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-slate-500">Hace 3 horas</span>
-                <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium">
+                <button
+                  onClick={() => setShowClientModal(true)}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+                >
                   Ver Cliente
                 </button>
               </div>
@@ -906,7 +925,10 @@ export default function DashboardEjecutivo() {
               </p>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-slate-500">Hace 5 horas</span>
-                <button className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors text-sm font-medium">
+                <button
+                  onClick={() => setShowCalendarModal(true)}
+                  className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors text-sm font-medium"
+                >
                   Agregar al Calendario
                 </button>
               </div>
@@ -1210,6 +1232,457 @@ export default function DashboardEjecutivo() {
           {activeView === 'notificaciones' && renderNotificacionesView()}
         </main>
       </div>
+
+      {/* Modal: Reporte Financiero */}
+      {showReportModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+                  Reporte Financiero - Enero 2024
+                </h2>
+                <button
+                  onClick={() => setShowReportModal(false)}
+                  className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                >
+                  <XMarkIcon className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Resumen Ejecutivo */}
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 rounded-xl p-6">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Resumen Ejecutivo</h3>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <div className="text-sm text-slate-600 dark:text-slate-400">Ingresos Totales</div>
+                      <div className="text-2xl font-bold text-green-600 dark:text-green-400">$2,450,000</div>
+                      <div className="text-xs text-green-600">↑ 23% vs. mes anterior</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-slate-600 dark:text-slate-400">Gastos Totales</div>
+                      <div className="text-2xl font-bold text-red-600 dark:text-red-400">$1,850,000</div>
+                      <div className="text-xs text-red-600">↑ 12% vs. mes anterior</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-slate-600 dark:text-slate-400">Utilidad Neta</div>
+                      <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">$600,000</div>
+                      <div className="text-xs text-blue-600">↑ 45% vs. mes anterior</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Análisis de Ventas */}
+                <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Análisis de Ventas</h3>
+                  <ul className="space-y-2 text-slate-700 dark:text-slate-300">
+                    <li>• Ventas por productos: $1,450,000 (59%)</li>
+                    <li>• Ventas por servicios: $780,000 (32%)</li>
+                    <li>• Otros ingresos: $220,000 (9%)</li>
+                    <li>• Clientes nuevos: 145 (+28%)</li>
+                    <li>• Tasa de retención: 87%</li>
+                  </ul>
+                </div>
+
+                {/* Gastos Operativos */}
+                <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Gastos Operativos</h3>
+                  <ul className="space-y-2 text-slate-700 dark:text-slate-300">
+                    <li>• Nómina: $980,000 (53%)</li>
+                    <li>• Infraestructura: $420,000 (23%)</li>
+                    <li>• Marketing: $280,000 (15%)</li>
+                    <li>• Administrativos: $170,000 (9%)</li>
+                  </ul>
+                </div>
+
+                {/* Proyecciones */}
+                <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950 dark:to-blue-950 rounded-xl p-6">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Proyecciones Febrero 2024</h3>
+                  <ul className="space-y-2 text-slate-700 dark:text-slate-300">
+                    <li>• Ingresos proyectados: $2,680,000 (+9%)</li>
+                    <li>• Utilidad estimada: $720,000 (+20%)</li>
+                    <li>• Nuevos contratos esperados: 35</li>
+                  </ul>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowReportModal(false)}
+                    className="flex-1 px-6 py-3 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors font-semibold"
+                  >
+                    Cerrar
+                  </button>
+                  <button className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                    Descargar PDF
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Detalles de Ventas */}
+      {showSalesDetailModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+                  Meta de Ventas Alcanzada 🎉
+                </h2>
+                <button
+                  onClick={() => setShowSalesDetailModal(false)}
+                  className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                >
+                  <XMarkIcon className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 rounded-xl p-6">
+                  <div className="text-center">
+                    <div className="text-5xl font-bold text-green-600 dark:text-green-400 mb-2">115%</div>
+                    <div className="text-lg text-slate-700 dark:text-slate-300">de la meta mensual</div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
+                    <div className="text-sm text-slate-600 dark:text-slate-400">Meta Establecida</div>
+                    <div className="text-2xl font-bold text-slate-900 dark:text-white">$2,000,000</div>
+                  </div>
+                  <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
+                    <div className="text-sm text-slate-600 dark:text-slate-400">Ventas Logradas</div>
+                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">$2,300,000</div>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Top Vendedores</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full flex items-center justify-center text-white font-bold">
+                          1
+                        </div>
+                        <div>
+                          <div className="font-semibold text-slate-900 dark:text-white">María González</div>
+                          <div className="text-sm text-slate-500">$580,000</div>
+                        </div>
+                      </div>
+                      <div className="text-green-600 font-semibold">+28%</div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-slate-400 to-slate-500 rounded-full flex items-center justify-center text-white font-bold">
+                          2
+                        </div>
+                        <div>
+                          <div className="font-semibold text-slate-900 dark:text-white">Carlos Ramírez</div>
+                          <div className="text-sm text-slate-500">$520,000</div>
+                        </div>
+                      </div>
+                      <div className="text-green-600 font-semibold">+22%</div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-amber-600 to-amber-700 rounded-full flex items-center justify-center text-white font-bold">
+                          3
+                        </div>
+                        <div>
+                          <div className="font-semibold text-slate-900 dark:text-white">Ana Martínez</div>
+                          <div className="text-sm text-slate-500">$485,000</div>
+                        </div>
+                      </div>
+                      <div className="text-green-600 font-semibold">+19%</div>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setShowSalesDetailModal(false)}
+                  className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Mantenimiento */}
+      {showMaintenanceModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-2xl w-full">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+                  Mantenimiento Programado
+                </h2>
+                <button
+                  onClick={() => setShowMaintenanceModal(false)}
+                  className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                >
+                  <XMarkIcon className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div className="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-950 dark:to-amber-950 rounded-xl p-6">
+                  <div className="flex items-center gap-4 mb-4">
+                    <ExclamationTriangleIcon className="w-12 h-12 text-yellow-600 dark:text-yellow-400" />
+                    <div>
+                      <h3 className="text-lg font-bold text-slate-900 dark:text-white">Atención</h3>
+                      <p className="text-slate-700 dark:text-slate-300">El sistema no estará disponible durante el mantenimiento</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Detalles del Mantenimiento</h3>
+                  <div className="space-y-3 text-slate-700 dark:text-slate-300">
+                    <div className="flex items-start gap-3">
+                      <CalendarIcon className="w-5 h-5 text-slate-500 mt-0.5" />
+                      <div>
+                        <div className="font-semibold">Fecha</div>
+                        <div>Sábado 3 de Febrero, 2024</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <ClockIcon className="w-5 h-5 text-slate-500 mt-0.5" />
+                      <div>
+                        <div className="font-semibold">Horario</div>
+                        <div>2:00 AM - 6:00 AM (4 horas)</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Cog6ToothIcon className="w-5 h-5 text-slate-500 mt-0.5" />
+                      <div>
+                        <div className="font-semibold">Tipo de Mantenimiento</div>
+                        <div>Actualización de servidores y optimización de base de datos</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 dark:bg-blue-950 rounded-xl p-4">
+                  <h4 className="font-semibold text-slate-900 dark:text-white mb-2">Recomendaciones</h4>
+                  <ul className="space-y-1 text-sm text-slate-700 dark:text-slate-300">
+                    <li>• Guarda todo tu trabajo antes del mantenimiento</li>
+                    <li>• Descarga los reportes que necesites</li>
+                    <li>• Planifica tareas fuera del horario de mantenimiento</li>
+                  </ul>
+                </div>
+
+                <button
+                  onClick={() => setShowMaintenanceModal(false)}
+                  className="w-full px-6 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors font-semibold"
+                >
+                  Entendido
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Cliente Nuevo */}
+      {showClientModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-3xl w-full">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+                  Nuevo Cliente Registrado
+                </h2>
+                <button
+                  onClick={() => setShowClientModal(false)}
+                  className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                >
+                  <XMarkIcon className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950 dark:to-indigo-950 rounded-xl p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                      ABC
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-slate-900 dark:text-white">Empresa ABC S.A.</h3>
+                      <p className="text-slate-700 dark:text-slate-300">Plan Enterprise</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
+                    <div className="flex items-center gap-2 mb-2">
+                      <BuildingOfficeIcon className="w-5 h-5 text-slate-500" />
+                      <div className="text-sm text-slate-600 dark:text-slate-400">Industria</div>
+                    </div>
+                    <div className="font-semibold text-slate-900 dark:text-white">Tecnología</div>
+                  </div>
+                  <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
+                    <div className="flex items-center gap-2 mb-2">
+                      <UsersIcon className="w-5 h-5 text-slate-500" />
+                      <div className="text-sm text-slate-600 dark:text-slate-400">Empleados</div>
+                    </div>
+                    <div className="font-semibold text-slate-900 dark:text-white">250-500</div>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Información de Contacto</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <EnvelopeIcon className="w-5 h-5 text-slate-500" />
+                      <div>
+                        <div className="text-sm text-slate-600 dark:text-slate-400">Email</div>
+                        <div className="font-semibold text-slate-900 dark:text-white">contacto@empresaabc.com</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <PhoneIcon className="w-5 h-5 text-slate-500" />
+                      <div>
+                        <div className="text-sm text-slate-600 dark:text-slate-400">Teléfono</div>
+                        <div className="font-semibold text-slate-900 dark:text-white">+57 300 123 4567</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <MapPinIcon className="w-5 h-5 text-slate-500" />
+                      <div>
+                        <div className="text-sm text-slate-600 dark:text-slate-400">Ubicación</div>
+                        <div className="font-semibold text-slate-900 dark:text-white">Bogotá, Colombia</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-green-50 dark:bg-green-950 rounded-xl p-4">
+                  <h4 className="font-semibold text-slate-900 dark:text-white mb-2">Plan Enterprise</h4>
+                  <ul className="space-y-1 text-sm text-slate-700 dark:text-slate-300">
+                    <li>• Usuarios ilimitados</li>
+                    <li>• Almacenamiento: 5TB</li>
+                    <li>• Soporte prioritario 24/7</li>
+                    <li>• Integraciones personalizadas</li>
+                  </ul>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowClientModal(false)}
+                    className="flex-1 px-6 py-3 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors font-semibold"
+                  >
+                    Cerrar
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowClientModal(false);
+                      setActiveView('clientes');
+                    }}
+                    className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold"
+                  >
+                    Ver en Clientes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Agregar al Calendario */}
+      {showCalendarModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-xl w-full">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+                  Agregar al Calendario
+                </h2>
+                <button
+                  onClick={() => setShowCalendarModal(false)}
+                  className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                >
+                  <XMarkIcon className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-xl p-6">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Reunión Trimestral de Equipo</h3>
+                  <div className="space-y-2 text-slate-700 dark:text-slate-300">
+                    <div className="flex items-center gap-2">
+                      <CalendarIcon className="w-5 h-5 text-slate-500" />
+                      <span>Mañana - 3 de Febrero, 2024</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <ClockIcon className="w-5 h-5 text-slate-500" />
+                      <span>10:00 AM - 12:00 PM</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MapPinIcon className="w-5 h-5 text-slate-500" />
+                      <span>Sala de Conferencias Principal</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
+                  <h4 className="font-semibold text-slate-900 dark:text-white mb-3">Agenda</h4>
+                  <ul className="space-y-2 text-sm text-slate-700 dark:text-slate-300">
+                    <li>• Revisión de resultados Q1 2024</li>
+                    <li>• Objetivos para Q2 2024</li>
+                    <li>• Actualización de proyectos en curso</li>
+                    <li>• Discusión de nuevas iniciativas</li>
+                    <li>• Sesión de preguntas y respuestas</li>
+                  </ul>
+                </div>
+
+                <div className="bg-blue-50 dark:bg-blue-950 rounded-xl p-4">
+                  <h4 className="font-semibold text-slate-900 dark:text-white mb-2">Participantes</h4>
+                  <div className="flex -space-x-2">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-xs font-bold border-2 border-white dark:border-slate-900">
+                      JD
+                    </div>
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center text-white text-xs font-bold border-2 border-white dark:border-slate-900">
+                      MG
+                    </div>
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white text-xs font-bold border-2 border-white dark:border-slate-900">
+                      CR
+                    </div>
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold border-2 border-white dark:border-slate-900">
+                      +12
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowCalendarModal(false)}
+                    className="flex-1 px-6 py-3 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors font-semibold"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowCalendarModal(false);
+                      alert('¡Evento agregado al calendario! 📅');
+                    }}
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-colors font-semibold"
+                  >
+                    Confirmar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
