@@ -84,7 +84,7 @@ const AtencionSchema = new Schema<IAtencion>(
       },
     },
     diagnosticoPrincipal: {
-      codigoCIE10: { type: String, required: true, index: true },
+      codigoCIE10: { type: String, required: true },
       descripcion: { type: String, required: true },
     },
     diagnosticosSecundarios: [{
