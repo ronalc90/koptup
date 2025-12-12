@@ -544,16 +544,16 @@ async function importToDatabase(medicamentos: MedicamentoData[]) {
               precioVenta: item.precioVenta || 0,
               activo: true,
               metadata: {
-                indicaciones: '',
-                contraindicaciones: '',
-                efectosSecundarios: '',
+                indicaciones: [],
+                contraindicaciones: [],
+                efectosSecundarios: [],
                 dosis: '',
               },
             },
           },
           upsert: true,
         },
-      }));
+      }) as any);
 
       const result = await Medicamento.bulkWrite(operations);
 
