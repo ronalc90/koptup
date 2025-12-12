@@ -3,6 +3,7 @@ import { validationResult } from 'express-validator';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
 import Contact from '../models/Contact';
 import { logger } from '../utils/logger';
+import { whatsappService } from '../services/whatsapp.service';
 
 export const submitContact = asyncHandler(async (req: Request, res: Response) => {
   const errors = validationResult(req);
@@ -12,6 +13,7 @@ export const submitContact = asyncHandler(async (req: Request, res: Response) =>
 
   const { name, email, subject, message } = req.body;
 
+  // Guardar en base de datos
   await Contact.create({
     name,
     email,
@@ -21,6 +23,17 @@ export const submitContact = asyncHandler(async (req: Request, res: Response) =>
   });
 
   logger.info(`Contact form submitted: ${email}`);
+
+  // Enviar notificación por WhatsApp (async, no bloqueante)
+  whatsappService.sendContactNotification({
+    name,
+    email,
+    subject,
+    message,
+  }).catch((err) => {
+    logger.error('Failed to send WhatsApp notification:', err);
+    // No fallar la petición si WhatsApp falla
+  });
 
   res.json({
     success: true,

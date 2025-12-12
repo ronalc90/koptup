@@ -17,9 +17,103 @@ const poppins = Poppins({
 });
 
 export const metadata = {
-  title: 'KopTup - Soluciones Tecnológicas a Medida',
+  metadataBase: new URL('https://koptup.com'),
+  title: {
+    default: 'KopTup - Auditoría Médica con IA | Glosas y Facturación en Salud',
+    template: '%s | KopTup',
+  },
   description:
-    'Desarrollamos software a medida, e-commerce, chatbots inteligentes, aplicaciones móviles y más. Innovación que impulsa tu negocio.',
+    'Plataforma líder en auditoría médica automatizada con IA. Gestión de glosas, facturación hospitalaria, liquidación de cuentas médicas y análisis de tarifas SOAT, ISS y contratos EPS. Soluciones tecnológicas para IPS, hospitales y clínicas en Colombia.',
+  keywords: [
+    'auditoría médica',
+    'glosas médicas',
+    'facturación en salud',
+    'liquidación cuentas médicas',
+    'auditoría con IA',
+    'gestión glosas hospitalarias',
+    'tarifas SOAT',
+    'tarifas ISS',
+    'contratos EPS',
+    'Nueva EPS',
+    'Salud Total',
+    'Compensar',
+    'facturación hospitalaria',
+    'sistema de salud Colombia',
+    'IPS Colombia',
+    'hospitales Colombia',
+    'software médico',
+    'automatización salud',
+    'auditoría automatizada',
+    'ley 100',
+    'resolución 3047',
+    'CUPS',
+    'CIE-10',
+    'radicación cuentas médicas',
+    'validación facturas médicas',
+    'glosas administrativas',
+    'glosas técnicas',
+    'optimización facturación médica',
+    'reducción glosas',
+    'inteligencia artificial salud',
+    'chatbot médico',
+    'asistente virtual salud',
+    'gestión documental médica',
+    'análisis de procedimientos médicos',
+  ],
+  authors: [{ name: 'KopTup' }],
+  creator: 'KopTup',
+  publisher: 'KopTup',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'es_CO',
+    url: 'https://koptup.com',
+    siteName: 'KopTup',
+    title: 'KopTup - Auditoría Médica con IA | Glosas y Facturación en Salud',
+    description:
+      'Automatiza la auditoría médica, gestiona glosas y optimiza la facturación en salud con inteligencia artificial. Soluciones para IPS, hospitales y clínicas en Colombia.',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'KopTup - Auditoría Médica con IA',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'KopTup - Auditoría Médica con IA | Glosas y Facturación en Salud',
+    description:
+      'Automatiza la auditoría médica, gestiona glosas y optimiza la facturación en salud con inteligencia artificial.',
+    images: ['/og-image.png'],
+    creator: '@koptup',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: 'google-site-verification-code', // Replace with actual code from Google Search Console
+  },
+  alternates: {
+    canonical: 'https://koptup.com',
+    languages: {
+      'es-CO': 'https://koptup.com',
+      'en-US': 'https://koptup.com/en',
+    },
+  },
 };
 
 // Load messages based on locale

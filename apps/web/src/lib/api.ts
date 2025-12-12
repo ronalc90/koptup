@@ -62,13 +62,6 @@ class ApiClient {
         const isAuthEndpoint = originalRequest.url?.includes('/api/auth/login') ||
                                originalRequest.url?.includes('/api/auth/register');
 
-        // Suppress console errors for expected failures (404, 401 when backend is down)
-        // This prevents cluttering the console when using fallback data
-        const isSuppressibleError =
-          error.response?.status === 404 ||
-          (error.response?.status === 401 && !Cookies.get('accessToken')) ||
-          error.code === 'ERR_NETWORK';
-
         // Handle 401 errors (token expired) - but not for auth endpoints
         if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint && Cookies.get('accessToken')) {
           originalRequest._retry = true;
@@ -89,6 +82,15 @@ class ApiClient {
             return Promise.reject(refreshError);
           }
         }
+
+        // Suppress console errors for expected failures (404, 401 when backend is down)
+        // BUT NOT for auth endpoints - we want those errors to be handled properly
+        const isSuppressibleError =
+          !isAuthEndpoint && (
+            error.response?.status === 404 ||
+            (error.response?.status === 401 && !Cookies.get('accessToken')) ||
+            error.code === 'ERR_NETWORK'
+          );
 
         // Create a custom error that won't log to console for suppressible errors
         if (isSuppressibleError) {
@@ -133,13 +135,35 @@ class ApiClient {
 
   // Auth endpoints
   async login(email: string, password: string) {
-    const response = await this.client.post('/api/auth/login', { email, password });
-    const { accessToken, refreshToken, user } = response.data.data;
+    try {
+      const response = await this.client.post('/api/auth/login', { email, password });
+      const { accessToken, refreshToken, user } = response.data.data;
 
-    Cookies.set('accessToken', accessToken, { expires: 1/96 }); // 15 minutes
-    Cookies.set('refreshToken', refreshToken, { expires: 7 }); // 7 days
+      Cookies.set('accessToken', accessToken, { expires: 1/96 }); // 15 minutes
+      Cookies.set('refreshToken', refreshToken, { expires: 7 }); // 7 days
 
-    return { user };
+      return { user };
+    } catch (error: any) {
+      // Crear un error completamente nuevo con mensaje amigable
+      if (error.response?.status === 401) {
+        // No usar el error original, crear uno completamente nuevo
+        const newError: any = new Error('El correo electrónico o la contraseña son incorrectos. Si no tienes cuenta, regístrate primero.');
+        newError.response = {
+          status: 401,
+          data: { message: 'El correo electrónico o la contraseña son incorrectos. Si no tienes cuenta, regístrate primero.' }
+        };
+        // Suprimir el log de consola del error original
+        throw newError;
+      }
+
+      // Para otros errores de red
+      if (error.code === 'ERR_NETWORK' || !error.response) {
+        const newError = new Error('No se pudo conectar con el servidor. Por favor verifica tu conexión a internet.');
+        throw newError;
+      }
+
+      throw error;
+    }
   }
 
   async logout() {
@@ -417,6 +441,10 @@ class ApiClient {
 
   put<T = any>(url: string, data?: any, config?: AxiosRequestConfig) {
     return this.client.put<T>(url, data, config);
+  }
+
+  patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig) {
+    return this.client.patch<T>(url, data, config);
   }
 
   delete<T = any>(url: string, config?: AxiosRequestConfig) {

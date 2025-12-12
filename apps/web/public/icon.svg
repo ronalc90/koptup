@@ -1,0 +1,30 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#iconGradient)"/>
+
+  <!-- Medical Cross -->
+  <path d="M256 140C256 129.954 247.046 121 237 121H218C207.954 121 199 129.954 199 140V199H140C129.954 199 121 207.954 121 218V237C121 247.046 129.954 256 140 256H199V315C199 325.046 207.954 334 218 334H237C247.046 334 256 325.046 256 315V256H315C325.046 256 334 247.046 334 237V218C334 207.954 325.046 199 315 199H256V140Z" fill="white"/>
+
+  <!-- AI Circuit accents -->
+  <g opacity="0.4">
+    <circle cx="370" cy="142" r="12" fill="white"/>
+    <circle cx="370" cy="370" r="12" fill="white"/>
+    <circle cx="142" cy="370" r="12" fill="white"/>
+    <line x1="334" y1="199" x2="358" y2="154" stroke="white" stroke-width="4" stroke-linecap="round"/>
+    <line x1="334" y1="256" x2="358" y2="358" stroke="white" stroke-width="4" stroke-linecap="round"/>
+    <line x1="199" y1="334" x2="154" y2="358" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <!-- K letter accent -->
+  <g opacity="0.9">
+    <line x1="380" y1="200" x2="380" y2="280" stroke="white" stroke-width="16" stroke-linecap="round"/>
+    <path d="M380 220L420 190M380 260L420 290" stroke="white" stroke-width="16" stroke-linecap="round"/>
+  </g>
+
+  <defs>
+    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1E40AF;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>

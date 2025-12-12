@@ -65,7 +65,17 @@
       "Bash(kill:*)",
       "Bash(xargs kill -9)",
       "Bash(export MONGODB_URI=\"mongodb://mongo:QTaKycIfxXPWhlXWuRkzTzHxtCFBreSM@trolley.proxy.rlwy.net:11709/koptup?authSource=admin\")",
-      "Bash(xattr:*)"
+      "Bash(xattr:*)",
+      "Bash(openssl s_client:*)",
+      "Bash(openssl x509:*)",
+      "Bash(dig:*)",
+      "Bash(vercel --version:*)",
+      "Bash(chmod:*)",
+      "Bash(grep:*)",
+      "Bash(mongo --version:*)",
+      "Bash(mongosh --version:*)",
+      "Bash(npm start)",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []

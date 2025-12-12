@@ -45,7 +45,24 @@ export default function LoginPage() {
       // Redirect to dashboard
       router.push('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || t('errorFields'));
+      // Manejo amigable de errores
+      let friendlyMessage = t('errorFields');
+
+      // Primero intentar obtener el mensaje amigable que ya viene del api.ts
+      if (err.message && !err.message.includes('Request failed with status code')) {
+        // Si el mensaje no es el mensaje técnico de axios, usarlo
+        friendlyMessage = err.message;
+      } else if (err.response?.data?.message) {
+        friendlyMessage = err.response.data.message;
+      } else if (err.response?.status === 401) {
+        friendlyMessage = 'El correo electrónico o la contraseña son incorrectos. Si no tienes cuenta, regístrate primero.';
+      } else if (err.response?.status === 404) {
+        friendlyMessage = 'No encontramos una cuenta con este correo. ¿Quieres crear una cuenta nueva?';
+      } else if (err.code === 'ERR_NETWORK') {
+        friendlyMessage = 'No se pudo conectar con el servidor. Por favor verifica tu conexión a internet.';
+      }
+
+      setError(friendlyMessage);
       setIsLoading(false);
     }
   };
@@ -92,7 +109,17 @@ export default function LoginPage() {
             {/* Error Message */}
             {error && (
               <div className="mb-6 p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">
-                <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+                <p className="text-sm text-red-600 dark:text-red-400">
+                  {error}
+                  {error.includes('regístrate') && (
+                    <>
+                      {' '}
+                      <Link href="/register" className="font-semibold underline hover:text-red-700 dark:hover:text-red-300">
+                        Crear cuenta
+                      </Link>
+                    </>
+                  )}
+                </p>
               </div>
             )}
 
