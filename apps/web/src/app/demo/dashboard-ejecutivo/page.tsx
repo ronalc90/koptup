@@ -11,6 +11,7 @@ import {
   BellIcon,
   MagnifyingGlassIcon,
   CalendarIcon,
+  ClockIcon,
   HomeIcon,
   CreditCardIcon,
   UserGroupIcon,

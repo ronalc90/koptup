@@ -1128,6 +1128,7 @@ Total de guías implementadas: 125`
       return () => {
         document.body.style.overflow = 'unset';
       };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mostrarModalCrear]);
 
     if (!mostrarModalCrear) return null;
@@ -1355,11 +1356,13 @@ Total de guías implementadas: 125`
       return () => {
         document.body.style.overflow = 'unset';
       };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mostrarModalDocumento]);
 
     useEffect(() => {
       // Limpiar búsqueda al cambiar de documento
       setSearchTerm('');
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [documentoSeleccionado]);
 
     if (!mostrarModalDocumento || !documentoSeleccionado) return null;
