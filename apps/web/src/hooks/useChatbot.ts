@@ -193,6 +193,7 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
         body: JSON.stringify({
           sessionId,
           message,
+          restrictedTopics: config.restrictedTopics || [],
         }),
       });
 
