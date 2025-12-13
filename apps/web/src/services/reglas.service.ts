@@ -122,4 +122,5 @@ class ReglasService {
   }
 }
 
-export default new ReglasService();
+const reglasServiceInstance = new ReglasService();
+export default reglasServiceInstance;

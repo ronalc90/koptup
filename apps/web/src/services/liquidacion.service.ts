@@ -180,4 +180,5 @@ class LiquidacionService {
   }
 }
 
-export default new LiquidacionService();
+const liquidacionServiceInstance = new LiquidacionService();
+export default liquidacionServiceInstance;

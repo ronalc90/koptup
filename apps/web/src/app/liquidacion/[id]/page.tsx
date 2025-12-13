@@ -18,6 +18,7 @@ export default function DetalleRadicadoPage() {
     if (params.id) {
       cargarRadicado(params.id as string);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id]);
 
   const cargarRadicado = async (id: string) => {
