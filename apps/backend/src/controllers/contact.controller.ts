@@ -11,24 +11,30 @@ export const submitContact = asyncHandler(async (req: Request, res: Response) =>
     throw new AppError('Validation error', 400);
   }
 
-  const { name, email, subject, message } = req.body;
+  const { name, email, phone, company, service, budget, message } = req.body;
 
   // Guardar en base de datos
   await Contact.create({
     name,
     email,
-    subject,
+    phone,
+    company,
+    service,
+    budget,
     message,
     status: 'new',
   });
 
-  logger.info(`Contact form submitted: ${email}`);
+  logger.info(`Contact form submitted: ${email} - Service: ${service}`);
 
   // Enviar notificación por WhatsApp (async, no bloqueante)
   whatsappService.sendContactNotification({
     name,
     email,
-    subject,
+    phone,
+    company,
+    service,
+    budget,
     message,
   }).catch((err) => {
     logger.error('Failed to send WhatsApp notification:', err);
