@@ -78,7 +78,10 @@ class WhatsAppService {
   async sendContactNotification(contactData: {
     name: string;
     email: string;
-    subject: string;
+    phone?: string;
+    company?: string;
+    service: string;
+    budget?: string;
     message: string;
   }): Promise<boolean> {
     if (!this.isConfigured()) {
@@ -112,20 +115,38 @@ class WhatsAppService {
   private formatContactMessage(data: {
     name: string;
     email: string;
-    subject: string;
+    phone?: string;
+    company?: string;
+    service: string;
+    budget?: string;
     message: string;
   }): string {
-    return `🔔 *Nuevo Formulario de Contacto - KopTup*
+    let msg = `🔔 *Nuevo Formulario de Contacto - KopTup*
 
 👤 *Nombre:* ${data.name}
-📧 *Email:* ${data.email}
-📋 *Asunto:* ${data.subject}
+📧 *Email:* ${data.email}`;
 
-💬 *Mensaje:*
+    if (data.phone) {
+      msg += `\n📱 *Teléfono:* ${data.phone}`;
+    }
+
+    if (data.company) {
+      msg += `\n🏢 *Empresa:* ${data.company}`;
+    }
+
+    msg += `\n💼 *Servicio:* ${data.service}`;
+
+    if (data.budget) {
+      msg += `\n💰 *Presupuesto:* ${data.budget}`;
+    }
+
+    msg += `\n\n💬 *Mensaje:*
 ${data.message}
 
 ---
 ⏰ ${new Date().toLocaleString('es-ES', { timeZone: 'America/Bogota' })}`;
+
+    return msg;
   }
 
   /**
@@ -220,8 +241,11 @@ ${data.message}
     return await this.sendContactNotification({
       name: 'Test User',
       email: 'test@example.com',
-      subject: 'Test Subject',
-      message: 'This is a test notification from KopTup',
+      phone: '+57 300 123 4567',
+      company: 'Test Company',
+      service: 'Desarrollo Web',
+      budget: '$5,000 - $10,000',
+      message: 'This is a test notification from KopTup contact form',
     });
   }
 }
