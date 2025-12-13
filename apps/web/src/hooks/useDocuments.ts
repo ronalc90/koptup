@@ -109,6 +109,7 @@ export function useDocuments(view: ViewType = 'all', selectedFolder?: string) {
   useEffect(() => {
     fetchFolders();
     fetchStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const uploadDocument = useCallback(
