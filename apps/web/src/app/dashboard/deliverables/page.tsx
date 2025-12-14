@@ -142,6 +142,39 @@ export default function DeliverablesPage() {
     }
   };
 
+  const downloadDeliverable = async (id: string) => {
+    try {
+      const data = await api.getDeliverableById(id);
+      const url = (data?.fileUrl || '').toString();
+      if (url) {
+        window.open(url, '_blank');
+      } else {
+        console.warn('No se recibió URL del entregable');
+      }
+    } catch (error) {
+      console.error('Error al descargar el entregable', error);
+    }
+  };
+
+  const approve = async (id: string) => {
+    try {
+      await api.approveDeliverable(id);
+      await loadDeliverables();
+    } catch (error) {
+      console.error('Error al aprobar el entregable', error);
+    }
+  };
+
+  const reject = async (id: string) => {
+    try {
+      const comments = prompt('Comentarios de rechazo') || 'Rechazado por el usuario';
+      await api.rejectDeliverable(id, comments);
+      await loadDeliverables();
+    } catch (error) {
+      console.error('Error al rechazar el entregable', error);
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const badges: Record<string, { className: string; text: string; icon: any }> = {
       approved: {
@@ -341,15 +374,25 @@ export default function DeliverablesPage() {
                       </div>
 
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" onClick={() => downloadDeliverable(deliverable.id)}>
                           <EyeIcon className="h-4 w-4" />
                         </Button>
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" onClick={() => downloadDeliverable(deliverable.id)}>
                           <ArrowDownTrayIcon className="h-4 w-4" />
                         </Button>
                         <Button variant="outline" size="sm">
                           <ChatBubbleLeftIcon className="h-4 w-4" />
                         </Button>
+                        {deliverable.status === 'in_review' && (
+                          <>
+                            <Button variant="primary" size="sm" onClick={() => approve(deliverable.id)}>
+                              Aprobar
+                            </Button>
+                            <Button variant="danger" size="sm" onClick={() => reject(deliverable.id)}>
+                              Rechazar
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </div>
                   ))}

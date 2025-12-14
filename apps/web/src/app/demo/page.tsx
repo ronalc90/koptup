@@ -64,77 +64,77 @@ export default function DemosPage() {
     },
     {
       id: 'dashboard-ejecutivo',
-      title: 'Dashboard Ejecutivo Empresarial',
-      description: 'Panel de control premium estilo CEO con KPIs, gráficos y analytics en tiempo real',
+      title: t('executive.title'),
+      description: t('executive.description'),
       icon: ChartBarIcon,
       href: '/demo/dashboard-ejecutivo',
       color: 'from-purple-600 to-purple-800',
-      badge: 'Nuevo',
+      badge: t('executive.badge'),
       features: [
-        'Tarjetas KPI con animaciones suaves',
-        'Gráficos interactivos de ingresos y desempeño',
-        'Insights inteligentes y recomendaciones',
-        'Sidebar moderno con navegación premium',
+        t('executive.features.0'),
+        t('executive.features.1'),
+        t('executive.features.2'),
+        t('executive.features.3'),
       ],
     },
     {
       id: 'gestor-documentos',
-      title: 'Gestor de Documentos con IA',
-      description: 'Organiza y busca archivos de forma inteligente con búsqueda semántica',
+      title: t('documents.title'),
+      description: t('documents.description'),
       icon: DocumentTextIcon,
       href: '/demo/gestor-documentos',
       color: 'from-blue-600 to-blue-800',
-      badge: 'Nuevo',
+      badge: t('documents.badge'),
       features: [
-        'Búsqueda semántica avanzada',
-        'Previsualizador PDF elegante',
-        'Resumen automático con IA',
-        'Comparación de documentos',
+        t('documents.features.0'),
+        t('documents.features.1'),
+        t('documents.features.2'),
+        t('documents.features.3'),
       ],
     },
     {
       id: 'sistema-reservas',
-      title: 'Sistema de Reservas Profesional',
-      description: 'Plataforma moderna de reservas estilo Booking Premium para servicios',
+      title: t('reservations.title'),
+      description: t('reservations.description'),
       icon: CalendarIcon,
       href: '/demo/sistema-reservas',
       color: 'from-orange-600 to-orange-800',
-      badge: 'Nuevo',
+      badge: t('reservations.badge'),
       features: [
-        'Calendario interactivo mensual y semanal',
-        'Flujo de reserva optimizado',
-        'Panel de gestión de reservas',
-        'Sistema de estados y confirmaciones',
+        t('reservations.features.0'),
+        t('reservations.features.1'),
+        t('reservations.features.2'),
+        t('reservations.features.3'),
       ],
     },
     {
       id: 'gestor-contenido',
-      title: 'Gestor de Contenido Corporativo',
-      description: 'Crea textos empresariales profesionales con plantillas y asistencia de IA',
+      title: t('contentManager.title'),
+      description: t('contentManager.description'),
       icon: PencilSquareIcon,
       href: '/demo/gestor-contenido',
       color: 'from-pink-600 to-pink-800',
-      badge: 'Nuevo',
+      badge: t('contentManager.badge'),
       features: [
-        'Plantillas corporativas prediseñadas',
-        'Editor profesional con previsualización',
-        'Herramientas de IA para mejorar textos',
-        'Exportación PDF y Word',
+        t('contentManager.features.0'),
+        t('contentManager.features.1'),
+        t('contentManager.features.2'),
+        t('contentManager.features.3'),
       ],
     },
     {
       id: 'control-proyectos',
-      title: 'Sistema de Control de Proyectos',
-      description: 'Gestiona proyectos y tareas con tablero Kanban estilo Trello Premium',
+      title: t('projects.title'),
+      description: t('projects.description'),
       icon: RectangleStackIcon,
       href: '/demo/control-proyectos',
       color: 'from-teal-600 to-teal-800',
-      badge: 'Nuevo',
+      badge: t('projects.badge'),
       features: [
-        'Tablero Kanban con drag & drop',
-        'Gestión de tareas con prioridades',
-        'Vista de calendario y progreso',
-        'Comentarios y archivos adjuntos',
+        t('projects.features.0'),
+        t('projects.features.1'),
+        t('projects.features.2'),
+        t('projects.features.3'),
       ],
     },
   ];
@@ -144,7 +144,7 @@ export default function DemosPage() {
     if (accessCode === '2020') {
       router.push('/demo/cuentas-medicas');
     } else {
-      setError('Código inválido. Por favor intente nuevamente.');
+      setError(t('accessModal.error'));
     }
   };
 
@@ -188,7 +188,7 @@ export default function DemosPage() {
                   >
                     <CardContent className="p-0">
                       {/* Header with gradient */}
-                      <div className={`bg-gradient-to-br ${demo.color} p-8 relative overflow-hidden`}>
+                      <div className={`bg-gradient-to-br ${demo.color} p-6 sm:p-8 relative overflow-hidden`}>
                         <div className="absolute inset-0 bg-grid-pattern opacity-10" />
                         <div className="relative">
                           <div className="flex items-start justify-between mb-4">
@@ -209,7 +209,7 @@ export default function DemosPage() {
                       </div>
 
                       {/* Features List */}
-                      <div className="p-8">
+                      <div className="p-6 sm:p-8">
                         <h3 className="text-sm font-semibold text-secondary-600 dark:text-secondary-400 uppercase tracking-wide mb-4">
                           {t('includes')}
                         </h3>
@@ -267,7 +267,7 @@ export default function DemosPage() {
                     className="inline-flex items-center gap-2 px-6 py-3 bg-secondary-600 hover:bg-secondary-700 text-white font-medium rounded-lg transition-colors"
                   >
                     <KeyIcon className="h-4 w-4" />
-                    Acceso con Código
+                    {t('accessModal.openButton')}
                   </button>
                 </div>
               </CardContent>
@@ -292,7 +292,7 @@ export default function DemosPage() {
                       <LockClosedIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
                     </div>
                     <h3 className="text-xl font-bold text-secondary-900 dark:text-white">
-                      Acceso con Código
+                      {t('accessModal.title')}
                     </h3>
                   </div>
                   <button
@@ -304,20 +304,20 @@ export default function DemosPage() {
                 </div>
 
                 <p className="text-secondary-600 dark:text-secondary-400 mb-6">
-                  Ingrese el código de acceso para ver demos personalizados para su producto.
+                  {t('accessModal.description')}
                 </p>
 
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                      Código de Acceso
+                      {t('accessModal.label')}
                     </label>
                     <input
                       type="text"
                       value={accessCode}
                       onChange={(e) => setAccessCode(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleCodeSubmit()}
-                      placeholder="Ingrese su código"
+                      placeholder={t('accessModal.placeholder')}
                       className="w-full px-4 py-3 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                     />
                   </div>
@@ -334,21 +334,21 @@ export default function DemosPage() {
                       variant="outline"
                       className="flex-1"
                     >
-                      Cancelar
+                      {t('accessModal.cancel')}
                     </Button>
                     <Button
                       onClick={handleCodeSubmit}
                       variant="primary"
                       className="flex-1"
                     >
-                      Acceder
+                      {t('accessModal.access')}
                     </Button>
                   </div>
                 </div>
 
                 <div className="mt-6 pt-6 border-t border-secondary-200 dark:border-secondary-700">
                   <p className="text-xs text-secondary-500 dark:text-secondary-500 text-center">
-                    ¿No tienes un código? Contacta con nuestro equipo de ventas.
+                    {t('accessModal.noCodeHint')}
                   </p>
                 </div>
               </CardContent>

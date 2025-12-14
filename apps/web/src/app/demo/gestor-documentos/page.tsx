@@ -23,10 +23,12 @@ import {
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import { useDocuments, Document as DocumentType } from '@/hooks/useDocuments';
+import { useTranslations } from 'next-intl';
 
 type ViewType = 'all' | 'favorites' | 'recent' | 'trash' | 'settings' | 'folder';
 
 export default function GestorDocumentos() {
+  const t = useTranslations('docManager');
   const [activeView, setActiveView] = useState<ViewType>('all');
   const [selectedFolder, setSelectedFolder] = useState<string>('');
   const [selectedDoc, setSelectedDoc] = useState<DocumentType | null>(null);
@@ -386,9 +388,9 @@ export default function GestorDocumentos() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-      <div className="flex h-screen">
+      <div className="flex min-h-[calc(100vh-4rem)] md:min-h-[calc(100vh-5rem)]">
         {/* Sidebar */}
-        <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col">
+        <aside className="hidden md:flex md:w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex-col">
           <div className="p-6 border-b border-slate-200 dark:border-slate-800">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
@@ -405,13 +407,13 @@ export default function GestorDocumentos() {
               multiple
               accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv"
             />
-            <button
-              onClick={() => document.getElementById('file-upload')?.click()}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg px-4 py-3 font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg flex items-center justify-center gap-2"
-            >
-              <CloudArrowUpIcon className="w-5 h-5" />
-              Subir Archivo
-            </button>
+              <button
+                onClick={() => document.getElementById('file-upload')?.click()}
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg px-4 py-3 font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg flex items-center justify-center gap-2"
+              >
+                <CloudArrowUpIcon className="w-5 h-5" />
+                {t('buttons.uploadFile')}
+              </button>
           </div>
 
           <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
@@ -446,12 +448,12 @@ export default function GestorDocumentos() {
             <div className="pt-6 mt-6 border-t border-slate-200 dark:border-slate-800">
               <div className="flex items-center justify-between mb-3 px-3">
                 <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                  Carpetas
+                  {t('folders.title')}
                 </h3>
                 <button
                   onClick={() => setShowNewFolderModal(true)}
                   className="text-blue-600 hover:text-blue-700"
-                  title="Nueva carpeta"
+                  title={t('folders.newFolder')}
                 >
                   <FolderPlusIcon className="w-4 h-4" />
                 </button>
@@ -485,7 +487,7 @@ export default function GestorDocumentos() {
         {/* Main Content */}
         <main className="flex-1 flex flex-col overflow-hidden">
           {/* Header - Fixed position */}
-          <header className="relative bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-6 z-10">
+          <header className="relative bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 sm:p-6 z-10">
             <div className="flex items-center gap-4 mb-4">
               <div className="flex-1 relative">
                 <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -493,23 +495,23 @@ export default function GestorDocumentos() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Buscar documentos..."
+                  placeholder={t('search.placeholder')}
                   className="w-full pl-10 pr-4 py-3 bg-slate-100 dark:bg-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               <button
                 onClick={handleSemanticSearch}
-                className="px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all flex items-center gap-2 shadow-lg"
+                className="px-3 py-2 text-sm sm:px-4 sm:py-3 sm:text-base bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all flex items-center gap-2 shadow-lg"
               >
                 <SparklesIcon className="w-5 h-5" />
-                Búsqueda IA
+                {t('search.aiSearch')}
               </button>
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="px-4 py-3 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
+                className="px-3 py-2 text-sm sm:px-4 sm:py-3 sm:text-base bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
               >
                 <AdjustmentsHorizontalIcon className="w-5 h-5" />
-                Filtros
+                {t('filters.title')}
               </button>
             </div>
 
@@ -555,9 +557,9 @@ export default function GestorDocumentos() {
                   <div className="text-center">
                     <CloudArrowUpIcon className="w-12 h-12 mx-auto mb-3 text-slate-400" />
                     <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">
-                      Arrastra y suelta tus archivos aquí o haz clic para seleccionar
+                      {t('upload.dragDrop')}
                     </p>
-                    <p className="text-xs text-slate-500">Soporta PDF, Word, Excel, PowerPoint, TXT, CSV</p>
+                    <p className="text-xs text-slate-500">{t('upload.supports')}</p>
                     {uploadProgress !== null && (
                       <div className="mt-4 max-w-md mx-auto">
                         <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
@@ -567,7 +569,7 @@ export default function GestorDocumentos() {
                           ></div>
                         </div>
                         <p className="text-xs text-slate-600 dark:text-slate-400 mt-2">
-                          Procesando con IA... {uploadProgress}%
+                          {t('upload.processing', {percent: uploadProgress})}
                         </p>
                       </div>
                     )}
@@ -580,13 +582,13 @@ export default function GestorDocumentos() {
                 {loading && (
                   <div className="text-center py-12">
                     <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
-                    <p className="mt-4 text-slate-600 dark:text-slate-400">Cargando documentos...</p>
+                    <p className="mt-4 text-slate-600 dark:text-slate-400">{t('states.loading')}</p>
                   </div>
                 )}
 
                 {error && (
                   <div className="text-center py-12">
-                    <p className="text-red-600">{error}</p>
+                    <p className="text-red-600">{t('states.error')}</p>
                   </div>
                 )}
 
@@ -594,7 +596,7 @@ export default function GestorDocumentos() {
                   <div className="text-center py-12">
                     <DocumentIcon className="w-24 h-24 mx-auto mb-4 text-slate-300" />
                     <p className="text-slate-600 dark:text-slate-400">
-                      No hay documentos aún. ¡Sube tu primer archivo!
+                      {t('states.empty')}
                     </p>
                   </div>
                 )}
@@ -602,7 +604,7 @@ export default function GestorDocumentos() {
                 {activeView === 'trash' && documents.length > 0 && (
                   <div className="mb-4 p-4 bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 rounded-lg">
                     <p className="text-sm text-orange-700 dark:text-orange-400">
-                      Los documentos en la papelera se eliminarán permanentemente después de 30 días.
+                      {t('trash.warning')}
                     </p>
                   </div>
                 )}
@@ -703,8 +705,8 @@ export default function GestorDocumentos() {
         {/* Document Viewer Panel */}
         {selectedDoc && activeView !== 'trash' && (
           <>
-            <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setSelectedDoc(null)} />
-            <div className="fixed right-0 top-0 h-full w-[600px] bg-white dark:bg-slate-900 z-50 shadow-2xl overflow-y-auto">
+            <div className="fixed inset-0 bg-black/50 z-[150]" onClick={() => setSelectedDoc(null)} />
+            <div className="fixed right-0 top-16 md:top-20 bottom-0 w-full max-w-[95vw] sm:max-w-[600px] bg-white dark:bg-slate-900 z-[200] shadow-2xl overflow-y-auto">
               <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-6 z-10">
                 <div className="flex items-start justify-between">
                   <div>
@@ -735,7 +737,7 @@ export default function GestorDocumentos() {
                     <div className="flex items-center gap-2 mb-4">
                       <SparklesIcon className="w-6 h-6 text-blue-600" />
                       <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                        Resumen Automático IA
+                        {t('viewer.aiSummary')}
                       </h3>
                     </div>
                     <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
@@ -749,7 +751,7 @@ export default function GestorDocumentos() {
                   <div className="mb-6">
                     <div className="flex items-center gap-2 mb-3">
                       <TagIcon className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-                      <h3 className="font-bold text-slate-900 dark:text-white">Palabras Clave</h3>
+                      <h3 className="font-bold text-slate-900 dark:text-white">{t('viewer.keywords')}</h3>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {selectedDoc.keywords.map((keyword, index) => (
@@ -769,7 +771,7 @@ export default function GestorDocumentos() {
                   <div className="mb-6">
                     <div className="flex items-center gap-2 mb-3">
                       <SparklesIcon className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-                      <h3 className="font-bold text-slate-900 dark:text-white">Entidades Detectadas</h3>
+                      <h3 className="font-bold text-slate-900 dark:text-white">{t('viewer.entities')}</h3>
                     </div>
                     <div className="space-y-2">
                       {selectedDoc.entities.map((entity, index) => (
@@ -786,13 +788,13 @@ export default function GestorDocumentos() {
 
                 {/* Folder Selection */}
                 <div className="mb-6">
-                  <h3 className="font-bold text-slate-900 dark:text-white mb-3">Mover a Carpeta</h3>
+                  <h3 className="font-bold text-slate-900 dark:text-white mb-3">{t('viewer.moveToFolder')}</h3>
                   <select
                     value={selectedDoc.folder}
                     onChange={(e) => handleMoveToFolder(selectedDoc.id, e.target.value)}
                     className="w-full px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg"
                   >
-                    <option value="General">General</option>
+                    <option value="General">{t('folders.general')}</option>
                     {folders.map((folder) => (
                       <option key={folder.name} value={folder.name}>
                         {folder.name}
@@ -808,12 +810,12 @@ export default function GestorDocumentos() {
                     disabled={loadingExplanation}
                     className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg px-4 py-3 font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all disabled:opacity-50"
                   >
-                    {loadingExplanation ? 'Generando explicación...' : 'Explicar este documento con IA'}
+                    {loadingExplanation ? t('viewer.generatingExplanation') : t('viewer.explainWithAI')}
                   </button>
 
                   {explanation && (
                     <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 rounded-lg">
-                      <h4 className="font-bold text-green-900 dark:text-green-100 mb-2">Explicación IA:</h4>
+                      <h4 className="font-bold text-green-900 dark:text-green-100 mb-2">{t('viewer.explanationTitle')}</h4>
                       <p className="text-sm text-green-800 dark:text-green-200 whitespace-pre-wrap">
                         {explanation}
                       </p>
@@ -824,7 +826,7 @@ export default function GestorDocumentos() {
                     onClick={() => handleDeleteClick(selectedDoc.id)}
                     className="w-full bg-red-600 text-white rounded-lg px-4 py-3 font-semibold hover:bg-red-700 transition-all"
                   >
-                    Mover a Papelera (Requiere PIN)
+                    {t('viewer.moveToTrash')}
                   </button>
                 </div>
               </div>
@@ -835,87 +837,87 @@ export default function GestorDocumentos() {
         {/* Semantic Search Results Modal */}
         {showSemanticSearch && (
           <>
-            <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setShowSemanticSearch(false)} />
+            <div className="fixed inset-0 bg-black/50 z-[150]" onClick={() => setShowSemanticSearch(false)} />
             <div className="fixed inset-x-4 top-20 max-w-4xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-2xl z-50 max-h-[80vh] overflow-y-auto">
-              <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                      Búsqueda Semántica IA
-                    </h3>
-                    <p className="text-sm text-slate-500">Consulta: {searchQuery}</p>
+                  <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                          {t('semantic.title')}
+                        </h3>
+                        <p className="text-sm text-slate-500">{t('semantic.query', {query: searchQuery})}</p>
+                      </div>
+                      <button
+                        onClick={() => setShowSemanticSearch(false)}
+                        className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
+                      >
+                        <XMarkIcon className="w-6 h-6" />
+                      </button>
+                    </div>
                   </div>
-                  <button
-                    onClick={() => setShowSemanticSearch(false)}
-                    className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
-                  >
-                    <XMarkIcon className="w-6 h-6" />
-                  </button>
-                </div>
-              </div>
 
               <div className="p-6">
-                {semanticLoading ? (
-                  <div className="text-center py-12">
-                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-purple-600 border-t-transparent"></div>
-                    <p className="mt-4 text-slate-600 dark:text-slate-400">
-                      Buscando documentos similares...
-                    </p>
-                  </div>
-                ) : semanticResults.length === 0 ? (
-                  <div className="text-center py-12">
-                    <p className="text-slate-600 dark:text-slate-400">
-                      No se encontraron documentos similares
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {semanticResults.map((result) => (
-                      <div
-                        key={result.id}
-                        className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700"
-                      >
-                        <div className="flex items-start justify-between mb-2">
-                          <h4 className="font-semibold text-slate-900 dark:text-white">{result.name}</h4>
-                          <span className="px-3 py-1 bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400 rounded-full text-xs font-semibold">
-                            {result.similarity}% similar
-                          </span>
-                        </div>
-                        {result.summary && (
-                          <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">{result.summary}</p>
-                        )}
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2 text-xs text-slate-500">
-                            <span>{result.type}</span>
-                            <span>•</span>
-                            <span>{result.folder}</span>
-                            <span>•</span>
-                            <span>{result.date}</span>
-                          </div>
-                          <button
-                            onClick={async () => {
-                              setLoadingSimilarity(true);
-                              setShowSimilarityModal(true);
-                              setSimilarityExplanation('');
-                              try {
-                                const exp = await explainSimilarity(result.id, searchQuery, result.similarity / 100);
-                                setSimilarityExplanation(exp);
-                              } catch (error: any) {
-                                setSimilarityExplanation('Error: ' + (error.message || 'No se pudo generar la explicación'));
-                              } finally {
-                                setLoadingSimilarity(false);
-                              }
-                            }}
-                            className="px-3 py-1 text-xs bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-1"
-                          >
-                            <SparklesIcon className="w-3 h-3" />
-                            ¿Por qué?
-                          </button>
-                        </div>
+                    {semanticLoading ? (
+                      <div className="text-center py-12">
+                        <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-purple-600 border-t-transparent"></div>
+                        <p className="mt-4 text-slate-600 dark:text-slate-400">
+                          {t('semantic.searching')}
+                        </p>
                       </div>
-                    ))}
-                  </div>
-                )}
+                    ) : semanticResults.length === 0 ? (
+                      <div className="text-center py-12">
+                        <p className="text-slate-600 dark:text-slate-400">
+                          {t('semantic.noResults')}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {semanticResults.map((result) => (
+                          <div
+                            key={result.id}
+                            className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700"
+                          >
+                            <div className="flex items-start justify-between mb-2">
+                              <h4 className="font-semibold text-slate-900 dark:text-white">{result.name}</h4>
+                              <span className="px-3 py-1 bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400 rounded-full text-xs font-semibold">
+                                {t('semantic.similarPercent', {percent: result.similarity})}
+                              </span>
+                            </div>
+                            {result.summary && (
+                              <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">{result.summary}</p>
+                            )}
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2 text-xs text-slate-500">
+                                <span>{result.type}</span>
+                                <span>•</span>
+                                <span>{result.folder}</span>
+                                <span>•</span>
+                                <span>{result.date}</span>
+                              </div>
+                              <button
+                                onClick={async () => {
+                                  setLoadingSimilarity(true);
+                                  setShowSimilarityModal(true);
+                                  setSimilarityExplanation('');
+                                  try {
+                                    const exp = await explainSimilarity(result.id, searchQuery, result.similarity / 100);
+                                    setSimilarityExplanation(exp);
+                                  } catch (error: any) {
+                                    setSimilarityExplanation(t('semantic.explainError', {error: error.message || ''}));
+                                  } finally {
+                                    setLoadingSimilarity(false);
+                                  }
+                                }}
+                                className="px-3 py-1 text-xs bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-1"
+                              >
+                                <SparklesIcon className="w-3 h-3" />
+                                {t('semantic.why')}
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
               </div>
             </div>
           </>
@@ -933,20 +935,20 @@ export default function GestorDocumentos() {
                   value={newFilename}
                   onChange={(e) => setNewFilename(e.target.value)}
                   className="w-full px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg mb-4"
-                  placeholder="Nuevo nombre"
+                  placeholder={t('rename.placeholder')}
                 />
                 <div className="flex gap-3">
                   <button
                     onClick={() => setShowRenameModal(false)}
                     className="flex-1 px-4 py-2 bg-slate-200 dark:bg-slate-700 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600"
                   >
-                    Cancelar
+                    {t('common.cancel')}
                   </button>
                   <button
                     onClick={handleRenameSubmit}
                     className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
-                    Renombrar
+                    {t('rename.submit')}
                   </button>
                 </div>
               </div>
@@ -960,26 +962,26 @@ export default function GestorDocumentos() {
             <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setShowNewFolderModal(false)} />
             <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
               <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-6 max-w-md w-full">
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Nueva Carpeta</h3>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">{t('newFolder.title')}</h3>
                 <input
                   type="text"
                   value={newFolderName}
                   onChange={(e) => setNewFolderName(e.target.value)}
                   className="w-full px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg mb-4"
-                  placeholder="Nombre de la carpeta"
+                  placeholder={t('newFolder.placeholder')}
                 />
                 <div className="flex gap-3">
                   <button
                     onClick={() => setShowNewFolderModal(false)}
                     className="flex-1 px-4 py-2 bg-slate-200 dark:bg-slate-700 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600"
                   >
-                    Cancelar
+                    {t('common.cancel')}
                   </button>
                   <button
                     onClick={handleCreateFolder}
                     className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
-                    Crear
+                    {t('newFolder.submit')}
                   </button>
                 </div>
               </div>
@@ -997,20 +999,20 @@ export default function GestorDocumentos() {
                   <ExclamationTriangleIcon className="w-10 h-10 text-red-600 dark:text-red-400" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 text-center">
-                  Eliminar Documento
+                  {t('pinDelete.title')}
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 text-center">
-                  Esta acción requiere un código PIN de seguridad.
+                  {t('pinDelete.description')}
                 </p>
                 <p className="text-xs text-slate-500 dark:text-slate-500 mb-4 text-center">
-                  PIN por defecto: <strong>1010</strong>
+                  {t('pinDelete.defaultPin')}
                 </p>
                 <input
                   type="password"
                   value={pinInput}
                   onChange={(e) => setPinInput(e.target.value)}
                   className="w-full px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg mb-4 text-center text-lg tracking-widest"
-                  placeholder="••••"
+                  placeholder={t('pinDelete.placeholder')}
                   maxLength={4}
                   onKeyPress={(e) => {
                     if (e.key === 'Enter') {
@@ -1027,14 +1029,14 @@ export default function GestorDocumentos() {
                     }}
                     className="flex-1 px-4 py-2 bg-slate-200 dark:bg-slate-700 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600"
                   >
-                    Cancelar
+                    {t('common.cancel')}
                   </button>
                   <button
                     onClick={handleDeleteSubmit}
                     disabled={pinInput.length !== 4}
                     className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Eliminar
+                    {t('pinDelete.submit')}
                   </button>
                 </div>
               </div>
@@ -1055,10 +1057,10 @@ export default function GestorDocumentos() {
                     </div>
                     <div>
                       <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                        Explicación IA
+                        {t('similar.title')}
                       </h3>
                       <p className="text-sm text-slate-500 dark:text-slate-400">
-                        ¿Por qué este documento es relevante?
+                        {t('similar.subtitle')}
                       </p>
                     </div>
                   </div>
@@ -1075,7 +1077,7 @@ export default function GestorDocumentos() {
                     <div className="flex items-center justify-center py-8">
                       <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-purple-600 border-t-transparent"></div>
                       <span className="ml-3 text-slate-600 dark:text-slate-400">
-                        Analizando con IA...
+                        {t('similar.analyzing')}
                       </span>
                     </div>
                   ) : (
@@ -1092,7 +1094,7 @@ export default function GestorDocumentos() {
                     onClick={() => setShowSimilarityModal(false)}
                     className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg shadow-purple-500/25"
                   >
-                    Entendido
+                    {t('common.ok')}
                   </button>
                 </div>
               </div>

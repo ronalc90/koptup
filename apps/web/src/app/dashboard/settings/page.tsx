@@ -11,10 +11,12 @@ import {
   GlobeAltIcon,
   PaintBrushIcon,
 } from '@heroicons/react/24/outline';
+import { useTranslations } from 'next-intl';
 
 export default function SettingsPage() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+  const t = useTranslations('settingsPage');
   const [settings, setSettings] = useState({
     notifications: {
       email: true,
@@ -57,66 +59,18 @@ export default function SettingsPage() {
     await new Promise(resolve => setTimeout(resolve, 1000));
     setSaving(false);
 
-    const message = settings.language === 'en'
-      ? 'Settings saved successfully'
-      : 'Configuración guardada exitosamente';
-    alert(message);
+    alert(t('toastSaved'));
   };
-
-  const translations = {
-    es: {
-      title: 'Configuración',
-      subtitle: 'Administra las preferencias de tu cuenta',
-      notifications: 'Notificaciones',
-      emailNotifications: 'Notificaciones por Email',
-      emailDesc: 'Recibir actualizaciones por correo electrónico',
-      pushNotifications: 'Notificaciones Push',
-      pushDesc: 'Recibir notificaciones en el navegador',
-      smsNotifications: 'Notificaciones SMS',
-      smsDesc: 'Recibir mensajes de texto importantes',
-      languageAndAppearance: 'Idioma y Apariencia',
-      language: 'Idioma',
-      theme: 'Tema',
-      light: 'Claro',
-      dark: 'Oscuro',
-      auto: 'Auto',
-      cancel: 'Cancelar',
-      save: 'Guardar Cambios',
-      saving: 'Guardando...',
-    },
-    en: {
-      title: 'Settings',
-      subtitle: 'Manage your account preferences',
-      notifications: 'Notifications',
-      emailNotifications: 'Email Notifications',
-      emailDesc: 'Receive email updates',
-      pushNotifications: 'Push Notifications',
-      pushDesc: 'Receive browser notifications',
-      smsNotifications: 'SMS Notifications',
-      smsDesc: 'Receive important text messages',
-      languageAndAppearance: 'Language & Appearance',
-      language: 'Language',
-      theme: 'Theme',
-      light: 'Light',
-      dark: 'Dark',
-      auto: 'Auto',
-      cancel: 'Cancel',
-      save: 'Save Changes',
-      saving: 'Saving...',
-    },
-  };
-
-  const t = translations[settings.language as 'es' | 'en'];
 
   return (
     <DashboardLayout>
       <div className="space-y-6 max-w-4xl">
         <div>
           <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">
-            {t.title}
+            {t('title')}
           </h1>
           <p className="text-secondary-600 dark:text-secondary-400">
-            {t.subtitle}
+            {t('subtitle')}
           </p>
         </div>
 
@@ -125,15 +79,15 @@ export default function SettingsPage() {
           <CardHeader>
             <div className="flex items-center gap-3">
               <BellIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-              <CardTitle>{t.notifications}</CardTitle>
+              <CardTitle>{t('notifications')}</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <label className="flex items-center justify-between p-4 rounded-lg border border-secondary-200 dark:border-secondary-700 cursor-pointer hover:bg-secondary-50 dark:hover:bg-secondary-900">
               <div>
-                <p className="font-medium text-secondary-900 dark:text-white">{t.emailNotifications}</p>
+                <p className="font-medium text-secondary-900 dark:text-white">{t('emailNotifications')}</p>
                 <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                  {t.emailDesc}
+                  {t('emailDesc')}
                 </p>
               </div>
               <input
@@ -151,9 +105,9 @@ export default function SettingsPage() {
 
             <label className="flex items-center justify-between p-4 rounded-lg border border-secondary-200 dark:border-secondary-700 cursor-pointer hover:bg-secondary-50 dark:hover:bg-secondary-900">
               <div>
-                <p className="font-medium text-secondary-900 dark:text-white">{t.pushNotifications}</p>
+                <p className="font-medium text-secondary-900 dark:text-white">{t('pushNotifications')}</p>
                 <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                  {t.pushDesc}
+                  {t('pushDesc')}
                 </p>
               </div>
               <input
@@ -171,9 +125,9 @@ export default function SettingsPage() {
 
             <label className="flex items-center justify-between p-4 rounded-lg border border-secondary-200 dark:border-secondary-700 cursor-pointer hover:bg-secondary-50 dark:hover:bg-secondary-900">
               <div>
-                <p className="font-medium text-secondary-900 dark:text-white">{t.smsNotifications}</p>
+                <p className="font-medium text-secondary-900 dark:text-white">{t('smsNotifications')}</p>
                 <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                  {t.smsDesc}
+                  {t('smsDesc')}
                 </p>
               </div>
               <input
@@ -196,13 +150,13 @@ export default function SettingsPage() {
           <CardHeader>
             <div className="flex items-center gap-3">
               <GlobeAltIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-              <CardTitle>{t.languageAndAppearance}</CardTitle>
+              <CardTitle>{t('languageAndAppearance')}</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-secondary-900 dark:text-white mb-2">
-                {t.language}
+                {t('language')}
               </label>
               <select
                 value={settings.language}
@@ -216,7 +170,7 @@ export default function SettingsPage() {
 
             <div>
               <label className="block text-sm font-medium text-secondary-900 dark:text-white mb-2">
-                {t.theme}
+                {t('theme')}
               </label>
               <div className="grid grid-cols-3 gap-3">
                 <button
@@ -230,7 +184,7 @@ export default function SettingsPage() {
                       : 'border-secondary-200 dark:border-secondary-700'
                   }`}
                 >
-                  <p className="font-medium text-secondary-900 dark:text-white">{t.light}</p>
+                  <p className="font-medium text-secondary-900 dark:text-white">{t('light')}</p>
                 </button>
                 <button
                   onClick={() => {
@@ -243,7 +197,7 @@ export default function SettingsPage() {
                       : 'border-secondary-200 dark:border-secondary-700'
                   }`}
                 >
-                  <p className="font-medium text-secondary-900 dark:text-white">{t.dark}</p>
+                  <p className="font-medium text-secondary-900 dark:text-white">{t('dark')}</p>
                 </button>
                 <button
                   onClick={() => {
@@ -256,7 +210,7 @@ export default function SettingsPage() {
                       : 'border-secondary-200 dark:border-secondary-700'
                   }`}
                 >
-                  <p className="font-medium text-secondary-900 dark:text-white">{t.auto}</p>
+                  <p className="font-medium text-secondary-900 dark:text-white">{t('auto')}</p>
                 </button>
               </div>
             </div>
@@ -265,9 +219,9 @@ export default function SettingsPage() {
 
         {/* Save Button */}
         <div className="flex justify-end gap-3">
-          <Button variant="outline">{t.cancel}</Button>
+          <Button variant="outline">{t('cancel')}</Button>
           <Button onClick={handleSave} disabled={saving}>
-            {saving ? t.saving : t.save}
+            {saving ? t('saving') : t('save')}
           </Button>
         </div>
       </div>

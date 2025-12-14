@@ -1,7 +1,7 @@
 {
   "common": {
     "companyName": "KopTup Soluciones Tecnológicas",
-    "tagline": "Innovación tecnológica a tu medida",
+    "tagline": "Innovación tecnológica a la medida",
     "learnMore": "Conocer más",
     "getStarted": "Comenzar ahora",
     "contactUs": "Contáctanos",
@@ -15,6 +15,104 @@
     "error": "Error",
     "success": "Éxito"
   },
+  "hero": {
+    "title": "Transformamos tus ideas en soluciones tecnológicas",
+    "subtitle": "Software a medida, e-commerce, chatbots con IA y más para impulsar tu negocio",
+    "cta1": "Ver Planes",
+    "cta2": "Hablar con nosotros"
+  },
+  "homePage": {
+    "stats": {
+      "projects": "Proyectos completados",
+      "clients": "Clientes satisfechos",
+      "support": "Soporte",
+      "rating": "Calificación promedio"
+    }
+  },
+  "services": {
+    "title": "Servicios Tecnológicos",
+    "subtitle": "Soluciones integrales para impulsar tu negocio",
+    "ecommerce": {
+      "title": "E-commerce Personalizado",
+      "description": "Tiendas online optimizadas con pagos, inventario y excelente UX"
+    },
+    "chatbots": {
+      "title": "Chatbots & IA",
+      "description": "Automatiza ventas y soporte con asistentes inteligentes"
+    },
+    "integrations": {
+      "title": "Integraciones API",
+      "description": "Conecta sistemas y automatiza procesos clave"
+    },
+    "custom": {
+      "title": "Software a Medida",
+      "description": "Soluciones personalizadas para tus procesos de negocio"
+    },
+    "mobile": {
+      "title": "Aplicaciones Móviles",
+      "description": "Apps nativas y multiplataforma para iOS y Android"
+    },
+    "uxui": {
+      "title": "UX/UI",
+      "description": "Interfaces modernas orientadas a conversión"
+    },
+    "security": {
+      "title": "Ciberseguridad",
+      "description": "Auditorías, pruebas y mejores prácticas de seguridad"
+    },
+    "consulting": {
+      "title": "Consultoría & Cloud",
+      "description": "Arquitectura, migración y optimización de infraestructura"
+    }
+  },
+  "homePage": {
+    "stats": {
+      "projects": "Proyectos completados",
+      "clients": "Clientes satisfechos",
+      "support": "Soporte",
+      "rating": "Calificación promedio"
+    },
+    "cta": {
+      "title": "¿Listo para iniciar tu proyecto?",
+      "subtitle": "Cuéntanos tus objetivos y diseñamos el mejor plan",
+      "button": "Ver Planes"
+    }
+  },
+  "privacyPage": {
+    "hero": {
+      "title": "Política de Privacidad",
+      "subtitle": "Cómo recopilamos, usamos y protegemos tu información personal"
+    }
+  },
+  "termsPage": {
+    "hero": {
+      "title": "Términos y Condiciones",
+      "subtitle": "Marco legal que rige el uso de nuestros servicios"
+    }
+  },
+  "cookiesPage": {
+    "hero": {
+      "title": "Política de Cookies",
+      "subtitle": "Información sobre las cookies y cómo las usamos"
+    }
+  },
+  "notFoundPage": {
+    "badge": "Página no encontrada",
+    "title": "No encontramos lo que buscas",
+    "subtitle": "Es posible que el enlace haya cambiado o la página ya no exista",
+    "homeButton": "Ir al inicio",
+    "backButton": "Volver"
+  },
+  "footer": {
+    "description": "Desarrollamos soluciones tecnológicas innovadoras que transforman negocios.",
+    "services": "Servicios",
+    "company": "Empresa",
+    "legal": "Legal",
+    "privacy": "Privacidad",
+    "terms": "Términos",
+    "cookies": "Cookies",
+    "allRightsReserved": "Todos los derechos reservados"
+  },
   "nav": {
     "home": "Inicio",
     "services": "Servicios",
@@ -26,679 +124,247 @@
     "login": "Iniciar sesión",
     "dashboard": "Panel"
   },
-  "hero": {
-    "title": "Transformamos tus ideas en soluciones tecnológicas",
-    "subtitle": "Desarrollamos software a medida, e-commerce, chatbots inteligentes, aplicaciones móviles y más. Innovación que impulsa tu negocio.",
-    "cta1": "Explorar soluciones",
-    "cta2": "Agendar consulta gratuita"
-  },
-  "services": {
-    "title": "Nuestros Servicios",
-    "subtitle": "Soluciones tecnológicas integrales para impulsar tu negocio",
-    "ecommerce": {
-      "title": "E-commerce Personalizado",
-      "description": "Tiendas online optimizadas para conversión con pasarelas de pago, inventario, analytics y UX excepcional."
-    },
-    "chatbots": {
-      "title": "Chatbots & Agentes Inteligentes",
-      "description": "Automatiza ventas, soporte y atención 24/7 con IA conversacional integrada a tus sistemas."
-    },
-    "integrations": {
-      "title": "Integraciones API & Automatizaciones",
-      "description": "Conecta tus herramientas, automatiza procesos y optimiza workflows empresariales."
-    },
-    "custom": {
-      "title": "Desarrollo de Software a Medida",
-      "description": "SaaS, ERP, CRM personalizados. Desde el concepto hasta la implementación completa."
-    },
-    "mobile": {
-      "title": "Aplicaciones Móviles",
-      "description": "Apps nativas y multiplataforma para Android e iOS con diseño intuitivo."
-    },
-    "uxui": {
-      "title": "UX/UI orientado a Conversión",
-      "description": "Diseño centrado en el usuario que maximiza engagement y resultados de negocio."
-    },
-    "security": {
-      "title": "Ciberseguridad & Soporte",
-      "description": "Auditorías de seguridad, mantenimiento preventivo y soporte técnico continuo."
-    },
-    "consulting": {
-      "title": "Consultoría & Cloud",
-      "description": "Estrategia tecnológica, migración a la nube y optimización de infraestructura."
-    }
-  },
-  "pricing": {
-    "title": "Planes Flexibles",
-    "subtitle": "Elige el plan que mejor se adapte a tus necesidades",
-    "basic": {
-      "name": "Básico",
-      "price": "A consultar",
-      "description": "Ideal para emprendimientos y pequeñas empresas",
-      "features": [
-        "Landing page profesional",
-        "Chatbot sencillo integrado",
-        "Hosting incluido (1 año)",
-        "Dominio personalizado",
-        "SEO básico",
-        "Soporte por email"
-      ],
-      "deliveryTime": "2-3 semanas"
-    },
-    "professional": {
-      "name": "Profesional",
-      "price": "A consultar",
-      "description": "Para empresas en crecimiento",
-      "features": [
-        "E-commerce completo",
-        "Chatbot avanzado con IA",
-        "Panel de administración",
-        "3 integraciones API",
-        "Analytics y reportes",
-        "Aplicación móvil opcional",
-        "Soporte prioritario"
-      ],
-      "deliveryTime": "6-8 semanas",
-      "popular": true
-    },
-    "enterprise": {
-      "name": "Empresarial",
-      "price": "Personalizado",
-      "description": "Soluciones a medida para grandes organizaciones",
-      "features": [
-        "Solución totalmente personalizada",
-        "Integraciones API ilimitadas",
-        "Dashboard empresarial",
-        "SLA garantizado",
-        "Soporte 24/7",
-        "Consultoría estratégica",
-        "Migración y capacitación",
-        "Escalabilidad cloud"
-      ],
-      "deliveryTime": "12+ semanas"
-    }
-  },
-  "demos": {
-    "badge": "Demos Interactivas",
-    "title": "Prueba Nuestras Soluciones",
-    "subtitle": "Experimenta demos interactivas de nuestros productos y servicios",
-    "interactive": "100% Interactivo - Sin necesidad de registro",
-    "includes": "Incluye:",
-    "tryDemo": "Probar Demo",
-    "chatbot": {
-      "title": "Demo de Chatbot con IA",
-      "description": "Crea y personaliza tu propio chatbot inteligente",
-      "badge": "Con IA",
-      "features": [
-        "Constructor visual de chatbot",
-        "Personalización completa de diseño",
-        "Carga de documentos para contexto",
-        "Vista previa en tiempo real"
-      ]
-    },
-    "ecommerce": {
-      "title": "Demo de E-commerce",
-      "description": "Explora una tienda online completa y funcional",
-      "badge": "Interactivo",
-      "features": [
-        "Catálogo de productos dinámico",
-        "Carrito de compras funcional",
-        "Búsqueda y filtros",
-        "Sistema de favoritos"
-      ]
-    },
-    "custom": {
-      "title": "¿Necesitas algo personalizado?",
-      "description": "Podemos crear una demo específica para tu proyecto. Contáctanos y cuéntanos qué necesitas.",
-      "button": "Solicitar Demo Personalizada"
-    }
-  },
-  "demo": {
-    "title": "Revisa Nuestras Demos Interactivas",
-    "subtitle": "Explora y prueba nuestras soluciones en acción",
-    "uploadPrompt": "Arrastra archivos aquí o haz clic para seleccionar",
-    "supportedFormats": "PDF, DOCX, TXT, CSV (máx. 10MB)",
-    "chatPlaceholder": "Escribe tu pregunta sobre los documentos...",
-    "uploading": "Subiendo archivo...",
-    "processing": "Procesando documento...",
-    "ready": "Listo para conversar",
-    "error": "Error al procesar el archivo"
-  },
-  "demoEcommerce": {
-    "title": "Demo Store",
-    "searchPlaceholder": "Buscar productos...",
-    "categories": {
-      "all": "Todos",
-      "electronics": "Electrónica",
-      "fashion": "Moda",
-      "home": "Hogar",
-      "sports": "Deportes"
-    },
-    "addToCart": "Agregar",
-    "outOfStock": "Agotado",
-    "noProducts": "No se encontraron productos",
-    "adminPanel": "Panel Admin",
-    "wishlist": "Favoritos",
-    "myWishlist": "Mis Favoritos",
-    "viewAllProducts": "Ver Todos los Productos",
-    "wishlistEmpty": "Tu lista de favoritos está vacía",
-    "wishlistEmptyDesc": "¡Empieza a agregar productos que te gusten!",
-    "allProducts": "Todos los Productos",
-    "searchResults": "Resultados de búsqueda para",
-    "productsCategory": "Productos de",
-    "banner": {
-      "specialOffer": "Oferta Especial",
-      "title": "¡Hasta 30% de descuento en productos seleccionados!",
-      "description": "Oferta por tiempo limitado. No te pierdas increíbles ofertas en electrónica, moda y artículos para el hogar.",
-      "freeShipping": "Envío gratis en compras mayores a $100",
-      "priceGuarantee": "Garantía de mejor precio"
-    },
-    "sections": {
-      "featured": "Productos Destacados",
-      "bestsellers": "Más Vendidos"
-    },
-    "cart": {
-      "title": "Carrito",
-      "empty": "Tu carrito está vacío",
-      "total": "Total",
-      "checkout": "Proceder al Pago"
-    },
-    "product": {
-      "view": "Ver Detalles",
-      "edit": "Editar",
-      "delete": "Eliminar",
-      "add": "Agregar Producto",
-      "name": "Nombre del producto",
-      "price": "Precio",
-      "originalPrice": "Precio original",
-      "discount": "Descuento (%)",
-      "category": "Categoría",
-      "stock": "Stock",
-      "rating": "Calificación",
-      "reviews": "Reseñas",
-      "image": "URL de imagen",
-      "inStock": "En stock",
-      "featured": "Destacado",
-      "bestseller": "Más vendido",
-      "new": "Nuevo",
-      "save": "Guardar",
-      "cancel": "Cancelar",
-      "deleteConfirm": "¿Estás seguro de que deseas eliminar este producto?",
-      "deleteWarning": "Esta acción no se puede deshacer.",
-      "codeRequired": "Código de validación requerido",
-      "enterCode": "Ingresa el código de administrador",
-      "demoCode": "Código demo: 1010",
-      "invalidCode": "Código inválido. Inténtalo de nuevo.",
-      "productAdded": "Producto agregado exitosamente",
-      "productUpdated": "Producto actualizado exitosamente",
-      "productDeleted": "Producto eliminado exitosamente"
-    }
-  },
-  "adminPanel": {
-    "title": "Panel de Administración",
-    "demoMode": "Modo Demo",
-    "backToStore": "← Volver a la tienda",
-    "tabs": {
+  "execDashboard": {
+    "menu": {
       "dashboard": "Dashboard",
-      "products": "Productos",
-      "orders": "Pedidos",
-      "customers": "Clientes"
+      "finances": "Finanzas",
+      "clients": "Clientes",
+      "settings": "Configuración"
     },
-    "dashboard": {
-      "stats": {
-        "revenue": "Ingresos Totales",
-        "orders": "Pedidos Totales",
-        "customers": "Clientes Totales",
-        "avgOrderValue": "Valor Promedio de Pedido",
-        "vsLastMonth": "vs último mes"
-      },
-      "recentOrders": "Pedidos Recientes",
-      "recentActivity": "Actividad Reciente",
-      "viewAll": "Ver todos",
-      "customer": "Cliente",
-      "total": "Total",
-      "status": "Estado"
+    "kpis": {
+      "revenueTitle": "Ingresos del Mes",
+      "revenueDesc": "vs mes anterior",
+      "newCustomersTitle": "Nuevos Clientes",
+      "newCustomersDesc": "este mes",
+      "retentionTitle": "Retención",
+      "retentionDesc": "tasa de retención",
+      "netMarginTitle": "Margen Neto",
+      "netMarginDesc": "margen promedio"
     },
-    "adminCode": {
-      "required": "Código de Administrador Requerido",
-      "setupPrompt": "Por favor configura tu código de administrador para habilitar la gestión de productos y acciones seguras.",
-      "placeholder": "Ingresa tu código de administrador (ej., 1010)",
-      "setButton": "Establecer Código",
-      "successAlert": "¡Código de administrador establecido exitosamente!"
+    "charts": {
+      "revenuePerMonth": "Ingresos por Mes",
+      "legendRevenue": "Ingresos",
+      "legendExpenses": "Gastos",
+      "performanceByArea": "Desempeño por Área",
+      "salesDistribution": "Distribución de Ventas por Categoría"
     },
-    "products": {
-      "title": "Gestión de Productos",
-      "addProduct": "Agregar Producto",
-      "editProduct": "Editar Producto",
-      "addNewProduct": "Agregar Nuevo Producto",
-      "name": "Nombre",
-      "productName": "Nombre del Producto",
-      "category": "Categoría",
-      "price": "Precio",
-      "priceUSD": "Precio ($)",
-      "stock": "Stock",
-      "sales": "Ventas",
-      "actions": "Acciones",
-      "lowStock": "Stock bajo",
-      "units": "unidades",
-      "sold": "vendidos",
-      "viewDetails": "Ver Detalles",
-      "deleteProduct": "Eliminar Producto",
-      "enterProductName": "Ingresa el nombre del producto",
-      "selectCategory": "Selecciona categoría",
-      "adminCode": "Código de Administrador",
-      "enterAdminCode": "Ingresa el código de administrador",
-      "cancel": "Cancelar",
-      "create": "Crear",
-      "update": "Actualizar",
-      "invalidAdminCode": "Código de administrador inválido",
-      "fillAllFields": "Por favor completa todos los campos",
-      "productDetails": "Detalles del Producto",
-      "revenue": "Ingresos",
-      "close": "Cerrar"
+    "insights": {
+      "title": "Insights Inteligentes"
     },
-    "orders": {
-      "title": "Gestión de Pedidos",
-      "filterByStatus": "Filtrar por estado",
-      "orderId": "Pedido #",
-      "items": "artículos",
-      "products": "productos",
-      "shipping": "Envío",
-      "shippingCost": "Costo de Envío",
-      "total": "Total",
-      "customer": "Cliente",
-      "free": "GRATIS",
-      "allStatus": "Todos los Estados",
-      "status": {
-        "all": "Todos",
-        "pending": "Pendiente",
-        "processing": "Procesando",
-        "shipped": "Enviado",
-        "delivered": "Entregado",
-        "cancelled": "Cancelado"
+    "finances": {
+      "totalIncome": "Total Ingresos",
+      "totalExpenses": "Total Egresos",
+      "netBalance": "Balance Neto",
+      "recentTransactions": "Transacciones Recientes",
+      "table": {
+        "date": "Fecha",
+        "concept": "Concepto",
+        "type": "Tipo",
+        "amount": "Monto",
+        "income": "Ingreso",
+        "expense": "Egreso"
       }
     },
     "customers": {
-      "title": "Gestión de Clientes",
-      "search": "Buscar clientes...",
-      "name": "Nombre",
-      "email": "Email",
-      "orders": "Pedidos",
-      "totalSpent": "Total gastado",
-      "lastOrder": "Último pedido",
-      "viewDetails": "Ver Detalles",
-      "customerDetails": "Detalles del Cliente",
-      "totalOrders": "Total de Pedidos",
-      "avgOrderValue": "Valor Promedio de Pedido",
-      "close": "Cerrar"
+      "title": "Base de Clientes",
+      "total": "Total: {count} clientes",
+      "active": "activos",
+      "status": {
+        "active": "Activo",
+        "inactive": "Inactivo"
+      },
+      "totalValue": "Valor Total"
     },
-    "validation": {
-      "title": "Verificación de Administrador Requerida",
-      "description": "Esta acción requiere verificación de administrador. Por favor ingresa el código de administrador para continuar.",
-      "inputPlaceholder": "Ingresa el código de administrador",
-      "demoHint": "Código demo: 1010",
-      "verify": "Verificar",
+    "settings": {
+      "savedTitle": "Cambios guardados exitosamente",
+      "savedDesc": "Tus preferencias han sido actualizadas",
+      "companyTitle": "Configuración de la Empresa",
+      "companyName": "Nombre de la Empresa",
+      "companyTax": "NIT / RUT",
+      "companyEmail": "Email Corporativo",
+      "companyPhone": "Teléfono",
+      "companyAddress": "Dirección",
+      "systemPrefsTitle": "Preferencias del Sistema",
+      "emailNotifs": "Notificaciones por Email",
+      "emailNotifsDesc": "Recibir alertas y reportes por correo",
+      "darkMode": "Modo Oscuro",
+      "darkModeDesc": "Interfaz con tema oscuro",
+      "autoExport": "Exportación Automática",
+      "autoExportDesc": "Generar reportes mensuales automáticamente",
       "cancel": "Cancelar",
-      "error": "Código inválido. Por favor intenta de nuevo."
+      "save": "Guardar Cambios"
     },
-    "categories": {
-      "electronics": "Electrónica",
-      "fashion": "Moda",
-      "home": "Hogar",
-      "sports": "Deportes",
-      "books": "Libros"
+    "notifications": {
+      "title": "Notificaciones",
+      "viewAll": "Ver todas las notificaciones",
+      "items": {
+        "report": {
+          "title": "Nuevo reporte financiero disponible",
+          "desc": "El reporte financiero del mes de enero ya está listo para revisión. Incluye análisis de ventas, gastos y proyecciones.",
+          "cta": "Ver Reporte"
+        },
+        "sales": {
+          "title": "Meta de ventas alcanzada",
+          "desc": "¡Felicitaciones! El equipo de ventas ha superado la meta mensual con un 15% de incremento respecto al mes anterior.",
+          "cta": "Ver Detalles"
+        },
+        "maintenance": {
+          "title": "Actualización de sistema programada",
+          "desc": "Se realizará un mantenimiento del sistema el próximo sábado de 2:00 AM a 6:00 AM. El servicio estará temporalmente no disponible.",
+          "cta": "Más Información"
+        },
+        "newClient": {
+          "title": "Nuevo cliente registrado",
+          "desc": "Un nuevo cliente se ha registrado en la plataforma: Empresa ABC S.A. - Plan Enterprise.",
+          "cta": "Ver Cliente"
+        },
+        "justNow5m": "Hace 5 minutos",
+        "oneHourAgo": "Hace 1 hora",
+        "twoHoursAgo": "Hace 2 horas",
+        "threeHoursAgo": "Hace 3 horas"
+      },
+      "justNow5m": "Hace 5 minutos",
+      "oneHourAgo": "Hace 1 hora",
+      "twoHoursAgo": "Hace 2 horas",
+      "threeHoursAgo": "Hace 3 horas"
     },
-    "activity": {
-      "newOrder": "Nuevo pedido recibido",
-      "productUpdated": "Producto actualizado",
-      "newCustomer": "Nuevo cliente registrado",
-      "orderShipped": "Pedido enviado",
-      "reviewReceived": "Nueva reseña recibida"
-    }
-  },
-  "contact": {
-    "title": "Hablemos de tu proyecto",
-    "subtitle": "Completa el formulario y nos pondremos en contacto contigo",
-    "name": "Nombre completo",
-    "email": "Email",
-    "phone": "Teléfono",
-    "company": "Empresa",
-    "message": "Cuéntanos sobre tu proyecto",
-    "service": "Servicio de interés",
-    "budget": "Presupuesto estimado",
-    "sendMessage": "Enviar mensaje",
-    "successMessage": "¡Mensaje enviado! Te contactaremos pronto."
-  },
-  "footer": {
-    "description": "Desarrollamos soluciones tecnológicas innovadoras que transforman negocios.",
-    "services": "Servicios",
-    "company": "Empresa",
-    "legal": "Legal",
-    "privacy": "Privacidad",
-    "terms": "Términos",
-    "cookies": "Cookies",
-    "followUs": "Síguenos",
-    "allRightsReserved": "Todos los derechos reservados"
-  },
-  "servicesPage": {
-    "hero": {
-      "badge": "Servicios Profesionales",
-      "title": "Soluciones Tecnológicas que Impulsan tu Negocio",
-      "subtitle": "Transformamos ideas en productos digitales excepcionales con tecnología de vanguardia",
-      "ctaConsult": "Solicita una Consulta Gratis",
-      "ctaPricing": "Ver Planes"
-    },
-    "services": {
-      "ecommerce": {
-        "title": "E-Commerce",
-        "shortDescription": "Tiendas online potentes y escalables",
-        "description": "Desarrollamos plataformas de comercio electrónico completas con gestión de inventario, pasarelas de pago integradas, y experiencias de compra optimizadas.",
-        "features": [
-          "Carrito de compras inteligente",
-          "Integración con múltiples pasarelas de pago",
-          "Gestión de inventario en tiempo real",
-          "Panel de administración completo",
-          "Diseño responsive y optimizado",
-          "SEO optimizado para productos",
-          "Sistema de cupones y descuentos",
-          "Analytics e informes de ventas"
-        ],
-        "price": "Desde $2,500",
-        "deliveryTime": "4-8 semanas"
-      },
-      "chatbots": {
-        "title": "Chatbots con IA",
-        "shortDescription": "Asistentes virtuales inteligentes 24/7",
-        "description": "Chatbots con inteligencia artificial que automatizan atención al cliente, ventas y soporte técnico usando procesamiento de lenguaje natural.",
-        "features": [
-          "Procesamiento de lenguaje natural (NLP)",
-          "Integración con WhatsApp, Telegram, Facebook",
-          "Respuestas contextuales inteligentes",
-          "Aprendizaje continuo",
-          "Gestión de conversaciones multicanal",
-          "Dashboard de analytics",
-          "Integración con CRM",
-          "Personalización de personalidad del bot"
-        ],
-        "price": "Desde $1,800",
-        "deliveryTime": "3-6 semanas"
-      },
-      "integrations": {
-        "title": "Integraciones API",
-        "shortDescription": "Conecta tus sistemas y automatiza procesos",
-        "description": "Integraciones robustas entre diferentes plataformas y servicios para automatizar flujos de trabajo y sincronizar datos en tiempo real.",
-        "features": [
-          "APIs RESTful y GraphQL",
-          "Webhooks y eventos en tiempo real",
-          "Sincronización bidireccional de datos",
-          "Transformación y mapeo de datos",
-          "Manejo de errores y reintentos",
-          "Documentación completa de APIs",
-          "Autenticación OAuth y JWT",
-          "Monitoreo y logs detallados"
-        ],
-        "price": "Desde $1,200",
-        "deliveryTime": "2-4 semanas"
-      },
-      "custom": {
-        "title": "Software a Medida",
-        "shortDescription": "Soluciones personalizadas para tu negocio",
-        "description": "Desarrollamos aplicaciones web personalizadas que se adaptan perfectamente a tus procesos de negocio y necesidades específicas.",
-        "features": [
-          "Análisis de requisitos detallado",
-          "Arquitectura escalable y modular",
-          "Base de datos optimizada",
-          "Panel de administración completo",
-          "Roles y permisos granulares",
-          "Reportes y dashboards personalizados",
-          "Integración con sistemas existentes",
-          "Documentación técnica completa"
-        ],
-        "price": "Desde $3,500",
-        "deliveryTime": "6-12 semanas"
-      },
-      "mobile": {
-        "title": "Apps Móviles",
-        "shortDescription": "Apps nativas e híbridas iOS y Android",
-        "description": "Aplicaciones móviles multiplataforma con rendimiento nativo y experiencia de usuario excepcional para iOS y Android.",
-        "features": [
-          "Desarrollo multiplataforma",
-          "UI/UX optimizada para móviles",
-          "Notificaciones push",
-          "Sincronización offline",
-          "Integración con servicios nativos",
-          "Analytics y seguimiento de eventos",
-          "Actualizaciones OTA",
-          "Publicación en App Store y Play Store"
-        ],
-        "price": "Desde $4,000",
-        "deliveryTime": "8-14 semanas"
-      },
-      "uxui": {
-        "title": "Diseño UX/UI",
-        "shortDescription": "Interfaces modernas y experiencias intuitivas",
-        "description": "Diseño de interfaces centradas en el usuario que combinan estética moderna con funcionalidad intuitiva y accesibilidad.",
-        "features": [
-          "Investigación de usuarios",
-          "Wireframes y prototipos interactivos",
-          "Diseño de sistema (Design System)",
-          "Guías de estilo y componentes",
-          "Testing de usabilidad",
-          "Diseño responsive multi-dispositivo",
-          "Accesibilidad WCAG 2.1",
-          "Handoff desarrollo con Figma/Sketch"
-        ],
-        "price": "Desde $1,500",
-        "deliveryTime": "2-4 semanas"
-      },
-      "security": {
-        "title": "Seguridad & Auditorías",
-        "shortDescription": "Protege tu aplicación y datos",
-        "description": "Auditorías de seguridad, pruebas de penetración y mejoras de seguridad para proteger tus aplicaciones y datos sensibles.",
-        "features": [
-          "Auditorías de código y vulnerabilidades",
-          "Pruebas de penetración (Pentesting)",
-          "Implementación HTTPS/SSL",
-          "Autenticación de dos factores (2FA)",
-          "Encriptación de datos sensibles",
-          "Cumplimiento GDPR y regulaciones",
-          "Monitoreo de seguridad continuo",
-          "Plan de respuesta a incidentes"
-        ],
-        "price": "Desde $1,000",
-        "deliveryTime": "1-3 semanas"
-      },
-      "consulting": {
-        "title": "Consultoría & Cloud",
-        "shortDescription": "Arquitectura cloud y optimización",
-        "description": "Consultoría técnica para arquitectura de software, migración a la nube, optimización de infraestructura y DevOps.",
-        "features": [
-          "Arquitectura de aplicaciones escalables",
-          "Migración a AWS, Azure, GCP",
-          "CI/CD y automatización",
-          "Optimización de costos cloud",
-          "Containerización con Docker/Kubernetes",
-          "Monitoreo y observabilidad",
-          "Backup y disaster recovery",
-          "Capacitación técnica de equipos"
-        ],
-        "price": "Desde $150/hora",
-        "deliveryTime": "Variable"
+    "search": {
+      "placeholder": "Buscar...",
+      "resultsTitle": "Resultados de búsqueda",
+      "typeToSearch": "Escribe para buscar...",
+      "items": {
+        "mainDashboard": "Dashboard Principal",
+        "mainDashboardDesc": "Vista principal con métricas",
+        "financesDesc": "Gráficos y reportes financieros",
+        "clientsDesc": "Gestión de clientes"
       }
     },
-    "process": {
-      "title": "Nuestro Proceso de Trabajo",
-      "subtitle": "Un proceso probado que garantiza resultados excepcionales",
-      "steps": {
-        "consult": {
-          "title": "Consulta Inicial",
-          "description": "Conversamos sobre tu proyecto, objetivos y necesidades específicas."
+    "months": {
+      "january2024": "Enero 2024",
+      "february2024": "Febrero 2024",
+      "march2024": "Marzo 2024"
+    },
+    "header": {
+      "roleCEO": "CEO",
+      "roleExecutive": "Ejecutivo",
+      "toggleToLight": "Cambiar a modo claro",
+      "toggleToDark": "Cambiar a modo oscuro"
+    },
+    "modals": {
+      "actions": {
+        "close": "Cerrar",
+        "downloadPdf": "Descargar PDF"
+      },
+      "report": {
+        "title": "Reporte Financiero - Enero 2024",
+        "execSummary": "Resumen Ejecutivo",
+        "totalRevenue": "Ingresos Totales",
+        "revenueDelta": "↑ 23% vs. mes anterior",
+        "totalExpenses": "Gastos Totales",
+        "expensesDelta": "↑ 12% vs. mes anterior",
+        "netProfit": "Utilidad Neta",
+        "netProfitDelta": "↑ 45% vs. mes anterior",
+        "salesAnalysis": "Análisis de Ventas",
+        "operationalExpenses": "Gastos Operativos",
+        "projectionsFeb2024": "Proyecciones Febrero 2024",
+        "bullets": {
+          "productSales": "Ventas por productos: $1,450,000 (59%)",
+          "serviceSales": "Ventas por servicios: $780,000 (32%)",
+          "otherIncome": "Otros ingresos: $220,000 (9%)",
+          "newCustomers": "Clientes nuevos: 145 (+28%)",
+          "retentionRate": "Tasa de retención: 87%"
         },
-        "proposal": {
-          "title": "Propuesta & Cotización",
-          "description": "Elaboramos una propuesta detallada con alcance, tiempos y costos."
-        },
-        "design": {
-          "title": "Diseño & Planificación",
-          "description": "Creamos mockups, arquitectura y plan de desarrollo."
-        },
-        "development": {
-          "title": "Desarrollo",
-          "description": "Desarrollamos tu solución con actualizaciones constantes."
-        },
-        "testing": {
-          "title": "Testing & QA",
-          "description": "Pruebas exhaustivas para garantizar calidad y funcionalidad."
-        },
-        "delivery": {
-          "title": "Entrega & Soporte",
-          "description": "Lanzamiento y soporte continuo post-implementación."
+        "operationalBullets": {
+          "payroll": "Nómina: $980,000 (53%)",
+          "infrastructure": "Infraestructura: $420,000 (23%)",
+          "marketing": "Marketing: $280,000 (15%)",
+          "administrative": "Administrativos: $170,000 (9%)"
         }
+      },
+      "sales": {
+        "title": "Meta de Ventas Alcanzada 🎉",
+        "ofMonthlyGoal": "de la meta mensual",
+        "goalSet": "Meta Establecida",
+        "salesAchieved": "Ventas Logradas",
+        "topSellers": "Top Vendedores"
+      },
+      "maintenance": {
+        "title": "Mantenimiento Programado",
+        "attention": "Atención",
+        "unavailableNote": "El sistema no estará disponible durante el mantenimiento",
+        "detailsTitle": "Detalles del Mantenimiento",
+        "dateTitle": "Fecha",
+        "dateValue": "Sábado 3 de Febrero, 2024",
+        "timeTitle": "Horario",
+        "timeValue": "2:00 AM - 6:00 AM (4 horas)",
+        "typeTitle": "Tipo de Mantenimiento",
+        "typeValue": "Actualización de servidores y optimización de base de datos",
+        "recommendationsTitle": "Recomendaciones",
+        "recommendationSaveWork": "Guarda todo tu trabajo antes del mantenimiento",
+        "recommendationDownloadReports": "Descarga los reportes que necesites",
+        "recommendationPlanTasks": "Planifica tareas fuera del horario de mantenimiento"
+      },
+      "calendar": {
+        "title": "Agregar al Calendario",
+        "meetingTitle": "Reunión Trimestral de Equipo",
+        "dateValue": "Mañana - 3 de Febrero, 2024",
+        "timeValue": "10:00 AM - 12:00 PM",
+        "locationValue": "Sala de Conferencias Principal",
+        "agendaTitle": "Agenda",
+        "agenda": {
+          "reviewQ1": "Revisión de resultados Q1 2024",
+          "goalsQ2": "Objetivos para Q2 2024",
+          "projectsUpdate": "Actualización de proyectos en curso",
+          "newInitiatives": "Discusión de nuevas iniciativas",
+          "qaSession": "Sesión de preguntas y respuestas"
+        },
+        "confirm": "Confirmar",
+        "addedAlert": "¡Evento agregado al calendario! 📅"
       }
-    },
-    "cta": {
-      "title": "¿Listo para iniciar tu proyecto?",
-      "subtitle": "Agenda una consulta gratuita y descubre cómo podemos ayudarte a alcanzar tus objetivos",
-      "ctaSchedule": "Agendar Consulta Gratis",
-      "ctaPricing": "Ver Precios"
-    },
-    "features": "Características:",
-    "technologies": "Tecnologías:",
-    "request": "Solicitar"
-  },
-  "loginPage": {
-    "title": "Bienvenido de nuevo",
-    "subtitle": "Inicia sesión para acceder a tu panel",
-    "email": "Email",
-    "password": "Contraseña",
-    "remember": "Recuérdame",
-    "forgotPassword": "¿Olvidaste tu contraseña?",
-    "loginButton": "Iniciar Sesión",
-    "loggingIn": "Iniciando sesión...",
-    "socialGoogle": "Continuar con Google",
-    "socialGithub": "Continuar con GitHub",
-    "divider": "O continúa con email",
-    "noAccount": "¿No tienes una cuenta?",
-    "signUpLink": "Regístrate gratis",
-    "backHome": "← Volver al inicio",
-    "errorFields": "Por favor completa todos los campos"
-  },
-  "registerPage": {
-    "title": "Crea tu cuenta",
-    "subtitle": "Comienza a dar seguimiento a tus proyectos hoy",
-    "name": "Nombre Completo",
-    "email": "Email",
-    "phone": "Teléfono",
-    "company": "Empresa",
-    "password": "Contraseña",
-    "confirmPassword": "Confirmar Contraseña",
-    "agreeTerms": "Acepto los",
-    "termsLink": "términos y condiciones",
-    "and": "y la",
-    "privacyLink": "política de privacidad",
-    "createButton": "Crear Cuenta",
-    "creating": "Creando cuenta...",
-    "socialGoogle": "Google",
-    "socialGithub": "GitHub",
-    "divider": "O regístrate con email",
-    "hasAccount": "¿Ya tienes una cuenta?",
-    "loginLink": "Inicia sesión",
-    "backHome": "← Volver al inicio",
-    "passwordRequirements": "Requisitos de contraseña:",
-    "reqLength": "Al menos 8 caracteres",
-    "reqUppercase": "Una letra mayúscula",
-    "reqLowercase": "Una letra minúscula",
-    "reqNumber": "Un número",
-    "errorPasswordMismatch": "Las contraseñas no coinciden",
-    "errorPasswordLength": "La contraseña debe tener al menos 8 caracteres",
-    "errorTerms": "Debes aceptar los términos y condiciones",
-    "namePlaceholder": "Tu nombre",
-    "emailPlaceholder": "tu@email.com",
-    "phonePlaceholder": "+57 300 123 4567",
-    "companyPlaceholder": "Tu empresa",
-    "passwordPlaceholder": "••••••••"
-  },
-  "dashboardPage": {
-    "welcome": "Hola",
-    "subtitle": "Aquí está el resumen de tus proyectos",
-    "stats": {
-      "activeProjects": "Proyectos Activos",
-      "inProgress": "En Progreso",
-      "completed": "Completados",
-      "pending": "Pendientes"
-    },
-    "myProjects": "Mis Proyectos",
-    "viewAll": "Ver todos",
-    "projectStatus": {
-      "active": "Activo",
-      "completed": "Completado",
-      "pending": "Pendiente"
-    },
-    "dueDate": "Entrega",
-    "tasksCompleted": "tareas completadas",
-    "recentActivity": "Actividad Reciente",
-    "quickActions": "Acciones Rápidas",
-    "reports": "Informes",
-    "support": "Soporte",
-    "analytics": "Analytics",
-    "logout": "Cerrar Sesión",
-    "redirecting": "Redirigiendo..."
-  },
-  "homePage": {
-    "stats": {
-      "projects": "Proyectos Completados",
-      "clients": "Clientes Satisfechos",
-      "support": "Soporte Técnico",
-      "rating": "Calificación Promedio"
-    },
-    "cta": {
-      "title": "¿Listo para transformar tu negocio?",
-      "subtitle": "Hablemos de tu proyecto y descubre cómo podemos ayudarte a alcanzar tus objetivos.",
-      "button": "Ver planes"
     }
   },
   "pricingPage": {
     "badge": "Planes y Precios",
     "hero": {
-      "title": "Elige el Plan Perfecto para tu Negocio",
-      "subtitle": "Precios transparentes sin sorpresas. Paga solo por lo que necesitas"
+      "title": "Planes flexibles para impulsar tu negocio",
+      "subtitle": "Elige entre paquetes diseñados para distintas etapas de crecimiento"
     },
     "billing": {
       "monthly": "Mensual",
       "annual": "Anual",
-      "save": "Ahorra 17%",
+      "save": "Ahorra 17% con pago anual",
       "perMonth": "mes",
-      "saveAnnually": "Ahorra {percent}% anualmente"
+      "saveAnnually": "Ahorro anual: {percent}%"
     },
     "plans": {
       "starter": {
         "name": "Starter",
-        "description": "Perfecto para startups y proyectos pequeños",
+        "description": "Ideal para comenzar con presencia profesional",
         "deliveryTime": "2-3 semanas",
-        "support": "Email 48h",
+        "support": "Soporte por email",
         "features": {
-          "website5": "Sitio web responsive hasta 5 páginas",
-          "customDesign": "Diseño personalizado",
+          "website5": "Sitio web de hasta 5 páginas",
+          "customDesign": "Diseño personalizado básico",
           "contactForm": "Formulario de contacto",
-          "basicSEO": "Optimización SEO básica",
+          "basicSEO": "SEO básico",
           "hosting1year": "Hosting incluido (1 año)",
-          "ssl": "SSL certificado",
+          "ssl": "Certificado SSL",
           "revisions2": "2 rondas de revisión",
-          "emailSupport": "Soporte por email (48h)",
-          "adminPanel": "Panel de administración",
-          "ecommerce": "E-commerce",
+          "emailSupport": "Soporte por email",
+          "adminPanel": "Panel de administración CMS",
+          "ecommerce": "E-commerce básico",
           "apiIntegrations": "Integraciones API",
           "prioritySupport": "Soporte prioritario"
         }
       },
       "professional": {
         "name": "Professional",
-        "description": "Ideal para negocios en crecimiento",
-        "popular": "Más Popular",
-        "deliveryTime": "4-6 semanas",
-        "support": "Prioritario 24h",
+        "description": "Para empresas en crecimiento con necesidades avanzadas",
+        "deliveryTime": "4-8 semanas",
+        "support": "Soporte prioritario",
+        "popular": "Más popular",
         "features": {
-          "website15": "Sitio web responsive hasta 15 páginas",
+          "website15": "Sitio web de hasta 15 páginas",
           "advancedDesign": "Diseño personalizado avanzado",
           "adminPanel": "Panel de administración CMS",
           "blog": "Sistema de blog incluido",
@@ -785,35 +451,35 @@
       "items": {
         "hosting": {
           "question": "¿Qué incluye el hosting?",
-          "answer": "El hosting incluye espacio en servidor, dominio SSL, copias de seguridad diarias, y ancho de banda suficiente para tráfico normal. Después del primer año, puedes renovar o migrar a tu propio hosting."
+          "answer": "Incluye espacio en servidor, SSL, backups diarios y ancho de banda suficiente. Tras el primer año puedes renovar o migrar."
         },
         "changePlan": {
           "question": "¿Puedo cambiar de plan después?",
-          "answer": "Sí, puedes actualizar tu plan en cualquier momento. Solo pagas la diferencia prorrateada. También ofrecemos downgrades al final del período de facturación."
+          "answer": "Sí, puedes actualizar tu plan en cualquier momento. Solo pagas la diferencia prorrateada."
         },
         "moreFeatures": {
-          "question": "¿Qué pasa si necesito más páginas o funcionalidades?",
-          "answer": "Podemos agregar páginas o funcionalidades adicionales a cualquier plan. Te enviaremos una cotización personalizada según tus necesidades específicas."
+          "question": "¿Qué pasa si necesito más funcionalidades?",
+          "answer": "Agregamos funcionalidades extra en cualquier plan con una cotización personalizada."
         },
         "sourceCode": {
           "question": "¿Incluyen el código fuente?",
-          "answer": "Sí, todos nuestros planes incluyen el código fuente completo y los derechos de propiedad intelectual del proyecto desarrollado."
+          "answer": "Sí, incluye el código fuente y derechos de propiedad intelectual."
         },
         "guarantee": {
           "question": "¿Ofrecen garantía?",
-          "answer": "Ofrecemos 30 días de garantía después de la entrega. Si no estás satisfecho, trabajaremos hasta que lo estés o te devolvemos tu dinero."
+          "answer": "Sí, 30 días de garantía y soporte para asegurar tu satisfacción."
         },
         "payment": {
           "question": "¿Cómo es el proceso de pago?",
-          "answer": "Solicitamos 50% al inicio del proyecto y 50% al finalizar. Para proyectos grandes, podemos dividir en hitos. Aceptamos transferencias, tarjetas y PayPal."
+          "answer": "50% al inicio y 50% al finalizar. Para proyectos grandes, trabajamos por hitos."
         },
         "training": {
-          "question": "¿Dan capacitación para usar el sistema?",
-          "answer": "Sí, todos los planes incluyen capacitación para usar el panel de administración. En el plan Professional y Enterprise, incluimos sesiones de capacitación más extensas."
+          "question": "¿Incluyen capacitación?",
+          "answer": "Sí, capacitación para usar el panel de administración y herramientas clave."
         },
         "technologies": {
           "question": "¿Qué tecnologías utilizan?",
-          "answer": "Utilizamos tecnologías modernas y probadas como React, Next.js, Node.js, PostgreSQL, y AWS. Elegimos la mejor tecnología según las necesidades de cada proyecto."
+          "answer": "React, Next.js, Node.js, PostgreSQL, AWS, entre otras. Elegimos la mejor según el proyecto."
         }
       },
       "moreQuestions": "¿Tienes más preguntas?",
@@ -821,156 +487,192 @@
     },
     "customPlan": {
       "title": "¿Necesitas un plan personalizado?",
-      "subtitle": "Contáctanos para una cotización a medida según tus necesidades específicas",
+      "subtitle": "Contáctanos para una cotización a medida según tus necesidades",
       "button": "Solicitar Cotización Personalizada"
     }
-  },
-  "aboutPage": {
-    "badge": "Sobre Nosotros",
-    "hero": {
-      "title": "Transformamos Ideas en Realidad Digital",
-      "subtitle": "Somos un equipo apasionado por la tecnología, dedicado a crear soluciones innovadoras que impulsan el éxito de nuestros clientes"
-    },
-    "stats": {
-      "projects": "Proyectos Completados",
-      "clients": "Clientes Satisfechos",
-      "experience": "Años de Experiencia",
-      "satisfaction": "Tasa de Satisfacción"
-    },
-    "mission": {
-      "title": "Nuestra Misión",
-      "text1": "En KopTup, nuestra misión es empoderar a las empresas mediante soluciones tecnológicas innovadoras y personalizadas. Creemos que la tecnología debe ser accesible, eficiente y escalable para todos.",
-      "text2": "Nos especializamos en convertir desafíos complejos en soluciones elegantes, combinando creatividad con excelencia técnica para entregar productos que no solo cumplen, sino que superan las expectativas.",
-      "points": {
-        "custom": "Soluciones personalizadas a medida",
-        "modern": "Tecnologías de última generación",
-        "support": "Soporte continuo y mantenimiento"
+  }
+  ,
+  "demos": {
+    "badge": "Demos Interactivas",
+    "title": "Prueba Nuestras Soluciones",
+    "subtitle": "Explora demos funcionales de nuestros productos y servicios",
+    "interactive": "100% Interactivo - Sin registro",
+    "includes": "Incluye:",
+    "tryDemo": "Probar Demo",
+    "chatbot": {
+      "badge": "Con IA",
+      "title": "Chatbot Inteligente",
+      "description": "Crea y personaliza tu asistente virtual con IA",
+      "features": {
+        "0": "Entrenamiento con documentos",
+        "1": "Respuestas contextuales",
+        "2": "Analítica de conversaciones",
+        "3": "Integración con web/app"
       }
     },
-    "values": {
-      "title": "Nuestros Valores",
-      "subtitle": "Los principios que guían cada decisión y proyecto que emprendemos",
-      "items": {
-        "innovation": {
-          "title": "Innovación Constante",
-          "description": "Adoptamos las últimas tecnologías y metodologías para ofrecer soluciones de vanguardia."
-        },
-        "excellence": {
-          "title": "Pasión por la Excelencia",
-          "description": "Cada proyecto es una oportunidad para superar expectativas y crear productos excepcionales."
-        },
-        "creativity": {
-          "title": "Creatividad sin Límites",
-          "description": "Pensamos fuera de la caja para resolver problemas complejos con soluciones elegantes."
-        },
-        "transparency": {
-          "title": "Transparencia Total",
-          "description": "Comunicación clara, honesta y constante en cada etapa del proyecto."
-        },
-        "clientFirst": {
-          "title": "Cliente en el Centro",
-          "description": "Tu éxito es nuestro éxito. Trabajamos como una extensión de tu equipo."
-        },
-        "results": {
-          "title": "Resultados Medibles",
-          "description": "Nos enfocamos en entregar valor real y ROI demostrable en cada proyecto."
-        }
+    "ecommerce": {
+      "badge": "Completo",
+      "title": "Tienda en Línea",
+      "description": "Carrito, checkout, gestión de productos y analytics",
+      "features": {
+        "0": "Carrito y checkout",
+        "1": "Panel admin",
+        "2": "Pagos y envíos",
+        "3": "Reportes de ventas"
       }
     },
-    
-    "team": {
-      "title": "Nuestro Equipo",
-      "subtitle": "Profesionales apasionados con experiencia en tecnologías de vanguardia",
-      "members": {
-        "ronald": {
-          "name": "Ronald Cipagauta",
-          "role": "CEO & Desarrollador Full Stack",
-          "description": "Desarrollador Full Stack con experiencia en frontend, backend e integración de IA. Especializado en construir soluciones escalables con React, Node.js y OpenAI."
-        },
-        "johan": {
-          "name": "Johan Mendieta",
-          "role": "Desarrollador Senior",
-          "description": "Desarrollador de software con experiencia en frontend, backend y arquitectura de microservicios. Liderando soluciones impulsadas por OpenAI con embeddings y búsqueda semántica."
-        },
-        "juan_vargas": {
-          "name": "Juan Vargas",
-          "role": "Desarrollador Full Stack",
-          "description": "Desarrollador Full Stack especializado en desarrollo de APIs, reportería empresarial e integración en la nube con Microsoft 365 y Azure. Experto en chatbots con IA."
-        },
-        "juan_pablo": {
-          "name": "Juan Pablo Caicedo",
-          "role": "Desarrollador Full Stack",
-          "description": "Desarrollador Full Stack especializado en diseño, desarrollo e implementación de aplicaciones web. Experto en JavaScript, Microsoft D365 y gestión de bases de datos."
-        }
+    "executive": {
+      "badge": "KPIs",
+      "title": "Dashboard Ejecutivo",
+      "description": "Panel con KPIs, finanzas y reportes",
+      "features": {
+        "0": "Métricas de negocio",
+        "1": "Análisis de ventas",
+        "2": "Proyecciones",
+        "3": "Exportación a PDF"
       }
-    }
-    ,
-  "history": {
-  "title": "Nuestra Historia",
-  "subtitle": "El camino que nos llevó a donde estamos hoy",
-  "milestones": {
-    "2019": {
-      "title": "Inicios Independientes",
-      "description": "Equipo colombiano colaborando con profesionales en México. Proyectos universitarios y para pequeños negocios."
     },
-    "2021": {
-      "title": "Proyectos de Backend y Sistemas",
-      "description": "Desarrollo en Java y Python para e-commerce. Configuración de clusters y replicación en CentOS. Enfoque técnico en backend."
+    "documents": {
+      "badge": "Búsqueda",
+      "title": "Gestor Documental",
+      "description": "Organiza, busca y comparte documentos",
+      "features": {
+        "0": "Etiquetas y versiones",
+        "1": "Búsqueda semántica",
+        "2": "Control de acceso",
+        "3": "Previsualización"
+      }
     },
-    "2022": {
-      "title": "Aplicación de IA",
-      "description": "Modelos de machine learning y deep learning para clientes en Costa Rica. Desarrollo de chatbot para procesos de recursos humanos."
+    "reservations": {
+      "badge": "Calendario",
+      "title": "Sistema de Reservas",
+      "description": "Reservas online con calendario y notificaciones",
+      "features": {
+        "0": "Gestión de disponibilidad",
+        "1": "Recordatorios",
+        "2": "Pagos online",
+        "3": "Panel de administración"
+      }
     },
-    "2023": {
-      "title": "Registro Oficial",
-      "description": "Registro en Cámara de Comercio el 26/03/2023. Formalización de la operación y ampliación de servicios."
+    "contentManager": {
+      "badge": "CMS",
+      "title": "Gestor de Contenido",
+      "description": "Blog, páginas y editor visual",
+      "features": {
+        "0": "Editor WYSIWYG",
+        "1": "SEO y metadatos",
+        "2": "Publicación programada",
+        "3": "Roles y permisos"
+      }
     },
-    "2025": {
-      "title": "Proyecto Sector Salud",
-      "description": "Desarrollo de solución para presentación a la Secretaría de Salud en Colombia."
+    "projects": {
+      "badge": "Ágil",
+      "title": "Gestión de Proyectos",
+      "description": "Kanban, sprints y tareas colaborativas",
+      "features": {
+        "0": "Tableros Kanban",
+        "1": "Gestión de sprints",
+        "2": "Tareas y comentarios",
+        "3": "Reportes"
+      }
+    },
+    "custom": {
+      "title": "¿Necesitas una demo personalizada?",
+      "description": "Creamos una demo ajustada a tu caso de uso",
+      "button": "Solicitar Demo"
+    },
+    "accessModal": {
+      "openButton": "Acceder con código",
+      "title": "Acceso a Demo Privada",
+      "description": "Ingresa el código para acceder a la demo privada de auditoría médica",
+      "label": "Código de acceso",
+      "placeholder": "Ej. 2020",
+      "cancel": "Cancelar",
+      "access": "Acceder",
+      "noCodeHint": "¿No tienes código? Contacta nuestro equipo comercial.",
+      "error": "Código inválido, intenta nuevamente."
     }
   }
-}
-
   ,
-    "technologies": {
-      "title": "Tecnologías que Dominamos",
-      "subtitle": "Stack tecnológico moderno para soluciones de clase mundial"
-    },
-    "cta": {
-      "title": "¿Listo para Trabajar Juntos?",
-      "subtitle": "Únete a las empresas que ya confían en nosotros para impulsar su transformación digital",
-      "button1": "Hablemos de tu Proyecto",
-      "button2": "Ver Nuestros Servicios"
-    }
+  "loginPage": {
+    "title": "Iniciar Sesión",
+    "subtitle": "Accede a tu cuenta para continuar",
+    "socialGoogle": "Continuar con Google",
+    "socialGithub": "Continuar con GitHub",
+    "divider": "o con tu correo",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "remember": "Recordarme",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "loggingIn": "Iniciando...",
+    "loginButton": "Ingresar",
+    "noAccount": "¿No tienes cuenta?",
+    "signUpLink": "Crear cuenta",
+    "backHome": "Volver al inicio",
+    "errorFields": "Por favor verifica tu correo y contraseña."
+  },
+  "registerPage": {
+    "title": "Crear Cuenta",
+    "subtitle": "Regístrate para comenzar",
+    "socialGoogle": "Registrarse con Google",
+    "socialGithub": "Registrarse con GitHub",
+    "divider": "o con tu correo",
+    "name": "Nombre completo",
+    "namePlaceholder": "Tu nombre",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "tu@email.com",
+    "phone": "Teléfono",
+    "phonePlaceholder": "+57 300 000 0000",
+    "company": "Empresa",
+    "companyPlaceholder": "Tu empresa",
+    "password": "Contraseña",
+    "passwordPlaceholder": "••••••••",
+    "confirmPassword": "Confirmar contraseña",
+    "passwordRequirements": "Tu contraseña debe cumplir:",
+    "reqLength": "Mínimo 8 caracteres",
+    "reqUppercase": "Al menos una mayúscula",
+    "reqLowercase": "Al menos una minúscula",
+    "reqNumber": "Al menos un número",
+    "agreeTerms": "Acepto los",
+    "termsLink": "Términos",
+    "and": "y",
+    "privacyLink": "Privacidad",
+    "creating": "Creando cuenta...",
+    "createButton": "Crear cuenta",
+    "hasAccount": "¿Ya tienes cuenta?",
+    "loginLink": "Iniciar sesión",
+    "backHome": "Volver al inicio",
+    "errorPasswordMismatch": "Las contraseñas no coinciden.",
+    "errorPasswordLength": "La contraseña debe tener al menos 8 caracteres.",
+    "errorTerms": "Debes aceptar los términos y la privacidad."
   },
   "contactPage": {
     "badge": "Contacto",
     "hero": {
-      "title": "Hablemos de tu Proyecto",
-      "subtitle": "Estamos listos para convertir tu visión en realidad. Agenda una consulta gratuita"
+      "title": "Hablemos de tu proyecto",
+      "subtitle": "Listos para convertir tu visión en realidad. Agenda una consulta gratuita"
     },
     "form": {
       "title": "Envíanos un Mensaje",
       "subtitle": "Completa el formulario y te responderemos en menos de 24 horas",
-      "name": "Nombre Completo",
+      "name": "Nombre completo",
       "email": "Email",
       "phone": "Teléfono",
       "company": "Empresa",
-      "service": "Servicio de Interés",
-      "budget": "Presupuesto Estimado",
-      "message": "Cuéntanos sobre tu Proyecto",
+      "service": "Servicio de interés",
+      "budget": "Presupuesto estimado",
+      "message": "Cuéntanos sobre tu proyecto",
       "namePlaceholder": "Tu nombre",
       "emailPlaceholder": "tu@email.com",
-      "phonePlaceholder": "+57 300 123 4567",
+      "phonePlaceholder": "+57 300 000 0000",
       "companyPlaceholder": "Tu empresa",
       "servicePlaceholder": "Selecciona un servicio",
       "budgetPlaceholder": "Selecciona un rango",
       "messagePlaceholder": "Describe tu proyecto, objetivos y cualquier detalle importante...",
-      "submit": "Enviar Mensaje",
+      "submit": "Enviar mensaje",
       "submitting": "Enviando...",
       "success": {
-        "title": "¡Mensaje Enviado!",
+        "title": "¡Mensaje enviado!",
         "subtitle": "Gracias por contactarnos. Te responderemos pronto."
       }
     },
@@ -992,52 +694,34 @@
       "5": "Más de $25,000"
     },
     "info": {
-      "email": {
-        "title": "Email",
-        "value": "contacto@koptup.com"
-      },
-      "phone": {
-        "title": "Teléfono",
-        "value": "+57 300 123 4567"
-      },
-      "location": {
-        "title": "Ubicación",
-        "value": "Medellín, Colombia"
-      },
-      "hours": {
-        "title": "Horario",
-        "value": "Lun - Vie: 8am - 6pm"
-      }
+      "email": { "title": "Email" },
+      "phone": { "title": "Teléfono" },
+      "location": { "title": "Ubicación" },
+      "hours": { "title": "Horario", "value": "Lun - Vie: 8am - 6pm" }
     },
-    "social": {
-      "title": "Síguenos en Redes"
-    },
+    "social": { "title": "Síguenos en redes" },
     "schedule": {
-      "title": "Agenda una Llamada",
-      "subtitle": "Programa una consulta gratuita de 30 minutos",
-      "button": "Agendar Ahora"
+      "title": "Agendar Llamada",
+      "subtitle": "Agenda una consulta gratuita de 30 minutos",
+      "button": "Agendar ahora"
     },
     "faq": {
       "title": "Preguntas Frecuentes",
-      "subtitle": "Respuestas rápidas a dudas comunes",
+      "subtitle": "Resolvemos las dudas más comunes",
       "items": {
         "time": {
-          "question": "¿Cuánto tiempo toma un proyecto?",
-          "answer": "Depende del alcance, pero típicamente de 2-12 semanas. Te damos estimados precisos en la consulta inicial."
+          "question": "¿En cuánto tiempo responden?",
+          "answer": "Respondemos en menos de 24 horas hábiles."
         },
         "guarantee": {
           "question": "¿Ofrecen garantía?",
-          "answer": "Sí, 30 días de garantía y soporte continuo para asegurar tu satisfacción total."
+          "answer": "Sí, 30 días de garantía y soporte post-entrega."
         },
         "startups": {
           "question": "¿Trabajan con startups?",
-          "answer": "Absolutamente. Tenemos planes especiales para startups y empresas en etapa temprana."
+          "answer": "¡Claro! Tenemos planes flexibles y acompañamiento."
         }
       }
-    },
-    "map": {
-      "title": "Medellín, Colombia",
-      "subtitle": "Mapa interactivo próximamente"
     }
   }
 }

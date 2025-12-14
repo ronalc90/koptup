@@ -249,12 +249,12 @@ export default function PricingPage() {
                   variant={plan.popular ? 'elevated' : 'bordered'}
                   className={`relative ${
                     plan.popular
-                      ? 'border-primary-500 dark:border-primary-500 shadow-xl scale-105 z-10'
+                      ? 'border-primary-500 dark:border-primary-500 shadow-xl md:scale-105 md:z-10'
                       : 'hover:shadow-large'
                   } transition-all`}
                 >
                   {plan.popular && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                    <div className="mt-2 mb-4 flex justify-center md:absolute md:-top-4 md:left-1/2 md:-translate-x-1/2 md:mt-0 md:mb-0">
                       <Badge variant="primary" size="lg">
                         {t('plans.professional.popular')}
                       </Badge>
@@ -270,7 +270,7 @@ export default function PricingPage() {
 
                     <div className="mt-6">
                       <div className="flex items-baseline justify-center gap-2">
-                        <span className="text-5xl font-bold text-secondary-900 dark:text-white">
+                        <span className="text-4xl md:text-5xl font-bold text-secondary-900 dark:text-white">
                           ${price.toLocaleString()}
                         </span>
                         <span className="text-secondary-600 dark:text-secondary-400">

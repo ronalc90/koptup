@@ -2,10 +2,17 @@
 const createNextIntlPlugin = require('next-intl/plugin');
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
+process.env._next_intl_trailing_slash = process.env._next_intl_trailing_slash ?? 'false';
 
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  poweredByHeader: false,
+
+  env: {
+    _next_intl_trailing_slash: 'false'
+  },
+  trailingSlash: false,
 
   // Image optimization
   images: {
@@ -15,7 +22,7 @@ const nextConfig = {
 
   // Performance optimizations
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
+    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
   },
 
   // Security headers
@@ -41,12 +48,13 @@ const nextConfig = {
             value: 'nosniff'
           },
           {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block'
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin'
           },
           {
-            key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin'
+            key: 'Content-Security-Policy',
+            value:
+              "default-src 'self'; img-src 'self' data: https://koptup-uploads.s3.amazonaws.com https://images.unsplash.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://koptup-uploads.s3.amazonaws.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"
           }
         ]
       }

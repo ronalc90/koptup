@@ -211,10 +211,10 @@ export default function PricingPage() {
 
             {/* Billing Toggle */}
             <div className="inline-flex flex-col items-center gap-3">
-              <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full p-2">
+              <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full p-2 max-w-[95vw]">
                 <button
                   onClick={() => setBillingPeriod('monthly')}
-                  className={`px-8 py-3 rounded-full transition-all duration-300 ${
+                  className={`px-5 py-3 text-sm sm:px-8 sm:text-base rounded-full transition-all duration-300 ${
                     billingPeriod === 'monthly'
                       ? 'bg-white text-primary-600 font-semibold shadow-lg'
                       : 'text-white hover:text-primary-100 hover:bg-white/5'
@@ -224,7 +224,7 @@ export default function PricingPage() {
                 </button>
                 <button
                   onClick={() => setBillingPeriod('annual')}
-                  className={`px-8 py-3 rounded-full transition-all duration-300 relative ${
+                  className={`px-5 py-3 text-sm sm:px-8 sm:text-base rounded-full transition-all duration-300 relative ${
                     billingPeriod === 'annual'
                       ? 'bg-white text-primary-600 font-semibold shadow-lg'
                       : 'text-white hover:text-primary-100 hover:bg-white/5'
@@ -260,12 +260,12 @@ export default function PricingPage() {
                   variant={plan.popular ? 'elevated' : 'bordered'}
                   className={`relative ${
                     plan.popular
-                      ? 'border-primary-500 dark:border-primary-500 shadow-xl scale-105 z-10'
+                      ? 'border-primary-500 dark:border-primary-500 shadow-xl md:scale-105 md:z-10'
                       : 'hover:shadow-large'
                   } transition-all`}
                 >
                   {plan.popular && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                    <div className="mt-2 mb-4 flex justify-center md:absolute md:-top-4 md:left-1/2 md:-translate-x-1/2 md:mt-0 md:mb-0">
                       <Badge variant="primary" size="lg">
                         {t('plans.professional.popular')}
                       </Badge>
@@ -281,7 +281,7 @@ export default function PricingPage() {
 
                     <div className="mt-6">
                       <div className="flex items-baseline justify-center gap-2">
-                        <span className="text-5xl font-bold text-secondary-900 dark:text-white">
+                        <span className="text-4xl md:text-5xl font-bold text-secondary-900 dark:text-white">
                           ${formatPrice(price)}
                         </span>
                         <span className="text-secondary-600 dark:text-secondary-400">

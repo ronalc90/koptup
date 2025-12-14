@@ -574,7 +574,7 @@ export default function EcommerceDemoPage() {
   return (
     <div className="min-h-screen bg-secondary-50 dark:bg-secondary-950">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white dark:bg-secondary-900 border-b border-secondary-200 dark:border-secondary-800 shadow-sm">
+      <header className="sticky top-16 md:top-20 z-50 bg-white dark:bg-secondary-900 border-b border-secondary-200 dark:border-secondary-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
@@ -788,10 +788,10 @@ export default function EcommerceDemoPage() {
       {isCartOpen && (
         <>
           <div
-            className="fixed inset-0 bg-black/50 z-40"
+            className="fixed inset-0 bg-black/50 z-[150]"
             onClick={() => setIsCartOpen(false)}
           />
-          <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white dark:bg-secondary-900 shadow-2xl z-50 flex flex-col">
+          <div className="fixed right-0 top-16 md:top-20 bottom-0 w-full max-w-md bg-white dark:bg-secondary-900 shadow-2xl z-[200] flex flex-col">
             {/* Cart Header */}
             <div className="p-6 border-b border-secondary-200 dark:border-secondary-800 flex items-center justify-between">
               <h2 className="text-2xl font-bold text-secondary-900 dark:text-white">

@@ -698,7 +698,7 @@ export default function ControlProyectos() {
     <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       <div className="flex h-screen">
         {/* Sidebar */}
-        <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col">
+        <aside className="hidden md:flex md:w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex-col">
           <div className="p-6 border-b border-slate-200 dark:border-slate-800">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-lg flex items-center justify-center">
@@ -769,7 +769,7 @@ export default function ControlProyectos() {
         {/* Main Content */}
         <main className="flex-1 flex flex-col overflow-hidden">
           {/* Header */}
-          <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4">
+          <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-3 sm:px-6 sm:py-4">
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">
@@ -782,7 +782,7 @@ export default function ControlProyectos() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setView('project')}
-                  className="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
+                  className="px-3 py-2 text-sm sm:px-4 sm:py-2 sm:text-base bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
                 >
                   <ChartPieIcon className="w-5 h-5" />
                   Vista de Proyecto
@@ -955,11 +955,11 @@ export default function ControlProyectos() {
       {showNewProjectModal && (
         <>
           <div
-            className="fixed inset-0 bg-black/50 z-40"
+            className="fixed inset-0 bg-black/50 z-[150]"
             onClick={() => setShowNewProjectModal(false)}
           />
           <div className="fixed inset-0 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-6 w-full max-w-md">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-6 w-full max-w-md z-[200]">
               <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Nuevo Proyecto</h3>
               <form onSubmit={(e) => {
                 e.preventDefault();
@@ -1025,11 +1025,11 @@ export default function ControlProyectos() {
       {showNewTaskModal && (
         <>
           <div
-            className="fixed inset-0 bg-black/50 z-40"
+            className="fixed inset-0 bg-black/50 z-[150]"
             onClick={() => setShowNewTaskModal(null)}
           />
           <div className="fixed inset-0 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-6 w-full max-w-md">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-6 w-full max-w-md z-[200]">
               <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Nueva Tarea</h3>
               <form onSubmit={(e) => {
                 e.preventDefault();
@@ -1090,10 +1090,10 @@ export default function ControlProyectos() {
       {selectedTask && (
         <>
           <div
-            className="fixed inset-0 bg-black/50 z-40"
+            className="fixed inset-0 bg-black/50 z-[150]"
             onClick={() => setSelectedTask(null)}
           />
-          <div className="fixed right-0 top-0 h-full w-full max-w-2xl bg-white dark:bg-slate-900 z-50 shadow-2xl overflow-y-auto">
+          <div className="fixed right-0 top-16 md:top-20 bottom-0 w-full max-w-2xl bg-white dark:bg-slate-900 z-[200] shadow-2xl overflow-y-auto">
             <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-6 z-10">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -1123,7 +1123,7 @@ export default function ControlProyectos() {
               </div>
 
               {/* Details */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <h4 className="text-sm font-semibold text-slate-500 mb-1">Asignado a</h4>
                   <div className="flex items-center gap-2">

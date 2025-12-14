@@ -197,8 +197,21 @@ class ApiClient {
 
   // Get current user
   async getCurrentUser() {
-    const response = await this.client.get('/api/auth/profile');
-    return response.data.data;
+    try {
+      const response = await this.client.get('/api/auth/profile');
+      return response.data.data;
+    } catch (error: any) {
+      const suppressible =
+        error?.code === 'ERR_NETWORK' ||
+        !error?.response ||
+        error?.response?.status === 401;
+      if (suppressible) {
+        const silentError = new Error('Profile unavailable');
+        Object.defineProperty(silentError, 'suppressLogging', { value: true });
+        throw silentError;
+      }
+      throw error;
+    }
   }
 
   // Document upload
@@ -427,6 +440,32 @@ class ApiClient {
     targetUserId?: string;
   }) {
     const response = await this.client.post('/api/notifications', data);
+    return response.data;
+  }
+
+  // Admin endpoints
+  async adminGetOrders(status?: string) {
+    const response = await this.client.get('/api/admin/orders', { params: { status } });
+    return response.data.data;
+  }
+
+  async adminUpdateOrderStatus(id: string, status: 'pending' | 'in_progress' | 'shipped' | 'completed' | 'cancelled') {
+    const response = await this.client.patch(`/api/admin/orders/${id}/status`, { status });
+    return response.data;
+  }
+
+  async adminGetInvoices(status?: string) {
+    const response = await this.client.get('/api/admin/invoices', { params: { status } });
+    return response.data.data;
+  }
+
+  async adminGetDeliverables(status?: string, projectId?: string) {
+    const response = await this.client.get('/api/admin/deliverables', { params: { status, projectId } });
+    return response.data.data;
+  }
+
+  async adminCreateInvoiceFromOrder(orderId: string) {
+    const response = await this.client.post(`/api/admin/orders/${orderId}/invoice`);
     return response.data;
   }
 

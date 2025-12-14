@@ -473,7 +473,7 @@ export default function ContactPage() {
       </section>
 
       {/* Map Section */}
-      <section className="h-96 bg-secondary-200 dark:bg-secondary-800">
+      <section className="h-72 sm:h-96 bg-secondary-200 dark:bg-secondary-800">
         <div className="w-full h-full">
           <iframe
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.9146859817846!2d-74.11588!3d4.609572!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f9e8f8f8f8f8f%3A0x8f8f8f8f8f8f8f8f!2sAv.%2068%20%231-63%2C%20Bogot%C3%A1%2C%20Colombia!5e0!3m2!1ses!2sco!4v1234567890123!5m2!1ses!2sco"
