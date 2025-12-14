@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import Badge from '@/components/ui/Badge';
 import Card, { CardContent } from '@/components/ui/Card';
 import {
@@ -12,6 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 export default function PrivacyPage() {
+  const t = useTranslations('privacyPage');
   const sections = [
     {
       icon: DocumentTextIcon,
@@ -151,10 +153,10 @@ export default function PrivacyPage() {
               Actualizado: Noviembre 2025
             </Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-              Política de Privacidad
+              {t('hero.title')}
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-primary-100">
-              En KopTup, protegemos y respetamos su privacidad. Esta política explica cómo recopilamos, usamos y protegemos su información personal.
+              {t('hero.subtitle')}
             </p>
             <div className="flex items-center justify-center gap-2 text-primary-100">
               <ShieldCheckIcon className="h-5 w-5" />

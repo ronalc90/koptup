@@ -12,6 +12,11 @@
     @apply border-secondary-200 dark:border-secondary-700;
   }
 
+  html {
+    /* Evita saltos al mostrar/ocultar scrollbar cuando se bloquea el scroll con modales */
+    scrollbar-gutter: stable both-edges;
+  }
+
   body {
     @apply bg-white dark:bg-secondary-950 text-secondary-900 dark:text-secondary-100;
   }

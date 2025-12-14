@@ -162,7 +162,7 @@ export default function OrdersPage() {
             </p>
           </div>
           <Button asChild>
-            <Link href="/contact?type=new-order">Nuevo Pedido</Link>
+            <Link href="/dashboard/orders/new">Nuevo Pedido</Link>
           </Button>
         </div>
 

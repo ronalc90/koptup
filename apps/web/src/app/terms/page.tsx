@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import Badge from '@/components/ui/Badge';
 import Card, { CardContent } from '@/components/ui/Card';
 import {
@@ -31,6 +32,7 @@ interface AdditionalTerm {
 }
 
 export default function TermsPage() {
+  const t = useTranslations('termsPage');
   const sections: Section[] = [
     {
       icon: DocumentCheckIcon,
@@ -203,10 +205,10 @@ export default function TermsPage() {
               Actualizado: Noviembre 2025
             </Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-              Términos y Condiciones
+              {t('hero.title')}
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-primary-100">
-              Estos términos rigen el uso de nuestros servicios y establecen los derechos y obligaciones entre KopTup y nuestros clientes.
+              {t('hero.subtitle')}
             </p>
             <div className="flex items-center justify-center gap-2 text-primary-100">
               <ScaleIcon className="h-5 w-5" />

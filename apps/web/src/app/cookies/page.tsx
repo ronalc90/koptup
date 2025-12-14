@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import Badge from '@/components/ui/Badge';
 import Card, { CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -15,6 +16,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 export default function CookiesPage() {
+  const t = useTranslations('cookiesPage');
   const [essentialEnabled, setEssentialEnabled] = useState(true);
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
   const [functionalEnabled, setFunctionalEnabled] = useState(false);
@@ -169,14 +171,14 @@ export default function CookiesPage() {
               Actualizado: Noviembre 2025
             </Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-              Política de Cookies
+              {t('hero.title')}
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-primary-100">
-              Información sobre cómo utilizamos las cookies y tecnologías similares en nuestro sitio web.
+              {t('hero.subtitle')}
             </p>
             <div className="flex items-center justify-center gap-2 text-primary-100">
               <CakeIcon className="h-5 w-5" />
-              <span>Transparencia en el uso de cookies</span>
+              <span>Preferencias transparentes y controladas por ti</span>
             </div>
           </div>
         </div>

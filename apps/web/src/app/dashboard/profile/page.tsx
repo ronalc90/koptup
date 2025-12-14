@@ -110,8 +110,10 @@ export default function ProfilePage() {
           postalCode: user.company.postalCode || '110111',
         });
       }
-    } catch (error) {
-      console.error('Failed to load profile from API, using fallback data:', error);
+    } catch (error: any) {
+      if (!error?.suppressLogging) {
+        console.error('Failed to load profile from API, using fallback data:', error);
+      }
 
       // Fallback to localStorage or default values
       const userData = localStorage.getItem('user');

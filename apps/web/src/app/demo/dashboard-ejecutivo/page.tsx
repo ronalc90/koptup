@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { jsPDF } from 'jspdf';
+import { useTranslations } from 'next-intl';
 import {
   ChartBarIcon,
   ArrowTrendingUpIcon,
@@ -30,15 +32,24 @@ import {
 type ViewType = 'dashboard' | 'finanzas' | 'clientes' | 'configuracion' | 'notificaciones';
 
 export default function DashboardEjecutivo() {
+  const t = useTranslations('execDashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [selectedDate, setSelectedDate] = useState('Enero 2024');
+  const [selectedDate, setSelectedDate] = useState(t('months.january2024'));
   const [activeView, setActiveView] = useState<ViewType>('dashboard');
+  const [searchActiveIndex, setSearchActiveIndex] = useState(0);
 
   // Estados de configuración
   const [darkMode, setDarkMode] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [autoExport, setAutoExport] = useState(true);
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
+  const [company, setCompany] = useState({
+    name: 'KopTup Tech Solutions',
+    tax: '900.123.456-7',
+    email: 'contacto@koptup.com',
+    phone: '+57 (1) 234 5678',
+    address: 'Calle 100 #20-50, Bogotá, Colombia',
+  });
 
   // Estados para búsqueda y notificaciones
   const [searchQuery, setSearchQuery] = useState('');
@@ -51,16 +62,23 @@ export default function DashboardEjecutivo() {
   const [showMaintenanceModal, setShowMaintenanceModal] = useState(false);
   const [showClientModal, setShowClientModal] = useState(false);
   const [showCalendarModal, setShowCalendarModal] = useState(false);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
 
   // Cargar preferencias desde localStorage al montar
   useEffect(() => {
     const savedDarkMode = localStorage.getItem('darkMode') === 'true';
     const savedEmailNotif = localStorage.getItem('emailNotifications') !== 'false';
     const savedAutoExport = localStorage.getItem('autoExport') !== 'false';
+    const savedCompany = localStorage.getItem('company');
 
     setDarkMode(savedDarkMode);
     setEmailNotifications(savedEmailNotif);
     setAutoExport(savedAutoExport);
+    if (savedCompany) {
+      try {
+        setCompany(JSON.parse(savedCompany));
+      } catch {}
+    }
   }, []);
 
   // Aplicar dark mode al documento
@@ -72,57 +90,133 @@ export default function DashboardEjecutivo() {
     }
   }, [darkMode]);
 
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowReportModal(false);
+        setShowSalesDetailModal(false);
+        setShowMaintenanceModal(false);
+        setShowClientModal(false);
+        setShowCalendarModal(false);
+        setShowNotifications(false);
+        setShowSearchResults(false);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
+  useEffect(() => {
+    const isMobile = window.matchMedia('(max-width: 767px)').matches;
+    const modalOpen =
+      showReportModal ||
+      showSalesDetailModal ||
+      showMaintenanceModal ||
+      showClientModal ||
+      showCalendarModal;
+    const shouldLock = modalOpen || (isMobile && sidebarOpen);
+    document.body.style.overflow = shouldLock ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showReportModal, showSalesDetailModal, showMaintenanceModal, showClientModal, showCalendarModal, sidebarOpen]);
   // Función para guardar cambios
   const handleSaveChanges = () => {
     localStorage.setItem('darkMode', darkMode.toString());
     localStorage.setItem('emailNotifications', emailNotifications.toString());
     localStorage.setItem('autoExport', autoExport.toString());
+    localStorage.setItem('company', JSON.stringify(company));
 
     setShowSaveSuccess(true);
     setTimeout(() => setShowSaveSuccess(false), 3000);
+  };
+
+  const handleDownloadPdf = async () => {
+    setDownloadingPdf(true);
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text(t('modals.report.title'), 14, 20);
+    doc.setFontSize(12);
+    doc.text(t('modals.report.execSummary'), 14, 32);
+    doc.text(`${t('modals.report.totalRevenue')}: $2,450,000 (${t('modals.report.revenueDelta')})`, 14, 40);
+    doc.text(`${t('modals.report.totalExpenses')}: $1,850,000 (${t('modals.report.expensesDelta')})`, 14, 48);
+    doc.text(`${t('modals.report.netProfit')}: $600,000 (${t('modals.report.netProfitDelta')})`, 14, 56);
+    doc.text(t('modals.report.salesAnalysis'), 14, 72);
+    doc.text('• Ventas por productos: $1,450,000 (59%)', 14, 80);
+    doc.text('• Ventas por servicios: $780,000 (32%)', 14, 88);
+    doc.text('• Otros ingresos: $220,000 (9%)', 14, 96);
+    doc.text('• Clientes nuevos: 145 (+28%)', 14, 104);
+    doc.text('• Tasa de retención: 87%', 14, 112);
+    doc.text(t('modals.report.operationalExpenses'), 14, 128);
+    doc.text('• Nómina: $980,000 (53%)', 14, 136);
+    doc.text('• Infraestructura: $420,000 (23%)', 14, 144);
+    doc.text('• Marketing: $280,000 (15%)', 14, 152);
+    doc.text('• Administrativos: $170,000 (9%)', 14, 160);
+    doc.save('reporte-financiero-enero-2024.pdf');
+    setDownloadingPdf(false);
+  };
+  const handleAddToCalendar = () => {
+    const ics = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'BEGIN:VEVENT',
+      `SUMMARY:${t('modals.calendar.meetingTitle')}`,
+      'DTSTART:20240203T100000',
+      'DTEND:20240203T120000',
+      `LOCATION:${t('modals.calendar.locationValue')}`,
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ].join('\n');
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'evento.ics';
+    a.click();
+    URL.revokeObjectURL(url);
+    setShowCalendarModal(false);
   };
 
   // Datos KPI
   const kpis = [
     {
       id: 1,
-      title: 'Ingresos del Mes',
+      title: t('kpis.revenueTitle'),
       value: '$1,245,890',
       change: '+12.5%',
       isPositive: true,
       icon: CurrencyDollarIcon,
       color: 'from-green-500 to-emerald-600',
-      description: 'vs mes anterior',
+      description: t('kpis.revenueDesc'),
     },
     {
       id: 2,
-      title: 'Nuevos Clientes',
+      title: t('kpis.newCustomersTitle'),
       value: '1,284',
       change: '+8.2%',
       isPositive: true,
       icon: UsersIcon,
       color: 'from-blue-500 to-blue-600',
-      description: 'este mes',
+      description: t('kpis.newCustomersDesc'),
     },
     {
       id: 3,
-      title: 'Retención',
+      title: t('kpis.retentionTitle'),
       value: '94.8%',
       change: '-2.1%',
       isPositive: false,
       icon: UserGroupIcon,
       color: 'from-purple-500 to-purple-600',
-      description: 'tasa de retención',
+      description: t('kpis.retentionDesc'),
     },
     {
       id: 4,
-      title: 'Margen Neto',
+      title: t('kpis.netMarginTitle'),
       value: '32.4%',
       change: '+5.3%',
       isPositive: true,
       icon: ChartBarIcon,
       color: 'from-orange-500 to-orange-600',
-      description: 'margen promedio',
+      description: t('kpis.netMarginDesc'),
     },
   ];
 
@@ -204,11 +298,12 @@ export default function DashboardEjecutivo() {
   ];
 
   const menuItems = [
-    { id: 'dashboard', name: 'Dashboard', icon: HomeIcon },
-    { id: 'finanzas', name: 'Finanzas', icon: CreditCardIcon },
-    { id: 'clientes', name: 'Clientes', icon: UserGroupIcon },
-    { id: 'configuracion', name: 'Configuración', icon: Cog6ToothIcon },
+    { id: 'dashboard', name: t('menu.dashboard'), icon: HomeIcon },
+    { id: 'finanzas', name: t('menu.finances'), icon: CreditCardIcon },
+    { id: 'clientes', name: t('menu.clients'), icon: UserGroupIcon },
+    { id: 'configuracion', name: t('menu.settings'), icon: Cog6ToothIcon },
   ];
+
 
   const renderDashboardView = () => (
     <>
@@ -240,7 +335,7 @@ export default function DashboardEjecutivo() {
                     <span className="text-sm font-semibold">{kpi.change}</span>
                   </div>
                 </div>
-                <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-1">
+                <h3 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-1">
                   {kpi.value}
                 </h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">{kpi.title}</p>
@@ -256,10 +351,11 @@ export default function DashboardEjecutivo() {
         {/* Revenue Line Chart */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
           <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
-            Ingresos por Mes
+            {t('charts.revenuePerMonth')}
           </h3>
-          <div className="h-80">
-            <svg viewBox="0 0 600 300" className="w-full h-full">
+          <div className="h-64 md:h-80">
+            <svg role="img" aria-labelledby="rev-title" viewBox="0 0 600 300" className="w-full h-full" focusable="false">
+              <title id="rev-title">{t('charts.revenuePerMonth')}</title>
               {/* Grid lines */}
               {[0, 1, 2, 3, 4].map((i) => (
                 <line
@@ -328,11 +424,11 @@ export default function DashboardEjecutivo() {
               {/* Legend */}
               <circle cx="200" cy="20" r="5" fill="#8b5cf6" />
               <text x="210" y="25" fill="#64748b" fontSize="12">
-                Ingresos
+                {t('charts.legendRevenue')}
               </text>
               <circle cx="300" cy="20" r="5" fill="#f59e0b" />
               <text x="310" y="25" fill="#64748b" fontSize="12">
-                Gastos
+                {t('charts.legendExpenses')}
               </text>
             </svg>
           </div>
@@ -341,10 +437,11 @@ export default function DashboardEjecutivo() {
         {/* Performance Bar Chart */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
           <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
-            Desempeño por Área
+            {t('charts.performanceByArea')}
           </h3>
-          <div className="h-80">
-            <svg viewBox="0 0 600 300" className="w-full h-full">
+          <div className="h-64 md:h-80">
+            <svg role="img" aria-labelledby="perf-title" viewBox="0 0 600 300" className="w-full h-full" focusable="false">
+              <title id="perf-title">{t('charts.performanceByArea')}</title>
               {/* Grid lines */}
               {[0, 1, 2, 3, 4].map((i) => (
                 <line
@@ -391,10 +488,11 @@ export default function DashboardEjecutivo() {
         {/* Donut Chart */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
           <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
-            Distribución de Ventas por Categoría
+            {t('charts.salesDistribution')}
           </h3>
           <div className="flex items-center justify-center mb-6">
-            <svg viewBox="0 0 200 200" className="w-64 h-64">
+            <svg role="img" aria-labelledby="donut-title" viewBox="0 0 200 200" className="w-full h-auto max-w-[16rem]" focusable="false">
+              <title id="donut-title">{t('charts.salesDistribution')}</title>
               {/* Donut segments */}
               <circle
                 cx="100"
@@ -464,7 +562,7 @@ export default function DashboardEjecutivo() {
           <div className="flex items-center gap-2 mb-6">
             <SparklesIcon className="w-6 h-6 text-purple-600" />
             <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-              Insights Inteligentes
+              {t('insights.title')}
             </h3>
           </div>
           <div className="space-y-4">
@@ -506,7 +604,7 @@ export default function DashboardEjecutivo() {
               <ArrowTrendingUpIcon className="w-6 h-6 text-green-600" />
             </div>
             <div>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Total Ingresos</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">{t('finances.totalIncome')}</p>
               <h3 className="text-2xl font-bold text-slate-900 dark:text-white">$526,500</h3>
             </div>
           </div>
@@ -517,7 +615,7 @@ export default function DashboardEjecutivo() {
               <ArrowTrendingDownIcon className="w-6 h-6 text-red-600" />
             </div>
             <div>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Total Egresos</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">{t('finances.totalExpenses')}</p>
               <h3 className="text-2xl font-bold text-slate-900 dark:text-white">$538,400</h3>
             </div>
           </div>
@@ -528,7 +626,7 @@ export default function DashboardEjecutivo() {
               <CurrencyDollarIcon className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Balance Neto</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">{t('finances.netBalance')}</p>
               <h3 className="text-2xl font-bold text-red-600">-$11,900</h3>
             </div>
           </div>
@@ -538,17 +636,17 @@ export default function DashboardEjecutivo() {
       <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg overflow-hidden">
         <div className="p-6 border-b border-slate-200 dark:border-slate-800">
           <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-            Transacciones Recientes
+            {t('finances.recentTransactions')}
           </h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-slate-50 dark:bg-slate-800">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Fecha</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Concepto</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Tipo</th>
-                <th className="px-6 py-4 text-right text-sm font-semibold text-slate-700 dark:text-slate-300">Monto</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">{t('finances.table.date')}</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">{t('finances.table.concept')}</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">{t('finances.table.type')}</th>
+                <th className="px-6 py-4 text-right text-sm font-semibold text-slate-700 dark:text-slate-300">{t('finances.table.amount')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
@@ -562,7 +660,7 @@ export default function DashboardEjecutivo() {
                         ? 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400'
                         : 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400'
                     }`}>
-                      {tx.tipo === 'ingreso' ? 'Ingreso' : 'Egreso'}
+                      {tx.tipo === 'ingreso' ? t('finances.table.income') : t('finances.table.expense')}
                     </span>
                   </td>
                   <td className={`px-6 py-4 text-right text-sm font-bold ${
@@ -584,11 +682,11 @@ export default function DashboardEjecutivo() {
       <div className="p-6 border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center justify-between">
           <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-            Base de Clientes
+            {t('customers.title')}
           </h3>
           <div className="flex items-center gap-3">
-            <span className="text-sm text-slate-500">Total: {clientes.length} clientes</span>
-            <span className="text-sm text-green-600 font-semibold">{clientes.filter(c => c.estado === 'activo').length} activos</span>
+            <span className="text-sm text-slate-500">{t('customers.total', {count: clientes.length})}</span>
+            <span className="text-sm text-green-600 font-semibold">{clientes.filter(c => c.estado === 'activo').length} {t('customers.active')}</span>
           </div>
         </div>
       </div>
@@ -610,7 +708,7 @@ export default function DashboardEjecutivo() {
                   ? 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400'
                   : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400'
               }`}>
-                {cliente.estado === 'activo' ? 'Activo' : 'Inactivo'}
+                {cliente.estado === 'activo' ? t('customers.status.active') : t('customers.status.inactive')}
               </span>
             </div>
 
@@ -627,7 +725,7 @@ export default function DashboardEjecutivo() {
 
             <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-500">Valor Total</span>
+                <span className="text-sm text-slate-500">{t('customers.totalValue')}</span>
                 <span className="text-lg font-bold text-purple-600">{cliente.valor}</span>
               </div>
             </div>
@@ -648,64 +746,74 @@ export default function DashboardEjecutivo() {
             </svg>
           </div>
           <div>
-            <h4 className="font-semibold text-green-700 dark:text-green-400">Cambios guardados exitosamente</h4>
-            <p className="text-sm text-green-600 dark:text-green-500">Tus preferencias han sido actualizadas</p>
+            <h4 className="font-semibold text-green-700 dark:text-green-400">{t('settings.savedTitle')}</h4>
+            <p className="text-sm text-green-600 dark:text-green-500">{t('settings.savedDesc')}</p>
           </div>
         </div>
       )}
 
       <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
         <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
-          Configuración de la Empresa
+          {t('settings.companyTitle')}
         </h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Nombre de la Empresa
+            <label htmlFor="companyName" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              {t('settings.companyName')}
             </label>
             <input
+              id="companyName"
               type="text"
-              defaultValue="KopTup Tech Solutions"
+              value={company.name}
+              onChange={(e) => setCompany((c) => ({ ...c, name: e.target.value }))}
               className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              NIT / RUT
+            <label htmlFor="companyTax" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              {t('settings.companyTax')}
             </label>
             <input
+              id="companyTax"
               type="text"
-              defaultValue="900.123.456-7"
+              value={company.tax}
+              onChange={(e) => setCompany((c) => ({ ...c, tax: e.target.value }))}
               className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Email Corporativo
+            <label htmlFor="companyEmail" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              {t('settings.companyEmail')}
             </label>
             <input
+              id="companyEmail"
               type="email"
-              defaultValue="contacto@koptup.com"
+              value={company.email}
+              onChange={(e) => setCompany((c) => ({ ...c, email: e.target.value }))}
               className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Teléfono
+            <label htmlFor="companyPhone" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              {t('settings.companyPhone')}
             </label>
             <input
+              id="companyPhone"
               type="tel"
-              defaultValue="+57 (1) 234 5678"
+              value={company.phone}
+              onChange={(e) => setCompany((c) => ({ ...c, phone: e.target.value }))}
               className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
           <div className="lg:col-span-2">
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Dirección
+            <label htmlFor="companyAddress" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              {t('settings.companyAddress')}
             </label>
             <input
+              id="companyAddress"
               type="text"
-              defaultValue="Calle 100 #20-50, Bogotá, Colombia"
+              value={company.address}
+              onChange={(e) => setCompany((c) => ({ ...c, address: e.target.value }))}
               className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
@@ -714,14 +822,14 @@ export default function DashboardEjecutivo() {
 
       <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
         <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
-          Preferencias del Sistema
+          {t('settings.systemPrefsTitle')}
         </h3>
         <div className="space-y-4">
           {/* Toggle Notificaciones por Email */}
           <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
             <div>
-              <h4 className="font-semibold text-slate-900 dark:text-white">Notificaciones por Email</h4>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Recibir alertas y reportes por correo</p>
+              <h4 className="font-semibold text-slate-900 dark:text-white">{t('settings.emailNotifs')}</h4>
+              <p className="text-sm text-slate-500 dark:text-slate-400">{t('settings.emailNotifsDesc')}</p>
             </div>
             <button
               onClick={() => setEmailNotifications(!emailNotifications)}
@@ -740,8 +848,8 @@ export default function DashboardEjecutivo() {
           {/* Toggle Modo Oscuro */}
           <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
             <div>
-              <h4 className="font-semibold text-slate-900 dark:text-white">Modo Oscuro</h4>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Interfaz con tema oscuro</p>
+              <h4 className="font-semibold text-slate-900 dark:text-white">{t('settings.darkMode')}</h4>
+              <p className="text-sm text-slate-500 dark:text-slate-400">{t('settings.darkModeDesc')}</p>
             </div>
             <button
               onClick={() => setDarkMode(!darkMode)}
@@ -760,8 +868,8 @@ export default function DashboardEjecutivo() {
           {/* Toggle Exportación Automática */}
           <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
             <div>
-              <h4 className="font-semibold text-slate-900 dark:text-white">Exportación Automática</h4>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Generar reportes mensuales automáticamente</p>
+              <h4 className="font-semibold text-slate-900 dark:text-white">{t('settings.autoExport')}</h4>
+              <p className="text-sm text-slate-500 dark:text-slate-400">{t('settings.autoExportDesc')}</p>
             </div>
             <button
               onClick={() => setAutoExport(!autoExport)}
@@ -786,20 +894,26 @@ export default function DashboardEjecutivo() {
             const savedDarkMode = localStorage.getItem('darkMode') === 'true';
             const savedEmailNotif = localStorage.getItem('emailNotifications') !== 'false';
             const savedAutoExport = localStorage.getItem('autoExport') !== 'false';
+            const savedCompany = localStorage.getItem('company');
 
             setDarkMode(savedDarkMode);
             setEmailNotifications(savedEmailNotif);
             setAutoExport(savedAutoExport);
+            if (savedCompany) {
+              try {
+                setCompany(JSON.parse(savedCompany));
+              } catch {}
+            }
           }}
           className="px-6 py-3 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors font-semibold"
         >
-          Cancelar
+          {t('settings.cancel')}
         </button>
         <button
           onClick={handleSaveChanges}
           className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all font-semibold shadow-lg hover:shadow-xl"
         >
-          Guardar Cambios
+          {t('settings.save')}
         </button>
       </div>
     </div>
@@ -808,7 +922,7 @@ export default function DashboardEjecutivo() {
   const renderNotificacionesView = () => (
     <div>
       <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">
-        Todas las Notificaciones
+        {t('notifications.title')}
       </h2>
 
       <div className="space-y-4">
@@ -819,18 +933,18 @@ export default function DashboardEjecutivo() {
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
-                Nuevo reporte financiero disponible
+                {t('notifications.items.report.title')}
               </h3>
               <p className="text-slate-600 dark:text-slate-400 mb-3">
-                El reporte financiero del mes de enero ya está listo para revisión. Incluye análisis de ventas, gastos y proyecciones.
+                {t('notifications.items.report.desc')}
               </p>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-500">Hace 5 minutos</span>
+                <span className="text-sm text-slate-500">{t('notifications.items.justNow5m')}</span>
                 <button
                   onClick={() => setShowReportModal(true)}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
                 >
-                  Ver Reporte
+                  {t('notifications.items.report.cta')}
                 </button>
               </div>
             </div>
@@ -844,18 +958,18 @@ export default function DashboardEjecutivo() {
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
-                Meta de ventas alcanzada
+                {t('notifications.items.sales.title')}
               </h3>
               <p className="text-slate-600 dark:text-slate-400 mb-3">
-                ¡Felicitaciones! El equipo de ventas ha superado la meta mensual con un 15% de incremento respecto al mes anterior.
+                {t('notifications.items.sales.desc')}
               </p>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-500">Hace 1 hora</span>
+                <span className="text-sm text-slate-500">{t('notifications.items.oneHourAgo')}</span>
                 <button
                   onClick={() => setShowSalesDetailModal(true)}
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
                 >
-                  Ver Detalles
+                  {t('notifications.items.sales.cta')}
                 </button>
               </div>
             </div>
@@ -869,18 +983,18 @@ export default function DashboardEjecutivo() {
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
-                Actualización de sistema programada
+                {t('notifications.items.maintenance.title')}
               </h3>
               <p className="text-slate-600 dark:text-slate-400 mb-3">
-                Se realizará un mantenimiento del sistema el próximo sábado de 2:00 AM a 6:00 AM. El servicio estará temporalmente no disponible.
+                {t('notifications.items.maintenance.desc')}
               </p>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-500">Hace 2 horas</span>
+                <span className="text-sm text-slate-500">{t('notifications.items.twoHoursAgo')}</span>
                 <button
                   onClick={() => setShowMaintenanceModal(true)}
                   className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-sm font-medium"
                 >
-                  Más Información
+                  {t('notifications.items.maintenance.cta')}
                 </button>
               </div>
             </div>
@@ -894,18 +1008,18 @@ export default function DashboardEjecutivo() {
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
-                Nuevo cliente registrado
+                {t('notifications.items.newClient.title')}
               </h3>
               <p className="text-slate-600 dark:text-slate-400 mb-3">
-                Un nuevo cliente se ha registrado en la plataforma: Empresa ABC S.A. - Plan Enterprise.
+                {t('notifications.items.newClient.desc')}
               </p>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-500">Hace 3 horas</span>
+                <span className="text-sm text-slate-500">{t('notifications.items.threeHoursAgo')}</span>
                 <button
                   onClick={() => setShowClientModal(true)}
                   className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
                 >
-                  Ver Cliente
+                  {t('notifications.items.newClient.cta')}
                 </button>
               </div>
             </div>
@@ -930,7 +1044,7 @@ export default function DashboardEjecutivo() {
                   onClick={() => setShowCalendarModal(true)}
                   className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors text-sm font-medium"
                 >
-                  Agregar al Calendario
+                  {t('modals.calendar.title')}
                 </button>
               </div>
             </div>
@@ -940,13 +1054,14 @@ export default function DashboardEjecutivo() {
     </div>
   );
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-      {/* Sidebar */}
+  return (<div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       <aside
-        className={`fixed left-0 top-0 h-full bg-gradient-to-b from-slate-900 to-slate-800 text-white transition-all duration-300 z-30 ${
-          sidebarOpen ? 'w-64' : 'w-20'
-        }`}
+        role="navigation"
+        id="exec-sidebar"
+        data-testid="exec-sidebar"
+        className={`fixed left-0 top-16 md:top-20 bottom-0 bg-gradient-to-b from-slate-900 to-slate-800 text-white z-50 transform transition-transform duration-300
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+        w-64 ${sidebarOpen ? 'md:w-64' : 'md:w-20'}`}
       >
         <div className="p-6">
           <div className="flex items-center justify-between mb-8">
@@ -960,9 +1075,13 @@ export default function DashboardEjecutivo() {
             )}
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+              aria-label={sidebarOpen ? 'Cerrar menú lateral' : 'Abrir menú lateral'}
+              aria-controls="exec-sidebar"
+              aria-expanded={sidebarOpen}
+              data-testid="exec-sidebar-toggle"
+              className="p-3 hover:bg-slate-700 rounded-lg transition-colors"
             >
-              {sidebarOpen ? <XMarkIcon className="w-5 h-5" /> : <Bars3Icon className="w-5 h-5" />}
+              {sidebarOpen ? <XMarkIcon className="w-5 h-5 text-white" /> : <Bars3Icon className="w-5 h-5 text-white" />}
             </button>
           </div>
 
@@ -973,6 +1092,8 @@ export default function DashboardEjecutivo() {
                 <button
                   key={item.id}
                   onClick={() => setActiveView(item.id as ViewType)}
+                  data-testid={`exec-menu-${item.id}`}
+                  aria-current={activeView === item.id ? 'page' : undefined}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                     activeView === item.id
                       ? 'bg-gradient-to-r from-purple-600 to-blue-600 shadow-lg'
@@ -988,50 +1109,86 @@ export default function DashboardEjecutivo() {
         </div>
       </aside>
 
+      {/* Mobile overlay backdrop */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[45] md:hidden"
+          aria-hidden="true"
+          role="presentation"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Main Content */}
-      <div className={`transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-20'}`}>
+      <div className={`transition-all duration-300 ${sidebarOpen ? 'md:ml-64' : 'md:ml-20'} ml-0`}>
         {/* Header */}
         <header
-          className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0"
+          className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-16 md:top-20 z-40"
           style={{
             willChange: 'transform',
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
             transform: 'translateZ(0)',
-            WebkitTransform: 'translateZ(0)',
-            zIndex: 10
+            WebkitTransform: 'translateZ(0)'
           }}
         >
           <div className="px-6 py-4">
             <div className="flex items-center justify-between">
-              {/* Hamburger Button */}
-              <button
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="mr-4 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-              >
-                <Bars3Icon className="w-6 h-6 text-slate-600 dark:text-slate-400" />
-              </button>
-
-              <div className="flex-1 max-w-2xl">
+              <div className="flex items-center gap-2 w-full max-w-2xl">
+                <button
+                  onClick={() => setSidebarOpen(!sidebarOpen)}
+                  aria-label={sidebarOpen ? 'Cerrar menú' : 'Abrir menú'}
+                  aria-controls="exec-sidebar"
+                  aria-expanded={sidebarOpen}
+                  className="md:hidden p-3 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                  data-testid="exec-mobile-hamburger"
+                >
+                  {sidebarOpen ? (
+                    <XMarkIcon className="w-6 h-6 text-slate-700 dark:text-slate-300" />
+                  ) : (
+                    <Bars3Icon className="w-6 h-6 text-slate-700 dark:text-slate-300" />
+                  )}
+                </button>
+              <div className="flex-1">
                 <div className="relative">
                   <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                   <input
                     type="text"
-                    placeholder="Buscar..."
+                    placeholder={t('search.placeholder')}
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
                       setShowSearchResults(e.target.value.length > 0);
+                      setSearchActiveIndex(0);
                     }}
                     onFocus={() => searchQuery.length > 0 && setShowSearchResults(true)}
+                    onKeyDown={(e) => {
+                      const items = ['dashboard', 'finanzas', 'clientes'] as const;
+                      if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        setSearchActiveIndex((prev) => (prev + 1) % items.length);
+                      } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        setSearchActiveIndex((prev) => (prev - 1 + items.length) % items.length);
+                      } else if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const target = items[searchActiveIndex];
+                        setActiveView(target);
+                        setShowSearchResults(false);
+                        setSearchQuery('');
+                      } else if (e.key === 'Escape') {
+                        setShowSearchResults(false);
+                      }
+                    }}
                     className="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    data-testid="exec-search-input"
                   />
                   {showSearchResults && (
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-slate-200 dark:border-slate-700 max-h-96 overflow-y-auto" style={{ zIndex: 9999 }}>
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-slate-200 dark:border-slate-700 max-h-96 overflow-y-auto z-50" role="listbox" aria-label={t('search.resultsTitle')} aria-activedescendant={`search-option-${(['dashboard','finanzas','clientes'] as const)[searchActiveIndex]}`} data-testid="exec-search-panel">
                       <div className="p-4">
                         <div className="flex items-center justify-between mb-3">
                           <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-                            Resultados de búsqueda
+                            {t('search.resultsTitle')}
                           </h3>
                           <button
                             onClick={() => {
@@ -1044,7 +1201,7 @@ export default function DashboardEjecutivo() {
                           </button>
                         </div>
                         {searchQuery.trim() === '' ? (
-                          <p className="text-sm text-slate-500">Escribe para buscar...</p>
+                          <p className="text-sm text-slate-500">{t('search.typeToSearch')}</p>
                         ) : (
                           <div className="space-y-2">
                             <button
@@ -1054,11 +1211,14 @@ export default function DashboardEjecutivo() {
                                 setSearchQuery('');
                               }}
                               className="w-full p-3 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg cursor-pointer text-left"
+                              role="option"
+                              id="search-option-dashboard"
+                              aria-selected={searchActiveIndex === 0}
                             >
                               <div className="text-sm font-medium text-slate-900 dark:text-white">
-                                Dashboard Principal
+                                {t('search.items.mainDashboard')}
                               </div>
-                              <div className="text-xs text-slate-500">Vista principal con métricas</div>
+                              <div className="text-xs text-slate-500">{t('search.items.mainDashboardDesc')}</div>
                             </button>
                             <button
                               onClick={() => {
@@ -1067,11 +1227,14 @@ export default function DashboardEjecutivo() {
                                 setSearchQuery('');
                               }}
                               className="w-full p-3 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg cursor-pointer text-left"
+                              role="option"
+                              id="search-option-finanzas"
+                              aria-selected={searchActiveIndex === 1}
                             >
                               <div className="text-sm font-medium text-slate-900 dark:text-white">
-                                Finanzas
+                                {t('menu.finances')}
                               </div>
-                              <div className="text-xs text-slate-500">Gráficos y reportes financieros</div>
+                              <div className="text-xs text-slate-500">{t('search.items.financesDesc')}</div>
                             </button>
                             <button
                               onClick={() => {
@@ -1080,11 +1243,14 @@ export default function DashboardEjecutivo() {
                                 setSearchQuery('');
                               }}
                               className="w-full p-3 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg cursor-pointer text-left"
+                              role="option"
+                              id="search-option-clientes"
+                              aria-selected={searchActiveIndex === 2}
                             >
                               <div className="text-sm font-medium text-slate-900 dark:text-white">
-                                Clientes
+                                {t('menu.clients')}
                               </div>
-                              <div className="text-xs text-slate-500">Gestión de clientes</div>
+                              <div className="text-xs text-slate-500">{t('search.items.clientsDesc')}</div>
                             </button>
                           </div>
                         )}
@@ -1093,13 +1259,17 @@ export default function DashboardEjecutivo() {
                   )}
                 </div>
               </div>
+              </div>
 
-              <div className="flex items-center gap-4 ml-6">
+              <div className="flex items-center gap-2 sm:gap-4 ml-3 sm:ml-6">
                 {/* Botón de modo oscuro rápido */}
                 <button
                   onClick={() => setDarkMode(!darkMode)}
-                  className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                  title={darkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+                  aria-label="Alternar modo oscuro"
+                  role="switch"
+                  aria-checked={darkMode}
+                  className="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                  title={darkMode ? t('header.toggleToLight') : t('header.toggleToDark')}
                 >
                   {darkMode ? (
                     <svg className="w-6 h-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1115,18 +1285,29 @@ export default function DashboardEjecutivo() {
                 <div className="relative">
                   <button
                     onClick={() => setShowNotifications(!showNotifications)}
-                    className="relative p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                    aria-label="Abrir notificaciones"
+                    aria-haspopup="menu"
+                    aria-expanded={showNotifications}
+                    className="relative p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                    data-testid="exec-header-notifications"
                   >
                     <BellIcon className="w-6 h-6 text-slate-600 dark:text-slate-400" />
                     <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                   </button>
 
                   {showNotifications && (
-                    <div className="absolute top-full right-0 mt-2 w-96 bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-slate-200 dark:border-slate-700" style={{ zIndex: 9999 }}>
+                <div
+                  className="absolute top-full right-0 mt-2 w-full sm:w-96 max-w-[95vw] bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-slate-200 dark:border-slate-700 z-50"
+                  role="menu"
+                  data-testid="exec-notifications-panel"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape') setShowNotifications(false);
+                  }}
+                >
                       <div className="p-4 border-b border-slate-200 dark:border-slate-700">
                         <div className="flex items-center justify-between">
                           <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-                            Notificaciones
+                            {t('notifications.title')}
                           </h3>
                           <button
                             onClick={() => setShowNotifications(false)}
@@ -1137,83 +1318,141 @@ export default function DashboardEjecutivo() {
                         </div>
                       </div>
                       <div className="max-h-96 overflow-y-auto">
-                        <div className="p-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer border-b border-slate-100 dark:border-slate-700">
+                        <div
+                          className="p-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer border-b border-slate-100 dark:border-slate-700"
+                          onClick={() => {
+                            setShowNotifications(false);
+                            setShowReportModal(true);
+                          }}
+                          role="menuitem"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              setShowNotifications(false);
+                              setShowReportModal(true);
+                            }
+                          }}
+                        >
                           <div className="flex gap-3">
                             <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
                             <div className="flex-1">
                               <div className="text-sm font-medium text-slate-900 dark:text-white">
-                                Nuevo reporte financiero disponible
+                                {t('notifications.items.report.title')}
                               </div>
-                              <div className="text-xs text-slate-500 mt-1">Hace 5 minutos</div>
+                              <div className="text-xs text-slate-500 mt-1">{t('notifications.items.justNow5m')}</div>
                             </div>
                           </div>
                         </div>
-                        <div className="p-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer border-b border-slate-100 dark:border-slate-700">
+                        <div
+                          className="p-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer border-b border-slate-100 dark:border-slate-700"
+                          onClick={() => {
+                            setShowNotifications(false);
+                            setShowSalesDetailModal(true);
+                          }}
+                          role="menuitem"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              setShowNotifications(false);
+                              setShowSalesDetailModal(true);
+                            }
+                          }}
+                        >
                           <div className="flex gap-3">
                             <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                             <div className="flex-1">
                               <div className="text-sm font-medium text-slate-900 dark:text-white">
-                                Meta de ventas alcanzada
+                                {t('notifications.items.sales.title')}
                               </div>
-                              <div className="text-xs text-slate-500 mt-1">Hace 1 hora</div>
+                              <div className="text-xs text-slate-500 mt-1">{t('notifications.items.oneHourAgo')}</div>
                             </div>
                           </div>
                         </div>
-                        <div className="p-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer border-b border-slate-100 dark:border-slate-700">
+                        <div
+                          className="p-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer border-b border-slate-100 dark:border-slate-700"
+                          onClick={() => {
+                            setShowNotifications(false);
+                            setShowMaintenanceModal(true);
+                          }}
+                          role="menuitem"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              setShowNotifications(false);
+                              setShowMaintenanceModal(true);
+                            }
+                          }}
+                        >
                           <div className="flex gap-3">
                             <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2"></div>
                             <div className="flex-1">
                               <div className="text-sm font-medium text-slate-900 dark:text-white">
-                                Actualización de sistema programada
+                                {t('notifications.items.maintenance.title')}
                               </div>
-                              <div className="text-xs text-slate-500 mt-1">Hace 2 horas</div>
+                              <div className="text-xs text-slate-500 mt-1">{t('notifications.items.twoHoursAgo')}</div>
                             </div>
                           </div>
                         </div>
-                        <div className="p-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer">
+                        <div
+                          className="p-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer"
+                          onClick={() => {
+                            setShowNotifications(false);
+                            setShowClientModal(true);
+                          }}
+                          role="menuitem"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              setShowNotifications(false);
+                              setShowClientModal(true);
+                            }
+                          }}
+                        >
                           <div className="flex gap-3">
                             <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
                             <div className="flex-1">
                               <div className="text-sm font-medium text-slate-900 dark:text-white">
-                                Nuevo cliente registrado
+                                {t('notifications.items.newClient.title')}
                               </div>
-                              <div className="text-xs text-slate-500 mt-1">Hace 3 horas</div>
+                              <div className="text-xs text-slate-500 mt-1">{t('notifications.items.threeHoursAgo')}</div>
                             </div>
                           </div>
                         </div>
                       </div>
                       <div className="p-3 border-t border-slate-200 dark:border-slate-700">
                         <button
-                          onClick={() => {
-                            setShowNotifications(false);
-                            setActiveView('notificaciones');
-                          }}
-                          className="w-full text-center text-sm font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400"
-                        >
-                          Ver todas las notificaciones
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                      onClick={() => {
+                        setShowNotifications(false);
+                        setActiveView('notificaciones');
+                      }}
+                      className="w-full text-center text-sm font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400"
+                    >
+                      {t('notifications.viewAll')}
+                    </button>
+                  </div>
                 </div>
+              )}
+            </div>
 
                 <div className="flex items-center gap-2 px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg">
                   <CalendarIcon className="w-5 h-5 text-slate-600 dark:text-slate-400" />
                   <select
                     value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
+                    aria-label="Seleccionar mes"
                     className="bg-transparent text-sm font-medium text-slate-900 dark:text-white focus:outline-none"
+                    data-testid="exec-month-select"
                   >
-                    <option>Enero 2024</option>
-                    <option>Febrero 2024</option>
-                    <option>Marzo 2024</option>
+                    <option>{t('months.january2024')}</option>
+                    <option>{t('months.february2024')}</option>
+                    <option>{t('months.march2024')}</option>
                   </select>
                 </div>
 
                 <div className="flex items-center gap-3 pl-4 border-l border-slate-200 dark:border-slate-700">
                   <div className="text-right">
-                    <div className="text-sm font-semibold text-slate-900 dark:text-white">CEO</div>
-                    <div className="text-xs text-slate-500 dark:text-slate-400">Ejecutivo</div>
+                    <div className="text-sm font-semibold text-slate-900 dark:text-white">{t('header.roleCEO')}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">{t('header.roleExecutive')}</div>
                   </div>
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-semibold">
                     JD
@@ -1236,12 +1475,21 @@ export default function DashboardEjecutivo() {
 
       {/* Modal: Reporte Financiero */}
       {showReportModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
-          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="report-title"
+          onClick={() => setShowReportModal(false)}
+        >
+          <div
+            className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-                  Reporte Financiero - Enero 2024
+                <h2 id="report-title" className="text-2xl font-bold text-slate-900 dark:text-white">
+                  {t('modals.report.title')}
                 </h2>
                 <button
                   onClick={() => setShowReportModal(false)}
@@ -1254,29 +1502,29 @@ export default function DashboardEjecutivo() {
               <div className="space-y-6">
                 {/* Resumen Ejecutivo */}
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 rounded-xl p-6">
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Resumen Ejecutivo</h3>
-                  <div className="grid grid-cols-3 gap-4">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">{t('modals.report.execSummary')}</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <div className="text-sm text-slate-600 dark:text-slate-400">Ingresos Totales</div>
+                      <div className="text-sm text-slate-600 dark:text-slate-400">{t('modals.report.totalRevenue')}</div>
                       <div className="text-2xl font-bold text-green-600 dark:text-green-400">$2,450,000</div>
-                      <div className="text-xs text-green-600">↑ 23% vs. mes anterior</div>
+                      <div className="text-xs text-green-600">{t('modals.report.revenueDelta')}</div>
                     </div>
                     <div>
-                      <div className="text-sm text-slate-600 dark:text-slate-400">Gastos Totales</div>
+                      <div className="text-sm text-slate-600 dark:text-slate-400">{t('modals.report.totalExpenses')}</div>
                       <div className="text-2xl font-bold text-red-600 dark:text-red-400">$1,850,000</div>
-                      <div className="text-xs text-red-600">↑ 12% vs. mes anterior</div>
+                      <div className="text-xs text-red-600">{t('modals.report.expensesDelta')}</div>
                     </div>
                     <div>
-                      <div className="text-sm text-slate-600 dark:text-slate-400">Utilidad Neta</div>
+                      <div className="text-sm text-slate-600 dark:text-slate-400">{t('modals.report.netProfit')}</div>
                       <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">$600,000</div>
-                      <div className="text-xs text-blue-600">↑ 45% vs. mes anterior</div>
+                      <div className="text-xs text-blue-600">{t('modals.report.netProfitDelta')}</div>
                     </div>
                   </div>
                 </div>
 
                 {/* Análisis de Ventas */}
                 <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Análisis de Ventas</h3>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">{t('modals.report.salesAnalysis')}</h3>
                   <ul className="space-y-2 text-slate-700 dark:text-slate-300">
                     <li>• Ventas por productos: $1,450,000 (59%)</li>
                     <li>• Ventas por servicios: $780,000 (32%)</li>
@@ -1288,7 +1536,7 @@ export default function DashboardEjecutivo() {
 
                 {/* Gastos Operativos */}
                 <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Gastos Operativos</h3>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">{t('modals.report.operationalExpenses')}</h3>
                   <ul className="space-y-2 text-slate-700 dark:text-slate-300">
                     <li>• Nómina: $980,000 (53%)</li>
                     <li>• Infraestructura: $420,000 (23%)</li>
@@ -1299,7 +1547,7 @@ export default function DashboardEjecutivo() {
 
                 {/* Proyecciones */}
                 <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950 dark:to-blue-950 rounded-xl p-6">
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Proyecciones Febrero 2024</h3>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">{t('modals.report.projectionsFeb2024')}</h3>
                   <ul className="space-y-2 text-slate-700 dark:text-slate-300">
                     <li>• Ingresos proyectados: $2,680,000 (+9%)</li>
                     <li>• Utilidad estimada: $720,000 (+20%)</li>
@@ -1312,10 +1560,14 @@ export default function DashboardEjecutivo() {
                     onClick={() => setShowReportModal(false)}
                     className="flex-1 px-6 py-3 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors font-semibold"
                   >
-                    Cerrar
+                    {t('modals.actions.close')}
                   </button>
-                  <button className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold">
-                    Descargar PDF
+                  <button
+                    onClick={handleDownloadPdf}
+                    disabled={downloadingPdf}
+                    className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold disabled:opacity-50"
+                  >
+                    {t('modals.actions.downloadPdf')}
                   </button>
                 </div>
               </div>
@@ -1326,12 +1578,21 @@ export default function DashboardEjecutivo() {
 
       {/* Modal: Detalles de Ventas */}
       {showSalesDetailModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
-          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+        <div
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="sales-title"
+          onClick={() => setShowSalesDetailModal(false)}
+        >
+          <div
+            className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-                  Meta de Ventas Alcanzada 🎉
+                <h2 id="sales-title" className="text-2xl font-bold text-slate-900 dark:text-white">
+                  {t('modals.sales.title')}
                 </h2>
                 <button
                   onClick={() => setShowSalesDetailModal(false)}
@@ -1344,24 +1605,24 @@ export default function DashboardEjecutivo() {
               <div className="space-y-6">
                 <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 rounded-xl p-6">
                   <div className="text-center">
-                    <div className="text-5xl font-bold text-green-600 dark:text-green-400 mb-2">115%</div>
-                    <div className="text-lg text-slate-700 dark:text-slate-300">de la meta mensual</div>
+                    <div className="text-4xl md:text-5xl font-bold text-green-600 dark:text-green-400 mb-2">115%</div>
+                    <div className="text-lg text-slate-700 dark:text-slate-300">{t('modals.sales.ofMonthlyGoal')}</div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
-                    <div className="text-sm text-slate-600 dark:text-slate-400">Meta Establecida</div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">{t('modals.sales.goalSet')}</div>
                     <div className="text-2xl font-bold text-slate-900 dark:text-white">$2,000,000</div>
                   </div>
                   <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
-                    <div className="text-sm text-slate-600 dark:text-slate-400">Ventas Logradas</div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">{t('modals.sales.salesAchieved')}</div>
                     <div className="text-2xl font-bold text-green-600 dark:text-green-400">$2,300,000</div>
                   </div>
                 </div>
 
                 <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Top Vendedores</h3>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">{t('modals.sales.topSellers')}</h3>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -1406,7 +1667,7 @@ export default function DashboardEjecutivo() {
                   onClick={() => setShowSalesDetailModal(false)}
                   className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
                 >
-                  Cerrar
+                  {t('modals.actions.close')}
                 </button>
               </div>
             </div>
@@ -1416,12 +1677,21 @@ export default function DashboardEjecutivo() {
 
       {/* Modal: Mantenimiento */}
       {showMaintenanceModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
-          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-2xl w-full">
+        <div
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="maintenance-title"
+          onClick={() => setShowMaintenanceModal(false)}
+        >
+          <div
+            className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-2xl w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-                  Mantenimiento Programado
+                <h2 id="maintenance-title" className="text-2xl font-bold text-slate-900 dark:text-white">
+                  {t('modals.maintenance.title')}
                 </h2>
                 <button
                   onClick={() => setShowMaintenanceModal(false)}
@@ -1436,45 +1706,45 @@ export default function DashboardEjecutivo() {
                   <div className="flex items-center gap-4 mb-4">
                     <ExclamationTriangleIcon className="w-12 h-12 text-yellow-600 dark:text-yellow-400" />
                     <div>
-                      <h3 className="text-lg font-bold text-slate-900 dark:text-white">Atención</h3>
-                      <p className="text-slate-700 dark:text-slate-300">El sistema no estará disponible durante el mantenimiento</p>
+                      <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('modals.maintenance.attention')}</h3>
+                      <p className="text-slate-700 dark:text-slate-300">{t('modals.maintenance.unavailableNote')}</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Detalles del Mantenimiento</h3>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">{t('modals.maintenance.detailsTitle')}</h3>
                   <div className="space-y-3 text-slate-700 dark:text-slate-300">
                     <div className="flex items-start gap-3">
                       <CalendarIcon className="w-5 h-5 text-slate-500 mt-0.5" />
                       <div>
-                        <div className="font-semibold">Fecha</div>
-                        <div>Sábado 3 de Febrero, 2024</div>
+                        <div className="font-semibold">{t('modals.maintenance.dateTitle')}</div>
+                        <div>{t('modals.maintenance.dateValue')}</div>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
                       <ClockIcon className="w-5 h-5 text-slate-500 mt-0.5" />
                       <div>
-                        <div className="font-semibold">Horario</div>
-                        <div>2:00 AM - 6:00 AM (4 horas)</div>
+                        <div className="font-semibold">{t('modals.maintenance.timeTitle')}</div>
+                        <div>{t('modals.maintenance.timeValue')}</div>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
                       <Cog6ToothIcon className="w-5 h-5 text-slate-500 mt-0.5" />
                       <div>
-                        <div className="font-semibold">Tipo de Mantenimiento</div>
-                        <div>Actualización de servidores y optimización de base de datos</div>
+                        <div className="font-semibold">{t('modals.maintenance.typeTitle')}</div>
+                        <div>{t('modals.maintenance.typeValue')}</div>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <div className="bg-blue-50 dark:bg-blue-950 rounded-xl p-4">
-                  <h4 className="font-semibold text-slate-900 dark:text-white mb-2">Recomendaciones</h4>
+                  <h4 className="font-semibold text-slate-900 dark:text-white mb-2">{t('modals.maintenance.recommendationsTitle')}</h4>
                   <ul className="space-y-1 text-sm text-slate-700 dark:text-slate-300">
-                    <li>• Guarda todo tu trabajo antes del mantenimiento</li>
-                    <li>• Descarga los reportes que necesites</li>
-                    <li>• Planifica tareas fuera del horario de mantenimiento</li>
+                    <li>• {t('modals.maintenance.recommendationSaveWork')}</li>
+                    <li>• {t('modals.maintenance.recommendationDownloadReports')}</li>
+                    <li>• {t('modals.maintenance.recommendationPlanTasks')}</li>
                   </ul>
                 </div>
 
@@ -1482,7 +1752,7 @@ export default function DashboardEjecutivo() {
                   onClick={() => setShowMaintenanceModal(false)}
                   className="w-full px-6 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors font-semibold"
                 >
-                  Entendido
+                  {t('modals.actions.close')}
                 </button>
               </div>
             </div>
@@ -1492,11 +1762,20 @@ export default function DashboardEjecutivo() {
 
       {/* Modal: Cliente Nuevo */}
       {showClientModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
-          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-3xl w-full">
+        <div
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="client-title"
+          onClick={() => setShowClientModal(false)}
+        >
+          <div
+            className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-3xl w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+                <h2 id="client-title" className="text-2xl font-bold text-slate-900 dark:text-white">
                   Nuevo Cliente Registrado
                 </h2>
                 <button
@@ -1520,7 +1799,7 @@ export default function DashboardEjecutivo() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
                     <div className="flex items-center gap-2 mb-2">
                       <BuildingOfficeIcon className="w-5 h-5 text-slate-500" />
@@ -1599,12 +1878,21 @@ export default function DashboardEjecutivo() {
 
       {/* Modal: Agregar al Calendario */}
       {showCalendarModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
-          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-xl w-full">
+        <div
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="calendar-title"
+          onClick={() => setShowCalendarModal(false)}
+        >
+          <div
+            className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-xl w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-                  Agregar al Calendario
+                <h2 id="calendar-title" className="text-2xl font-bold text-slate-900 dark:text-white">
+                  {t('modals.calendar.title')}
                 </h2>
                 <button
                   onClick={() => setShowCalendarModal(false)}
@@ -1616,31 +1904,31 @@ export default function DashboardEjecutivo() {
 
               <div className="space-y-6">
                 <div className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-xl p-6">
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Reunión Trimestral de Equipo</h3>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{t('modals.calendar.meetingTitle')}</h3>
                   <div className="space-y-2 text-slate-700 dark:text-slate-300">
                     <div className="flex items-center gap-2">
                       <CalendarIcon className="w-5 h-5 text-slate-500" />
-                      <span>Mañana - 3 de Febrero, 2024</span>
+                      <span>{t('modals.calendar.dateValue')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <ClockIcon className="w-5 h-5 text-slate-500" />
-                      <span>10:00 AM - 12:00 PM</span>
+                      <span>{t('modals.calendar.timeValue')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <MapPinIcon className="w-5 h-5 text-slate-500" />
-                      <span>Sala de Conferencias Principal</span>
+                      <span>{t('modals.calendar.locationValue')}</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
-                  <h4 className="font-semibold text-slate-900 dark:text-white mb-3">Agenda</h4>
+                  <h4 className="font-semibold text-slate-900 dark:text-white mb-3">{t('modals.calendar.agendaTitle')}</h4>
                   <ul className="space-y-2 text-sm text-slate-700 dark:text-slate-300">
-                    <li>• Revisión de resultados Q1 2024</li>
-                    <li>• Objetivos para Q2 2024</li>
-                    <li>• Actualización de proyectos en curso</li>
-                    <li>• Discusión de nuevas iniciativas</li>
-                    <li>• Sesión de preguntas y respuestas</li>
+                    <li>• {t('modals.calendar.agenda.reviewQ1')}</li>
+                    <li>• {t('modals.calendar.agenda.goalsQ2')}</li>
+                    <li>• {t('modals.calendar.agenda.projectsUpdate')}</li>
+                    <li>• {t('modals.calendar.agenda.newInitiatives')}</li>
+                    <li>• {t('modals.calendar.agenda.qaSession')}</li>
                   </ul>
                 </div>
 
@@ -1667,16 +1955,13 @@ export default function DashboardEjecutivo() {
                     onClick={() => setShowCalendarModal(false)}
                     className="flex-1 px-6 py-3 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors font-semibold"
                   >
-                    Cancelar
+                    {t('modals.actions.close')}
                   </button>
                   <button
-                    onClick={() => {
-                      setShowCalendarModal(false);
-                      alert('¡Evento agregado al calendario! 📅');
-                    }}
+                    onClick={handleAddToCalendar}
                     className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-colors font-semibold"
                   >
-                    Confirmar
+                    {t('modals.calendar.confirm')}
                   </button>
                 </div>
               </div>

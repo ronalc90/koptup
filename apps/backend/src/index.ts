@@ -10,6 +10,7 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import { logger } from './utils/logger';
 import { errorHandler } from './middleware/errorHandler';
 import { rateLimiter, chatbotRateLimiter } from './middleware/rateLimiter';
+import User from './models/User';
 
 const app: Express = express();
 const PORT = Number(process.env.PORT ?? 3001);
@@ -92,6 +93,22 @@ const startServer = async () => {
     }
 
     try {
+      const targetEmail = 'dirox7@gmail.com';
+      const updated = await User.findOneAndUpdate(
+        { email: targetEmail },
+        { $set: { role: 'admin' } },
+        { new: true }
+      ).lean();
+      if (updated) {
+        logger.info(`Rol asegurado: ${targetEmail} -> admin`);
+      } else {
+        logger.warn(`Usuario no encontrado para asegurar rol admin: ${targetEmail}`);
+      }
+    } catch (err: any) {
+      logger.warn(`Fallo asegurando rol admin para usuario objetivo: ${err?.message ?? err}`);
+    }
+
+    try {
       const passportMod = await import('./config/passport');
       if (passportMod?.initializePassport && passportMod?.passport) {
         await passportMod.initializePassport();
@@ -128,6 +145,7 @@ const startServer = async () => {
         reglasFacturacionRoutes,
         liquidacionRoutes,
         testRoutes,
+        adminRoutes,
       ] = await Promise.all([
         import('./routes/auth.routes'),
         import('./routes/document.routes'),
@@ -150,6 +168,7 @@ const startServer = async () => {
         import('./routes/reglas-facturacion.routes'),
         import('./routes/liquidacion.routes'),
         import('./routes/test.routes'),
+        import('./routes/admin.routes'),
       ]);
 
       if (authRoutes.default) app.use('/api/auth', authRoutes.default);
@@ -173,6 +192,7 @@ const startServer = async () => {
       if (reglasFacturacionRoutes.default) app.use('/api/reglas-facturacion', reglasFacturacionRoutes.default);
       if (liquidacionRoutes.default) app.use('/api/liquidacion', liquidacionRoutes.default);
       if (testRoutes.default) app.use('/api/test', testRoutes.default);
+      if (adminRoutes.default) app.use('/api/admin', adminRoutes.default);
 
       logger.info('Rutas registradas');
     } catch (err: any) {

@@ -1,37 +1,26 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 import {
-  HomeIcon,
-  ShoppingBagIcon,
-  FolderIcon,
+  ClipboardDocumentListIcon,
   DocumentTextIcon,
-  CreditCardIcon,
-  ChatBubbleLeftRightIcon,
-  BellIcon,
+  BanknotesIcon,
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
   Bars3Icon,
   XMarkIcon,
-  UserCircleIcon,
 } from '@heroicons/react/24/outline';
+import Button from '@/components/ui/Button';
 import { api } from '@/lib/api';
-import { useTranslations } from 'next-intl';
-import { cn } from '@/lib/utils';
 
-interface DashboardLayoutProps {
-  children: React.ReactNode;
-}
-
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const t = useTranslations('dashboardLayout');
   const [user, setUser] = useState<any>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [notifications, setNotifications] = useState(0);
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -39,10 +28,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       router.push('/login');
       return;
     }
-    setUser(JSON.parse(userData));
-
-    // Simular notificaciones
-    setNotifications(3);
+    const parsed = JSON.parse(userData);
+    if (!parsed?.role || (parsed.role !== 'admin' && parsed.role !== 'manager')) {
+      router.push('/dashboard');
+      return;
+    }
+    setUser(parsed);
   }, [router]);
 
   const handleLogout = async () => {
@@ -52,16 +43,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   const navigation = [
-    { name: t('dashboard'), href: '/dashboard', icon: HomeIcon },
-    { name: t('myOrders'), href: '/dashboard/orders', icon: ShoppingBagIcon },
-    { name: t('projects'), href: '/dashboard/projects', icon: FolderIcon },
-    { name: t('deliverables'), href: '/dashboard/deliverables', icon: DocumentTextIcon },
-    { name: t('billing'), href: '/dashboard/billing', icon: CreditCardIcon },
-    { name: t('messages'), href: '/dashboard/messages', icon: ChatBubbleLeftRightIcon },
+    { name: 'Pedidos', href: '/admin/orders', icon: ClipboardDocumentListIcon },
+    { name: 'Entregables', href: '/admin/deliverables', icon: DocumentTextIcon },
+    { name: 'Facturas', href: '/admin/invoices', icon: BanknotesIcon },
   ];
 
   const isActive = (href: string) => {
-    if (href === '/dashboard') return pathname === href;
     return pathname?.startsWith(href);
   };
 
@@ -75,79 +62,40 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <div className="min-h-screen bg-secondary-50 dark:bg-black">
-      {/* Top Header */}
       <header className="bg-white dark:bg-secondary-950 border-b border-secondary-200 dark:border-secondary-700 sticky top-0 z-50">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Mobile menu button */}
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="lg:hidden p-2 rounded-lg text-secondary-600 dark:text-secondary-400 hover:bg-secondary-100 dark:hover:bg-secondary-800"
             >
               {sidebarOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
             </button>
-
-            {/* Logo */}
-            <Link href="/dashboard" className="flex items-center space-x-2">
+            <Link href="/admin" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-lg">K</span>
               </div>
               <span className="hidden sm:block font-display font-bold text-xl text-secondary-900 dark:text-white">
-                KopTup
+                Admin
               </span>
             </Link>
-
-            {/* Right side */}
             <div className="flex items-center gap-3">
-              {/* Notifications */}
-              <Link
-                href="/dashboard/notifications"
-                className="relative p-2 rounded-lg text-secondary-600 dark:text-secondary-400 hover:bg-secondary-100 dark:hover:bg-secondary-800"
-              >
-                <BellIcon className="h-6 w-6" />
-                {notifications > 0 && (
-                  <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                    {notifications}
-                  </span>
-                )}
+              <Link href="/dashboard" className="p-2 rounded-lg text-secondary-600 dark:text-secondary-400 hover:bg-secondary-100 dark:hover:bg-secondary-800">
+                Ir al Dashboard
               </Link>
-
-              {/* User menu */}
-              <div className="flex items-center gap-2">
-                <Link
-                  href="/dashboard/profile"
-                  className="hidden md:flex items-center gap-3 p-2 rounded-lg hover:bg-secondary-100 dark:hover:bg-secondary-800"
-                >
-                  <div className="w-8 h-8 rounded-full overflow-hidden bg-primary-100 dark:bg-primary-950">
-                    {user?.avatar ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold text-sm">
-                        {user?.name?.[0] || 'U'}
-                      </div>
-                    )}
-                  </div>
-                  <span className="text-sm font-medium text-secondary-900 dark:text-white">
-                    {user?.name?.split(' ')[0]}
-                  </span>
-                </Link>
-
-                <button
-                  onClick={handleLogout}
-                  className="p-2 rounded-lg text-secondary-600 dark:text-secondary-400 hover:bg-secondary-100 dark:hover:bg-secondary-800"
-                  title={t('logout')}
-                >
-                  <ArrowRightOnRectangleIcon className="h-5 w-5" />
-                </button>
-              </div>
+              <button
+                onClick={handleLogout}
+                className="p-2 rounded-lg text-secondary-600 dark:text-secondary-400 hover:bg-secondary-100 dark:hover:bg-secondary-800"
+                title="Salir"
+              >
+                <ArrowRightOnRectangleIcon className="h-5 w-5" />
+              </button>
             </div>
           </div>
         </div>
       </header>
 
       <div className="flex">
-        {/* Sidebar */}
         <aside
           className={cn(
             'fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-secondary-950 border-r border-secondary-200 dark:border-secondary-700 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-auto',
@@ -176,39 +124,26 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </Link>
               );
             })}
-
             <div className="pt-4 border-t border-secondary-200 dark:border-secondary-700 space-y-1">
               <Link
-                href="/dashboard/profile"
-                onClick={() => setSidebarOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800"
-              >
-                <UserCircleIcon className="h-5 w-5 flex-shrink-0" />
-                <span>{t('myProfile')}</span>
-              </Link>
-              <Link
-                href="/dashboard/settings"
+                href="/admin/settings"
                 onClick={() => setSidebarOpen(false)}
                 className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800"
               >
                 <Cog6ToothIcon className="h-5 w-5 flex-shrink-0" />
-                <span>{t('settings')}</span>
+                <span>Configuración</span>
               </Link>
             </div>
           </nav>
         </aside>
 
-        {/* Overlay for mobile */}
         {sidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-          />
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden" onClick={() => setSidebarOpen(false)} />
         )}
 
-        {/* Main content */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>
   );
 }
+

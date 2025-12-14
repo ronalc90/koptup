@@ -86,18 +86,16 @@ export interface UpdateTaskData extends Partial<CreateTaskData> {
 // ============================================================================
 
 export interface CreateOrderData {
+  name: string;
+  description?: string;
   projectId?: string;
   items: OrderItem[];
-  totalAmount: number;
-  notes?: string;
 }
 
 export interface OrderItem {
-  productId: string;
-  productName: string;
+  name: string;
   quantity: number;
-  unitPrice: number;
-  totalPrice: number;
+  price: number;
 }
 
 // ============================================================================

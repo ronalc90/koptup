@@ -74,6 +74,34 @@ export default function BillingPage() {
     }
   };
 
+  const downloadInvoice = async (id: string) => {
+    try {
+      const data = await api.downloadInvoice(id);
+      const url = (data?.downloadUrl || data?.url || '').toString();
+      if (url) {
+        window.open(url, '_blank');
+      } else {
+        console.warn('No se recibió URL de descarga');
+      }
+    } catch (error) {
+      console.error('Error al descargar la factura', error);
+    }
+  };
+
+  const payInvoice = async (invoice: any) => {
+    try {
+      const amount = Number(invoice.amount || 0);
+      await api.payInvoice(invoice.id, {
+        paymentMethod: 'credit_card',
+        amount,
+        notes: 'Pago rápido desde dashboard',
+      });
+      await loadInvoices();
+    } catch (error) {
+      console.error('Error al pagar la factura', error);
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const badges: Record<string, { className: string; text: string; icon: any }> = {
       paid: {
@@ -213,9 +241,11 @@ export default function BillingPage() {
                   <div className="space-y-2">
                     {invoice.items?.map((item: any, idx: number) => (
                       <div key={idx} className="flex items-center justify-between text-sm">
-                        <span className="text-secondary-600 dark:text-secondary-400">{item.description || 'Sin descripción'}</span>
+                        <span className="text-secondary-600 dark:text-secondary-400">
+                          {item.description || 'Sin descripción'}
+                        </span>
                         <span className="font-semibold text-secondary-900 dark:text-white">
-                          ${(item.amount || 0).toFixed(2)}
+                          ${Number(item.amount ?? item.total ?? 0).toFixed(2)}
                         </span>
                       </div>
                     ))}
@@ -223,12 +253,12 @@ export default function BillingPage() {
                 </div>
 
                 <div className="flex gap-3">
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => downloadInvoice(invoice.id)}>
                     <DocumentArrowDownIcon className="h-4 w-4 mr-2" />
                     Descargar PDF
                   </Button>
                   {invoice.status !== 'paid' && (
-                    <Button size="sm">
+                    <Button size="sm" onClick={() => payInvoice(invoice)}>
                       <CreditCardIcon className="h-4 w-4 mr-2" />
                       Pagar Ahora
                     </Button>
