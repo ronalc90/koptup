@@ -26,8 +26,17 @@ export default function DashboardPage() {
   const [dashboardData, setDashboardData] = useState<any>(null);
 
   useEffect(() => {
+    // Check if user is admin and redirect to admin panel
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      const user = JSON.parse(userData);
+      if (user.role === 'admin') {
+        router.push('/admin');
+        return;
+      }
+    }
     loadDashboardData();
-  }, []);
+  }, [router]);
 
   const loadDashboardData = async () => {
     try {

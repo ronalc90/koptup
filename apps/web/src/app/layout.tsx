@@ -19,11 +19,11 @@ const poppins = Poppins({
 export const metadata = {
   metadataBase: new URL('https://koptup.com'),
   title: {
-    default: 'KopTup - Auditoría Médica con IA | Glosas y Facturación en Salud',
+    default: 'KopTup - Soluciones Tecnológicas | Desarrollo de Software Empresarial',
     template: '%s | KopTup',
   },
   description:
-    'Plataforma líder en auditoría médica automatizada con IA. Gestión de glosas, facturación hospitalaria, liquidación de cuentas médicas y análisis de tarifas SOAT, ISS y contratos EPS. Soluciones tecnológicas para IPS, hospitales y clínicas en Colombia.',
+    'KopTup - Soluciones tecnológicas empresariales. Desarrollo de software a medida, aplicaciones web y móviles, automatización de procesos, inteligencia artificial y transformación digital para empresas.',
   keywords: [
     'auditoría médica',
     'glosas médicas',
