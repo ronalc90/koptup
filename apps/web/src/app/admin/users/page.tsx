@@ -30,10 +30,13 @@ export default function AdminUsersPage() {
       if (roleFilter !== 'all') params.append('role', roleFilter);
       if (searchQuery) params.append('search', searchQuery);
 
-      const response = await api.get(`/admin/users?${params.toString()}`);
+      const response = await api.get(`/api/admin/users?${params.toString()}`);
       setUsers(response.data?.data || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading users:', error);
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        alert('No tienes permisos para acceder a esta página. Debes iniciar sesión con una cuenta de administrador.');
+      }
       setUsers([]);
     } finally {
       setLoading(false);
@@ -52,7 +55,7 @@ export default function AdminUsersPage() {
 
     try {
       setUpdatingRole(userId);
-      await api.patch(`/admin/users/${userId}/role`, { role: newRole });
+      await api.patch(`/api/admin/users/${userId}/role`, { role: newRole });
       await loadUsers();
       alert('Rol actualizado exitosamente');
     } catch (error) {

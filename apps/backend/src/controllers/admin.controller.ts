@@ -8,8 +8,9 @@ import Message from '../models/Message';
 import Contact from '../models/Contact';
 import mongoose from 'mongoose';
 import User from '../models/User';
+import { sendOrderStatusMessage } from '../utils/conversationHelper';
 
-export const adminGetOrders = async (req: AuthRequest, res: Response) => {
+export const adminGetOrders = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { status } = req.query as { status?: string };
     const query: any = {};
@@ -23,13 +24,25 @@ export const adminGetOrders = async (req: AuthRequest, res: Response) => {
       .lean();
     const data = orders.map((o: any) => ({
       id: o.orderId,
+      _id: o._id,
       name: o.name,
       description: o.description,
       status: o.status,
+      approvalStatus: o.approvalStatus || 'pending',
       date: o.orderDate?.toISOString?.().split('T')[0],
       amount: o.amount,
-      user: o.userId,
+      currency: o.currency || 'USD',
+      items: o.items || [],
+      user: {
+        _id: o.userId?._id,
+        name: o.userId?.name,
+        email: o.userId?.email,
+      },
       project: o.projectId,
+      conversationId: o.conversationId,
+      approvedDate: o.approvedDate,
+      rejectedDate: o.rejectedDate,
+      rejectionReason: o.rejectionReason,
     }));
     res.json({ success: true, data });
   } catch (error) {
@@ -37,16 +50,16 @@ export const adminGetOrders = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const adminUpdateOrderStatus = async (req: AuthRequest, res: Response) => {
+export const adminUpdateOrderStatus = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { status } = req.body as { status: 'pending' | 'in_progress' | 'shipped' | 'completed' | 'cancelled' };
     if (!status) {
-      return res.status(400).json({ success: false, message: 'Estado requerido' });
+      res.status(400).json({ success: false, message: 'Estado requerido' });
     }
     const order = await Order.findOne({ orderId: id });
     if (!order) {
-      return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+      res.status(404).json({ success: false, message: 'Pedido no encontrado' });
     }
     order.status = status;
     order.history.push({
@@ -62,7 +75,106 @@ export const adminUpdateOrderStatus = async (req: AuthRequest, res: Response) =>
   }
 };
 
-export const adminGetInvoices = async (req: AuthRequest, res: Response) => {
+// Admin - Aprobar pedido
+export const adminApproveOrder = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const order = await Order.findOne({ orderId: id });
+
+    if (!order) {
+      res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+      return;
+    }
+
+    if (order.approvalStatus === 'approved') {
+      res.status(400).json({ success: false, message: 'El pedido ya está aprobado' });
+      return;
+    }
+
+    order.approvalStatus = 'approved';
+    order.approvedDate = new Date();
+    order.history.push({
+      date: new Date(),
+      status: 'approved',
+      description: 'Pedido aprobado por administrador',
+      updatedBy: new mongoose.Types.ObjectId(req.user!.id),
+    });
+
+    await order.save();
+
+    // Enviar mensaje automático a la conversación
+    if (order.conversationId) {
+      await sendOrderStatusMessage(
+        order.conversationId,
+        order.orderId,
+        'approved'
+      );
+    }
+
+    res.json({
+      success: true,
+      message: 'Pedido aprobado exitosamente',
+      data: { id: order.orderId, approvalStatus: 'approved' },
+    });
+  } catch (error) {
+    console.error('Error approving order:', error);
+    res.status(500).json({ success: false, message: 'Error al aprobar pedido' });
+  }
+};
+
+// Admin - Rechazar pedido
+export const adminRejectOrder = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body as { reason?: string };
+
+    const order = await Order.findOne({ orderId: id });
+
+    if (!order) {
+      res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+      return;
+    }
+
+    if (order.approvalStatus === 'rejected') {
+      res.status(400).json({ success: false, message: 'El pedido ya está rechazado' });
+      return;
+    }
+
+    order.approvalStatus = 'rejected';
+    order.rejectedDate = new Date();
+    order.rejectionReason = reason || 'No especificado';
+    order.status = 'cancelled';
+    order.history.push({
+      date: new Date(),
+      status: 'rejected',
+      description: `Pedido rechazado por administrador${reason ? `: ${reason}` : ''}`,
+      updatedBy: new mongoose.Types.ObjectId(req.user!.id),
+    });
+
+    await order.save();
+
+    // Enviar mensaje automático a la conversación
+    if (order.conversationId) {
+      await sendOrderStatusMessage(
+        order.conversationId,
+        order.orderId,
+        'rejected',
+        reason
+      );
+    }
+
+    res.json({
+      success: true,
+      message: 'Pedido rechazado',
+      data: { id: order.orderId, approvalStatus: 'rejected', rejectionReason: reason },
+    });
+  } catch (error) {
+    console.error('Error rejecting order:', error);
+    res.status(500).json({ success: false, message: 'Error al rechazar pedido' });
+  }
+};
+
+export const adminGetInvoices = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { status } = req.query as { status?: string };
     const query: any = {};
@@ -90,7 +202,7 @@ export const adminGetInvoices = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const adminGetDeliverables = async (req: AuthRequest, res: Response) => {
+export const adminGetDeliverables = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { status, projectId } = req.query as { status?: string; projectId?: string };
     const query: any = {};
@@ -120,12 +232,12 @@ export const adminGetDeliverables = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const adminCreateInvoiceFromOrder = async (req: AuthRequest, res: Response) => {
+export const adminCreateInvoiceFromOrder = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const order = await Order.findOne({ orderId: id }).lean();
     if (!order) {
-      return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+      res.status(404).json({ success: false, message: 'Pedido no encontrado' });
     }
     const user = await User.findById(order.userId).lean();
     const clientInfo = {
@@ -139,7 +251,7 @@ export const adminCreateInvoiceFromOrder = async (req: AuthRequest, res: Respons
       total: it.quantity * it.price,
     }));
     if (!items.length) {
-      return res.status(400).json({ success: false, message: 'El pedido no tiene ítems válidos' });
+      res.status(400).json({ success: false, message: 'El pedido no tiene ítems válidos' });
     }
     const subtotal = items.reduce((sum: number, item: any) => sum + item.total, 0);
     const taxRate = 0.19;
@@ -179,7 +291,7 @@ export const adminCreateInvoiceFromOrder = async (req: AuthRequest, res: Respons
 };
 
 // Admin - Get all conversations
-export const adminGetConversations = async (req: AuthRequest, res: Response) => {
+export const adminGetConversations = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { status } = req.query as { status?: string };
     const query: any = {};
@@ -223,7 +335,7 @@ export const adminGetConversations = async (req: AuthRequest, res: Response) => 
 };
 
 // Admin - Get conversation details with messages
-export const adminGetConversationDetails = async (req: AuthRequest, res: Response) => {
+export const adminGetConversationDetails = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 
@@ -233,7 +345,7 @@ export const adminGetConversationDetails = async (req: AuthRequest, res: Respons
       .lean();
 
     if (!conversation) {
-      return res.status(404).json({ success: false, message: 'Conversación no encontrada' });
+      res.status(404).json({ success: false, message: 'Conversación no encontrada' });
     }
 
     // Get messages
@@ -279,7 +391,7 @@ export const adminGetConversationDetails = async (req: AuthRequest, res: Respons
 };
 
 // Admin - Get all users
-export const adminGetUsers = async (req: AuthRequest, res: Response) => {
+export const adminGetUsers = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { role, search } = req.query as { role?: string; search?: string };
     const query: any = {};
@@ -319,13 +431,13 @@ export const adminGetUsers = async (req: AuthRequest, res: Response) => {
 };
 
 // Admin - Update user role
-export const adminUpdateUserRole = async (req: AuthRequest, res: Response) => {
+export const adminUpdateUserRole = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { role } = req.body as { role: 'user' | 'admin' | 'manager' | 'developer' };
 
     if (!role) {
-      return res.status(400).json({ success: false, message: 'Rol requerido' });
+      res.status(400).json({ success: false, message: 'Rol requerido' });
     }
 
     const user = await User.findByIdAndUpdate(
@@ -335,7 +447,7 @@ export const adminUpdateUserRole = async (req: AuthRequest, res: Response) => {
     ).select('-password');
 
     if (!user) {
-      return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+      res.status(404).json({ success: false, message: 'Usuario no encontrado' });
     }
 
     res.json({
@@ -354,7 +466,7 @@ export const adminUpdateUserRole = async (req: AuthRequest, res: Response) => {
 };
 
 // Admin - Get all contacts
-export const adminGetContacts = async (req: AuthRequest, res: Response) => {
+export const adminGetContacts = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { status } = req.query as { status?: string };
     const query: any = {};
@@ -387,13 +499,13 @@ export const adminGetContacts = async (req: AuthRequest, res: Response) => {
 };
 
 // Admin - Update contact status
-export const adminUpdateContactStatus = async (req: AuthRequest, res: Response) => {
+export const adminUpdateContactStatus = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { status } = req.body as { status: 'new' | 'read' | 'responded' };
 
     if (!status) {
-      return res.status(400).json({ success: false, message: 'Estado requerido' });
+      res.status(400).json({ success: false, message: 'Estado requerido' });
     }
 
     const contact = await Contact.findByIdAndUpdate(
@@ -403,7 +515,7 @@ export const adminUpdateContactStatus = async (req: AuthRequest, res: Response) 
     );
 
     if (!contact) {
-      return res.status(404).json({ success: false, message: 'Contacto no encontrado' });
+      res.status(404).json({ success: false, message: 'Contacto no encontrado' });
     }
 
     res.json({

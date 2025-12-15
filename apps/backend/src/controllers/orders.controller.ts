@@ -173,6 +173,25 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
 
     await newOrder.save();
 
+    // Crear conversación automática entre cliente y admin
+    try {
+      const { createOrderConversation } = await import('../utils/conversationHelper');
+      const conversationId = await createOrderConversation(
+        newOrder.orderId,
+        newOrder.name,
+        new mongoose.Types.ObjectId(userId),
+        newOrder.amount,
+        newOrder.items
+      );
+
+      // Actualizar el pedido con el ID de la conversación
+      newOrder.conversationId = conversationId;
+      await newOrder.save();
+    } catch (error) {
+      console.error('Error creating order conversation:', error);
+      // No fallar la creación del pedido si falla la conversación
+    }
+
     res.status(201).json({
       success: true,
       data: {

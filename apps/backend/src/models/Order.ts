@@ -5,8 +5,10 @@ export interface IOrder extends Document {
   name: string;
   description: string;
   status: 'pending' | 'in_progress' | 'shipped' | 'completed' | 'cancelled';
+  approvalStatus: 'pending' | 'approved' | 'rejected';
   userId: mongoose.Types.ObjectId;
   projectId?: mongoose.Types.ObjectId;
+  conversationId?: mongoose.Types.ObjectId;
   amount: number;
   currency: string;
   items: Array<{
@@ -19,6 +21,9 @@ export interface IOrder extends Document {
   carrier?: string;
   orderDate: Date;
   completedDate?: Date;
+  approvedDate?: Date;
+  rejectedDate?: Date;
+  rejectionReason?: string;
   history: Array<{
     date: Date;
     status: string;
@@ -48,6 +53,11 @@ const OrderSchema: Schema = new Schema(
       enum: ['pending', 'in_progress', 'shipped', 'completed', 'cancelled'],
       default: 'pending',
     },
+    approvalStatus: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected'],
+      default: 'pending',
+    },
     userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
@@ -57,6 +67,10 @@ const OrderSchema: Schema = new Schema(
     projectId: {
       type: Schema.Types.ObjectId,
       ref: 'Project',
+    },
+    conversationId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Conversation',
     },
     amount: {
       type: Number,
@@ -87,6 +101,15 @@ const OrderSchema: Schema = new Schema(
     },
     completedDate: {
       type: Date,
+    },
+    approvedDate: {
+      type: Date,
+    },
+    rejectedDate: {
+      type: Date,
+    },
+    rejectionReason: {
+      type: String,
     },
     history: [
       {
