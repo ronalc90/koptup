@@ -35,7 +35,7 @@ export default function AdminConversationDetailPage() {
   const loadConversation = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/admin/conversations/${conversationId}`);
+      const response = await api.get(`/api/admin/conversations/${conversationId}`);
       setConversation(response.data?.data?.conversation);
       setMessages(response.data?.data?.messages || []);
     } catch (error) {

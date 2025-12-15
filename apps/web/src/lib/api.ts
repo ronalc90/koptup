@@ -74,7 +74,7 @@ class ApiClient {
             }
           } catch (refreshError) {
             // Refresh failed, redirect to login only if we're on a protected page
-            if (typeof window !== 'undefined' && window.location.pathname.startsWith('/dashboard')) {
+            if (typeof window !== 'undefined' && (window.location.pathname.startsWith('/dashboard') || window.location.pathname.startsWith('/admin'))) {
               Cookies.remove('accessToken');
               Cookies.remove('refreshToken');
               window.location.href = '/login';

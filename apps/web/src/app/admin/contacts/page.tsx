@@ -29,7 +29,7 @@ export default function AdminContactsPage() {
   const loadContacts = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/admin/contacts?status=${statusFilter}`);
+      const response = await api.get(`/api/admin/contacts?status=${statusFilter}`);
       setContacts(response.data?.data || []);
     } catch (error) {
       console.error('Error loading contacts:', error);
@@ -42,7 +42,7 @@ export default function AdminContactsPage() {
   const handleUpdateStatus = async (contactId: string, newStatus: string) => {
     try {
       setUpdatingStatus(contactId);
-      await api.patch(`/admin/contacts/${contactId}/status`, { status: newStatus });
+      await api.patch(`/api/admin/contacts/${contactId}/status`, { status: newStatus });
       await loadContacts();
       if (selectedContact?._id === contactId) {
         setSelectedContact({ ...selectedContact, status: newStatus });

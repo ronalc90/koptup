@@ -25,7 +25,7 @@ export default function AdminConversationsPage() {
   const loadConversations = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/admin/conversations?status=${statusFilter}`);
+      const response = await api.get(`/api/admin/conversations?status=${statusFilter}`);
       setConversations(response.data?.data || []);
     } catch (error) {
       console.error('Error loading conversations:', error);

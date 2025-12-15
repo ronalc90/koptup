@@ -3,6 +3,8 @@ import { authenticate, authorize } from '../middleware/auth';
 import {
   adminGetOrders,
   adminUpdateOrderStatus,
+  adminApproveOrder,
+  adminRejectOrder,
   adminGetInvoices,
   adminGetDeliverables,
   adminCreateInvoiceFromOrder,
@@ -21,6 +23,8 @@ router.use(authenticate, authorize('admin', 'manager'));
 // Orders
 router.get('/orders', adminGetOrders);
 router.patch('/orders/:id/status', adminUpdateOrderStatus);
+router.post('/orders/:id/approve', adminApproveOrder);
+router.post('/orders/:id/reject', adminRejectOrder);
 router.post('/orders/:id/invoice', adminCreateInvoiceFromOrder);
 
 // Invoices
