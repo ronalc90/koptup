@@ -65,6 +65,176 @@
       "description": "Arquitectura, migración y optimización de infraestructura"
     }
   },
+  "servicesPage": {
+    "hero": {
+      "badge": "Servicios Tecnológicos",
+      "title": "Soluciones Tecnológicas Integrales",
+      "subtitle": "Desarrollamos software a medida, e-commerce, chatbots con IA y más para impulsar tu negocio",
+      "ctaConsult": "Solicitar Consultoría",
+      "ctaPricing": "Ver Precios"
+    },
+    "services": {
+      "ecommerce": {
+        "title": "E-commerce Personalizado",
+        "shortDescription": "Tiendas online optimizadas con excelente UX",
+        "description": "Desarrollamos tiendas en línea completas con gestión de productos, carrito de compras, pasarelas de pago y análisis de ventas.",
+        "features": [
+          "Catálogo de productos ilimitado",
+          "Múltiples métodos de pago",
+          "Sistema de inventario",
+          "Panel de administración",
+          "Reportes de ventas",
+          "Responsive design"
+        ],
+        "price": "Desde $3,000",
+        "deliveryTime": "4-6 semanas"
+      },
+      "chatbots": {
+        "title": "Chatbots & IA",
+        "shortDescription": "Asistentes virtuales inteligentes 24/7",
+        "description": "Implementamos chatbots con inteligencia artificial para automatizar atención al cliente, ventas y soporte técnico.",
+        "features": [
+          "Procesamiento de lenguaje natural",
+          "Integración con bases de conocimiento",
+          "Respuestas contextuales",
+          "Análisis de conversaciones",
+          "Múltiples canales (web, WhatsApp, etc.)",
+          "Aprendizaje continuo"
+        ],
+        "price": "Desde $2,000",
+        "deliveryTime": "3-4 semanas"
+      },
+      "integrations": {
+        "title": "Integraciones API",
+        "shortDescription": "Conecta sistemas y automatiza procesos",
+        "description": "Desarrollamos integraciones personalizadas entre diferentes sistemas y plataformas para automatizar tus procesos de negocio.",
+        "features": [
+          "APIs RESTful y GraphQL",
+          "Sincronización de datos",
+          "Webhooks y eventos",
+          "Autenticación segura",
+          "Documentación completa",
+          "Monitoreo en tiempo real"
+        ],
+        "price": "Desde $1,500",
+        "deliveryTime": "2-4 semanas"
+      },
+      "custom": {
+        "title": "Software a Medida",
+        "shortDescription": "Soluciones personalizadas para tu negocio",
+        "description": "Desarrollamos software personalizado adaptado completamente a tus procesos de negocio y necesidades específicas.",
+        "features": [
+          "Análisis de requisitos",
+          "Arquitectura escalable",
+          "Diseño personalizado",
+          "Integración con sistemas existentes",
+          "Testing completo",
+          "Capacitación incluida"
+        ],
+        "price": "Desde $5,000",
+        "deliveryTime": "6-12 semanas"
+      },
+      "mobile": {
+        "title": "Aplicaciones Móviles",
+        "shortDescription": "Apps nativas y multiplataforma",
+        "description": "Creamos aplicaciones móviles nativas para iOS y Android, o multiplataforma con React Native y Flutter.",
+        "features": [
+          "Diseño nativo o multiplataforma",
+          "Notificaciones push",
+          "Geolocalización",
+          "Pagos in-app",
+          "Sincronización offline",
+          "Publicación en tiendas"
+        ],
+        "price": "Desde $6,000",
+        "deliveryTime": "8-12 semanas"
+      },
+      "uxui": {
+        "title": "Diseño UX/UI",
+        "shortDescription": "Interfaces modernas orientadas a conversión",
+        "description": "Diseñamos experiencias de usuario intuitivas y atractivas que maximizan la conversión y satisfacción.",
+        "features": [
+          "Investigación de usuarios",
+          "Wireframes y prototipos",
+          "Diseño visual",
+          "Sistema de diseño",
+          "Testing de usabilidad",
+          "Guías de estilo"
+        ],
+        "price": "Desde $2,500",
+        "deliveryTime": "3-5 semanas"
+      },
+      "security": {
+        "title": "Ciberseguridad",
+        "shortDescription": "Protege tu negocio digital",
+        "description": "Realizamos auditorías de seguridad, pruebas de penetración y implementamos mejores prácticas para proteger tus sistemas.",
+        "features": [
+          "Auditorías de seguridad",
+          "Pruebas de penetración",
+          "Análisis de vulnerabilidades",
+          "Implementación de SSL/TLS",
+          "Políticas de seguridad",
+          "Capacitación al equipo"
+        ],
+        "price": "Desde $2,000",
+        "deliveryTime": "2-4 semanas"
+      },
+      "consulting": {
+        "title": "Consultoría & Cloud",
+        "shortDescription": "Optimiza tu infraestructura tecnológica",
+        "description": "Asesoramos en arquitectura de software, migración a la nube y optimización de infraestructura tecnológica.",
+        "features": [
+          "Análisis de arquitectura",
+          "Migración a cloud (AWS, Azure, GCP)",
+          "Optimización de costos",
+          "DevOps y CI/CD",
+          "Escalabilidad y alta disponibilidad",
+          "Monitoreo y alertas"
+        ],
+        "price": "Desde $3,500",
+        "deliveryTime": "4-8 semanas"
+      }
+    },
+    "features": "Características",
+    "technologies": "Tecnologías",
+    "request": "Solicitar",
+    "process": {
+      "title": "Nuestro Proceso de Trabajo",
+      "subtitle": "Un enfoque probado para garantizar el éxito de tu proyecto",
+      "steps": {
+        "consult": {
+          "title": "Consulta Inicial",
+          "description": "Analizamos tus necesidades y objetivos de negocio"
+        },
+        "proposal": {
+          "title": "Propuesta",
+          "description": "Presentamos solución técnica y presupuesto detallado"
+        },
+        "design": {
+          "title": "Diseño",
+          "description": "Creamos prototipos y diseños para tu aprobación"
+        },
+        "development": {
+          "title": "Desarrollo",
+          "description": "Implementamos la solución con metodologías ágiles"
+        },
+        "testing": {
+          "title": "Testing",
+          "description": "Probamos exhaustivamente antes del lanzamiento"
+        },
+        "delivery": {
+          "title": "Entrega",
+          "description": "Desplegamos y capacitamos a tu equipo"
+        }
+      }
+    },
+    "cta": {
+      "title": "¿Listo para iniciar tu proyecto?",
+      "subtitle": "Agenda una consulta gratuita y descubre cómo podemos ayudarte",
+      "ctaSchedule": "Agendar Consulta",
+      "ctaPricing": "Ver Planes"
+    }
+  },
   "homePage": {
     "stats": {
       "projects": "Proyectos completados",
@@ -594,6 +764,117 @@
     }
   }
   ,
+  "dashboardLayout": {
+    "dashboard": "Panel",
+    "myOrders": "Mis Pedidos",
+    "projects": "Proyectos",
+    "deliverables": "Entregables",
+    "billing": "Facturación",
+    "messages": "Mensajes",
+    "myProfile": "Mi Perfil",
+    "settings": "Configuración",
+    "logout": "Cerrar Sesión"
+  },
+  "settingsPage": {
+    "title": "Configuración",
+    "subtitle": "Personaliza tu experiencia en KopTup",
+    "notifications": "Notificaciones",
+    "emailNotifications": "Notificaciones por correo",
+    "emailDesc": "Recibe actualizaciones importantes por correo electrónico",
+    "pushNotifications": "Notificaciones push",
+    "pushDesc": "Recibe notificaciones en tiempo real en tu navegador",
+    "smsNotifications": "Notificaciones SMS",
+    "smsDesc": "Recibe alertas importantes por mensaje de texto",
+    "languageAndAppearance": "Idioma y Apariencia",
+    "language": "Idioma",
+    "theme": "Tema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "auto": "Auto",
+    "cancel": "Cancelar",
+    "save": "Guardar cambios",
+    "saving": "Guardando...",
+    "toastSaved": "Configuración guardada exitosamente"
+  },
+  "adminConversations": {
+    "title": "Conversaciones",
+    "subtitle": "Visualiza y gestiona todas las conversaciones del sistema",
+    "filterAll": "Todas",
+    "filterActive": "Activas",
+    "filterArchived": "Archivadas",
+    "filterClosed": "Cerradas",
+    "allConversations": "Todas las conversaciones",
+    "noConversations": "No hay conversaciones para mostrar",
+    "unread": "sin leer",
+    "project": "Proyecto",
+    "loading": "Cargando conversaciones...",
+    "backToList": "Volver a conversaciones",
+    "conversationNotFound": "Conversación no encontrada",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "typeMessage": "Escribe tu mensaje...",
+    "send": "Enviar",
+    "sending": "Enviando...",
+    "statusActive": "Activa",
+    "statusArchived": "Archivada",
+    "statusClosed": "Cerrada"
+  },
+  "adminUsers": {
+    "title": "Usuarios",
+    "subtitle": "Gestiona usuarios y sus roles en el sistema",
+    "searchPlaceholder": "Buscar por nombre o email...",
+    "search": "Buscar",
+    "filterAll": "Todos",
+    "filterAdmin": "Admin",
+    "filterManager": "Manager",
+    "filterUser": "Usuario",
+    "allUsers": "Todos los usuarios",
+    "noUsers": "No se encontraron usuarios",
+    "loading": "Cargando usuarios...",
+    "tableUser": "Usuario",
+    "tableEmail": "Email",
+    "tableRole": "Rol",
+    "tableProvider": "Proveedor",
+    "tableLastLogin": "Último acceso",
+    "tableCreated": "Fecha registro",
+    "tableActions": "Acciones",
+    "roleUser": "Usuario",
+    "roleDeveloper": "Developer",
+    "roleManager": "Manager",
+    "roleAdmin": "Admin",
+    "confirmRoleChange": "¿Estás seguro de cambiar el rol de este usuario a {role}?",
+    "roleUpdated": "Rol actualizado exitosamente",
+    "roleUpdateError": "Error al actualizar el rol"
+  },
+  "adminContacts": {
+    "title": "Contactos",
+    "subtitle": "Gestiona las solicitudes de contacto recibidas",
+    "filterAll": "Todos",
+    "filterNew": "Nuevos",
+    "filterRead": "Leídos",
+    "filterResponded": "Respondidos",
+    "contactRequests": "Solicitudes de contacto",
+    "noContacts": "No hay contactos para mostrar",
+    "loading": "Cargando contactos...",
+    "contactDetail": "Detalle del contacto",
+    "selectContact": "Selecciona un contacto para ver sus detalles",
+    "email": "Email",
+    "phone": "Teléfono",
+    "company": "Empresa",
+    "service": "Servicio",
+    "budget": "Presupuesto",
+    "message": "Mensaje",
+    "contactDate": "Fecha de contacto",
+    "updateStatus": "Actualizar estado",
+    "markAsNew": "Marcar como nuevo",
+    "markAsRead": "Marcar como leído",
+    "markAsResponded": "Marcar como respondido",
+    "statusNew": "Nuevo",
+    "statusRead": "Leído",
+    "statusResponded": "Respondido",
+    "statusUpdated": "Estado actualizado exitosamente",
+    "statusUpdateError": "Error al actualizar estado"
+  },
   "loginPage": {
     "title": "Iniciar Sesión",
     "subtitle": "Accede a tu cuenta para continuar",
@@ -645,6 +926,121 @@
     "errorPasswordMismatch": "Las contraseñas no coinciden.",
     "errorPasswordLength": "La contraseña debe tener al menos 8 caracteres.",
     "errorTerms": "Debes aceptar los términos y la privacidad."
+  },
+  "aboutPage": {
+    "badge": "Sobre Nosotros",
+    "hero": {
+      "title": "Transformamos Ideas en Realidad Digital",
+      "subtitle": "Somos un equipo apasionado por la tecnología, dedicado a crear soluciones innovadoras que impulsan el éxito de nuestros clientes"
+    },
+    "stats": {
+      "projects": "Proyectos Completados",
+      "clients": "Clientes Satisfechos",
+      "experience": "Años de Experiencia",
+      "satisfaction": "Tasa de Satisfacción"
+    },
+    "mission": {
+      "title": "Nuestra Misión",
+      "text1": "En KopTup, nuestra misión es empoderar a las empresas mediante soluciones tecnológicas innovadoras y personalizadas. Creemos que la tecnología debe ser accesible, eficiente y escalable para todos.",
+      "text2": "Nos especializamos en convertir desafíos complejos en soluciones elegantes, combinando creatividad con excelencia técnica para entregar productos que no solo cumplen, sino que superan las expectativas.",
+      "points": {
+        "custom": "Soluciones personalizadas a medida",
+        "modern": "Tecnologías de última generación",
+        "support": "Soporte continuo y mantenimiento"
+      }
+    },
+    "values": {
+      "title": "Nuestros Valores",
+      "subtitle": "Los principios que guían cada decisión y proyecto que emprendemos",
+      "items": {
+        "innovation": {
+          "title": "Innovación Constante",
+          "description": "Adoptamos las últimas tecnologías y metodologías para ofrecer soluciones de vanguardia."
+        },
+        "excellence": {
+          "title": "Pasión por la Excelencia",
+          "description": "Cada proyecto es una oportunidad para superar expectativas y crear productos excepcionales."
+        },
+        "creativity": {
+          "title": "Creatividad sin Límites",
+          "description": "Pensamos fuera de la caja para resolver problemas complejos con soluciones elegantes."
+        },
+        "transparency": {
+          "title": "Transparencia Total",
+          "description": "Comunicación clara, honesta y constante en cada etapa del proyecto."
+        },
+        "clientFirst": {
+          "title": "Cliente en el Centro",
+          "description": "Tu éxito es nuestro éxito. Trabajamos como una extensión de tu equipo."
+        },
+        "results": {
+          "title": "Resultados Medibles",
+          "description": "Nos enfocamos en entregar valor real y ROI demostrable en cada proyecto."
+        }
+      }
+    },
+    "team": {
+      "title": "Nuestro Equipo",
+      "subtitle": "Profesionales apasionados con experiencia en tecnologías de vanguardia",
+      "members": {
+        "ronald": {
+          "name": "Ronald Cipagauta",
+          "role": "CEO & Desarrollador Full Stack",
+          "description": "Desarrollador Full Stack con experiencia en frontend, backend e integración de IA. Especializado en construir soluciones escalables con React, Node.js y OpenAI."
+        },
+        "johan": {
+          "name": "Johan Mendieta",
+          "role": "Desarrollador Senior",
+          "description": "Desarrollador de software con experiencia en frontend, backend y arquitectura de microservicios. Liderando soluciones impulsadas por OpenAI con embeddings y búsqueda semántica."
+        },
+        "juan_vargas": {
+          "name": "Juan Vargas",
+          "role": "Desarrollador Full Stack",
+          "description": "Desarrollador Full Stack especializado en desarrollo de APIs, reportería empresarial e integración en la nube con Microsoft 365 y Azure. Experto en chatbots con IA."
+        },
+        "juan_pablo": {
+          "name": "Juan Pablo Caicedo",
+          "role": "Desarrollador Full Stack",
+          "description": "Desarrollador Full Stack especializado en diseño, desarrollo e implementación de aplicaciones web. Experto en JavaScript, Microsoft D365 y gestión de bases de datos."
+        }
+      }
+    },
+    "history": {
+      "title": "Nuestra Historia",
+      "subtitle": "El camino que nos llevó a donde estamos hoy",
+      "milestones": {
+        "2019": {
+          "title": "Inicios Independientes",
+          "description": "Equipo colombiano colaborando con profesionales en México. Proyectos universitarios y para pequeños negocios."
+        },
+        "2021": {
+          "title": "Proyectos de Backend y Sistemas",
+          "description": "Desarrollo en Java y Python para e-commerce. Configuración de clusters y replicación en CentOS. Enfoque técnico en backend."
+        },
+        "2022": {
+          "title": "Aplicación de IA",
+          "description": "Modelos de machine learning y deep learning para clientes en Costa Rica. Desarrollo de chatbot para procesos de recursos humanos."
+        },
+        "2023": {
+          "title": "Registro Oficial",
+          "description": "Registro en Cámara de Comercio el 26/03/2023. Formalización de la operación y ampliación de servicios."
+        },
+        "2025": {
+          "title": "Proyecto Sector Salud",
+          "description": "Desarrollo de solución para presentación a la Secretaría de Salud en Colombia."
+        }
+      }
+    },
+    "technologies": {
+      "title": "Tecnologías que Dominamos",
+      "subtitle": "Stack tecnológico moderno para soluciones de clase mundial"
+    },
+    "cta": {
+      "title": "¿Listo para Trabajar Juntos?",
+      "subtitle": "Únete a las empresas que ya confían en nosotros para impulsar su transformación digital",
+      "button1": "Hablemos de tu Proyecto",
+      "button2": "Ver Nuestros Servicios"
+    }
   },
   "contactPage": {
     "badge": "Contacto",

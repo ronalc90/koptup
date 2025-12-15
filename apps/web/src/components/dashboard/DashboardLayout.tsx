@@ -41,8 +41,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     }
     setUser(JSON.parse(userData));
 
-    // Simular notificaciones
-    setNotifications(3);
+    // Cargar notificaciones reales
+    const loadNotifications = async () => {
+      try {
+        const data = await api.getNotifications(true); // unreadOnly = true
+        setNotifications(data?.length || 0);
+      } catch (err) {
+        // Silenciar errores de notificaciones
+        setNotifications(0);
+      }
+    };
+    loadNotifications();
   }, [router]);
 
   const handleLogout = async () => {

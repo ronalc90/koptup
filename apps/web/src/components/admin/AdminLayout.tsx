@@ -8,6 +8,9 @@ import {
   ClipboardDocumentListIcon,
   DocumentTextIcon,
   BanknotesIcon,
+  ChatBubbleLeftRightIcon,
+  UserGroupIcon,
+  EnvelopeIcon,
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
   Bars3Icon,
@@ -46,6 +49,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: 'Pedidos', href: '/admin/orders', icon: ClipboardDocumentListIcon },
     { name: 'Entregables', href: '/admin/deliverables', icon: DocumentTextIcon },
     { name: 'Facturas', href: '/admin/invoices', icon: BanknotesIcon },
+    { name: 'Conversaciones', href: '/admin/conversations', icon: ChatBubbleLeftRightIcon },
+    { name: 'Usuarios', href: '/admin/users', icon: UserGroupIcon },
+    { name: 'Contactos', href: '/admin/contacts', icon: EnvelopeIcon },
   ];
 
   const isActive = (href: string) => {
@@ -80,9 +86,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </span>
             </Link>
             <div className="flex items-center gap-3">
-              <Link href="/dashboard" className="p-2 rounded-lg text-secondary-600 dark:text-secondary-400 hover:bg-secondary-100 dark:hover:bg-secondary-800">
-                Ir al Dashboard
-              </Link>
               <button
                 onClick={handleLogout}
                 className="p-2 rounded-lg text-secondary-600 dark:text-secondary-400 hover:bg-secondary-100 dark:hover:bg-secondary-800"

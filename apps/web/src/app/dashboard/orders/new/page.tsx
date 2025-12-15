@@ -106,7 +106,6 @@ export default function NewOrderPage() {
                   placeholder="Ej. Sitio web corporativo"
                   required
                 />
-              }
               </div>
 
               <div>

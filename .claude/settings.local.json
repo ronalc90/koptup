@@ -79,7 +79,14 @@
       "Bash(test:*)",
       "Bash(npm i:*)",
       "Bash(vercel:*)",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "Bash(git fetch:*)",
+      "Bash(git pull:*)",
+      "Bash(git remote:*)",
+      "Bash(PORT=3000 npm run dev:*)",
+      "Bash(pkill:*)",
+      "Bash(MONGODB_URI=\"mongodb://mongo:QTaKycIfxXPWhlXWuRkzTzHxtCFBreSM@trolley.proxy.rlwy.net:11709/koptup?authSource=admin\" npx tsx:*)",
+      "Bash(echo:*)"
     ],
     "deny": [],
     "ask": []

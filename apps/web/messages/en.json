@@ -65,6 +65,176 @@
       "description": "Architecture, migration and infrastructure optimization"
     }
   },
+  "servicesPage": {
+    "hero": {
+      "badge": "Technology Services",
+      "title": "Comprehensive Technology Solutions",
+      "subtitle": "We develop custom software, e-commerce, AI chatbots and more to power your business",
+      "ctaConsult": "Request Consultation",
+      "ctaPricing": "View Pricing"
+    },
+    "services": {
+      "ecommerce": {
+        "title": "Custom E-commerce",
+        "shortDescription": "Optimized online stores with excellent UX",
+        "description": "We develop complete online stores with product management, shopping cart, payment gateways and sales analytics.",
+        "features": [
+          "Unlimited product catalog",
+          "Multiple payment methods",
+          "Inventory system",
+          "Admin panel",
+          "Sales reports",
+          "Responsive design"
+        ],
+        "price": "From $3,000",
+        "deliveryTime": "4-6 weeks"
+      },
+      "chatbots": {
+        "title": "Chatbots & AI",
+        "shortDescription": "Intelligent virtual assistants 24/7",
+        "description": "We implement AI-powered chatbots to automate customer service, sales and technical support.",
+        "features": [
+          "Natural language processing",
+          "Knowledge base integration",
+          "Contextual responses",
+          "Conversation analytics",
+          "Multiple channels (web, WhatsApp, etc.)",
+          "Continuous learning"
+        ],
+        "price": "From $2,000",
+        "deliveryTime": "3-4 weeks"
+      },
+      "integrations": {
+        "title": "API Integrations",
+        "shortDescription": "Connect systems and automate processes",
+        "description": "We develop custom integrations between different systems and platforms to automate your business processes.",
+        "features": [
+          "RESTful and GraphQL APIs",
+          "Data synchronization",
+          "Webhooks and events",
+          "Secure authentication",
+          "Complete documentation",
+          "Real-time monitoring"
+        ],
+        "price": "From $1,500",
+        "deliveryTime": "2-4 weeks"
+      },
+      "custom": {
+        "title": "Custom Software",
+        "shortDescription": "Tailored solutions for your business",
+        "description": "We develop custom software completely adapted to your business processes and specific needs.",
+        "features": [
+          "Requirements analysis",
+          "Scalable architecture",
+          "Custom design",
+          "Integration with existing systems",
+          "Complete testing",
+          "Training included"
+        ],
+        "price": "From $5,000",
+        "deliveryTime": "6-12 weeks"
+      },
+      "mobile": {
+        "title": "Mobile Applications",
+        "shortDescription": "Native and cross-platform apps",
+        "description": "We create native mobile applications for iOS and Android, or cross-platform with React Native and Flutter.",
+        "features": [
+          "Native or cross-platform design",
+          "Push notifications",
+          "Geolocation",
+          "In-app payments",
+          "Offline sync",
+          "Store publishing"
+        ],
+        "price": "From $6,000",
+        "deliveryTime": "8-12 weeks"
+      },
+      "uxui": {
+        "title": "UX/UI Design",
+        "shortDescription": "Modern interfaces focused on conversion",
+        "description": "We design intuitive and attractive user experiences that maximize conversion and satisfaction.",
+        "features": [
+          "User research",
+          "Wireframes and prototypes",
+          "Visual design",
+          "Design system",
+          "Usability testing",
+          "Style guides"
+        ],
+        "price": "From $2,500",
+        "deliveryTime": "3-5 weeks"
+      },
+      "security": {
+        "title": "Cybersecurity",
+        "shortDescription": "Protect your digital business",
+        "description": "We perform security audits, penetration testing and implement best practices to protect your systems.",
+        "features": [
+          "Security audits",
+          "Penetration testing",
+          "Vulnerability analysis",
+          "SSL/TLS implementation",
+          "Security policies",
+          "Team training"
+        ],
+        "price": "From $2,000",
+        "deliveryTime": "2-4 weeks"
+      },
+      "consulting": {
+        "title": "Consulting & Cloud",
+        "shortDescription": "Optimize your technology infrastructure",
+        "description": "We provide guidance on software architecture, cloud migration and technology infrastructure optimization.",
+        "features": [
+          "Architecture analysis",
+          "Cloud migration (AWS, Azure, GCP)",
+          "Cost optimization",
+          "DevOps and CI/CD",
+          "Scalability and high availability",
+          "Monitoring and alerts"
+        ],
+        "price": "From $3,500",
+        "deliveryTime": "4-8 weeks"
+      }
+    },
+    "features": "Features",
+    "technologies": "Technologies",
+    "request": "Request",
+    "process": {
+      "title": "Our Work Process",
+      "subtitle": "A proven approach to ensure your project's success",
+      "steps": {
+        "consult": {
+          "title": "Initial Consultation",
+          "description": "We analyze your needs and business objectives"
+        },
+        "proposal": {
+          "title": "Proposal",
+          "description": "We present technical solution and detailed budget"
+        },
+        "design": {
+          "title": "Design",
+          "description": "We create prototypes and designs for your approval"
+        },
+        "development": {
+          "title": "Development",
+          "description": "We implement the solution with agile methodologies"
+        },
+        "testing": {
+          "title": "Testing",
+          "description": "We test thoroughly before launch"
+        },
+        "delivery": {
+          "title": "Delivery",
+          "description": "We deploy and train your team"
+        }
+      }
+    },
+    "cta": {
+      "title": "Ready to start your project?",
+      "subtitle": "Schedule a free consultation and discover how we can help you",
+      "ctaSchedule": "Schedule Consultation",
+      "ctaPricing": "View Plans"
+    }
+  },
   "homePage": {
     "stats": {
       "projects": "Projects completed",
@@ -594,6 +764,117 @@
     }
   }
   ,
+  "dashboardLayout": {
+    "dashboard": "Dashboard",
+    "myOrders": "My Orders",
+    "projects": "Projects",
+    "deliverables": "Deliverables",
+    "billing": "Billing",
+    "messages": "Messages",
+    "myProfile": "My Profile",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "settingsPage": {
+    "title": "Settings",
+    "subtitle": "Customize your KopTup experience",
+    "notifications": "Notifications",
+    "emailNotifications": "Email notifications",
+    "emailDesc": "Receive important updates via email",
+    "pushNotifications": "Push notifications",
+    "pushDesc": "Receive real-time notifications in your browser",
+    "smsNotifications": "SMS notifications",
+    "smsDesc": "Receive important alerts via text message",
+    "languageAndAppearance": "Language & Appearance",
+    "language": "Language",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "auto": "Auto",
+    "cancel": "Cancel",
+    "save": "Save changes",
+    "saving": "Saving...",
+    "toastSaved": "Settings saved successfully"
+  },
+  "adminConversations": {
+    "title": "Conversations",
+    "subtitle": "View and manage all system conversations",
+    "filterAll": "All",
+    "filterActive": "Active",
+    "filterArchived": "Archived",
+    "filterClosed": "Closed",
+    "allConversations": "All conversations",
+    "noConversations": "No conversations to display",
+    "unread": "unread",
+    "project": "Project",
+    "loading": "Loading conversations...",
+    "backToList": "Back to conversations",
+    "conversationNotFound": "Conversation not found",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "typeMessage": "Type your message...",
+    "send": "Send",
+    "sending": "Sending...",
+    "statusActive": "Active",
+    "statusArchived": "Archived",
+    "statusClosed": "Closed"
+  },
+  "adminUsers": {
+    "title": "Users",
+    "subtitle": "Manage users and their roles in the system",
+    "searchPlaceholder": "Search by name or email...",
+    "search": "Search",
+    "filterAll": "All",
+    "filterAdmin": "Admin",
+    "filterManager": "Manager",
+    "filterUser": "User",
+    "allUsers": "All users",
+    "noUsers": "No users found",
+    "loading": "Loading users...",
+    "tableUser": "User",
+    "tableEmail": "Email",
+    "tableRole": "Role",
+    "tableProvider": "Provider",
+    "tableLastLogin": "Last login",
+    "tableCreated": "Registration date",
+    "tableActions": "Actions",
+    "roleUser": "User",
+    "roleDeveloper": "Developer",
+    "roleManager": "Manager",
+    "roleAdmin": "Admin",
+    "confirmRoleChange": "Are you sure you want to change this user's role to {role}?",
+    "roleUpdated": "Role updated successfully",
+    "roleUpdateError": "Error updating role"
+  },
+  "adminContacts": {
+    "title": "Contacts",
+    "subtitle": "Manage received contact requests",
+    "filterAll": "All",
+    "filterNew": "New",
+    "filterRead": "Read",
+    "filterResponded": "Responded",
+    "contactRequests": "Contact requests",
+    "noContacts": "No contacts to display",
+    "loading": "Loading contacts...",
+    "contactDetail": "Contact detail",
+    "selectContact": "Select a contact to view details",
+    "email": "Email",
+    "phone": "Phone",
+    "company": "Company",
+    "service": "Service",
+    "budget": "Budget",
+    "message": "Message",
+    "contactDate": "Contact date",
+    "updateStatus": "Update status",
+    "markAsNew": "Mark as new",
+    "markAsRead": "Mark as read",
+    "markAsResponded": "Mark as responded",
+    "statusNew": "New",
+    "statusRead": "Read",
+    "statusResponded": "Responded",
+    "statusUpdated": "Status updated successfully",
+    "statusUpdateError": "Error updating status"
+  },
   "loginPage": {
     "title": "Sign In",
     "subtitle": "Access your account to continue",
@@ -645,6 +926,121 @@
     "errorPasswordMismatch": "Passwords do not match.",
     "errorPasswordLength": "Password must be at least 8 characters.",
     "errorTerms": "You must accept the terms and privacy."
+  },
+  "aboutPage": {
+    "badge": "About Us",
+    "hero": {
+      "title": "We Transform Ideas into Digital Reality",
+      "subtitle": "We are a team passionate about technology, dedicated to creating innovative solutions that drive our clients' success"
+    },
+    "stats": {
+      "projects": "Projects Completed",
+      "clients": "Satisfied Clients",
+      "experience": "Years of Experience",
+      "satisfaction": "Satisfaction Rate"
+    },
+    "mission": {
+      "title": "Our Mission",
+      "text1": "At KopTup, our mission is to empower businesses through innovative and customized technological solutions. We believe that technology should be accessible, efficient and scalable for everyone.",
+      "text2": "We specialize in turning complex challenges into elegant solutions, combining creativity with technical excellence to deliver products that not only meet but exceed expectations.",
+      "points": {
+        "custom": "Tailored custom solutions",
+        "modern": "Cutting-edge technologies",
+        "support": "Continuous support and maintenance"
+      }
+    },
+    "values": {
+      "title": "Our Values",
+      "subtitle": "The principles that guide every decision and project we undertake",
+      "items": {
+        "innovation": {
+          "title": "Constant Innovation",
+          "description": "We adopt the latest technologies and methodologies to offer cutting-edge solutions."
+        },
+        "excellence": {
+          "title": "Passion for Excellence",
+          "description": "Every project is an opportunity to exceed expectations and create exceptional products."
+        },
+        "creativity": {
+          "title": "Limitless Creativity",
+          "description": "We think outside the box to solve complex problems with elegant solutions."
+        },
+        "transparency": {
+          "title": "Total Transparency",
+          "description": "Clear, honest and constant communication at every stage of the project."
+        },
+        "clientFirst": {
+          "title": "Client at the Center",
+          "description": "Your success is our success. We work as an extension of your team."
+        },
+        "results": {
+          "title": "Measurable Results",
+          "description": "We focus on delivering real value and demonstrable ROI in every project."
+        }
+      }
+    },
+    "team": {
+      "title": "Our Team",
+      "subtitle": "Passionate professionals with experience in cutting-edge technologies",
+      "members": {
+        "ronald": {
+          "name": "Ronald Cipagauta",
+          "role": "CEO & Full Stack Developer",
+          "description": "Full Stack Developer with experience in frontend, backend, and AI integration. Specialized in building scalable solutions with React, Node.js, and OpenAI."
+        },
+        "johan": {
+          "name": "Johan Mendieta",
+          "role": "Senior Developer",
+          "description": "Software developer with experience in frontend, backend, and microservices architecture. Leading OpenAI-powered solutions with embeddings and semantic search."
+        },
+        "juan_vargas": {
+          "name": "Juan Vargas",
+          "role": "Full Stack Developer",
+          "description": "Full Stack Developer specialized in API development, business reporting, and cloud integration with Microsoft 365 and Azure. Expert in AI-powered chatbots."
+        },
+        "juan_pablo": {
+          "name": "Juan Pablo Caicedo",
+          "role": "Full Stack Developer",
+          "description": "Full Stack Developer specialized in design, development, and deployment of web applications. Expert in JavaScript, Microsoft D365, and database management."
+        }
+      }
+    },
+    "history": {
+      "title": "Our History",
+      "subtitle": "The journey that brought us to where we are today",
+      "milestones": {
+        "2019": {
+          "title": "Independent Beginnings",
+          "description": "Colombian team collaborating with professionals in Mexico. University projects and for small businesses."
+        },
+        "2021": {
+          "title": "Backend and Systems Projects",
+          "description": "Development in Java and Python for e-commerce. Cluster configuration and replication on CentOS. Technical focus on backend."
+        },
+        "2022": {
+          "title": "AI Application",
+          "description": "Machine learning and deep learning models for clients in Costa Rica. Chatbot development for HR processes."
+        },
+        "2023": {
+          "title": "Official Registration",
+          "description": "Chamber of Commerce registration on 03/26/2023. Formalization of operations and service expansion."
+        },
+        "2025": {
+          "title": "Healthcare Sector Project",
+          "description": "Development of solution for presentation to the Ministry of Health in Colombia."
+        }
+      }
+    },
+    "technologies": {
+      "title": "Technologies We Master",
+      "subtitle": "Modern tech stack for world-class solutions"
+    },
+    "cta": {
+      "title": "Ready to Work Together?",
+      "subtitle": "Join the companies that already trust us to drive their digital transformation",
+      "button1": "Let's Talk About Your Project",
+      "button2": "View Our Services"
+    }
   },
   "contactPage": {
     "badge": "Contact",
