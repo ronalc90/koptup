@@ -14,7 +14,13 @@ import type {
   PayInvoiceData,
 } from '@/types/api.types';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const RAW_API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').trim();
+const NORMALIZED_API_URL = (() => {
+  let u = RAW_API_URL;
+  if (!/^https?:\/\//i.test(u)) u = `https://${u}`;
+  return u.replace(/\/+$/, '');
+})();
+const API_URL = NORMALIZED_API_URL;
 
 /**
  * API Client singleton

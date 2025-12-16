@@ -4,6 +4,13 @@ const createNextIntlPlugin = require('next-intl/plugin');
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 process.env._next_intl_trailing_slash = process.env._next_intl_trailing_slash ?? 'false';
 
+const RAW_API = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').trim();
+const NORMALIZED_API = RAW_API.startsWith('http') ? RAW_API : `https://${RAW_API}`;
+let API_ORIGIN = 'http://localhost:3001';
+try {
+  API_ORIGIN = new URL(NORMALIZED_API).origin;
+} catch {}
+
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
@@ -54,7 +61,7 @@ const nextConfig = {
           {
             key: 'Content-Security-Policy',
             value:
-              "default-src 'self' https://www.google.com; img-src 'self' data: https://koptup-uploads.s3.amazonaws.com https://images.unsplash.com https://media.licdn.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:3001 https://koptupbackend-production.up.railway.app https://koptup-uploads.s3.amazonaws.com; frame-src 'self' https://www.google.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"
+              `default-src 'self' https://www.google.com; img-src 'self' data: https://koptup-uploads.s3.amazonaws.com https://images.unsplash.com https://media.licdn.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' ${API_ORIGIN} http://localhost:3001 https://*.railway.app https://koptup-uploads.s3.amazonaws.com; frame-src 'self' https://www.google.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'`
           }
         ]
       }
