@@ -11,6 +11,7 @@ router.post(
   [
     body('name').trim().notEmpty(),
     body('email').isEmail().normalizeEmail(),
+    body('service').trim().notEmpty(),
     body('message').trim().notEmpty(),
   ],
   submitContact as RequestHandler
