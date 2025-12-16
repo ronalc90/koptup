@@ -17,6 +17,19 @@ export interface IOrder extends Document {
     quantity: number;
     price: number;
   }>;
+  attachments: Array<{
+    fileName: string;
+    fileUrl: string;
+    fileSize: number;
+    fileType: string;
+    uploadedAt: Date;
+  }>;
+  comments: Array<{
+    text: string;
+    userId?: mongoose.Types.ObjectId;
+    userName: string;
+    createdAt: Date;
+  }>;
   tracking?: string;
   carrier?: string;
   orderDate: Date;
@@ -87,6 +100,23 @@ const OrderSchema: Schema = new Schema(
         description: { type: String },
         quantity: { type: Number, required: true, min: 1 },
         price: { type: Number, required: true, min: 0 },
+      },
+    ],
+    attachments: [
+      {
+        fileName: { type: String, required: true },
+        fileUrl: { type: String, required: true },
+        fileSize: { type: Number, required: true },
+        fileType: { type: String, required: true },
+        uploadedAt: { type: Date, default: Date.now },
+      },
+    ],
+    comments: [
+      {
+        text: { type: String, required: true },
+        userId: { type: Schema.Types.ObjectId, ref: 'User' },
+        userName: { type: String, required: true },
+        createdAt: { type: Date, default: Date.now },
       },
     ],
     tracking: {

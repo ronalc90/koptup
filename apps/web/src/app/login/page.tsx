@@ -27,11 +27,17 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [sessionExpiredMessage, setSessionExpiredMessage] = useState('');
 
-  // Check for OAuth errors in URL
+  // Check for OAuth errors and session expiration in URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const authError = params.get('error');
+    const sessionExpired = params.get('session');
+
+    if (sessionExpired === 'expired') {
+      setSessionExpiredMessage('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+    }
 
     if (authError === 'auth_failed') {
       setError('No se pudo iniciar sesión con Google. Por favor intenta nuevamente o regístrate primero.');
@@ -43,6 +49,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSessionExpiredMessage('');
     setIsLoading(true);
 
     try {
@@ -54,8 +61,15 @@ export default function LoginPage() {
         localStorage.setItem('user', JSON.stringify(user));
       }
 
-      // Redirect to dashboard
-      router.push('/dashboard');
+      // Check if there's a redirect URL saved
+      const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
+      if (redirectUrl) {
+        sessionStorage.removeItem('redirectAfterLogin');
+        router.push(redirectUrl);
+      } else {
+        // Redirect to dashboard
+        router.push('/dashboard');
+      }
     } catch (err: any) {
       // Manejo amigable de errores
       let friendlyMessage = t('errorFields');
@@ -118,6 +132,15 @@ export default function LoginPage() {
 
         <Card variant="elevated" className="shadow-xl">
           <CardContent className="p-8">
+            {/* Session Expired Message */}
+            {sessionExpiredMessage && (
+              <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                <p className="text-sm text-yellow-800 dark:text-yellow-300 font-medium">
+                  {sessionExpiredMessage}
+                </p>
+              </div>
+            )}
+
             {/* Error Message */}
             {error && (
               <div className="mb-6 p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">

@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth';
+import { uploadOrderFiles, handleUploadError } from '../middleware/upload';
 import {
   getOrders,
   getOrderById,
@@ -15,7 +16,7 @@ router.use(authenticate);
 
 // Order routes
 router.get('/', getOrders);
-router.post('/', createOrder);
+router.post('/', uploadOrderFiles.array('attachments', 10), handleUploadError, createOrder);
 router.get('/:id', getOrderById);
 router.put('/:id', updateOrder);
 router.post('/:id/cancel', cancelOrder);

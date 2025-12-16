@@ -94,13 +94,33 @@ export default function AdminOrdersPage() {
     setShowRejectModal(true);
   };
 
+  const handleStatusChange = async (orderId: string, newStatus: string) => {
+    if (!confirm(`¿Cambiar el estado del pedido a "${newStatus}"?`)) {
+      return;
+    }
+
+    try {
+      setProcessingOrder(orderId);
+      await api.patch(`/api/admin/orders/${orderId}/status`, { status: newStatus });
+      await loadOrders();
+      alert('Estado actualizado exitosamente');
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      alert('Error al actualizar el estado');
+    } finally {
+      setProcessingOrder(null);
+    }
+  };
+
   const getApprovalBadge = (status: string) => {
     const badges: Record<string, { variant: any; text: string; icon: any }> = {
       pending: { variant: 'secondary', text: 'Pendiente de Aprobación', icon: ClockIcon },
       approved: { variant: 'primary', text: 'Aprobado', icon: CheckCircleIcon },
       rejected: { variant: 'danger', text: 'Rechazado', icon: XCircleIcon },
     };
-    const badge = badges[status] || badges.pending;
+    // Si no tiene approvalStatus, asumimos que es pending
+    const actualStatus = status || 'pending';
+    const badge = badges[actualStatus] || badges.pending;
     const Icon = badge.icon;
     return (
       <Badge variant={badge.variant} size="sm" className="flex items-center gap-1">
@@ -295,6 +315,52 @@ export default function AdminOrdersPage() {
                       </div>
                     )}
 
+                    {/* Comentarios del cliente */}
+                    {order.comments && order.comments.length > 0 && (
+                      <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <p className="text-sm font-semibold text-blue-900 dark:text-blue-200 mb-2 flex items-center gap-2">
+                          <ChatBubbleLeftRightIcon className="h-4 w-4" />
+                          Descripción del proyecto del cliente:
+                        </p>
+                        {order.comments.map((comment: any, idx: number) => (
+                          <div key={idx} className="text-sm text-blue-800 dark:text-blue-300 whitespace-pre-wrap">
+                            {comment.text}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Archivos adjuntos */}
+                    {order.attachments && order.attachments.length > 0 && (
+                      <div className="mb-4">
+                        <p className="text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2 flex items-center gap-2">
+                          <ClockIcon className="h-4 w-4" />
+                          Archivos adjuntos ({order.attachments.length}):
+                        </p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {order.attachments.map((file: any, idx: number) => (
+                            <a
+                              key={idx}
+                              href={file.fileUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-2 p-2 bg-white dark:bg-secondary-950 rounded border border-secondary-200 dark:border-secondary-700 hover:bg-secondary-50 dark:hover:bg-secondary-900 transition-colors"
+                            >
+                              <CurrencyDollarIcon className="h-4 w-4 text-primary-600 dark:text-primary-400 flex-shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-secondary-900 dark:text-white truncate">
+                                  {file.fileName}
+                                </p>
+                                <p className="text-xs text-secondary-500">
+                                  {(file.fileSize / 1024).toFixed(1)} KB
+                                </p>
+                              </div>
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Rejection Reason */}
                     {order.approvalStatus === 'rejected' && order.rejectionReason && (
                       <div className="mb-4 p-3 bg-red-50 dark:bg-red-950 rounded-lg">
@@ -308,40 +374,86 @@ export default function AdminOrdersPage() {
                     )}
 
                     {/* Actions */}
-                    <div className="flex gap-2 flex-wrap">
+                    <div className="space-y-3">
                       {/* Approval Actions */}
-                      {order.approvalStatus === 'pending' && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="primary"
-                            onClick={() => handleApprove(order)}
-                            disabled={processingOrder === order.id}
-                          >
-                            <CheckCircleIcon className="h-4 w-4 mr-2" />
-                            Aprobar Pedido
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="danger"
-                            onClick={() => openRejectModal(order)}
-                            disabled={processingOrder === order.id}
-                          >
-                            <XCircleIcon className="h-4 w-4 mr-2" />
-                            Rechazar Pedido
-                          </Button>
-                        </>
+                      <div>
+                        <p className="text-xs font-medium text-secondary-500 mb-2">Aprobación del pedido:</p>
+                        <div className="flex gap-2 flex-wrap">
+                          {(!order.approvalStatus || order.approvalStatus !== 'approved') && (
+                            <Button
+                              size="sm"
+                              variant="primary"
+                              onClick={() => handleApprove(order)}
+                              disabled={processingOrder === order.id}
+                            >
+                              <CheckCircleIcon className="h-4 w-4 mr-2" />
+                              {order.approvalStatus === 'rejected' ? 'Re-aprobar' : 'Aprobar Pedido'}
+                            </Button>
+                          )}
+                          {(!order.approvalStatus || order.approvalStatus !== 'rejected') && (
+                            <Button
+                              size="sm"
+                              variant="danger"
+                              onClick={() => openRejectModal(order)}
+                              disabled={processingOrder === order.id}
+                            >
+                              <XCircleIcon className="h-4 w-4 mr-2" />
+                              Rechazar Pedido
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Status Change Actions */}
+                      {(order.approvalStatus === 'approved' || !order.approvalStatus) && order.status !== 'completed' && order.status !== 'cancelled' && (
+                        <div>
+                          <p className="text-xs font-medium text-secondary-500 mb-2">Cambiar estado del pedido:</p>
+                          <div className="flex gap-2 flex-wrap">
+                            {order.status === 'pending' && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleStatusChange(order.id, 'in_progress')}
+                                disabled={processingOrder === order.id}
+                              >
+                                Iniciar Progreso
+                              </Button>
+                            )}
+                            {order.status === 'in_progress' && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleStatusChange(order.id, 'shipped')}
+                                disabled={processingOrder === order.id}
+                              >
+                                Marcar como Enviado
+                              </Button>
+                            )}
+                            {(order.status === 'in_progress' || order.status === 'shipped') && (
+                              <Button
+                                size="sm"
+                                variant="primary"
+                                onClick={() => handleStatusChange(order.id, 'completed')}
+                                disabled={processingOrder === order.id}
+                              >
+                                Completar Pedido
+                              </Button>
+                            )}
+                          </div>
+                        </div>
                       )}
 
                       {/* Conversation Link */}
-                      {order.conversationId && (
-                        <Link href={`/admin/conversations/${order.conversationId}`}>
-                          <Button size="sm" variant="outline">
-                            <ChatBubbleLeftRightIcon className="h-4 w-4 mr-2" />
-                            Ver Conversación
-                          </Button>
-                        </Link>
-                      )}
+                      <div>
+                        {order.conversationId && (
+                          <Link href={`/admin/conversations/${order.conversationId}`}>
+                            <Button size="sm" variant="outline">
+                              <ChatBubbleLeftRightIcon className="h-4 w-4 mr-2" />
+                              Ver Conversación con Cliente
+                            </Button>
+                          </Link>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}

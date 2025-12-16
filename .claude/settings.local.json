@@ -87,7 +87,10 @@
       "Bash(pkill:*)",
       "Bash(MONGODB_URI=\"mongodb://mongo:QTaKycIfxXPWhlXWuRkzTzHxtCFBreSM@trolley.proxy.rlwy.net:11709/koptup?authSource=admin\" npx tsx:*)",
       "Bash(echo:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(if not exist \"C:\\Users\\johan albeiro\\Documents\\Soluciones Tecnologicas KopTup\\uploads\\orders\" mkdir \"C:\\Users\\johan albeiro\\Documents\\Soluciones Tecnologicas KopTup\\uploads\\orders\")",
+      "Bash(xargs ps:*)",
+      "Bash(ps:*)"
     ],
     "deny": [],
     "ask": []

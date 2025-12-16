@@ -7,6 +7,8 @@ import compression from 'compression';
 import morgan from 'morgan';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
+import fs from 'fs';
+import path from 'path';
 import { logger } from './utils/logger';
 import { errorHandler } from './middleware/errorHandler';
 import { rateLimiter, chatbotRateLimiter } from './middleware/rateLimiter';
@@ -78,6 +80,26 @@ const startServer = async () => {
     if (!process.env.MONGODB_URI) {
       logger.warn('MONGODB_URI no definido. Algunas funcionalidades pueden fallar.');
     }
+
+    // Crear directorios necesarios para uploads
+    const uploadDirs = [
+      './uploads',
+      './uploads/orders',
+      './uploads/cuentas-medicas',
+      './uploads/ley100',
+      './uploads/exports',
+      './uploads/temp-images',
+      './uploads/temp-processing',
+      './uploads/chatbot',
+    ];
+
+    uploadDirs.forEach((dir) => {
+      const dirPath = path.resolve(dir);
+      if (!fs.existsSync(dirPath)) {
+        fs.mkdirSync(dirPath, { recursive: true });
+        logger.info(`Directorio creado: ${dir}`);
+      }
+    });
 
     // Conectar a la DB y cargar passport antes de registrar rutas que dependan de modelos
     try {

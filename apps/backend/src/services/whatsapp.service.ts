@@ -235,6 +235,87 @@ ${data.message}
   }
 
   /**
+   * Envía notificación de nuevo pedido
+   */
+  async sendOrderNotification(orderData: {
+    orderId: string;
+    name: string;
+    clientName: string;
+    clientEmail: string;
+    amount: number;
+    items: Array<{ name: string; quantity: number; price: number }>;
+    hasAttachments: boolean;
+  }): Promise<boolean> {
+    if (!this.isConfigured()) {
+      logger.warn('WhatsApp not configured - skipping notification');
+      return false;
+    }
+
+    const messageText = this.formatOrderMessage(orderData);
+
+    try {
+      switch (this.config.provider) {
+        case 'twilio':
+          return await this.sendViaTwilio(messageText);
+        case 'whatsapp-business':
+          return await this.sendViaWhatsAppBusiness(messageText);
+        case 'ultramsg':
+          return await this.sendViaUltraMsg(messageText);
+        default:
+          logger.error('Unknown WhatsApp provider');
+          return false;
+      }
+    } catch (error: any) {
+      logger.error('Error sending WhatsApp order notification:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Formatea el mensaje de nuevo pedido
+   */
+  private formatOrderMessage(data: {
+    orderId: string;
+    name: string;
+    clientName: string;
+    clientEmail: string;
+    amount: number;
+    items: Array<{ name: string; quantity: number; price: number }>;
+    hasAttachments: boolean;
+  }): string {
+    const itemsList = data.items
+      .slice(0, 5)
+      .map((item) => `  • ${item.name} (x${item.quantity})`)
+      .join('\n');
+
+    const moreItems = data.items.length > 5 ? `\n  ... y ${data.items.length - 5} más` : '';
+
+    let msg = `📦 *Nuevo Pedido - KopTup*
+
+🆔 *ID:* ${data.orderId}
+📋 *Nombre:* ${data.name}
+
+👤 *Cliente:*
+  Nombre: ${data.clientName}
+  Email: ${data.clientEmail}
+
+💰 *Monto Total:* $${data.amount.toFixed(2)} USD
+
+📦 *Items:*
+${itemsList}${moreItems}`;
+
+    if (data.hasAttachments) {
+      msg += `\n\n📎 *Adjuntos:* Sí (ver en sistema)`;
+    }
+
+    msg += `\n\n---
+⏰ ${new Date().toLocaleString('es-ES', { timeZone: 'America/Bogota' })}
+🔗 Revisa el pedido en el panel admin`;
+
+    return msg;
+  }
+
+  /**
    * Envía notificación de prueba
    */
   async sendTestMessage(): Promise<boolean> {
