@@ -54,115 +54,13 @@ export default function NotificationsPage() {
 
   const loadNotifications = async () => {
     try {
-      // Try to fetch from API
+      // Fetch real notifications from API
       const data = await api.getNotifications(filter !== 'all' ? filter : undefined, false);
-      setNotifications(data);
+      setNotifications(data || []);
     } catch (error) {
-      // Silently use fallback data when API is unavailable
-
-      // Fallback to mock data if API fails
-      const mockNotifications: Notification[] = [
-        {
-          id: 'notif-001',
-          type: 'order',
-          title: 'Nuevo pedido confirmado',
-          message: 'Tu pedido ORD-005 ha sido confirmado y está en proceso.',
-          timestamp: '2025-10-11T10:30:00',
-          isRead: false,
-          actionUrl: '/dashboard/orders/ORD-005',
-          metadata: { orderId: 'ORD-005' },
-        },
-        {
-          id: 'notif-002',
-          type: 'project',
-          title: 'Hito del proyecto completado',
-          message: 'Se ha completado el Hito 2 del proyecto "Sistema de gestión de inventario".',
-          timestamp: '2025-10-11T09:15:00',
-          isRead: false,
-          actionUrl: '/dashboard/projects/PRJ-001',
-          metadata: { projectId: 'PRJ-001' },
-        },
-        {
-          id: 'notif-003',
-          type: 'billing',
-          title: 'Nueva factura disponible',
-          message: 'La factura INV-2025-042 por $3,500.00 está lista para descargar.',
-          timestamp: '2025-10-11T08:00:00',
-          isRead: false,
-          actionUrl: '/dashboard/billing',
-          metadata: { invoiceId: 'INV-2025-042', amount: 3500 },
-        },
-        {
-          id: 'notif-004',
-          type: 'message',
-          title: 'Nuevo mensaje recibido',
-          message: 'Tienes un nuevo mensaje sobre el proyecto "Aplicación móvil iOS/Android".',
-          timestamp: '2025-10-10T16:45:00',
-          isRead: true,
-          actionUrl: '/dashboard/messages',
-          metadata: { projectId: 'PRJ-002' },
-        },
-        {
-          id: 'notif-005',
-          type: 'project',
-          title: 'Actualización de cronograma',
-          message: 'El cronograma del proyecto "Website corporativo" ha sido actualizado.',
-          timestamp: '2025-10-10T14:20:00',
-          isRead: true,
-          actionUrl: '/dashboard/projects/PRJ-003',
-          metadata: { projectId: 'PRJ-003' },
-        },
-        {
-          id: 'notif-006',
-          type: 'order',
-          title: 'Pedido enviado',
-          message: 'Tu pedido ORD-003 ha sido enviado y está en camino.',
-          timestamp: '2025-10-09T11:30:00',
-          isRead: true,
-          actionUrl: '/dashboard/orders/ORD-003',
-          metadata: { orderId: 'ORD-003' },
-        },
-        {
-          id: 'notif-007',
-          type: 'billing',
-          title: 'Pago procesado',
-          message: 'Tu pago de $2,500.00 ha sido procesado exitosamente.',
-          timestamp: '2025-10-08T10:15:00',
-          isRead: true,
-          actionUrl: '/dashboard/billing',
-          metadata: { amount: 2500 },
-        },
-        {
-          id: 'notif-008',
-          type: 'message',
-          title: 'Respuesta del equipo',
-          message: 'El equipo de KopTup ha respondido a tu consulta sobre el proyecto PRJ-001.',
-          timestamp: '2025-10-07T15:00:00',
-          isRead: true,
-          actionUrl: '/dashboard/messages',
-          metadata: { projectId: 'PRJ-001' },
-        },
-        {
-          id: 'notif-009',
-          type: 'system',
-          title: 'Mantenimiento programado',
-          message: 'Realizaremos mantenimiento del sistema el sábado de 2:00 AM a 4:00 AM.',
-          timestamp: '2025-10-06T12:00:00',
-          isRead: true,
-        },
-        {
-          id: 'notif-010',
-          type: 'project',
-          title: 'Entregable disponible',
-          message: 'Un nuevo entregable está disponible para el proyecto "Chatbot con IA".',
-          timestamp: '2025-10-05T09:30:00',
-          isRead: true,
-          actionUrl: '/dashboard/deliverables',
-          metadata: { projectId: 'PRJ-004' },
-        },
-      ];
-
-      setNotifications(mockNotifications);
+      // No mock data - only show real notifications from API
+      console.error('Failed to load notifications:', error);
+      setNotifications([]);
     } finally {
       setLoading(false);
     }
