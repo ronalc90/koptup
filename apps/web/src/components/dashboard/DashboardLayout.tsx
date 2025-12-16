@@ -44,7 +44,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     // Cargar notificaciones reales
     const loadNotifications = async () => {
       try {
-        const data = await api.getNotifications(true); // unreadOnly = true
+        const data = await api.getNotifications(undefined, true); // type: undefined, unreadOnly: true
         setNotifications(data?.length || 0);
       } catch (err) {
         // Silenciar errores de notificaciones
