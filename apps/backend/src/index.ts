@@ -34,10 +34,36 @@ logger.info('index.ts arrancando');
 
 // Basic middleware that never fails
 app.use(helmet());
+
+// CORS configuration - siempre incluir dominios de producción
+const allowedOrigins = process.env.NODE_ENV === 'production'
+  ? [
+      'https://koptup.com',
+      'https://www.koptup.com',
+      ...(process.env.CORS_ORIGIN?.split(',').filter(Boolean) || [])
+    ]
+  : [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'https://koptup.com',
+      'https://www.koptup.com'
+    ];
+
+logger.info('CORS origins configurados:', allowedOrigins);
+
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production'
-    ? (process.env.CORS_ORIGIN?.split(',') || ['https://koptup.com', 'https://www.koptup.com'])
-    : ['http://localhost:3000', 'http://localhost:3001'],
+  origin: (origin, callback) => {
+    // Permitir requests sin origin (como Postman, curl, etc.)
+    if (!origin) return callback(null, true);
+
+    // Verificar si el origin está en la lista permitida
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      logger.warn(`CORS blocked origin: ${origin}`);
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
