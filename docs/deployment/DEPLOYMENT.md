@@ -255,6 +255,27 @@ Para cambiar la rama:
 1. Ve a **Settings** → **Git**
 2. Cambia **Production Branch** según necesites
 
+### Paso 5: Secrets requeridos para CI/CD (GitHub Actions)
+
+Configura los siguientes Secrets en GitHub → Settings → Secrets and variables → Actions:
+
+```
+VERCEL_TOKEN          # Token personal con acceso al Team donde vive “koptup-web”
+VERCEL_ORG_ID         # Team ID de Vercel (ej. team_XXXXXXXX)
+VERCEL_PROJECT_ID     # Project ID de Vercel para “koptup-web” (ej. prj_XXXXXXXX)
+NEXT_PUBLIC_API_URL   # URL pública del backend (ej. https://api.koptup.com)
+NEXT_PUBLIC_SITE_URL  # URL pública del sitio (ej. https://koptup-web.vercel.app)
+DOCKER_USERNAME       # Usuario de Docker Hub (opcional, si se publican imágenes)
+DOCKER_PASSWORD       # Password o token de Docker Hub
+```
+
+Cómo obtener `VERCEL_ORG_ID` y `VERCEL_PROJECT_ID`:
+- Vercel Dashboard → Proyecto “koptup-web” → Settings → General → copiar `Team ID` y `Project ID`.
+
+Notas:
+- El deploy a Vercel en CI solo corre si los Secrets están presentes.
+- Para evitar builds duplicados por Git Integration, está deshabilitado en `apps/web/vercel.json`.
+
 ---
 
 ## Verificación Final

@@ -1,4 +1,5 @@
 # KopTup - Soluciones Tecnológicas a Medida
+[![CI/CD](https://github.com/ronalc90/koptup/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ronalc90/koptup/actions/workflows/ci.yml)
 
 ![KopTup Logo](https://via.placeholder.com/800x200/2563eb/ffffff?text=KopTup+Tech+Solutions)
 
