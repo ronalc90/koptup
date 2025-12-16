@@ -556,9 +556,9 @@ Glosas Generadas (1)
 └───────────────────────────────────────────────────┘
 ```
 
-## 🚀 URL del PR
+## 🚀 Sistema en GitHub
 
-**https://github.com/ronalc90/koptup/pull/new/claude/healthcare-billing-audit-01Ejj1TR23Eumac4gUvJnzib**
+**Repositorio:** https://github.com/ronalc90/koptup
 
 ---
 
