@@ -1,13 +1,11 @@
 {
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
-  "installCommand": "npm install",
+  "installCommand": "npm ci",
   "framework": "nextjs",
   "outputDirectory": ".next",
   "regions": ["iad1"],
-  "git": {
-    "deploymentEnabled": {
-      "main": true
-    }
+  "github": {
+    "enabled": false
   }
 }
