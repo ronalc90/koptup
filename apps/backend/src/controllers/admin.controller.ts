@@ -33,6 +33,8 @@ export const adminGetOrders = async (req: AuthRequest, res: Response): Promise<v
       amount: o.amount,
       currency: o.currency || 'USD',
       items: o.items || [],
+      attachments: o.attachments || [],
+      comments: o.comments || [],
       user: {
         _id: o.userId?._id,
         name: o.userId?.name,

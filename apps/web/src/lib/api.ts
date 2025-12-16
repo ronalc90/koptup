@@ -62,24 +62,26 @@ class ApiClient {
         const isAuthEndpoint = originalRequest.url?.includes('/api/auth/login') ||
                                originalRequest.url?.includes('/api/auth/register');
 
-        // Handle 401 errors (token expired) - but not for auth endpoints
-        if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint && Cookies.get('accessToken')) {
-          originalRequest._retry = true;
+        // Handle 401 errors (Unauthorized)
+        if (error.response?.status === 401 && !isAuthEndpoint) {
+          // Si hay un token y no hemos intentado refrescarlo, intentamos refresh
+          if (!originalRequest._retry && Cookies.get('accessToken')) {
+            originalRequest._retry = true;
 
-          try {
-            const newToken = await this.refreshToken();
-            if (newToken && originalRequest.headers) {
-              originalRequest.headers.Authorization = `Bearer ${newToken}`;
-              return this.client(originalRequest);
+            try {
+              const newToken = await this.refreshToken();
+              if (newToken && originalRequest.headers) {
+                originalRequest.headers.Authorization = `Bearer ${newToken}`;
+                return this.client(originalRequest);
+              }
+            } catch (refreshError) {
+              // Refresh falló, limpiar y redirigir a login
+              this.redirectToLogin();
+              return Promise.reject(refreshError);
             }
-          } catch (refreshError) {
-            // Refresh failed, redirect to login only if we're on a protected page
-            if (typeof window !== 'undefined' && (window.location.pathname.startsWith('/dashboard') || window.location.pathname.startsWith('/admin'))) {
-              Cookies.remove('accessToken');
-              Cookies.remove('refreshToken');
-              window.location.href = '/login';
-            }
-            return Promise.reject(refreshError);
+          } else {
+            // No hay token o ya intentamos refresh, redirigir a login
+            this.redirectToLogin();
           }
         }
 
@@ -102,6 +104,26 @@ class ApiClient {
         return Promise.reject(error);
       }
     );
+  }
+
+  private redirectToLogin() {
+    if (typeof window !== 'undefined') {
+      // Limpiar cookies
+      Cookies.remove('accessToken');
+      Cookies.remove('refreshToken');
+
+      // Limpiar localStorage
+      localStorage.removeItem('user');
+
+      // Guardar la URL actual para redirigir después del login
+      const currentPath = window.location.pathname;
+      if (currentPath !== '/login' && currentPath !== '/register') {
+        sessionStorage.setItem('redirectAfterLogin', currentPath);
+      }
+
+      // Redirigir a login
+      window.location.href = '/login?session=expired';
+    }
   }
 
   private async refreshToken(): Promise<string | null> {

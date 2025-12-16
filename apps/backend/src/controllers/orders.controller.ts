@@ -3,6 +3,8 @@ import { AuthRequest } from '../types';
 import Order from '../models/Order';
 import User from '../models/User';
 import mongoose from 'mongoose';
+import { whatsappService } from '../services/whatsapp.service';
+import { logger } from '../utils/logger';
 
 // Obtener todos los pedidos del usuario
 export const getOrders = async (req: AuthRequest, res: Response) => {
@@ -126,7 +128,8 @@ export const getOrderById = async (req: AuthRequest, res: Response) => {
 export const createOrder = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
-    const { name, description, items, projectId } = req.body;
+    let { name, description, items, projectId, comments } = req.body;
+    const files = (req as any).files as Express.Multer.File[];
 
     if (!userId) {
       res.status(401).json({
@@ -134,6 +137,19 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
         message: 'Usuario no autenticado',
       });
       return;
+    }
+
+    // Si items viene como string (desde FormData), parsearlo
+    if (typeof items === 'string') {
+      try {
+        items = JSON.parse(items);
+      } catch (error) {
+        res.status(400).json({
+          success: false,
+          message: 'Formato de items inválido',
+        });
+        return;
+      }
     }
 
     // Validar datos requeridos
@@ -150,6 +166,26 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
       return sum + (item.quantity * item.price);
     }, 0);
 
+    // Procesar archivos adjuntos
+    const attachments = files ? files.map((file) => ({
+      fileName: file.originalname,
+      fileUrl: `/uploads/orders/${file.filename}`,
+      fileSize: file.size,
+      fileType: file.mimetype,
+      uploadedAt: new Date(),
+    })) : [];
+
+    // Obtener información del usuario
+    const user = await User.findById(userId).select('name email');
+
+    // Procesar comentarios iniciales
+    const initialComments = comments ? [{
+      text: comments,
+      userId: new mongoose.Types.ObjectId(userId),
+      userName: user?.name || 'Cliente',
+      createdAt: new Date(),
+    }] : [];
+
     // Crear pedido
     const newOrder = new Order({
       name,
@@ -159,7 +195,10 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
       amount,
       currency: 'USD',
       items,
+      attachments,
+      comments: initialComments,
       status: 'pending',
+      approvalStatus: 'pending',
       orderDate: new Date(),
       history: [
         {
@@ -188,8 +227,25 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
       newOrder.conversationId = conversationId;
       await newOrder.save();
     } catch (error) {
-      console.error('Error creating order conversation:', error);
+      logger.error('Error creating order conversation:', error);
       // No fallar la creación del pedido si falla la conversación
+    }
+
+    // Enviar notificación por WhatsApp al administrador
+    try {
+      await whatsappService.sendOrderNotification({
+        orderId: newOrder.orderId,
+        name: newOrder.name,
+        clientName: user?.name || 'Cliente',
+        clientEmail: user?.email || '',
+        amount: newOrder.amount,
+        items: newOrder.items,
+        hasAttachments: attachments.length > 0,
+      });
+      logger.info(`Order notification sent for ${newOrder.orderId}`);
+    } catch (error) {
+      logger.error('Error sending order notification:', error);
+      // No fallar la creación del pedido si falla la notificación
     }
 
     res.status(201).json({
@@ -201,11 +257,12 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
         status: newOrder.status,
         amount: newOrder.amount,
         date: newOrder.orderDate.toISOString().split('T')[0],
+        attachmentsCount: attachments.length,
       },
       message: 'Pedido creado exitosamente',
     });
   } catch (error) {
-    console.error('Create order error:', error);
+    logger.error('Create order error:', error);
     res.status(500).json({
       success: false,
       message: 'Error al crear pedido',

@@ -33,8 +33,22 @@ export default function Navbar() {
   const handleScroll = () => setScrolled(window.scrollY > 20);
   window.addEventListener('scroll', handleScroll);
 
-  const userData = localStorage.getItem('user');
-  if (userData) setUser(JSON.parse(userData));
+  // Verificar si hay token válido en cookies
+  const hasValidToken = document.cookie
+    .split('; ')
+    .some(row => row.startsWith('accessToken='));
+
+  // Solo cargar usuario si hay token válido
+  if (hasValidToken) {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  } else {
+    // Si no hay token, limpiar localStorage y estado de usuario
+    localStorage.removeItem('user');
+    setUser(null);
+  }
 
   const locale = document.cookie
     .split('; ')

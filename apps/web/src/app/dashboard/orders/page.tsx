@@ -33,68 +33,10 @@ export default function OrdersPage() {
     try {
       // Cargar pedidos desde la API
       const ordersData = await api.getOrders();
-      setOrders(ordersData);
+      setOrders(ordersData || []);
     } catch (error) {
       console.error('Failed to load orders:', error);
-      // Si falla, usar datos mock
-      const mockOrders = [
-        {
-          id: 'ORD-001',
-          name: 'Sistema de gestión de inventario',
-          description: 'Desarrollo de sistema completo para gestión de stock',
-          status: 'in_progress',
-          date: '2025-10-01',
-          amount: 3500.00,
-          items: 3,
-          tracking: 'TRK-123456',
-          carrier: 'Entrega digital',
-        },
-        {
-          id: 'ORD-002',
-          name: 'Aplicación móvil iOS/Android',
-          status: 'pending',
-          description: 'App nativa para gestión de pedidos',
-          date: '2025-10-05',
-          amount: 8500.00,
-          items: 5,
-          tracking: null,
-          carrier: null,
-        },
-        {
-          id: 'ORD-003',
-          name: 'Website corporativo',
-          description: 'Sitio web responsive con CMS',
-          status: 'shipped',
-          date: '2025-09-15',
-          amount: 2500.00,
-          items: 1,
-          tracking: 'TRK-789012',
-          carrier: 'Entrega digital',
-        },
-        {
-          id: 'ORD-004',
-          name: 'Chatbot con IA',
-          description: 'Chatbot inteligente para atención al cliente',
-          status: 'completed',
-          date: '2025-08-20',
-          amount: 4200.00,
-          items: 2,
-          tracking: 'TRK-345678',
-          carrier: 'Entrega digital',
-        },
-        {
-          id: 'ORD-005',
-          name: 'Dashboard de analytics',
-          description: 'Panel de control con métricas en tiempo real',
-          status: 'cancelled',
-          date: '2025-09-01',
-          amount: 3000.00,
-          items: 2,
-          tracking: null,
-          carrier: null,
-        },
-      ];
-      setOrders(mockOrders);
+      setOrders([]);
     } finally {
       setLoading(false);
     }
