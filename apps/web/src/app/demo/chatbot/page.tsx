@@ -56,7 +56,7 @@ interface RestrictionsConfig {
 }
 
 export default function DemoPage() {
-  const t = useTranslations('demo');
+  const t = useTranslations('demos');
   const tc = useTranslations('common');
 
   const [activeTab, setActiveTab] = useState<TabType>('documents');
