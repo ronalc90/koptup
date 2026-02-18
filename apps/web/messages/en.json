@@ -30,8 +30,56 @@
     },
     "cta": {
       "title": "Ready to start your project?",
-      "subtitle": "Tell us your goals and we’ll design the best plan",
+      "subtitle": "Tell us your goals and we'll design the best plan",
       "button": "View Plans"
+    },
+    "demos": {
+      "sectionBadge": "Interactive Demos",
+      "sectionTitle": "Solutions for Every Industry",
+      "sectionSubtitle": "Explore our fully functional demos and discover how we turn ideas into real software. From e-commerce to AI-powered dashboards, we have the expertise to drive your business forward.",
+      "exploreDemo": "Explore demo →",
+      "ecommerce": {
+        "title": "Full E-Commerce",
+        "description": "Modern online store with cart, checkout, product management and real-time sales dashboard.",
+        "category": "Retail & Sales"
+      },
+      "chatbot": {
+        "title": "Intelligent Chatbot",
+        "description": "AI-powered virtual assistant that answers questions, processes documents and learns from every interaction.",
+        "category": "Customer Support"
+      },
+      "dashboard": {
+        "title": "Executive Dashboard",
+        "description": "Management control panel with KPIs, financial metrics, sales analysis and interactive reports.",
+        "category": "Business Intelligence"
+      },
+      "projects": {
+        "title": "Project Management",
+        "description": "Complete agile management system with Kanban boards, sprints, tasks and team collaboration.",
+        "category": "Productivity"
+      },
+      "documents": {
+        "title": "Document Manager",
+        "description": "Organize, search and share documents with tags, semantic search and version control.",
+        "category": "Document Management"
+      },
+      "cms": {
+        "title": "Advanced CMS",
+        "description": "Manage content, pages and blog with a visual editor, SEO tools and scheduled publishing.",
+        "category": "Digital Marketing"
+      },
+      "reservations": {
+        "title": "Booking System",
+        "description": "Complete online booking platform with calendar, notifications and availability management.",
+        "category": "Services"
+      },
+      "whyTitle": "Why choose KopTup for your project?",
+      "benefit1Title": "Tailored Solutions",
+      "benefit1Desc": "Custom development adapted to the specific needs of your industry and business model.",
+      "benefit2Title": "Cutting-Edge Technology",
+      "benefit2Desc": "React, Next.js, TypeScript, artificial intelligence and modern development best practices.",
+      "benefit3Title": "Ongoing Support",
+      "benefit3Desc": "Updates, maintenance and technical support to ensure your solution evolves with your business."
     }
   },
   "services": {
@@ -244,18 +292,253 @@
     "hero": {
       "title": "Privacy Policy",
       "subtitle": "How we collect, use and protect your personal information"
+    },
+    "updatedBadge": "Updated: November 2025",
+    "heroClaim": "Your trust is our priority",
+    "intro": {
+      "title": "Introduction",
+      "p1": "KopTup - Tech Solutions (\"we\", \"our\" or \"the company\") is committed to protecting the privacy of our clients and users. This Privacy Policy describes how we collect, use, share and protect personal information when you use our software development, technology consulting and digital solutions services.",
+      "p2": "By using our services, you agree to the practices described in this policy. If you do not agree with this policy, please do not use our services."
+    },
+    "s1": {
+      "title": "1. Information We Collect",
+      "c1": { "subtitle": "1.1 Personal Information", "text": "We collect information you provide directly to us, including: name, email address, phone number, company, billing information and any other information you choose to share with us when using our services." },
+      "c2": { "subtitle": "1.2 Usage Information", "text": "We automatically collect information about your interaction with our services, including: IP address, browser type, pages visited, time spent, cookies and web analytics data." },
+      "c3": { "subtitle": "1.3 Project Information", "text": "When you hire our services, we collect information related to the project: technical requirements, documentation, shared files and communications related to development." }
+    },
+    "s2": {
+      "title": "2. How We Use Your Information",
+      "c1": { "subtitle": "2.1 Service Delivery", "text": "We use your information to provide, maintain and improve our software development, technology consulting and digital solutions services." },
+      "c2": { "subtitle": "2.2 Communication", "text": "To communicate with you about your projects, service updates, technical support and to answer your queries." },
+      "c3": { "subtitle": "2.3 Service Improvement", "text": "We analyze the use of our services to improve user experience, develop new features and optimize our processes." },
+      "c4": { "subtitle": "2.4 Marketing", "text": "With your consent, we may send you information about new services, updates and special offers. You may unsubscribe at any time." }
+    },
+    "s3": {
+      "title": "3. Data Protection",
+      "c1": { "subtitle": "3.1 Security Measures", "text": "We implement appropriate technical and organizational security measures to protect your personal information against unauthorized access, alteration, disclosure or destruction. This includes SSL/TLS encryption, firewalls, access controls and regular security audits." },
+      "c2": { "subtitle": "3.2 Limited Access", "text": "Access to your personal information is limited to employees, contractors and agents who need to know this information to process it on our behalf and are subject to confidentiality obligations." },
+      "c3": { "subtitle": "3.3 Storage", "text": "Your data is stored on secure servers located in certified data centers. We use trusted cloud service providers like AWS that comply with international security standards." }
+    },
+    "s4": {
+      "title": "4. Sharing Information",
+      "c1": { "subtitle": "4.1 Service Providers", "text": "We share information with external service providers who help us operate our business (hosting, analytics, payment processing), who are obligated to protect your information." },
+      "c2": { "subtitle": "4.2 Legal Requirements", "text": "We may disclose your information if required by law, a court order, or to protect our rights, property or safety." },
+      "c3": { "subtitle": "4.3 Business Transfers", "text": "In the event of a merger, acquisition or sale of assets, your personal information may be transferred. We will notify you before your information is transferred and becomes subject to a different privacy policy." },
+      "c4": { "subtitle": "4.4 No Data Sale", "text": "KopTup does NOT sell, rent or commercialize your personal information to third parties for advertising purposes." }
+    },
+    "s5": {
+      "title": "5. Data Retention",
+      "c1": { "subtitle": "5.1 Retention Period", "text": "We retain your personal information for as long as necessary to fulfill the purposes set out in this policy, unless the law requires or permits a longer retention period." },
+      "c2": { "subtitle": "5.2 Project Data", "text": "Data related to projects is retained for the duration of the project and an additional period for support and warranty purposes, typically 1-3 years after completion." },
+      "c3": { "subtitle": "5.3 Deletion", "text": "When we no longer need your information, we will securely delete it or anonymize it so that you cannot be identified." }
+    },
+    "rights": {
+      "title": "Your Rights",
+      "subtitle": "You have the right to control your personal information. Below are your rights:",
+      "r1": { "title": "Access", "description": "Request a copy of the personal information we hold about you." },
+      "r2": { "title": "Rectification", "description": "Request correction of inaccurate or incomplete information." },
+      "r3": { "title": "Deletion", "description": "Request deletion of your personal information under certain circumstances." },
+      "r4": { "title": "Portability", "description": "Receive your information in a structured and commonly used format." },
+      "r5": { "title": "Objection", "description": "Object to the processing of your information for certain purposes." },
+      "r6": { "title": "Restriction", "description": "Request that we restrict the processing of your information." },
+      "exerciseTitle": "How to Exercise Your Rights",
+      "exerciseText": "To exercise any of these rights, contact us through:",
+      "responseTime": "We will respond to your request within 30 business days."
+    },
+    "s6": {
+      "title": "6. Cookies and Similar Technologies",
+      "p1": "We use cookies and similar technologies to improve your experience, analyze the use of our services and personalize content. Cookies are small text files stored on your device.",
+      "p2": "You can control the use of cookies through your browser settings. However, please note that disabling cookies may affect the functionality of our services.",
+      "p3": "For more information, see our",
+      "link": "Cookie Policy"
+    },
+    "s7": {
+      "title": "7. International Transfers",
+      "p1": "Your information may be transferred and stored on servers located outside Colombia. We take measures to ensure your information receives an adequate level of protection wherever it is processed.",
+      "p2": "By using our services, you consent to these international transfers of your information."
+    },
+    "s8": {
+      "title": "8. Children's Privacy",
+      "p1": "Our services are not directed at individuals under 18 years of age. We do not intentionally collect personal information from minors. If we discover we have collected information from a minor without appropriate parental consent, we will delete that information immediately."
+    },
+    "s9": {
+      "title": "9. Changes to this Policy",
+      "p1": "We may update this Privacy Policy periodically to reflect changes in our practices or for other operational, legal or regulatory reasons. The \"Last updated\" date at the top indicates when the policy was last reviewed.",
+      "p2": "We will notify you of material changes by posting the new policy on our website and, where appropriate, by email. We recommend reviewing this policy periodically."
+    },
+    "s10": {
+      "title": "10. Contact",
+      "text": "If you have questions, concerns or requests related to this Privacy Policy or our data handling practices, contact us:",
+      "labelEmail": "Email:",
+      "labelPhone": "Phone:",
+      "labelAddress": "Address:"
+    },
+    "footer": {
+      "updated": "Last updated: November 2025",
+      "copyright": "© 2025 KopTup - Tech Solutions. All rights reserved."
     }
   },
   "termsPage": {
     "hero": {
       "title": "Terms & Conditions",
       "subtitle": "Legal framework governing the use of our services"
+    },
+    "updatedBadge": "Updated: November 2025",
+    "heroClaim": "Transparency and clarity in our business relationships",
+    "intro": {
+      "title": "Welcome to KopTup",
+      "p1": "These Terms and Conditions (\"Terms\") constitute a legally binding agreement between you (the \"Client\") and KopTup - Tech Solutions (\"KopTup\", \"we\" or \"the Company\") regarding the use of our software development and technology consulting services.",
+      "p2": "Please read these terms carefully before hiring our services. By using our services, you confirm that you have read, understood and agreed to these terms in their entirety."
+    },
+    "s1": {
+      "title": "1. Acceptance of Terms",
+      "c1": { "text": "By accessing and using the services of KopTup - Tech Solutions (\"KopTup\", \"we\", \"our\"), you agree to be legally bound by these Terms and Conditions. If you do not agree with any part of these terms, you must not use our services." },
+      "c2": { "text": "These terms apply to all users, clients and visitors of our website and services, including but not limited to: software development, web development, mobile applications, artificial intelligence, chatbots, e-commerce, technology consulting and any other service offered by KopTup." },
+      "c3": { "text": "We reserve the right to modify these terms at any time. Changes will take effect immediately upon posting on our website. Your continued use of our services constitutes your acceptance of the modified terms." }
+    },
+    "s2": {
+      "title": "2. Services Offered",
+      "c1": { "subtitle": "2.1 Service Description", "text": "KopTup offers professional software development and technology solutions services, including but not limited to: web and mobile application development, artificial intelligence systems, chatbots, e-commerce platforms, API integrations, technology consulting, UX/UI design and maintenance services." },
+      "c2": { "subtitle": "2.2 Project Scope", "text": "The specific scope of each project will be defined in a separate commercial proposal or contract. Each project will include: specific objectives, deliverables, timeline, budget and payment conditions." },
+      "c3": { "subtitle": "2.3 Scope Changes", "text": "Any changes to the original project scope must be agreed in writing and may result in timeline and budget adjustments. Significant changes may require an addendum to the original contract." }
+    },
+    "s3": {
+      "title": "3. Pricing and Payments",
+      "c1": { "subtitle": "3.1 Pricing", "text": "Service prices will be specified in the corresponding commercial proposal. All prices are expressed in Colombian pesos (COP) or US dollars (USD), as agreed, and do not include applicable taxes unless otherwise specified." },
+      "c2": { "subtitle": "3.2 Payment Terms", "text": "We generally require a 50% advance at project start and the remaining 50% upon completion. For larger projects, we may establish specific payment milestones. Payments must be made within 15 days of invoice issuance." },
+      "c3": { "subtitle": "3.3 Late Payments", "text": "Payments not made by the due date will be subject to a late interest charge of 1.5% per month. KopTup reserves the right to suspend services until payment is regularized." },
+      "c4": { "subtitle": "3.4 Additional Expenses", "text": "Any additional expenses required for the project (software licenses, third-party services, hosting, etc.) will be invoiced separately or included in the proposal if known in advance." }
+    },
+    "s4": {
+      "title": "4. Intellectual Property",
+      "c1": { "subtitle": "4.1 Client Rights", "text": "Once full payment for the project is completed, the client will receive usage rights to the software developed specifically for their project. This includes custom source code and designs created exclusively for the client." },
+      "c2": { "subtitle": "4.2 KopTup Rights", "text": "KopTup retains ownership of: frameworks, tools, reusable components, methodologies and any pre-existing code or material used in the project. We also reserve the right to use general knowledge and experience gained in future projects." },
+      "c3": { "subtitle": "4.3 Third-Party Licenses", "text": "The software may include open-source components or third-party licenses. The client is responsible for complying with the terms of such licenses. KopTup will provide documentation of licenses used." },
+      "c4": { "subtitle": "4.4 Portfolio and Marketing", "text": "KopTup reserves the right to include the project in its portfolio, marketing materials and case studies, unless there is a specific confidentiality agreement that prohibits it." }
+    },
+    "s5": {
+      "title": "5. Confidentiality",
+      "c1": { "subtitle": "5.1 Confidential Information", "text": "Both parties agree to keep confidential all proprietary, commercial or technical information shared during the business relationship. This includes but is not limited to: source code, designs, business strategies, client data and financial information." },
+      "c2": { "subtitle": "5.2 Exceptions", "text": "The confidentiality obligation does not apply to information that: is in the public domain, is independently developed, is required by law, or is authorized in writing for disclosure." },
+      "c3": { "subtitle": "5.3 Duration", "text": "Confidentiality obligations will remain in force during the business relationship and for a period of 3 years after its termination." }
+    },
+    "s6": {
+      "title": "6. Deadlines and Deliveries",
+      "c1": { "subtitle": "6.1 Timeline", "text": "Delivery deadlines will be specified in the project proposal and are considered estimates based on the agreed scope. We will make our best effort to meet established deadlines." },
+      "c2": { "subtitle": "6.2 Delays", "text": "Deadlines may be extended due to: scope changes requested by the client, delays in providing necessary information or materials, force majeure circumstances, or unforeseen technical issues." },
+      "c3": { "subtitle": "6.3 Client Collaboration", "text": "Meeting deadlines depends on timely client collaboration, including: content provision, timely feedback, approvals and access to required systems." }
+    },
+    "s7": {
+      "title": "7. Warranties and Limitations",
+      "c1": { "subtitle": "7.1 Service Warranty", "text": "We guarantee that services will be performed professionally and in accordance with industry standards. We provide a warranty period of 30-90 days (as agreed) to correct errors or defects in the delivered code." },
+      "c2": { "subtitle": "7.2 Warranty Exclusions", "text": "The warranty does not cover: problems caused by client modifications, misuse, changes in the hosting environment, third-party services, or issues with client equipment/software." },
+      "c3": { "subtitle": "7.3 Limitation of Liability", "text": "In no event shall KopTup be liable for indirect, incidental, special or consequential damages. Our total liability shall not exceed the amount paid by the client for the specific project." },
+      "c4": { "subtitle": "7.4 Disclaimer", "text": "Services are provided \"as is\". We do not guarantee that the software will be error-free or operate without interruption. The client is responsible for maintaining adequate backups of their data." }
+    },
+    "at1": { "title": "8. Support and Maintenance", "content": "Post-delivery support is specified in the project contract. Warranty support covers correction of errors in the delivered code. Ongoing maintenance services, feature updates and extended technical support are available through separate contracts." },
+    "at2": { "title": "9. Service Termination", "content": "Either party may terminate the contract with 30 days written notice. Upon termination, the client will pay for all work completed to date. If the client terminates the contract without just cause, the advance payment is non-refundable. KopTup may immediately terminate the contract in case of material breach by the client." },
+    "at3": { "title": "10. Governing Law and Jurisdiction", "content": "These terms shall be governed and interpreted in accordance with the laws of the Republic of Colombia. Any dispute arising from these terms shall be subject to the exclusive jurisdiction of the courts of Bogotá, Colombia. The parties will attempt to resolve any dispute through good faith negotiation before resorting to legal proceedings." },
+    "at4": { "title": "11. Entire Agreement", "content": "These terms, together with any specific project proposal or contract, constitute the entire agreement between the parties. Any modification must be made in writing and signed by both parties. If any provision is found invalid, the remaining provisions shall remain in force." },
+    "contact": {
+      "title": "12. Contact Information",
+      "text": "If you have questions about these Terms and Conditions, contact us:",
+      "labelCompany": "Company:",
+      "labelEmail": "Email:",
+      "labelPhone": "Phone:",
+      "labelAddress": "Address:",
+      "labelWeb": "Website:"
+    },
+    "footer": {
+      "updated": "Last updated: November 2025",
+      "copyright": "© 2025 KopTup - Tech Solutions. All rights reserved.",
+      "linkPrivacy": "Privacy Policy",
+      "linkCookies": "Cookie Policy"
     }
   },
   "cookiesPage": {
     "hero": {
-      "title": "Cookies Policy",
+      "title": "Cookie Policy",
       "subtitle": "Information about cookies and how we use them"
+    },
+    "updatedBadge": "Updated: November 2025",
+    "heroClaim": "Transparent preferences controlled by you",
+    "intro": {
+      "title": "What are Cookies?",
+      "p1": "Cookies are small text files stored on your device (computer, tablet or mobile) when you visit a website. Cookies allow the website to remember your actions and preferences over a period of time, so you don't have to re-enter them every time you return to the site or navigate from one page to another.",
+      "p2": "At KopTup we use cookies to improve your browsing experience, analyze the use of our site and personalize content. This policy explains what cookies we use and why."
+    },
+    "types": {
+      "title": "Types of Cookies We Use",
+      "subtitle": "Below are the different types of cookies we use on our website",
+      "alwaysActive": "Always Active",
+      "colName": "Name",
+      "colPurpose": "Purpose",
+      "colDuration": "Duration",
+      "colType": "Type",
+      "ct1": {
+        "title": "Essential Cookies",
+        "description": "Cookies necessary for the basic functioning of the website",
+        "ck1": { "purpose": "Maintain user session", "duration": "Session", "type": "First party" },
+        "ck2": { "purpose": "Authentication and security", "duration": "7 days", "type": "First party" },
+        "ck3": { "purpose": "Protection against CSRF attacks", "duration": "Session", "type": "First party" },
+        "ck4": { "purpose": "Store cookie preferences", "duration": "1 year", "type": "First party" }
+      },
+      "ct2": {
+        "title": "Functional Cookies",
+        "description": "Cookies that enhance functionality and personalization",
+        "ck1": { "purpose": "Remember language preference", "duration": "1 year", "type": "First party" },
+        "ck2": { "purpose": "Remember theme (light/dark)", "duration": "1 year", "type": "First party" },
+        "ck3": { "purpose": "Store user settings", "duration": "6 months", "type": "First party" }
+      },
+      "ct3": {
+        "title": "Analytics Cookies",
+        "description": "Cookies that help us understand how the site is used",
+        "ck1": { "purpose": "Google Analytics - Distinguish users", "duration": "2 years", "type": "Third party (Google)" },
+        "ck2": { "purpose": "Google Analytics - Distinguish users", "duration": "24 hours", "type": "Third party (Google)" },
+        "ck3": { "purpose": "Google Analytics - Throttle request rate", "duration": "1 minute", "type": "Third party (Google)" }
+      }
+    },
+    "preferences": {
+      "title": "Manage Cookie Preferences",
+      "subtitle": "You can change your cookie preferences at any time using the controls below",
+      "acceptAll": "Accept All",
+      "essentialOnly": "Essential Only",
+      "savePreferences": "Save Preferences",
+      "alertSaved": "Preferences saved successfully",
+      "alertAccepted": "All cookies have been accepted",
+      "alertEssential": "Only essential cookies are enabled"
+    },
+    "control": {
+      "title": "How to Control Cookies",
+      "p1": "You can control and/or delete cookies as you wish. For more details, see",
+      "aboutCookiesLink": "aboutcookies.org",
+      "browserTitle": "Browser Settings",
+      "browserP1": "Most web browsers allow you to control cookies through their settings. For information on how to do this in popular browsers:",
+      "browserWarning": "Please note that if you block or delete cookies, some parts of our website may not work correctly."
+    },
+    "thirdParty": {
+      "title": "Third-Party Cookies",
+      "p1": "Some of our business partners use cookies on our site (e.g., Google Analytics). We have no access to or control over these cookies. This cookie policy covers the use of cookies by KopTup and not the use of cookies by third parties.",
+      "googleTitle": "Google Analytics",
+      "googleP1": "We use Google Analytics to analyze the use of our website. For more information on how Google uses data, visit",
+      "googleLink": "Google's policies"
+    },
+    "updates": {
+      "title": "Updates to this Policy",
+      "p1": "We may update this Cookie Policy periodically to reflect changes in the cookies we use or for other operational, legal or regulatory reasons.",
+      "p2": "We recommend that you review this page regularly to stay informed about our use of cookies and related technologies."
+    },
+    "contact": {
+      "title": "Contact",
+      "text": "If you have questions about our Cookie Policy, contact us:",
+      "labelEmail": "Email:",
+      "labelPhone": "Phone:"
+    },
+    "footer": {
+      "updated": "Last updated: November 2025",
+      "copyright": "© 2025 KopTup - Tech Solutions. All rights reserved.",
+      "linkPrivacy": "Privacy Policy",
+      "linkTerms": "Terms & Conditions"
     }
   },
   "notFoundPage": {
@@ -1075,7 +1358,11 @@
     },
     "technologies": {
       "title": "Technologies We Master",
-      "subtitle": "Modern tech stack for world-class solutions"
+      "subtitle": "Modern tech stack for world-class solutions",
+      "searchPlaceholder": "Search technologies...",
+      "noResults": "No technologies found matching \"{query}\"",
+      "showLess": "Show less",
+      "viewAll": "View all"
     },
     "cta": {
       "title": "Ready to Work Together?",
@@ -1109,6 +1396,7 @@
       "messagePlaceholder": "Describe your project, objectives and any important details...",
       "submit": "Send message",
       "submitting": "Sending...",
+      "errorSubmit": "Error sending message. Please try again or contact us directly via WhatsApp.",
       "success": {
         "title": "Message sent!",
         "subtitle": "Thanks for contacting us. We'll respond soon."
@@ -1152,7 +1440,10 @@
     "schedule": {
       "title": "Schedule a Call",
       "subtitle": "Schedule a free 30-minute consultation",
-      "button": "Schedule now"
+      "button": "Schedule now",
+      "opening": "Opening...",
+      "emailSubject": "Call Scheduling Request - KopTup",
+      "emailBody": "Hello KopTup team,\n\nI would like to schedule a call to discuss my technology needs.\n\nPlease confirm availability so we can set up a meeting.\n\nBest regards"
     },
     "faq": {
       "title": "Frequently Asked Questions",
@@ -1177,6 +1468,13 @@
     "buttons": {
       "uploadFile": "Upload File"
     },
+    "sidebar": {
+      "allDocuments": "All Documents",
+      "favorites": "Favorites",
+      "recent": "Recent",
+      "trash": "Trash",
+      "settings": "Settings"
+    },
     "folders": {
       "title": "Folders",
       "newFolder": "New Folder",
@@ -1187,7 +1485,33 @@
       "aiSearch": "AI Semantic Search"
     },
     "filters": {
-      "title": "Filters"
+      "title": "Filters",
+      "typeAll": "Type: All",
+      "dateAll": "Date: All",
+      "lastWeek": "Last week",
+      "lastMonth": "Last month",
+      "lastYear": "Last year"
+    },
+    "settings": {
+      "title": "System Settings",
+      "autoProcess": "Automatic AI Processing",
+      "autoProcessDesc": "Analyze documents with AI on upload",
+      "semanticSearch": "Semantic Search",
+      "semanticSearchDesc": "Enable AI-powered meaning-based search",
+      "autoTagging": "Auto Tagging",
+      "autoTaggingDesc": "Automatically generate tags with AI",
+      "saved": "✓ Settings saved",
+      "updateHint": "Update your settings here",
+      "saveButton": "Save Changes",
+      "storageTitle": "Storage",
+      "spaceUsed": "Space Used",
+      "documentsStored": "{count} documents stored",
+      "summaryTitle": "Settings Summary",
+      "aiProcessingLabel": "AI Processing",
+      "semanticSearchLabel": "Semantic Search",
+      "autoTaggingLabel": "Auto Tagging",
+      "on": "Enabled",
+      "off": "Disabled"
     },
     "upload": {
       "dragDrop": "Drag files here or click to select",
@@ -1227,6 +1551,8 @@
       "analyzing": "Analyzing similarity..."
     },
     "rename": {
+      "title": "Rename Document",
+      "titleAttr": "Rename",
       "placeholder": "New name",
       "submit": "Rename"
     },
@@ -1515,5 +1841,288 @@
       "in_review": "In Review",
       "rejected": "Rejected"
     }
+  },
+  "chatbotBuilder": {
+    "pageTitle": "Professional Chatbot Builder",
+    "pageSubtitle": "Customize your AI chatbot and test it in real time",
+    "openPreview": "Open Full-Screen Preview",
+    "tabs": {
+      "documents": "Documents",
+      "chat": "Chat",
+      "design": "Design",
+      "typography": "Typography",
+      "restrictions": "Restrictions",
+      "embed": "Embed"
+    },
+    "defaults": {
+      "title": "Virtual Assistant",
+      "greeting": "Hi! 👋 I'm your virtual assistant. How can I help you today?",
+      "placeholder": "Type your message here..."
+    },
+    "documents": {
+      "title": "Upload Documents",
+      "description": "Upload documents the chatbot will use as context to answer questions",
+      "dragDrop": "Drag files here or click to select",
+      "fileTypes": "PDF, DOCX, TXT, CSV (max. 10MB per file)",
+      "selectFiles": "Select Files",
+      "uploading": "Uploading documents...",
+      "uploadedFiles": "Uploaded Files"
+    },
+    "chat": {
+      "title": "Chat Configuration",
+      "description": "Customize the chatbot's messages and texts",
+      "titleLabel": "Chatbot Title",
+      "greetingLabel": "Greeting Message",
+      "placeholderLabel": "Input Placeholder",
+      "titlePlaceholder": "E.g.: Virtual Assistant",
+      "greetingPlaceholder": "E.g.: Hi! How can I help you?",
+      "placeholderPlaceholder": "E.g.: Type your message...",
+      "clearChat": "Clear Conversation"
+    },
+    "design": {
+      "title": "Visual Design",
+      "description": "Customize the colors and icon of your chatbot",
+      "customIcon": "Custom Icon (Temporary)",
+      "uploadIcon": "Upload Icon",
+      "removeIcon": "Remove",
+      "predefinedIcon": "Or choose a predefined icon",
+      "headerColor": "Header Color",
+      "backgroundColor": "Background Color",
+      "textColor": "Text Color",
+      "icons": {
+        "bubbles": "Bubbles",
+        "dots": "Dots",
+        "rocket": "Rocket",
+        "robot": "Robot",
+        "comment": "Comment"
+      }
+    },
+    "typography": {
+      "title": "Typography",
+      "description": "Select the font that best suits your brand"
+    },
+    "restrictions": {
+      "title": "Restricted Topics",
+      "description": "Configure topics the chatbot should NOT talk about",
+      "placeholder": "E.g.: Politics, Religion, etc.",
+      "add": "Add",
+      "topicsTitle": "Restricted Topics",
+      "note": "Note",
+      "noteText": "The chatbot will refuse to answer questions related to these topics and will redirect the conversation to allowed topics."
+    },
+    "embed": {
+      "title": "Embed Code",
+      "description": "Copy this code to embed the chatbot on your website",
+      "viewPreview": "View Preview",
+      "copyCode": "Copy Code",
+      "important": "Important",
+      "importantText": "Custom icons are temporary and only work in this session. For production use, upload the icon to your server and use the URL."
+    },
+    "preview": {
+      "title": "Live Preview",
+      "clearTitle": "Clear chat"
+    },
+    "upload": {
+      "single": "You uploaded the file {name}! 📄 I'm available to help you with any questions about it or anything else you need.",
+      "plural": "I received the files {names}! 📄 I'm available to help you with any questions about them or anything else you need."
+    },
+    "previewPage": {
+      "configuration": "Configuration",
+      "chatDesign": "Chat Design",
+      "titleLabel": "Title",
+      "welcomeMessage": "Welcome Message",
+      "placeholder": "Placeholder",
+      "headerColor": "Header Color",
+      "textColor": "Text Color",
+      "font": "Font",
+      "icon": "Icon",
+      "restrictedTopics": "Restricted Topics",
+      "uploadedDocuments": "Uploaded Documents",
+      "noDocuments": "No documents uploaded yet",
+      "clearConversation": "Clear Conversation",
+      "backToBuilder": "Back to builder",
+      "hidePanel": "Hide panel",
+      "showPanel": "Show panel",
+      "source": "Source",
+      "send": "Send",
+      "clearTitle": "Clear conversation"
+    }
+  },
+  "reservations": {
+    "heroTitle": "Book Your Appointment Online",
+    "heroSubtitle": "A modern, professional system to schedule your services quickly and easily",
+    "availability": "24/7 Availability",
+    "instantConfirmation": "Instant Confirmation",
+    "ourServices": "Our Services",
+    "selectService": "Select the service you need and book your appointment",
+    "bookNow": "Book now",
+    "adminPanel": "Administration Panel",
+    "backToServices": "← Back to services",
+    "bookTitle": "Book Your Appointment",
+    "stepDate": "Date",
+    "stepTime": "Time",
+    "stepData": "Details",
+    "stepConfirm": "Confirm",
+    "selectDate": "Select a Date",
+    "viewMonth": "Month",
+    "viewWeek": "Week",
+    "selectTime": "Select a Time",
+    "selectedDate": "Selected date: {date}",
+    "back": "Back",
+    "yourData": "Your Details",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "John Doe",
+    "emailPlaceholder": "john@example.com",
+    "phonePlaceholder": "+1 300 123 4567",
+    "comments": "Comments (Optional)",
+    "commentsPlaceholder": "Additional information about your appointment...",
+    "continue": "Continue",
+    "bookingConfirmed": "Booking Confirmed!",
+    "bookingSuccess": "Your appointment has been scheduled successfully",
+    "serviceLbl": "Service",
+    "dateTime": "Date and Time",
+    "duration": "Duration",
+    "backToHome": "Back to Home",
+    "backToPublic": "← Back to public view",
+    "adminTitle": "Bookings Panel",
+    "adminSubtitle": "Manage all your business bookings",
+    "filters": "Filters:",
+    "allDates": "All dates",
+    "today": "Today",
+    "thisWeek": "This week",
+    "thisMonth": "This month",
+    "allServices": "All services",
+    "allStatuses": "All statuses",
+    "statusConfirmed": "Confirmed",
+    "statusPending": "Pending",
+    "statusCancelled": "Cancelled",
+    "clearFilters": "Clear Filters",
+    "colClient": "Client",
+    "colService": "Service",
+    "colDate": "Date",
+    "colTime": "Time",
+    "colStatus": "Status",
+    "colActions": "Actions",
+    "noBookings": "No bookings found with the selected filters",
+    "viewDetails": "View Details",
+    "bookingDetails": "Booking Details",
+    "client": "Client",
+    "serviceInfo": "Service Information",
+    "changeStatus": "Change Status",
+    "confirm": "✓ Confirm",
+    "pending": "⏳ Pending",
+    "cancelAction": "✕ Cancel",
+    "notes": "Notes",
+    "notesPlaceholder": "Add notes about the booking...",
+    "saveNotes": "Save Notes"
+  },
+  "contentManager": {
+    "title": "Corporate Content Manager",
+    "subtitle": "Create professional business content with AI assistance",
+    "savedDocs": "Saved Documents",
+    "selectTemplate": "Select a Template",
+    "backToTemplates": "← Back to templates",
+    "versions": "Versions",
+    "export": "Export",
+    "copyToClipboard": "Copy to Clipboard",
+    "emailPreview": "Email Preview",
+    "downloadPdf": "Download as PDF",
+    "downloadTxt": "Download as TXT",
+    "aiTools": "AI Tools",
+    "processing": "Processing with AI...",
+    "improveText": "Improve Text",
+    "adjustWords200": "Adjust to 200 words",
+    "adjustWords500": "Adjust to 500 words",
+    "generateVersions": "Generate Versions",
+    "preview": "Preview",
+    "previewSubtitle": "Corporate format view",
+    "contentPlaceholder": "Content will appear here as you type...",
+    "docFooter": "Document generated with KopTup Content Manager",
+    "prevVersions": "Previous Versions",
+    "noVersions": "No versions generated yet. Use the \"Generate Versions\" button to create variations of your content.",
+    "load": "Load",
+    "emailPreviewTitle": "Email Preview",
+    "yourCompany": "Your Company",
+    "emailTo": "To:",
+    "emailSubject": "Subject:",
+    "autoGenerated": "This is an automatically generated message. Please do not reply to this email.",
+    "close": "Close",
+    "copyEmail": "Copy Email"
+  },
+  "projectManager": {
+    "appName": "ProyectHub",
+    "newProject": "New Project",
+    "projects": "Projects",
+    "favorites": "Favorites",
+    "notifications": "Notifications",
+    "settings": "Settings",
+    "backToBoard": "← Back to board",
+    "markAllRead": "Mark all as read",
+    "favoriteProjects": "Favorite Projects",
+    "activeTasks": "active tasks",
+    "settingsTitle": "Settings",
+    "settingsProjects": "Projects",
+    "settingsNotifications": "Notifications",
+    "notifNewTasks": "New assigned tasks",
+    "notifComments": "Comments on my tasks",
+    "notifDue": "Tasks due soon",
+    "settingsPreferences": "Preferences",
+    "defaultView": "Default view",
+    "viewKanban": "Kanban Board",
+    "viewProject": "Project View",
+    "viewCalendar": "Calendar",
+    "language": "Language",
+    "totalProgress": "Total Progress",
+    "tasksCompleted": "of {total} tasks completed",
+    "overdueTasks": "Overdue Tasks",
+    "requireAttention": "Require immediate attention",
+    "dueDateLabel": "Due:",
+    "statistics": "Statistics",
+    "deadlineCalendar": "Deadline Calendar",
+    "mainProject": "Web Development",
+    "tasksCount": "{count} tasks • {progress}% completed",
+    "viewProjectBtn": "Project View",
+    "progress": "Progress",
+    "duplicate": "Duplicate",
+    "delete": "Delete",
+    "newProjectTitle": "New Project",
+    "projectNameLabel": "Project name",
+    "projectNamePlaceholder": "E.g.: Web Development",
+    "colorLabel": "Color",
+    "colorBlue": "Blue",
+    "colorGreen": "Green",
+    "colorPurple": "Purple",
+    "colorOrange": "Orange",
+    "colorRed": "Red",
+    "colorPink": "Pink",
+    "cancel": "Cancel",
+    "createProject": "Create Project",
+    "newTask": "New Task",
+    "taskTitleLabel": "Title",
+    "taskTitlePlaceholder": "E.g.: Implement login",
+    "taskDescLabel": "Description",
+    "taskDescPlaceholder": "Describe the task...",
+    "createTask": "Create Task",
+    "inColumn": "In {column}",
+    "description": "Description",
+    "assignedTo": "Assigned to",
+    "dueDate": "Due date",
+    "priority": "Priority",
+    "labels": "Labels",
+    "checklist": "Checklist ({done}/{total})",
+    "comments": "Comments ({count})",
+    "addCommentPlaceholder": "Add a comment...",
+    "addComment": "Add Comment",
+    "attachments": "Attachments ({count})",
+    "download": "Download",
+    "activityHistory": "Change History",
+    "movedTask": "moved this task to",
+    "createdTask": "created this task",
+    "hoursAgo": "3 hours ago",
+    "dayAgo": "1 day ago",
+    "unassigned": "Unassigned",
+    "currentUser": "Current User",
+    "justNow": "Just now",
+    "copy": "(copy)"
   }
 }

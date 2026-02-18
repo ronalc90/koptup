@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   RectangleStackIcon,
   PlusIcon,
@@ -62,6 +63,8 @@ interface Notification {
 }
 
 export default function ControlProyectos() {
+  const t = useTranslations('projectManager');
+
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [view, setView] = useState<'board' | 'project' | 'calendar' | 'favorites' | 'notifications' | 'settings'>('board');
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
@@ -270,7 +273,7 @@ export default function ControlProyectos() {
       id: tasks.length + 1,
       title,
       description,
-      assignee: 'Sin asignar',
+      assignee: t('unassigned'),
       dueDate: new Date().toISOString().split('T')[0],
       priority: 'media',
       tags: [],
@@ -293,7 +296,7 @@ export default function ControlProyectos() {
     const newTask: Task = {
       ...task,
       id: tasks.length + 1,
-      title: `${task.title} (copia)`,
+      title: `${task.title} ${t('copy')}`,
     };
     setTasks([...tasks, newTask]);
     setTaskMenuOpen(null);
@@ -324,9 +327,9 @@ export default function ControlProyectos() {
 
     const comment: Comment = {
       id: selectedTask.comments.length + 1,
-      author: 'Usuario Actual',
+      author: t('currentUser'),
       text: newComment,
-      timestamp: 'Justo ahora',
+      timestamp: t('justNow'),
     };
 
     setTasks(tasks.map(task =>
@@ -358,17 +361,17 @@ export default function ControlProyectos() {
             onClick={() => setView('board')}
             className="text-teal-600 dark:text-teal-400 hover:underline mb-6"
           >
-            ← Volver al tablero
+            {t('backToBoard')}
           </button>
 
           <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Notificaciones</h2>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{t('notifications')}</h2>
               <button
                 onClick={() => setNotifications(notifications.map(n => ({ ...n, read: true })))}
                 className="text-sm text-teal-600 dark:text-teal-400 hover:underline"
               >
-                Marcar todas como leídas
+                {t('markAllRead')}
               </button>
             </div>
 
@@ -406,10 +409,6 @@ export default function ControlProyectos() {
 
   // Favorites View
   if (view === 'favorites') {
-    const favoriteTasks = tasks.filter(t =>
-      projects.find(p => p.favorite && p.name === 'Desarrollo Web') // Simplificado
-    );
-
     return (
       <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-8">
         <div className="max-w-6xl mx-auto">
@@ -417,10 +416,10 @@ export default function ControlProyectos() {
             onClick={() => setView('board')}
             className="text-teal-600 dark:text-teal-400 hover:underline mb-6"
           >
-            ← Volver al tablero
+            {t('backToBoard')}
           </button>
 
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-8">Proyectos Favoritos</h2>
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-8">{t('favoriteProjects')}</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {projects.filter(p => p.favorite).map((project) => (
@@ -439,7 +438,7 @@ export default function ControlProyectos() {
                 </div>
                 <div className="space-y-2">
                   <p className="text-sm text-slate-600 dark:text-slate-400">
-                    {tasks.filter(t => t.column !== 'done').length} tareas activas
+                    {tasks.filter(t => t.column !== 'done').length} {t('activeTasks')}
                   </p>
                   <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                     <div
@@ -465,14 +464,14 @@ export default function ControlProyectos() {
             onClick={() => setView('board')}
             className="text-teal-600 dark:text-teal-400 hover:underline mb-6"
           >
-            ← Volver al tablero
+            {t('backToBoard')}
           </button>
 
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-8">Configuración</h2>
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-8">{t('settingsTitle')}</h2>
 
           <div className="space-y-6">
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Proyectos</h3>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">{t('settingsProjects')}</h3>
               <div className="space-y-3">
                 {projects.map((project) => (
                   <div key={project.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
@@ -501,39 +500,39 @@ export default function ControlProyectos() {
             </div>
 
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Notificaciones</h3>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">{t('settingsNotifications')}</h3>
               <div className="space-y-4">
                 <label className="flex items-center justify-between">
-                  <span className="text-slate-700 dark:text-slate-300">Nuevas tareas asignadas</span>
+                  <span className="text-slate-700 dark:text-slate-300">{t('notifNewTasks')}</span>
                   <input type="checkbox" defaultChecked className="w-5 h-5 text-teal-600 rounded" />
                 </label>
                 <label className="flex items-center justify-between">
-                  <span className="text-slate-700 dark:text-slate-300">Comentarios en mis tareas</span>
+                  <span className="text-slate-700 dark:text-slate-300">{t('notifComments')}</span>
                   <input type="checkbox" defaultChecked className="w-5 h-5 text-teal-600 rounded" />
                 </label>
                 <label className="flex items-center justify-between">
-                  <span className="text-slate-700 dark:text-slate-300">Tareas próximas a vencer</span>
+                  <span className="text-slate-700 dark:text-slate-300">{t('notifDue')}</span>
                   <input type="checkbox" defaultChecked className="w-5 h-5 text-teal-600 rounded" />
                 </label>
               </div>
             </div>
 
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Preferencias</h3>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">{t('settingsPreferences')}</h3>
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                    Vista predeterminada
+                    {t('defaultView')}
                   </label>
                   <select className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800">
-                    <option>Tablero Kanban</option>
-                    <option>Vista de Proyecto</option>
-                    <option>Calendario</option>
+                    <option>{t('viewKanban')}</option>
+                    <option>{t('viewProject')}</option>
+                    <option>{t('viewCalendar')}</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                    Idioma
+                    {t('language')}
                   </label>
                   <select className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800">
                     <option>Español</option>
@@ -556,14 +555,14 @@ export default function ControlProyectos() {
             onClick={() => setView('board')}
             className="text-teal-600 dark:text-teal-400 hover:underline mb-6"
           >
-            ← Volver al tablero
+            {t('backToBoard')}
           </button>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             {/* Progress Card */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
               <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-                Progreso Total
+                {t('totalProgress')}
               </h3>
               <div className="flex items-center justify-center">
                 <div className="relative w-32 h-32">
@@ -596,21 +595,21 @@ export default function ControlProyectos() {
                 </div>
               </div>
               <p className="text-center text-sm text-slate-600 dark:text-slate-400 mt-4">
-                {tasks.filter(t => t.column === 'done').length} de {tasks.length} tareas completadas
+                {tasks.filter(t => t.column === 'done').length} {t('tasksCompleted', { total: tasks.length })}
               </p>
             </div>
 
             {/* Overdue Tasks */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
               <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-                Tareas Atrasadas
+                {t('overdueTasks')}
               </h3>
               <div className="text-center">
                 <div className="text-5xl font-bold text-red-600 mb-2">
                   {getOverdueTasks().length}
                 </div>
                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Requieren atención inmediata
+                  {t('requireAttention')}
                 </p>
               </div>
               <div className="mt-4 space-y-2">
@@ -620,7 +619,7 @@ export default function ControlProyectos() {
                       {task.title}
                     </p>
                     <p className="text-xs text-red-600 dark:text-red-400">
-                      Vencía: {task.dueDate}
+                      {t('dueDateLabel')} {task.dueDate}
                     </p>
                   </div>
                 ))}
@@ -630,7 +629,7 @@ export default function ControlProyectos() {
             {/* Stats */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
               <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-                Estadísticas
+                {t('statistics')}
               </h3>
               <div className="space-y-4">
                 {columns.map((col) => (
@@ -660,7 +659,7 @@ export default function ControlProyectos() {
           {/* Calendar View */}
           <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
             <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-              Calendario de Deadlines
+              {t('deadlineCalendar')}
             </h3>
             <div className="grid grid-cols-7 gap-2">
               {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((day) => (
@@ -704,7 +703,7 @@ export default function ControlProyectos() {
               <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-lg flex items-center justify-center">
                 <RectangleStackIcon className="w-6 h-6 text-white" />
               </div>
-              <span className="font-bold text-xl">ProyectHub</span>
+              <span className="font-bold text-xl">{t('appName')}</span>
             </div>
 
             <button
@@ -712,14 +711,14 @@ export default function ControlProyectos() {
               className="w-full bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-lg px-4 py-3 font-semibold hover:from-teal-700 hover:to-cyan-700 transition-all shadow-lg flex items-center justify-center gap-2"
             >
               <PlusIcon className="w-5 h-5" />
-              Nuevo Proyecto
+              {t('newProject')}
             </button>
           </div>
 
           <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
             <div className="mb-4">
               <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-2 px-3">
-                Proyectos
+                {t('projects')}
               </h3>
               {projects.map((project) => (
                 <button
@@ -741,14 +740,14 @@ export default function ControlProyectos() {
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors"
               >
                 <StarIcon className="w-5 h-5" />
-                <span className="text-sm font-medium">Favoritos</span>
+                <span className="text-sm font-medium">{t('favorites')}</span>
               </button>
               <button
                 onClick={() => setView('notifications')}
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors"
               >
                 <BellIcon className="w-5 h-5" />
-                <span className="text-sm font-medium">Notificaciones</span>
+                <span className="text-sm font-medium">{t('notifications')}</span>
                 {notifications.filter(n => !n.read).length > 0 && (
                   <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
                     {notifications.filter(n => !n.read).length}
@@ -760,7 +759,7 @@ export default function ControlProyectos() {
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors"
               >
                 <Cog6ToothIcon className="w-5 h-5" />
-                <span className="text-sm font-medium">Configuración</span>
+                <span className="text-sm font-medium">{t('settings')}</span>
               </button>
             </div>
           </nav>
@@ -773,10 +772,10 @@ export default function ControlProyectos() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">
-                  Desarrollo Web
+                  {t('mainProject')}
                 </h1>
                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                  {tasks.length} tareas • {getTotalProgress()}% completado
+                  {t('tasksCount', { count: tasks.length, progress: getTotalProgress() })}
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -785,7 +784,7 @@ export default function ControlProyectos() {
                   className="px-3 py-2 text-sm sm:px-4 sm:py-2 sm:text-base bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
                 >
                   <ChartPieIcon className="w-5 h-5" />
-                  Vista de Proyecto
+                  {t('viewProjectBtn')}
                 </button>
                 <div className="flex -space-x-2">
                   {['MG', 'CR', 'AM', 'PL'].map((initials, i) => (
@@ -865,7 +864,7 @@ export default function ControlProyectos() {
                                     className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                                   >
                                     <DocumentDuplicateIcon className="w-4 h-4" />
-                                    Duplicar
+                                    {t('duplicate')}
                                   </button>
                                   <button
                                     onClick={(e) => {
@@ -875,7 +874,7 @@ export default function ControlProyectos() {
                                     className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 transition-colors"
                                   >
                                     <TrashIcon className="w-4 h-4" />
-                                    Eliminar
+                                    {t('delete')}
                                   </button>
                                 </div>
                               )}
@@ -900,7 +899,7 @@ export default function ControlProyectos() {
                           {task.checklist.length > 0 && (
                             <div className="mb-3">
                               <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-                                <span>Progreso</span>
+                                <span>{t('progress')}</span>
                                 <span>{getTaskProgress(task)}%</span>
                               </div>
                               <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
@@ -960,7 +959,7 @@ export default function ControlProyectos() {
           />
           <div className="fixed inset-0 flex items-center justify-center z-50">
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-6 w-full max-w-md z-[200]">
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Nuevo Proyecto</h3>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">{t('newProjectTitle')}</h3>
               <form onSubmit={(e) => {
                 e.preventDefault();
                 const formData = new FormData(e.currentTarget);
@@ -972,31 +971,31 @@ export default function ControlProyectos() {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                      Nombre del proyecto
+                      {t('projectNameLabel')}
                     </label>
                     <input
                       type="text"
                       name="name"
                       required
                       className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                      placeholder="Ej: Desarrollo Web"
+                      placeholder={t('projectNamePlaceholder')}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                      Color
+                      {t('colorLabel')}
                     </label>
                     <select
                       name="color"
                       required
                       className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500"
                     >
-                      <option value="bg-blue-500">Azul</option>
-                      <option value="bg-green-500">Verde</option>
-                      <option value="bg-purple-500">Morado</option>
-                      <option value="bg-orange-500">Naranja</option>
-                      <option value="bg-red-500">Rojo</option>
-                      <option value="bg-pink-500">Rosa</option>
+                      <option value="bg-blue-500">{t('colorBlue')}</option>
+                      <option value="bg-green-500">{t('colorGreen')}</option>
+                      <option value="bg-purple-500">{t('colorPurple')}</option>
+                      <option value="bg-orange-500">{t('colorOrange')}</option>
+                      <option value="bg-red-500">{t('colorRed')}</option>
+                      <option value="bg-pink-500">{t('colorPink')}</option>
                     </select>
                   </div>
                 </div>
@@ -1006,13 +1005,13 @@ export default function ControlProyectos() {
                     onClick={() => setShowNewProjectModal(false)}
                     className="flex-1 px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                   >
-                    Cancelar
+                    {t('cancel')}
                   </button>
                   <button
                     type="submit"
                     className="flex-1 px-4 py-2 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-lg hover:from-teal-700 hover:to-cyan-700 transition-all"
                   >
-                    Crear Proyecto
+                    {t('createProject')}
                   </button>
                 </div>
               </form>
@@ -1030,7 +1029,7 @@ export default function ControlProyectos() {
           />
           <div className="fixed inset-0 flex items-center justify-center z-50">
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-6 w-full max-w-md z-[200]">
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Nueva Tarea</h3>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">{t('newTask')}</h3>
               <form onSubmit={(e) => {
                 e.preventDefault();
                 const formData = new FormData(e.currentTarget);
@@ -1043,25 +1042,25 @@ export default function ControlProyectos() {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                      Título
+                      {t('taskTitleLabel')}
                     </label>
                     <input
                       type="text"
                       name="title"
                       required
                       className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                      placeholder="Ej: Implementar login"
+                      placeholder={t('taskTitlePlaceholder')}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                      Descripción
+                      {t('taskDescLabel')}
                     </label>
                     <textarea
                       name="description"
                       rows={3}
                       className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                      placeholder="Describe la tarea..."
+                      placeholder={t('taskDescPlaceholder')}
                     />
                   </div>
                 </div>
@@ -1071,13 +1070,13 @@ export default function ControlProyectos() {
                     onClick={() => setShowNewTaskModal(null)}
                     className="flex-1 px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                   >
-                    Cancelar
+                    {t('cancel')}
                   </button>
                   <button
                     type="submit"
                     className="flex-1 px-4 py-2 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-lg hover:from-teal-700 hover:to-cyan-700 transition-all"
                   >
-                    Crear Tarea
+                    {t('createTask')}
                   </button>
                 </div>
               </form>
@@ -1101,7 +1100,7 @@ export default function ControlProyectos() {
                     {selectedTask.title}
                   </h2>
                   <div className="flex items-center gap-2 text-sm text-slate-500">
-                    <span>En {columns.find(c => c.id === selectedTask.column)?.title}</span>
+                    <span>{t('inColumn', { column: columns.find(c => c.id === selectedTask.column)?.title ?? '' })}</span>
                   </div>
                 </div>
                 <button
@@ -1116,7 +1115,7 @@ export default function ControlProyectos() {
             <div className="p-6 space-y-6">
               {/* Description */}
               <div>
-                <h3 className="font-bold text-slate-900 dark:text-white mb-2">Descripción</h3>
+                <h3 className="font-bold text-slate-900 dark:text-white mb-2">{t('description')}</h3>
                 <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
                   {selectedTask.description}
                 </p>
@@ -1125,7 +1124,7 @@ export default function ControlProyectos() {
               {/* Details */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <h4 className="text-sm font-semibold text-slate-500 mb-1">Asignado a</h4>
+                  <h4 className="text-sm font-semibold text-slate-500 mb-1">{t('assignedTo')}</h4>
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-400 to-cyan-400 flex items-center justify-center text-white text-sm font-semibold">
                       {selectedTask.assignee.split(' ').map(n => n[0]).join('')}
@@ -1134,17 +1133,17 @@ export default function ControlProyectos() {
                   </div>
                 </div>
                 <div>
-                  <h4 className="text-sm font-semibold text-slate-500 mb-1">Fecha límite</h4>
+                  <h4 className="text-sm font-semibold text-slate-500 mb-1">{t('dueDate')}</h4>
                   <p className="font-medium">{selectedTask.dueDate}</p>
                 </div>
                 <div>
-                  <h4 className="text-sm font-semibold text-slate-500 mb-1">Prioridad</h4>
+                  <h4 className="text-sm font-semibold text-slate-500 mb-1">{t('priority')}</h4>
                   <span className={`inline-block px-3 py-1 rounded text-sm font-semibold ${getPriorityColor(selectedTask.priority)}`}>
                     {selectedTask.priority.charAt(0).toUpperCase() + selectedTask.priority.slice(1)}
                   </span>
                 </div>
                 <div>
-                  <h4 className="text-sm font-semibold text-slate-500 mb-1">Etiquetas</h4>
+                  <h4 className="text-sm font-semibold text-slate-500 mb-1">{t('labels')}</h4>
                   <div className="flex flex-wrap gap-1">
                     {selectedTask.tags.map((tag, i) => (
                       <span
@@ -1161,7 +1160,7 @@ export default function ControlProyectos() {
               {/* Checklist */}
               <div>
                 <h3 className="font-bold text-slate-900 dark:text-white mb-3">
-                  Checklist ({selectedTask.checklist.filter(item => item.done).length}/{selectedTask.checklist.length})
+                  {t('checklist', { done: selectedTask.checklist.filter(item => item.done).length, total: selectedTask.checklist.length })}
                 </h3>
                 <div className="space-y-2">
                   {selectedTask.checklist.map((item, i) => (
@@ -1186,7 +1185,7 @@ export default function ControlProyectos() {
               {/* Comments */}
               <div>
                 <h3 className="font-bold text-slate-900 dark:text-white mb-3">
-                  Comentarios ({selectedTask.comments.length})
+                  {t('comments', { count: selectedTask.comments.length })}
                 </h3>
                 <div className="space-y-3">
                   {selectedTask.comments.map((comment) => (
@@ -1212,7 +1211,7 @@ export default function ControlProyectos() {
                   <textarea
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
-                    placeholder="Agregar un comentario..."
+                    placeholder={t('addCommentPlaceholder')}
                     className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500"
                     rows={3}
                   />
@@ -1221,7 +1220,7 @@ export default function ControlProyectos() {
                     disabled={!newComment.trim()}
                     className="mt-2 px-4 py-2 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-lg hover:from-teal-700 hover:to-cyan-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Agregar Comentario
+                    {t('addComment')}
                   </button>
                 </div>
               </div>
@@ -1229,7 +1228,7 @@ export default function ControlProyectos() {
               {/* Attachments */}
               <div>
                 <h3 className="font-bold text-slate-900 dark:text-white mb-3">
-                  Archivos Adjuntos ({selectedTask.attachments})
+                  {t('attachments', { count: selectedTask.attachments })}
                 </h3>
                 {selectedTask.attachments > 0 && (
                   <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg flex items-center gap-3">
@@ -1239,7 +1238,7 @@ export default function ControlProyectos() {
                       <p className="text-xs text-slate-500">245 KB</p>
                     </div>
                     <button className="text-teal-600 hover:text-teal-700 text-sm font-medium">
-                      Descargar
+                      {t('download')}
                     </button>
                   </div>
                 )}
@@ -1247,25 +1246,25 @@ export default function ControlProyectos() {
 
               {/* Activity History */}
               <div>
-                <h3 className="font-bold text-slate-900 dark:text-white mb-3">Historial de Cambios</h3>
+                <h3 className="font-bold text-slate-900 dark:text-white mb-3">{t('activityHistory')}</h3>
                 <div className="space-y-3">
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 rounded-full bg-teal-600 mt-2" />
                     <div className="flex-1">
                       <p className="text-sm">
-                        <span className="font-semibold">{selectedTask.assignee}</span> movió esta tarea a{' '}
+                        <span className="font-semibold">{selectedTask.assignee}</span> {t('movedTask')}{' '}
                         <span className="font-semibold">{columns.find(c => c.id === selectedTask.column)?.title}</span>
                       </p>
-                      <p className="text-xs text-slate-500">Hace 3 horas</p>
+                      <p className="text-xs text-slate-500">{t('hoursAgo')}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 rounded-full bg-slate-400 mt-2" />
                     <div className="flex-1">
                       <p className="text-sm">
-                        <span className="font-semibold">María G.</span> creó esta tarea
+                        <span className="font-semibold">María G.</span> {t('createdTask')}
                       </p>
-                      <p className="text-xs text-slate-500">Hace 1 día</p>
+                      <p className="text-xs text-slate-500">{t('dayAgo')}</p>
                     </div>
                   </div>
                 </div>

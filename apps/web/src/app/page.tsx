@@ -85,58 +85,58 @@ export default function HomePage() {
   const featuredDemos = [
     {
       icon: ShoppingCartIcon,
-      title: 'E-Commerce Completo',
-      description: 'Tienda en línea moderna con carrito, checkout, gestión de productos y dashboard de ventas en tiempo real.',
+      title: th('demos.ecommerce.title'),
+      description: th('demos.ecommerce.description'),
       href: '/demo/ecommerce',
-      category: 'Retail & Ventas',
+      category: th('demos.ecommerce.category'),
       color: 'from-green-500 to-green-700',
     },
     {
       icon: ChatBubbleBottomCenterTextIcon,
-      title: 'Chatbot Inteligente',
-      description: 'Asistente virtual con IA que responde preguntas, procesa documentos y aprende de cada interacción.',
+      title: th('demos.chatbot.title'),
+      description: th('demos.chatbot.description'),
       href: '/demo/chatbot',
-      category: 'Atención al Cliente',
+      category: th('demos.chatbot.category'),
       color: 'from-purple-500 to-purple-700',
     },
     {
       icon: CubeIcon,
-      title: 'Dashboard Ejecutivo',
-      description: 'Panel de control gerencial con KPIs, métricas financieras, análisis de ventas y reportes interactivos.',
+      title: th('demos.dashboard.title'),
+      description: th('demos.dashboard.description'),
       href: '/demo/dashboard-ejecutivo',
-      category: 'Business Intelligence',
+      category: th('demos.dashboard.category'),
       color: 'from-indigo-500 to-indigo-700',
     },
     {
       icon: CodeBracketIcon,
-      title: 'Gestión de Proyectos',
-      description: 'Sistema completo de gestión ágil con tableros Kanban, sprints, tareas y colaboración en equipo.',
+      title: th('demos.projects.title'),
+      description: th('demos.projects.description'),
       href: '/demo/control-proyectos',
-      category: 'Productividad',
+      category: th('demos.projects.category'),
       color: 'from-orange-500 to-orange-700',
     },
     {
       icon: CloudIcon,
-      title: 'Gestor Documental',
-      description: 'Organiza, busca y comparte documentos con etiquetas, búsqueda semántica y control de versiones.',
+      title: th('demos.documents.title'),
+      description: th('demos.documents.description'),
       href: '/demo/gestor-documentos',
-      category: 'Gestión Documental',
+      category: th('demos.documents.category'),
       color: 'from-cyan-500 to-cyan-700',
     },
     {
       icon: PaintBrushIcon,
-      title: 'CMS Avanzado',
-      description: 'Administra contenido, páginas y blog con editor visual, SEO y publicación programada.',
+      title: th('demos.cms.title'),
+      description: th('demos.cms.description'),
       href: '/demo/gestor-contenido',
-      category: 'Marketing Digital',
+      category: th('demos.cms.category'),
       color: 'from-pink-500 to-pink-700',
     },
     {
       icon: CheckCircleIcon,
-      title: 'Sistema de Reservas',
-      description: 'Plataforma completa para reservas online con calendario, notificaciones y gestión de disponibilidad.',
+      title: th('demos.reservations.title'),
+      description: th('demos.reservations.description'),
       href: '/demo/sistema-reservas',
-      category: 'Servicios',
+      category: th('demos.reservations.category'),
       color: 'from-teal-500 to-teal-700',
     },
   ];
@@ -194,14 +194,13 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <Badge variant="primary" size="md" className="mb-4">
-              Demos Interactivas
+              {th('demos.sectionBadge')}
             </Badge>
             <h2 className="text-3xl md:text-5xl font-bold text-secondary-900 dark:text-white mb-4">
-              Soluciones para Cada Industria
+              {th('demos.sectionTitle')}
             </h2>
             <p className="text-xl text-secondary-600 dark:text-secondary-400 max-w-3xl mx-auto">
-              Explora nuestras demos funcionales y descubre cómo transformamos ideas en software real.
-              Desde e-commerce hasta dashboards con IA, tenemos la experiencia para impulsar tu negocio.
+              {th('demos.sectionSubtitle')}
             </p>
           </div>
 
@@ -231,7 +230,7 @@ export default function HomePage() {
                         {demo.description}
                       </CardDescription>
                       <div className="flex items-center text-primary-600 dark:text-primary-400 text-sm font-medium group-hover:translate-x-1 transition-transform">
-                        Explorar demo →
+                        {th('demos.exploreDemo')}
                       </div>
                     </CardContent>
                   </Card>
@@ -243,7 +242,7 @@ export default function HomePage() {
           {/* Key Benefits */}
           <div className="bg-gradient-to-br from-primary-50 to-secondary-50 dark:from-secondary-900 dark:to-secondary-950 rounded-2xl p-8 md:p-12">
             <h3 className="text-2xl md:text-3xl font-bold text-secondary-900 dark:text-white mb-8 text-center">
-              ¿Por qué elegir KopTup para tu proyecto?
+              {th('demos.whyTitle')}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center">
@@ -251,10 +250,10 @@ export default function HomePage() {
                   <CheckCircleIcon className="h-8 w-8 text-white" />
                 </div>
                 <h4 className="text-lg font-bold text-secondary-900 dark:text-white mb-2">
-                  Soluciones a Medida
+                  {th('demos.benefit1Title')}
                 </h4>
                 <p className="text-secondary-600 dark:text-secondary-400">
-                  Desarrollo personalizado adaptado a las necesidades específicas de tu industria y modelo de negocio.
+                  {th('demos.benefit1Desc')}
                 </p>
               </div>
               <div className="text-center">
@@ -262,10 +261,10 @@ export default function HomePage() {
                   <CurrencyDollarIcon className="h-8 w-8 text-white" />
                 </div>
                 <h4 className="text-lg font-bold text-secondary-900 dark:text-white mb-2">
-                  Tecnología de Vanguardia
+                  {th('demos.benefit2Title')}
                 </h4>
                 <p className="text-secondary-600 dark:text-secondary-400">
-                  React, Next.js, TypeScript, inteligencia artificial y las mejores prácticas del desarrollo moderno.
+                  {th('demos.benefit2Desc')}
                 </p>
               </div>
               <div className="text-center">
@@ -273,10 +272,10 @@ export default function HomePage() {
                   <ShieldCheckIcon className="h-8 w-8 text-white" />
                 </div>
                 <h4 className="text-lg font-bold text-secondary-900 dark:text-white mb-2">
-                  Soporte Continuo
+                  {th('demos.benefit3Title')}
                 </h4>
                 <p className="text-secondary-600 dark:text-secondary-400">
-                  Actualizaciones, mantenimiento y soporte técnico para garantizar que tu solución evolucione con tu negocio.
+                  {th('demos.benefit3Desc')}
                 </p>
               </div>
             </div>

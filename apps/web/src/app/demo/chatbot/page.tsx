@@ -29,7 +29,6 @@ import {
   FaFont,
 } from 'react-icons/fa';
 import { useChatbot } from '@/hooks/useChatbot';
-import Link from 'next/link';
 
 type TabType = 'documents' | 'chat' | 'design' | 'typography' | 'restrictions' | 'embed';
 
@@ -56,15 +55,14 @@ interface RestrictionsConfig {
 }
 
 export default function DemoPage() {
-  const t = useTranslations('demos');
-  const tc = useTranslations('common');
+  const tcb = useTranslations('chatbotBuilder');
 
   const [activeTab, setActiveTab] = useState<TabType>('documents');
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [chatConfig, setChatConfig] = useState<ChatConfig>({
-    greeting: '¡Hola! 👋 Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?',
-    title: 'Asistente Virtual',
-    placeholder: 'Escribe tu mensaje aquí...',
+    greeting: tcb('defaults.greeting'),
+    title: tcb('defaults.title'),
+    placeholder: tcb('defaults.placeholder'),
   });
   const [designConfig, setDesignConfig] = useState<DesignConfig>({
     textColor: '#1F2937',
@@ -86,6 +84,26 @@ export default function DemoPage() {
   const [embedCopied, setEmbedCopied] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  const chatIcons = [
+    { id: 'FaComments', icon: FaComments, label: tcb('design.icons.bubbles') },
+    { id: 'FaRegCommentDots', icon: FaRegCommentDots, label: tcb('design.icons.dots') },
+    { id: 'FaRocketchat', icon: FaRocketchat, label: tcb('design.icons.rocket') },
+    { id: 'FaRobot', icon: FaRobot, label: tcb('design.icons.robot') },
+    { id: 'FaComment', icon: FaComment, label: tcb('design.icons.comment') },
+  ];
+
+  const fontOptions = [
+    { id: 'Inter', label: 'Inter', preview: 'font-sans' },
+    { id: 'Roboto', label: 'Roboto', preview: 'font-sans' },
+    { id: 'Open Sans', label: 'Open Sans', preview: 'font-sans' },
+    { id: 'Lato', label: 'Lato', preview: 'font-sans' },
+    { id: 'Montserrat', label: 'Montserrat', preview: 'font-sans' },
+    { id: 'Poppins', label: 'Poppins', preview: 'font-sans' },
+    { id: 'Raleway', label: 'Raleway', preview: 'font-sans' },
+    { id: 'Playfair Display', label: 'Playfair Display', preview: 'font-serif' },
+    { id: 'Merriweather', label: 'Merriweather', preview: 'font-serif' },
+  ];
 
   // Memoize chatbot config to prevent unnecessary re-renders and API calls
   const chatbotConfig = useMemo(() => ({
@@ -132,26 +150,6 @@ export default function DemoPage() {
     }
   }, [messages, isLoading]);
 
-  const chatIcons = [
-    { id: 'FaComments', icon: FaComments, label: 'Burbujas' },
-    { id: 'FaRegCommentDots', icon: FaRegCommentDots, label: 'Puntos' },
-    { id: 'FaRocketchat', icon: FaRocketchat, label: 'Cohete' },
-    { id: 'FaRobot', icon: FaRobot, label: 'Robot' },
-    { id: 'FaComment', icon: FaComment, label: 'Comentario' },
-  ];
-
-  const fontOptions = [
-    { id: 'Inter', label: 'Inter', preview: 'font-sans' },
-    { id: 'Roboto', label: 'Roboto', preview: 'font-sans' },
-    { id: 'Open Sans', label: 'Open Sans', preview: 'font-sans' },
-    { id: 'Lato', label: 'Lato', preview: 'font-sans' },
-    { id: 'Montserrat', label: 'Montserrat', preview: 'font-sans' },
-    { id: 'Poppins', label: 'Poppins', preview: 'font-sans' },
-    { id: 'Raleway', label: 'Raleway', preview: 'font-sans' },
-    { id: 'Playfair Display', label: 'Playfair Display', preview: 'font-serif' },
-    { id: 'Merriweather', label: 'Merriweather', preview: 'font-serif' },
-  ];
-
   // Load Google Fonts dynamically
   useEffect(() => {
     const fonts = fontOptions.map(f => f.id.replace(' ', '+')).join('&family=');
@@ -164,9 +162,7 @@ export default function DemoPage() {
   // Sync uploadedFiles with uploadedDocuments from backend on page load
   useEffect(() => {
     if (uploadedDocuments.length > 0 && uploadedFiles.length === 0) {
-      // Create File objects from document names (for display purposes)
       const files = uploadedDocuments.map(docName => {
-        // Create a mock File object for display
         return new File([], docName, { type: 'application/octet-stream' });
       });
       setUploadedFiles(files);
@@ -188,7 +184,9 @@ export default function DemoPage() {
         const plural = newFiles.length > 1;
         addMessage({
           role: 'assistant',
-          content: `¡${plural ? 'Recibí los archivos' : 'Cargaste el archivo'} ${names}! 📄 Estoy disponible para ayudarte a resolver cualquier duda que tengas sobre ${plural ? 'ellos' : 'él'} o lo que necesites que te ayude.`,
+          content: plural
+            ? tcb('upload.plural', { names })
+            : tcb('upload.single', { name: names }),
         });
         setIsChatOpen(true);
         setActiveTab('chat');
@@ -295,12 +293,12 @@ export default function DemoPage() {
   const SelectedIcon = chatIcons.find(i => i.id === designConfig.icon)?.icon || FaComments;
 
   const tabs = [
-    { id: 'documents' as TabType, label: 'Documentos', icon: DocumentArrowUpIcon },
-    { id: 'chat' as TabType, label: 'Chat', icon: ChatBubbleLeftRightIcon },
-    { id: 'design' as TabType, label: 'Diseño', icon: PaintBrushIcon },
-    { id: 'typography' as TabType, label: 'Tipografía', icon: FaFont },
-    { id: 'restrictions' as TabType, label: 'Restricciones', icon: ShieldExclamationIcon },
-    { id: 'embed' as TabType, label: 'Embed', icon: CodeBracketIcon },
+    { id: 'documents' as TabType, label: tcb('tabs.documents'), icon: DocumentArrowUpIcon },
+    { id: 'chat' as TabType, label: tcb('tabs.chat'), icon: ChatBubbleLeftRightIcon },
+    { id: 'design' as TabType, label: tcb('tabs.design'), icon: PaintBrushIcon },
+    { id: 'typography' as TabType, label: tcb('tabs.typography'), icon: FaFont },
+    { id: 'restrictions' as TabType, label: tcb('tabs.restrictions'), icon: ShieldExclamationIcon },
+    { id: 'embed' as TabType, label: tcb('tabs.embed'), icon: CodeBracketIcon },
   ];
 
   return (
@@ -309,10 +307,10 @@ export default function DemoPage() {
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-secondary-900 dark:text-white mb-3 sm:mb-4">
-            Constructor de Chatbot Profesional
+            {tcb('pageTitle')}
           </h1>
           <p className="text-base sm:text-lg lg:text-xl text-secondary-600 dark:text-secondary-400 px-4 mb-6">
-            Personaliza tu chatbot con IA y pruébalo en tiempo real
+            {tcb('pageSubtitle')}
           </p>
 
           {/* Preview Button */}
@@ -321,7 +319,7 @@ export default function DemoPage() {
             className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors shadow-lg hover:shadow-xl"
           >
             <EyeIcon className="h-5 w-5" />
-            Abrir Preview en Pantalla Completa
+            {tcb('openPreview')}
             <ArrowTopRightOnSquareIcon className="h-4 w-4" />
           </button>
         </div>
@@ -360,10 +358,10 @@ export default function DemoPage() {
                   <div className="space-y-4 sm:space-y-6">
                     <div>
                       <h3 className="text-base sm:text-lg font-semibold text-secondary-900 dark:text-white mb-3 sm:mb-4">
-                        Subir Documentos
+                        {tcb('documents.title')}
                       </h3>
                       <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-3 sm:mb-4">
-                        Sube documentos que el chatbot usará como contexto para responder preguntas
+                        {tcb('documents.description')}
                       </p>
                     </div>
 
@@ -384,14 +382,14 @@ export default function DemoPage() {
                         <DocumentArrowUpIcon className="h-12 w-12 sm:h-16 sm:w-16 text-secondary-400" />
                         <div>
                           <p className="text-base sm:text-lg font-medium text-secondary-900 dark:text-white mb-1">
-                            Arrastra archivos aquí o haz clic para seleccionar
+                            {tcb('documents.dragDrop')}
                           </p>
                           <p className="text-xs sm:text-sm text-secondary-500">
-                            PDF, DOCX, TXT, CSV (máx. 10MB por archivo)
+                            {tcb('documents.fileTypes')}
                           </p>
                         </div>
                         <Button variant="outline" className="text-sm">
-                          Seleccionar Archivos
+                          {tcb('documents.selectFiles')}
                         </Button>
                       </div>
                     </div>
@@ -399,7 +397,7 @@ export default function DemoPage() {
                     {isUploading && (
                       <div className="p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
                         <p className="text-sm text-blue-800 dark:text-blue-200">
-                          Subiendo documentos...
+                          {tcb('documents.uploading')}
                         </p>
                       </div>
                     )}
@@ -415,7 +413,7 @@ export default function DemoPage() {
                     {uploadedFiles.length > 0 && (
                       <div className="space-y-2">
                         <h4 className="font-medium text-secondary-900 dark:text-white">
-                          Archivos Subidos ({uploadedFiles.length})
+                          {tcb('documents.uploadedFiles')} ({uploadedFiles.length})
                         </h4>
                         <div className="space-y-2">
                           {uploadedFiles.map((file, index) => (
@@ -453,50 +451,50 @@ export default function DemoPage() {
                   <div className="space-y-4 sm:space-y-6">
                     <div>
                       <h3 className="text-base sm:text-lg font-semibold text-secondary-900 dark:text-white mb-3 sm:mb-4">
-                        Configuración del Chat
+                        {tcb('chat.title')}
                       </h3>
                       <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-3 sm:mb-4">
-                        Personaliza los mensajes y textos del chatbot
+                        {tcb('chat.description')}
                       </p>
                     </div>
 
                     <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                          Título del Chatbot
+                          {tcb('chat.titleLabel')}
                         </label>
                         <input
                           type="text"
                           value={chatConfig.title}
                           onChange={(e) => setChatConfig({ ...chatConfig, title: e.target.value })}
                           className="w-full px-4 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                          placeholder="Ej: Asistente Virtual"
+                          placeholder={tcb('chat.titlePlaceholder')}
                         />
                       </div>
 
                       <div>
                         <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                          Mensaje de Saludo
+                          {tcb('chat.greetingLabel')}
                         </label>
                         <textarea
                           value={chatConfig.greeting}
                           onChange={(e) => setChatConfig({ ...chatConfig, greeting: e.target.value })}
                           rows={3}
                           className="w-full px-4 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                          placeholder="Ej: ¡Hola! ¿En qué puedo ayudarte?"
+                          placeholder={tcb('chat.greetingPlaceholder')}
                         />
                       </div>
 
                       <div>
                         <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                          Placeholder del Input
+                          {tcb('chat.placeholderLabel')}
                         </label>
                         <input
                           type="text"
                           value={chatConfig.placeholder}
                           onChange={(e) => setChatConfig({ ...chatConfig, placeholder: e.target.value })}
                           className="w-full px-4 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                          placeholder="Ej: Escribe tu mensaje..."
+                          placeholder={tcb('chat.placeholderPlaceholder')}
                         />
                       </div>
 
@@ -508,7 +506,7 @@ export default function DemoPage() {
                             className="w-full text-red-600 hover:text-red-700 hover:border-red-300 dark:text-red-400 dark:hover:text-red-300"
                           >
                             <TrashIcon className="h-4 w-4 mr-2" />
-                            Limpiar Conversación
+                            {tcb('chat.clearChat')}
                           </Button>
                         </div>
                       )}
@@ -521,10 +519,10 @@ export default function DemoPage() {
                   <div className="space-y-4 sm:space-y-6">
                     <div>
                       <h3 className="text-base sm:text-lg font-semibold text-secondary-900 dark:text-white mb-3 sm:mb-4">
-                        Diseño Visual
+                        {tcb('design.title')}
                       </h3>
                       <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-3 sm:mb-4">
-                        Personaliza los colores e icono del chatbot
+                        {tcb('design.description')}
                       </p>
                     </div>
 
@@ -532,7 +530,7 @@ export default function DemoPage() {
                       {/* Custom Icon Upload */}
                       <div>
                         <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-3">
-                          Icono Personalizado (Temporal)
+                          {tcb('design.customIcon')}
                         </label>
                         <div className="flex items-center gap-4">
                           <input
@@ -547,7 +545,7 @@ export default function DemoPage() {
                             className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-secondary-300 dark:border-secondary-700 rounded-lg hover:border-primary-500 transition-colors"
                           >
                             <PhotoIcon className="h-5 w-5 text-secondary-500" />
-                            <span className="text-sm">Subir Icono</span>
+                            <span className="text-sm">{tcb('design.uploadIcon')}</span>
                           </button>
                           {designConfig.customIconUrl && (
                             <div className="flex items-center gap-2">
@@ -560,7 +558,7 @@ export default function DemoPage() {
                                 onClick={() => setDesignConfig({ ...designConfig, customIconUrl: undefined })}
                                 className="text-xs text-red-600 hover:text-red-700"
                               >
-                                Eliminar
+                                {tcb('design.removeIcon')}
                               </button>
                             </div>
                           )}
@@ -570,7 +568,7 @@ export default function DemoPage() {
                       {/* Icon Selection */}
                       <div>
                         <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-3">
-                          O elige un icono predefinido
+                          {tcb('design.predefinedIcon')}
                         </label>
                         <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-3">
                           {chatIcons.map((iconItem) => {
@@ -601,7 +599,7 @@ export default function DemoPage() {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                            Color del Header
+                            {tcb('design.headerColor')}
                           </label>
                           <input
                             type="color"
@@ -613,7 +611,7 @@ export default function DemoPage() {
 
                         <div>
                           <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                            Color de Fondo
+                            {tcb('design.backgroundColor')}
                           </label>
                           <input
                             type="color"
@@ -625,7 +623,7 @@ export default function DemoPage() {
 
                         <div>
                           <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                            Color del Texto
+                            {tcb('design.textColor')}
                           </label>
                           <input
                             type="color"
@@ -644,10 +642,10 @@ export default function DemoPage() {
                   <div className="space-y-4 sm:space-y-6">
                     <div>
                       <h3 className="text-base sm:text-lg font-semibold text-secondary-900 dark:text-white mb-3 sm:mb-4">
-                        Tipografía
+                        {tcb('typography.title')}
                       </h3>
                       <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-3 sm:mb-4">
-                        Selecciona la fuente que mejor se adapte a tu marca
+                        {tcb('typography.description')}
                       </p>
                     </div>
 
@@ -680,10 +678,10 @@ export default function DemoPage() {
                   <div className="space-y-4 sm:space-y-6">
                     <div>
                       <h3 className="text-base sm:text-lg font-semibold text-secondary-900 dark:text-white mb-3 sm:mb-4">
-                        Temas Restringidos
+                        {tcb('restrictions.title')}
                       </h3>
                       <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-3 sm:mb-4">
-                        Configura temas de los que el chatbot NO debe hablar
+                        {tcb('restrictions.description')}
                       </p>
                     </div>
 
@@ -694,7 +692,7 @@ export default function DemoPage() {
                           value={newRestrictedTopic}
                           onChange={(e) => setNewRestrictedTopic(e.target.value)}
                           onKeyPress={(e) => e.key === 'Enter' && handleAddRestrictedTopic()}
-                          placeholder="Ej: Política, Religión, etc."
+                          placeholder={tcb('restrictions.placeholder')}
                           className="flex-1 px-4 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                         />
                         <Button
@@ -702,14 +700,14 @@ export default function DemoPage() {
                           disabled={!newRestrictedTopic.trim()}
                           className="whitespace-nowrap"
                         >
-                          Agregar
+                          {tcb('restrictions.add')}
                         </Button>
                       </div>
 
                       {restrictionsConfig.restrictedTopics.length > 0 && (
                         <div className="space-y-2">
                           <h4 className="font-medium text-secondary-900 dark:text-white">
-                            Temas Restringidos ({restrictionsConfig.restrictedTopics.length})
+                            {tcb('restrictions.topicsTitle')} ({restrictionsConfig.restrictedTopics.length})
                           </h4>
                           <div className="flex flex-wrap gap-2">
                             {restrictionsConfig.restrictedTopics.map((topic, index) => (
@@ -735,7 +733,7 @@ export default function DemoPage() {
 
                       <div className="p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
                         <p className="text-sm text-blue-800 dark:text-blue-200">
-                          <strong>Nota:</strong> El chatbot rechazará responder preguntas relacionadas con estos temas y redirigirá la conversación hacia temas permitidos.
+                          <strong>{tcb('restrictions.note')}:</strong> {tcb('restrictions.noteText')}
                         </p>
                       </div>
                     </div>
@@ -747,10 +745,10 @@ export default function DemoPage() {
                   <div className="space-y-4 sm:space-y-6">
                     <div>
                       <h3 className="text-base sm:text-lg font-semibold text-secondary-900 dark:text-white mb-3 sm:mb-4">
-                        Código de Inserción
+                        {tcb('embed.title')}
                       </h3>
                       <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-3 sm:mb-4">
-                        Copia este código para embeber el chatbot en tu sitio web
+                        {tcb('embed.description')}
                       </p>
                     </div>
 
@@ -777,7 +775,7 @@ export default function DemoPage() {
                           className="flex items-center justify-center gap-2 px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors"
                         >
                           <EyeIcon className="h-5 w-5" />
-                          Ver Preview
+                          {tcb('embed.viewPreview')}
                           <ArrowTopRightOnSquareIcon className="h-4 w-4" />
                         </button>
 
@@ -786,13 +784,13 @@ export default function DemoPage() {
                           className="flex items-center justify-center gap-2 px-4 py-3 bg-secondary-200 dark:bg-secondary-700 hover:bg-secondary-300 dark:hover:bg-secondary-600 text-secondary-900 dark:text-white font-medium rounded-lg transition-colors"
                         >
                           <ClipboardDocumentIcon className="h-5 w-5" />
-                          Copiar Código
+                          {tcb('embed.copyCode')}
                         </button>
                       </div>
 
                       <div className="p-4 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                         <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                          <strong>Importante:</strong> Los iconos personalizados son temporales y solo funcionan en esta sesión. Para uso en producción, sube el icono a tu servidor y usa la URL.
+                          <strong>{tcb('embed.important')}:</strong> {tcb('embed.importantText')}
                         </p>
                       </div>
                     </div>
@@ -807,7 +805,7 @@ export default function DemoPage() {
             <div className="lg:sticky lg:top-24">
               <Card variant="bordered">
                 <CardHeader>
-                  <CardTitle className="text-base sm:text-lg">Vista Previa</CardTitle>
+                  <CardTitle className="text-base sm:text-lg">{tcb('preview.title')}</CardTitle>
                 </CardHeader>
                 <CardContent className="p-3 sm:p-4">
                   <div className="bg-secondary-100 dark:bg-secondary-900 rounded-lg p-3 sm:p-4 h-[500px] sm:h-[550px] lg:h-[600px] flex items-end justify-end">
@@ -840,7 +838,7 @@ export default function DemoPage() {
                             {messages.length > 0 && (
                               <button
                                 onClick={() => clearMessages()}
-                                title="Vaciar chat"
+                                title={tcb('preview.clearTitle')}
                                 className="p-1 hover:bg-white/20 rounded-lg transition-colors"
                               >
                                 <TrashIcon className="h-5 w-5 text-white" />

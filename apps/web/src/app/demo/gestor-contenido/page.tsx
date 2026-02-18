@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   DocumentTextIcon,
   PresentationChartBarIcon,
@@ -37,10 +38,12 @@ interface SavedContent {
   type: string;
   date: string;
   favorite: boolean;
-  content: string; // Contenido de ejemplo
+  content: string;
 }
 
 export default function GestorContenido() {
+  const t = useTranslations('contentManager');
+
   const [view, setView] = useState<'templates' | 'editor'>('templates');
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [content, setContent] = useState('');
@@ -193,8 +196,7 @@ export default function GestorContenido() {
   };
 
   const openSavedContent = (item: SavedContent) => {
-    // Buscar la plantilla correspondiente al tipo de documento
-    const template = templates.find(t => t.name === item.type);
+    const template = templates.find(tmpl => tmpl.name === item.type);
     if (template) {
       setSelectedTemplate(template);
       setContent(item.content);
@@ -218,7 +220,7 @@ export default function GestorContenido() {
       const templateId = contentService.getTemplateId(selectedTemplate.name);
       const improved = await contentService.improveContent(content, templateId);
       setPreviewContent(improved);
-      setEditableFields({}); // Limpiar campos al generar nuevo contenido
+      setEditableFields({});
     } catch (err: any) {
       setError(err.message || 'Error al mejorar el texto');
     } finally {
@@ -240,7 +242,7 @@ export default function GestorContenido() {
       const templateId = contentService.getTemplateId(selectedTemplate.name);
       const adapted = await contentService.changeTone(content, newTone, templateId);
       setPreviewContent(adapted);
-      setEditableFields({}); // Limpiar campos al generar nuevo contenido
+      setEditableFields({});
     } catch (err: any) {
       setError(err.message || 'Error al cambiar el tono');
     } finally {
@@ -261,7 +263,7 @@ export default function GestorContenido() {
       const templateId = contentService.getTemplateId(selectedTemplate.name);
       const adjusted = await contentService.adjustLength(content, targetWords, templateId);
       setPreviewContent(adjusted);
-      setEditableFields({}); // Limpiar campos al generar nuevo contenido
+      setEditableFields({});
     } catch (err: any) {
       setError(err.message || 'Error al ajustar la longitud');
     } finally {
@@ -290,11 +292,9 @@ export default function GestorContenido() {
     }
   };
 
-  // Función para renderizar contenido con campos editables
   const renderEditableContent = (text: string) => {
     if (!text) return null;
 
-    // Patrón para encontrar texto entre corchetes [texto]
     const pattern = /\[([^\]]+)\]/g;
     const parts: (string | JSX.Element)[] = [];
     let lastIndex = 0;
@@ -302,12 +302,10 @@ export default function GestorContenido() {
     let fieldIndex = 0;
 
     while ((match = pattern.exec(text)) !== null) {
-      // Agregar texto antes del match
       if (match.index > lastIndex) {
         parts.push(text.substring(lastIndex, match.index));
       }
 
-      // Agregar campo editable
       const fieldKey = `field_${fieldIndex}`;
       const placeholder = match[1];
       const value = editableFields[fieldKey] || '';
@@ -327,7 +325,6 @@ export default function GestorContenido() {
       fieldIndex++;
     }
 
-    // Agregar texto restante
     if (lastIndex < text.length) {
       parts.push(text.substring(lastIndex));
     }
@@ -335,7 +332,6 @@ export default function GestorContenido() {
     return parts;
   };
 
-  // Función para obtener el texto final con los valores de los campos
   const getFinalContent = () => {
     const displayText = previewContent || content;
     if (!displayText) return '';
@@ -356,13 +352,12 @@ export default function GestorContenido() {
 
   const loadVersion = (version: contentService.ContentVersion) => {
     setContent(version.content);
-    setEditableFields({}); // Limpiar campos editables al cargar nueva versión
+    setEditableFields({});
     setPreviewContent(version.content);
     setTone(version.tone);
     setShowVersions(false);
   };
 
-  // Función para copiar al portapapeles
   const copyToClipboard = async () => {
     const finalText = getFinalContent();
     try {
@@ -375,7 +370,6 @@ export default function GestorContenido() {
     }
   };
 
-  // Función para descargar como archivo de texto
   const downloadAsTxt = () => {
     const finalText = getFinalContent();
     const blob = new Blob([finalText], { type: 'text/plain' });
@@ -390,27 +384,22 @@ export default function GestorContenido() {
     setShowExportMenu(false);
   };
 
-  // Función para descargar como PDF
   const downloadAsPdf = async () => {
     const finalText = getFinalContent();
     try {
       const { jsPDF } = await import('jspdf');
       const doc = new jsPDF();
 
-      // Configurar fuente y margenes
       doc.setFont('helvetica');
       doc.setFontSize(12);
 
-      // Título
       doc.setFontSize(16);
       doc.setFont('helvetica', 'bold');
       doc.text(selectedTemplate?.name || 'Documento', 20, 20);
 
-      // Contenido
       doc.setFontSize(11);
       doc.setFont('helvetica', 'normal');
 
-      // Dividir el texto en líneas que quepan en la página
       const lines = doc.splitTextToSize(finalText, 170);
       let yPosition = 35;
       const lineHeight = 7;
@@ -425,7 +414,6 @@ export default function GestorContenido() {
         yPosition += lineHeight;
       });
 
-      // Descargar
       doc.save(`${selectedTemplate?.name || 'documento'}.pdf`);
       setShowExportMenu(false);
     } catch (err) {
@@ -434,7 +422,6 @@ export default function GestorContenido() {
     }
   };
 
-  // Función para vista previa de email
   const [showEmailPreview, setShowEmailPreview] = useState(false);
 
   const previewAsEmail = () => {
@@ -442,7 +429,6 @@ export default function GestorContenido() {
     setShowExportMenu(false);
   };
 
-  // Evitar scroll automático al cargar la página
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [view]);
@@ -458,11 +444,11 @@ export default function GestorContenido() {
                 <DocumentTextIcon className="w-7 h-7 text-white" />
               </div>
               <h1 className="text-4xl font-bold text-slate-900 dark:text-white">
-                Gestor de Contenido Corporativo
+                {t('title')}
               </h1>
             </div>
             <p className="text-xl text-slate-600 dark:text-slate-400">
-              Crea textos empresariales profesionales con asistencia de IA
+              {t('subtitle')}
             </p>
           </div>
 
@@ -470,7 +456,7 @@ export default function GestorContenido() {
           <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6 mb-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-                Documentos Guardados
+                {t('savedDocs')}
               </h2>
               <div className="flex items-center gap-2">
                 <button className="px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
@@ -505,7 +491,7 @@ export default function GestorContenido() {
 
           {/* Templates Grid */}
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">
-            Selecciona una Plantilla
+            {t('selectTemplate')}
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -552,7 +538,7 @@ export default function GestorContenido() {
                 onClick={() => setView('templates')}
                 className="text-pink-600 dark:text-pink-400 hover:underline"
               >
-                ← Volver a plantillas
+                {t('backToTemplates')}
               </button>
               <div className="border-l border-slate-300 dark:border-slate-700 pl-4">
                 <h1 className="text-xl font-bold text-slate-900 dark:text-white">
@@ -571,7 +557,7 @@ export default function GestorContenido() {
                 className="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <ClockIcon className="w-4 h-4" />
-                Versiones {generatedVersions.length > 0 && `(${generatedVersions.length})`}
+                {t('versions')} {generatedVersions.length > 0 && `(${generatedVersions.length})`}
               </button>
               <div className="relative">
                 <button
@@ -579,7 +565,7 @@ export default function GestorContenido() {
                   className="px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-lg hover:from-pink-700 hover:to-purple-700 transition-all flex items-center gap-2 text-sm font-semibold"
                 >
                   <ArrowDownTrayIcon className="w-4 h-4" />
-                  Exportar
+                  {t('export')}
                 </button>
                 {showExportMenu && (
                   <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 z-10">
@@ -588,7 +574,7 @@ export default function GestorContenido() {
                       className="w-full px-4 py-3 text-left hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-sm flex items-center gap-2"
                     >
                       <DocumentTextIcon className="w-4 h-4" />
-                      Copiar al Portapapeles
+                      {t('copyToClipboard')}
                     </button>
                     {selectedTemplate?.name === 'Correo Corporativo' && (
                       <button
@@ -596,7 +582,7 @@ export default function GestorContenido() {
                         className="w-full px-4 py-3 text-left hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-sm flex items-center gap-2 border-t border-slate-200 dark:border-slate-700"
                       >
                         <EnvelopeIcon className="w-4 h-4" />
-                        Vista Previa Email
+                        {t('emailPreview')}
                       </button>
                     )}
                     <button
@@ -604,14 +590,14 @@ export default function GestorContenido() {
                       className="w-full px-4 py-3 text-left hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-sm flex items-center gap-2 border-t border-slate-200 dark:border-slate-700"
                     >
                       <ArrowDownTrayIcon className="w-4 h-4" />
-                      Descargar como PDF
+                      {t('downloadPdf')}
                     </button>
                     <button
                       onClick={downloadAsTxt}
                       className="w-full px-4 py-3 text-left hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-sm flex items-center gap-2 border-t border-slate-200 dark:border-slate-700"
                     >
                       <ArrowDownTrayIcon className="w-4 h-4" />
-                      Descargar como TXT
+                      {t('downloadTxt')}
                     </button>
                   </div>
                 )}
@@ -665,7 +651,7 @@ export default function GestorContenido() {
             <div className="bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-950 dark:to-purple-950 border-t border-pink-200 dark:border-pink-800 px-6 py-4">
               <div className="flex items-center gap-2 mb-3">
                 <SparklesIcon className="w-5 h-5 text-pink-600" />
-                <h3 className="font-semibold text-slate-900 dark:text-white">Herramientas IA</h3>
+                <h3 className="font-semibold text-slate-900 dark:text-white">{t('aiTools')}</h3>
               </div>
 
               {error && (
@@ -678,7 +664,7 @@ export default function GestorContenido() {
                 <div className="mb-3 p-3 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-800 rounded-lg">
                   <p className="text-sm text-blue-800 dark:text-blue-200 flex items-center gap-2">
                     <ArrowPathIcon className="w-4 h-4 animate-spin" />
-                    Procesando con IA...
+                    {t('processing')}
                   </p>
                 </div>
               )}
@@ -690,7 +676,7 @@ export default function GestorContenido() {
                   className="px-4 py-2 bg-white dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-sm font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <SparklesIcon className="w-4 h-4" />
-                  Mejorar Texto
+                  {t('improveText')}
                 </button>
                 <div className="flex gap-1 bg-white dark:bg-slate-800 rounded-lg p-1">
                   {(['formal', 'técnico', 'persuasivo'] as const).map((toneOption) => (
@@ -713,14 +699,14 @@ export default function GestorContenido() {
                   disabled={loading}
                   className="px-4 py-2 bg-white dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Ajustar a 200 palabras
+                  {t('adjustWords200')}
                 </button>
                 <button
                   onClick={() => adjustWordCount(500)}
                   disabled={loading}
                   className="px-4 py-2 bg-white dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Ajustar a 500 palabras
+                  {t('adjustWords500')}
                 </button>
                 <button
                   onClick={generateVersionsHandler}
@@ -728,7 +714,7 @@ export default function GestorContenido() {
                   className="px-4 py-2 bg-white dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-sm font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ArrowPathIcon className="w-4 h-4" />
-                  Generar Versiones
+                  {t('generateVersions')}
                 </button>
               </div>
             </div>
@@ -738,10 +724,10 @@ export default function GestorContenido() {
           <div className="w-1/2 bg-slate-50 dark:bg-slate-950 flex flex-col">
             <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4">
               <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                Previsualización
+                {t('preview')}
               </h2>
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                Vista en formato corporativo
+                {t('previewSubtitle')}
               </p>
             </div>
 
@@ -769,7 +755,7 @@ export default function GestorContenido() {
                     </div>
                   ) : (
                     <p className="text-slate-400 italic">
-                      El contenido aparecerá aquí mientras escribes...
+                      {t('contentPlaceholder')}
                     </p>
                   )}
                 </div>
@@ -777,7 +763,7 @@ export default function GestorContenido() {
                 {/* Footer */}
                 <div className="mt-12 pt-6 border-t-2 border-slate-200 dark:border-slate-800">
                   <p className="text-sm text-slate-500 text-center">
-                    Documento generado con KopTup Content Manager
+                    {t('docFooter')}
                   </p>
                 </div>
               </div>
@@ -799,7 +785,7 @@ export default function GestorContenido() {
                 <div className="flex items-center gap-3">
                   <ClockIcon className="w-6 h-6 text-pink-600" />
                   <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-                    Versiones Anteriores
+                    {t('prevVersions')}
                   </h2>
                 </div>
                 <button
@@ -813,7 +799,7 @@ export default function GestorContenido() {
               <div className="p-6">
                 {generatedVersions.length === 0 ? (
                   <div className="text-center py-8 text-slate-500">
-                    No hay versiones generadas aún. Usa el botón &quot;Generar Versiones&quot; para crear variaciones de tu contenido.
+                    {t('noVersions')}
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -836,7 +822,7 @@ export default function GestorContenido() {
                               onClick={() => loadVersion(version)}
                               className="px-3 py-1 bg-pink-100 dark:bg-pink-950 text-pink-600 dark:text-pink-400 rounded-lg hover:bg-pink-200 dark:hover:bg-pink-900 transition-colors text-sm font-medium"
                             >
-                              Cargar
+                              {t('load')}
                             </button>
                           </div>
                         </div>
@@ -853,15 +839,14 @@ export default function GestorContenido() {
         </>
       )}
 
-      {/* Modal de Vista Previa Email */}
+      {/* Email Preview Modal */}
       {showEmailPreview && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-            {/* Header del modal */}
             <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
               <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 <EnvelopeIcon className="w-6 h-6" />
-                Vista Previa de Email
+                {t('emailPreviewTitle')}
               </h3>
               <button
                 onClick={() => setShowEmailPreview(false)}
@@ -871,11 +856,8 @@ export default function GestorContenido() {
               </button>
             </div>
 
-            {/* Contenido del email */}
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
-              {/* Simulación de cliente de email */}
               <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
-                {/* Header del email */}
                 <div className="mb-6 pb-4 border-b border-slate-300 dark:border-slate-600">
                   <div className="flex items-center gap-4 mb-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
@@ -883,7 +865,7 @@ export default function GestorContenido() {
                     </div>
                     <div className="flex-1">
                       <div className="font-semibold text-slate-900 dark:text-white">
-                        Tu Empresa
+                        {t('yourCompany')}
                       </div>
                       <div className="text-sm text-slate-600 dark:text-slate-400">
                         contacto@tuempresa.com
@@ -891,32 +873,29 @@ export default function GestorContenido() {
                     </div>
                   </div>
                   <div className="text-sm text-slate-600 dark:text-slate-400 space-y-1">
-                    <div><span className="font-medium">Para:</span> cliente@ejemplo.com</div>
-                    <div><span className="font-medium">Asunto:</span> {selectedTemplate?.name}</div>
+                    <div><span className="font-medium">{t('emailTo')}</span> cliente@ejemplo.com</div>
+                    <div><span className="font-medium">{t('emailSubject')}</span> {selectedTemplate?.name}</div>
                   </div>
                 </div>
 
-                {/* Cuerpo del email */}
                 <div className="bg-white dark:bg-slate-900 rounded-lg p-6 shadow-sm">
                   <div className="prose dark:prose-invert max-w-none whitespace-pre-wrap font-sans text-slate-900 dark:text-white">
                     {getFinalContent()}
                   </div>
                 </div>
 
-                {/* Footer del email */}
                 <div className="mt-6 pt-4 border-t border-slate-300 dark:border-slate-600 text-xs text-slate-500 dark:text-slate-400 text-center">
-                  Este es un mensaje generado automáticamente. Por favor no responder a este correo.
+                  {t('autoGenerated')}
                 </div>
               </div>
             </div>
 
-            {/* Footer del modal */}
             <div className="p-6 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-3">
               <button
                 onClick={() => setShowEmailPreview(false)}
                 className="px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               >
-                Cerrar
+                {t('close')}
               </button>
               <button
                 onClick={() => {
@@ -925,7 +904,7 @@ export default function GestorContenido() {
                 }}
                 className="px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-lg hover:from-pink-700 hover:to-purple-700 transition-all"
               >
-                Copiar Email
+                {t('copyEmail')}
               </button>
             </div>
           </div>
