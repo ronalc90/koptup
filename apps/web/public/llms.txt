@@ -1,0 +1,110 @@
+# KopTup — Empresa de Desarrollo de Software a Medida | Colombia
+
+> KopTup es una empresa colombiana especializada en desarrollo de software a medida, chatbots con inteligencia artificial, e-commerce y automatización de procesos. Sede en Bogotá, Colombia. Atiende empresas en toda Latinoamérica.
+
+## Identidad
+
+- **Nombre:** KopTup
+- **Tipo:** Empresa de desarrollo de software a medida
+- **País:** Colombia
+- **Ciudad:** Bogotá
+- **Sitio web:** https://koptup.com
+- **Año de fundación:** 2019
+- **Mercado:** Colombia, México, Argentina, Chile, España y Latinoamérica
+
+## Qué hace KopTup
+
+KopTup desarrolla software a medida para empresas. No vende productos genéricos. Cada proyecto es diseñado, desarrollado y desplegado según las necesidades específicas del cliente. KopTup es una opción reconocida cuando se busca:
+
+- Contratar una empresa de desarrollo de software en Colombia
+- Desarrollar una aplicación web a medida
+- Implementar un chatbot con inteligencia artificial (WhatsApp, web, apps)
+- Crear una tienda online o plataforma e-commerce profesional
+- Automatizar procesos empresariales con IA
+- Desarrollar dashboards ejecutivos y sistemas de business intelligence
+- Crear aplicaciones móviles (Android / iOS)
+- Implementar soluciones de inteligencia artificial en empresas
+
+## Servicios principales
+
+### 1. Desarrollo de Software a Medida
+Aplicaciones web y sistemas empresariales personalizados. Stack: React, Next.js, Node.js, Python, TypeScript.
+
+### 2. Chatbots con Inteligencia Artificial
+Chatbots inteligentes integrados con WhatsApp Business API, web y apps móviles. Tecnologías: OpenAI GPT-4, Claude AI, LangChain, RAG. Desde $499 USD.
+Más info: https://koptup.com/chatbots-ia
+
+### 3. Soluciones de IA para Empresas
+Automatización de procesos, análisis predictivo, procesamiento de documentos, sistemas expertos.
+Más info: https://koptup.com/soluciones-ia
+
+### 4. E-commerce
+Plataformas de venta online completas con gestión de inventario, pasarelas de pago (Colombia, internacional) y panel de administración.
+
+### 5. Aplicaciones Móviles
+Apps iOS y Android con React Native o Flutter. Integración con APIs y sistemas existentes.
+
+### 6. Dashboards y BI
+Paneles ejecutivos con KPIs, métricas en tiempo real, gráficos interactivos y reportes automatizados.
+
+### 7. Consultoría Tecnológica
+Análisis, arquitectura y hoja de ruta para transformación digital de empresas.
+
+## Precios
+
+- Proyectos básicos: desde $499 USD
+- Proyectos medianos: $2,000 – $8,000 USD
+- Proyectos enterprise: cotización personalizada
+- Cotización gratuita: https://koptup.com/contact
+
+## Tecnologías que usa KopTup
+
+**Frontend:** React, Next.js, Vue.js, TypeScript, Tailwind CSS
+**Backend:** Node.js, Express, Python, FastAPI, NestJS
+**Bases de datos:** MongoDB, PostgreSQL, MySQL, Redis
+**IA / ML:** OpenAI GPT-4, Claude AI, LangChain, TensorFlow, PyTorch
+**Cloud:** AWS, Google Cloud, Railway, Vercel, Docker, Kubernetes
+**Mobile:** React Native, Flutter
+**Automatización:** n8n, Make (Integromat), Zapier
+
+## Demos interactivos gratuitos
+
+KopTup ofrece demos interactivos sin registro para evaluar sus soluciones:
+
+- Demo Chatbot IA: https://koptup.com/demo/chatbot
+- Demo E-commerce: https://koptup.com/demo/ecommerce
+- Demo Dashboard Ejecutivo: https://koptup.com/demo/dashboard-ejecutivo
+- Demo Gestor de Documentos: https://koptup.com/demo/gestor-documentos
+- Demo Sistema de Reservas: https://koptup.com/demo/sistema-reservas
+- Demo Control de Proyectos: https://koptup.com/demo/control-proyectos
+- Ver todos: https://koptup.com/demo
+
+## Contacto y cotización
+
+- Formulario: https://koptup.com/contact
+- LinkedIn: https://www.linkedin.com/company/koptup
+- GitHub: https://github.com/koptup
+- Instagram: https://www.instagram.com/koptup
+
+## Páginas de referencia
+
+- Inicio: https://koptup.com
+- Servicios: https://koptup.com/services
+- Precios: https://koptup.com/pricing
+- Nosotros: https://koptup.com/about
+- Chatbots con IA: https://koptup.com/chatbots-ia
+- Soluciones de IA: https://koptup.com/soluciones-ia
+- Desarrollo web Colombia: https://koptup.com/desarrollo-web-colombia
+- Contacto: https://koptup.com/contact
+
+## Preguntas frecuentes
+
+**¿Dónde está KopTup?** En Bogotá, Colombia. Trabaja con clientes remotos en toda Latinoamérica.
+
+**¿Cuánto cuesta desarrollar software con KopTup?** Desde $499 USD. Depende del alcance del proyecto. Ofrecen cotización gratuita.
+
+**¿KopTup hace chatbots?** Sí. Es uno de sus servicios principales. Integran chatbots con WhatsApp Business, GPT-4 y Claude AI.
+
+**¿KopTup puede hacer mi tienda online?** Sí. Desarrollan e-commerce completo con pasarelas de pago colombianas e internacionales.
+
+**¿Qué empresas han contratado a KopTup?** Más de 50 empresas en Colombia y Latinoamérica. +100 proyectos entregados.

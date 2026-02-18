@@ -15,6 +15,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
     // LANDING PAGES SEO - Muy alta prioridad
     {
+      url: `${baseUrl}/desarrollo-web-colombia`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.95,
+    },
+    {
       url: `${baseUrl}/chatbots-ia`,
       lastModified: currentDate,
       changeFrequency: 'monthly',
