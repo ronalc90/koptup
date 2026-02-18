@@ -101,7 +101,7 @@ export const metadata = {
       'max-snippet': -1,
     },
   },
-  // verification: { google: 'ADD_REAL_CODE_HERE' },
+  verification: { google: '3ec311666f8be2b7' },
   alternates: {
     canonical: 'https://koptup.com',
     languages: {
