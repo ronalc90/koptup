@@ -6,6 +6,7 @@ import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
+import { useTranslations } from 'next-intl';
 import {
   CreditCardIcon,
   DocumentArrowDownIcon,
@@ -15,6 +16,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 export default function BillingPage() {
+  const t = useTranslations('billingPage');
   const [invoices, setInvoices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -106,17 +108,17 @@ export default function BillingPage() {
     const badges: Record<string, { className: string; text: string; icon: any }> = {
       paid: {
         className: 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300',
-        text: 'Pagado',
+        text: t('paid'),
         icon: CheckCircleIcon,
       },
       pending: {
         className: 'bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300',
-        text: 'Pendiente',
+        text: t('pending'),
         icon: ClockIcon,
       },
       overdue: {
         className: 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300',
-        text: 'Vencido',
+        text: t('overdue'),
         icon: ExclamationTriangleIcon,
       },
     };
@@ -150,9 +152,9 @@ export default function BillingPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">Facturación y Pagos</h1>
+          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">{t('title')}</h1>
           <p className="text-secondary-600 dark:text-secondary-400">
-            Administra tus facturas y realiza pagos
+            {t('subtitle')}
           </p>
         </div>
 
@@ -160,36 +162,36 @@ export default function BillingPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card variant="bordered">
             <CardContent className="p-6">
-              <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">Pendiente</p>
+              <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">{t('pending')}</p>
               <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-400 mb-2">
                 ${totalPending.toFixed(2)}
               </p>
               <p className="text-xs text-secondary-500">
-                {invoices.filter(i => i.status === 'pending').length} facturas
+                {invoices.filter(i => i.status === 'pending').length} {t('invoices')}
               </p>
             </CardContent>
           </Card>
 
           <Card variant="bordered">
             <CardContent className="p-6">
-              <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">Vencido</p>
+              <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">{t('overdue')}</p>
               <p className="text-3xl font-bold text-red-600 dark:text-red-400 mb-2">
                 ${totalOverdue.toFixed(2)}
               </p>
               <p className="text-xs text-secondary-500">
-                {invoices.filter(i => i.status === 'overdue').length} facturas
+                {invoices.filter(i => i.status === 'overdue').length} {t('invoices')}
               </p>
             </CardContent>
           </Card>
 
           <Card variant="bordered">
             <CardContent className="p-6">
-              <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">Pagado</p>
+              <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">{t('paid')}</p>
               <p className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
                 ${totalPaid.toFixed(2)}
               </p>
               <p className="text-xs text-secondary-500">
-                {invoices.filter(i => i.status === 'paid').length} facturas
+                {invoices.filter(i => i.status === 'paid').length} {t('invoices')}
               </p>
             </CardContent>
           </Card>
@@ -219,16 +221,16 @@ export default function BillingPage() {
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 text-sm">
                   <div>
-                    <p className="text-secondary-600 dark:text-secondary-400 mb-1">Emitida</p>
+                    <p className="text-secondary-600 dark:text-secondary-400 mb-1">{t('issued')}</p>
                     <p className="font-semibold text-secondary-900 dark:text-white">{invoice.issueDate}</p>
                   </div>
                   <div>
-                    <p className="text-secondary-600 dark:text-secondary-400 mb-1">Vencimiento</p>
+                    <p className="text-secondary-600 dark:text-secondary-400 mb-1">{t('dueDate')}</p>
                     <p className="font-semibold text-secondary-900 dark:text-white">{invoice.dueDate}</p>
                   </div>
                   {invoice.paidDate && (
                     <div>
-                      <p className="text-secondary-600 dark:text-secondary-400 mb-1">Pagada</p>
+                      <p className="text-secondary-600 dark:text-secondary-400 mb-1">{t('paidDate')}</p>
                       <p className="font-semibold text-secondary-900 dark:text-white">{invoice.paidDate}</p>
                     </div>
                   )}
@@ -236,13 +238,13 @@ export default function BillingPage() {
 
                 <div className="border-t border-secondary-200 dark:border-secondary-700 pt-4 mb-4">
                   <h4 className="text-sm font-semibold text-secondary-900 dark:text-white mb-3">
-                    Detalles
+                    {t('details')}
                   </h4>
                   <div className="space-y-2">
                     {invoice.items?.map((item: any, idx: number) => (
                       <div key={idx} className="flex items-center justify-between text-sm">
                         <span className="text-secondary-600 dark:text-secondary-400">
-                          {item.description || 'Sin descripción'}
+                          {item.description || t('noDescription')}
                         </span>
                         <span className="font-semibold text-secondary-900 dark:text-white">
                           ${Number(item.amount ?? item.total ?? 0).toFixed(2)}
@@ -255,12 +257,12 @@ export default function BillingPage() {
                 <div className="flex gap-3">
                   <Button variant="outline" size="sm" onClick={() => downloadInvoice(invoice.id)}>
                     <DocumentArrowDownIcon className="h-4 w-4 mr-2" />
-                    Descargar PDF
+                    {t('downloadPdf')}
                   </Button>
                   {invoice.status !== 'paid' && (
                     <Button size="sm" onClick={() => payInvoice(invoice)}>
                       <CreditCardIcon className="h-4 w-4 mr-2" />
-                      Pagar Ahora
+                      {t('payNow')}
                     </Button>
                   )}
                 </div>

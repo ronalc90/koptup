@@ -32,7 +32,7 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
   },
 
-  // Security headers
+  // Security & SEO headers
   async headers() {
     return [
       {
@@ -59,9 +59,33 @@ const nextConfig = {
             value: 'strict-origin-when-cross-origin'
           },
           {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=(self)'
+          },
+          {
             key: 'Content-Security-Policy',
             value:
               `default-src 'self' https://www.google.com; img-src 'self' data: https://koptup-uploads.s3.amazonaws.com https://images.unsplash.com https://media.licdn.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' ${API_ORIGIN} http://localhost:3001 https://*.railway.app https://koptup-uploads.s3.amazonaws.com; frame-src 'self' https://www.google.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'`
+          }
+        ]
+      },
+      // Cache static assets aggressively
+      {
+        source: '/(.*)\\.(ico|png|jpg|jpeg|gif|svg|webp|avif|woff|woff2)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          }
+        ]
+      },
+      // Cache manifest and robots
+      {
+        source: '/(manifest\\.json|robots\\.txt|sitemap\\.xml)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400'
           }
         ]
       }

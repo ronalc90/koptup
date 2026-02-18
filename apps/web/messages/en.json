@@ -27,6 +27,11 @@
       "clients": "Satisfied clients",
       "support": "Support",
       "rating": "Average rating"
+    },
+    "cta": {
+      "title": "Ready to start your project?",
+      "subtitle": "Tell us your goals and we’ll design the best plan",
+      "button": "View Plans"
     }
   },
   "services": {
@@ -233,19 +238,6 @@
       "subtitle": "Schedule a free consultation and discover how we can help you",
       "ctaSchedule": "Schedule Consultation",
       "ctaPricing": "View Plans"
-    }
-  },
-  "homePage": {
-    "stats": {
-      "projects": "Projects completed",
-      "clients": "Satisfied clients",
-      "support": "Support",
-      "rating": "Average rating"
-    },
-    "cta": {
-      "title": "Ready to start your project?",
-      "subtitle": "Tell us your goals and we’ll design the best plan",
-      "button": "View Plans"
     }
   },
   "privacyPage": {
@@ -660,8 +652,7 @@
       "subtitle": "Contact us for a tailored quote for your needs",
       "button": "Request Custom Quote"
     }
-  }
-  ,
+  },
   "demos": {
     "badge": "Interactive Demos",
     "title": "Try Our Solutions",
@@ -754,7 +745,7 @@
     "accessModal": {
       "openButton": "Access with code",
       "title": "Private Demo Access",
-      "description": "Enter the code to access the private medical auditing demo",
+      "description": "Enter the code to access the private demo",
       "label": "Access code",
       "placeholder": "Eg. 2020",
       "cancel": "Cancel",
@@ -762,8 +753,7 @@
       "noCodeHint": "Don't have a code? Contact our sales team.",
       "error": "Invalid code, please try again."
     }
-  }
-  ,
+  },
   "dashboardLayout": {
     "dashboard": "Dashboard",
     "myOrders": "My Orders",
@@ -774,6 +764,51 @@
     "myProfile": "My Profile",
     "settings": "Settings",
     "logout": "Logout"
+  },
+  "dashboardPage": {
+    "loading": "Loading dashboard...",
+    "welcomeBack": "Welcome back! 👋",
+    "summaryActive": "Here's a summary of your recent activity",
+    "summaryEmpty": "Your panel is ready. Start by exploring our services.",
+    "onboarding": {
+      "title": "Start your first project",
+      "description": "Tell us your idea and we'll help make it a reality. Explore our demos to see what we can build for you.",
+      "requestQuote": "Request Quote",
+      "viewDemos": "View Demos",
+      "exploreServices": "Explore Services"
+    },
+    "kpis": {
+      "activeOrders": "Active Orders",
+      "pendingConfirmation": "{count} pending confirmation",
+      "activeProjects": "Active Projects",
+      "avgProgress": "Average progress: {percent}%",
+      "pendingBalance": "Pending Balance",
+      "nextDue": "Next due: {date}",
+      "unreadMessages": "Unread Messages",
+      "totalMessages": "{count} total messages"
+    },
+    "recentOrders": "Recent Orders",
+    "activeProjectsSection": "Active Projects",
+    "viewAll": "View all",
+    "nextMilestone": "Next milestone: {milestone}",
+    "progress": "Progress",
+    "deadline": "Deadline: {date}",
+    "upcomingDeadlines": "Upcoming Deadlines",
+    "quickActions": "Quick Actions",
+    "newProject": "New Project",
+    "contactSupport": "Contact Support",
+    "payInvoice": "Pay Invoice",
+    "status": {
+      "active": "Active",
+      "in_progress": "In Progress",
+      "pending": "Pending",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "defaults": {
+      "inProcess": "In progress",
+      "noDate": "No date"
+    }
   },
   "settingsPage": {
     "title": "Settings",
@@ -890,7 +925,14 @@
     "noAccount": "Don't have an account?",
     "signUpLink": "Create account",
     "backHome": "Back to home",
-    "errorFields": "Please check your email and password."
+    "errorFields": "Please check your email and password.",
+    "sessionExpired": "Your session has expired. Please sign in again.",
+    "errorGoogle": "Could not sign in with Google. Please try again or register first.",
+    "errorGeneric": "An error occurred during sign in. Please try again.",
+    "errorCredentials": "Email or password is incorrect. If you don't have an account, register first.",
+    "errorNotFound": "We couldn't find an account with this email. Would you like to create a new account?",
+    "errorNetwork": "Could not connect to the server. Please check your internet connection.",
+    "createAccount": "Create account"
   },
   "registerPage": {
     "title": "Create Account",
@@ -1090,12 +1132,23 @@
       "5": "More than $25,000"
     },
     "info": {
-      "email": { "title": "Email" },
-      "phone": { "title": "Phone" },
-      "location": { "title": "Location" },
-      "hours": { "title": "Hours", "value": "Mon - Fri: 8am - 6pm" }
+      "email": {
+        "title": "Email"
+      },
+      "phone": {
+        "title": "Phone"
+      },
+      "location": {
+        "title": "Location"
+      },
+      "hours": {
+        "title": "Hours",
+        "value": "Mon - Fri: 8am - 6pm"
+      }
     },
-    "social": { "title": "Follow Us on Social Media" },
+    "social": {
+      "title": "Follow Us on Social Media"
+    },
     "schedule": {
       "title": "Schedule a Call",
       "subtitle": "Schedule a free 30-minute consultation",
@@ -1118,6 +1171,349 @@
           "answer": "Absolutely! We have flexible plans and guidance."
         }
       }
+    }
+  },
+  "docManager": {
+    "buttons": {
+      "uploadFile": "Upload File"
+    },
+    "folders": {
+      "title": "Folders",
+      "newFolder": "New Folder",
+      "general": "General"
+    },
+    "search": {
+      "placeholder": "Search documents...",
+      "aiSearch": "AI Semantic Search"
+    },
+    "filters": {
+      "title": "Filters"
+    },
+    "upload": {
+      "dragDrop": "Drag files here or click to select",
+      "supports": "Supports PDF, DOCX, TXT (max 10MB)",
+      "processing": "Processing... {percent}%"
+    },
+    "states": {
+      "loading": "Loading documents...",
+      "error": "Error loading documents",
+      "empty": "No documents"
+    },
+    "trash": {
+      "warning": "Documents in trash will be permanently deleted after 30 days"
+    },
+    "viewer": {
+      "aiSummary": "AI Summary",
+      "keywords": "Keywords",
+      "entities": "Detected Entities",
+      "moveToFolder": "Move to Folder",
+      "explainWithAI": "Explain with AI",
+      "generatingExplanation": "Generating explanation...",
+      "explanationTitle": "Document Explanation",
+      "moveToTrash": "Move to Trash"
+    },
+    "semantic": {
+      "title": "Semantic Search Results",
+      "query": "Query: \"{query}\"",
+      "searching": "Searching...",
+      "noResults": "No results found",
+      "why": "Why this result?",
+      "similarPercent": "{percent}% similarity",
+      "explainError": "Error explaining: {error}"
+    },
+    "similar": {
+      "title": "Similar Documents",
+      "subtitle": "Based on content",
+      "analyzing": "Analyzing similarity..."
+    },
+    "rename": {
+      "placeholder": "New name",
+      "submit": "Rename"
+    },
+    "newFolder": {
+      "title": "New Folder",
+      "placeholder": "Folder name",
+      "submit": "Create"
+    },
+    "pinDelete": {
+      "title": "Delete Document",
+      "description": "This action cannot be undone. Enter the PIN to confirm.",
+      "placeholder": "Enter PIN",
+      "defaultPin": "Default PIN: 2020",
+      "submit": "Delete"
+    },
+    "common": {
+      "cancel": "Cancel",
+      "ok": "OK"
+    }
+  },
+  "demoCTA": {
+    "title": "Want something like this for your business?",
+    "titleWithName": "Need a {demoName} like this?",
+    "description": "We develop custom software tailored to your company's needs. Request a no-obligation quote.",
+    "requestQuote": "Request Quote",
+    "viewPricing": "View Plans & Pricing"
+  },
+  "demoEcommerce": {
+    "title": "Demo Store",
+    "checkout": "Checkout",
+    "products": "Products",
+    "categoriesLabel": "Categories",
+    "addToCart": "Add to Cart",
+    "viewCart": "View Cart",
+    "total": "Total",
+    "continue": "Continue Shopping",
+    "outOfStock": "Out of Stock",
+    "searchPlaceholder": "Search products...",
+    "allProducts": "All Products",
+    "adminPanel": "Admin Panel",
+    "banner": {
+      "title": "Special Offers",
+      "description": "Discover our best deals with free shipping",
+      "specialOffer": "Special Offer",
+      "freeShipping": "Free Shipping",
+      "priceGuarantee": "Best Price Guaranteed"
+    },
+    "categories": {
+      "all": "All",
+      "electronics": "Electronics",
+      "fashion": "Fashion",
+      "home": "Home",
+      "sports": "Sports"
+    },
+    "searchResults": "Search results for",
+    "productsCategory": "Products in",
+    "noProducts": "No products found",
+    "myWishlist": "My Wishlist",
+    "viewAllProducts": "View All Products",
+    "wishlistEmpty": "Your wishlist is empty",
+    "wishlistEmptyDesc": "Add products to your wishlist to see them here",
+    "cart": {
+      "title": "Cart",
+      "empty": "Your cart is empty"
+    },
+    "product": {
+      "view": "View Product",
+      "reviews": "reviews",
+      "category": "Category",
+      "stock": "Stock",
+      "inStock": "In Stock"
+    },
+    "sections": {
+      "featured": "Featured Products",
+      "bestsellers": "Best Sellers"
+    }
+  },
+  "adminHome": {
+    "orders": "Orders",
+    "ordersDesc": "Review and update order statuses.",
+    "goToOrders": "Go to orders",
+    "deliverables": "Deliverables",
+    "deliverablesDesc": "Approve or reject deliverables.",
+    "goToDeliverables": "Go to deliverables",
+    "invoices": "Invoices",
+    "invoicesDesc": "View invoices and statuses.",
+    "goToInvoices": "Go to invoices"
+  },
+  "adminOrders": {
+    "title": "Orders",
+    "subtitle": "Manage client orders and approve or reject requests",
+    "approvalStatus": "Approval Status",
+    "orderStatus": "Order Status",
+    "all": "All",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "allOrders": "All orders",
+    "noOrders": "No orders to display",
+    "client": "Client",
+    "date": "Date",
+    "orderItems": "Order items",
+    "perUnit": "ea",
+    "clientDescription": "Client project description",
+    "attachments": "Attachments",
+    "rejectionReason": "Rejection reason",
+    "orderApproval": "Order approval",
+    "reApprove": "Re-approve",
+    "approveOrder": "Approve Order",
+    "rejectOrder": "Reject Order",
+    "changeOrderStatus": "Change order status",
+    "startProgress": "Start Progress",
+    "markShipped": "Mark as Shipped",
+    "completeOrder": "Complete Order",
+    "viewConversation": "View Client Conversation",
+    "rejectModalTitle": "Reject Order",
+    "rejectModalDesc": "Why do you want to reject order",
+    "rejectPlaceholder": "Enter the reason for rejection...",
+    "cancel": "Cancel",
+    "confirmApprove": "Approve order {id} from {name}?",
+    "confirmStatusChange": "Change order status to \"{status}\"?",
+    "approvedSuccess": "Order approved successfully",
+    "approveError": "Error approving order",
+    "rejectedSuccess": "Order rejected",
+    "rejectError": "Error rejecting order",
+    "statusUpdated": "Status updated successfully",
+    "statusUpdateError": "Error updating status",
+    "notSpecified": "Not specified",
+    "approvalBadge": {
+      "pending": "Pending Approval",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    }
+  },
+  "profilePage": {
+    "title": "My Profile",
+    "subtitle": "Manage your personal information and preferences",
+    "personalInfo": "Personal Information",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "changePhoto": "Change photo",
+    "fullName": "Full name",
+    "email": "Email",
+    "phone": "Phone",
+    "companyRole": "Company role",
+    "companyInfo": "Company Information",
+    "companyName": "Company name",
+    "taxId": "Tax ID",
+    "country": "Country",
+    "address": "Address",
+    "city": "City",
+    "postalCode": "Postal code",
+    "changePassword": "Change Password",
+    "changePasswordDesc": "Update your password to keep your account secure",
+    "currentPassword": "Current password",
+    "currentPasswordPlaceholder": "Enter your current password",
+    "newPassword": "New password",
+    "newPasswordPlaceholder": "Minimum 8 characters",
+    "confirmNewPassword": "Confirm new password",
+    "confirmNewPasswordPlaceholder": "Confirm your new password",
+    "permissions": "Permissions",
+    "viewProjects": "View projects",
+    "createOrders": "Create orders",
+    "manageBilling": "Manage billing",
+    "inviteUsers": "Invite users",
+    "companySettings": "Company settings",
+    "notificationPrefs": "Notification Preferences",
+    "emailOrders": "Orders by email",
+    "emailProjects": "Projects by email",
+    "emailBilling": "Billing by email",
+    "emailMessages": "Messages by email",
+    "pushNotifications": "Push notifications",
+    "weeklyReport": "Weekly report",
+    "savePreferences": "Save Preferences",
+    "passwordMismatch": "Passwords do not match",
+    "passwordUpdated": "Password updated successfully",
+    "preferencesSaved": "Preferences saved",
+    "roles": {
+      "owner": "Owner",
+      "admin": "Administrator",
+      "member": "Member",
+      "viewer": "Viewer"
+    }
+  },
+  "ordersPage": {
+    "title": "My Orders",
+    "subtitle": "Manage and track all your orders",
+    "newOrder": "New Order",
+    "searchPlaceholder": "Search by name or ID...",
+    "noOrders": "No orders found",
+    "items": "items",
+    "viewDetail": "View Detail",
+    "invoice": "Invoice",
+    "status": {
+      "all": "All",
+      "pending": "Pending",
+      "in_progress": "In Progress",
+      "shipped": "Shipped",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "projectsPage": {
+    "title": "My Projects",
+    "subtitle": "Track the progress of all your projects",
+    "newProject": "New Project",
+    "noProjects": "You have no active projects",
+    "noProjectsDesc": "Start by requesting a new project to see its progress here",
+    "requestNewProject": "Request New Project",
+    "progress": "Progress",
+    "members": "members",
+    "manager": "Manager",
+    "team": "Team",
+    "startDate": "Start",
+    "deliveryDate": "Delivery",
+    "budgetUsed": "Budget used",
+    "remaining": "Remaining",
+    "projectPhases": "Project Phases",
+    "milestones": "Milestones",
+    "deliverables": "Deliverables",
+    "viewDeliverables": "View Deliverables",
+    "contactTeam": "Contact Team",
+    "noDescription": "No description",
+    "noDate": "No date",
+    "unassigned": "Unassigned",
+    "phases": {
+      "planning": "Planning",
+      "development": "Development",
+      "qa": "QA",
+      "delivery": "Delivery"
+    },
+    "status": {
+      "planning": "Planning",
+      "active": "Active",
+      "on_hold": "On Hold",
+      "completed": "Completed",
+      "in_progress": "In Progress",
+      "pending": "Pending",
+      "approved": "Approved",
+      "in_review": "In Review"
+    }
+  },
+  "billingPage": {
+    "title": "Billing & Payments",
+    "subtitle": "Manage your invoices and make payments",
+    "pending": "Pending",
+    "overdue": "Overdue",
+    "paid": "Paid",
+    "invoices": "invoices",
+    "issued": "Issued",
+    "dueDate": "Due Date",
+    "paidDate": "Paid",
+    "details": "Details",
+    "noDescription": "No description",
+    "downloadPdf": "Download PDF",
+    "payNow": "Pay Now"
+  },
+  "messagesPage": {
+    "title": "Messages",
+    "subtitle": "Communicate with the KopTup team about your projects",
+    "searchPlaceholder": "Search conversations...",
+    "noConversations": "No conversations found",
+    "noParticipants": "No participants",
+    "messagePlaceholder": "Write a message...",
+    "enterToSend": "Press Enter to send, Shift + Enter for new line",
+    "selectConversation": "Select a conversation to start",
+    "unknown": "Unknown",
+    "you": "You"
+  },
+  "deliverablesPage": {
+    "title": "Deliverables & Documents",
+    "subtitle": "File and deliverables repository by project",
+    "total": "Total",
+    "approved": "Approved",
+    "inReview": "In Review",
+    "rejected": "Rejected",
+    "all": "All",
+    "files": "files",
+    "approve": "Approve",
+    "reject": "Reject",
+    "rejectComments": "Rejection comments",
+    "rejectedByUser": "Rejected by user",
+    "status": {
+      "approved": "Approved",
+      "in_review": "In Review",
+      "rejected": "Rejected"
     }
   }
 }

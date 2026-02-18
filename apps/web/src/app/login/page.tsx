@@ -36,13 +36,13 @@ export default function LoginPage() {
     const sessionExpired = params.get('session');
 
     if (sessionExpired === 'expired') {
-      setSessionExpiredMessage('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+      setSessionExpiredMessage(t('sessionExpired'));
     }
 
     if (authError === 'auth_failed') {
-      setError('No se pudo iniciar sesión con Google. Por favor intenta nuevamente o regístrate primero.');
+      setError(t('errorGoogle'));
     } else if (authError) {
-      setError('Ocurrió un error durante el inicio de sesión. Por favor intenta nuevamente.');
+      setError(t('errorGeneric'));
     }
   }, []);
 
@@ -81,11 +81,11 @@ export default function LoginPage() {
       } else if (err.response?.data?.message) {
         friendlyMessage = err.response.data.message;
       } else if (err.response?.status === 401) {
-        friendlyMessage = 'El correo electrónico o la contraseña son incorrectos. Si no tienes cuenta, regístrate primero.';
+        friendlyMessage = t('errorCredentials');
       } else if (err.response?.status === 404) {
-        friendlyMessage = 'No encontramos una cuenta con este correo. ¿Quieres crear una cuenta nueva?';
+        friendlyMessage = t('errorNotFound');
       } else if (err.code === 'ERR_NETWORK') {
-        friendlyMessage = 'No se pudo conectar con el servidor. Por favor verifica tu conexión a internet.';
+        friendlyMessage = t('errorNetwork');
       }
 
       setError(friendlyMessage);
@@ -146,11 +146,11 @@ export default function LoginPage() {
               <div className="mb-6 p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">
                 <p className="text-sm text-red-600 dark:text-red-400">
                   {error}
-                  {error.includes('regístrate') && (
+                  {error.includes(t('signUpLink')) && (
                     <>
                       {' '}
                       <Link href="/register" className="font-semibold underline hover:text-red-700 dark:hover:text-red-300">
-                        Crear cuenta
+                        {t('createAccount')}
                       </Link>
                     </>
                   )}

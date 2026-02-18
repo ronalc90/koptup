@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
@@ -15,6 +16,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 export default function OrdersPage() {
+  const t = useTranslations('ordersPage');
   const [orders, setOrders] = useState<any[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -61,23 +63,23 @@ export default function OrdersPage() {
 
   const getStatusBadge = (status: string) => {
     const badges: Record<string, { className: string; text: string }> = {
-      pending: { className: 'bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300', text: 'Pendiente' },
-      in_progress: { className: 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300', text: 'En Proceso' },
-      shipped: { className: 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300', text: 'Enviado' },
-      completed: { className: 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300', text: 'Completado' },
-      cancelled: { className: 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300', text: 'Cancelado' },
+      pending: { className: 'bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300', text: t('status.pending') },
+      in_progress: { className: 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300', text: t('status.in_progress') },
+      shipped: { className: 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300', text: t('status.shipped') },
+      completed: { className: 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300', text: t('status.completed') },
+      cancelled: { className: 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300', text: t('status.cancelled') },
     };
     const badge = badges[status] || { className: 'bg-secondary-100', text: status };
     return <Badge variant="secondary" size="sm" className={badge.className}>{badge.text}</Badge>;
   };
 
   const statusOptions = [
-    { value: 'all', label: 'Todos' },
-    { value: 'pending', label: 'Pendiente' },
-    { value: 'in_progress', label: 'En Proceso' },
-    { value: 'shipped', label: 'Enviado' },
-    { value: 'completed', label: 'Completado' },
-    { value: 'cancelled', label: 'Cancelado' },
+    { value: 'all', label: t('status.all') },
+    { value: 'pending', label: t('status.pending') },
+    { value: 'in_progress', label: t('status.in_progress') },
+    { value: 'shipped', label: t('status.shipped') },
+    { value: 'completed', label: t('status.completed') },
+    { value: 'cancelled', label: t('status.cancelled') },
   ];
 
   if (loading) {
@@ -97,14 +99,14 @@ export default function OrdersPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">
-              Mis Pedidos
+              {t('title')}
             </h1>
             <p className="text-secondary-600 dark:text-secondary-400">
-              Gestiona y rastrea todos tus pedidos
+              {t('subtitle')}
             </p>
           </div>
           <Button asChild>
-            <Link href="/dashboard/orders/new">Nuevo Pedido</Link>
+            <Link href="/dashboard/orders/new">{t('newOrder')}</Link>
           </Button>
         </div>
 
@@ -118,7 +120,7 @@ export default function OrdersPage() {
                   <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-secondary-400" />
                   <input
                     type="text"
-                    placeholder="Buscar por nombre o ID..."
+                    placeholder={t('searchPlaceholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -153,7 +155,7 @@ export default function OrdersPage() {
             <Card variant="bordered">
               <CardContent className="p-12 text-center">
                 <p className="text-secondary-600 dark:text-secondary-400">
-                  No se encontraron pedidos
+                  {t('noOrders')}
                 </p>
               </CardContent>
             </Card>
@@ -179,7 +181,7 @@ export default function OrdersPage() {
                             <span>•</span>
                             <span>{order.date}</span>
                             <span>•</span>
-                            <span>{order.items} artículos</span>
+                            <span>{order.items} {t('items')}</span>
                             {order.tracking && (
                               <>
                                 <span>•</span>
@@ -202,13 +204,13 @@ export default function OrdersPage() {
                         <Button variant="outline" size="sm" asChild>
                           <Link href={`/dashboard/orders/${order.id}`}>
                             <EyeIcon className="h-4 w-4 mr-2" />
-                            Ver Detalle
+                            {t('viewDetail')}
                           </Link>
                         </Button>
                         {order.status === 'completed' && (
                           <Button variant="outline" size="sm">
                             <DocumentArrowDownIcon className="h-4 w-4 mr-2" />
-                            Factura
+                            {t('invoice')}
                           </Button>
                         )}
                       </div>

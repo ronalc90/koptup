@@ -6,6 +6,7 @@ import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
+import { useTranslations } from 'next-intl';
 import {
   MagnifyingGlassIcon,
   PaperClipIcon,
@@ -37,6 +38,7 @@ interface Conversation {
 }
 
 export default function MessagesPage() {
+  const t = useTranslations('messagesPage');
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -70,7 +72,7 @@ export default function MessagesPage() {
         Array.isArray(data) && data.length > 0
           ? data.map((c: any): Conversation => ({
               id: String(c.id || c._id || `conv-${Date.now()}`),
-              title: safeString(c.title || c.name || 'Sin título'),
+              title: safeString(c.title || c.name || ''),
               projectId: safeString(c.projectId || c.project?.id || c.project || ''),
               lastMessage: safeString(c.lastMessage || c.preview || ''),
               lastMessageTime: safeString(c.lastMessageTime || c.updatedAt || new Date().toISOString()),
@@ -101,7 +103,7 @@ export default function MessagesPage() {
       apiMessage.sender?.name ||
       apiMessage.sender?.email ||
       apiMessage.sender ||
-      'Desconocido'
+      t('unknown')
     );
     const content = safeString(apiMessage.content ?? apiMessage.text ?? apiMessage.body ?? '');
     const timestamp = safeString(apiMessage.timestamp || apiMessage.createdAt || new Date().toISOString());
@@ -164,7 +166,7 @@ export default function MessagesPage() {
     const optimisticMessage: Message = {
       id: `msg-temp-${Date.now()}`,
       senderId: 'current-user',
-      senderName: 'Tú',
+      senderName: t('you'),
       content: messageContent,
       timestamp: new Date().toISOString(),
       isOwnMessage: true,
@@ -261,9 +263,9 @@ export default function MessagesPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">Mensajes</h1>
+          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">{t('title')}</h1>
           <p className="text-secondary-600 dark:text-secondary-400">
-            Comunícate con el equipo de KopTup sobre tus proyectos
+            {t('subtitle')}
           </p>
         </div>
 
@@ -276,7 +278,7 @@ export default function MessagesPage() {
                     <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-secondary-400" />
                     <input
                       type="text"
-                      placeholder="Buscar conversaciones..."
+                      placeholder={t('searchPlaceholder')}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="w-full pl-10 pr-4 py-2 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -287,7 +289,7 @@ export default function MessagesPage() {
                 <div className="flex-1 overflow-y-auto space-y-2">
                   {filteredConversations.length === 0 ? (
                     <div className="text-center py-8">
-                      <p className="text-secondary-600 dark:text-secondary-400">No se encontraron conversaciones</p>
+                      <p className="text-secondary-600 dark:text-secondary-400">{t('noConversations')}</p>
                     </div>
                   ) : (
                     filteredConversations.map((conv) => (
@@ -340,7 +342,7 @@ export default function MessagesPage() {
                     <div>
                       <h3 className="text-lg font-semibold text-secondary-900 dark:text-white">{selectedConversation.title}</h3>
                       <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                        {selectedConversation.participants?.join(', ') || 'Sin participantes'}
+                        {selectedConversation.participants?.join(', ') || t('noParticipants')}
                       </p>
                     </div>
                     <Badge variant="primary" size="sm">
@@ -353,7 +355,7 @@ export default function MessagesPage() {
                   {messages.map((message) => {
                     const messageId = String(message?.id || `msg-${Date.now()}`);
                     const messageContent = typeof message?.content === 'string' ? message.content : safeString(message?.content);
-                    const messageSenderName = safeString(message?.senderName || 'Desconocido');
+                    const messageSenderName = safeString(message?.senderName || t('unknown'));
                     const messageTimestamp = safeString(message?.timestamp || new Date().toISOString());
                     const messageIsOwnMessage = Boolean(message?.isOwnMessage);
                     const messageStatus = message?.status || 'sent';
@@ -388,7 +390,7 @@ export default function MessagesPage() {
                   <div className="flex items-end gap-2">
                     <button
                       className="p-2 rounded-lg text-secondary-600 dark:text-secondary-400 hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors"
-                      title="Adjuntar archivo"
+                      title={t('title')}
                     >
                       <PaperClipIcon className="h-6 w-6" />
                     </button>
@@ -397,7 +399,7 @@ export default function MessagesPage() {
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
                         onKeyPress={handleKeyPress}
-                        placeholder="Escribe un mensaje..."
+                        placeholder={t('messagePlaceholder')}
                         rows={2}
                         className="w-full px-4 py-2 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
                       />
@@ -406,14 +408,14 @@ export default function MessagesPage() {
                       <PaperAirplaneIcon className="h-5 w-5" />
                     </Button>
                   </div>
-                  <p className="text-xs text-secondary-500 mt-2">Presiona Enter para enviar, Shift + Enter para nueva línea</p>
+                  <p className="text-xs text-secondary-500 mt-2">{t('enterToSend')}</p>
                 </div>
               </Card>
             ) : (
               <Card variant="bordered" className="h-full flex items-center justify-center">
                 <div className="text-center">
                   <UserCircleIcon className="h-16 w-16 text-secondary-400 mx-auto mb-4" />
-                  <p className="text-secondary-600 dark:text-secondary-400">Selecciona una conversación para comenzar</p>
+                  <p className="text-secondary-600 dark:text-secondary-400">{t('selectConversation')}</p>
                 </div>
               </Card>
             )}

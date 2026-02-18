@@ -14,34 +14,44 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
     '@type': 'Organization',
     name: 'KopTup',
     url: 'https://koptup.com',
-    logo: 'https://koptup.com/logo.png',
+    logo: 'https://koptup.com/logo.svg',
     description:
-      'Plataforma líder en auditoría médica automatizada con IA. Gestión de glosas, facturación hospitalaria y soluciones tecnológicas para el sector salud en Colombia.',
+      'Empresa de desarrollo de software a medida. Creamos aplicaciones web, móviles, e-commerce, chatbots con IA, dashboards y soluciones tecnológicas personalizadas para empresas en Colombia y Latinoamérica.',
     address: {
       '@type': 'PostalAddress',
+      streetAddress: 'Av. 68 #1-63',
+      addressLocality: 'Bogotá',
+      addressRegion: 'Cundinamarca',
       addressCountry: 'CO',
-      addressLocality: 'Colombia',
     },
     contactPoint: {
       '@type': 'ContactPoint',
-      contactType: 'Customer Service',
+      contactType: 'sales',
+      telephone: '+57-302-479-4842',
+      email: 'ronald@koptup.com',
       availableLanguage: ['Spanish', 'English'],
-      email: 'soporte@koptup.com',
     },
     sameAs: [
       'https://www.linkedin.com/company/koptup',
-      'https://twitter.com/koptup',
-      'https://www.facebook.com/koptup',
     ],
     founder: {
       '@type': 'Person',
       name: 'KopTup Team',
     },
     foundingDate: '2024',
-    areaServed: {
-      '@type': 'Country',
-      name: 'Colombia',
-    },
+    areaServed: [
+      { '@type': 'Country', name: 'Colombia' },
+      { '@type': 'GeoCircle', name: 'Latinoamérica' },
+    ],
+    knowsAbout: [
+      'Desarrollo de software a medida',
+      'Aplicaciones web',
+      'Aplicaciones móviles',
+      'E-commerce',
+      'Chatbots con IA',
+      'Dashboards empresariales',
+      'Automatización de procesos',
+    ],
   });
 
   const getWebsiteSchema = () => ({
@@ -50,7 +60,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
     name: 'KopTup',
     url: 'https://koptup.com',
     description:
-      'Auditoría médica automatizada con IA, gestión de glosas y facturación en salud para IPS, hospitales y clínicas en Colombia.',
+      'Desarrollo de software a medida para empresas. Prueba nuestras demos interactivas: e-commerce, chatbots IA, dashboards, gestión documental y más.',
     inLanguage: 'es-CO',
     potentialAction: {
       '@type': 'SearchAction',
@@ -65,123 +75,98 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
   const getSoftwareApplicationSchema = () => ({
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'KopTup - Auditoría Médica con IA',
-    applicationCategory: 'HealthApplication',
+    name: 'KopTup - Software a Medida',
+    applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
     offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'COP',
+      '@type': 'AggregateOffer',
+      lowPrice: '500',
+      highPrice: '50000',
+      priceCurrency: 'USD',
+      offerCount: '3',
     },
     description:
-      'Plataforma de auditoría médica automatizada con inteligencia artificial para la gestión de glosas, facturación hospitalaria y liquidación de cuentas médicas.',
+      'Plataforma de desarrollo de software empresarial a medida. E-commerce, chatbots con IA, dashboards, gestión documental, sistemas de reservas y más.',
     featureList: [
-      'Auditoría médica automatizada con IA',
-      'Gestión de glosas administrativas y técnicas',
-      'Facturación hospitalaria optimizada',
-      'Análisis de tarifas SOAT, ISS y contratos EPS',
-      'Liquidación automatizada de cuentas médicas',
-      'Validación de códigos CUPS y CIE-10',
-      'Chatbot médico inteligente',
-      'Gestión documental médica',
+      'E-commerce completo con pasarela de pagos',
+      'Chatbots inteligentes con IA',
+      'Dashboards ejecutivos con KPIs en tiempo real',
+      'Gestión documental con búsqueda avanzada',
+      'Sistemas de reservas online',
+      'CMS y gestión de contenido',
+      'Control de proyectos y tareas',
+      'Integraciones con APIs externas',
     ],
     aggregateRating: {
       '@type': 'AggregateRating',
       ratingValue: '4.8',
-      ratingCount: '127',
+      ratingCount: '50',
+      bestRating: '5',
     },
   });
 
-  const getMedicalServiceSchema = () => ({
+  const getServiceSchema = () => ({
     '@context': 'https://schema.org',
-    '@type': 'MedicalBusiness',
-    name: 'KopTup - Auditoría Médica',
+    '@type': 'ProfessionalService',
+    name: 'KopTup - Desarrollo de Software',
     description:
-      'Servicios de auditoría médica automatizada, gestión de glosas y optimización de facturación para instituciones de salud en Colombia.',
-    medicalSpecialty: [
-      'Auditoría Médica',
-      'Gestión de Glosas',
-      'Facturación en Salud',
-    ],
-    priceRange: '$$',
-    availableService: [
-      {
-        '@type': 'MedicalProcedure',
-        name: 'Auditoría Médica Automatizada',
-        description:
-          'Auditoría de cuentas médicas con inteligencia artificial, validación de tarifas y procedimientos.',
-      },
-      {
-        '@type': 'Service',
-        name: 'Gestión de Glosas',
-        description:
-          'Identificación, análisis y gestión de glosas administrativas y técnicas en facturación médica.',
-      },
-      {
-        '@type': 'Service',
-        name: 'Liquidación de Cuentas Médicas',
-        description:
-          'Liquidación automatizada de cuentas médicas con validación de tarifas SOAT, ISS y contratos EPS.',
-      },
-    ],
-  });
-
-  const getFAQSchema = () => ({
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: [
-      {
-        '@type': 'Question',
-        name: '¿Qué es la auditoría médica automatizada?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'La auditoría médica automatizada es un proceso que utiliza inteligencia artificial para revisar, validar y analizar cuentas médicas, procedimientos, tarifas y diagnósticos de forma automática, reduciendo errores y optimizando el proceso de facturación.',
+      'Servicios profesionales de desarrollo de software a medida para empresas. Aplicaciones web, móviles, e-commerce y soluciones con inteligencia artificial.',
+    priceRange: '$$ - $$$$',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'Av. 68 #1-63',
+      addressLocality: 'Bogotá',
+      addressCountry: 'CO',
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: '4.6097',
+      longitude: '-74.0817',
+    },
+    openingHoursSpecification: {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      opens: '08:00',
+      closes: '18:00',
+    },
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: 'Servicios de Desarrollo',
+      itemListElement: [
+        {
+          '@type': 'Offer',
+          itemOffered: {
+            '@type': 'Service',
+            name: 'Desarrollo Web a Medida',
+            description: 'Aplicaciones web personalizadas con React, Next.js y Node.js.',
+          },
         },
-      },
-      {
-        '@type': 'Question',
-        name: '¿Cómo ayuda KopTup a reducir las glosas médicas?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'KopTup identifica automáticamente posibles glosas antes de la radicación, valida tarifas contra contratos EPS (Nueva EPS, Salud Total, Compensar), verifica códigos CUPS y CIE-10, y sugiere correcciones para evitar rechazos.',
+        {
+          '@type': 'Offer',
+          itemOffered: {
+            '@type': 'Service',
+            name: 'E-Commerce',
+            description: 'Tiendas en línea completas con carrito, checkout y gestión de inventario.',
+          },
         },
-      },
-      {
-        '@type': 'Question',
-        name: '¿Qué tarifas maneja el sistema?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'KopTup maneja tarifas SOAT, ISS 2001, ISS 2004, y contratos específicos de EPS como Nueva EPS, Salud Total y Compensar. El sistema valida automáticamente que los valores cobrados correspondan a las tarifas contratadas.',
+        {
+          '@type': 'Offer',
+          itemOffered: {
+            '@type': 'Service',
+            name: 'Chatbots con IA',
+            description: 'Asistentes virtuales inteligentes para atención al cliente y automatización.',
+          },
         },
-      },
-      {
-        '@type': 'Question',
-        name: '¿Para qué instituciones está diseñado KopTup?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'KopTup está diseñado para IPS (Instituciones Prestadoras de Salud), hospitales, clínicas, centros médicos y cualquier institución que facture servicios de salud en Colombia.',
+        {
+          '@type': 'Offer',
+          itemOffered: {
+            '@type': 'Service',
+            name: 'Aplicaciones Móviles',
+            description: 'Apps nativas y multiplataforma para iOS y Android.',
+          },
         },
-      },
-      {
-        '@type': 'Question',
-        name: '¿Cómo funciona el chatbot médico?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'El chatbot médico de KopTup utiliza IA para responder consultas sobre normatividad en salud (Ley 100, Resolución 3047), tarifas, códigos CUPS, CIE-10, y procedimientos de facturación, basándose en documentos oficiales y contratos.',
-        },
-      },
-    ],
-  });
-
-  const getBreadcrumbSchema = (items: { name: string; url: string }[]) => ({
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: items.map((item, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      name: item.name,
-      item: item.url,
-    })),
+      ],
+    },
   });
 
   const getSchemaByType = () => {
@@ -191,7 +176,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
       case 'website':
         return getWebsiteSchema();
       case 'service':
-        return getMedicalServiceSchema();
+        return getServiceSchema();
       case 'softwareApplication':
         return getSoftwareApplicationSchema();
       case 'article':
@@ -219,34 +204,42 @@ export function FAQStructuredData() {
     mainEntity: [
       {
         '@type': 'Question',
-        name: '¿Qué es la auditoría médica automatizada?',
+        name: '¿Qué tipo de software desarrolla KopTup?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'La auditoría médica automatizada es un proceso que utiliza inteligencia artificial para revisar, validar y analizar cuentas médicas, procedimientos, tarifas y diagnósticos de forma automática, reduciendo errores y optimizando el proceso de facturación.',
+          text: 'Desarrollamos software a medida para empresas: e-commerce, chatbots con IA, dashboards ejecutivos, sistemas de gestión documental, plataformas de reservas, CMS, aplicaciones móviles y soluciones personalizadas según las necesidades de cada negocio.',
         },
       },
       {
         '@type': 'Question',
-        name: '¿Cómo ayuda KopTup a reducir las glosas médicas?',
+        name: '¿Puedo probar el software antes de contratar?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'KopTup identifica automáticamente posibles glosas antes de la radicación, valida tarifas contra contratos EPS (Nueva EPS, Salud Total, Compensar), verifica códigos CUPS y CIE-10, y sugiere correcciones para evitar rechazos.',
+          text: 'Sí. Ofrecemos demos interactivas y completamente funcionales de cada tipo de solución que desarrollamos. Puedes probar e-commerce, chatbot IA, dashboards, gestión documental, reservas y más directamente en nuestro sitio web antes de tomar cualquier decisión.',
         },
       },
       {
         '@type': 'Question',
-        name: '¿Qué tarifas maneja el sistema?',
+        name: '¿Cuánto cuesta desarrollar software a medida con KopTup?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'KopTup maneja tarifas SOAT, ISS 2001, ISS 2004, y contratos específicos de EPS como Nueva EPS, Salud Total y Compensar. El sistema valida automáticamente que los valores cobrados correspondan a las tarifas contratadas.',
+          text: 'Ofrecemos planes desde $499 USD para proyectos básicos hasta soluciones enterprise personalizadas. El costo final depende de la complejidad, funcionalidades y alcance del proyecto. Contacta con nosotros para recibir una cotización personalizada sin compromiso.',
         },
       },
       {
         '@type': 'Question',
-        name: '¿Para qué instituciones está diseñado KopTup?',
+        name: '¿Qué tecnologías utilizan?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'KopTup está diseñado para IPS (Instituciones Prestadoras de Salud), hospitales, clínicas, centros médicos y cualquier institución que facture servicios de salud en Colombia.',
+          text: 'Utilizamos tecnologías de vanguardia: React, Next.js, TypeScript, Node.js, Python, MongoDB, PostgreSQL e inteligencia artificial (OpenAI, Claude). Todas nuestras soluciones son escalables, seguras y optimizadas para rendimiento.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '¿Ofrecen soporte después del desarrollo?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Sí. Todos nuestros planes incluyen soporte técnico post-lanzamiento. Ofrecemos mantenimiento, actualizaciones, monitoreo y soporte continuo para garantizar que tu software evolucione con tu negocio.',
         },
       },
     ],
