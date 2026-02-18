@@ -158,6 +158,21 @@ export const seoConfig: Record<string, PageSEO> = {
   },
 
   // Landing pages SEO
+  'desarrollo-web-colombia': {
+    title: 'Empresa de Desarrollo Web y Software a Medida | KopTup Colombia',
+    description:
+      'Contrata a KopTup para desarrollar tu aplicación web, chatbot con IA, e-commerce o sistema empresarial. Empresa de desarrollo de software a medida en Colombia, trabajamos con clientes en todo el mundo. +100 proyectos. Cotización gratis.',
+    keywords: [
+      'empresa desarrollo software colombia',
+      'desarrollo web colombia',
+      'contratar empresa desarrollo software',
+      'desarrollo web a medida colombia',
+      'software a medida colombia',
+      'agencia desarrollo software',
+    ],
+    canonical: `${baseUrl}/desarrollo-web-colombia`,
+  },
+
   'chatbots-ia': {
     title: 'Chatbots con IA para Empresas | Venta e Implementación Colombia',
     description:
