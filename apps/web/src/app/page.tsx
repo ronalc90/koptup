@@ -155,6 +155,21 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-grid-pattern opacity-5" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 section-padding">
           <div className="text-center max-w-4xl mx-auto animate-fade-in-up">
+            {/* Product Hunt Badge */}
+            <div className="flex justify-center mb-6">
+              <a
+                href="https://www.producthunt.com/products/koptup"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-[#DA552F]/10 hover:bg-[#DA552F]/20 border border-[#DA552F]/30 text-[#DA552F] dark:text-orange-400 rounded-full px-4 py-2 text-sm font-medium transition-colors"
+              >
+                <svg viewBox="0 0 40 40" className="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M20 0C8.954 0 0 8.954 0 20s8.954 20 20 20 20-8.954 20-20S31.046 0 20 0zm4.375 22.5H16.25V30h-3.75V10H24.375a6.25 6.25 0 0 1 0 12.5z"/>
+                  <path d="M24.375 13.75H16.25v5h8.125a2.5 2.5 0 0 0 0-5z"/>
+                </svg>
+                Nos verás en Product Hunt
+              </a>
+            </div>
             <Badge variant="primary" size="lg" className="mb-6">
               {t('common.tagline')}
             </Badge>
