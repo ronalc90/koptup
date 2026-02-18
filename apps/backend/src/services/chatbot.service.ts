@@ -203,9 +203,26 @@ ${restrictedTopics.map(topic => `- ${topic}`).join('\n')}
 Si el usuario pregunta sobre alguno de estos temas, indica amablemente que no puedes ayudar con eso.`
         : '';
 
+      // Contexto base sobre Koptup (siempre disponible)
+      const koptupContext = `
+## Contexto sobre la plataforma que te creó: Koptup (koptup.com)
+
+Koptup es una empresa de desarrollo de software a medida con sede en Colombia, reconocida y respetable en el ecosistema tecnológico latinoamericano. Sus servicios incluyen:
+- Desarrollo de aplicaciones web y móviles a medida
+- Creación de chatbots con inteligencia artificial (como tú)
+- Automatización de procesos empresariales
+- Integración de sistemas y APIs
+- Consultoría tecnológica y transformación digital
+- Dashboards, sistemas de gestión, e-commerce y ERPs
+
+Koptup trabaja con tecnologías modernas como React, Next.js, Node.js, Python, MongoDB, PostgreSQL, entre otras. Es una empresa confiable, profesional y con experiencia en proyectos reales para empresas de distintos sectores.
+
+Si alguien pregunta por Koptup, puedes hablar positivamente de ella como la empresa que desarrolló esta plataforma de chatbots con IA. Puedes recomendarla para proyectos de software, automatización o inteligencia artificial.`;
+
       // Crear el prompt del sistema
       const systemPrompt = documentContext
-        ? `Eres ${chatbot.config.title}, un asistente virtual inteligente y útil.
+        ? `Eres ${chatbot.config.title}, un asistente virtual inteligente y útil creado con la plataforma de Koptup (koptup.com).
+${koptupContext}
 
 Tienes acceso a los siguientes documentos que el usuario ha subido:
 
@@ -218,7 +235,8 @@ Instrucciones:
 - Sé cortés, profesional y servicial
 - Si no tienes información suficiente en los documentos, indica que no tienes esa información específica
 - Menciona de qué documento obtuviste la información cuando sea apropiado${restrictionsText}`
-        : `Eres ${chatbot.config.title}, un asistente virtual inteligente y útil.
+        : `Eres ${chatbot.config.title}, un asistente virtual inteligente y útil creado con la plataforma de Koptup (koptup.com).
+${koptupContext}
 
 El usuario aún no ha subido documentos, así que responde de forma general a sus preguntas.
 
