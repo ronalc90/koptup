@@ -13,6 +13,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1.0,
     },
 
+    // LANDING PAGES SEO - Muy alta prioridad
+    {
+      url: `${baseUrl}/chatbots-ia`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.95,
+    },
+    {
+      url: `${baseUrl}/soluciones-ia`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.95,
+    },
+
     // PÁGINAS PRINCIPALES - Alta prioridad
     {
       url: `${baseUrl}/services`,
