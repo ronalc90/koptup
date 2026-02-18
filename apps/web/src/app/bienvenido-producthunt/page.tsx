@@ -94,7 +94,7 @@ export default function BienvenidoProductHuntPage() {
               <span className="font-bold text-lg">Oferta Product Hunt</span>
             </div>
             <p className="text-white/90 mb-1 text-sm">
-              Menciona <strong>"PRODUCTHUNT"</strong> en tu mensaje y obtén:
+              Menciona <strong>&quot;PRODUCTHUNT&quot;</strong> en tu mensaje y obtén:
             </p>
             <p className="text-2xl font-bold mb-2">15% de descuento en tu primer proyecto</p>
             <p className="text-white/70 text-xs">Válido por 30 días desde el lanzamiento. Solo para nuevos clientes.</p>
@@ -199,7 +199,7 @@ export default function BienvenidoProductHuntPage() {
           <p className="text-xl text-white/85 mb-8">
             Cuéntanos qué necesitas. Respondemos en menos de 24 horas. No hay compromiso.
             <br />
-            <strong>Recuerda mencionar "PRODUCTHUNT" para tu 15% de descuento.</strong>
+            <strong>Recuerda mencionar &quot;PRODUCTHUNT&quot; para tu 15% de descuento.</strong>
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-white text-[#DA552F] hover:bg-orange-50 font-bold" asChild>
