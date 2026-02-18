@@ -92,7 +92,7 @@ export async function uploadDocuments(req: Request, res: Response) {
  */
 export async function sendMessage(req: Request, res: Response) {
   try {
-    const { sessionId, message } = req.body;
+    const { sessionId, message, restrictedTopics } = req.body;
 
     if (!sessionId) {
       return res.status(400).json({
@@ -108,7 +108,7 @@ export async function sendMessage(req: Request, res: Response) {
       });
     }
 
-    const response = await chatbotService.sendMessage(sessionId, message);
+    const response = await chatbotService.sendMessage(sessionId, message, restrictedTopics);
 
     return res.json({
       success: true,

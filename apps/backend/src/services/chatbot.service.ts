@@ -132,12 +132,15 @@ class ChatbotService {
   /**
    * Envía un mensaje al chatbot y obtiene respuesta usando RAG
    */
-  async sendMessage(sessionId: string, userMessage: string): Promise<ChatResponse> {
+  async sendMessage(sessionId: string, userMessage: string, incomingRestrictedTopics?: string[]): Promise<ChatResponse> {
     const chatbot = await this.getOrCreateSession(sessionId);
     const openai = getOpenAI();
 
-    // Verificar temas restringidos ANTES de procesar
-    const restrictedTopics = chatbot.config.restrictedTopics || [];
+    // Usar los temas restringidos del request (configuración activa del usuario)
+    // con fallback a los almacenados en la DB
+    const restrictedTopics = (incomingRestrictedTopics && incomingRestrictedTopics.length > 0)
+      ? incomingRestrictedTopics
+      : (chatbot.config.restrictedTopics || []);
     if (restrictedTopics.length > 0) {
       const messageToCheck = userMessage.toLowerCase();
       const foundRestrictedTopic = restrictedTopics.find(topic =>
