@@ -22,6 +22,7 @@ import {
   FaComment
 } from 'react-icons/fa';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const chatIcons = [
   { id: 'FaComments', icon: FaComments },
@@ -100,6 +101,7 @@ export default function ChatbotPreviewPage() {
       customIconUrl: searchParams.get('customIconUrl') || undefined,
       restrictedTopics: parsedRestrictedTopics,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
   const {
@@ -226,7 +228,7 @@ export default function ChatbotPreviewPage() {
                     <p className="text-xs text-gray-500 mb-1">{tcb('previewPage.icon')}</p>
                     <div className="flex items-center gap-2 mt-2">
                       {config.customIconUrl ? (
-                        <img src={config.customIconUrl} alt="Icon" className="w-8 h-8 rounded-full" />
+                        <Image src={config.customIconUrl} alt="Icon" width={32} height={32} className="rounded-full" unoptimized />
                       ) : (
                         <SelectedIcon className="h-8 w-8" style={{ color: config.headerColor }} />
                       )}
@@ -318,10 +320,13 @@ export default function ChatbotPreviewPage() {
               </button>
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
                 {config.customIconUrl ? (
-                  <img
+                  <Image
                     src={config.customIconUrl}
                     alt="Chat icon"
-                    className="w-6 h-6 rounded-full object-cover"
+                    width={24}
+                    height={24}
+                    className="rounded-full object-cover"
+                    unoptimized
                   />
                 ) : (
                   <SelectedIcon className="h-6 w-6 text-white" />
@@ -347,10 +352,13 @@ export default function ChatbotPreviewPage() {
               <div className="flex gap-3">
                 <div className="w-10 h-10 bg-primary-100 dark:bg-primary-950 rounded-full flex items-center justify-center flex-shrink-0">
                   {config.customIconUrl ? (
-                    <img
+                    <Image
                       src={config.customIconUrl}
                       alt="Assistant"
-                      className="w-6 h-6 rounded-full object-cover"
+                      width={24}
+                      height={24}
+                      className="rounded-full object-cover"
+                      unoptimized
                     />
                   ) : (
                     <SelectedIcon className="h-5 w-5 text-primary-600 dark:text-primary-400" />
@@ -372,10 +380,13 @@ export default function ChatbotPreviewPage() {
                   {msg.role === 'assistant' && (
                     <div className="w-10 h-10 bg-primary-100 dark:bg-primary-950 rounded-full flex items-center justify-center flex-shrink-0">
                       {config.customIconUrl ? (
-                        <img
+                        <Image
                           src={config.customIconUrl}
                           alt="Assistant"
-                          className="w-6 h-6 rounded-full object-cover"
+                          width={24}
+                          height={24}
+                          className="rounded-full object-cover"
+                          unoptimized
                         />
                       ) : (
                         <SelectedIcon className="h-5 w-5 text-primary-600 dark:text-primary-400" />
@@ -416,10 +427,13 @@ export default function ChatbotPreviewPage() {
                 <div className="flex gap-3">
                   <div className="w-10 h-10 bg-primary-100 dark:bg-primary-950 rounded-full flex items-center justify-center flex-shrink-0">
                     {config.customIconUrl ? (
-                      <img
+                      <Image
                         src={config.customIconUrl}
                         alt="Assistant"
-                        className="w-6 h-6 rounded-full object-cover"
+                        width={24}
+                        height={24}
+                        className="rounded-full object-cover"
+                        unoptimized
                       />
                     ) : (
                       <SelectedIcon className="h-5 w-5 text-primary-600 dark:text-primary-400" />

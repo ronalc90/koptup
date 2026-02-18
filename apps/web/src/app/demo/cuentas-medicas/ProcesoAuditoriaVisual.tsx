@@ -840,6 +840,7 @@ export default function ProcesoAuditoriaVisual({
         prev.map((doc) => ({ ...doc, estado: 'pendiente' as const }))
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enEjecucion]);
 
   return (

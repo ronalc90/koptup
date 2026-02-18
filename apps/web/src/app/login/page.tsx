@@ -44,6 +44,7 @@ export default function LoginPage() {
     } else if (authError) {
       setError(t('errorGeneric'));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
