@@ -106,6 +106,8 @@ export const metadata = {
     canonical: 'https://koptup.com',
     languages: {
       'es-CO': 'https://koptup.com',
+      'en-US': 'https://koptup.com',
+      'x-default': 'https://koptup.com',
     },
   },
 };

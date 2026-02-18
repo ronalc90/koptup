@@ -4,7 +4,7 @@
  */
 
 interface StructuredDataProps {
-  type: 'organization' | 'website' | 'service' | 'article' | 'softwareApplication';
+  type: 'organization' | 'website' | 'service' | 'article' | 'softwareApplication' | 'localBusiness';
   data?: any;
 }
 
@@ -169,6 +169,59 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
     },
   });
 
+  const getLocalBusinessSchema = () => ({
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    '@id': 'https://koptup.com/#localbusiness',
+    name: 'KopTup - Soluciones Tecnológicas',
+    description:
+      'Empresa de desarrollo de software a medida en Bogotá, Colombia. E-commerce, chatbots con IA, dashboards, aplicaciones móviles y soluciones tecnológicas personalizadas.',
+    url: 'https://koptup.com',
+    telephone: '+57-302-479-4842',
+    email: 'ronald@koptup.com',
+    image: 'https://koptup.com/og-image.png',
+    logo: 'https://koptup.com/logo.svg',
+    priceRange: '$$ - $$$$',
+    currenciesAccepted: 'COP, USD',
+    paymentAccepted: 'Transferencia bancaria, tarjeta de crédito',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'Av. 68 #1-63',
+      addressLocality: 'Bogotá',
+      addressRegion: 'Cundinamarca',
+      postalCode: '111321',
+      addressCountry: 'CO',
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: '4.6097',
+      longitude: '-74.0817',
+    },
+    openingHoursSpecification: [
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        opens: '08:00',
+        closes: '18:00',
+      },
+    ],
+    sameAs: ['https://www.linkedin.com/company/koptup'],
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.8',
+      ratingCount: '50',
+      bestRating: '5',
+      worstRating: '1',
+    },
+    hasMap: 'https://maps.google.com/?q=Av.+68+%231-63,+Bogotá,+Colombia',
+    areaServed: [
+      { '@type': 'Country', name: 'Colombia' },
+      { '@type': 'Country', name: 'México' },
+      { '@type': 'Country', name: 'Argentina' },
+      { '@type': 'Country', name: 'España' },
+    ],
+  });
+
   const getSchemaByType = () => {
     switch (type) {
       case 'organization':
@@ -179,6 +232,8 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
         return getServiceSchema();
       case 'softwareApplication':
         return getSoftwareApplicationSchema();
+      case 'localBusiness':
+        return getLocalBusinessSchema();
       case 'article':
         return data;
       default:

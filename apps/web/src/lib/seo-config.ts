@@ -18,20 +18,143 @@ export interface PageSEO {
 export const seoConfig: Record<string, PageSEO> = {
   // Homepage
   home: {
-    title: 'KopTup - Auditoría Médica con IA | Glosas y Facturación en Salud',
+    title: 'KopTup - Desarrollo de Software a Medida | Demos Interactivas',
     description:
-      'Plataforma líder en auditoría médica automatizada con IA. Gestión de glosas, facturación hospitalaria, liquidación de cuentas médicas y análisis de tarifas SOAT, ISS y contratos EPS. Soluciones para IPS, hospitales y clínicas en Colombia.',
+      'KopTup: empresa de desarrollo de software a medida en Colombia. Creamos e-commerce, chatbots con IA, dashboards ejecutivos, apps móviles y soluciones tecnológicas personalizadas. Prueba nuestras demos gratuitas.',
     keywords: [
-      'auditoría médica',
-      'glosas médicas',
-      'facturación en salud',
-      'liquidación cuentas médicas',
-      'software médico Colombia',
-      'IPS Colombia',
-      'tarifas SOAT',
-      'tarifas ISS',
-      'contratos EPS',
+      'desarrollo de software a medida',
+      'empresa de software Colombia',
+      'software personalizado empresas',
+      'desarrollo web Colombia',
+      'aplicaciones web a medida',
+      'e-commerce Colombia',
+      'chatbot inteligencia artificial',
+      'dashboard ejecutivo',
+      'transformación digital',
+      'desarrollo software Bogotá',
     ],
+    canonical: baseUrl,
+  },
+
+  // Services page
+  services: {
+    title: 'Servicios de Desarrollo de Software | E-commerce, IA, Apps Móviles',
+    description:
+      'Servicios profesionales de desarrollo de software a medida: e-commerce, chatbots con IA, aplicaciones móviles, dashboards, integración de sistemas, consultoría tecnológica y diseño UX/UI. Soluciones para empresas en Colombia y Latinoamérica.',
+    keywords: [
+      'servicios desarrollo software',
+      'desarrollo e-commerce',
+      'chatbot con IA',
+      'aplicaciones móviles',
+      'dashboard empresarial',
+      'integración de sistemas',
+      'consultoría tecnológica',
+      'diseño UX UI',
+      'desarrollo web profesional',
+      'software empresarial',
+      'automatización procesos',
+      'seguridad informática',
+    ],
+    canonical: `${baseUrl}/services`,
+  },
+
+  // Pricing page
+  pricing: {
+    title: 'Planes y Precios | Software a Medida desde $499 USD',
+    description:
+      'Planes de desarrollo de software a medida para cada necesidad. Desde proyectos básicos ($499 USD) hasta soluciones enterprise personalizadas. Incluye diseño, desarrollo, deploy y soporte. Cotización sin compromiso.',
+    keywords: [
+      'precios desarrollo software',
+      'costo software a medida',
+      'planes software empresarial',
+      'cotización desarrollo web',
+      'precio aplicación móvil',
+      'desarrollo software Colombia precios',
+      'planes tecnológicos empresas',
+      'inversión software',
+    ],
+    canonical: `${baseUrl}/pricing`,
+  },
+
+  // Contact page
+  contact: {
+    title: 'Contacto | Solicita tu Cotización de Software Gratis',
+    description:
+      'Contacta con KopTup para solicitar tu cotización de desarrollo de software sin compromiso. Respondemos en menos de 24 horas. WhatsApp, email y llamada disponibles. Bogotá, Colombia.',
+    keywords: [
+      'contacto empresa software',
+      'cotización software Colombia',
+      'presupuesto desarrollo web',
+      'consultoría software gratis',
+      'contactar desarrolladores',
+      'empresa software Bogotá',
+      'solicitar propuesta tecnológica',
+    ],
+    canonical: `${baseUrl}/contact`,
+  },
+
+  // About page
+  about: {
+    title: 'Sobre Nosotros | KopTup - Empresa de Software en Bogotá',
+    description:
+      'Conoce al equipo de KopTup: empresa de desarrollo de software a medida en Bogotá, Colombia. Expertos en React, Next.js, Node.js, IA y cloud computing. Más de 100 proyectos entregados con éxito.',
+    keywords: [
+      'equipo koptup',
+      'empresa software bogotá',
+      'quiénes somos koptup',
+      'desarrolladores colombia',
+      'empresa tecnología colombia',
+      'startup software bogotá',
+      'expertos react nextjs',
+      'desarrollo software equipo',
+    ],
+    canonical: `${baseUrl}/about`,
+  },
+
+  // Demo hub page
+  demo: {
+    title: 'Demos Interactivas | Prueba Gratis Nuestras Soluciones de Software',
+    description:
+      'Explora demos interactivas y funcionales de nuestras soluciones: e-commerce, chatbot IA, dashboard ejecutivo, gestor de documentos, sistema de reservas, CMS y más. Sin registro ni tarjeta de crédito.',
+    keywords: [
+      'demos software interactivas',
+      'prueba software gratis',
+      'demo ecommerce',
+      'demo chatbot IA',
+      'demo dashboard',
+      'demo gestión documental',
+      'demo sistema reservas',
+      'software demo gratuito',
+      'prototipo funcional software',
+    ],
+    canonical: `${baseUrl}/demo`,
+  },
+
+  // Privacy page
+  privacy: {
+    title: 'Política de Privacidad | KopTup',
+    description:
+      'Política de privacidad de KopTup. Cómo recopilamos, usamos y protegemos tu información personal. Cumplimiento con la Ley 1581 de 2012 (Colombia) y GDPR.',
+    keywords: ['política privacidad', 'protección datos', 'GDPR', 'ley 1581', 'privacidad koptup'],
+    canonical: `${baseUrl}/privacy`,
+  },
+
+  // Terms page
+  terms: {
+    title: 'Términos y Condiciones | KopTup',
+    description:
+      'Términos y condiciones de uso de los servicios de KopTup. Condiciones de contratación, responsabilidades, pagos y garantías para desarrollo de software a medida.',
+    keywords: ['términos condiciones', 'condiciones uso', 'términos servicio koptup', 'contrato software'],
+    canonical: `${baseUrl}/terms`,
+  },
+
+  // Cookies page
+  cookies: {
+    title: 'Política de Cookies | KopTup',
+    description:
+      'Política de cookies de KopTup. Qué cookies usamos, para qué sirven y cómo puedes gestionarlas o desactivarlas en tu navegador.',
+    keywords: ['política cookies', 'cookies koptup', 'gestión cookies', 'cookies sitio web'],
+    canonical: `${baseUrl}/cookies`,
   },
 
   // DEMOS MÉDICOS
