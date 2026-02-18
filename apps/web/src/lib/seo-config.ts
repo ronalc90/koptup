@@ -191,7 +191,6 @@ export const seoConfig: Record<string, PageSEO> = {
       'resolución 3047',
       'ley 100',
     ],
-    ogImage: '/og-image-auditoria.png',
     canonical: `${baseUrl}/demo/cuentas-medicas`,
   },
 
@@ -222,7 +221,6 @@ export const seoConfig: Record<string, PageSEO> = {
       'procesamiento lenguaje natural médico',
       'chatbot personalizado salud',
     ],
-    ogImage: '/og-image-chatbot.png',
     canonical: `${baseUrl}/demo/chatbot`,
   },
 
@@ -248,7 +246,6 @@ export const seoConfig: Record<string, PageSEO> = {
       'IA escritura médica',
       'automatización documentos salud',
     ],
-    ogImage: '/og-image-contenido.png',
     canonical: `${baseUrl}/demo/gestor-contenido`,
   },
 
@@ -274,7 +271,6 @@ export const seoConfig: Record<string, PageSEO> = {
       'digitalización documentos médicos',
       'normatividad archivo clínico',
     ],
-    ogImage: '/og-image-documentos.png',
     canonical: `${baseUrl}/demo/gestor-documentos`,
   },
 
@@ -297,7 +293,6 @@ export const seoConfig: Record<string, PageSEO> = {
       'software ecommerce',
       'plataforma ventas',
     ],
-    ogImage: '/og-image-ecommerce.png',
     canonical: `${baseUrl}/demo/ecommerce`,
   },
 
@@ -318,7 +313,6 @@ export const seoConfig: Record<string, PageSEO> = {
       'indicadores gestión',
       'análisis empresarial',
     ],
-    ogImage: '/og-image-dashboard.png',
     canonical: `${baseUrl}/demo/dashboard-ejecutivo`,
   },
 
@@ -339,7 +333,6 @@ export const seoConfig: Record<string, PageSEO> = {
       'kanban',
       'cronograma proyectos',
     ],
-    ogImage: '/og-image-proyectos.png',
     canonical: `${baseUrl}/demo/control-proyectos`,
   },
 
@@ -360,7 +353,6 @@ export const seoConfig: Record<string, PageSEO> = {
       'reservas consultorios',
       'booking system',
     ],
-    ogImage: '/og-image-reservas.png',
     canonical: `${baseUrl}/demo/sistema-reservas`,
   },
 
@@ -381,7 +373,6 @@ export const seoConfig: Record<string, PageSEO> = {
       'sistema inteligente',
       'IA empresarial',
     ],
-    ogImage: '/og-image-experto.png',
     canonical: `${baseUrl}/demo/sistema-experto`,
   },
 };

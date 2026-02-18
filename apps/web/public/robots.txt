@@ -8,23 +8,28 @@ Allow: /services
 Allow: /pricing
 Allow: /contact
 Allow: /about
+Allow: /privacy
+Allow: /terms
+Allow: /cookies
 Disallow: /dashboard/*
 Disallow: /admin/*
 Disallow: /api/*
 Disallow: /login
 Disallow: /register
 Disallow: /auth/*
+Disallow: /test
+Disallow: /liquidacion/*
 Disallow: /*?*sessionId=*
 Disallow: /*?*token=*
 
 # Permitir rastreadores principales
 User-agent: Googlebot
 Allow: /
-Crawl-delay: 5
+Crawl-delay: 2
 
 User-agent: Bingbot
 Allow: /
-Crawl-delay: 10
+Crawl-delay: 5
 
 # Bloquear bots no deseados
 User-agent: AhrefsBot
@@ -45,5 +50,6 @@ Disallow: /
 User-agent: CCBot
 Disallow: /
 
-# Sitemap
+# Sitemaps
+Sitemap: https://www.koptup.com/sitemap.xml
 Sitemap: https://koptup.com/sitemap.xml
