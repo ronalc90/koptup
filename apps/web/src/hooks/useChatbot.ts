@@ -115,7 +115,9 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
         if (data.success && data.data) {
           setMessages(data.data.messages || []);
           if (data.data.config) {
-            setConfig(prev => ({ ...prev, ...data.data.config }));
+            // No sobreescribir restrictedTopics (se gestionan localmente desde la UI)
+            const { restrictedTopics: _, ...serverConfig } = data.data.config;
+            setConfig(prev => ({ ...prev, ...serverConfig }));
           }
           // Extract documents if available
           if (data.data.documents) {
@@ -226,6 +228,11 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
     }
   };
 
+  // Agregar mensaje directamente (sin backend)
+  const addMessage = (message: Omit<ChatMessage, 'timestamp'>): void => {
+    setMessages(prev => [...prev, { ...message, timestamp: new Date() }]);
+  };
+
   // Limpiar mensajes
   const clearMessages = async (): Promise<void> => {
     if (!sessionId) return;
@@ -249,6 +256,7 @@ export function useChatbot(initialConfig?: Partial<ChatbotConfig>) {
     uploadedDocuments,
     uploadDocuments,
     sendMessage,
+    addMessage,
     updateConfig,
     clearMessages,
   };

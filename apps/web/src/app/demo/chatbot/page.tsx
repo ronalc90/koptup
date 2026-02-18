@@ -85,6 +85,7 @@ export default function DemoPage() {
   const [customIconFile, setCustomIconFile] = useState<File | null>(null);
   const [embedCopied, setEmbedCopied] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   // Memoize chatbot config to prevent unnecessary re-renders and API calls
   const chatbotConfig = useMemo(() => ({
@@ -119,8 +120,17 @@ export default function DemoPage() {
     uploadedDocuments,
     uploadDocuments,
     sendMessage,
+    addMessage,
     clearMessages,
   } = useChatbot(chatbotConfig);
+
+  // Auto-scroll al último mensaje dentro del contenedor del chat
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
+  }, [messages, isLoading]);
 
   const chatIcons = [
     { id: 'FaComments', icon: FaComments, label: 'Burbujas' },
@@ -173,7 +183,16 @@ export default function DemoPage() {
       const success = await uploadDocuments(newFiles);
       setIsUploading(false);
 
-      if (!success) {
+      if (success) {
+        const names = newFiles.map(f => `"${f.name}"`).join(', ');
+        const plural = newFiles.length > 1;
+        addMessage({
+          role: 'assistant',
+          content: `¡${plural ? 'Recibí los archivos' : 'Cargaste el archivo'} ${names}! 📄 Estoy disponible para ayudarte a resolver cualquier duda que tengas sobre ${plural ? 'ellos' : 'él'} o lo que necesites que te ayude.`,
+        });
+        setIsChatOpen(true);
+        setActiveTab('chat');
+      } else {
         setUploadedFiles(prev => prev.filter(f => !newFiles.includes(f)));
       }
     }
@@ -229,6 +248,10 @@ export default function DemoPage() {
       icon: designConfig.icon,
       fontFamily: typographyConfig.fontFamily,
     });
+
+    if (restrictionsConfig.restrictedTopics.length > 0) {
+      params.append('restrictedTopics', JSON.stringify(restrictionsConfig.restrictedTopics));
+    }
 
     if (designConfig.customIconUrl) {
       params.append('customIconUrl', designConfig.customIconUrl);
@@ -813,16 +836,28 @@ export default function DemoPage() {
                             </div>
                             <h3 className="font-semibold text-white text-sm sm:text-base truncate">{chatConfig.title}</h3>
                           </div>
-                          <button
-                            onClick={() => setIsChatOpen(false)}
-                            className="p-1 hover:bg-white/20 rounded-lg transition-colors flex-shrink-0"
-                          >
-                            <XMarkIcon className="h-5 w-5 text-white" />
-                          </button>
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            {messages.length > 0 && (
+                              <button
+                                onClick={() => clearMessages()}
+                                title="Vaciar chat"
+                                className="p-1 hover:bg-white/20 rounded-lg transition-colors"
+                              >
+                                <TrashIcon className="h-5 w-5 text-white" />
+                              </button>
+                            )}
+                            <button
+                              onClick={() => setIsChatOpen(false)}
+                              className="p-1 hover:bg-white/20 rounded-lg transition-colors"
+                            >
+                              <XMarkIcon className="h-5 w-5 text-white" />
+                            </button>
+                          </div>
                         </div>
 
                         {/* Messages */}
                         <div
+                          ref={messagesContainerRef}
                           className="flex-1 p-3 sm:p-4 overflow-y-auto space-y-2 sm:space-y-3"
                           style={{ backgroundColor: designConfig.backgroundColor }}
                         >

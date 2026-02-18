@@ -10,7 +10,8 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   Cog6ToothIcon,
-  TrashIcon
+  TrashIcon,
+  ShieldExclamationIcon,
 } from '@heroicons/react/24/outline';
 import {
   FaRegCommentDots,
@@ -33,6 +34,8 @@ export default function ChatbotPreviewPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const hasClearedOnMount = useRef(false);
   const [inputMessage, setInputMessage] = useState('');
   const [showSidebar, setShowSidebar] = useState(true);
   const [previewDocuments, setPreviewDocuments] = useState<string[]>([]);
@@ -77,6 +80,12 @@ export default function ChatbotPreviewPage() {
     }
 
     // Fallback to URL params (for embed usage)
+    let parsedRestrictedTopics: string[] = [];
+    try {
+      const raw = searchParams.get('restrictedTopics');
+      if (raw) parsedRestrictedTopics = JSON.parse(raw);
+    } catch {}
+
     setConfig({
       title: searchParams.get('title') || 'Asistente Virtual',
       greeting: searchParams.get('greeting') || '¡Hola! 👋 Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?',
@@ -87,10 +96,12 @@ export default function ChatbotPreviewPage() {
       icon: searchParams.get('icon') || 'FaComments',
       fontFamily: searchParams.get('fontFamily') || 'Inter',
       customIconUrl: searchParams.get('customIconUrl') || undefined,
+      restrictedTopics: parsedRestrictedTopics,
     });
   }, [searchParams]);
 
   const {
+    sessionId,
     messages,
     isLoading,
     error,
@@ -99,18 +110,28 @@ export default function ChatbotPreviewPage() {
     clearMessages,
   } = useChatbot(config);
 
-  // Scroll to bottom only when user sends a message (manual scroll)
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  // Limpiar chat al entrar al preview (siempre empieza limpio)
+  useEffect(() => {
+    if (sessionId && !hasClearedOnMount.current) {
+      hasClearedOnMount.current = true;
+      clearMessages();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId]);
+
+  // Auto-scroll al último mensaje dentro del contenedor del chat
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
+  }, [messages, isLoading]);
 
   const handleSendMessage = async () => {
     if (inputMessage.trim() && !isLoading) {
       const message = inputMessage;
       setInputMessage('');
       await sendMessage(message);
-      // Only scroll when user explicitly sends a message
-      setTimeout(scrollToBottom, 100);
     }
   };
 
@@ -212,6 +233,27 @@ export default function ChatbotPreviewPage() {
                   </div>
                 </div>
 
+                {/* Restricted Topics Section */}
+                {config.restrictedTopics && config.restrictedTopics.length > 0 && (
+                  <div className="pt-4 border-t border-gray-200">
+                    <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-1.5">
+                      <ShieldExclamationIcon className="h-4 w-4 text-red-500" />
+                      Temas Restringidos
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {config.restrictedTopics.map((topic, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center gap-1.5 px-2 py-1 bg-red-50 border border-red-200 rounded-lg"
+                        >
+                          <ShieldExclamationIcon className="h-3.5 w-3.5 text-red-500 flex-shrink-0" />
+                          <span className="text-xs text-red-800">{topic}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* Documents Section */}
                 <div className="pt-4 border-t border-gray-200">
                   <h3 className="text-sm font-medium text-gray-700 mb-3">Documentos Cargados</h3>
@@ -254,9 +296,17 @@ export default function ChatbotPreviewPage() {
             style={{ backgroundColor: config.headerColor }}
           >
             <div className="flex items-center gap-3">
+              <Link
+                href="/demo/chatbot"
+                className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                title="Volver al constructor"
+              >
+                <ArrowLeftIcon className="h-6 w-6 text-white" />
+              </Link>
               <button
                 onClick={() => setShowSidebar(!showSidebar)}
                 className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                title={showSidebar ? 'Ocultar panel' : 'Mostrar panel'}
               >
                 {showSidebar ? (
                   <ChevronLeftIcon className="h-6 w-6 text-white" />
@@ -264,12 +314,6 @@ export default function ChatbotPreviewPage() {
                   <ChevronRightIcon className="h-6 w-6 text-white" />
                 )}
               </button>
-              <Link
-                href="/demo/chatbot"
-                className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-              >
-                <ArrowLeftIcon className="h-6 w-6 text-white" />
-              </Link>
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
                 {config.customIconUrl ? (
                   <img
@@ -283,15 +327,10 @@ export default function ChatbotPreviewPage() {
               </div>
               <h1 className="text-xl font-semibold text-white">{config.title}</h1>
             </div>
-            {/* Clear Chat Button - visible on mobile */}
             {messages.length > 0 && (
               <button
-                onClick={() => {
-                  if (confirm('¿Estás seguro de que deseas limpiar la conversación?')) {
-                    clearMessages();
-                  }
-                }}
-                className="p-2 hover:bg-white/20 rounded-lg transition-colors group"
+                onClick={() => clearMessages()}
+                className="p-2 hover:bg-white/20 rounded-lg transition-colors"
                 title="Limpiar conversación"
               >
                 <TrashIcon className="h-5 w-5 text-white" />
@@ -300,7 +339,7 @@ export default function ChatbotPreviewPage() {
           </div>
 
           {/* Messages Container */}
-          <div className="flex-1 overflow-y-auto px-6 py-6">
+          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-6 py-6">
             <div className="space-y-4">
               {/* Greeting Message */}
               <div className="flex gap-3">
