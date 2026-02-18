@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo } from 'react';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -157,6 +158,7 @@ export default function DemoPage() {
     link.href = `https://fonts.googleapis.com/css2?${fonts.split('&family=').map(f => `family=${f}:wght@400;500;600;700`).join('&')}&display=swap`;
     link.rel = 'stylesheet';
     document.head.appendChild(link);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Sync uploadedFiles with uploadedDocuments from backend on page load
@@ -167,6 +169,7 @@ export default function DemoPage() {
       });
       setUploadedFiles(files);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uploadedDocuments]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -549,10 +552,13 @@ export default function DemoPage() {
                           </button>
                           {designConfig.customIconUrl && (
                             <div className="flex items-center gap-2">
-                              <img
+                              <Image
                                 src={designConfig.customIconUrl}
                                 alt="Custom icon"
-                                className="w-10 h-10 rounded-full object-cover border-2 border-primary-500"
+                                width={40}
+                                height={40}
+                                className="rounded-full object-cover border-2 border-primary-500"
+                                unoptimized
                               />
                               <button
                                 onClick={() => setDesignConfig({ ...designConfig, customIconUrl: undefined })}
@@ -823,10 +829,13 @@ export default function DemoPage() {
                           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                             <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
                               {designConfig.customIconUrl ? (
-                                <img
+                                <Image
                                   src={designConfig.customIconUrl}
                                   alt="Chat icon"
-                                  className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover"
+                                  width={24}
+                                  height={24}
+                                  className="rounded-full object-cover"
+                                  unoptimized
                                 />
                               ) : (
                                 <SelectedIcon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
@@ -863,10 +872,13 @@ export default function DemoPage() {
                           <div className="flex gap-1.5 sm:gap-2">
                             <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary-100 dark:bg-primary-950 rounded-full flex items-center justify-center flex-shrink-0">
                               {designConfig.customIconUrl ? (
-                                <img
+                                <Image
                                   src={designConfig.customIconUrl}
                                   alt="Assistant"
-                                  className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full object-cover"
+                                  width={16}
+                                  height={16}
+                                  className="rounded-full object-cover"
+                                  unoptimized
                                 />
                               ) : (
                                 <SelectedIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-600 dark:text-primary-400" />
@@ -888,10 +900,13 @@ export default function DemoPage() {
                                 {msg.role === 'assistant' && (
                                   <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary-100 dark:bg-primary-950 rounded-full flex items-center justify-center flex-shrink-0">
                                     {designConfig.customIconUrl ? (
-                                      <img
+                                      <Image
                                         src={designConfig.customIconUrl}
                                         alt="Assistant"
-                                        className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full object-cover"
+                                        width={16}
+                                        height={16}
+                                        className="rounded-full object-cover"
+                                        unoptimized
                                       />
                                     ) : (
                                       <SelectedIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-600 dark:text-primary-400" />
@@ -932,10 +947,13 @@ export default function DemoPage() {
                             <div className="flex gap-1.5 sm:gap-2">
                               <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary-100 dark:bg-primary-950 rounded-full flex items-center justify-center flex-shrink-0">
                                 {designConfig.customIconUrl ? (
-                                  <img
+                                  <Image
                                     src={designConfig.customIconUrl}
                                     alt="Assistant"
-                                    className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full object-cover"
+                                    width={16}
+                                    height={16}
+                                    className="rounded-full object-cover"
+                                    unoptimized
                                   />
                                 ) : (
                                   <SelectedIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-600 dark:text-primary-400" />
@@ -984,10 +1002,13 @@ export default function DemoPage() {
                         style={{ backgroundColor: designConfig.headerColor }}
                       >
                         {designConfig.customIconUrl ? (
-                          <img
+                          <Image
                             src={designConfig.customIconUrl}
                             alt="Chat icon"
-                            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover"
+                            width={32}
+                            height={32}
+                            className="rounded-full object-cover"
+                            unoptimized
                           />
                         ) : (
                           <SelectedIcon className="h-7 w-7 sm:h-8 sm:w-8 text-white" />

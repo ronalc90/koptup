@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
@@ -285,10 +286,13 @@ export default function ProfilePage() {
                   <div className="flex items-center gap-4">
                     <div className="w-20 h-20 rounded-full overflow-hidden bg-primary-100 dark:bg-primary-950 flex items-center justify-center">
                       {userProfile.avatar ? (
-                        <img
+                        <Image
                           src={userProfile.avatar}
                           alt={userProfile.name}
-                          className="w-full h-full object-cover"
+                          width={80}
+                          height={80}
+                          className="object-cover"
+                          unoptimized
                         />
                       ) : (
                         <UserCircleIcon className="h-12 w-12 text-primary-600 dark:text-primary-400" />
