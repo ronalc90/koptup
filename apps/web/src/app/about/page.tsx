@@ -387,7 +387,7 @@ const filtered = useMemo(() => {
           <input
             value={query}
             onChange={e => setQuery(e.target.value)}
-            placeholder="Search technologies..."
+            placeholder={t('technologies.searchPlaceholder')}
             className="flex-1 px-4 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white placeholder-secondary-400 dark:placeholder-secondary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
           <div className="flex gap-2 flex-wrap">
@@ -412,7 +412,7 @@ const filtered = useMemo(() => {
           {Object.entries(filtered).length === 0 ? (
             <div className="text-center py-12">
               <p className="text-secondary-600 dark:text-secondary-400">
-                No technologies found matching &quot;{query}&quot;
+                {t('technologies.noResults', { query })}
               </p>
             </div>
           ) : (
@@ -431,7 +431,7 @@ const filtered = useMemo(() => {
                         onClick={() => setShowAll(s => !s)}
                         className="text-sm text-primary-600 dark:text-primary-400 hover:underline font-medium"
                       >
-                        {showAll ? 'Show less' : 'View all'}
+                        {showAll ? t('technologies.showLess') : t('technologies.viewAll')}
                       </button>
                     )}
                   </div>

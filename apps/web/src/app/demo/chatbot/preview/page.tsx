@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useChatbot, ChatbotConfig } from '@/hooks/useChatbot';
 import {
   PaperAirplaneIcon,
@@ -33,6 +34,7 @@ const chatIcons = [
 export default function ChatbotPreviewPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const tcb = useTranslations('chatbotBuilder');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const hasClearedOnMount = useRef(false);
@@ -40,9 +42,9 @@ export default function ChatbotPreviewPage() {
   const [showSidebar, setShowSidebar] = useState(true);
   const [previewDocuments, setPreviewDocuments] = useState<string[]>([]);
   const [config, setConfig] = useState<Partial<ChatbotConfig>>({
-    title: 'Asistente Virtual',
-    greeting: '¡Hola! 👋 Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?',
-    placeholder: 'Escribe tu mensaje aquí...',
+    title: tcb('defaults.title'),
+    greeting: tcb('defaults.greeting'),
+    placeholder: tcb('defaults.placeholder'),
     textColor: '#1F2937',
     headerColor: '#4F46E5',
     backgroundColor: '#FFFFFF',
@@ -61,9 +63,9 @@ export default function ChatbotPreviewPage() {
           // Set documents from stored config
           setPreviewDocuments(data.uploadedDocuments || []);
           setConfig({
-            title: data.chatConfig?.title || 'Asistente Virtual',
-            greeting: data.chatConfig?.greeting || '¡Hola! 👋 Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?',
-            placeholder: data.chatConfig?.placeholder || 'Escribe tu mensaje aquí...',
+            title: data.chatConfig?.title || tcb('defaults.title'),
+            greeting: data.chatConfig?.greeting || tcb('defaults.greeting'),
+            placeholder: data.chatConfig?.placeholder || tcb('defaults.placeholder'),
             textColor: data.designConfig?.textColor || '#1F2937',
             headerColor: data.designConfig?.headerColor || '#4F46E5',
             backgroundColor: data.designConfig?.backgroundColor || '#FFFFFF',
@@ -87,9 +89,9 @@ export default function ChatbotPreviewPage() {
     } catch {}
 
     setConfig({
-      title: searchParams.get('title') || 'Asistente Virtual',
-      greeting: searchParams.get('greeting') || '¡Hola! 👋 Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?',
-      placeholder: searchParams.get('placeholder') || 'Escribe tu mensaje aquí...',
+      title: searchParams.get('title') || tcb('defaults.title'),
+      greeting: searchParams.get('greeting') || tcb('defaults.greeting'),
+      placeholder: searchParams.get('placeholder') || tcb('defaults.placeholder'),
       textColor: searchParams.get('textColor') || '#1F2937',
       headerColor: searchParams.get('headerColor') || '#4F46E5',
       backgroundColor: searchParams.get('backgroundColor') || '#FFFFFF',
@@ -167,33 +169,33 @@ export default function ChatbotPreviewPage() {
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
                   <Cog6ToothIcon className="h-6 w-6 text-gray-700" />
-                  <h2 className="text-lg font-semibold text-gray-900">Configuración</h2>
+                  <h2 className="text-lg font-semibold text-gray-900">{tcb('previewPage.configuration')}</h2>
                 </div>
               </div>
 
               {/* Configuration Details */}
               <div className="flex-1 overflow-y-auto space-y-4">
                 <div className="space-y-3">
-                  <h3 className="text-sm font-medium text-gray-700">Diseño del Chat</h3>
+                  <h3 className="text-sm font-medium text-gray-700">{tcb('previewPage.chatDesign')}</h3>
 
                   <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="text-xs text-gray-500 mb-1">Título</p>
+                    <p className="text-xs text-gray-500 mb-1">{tcb('previewPage.titleLabel')}</p>
                     <p className="text-sm font-medium text-gray-900">{config.title}</p>
                   </div>
 
                   <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="text-xs text-gray-500 mb-1">Mensaje de Bienvenida</p>
+                    <p className="text-xs text-gray-500 mb-1">{tcb('previewPage.welcomeMessage')}</p>
                     <p className="text-sm text-gray-900">{config.greeting}</p>
                   </div>
 
                   <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="text-xs text-gray-500 mb-1">Placeholder</p>
+                    <p className="text-xs text-gray-500 mb-1">{tcb('previewPage.placeholder')}</p>
                     <p className="text-sm text-gray-900">{config.placeholder}</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
                     <div className="bg-gray-50 p-3 rounded-lg">
-                      <p className="text-xs text-gray-500 mb-2">Color del Header</p>
+                      <p className="text-xs text-gray-500 mb-2">{tcb('previewPage.headerColor')}</p>
                       <div className="flex items-center gap-2">
                         <div
                           className="w-8 h-8 rounded-md border-2 border-gray-200"
@@ -204,7 +206,7 @@ export default function ChatbotPreviewPage() {
                     </div>
 
                     <div className="bg-gray-50 p-3 rounded-lg">
-                      <p className="text-xs text-gray-500 mb-2">Color de Texto</p>
+                      <p className="text-xs text-gray-500 mb-2">{tcb('previewPage.textColor')}</p>
                       <div className="flex items-center gap-2">
                         <div
                           className="w-8 h-8 rounded-md border-2 border-gray-200"
@@ -216,12 +218,12 @@ export default function ChatbotPreviewPage() {
                   </div>
 
                   <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="text-xs text-gray-500 mb-1">Fuente</p>
+                    <p className="text-xs text-gray-500 mb-1">{tcb('previewPage.font')}</p>
                     <p className="text-sm font-medium text-gray-900">{config.fontFamily || 'Inter'}</p>
                   </div>
 
                   <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="text-xs text-gray-500 mb-1">Icono</p>
+                    <p className="text-xs text-gray-500 mb-1">{tcb('previewPage.icon')}</p>
                     <div className="flex items-center gap-2 mt-2">
                       {config.customIconUrl ? (
                         <img src={config.customIconUrl} alt="Icon" className="w-8 h-8 rounded-full" />
@@ -238,7 +240,7 @@ export default function ChatbotPreviewPage() {
                   <div className="pt-4 border-t border-gray-200">
                     <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-1.5">
                       <ShieldExclamationIcon className="h-4 w-4 text-red-500" />
-                      Temas Restringidos
+                      {tcb('previewPage.restrictedTopics')}
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {config.restrictedTopics.map((topic, idx) => (
@@ -256,7 +258,7 @@ export default function ChatbotPreviewPage() {
 
                 {/* Documents Section */}
                 <div className="pt-4 border-t border-gray-200">
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">Documentos Cargados</h3>
+                  <h3 className="text-sm font-medium text-gray-700 mb-3">{tcb('previewPage.uploadedDocuments')}</h3>
                   <div className="space-y-2">
                     {(previewDocuments.length > 0 || uploadedDocuments.length > 0) ? (
                       [...new Set([...previewDocuments, ...uploadedDocuments])].map((doc, idx) => (
@@ -266,7 +268,7 @@ export default function ChatbotPreviewPage() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-sm text-gray-500 italic">No hay documentos cargados aún</p>
+                      <p className="text-sm text-gray-500 italic">{tcb('previewPage.noDocuments')}</p>
                     )}
                   </div>
                 </div>
@@ -279,7 +281,7 @@ export default function ChatbotPreviewPage() {
                       className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 border border-red-200 hover:border-red-300 rounded-lg transition-colors"
                     >
                       <TrashIcon className="h-4 w-4" />
-                      <span className="text-sm font-medium">Limpiar Conversación</span>
+                      <span className="text-sm font-medium">{tcb('previewPage.clearConversation')}</span>
                     </button>
                   </div>
                 )}
@@ -299,14 +301,14 @@ export default function ChatbotPreviewPage() {
               <Link
                 href="/demo/chatbot"
                 className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-                title="Volver al constructor"
+                title={tcb('previewPage.backToBuilder')}
               >
                 <ArrowLeftIcon className="h-6 w-6 text-white" />
               </Link>
               <button
                 onClick={() => setShowSidebar(!showSidebar)}
                 className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-                title={showSidebar ? 'Ocultar panel' : 'Mostrar panel'}
+                title={showSidebar ? tcb('previewPage.hidePanel') : tcb('previewPage.showPanel')}
               >
                 {showSidebar ? (
                   <ChevronLeftIcon className="h-6 w-6 text-white" />
@@ -331,7 +333,7 @@ export default function ChatbotPreviewPage() {
               <button
                 onClick={() => clearMessages()}
                 className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-                title="Limpiar conversación"
+                title={tcb('previewPage.clearTitle')}
               >
                 <TrashIcon className="h-5 w-5 text-white" />
               </button>
@@ -401,7 +403,7 @@ export default function ChatbotPreviewPage() {
                       <div className="flex items-center gap-1.5 mt-1 ml-2">
                         <DocumentTextIcon className="h-3.5 w-3.5 text-secondary-400" />
                         <span className="text-xs text-secondary-500">
-                          Fuente: {(msg as any).source}
+                          {tcb('previewPage.source')}: {(msg as any).source}
                         </span>
                       </div>
                     )}
@@ -471,7 +473,7 @@ export default function ChatbotPreviewPage() {
                 style={{ backgroundColor: config.headerColor }}
               >
                 <PaperAirplaneIcon className="h-5 w-5" />
-                <span className="hidden sm:inline">Enviar</span>
+                <span className="hidden sm:inline">{tcb('previewPage.send')}</span>
               </button>
             </div>
           </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   CalendarIcon,
   ClockIcon,
@@ -37,6 +38,8 @@ interface Booking {
 type CalendarView = 'month' | 'week';
 
 export default function SistemaReservas() {
+  const t = useTranslations('reservations');
+
   const [view, setView] = useState<'public' | 'booking' | 'admin'>('public');
   const [calendarView, setCalendarView] = useState<CalendarView>('month');
   const [selectedService, setSelectedService] = useState<Service | null>(null);
@@ -178,12 +181,10 @@ export default function SistemaReservas() {
 
     const days = [];
 
-    // Add empty cells for days before the first day of the month
     for (let i = 0; i < startingDayOfWeek; i++) {
       days.push(null);
     }
 
-    // Add all days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       days.push(day);
     }
@@ -225,6 +226,15 @@ export default function SistemaReservas() {
     }
   };
 
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'confirmado': return t('statusConfirmed');
+      case 'pendiente': return t('statusPending');
+      case 'cancelado': return t('statusCancelled');
+      default: return status;
+    }
+  };
+
   // Public Landing View
   if (view === 'public') {
     return (
@@ -233,18 +243,18 @@ export default function SistemaReservas() {
         <div className="relative bg-gradient-to-r from-orange-600 to-amber-600 text-white py-20 overflow-hidden">
           <div className="absolute inset-0 bg-grid-pattern opacity-10" />
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-5xl font-bold mb-4">Reserva tu Cita en Línea</h1>
+            <h1 className="text-5xl font-bold mb-4">{t('heroTitle')}</h1>
             <p className="text-xl text-orange-100 mb-8 max-w-2xl mx-auto">
-              Sistema moderno y profesional para agendar tus servicios de forma rápida y sencilla
+              {t('heroSubtitle')}
             </p>
             <div className="flex items-center justify-center gap-6 text-orange-100">
               <div className="flex items-center gap-2">
                 <CalendarIcon className="w-5 h-5" />
-                <span>Disponibilidad 24/7</span>
+                <span>{t('availability')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircleIcon className="w-5 h-5" />
-                <span>Confirmación Instantánea</span>
+                <span>{t('instantConfirmation')}</span>
               </div>
             </div>
           </div>
@@ -254,10 +264,10 @@ export default function SistemaReservas() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
-              Nuestros Servicios
+              {t('ourServices')}
             </h2>
             <p className="text-slate-600 dark:text-slate-400">
-              Selecciona el servicio que necesitas y agenda tu cita
+              {t('selectService')}
             </p>
           </div>
 
@@ -294,7 +304,7 @@ export default function SistemaReservas() {
                     }}
                     className="w-full bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-lg px-4 py-3 font-semibold hover:from-orange-700 hover:to-amber-700 transition-all shadow-lg"
                   >
-                    Reservar ahora
+                    {t('bookNow')}
                   </button>
                 </div>
               </div>
@@ -311,7 +321,7 @@ export default function SistemaReservas() {
               }}
               className="px-6 py-3 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors font-semibold"
             >
-              Panel de Administración
+              {t('adminPanel')}
             </button>
           </div>
         </div>
@@ -334,10 +344,10 @@ export default function SistemaReservas() {
               }}
               className="text-orange-600 dark:text-orange-400 hover:underline mb-4"
             >
-              ← Volver a servicios
+              {t('backToServices')}
             </button>
             <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-              Reserva tu Cita
+              {t('bookTitle')}
             </h1>
             <p className="text-slate-600 dark:text-slate-400">
               {selectedService?.name}
@@ -348,10 +358,10 @@ export default function SistemaReservas() {
           <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg p-6 mb-8">
             <div className="flex items-center justify-between">
               {[
-                { num: 1, label: 'Fecha' },
-                { num: 2, label: 'Hora' },
-                { num: 3, label: 'Datos' },
-                { num: 4, label: 'Confirmar' },
+                { num: 1, label: t('stepDate') },
+                { num: 2, label: t('stepTime') },
+                { num: 3, label: t('stepData') },
+                { num: 4, label: t('stepConfirm') },
               ].map((step, index) => (
                 <div key={step.num} className="flex items-center flex-1">
                   <div className="flex flex-col items-center flex-1">
@@ -386,7 +396,7 @@ export default function SistemaReservas() {
           {bookingStep === 1 && (
             <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg p-6">
               <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
-                Selecciona una Fecha
+                {t('selectDate')}
               </h2>
 
               {/* Calendar View Toggle */}
@@ -417,7 +427,7 @@ export default function SistemaReservas() {
                         : 'bg-slate-100 dark:bg-slate-800'
                     }`}
                   >
-                    Mes
+                    {t('viewMonth')}
                   </button>
                   <button
                     onClick={() => setCalendarView('week')}
@@ -427,7 +437,7 @@ export default function SistemaReservas() {
                         : 'bg-slate-100 dark:bg-slate-800'
                     }`}
                   >
-                    Semana
+                    {t('viewWeek')}
                   </button>
                 </div>
               </div>
@@ -469,10 +479,10 @@ export default function SistemaReservas() {
           {bookingStep === 2 && (
             <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg p-6">
               <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
-                Selecciona una Hora
+                {t('selectTime')}
               </h2>
               <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
-                Fecha seleccionada: {selectedDate}
+                {t('selectedDate', { date: selectedDate ?? '' })}
               </p>
 
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
@@ -503,7 +513,7 @@ export default function SistemaReservas() {
                   onClick={() => setBookingStep(1)}
                   className="px-6 py-3 bg-slate-200 dark:bg-slate-800 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors"
                 >
-                  Atrás
+                  {t('back')}
                 </button>
               </div>
             </div>
@@ -513,18 +523,18 @@ export default function SistemaReservas() {
           {bookingStep === 3 && (
             <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg p-6">
               <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
-                Tus Datos
+                {t('yourData')}
               </h2>
 
               <form className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                    Nombre Completo
+                    {t('fullName')}
                   </label>
                   <input
                     type="text"
                     className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    placeholder="Juan Pérez"
+                    placeholder={t('fullNamePlaceholder')}
                   />
                 </div>
                 <div>
@@ -534,27 +544,27 @@ export default function SistemaReservas() {
                   <input
                     type="email"
                     className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    placeholder="juan@ejemplo.com"
+                    placeholder={t('emailPlaceholder')}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                    Teléfono
+                    {t('fullName').includes('Full') ? 'Phone' : 'Teléfono'}
                   </label>
                   <input
                     type="tel"
                     className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    placeholder="+57 300 123 4567"
+                    placeholder={t('phonePlaceholder')}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                    Comentarios (Opcional)
+                    {t('comments')}
                   </label>
                   <textarea
                     rows={3}
                     className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    placeholder="Información adicional sobre tu cita..."
+                    placeholder={t('commentsPlaceholder')}
                   />
                 </div>
               </form>
@@ -564,13 +574,13 @@ export default function SistemaReservas() {
                   onClick={() => setBookingStep(2)}
                   className="px-6 py-3 bg-slate-200 dark:bg-slate-800 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors"
                 >
-                  Atrás
+                  {t('back')}
                 </button>
                 <button
                   onClick={() => setBookingStep(4)}
                   className="flex-1 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-lg px-6 py-3 font-semibold hover:from-orange-700 hover:to-amber-700 transition-all"
                 >
-                  Continuar
+                  {t('continue')}
                 </button>
               </div>
             </div>
@@ -584,10 +594,10 @@ export default function SistemaReservas() {
                   <CheckCircleIcon className="w-10 h-10 text-green-600" />
                 </div>
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-                  ¡Reserva Confirmada!
+                  {t('bookingConfirmed')}
                 </h2>
                 <p className="text-slate-600 dark:text-slate-400">
-                  Tu cita ha sido agendada exitosamente
+                  {t('bookingSuccess')}
                 </p>
               </div>
 
@@ -595,21 +605,21 @@ export default function SistemaReservas() {
                 <div className="flex items-start gap-3">
                   <CalendarIcon className="w-5 h-5 text-slate-500 mt-0.5" />
                   <div>
-                    <div className="text-sm text-slate-500">Servicio</div>
+                    <div className="text-sm text-slate-500">{t('serviceLbl')}</div>
                     <div className="font-semibold">{selectedService?.name}</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <ClockIcon className="w-5 h-5 text-slate-500 mt-0.5" />
                   <div>
-                    <div className="text-sm text-slate-500">Fecha y Hora</div>
+                    <div className="text-sm text-slate-500">{t('dateTime')}</div>
                     <div className="font-semibold">{selectedDate} - {selectedTime}</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <UserIcon className="w-5 h-5 text-slate-500 mt-0.5" />
                   <div>
-                    <div className="text-sm text-slate-500">Duración</div>
+                    <div className="text-sm text-slate-500">{t('duration')}</div>
                     <div className="font-semibold">{selectedService?.duration}</div>
                   </div>
                 </div>
@@ -624,7 +634,7 @@ export default function SistemaReservas() {
                   }}
                   className="flex-1 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-lg px-6 py-3 font-semibold hover:from-orange-700 hover:to-amber-700 transition-all"
                 >
-                  Volver al Inicio
+                  {t('backToHome')}
                 </button>
               </div>
             </div>
@@ -648,13 +658,13 @@ export default function SistemaReservas() {
             }}
             className="text-orange-600 dark:text-orange-400 hover:underline mb-4"
           >
-            ← Volver a vista pública
+            {t('backToPublic')}
           </button>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-            Panel de Reservas
+            {t('adminTitle')}
           </h1>
           <p className="text-slate-600 dark:text-slate-400">
-            Gestiona todas las reservas de tu negocio
+            {t('adminSubtitle')}
           </p>
         </div>
 
@@ -663,24 +673,24 @@ export default function SistemaReservas() {
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
               <FunnelIcon className="w-5 h-5 text-slate-500" />
-              <span className="font-semibold">Filtros:</span>
+              <span className="font-semibold">{t('filters')}</span>
             </div>
             <select
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value)}
               className="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg"
             >
-              <option value="all">Todas las fechas</option>
-              <option value="today">Hoy</option>
-              <option value="week">Esta semana</option>
-              <option value="month">Este mes</option>
+              <option value="all">{t('allDates')}</option>
+              <option value="today">{t('today')}</option>
+              <option value="week">{t('thisWeek')}</option>
+              <option value="month">{t('thisMonth')}</option>
             </select>
             <select
               value={serviceFilter}
               onChange={(e) => setServiceFilter(e.target.value)}
               className="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg"
             >
-              <option value="all">Todos los servicios</option>
+              <option value="all">{t('allServices')}</option>
               {services.map((service) => (
                 <option key={service.id} value={service.name}>{service.name}</option>
               ))}
@@ -690,10 +700,10 @@ export default function SistemaReservas() {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg"
             >
-              <option value="all">Todos los estados</option>
-              <option value="confirmado">Confirmado</option>
-              <option value="pendiente">Pendiente</option>
-              <option value="cancelado">Cancelado</option>
+              <option value="all">{t('allStatuses')}</option>
+              <option value="confirmado">{t('statusConfirmed')}</option>
+              <option value="pendiente">{t('statusPending')}</option>
+              <option value="cancelado">{t('statusCancelled')}</option>
             </select>
             <button
               onClick={() => {
@@ -704,7 +714,7 @@ export default function SistemaReservas() {
               className="ml-auto px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center gap-2"
             >
               <ArrowPathIcon className="w-5 h-5" />
-              Limpiar Filtros
+              {t('clearFilters')}
             </button>
           </div>
         </div>
@@ -716,22 +726,22 @@ export default function SistemaReservas() {
               <thead className="bg-slate-50 dark:bg-slate-800">
                 <tr>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">
-                    Cliente
+                    {t('colClient')}
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">
-                    Servicio
+                    {t('colService')}
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">
-                    Fecha
+                    {t('colDate')}
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">
-                    Hora
+                    {t('colTime')}
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">
-                    Estado
+                    {t('colStatus')}
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">
-                    Acciones
+                    {t('colActions')}
                   </th>
                 </tr>
               </thead>
@@ -739,7 +749,7 @@ export default function SistemaReservas() {
                 {getFilteredBookings().length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
-                      No se encontraron reservas con los filtros seleccionados
+                      {t('noBookings')}
                     </td>
                   </tr>
                 ) : (
@@ -764,7 +774,7 @@ export default function SistemaReservas() {
                       </td>
                       <td className="px-6 py-4">
                         <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(booking.status)}`}>
-                          {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                          {getStatusLabel(booking.status)}
                         </span>
                       </td>
                       <td className="px-6 py-4">
@@ -775,7 +785,7 @@ export default function SistemaReservas() {
                           }}
                           className="text-orange-600 hover:text-orange-700 text-sm font-medium"
                         >
-                          Ver Detalles
+                          {t('viewDetails')}
                         </button>
                       </td>
                     </tr>
@@ -793,7 +803,7 @@ export default function SistemaReservas() {
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    Detalles de la Reserva
+                    {t('bookingDetails')}
                   </h2>
                   <button
                     onClick={() => {
@@ -817,7 +827,7 @@ export default function SistemaReservas() {
                         <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                           {selectedBooking.client}
                         </h3>
-                        <p className="text-slate-600 dark:text-slate-400">Cliente</p>
+                        <p className="text-slate-600 dark:text-slate-400">{t('client')}</p>
                       </div>
                     </div>
 
@@ -835,24 +845,24 @@ export default function SistemaReservas() {
 
                   {/* Service Info */}
                   <div className="space-y-3">
-                    <h4 className="font-semibold text-slate-900 dark:text-white">Información del Servicio</h4>
+                    <h4 className="font-semibold text-slate-900 dark:text-white">{t('serviceInfo')}</h4>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <div className="text-sm text-slate-500">Servicio</div>
+                        <div className="text-sm text-slate-500">{t('colService')}</div>
                         <div className="font-semibold">{selectedBooking.service}</div>
                       </div>
                       <div>
-                        <div className="text-sm text-slate-500">Fecha</div>
+                        <div className="text-sm text-slate-500">{t('colDate')}</div>
                         <div className="font-semibold">{selectedBooking.date}</div>
                       </div>
                       <div>
-                        <div className="text-sm text-slate-500">Hora</div>
+                        <div className="text-sm text-slate-500">{t('colTime')}</div>
                         <div className="font-semibold">{selectedBooking.time}</div>
                       </div>
                       <div>
-                        <div className="text-sm text-slate-500">Estado</div>
+                        <div className="text-sm text-slate-500">{t('colStatus')}</div>
                         <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(selectedBooking.status)}`}>
-                          {selectedBooking.status.charAt(0).toUpperCase() + selectedBooking.status.slice(1)}
+                          {getStatusLabel(selectedBooking.status)}
                         </span>
                       </div>
                     </div>
@@ -860,7 +870,7 @@ export default function SistemaReservas() {
 
                   {/* Status Actions */}
                   <div className="space-y-3">
-                    <h4 className="font-semibold text-slate-900 dark:text-white">Cambiar Estado</h4>
+                    <h4 className="font-semibold text-slate-900 dark:text-white">{t('changeStatus')}</h4>
                     <div className="flex gap-3">
                       <button
                         onClick={() => {
@@ -874,7 +884,7 @@ export default function SistemaReservas() {
                             : 'bg-green-600 text-white hover:bg-green-700'
                         }`}
                       >
-                        ✓ Confirmar
+                        {t('confirm')}
                       </button>
                       <button
                         onClick={() => {
@@ -888,7 +898,7 @@ export default function SistemaReservas() {
                             : 'bg-yellow-600 text-white hover:bg-yellow-700'
                         }`}
                       >
-                        ⏳ Pendiente
+                        {t('pending')}
                       </button>
                       <button
                         onClick={() => {
@@ -902,21 +912,21 @@ export default function SistemaReservas() {
                             : 'bg-red-600 text-white hover:bg-red-700'
                         }`}
                       >
-                        ✕ Cancelar
+                        {t('cancelAction')}
                       </button>
                     </div>
                   </div>
 
                   {/* Notes Section */}
                   <div className="space-y-3">
-                    <h4 className="font-semibold text-slate-900 dark:text-white">Notas</h4>
+                    <h4 className="font-semibold text-slate-900 dark:text-white">{t('notes')}</h4>
                     <textarea
                       className="w-full px-4 py-3 bg-slate-100 dark:bg-slate-800 rounded-lg resize-none"
                       rows={4}
-                      placeholder="Agregar notas sobre la reserva..."
+                      placeholder={t('notesPlaceholder')}
                     ></textarea>
                     <button className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors">
-                      Guardar Notas
+                      {t('saveNotes')}
                     </button>
                   </div>
                 </div>

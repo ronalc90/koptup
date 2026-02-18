@@ -59,7 +59,7 @@ export default function ContactPage() {
       }, 3000);
     } catch (err: any) {
       console.error('Error submitting contact form:', err);
-      setError('Error al enviar el mensaje. Por favor intenta de nuevo o contáctanos directamente por WhatsApp.');
+      setError(t('form.errorSubmit'));
     } finally {
       setIsSubmitting(false);
     }
@@ -77,13 +77,8 @@ export default function ContactPage() {
 
     // Crear el mailto con ambos destinatarios
     const recipients = 'ronald@koptup.com,ronalddemiancipagauta@gmail.com';
-    const subject = encodeURIComponent('Solicitud de Agendamiento de Llamada - KopTup');
-    const body = encodeURIComponent(
-      `Hola equipo de KopTup,\n\n` +
-      `Me gustaría agendar una llamada para discutir mis necesidades tecnológicas.\n\n` +
-      `Por favor, confirmen disponibilidad y agendemos una reunión.\n\n` +
-      `Saludos cordiales`
-    );
+    const subject = encodeURIComponent(t('schedule.emailSubject'));
+    const body = encodeURIComponent(t('schedule.emailBody'));
 
     // Abrir cliente de email con los datos
     window.location.href = `mailto:${recipients}?subject=${subject}&body=${body}`;
@@ -433,7 +428,7 @@ export default function ContactPage() {
                     onClick={handleScheduleCall}
                     disabled={isScheduling}
                   >
-                    {isScheduling ? 'Abriendo...' : t('schedule.button')}
+                    {isScheduling ? t('schedule.opening') : t('schedule.button')}
                   </Button>
                 </CardContent>
               </Card>

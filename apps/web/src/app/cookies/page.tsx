@@ -24,92 +24,42 @@ export default function CookiesPage() {
   const cookieTypes = [
     {
       icon: ShieldCheckIcon,
-      title: 'Cookies Esenciales',
-      description: 'Cookies necesarias para el funcionamiento básico del sitio web',
+      title: t('types.ct1.title'),
+      description: t('types.ct1.description'),
       required: true,
       enabled: essentialEnabled,
       setEnabled: setEssentialEnabled,
       cookies: [
-        {
-          name: 'session_id',
-          purpose: 'Mantener la sesión del usuario',
-          duration: 'Sesión',
-          type: 'Primera parte',
-        },
-        {
-          name: 'auth_token',
-          purpose: 'Autenticación y seguridad',
-          duration: '7 días',
-          type: 'Primera parte',
-        },
-        {
-          name: 'csrf_token',
-          purpose: 'Protección contra ataques CSRF',
-          duration: 'Sesión',
-          type: 'Primera parte',
-        },
-        {
-          name: 'cookie_consent',
-          purpose: 'Almacenar preferencias de cookies',
-          duration: '1 año',
-          type: 'Primera parte',
-        },
+        { name: 'session_id', purpose: t('types.ct1.ck1.purpose'), duration: t('types.ct1.ck1.duration'), type: t('types.ct1.ck1.type') },
+        { name: 'auth_token', purpose: t('types.ct1.ck2.purpose'), duration: t('types.ct1.ck2.duration'), type: t('types.ct1.ck2.type') },
+        { name: 'csrf_token', purpose: t('types.ct1.ck3.purpose'), duration: t('types.ct1.ck3.duration'), type: t('types.ct1.ck3.type') },
+        { name: 'cookie_consent', purpose: t('types.ct1.ck4.purpose'), duration: t('types.ct1.ck4.duration'), type: t('types.ct1.ck4.type') },
       ],
     },
     {
       icon: Cog6ToothIcon,
-      title: 'Cookies Funcionales',
-      description: 'Cookies que mejoran la funcionalidad y personalización',
+      title: t('types.ct2.title'),
+      description: t('types.ct2.description'),
       required: false,
       enabled: functionalEnabled,
       setEnabled: setFunctionalEnabled,
       cookies: [
-        {
-          name: 'language',
-          purpose: 'Recordar preferencia de idioma',
-          duration: '1 año',
-          type: 'Primera parte',
-        },
-        {
-          name: 'theme',
-          purpose: 'Recordar tema (claro/oscuro)',
-          duration: '1 año',
-          type: 'Primera parte',
-        },
-        {
-          name: 'user_preferences',
-          purpose: 'Almacenar configuraciones del usuario',
-          duration: '6 meses',
-          type: 'Primera parte',
-        },
+        { name: 'language', purpose: t('types.ct2.ck1.purpose'), duration: t('types.ct2.ck1.duration'), type: t('types.ct2.ck1.type') },
+        { name: 'theme', purpose: t('types.ct2.ck2.purpose'), duration: t('types.ct2.ck2.duration'), type: t('types.ct2.ck2.type') },
+        { name: 'user_preferences', purpose: t('types.ct2.ck3.purpose'), duration: t('types.ct2.ck3.duration'), type: t('types.ct2.ck3.type') },
       ],
     },
     {
       icon: ChartBarIcon,
-      title: 'Cookies Analíticas',
-      description: 'Cookies que nos ayudan a entender cómo se utiliza el sitio',
+      title: t('types.ct3.title'),
+      description: t('types.ct3.description'),
       required: false,
       enabled: analyticsEnabled,
       setEnabled: setAnalyticsEnabled,
       cookies: [
-        {
-          name: '_ga',
-          purpose: 'Google Analytics - Distinguir usuarios',
-          duration: '2 años',
-          type: 'Terceros (Google)',
-        },
-        {
-          name: '_gid',
-          purpose: 'Google Analytics - Distinguir usuarios',
-          duration: '24 horas',
-          type: 'Terceros (Google)',
-        },
-        {
-          name: '_gat',
-          purpose: 'Google Analytics - Limitar tasa de solicitudes',
-          duration: '1 minuto',
-          type: 'Terceros (Google)',
-        },
+        { name: '_ga', purpose: t('types.ct3.ck1.purpose'), duration: t('types.ct3.ck1.duration'), type: t('types.ct3.ck1.type') },
+        { name: '_gid', purpose: t('types.ct3.ck2.purpose'), duration: t('types.ct3.ck2.duration'), type: t('types.ct3.ck2.type') },
+        { name: '_gat', purpose: t('types.ct3.ck3.purpose'), duration: t('types.ct3.ck3.duration'), type: t('types.ct3.ck3.type') },
       ],
     },
   ];
@@ -121,43 +71,26 @@ export default function CookiesPage() {
       analytics: analyticsEnabled,
       timestamp: new Date().toISOString(),
     };
-
-    // En un caso real, aquí guardarías las preferencias
     localStorage.setItem('cookie_preferences', JSON.stringify(preferences));
-
-    alert('Preferencias guardadas correctamente');
+    alert(t('preferences.alertSaved'));
   };
 
   const handleAcceptAll = () => {
     setEssentialEnabled(true);
     setFunctionalEnabled(true);
     setAnalyticsEnabled(true);
-
-    const preferences = {
-      essential: true,
-      functional: true,
-      analytics: true,
-      timestamp: new Date().toISOString(),
-    };
-
+    const preferences = { essential: true, functional: true, analytics: true, timestamp: new Date().toISOString() };
     localStorage.setItem('cookie_preferences', JSON.stringify(preferences));
-    alert('Todas las cookies han sido aceptadas');
+    alert(t('preferences.alertAccepted'));
   };
 
   const handleRejectOptional = () => {
     setEssentialEnabled(true);
     setFunctionalEnabled(false);
     setAnalyticsEnabled(false);
-
-    const preferences = {
-      essential: true,
-      functional: false,
-      analytics: false,
-      timestamp: new Date().toISOString(),
-    };
-
+    const preferences = { essential: true, functional: false, analytics: false, timestamp: new Date().toISOString() };
     localStorage.setItem('cookie_preferences', JSON.stringify(preferences));
-    alert('Solo cookies esenciales están habilitadas');
+    alert(t('preferences.alertEssential'));
   };
 
   return (
@@ -168,7 +101,7 @@ export default function CookiesPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
           <div className="text-center max-w-4xl mx-auto">
             <Badge variant="outline" size="lg" className="mb-6 border-white/30 text-white">
-              Actualizado: Noviembre 2025
+              {t('updatedBadge')}
             </Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
               {t('hero.title')}
@@ -178,7 +111,7 @@ export default function CookiesPage() {
             </p>
             <div className="flex items-center justify-center gap-2 text-primary-100">
               <CakeIcon className="h-5 w-5" />
-              <span>Preferencias transparentes y controladas por ti</span>
+              <span>{t('heroClaim')}</span>
             </div>
           </div>
         </div>
@@ -195,13 +128,13 @@ export default function CookiesPage() {
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-secondary-900 dark:text-white mb-4">
-                    ¿Qué son las Cookies?
+                    {t('intro.title')}
                   </h2>
                   <p className="text-secondary-700 dark:text-secondary-300 mb-4">
-                    Las cookies son pequeños archivos de texto que se almacenan en su dispositivo (computadora, tablet o móvil) cuando visita un sitio web. Las cookies permiten que el sitio web recuerde sus acciones y preferencias durante un período de tiempo, para que no tenga que volver a configurarlas cada vez que regrese al sitio o navegue de una página a otra.
+                    {t('intro.p1')}
                   </p>
                   <p className="text-secondary-700 dark:text-secondary-300">
-                    En KopTup utilizamos cookies para mejorar su experiencia de navegación, analizar el uso de nuestro sitio y personalizar el contenido. Esta política explica qué cookies utilizamos y por qué.
+                    {t('intro.p2')}
                   </p>
                 </div>
               </div>
@@ -215,10 +148,10 @@ export default function CookiesPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-secondary-900 dark:text-white mb-4">
-              Tipos de Cookies que Utilizamos
+              {t('types.title')}
             </h2>
             <p className="text-xl text-secondary-600 dark:text-secondary-400 max-w-3xl mx-auto">
-              A continuación se detallan los diferentes tipos de cookies que utilizamos en nuestro sitio web
+              {t('types.subtitle')}
             </p>
           </div>
 
@@ -244,7 +177,7 @@ export default function CookiesPage() {
                             </p>
                             {type.required && (
                               <Badge variant="secondary" size="sm">
-                                Siempre Activas
+                                {t('types.alwaysActive')}
                               </Badge>
                             )}
                           </div>
@@ -277,16 +210,16 @@ export default function CookiesPage() {
                           <thead>
                             <tr className="border-b border-secondary-200 dark:border-secondary-800">
                               <th className="text-left py-3 px-4 text-sm font-semibold text-secondary-900 dark:text-white">
-                                Nombre
+                                {t('types.colName')}
                               </th>
                               <th className="text-left py-3 px-4 text-sm font-semibold text-secondary-900 dark:text-white">
-                                Propósito
+                                {t('types.colPurpose')}
                               </th>
                               <th className="text-left py-3 px-4 text-sm font-semibold text-secondary-900 dark:text-white">
-                                Duración
+                                {t('types.colDuration')}
                               </th>
                               <th className="text-left py-3 px-4 text-sm font-semibold text-secondary-900 dark:text-white">
-                                Tipo
+                                {t('types.colType')}
                               </th>
                             </tr>
                           </thead>
@@ -328,35 +261,22 @@ export default function CookiesPage() {
           <Card variant="bordered" className="bg-primary-50 dark:bg-primary-950 border-primary-200 dark:border-primary-800">
             <CardContent className="p-8">
               <h2 className="text-2xl font-bold text-secondary-900 dark:text-white mb-6 text-center">
-                Administrar Preferencias de Cookies
+                {t('preferences.title')}
               </h2>
               <p className="text-secondary-700 dark:text-secondary-300 mb-6 text-center">
-                Puede cambiar sus preferencias de cookies en cualquier momento utilizando los controles a continuación
+                {t('preferences.subtitle')}
               </p>
-
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button
-                  variant="primary"
-                  size="lg"
-                  onClick={handleAcceptAll}
-                >
+                <Button variant="primary" size="lg" onClick={handleAcceptAll}>
                   <CheckCircleIcon className="h-5 w-5 mr-2" />
-                  Aceptar Todas
+                  {t('preferences.acceptAll')}
                 </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={handleRejectOptional}
-                >
+                <Button variant="outline" size="lg" onClick={handleRejectOptional}>
                   <XCircleIcon className="h-5 w-5 mr-2" />
-                  Solo Esenciales
+                  {t('preferences.essentialOnly')}
                 </Button>
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  onClick={handleSavePreferences}
-                >
-                  Guardar Preferencias
+                <Button variant="secondary" size="lg" onClick={handleSavePreferences}>
+                  {t('preferences.savePreferences')}
                 </Button>
               </div>
             </CardContent>
@@ -370,23 +290,20 @@ export default function CookiesPage() {
           <Card variant="bordered">
             <CardContent className="p-6">
               <h2 className="text-2xl font-bold text-secondary-900 dark:text-white mb-4">
-                Cómo Controlar las Cookies
+                {t('control.title')}
               </h2>
               <div className="space-y-4 text-secondary-700 dark:text-secondary-300">
                 <p>
-                  Puede controlar y/o eliminar las cookies como desee. Para obtener más detalles, consulte{' '}
+                  {t('control.p1')}{' '}
                   <a href="https://www.aboutcookies.org" target="_blank" rel="noopener noreferrer" className="text-primary-600 dark:text-primary-400 hover:underline">
-                    aboutcookies.org
+                    {t('control.aboutCookiesLink')}
                   </a>.
                 </p>
-
                 <div>
                   <h3 className="font-semibold text-secondary-900 dark:text-white mb-2">
-                    Configuración del Navegador
+                    {t('control.browserTitle')}
                   </h3>
-                  <p className="mb-2">
-                    La mayoría de los navegadores web permiten controlar las cookies a través de su configuración. Para obtener información sobre cómo hacerlo en navegadores populares:
-                  </p>
+                  <p className="mb-2">{t('control.browserP1')}</p>
                   <ul className="list-disc list-inside space-y-1 ml-4">
                     <li>
                       <a href="https://support.google.com/chrome/answer/95647" target="_blank" rel="noopener noreferrer" className="text-primary-600 dark:text-primary-400 hover:underline">
@@ -410,10 +327,7 @@ export default function CookiesPage() {
                     </li>
                   </ul>
                 </div>
-
-                <p>
-                  Tenga en cuenta que si bloquea o elimina las cookies, algunas partes de nuestro sitio web pueden no funcionar correctamente.
-                </p>
+                <p>{t('control.browserWarning')}</p>
               </div>
             </CardContent>
           </Card>
@@ -421,20 +335,20 @@ export default function CookiesPage() {
           <Card variant="bordered">
             <CardContent className="p-6">
               <h2 className="text-2xl font-bold text-secondary-900 dark:text-white mb-4">
-                Cookies de Terceros
+                {t('thirdParty.title')}
               </h2>
               <p className="text-secondary-700 dark:text-secondary-300 mb-4">
-                Algunos de nuestros socios comerciales utilizan cookies en nuestro sitio (por ejemplo, Google Analytics). No tenemos acceso ni control sobre estas cookies. Esta política de cookies cubre el uso de cookies por parte de KopTup y no el uso de cookies por parte de terceros.
+                {t('thirdParty.p1')}
               </p>
               <div className="space-y-3">
                 <div>
                   <h3 className="font-semibold text-secondary-900 dark:text-white mb-2">
-                    Google Analytics
+                    {t('thirdParty.googleTitle')}
                   </h3>
                   <p className="text-secondary-700 dark:text-secondary-300 text-sm">
-                    Utilizamos Google Analytics para analizar el uso de nuestro sitio web. Para más información sobre cómo Google utiliza los datos, visite{' '}
+                    {t('thirdParty.googleP1')}{' '}
                     <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer" className="text-primary-600 dark:text-primary-400 hover:underline">
-                      políticas de Google
+                      {t('thirdParty.googleLink')}
                     </a>.
                   </p>
                 </div>
@@ -445,34 +359,28 @@ export default function CookiesPage() {
           <Card variant="bordered">
             <CardContent className="p-6">
               <h2 className="text-2xl font-bold text-secondary-900 dark:text-white mb-4">
-                Actualizaciones de esta Política
+                {t('updates.title')}
               </h2>
-              <p className="text-secondary-700 dark:text-secondary-300 mb-4">
-                Podemos actualizar esta Política de Cookies periódicamente para reflejar cambios en las cookies que utilizamos o por otras razones operativas, legales o reglamentarias.
-              </p>
-              <p className="text-secondary-700 dark:text-secondary-300">
-                Le recomendamos que revise esta página regularmente para mantenerse informado sobre nuestro uso de cookies y tecnologías relacionadas.
-              </p>
+              <p className="text-secondary-700 dark:text-secondary-300 mb-4">{t('updates.p1')}</p>
+              <p className="text-secondary-700 dark:text-secondary-300">{t('updates.p2')}</p>
             </CardContent>
           </Card>
 
           <Card variant="bordered" className="bg-primary-50 dark:bg-primary-950 border-primary-200 dark:border-primary-800">
             <CardContent className="p-6">
               <h2 className="text-2xl font-bold text-secondary-900 dark:text-white mb-4">
-                Contacto
+                {t('contact.title')}
               </h2>
-              <p className="text-secondary-700 dark:text-secondary-300 mb-4">
-                Si tiene preguntas sobre nuestra Política de Cookies, contáctenos:
-              </p>
+              <p className="text-secondary-700 dark:text-secondary-300 mb-4">{t('contact.text')}</p>
               <div className="space-y-2 text-secondary-700 dark:text-secondary-300">
                 <div className="flex items-center gap-2">
-                  <strong>Email:</strong>
+                  <strong>{t('contact.labelEmail')}</strong>
                   <a href="mailto:ronald@koptup.com" className="text-primary-600 dark:text-primary-400 hover:underline">
                     ronald@koptup.com
                   </a>
                 </div>
                 <div className="flex items-center gap-2">
-                  <strong>Teléfono:</strong>
+                  <strong>{t('contact.labelPhone')}</strong>
                   <a href="tel:+573024794842" className="text-primary-600 dark:text-primary-400 hover:underline">
                     +57 302 479 4842
                   </a>
@@ -488,18 +396,18 @@ export default function CookiesPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="flex items-center justify-center gap-2 text-secondary-600 dark:text-secondary-400 mb-4">
             <ClockIcon className="h-5 w-5" />
-            <span className="text-sm">Última actualización: Noviembre 2025</span>
+            <span className="text-sm">{t('footer.updated')}</span>
           </div>
           <p className="text-sm text-secondary-500 dark:text-secondary-500 mb-2">
-            © 2025 KopTup - Soluciones Tecnológicas. Todos los derechos reservados.
+            {t('footer.copyright')}
           </p>
           <div className="flex items-center justify-center gap-4 text-sm">
             <a href="/privacy" className="text-primary-600 dark:text-primary-400 hover:underline">
-              Política de Privacidad
+              {t('footer.linkPrivacy')}
             </a>
             <span className="text-secondary-400">•</span>
             <a href="/terms" className="text-primary-600 dark:text-primary-400 hover:underline">
-              Términos y Condiciones
+              {t('footer.linkTerms')}
             </a>
           </div>
         </div>

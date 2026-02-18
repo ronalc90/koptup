@@ -236,11 +236,11 @@ export default function GestorDocumentos() {
   };
 
   const sidebarItems = [
-    { id: 'all', name: 'Todos los Documentos', icon: DocumentTextIcon, count: stats?.total || 0 },
-    { id: 'favorites', name: 'Favoritos', icon: StarIcon, count: stats?.favorites || 0 },
-    { id: 'recent', name: 'Recientes', icon: ClockIcon, count: stats?.recent || 0 },
-    { id: 'trash', name: 'Papelera', icon: TrashIcon, count: stats?.trash || 0 },
-    { id: 'settings', name: 'Configuración', icon: Cog6ToothIcon, count: null },
+    { id: 'all', name: t('sidebar.allDocuments'), icon: DocumentTextIcon, count: stats?.total || 0 },
+    { id: 'favorites', name: t('sidebar.favorites'), icon: StarIcon, count: stats?.favorites || 0 },
+    { id: 'recent', name: t('sidebar.recent'), icon: ClockIcon, count: stats?.recent || 0 },
+    { id: 'trash', name: t('sidebar.trash'), icon: TrashIcon, count: stats?.trash || 0 },
+    { id: 'settings', name: t('sidebar.settings'), icon: Cog6ToothIcon, count: null },
   ];
 
   const toggleSetting = (key: keyof typeof settings) => {
@@ -259,13 +259,13 @@ export default function GestorDocumentos() {
     <div className="space-y-6">
       <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
         <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
-          Configuración del Sistema
+          {t('settings.title')}
         </h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
             <div>
-              <h4 className="font-semibold text-slate-900 dark:text-white">Procesamiento IA Automático</h4>
-              <p className="text-sm text-slate-500">Analizar documentos con IA al subirlos</p>
+              <h4 className="font-semibold text-slate-900 dark:text-white">{t('settings.autoProcess')}</h4>
+              <p className="text-sm text-slate-500">{t('settings.autoProcessDesc')}</p>
             </div>
             <button
               onClick={() => toggleSetting('autoProcess')}
@@ -282,8 +282,8 @@ export default function GestorDocumentos() {
           </div>
           <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
             <div>
-              <h4 className="font-semibold text-slate-900 dark:text-white">Búsqueda Semántica</h4>
-              <p className="text-sm text-slate-500">Habilitar búsqueda por significado con IA</p>
+              <h4 className="font-semibold text-slate-900 dark:text-white">{t('settings.semanticSearch')}</h4>
+              <p className="text-sm text-slate-500">{t('settings.semanticSearchDesc')}</p>
             </div>
             <button
               onClick={() => toggleSetting('semanticSearchEnabled')}
@@ -300,8 +300,8 @@ export default function GestorDocumentos() {
           </div>
           <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
             <div>
-              <h4 className="font-semibold text-slate-900 dark:text-white">Etiquetado Automático</h4>
-              <p className="text-sm text-slate-500">Generar tags automáticamente con IA</p>
+              <h4 className="font-semibold text-slate-900 dark:text-white">{t('settings.autoTagging')}</h4>
+              <p className="text-sm text-slate-500">{t('settings.autoTaggingDesc')}</p>
             </div>
             <button
               onClick={() => toggleSetting('autoTagging')}
@@ -322,27 +322,27 @@ export default function GestorDocumentos() {
           <div className="text-sm text-slate-600 dark:text-slate-400">
             {settingsSaved ? (
               <span className="text-green-600 dark:text-green-400 font-medium">
-                ✓ Configuración guardada
+                {t('settings.saved')}
               </span>
             ) : (
-              <span>Actualiza tu configuración aquí</span>
+              <span>{t('settings.updateHint')}</span>
             )}
           </div>
           <button
             onClick={saveSettings}
             className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all"
           >
-            Guardar Cambios
+            {t('settings.saveButton')}
           </button>
         </div>
       </div>
 
       {stats && (
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
-          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Almacenamiento</h3>
+          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">{t('settings.storageTitle')}</h3>
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-slate-600 dark:text-slate-400">Espacio Utilizado</span>
+              <span className="text-sm text-slate-600 dark:text-slate-400">{t('settings.spaceUsed')}</span>
               <span className="text-sm font-semibold">
                 {(stats.totalSize / (1024 * 1024)).toFixed(2)} MB
               </span>
@@ -354,31 +354,31 @@ export default function GestorDocumentos() {
               ></div>
             </div>
           </div>
-          <p className="text-sm text-slate-500 mt-4">{stats.total} documentos guardados</p>
+          <p className="text-sm text-slate-500 mt-4">{t('settings.documentsStored', { count: stats.total })}</p>
         </div>
       )}
 
       <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
         <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
-          Resumen de Configuración
+          {t('settings.summaryTitle')}
         </h3>
         <div className="space-y-3">
           <div className="flex items-center gap-3 text-sm">
             <div className={`w-2 h-2 rounded-full ${settings.autoProcess ? 'bg-green-500' : 'bg-slate-400'}`}></div>
             <span className="text-slate-700 dark:text-slate-300">
-              Procesamiento IA: <strong>{settings.autoProcess ? 'Activado' : 'Desactivado'}</strong>
+              {t('settings.aiProcessingLabel')}: <strong>{settings.autoProcess ? t('settings.on') : t('settings.off')}</strong>
             </span>
           </div>
           <div className="flex items-center gap-3 text-sm">
             <div className={`w-2 h-2 rounded-full ${settings.semanticSearchEnabled ? 'bg-green-500' : 'bg-slate-400'}`}></div>
             <span className="text-slate-700 dark:text-slate-300">
-              Búsqueda Semántica: <strong>{settings.semanticSearchEnabled ? 'Activada' : 'Desactivada'}</strong>
+              {t('settings.semanticSearchLabel')}: <strong>{settings.semanticSearchEnabled ? t('settings.on') : t('settings.off')}</strong>
             </span>
           </div>
           <div className="flex items-center gap-3 text-sm">
             <div className={`w-2 h-2 rounded-full ${settings.autoTagging ? 'bg-green-500' : 'bg-slate-400'}`}></div>
             <span className="text-slate-700 dark:text-slate-300">
-              Etiquetado Automático: <strong>{settings.autoTagging ? 'Activado' : 'Desactivado'}</strong>
+              {t('settings.autoTaggingLabel')}: <strong>{settings.autoTagging ? t('settings.on') : t('settings.off')}</strong>
             </span>
           </div>
         </div>
@@ -518,16 +518,16 @@ export default function GestorDocumentos() {
             {showFilters && (
               <div className="flex gap-3 flex-wrap">
                 <select className="px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm">
-                  <option>Tipo: Todos</option>
+                  <option>{t('filters.typeAll')}</option>
                   <option>PDF</option>
                   <option>Word</option>
                   <option>Excel</option>
                 </select>
                 <select className="px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm">
-                  <option>Fecha: Todas</option>
-                  <option>Última semana</option>
-                  <option>Último mes</option>
-                  <option>Último año</option>
+                  <option>{t('filters.dateAll')}</option>
+                  <option>{t('filters.lastWeek')}</option>
+                  <option>{t('filters.lastMonth')}</option>
+                  <option>{t('filters.lastYear')}</option>
                 </select>
               </div>
             )}
@@ -645,7 +645,7 @@ export default function GestorDocumentos() {
                                     handleRenameClick(doc.id, doc.name);
                                   }}
                                   className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                                  title="Renombrar"
+                                  title={t('rename.titleAttr')}
                                 >
                                   <PencilIcon className="w-4 h-4 text-slate-600" />
                                 </button>
@@ -929,7 +929,7 @@ export default function GestorDocumentos() {
             <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setShowRenameModal(false)} />
             <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
               <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-6 max-w-md w-full">
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Renombrar Documento</h3>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">{t('rename.title')}</h3>
                 <input
                   type="text"
                   value={newFilename}
