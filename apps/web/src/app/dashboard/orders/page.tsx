@@ -29,6 +29,7 @@ export default function OrdersPage() {
 
   useEffect(() => {
     filterOrders();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm, statusFilter, orders]);
 
   const loadOrders = async () => {
