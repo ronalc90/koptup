@@ -7,6 +7,7 @@ import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import { api } from '@/lib/api';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import {
   CheckCircleIcon,
   XCircleIcon,
@@ -17,6 +18,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 export default function AdminOrdersPage() {
+  const t = useTranslations('adminOrders');
   const [orders, setOrders] = useState<any[]>([]);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [approvalFilter, setApprovalFilter] = useState<string>('all');
@@ -51,7 +53,7 @@ export default function AdminOrdersPage() {
   }, [statusFilter, approvalFilter]);
 
   const handleApprove = async (order: any) => {
-    if (!confirm(`¿Aprobar el pedido ${order.id} de ${order.user?.name}?`)) {
+    if (!confirm(t('confirmApprove', { id: order.id, name: order.user?.name }))) {
       return;
     }
 
@@ -59,10 +61,10 @@ export default function AdminOrdersPage() {
       setProcessingOrder(order.id);
       await api.post(`/api/admin/orders/${order.id}/approve`);
       await loadOrders();
-      alert('Pedido aprobado exitosamente');
+      alert(t('approvedSuccess'));
     } catch (error) {
       console.error('Error approving order:', error);
-      alert('Error al aprobar pedido');
+      alert(t('approveError'));
     } finally {
       setProcessingOrder(null);
     }
@@ -74,16 +76,16 @@ export default function AdminOrdersPage() {
     try {
       setProcessingOrder(orderToReject.id);
       await api.post(`/api/admin/orders/${orderToReject.id}/reject`, {
-        reason: rejectionReason || 'No especificado',
+        reason: rejectionReason || t('notSpecified'),
       });
       await loadOrders();
       setShowRejectModal(false);
       setRejectionReason('');
       setOrderToReject(null);
-      alert('Pedido rechazado');
+      alert(t('rejectedSuccess'));
     } catch (error) {
       console.error('Error rejecting order:', error);
-      alert('Error al rechazar pedido');
+      alert(t('rejectError'));
     } finally {
       setProcessingOrder(null);
     }
@@ -95,7 +97,7 @@ export default function AdminOrdersPage() {
   };
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
-    if (!confirm(`¿Cambiar el estado del pedido a "${newStatus}"?`)) {
+    if (!confirm(t('confirmStatusChange', { status: newStatus }))) {
       return;
     }
 
@@ -103,10 +105,10 @@ export default function AdminOrdersPage() {
       setProcessingOrder(orderId);
       await api.patch(`/api/admin/orders/${orderId}/status`, { status: newStatus });
       await loadOrders();
-      alert('Estado actualizado exitosamente');
+      alert(t('statusUpdated'));
     } catch (error) {
       console.error('Error updating order status:', error);
-      alert('Error al actualizar el estado');
+      alert(t('statusUpdateError'));
     } finally {
       setProcessingOrder(null);
     }
@@ -114,9 +116,9 @@ export default function AdminOrdersPage() {
 
   const getApprovalBadge = (status: string) => {
     const badges: Record<string, { variant: any; text: string; icon: any }> = {
-      pending: { variant: 'secondary', text: 'Pendiente de Aprobación', icon: ClockIcon },
-      approved: { variant: 'primary', text: 'Aprobado', icon: CheckCircleIcon },
-      rejected: { variant: 'danger', text: 'Rechazado', icon: XCircleIcon },
+      pending: { variant: 'secondary', text: t('approvalBadge.pending'), icon: ClockIcon },
+      approved: { variant: 'primary', text: t('approvalBadge.approved'), icon: CheckCircleIcon },
+      rejected: { variant: 'danger', text: t('approvalBadge.rejected'), icon: XCircleIcon },
     };
     // Si no tiene approvalStatus, asumimos que es pending
     const actualStatus = status || 'pending';
@@ -156,10 +158,10 @@ export default function AdminOrdersPage() {
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">
-            Pedidos
+            {t('title')}
           </h1>
           <p className="text-secondary-600 dark:text-secondary-400 mt-1">
-            Gestiona los pedidos de los clientes y aprueba o rechaza solicitudes
+            {t('subtitle')}
           </p>
         </div>
 
@@ -170,7 +172,7 @@ export default function AdminOrdersPage() {
               {/* Approval Status Filter */}
               <div>
                 <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                  Estado de Aprobación
+                  {t('approvalStatus')}
                 </label>
                 <div className="flex gap-2 flex-wrap">
                   <Button
@@ -178,7 +180,7 @@ export default function AdminOrdersPage() {
                     size="sm"
                     onClick={() => setApprovalFilter('all')}
                   >
-                    Todos
+                    {t('all')}
                   </Button>
                   <Button
                     variant={approvalFilter === 'pending' ? 'primary' : 'outline'}
@@ -186,7 +188,7 @@ export default function AdminOrdersPage() {
                     onClick={() => setApprovalFilter('pending')}
                   >
                     <ClockIcon className="h-4 w-4 mr-1" />
-                    Pendientes
+                    {t('pending')}
                   </Button>
                   <Button
                     variant={approvalFilter === 'approved' ? 'primary' : 'outline'}
@@ -194,7 +196,7 @@ export default function AdminOrdersPage() {
                     onClick={() => setApprovalFilter('approved')}
                   >
                     <CheckCircleIcon className="h-4 w-4 mr-1" />
-                    Aprobados
+                    {t('approved')}
                   </Button>
                   <Button
                     variant={approvalFilter === 'rejected' ? 'primary' : 'outline'}
@@ -202,7 +204,7 @@ export default function AdminOrdersPage() {
                     onClick={() => setApprovalFilter('rejected')}
                   >
                     <XCircleIcon className="h-4 w-4 mr-1" />
-                    Rechazados
+                    {t('rejected')}
                   </Button>
                 </div>
               </div>
@@ -210,7 +212,7 @@ export default function AdminOrdersPage() {
               {/* Order Status Filter */}
               <div>
                 <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                  Estado del Pedido
+                  {t('orderStatus')}
                 </label>
                 <div className="flex gap-2 flex-wrap">
                   {['all', 'pending', 'in_progress', 'shipped', 'completed', 'cancelled'].map((s) => (
@@ -220,7 +222,7 @@ export default function AdminOrdersPage() {
                       variant={statusFilter === s ? 'primary' : 'outline'}
                       onClick={() => setStatusFilter(s)}
                     >
-                      {s === 'all' ? 'Todos' : s}
+                      {s === 'all' ? t('all') : s}
                     </Button>
                   ))}
                 </div>
@@ -232,7 +234,7 @@ export default function AdminOrdersPage() {
         {/* Orders List */}
         <Card variant="bordered">
           <CardHeader>
-            <CardTitle>Todos los pedidos ({orders.length})</CardTitle>
+            <CardTitle>{t('allOrders')} ({orders.length})</CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
@@ -242,7 +244,7 @@ export default function AdminOrdersPage() {
             ) : orders.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-secondary-600 dark:text-secondary-400">
-                  No hay pedidos para mostrar
+                  {t('noOrders')}
                 </p>
               </div>
             ) : (
@@ -279,14 +281,14 @@ export default function AdminOrdersPage() {
                       <UserIcon className="h-10 w-10 text-secondary-400" />
                       <div className="flex-1">
                         <p className="text-sm font-semibold text-secondary-900 dark:text-white">
-                          Cliente: {order.user?.name}
+                          {t('client')}: {order.user?.name}
                         </p>
                         <p className="text-xs text-secondary-600 dark:text-secondary-400">
                           {order.user?.email}
                         </p>
                       </div>
                       <div className="text-right text-xs text-secondary-500">
-                        <p>Fecha: {formatDate(order.date)}</p>
+                        <p>{t('date')}: {formatDate(order.date)}</p>
                         <p>ID: {order.id}</p>
                       </div>
                     </div>
@@ -295,7 +297,7 @@ export default function AdminOrdersPage() {
                     {order.items && order.items.length > 0 && (
                       <div className="mb-4">
                         <p className="text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                          Items del pedido:
+                          {t('orderItems')}:
                         </p>
                         <div className="space-y-2">
                           {order.items.map((item: any, idx: number) => (
@@ -307,7 +309,7 @@ export default function AdminOrdersPage() {
                                 {item.name} {item.description && `(${item.description})`}
                               </span>
                               <span className="text-secondary-600 dark:text-secondary-400">
-                                x{item.quantity} · ${item.price} c/u
+                                x{item.quantity} · ${item.price} {t('perUnit')}
                               </span>
                             </div>
                           ))}
@@ -320,7 +322,7 @@ export default function AdminOrdersPage() {
                       <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
                         <p className="text-sm font-semibold text-blue-900 dark:text-blue-200 mb-2 flex items-center gap-2">
                           <ChatBubbleLeftRightIcon className="h-4 w-4" />
-                          Descripción del proyecto del cliente:
+                          {t('clientDescription')}:
                         </p>
                         {order.comments.map((comment: any, idx: number) => (
                           <div key={idx} className="text-sm text-blue-800 dark:text-blue-300 whitespace-pre-wrap">
@@ -335,7 +337,7 @@ export default function AdminOrdersPage() {
                       <div className="mb-4">
                         <p className="text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2 flex items-center gap-2">
                           <ClockIcon className="h-4 w-4" />
-                          Archivos adjuntos ({order.attachments.length}):
+                          {t('attachments')} ({order.attachments.length}):
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                           {order.attachments.map((file: any, idx: number) => (
@@ -365,7 +367,7 @@ export default function AdminOrdersPage() {
                     {order.approvalStatus === 'rejected' && order.rejectionReason && (
                       <div className="mb-4 p-3 bg-red-50 dark:bg-red-950 rounded-lg">
                         <p className="text-sm font-medium text-red-900 dark:text-red-400 mb-1">
-                          Motivo de rechazo:
+                          {t('rejectionReason')}:
                         </p>
                         <p className="text-sm text-red-700 dark:text-red-300">
                           {order.rejectionReason}
@@ -377,7 +379,7 @@ export default function AdminOrdersPage() {
                     <div className="space-y-3">
                       {/* Approval Actions */}
                       <div>
-                        <p className="text-xs font-medium text-secondary-500 mb-2">Aprobación del pedido:</p>
+                        <p className="text-xs font-medium text-secondary-500 mb-2">{t('orderApproval')}:</p>
                         <div className="flex gap-2 flex-wrap">
                           {(!order.approvalStatus || order.approvalStatus !== 'approved') && (
                             <Button
@@ -387,7 +389,7 @@ export default function AdminOrdersPage() {
                               disabled={processingOrder === order.id}
                             >
                               <CheckCircleIcon className="h-4 w-4 mr-2" />
-                              {order.approvalStatus === 'rejected' ? 'Re-aprobar' : 'Aprobar Pedido'}
+                              {order.approvalStatus === 'rejected' ? t('reApprove') : t('approveOrder')}
                             </Button>
                           )}
                           {(!order.approvalStatus || order.approvalStatus !== 'rejected') && (
@@ -398,7 +400,7 @@ export default function AdminOrdersPage() {
                               disabled={processingOrder === order.id}
                             >
                               <XCircleIcon className="h-4 w-4 mr-2" />
-                              Rechazar Pedido
+                              {t('rejectOrder')}
                             </Button>
                           )}
                         </div>
@@ -407,7 +409,7 @@ export default function AdminOrdersPage() {
                       {/* Status Change Actions */}
                       {(order.approvalStatus === 'approved' || !order.approvalStatus) && order.status !== 'completed' && order.status !== 'cancelled' && (
                         <div>
-                          <p className="text-xs font-medium text-secondary-500 mb-2">Cambiar estado del pedido:</p>
+                          <p className="text-xs font-medium text-secondary-500 mb-2">{t('changeOrderStatus')}:</p>
                           <div className="flex gap-2 flex-wrap">
                             {order.status === 'pending' && (
                               <Button
@@ -416,7 +418,7 @@ export default function AdminOrdersPage() {
                                 onClick={() => handleStatusChange(order.id, 'in_progress')}
                                 disabled={processingOrder === order.id}
                               >
-                                Iniciar Progreso
+                                {t('startProgress')}
                               </Button>
                             )}
                             {order.status === 'in_progress' && (
@@ -426,7 +428,7 @@ export default function AdminOrdersPage() {
                                 onClick={() => handleStatusChange(order.id, 'shipped')}
                                 disabled={processingOrder === order.id}
                               >
-                                Marcar como Enviado
+                                {t('markShipped')}
                               </Button>
                             )}
                             {(order.status === 'in_progress' || order.status === 'shipped') && (
@@ -436,7 +438,7 @@ export default function AdminOrdersPage() {
                                 onClick={() => handleStatusChange(order.id, 'completed')}
                                 disabled={processingOrder === order.id}
                               >
-                                Completar Pedido
+                                {t('completeOrder')}
                               </Button>
                             )}
                           </div>
@@ -449,7 +451,7 @@ export default function AdminOrdersPage() {
                           <Link href={`/admin/conversations/${order.conversationId}`}>
                             <Button size="sm" variant="outline">
                               <ChatBubbleLeftRightIcon className="h-4 w-4 mr-2" />
-                              Ver Conversación con Cliente
+                              {t('viewConversation')}
                             </Button>
                           </Link>
                         )}
@@ -467,15 +469,15 @@ export default function AdminOrdersPage() {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white dark:bg-secondary-900 rounded-lg p-6 max-w-md w-full">
               <h3 className="text-lg font-bold text-secondary-900 dark:text-white mb-4">
-                Rechazar Pedido
+                {t('rejectOrder')}
               </h3>
               <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-4">
-                ¿Por qué deseas rechazar el pedido <strong>{orderToReject?.id}</strong>?
+                {t('rejectModalDesc')} <strong>{orderToReject?.id}</strong>?
               </p>
               <textarea
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
-                placeholder="Escribe el motivo del rechazo..."
+                placeholder={t('rejectPlaceholder')}
                 className="w-full px-4 py-2 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-950 text-secondary-900 dark:text-white mb-4"
                 rows={4}
               />
@@ -488,10 +490,10 @@ export default function AdminOrdersPage() {
                     setOrderToReject(null);
                   }}
                 >
-                  Cancelar
+                  {t('cancel')}
                 </Button>
                 <Button variant="danger" onClick={handleReject} disabled={!rejectionReason.trim()}>
-                  Rechazar Pedido
+                  {t('rejectOrder')}
                 </Button>
               </div>
             </div>

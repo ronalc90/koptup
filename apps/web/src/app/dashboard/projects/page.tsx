@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
@@ -17,6 +18,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 export default function ProjectsPage() {
+  const t = useTranslations('projectsPage');
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProject, setSelectedProject] = useState<any>(null);
@@ -34,12 +36,12 @@ export default function ProjectsPage() {
       const formattedProjects = projectsData.map((p: any) => ({
         id: p._id || p.id,
         name: p.name,
-        description: p.description || 'Sin descripción',
+        description: p.description || t('noDescription'),
         status: p.status || 'active',
         progress: p.progress || 0,
-        startDate: p.start_date ? new Date(p.start_date).toISOString().split('T')[0] : 'Sin fecha',
-        endDate: p.end_date ? new Date(p.end_date).toISOString().split('T')[0] : 'Sin fecha',
-        manager: p.manager_name || 'Sin asignar',
+        startDate: p.start_date ? new Date(p.start_date).toISOString().split('T')[0] : t('noDate'),
+        endDate: p.end_date ? new Date(p.end_date).toISOString().split('T')[0] : t('noDate'),
+        manager: p.manager_name || t('unassigned'),
         teamSize: p.team_size || 0,
         budget: p.budget || 0,
         spent: p.actual_hours ? (p.actual_hours / (p.estimated_hours || 1)) * (p.budget || 0) : 0,
@@ -47,28 +49,28 @@ export default function ProjectsPage() {
         completedTasks: p.completed_tasks || 0,
         phases: [
           {
-            name: 'Planeación',
+            name: t('phases.planning'),
             status: p.progress > 0 ? 'completed' : 'in_progress',
             progress: p.progress > 0 ? 100 : 50,
-            dueDate: p.start_date ? new Date(p.start_date).toISOString().split('T')[0] : 'Sin fecha'
+            dueDate: p.start_date ? new Date(p.start_date).toISOString().split('T')[0] : t('noDate')
           },
           {
-            name: 'Desarrollo',
+            name: t('phases.development'),
             status: p.progress > 0 && p.progress < 100 ? 'in_progress' : p.progress === 100 ? 'completed' : 'pending',
             progress: p.progress || 0,
-            dueDate: p.end_date ? new Date(p.end_date).toISOString().split('T')[0] : 'Sin fecha'
+            dueDate: p.end_date ? new Date(p.end_date).toISOString().split('T')[0] : t('noDate')
           },
           {
-            name: 'QA',
+            name: t('phases.qa'),
             status: p.progress > 80 ? 'in_progress' : 'pending',
             progress: p.progress > 80 ? (p.progress - 80) * 5 : 0,
-            dueDate: p.end_date ? new Date(p.end_date).toISOString().split('T')[0] : 'Sin fecha'
+            dueDate: p.end_date ? new Date(p.end_date).toISOString().split('T')[0] : t('noDate')
           },
           {
-            name: 'Entrega',
+            name: t('phases.delivery'),
             status: p.status === 'completed' ? 'completed' : 'pending',
             progress: p.status === 'completed' ? 100 : 0,
-            dueDate: p.end_date ? new Date(p.end_date).toISOString().split('T')[0] : 'Sin fecha'
+            dueDate: p.end_date ? new Date(p.end_date).toISOString().split('T')[0] : t('noDate')
           },
         ],
         milestones: [],
@@ -88,10 +90,10 @@ export default function ProjectsPage() {
 
   const getStatusBadge = (status: string) => {
     const badges: Record<string, { className: string; text: string }> = {
-      planning: { className: 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300', text: 'Planeación' },
-      active: { className: 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300', text: 'Activo' },
-      on_hold: { className: 'bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300', text: 'En Espera' },
-      completed: { className: 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300', text: 'Completado' },
+      planning: { className: 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300', text: t('status.planning') },
+      active: { className: 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300', text: t('status.active') },
+      on_hold: { className: 'bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300', text: t('status.on_hold') },
+      completed: { className: 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300', text: t('status.completed') },
     };
     const badge = badges[status] || { className: 'bg-secondary-100', text: status };
     return <Badge variant="secondary" size="sm" className={badge.className}>{badge.text}</Badge>;
@@ -120,14 +122,14 @@ export default function ProjectsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">
-              Mis Proyectos
+              {t('title')}
             </h1>
             <p className="text-secondary-600 dark:text-secondary-400">
-              Sigue el progreso de todos tus proyectos
+              {t('subtitle')}
             </p>
           </div>
           <Button asChild>
-            <Link href="/contact?type=new-project">Nuevo Proyecto</Link>
+            <Link href="/contact?type=new-project">{t('newProject')}</Link>
           </Button>
         </div>
 
@@ -136,13 +138,13 @@ export default function ProjectsPage() {
             <CardContent className="flex flex-col items-center justify-center py-12">
               <div className="text-center">
                 <h3 className="text-xl font-semibold text-secondary-900 dark:text-white mb-2">
-                  No tienes proyectos activos
+                  {t('noProjects')}
                 </h3>
                 <p className="text-secondary-600 dark:text-secondary-400 mb-6">
-                  Comienza solicitando un nuevo proyecto para ver su progreso aquí
+                  {t('noProjectsDesc')}
                 </p>
                 <Button asChild>
-                  <Link href="/contact?type=new-project">Solicitar Nuevo Proyecto</Link>
+                  <Link href="/contact?type=new-project">{t('requestNewProject')}</Link>
                 </Button>
               </div>
             </CardContent>
@@ -174,7 +176,7 @@ export default function ProjectsPage() {
                   </p>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-secondary-600 dark:text-secondary-400">Progreso</span>
+                      <span className="text-secondary-600 dark:text-secondary-400">{t('progress')}</span>
                       <span className="font-semibold text-secondary-900 dark:text-white">
                         {project.progress}%
                       </span>
@@ -189,7 +191,7 @@ export default function ProjectsPage() {
                   <div className="mt-3 flex items-center gap-4 text-xs text-secondary-500">
                     <span className="font-mono">{project.id}</span>
                     <span>•</span>
-                    <span>{project.teamSize} miembros</span>
+                    <span>{project.teamSize} {t('members')}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -215,25 +217,25 @@ export default function ProjectsPage() {
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                     <div>
-                      <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">Manager</p>
+                      <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">{t('manager')}</p>
                       <p className="font-semibold text-secondary-900 dark:text-white">
                         {selectedProject.manager}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">Equipo</p>
+                      <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">{t('team')}</p>
                       <p className="font-semibold text-secondary-900 dark:text-white">
-                        {selectedProject.teamSize} miembros
+                        {selectedProject.teamSize} {t('members')}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">Inicio</p>
+                      <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">{t('startDate')}</p>
                       <p className="font-semibold text-secondary-900 dark:text-white">
                         {selectedProject.startDate}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">Entrega</p>
+                      <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">{t('deliveryDate')}</p>
                       <p className="font-semibold text-secondary-900 dark:text-white">
                         {selectedProject.endDate}
                       </p>
@@ -243,7 +245,7 @@ export default function ProjectsPage() {
                   <div className="flex items-center gap-4 p-4 bg-secondary-50 dark:bg-secondary-900 rounded-lg">
                     <div className="flex-1">
                       <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">
-                        Presupuesto utilizado
+                        {t('budgetUsed')}
                       </p>
                       <p className="text-2xl font-bold text-secondary-900 dark:text-white">
                         ${selectedProject.spent.toLocaleString()} / ${selectedProject.budget.toLocaleString()}
@@ -251,7 +253,7 @@ export default function ProjectsPage() {
                     </div>
                     <div className="text-right">
                       <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">
-                        Restante
+                        {t('remaining')}
                       </p>
                       <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                         ${(selectedProject.budget - selectedProject.spent).toLocaleString()}
@@ -264,7 +266,7 @@ export default function ProjectsPage() {
               {/* Timeline - Phases */}
               <Card variant="bordered">
                 <CardHeader>
-                  <CardTitle>Fases del Proyecto</CardTitle>
+                  <CardTitle>{t('projectPhases')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -288,7 +290,7 @@ export default function ProjectsPage() {
                           <div className="space-y-2">
                             <div className="flex items-center justify-between text-sm">
                               <span className="text-secondary-600 dark:text-secondary-400">
-                                Progreso
+                                {t('progress')}
                               </span>
                               <span className="font-semibold text-secondary-900 dark:text-white">
                                 {phase.progress}%
@@ -319,7 +321,7 @@ export default function ProjectsPage() {
                 {/* Milestones */}
                 <Card variant="bordered">
                   <CardHeader>
-                    <CardTitle>Hitos</CardTitle>
+                    <CardTitle>{t('milestones')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
@@ -344,10 +346,10 @@ export default function ProjectsPage() {
                                 }
                               >
                                 {milestone.status === 'completed'
-                                  ? 'Completado'
+                                  ? t('status.completed')
                                   : milestone.status === 'in_progress'
-                                  ? 'En Progreso'
-                                  : 'Pendiente'}
+                                  ? t('status.in_progress')
+                                  : t('status.pending')}
                               </Badge>
                             </div>
                           </div>
@@ -360,7 +362,7 @@ export default function ProjectsPage() {
                 {/* Deliverables */}
                 <Card variant="bordered">
                   <CardHeader>
-                    <CardTitle>Entregables</CardTitle>
+                    <CardTitle>{t('deliverables')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
@@ -382,7 +384,7 @@ export default function ProjectsPage() {
                                     : 'bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300'
                                 }
                               >
-                                {deliverable.status === 'approved' ? 'Aprobado' : 'En Revisión'}
+                                {deliverable.status === 'approved' ? t('status.approved') : t('status.in_review')}
                               </Badge>
                             </div>
                           </div>
@@ -398,13 +400,13 @@ export default function ProjectsPage() {
                 <Button variant="outline" className="flex-1" asChild>
                   <Link href="/dashboard/deliverables">
                     <DocumentTextIcon className="h-4 w-4 mr-2" />
-                    Ver Entregables
+                    {t('viewDeliverables')}
                   </Link>
                 </Button>
                 <Button variant="outline" className="flex-1" asChild>
                   <Link href="/dashboard/messages">
                     <ChatBubbleLeftIcon className="h-4 w-4 mr-2" />
-                    Contactar Equipo
+                    {t('contactTeam')}
                   </Link>
                 </Button>
               </div>

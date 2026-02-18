@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import Card, { CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/Card';
@@ -46,6 +47,7 @@ interface NotificationPreferences {
 }
 
 export default function ProfilePage() {
+  const t = useTranslations('profilePage');
   const [loading, setLoading] = useState(true);
   const [editingProfile, setEditingProfile] = useState(false);
   const [editingCompany, setEditingCompany] = useState(false);
@@ -174,13 +176,13 @@ export default function ProfilePage() {
 
   const handleChangePassword = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert('Las contraseñas no coinciden');
+      alert(t('passwordMismatch'));
       return;
     }
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       // Call API to change password
-      alert('Contraseña actualizada exitosamente');
+      alert(t('passwordUpdated'));
       setPasswordData({
         currentPassword: '',
         newPassword: '',
@@ -195,7 +197,7 @@ export default function ProfilePage() {
     try {
       await new Promise(resolve => setTimeout(resolve, 800));
       // Save to API
-      alert('Preferencias guardadas');
+      alert(t('preferencesSaved'));
     } catch (error) {
       console.error('Failed to save preferences:', error);
     }
@@ -203,10 +205,10 @@ export default function ProfilePage() {
 
   const getRoleBadge = (role: UserProfile['role']) => {
     const badges: Record<UserProfile['role'], { variant: any; text: string }> = {
-      owner: { variant: 'primary', text: 'Propietario' },
-      admin: { variant: 'info', text: 'Administrador' },
-      member: { variant: 'success', text: 'Miembro' },
-      viewer: { variant: 'default', text: 'Observador' },
+      owner: { variant: 'primary', text: t('roles.owner') },
+      admin: { variant: 'info', text: t('roles.admin') },
+      member: { variant: 'success', text: t('roles.member') },
+      viewer: { variant: 'default', text: t('roles.viewer') },
     };
     const badge = badges[role] || badges.viewer;
     return <Badge variant={badge.variant} size="sm">{badge.text}</Badge>;
@@ -228,10 +230,10 @@ export default function ProfilePage() {
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">
-            Mi Perfil
+            {t('title')}
           </h1>
           <p className="text-secondary-600 dark:text-secondary-400">
-            Gestiona tu información personal y preferencias
+            {t('subtitle')}
           </p>
         </div>
 
@@ -244,7 +246,7 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <UserCircleIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-                    <CardTitle>Información Personal</CardTitle>
+                    <CardTitle>{t('personalInfo')}</CardTitle>
                   </div>
                   {!editingProfile ? (
                     <Button
@@ -253,7 +255,7 @@ export default function ProfilePage() {
                       onClick={() => setEditingProfile(true)}
                     >
                       <PencilIcon className="h-4 w-4 mr-2" />
-                      Editar
+                      {t('edit')}
                     </Button>
                   ) : (
                     <div className="flex gap-2">
@@ -263,7 +265,7 @@ export default function ProfilePage() {
                         onClick={() => setEditingProfile(false)}
                       >
                         <XMarkIcon className="h-4 w-4 mr-2" />
-                        Cancelar
+                        {t('cancel')}
                       </Button>
                       <Button
                         size="sm"
@@ -271,7 +273,7 @@ export default function ProfilePage() {
                         isLoading={savingProfile}
                       >
                         <CheckIcon className="h-4 w-4 mr-2" />
-                        Guardar
+                        {t('save')}
                       </Button>
                     </div>
                   )}
@@ -295,7 +297,7 @@ export default function ProfilePage() {
                     {editingProfile && (
                       <Button variant="outline" size="sm">
                         <CameraIcon className="h-4 w-4 mr-2" />
-                        Cambiar foto
+                        {t('changePhoto')}
                       </Button>
                     )}
                   </div>
@@ -303,20 +305,20 @@ export default function ProfilePage() {
                   {/* Form Fields */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input
-                      label="Nombre completo"
+                      label={t('fullName')}
                       value={userProfile.name}
                       onChange={(e) => setUserProfile({ ...userProfile, name: e.target.value })}
                       disabled={!editingProfile}
                     />
                     <Input
-                      label="Correo electrónico"
+                      label={t('email')}
                       type="email"
                       value={userProfile.email}
                       onChange={(e) => setUserProfile({ ...userProfile, email: e.target.value })}
                       disabled={!editingProfile}
                     />
                     <Input
-                      label="Teléfono"
+                      label={t('phone')}
                       type="tel"
                       value={userProfile.phone}
                       onChange={(e) => setUserProfile({ ...userProfile, phone: e.target.value })}
@@ -324,7 +326,7 @@ export default function ProfilePage() {
                     />
                     <div>
                       <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                        Rol en la empresa
+                        {t('companyRole')}
                       </label>
                       <div className="mt-2">
                         {getRoleBadge(userProfile.role)}
@@ -341,7 +343,7 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <BuildingOfficeIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-                    <CardTitle>Información de la Empresa</CardTitle>
+                    <CardTitle>{t('companyInfo')}</CardTitle>
                   </div>
                   {!editingCompany ? (
                     <Button
@@ -350,7 +352,7 @@ export default function ProfilePage() {
                       onClick={() => setEditingCompany(true)}
                     >
                       <PencilIcon className="h-4 w-4 mr-2" />
-                      Editar
+                      {t('edit')}
                     </Button>
                   ) : (
                     <div className="flex gap-2">
@@ -360,7 +362,7 @@ export default function ProfilePage() {
                         onClick={() => setEditingCompany(false)}
                       >
                         <XMarkIcon className="h-4 w-4 mr-2" />
-                        Cancelar
+                        {t('cancel')}
                       </Button>
                       <Button
                         size="sm"
@@ -368,7 +370,7 @@ export default function ProfilePage() {
                         isLoading={savingCompany}
                       >
                         <CheckIcon className="h-4 w-4 mr-2" />
-                        Guardar
+                        {t('save')}
                       </Button>
                     </div>
                   )}
@@ -378,40 +380,40 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="md:col-span-2">
                     <Input
-                      label="Nombre de la empresa"
+                      label={t('companyName')}
                       value={companyInfo.name}
                       onChange={(e) => setCompanyInfo({ ...companyInfo, name: e.target.value })}
                       disabled={!editingCompany}
                     />
                   </div>
                   <Input
-                    label="NIT / RUT"
+                    label={t('taxId')}
                     value={companyInfo.taxId}
                     onChange={(e) => setCompanyInfo({ ...companyInfo, taxId: e.target.value })}
                     disabled={!editingCompany}
                   />
                   <Input
-                    label="País"
+                    label={t('country')}
                     value={companyInfo.country}
                     onChange={(e) => setCompanyInfo({ ...companyInfo, country: e.target.value })}
                     disabled={!editingCompany}
                   />
                   <div className="md:col-span-2">
                     <Input
-                      label="Dirección"
+                      label={t('address')}
                       value={companyInfo.address}
                       onChange={(e) => setCompanyInfo({ ...companyInfo, address: e.target.value })}
                       disabled={!editingCompany}
                     />
                   </div>
                   <Input
-                    label="Ciudad"
+                    label={t('city')}
                     value={companyInfo.city}
                     onChange={(e) => setCompanyInfo({ ...companyInfo, city: e.target.value })}
                     disabled={!editingCompany}
                   />
                   <Input
-                    label="Código postal"
+                    label={t('postalCode')}
                     value={companyInfo.postalCode}
                     onChange={(e) => setCompanyInfo({ ...companyInfo, postalCode: e.target.value })}
                     disabled={!editingCompany}
@@ -426,9 +428,9 @@ export default function ProfilePage() {
                 <div className="flex items-center gap-3">
                   <KeyIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
                   <div>
-                    <CardTitle>Cambiar Contraseña</CardTitle>
+                    <CardTitle>{t('changePassword')}</CardTitle>
                     <CardDescription>
-                      Actualiza tu contraseña para mantener tu cuenta segura
+                      {t('changePasswordDesc')}
                     </CardDescription>
                   </div>
                 </div>
@@ -436,28 +438,28 @@ export default function ProfilePage() {
               <CardContent>
                 <div className="space-y-4">
                   <Input
-                    label="Contraseña actual"
+                    label={t('currentPassword')}
                     type="password"
                     value={passwordData.currentPassword}
                     onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                    placeholder="Ingresa tu contraseña actual"
+                    placeholder={t('currentPasswordPlaceholder')}
                   />
                   <Input
-                    label="Nueva contraseña"
+                    label={t('newPassword')}
                     type="password"
                     value={passwordData.newPassword}
                     onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                    placeholder="Mínimo 8 caracteres"
+                    placeholder={t('newPasswordPlaceholder')}
                   />
                   <Input
-                    label="Confirmar nueva contraseña"
+                    label={t('confirmNewPassword')}
                     type="password"
                     value={passwordData.confirmPassword}
                     onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                    placeholder="Confirma tu nueva contraseña"
+                    placeholder={t('confirmNewPasswordPlaceholder')}
                   />
                   <Button onClick={handleChangePassword}>
-                    Cambiar Contraseña
+                    {t('changePassword')}
                   </Button>
                 </div>
               </CardContent>
@@ -471,38 +473,38 @@ export default function ProfilePage() {
               <CardHeader>
                 <div className="flex items-center gap-3">
                   <ShieldCheckIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-                  <CardTitle>Permisos</CardTitle>
+                  <CardTitle>{t('permissions')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                      Ver proyectos
+                      {t('viewProjects')}
                     </span>
                     <CheckIcon className="h-5 w-5 text-green-600" />
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                      Crear pedidos
+                      {t('createOrders')}
                     </span>
                     <CheckIcon className="h-5 w-5 text-green-600" />
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                      Gestionar facturación
+                      {t('manageBilling')}
                     </span>
                     <CheckIcon className="h-5 w-5 text-green-600" />
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                      Invitar usuarios
+                      {t('inviteUsers')}
                     </span>
                     <CheckIcon className="h-5 w-5 text-green-600" />
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                      Configuración de empresa
+                      {t('companySettings')}
                     </span>
                     <CheckIcon className="h-5 w-5 text-green-600" />
                   </div>
@@ -515,7 +517,7 @@ export default function ProfilePage() {
               <CardHeader>
                 <div className="flex items-center gap-3">
                   <BellIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-                  <CardTitle>Preferencias de Notificaciones</CardTitle>
+                  <CardTitle>{t('notificationPrefs')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
@@ -523,7 +525,7 @@ export default function ProfilePage() {
                   <div className="space-y-3">
                     <label className="flex items-center justify-between cursor-pointer">
                       <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                        Pedidos por email
+                        {t('emailOrders')}
                       </span>
                       <input
                         type="checkbox"
@@ -534,7 +536,7 @@ export default function ProfilePage() {
                     </label>
                     <label className="flex items-center justify-between cursor-pointer">
                       <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                        Proyectos por email
+                        {t('emailProjects')}
                       </span>
                       <input
                         type="checkbox"
@@ -545,7 +547,7 @@ export default function ProfilePage() {
                     </label>
                     <label className="flex items-center justify-between cursor-pointer">
                       <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                        Facturación por email
+                        {t('emailBilling')}
                       </span>
                       <input
                         type="checkbox"
@@ -556,7 +558,7 @@ export default function ProfilePage() {
                     </label>
                     <label className="flex items-center justify-between cursor-pointer">
                       <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                        Mensajes por email
+                        {t('emailMessages')}
                       </span>
                       <input
                         type="checkbox"
@@ -567,7 +569,7 @@ export default function ProfilePage() {
                     </label>
                     <label className="flex items-center justify-between cursor-pointer">
                       <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                        Notificaciones push
+                        {t('pushNotifications')}
                       </span>
                       <input
                         type="checkbox"
@@ -578,7 +580,7 @@ export default function ProfilePage() {
                     </label>
                     <label className="flex items-center justify-between cursor-pointer">
                       <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                        Reporte semanal
+                        {t('weeklyReport')}
                       </span>
                       <input
                         type="checkbox"
@@ -593,7 +595,7 @@ export default function ProfilePage() {
                     fullWidth
                     onClick={handleSaveNotificationPrefs}
                   >
-                    Guardar Preferencias
+                    {t('savePreferences')}
                   </Button>
                 </div>
               </CardContent>

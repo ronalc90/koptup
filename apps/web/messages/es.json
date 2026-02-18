@@ -27,6 +27,11 @@
       "clients": "Clientes satisfechos",
       "support": "Soporte",
       "rating": "Calificación promedio"
+    },
+    "cta": {
+      "title": "¿Listo para iniciar tu proyecto?",
+      "subtitle": "Cuéntanos tus objetivos y diseñamos el mejor plan",
+      "button": "Ver Planes"
     }
   },
   "services": {
@@ -233,19 +238,6 @@
       "subtitle": "Agenda una consulta gratuita y descubre cómo podemos ayudarte",
       "ctaSchedule": "Agendar Consulta",
       "ctaPricing": "Ver Planes"
-    }
-  },
-  "homePage": {
-    "stats": {
-      "projects": "Proyectos completados",
-      "clients": "Clientes satisfechos",
-      "support": "Soporte",
-      "rating": "Calificación promedio"
-    },
-    "cta": {
-      "title": "¿Listo para iniciar tu proyecto?",
-      "subtitle": "Cuéntanos tus objetivos y diseñamos el mejor plan",
-      "button": "Ver Planes"
     }
   },
   "privacyPage": {
@@ -660,8 +652,7 @@
       "subtitle": "Contáctanos para una cotización a medida según tus necesidades",
       "button": "Solicitar Cotización Personalizada"
     }
-  }
-  ,
+  },
   "demos": {
     "badge": "Demos Interactivas",
     "title": "Prueba Nuestras Soluciones",
@@ -754,7 +745,7 @@
     "accessModal": {
       "openButton": "Acceder con código",
       "title": "Acceso a Demo Privada",
-      "description": "Ingresa el código para acceder a la demo privada de auditoría médica",
+      "description": "Ingresa el código para acceder a la demo privada",
       "label": "Código de acceso",
       "placeholder": "Ej. 2020",
       "cancel": "Cancelar",
@@ -762,8 +753,7 @@
       "noCodeHint": "¿No tienes código? Contacta nuestro equipo comercial.",
       "error": "Código inválido, intenta nuevamente."
     }
-  }
-  ,
+  },
   "dashboardLayout": {
     "dashboard": "Panel",
     "myOrders": "Mis Pedidos",
@@ -774,6 +764,51 @@
     "myProfile": "Mi Perfil",
     "settings": "Configuración",
     "logout": "Cerrar Sesión"
+  },
+  "dashboardPage": {
+    "loading": "Cargando dashboard...",
+    "welcomeBack": "Bienvenido de nuevo! 👋",
+    "summaryActive": "Aquí está un resumen de tu actividad reciente",
+    "summaryEmpty": "Tu panel está listo. Comienza explorando nuestros servicios.",
+    "onboarding": {
+      "title": "Comienza tu primer proyecto",
+      "description": "Cuéntanos tu idea y te ayudamos a hacerla realidad. Explora nuestras demos para ver lo que podemos construir para ti.",
+      "requestQuote": "Solicitar Cotización",
+      "viewDemos": "Ver Demos",
+      "exploreServices": "Explorar Servicios"
+    },
+    "kpis": {
+      "activeOrders": "Pedidos Activos",
+      "pendingConfirmation": "{count} pendientes de confirmación",
+      "activeProjects": "Proyectos Activos",
+      "avgProgress": "Progreso promedio: {percent}%",
+      "pendingBalance": "Saldo Pendiente",
+      "nextDue": "Próximo vencimiento: {date}",
+      "unreadMessages": "Mensajes No Leídos",
+      "totalMessages": "{count} mensajes totales"
+    },
+    "recentOrders": "Pedidos Recientes",
+    "activeProjectsSection": "Proyectos en Curso",
+    "viewAll": "Ver todos",
+    "nextMilestone": "Próximo hito: {milestone}",
+    "progress": "Progreso",
+    "deadline": "Fecha límite: {date}",
+    "upcomingDeadlines": "Próximos Vencimientos",
+    "quickActions": "Acciones Rápidas",
+    "newProject": "Nuevo Proyecto",
+    "contactSupport": "Contactar Soporte",
+    "payInvoice": "Pagar Factura",
+    "status": {
+      "active": "Activo",
+      "in_progress": "En Proceso",
+      "pending": "Pendiente",
+      "completed": "Completado",
+      "cancelled": "Cancelado"
+    },
+    "defaults": {
+      "inProcess": "En proceso",
+      "noDate": "Sin fecha"
+    }
   },
   "settingsPage": {
     "title": "Configuración",
@@ -890,7 +925,14 @@
     "noAccount": "¿No tienes cuenta?",
     "signUpLink": "Crear cuenta",
     "backHome": "Volver al inicio",
-    "errorFields": "Por favor verifica tu correo y contraseña."
+    "errorFields": "Por favor verifica tu correo y contraseña.",
+    "sessionExpired": "Tu sesión ha expirado. Por favor inicia sesión nuevamente.",
+    "errorGoogle": "No se pudo iniciar sesión con Google. Por favor intenta nuevamente o regístrate primero.",
+    "errorGeneric": "Ocurrió un error durante el inicio de sesión. Por favor intenta nuevamente.",
+    "errorCredentials": "El correo electrónico o la contraseña son incorrectos. Si no tienes cuenta, regístrate primero.",
+    "errorNotFound": "No encontramos una cuenta con este correo. ¿Quieres crear una cuenta nueva?",
+    "errorNetwork": "No se pudo conectar con el servidor. Por favor verifica tu conexión a internet.",
+    "createAccount": "Crear cuenta"
   },
   "registerPage": {
     "title": "Crear Cuenta",
@@ -1090,12 +1132,23 @@
       "5": "Más de $25,000"
     },
     "info": {
-      "email": { "title": "Email" },
-      "phone": { "title": "Teléfono" },
-      "location": { "title": "Ubicación" },
-      "hours": { "title": "Horario", "value": "Lun - Vie: 8am - 6pm" }
+      "email": {
+        "title": "Email"
+      },
+      "phone": {
+        "title": "Teléfono"
+      },
+      "location": {
+        "title": "Ubicación"
+      },
+      "hours": {
+        "title": "Horario",
+        "value": "Lun - Vie: 8am - 6pm"
+      }
     },
-    "social": { "title": "Síguenos en redes" },
+    "social": {
+      "title": "Síguenos en redes"
+    },
     "schedule": {
       "title": "Agendar Llamada",
       "subtitle": "Agenda una consulta gratuita de 30 minutos",
@@ -1118,6 +1171,349 @@
           "answer": "¡Claro! Tenemos planes flexibles y acompañamiento."
         }
       }
+    }
+  },
+  "docManager": {
+    "buttons": {
+      "uploadFile": "Subir Archivo"
+    },
+    "folders": {
+      "title": "Carpetas",
+      "newFolder": "Nueva Carpeta",
+      "general": "General"
+    },
+    "search": {
+      "placeholder": "Buscar documentos...",
+      "aiSearch": "Búsqueda Semántica con IA"
+    },
+    "filters": {
+      "title": "Filtros"
+    },
+    "upload": {
+      "dragDrop": "Arrastra archivos aquí o haz clic para seleccionar",
+      "supports": "Soporta PDF, DOCX, TXT (máx. 10MB)",
+      "processing": "Procesando... {percent}%"
+    },
+    "states": {
+      "loading": "Cargando documentos...",
+      "error": "Error al cargar documentos",
+      "empty": "No hay documentos"
+    },
+    "trash": {
+      "warning": "Los documentos en la papelera se eliminarán permanentemente después de 30 días"
+    },
+    "viewer": {
+      "aiSummary": "Resumen con IA",
+      "keywords": "Palabras Clave",
+      "entities": "Entidades Detectadas",
+      "moveToFolder": "Mover a Carpeta",
+      "explainWithAI": "Explicar con IA",
+      "generatingExplanation": "Generando explicación...",
+      "explanationTitle": "Explicación del Documento",
+      "moveToTrash": "Mover a Papelera"
+    },
+    "semantic": {
+      "title": "Resultados de Búsqueda Semántica",
+      "query": "Consulta: \"{query}\"",
+      "searching": "Buscando...",
+      "noResults": "No se encontraron resultados",
+      "why": "¿Por qué este resultado?",
+      "similarPercent": "{percent}% de similitud",
+      "explainError": "Error al explicar: {error}"
+    },
+    "similar": {
+      "title": "Documentos Similares",
+      "subtitle": "Basado en contenido",
+      "analyzing": "Analizando similitud..."
+    },
+    "rename": {
+      "placeholder": "Nuevo nombre",
+      "submit": "Renombrar"
+    },
+    "newFolder": {
+      "title": "Nueva Carpeta",
+      "placeholder": "Nombre de la carpeta",
+      "submit": "Crear"
+    },
+    "pinDelete": {
+      "title": "Eliminar Documento",
+      "description": "Esta acción no se puede deshacer. Ingresa el PIN para confirmar.",
+      "placeholder": "Ingresa PIN",
+      "defaultPin": "PIN por defecto: 2020",
+      "submit": "Eliminar"
+    },
+    "common": {
+      "cancel": "Cancelar",
+      "ok": "Aceptar"
+    }
+  },
+  "demoCTA": {
+    "title": "¿Te gustaría algo así para tu negocio?",
+    "titleWithName": "¿Necesitas un {demoName} como este?",
+    "description": "Desarrollamos software a medida adaptado a las necesidades de tu empresa. Solicita una cotización sin compromiso.",
+    "requestQuote": "Solicitar Cotización",
+    "viewPricing": "Ver Planes y Precios"
+  },
+  "demoEcommerce": {
+    "title": "Tienda Demo",
+    "checkout": "Pagar",
+    "products": "Productos",
+    "categoriesLabel": "Categorías",
+    "addToCart": "Agregar al Carrito",
+    "viewCart": "Ver Carrito",
+    "total": "Total",
+    "continue": "Continuar Comprando",
+    "outOfStock": "Agotado",
+    "searchPlaceholder": "Buscar productos...",
+    "allProducts": "Todos los Productos",
+    "adminPanel": "Panel de Administración",
+    "banner": {
+      "title": "Ofertas Especiales",
+      "description": "Descubre nuestras mejores ofertas con envío gratis",
+      "specialOffer": "Oferta Especial",
+      "freeShipping": "Envío Gratis",
+      "priceGuarantee": "Mejor Precio Garantizado"
+    },
+    "categories": {
+      "all": "Todas",
+      "electronics": "Electrónica",
+      "fashion": "Moda",
+      "home": "Hogar",
+      "sports": "Deportes"
+    },
+    "searchResults": "Resultados de búsqueda para",
+    "productsCategory": "Productos en",
+    "noProducts": "No se encontraron productos",
+    "myWishlist": "Mi Lista de Deseos",
+    "viewAllProducts": "Ver Todos los Productos",
+    "wishlistEmpty": "Tu lista de deseos está vacía",
+    "wishlistEmptyDesc": "Agrega productos a tu lista de deseos para verlos aquí",
+    "cart": {
+      "title": "Carrito",
+      "empty": "Tu carrito está vacío"
+    },
+    "product": {
+      "view": "Ver Producto",
+      "reviews": "reseñas",
+      "category": "Categoría",
+      "stock": "Stock",
+      "inStock": "En Stock"
+    },
+    "sections": {
+      "featured": "Productos Destacados",
+      "bestsellers": "Más Vendidos"
+    }
+  },
+  "adminHome": {
+    "orders": "Pedidos",
+    "ordersDesc": "Revisa y actualiza el estado de pedidos.",
+    "goToOrders": "Ir a pedidos",
+    "deliverables": "Entregables",
+    "deliverablesDesc": "Aprueba o rechaza entregables.",
+    "goToDeliverables": "Ir a entregables",
+    "invoices": "Facturas",
+    "invoicesDesc": "Consulta facturas y estados.",
+    "goToInvoices": "Ir a facturas"
+  },
+  "adminOrders": {
+    "title": "Pedidos",
+    "subtitle": "Gestiona los pedidos de los clientes y aprueba o rechaza solicitudes",
+    "approvalStatus": "Estado de Aprobación",
+    "orderStatus": "Estado del Pedido",
+    "all": "Todos",
+    "pending": "Pendientes",
+    "approved": "Aprobados",
+    "rejected": "Rechazados",
+    "allOrders": "Todos los pedidos",
+    "noOrders": "No hay pedidos para mostrar",
+    "client": "Cliente",
+    "date": "Fecha",
+    "orderItems": "Items del pedido",
+    "perUnit": "c/u",
+    "clientDescription": "Descripción del proyecto del cliente",
+    "attachments": "Archivos adjuntos",
+    "rejectionReason": "Motivo de rechazo",
+    "orderApproval": "Aprobación del pedido",
+    "reApprove": "Re-aprobar",
+    "approveOrder": "Aprobar Pedido",
+    "rejectOrder": "Rechazar Pedido",
+    "changeOrderStatus": "Cambiar estado del pedido",
+    "startProgress": "Iniciar Progreso",
+    "markShipped": "Marcar como Enviado",
+    "completeOrder": "Completar Pedido",
+    "viewConversation": "Ver Conversación con Cliente",
+    "rejectModalTitle": "Rechazar Pedido",
+    "rejectModalDesc": "¿Por qué deseas rechazar el pedido",
+    "rejectPlaceholder": "Escribe el motivo del rechazo...",
+    "cancel": "Cancelar",
+    "confirmApprove": "¿Aprobar el pedido {id} de {name}?",
+    "confirmStatusChange": "¿Cambiar el estado del pedido a \"{status}\"?",
+    "approvedSuccess": "Pedido aprobado exitosamente",
+    "approveError": "Error al aprobar pedido",
+    "rejectedSuccess": "Pedido rechazado",
+    "rejectError": "Error al rechazar pedido",
+    "statusUpdated": "Estado actualizado exitosamente",
+    "statusUpdateError": "Error al actualizar el estado",
+    "notSpecified": "No especificado",
+    "approvalBadge": {
+      "pending": "Pendiente de Aprobación",
+      "approved": "Aprobado",
+      "rejected": "Rechazado"
+    }
+  },
+  "profilePage": {
+    "title": "Mi Perfil",
+    "subtitle": "Gestiona tu información personal y preferencias",
+    "personalInfo": "Información Personal",
+    "edit": "Editar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "changePhoto": "Cambiar foto",
+    "fullName": "Nombre completo",
+    "email": "Correo electrónico",
+    "phone": "Teléfono",
+    "companyRole": "Rol en la empresa",
+    "companyInfo": "Información de la Empresa",
+    "companyName": "Nombre de la empresa",
+    "taxId": "NIT / RUT",
+    "country": "País",
+    "address": "Dirección",
+    "city": "Ciudad",
+    "postalCode": "Código postal",
+    "changePassword": "Cambiar Contraseña",
+    "changePasswordDesc": "Actualiza tu contraseña para mantener tu cuenta segura",
+    "currentPassword": "Contraseña actual",
+    "currentPasswordPlaceholder": "Ingresa tu contraseña actual",
+    "newPassword": "Nueva contraseña",
+    "newPasswordPlaceholder": "Mínimo 8 caracteres",
+    "confirmNewPassword": "Confirmar nueva contraseña",
+    "confirmNewPasswordPlaceholder": "Confirma tu nueva contraseña",
+    "permissions": "Permisos",
+    "viewProjects": "Ver proyectos",
+    "createOrders": "Crear pedidos",
+    "manageBilling": "Gestionar facturación",
+    "inviteUsers": "Invitar usuarios",
+    "companySettings": "Configuración de empresa",
+    "notificationPrefs": "Preferencias de Notificaciones",
+    "emailOrders": "Pedidos por email",
+    "emailProjects": "Proyectos por email",
+    "emailBilling": "Facturación por email",
+    "emailMessages": "Mensajes por email",
+    "pushNotifications": "Notificaciones push",
+    "weeklyReport": "Reporte semanal",
+    "savePreferences": "Guardar Preferencias",
+    "passwordMismatch": "Las contraseñas no coinciden",
+    "passwordUpdated": "Contraseña actualizada exitosamente",
+    "preferencesSaved": "Preferencias guardadas",
+    "roles": {
+      "owner": "Propietario",
+      "admin": "Administrador",
+      "member": "Miembro",
+      "viewer": "Observador"
+    }
+  },
+  "ordersPage": {
+    "title": "Mis Pedidos",
+    "subtitle": "Gestiona y rastrea todos tus pedidos",
+    "newOrder": "Nuevo Pedido",
+    "searchPlaceholder": "Buscar por nombre o ID...",
+    "noOrders": "No se encontraron pedidos",
+    "items": "artículos",
+    "viewDetail": "Ver Detalle",
+    "invoice": "Factura",
+    "status": {
+      "all": "Todos",
+      "pending": "Pendiente",
+      "in_progress": "En Proceso",
+      "shipped": "Enviado",
+      "completed": "Completado",
+      "cancelled": "Cancelado"
+    }
+  },
+  "projectsPage": {
+    "title": "Mis Proyectos",
+    "subtitle": "Sigue el progreso de todos tus proyectos",
+    "newProject": "Nuevo Proyecto",
+    "noProjects": "No tienes proyectos activos",
+    "noProjectsDesc": "Comienza solicitando un nuevo proyecto para ver su progreso aquí",
+    "requestNewProject": "Solicitar Nuevo Proyecto",
+    "progress": "Progreso",
+    "members": "miembros",
+    "manager": "Manager",
+    "team": "Equipo",
+    "startDate": "Inicio",
+    "deliveryDate": "Entrega",
+    "budgetUsed": "Presupuesto utilizado",
+    "remaining": "Restante",
+    "projectPhases": "Fases del Proyecto",
+    "milestones": "Hitos",
+    "deliverables": "Entregables",
+    "viewDeliverables": "Ver Entregables",
+    "contactTeam": "Contactar Equipo",
+    "noDescription": "Sin descripción",
+    "noDate": "Sin fecha",
+    "unassigned": "Sin asignar",
+    "phases": {
+      "planning": "Planeación",
+      "development": "Desarrollo",
+      "qa": "QA",
+      "delivery": "Entrega"
+    },
+    "status": {
+      "planning": "Planeación",
+      "active": "Activo",
+      "on_hold": "En Espera",
+      "completed": "Completado",
+      "in_progress": "En Progreso",
+      "pending": "Pendiente",
+      "approved": "Aprobado",
+      "in_review": "En Revisión"
+    }
+  },
+  "billingPage": {
+    "title": "Facturación y Pagos",
+    "subtitle": "Administra tus facturas y realiza pagos",
+    "pending": "Pendiente",
+    "overdue": "Vencido",
+    "paid": "Pagado",
+    "invoices": "facturas",
+    "issued": "Emitida",
+    "dueDate": "Vencimiento",
+    "paidDate": "Pagada",
+    "details": "Detalles",
+    "noDescription": "Sin descripción",
+    "downloadPdf": "Descargar PDF",
+    "payNow": "Pagar Ahora"
+  },
+  "messagesPage": {
+    "title": "Mensajes",
+    "subtitle": "Comunícate con el equipo de KopTup sobre tus proyectos",
+    "searchPlaceholder": "Buscar conversaciones...",
+    "noConversations": "No se encontraron conversaciones",
+    "noParticipants": "Sin participantes",
+    "messagePlaceholder": "Escribe un mensaje...",
+    "enterToSend": "Presiona Enter para enviar, Shift + Enter para nueva línea",
+    "selectConversation": "Selecciona una conversación para comenzar",
+    "unknown": "Desconocido",
+    "you": "Tú"
+  },
+  "deliverablesPage": {
+    "title": "Entregables y Documentos",
+    "subtitle": "Repositorio de archivos y entregables por proyecto",
+    "total": "Total",
+    "approved": "Aprobados",
+    "inReview": "En Revisión",
+    "rejected": "Rechazados",
+    "all": "Todos",
+    "files": "archivos",
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "rejectComments": "Comentarios de rechazo",
+    "rejectedByUser": "Rechazado por el usuario",
+    "status": {
+      "approved": "Aprobado",
+      "in_review": "En Revisión",
+      "rejected": "Rechazado"
     }
   }
 }

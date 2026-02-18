@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
@@ -18,6 +19,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 export default function DeliverablesPage() {
+  const t = useTranslations('deliverablesPage');
   const [deliverables, setDeliverables] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState('all');
@@ -167,7 +169,7 @@ export default function DeliverablesPage() {
 
   const reject = async (id: string) => {
     try {
-      const comments = prompt('Comentarios de rechazo') || 'Rechazado por el usuario';
+      const comments = prompt(t('rejectComments')) || t('rejectedByUser');
       await api.rejectDeliverable(id, comments);
       await loadDeliverables();
     } catch (error) {
@@ -179,17 +181,17 @@ export default function DeliverablesPage() {
     const badges: Record<string, { className: string; text: string; icon: any }> = {
       approved: {
         className: 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300',
-        text: 'Aprobado',
+        text: t('status.approved'),
         icon: CheckCircleIcon,
       },
       in_review: {
         className: 'bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300',
-        text: 'En Revisión',
+        text: t('status.in_review'),
         icon: ClockIcon,
       },
       rejected: {
         className: 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300',
-        text: 'Rechazado',
+        text: t('status.rejected'),
         icon: XCircleIcon,
       },
     };
@@ -219,7 +221,7 @@ export default function DeliverablesPage() {
     : deliverables.filter(d => d.status === filterStatus);
 
   const groupedByProject = filteredDeliverables.reduce((acc: any, deliverable) => {
-    const projectName = deliverable.project || 'Sin proyecto';
+    const projectName = deliverable.project || '';
     if (!acc[projectName]) {
       acc[projectName] = [];
     }
@@ -244,10 +246,10 @@ export default function DeliverablesPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">
-              Entregables y Documentos
+              {t('title')}
             </h1>
             <p className="text-secondary-600 dark:text-secondary-400">
-              Repositorio de archivos y entregables por proyecto
+              {t('subtitle')}
             </p>
           </div>
         </div>
@@ -258,7 +260,7 @@ export default function DeliverablesPage() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">Total</p>
+                  <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">{t('total')}</p>
                   <p className="text-2xl font-bold text-secondary-900 dark:text-white">
                     {deliverables.length}
                   </p>
@@ -270,7 +272,7 @@ export default function DeliverablesPage() {
 
           {['approved', 'in_review', 'rejected'].map(status => {
             const count = deliverables.filter(d => d.status === status).length;
-            const label = status === 'approved' ? 'Aprobados' : status === 'in_review' ? 'En Revisión' : 'Rechazados';
+            const label = status === 'approved' ? t('approved') : status === 'in_review' ? t('inReview') : t('rejected');
             const color = status === 'approved' ? 'text-green-600' : status === 'in_review' ? 'text-yellow-600' : 'text-red-600';
             return (
               <Card key={status} variant="bordered" className="cursor-pointer" onClick={() => setFilterStatus(status)}>
@@ -294,28 +296,28 @@ export default function DeliverablesPage() {
             size="sm"
             onClick={() => setFilterStatus('all')}
           >
-            Todos
+            {t('all')}
           </Button>
           <Button
             variant={filterStatus === 'approved' ? 'primary' : 'outline'}
             size="sm"
             onClick={() => setFilterStatus('approved')}
           >
-            Aprobados
+            {t('approved')}
           </Button>
           <Button
             variant={filterStatus === 'in_review' ? 'primary' : 'outline'}
             size="sm"
             onClick={() => setFilterStatus('in_review')}
           >
-            En Revisión
+            {t('inReview')}
           </Button>
           <Button
             variant={filterStatus === 'rejected' ? 'primary' : 'outline'}
             size="sm"
             onClick={() => setFilterStatus('rejected')}
           >
-            Rechazados
+            {t('rejected')}
           </Button>
         </div>
 
@@ -328,7 +330,7 @@ export default function DeliverablesPage() {
                   <FolderIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
                   <CardTitle>{projectName}</CardTitle>
                   <Badge variant="secondary" size="sm">
-                    {projectDeliverables.length} archivos
+                    {projectDeliverables.length} {t('files')}
                   </Badge>
                 </div>
               </CardHeader>
@@ -386,10 +388,10 @@ export default function DeliverablesPage() {
                         {deliverable.status === 'in_review' && (
                           <>
                             <Button variant="primary" size="sm" onClick={() => approve(deliverable.id)}>
-                              Aprobar
+                              {t('approve')}
                             </Button>
                             <Button variant="danger" size="sm" onClick={() => reject(deliverable.id)}>
-                              Rechazar
+                              {t('reject')}
                             </Button>
                           </>
                         )}

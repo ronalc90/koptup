@@ -15,7 +15,6 @@ import {
   CloudIcon,
   CubeIcon,
   PaintBrushIcon,
-  DocumentMagnifyingGlassIcon,
   CurrencyDollarIcon,
   CheckCircleIcon,
 } from '@heroicons/react/24/outline';
@@ -84,14 +83,6 @@ export default function HomePage() {
 
   // Featured demos showcasing various industry solutions
   const featuredDemos = [
-    {
-      icon: DocumentMagnifyingGlassIcon,
-      title: 'Auditoría Médica con IA',
-      description: 'Sistema inteligente para auditoría de cuentas médicas. Valida procedimientos, diagnósticos y tarifas automáticamente.',
-      href: '/demo/cuentas-medicas',
-      category: 'Sector Salud',
-      color: 'from-blue-500 to-blue-700',
-    },
     {
       icon: ShoppingCartIcon,
       title: 'E-Commerce Completo',
@@ -209,8 +200,8 @@ export default function HomePage() {
               Soluciones para Cada Industria
             </h2>
             <p className="text-xl text-secondary-600 dark:text-secondary-400 max-w-3xl mx-auto">
-              Explora nuestras demos funcionales y descubre cómo transformamos ideas en soluciones tecnológicas.
-              Desde salud hasta e-commerce, tenemos la experiencia para impulsar tu negocio.
+              Explora nuestras demos funcionales y descubre cómo transformamos ideas en software real.
+              Desde e-commerce hasta dashboards con IA, tenemos la experiencia para impulsar tu negocio.
             </p>
           </div>
 

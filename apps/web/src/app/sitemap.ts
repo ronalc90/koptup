@@ -5,7 +5,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const currentDate = new Date();
 
   return [
-    // Homepage
+    // Homepage - highest priority
     {
       url: baseUrl,
       lastModified: currentDate,
@@ -13,9 +13,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1.0,
     },
 
-    // DEMOS MÉDICOS - Alta prioridad (principales servicios)
+    // DEMOS INTERACTIVAS - Alta prioridad (muestran capacidad)
     {
-      url: `${baseUrl}/demo/cuentas-medicas`,
+      url: `${baseUrl}/demo/ecommerce`,
       lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.95,
@@ -27,7 +27,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.95,
     },
     {
-      url: `${baseUrl}/demo/gestor-contenido`,
+      url: `${baseUrl}/demo/dashboard-ejecutivo`,
       lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.9,
@@ -37,20 +37,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.9,
-    },
-
-    // DEMOS GENERALES
-    {
-      url: `${baseUrl}/demo/ecommerce`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.85,
-    },
-    {
-      url: `${baseUrl}/demo/dashboard-ejecutivo`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.85,
     },
     {
       url: `${baseUrl}/demo/control-proyectos`,
@@ -65,10 +51,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.85,
     },
     {
-      url: `${baseUrl}/demo/sistema-experto`,
+      url: `${baseUrl}/demo/gestor-contenido`,
       lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.85,
+    },
+    {
+      url: `${baseUrl}/demo/sistema-experto`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.8,
     },
 
     // PÁGINAS PRINCIPALES
@@ -76,10 +68,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/services`,
       lastModified: currentDate,
       changeFrequency: 'monthly',
-      priority: 0.8,
+      priority: 0.9,
     },
     {
       url: `${baseUrl}/pricing`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/demo`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    },
+    {
+      url: `${baseUrl}/contact`,
       lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.8,
@@ -90,17 +94,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.7,
     },
+
+    // LEGAL
     {
-      url: `${baseUrl}/contact`,
+      url: `${baseUrl}/privacy`,
       lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.75,
+      changeFrequency: 'yearly',
+      priority: 0.3,
     },
     {
-      url: `${baseUrl}/blog`,
+      url: `${baseUrl}/terms`,
       lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.7,
+      changeFrequency: 'yearly',
+      priority: 0.3,
     },
   ];
 }

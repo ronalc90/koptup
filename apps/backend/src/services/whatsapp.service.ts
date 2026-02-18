@@ -154,16 +154,56 @@ ${data.message}
    */
   private async sendViaTwilio(message: string): Promise<boolean> {
     try {
-      await this.twilioClient.messages.create({
+      logger.info('📤 Sending WhatsApp message via Twilio...');
+      logger.info(`   From: whatsapp:${this.config.twilioWhatsAppNumber}`);
+      logger.info(`   To: whatsapp:${this.config.recipientNumber}`);
+      logger.info(`   Message length: ${message.length} characters`);
+
+      const result = await this.twilioClient.messages.create({
         from: `whatsapp:${this.config.twilioWhatsAppNumber}`,
         to: `whatsapp:${this.config.recipientNumber}`,
         body: message,
       });
 
-      logger.info(`✅ WhatsApp notification sent via Twilio to ${this.config.recipientNumber}`);
+      logger.info(`✅ WhatsApp message created in Twilio`);
+      logger.info(`   Message SID: ${result.sid}`);
+      logger.info(`   Initial Status: ${result.status}`);
+      logger.info(`   Date Created: ${result.dateCreated}`);
+      logger.info(`   Price: ${result.price || 'Not calculated yet'}`);
+      logger.info(`   Error Code: ${result.errorCode || 'None'}`);
+      logger.info(`   Error Message: ${result.errorMessage || 'None'}`);
+
+      // Esperar 3 segundos y verificar el estado real
+      setTimeout(async () => {
+        try {
+          const messageStatus = await this.twilioClient.messages(result.sid).fetch();
+          logger.info(`📊 Message status after 3s: ${messageStatus.status}`);
+          logger.info(`   Final Status: ${messageStatus.status}`);
+          logger.info(`   Error Code: ${messageStatus.errorCode || 'None'}`);
+          logger.info(`   Error Message: ${messageStatus.errorMessage || 'None'}`);
+
+          if (messageStatus.status === 'failed' || messageStatus.status === 'undelivered') {
+            logger.error(`❌ MESSAGE DELIVERY FAILED!`);
+            logger.error(`   Reason: ${messageStatus.errorMessage || 'Unknown'}`);
+            logger.error(`   Error Code: ${messageStatus.errorCode || 'Unknown'}`);
+            logger.error(`   Make sure you joined the Twilio Sandbox by sending "join <code>" to ${this.config.twilioWhatsAppNumber}`);
+          } else if (messageStatus.status === 'delivered') {
+            logger.info(`✅ MESSAGE DELIVERED SUCCESSFULLY!`);
+          } else if (messageStatus.status === 'sent') {
+            logger.info(`📨 MESSAGE SENT (waiting for delivery confirmation)`);
+          }
+        } catch (statusError: any) {
+          logger.error('Error checking message status:', statusError.message);
+        }
+      }, 3000);
+
       return true;
     } catch (error: any) {
-      logger.error('Twilio WhatsApp error:', error);
+      logger.error('❌ Twilio WhatsApp error:');
+      logger.error(`   Error: ${error.message}`);
+      logger.error(`   Code: ${error.code}`);
+      logger.error(`   Status: ${error.status}`);
+      logger.error(`   More info: ${error.moreInfo}`);
       throw error;
     }
   }

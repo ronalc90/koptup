@@ -1,6 +1,6 @@
 import { Router, RequestHandler } from 'express';
 import { body } from 'express-validator';
-import { submitContact } from '../controllers/contact.controller';
+import { submitContact, testWhatsApp, testEmail } from '../controllers/contact.controller';
 import { strictRateLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
@@ -16,5 +16,9 @@ router.post(
   ],
   submitContact as RequestHandler
 );
+
+// Endpoints de prueba
+router.post('/test-whatsapp', testWhatsApp as RequestHandler);
+router.post('/test-email', testEmail as RequestHandler);
 
 export default router;

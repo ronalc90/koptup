@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import Card, { CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
@@ -22,6 +23,7 @@ import {
 
 export default function DashboardPage() {
   const router = useRouter();
+  const t = useTranslations('dashboardPage');
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState<any>(null);
 
@@ -40,36 +42,28 @@ export default function DashboardPage() {
 
   const loadDashboardData = async () => {
     try {
-      // Cargar datos del dashboard desde las APIs
       const [stats, projects] = await Promise.all([
         api.getDashboardStats(),
         api.getUserProjects(),
       ]);
 
-      // Calcular estadísticas de proyectos
       const activeProjects = projects.filter((p: any) => p.status === 'active' || p.status === 'in_progress');
       const completedProjects = projects.filter((p: any) => p.status === 'completed');
       const avgProgress = activeProjects.length > 0
         ? Math.round(activeProjects.reduce((sum: number, p: any) => sum + (p.progress || 0), 0) / activeProjects.length)
         : 0;
 
-      // Tomar los proyectos más recientes
       const recentProjects = activeProjects.slice(0, 2).map((p: any) => ({
         id: p.id,
         name: p.name,
         status: p.status,
         progress: p.progress || 0,
-        nextMilestone: 'En proceso',
-        dueDate: p.end_date || 'Sin fecha',
+        nextMilestone: t('defaults.inProcess'),
+        dueDate: p.end_date || t('defaults.noDate'),
       }));
 
       setDashboardData({
-        orders: {
-          active: 0,
-          pending: 0,
-          completed: 0,
-          total: 0,
-        },
+        orders: { active: 0, pending: 0, completed: 0, total: 0 },
         projects: {
           active: activeProjects.length,
           inProgress: activeProjects.length,
@@ -77,22 +71,13 @@ export default function DashboardPage() {
           total: projects.length,
           avgProgress,
         },
-        billing: {
-          pending: 0,
-          overdue: 0,
-          paid: 0,
-          nextDue: '',
-        },
-        messages: {
-          unread: 0,
-          total: 0,
-        },
+        billing: { pending: 0, overdue: 0, paid: 0, nextDue: '' },
+        messages: { unread: 0, total: 0 },
         recentOrders: [],
         recentProjects,
         upcomingDeadlines: [],
       });
     } catch (error) {
-      // Silently use empty data when API is unavailable
       setDashboardData({
         orders: { active: 0, pending: 0, completed: 0, total: 0 },
         projects: { active: 0, inProgress: 0, completed: 0, total: 0, avgProgress: 0 },
@@ -113,7 +98,7 @@ export default function DashboardPage() {
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-            <p className="text-secondary-600 dark:text-secondary-400">Cargando dashboard...</p>
+            <p className="text-secondary-600 dark:text-secondary-400">{t('loading')}</p>
           </div>
         </div>
       </DashboardLayout>
@@ -121,15 +106,9 @@ export default function DashboardPage() {
   }
 
   const getStatusBadge = (status: string) => {
-    const badges: Record<string, { variant: any; text: string }> = {
-      active: { variant: 'primary', text: 'Activo' },
-      in_progress: { variant: 'primary', text: 'En Proceso' },
-      pending: { variant: 'secondary', text: 'Pendiente' },
-      completed: { variant: 'secondary', text: 'Completado' },
-      cancelled: { variant: 'secondary', text: 'Cancelado' },
-    };
-    const badge = badges[status] || { variant: 'secondary', text: status };
-    return <Badge variant={badge.variant as any} size="sm">{badge.text}</Badge>;
+    const variant = (status === 'active' || status === 'in_progress') ? 'primary' : 'secondary';
+    const text = t(`status.${status}`);
+    return <Badge variant={variant as any} size="sm">{text}</Badge>;
   };
 
   const getPriorityIcon = (priority: string) => {
@@ -139,18 +118,56 @@ export default function DashboardPage() {
     return <ClockIcon className="h-5 w-5 text-yellow-600" />;
   };
 
+  const hasActivity =
+    dashboardData.orders.total > 0 ||
+    dashboardData.projects.total > 0 ||
+    dashboardData.billing.pending > 0 ||
+    dashboardData.messages.total > 0;
+
   return (
     <DashboardLayout>
       <div className="space-y-8">
         {/* Welcome Section */}
         <div>
           <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">
-            Bienvenido de nuevo! 👋
+            {t('welcomeBack')}
           </h1>
           <p className="text-secondary-600 dark:text-secondary-400">
-            Aquí está un resumen de tu actividad reciente
+            {hasActivity ? t('summaryActive') : t('summaryEmpty')}
           </p>
         </div>
+
+        {/* Onboarding Banner - only when no activity */}
+        {!hasActivity && (
+          <Card variant="bordered" className="bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-950 dark:to-primary-900 border-primary-200 dark:border-primary-800">
+            <CardContent className="p-6">
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+                <div className="w-14 h-14 bg-primary-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <FolderIcon className="h-7 w-7 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-xl font-bold text-secondary-900 dark:text-white mb-1">
+                    {t('onboarding.title')}
+                  </h2>
+                  <p className="text-secondary-600 dark:text-secondary-400 mb-4">
+                    {t('onboarding.description')}
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <Button size="sm" asChild>
+                      <Link href="/contact?type=new-project">{t('onboarding.requestQuote')}</Link>
+                    </Button>
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href="/demo">{t('onboarding.viewDemos')}</Link>
+                    </Button>
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link href="/services">{t('onboarding.exploreServices')}</Link>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* KPIs Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -165,12 +182,12 @@ export default function DashboardPage() {
                   <ArrowRightIcon className="h-5 w-5 text-secondary-400 hover:text-primary-600" />
                 </Link>
               </div>
-              <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">Pedidos Activos</p>
+              <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">{t('kpis.activeOrders')}</p>
               <p className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">
                 {dashboardData.orders.active}
               </p>
               <p className="text-xs text-secondary-500">
-                {dashboardData.orders.pending} pendientes de confirmación
+                {t('kpis.pendingConfirmation', { count: dashboardData.orders.pending })}
               </p>
             </CardContent>
           </Card>
@@ -186,12 +203,12 @@ export default function DashboardPage() {
                   <ArrowRightIcon className="h-5 w-5 text-secondary-400 hover:text-primary-600" />
                 </Link>
               </div>
-              <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">Proyectos Activos</p>
+              <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">{t('kpis.activeProjects')}</p>
               <p className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">
                 {dashboardData.projects.active}
               </p>
               <p className="text-xs text-secondary-500">
-                Progreso promedio: {dashboardData.projects.avgProgress}%
+                {t('kpis.avgProgress', { percent: dashboardData.projects.avgProgress })}
               </p>
             </CardContent>
           </Card>
@@ -207,12 +224,12 @@ export default function DashboardPage() {
                   <ArrowRightIcon className="h-5 w-5 text-secondary-400 hover:text-primary-600" />
                 </Link>
               </div>
-              <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">Saldo Pendiente</p>
+              <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">{t('kpis.pendingBalance')}</p>
               <p className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">
                 ${dashboardData.billing.pending.toFixed(2)}
               </p>
               <p className="text-xs text-secondary-500">
-                Próximo vencimiento: {dashboardData.billing.nextDue}
+                {t('kpis.nextDue', { date: dashboardData.billing.nextDue })}
               </p>
             </CardContent>
           </Card>
@@ -228,12 +245,12 @@ export default function DashboardPage() {
                   <ArrowRightIcon className="h-5 w-5 text-secondary-400 hover:text-primary-600" />
                 </Link>
               </div>
-              <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">Mensajes No Leídos</p>
+              <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">{t('kpis.unreadMessages')}</p>
               <p className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">
                 {dashboardData.messages.unread}
               </p>
               <p className="text-xs text-secondary-500">
-                {dashboardData.messages.total} mensajes totales
+                {t('kpis.totalMessages', { count: dashboardData.messages.total })}
               </p>
             </CardContent>
           </Card>
@@ -246,9 +263,9 @@ export default function DashboardPage() {
             <Card variant="bordered">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>Pedidos Recientes</CardTitle>
+                  <CardTitle>{t('recentOrders')}</CardTitle>
                   <Button variant="ghost" size="sm" asChild>
-                    <Link href="/dashboard/orders">Ver todos</Link>
+                    <Link href="/dashboard/orders">{t('viewAll')}</Link>
                   </Button>
                 </div>
               </CardHeader>
@@ -285,9 +302,9 @@ export default function DashboardPage() {
             <Card variant="bordered">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>Proyectos en Curso</CardTitle>
+                  <CardTitle>{t('activeProjectsSection')}</CardTitle>
                   <Button variant="ghost" size="sm" asChild>
-                    <Link href="/dashboard/projects">Ver todos</Link>
+                    <Link href="/dashboard/projects">{t('viewAll')}</Link>
                   </Button>
                 </div>
               </CardHeader>
@@ -304,14 +321,14 @@ export default function DashboardPage() {
                             {project.name}
                           </p>
                           <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                            Próximo hito: {project.nextMilestone}
+                            {t('nextMilestone', { milestone: project.nextMilestone })}
                           </p>
                         </div>
                         {getStatusBadge(project.status)}
                       </div>
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-secondary-600 dark:text-secondary-400">Progreso</span>
+                          <span className="text-secondary-600 dark:text-secondary-400">{t('progress')}</span>
                           <span className="font-semibold text-secondary-900 dark:text-white">
                             {project.progress}%
                           </span>
@@ -324,7 +341,7 @@ export default function DashboardPage() {
                         </div>
                         <div className="flex items-center gap-2 text-xs text-secondary-500">
                           <CalendarIcon className="h-4 w-4" />
-                          <span>Fecha límite: {project.dueDate}</span>
+                          <span>{t('deadline', { date: project.dueDate })}</span>
                         </div>
                       </div>
                     </div>
@@ -339,7 +356,7 @@ export default function DashboardPage() {
             {/* Upcoming Deadlines */}
             <Card variant="bordered">
               <CardHeader>
-                <CardTitle>Próximos Vencimientos</CardTitle>
+                <CardTitle>{t('upcomingDeadlines')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -366,25 +383,25 @@ export default function DashboardPage() {
             {/* Quick Actions */}
             <Card variant="bordered">
               <CardHeader>
-                <CardTitle>Acciones Rápidas</CardTitle>
+                <CardTitle>{t('quickActions')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <Button variant="outline" size="sm" fullWidth className="justify-start" asChild>
                   <Link href="/contact?type=new-project">
                     <FolderIcon className="h-4 w-4 mr-2" />
-                    Nuevo Proyecto
+                    {t('newProject')}
                   </Link>
                 </Button>
                 <Button variant="outline" size="sm" fullWidth className="justify-start" asChild>
                   <Link href="/dashboard/messages">
                     <ChatBubbleLeftRightIcon className="h-4 w-4 mr-2" />
-                    Contactar Soporte
+                    {t('contactSupport')}
                   </Link>
                 </Button>
                 <Button variant="outline" size="sm" fullWidth className="justify-start" asChild>
                   <Link href="/dashboard/billing">
                     <CreditCardIcon className="h-4 w-4 mr-2" />
-                    Pagar Factura
+                    {t('payInvoice')}
                   </Link>
                 </Button>
               </CardContent>
