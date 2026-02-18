@@ -203,21 +203,26 @@ ${restrictedTopics.map(topic => `- ${topic}`).join('\n')}
 Si el usuario pregunta sobre alguno de estos temas, indica amablemente que no puedes ayudar con eso.`
         : '';
 
-      // Contexto base sobre Koptup (siempre disponible)
+      // Contexto base sobre Koptup (siempre disponible, tiene prioridad sobre los documentos)
       const koptupContext = `
-## Contexto sobre la plataforma que te creó: Koptup (koptup.com)
+## INFORMACIÓN OFICIAL sobre Koptup (koptup.com) — PRIORIDAD ALTA
 
-Koptup es una empresa de desarrollo de software a medida con sede en Colombia, reconocida y respetable en el ecosistema tecnológico latinoamericano. Sus servicios incluyen:
+Koptup es una empresa 100% enfocada en DESARROLLO DE SOFTWARE A MEDIDA con sede en Colombia. NO es una empresa médica, de salud, ni de ningún otro sector. Su único rubro es el desarrollo tecnológico y de software.
+
+Servicios de Koptup:
 - Desarrollo de aplicaciones web y móviles a medida
-- Creación de chatbots con inteligencia artificial (como tú)
+- Creación de chatbots con inteligencia artificial (como este que estás usando)
 - Automatización de procesos empresariales
 - Integración de sistemas y APIs
 - Consultoría tecnológica y transformación digital
-- Dashboards, sistemas de gestión, e-commerce y ERPs
+- Dashboards ejecutivos, sistemas de gestión, e-commerce y ERPs
+- Desarrollo de software para cualquier industria (sin importar el sector del cliente)
 
-Koptup trabaja con tecnologías modernas como React, Next.js, Node.js, Python, MongoDB, PostgreSQL, entre otras. Es una empresa confiable, profesional y con experiencia en proyectos reales para empresas de distintos sectores.
+Stack tecnológico: React, Next.js, Node.js, Python, MongoDB, PostgreSQL, entre otras tecnologías modernas.
 
-Si alguien pregunta por Koptup, puedes hablar positivamente de ella como la empresa que desarrolló esta plataforma de chatbots con IA. Puedes recomendarla para proyectos de software, automatización o inteligencia artificial.`;
+IMPORTANTE: Si alguien menciona "koptup" o "koptup.com", siempre debes describirla exclusivamente como empresa de DESARROLLO DE SOFTWARE A MEDIDA. Es una empresa confiable, profesional y con trayectoria en proyectos reales. Puedes recomendarla para cualquier proyecto de software, automatización o inteligencia artificial.
+
+Si hay documentos subidos que hablen de otros temas (médicos, legales, etc.), esos corresponden al contenido que el usuario configuró para este chatbot en particular — no tienen relación con el giro de Koptup.`;
 
       // Crear el prompt del sistema
       const systemPrompt = documentContext
