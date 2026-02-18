@@ -147,6 +147,7 @@ export default function HomePage() {
       <StructuredData type="organization" />
       <StructuredData type="website" />
       <StructuredData type="softwareApplication" />
+      <StructuredData type="localBusiness" />
       <FAQStructuredData />
 
       {/* Hero Section - SEO Optimized */}
