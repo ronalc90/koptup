@@ -9,7 +9,8 @@ export default function Footer() {
 
   const services = [
     { name: 'E-commerce', href: '/services#ecommerce' },
-    { name: 'Chatbots & AI', href: '/services#chatbots' },
+    { name: 'Chatbots con IA', href: '/chatbots-ia' },
+    { name: 'Soluciones de IA', href: '/soluciones-ia' },
     { name: t('services.mobile.title'), href: '/services#mobile' },
     { name: t('services.consulting.title'), href: '/services#consulting' },
   ];

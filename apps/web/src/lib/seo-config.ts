@@ -157,6 +157,37 @@ export const seoConfig: Record<string, PageSEO> = {
     canonical: `${baseUrl}/cookies`,
   },
 
+  // Landing pages SEO
+  'chatbots-ia': {
+    title: 'Chatbots con IA para Empresas | Venta e Implementación Colombia',
+    description:
+      'Implementamos chatbots con inteligencia artificial para empresas en Colombia. Integración con WhatsApp Business, GPT-4 y Claude AI. Atención 24/7, captura de leads y ventas automatizadas. Desde $499 USD.',
+    keywords: [
+      'chatbot con ia',
+      'chatbot inteligencia artificial',
+      'implementar chatbot empresa',
+      'venta chatbots colombia',
+      'chatbot whatsapp colombia',
+      'chatbot para negocios',
+    ],
+    canonical: `${baseUrl}/chatbots-ia`,
+  },
+
+  'soluciones-ia': {
+    title: 'Soluciones de Inteligencia Artificial para Empresas | KopTup Colombia',
+    description:
+      'Implementamos soluciones de inteligencia artificial para empresas en Colombia: chatbots, automatización, análisis predictivo y sistemas expertos con GPT-4 y Claude AI. Consultoría gratuita.',
+    keywords: [
+      'soluciones de inteligencia artificial',
+      'inteligencia artificial para empresas',
+      'implementar IA empresa',
+      'automatización con IA',
+      'IA colombia',
+      'transformación digital IA',
+    ],
+    canonical: `${baseUrl}/soluciones-ia`,
+  },
+
   // DEMOS MÉDICOS
 
   // Demo: Cuentas Médicas (Auditoría)
