@@ -16,7 +16,17 @@ export default function Footer() {
 
   const company = [
     { name: t('nav.about'), href: '/about' },
+    { name: t('nav.pricing'), href: '/pricing' },
     { name: t('nav.contact'), href: '/contact' },
+  ];
+
+  const demos = [
+    { name: 'E-commerce', href: '/demo/ecommerce' },
+    { name: 'Chatbot IA', href: '/demo/chatbot' },
+    { name: 'Dashboard', href: '/demo/dashboard-ejecutivo' },
+    { name: 'Gestión Documental', href: '/demo/gestor-documentos' },
+    { name: 'Sistema Reservas', href: '/demo/sistema-reservas' },
+    { name: t('nav.demos'), href: '/demo' },
   ];
 
   const legal = [
@@ -67,7 +77,7 @@ export default function Footer() {
   return (
     <footer className="bg-secondary-900 dark:bg-black text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-12">
           {/* Company Info */}
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center space-x-2 mb-4">
@@ -102,6 +112,23 @@ export default function Footer() {
             <ul className="space-y-2">
               {services.map((item) => (
                 <li key={item.name}>
+                  <Link
+                    href={item.href}
+                    className="text-secondary-400 hover:text-primary-400 transition-colors"
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Demos */}
+          <div>
+            <h3 className="font-semibold text-lg mb-4">{t('nav.demos')}</h3>
+            <ul className="space-y-2">
+              {demos.map((item) => (
+                <li key={item.href}>
                   <Link
                     href={item.href}
                     className="text-secondary-400 hover:text-primary-400 transition-colors"
