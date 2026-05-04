@@ -1,136 +1,37 @@
 import { useSyncExternalStore } from 'react';
+import {
+  Cliente,
+  Conductor,
+  Vehiculo,
+  OrdenServicio,
+  GuiaRemision,
+  Factura,
+  User,
+} from './types';
+import {
+  seedClientes,
+  seedConductores,
+  seedVehiculos,
+  seedOrdenes,
+  seedGuias,
+  seedFacturas,
+  seedUsuarios,
+} from './mockData';
 
-export interface Cliente {
-  id: string;
-  tipoDoc: number;
-  numeroDoc: string;
-  razonSocial: string;
-  nombreComercial?: string;
-  dirección: string;
-  ubigeo: string;
-  telefono: string;
-  email: string;
-  activo: boolean;
-  createdAt: Date;
-}
-
-export interface Conductor {
-  id: string;
-  dni: string;
-  nombres: string;
-  apellidos: string;
-  licencia: string;
-  categoriaLicencia: string;
-  vencimientoLicencia: Date;
-  telefono?: string;
-  email?: string;
-  activo: boolean;
-  createdAt: Date;
-}
-
-export interface Vehiculo {
-  id: string;
-  placa: string;
-  configuracion: string;
-  anio: number;
-  capacidadKg: number;
-  vencimientoSOAT: Date;
-  vencimientoRevision: Date;
-  certificadoMTC?: string;
-  activo: boolean;
-  createdAt: Date;
-}
-
-export interface Orden {
-  id: string;
-  numero: string;
-  clienteId: string;
-  conductorId: string;
-  vehiculoId: string;
-  modalidadTransporte: string;
-  origen: {
-    direccion: string;
-    ubigeo: string;
-  };
-  destino: {
-    direccion: string;
-    ubigeo: string;
-  };
-  fechaInicioTraslado: Date;
-  pesoTotal: number;
-  bultos: number;
-  descripcionMercancia: string;
-  flete: number;
-  igv: number;
-  total: number;
-  estado: 'borrador' | 'confirmada' | 'en_ruta' | 'entregada' | 'facturada';
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface Guia {
-  id: string;
-  numero: string;
-  ordenId: string;
-  remitente: { razonSocial: string; numeroDoc: string };
-  destinatario: { razonSocial: string; numeroDoc: string };
-  transportista: { razonSocial: string; ruc: string };
-  conductor: { nombres: string; dni: string };
-  vehiculo: { placa: string };
-  hash: string;
-  xml: string;
-  cdr?: string;
-  estado: 'emitida' | 'aceptada' | 'rechazada' | 'anulada';
-  createdAt: Date;
-}
-
-export interface FacturaItem {
-  id: string;
-  descripcion: string;
-  cantidad: number;
-  unitario: number;
-  subtotal: number;
-}
-
-export interface Factura {
-  id: string;
-  numero: string;
-  ordenId: string;
-  clienteId: string;
-  clienteRazonSocial: string;
-  clienteNumeroDoc: string;
-  items: FacturaItem[];
-  subtotal: number;
-  igv: number;
-  detraccion?: number;
-  total: number;
-  xml: string;
-  cdr?: string;
-  estado: 'emitida' | 'cancelada' | 'anulada';
-  createdAt: Date;
-}
-
-export interface Usuario {
-  id: string;
-  email: string;
-  nombre: string;
-  rol: 'admin' | 'operador' | 'conductor';
-  activo: boolean;
-}
-
-export interface TransporteState {
+// Interfaz del estado
+interface TransporteState {
   clientes: Cliente[];
   conductores: Conductor[];
   vehiculos: Vehiculo[];
-  ordenes: Orden[];
-  guias: Guia[];
+  ordenes: OrdenServicio[];
+  guias: GuiaRemision[];
   facturas: Factura[];
-  usuarios: Usuario[];
+  usuarios: User[];
+  currentUserId: string;
 }
 
-const STORAGE_KEY = 'koptup-transporte-demo-v1';
-
-let state: TransporteState = {
+// Estado inicial vacío
+const initialState: TransporteState = {
   clientes: [],
   conductores: [],
   vehiculos: [],
@@ -138,48 +39,101 @@ let state: TransporteState = {
   guias: [],
   facturas: [],
   usuarios: [],
+  currentUserId: 'user-001',
 };
 
-let listeners: Set<() => void> = new Set();
+// Estado interno del módulo
+let state: TransporteState = { ...initialState };
 
-function subscribe(listener: () => void) {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-}
+// Lista de listeners para cambios de estado
+const listeners = new Set<() => void>();
 
-function notify() {
-  listeners.forEach((listener) => listener());
-}
+// Flag para controlar inicialización
+let initialized = false;
 
-export function getState(): TransporteState {
-  return state;
-}
-
-export function setState(newState: Partial<TransporteState>) {
-  state = { ...state, ...newState };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  notify();
-}
-
-export function init(initialState: TransporteState) {
-  state = initialState;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  notify();
-}
-
-export function loadState(): TransporteState {
-  if (typeof window === 'undefined') return state;
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored) {
-    try {
-      state = JSON.parse(stored);
-    } catch (e) {
-      console.error('Failed to parse stored state', e);
-    }
+// Función para obtener el estado actual
+export const getState = (): TransporteState => {
+  // Inicializar con seed data si no se ha hecho
+  if (!initialized) {
+    init();
   }
   return state;
-}
+};
 
-export function useTransporteStore(): TransporteState {
-  return useSyncExternalStore(subscribe, getState);
+// Función para actualizar el estado (con mutaciones)
+export const setState = (updater: (state: TransporteState) => void): void => {
+  updater(state);
+  // Notificar a todos los listeners
+  listeners.forEach((listener) => listener());
+};
+
+// Función de inicialización que carga seed data
+export const init = (): void => {
+  if (initialized) return;
+
+  // Intentar cargar del localStorage
+  const STORAGE_KEY = 'koptup-transporte-demo-v1';
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      state = { ...initialState, ...parsed };
+      initialized = true;
+      return;
+    }
+  } catch (e) {
+    // localStorage no disponible o error en parse, continuar con seed
+  }
+
+  // Cargar seed data
+  state = {
+    clientes: [...seedClientes],
+    conductores: [...seedConductores],
+    vehiculos: [...seedVehiculos],
+    ordenes: [...seedOrdenes],
+    guias: [...seedGuias],
+    facturas: [...seedFacturas],
+    usuarios: [...seedUsuarios],
+    currentUserId: 'user-001',
+  };
+
+  initialized = true;
+
+  // Opcionalmente, guardar en localStorage para persistencia
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    // localStorage no disponible, no hacer nada
+  }
+};
+
+// Función para obtener snapshot del estado (para useSyncExternalStore)
+const getSnapshot = (): TransporteState => {
+  return state;
+};
+
+// Función para suscribirse a cambios (para useSyncExternalStore)
+const subscribe = (callback: () => void): (() => void) => {
+  listeners.add(callback);
+  return () => {
+    listeners.delete(callback);
+  };
+};
+
+// Hook de React para usar el store
+export const useTransporteStore = <T,>(
+  selector: (state: TransporteState) => T
+): T => {
+  // Asegurar inicialización
+  if (!initialized) {
+    init();
+  }
+
+  const snapshot = useSyncExternalStore(subscribe, getSnapshot);
+  return selector(snapshot);
+};
+
+// Inicialización automática al importar el módulo en SSR-safe way
+if (typeof window !== 'undefined') {
+  init();
 }
