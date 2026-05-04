@@ -1,120 +1,209 @@
 'use client';
 
-import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Vehiculo } from '../../store';
-import { Input } from '../Input';
-import { Select } from '../Select';
+import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
+import Select from '../Select';
 import toast from 'react-hot-toast';
+import { Vehiculo } from '../../types';
 
 const vehiculoSchema = z.object({
-  placa: z.string().regex(/^[A-Z]{3}-\d{3}$/, 'Formato: ABC-123'),
-  configuracion: z.string().min(1, 'Requerido'),
-  anio: z.number().min(1990).max(new Date().getFullYear()),
-  capacidadKg: z.number().positive('Debe ser mayor a 0'),
-  vencimientoSOAT: z.string().min(1, 'Requerido'),
-  vencimientoRevision: z.string().min(1, 'Requerido'),
+  placa: z.string().regex(/^[A-Z]{3}-?\d{3}$/),
+  configuracion: z.string(),
+  anio: z.number().min(1990).max(2030),
+  capacidadKg: z.number().positive(),
+  vencimientoSOAT: z.string(),
+  vencimientoRevision: z.string(),
   certificadoMTC: z.string().optional(),
-  activo: z.boolean(),
+  activo: z.boolean().default(true),
 });
 
 type VehiculoFormData = z.infer<typeof vehiculoSchema>;
 
 interface VehiculoFormProps {
   initialData?: Vehiculo;
-  onSubmit: (data: VehiculoFormData) => void | Promise<void>;
+  onSubmit: (data: Vehiculo) => Promise<void>;
   onCancel: () => void;
 }
 
-const configuraciones = ['C2', 'C3', 'C4', 'T2S2', 'T2S3', 'T3S2', 'T3S3', 'C2RB1', 'C3RB1'];
+const CONFIGURACIONES = ['C2', 'C3', 'C4', 'T2S2', 'T2S3', 'T3S2', 'T3S3', 'C2RB1', 'C3RB1'];
 
-export function VehiculoForm({ initialData, onSubmit, onCancel }: VehiculoFormProps) {
+export default function VehiculoForm({ initialData, onSubmit, onCancel }: VehiculoFormProps) {
   const {
-    register,
+    control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<VehiculoFormData>({
     resolver: zodResolver(vehiculoSchema),
-    defaultValues: initialData || { activo: true, anio: new Date().getFullYear() },
+    defaultValues: {
+      placa: initialData?.placa || '',
+      configuracion: initialData?.configuracion || 'C2',
+      anio: initialData?.anio || new Date().getFullYear(),
+      capacidadKg: initialData?.capacidadKg || 0,
+      vencimientoSOAT: initialData?.vencimientoSOAT || '',
+      vencimientoRevision: initialData?.vencimientoRevision || '',
+      certificadoMTC: initialData?.certificadoMTC || '',
+      activo: initialData?.activo !== false,
+    },
   });
 
-  const onSubmitHandler = async (data: VehiculoFormData) => {
+  const onFormSubmit = async (data: VehiculoFormData) => {
     try {
-      await onSubmit(data);
+      await onSubmit({
+        id: initialData?.id || '',
+        ...data,
+      });
     } catch (error) {
-      toast.error('Error al guardar');
+      toast.error('Error al guardar vehículo');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmitHandler)} className="space-y-4">
-      <Input
-        label="Placa"
-        {...register('placa')}
-        error={errors.placa?.message}
-        placeholder="ABC-123"
-        maxLength={8}
-      />
+    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
+      {/* Placa */}
+      <div>
+        <label className="block text-sm font-medium mb-2">Placa</label>
+        <Controller
+          name="placa"
+          control={control}
+          render={({ field }) => (
+            <Input
+              {...field}
+              placeholder="ABC-123"
+              maxLength={7}
+              onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+              error={errors.placa?.message}
+            />
+          )}
+        />
+      </div>
 
-      <Select
-        label="Configuración"
-        {...register('configuracion')}
-        options={configuraciones.map((c) => ({ value: c, label: c }))}
-        error={errors.configuracion?.message}
-      />
+      {/* Configuración y Año */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium mb-2">Configuración</label>
+          <Controller
+            name="configuracion"
+            control={control}
+            render={({ field }) => (
+              <Select
+                {...field}
+                options={CONFIGURACIONES.map((conf) => ({ value: conf, label: conf }))}
+              />
+            )}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">Año</label>
+          <Controller
+            name="anio"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="number"
+                min="1990"
+                max="2030"
+                error={errors.anio?.message}
+              />
+            )}
+          />
+        </div>
+      </div>
 
-      <Input
-        type="number"
-        label="Año"
-        {...register('anio', { valueAsNumber: true })}
-        error={errors.anio?.message}
-      />
+      {/* Capacidad */}
+      <div>
+        <label className="block text-sm font-medium mb-2">Capacidad (kg)</label>
+        <Controller
+          name="capacidadKg"
+          control={control}
+          render={({ field }) => (
+            <Input
+              {...field}
+              type="number"
+              placeholder="5000"
+              error={errors.capacidadKg?.message}
+            />
+          )}
+        />
+      </div>
 
-      <Input
-        type="number"
-        label="Capacidad (kg)"
-        {...register('capacidadKg', { valueAsNumber: true })}
-        error={errors.capacidadKg?.message}
-      />
+      {/* Vencimientos */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium mb-2">Vencimiento SOAT</label>
+          <Controller
+            name="vencimientoSOAT"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="date"
+                error={errors.vencimientoSOAT?.message}
+              />
+            )}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">Vencimiento Revisión</label>
+          <Controller
+            name="vencimientoRevision"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="date"
+                error={errors.vencimientoRevision?.message}
+              />
+            )}
+          />
+        </div>
+      </div>
 
-      <Input
-        type="date"
-        label="Vencimiento SOAT"
-        {...register('vencimientoSOAT')}
-        error={errors.vencimientoSOAT?.message}
-      />
+      {/* Certificado MTC */}
+      <div>
+        <label className="block text-sm font-medium mb-2">Certificado MTC (Opcional)</label>
+        <Controller
+          name="certificadoMTC"
+          control={control}
+          render={({ field }) => (
+            <Input
+              {...field}
+              placeholder="Número de certificado"
+            />
+          )}
+        />
+      </div>
 
-      <Input
-        type="date"
-        label="Vencimiento Revisión"
-        {...register('vencimientoRevision')}
-        error={errors.vencimientoRevision?.message}
-      />
+      {/* Activo */}
+      <div>
+        <Controller
+          name="activo"
+          control={control}
+          render={({ field }) => (
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={field.value}
+                onChange={(e) => field.onChange(e.target.checked)}
+                className="w-4 h-4"
+              />
+              <span className="text-sm font-medium">Activo</span>
+            </label>
+          )}
+        />
+      </div>
 
-      <Input label="Certificado MTC" {...register('certificadoMTC')} />
-
-      <label className="flex items-center space-x-2">
-        <input type="checkbox" {...register('activo')} className="w-4 h-4" />
-        <span className="text-slate-700 dark:text-slate-300">Activo</span>
-      </label>
-
-      <div className="flex space-x-2 pt-4">
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg transition-colors"
-        >
-          {isSubmitting ? 'Guardando...' : 'Guardar'}
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="flex-1 px-4 py-2 bg-slate-300 dark:bg-slate-600 text-slate-900 dark:text-white rounded-lg hover:bg-slate-400 dark:hover:bg-slate-700 transition-colors"
-        >
+      {/* Buttons */}
+      <div className="flex gap-3 pt-4 border-t">
+        <Button type="submit" isLoading={isSubmitting} className="flex-1">
+          {initialData ? 'Actualizar' : 'Crear'}
+        </Button>
+        <Button type="button" onClick={onCancel} variant="secondary" className="flex-1">
           Cancelar
-        </button>
+        </Button>
       </div>
     </form>
   );
