@@ -20,6 +20,7 @@ import {
   CalendarIcon,
   PencilSquareIcon,
   RectangleStackIcon,
+  TruckIcon,
 } from '@heroicons/react/24/outline';
 
 export default function DemosPage() {
@@ -135,6 +136,21 @@ export default function DemosPage() {
         t('projects.features.1'),
         t('projects.features.2'),
         t('projects.features.3'),
+      ],
+    },
+    {
+      id: 'transporte-carga',
+      title: t('transport.title'),
+      description: t('transport.description'),
+      icon: TruckIcon,
+      href: '/demo/transporte-carga',
+      color: 'from-amber-600 to-orange-800',
+      badge: t('transport.badge'),
+      features: [
+        t('transport.features.0'),
+        t('transport.features.1'),
+        t('transport.features.2'),
+        t('transport.features.3'),
       ],
     },
   ];
