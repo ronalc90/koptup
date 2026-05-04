@@ -1,132 +1,253 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Cliente } from '../../store';
-import { Input } from '../Input';
-import { Select } from '../Select';
+import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
 import toast from 'react-hot-toast';
+import { Cliente } from '../../types';
 
 const clienteSchema = z.object({
-  tipoDoc: z.number(),
-  numeroDoc: z.string().min(1, 'Requerido'),
-  razonSocial: z.string().min(1, 'Requerido'),
+  tipoDoc: z.enum(['1', '6']),
+  numeroDoc: z.string().min(8).max(11),
+  razonSocial: z.string().min(3),
   nombreComercial: z.string().optional(),
-  dirección: z.string().min(1, 'Requerido'),
-  ubigeo: z.string().min(1, 'Requerido'),
-  telefono: z.string().min(1, 'Requerido'),
-  email: z.string().email('Email inválido'),
-  activo: z.boolean(),
+  direccion: z.string().min(5),
+  ubigeo: z.string().regex(/^\d{6}$/),
+  telefono: z.string().regex(/^\d{9}$/),
+  email: z.string().email(),
+  activo: z.boolean().default(true),
 });
 
 type ClienteFormData = z.infer<typeof clienteSchema>;
 
 interface ClienteFormProps {
   initialData?: Cliente;
-  onSubmit: (data: ClienteFormData) => void | Promise<void>;
+  onSubmit: (data: Cliente) => Promise<void>;
   onCancel: () => void;
 }
 
-export function ClienteForm({ initialData, onSubmit, onCancel }: ClienteFormProps) {
+export default function ClienteForm({ initialData, onSubmit, onCancel }: ClienteFormProps) {
   const {
-    register,
+    control,
     handleSubmit,
-    watch,
     formState: { errors, isSubmitting },
+    watch,
   } = useForm<ClienteFormData>({
     resolver: zodResolver(clienteSchema),
-    defaultValues: initialData || { tipoDoc: 6, activo: true },
+    defaultValues: {
+      tipoDoc: initialData?.tipoDoc || '6',
+      numeroDoc: initialData?.numeroDoc || '',
+      razonSocial: initialData?.razonSocial || '',
+      nombreComercial: initialData?.nombreComercial || '',
+      direccion: initialData?.direccion || '',
+      ubigeo: initialData?.ubigeo || '',
+      telefono: initialData?.telefono || '',
+      email: initialData?.email || '',
+      activo: initialData?.activo !== false,
+    },
   });
 
   const tipoDoc = watch('tipoDoc');
+  const maxLength = tipoDoc === '1' ? 8 : 11;
 
-  const onSubmitHandler = async (data: ClienteFormData) => {
+  const onFormSubmit = async (data: ClienteFormData) => {
     try {
-      await onSubmit(data);
+      await onSubmit({
+        id: initialData?.id || '',
+        ...data,
+      });
     } catch (error) {
-      toast.error('Error al guardar');
+      toast.error('Error al guardar cliente');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmitHandler)} className="space-y-4">
+    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
+      {/* Tipo Documento */}
       <div className="grid grid-cols-2 gap-4">
-        <Select
-          label="Tipo Doc"
-          {...register('tipoDoc')}
-          options={[
-            { value: 1, label: 'DNI' },
-            { value: 6, label: 'RUC' },
-          ]}
-        />
-        <Input
-          label="Número Doc"
-          {...register('numeroDoc')}
-          error={errors.numeroDoc?.message}
-          maxLength={tipoDoc === 6 ? 11 : 8}
+        <div>
+          <label className="block text-sm font-medium mb-2">Tipo de Documento</label>
+          <div className="flex gap-4">
+            <label className="flex items-center">
+              <Controller
+                name="tipoDoc"
+                control={control}
+                render={({ field }) => (
+                  <input
+                    type="radio"
+                    value="1"
+                    checked={field.value === '1'}
+                    onChange={(e) => field.onChange(e.target.value)}
+                    className="w-4 h-4"
+                  />
+                )}
+              />
+              <span className="ml-2 text-sm">DNI</span>
+            </label>
+            <label className="flex items-center">
+              <Controller
+                name="tipoDoc"
+                control={control}
+                render={({ field }) => (
+                  <input
+                    type="radio"
+                    value="6"
+                    checked={field.value === '6'}
+                    onChange={(e) => field.onChange(e.target.value)}
+                    className="w-4 h-4"
+                  />
+                )}
+              />
+              <span className="ml-2 text-sm">RUC</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Número Documento */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Número</label>
+          <Controller
+            name="numeroDoc"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                maxLength={maxLength}
+                placeholder={tipoDoc === '1' ? '12345678' : '12345678901'}
+                error={errors.numeroDoc?.message}
+              />
+            )}
+          />
+        </div>
+      </div>
+
+      {/* Razón Social */}
+      <div>
+        <label className="block text-sm font-medium mb-2">Razón Social</label>
+        <Controller
+          name="razonSocial"
+          control={control}
+          render={({ field }) => (
+            <Input
+              {...field}
+              placeholder="Nombre empresa o persona"
+              error={errors.razonSocial?.message}
+            />
+          )}
         />
       </div>
 
-      <Input
-        label="Razón Social"
-        {...register('razonSocial')}
-        error={errors.razonSocial?.message}
-      />
+      {/* Nombre Comercial */}
+      <div>
+        <label className="block text-sm font-medium mb-2">Nombre Comercial (Opcional)</label>
+        <Controller
+          name="nombreComercial"
+          control={control}
+          render={({ field }) => (
+            <Input
+              {...field}
+              placeholder="Nombre comercial"
+            />
+          )}
+        />
+      </div>
 
-      <Input
-        label="Nombre Comercial"
-        {...register('nombreComercial')}
-        error={errors.nombreComercial?.message}
-      />
+      {/* Dirección y UBIGEO */}
+      <div className="grid grid-cols-3 gap-4">
+        <div className="col-span-2">
+          <label className="block text-sm font-medium mb-2">Dirección</label>
+          <Controller
+            name="direccion"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                placeholder="Calle, número, distrito"
+                error={errors.direccion?.message}
+              />
+            )}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">UBIGEO</label>
+          <Controller
+            name="ubigeo"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                placeholder="150000"
+                maxLength={6}
+                error={errors.ubigeo?.message}
+              />
+            )}
+          />
+        </div>
+      </div>
 
-      <Input
-        label="Dirección"
-        {...register('dirección')}
-        error={errors.dirección?.message}
-      />
+      {/* Teléfono y Email */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium mb-2">Teléfono</label>
+          <Controller
+            name="telefono"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                placeholder="987654321"
+                maxLength={9}
+                error={errors.telefono?.message}
+              />
+            )}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">Email</label>
+          <Controller
+            name="email"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="email"
+                placeholder="contacto@empresa.com"
+                error={errors.email?.message}
+              />
+            )}
+          />
+        </div>
+      </div>
 
-      <Input
-        label="UBIGEO"
-        {...register('ubigeo')}
-        error={errors.ubigeo?.message}
-        placeholder="150131"
-      />
+      {/* Activo */}
+      <div>
+        <Controller
+          name="activo"
+          control={control}
+          render={({ field }) => (
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={field.value}
+                onChange={(e) => field.onChange(e.target.checked)}
+                className="w-4 h-4"
+              />
+              <span className="text-sm font-medium">Activo</span>
+            </label>
+          )}
+        />
+      </div>
 
-      <Input
-        label="Teléfono"
-        {...register('telefono')}
-        error={errors.telefono?.message}
-      />
-
-      <Input
-        type="email"
-        label="Email"
-        {...register('email')}
-        error={errors.email?.message}
-      />
-
-      <label className="flex items-center space-x-2">
-        <input type="checkbox" {...register('activo')} className="w-4 h-4" />
-        <span className="text-slate-700 dark:text-slate-300">Activo</span>
-      </label>
-
-      <div className="flex space-x-2 pt-4">
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg transition-colors"
-        >
-          {isSubmitting ? 'Guardando...' : 'Guardar'}
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="flex-1 px-4 py-2 bg-slate-300 dark:bg-slate-600 text-slate-900 dark:text-white rounded-lg hover:bg-slate-400 dark:hover:bg-slate-700 transition-colors"
-        >
+      {/* Buttons */}
+      <div className="flex gap-3 pt-4 border-t">
+        <Button type="submit" isLoading={isSubmitting} className="flex-1">
+          {initialData ? 'Actualizar' : 'Crear'}
+        </Button>
+        <Button type="button" onClick={onCancel} variant="secondary" className="flex-1">
           Cancelar
-        </button>
+        </Button>
       </div>
     </form>
   );
