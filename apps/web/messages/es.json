@@ -1,1 +1,109 @@
-{"common":{"errors":{"404":"No encontrado","500":"Error interno del servidor"},"buttons":{"submit":"Enviar","cancel":"Cancelar","save":"Guardar","edit":"Editar","delete":"Eliminar","add":"Agregar"},"status":{"loading":"Cargando...","success":"Éxito","error":"Error"}},"hero":{"title":"Soluciones de Transporte Integral","subtitle":"Gestiona tus operaciones de transporte con eficiencia","cta":"Comenzar ahora"},"homePage":{"title":"Inicio","welcome":"Bienvenido"},"services":{"title":"Nuestros Servicios","description":"Soluciones completas para tu negocio","items":[{"id":"logistics","name":"Logística","description":"Gestión de envíos y entregas"},{"id":"fleet","name":"Flota","description":"Administración de vehículos"}]},"demos":{"title":"Demostraciones","subtitle":"Explora nuestras soluciones","transport":{"badge":"Transporte","title":"Transporte de Carga","description":"Sistema de gestión integral: clientes, viajes, guías, facturas y detracciones","features":["Gestión de clientes y proveedores","Seguimiento de viajes en tiempo real","Generación de guías de remisión","Facturación automática","Control de detracciones","Reportes y análisis"]},"logistics":{"badge":"Logística","title":"Sistema Logístico","description":"Plataforma completa de gestión logística","features":["Inventario centralizado","Optimización de rutas","Seguimiento de paquetes"]},"retail":{"badge":"Retail","title":"Gestión Retail","description":"Solución integral para tiendas","features":["POS integrado","Gestión de inventario","Reportes de ventas"]}},"footer":{"copyright":"Todos los derechos reservados","links":{"privacy":"Política de privacidad","terms":"Términos de servicio"}}},"contact":{"title":"Contacto","email":"Email","message":"Mensaje","submit":"Enviar"},"pricing":{"title":"Precios","plans":[{"name":"Básico","price":"$29"},{"name":"Profesional","price":"$99"}]}}
+{
+  "common": {
+    "errors": {
+      "404": "No encontrado",
+      "500": "Error interno del servidor"
+    },
+    "buttons": {
+      "submit": "Enviar",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "add": "Agregar"
+    },
+    "status": {
+      "loading": "Cargando...",
+      "success": "Éxito",
+      "error": "Error"
+    }
+  },
+  "hero": {
+    "title": "Soluciones de Transporte Integral",
+    "subtitle": "Gestiona tus operaciones de transporte con eficiencia",
+    "cta": "Comenzar ahora"
+  },
+  "homePage": {
+    "title": "Inicio",
+    "welcome": "Bienvenido"
+  },
+  "services": {
+    "title": "Nuestros Servicios",
+    "description": "Soluciones completas para tu negocio",
+    "items": [
+      {
+        "id": "logistics",
+        "name": "Logística",
+        "description": "Gestión de envíos y entregas"
+      },
+      {
+        "id": "fleet",
+        "name": "Flota",
+        "description": "Administración de vehículos"
+      }
+    ]
+  },
+  "demos": {
+    "title": "Demostraciones",
+    "subtitle": "Explora nuestras soluciones",
+    "transport": {
+      "badge": "Transporte",
+      "title": "Transporte de Carga",
+      "description": "Sistema de gestión integral: clientes, viajes, guías, facturas y detracciones",
+      "features": [
+        "Gestión de clientes y proveedores",
+        "Seguimiento de viajes en tiempo real",
+        "Generación de guías de remisión",
+        "Facturación automática",
+        "Control de detracciones",
+        "Reportes y análisis"
+      ]
+    },
+    "logistics": {
+      "badge": "Logística",
+      "title": "Sistema Logístico",
+      "description": "Plataforma completa de gestión logística",
+      "features": [
+        "Inventario centralizado",
+        "Optimización de rutas",
+        "Seguimiento de paquetes"
+      ]
+    },
+    "retail": {
+      "badge": "Retail",
+      "title": "Gestión Retail",
+      "description": "Solución integral para tiendas",
+      "features": [
+        "POS integrado",
+        "Gestión de inventario",
+        "Reportes de ventas"
+      ]
+    }
+  },
+  "footer": {
+    "copyright": "Todos los derechos reservados",
+    "links": {
+      "privacy": "Política de privacidad",
+      "terms": "Términos de servicio"
+    }
+  },
+  "contact": {
+    "title": "Contacto",
+    "email": "Email",
+    "message": "Mensaje",
+    "submit": "Enviar"
+  },
+  "pricing": {
+    "title": "Precios",
+    "plans": [
+      {
+        "name": "Básico",
+        "price": "$29"
+      },
+      {
+        "name": "Profesional",
+        "price": "$99"
+      }
+    ]
+  }
+}
