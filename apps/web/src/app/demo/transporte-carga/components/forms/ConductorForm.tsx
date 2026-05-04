@@ -1,109 +1,236 @@
 'use client';
 
-import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Conductor } from '../../store';
-import { Input } from '../Input';
-import { Select } from '../Select';
+import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
+import Select from '../Select';
 import toast from 'react-hot-toast';
+import { Conductor } from '../../types';
 
 const conductorSchema = z.object({
-  dni: z.string().length(8, 'DNI debe tener 8 dígitos'),
-  nombres: z.string().min(1, 'Requerido'),
-  apellidos: z.string().min(1, 'Requerido'),
-  licencia: z.string().min(1, 'Requerido'),
-  categoriaLicencia: z.string().min(1, 'Requerido'),
-  vencimientoLicencia: z.string().min(1, 'Requerido'),
-  telefono: z.string().optional(),
-  email: z.string().email().optional().or(z.literal('')),
-  activo: z.boolean(),
+  dni: z.string().regex(/^\d{8}$/),
+  nombres: z.string().min(3),
+  apellidos: z.string().min(3),
+  licencia: z.string().min(6),
+  categoriaLicencia: z.string(),
+  vencimientoLicencia: z.string(),
+  telefono: z.string().regex(/^\d{9}$/).optional(),
+  email: z.string().email().optional(),
+  activo: z.boolean().default(true),
 });
 
 type ConductorFormData = z.infer<typeof conductorSchema>;
 
 interface ConductorFormProps {
   initialData?: Conductor;
-  onSubmit: (data: ConductorFormData) => void | Promise<void>;
+  onSubmit: (data: Conductor) => Promise<void>;
   onCancel: () => void;
 }
 
-const categorias = [
+const CATEGORIAS = [
   'A-I',
-  'A-II',
-  'A-IIA',
-  'A-IIB',
-  'A-III',
-  'A-IIIA',
-  'A-IIIB',
+  'A-IIa',
+  'A-IIb',
+  'A-IIIa',
+  'A-IIIb',
+  'A-IIIc',
   'B-I',
   'B-II',
-  'B-IIC',
+  'B-IIa',
+  'B-IIb',
+  'B-IIc',
 ];
 
-export function ConductorForm({ initialData, onSubmit, onCancel }: ConductorFormProps) {
+export default function ConductorForm({ initialData, onSubmit, onCancel }: ConductorFormProps) {
   const {
-    register,
+    control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<ConductorFormData>({
     resolver: zodResolver(conductorSchema),
-    defaultValues: initialData || { activo: true },
+    defaultValues: {
+      dni: initialData?.dni || '',
+      nombres: initialData?.nombres || '',
+      apellidos: initialData?.apellidos || '',
+      licencia: initialData?.licencia || '',
+      categoriaLicencia: initialData?.categoriaLicencia || 'B-I',
+      vencimientoLicencia: initialData?.vencimientoLicencia || '',
+      telefono: initialData?.telefono || '',
+      email: initialData?.email || '',
+      activo: initialData?.activo !== false,
+    },
   });
 
-  const onSubmitHandler = async (data: ConductorFormData) => {
+  const onFormSubmit = async (data: ConductorFormData) => {
     try {
-      await onSubmit(data);
+      await onSubmit({
+        id: initialData?.id || '',
+        ...data,
+      });
     } catch (error) {
-      toast.error('Error al guardar');
+      toast.error('Error al guardar conductor');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmitHandler)} className="space-y-4">
-      <Input label="DNI" {...register('dni')} error={errors.dni?.message} />
-      <Input label="Nombres" {...register('nombres')} error={errors.nombres?.message} />
-      <Input label="Apellidos" {...register('apellidos')} error={errors.apellidos?.message} />
-      <Input label="Licencia" {...register('licencia')} error={errors.licencia?.message} />
+    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
+      {/* DNI y Nombres */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium mb-2">DNI</label>
+          <Controller
+            name="dni"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                placeholder="12345678"
+                maxLength={8}
+                error={errors.dni?.message}
+              />
+            )}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">Nombres</label>
+          <Controller
+            name="nombres"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                placeholder="Juan"
+                error={errors.nombres?.message}
+              />
+            )}
+          />
+        </div>
+      </div>
 
-      <Select
-        label="Categoría Licencia"
-        {...register('categoriaLicencia')}
-        options={categorias.map((c) => ({ value: c, label: c }))}
-        error={errors.categoriaLicencia?.message}
-      />
+      {/* Apellidos */}
+      <div>
+        <label className="block text-sm font-medium mb-2">Apellidos</label>
+        <Controller
+          name="apellidos"
+          control={control}
+          render={({ field }) => (
+            <Input
+              {...field}
+              placeholder="Pérez García"
+              error={errors.apellidos?.message}
+            />
+          )}
+        />
+      </div>
 
-      <Input
-        type="date"
-        label="Vencimiento Licencia"
-        {...register('vencimientoLicencia')}
-        error={errors.vencimientoLicencia?.message}
-      />
+      {/* Licencia */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium mb-2">Número Licencia</label>
+          <Controller
+            name="licencia"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                placeholder="000123456"
+                error={errors.licencia?.message}
+              />
+            )}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">Categoría</label>
+          <Controller
+            name="categoriaLicencia"
+            control={control}
+            render={({ field }) => (
+              <Select
+                {...field}
+                options={CATEGORIAS.map((cat) => ({ value: cat, label: cat }))}
+              />
+            )}
+          />
+        </div>
+      </div>
 
-      <Input label="Teléfono" {...register('telefono')} />
-      <Input type="email" label="Email" {...register('email')} />
+      {/* Vencimiento */}
+      <div>
+        <label className="block text-sm font-medium mb-2">Vencimiento de Licencia</label>
+        <Controller
+          name="vencimientoLicencia"
+          control={control}
+          render={({ field }) => (
+            <Input
+              {...field}
+              type="date"
+              error={errors.vencimientoLicencia?.message}
+            />
+          )}
+        />
+      </div>
 
-      <label className="flex items-center space-x-2">
-        <input type="checkbox" {...register('activo')} className="w-4 h-4" />
-        <span className="text-slate-700 dark:text-slate-300">Activo</span>
-      </label>
+      {/* Teléfono y Email */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium mb-2">Teléfono (Opcional)</label>
+          <Controller
+            name="telefono"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                placeholder="987654321"
+                maxLength={9}
+              />
+            )}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">Email (Opcional)</label>
+          <Controller
+            name="email"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="email"
+                placeholder="juan@example.com"
+              />
+            )}
+          />
+        </div>
+      </div>
 
-      <div className="flex space-x-2 pt-4">
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg transition-colors"
-        >
-          {isSubmitting ? 'Guardando...' : 'Guardar'}
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="flex-1 px-4 py-2 bg-slate-300 dark:bg-slate-600 text-slate-900 dark:text-white rounded-lg hover:bg-slate-400 dark:hover:bg-slate-700 transition-colors"
-        >
+      {/* Activo */}
+      <div>
+        <Controller
+          name="activo"
+          control={control}
+          render={({ field }) => (
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={field.value}
+                onChange={(e) => field.onChange(e.target.checked)}
+                className="w-4 h-4"
+              />
+              <span className="text-sm font-medium">Activo</span>
+            </label>
+          )}
+        />
+      </div>
+
+      {/* Buttons */}
+      <div className="flex gap-3 pt-4 border-t">
+        <Button type="submit" isLoading={isSubmitting} className="flex-1">
+          {initialData ? 'Actualizar' : 'Crear'}
+        </Button>
+        <Button type="button" onClick={onCancel} variant="secondary" className="flex-1">
           Cancelar
-        </button>
+        </Button>
       </div>
     </form>
   );
