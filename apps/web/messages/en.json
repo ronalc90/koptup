@@ -1,1 +1,109 @@
-{"common":{"errors":{"404":"Not Found","500":"Internal Server Error"},"buttons":{"submit":"Submit","cancel":"Cancel","save":"Save","edit":"Edit","delete":"Delete","add":"Add"},"status":{"loading":"Loading...","success":"Success","error":"Error"}},"hero":{"title":"Comprehensive Transport Solutions","subtitle":"Manage your transport operations efficiently","cta":"Get Started"},"homePage":{"title":"Home","welcome":"Welcome"},"services":{"title":"Our Services","description":"Complete solutions for your business","items":[{"id":"logistics","name":"Logistics","description":"Shipment and delivery management"},{"id":"fleet","name":"Fleet","description":"Vehicle administration"}]},"demos":{"title":"Demonstrations","subtitle":"Explore our solutions","transport":{"badge":"Transport","title":"Cargo Transport","description":"Full management: customers, trips, waybills, invoices and tax retention (detracción)","features":["Customer and supplier management","Real-time trip tracking","Waybill generation","Automatic invoicing","Tax retention control","Reports and analytics"]},"logistics":{"badge":"Logistics","title":"Logistics System","description":"Complete logistics management platform","features":["Centralized inventory","Route optimization","Package tracking"]},"retail":{"badge":"Retail","title":"Retail Management","description":"Comprehensive solution for stores","features":["Integrated POS","Inventory management","Sales reports"]}},"footer":{"copyright":"All rights reserved","links":{"privacy":"Privacy Policy","terms":"Terms of Service"}}},"contact":{"title":"Contact","email":"Email","message":"Message","submit":"Submit"},"pricing":{"title":"Pricing","plans":[{"name":"Basic","price":"$29"},{"name":"Professional","price":"$99"}]}}
+{
+  "common": {
+    "errors": {
+      "404": "Not Found",
+      "500": "Internal Server Error"
+    },
+    "buttons": {
+      "submit": "Submit",
+      "cancel": "Cancel",
+      "save": "Save",
+      "edit": "Edit",
+      "delete": "Delete",
+      "add": "Add"
+    },
+    "status": {
+      "loading": "Loading...",
+      "success": "Success",
+      "error": "Error"
+    }
+  },
+  "hero": {
+    "title": "Comprehensive Transport Solutions",
+    "subtitle": "Manage your transport operations efficiently",
+    "cta": "Get Started"
+  },
+  "homePage": {
+    "title": "Home",
+    "welcome": "Welcome"
+  },
+  "services": {
+    "title": "Our Services",
+    "description": "Complete solutions for your business",
+    "items": [
+      {
+        "id": "logistics",
+        "name": "Logistics",
+        "description": "Shipment and delivery management"
+      },
+      {
+        "id": "fleet",
+        "name": "Fleet",
+        "description": "Vehicle administration"
+      }
+    ]
+  },
+  "demos": {
+    "title": "Demonstrations",
+    "subtitle": "Explore our solutions",
+    "transport": {
+      "badge": "Transport",
+      "title": "Cargo Transport",
+      "description": "Full management: customers, trips, waybills, invoices and tax retention (detracción)",
+      "features": [
+        "Customer and supplier management",
+        "Real-time trip tracking",
+        "Waybill generation",
+        "Automatic invoicing",
+        "Tax retention control",
+        "Reports and analytics"
+      ]
+    },
+    "logistics": {
+      "badge": "Logistics",
+      "title": "Logistics System",
+      "description": "Complete logistics management platform",
+      "features": [
+        "Centralized inventory",
+        "Route optimization",
+        "Package tracking"
+      ]
+    },
+    "retail": {
+      "badge": "Retail",
+      "title": "Retail Management",
+      "description": "Comprehensive solution for stores",
+      "features": [
+        "Integrated POS",
+        "Inventory management",
+        "Sales reports"
+      ]
+    }
+  },
+  "footer": {
+    "copyright": "All rights reserved",
+    "links": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service"
+    }
+  },
+  "contact": {
+    "title": "Contact",
+    "email": "Email",
+    "message": "Message",
+    "submit": "Submit"
+  },
+  "pricing": {
+    "title": "Pricing",
+    "plans": [
+      {
+        "name": "Basic",
+        "price": "$29"
+      },
+      {
+        "name": "Professional",
+        "price": "$99"
+      }
+    ]
+  }
+}
