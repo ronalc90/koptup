@@ -1,15 +1,27 @@
-import type { Metadata } from 'next';
+import { Metadata } from 'next';
+import { generateMetadata, getBreadcrumbSchema } from '@/lib/seo-config';
 
-export const metadata: Metadata = {
-  title: 'Transporte y Carga | Demo',
-  description: 'Sistema de gestión de transporte y carga con cumplimiento SUNAT',
-  keywords: ['transporte', 'carga', 'logística', 'SUNAT', 'Perú'],
-  openGraph: {
-    title: 'Transporte y Carga | Demo',
-    description: 'Sistema de gestión de transporte y carga con cumplimiento SUNAT',
-  },
-};
+export const metadata: Metadata = generateMetadata('demo-transporte-carga');
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+interface LayoutProps {
+  children: React.ReactNode;
+}
+
+export default function TransporteCargaLayout({ children }: LayoutProps) {
+  // Schema breadcrumb para SEO - URL dinámica generada desde la configuración
+  const breadcrumbSchema = getBreadcrumbSchema([
+    { name: 'Inicio', url: '/' },
+    { name: 'Demos', url: '/demo' },
+    { name: 'Transporte de Carga', url: '/demo/transporte-carga' },
+  ]);
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      {children}
+    </>
+  );
 }
