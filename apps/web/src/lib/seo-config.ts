@@ -382,6 +382,26 @@ export const seoConfig: Record<string, PageSEO> = {
     canonical: `${baseUrl}/demo/control-proyectos`,
   },
 
+  // Demo: Transporte de Carga
+  'demo-transporte-carga': {
+    title: 'Sistema de Gestión de Transporte de Carga | SUNAT, GRE y Facturación Electrónica',
+    description:
+      'Demo funcional de software de gestión de transporte de carga para empresas en Perú. Órdenes de servicio, guía de remisión electrónica (GRE), facturación electrónica SUNAT UBL 2.1, detracciones del SPOT (4%) y reportes operativos.',
+    keywords: [
+      'sistema transporte carga',
+      'gestión flota Perú',
+      'guía remisión electrónica',
+      'facturación electrónica SUNAT',
+      'detracción transporte 4%',
+      'UBL 2.1',
+      'software transporte carga',
+      'SPOT detracción',
+      'GRE transportista',
+      'logística Perú',
+    ],
+    canonical: `${baseUrl}/demo/transporte-carga`,
+  },
+
   // Demo: Sistema de Reservas
   'demo-sistema-reservas': {
     title: 'Sistema de Reservas Online | Gestión de Citas y Agendamiento',
