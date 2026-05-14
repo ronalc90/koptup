@@ -1,0 +1,248 @@
+{
+  "demoCrm": {
+    "pageTitle": "CRM con IA",
+    "pageSubtitle": "Plataforma comercial inteligente: pipeline visual, lead scoring ML, forecast predictivo y asistente IA para tu equipo de ventas.",
+    "tabs": {
+      "pipeline": "Pipeline",
+      "contacts": "Contactos",
+      "forecast": "Forecast",
+      "assistant": "Asistente IA",
+      "conversations": "Conversaciones",
+      "sequences": "Secuencias"
+    },
+    "metrics": {
+      "title": "Resumen ejecutivo",
+      "dealsActive": "Deals activos",
+      "dealsActiveSub": "en pipeline",
+      "pipelineValue": "Valor pipeline",
+      "pipelineValueSub": "ponderado IA",
+      "winRate": "Win rate",
+      "winRateSub": "últimos 90 días",
+      "avgCycle": "Ciclo promedio",
+      "avgCycleSub": "días para cerrar",
+      "trendUp": "vs mes anterior",
+      "trendDown": "vs mes anterior"
+    },
+    "pipeline": {
+      "title": "Pipeline visual",
+      "subtitle": "Arrastra deals entre etapas. La IA recalcula la probabilidad de cierre en tiempo real.",
+      "stages": {
+        "prospect": "Prospecto",
+        "qualified": "Calificado",
+        "proposal": "Propuesta",
+        "negotiation": "Negociación",
+        "closed": "Cerrado ganado"
+      },
+      "deals": "deals",
+      "probability": "Prob.",
+      "owner": "Owner",
+      "closeDate": "Cierra",
+      "viewDetails": "Ver detalle",
+      "emptyStage": "Sin deals en esta etapa",
+      "addDeal": "Nuevo deal"
+    },
+    "contacts": {
+      "title": "Contactos y leads",
+      "subtitle": "Base unificada con scoring IA, próxima mejor acción y enriquecimiento automático.",
+      "searchPlaceholder": "Buscar por nombre, empresa o email...",
+      "filters": {
+        "all": "Todos",
+        "hot": "Hot",
+        "warm": "Warm",
+        "cold": "Cold",
+        "untouched": "Sin contactar"
+      },
+      "columns": {
+        "name": "Nombre",
+        "company": "Empresa",
+        "score": "Score IA",
+        "dealValue": "Valor deal",
+        "nextAction": "Próxima acción",
+        "lastContact": "Último contacto",
+        "actions": ""
+      },
+      "scoreLabels": {
+        "hot": "Hot",
+        "warm": "Warm",
+        "cold": "Cold"
+      },
+      "viewProfile": "Ver perfil",
+      "openCustomer360": "Abrir Customer 360",
+      "noResults": "No se encontraron contactos con esos criterios.",
+      "results": "{count} contactos"
+    },
+    "customer360": {
+      "title": "Customer 360",
+      "subtitle": "Vista unificada del cliente",
+      "tabs": {
+        "timeline": "Timeline",
+        "deals": "Deals",
+        "tickets": "Tickets",
+        "files": "Archivos"
+      },
+      "score": "Score IA",
+      "lifetimeValue": "Valor de vida",
+      "totalDeals": "Deals totales",
+      "openTickets": "Tickets abiertos",
+      "lastInteraction": "Última interacción",
+      "aiInsights": "Insights de IA",
+      "insight1": "Alta probabilidad de upsell en próximos 30 días.",
+      "insight2": "Sentimiento positivo creciente en últimas 3 interacciones.",
+      "insight3": "Cliente activo, mejor canal para contactar: email matutino.",
+      "timeline": {
+        "title": "Línea de tiempo",
+        "emailSent": "Email enviado",
+        "callMade": "Llamada realizada",
+        "meetingHeld": "Reunión",
+        "dealCreated": "Deal creado",
+        "ticketOpened": "Ticket abierto",
+        "transactionCompleted": "Transacción completada"
+      },
+      "summaries": {
+        "discovery": "Discovery call · 45min",
+        "proposalSent": "Propuesta v2 enviada",
+        "followUp": "Llamada follow-up",
+        "renewal": "Renovación plan Pro · $4.8k",
+        "supportApi": "Soporte: integración API",
+        "newDeal": "Nuevo deal · {value}",
+        "firstOutbound": "Primer contacto outbound"
+      },
+      "deals": {
+        "q2": "Deal {company} · Q2",
+        "annualRenewal": "Renovación anual",
+        "expansion": "Expansion · Add-on"
+      },
+      "tickets": {
+        "t1": "Integración API REST falla con código 429",
+        "t2": "Solicitud nuevo usuario admin"
+      },
+      "ticketStatus": {
+        "open": "Abierto",
+        "resolved": "Resuelto"
+      },
+      "priorities": {
+        "high": "Alta",
+        "medium": "Media",
+        "low": "Baja"
+      },
+      "noFiles": "Aún no hay archivos compartidos.",
+      "close": "Cerrar"
+    },
+    "forecast": {
+      "title": "Forecast comercial",
+      "subtitle": "Predicción de cierres por trimestre, calibrada por el modelo IA con históricos.",
+      "thisQuarter": "Este trimestre",
+      "quotaAttainment": "Cumplimiento de cuota",
+      "quota": "Cuota",
+      "categories": {
+        "commit": "Commit",
+        "commitSub": "Compromisos firmes del equipo",
+        "best": "Best case",
+        "bestSub": "Mejor escenario realista",
+        "weighted": "Pipeline ponderado",
+        "weightedSub": "Valor x probabilidad IA"
+      },
+      "byOwner": "Forecast por owner",
+      "byStage": "Distribución por etapa",
+      "trend": "Tendencia 6 meses",
+      "monthLabels": {
+        "jan": "Ene",
+        "feb": "Feb",
+        "mar": "Mar",
+        "apr": "Abr",
+        "may": "May",
+        "jun": "Jun"
+      },
+      "aiCommentary": "Comentario del modelo",
+      "aiCommentaryText": "Riesgo medio en cuenta Acme Corp ($85k) por silencio del decisor. Sugerido: reactivar con caso de éxito relevante. Pipeline ponderado supera meta en 12%."
+    },
+    "assistant": {
+      "title": "Asistente IA de ventas",
+      "subtitle": "Redacta emails, genera scripts y obtén sugerencias contextuales.",
+      "emailComposer": "Compositor de email IA",
+      "selectContact": "Seleccionar contacto",
+      "objective": "Objetivo del email",
+      "objectives": {
+        "intro": "Primer contacto",
+        "followUp": "Seguimiento",
+        "proposal": "Enviar propuesta",
+        "reEngage": "Reactivar lead",
+        "closing": "Cierre"
+      },
+      "tone": "Tono",
+      "tones": {
+        "professional": "Profesional",
+        "friendly": "Cercano",
+        "direct": "Directo",
+        "consultative": "Consultivo"
+      },
+      "context": "Contexto adicional (opcional)",
+      "contextPlaceholder": "Ej: el cliente mencionó que evalúa también a un competidor...",
+      "generate": "Generar borrador",
+      "generating": "Generando...",
+      "generated": "Borrador generado",
+      "subject": "Asunto",
+      "body": "Cuerpo",
+      "copy": "Copiar",
+      "copied": "Copiado",
+      "regenerate": "Regenerar",
+      "send": "Enviar",
+      "subjectDraft": "Próximos pasos para {company} — alineación rápida",
+      "bodyDraft": "Hola {name},\n\nGracias por tu tiempo la semana pasada. Resumiendo lo conversado, creemos que podemos ayudar a {company} a:\n\n- Reducir el ciclo de ventas en ~25% con automatización de pipeline.\n- Subir el win rate gracias a lead scoring basado en datos.\n- Centralizar la operación comercial en una sola vista.\n\n¿Tendrías 20 minutos esta semana para revisar una propuesta personalizada? Te dejo un par de horarios en mi calendario.\n\nQuedo atento,\nRonald",
+      "quickActions": "Acciones rápidas",
+      "quickActionItems": {
+        "summarize": "Resumir última llamada",
+        "nextStep": "Sugerir próximo paso",
+        "competitor": "Análisis de competencia",
+        "objection": "Manejar objeción común"
+      }
+    },
+    "conversations": {
+      "title": "Inteligencia conversacional",
+      "subtitle": "Llamadas grabadas analizadas por IA: sentimiento, temas y action items detectados automáticamente.",
+      "sentiment": {
+        "positive": "Positivo",
+        "neutral": "Neutro",
+        "negative": "Negativo"
+      },
+      "duration": "Duración",
+      "topics": "Temas detectados",
+      "actionItems": "Action items",
+      "talkRatio": "Talk ratio",
+      "rep": "Comercial",
+      "client": "Cliente",
+      "playRecording": "Reproducir",
+      "viewTranscript": "Ver transcript",
+      "noConversations": "No hay conversaciones esta semana."
+    },
+    "sequences": {
+      "title": "Secuencias multi-canal",
+      "subtitle": "Cadencias automatizadas que combinan email, WhatsApp y tareas de llamada.",
+      "activeSequence": "Secuencia activa",
+      "stepsCompleted": "{done} de {total} pasos",
+      "enrolled": "Leads inscritos",
+      "openRate": "Tasa de apertura",
+      "replyRate": "Tasa de respuesta",
+      "channels": {
+        "email": "Email",
+        "whatsapp": "WhatsApp",
+        "call": "Llamada",
+        "linkedin": "LinkedIn",
+        "task": "Tarea"
+      },
+      "stepStatus": {
+        "done": "Completado",
+        "current": "En curso",
+        "pending": "Pendiente"
+      },
+      "stepDay": "Día {day}"
+    },
+    "common": {
+      "loading": "Cargando...",
+      "viewAll": "Ver todo",
+      "close": "Cerrar",
+      "deal": "deal",
+      "deals": "deals"
+    }
+  }
+}
