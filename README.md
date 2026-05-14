@@ -18,6 +18,8 @@ Cada demo es una aplicación interactiva navegable, con datos simulados realista
 
 | LMS | Educación | Plataforma de cursos con tracks de aprendizaje, quizzes, certificados, gamificación y analytics de progreso. | [Ver demo](./apps/web/src/app/demo/lms/) |
 
+| Telemedicina | Salud | Videoconsultas, agenda médica, historia clínica electrónica, prescripciones digitales y triage con IA. | [Ver demo](./apps/web/src/app/demo/telemedicina/) |
+
 ## 🚀 Stack Tecnológico
 
 ### Frontend
