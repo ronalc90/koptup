@@ -1,0 +1,323 @@
+{
+  "demoSaas": {
+    "pageTitle": "Multi-tenant SaaS boilerplate",
+    "pageSubtitle": "A production-ready template for B2B SaaS with enterprise auth, billing, multi-tenancy, webhooks, audit logs, feature flags, and observability built in from day one.",
+    "stack": {
+      "title": "Stack",
+      "items": ["Next.js 14", "TypeScript", "PostgreSQL + RLS", "Redis", "Stripe", "Paddle", "OpenTelemetry", "Sentry"]
+    },
+    "tabs": {
+      "overview": "Architecture",
+      "tenancy": "Multi-tenancy",
+      "auth": "Auth",
+      "billing": "Billing",
+      "admin": "Admin panel",
+      "webhooks": "Webhooks",
+      "api": "API + Docs",
+      "audit": "Audit logs",
+      "flags": "Feature flags",
+      "i18n": "i18n",
+      "observability": "Observability",
+      "teams": "Teams"
+    },
+    "overview": {
+      "title": "Reference architecture",
+      "subtitle": "Decoupled services, per-tenant data isolation, and end-to-end observability.",
+      "nodes": {
+        "frontend": "Next.js frontend",
+        "frontendSub": "SSR + RSC + edge",
+        "api": "API gateway",
+        "apiSub": "tRPC / REST / GraphQL",
+        "auth": "Auth service",
+        "authSub": "SSO + MFA + SCIM",
+        "db": "Postgres + RLS",
+        "dbSub": "Row-level isolation",
+        "cache": "Redis",
+        "cacheSub": "Cache and rate limiting",
+        "queue": "Workers",
+        "queueSub": "BullMQ / Temporal",
+        "webhooks": "Webhook bus",
+        "webhooksSub": "Retries and DLQ",
+        "billing": "Stripe / Paddle",
+        "billingSub": "Subscriptions and usage"
+      },
+      "highlights": {
+        "title": "Design decisions",
+        "items": [
+          "Per-tenant isolation via Postgres row-level security",
+          "Signed JWT sessions with rotating JWKS keys",
+          "Webhook queue with exponential retries and a dead letter queue",
+          "OpenTelemetry data shipped to a central collector",
+          "Feature flags evaluated at the edge for minimal latency"
+        ]
+      }
+    },
+    "tenancy": {
+      "title": "Multi-tenancy patterns",
+      "subtitle": "Pick the isolation model that fits your customer profile and compliance needs.",
+      "patterns": {
+        "sharedDb": {
+          "name": "Shared DB + RLS",
+          "tagline": "One database, row-level isolation",
+          "pros": ["Low cost at scale", "Simple migrations", "Uniform operations"],
+          "cons": ["Risky if the tenant filter is skipped", "Index tuning matters", "Per-tenant backups are tricky"],
+          "snippet": "-- Enable RLS and per-tenant policy\nALTER TABLE invoices ENABLE ROW LEVEL SECURITY;\n\nCREATE POLICY tenant_isolation ON invoices\n  USING (tenant_id = current_setting('app.tenant_id')::uuid);\n\n-- On every request\nSET LOCAL app.tenant_id = '8f3a...';"
+        },
+        "schemaPerTenant": {
+          "name": "Schema per tenant",
+          "tagline": "One schema per customer",
+          "pros": ["Strong logical isolation", "Per-tenant backups", "Staged migrations"],
+          "cons": ["A connection per schema", "Slower migrations", "Large catalog"],
+          "snippet": "// Resolve schema per tenant\nconst client = await pool.connect();\nawait client.query(`SET search_path TO tenant_${tenantId}, public`);\n\nconst { rows } = await client.query(\n  'SELECT * FROM invoices LIMIT 50'\n);"
+        },
+        "dbPerTenant": {
+          "name": "DB per tenant",
+          "tagline": "One database per customer",
+          "pros": ["Physical isolation", "Strict compliance posture", "Independent restores"],
+          "cons": ["High operational cost", "Complex connection pooling", "Costly global schema changes"],
+          "snippet": "// Per-tenant connection router\nconst dsn = await vault.getTenantDsn(tenantId);\nconst db = getOrCreatePool(dsn);\n\nreturn db.query(\n  'SELECT * FROM invoices WHERE deleted_at IS NULL'\n);"
+        }
+      },
+      "prosLabel": "Pros",
+      "consLabel": "Trade-offs",
+      "snippetLabel": "Snippet"
+    },
+    "auth": {
+      "title": "Enterprise auth",
+      "subtitle": "SSO, MFA, social, and magic links · every flow handled by a single provider.",
+      "methods": {
+        "sso": "SSO",
+        "mfa": "MFA",
+        "social": "Social",
+        "magic": "Magic link"
+      },
+      "sso": {
+        "title": "Corporate single sign-on",
+        "saml": "SAML 2.0",
+        "samlDesc": "Generic connector for Okta, Azure AD, Google Workspace, and Ping.",
+        "oidc": "OIDC",
+        "oidcDesc": "Automatic discovery, refresh tokens, and revocation.",
+        "scim": "SCIM provisioning",
+        "scimDesc": "Sync users and groups from your IdP."
+      },
+      "mfa": {
+        "title": "Required second factor",
+        "totp": "TOTP",
+        "totpDesc": "RFC 6238-compatible authenticator apps.",
+        "webauthn": "Passkeys · WebAuthn",
+        "webauthnDesc": "Hardware keys, Face ID, and Touch ID.",
+        "sms": "SMS",
+        "smsDesc": "Fallback with rate limiting and fraud detection."
+      },
+      "social": {
+        "title": "Social identities",
+        "items": ["Google", "GitHub", "Apple", "Microsoft"]
+      },
+      "magic": {
+        "title": "Passwordless access",
+        "step1": "User enters their email",
+        "step2": "Receives a signed link, valid for 10 minutes",
+        "step3": "Clicks the link · session opens with a device fingerprint"
+      },
+      "sendCode": "Send code",
+      "verify": "Verify",
+      "codeSent": "Code sent to your device",
+      "linkSent": "Link sent to your inbox",
+      "verified": "Identity verified",
+      "providersLabel": "Continue with",
+      "email": "Email"
+    },
+    "billing": {
+      "title": "Billing and subscriptions",
+      "subtitle": "Stripe and Paddle wired up with trials, proration, usage metering, and automated dunning.",
+      "plansTitle": "Plans",
+      "billed": "billed monthly",
+      "trial": "14-day trial",
+      "currentPlan": "Current plan",
+      "selectPlan": "Select",
+      "plans": {
+        "starter": {
+          "name": "Starter",
+          "price": "$29",
+          "features": ["Up to 3 users", "10k requests/month", "Email support", "30 days of audit logs"]
+        },
+        "pro": {
+          "name": "Pro",
+          "price": "$99",
+          "features": ["Up to 25 users", "100k requests/month", "SSO via SAML and OIDC", "1 year of audit logs", "Unlimited webhooks"]
+        },
+        "enterprise": {
+          "name": "Enterprise",
+          "price": "Contact us",
+          "features": ["Unlimited users", "Custom volume", "SCIM and verified domains", "99.99% SLA", "DPA and data residency"]
+        }
+      },
+      "checkout": {
+        "title": "Mock checkout",
+        "subtitle": "Stripe Elements with 3D Secure",
+        "card": "Card",
+        "cardPlaceholder": "4242 4242 4242 4242",
+        "expiry": "MM/YY",
+        "cvc": "CVC",
+        "email": "Billing email",
+        "pay": "Pay and activate",
+        "processing": "Processing payment securely...",
+        "success": "Subscription is active"
+      },
+      "usage": {
+        "title": "Usage this cycle",
+        "subtitle": "Real-time metering with usage-based billing.",
+        "apiCalls": "API calls",
+        "storage": "Storage",
+        "seats": "Active seats",
+        "of": "of"
+      },
+      "dunning": {
+        "title": "Dunning emails",
+        "subtitle": "Automated reminders when payments fail.",
+        "items": [
+          { "day": "Day 0", "subject": "We couldn't charge your subscription" },
+          { "day": "Day 3", "subject": "Reminder · update your payment method" },
+          { "day": "Day 7", "subject": "Access will be suspended in 48h" },
+          { "day": "Day 14", "subject": "Subscription canceled" }
+        ]
+      }
+    },
+    "admin": {
+      "title": "Admin panel",
+      "subtitle": "Impersonation, flags, and support tools for your internal team.",
+      "impersonation": {
+        "title": "Impersonation",
+        "subtitle": "Assume a tenant's identity to debug incidents · fully audited.",
+        "selectTenant": "Select tenant",
+        "impersonate": "Impersonate",
+        "active": "Impersonation session active",
+        "stop": "Stop",
+        "reason": "Reason · required"
+      },
+      "flags": {
+        "title": "Per-tenant feature flags",
+        "subtitle": "Turn on beta features for specific customers."
+      },
+      "support": {
+        "title": "Recent events",
+        "subtitle": "Auditable event stream for the selected tenant.",
+        "user": "User",
+        "event": "Event",
+        "time": "Ago"
+      }
+    },
+    "webhooks": {
+      "title": "Outbound webhooks",
+      "subtitle": "A reliable event bus with exponential retries, HMAC signatures, and a dead letter queue.",
+      "eventsTitle": "Latest deliveries",
+      "columns": {
+        "event": "Event",
+        "endpoint": "Endpoint",
+        "status": "Status",
+        "attempts": "Attempts",
+        "lastDelivery": "Last delivery"
+      },
+      "status": {
+        "delivered": "Delivered",
+        "retrying": "Retrying",
+        "failed": "Failed"
+      },
+      "payloadTitle": "Example payload",
+      "signatureTitle": "HMAC SHA-256 signature",
+      "signatureDesc": "Every request includes an `X-Signature` header so you can verify it's authentic."
+    },
+    "api": {
+      "title": "API and docs",
+      "subtitle": "REST with OpenAPI 3.1, auto-generated SDKs, and Mintlify-style docs.",
+      "endpoints": "Endpoints",
+      "exampleTitle": "Example · create invoice",
+      "tryIt": "Try in sandbox",
+      "languages": {
+        "ts": "TypeScript",
+        "py": "Python",
+        "go": "Go"
+      }
+    },
+    "audit": {
+      "title": "Per-organization audit logs",
+      "subtitle": "Immutable record of who did what, when, and from where · exportable to your SIEM.",
+      "filtersUser": "User",
+      "filtersAction": "Action",
+      "all": "All",
+      "columns": {
+        "actor": "Actor",
+        "action": "Action",
+        "resource": "Resource",
+        "ip": "IP",
+        "when": "When"
+      }
+    },
+    "flags": {
+      "title": "Feature flags and experiments",
+      "subtitle": "Gradual rollouts, attribute targeting, and native A/B testing.",
+      "flagsTitle": "Flags",
+      "experimentsTitle": "Active experiments",
+      "rollout": "rollout",
+      "variantA": "Variant A",
+      "variantB": "Variant B",
+      "conversion": "conversion"
+    },
+    "i18n": {
+      "title": "Full internationalization",
+      "subtitle": "Per-user locales, currencies, time zones, and number formats.",
+      "languageLabel": "Language",
+      "timezoneLabel": "Time zone",
+      "currencyLabel": "Currency",
+      "previewLabel": "Preview",
+      "examplePrice": "Price",
+      "exampleDate": "Today's date"
+    },
+    "observability": {
+      "title": "Observability stack",
+      "subtitle": "Traces, metrics, logs, and public uptime in a single pipeline.",
+      "sentry": "Sentry",
+      "sentryDesc": "Errors and session replay grouped by release.",
+      "otel": "OpenTelemetry",
+      "otelDesc": "Distributed traces exported to a central collector.",
+      "grafana": "Grafana",
+      "grafanaDesc": "p95/p99 latency and throughput dashboards.",
+      "status": "StatusPage",
+      "statusDesc": "Public uptime page with an audited incident history.",
+      "uptime": "Uptime · last 90 days",
+      "p95": "p95 latency",
+      "errors": "Errors · 24h"
+    },
+    "teams": {
+      "title": "Org and team management",
+      "subtitle": "RBAC roles, pending invitations, and SCIM sync with your IdP.",
+      "inviteLabel": "Invite by email",
+      "invite": "Invite",
+      "membersTitle": "Members",
+      "invitesTitle": "Pending invitations",
+      "scimTitle": "SCIM sync",
+      "scimDesc": "Connected to Okta · last sync",
+      "scimSyncedAgo": "2 minutes ago",
+      "scimStatus": "Active",
+      "roles": {
+        "owner": "Owner",
+        "admin": "Admin",
+        "member": "Member",
+        "billing": "Billing",
+        "viewer": "Viewer"
+      },
+      "columns": {
+        "user": "User",
+        "role": "Role",
+        "status": "Status",
+        "email": "Email",
+        "sentAt": "Sent",
+        "actions": "Actions"
+      },
+      "resend": "Resend",
+      "revoke": "Revoke",
+      "active": "Active",
+      "pending": "Pending"
+    }
+  }
+}

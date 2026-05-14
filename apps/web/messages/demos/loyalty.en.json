@@ -1,0 +1,297 @@
+{
+  "demoLoyalty": {
+    "pageTitle": "Loyalty · omnichannel customer retention",
+    "pageSubtitle": "Points, tiers, missions, coalitions, and retention analytics for retail, banking, and services.",
+    "tabs": {
+      "member": "Member view",
+      "admin": "Admin",
+      "analytics": "Analytics"
+    },
+    "common": {
+      "active": "Active",
+      "paused": "Paused",
+      "draft": "Draft",
+      "save": "Save",
+      "edit": "Edit",
+      "create": "Create",
+      "view": "View",
+      "redeem": "Redeem",
+      "share": "Share",
+      "invite": "Invite",
+      "points": "points",
+      "pts": "pts",
+      "available": "available",
+      "expiringSoon": "expiring soon",
+      "members": "members"
+    },
+    "member": {
+      "greeting": "Hi, Ronald",
+      "memberSince": "Member since March 2022",
+      "pointsLabel": "Available points",
+      "expiringSoon": "{count} pts expire on June 30",
+      "tier": {
+        "current": "Current tier",
+        "next": "Next tier",
+        "progressTo": "{points} pts to {tier}",
+        "perks": "Perks",
+        "bronze": "Bronze",
+        "silver": "Silver",
+        "gold": "Gold",
+        "platinum": "Platinum",
+        "perksList": {
+          "freeShipping": "Free shipping",
+          "doublePoints": "2x points on your birthday",
+          "earlyAccess": "Early access to sales",
+          "conciergeSupport": "24/7 concierge support",
+          "vipEvents": "Exclusive VIP events",
+          "personalShopper": "Personal shopper"
+        }
+      },
+      "wallet": {
+        "title": "Wallet pass",
+        "subtitle": "Add to Apple Wallet or Google Wallet",
+        "memberCode": "Member code",
+        "addApple": "Add to Apple Wallet",
+        "addGoogle": "Add to Google Wallet",
+        "tapToFlip": "Tap to flip"
+      },
+      "rewards": {
+        "title": "Rewards catalog",
+        "subtitle": "Redeem points for experiences and partner offers",
+        "categories": {
+          "all": "All",
+          "giftcards": "Gift cards",
+          "experiences": "Experiences",
+          "products": "Products",
+          "donations": "Donations"
+        },
+        "items": {
+          "starbucks": "Starbucks $10",
+          "amazon": "Amazon $25",
+          "netflix": "Netflix 1 month",
+          "spotify": "Spotify Premium",
+          "uber": "Uber $20",
+          "concert": "VIP concert ticket",
+          "spa": "Luxury spa day",
+          "donation": "Donate to UNICEF"
+        },
+        "stockLow": "Low stock",
+        "redeemed": "Redeemed",
+        "insufficientPoints": "Not enough points"
+      },
+      "missions": {
+        "title": "Weekly missions",
+        "subtitle": "Complete challenges to earn bonus points",
+        "items": {
+          "buy3": {
+            "title": "Place 3 orders this week",
+            "reward": "+500 pts"
+          },
+          "review": {
+            "title": "Write 2 reviews",
+            "reward": "+150 pts"
+          },
+          "refer": {
+            "title": "Refer a friend",
+            "reward": "+300 pts"
+          },
+          "app": {
+            "title": "Enable push notifications",
+            "reward": "+50 pts"
+          }
+        },
+        "progress": "{current}/{total}",
+        "claim": "Claim"
+      },
+      "referrals": {
+        "title": "Invite friends, earn points",
+        "subtitle": "Get 500 pts for every friend who joins",
+        "yourLink": "Your referral link",
+        "friendsInvited": "Friends invited",
+        "pointsEarned": "Points earned",
+        "copy": "Copy",
+        "copied": "Copied!",
+        "channels": "Share via"
+      },
+      "birthday": {
+        "title": "Happy birthday month, Ronald",
+        "subtitle": "There's a special gift waiting for you",
+        "cta": "Claim gift"
+      },
+      "streak": {
+        "title": "Visit streak",
+        "days": "{days} days",
+        "subtitle": "Keep the streak alive for bonus points"
+      },
+      "leaderboard": {
+        "title": "Top 10 this month",
+        "subtitle": "See how you stack up against other members",
+        "you": "You",
+        "rank": "Rank"
+      }
+    },
+    "admin": {
+      "title": "Admin console",
+      "subtitle": "Configure programs, rules, campaigns, and monitoring.",
+      "tabs": {
+        "points": "Points",
+        "tiers": "Tiers",
+        "missions": "Missions",
+        "referrals": "Referrals",
+        "cashback": "Cashback",
+        "sweepstakes": "Sweepstakes"
+      },
+      "programs": {
+        "points": {
+          "title": "Earning rules · rules engine",
+          "subtitle": "Set how points are earned by category and channel",
+          "baseRate": "Base rate",
+          "baseHelp": "1 point per $1 spent",
+          "multipliers": "Category multipliers",
+          "categories": {
+            "groceries": "Groceries",
+            "fashion": "Fashion",
+            "electronics": "Electronics",
+            "travel": "Travel",
+            "dining": "Dining"
+          },
+          "channels": "Channel multipliers",
+          "channelList": {
+            "web": "Web",
+            "app": "Mobile app",
+            "pos": "Point of sale",
+            "marketplace": "Marketplace"
+          }
+        },
+        "tiers": {
+          "title": "Tier configurator",
+          "subtitle": "Tune upgrade and downgrade thresholds",
+          "upgradeAt": "Upgrade to {tier} at",
+          "downgradeAfter": "Downgrade after {months} months inactive",
+          "membersIn": "{count} members"
+        },
+        "missions": {
+          "title": "Missions and challenges",
+          "subtitle": "Build gamified, multichannel missions",
+          "running": "Running",
+          "completion": "Completion",
+          "uplift": "Uplift"
+        },
+        "referrals": {
+          "title": "Referral program",
+          "subtitle": "Track dual rewards for referrer and referee",
+          "rewardReferrer": "Referrer reward",
+          "rewardReferee": "Referee reward",
+          "totalReferrals": "Total referrals",
+          "conversion": "Conversion"
+        },
+        "cashback": {
+          "title": "Smart cashback",
+          "subtitle": "Return as points or balance, by segment",
+          "rate": "Average rate",
+          "redeemed": "Redeemed this month",
+          "segments": "Active segments"
+        },
+        "sweepstakes": {
+          "title": "Sweepstakes and experiences",
+          "subtitle": "Tickets redeemable in premium prize draws",
+          "activeDraws": "Active draws",
+          "tickets": "Tickets issued",
+          "winners": "Winners announced"
+        }
+      },
+      "campaigns": {
+        "title": "Multichannel campaign templates",
+        "subtitle": "Run a single campaign across web, app, POS, email, and WhatsApp",
+        "channels": {
+          "web": "Web",
+          "app": "App",
+          "pos": "POS",
+          "email": "Email",
+          "whatsapp": "WhatsApp"
+        },
+        "items": {
+          "doublePoints": "Double points weekend",
+          "winback": "Win back inactive members",
+          "vipDay": "Exclusive VIP day",
+          "birthday": "Birthday auto-send"
+        },
+        "audience": "Audience",
+        "scheduled": "Scheduled"
+      },
+      "coalitions": {
+        "title": "Partner coalitions",
+        "subtitle": "Share a points pool across brands",
+        "partners": "Partners",
+        "sharedPool": "Shared pool",
+        "addPartner": "Add partner"
+      },
+      "fraud": {
+        "title": "Fraud detection",
+        "subtitle": "Real-time alerts",
+        "alerts": {
+          "farming": "Point farming detected",
+          "multiAccount": "Suspicious multi-account activity",
+          "fakeReferral": "Fake referral blocked",
+          "abnormalRedeem": "Unusual redemption pattern"
+        },
+        "severity": {
+          "high": "High",
+          "medium": "Medium",
+          "low": "Low"
+        },
+        "review": "Review"
+      },
+      "experiments": {
+        "title": "A/B test program mechanics",
+        "subtitle": "Experiment with earning, redemption, and UX",
+        "running": "Running",
+        "uplift": "Uplift",
+        "items": {
+          "tripleMultiplier": "Triple points vs. double points",
+          "tierFastTrack": "Silver fast-track vs. control",
+          "missionLayout": "Mission layout A/B test"
+        }
+      }
+    },
+    "analytics": {
+      "title": "Analytics and insights",
+      "subtitle": "Real-time KPIs across the entire program",
+      "kpis": {
+        "activeMembers": "Active members",
+        "redemptionRate": "Redemption rate",
+        "engagement": "Engagement",
+        "ltvUplift": "LTV uplift",
+        "breakage": "Breakage · expired points",
+        "aovDelta": "AOV vs. non-members"
+      },
+      "cohort": {
+        "title": "Cohort retention",
+        "subtitle": "Active members, by sign-up month",
+        "month": "Month"
+      },
+      "topRewards": {
+        "title": "Top redeemed rewards",
+        "subtitle": "Last 30 days",
+        "redemptions": "Redemptions",
+        "pointsBurned": "Points burned"
+      },
+      "tierDistribution": {
+        "title": "Tier distribution",
+        "subtitle": "Current member base"
+      },
+      "ml": {
+        "title": "ML personalization",
+        "subtitle": "Recommendations by segment",
+        "segments": {
+          "vip": "High-value VIPs",
+          "atRisk": "At risk of churn",
+          "rising": "Climbing tiers",
+          "dormant": "Dormant 90+ days"
+        },
+        "recommendation": "Recommendation",
+        "expectedUplift": "Expected uplift"
+      }
+    }
+  }
+}
