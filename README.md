@@ -32,6 +32,8 @@ Cada demo es una aplicación interactiva navegable, con datos simulados realista
 
 | Voice AI | IA conversacional | Agente de voz con reconocimiento de habla, NLU, síntesis de voz y orquestación de llamadas inbound/outbound. | [Ver demo](./apps/web/src/app/demo/voice-ai/) |
 
+| Firma electrónica | Legal | Firma digital con validez legal, flujo de aprobaciones, plantillas reutilizables y audit trail completo. | [Ver demo](./apps/web/src/app/demo/firma-electronica/) |
+
 ## 🚀 Stack Tecnológico
 
 ### Frontend
