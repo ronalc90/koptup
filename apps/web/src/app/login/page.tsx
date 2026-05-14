@@ -29,11 +29,14 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [sessionExpiredMessage, setSessionExpiredMessage] = useState('');
 
-  // Check for OAuth errors and session expiration in URL
+  const [redirectTarget, setRedirectTarget] = useState<string | null>(null);
+
+  // Check for OAuth errors, session expiration y redirect en URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const authError = params.get('error');
     const sessionExpired = params.get('session');
+    const redirect = params.get('redirect');
 
     if (sessionExpired === 'expired') {
       setSessionExpiredMessage(t('sessionExpired'));
@@ -43,6 +46,11 @@ export default function LoginPage() {
       setError(t('errorGoogle'));
     } else if (authError) {
       setError(t('errorGeneric'));
+    }
+
+    if (redirect && redirect.startsWith('/')) {
+      setRedirectTarget(redirect);
+      sessionStorage.setItem('redirectAfterLogin', redirect);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -62,13 +70,18 @@ export default function LoginPage() {
         localStorage.setItem('user', JSON.stringify(user));
       }
 
-      // Check if there's a redirect URL saved
+      // Detección de admin para enrutar al panel correspondiente
+      const isAdmin =
+        user?.role === 'admin' ||
+        (user?.email || '').toLowerCase() === 'admin@koptup.com';
+
       const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
       if (redirectUrl) {
         sessionStorage.removeItem('redirectAfterLogin');
         router.push(redirectUrl);
+      } else if (isAdmin) {
+        router.push('/admin');
       } else {
-        // Redirect to dashboard
         router.push('/dashboard');
       }
     } catch (err: any) {
@@ -130,6 +143,15 @@ export default function LoginPage() {
             {t('subtitle')}
           </p>
         </div>
+
+        {redirectTarget && (
+          <div className="p-4 bg-primary-50 dark:bg-primary-950 border border-primary-200 dark:border-primary-800 rounded-lg text-center">
+            {/* TODO: extract to i18n */}
+            <p className="text-sm text-primary-700 dark:text-primary-300">
+              Iniciá sesión para continuar a <span className="font-semibold">{redirectTarget}</span>
+            </p>
+          </div>
+        )}
 
         <Card variant="elevated" className="shadow-xl">
           <CardContent className="p-8">
@@ -297,6 +319,18 @@ export default function LoginPage() {
             {t('signUpLink')}
           </Link>
         </p>
+
+        {/* Continuar como invitado */}
+        {/* TODO: extract to i18n */}
+        <div className="text-center">
+          <Link
+            href="/demo"
+            className="inline-flex items-center gap-1 text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
+          >
+            Continuar como invitado y ver demos
+            <ArrowRightIcon className="h-4 w-4" />
+          </Link>
+        </div>
 
         {/* Back to Home */}
         <p className="text-center">

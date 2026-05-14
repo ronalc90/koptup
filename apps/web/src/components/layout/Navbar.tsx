@@ -5,22 +5,38 @@ import Link from 'next/link';
 import { usePathname,useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
-import { Bars3Icon, XMarkIcon, MoonIcon, SunIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
+import {
+  Bars3Icon,
+  XMarkIcon,
+  MoonIcon,
+  SunIcon,
+  GlobeAltIcon,
+  UserCircleIcon,
+  CreditCardIcon,
+  LifebuoyIcon,
+  ArrowRightOnRectangleIcon,
+  Squares2X2Icon,
+  ChevronDownIcon,
+  PlayCircleIcon,
+} from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 import { useAutoContrast } from '@/hooks/useAutoContrast';
+import { api } from '@/lib/api';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [currentLocale, setCurrentLocale] = useState('es');
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const t = useTranslations();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   // Hook para detectar automáticamente el contraste
   const { textColor, isDarkBackground } = useAutoContrast(navRef, {
@@ -58,6 +74,33 @@ export default function Navbar() {
 
   return () => window.removeEventListener('scroll', handleScroll);
 }, []);
+
+  // Cerrar el menú del usuario al hacer click afuera
+  useEffect(() => {
+    if (!userMenuOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [userMenuOpen]);
+
+  const handleLogout = async () => {
+    try {
+      await api.logout();
+    } catch {
+      // ignorar — seguimos limpiando localmente
+    }
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('user');
+      localStorage.removeItem('koptup.clientType');
+    }
+    setUser(null);
+    setUserMenuOpen(false);
+    router.push('/');
+  };
 
 
   const navigation = [
@@ -174,18 +217,107 @@ const toggleLanguage = () => {
             )}
 
             {user ? (
-              <Button size="sm" asChild>
-                <Link href="/dashboard">{t('nav.dashboard')}</Link>
-              </Button>
-            ) : (
-              <Button size="sm" variant="outline" asChild>
-                <Link href="/login">{t('nav.login')}</Link>
-              </Button>
-            )}
+              <div className="relative" ref={userMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setUserMenuOpen((o) => !o)}
+                  className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors"
+                  aria-haspopup="menu"
+                  aria-expanded={userMenuOpen}
+                  style={{ color: textColor }}
+                >
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-bold text-sm overflow-hidden">
+                    {user?.avatar ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={user.avatar} alt={user.name || 'avatar'} className="w-full h-full object-cover" />
+                    ) : (
+                      <span>{(user?.name?.[0] || user?.email?.[0] || 'U').toUpperCase()}</span>
+                    )}
+                  </div>
+                  <span className="text-sm font-medium hidden lg:inline">
+                    {user?.name?.split(' ')[0] || 'Mi cuenta'}
+                  </span>
+                  <ChevronDownIcon className="h-4 w-4" />
+                </button>
 
-            <Button size="sm" asChild>
-              <Link href="/contact">{t('common.contactUs')}</Link>
-            </Button>
+                {userMenuOpen && (
+                  <div
+                    role="menu"
+                    className="absolute right-0 mt-2 w-60 bg-white dark:bg-secondary-900 rounded-xl shadow-xl border border-secondary-200 dark:border-secondary-800 overflow-hidden z-50"
+                  >
+                    <div className="p-4 border-b border-secondary-200 dark:border-secondary-800">
+                      <p className="text-sm font-semibold text-secondary-900 dark:text-white truncate">
+                        {user?.name || 'Cliente'}
+                      </p>
+                      <p className="text-xs text-secondary-500 dark:text-secondary-400 truncate">
+                        {user?.email}
+                      </p>
+                    </div>
+                    <div className="py-1">
+                      {/* TODO: extract to i18n */}
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2 text-sm text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800"
+                      >
+                        <Squares2X2Icon className="h-4 w-4" />
+                        Dashboard
+                      </Link>
+                      <Link
+                        href="/dashboard/profile"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2 text-sm text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800"
+                      >
+                        <UserCircleIcon className="h-4 w-4" />
+                        Mi cuenta
+                      </Link>
+                      <Link
+                        href="/dashboard/billing"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2 text-sm text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800"
+                      >
+                        <CreditCardIcon className="h-4 w-4" />
+                        Facturas
+                      </Link>
+                      <Link
+                        href="/contact"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2 text-sm text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800"
+                      >
+                        <LifebuoyIcon className="h-4 w-4" />
+                        Soporte
+                      </Link>
+                    </div>
+                    <div className="border-t border-secondary-200 dark:border-secondary-800 py-1">
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 text-left"
+                      >
+                        <ArrowRightOnRectangleIcon className="h-4 w-4" />
+                        Cerrar sesión
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                {/* TODO: extract to i18n */}
+                <Button size="sm" variant="ghost" asChild>
+                  <Link href="/demo" className="flex items-center gap-1">
+                    <PlayCircleIcon className="h-4 w-4" />
+                    Probar demos
+                  </Link>
+                </Button>
+                <Button size="sm" variant="outline" asChild>
+                  <Link href="/login">{t('nav.login')}</Link>
+                </Button>
+                <Button size="sm" asChild>
+                  <Link href="/pricing">Quiero esto</Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -225,17 +357,51 @@ const toggleLanguage = () => {
             ))}
             <div className="pt-4 space-y-2">
               {user ? (
-                <Button size="sm" fullWidth asChild>
-                  <Link href="/dashboard">{t('nav.dashboard')}</Link>
-                </Button>
+                <>
+                  <div className="flex items-center gap-3 px-2 py-2 mb-2">
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-bold text-sm">
+                      {(user?.name?.[0] || 'U').toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-secondary-900 dark:text-white truncate">
+                        {user?.name || 'Cliente'}
+                      </p>
+                      <p className="text-xs text-secondary-500 dark:text-secondary-400 truncate">
+                        {user?.email}
+                      </p>
+                    </div>
+                  </div>
+                  <Button size="sm" fullWidth asChild>
+                    <Link href="/dashboard">{t('nav.dashboard')}</Link>
+                  </Button>
+                  <Button size="sm" fullWidth variant="outline" asChild>
+                    <Link href="/dashboard/billing">Facturas</Link>
+                  </Button>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950"
+                  >
+                    <ArrowRightOnRectangleIcon className="h-4 w-4" />
+                    Cerrar sesión
+                  </button>
+                </>
               ) : (
-                <Button size="sm" fullWidth variant="outline" asChild>
-                  <Link href="/login">{t('nav.login')}</Link>
-                </Button>
+                <>
+                  {/* TODO: extract to i18n */}
+                  <Button size="sm" fullWidth variant="ghost" asChild>
+                    <Link href="/demo">Probar demos</Link>
+                  </Button>
+                  <Button size="sm" fullWidth variant="outline" asChild>
+                    <Link href="/login">{t('nav.login')}</Link>
+                  </Button>
+                  <Button size="sm" fullWidth asChild>
+                    <Link href="/pricing">Quiero esto</Link>
+                  </Button>
+                </>
               )}
 
               <div className="flex items-center space-x-2">
-                <Button size="sm" fullWidth asChild>
+                <Button size="sm" fullWidth variant="outline" asChild>
                   <Link href="/contact">{t('common.contactUs')}</Link>
                 </Button>
                 <button

@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import Button from '@/components/ui/Button';
 import Card, { CardContent } from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
 import {
   UserIcon,
   EnvelopeIcon,
@@ -16,12 +17,53 @@ import {
   BuildingOfficeIcon,
   PhoneIcon,
   CheckCircleIcon,
+  SparklesIcon,
 } from '@heroicons/react/24/outline';
 import { FaGoogle, FaGithub } from 'react-icons/fa';
 
-export default function RegisterPage() {
+// TODO: extract to i18n
+const COP_FMT = (n: number) =>
+  '$ ' + new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 }).format(n) + ' COP';
+
+const PLAN_PREVIEW: Record<string, { name: string; tiers: Record<string, { label: string; price: number; bullets: string[] }> }> = {
+  'chatbot-rag-ia': {
+    name: 'Chatbot RAG con IA',
+    tiers: {
+      starter: { label: 'Starter', price: 249000, bullets: ['Hasta 3.000 conversaciones/mes', '20 documentos RAG', 'Soporte por email'] },
+      profesional: { label: 'Profesional', price: 489000, bullets: ['Hasta 15.000 conversaciones/mes', '100 documentos RAG', 'WhatsApp + Web'] },
+      enterprise: { label: 'Enterprise', price: 1290000, bullets: ['Conversaciones ilimitadas', 'Documentos ilimitados', 'SLA y soporte 24/7'] },
+    },
+  },
+  'agente-ia-ventas': {
+    name: 'Agente IA de Ventas',
+    tiers: {
+      growth: { label: 'Growth', price: 1290000, bullets: ['Calificación de leads', 'Integración CRM', 'Reportes semanales'] },
+      pro: { label: 'Pro', price: 2490000, bullets: ['Multi-canal', 'A/B testing', 'Dashboard ejecutivo'] },
+    },
+  },
+};
+
+function RegisterPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const t = useTranslations('registerPage');
+
+  const planSlug = searchParams.get('plan');
+  const tierSlug = searchParams.get('tier');
+  const sourceParam = searchParams.get('source');
+  const serviceParam = searchParams.get('service');
+
+  const planContext =
+    planSlug && PLAN_PREVIEW[planSlug]
+      ? {
+          name: PLAN_PREVIEW[planSlug].name,
+          tier: tierSlug && PLAN_PREVIEW[planSlug].tiers[tierSlug]
+            ? PLAN_PREVIEW[planSlug].tiers[tierSlug]
+            : null,
+          slug: planSlug,
+        }
+      : null;
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -78,8 +120,18 @@ export default function RegisterPage() {
         }));
       }
 
-      // Redirect to dashboard
-      router.push('/dashboard');
+      // Redirect to dashboard con welcome flag y contexto del plan
+      const params = new URLSearchParams();
+      params.set('welcome', '1');
+      if (planSlug) params.set('plan', planSlug);
+      if (tierSlug) params.set('tier', tierSlug);
+      // Si vino con plan/tier, asumimos cliente SaaS; si vino con service, servicio a medida
+      if (planSlug) {
+        params.set('type', 'plan');
+      } else if (serviceParam) {
+        params.set('type', 'service');
+      }
+      router.push(`/dashboard?${params.toString()}`);
     } catch (err: any) {
       setError(err.response?.data?.message || err.message || 'Error al crear la cuenta');
       setIsLoading(false);
@@ -111,7 +163,7 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:from-secondary-950 dark:via-black dark:to-primary-950 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl w-full space-y-8">
+      <div className={planContext ? 'max-w-6xl w-full space-y-8' : 'max-w-2xl w-full space-y-8'}>
         {/* Logo */}
         <div className="text-center">
           <Link href="/" className="inline-flex items-center space-x-2">
@@ -130,7 +182,18 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        <Card variant="elevated" className="shadow-xl">
+        {/* Banner contexto: viene de contact form */}
+        {/* TODO: extract to i18n */}
+        {sourceParam === 'contact' && (
+          <div className="p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg text-center">
+            <p className="text-sm text-blue-700 dark:text-blue-300">
+              Tu solicitud de contacto fue enviada. Creá tu cuenta para hacer seguimiento desde tu dashboard.
+            </p>
+          </div>
+        )}
+
+        <div className={planContext ? 'grid grid-cols-1 lg:grid-cols-3 gap-6' : ''}>
+        <Card variant="elevated" className={planContext ? 'shadow-xl lg:col-span-2' : 'shadow-xl'}>
           <CardContent className="p-8">
             {/* Error Message */}
             {error && (
@@ -379,11 +442,65 @@ export default function RegisterPage() {
                 fullWidth
                 disabled={isLoading}
               >
-                {isLoading ? t('creating') : t('createButton')}
+                {/* TODO: extract to i18n */}
+                {isLoading ? t('creating') : (planContext ? 'Crear cuenta y empezar' : t('createButton'))}
               </Button>
             </form>
           </CardContent>
         </Card>
+
+        {/* Plan summary aside */}
+        {/* TODO: extract to i18n */}
+        {planContext && (
+          <aside className="lg:col-span-1">
+            <Card variant="bordered" className="sticky top-6 border-primary-200 dark:border-primary-800 bg-gradient-to-br from-primary-50 to-white dark:from-primary-950 dark:to-secondary-950">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <SparklesIcon className="h-5 w-5 text-primary-600 dark:text-primary-400" />
+                  <span className="text-xs uppercase tracking-wide font-semibold text-primary-700 dark:text-primary-300">
+                    Tu plan elegido
+                  </span>
+                </div>
+                <h3 className="text-xl font-bold text-secondary-900 dark:text-white mb-1">
+                  {planContext.name}
+                </h3>
+                {planContext.tier && (
+                  <Badge variant="primary" size="sm" className="mb-4">
+                    Plan {planContext.tier.label}
+                  </Badge>
+                )}
+                {planContext.tier && (
+                  <>
+                    <p className="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-1">
+                      {COP_FMT(planContext.tier.price)}
+                    </p>
+                    <p className="text-xs text-secondary-500 dark:text-secondary-400 mb-4">
+                      / mes · sin permanencia
+                    </p>
+                    <ul className="space-y-2 mb-4">
+                      {planContext.tier.bullets.map((b) => (
+                        <li key={b} className="flex items-start gap-2 text-sm text-secondary-700 dark:text-secondary-300">
+                          <CheckCircleIcon className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                          {b}
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+                <div className="p-3 rounded-lg bg-secondary-50 dark:bg-secondary-900 text-xs text-secondary-600 dark:text-secondary-400">
+                  Al crear tu cuenta podrás configurar este plan, integrar tus APIs y empezar a usarlo en minutos.
+                </div>
+                <Link
+                  href="/pricing"
+                  className="block mt-3 text-xs text-center text-primary-600 dark:text-primary-400 hover:underline"
+                >
+                  Cambiar de plan
+                </Link>
+              </CardContent>
+            </Card>
+          </aside>
+        )}
+        </div>
 
         {/* Login Link */}
         <p className="text-center text-sm text-secondary-600 dark:text-secondary-400">
@@ -401,5 +518,19 @@ export default function RegisterPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-secondary-50 dark:bg-black">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600" />
+        </div>
+      }
+    >
+      <RegisterPageInner />
+    </Suspense>
   );
 }
