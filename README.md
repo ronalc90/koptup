@@ -5,6 +5,14 @@
 
 Plataforma web profesional, moderna y responsiva para una empresa que vende soluciones tecnológicas personalizadas. Incluye e-commerce, chatbots inteligentes, integración con APIs, aplicaciones móviles y más.
 
+## Demos del catálogo enterprise
+
+Cada demo es una aplicación interactiva navegable, con datos simulados realistas, i18n ES/EN, modo oscuro y diseño responsive. Todas exponen además un módulo backend Express con endpoints REST.
+
+| Demo | Categoría | Descripción | Ver demo |
+| --- | --- | --- | --- |
+| CRM con IA | Ventas IA | Pipeline visual, lead scoring ML, conversation intelligence y sequences multi-canal con copiloto de IA. | [Ver demo](./apps/web/src/app/demo/crm-ia/) |
+
 ## 🚀 Stack Tecnológico
 
 ### Frontend
