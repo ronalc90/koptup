@@ -14,11 +14,11 @@
     },
     "servicesIntro": {
       "title": "Services — custom development",
-      "body": "We build fully custom software for your company. We hand over the source code, documentation and access. The software is yours — host it anywhere."
+      "body": "We build fully custom software for your company. We hand over the source code, documentation and access. The software is yours — host it anywhere. APIs (OpenAI, etc.) and infrastructure are billed directly by their providers."
     },
     "plansIntro": {
       "title": "Plans — software as a service",
-      "body": "Use our production-ready solutions with a monthly fee. We take care of hosting, maintenance, updates and scaling. Cancel anytime."
+      "body": "Use our production-ready solutions with a monthly fee. We take care of hosting, maintenance, updates and scaling. Usage-based add-ons (LLMs, WhatsApp, maps) are billed directly by their providers."
     },
     "categories": {
       "all": "All",
@@ -38,7 +38,7 @@
       "engagement": "Engagement"
     },
     "card": {
-      "viewDetails": "View plans",
+      "viewDetails": "View more details",
       "viewDemo": "Try demo",
       "fromPrice": "From",
       "perMonth": "/mo"
@@ -103,16 +103,66 @@
     "modal": {
       "title": "Plans and pricing",
       "close": "Close",
-      "quote": "I want this plan",
+      "quote": "Quote this plan",
+      "viewMore": "View more details",
+      "viewLess": "Show less",
       "soporte": "Support",
       "idealPara": "Ideal for",
       "incluye": "What is included",
       "setupIncluye": "What setup includes",
-      "mantenimientoIncluye": "What maintenance includes"
+      "mantenimientoIncluye": "What maintenance includes",
+      "limits": "What this plan includes",
+      "limitsAdminUsers": "Admin users",
+      "limitsEndUsers": "End users",
+      "limitsAccounts": "Accounts / tenants",
+      "limitsVolume": "Monthly volume",
+      "limitsStorage": "Storage",
+      "limitsSupport": "Support",
+      "limitsUnlimited": "Unlimited",
+      "limitsNotApplicable": "N/A",
+      "costsTitle": "Additional costs (paid by the client)",
+      "costsNote": "These costs are paid by the client directly to the provider (OpenAI, AWS, Twilio, etc.). We build, integrate and maintain the system, but we do not bill APIs or infrastructure.",
+      "costsNoteSaas": "Your plan includes hosting, database and monitoring. Usage-based add-ons (LLMs, WhatsApp, maps, etc.) are paid directly to the provider based on real usage.",
+      "costsResource": "Resource",
+      "costsEstimate": "Estimate USD/mo",
+      "costsDetail": "Detail",
+      "costsBilledByClient": "Client pays provider",
+      "costsBilledByKoptup": "Included in the plan",
+      "integrationLevel": "Integration level",
+      "integrationsTitle": "Included integrations",
+      "ownership": "Software ownership",
+      "ownershipServiceBody": "You own 100% of the source code when the project ends. Host it wherever you want — you do not depend on us.",
+      "ownershipPlanBody": "You use the platform as a service: we host, monitor and update it. You do not receive source code; cancel anytime.",
+      "deliveryTime": "Delivery time",
+      "tierPrice": "Tier price",
+      "supportSLA": {
+        "24-48h email": "Email in business hours, 24-48h business response",
+        "4h business": "Email + WhatsApp in business hours, 4h business response",
+        "1h business": "Email + chat + phone in business hours, 1h business response",
+        "priority-1h": "Priority support in Colombian business hours, 1h business SLA for critical incidents"
+      }
     },
     "noResults": "We did not find results for your search.",
     "ctaTitle": "Not sure which one to pick?",
     "ctaBody": "Talk to us — we will help you decide whether to own the software or use our SaaS.",
-    "ctaButton": "Talk to an expert"
+    "ctaButton": "Talk to an expert",
+    "currency": {
+      "cop": "COP",
+      "usd": "USD",
+      "toggleLabel": "Show in"
+    },
+    "support": {
+      "businessHours": "Colombian business hours (Mon-Fri 8 AM - 5 PM)",
+      "sla24h": "Email in business hours, max 24h business response",
+      "sla4h": "Email + WhatsApp in business hours, max 4h business response",
+      "sla1h": "Priority support in business hours, 1h business SLA for critical incidents",
+      "label": "Support"
+    },
+    "infraNote": "Automated monitoring and auto-scaling configured from day one. Infrastructure costs (AWS/GCP/Vercel/Datadog) and third-party API costs (OpenAI, Twilio, Stripe) are billed by the provider directly to the customer — we do not mark them up.",
+    "customNotice": {
+      "title": "Can't find what you need?",
+      "body": "If you need something not in our catalog, we build it from scratch. Request a quote and we'll come back with scope, timeline and proposal within 48 business hours.",
+      "cta": "Request a custom quote"
+    }
   }
 }

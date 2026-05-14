@@ -2,7 +2,7 @@
   "plan_chatbotRagIa": {
     "name": "RAG Chatbot with AI",
     "tagline": "Smart bot ready in hours, nothing to install",
-    "description": "Launch a virtual assistant trained on your documents in under 24 hours. We host it for you — you just pay the plan you need.",
+    "description": "Launch a virtual assistant trained on your documents in under one business day. We host it for you — you just pay the plan you need.",
     "categoryLabel": "AI Platform",
     "plans": {
       "starter": {
@@ -42,11 +42,13 @@
           "Optional private or on-prem models",
           "HIPAA, GDPR and ISO 27001 compliance",
           "Dedicated success manager",
-          "24/7 support and on-call for critical incidents",
+          "Priority support in Colombian business hours (Mon-Fri 8 AM - 5 PM), 1h business SLA for critical incidents",
           "Monthly audits and reports for your committee"
         ],
         "idealPara": "Large enterprises with thousands of users and compliance needs"
       }
-    }
+    },
+    "costoNote": "Your plan includes hosting, database and monitoring. Usage-based add-ons (LLMs, WhatsApp, maps, payment gateways) are paid directly to the provider based on actual usage.",
+    "limitsLabel": "What this plan includes"
   }
 }
