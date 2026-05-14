@@ -28,6 +28,7 @@ Cada demo es una aplicación interactiva navegable, con datos simulados realista
 | Code Review IA | DevTools | Review automatizado en PRs con SAST/DAST/SCA, test generation, refactoring y analytics de calidad. | [Ver demo](./apps/web/src/app/demo/code-review-ia/) |
 | Moderación de Contenido IA | Trust & Safety | Clasificación multi-modal NSFW/hate/spam con human-in-the-loop, wellness para moderadores y compliance DSA. | [Ver demo](./apps/web/src/app/demo/moderacion-contenido/) |
 | App de Delivery | OnDemand | 3 apps (customer / driver / merchant) con tracking en vivo, routing ML, anti-fraude y pricing dinámico. | [Ver demo](./apps/web/src/app/demo/delivery/) |
+| Loyalty / Fidelización | Engagement | Programas points/tiers/missions con coalitions multi-marca, gamification y personalization ML. | [Ver demo](./apps/web/src/app/demo/loyalty/) |
 
 ## 🚀 Stack Tecnológico
 
