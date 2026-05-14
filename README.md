@@ -85,51 +85,541 @@ El **backend Express** simula APIs REST de cada demo con datos mock pero estruct
 
 ## 2. Las 27 demos en detalle
 
-Todas las demos comparten estos atributos:
+Todas las demos son **aplicaciones interactivas navegables** con datos simulados realistas, soporte completo de internacionalización ES/EN, modo oscuro y diseño responsive mobile-first. Cada una expone además un módulo backend Express con endpoints REST funcionales y se monta automáticamente en `/demo/<slug>` del frontend.
 
-- **Navegables**: tabs, modales, formularios, drag-and-drop según aplique.
-- **Datos simulados realistas**: mockData consistente y suficiente para que se vea poblada.
-- **i18n ES/EN**: textos en `apps/web/messages/demos/<slug>.{es,en}.json` con merge automático.
-- **Modo oscuro completo**: paletas `primary-*` y `secondary-*` del design system.
-- **Responsive mobile-first**: probadas en breakpoints `sm`, `md`, `lg`, `xl`.
-- **Backend mock**: la mayoría tienen su módulo Express con endpoints REST en `apps/backend/src/modules/<modulo>/`.
+**Demos en vivo: [https://www.koptup.com/demo](https://www.koptup.com/demo)**
 
-### Demos originales (1–9)
+### Categorías
 
-| # | Demo | Categoría | Descripción | Frontend | Backend |
-|---|------|-----------|-------------|----------|---------|
-| 1 | Chatbot Inteligente | Atención al Cliente | Asistente virtual con IA, RAG enterprise (19 capas), builder visual y embed multi-canal. Responde, procesa documentos y aprende de cada interacción. | [Ver demo](./apps/web/src/app/demo/chatbot/) | [Módulo backend](./apps/backend/src/routes/) |
-| 2 | E-Commerce Completo | Retail & Ventas | Tienda en línea moderna con carrito, checkout, gestión de productos y dashboard de ventas en tiempo real. | [Ver demo](./apps/web/src/app/demo/ecommerce/) | — |
-| 3 | Dashboard Ejecutivo | Business Intelligence | Panel de control gerencial con KPIs, métricas financieras, análisis de ventas y reportes interactivos. | [Ver demo](./apps/web/src/app/demo/dashboard-ejecutivo/) | — |
-| 4 | Gestor Documental | Gestión Documental | Organiza, busca y comparte documentos con etiquetas, búsqueda semántica y control de versiones. | [Ver demo](./apps/web/src/app/demo/gestor-documentos/) | — |
-| 5 | Sistema de Reservas | Servicios | Plataforma de reservas online con calendario, notificaciones y gestión de disponibilidad. | [Ver demo](./apps/web/src/app/demo/sistema-reservas/) | — |
-| 6 | CMS Avanzado | Marketing Digital | Administra contenido, páginas y blog con editor visual, SEO y publicación programada. | [Ver demo](./apps/web/src/app/demo/gestor-contenido/) | — |
-| 7 | Gestión de Proyectos | Productividad | Sistema ágil con tableros Kanban, sprints, tareas, dependencias y colaboración en equipo. | [Ver demo](./apps/web/src/app/demo/control-proyectos/) | — |
-| 8 | Auditoría de Cuentas Médicas | Salud | Vertical médico para auditar facturación clínica con catálogos CIE-10 / CUPS, flujos de glosas y trazabilidad. Acceso con código **2020**. | [Ver demo](./apps/web/src/app/demo/cuentas-medicas/) | — |
-| 9 | Sistema Experto Médico | Salud / IA | Motor de reglas y árboles de decisión para auditoría médica automatizada con explicabilidad. | [Ver demo](./apps/web/src/app/demo/sistema-experto/) | — |
+- [Inteligencia Artificial](#inteligencia-artificial) — 4 demos
+- [Ventas y CRM](#ventas-y-crm) — 2 demos
+- [Operaciones y Logística](#operaciones-y-logística) — 3 demos
+- [Finanzas](#finanzas) — 3 demos
+- [Comercio y Retail](#comercio-y-retail) — 3 demos
+- [Atención al Cliente y Soporte](#atención-al-cliente-y-soporte) — 2 demos
+- [Salud](#salud) — 2 demos
+- [Educación](#educación) — 1 demo
+- [Contenido y Documentos](#contenido-y-documentos) — 2 demos
+- [Productividad y Gestión](#productividad-y-gestión) — 2 demos
+- [Seguridad y Compliance](#seguridad-y-compliance) — 2 demos
+- [DevTools y QA](#devtools-y-qa) — 1 demo
 
-### Demos enterprise nuevas (10–27)
+---
 
-| # | Demo | Categoría | Descripción | Frontend | Backend |
-|---|------|-----------|-------------|----------|---------|
-| 10 | CRM con IA | Ventas IA | Plataforma comercial inteligente: pipeline visual, lead scoring ML, forecast predictivo y asistente IA para tu equipo de ventas. | [Ver demo](./apps/web/src/app/demo/crm-ia/) | [Módulo backend](./apps/backend/src/modules/crm/) |
-| 11 | ERP Modular | Gestión Empresarial | Suite empresarial integral con módulos de Contabilidad, Finanzas, Inventario, Ventas, Compras, RRHH y Manufactura. Multi-país (CO/MX/AR/CL/PE) y multi-moneda. | [Ver demo](./apps/web/src/app/demo/erp/) | [Módulo backend](./apps/backend/src/modules/erp/) |
-| 12 | Help Desk con IA | Servicio al Cliente | Centro omnicanal de tickets con enrutamiento inteligente por skills y sentiment, respuestas asistidas y SLA en tiempo real. | [Ver demo](./apps/web/src/app/demo/helpdesk-ia/) | [Módulo backend](./apps/backend/src/modules/helpdesk/) |
-| 13 | Plataforma LMS | Educación | E-learning interactivo con IA, gamificación, clases en vivo, certificados blockchain y analíticas para alumno, instructor y admin. | [Ver demo](./apps/web/src/app/demo/lms/) | [Módulo backend](./apps/backend/src/modules/lms/) |
-| 14 | Telemedicina | Salud Digital | Plataforma integral de teleconsulta: sala de espera con triage IA, video consulta, ficha clínica, receta electrónica, laboratorio HL7/FHIR y agenda por especialidad. | [Ver demo](./apps/web/src/app/demo/telemedicina/) | [Módulo backend](./apps/backend/src/modules/telemedicine/) |
-| 15 | Facturación Electrónica | Fiscal LATAM | Plataforma fiscal unificada: emite, recibe, valida y almacena documentos con cumplimiento normativo en 8 países (DIAN, SAT, AFIP, SII, SUNAT y más). | [Ver demo](./apps/web/src/app/demo/facturacion-electronica/) | [Módulo backend](./apps/backend/src/modules/e-invoicing/) |
-| 16 | WMS & Logística | Supply Chain | Gestión de bodegas, picking optimizado, ruteo VRP, last-mile y 3PL multi-cliente en una sola plataforma. | [Ver demo](./apps/web/src/app/demo/wms-logistica/) | [Módulo backend](./apps/backend/src/modules/wms/) |
-| 17 | POS / Punto de Venta | Retail Omnicanal | Suite omnicanal: restaurante, retail, autoservicio y kiosko con facturación electrónica, fidelización y hardware integrado (impresoras, scanners, cajones, balanzas). | [Ver demo](./apps/web/src/app/demo/pos/) | [Módulo backend](./apps/backend/src/modules/pos/) |
-| 18 | HRMS | Talento Humano | Plataforma integral de talento: directorio, ATS, performance, payroll, learning y analítica con IA para LATAM. | [Ver demo](./apps/web/src/app/demo/hrms/) | [Módulo backend](./apps/backend/src/modules/hrms/) |
-| 19 | Automatización | DevTools / iPaaS | Diseña flujos visuales con triggers, IA nativa, código sandboxed, observabilidad y versionado. Estilo n8n + Zapier, pensado para equipos. | [Ver demo](./apps/web/src/app/demo/automatizacion/) | [Módulo backend](./apps/backend/src/modules/automation/) |
-| 20 | SaaS Boilerplate | Plataforma B2B | Plantilla productiva para construir SaaS B2B: auth empresarial, billing, multi-tenancy con RLS, webhooks, audit logs, feature flags y observabilidad. Todo listo desde el día uno. | [Ver demo](./apps/web/src/app/demo/saas-boilerplate/) | [Módulo backend](./apps/backend/src/modules/saas-platform/) |
-| 21 | Voice AI / Call Center | Comunicaciones IA | Cockpit de voz: agente conversacional, transcripción en vivo, sentiment, function calling, campañas outbound y handoff a humano. | [Ver demo](./apps/web/src/app/demo/voice-ai/) | [Módulo backend](./apps/backend/src/modules/voice-ai/) |
-| 22 | Firma Electrónica | LegalTech | Firma documentos legalmente vinculantes en minutos. Simple, Avanzada y Cualificada eIDAS / Ley 527 CO con audit trail criptográfico. | [Ver demo](./apps/web/src/app/demo/firma-electronica/) | [Módulo backend](./apps/backend/src/modules/e-signature/) |
-| 23 | Scraping & Extracción | DataOps | Builder visual point-and-click, IA con schemas, cluster de browsers headless, anti-bot stealth, scheduler, diff detection y outputs multi-canal. | [Ver demo](./apps/web/src/app/demo/scraping/) | [Módulo backend](./apps/backend/src/modules/scraping/) |
-| 24 | Code Review con IA | DevTools | Plataforma DevTools: revisión automatizada de PRs, generación de tests, escaneo de seguridad (SAST/DAST/SCA), compliance de licencias y analítica de ingeniería. | [Ver demo](./apps/web/src/app/demo/code-review-ia/) | [Módulo backend](./apps/backend/src/modules/code-review/) |
-| 25 | Moderación de Contenido | Trust & Safety | Clasificación multi-modal (texto, imagen, video, audio), workflows configurables, bienestar de moderadores y trazabilidad completa para plataformas a escala. | [Ver demo](./apps/web/src/app/demo/moderacion-contenido/) | [Módulo backend](./apps/backend/src/modules/moderation/) |
-| 26 | App de Delivery | Marketplaces | Plataforma multi-rol: Customer, Driver, Merchant y Operaciones con tracking en vivo, pagos in-app y routing ML. | [Ver demo](./apps/web/src/app/demo/delivery/) | [Módulo backend](./apps/backend/src/modules/delivery/) |
-| 27 | Loyalty | Fidelización | Plataforma integral de puntos, tiers, misiones, coaliciones y analítica de retención para retail, banca y servicios. | [Ver demo](./apps/web/src/app/demo/loyalty/) | [Módulo backend](./apps/backend/src/modules/loyalty/) |
+### Inteligencia Artificial
+
+#### 1. Chatbot RAG con IA
+> **Asistente virtual que aprende de tus documentos y responde con citas verificables**
+
+Plataforma RAG (Retrieval-Augmented Generation) end-to-end que ingiere PDFs, Word, Excel, CSV, HTML y URLs, los chunkea por párrafos y los indexa con búsqueda BM25-lite (TF·IDF). Cuando un usuario pregunta, recupera los top-k chunks más relevantes y los manda a OpenAI GPT-4o-mini (configurable a GPT-4o o GPT-4 Turbo) para que sintetice una respuesta natural con citas inline `[1] [2]` clickeables. Está pensado como demo de referencia del nivel enterprise que construimos: 19 capas reales documentadas, builder visual y embed multi-canal.
+
+**Capacidades destacadas**:
+- 19 capas enterprise visibles: ingesta multi-fuente, chunking semántico, hybrid retrieval, query understanding, reranking, context engineering, agents, tools, memory, multimodal, multi-LLM routing, observability, evaluación, optimization, knowledge graphs, guardrails, compliance, producción y builder/embed.
+- Modo Builder & Embed para personalizar avatar (emoji o imagen subida), color, posición del widget y generar código embed (iframe, script tag, componente React, webhook URL).
+- 3 modos de preview: Desktop, Mobile (frame de iPhone) y Bubble (FAB integrable).
+- Tenants persistentes con CRUD completo (crear, listar, eliminar bots, historial de conversaciones).
+- Fallback a modo extractivo BM25 si no hay clave de OpenAI configurada.
+
+**Tecnologías**: Next.js 14 App Router · React 18 · TypeScript · OpenAI Chat Completions · Express + Node 18 · BM25-lite custom · TailwindCSS + dark mode · next-intl
+
+**Backend**: `apps/backend/src/routes/chatbot.routes.ts` con 11 endpoints REST
+**Demo**: [Ver código](./apps/web/src/app/demo/chatbot/) · [https://www.koptup.com/demo/chatbot](https://www.koptup.com/demo/chatbot)
+
+---
+
+#### 2. Voice AI / Call Center
+> **Centro de llamadas conversacional con STT/TTS streaming y function calling**
+
+Mock de call center moderno con IVR sin menús, transcripción en vivo, sentiment analysis por turno, function calling (transferir / agendar / consultar), llamadas inbound y outbound con campañas, handoff a humano con contexto compartido y agent assist en tiempo real. Pensado para equipos que quieren reducir tiempo de cola, automatizar L1 y dar al agente humano todo el contexto antes de tomar la llamada.
+
+**Capacidades destacadas**:
+- STT streaming objetivo <300 ms con Whisper, Deepgram y AssemblyAI (badges seleccionables).
+- TTS realista con ElevenLabs, Cartesia y Play.ht + barge-in detection.
+- Sentiment gauge actualizado por turno (positivo / neutro / negativo).
+- PCI redaction automática en transcripciones (números de tarjeta enmascarados como `****1234`).
+- Compliance: DNC list checker, recording disclosure, code-switching ES/EN.
+- Telefonía: Twilio, Vonage y Telnyx integradas como providers seleccionables.
+
+**Tecnologías**: Next.js · React · TypeScript · waveform CSS animado · function calling tipado · Express mock backend
+
+**Backend**: `apps/backend/src/modules/voice-ai/`
+**Demo**: [Ver código](./apps/web/src/app/demo/voice-ai/) · [https://www.koptup.com/demo/voice-ai](https://www.koptup.com/demo/voice-ai)
+
+---
+
+#### 3. Automatización de Workflows
+> **Plataforma estilo n8n + Zapier con IA nativa y código sandboxed**
+
+Editor visual drag-and-drop para construir flujos con triggers (webhook, cron, eventos), 500+ integraciones simuladas (Slack, Gmail, Notion, Stripe, HubSpot, etc.), nodos de IA nativos (LLM, embeddings, RAG, vision, STT/TTS) y nodos de código JS o Python ejecutados en sandbox. Está pensado para que un equipo de operaciones diseñe automatizaciones complejas sin depender de un dev y para que la organización mantenga versionado y observabilidad de cada workflow.
+
+**Capacidades destacadas**:
+- Visual workflow builder con 500+ integraciones y catálogo searchable.
+- AI nodes nativos: LLM, embedding, RAG, vision, STT/TTS y structured output.
+- Code nodes JS / Python sandboxed con SDK custom y secrets manager.
+- Versioning git-backed, environments (dev/staging/prod) y replay paso a paso.
+- Observabilidad: traces por ejecución, métricas por nodo, retries con backoff.
+
+**Tecnologías**: Next.js · React Flow para el canvas · TypeScript · Express · OpenAI SDK · sandbox VM mock
+
+**Backend**: `apps/backend/src/modules/automation/`
+**Demo**: [Ver código](./apps/web/src/app/demo/automatizacion/) · [https://www.koptup.com/demo/automatizacion](https://www.koptup.com/demo/automatizacion)
+
+---
+
+#### 4. Moderación de Contenido con IA
+> **Trust & Safety multi-modal con human-in-the-loop y compliance DSA**
+
+Plataforma para clasificar y moderar contenido en tiempo real: detecta NSFW, hate speech, spam, violencia y self-harm sobre texto, imagen, video y audio. Combina modelos automáticos con cola de revisión humana priorizada por severidad. Incluye un módulo de bienestar para los moderadores (blur de contenido sensible, breaks programados, rotación) y trazabilidad completa para compliance.
+
+**Capacidades destacadas**:
+- Clasificación multi-modal: texto, imagen, video y audio en tiempo real.
+- Custom models por vertical (gaming, dating, kids, fintech).
+- Human-in-the-loop con priority routing por severidad y appeals workflow.
+- Moderator wellness: blur, breaks, rotación de categorías difíciles.
+- Compliance DSA (Digital Services Act) + audit trail por decisión.
+
+**Tecnologías**: Next.js · React · TypeScript · clasificadores mock · Express · OpenAI Moderation API · TailwindCSS
+
+**Backend**: `apps/backend/src/modules/moderation/`
+**Demo**: [Ver código](./apps/web/src/app/demo/moderacion-contenido/) · [https://www.koptup.com/demo/moderacion-contenido](https://www.koptup.com/demo/moderacion-contenido)
+
+---
+
+### Ventas y CRM
+
+#### 5. CRM con IA
+> **Pipeline kanban con lead scoring ML, conversation intelligence y forecasting**
+
+CRM comercial pensado para equipos de ventas B2B: pipeline visual estilo Pipedrive con drag-and-drop entre etapas, scoring de leads basado en machine learning con explicabilidad de features (qué señales pesan más), conversation intelligence sobre llamadas grabadas (transcripción, sentiment por turno, next steps automáticos) y forecasting con escenarios optimista / realista / pesimista.
+
+**Capacidades destacadas**:
+- Lead scoring ML con propensity-to-buy y explicabilidad por feature.
+- AI email composer con brand voice + A/B variants y secuencias omnicanal.
+- Conversation intelligence: grabación, sentiment por turno, action items.
+- Customer 360 unificado y forecasting con escenarios + simuladores.
+
+**Tecnologías**: Next.js · React · TypeScript · OpenAI · Recharts · drag-and-drop · Express + Mongoose
+
+**Backend**: `apps/backend/src/modules/crm/`
+**Demo**: [Ver código](./apps/web/src/app/demo/crm-ia/) · [https://www.koptup.com/demo/crm-ia](https://www.koptup.com/demo/crm-ia)
+
+---
+
+#### 6. HRMS / Gestión de Talento
+> **Plataforma de RRHH end-to-end con payroll multi-país e IA de retención**
+
+Suite integral para gestionar el ciclo completo del empleado: ATS (applicant tracking) con scoring CV asistido por IA, onboarding y offboarding con firma electrónica de contratos, performance management con OKRs y 1:1s, payroll multi-país con compliance laboral (Colombia, México, Argentina), y un módulo de analytics con IA que predice fuga de talento, calcula eNPS y compara salarios contra benchmarks de mercado.
+
+**Capacidades destacadas**:
+- ATS con scoring CV por IA y screening calls automáticas pre-entrevista.
+- Onboarding / offboarding con e-sign de contratos y checklists por rol.
+- Payroll multi-país con compliance laboral (CO, MX, AR) y reportes legales.
+- AI insights: retención predicha, eNPS con sentiment, salary benchmarks.
+
+**Tecnologías**: Next.js · React · TypeScript · OpenAI · DocuSign-style flow · Express · Mongoose
+
+**Backend**: `apps/backend/src/modules/hrms/`
+**Demo**: [Ver código](./apps/web/src/app/demo/hrms/) · [https://www.koptup.com/demo/hrms](https://www.koptup.com/demo/hrms)
+
+---
+
+### Operaciones y Logística
+
+#### 7. WMS y Logística
+> **Gestión de bodegas, picking optimizado y last-mile con carriers integrados**
+
+Warehouse Management System pensado para 3PL y operaciones omnicanal: multi-bodega con zonas / bins / slotting basado en ML, picking en modos wave / batch / zone / cluster, cycle counting ABC, ruteo VRP para distribución, y módulo de last-mile con app de driver y POD (proof-of-delivery). Integra carriers locales y globales para cotizar y despachar desde un solo dashboard.
+
+**Capacidades destacadas**:
+- Multi-warehouse con zonas, bins y slotting ML según rotación.
+- Picking wave / batch / zone / cluster + cycle counting ABC automatizado.
+- Route optimization VRP + last-mile con POD digital y firma del cliente.
+- Carriers integrados: FedEx, DHL, Servientrega, Coordinadora, Inter Rapidísimo, TCC.
+
+**Tecnologías**: Next.js · React · TypeScript · mapas Leaflet mock · algoritmos VRP simplificados · Express · Mongoose
+
+**Backend**: `apps/backend/src/modules/wms/`
+**Demo**: [Ver código](./apps/web/src/app/demo/wms-logistica/) · [https://www.koptup.com/demo/wms-logistica](https://www.koptup.com/demo/wms-logistica)
+
+---
+
+#### 8. App de Delivery
+> **Plataforma multi-rol con tracking en vivo, routing ML y anti-fraude**
+
+Marketplace de delivery on-demand con 4 vistas: customer (cliente final), driver (repartidor), merchant (comercio) y un dashboard de operaciones. Incluye tracking GPS en vivo con ETA basado en ML, pricing dinámico con surge, programas de loyalty / membership y detección de fraude (GPS spoofing, multi-account, KYC de drivers).
+
+**Capacidades destacadas**:
+- 4 apps integradas: customer, driver, merchant y ops dashboard.
+- Routing ML multi-pickup con tracking en vivo y ETA por modelo.
+- Pricing dinámico (surge), loyalty y suscripción membership-style.
+- Anti-fraude: GPS spoofing detection, multi-account, KYC drivers.
+
+**Tecnologías**: Next.js · React · TypeScript · mapas con tiles · WebSockets mock · Express · Mongoose
+
+**Backend**: `apps/backend/src/modules/delivery/`
+**Demo**: [Ver código](./apps/web/src/app/demo/delivery/) · [https://www.koptup.com/demo/delivery](https://www.koptup.com/demo/delivery)
+
+---
+
+#### 9. Sistema de Reservas
+> **Plataforma de booking online con calendario, notificaciones y disponibilidad en vivo**
+
+Sistema de reservas pensado para servicios profesionales y comercios con cita previa (peluquerías, consultorios, restaurantes, talleres, coworkings). Permite a los clientes elegir servicio, profesional, fecha y franja, recibir confirmación y recordatorios, y al negocio gestionar disponibilidad, bloqueos, recursos y reportes.
+
+**Capacidades destacadas**:
+- Calendario con vistas día / semana / mes y multi-recurso (sala, profesional, equipo).
+- Notificaciones automáticas por email / SMS / WhatsApp con confirmación y recordatorios.
+- Gestión de disponibilidad: horarios, bloqueos, vacaciones, capacidad por slot.
+- Pagos anticipados, depósitos y políticas de cancelación configurables.
+
+**Tecnologías**: Next.js · React · TypeScript · date-fns · TailwindCSS · Express mock REST
+
+**Backend**: Sin backend dedicado (datos mock client-side)
+**Demo**: [Ver código](./apps/web/src/app/demo/sistema-reservas/) · [https://www.koptup.com/demo/sistema-reservas](https://www.koptup.com/demo/sistema-reservas)
+
+---
+
+### Finanzas
+
+#### 10. ERP Modular Multi-país
+> **Suite empresarial con contabilidad, inventario, ventas, manufactura y facturación electrónica LATAM**
+
+ERP completo y modular: contabilidad de doble entrada multi-currency y multi-company, finanzas con conciliación bancaria automática (Open Banking + AI matching), inventario con kardex, ventas, compras, RRHH y manufactura con MRP, BOM y work orders. Integra facturación electrónica nativa para 8 países de LatAm (DIAN, SAT, AFIP, SII, SUNAT, DGI, SET y SRI).
+
+**Capacidades destacadas**:
+- Contabilidad de doble entrada multi-currency y multi-company consolidable.
+- Bank reconciliation con Open Banking + AI matching y reglas de auto-asignación.
+- MRP, BOM, work orders y forecasting de demanda con ML.
+- Facturación electrónica nativa para 8 países LatAm.
+
+**Tecnologías**: Next.js · React · TypeScript · PostgreSQL para contabilidad estricta · Express · Recharts · OpenAI para matching
+
+**Backend**: `apps/backend/src/modules/erp/`
+**Demo**: [Ver código](./apps/web/src/app/demo/erp/) · [https://www.koptup.com/demo/erp](https://www.koptup.com/demo/erp)
+
+---
+
+#### 11. Facturación Electrónica Multi-país
+> **Emite, recibe y valida facturas electrónicas en 8 países LATAM con SDK y white-label**
+
+Plataforma fiscal unificada para emitir y recibir facturas electrónicas con cumplimiento normativo en Colombia (DIAN), México (SAT), Argentina (AFIP), Chile (SII), Perú (SUNAT), Uruguay (DGI), Paraguay (SET) y Ecuador (SRI). Soporta factura, nota crédito, nota débito y tickets POS, valida NIT/RUC/RFC en tiempo real, y recibe documentos de proveedores con OCR para auto-cargar al ERP.
+
+**Capacidades destacadas**:
+- 8 países LatAm: CO, MX, AR, CL, PE, UY, PY, EC con resoluciones y rangos.
+- Documentos: factura, NC, ND, POS + validación NIT/RUC/RFC en tiempo real.
+- Recepción de proveedores con OCR + validación automática contra DIAN/SAT.
+- API + SDKs (JS, Python, PHP) + plugins ERP/POS + modo white-label.
+
+**Tecnologías**: Next.js · React · TypeScript · firma XMLDSig mock · PDF417 / QR · pdf-parse para OCR · Express
+
+**Backend**: `apps/backend/src/modules/e-invoicing/`
+**Demo**: [Ver código](./apps/web/src/app/demo/facturacion-electronica/) · [https://www.koptup.com/demo/facturacion-electronica](https://www.koptup.com/demo/facturacion-electronica)
+
+---
+
+#### 12. Dashboard Ejecutivo
+> **Panel gerencial con KPIs, métricas financieras y análisis interactivo**
+
+Dashboard pensado para C-level y gerencia: consolida KPIs financieros, comerciales y operativos en una sola pantalla con drill-down. Incluye gráficas interactivas (área, barras, donut, sankey, funnel), comparativos year-over-year, alertas configurables sobre umbrales y exportación a PDF / Excel para los comités directivos.
+
+**Capacidades destacadas**:
+- KPIs financieros (ingresos, EBITDA, margen, runway) con drill-down por unidad.
+- Análisis de ventas con cohortes, funnel y conversión por canal.
+- Comparativos YoY / QoQ con tendencias y outliers señalados.
+- Exportación a PDF (jspdf) y Excel (exceljs) con branding corporativo.
+
+**Tecnologías**: Next.js · React · TypeScript · Recharts · jspdf · exceljs · TailwindCSS
+
+**Backend**: Sin backend dedicado (datos mock client-side)
+**Demo**: [Ver código](./apps/web/src/app/demo/dashboard-ejecutivo/) · [https://www.koptup.com/demo/dashboard-ejecutivo](https://www.koptup.com/demo/dashboard-ejecutivo)
+
+---
+
+### Comercio y Retail
+
+#### 13. E-Commerce Completo
+> **Tienda online con carrito, checkout, gestión de catálogo y dashboard de ventas**
+
+E-commerce moderno listo para vender en LATAM: catálogo con variantes y stock, carrito persistido, checkout con múltiples pasarelas (Stripe, Wompi, Mercado Pago, PSE), gestión de pedidos y devoluciones, y un dashboard de admin con métricas de ventas en tiempo real. Optimizado para Core Web Vitals y SEO desde el día uno.
+
+**Capacidades destacadas**:
+- Catálogo con variantes, stock multi-bodega y precios por lista.
+- Checkout con Stripe (mock), Wompi, Mercado Pago y PSE Colombia.
+- Facturación electrónica DIAN integrada para Colombia.
+- Dashboard de admin: ventas en tiempo real, top productos, conversión.
+
+**Tecnologías**: Next.js · React · TypeScript · next/image · TailwindCSS · Recharts · Stripe SDK mock
+
+**Backend**: Sin backend dedicado (datos mock client-side)
+**Demo**: [Ver código](./apps/web/src/app/demo/ecommerce/) · [https://www.koptup.com/demo/ecommerce](https://www.koptup.com/demo/ecommerce)
+
+---
+
+#### 14. POS / Punto de Venta Omnicanal
+> **POS offline-first con KDS, multi-payment y hardware integrado**
+
+Suite POS pensada para restaurantes, retail, autoservicio y kioskos. Funciona offline-first con CRDT sync y conflict resolution (sigue vendiendo aunque se caiga internet, sincroniza después). Soporta efectivo, tarjeta, QR, wallets, BNPL y split entre formas de pago, con KDS para cocina, gestión de mesas, modificadores y combos. Integra hardware POS real: scanners Bluetooth, balanzas, impresoras térmicas y cajones monederos.
+
+**Capacidades destacadas**:
+- Offline-first con CRDT sync y conflict resolution sin pérdida de transacciones.
+- Multi-payment: efectivo, tarjeta, QR, wallets, BNPL y split de cuenta.
+- KDS para cocina, mesas, modificadores, combos y happy hour.
+- Hardware integrado: scanners Bluetooth, balanzas, impresoras, cajones.
+
+**Tecnologías**: Next.js · React · TypeScript · IndexedDB para offline · CRDT mock · Web Bluetooth · ESC/POS
+
+**Backend**: `apps/backend/src/modules/pos/`
+**Demo**: [Ver código](./apps/web/src/app/demo/pos/) · [https://www.koptup.com/demo/pos](https://www.koptup.com/demo/pos)
+
+---
+
+#### 15. Loyalty / Fidelización
+> **Programas de puntos, tiers y misiones con coaliciones multi-marca**
+
+Plataforma de fidelización con todos los mecanismos modernos: puntos por compra, tiers (Bronze / Silver / Gold / Platinum) con beneficios escalonados, misiones gamificadas, referrals con recompensa bilateral, cashback y sweepstakes (sorteos). Soporta coaliciones multi-marca donde varias empresas comparten un pool de puntos, con personalization basada en ML y emisión de Wallet pass (Apple / Google).
+
+**Capacidades destacadas**:
+- Mecánicas: points, tiers, missions, referrals, cashback, sweepstakes.
+- Coalitions multi-marca con shared points pool y settlement entre socios.
+- Gamification: badges, streaks, challenges y leaderboards públicos.
+- Personalization ML + A/B testing de campañas + Wallet pass Apple/Google.
+
+**Tecnologías**: Next.js · React · TypeScript · Recharts · pass.json builder · Express · Mongoose
+
+**Backend**: `apps/backend/src/modules/loyalty/`
+**Demo**: [Ver código](./apps/web/src/app/demo/loyalty/) · [https://www.koptup.com/demo/loyalty](https://www.koptup.com/demo/loyalty)
+
+---
+
+### Atención al Cliente y Soporte
+
+#### 16. Help Desk IA Omnichannel
+> **Ticketing inteligente con routing ML, sugerencias IA y SLA management**
+
+Help Desk omnicanal que unifica email, WhatsApp, Instagram, Facebook, X, voz y chat web en una sola cola de tickets. El routing es por ML (mira skills del agente, sentiment del cliente e idioma) y un copilot de IA sugiere respuestas con confidence score sobre el knowledge base. Gestiona SLA con escalations automáticos, CSAT/NPS post-resolución y QA con IA sobre las conversaciones cerradas.
+
+**Capacidades destacadas**:
+- Omnichannel: email, WhatsApp, IG, FB, X, voz y chat web en una sola cola.
+- Routing inteligente con ML (skills, sentiment, idioma, prioridad cliente).
+- Sugerencias IA en vivo y auto-respuestas con confidence threshold.
+- SLA con escalations, CSAT/NPS automáticos y QA con IA sobre tickets cerrados.
+
+**Tecnologías**: Next.js · React · TypeScript · OpenAI · WhatsApp Business API mock · Express · Mongoose
+
+**Backend**: `apps/backend/src/modules/helpdesk/`
+**Demo**: [Ver código](./apps/web/src/app/demo/helpdesk-ia/) · [https://www.koptup.com/demo/helpdesk-ia](https://www.koptup.com/demo/helpdesk-ia)
+
+---
+
+#### 17. Sistema Experto Médico
+> **Motor de reglas y árboles de decisión para auditoría médica explicable**
+
+Sistema experto basado en reglas de negocio + árboles de decisión para automatizar tareas de auditoría médica que tradicionalmente requieren un humano experto. A diferencia de un modelo black-box, cada decisión incluye **trazabilidad**: qué regla disparó, qué inputs evaluó y por qué llegó al veredicto. Pensado para EPS, IPS y aseguradoras que necesitan defender cada glosa frente al ente regulador.
+
+**Capacidades destacadas**:
+- Motor de reglas declarativo con DSL legible por auditores no-técnicos.
+- Árboles de decisión visualizables y editables sin tocar código.
+- Explicabilidad completa: traza por regla, input, output y veredicto.
+- Validación contra catálogos CIE-10 / CUPS y reglas POS / Plan Beneficios.
+
+**Tecnologías**: Next.js · React · TypeScript · motor de reglas custom · Express con `expert-system.routes.ts`
+
+**Backend**: `apps/backend/src/routes/expert-system.routes.ts`
+**Demo**: [Ver código](./apps/web/src/app/demo/sistema-experto/) · [https://www.koptup.com/demo/sistema-experto](https://www.koptup.com/demo/sistema-experto)
+
+---
+
+### Salud
+
+#### 18. Auditoría de Cuentas Médicas
+> **Vertical médico para auditar facturación clínica con catálogos CIE-10 y CUPS**
+
+Aplicación específica para la auditoría de cuentas médicas en Colombia: revisión de facturas de prestadores de salud, validación contra catálogos oficiales (CIE-10 para diagnósticos, CUPS para procedimientos), flujo de glosas con tipificación normativa, liquidación automática y trazabilidad de cada decisión para el ente regulador. Acceso protegido con código **2020** desde el catálogo de demos.
+
+**Capacidades destacadas**:
+- Catálogos oficiales precargados: CIE-10, CUPS, manual tarifario.
+- Flujo de glosas con tipificación normativa (Resolución 3047 y sucesoras).
+- Liquidación automática con cálculo de valor aceptado / glosado.
+- Trazabilidad por auditor, fecha y motivo + reportes para entes de control.
+
+**Tecnologías**: Next.js · React · TypeScript · Express con `cuentas.routes.ts`, `cups.routes.ts`, `liquidacion.routes.ts`
+
+**Backend**: `apps/backend/src/routes/cuentas.routes.ts` + `cups.routes.ts` + `liquidacion.routes.ts` + `reglas-facturacion.routes.ts`
+**Demo**: [Ver código](./apps/web/src/app/demo/cuentas-medicas/) · [https://www.koptup.com/demo/cuentas-medicas](https://www.koptup.com/demo/cuentas-medicas) (código de acceso: `2020`)
+
+---
+
+#### 19. Telemedicina HIPAA
+> **Video consulta segura, EHR integrado, triage IA y receta electrónica**
+
+Plataforma de telemedicina end-to-end pensada para cumplimiento HIPAA / BAA: sala de espera con triage IA por síntomas, video consulta WebRTC propia, ficha clínica (EHR/EMR) con historial unificado, receta electrónica con firma digital, integración con laboratorios vía HL7/FHIR y conexión con farmacias para dispensación. Incluye soporte para wearables (Apple Health, Fitbit, Google Fit).
+
+**Capacidades destacadas**:
+- Video call HIPAA-compliant con WebRTC propio (sin terceros).
+- EHR/EMR + receta electrónica con firma digital del médico.
+- Triage IA con clasificación de síntomas y derivación por especialidad.
+- Integración wearables (Apple Health, Fitbit), laboratorios HL7/FHIR y farmacias.
+
+**Tecnologías**: Next.js · React · TypeScript · WebRTC mock · HL7/FHIR types · OpenAI · Express con BAA references
+
+**Backend**: `apps/backend/src/modules/telemedicine/`
+**Demo**: [Ver código](./apps/web/src/app/demo/telemedicina/) · [https://www.koptup.com/demo/telemedicina](https://www.koptup.com/demo/telemedicina)
+
+---
+
+### Educación
+
+#### 20. LMS / E-learning con IA
+> **Plataforma educativa con AI tutor 1:1, adaptive learning y gamification completa**
+
+Learning Management System con experiencia moderna estilo Coursera + Duolingo. Cada alumno tiene un AI tutor 1:1 conversacional que responde dudas en el contexto del curso, los quizzes se auto-generan a partir del material y el camino de aprendizaje se adapta al desempeño individual. Soporta clases en vivo con breakout rooms y subtítulos multi-idioma, gamification (XP, badges, leaderboards) y certificados verificables.
+
+**Capacidades destacadas**:
+- AI Tutor 1:1 conversacional contextualizado en el curso del alumno.
+- Quizzes auto-generados desde el material + adaptive learning paths.
+- Clases en vivo con breakout rooms y subtítulos multi-idioma en tiempo real.
+- Gamification: XP, badges, leaderboards, streaks y certificados verificables.
+
+**Tecnologías**: Next.js · React · TypeScript · OpenAI · WebRTC mock · video.js · Express · Mongoose
+
+**Backend**: `apps/backend/src/modules/lms/`
+**Demo**: [Ver código](./apps/web/src/app/demo/lms/) · [https://www.koptup.com/demo/lms](https://www.koptup.com/demo/lms)
+
+---
+
+### Contenido y Documentos
+
+#### 21. CMS Avanzado / Gestor de Contenido
+> **Editor visual con SEO, publicación programada y multi-sitio**
+
+CMS pensado para equipos de marketing y editorial: editor WYSIWYG con bloques, gestión de páginas y posts de blog, SEO on-page (metadata, OG tags, sitemap), publicación programada y multi-sitio (un solo backoffice manejando varios dominios). Soporta roles (editor, revisor, publisher) con workflow de aprobación.
+
+**Capacidades destacadas**:
+- Editor de bloques tipo Notion / WordPress Gutenberg.
+- SEO on-page con preview Google, OG tags y sitemap automático.
+- Publicación programada y workflow de aprobación editor → revisor → publisher.
+- Multi-sitio: un backoffice gestionando múltiples dominios.
+
+**Tecnologías**: Next.js · React · TypeScript · TipTap editor · TailwindCSS · Express con `content-manager.routes.ts`
+
+**Backend**: `apps/backend/src/routes/content-manager.routes.ts`
+**Demo**: [Ver código](./apps/web/src/app/demo/gestor-contenido/) · [https://www.koptup.com/demo/gestor-contenido](https://www.koptup.com/demo/gestor-contenido)
+
+---
+
+#### 22. Gestor Documental
+> **Organiza, busca y comparte documentos con búsqueda semántica y versionado**
+
+DMS (Document Management System) para equipos que generan muchos archivos: subida masiva con drag-and-drop, etiquetado manual y automático, búsqueda full-text + semántica (embeddings), control de versiones con diff y permisos granulares por carpeta / documento / usuario. Pensado para áreas legales, contables y de proyecto que necesitan trazabilidad documental.
+
+**Capacidades destacadas**:
+- Subida masiva, etiquetado manual y auto-tagging por contenido.
+- Búsqueda full-text + semántica con embeddings.
+- Versionado con diff visual y restauración a versión anterior.
+- Permisos granulares por carpeta / documento + audit log de accesos.
+
+**Tecnologías**: Next.js · React · TypeScript · pdf-parse · mammoth · OpenAI embeddings · Express con `document.routes.ts`
+
+**Backend**: `apps/backend/src/routes/document.routes.ts`
+**Demo**: [Ver código](./apps/web/src/app/demo/gestor-documentos/) · [https://www.koptup.com/demo/gestor-documentos](https://www.koptup.com/demo/gestor-documentos)
+
+---
+
+### Productividad y Gestión
+
+#### 23. Gestión de Proyectos
+> **Sistema ágil con tableros Kanban, sprints, dependencias y colaboración**
+
+Herramienta de project management estilo Jira / Linear: tableros Kanban con swimlanes, planning de sprints con story points y burndown, gestión de tareas con dependencias y subtareas, asignaciones por equipo y vista de roadmap. Soporta comentarios, menciones, adjuntos y notificaciones en tiempo real.
+
+**Capacidades destacadas**:
+- Tableros Kanban con swimlanes y columnas configurables por estado.
+- Sprints con story points, burndown chart y velocity por equipo.
+- Tareas con dependencias, subtareas, checklists, adjuntos y comentarios.
+- Roadmap visual + reportes de cumplimiento y forecast de entrega.
+
+**Tecnologías**: Next.js · React · TypeScript · drag-and-drop · Recharts · TailwindCSS · Express con `project.routes.ts`
+
+**Backend**: `apps/backend/src/routes/project.routes.ts`
+**Demo**: [Ver código](./apps/web/src/app/demo/control-proyectos/) · [https://www.koptup.com/demo/control-proyectos](https://www.koptup.com/demo/control-proyectos)
+
+---
+
+#### 24. SaaS Boilerplate Multi-tenant
+> **Plantilla productiva con auth SSO, billing, multi-tenancy y observability**
+
+Boilerplate para arrancar un SaaS B2B con todo lo importante resuelto desde el día uno: auth empresarial (SSO SAML/OIDC, MFA, passkeys, magic links), billing con Stripe + Paddle (trials, usage-based, dunning), multi-tenancy configurable (shared-DB con RLS, schema por tenant o DB por tenant), audit logs estilo Vanta, feature flags tipados, webhooks firmados, i18n y observability lista.
+
+**Capacidades destacadas**:
+- Multi-tenancy con 3 estrategias: shared-DB + RLS, schema o DB por tenant.
+- Auth completo: SSO SAML/OIDC, MFA, passkeys, magic links.
+- Billing dual Stripe + Paddle con trials, usage-based y dunning automático.
+- Audit logs Vanta-style, feature flags tipados, webhooks firmados.
+
+**Tecnologías**: Next.js · React · TypeScript · NextAuth · Stripe SDK · Paddle · Express · Postgres RLS
+
+**Backend**: `apps/backend/src/modules/saas-platform/`
+**Demo**: [Ver código](./apps/web/src/app/demo/saas-boilerplate/) · [https://www.koptup.com/demo/saas-boilerplate](https://www.koptup.com/demo/saas-boilerplate)
+
+---
+
+### Seguridad y Compliance
+
+#### 25. Firma Electrónica
+> **Simple, Avanzada y Cualificada eIDAS / Ley 527 CO con audit trail criptográfico**
+
+Plataforma de firma electrónica con los tres niveles legales: simple (clic + IP), avanzada (KYC del firmante) y cualificada (eIDAS / Ley 527 Colombia con certificado y blockchain timestamp). Soporta múltiples firmantes con orden secuencial, condicional o paralelo, bulk send para masivos y auditoría criptográfica con hash chain RFC 3161.
+
+**Capacidades destacadas**:
+- 3 niveles legales: simple, avanzada y cualificada (eIDAS, Ley 527 CO).
+- KYC del firmante: SMS OTP, email, ID + selfie, video, biometría.
+- Audit trail criptográfico con hash chain y timestamp RFC 3161.
+- Multi-firmante con orden secuencial / condicional / paralelo + bulk send.
+
+**Tecnologías**: Next.js · React · TypeScript · PDF signing mock · pdf-lib · RFC 3161 timestamp · Express
+
+**Backend**: `apps/backend/src/modules/e-signature/`
+**Demo**: [Ver código](./apps/web/src/app/demo/firma-electronica/) · [https://www.koptup.com/demo/firma-electronica](https://www.koptup.com/demo/firma-electronica)
+
+---
+
+#### 26. Scraping y Data Extraction
+> **Builder visual con AI extraction, proxy rotation, captcha solving y auto-fix de DOM**
+
+Plataforma de extracción de datos a escala: builder visual point-and-click para definir selectores sin código, extracción asistida por IA con schemas tipo Pydantic (le decís qué campos querés y el modelo arma el JSON), rotación de proxies (datacenter, residencial, móvil), resolución de captchas y auto-fix con LLM cuando cambia el DOM del sitio objetivo.
+
+**Capacidades destacadas**:
+- Visual builder point-and-click + AI extraction con schemas tipados.
+- Proxy rotation: datacenter, residential, mobile + captcha solving.
+- Anti-bot evasion: fingerprinting, stealth headers, human-like delays.
+- Auto-fix con LLM cuando cambia el DOM + diff detection entre runs.
+
+**Tecnologías**: Next.js · React · TypeScript · Playwright/Puppeteer mock · OpenAI · cheerio · Express
+
+**Backend**: `apps/backend/src/modules/scraping/`
+**Demo**: [Ver código](./apps/web/src/app/demo/scraping/) · [https://www.koptup.com/demo/scraping](https://www.koptup.com/demo/scraping)
+
+---
+
+### DevTools y QA
+
+#### 27. Code Review con IA
+> **Revisión automatizada de PRs con SAST/DAST/SCA, test generation y refactoring**
+
+Plataforma DevTools para equipos de ingeniería: revisión automatizada de Pull Requests con un agente de IA que comenta por archivo sobre style, bugs, security, performance y design. Integra escáner de seguridad (SAST + DAST + SCA + SBOM + license compliance), generación automática de tests para código sin cobertura y sugerencias de refactoring con LLM.
+
+**Capacidades destacadas**:
+- AI review por archivo: style, bugs, security, perf, design con severity.
+- SAST + DAST + SCA + SBOM + license compliance en cada PR.
+- Test generation automática y refactoring suggestions con LLM.
+- Integraciones: GitHub, GitLab, Bitbucket, Azure DevOps con checks status.
+
+**Tecnologías**: Next.js · React · TypeScript · OpenAI · diff parsers · Octokit · Express
+
+**Backend**: `apps/backend/src/modules/code-review/`
+**Demo**: [Ver código](./apps/web/src/app/demo/code-review-ia/) · [https://www.koptup.com/demo/code-review-ia](https://www.koptup.com/demo/code-review-ia)
+
+---
 
 > **Nota sobre el catálogo de servicios**: el archivo `services-catalog.ts` con los 26+ servicios comerciales (3 planes cada uno con precios en COP) se perdió en un `git stash drop` reciente. La reconstrucción del catálogo está **pendiente** y forma parte del próximo sprint.
 
