@@ -1,0 +1,289 @@
+{
+  "demoScraping": {
+    "meta": {
+      "title": "Scraping and data extraction platform",
+      "subtitle": "Point-and-click builder, AI schema extraction, a headless browser cluster, stealth anti-bot, scheduler, diff detection, and multichannel outputs.",
+      "ethicalMode": "Ethical mode",
+      "live": "Live",
+      "menu": "Menu"
+    },
+    "actions": {
+      "newScraper": "New scraper",
+      "run": "Run",
+      "running": "Scraping...",
+      "stop": "Stop",
+      "save": "Save",
+      "clone": "Clone",
+      "exportSchema": "Export schema",
+      "testSelector": "Test selector",
+      "addField": "Add field",
+      "delete": "Delete",
+      "edit": "Edit"
+    },
+    "tabs": {
+      "dashboard": "Dashboard",
+      "builder": "Visual builder",
+      "schedule": "Scheduler",
+      "proxies": "Proxies",
+      "antibot": "Anti-bot",
+      "outputs": "Outputs",
+      "diff": "Diff detection",
+      "monitoring": "Monitoring",
+      "cluster": "Cluster",
+      "compliance": "GDPR"
+    },
+    "dashboard": {
+      "title": "Operations overview",
+      "subtitle": "Last 24 hours",
+      "kpis": {
+        "activeScrapers": "Active scrapers",
+        "pagesPerDay": "Pages/day",
+        "successRate": "Success rate",
+        "captchasSolved": "Captchas solved",
+        "proxyCost": "Proxy cost"
+      },
+      "chartTitle": "Runs in the last 24h",
+      "chartLegend": "Success vs. error per hour",
+      "topScrapers": "Most active scrapers",
+      "recentAlerts": "Recent alerts",
+      "alerts": {
+        "domChange": "DOM changed on Amazon PE · auto-fix applied",
+        "rateLimit": "Rate limit hit on MercadoLibre · backoff active",
+        "proxyDown": "Residential proxy pe-03 is down",
+        "captchaSurge": "Captcha surge on Linio · 3.2x"
+      }
+    },
+    "scrapers": {
+      "listTitle": "My scrapers",
+      "searchPlaceholder": "Search scrapers...",
+      "filterAll": "All",
+      "filterRunning": "Running",
+      "filterIdle": "Idle",
+      "filterError": "Error",
+      "status": {
+        "running": "Running",
+        "idle": "Idle",
+        "error": "Error",
+        "paused": "Paused"
+      },
+      "lastRun": "ago",
+      "items": "items"
+    },
+    "builder": {
+      "title": "Visual builder",
+      "subtitle": "Click fields in the preview to start extracting them",
+      "previewTitle": "Target page",
+      "previewUrl": "URL",
+      "previewDevice": "Device",
+      "devices": {
+        "desktop": "Desktop",
+        "tablet": "Tablet",
+        "mobile": "Mobile"
+      },
+      "fieldsTitle": "Fields to extract",
+      "fieldsEmpty": "No fields yet — click the preview to add one.",
+      "fields": {
+        "name": "Name",
+        "selector": "CSS selector",
+        "type": "Type",
+        "required": "Required",
+        "add": "Add field",
+        "types": {
+          "text": "Text",
+          "number": "Number",
+          "url": "URL",
+          "image": "Image",
+          "html": "HTML",
+          "list": "List"
+        },
+        "sample": {
+          "title": "Title",
+          "price": "Price",
+          "author": "Author",
+          "image": "Main image",
+          "rating": "Rating",
+          "stock": "Stock available"
+        }
+      },
+      "pagination": {
+        "title": "Pagination",
+        "selectorLabel": "Next button selector",
+        "maxPages": "Max pages"
+      },
+      "ai": {
+        "toggle": "Use LLM with schema",
+        "toggleHint": "Falls back to AI extraction with Claude or GPT when the HTML shifts",
+        "schemaTitle": "Pydantic-style schema",
+        "previewTitle": "AI extraction preview",
+        "previewSubtitle": "Structured JSON returned by the model",
+        "modelLabel": "Model"
+      }
+    },
+    "schedule": {
+      "title": "Scheduler",
+      "subtitle": "Decide when the scraper runs",
+      "modeLabel": "Mode",
+      "modes": {
+        "single": "One-off",
+        "recurring": "Recurring",
+        "onEvent": "On event"
+      },
+      "cronLabel": "Cron expression",
+      "cronHint": "e.g. 0 */2 * * * · every 2 hours",
+      "nextRunsTitle": "Next 5 runs",
+      "triggers": {
+        "title": "Change-based triggers",
+        "subtitle": "Fire actions when the extracted data changes",
+        "priceChange": "Price change",
+        "stockChange": "Stock change",
+        "newItem": "New item detected",
+        "removed": "Item removed"
+      },
+      "concurrencyLabel": "Max concurrency",
+      "retriesLabel": "Retries"
+    },
+    "proxies": {
+      "title": "Proxy management",
+      "subtitle": "Global pool with smart rotation",
+      "rotation": "Auto-rotation",
+      "rotationHint": "Rotate IP every N requests or after a 403 / 429",
+      "types": {
+        "datacenter": "Datacenter",
+        "residential": "Residential",
+        "mobile": "Mobile"
+      },
+      "table": {
+        "country": "Country",
+        "type": "Type",
+        "latency": "Latency",
+        "status": "Status",
+        "successRate": "Success",
+        "lastUsed": "Last used"
+      },
+      "status": {
+        "healthy": "Healthy",
+        "degraded": "Degraded",
+        "down": "Down"
+      },
+      "costLabel": "Estimated monthly cost"
+    },
+    "antibot": {
+      "title": "Anti-bot evasion",
+      "subtitle": "Stay under the detection radar",
+      "options": {
+        "fingerprinting": "Fingerprint randomization",
+        "fingerprintingHint": "Randomize canvas, WebGL, fonts, and plugins per session",
+        "stealth": "Stealth plugin",
+        "stealthHint": "Hide navigator.webdriver and CDP signals",
+        "humanLike": "Human-like behavior",
+        "humanLikeHint": "Simulate mouse movement, scroll speed, and natural delays",
+        "tlsFingerprint": "TLS / JA3 spoofing",
+        "tlsHint": "Mimic a real Chrome TLS fingerprint"
+      },
+      "captchaTitle": "Captcha solver",
+      "captchaHint": "Service for reCAPTCHA, hCaptcha, and Cloudflare Turnstile",
+      "captchaProvider": "Provider",
+      "providers": {
+        "twoCaptcha": "2Captcha",
+        "antiCaptcha": "Anti-Captcha",
+        "capsolver": "CapSolver",
+        "none": "None"
+      },
+      "userAgentLabel": "User-agent pool"
+    },
+    "outputs": {
+      "title": "Outputs",
+      "subtitle": "Ship extracted data to multiple destinations",
+      "channels": {
+        "webhook": "Webhook",
+        "s3": "Amazon S3",
+        "db": "Database",
+        "sheets": "Google Sheets",
+        "airtable": "Airtable"
+      },
+      "configWebhook": "Webhook URL",
+      "configS3Bucket": "S3 bucket",
+      "configS3Region": "Region",
+      "configDbUrl": "Connection string",
+      "configSheetsId": "Spreadsheet ID",
+      "configAirtableBase": "Base ID",
+      "enabled": "Enabled",
+      "format": "Format",
+      "formats": {
+        "json": "JSON",
+        "csv": "CSV",
+        "parquet": "Parquet",
+        "ndjson": "NDJSON"
+      }
+    },
+    "diff": {
+      "title": "Diff detection",
+      "subtitle": "Changes between the last run and this one",
+      "previous": "Previous run",
+      "current": "Current run",
+      "summary": "Summary",
+      "added": "Added",
+      "removed": "Removed",
+      "modified": "Modified",
+      "field": "Field",
+      "noChanges": "No changes detected"
+    },
+    "monitoring": {
+      "title": "Monitoring and logs",
+      "subtitle": "Recent runs with AI auto-fix",
+      "autoFixTitle": "AI auto-fix is on",
+      "autoFixHint": "When the DOM shifts, the LLM regenerates selectors automatically",
+      "table": {
+        "scraper": "Scraper",
+        "status": "Status",
+        "duration": "Duration",
+        "items": "Items",
+        "errors": "Errors",
+        "startedAt": "Started"
+      },
+      "logsTitle": "Real-time logs",
+      "notification": "DOM changed on target.com · LLM auto-fix regenerated 3 selectors in 1.8s"
+    },
+    "cluster": {
+      "title": "Playwright cluster on K8s",
+      "subtitle": "Autoscaling pool of headless browser workers",
+      "workersTitle": "Active workers",
+      "loadLabel": "Load",
+      "nodeLabel": "Node",
+      "browserLabel": "Browser",
+      "browsers": {
+        "chromium": "Chromium",
+        "firefox": "Firefox",
+        "webkit": "WebKit"
+      },
+      "autoscale": "HPA autoscaling",
+      "autoscaleHint": "Min 3, max 32 pods based on the job queue"
+    },
+    "compliance": {
+      "title": "GDPR and ethics",
+      "subtitle": "Compliance, retention, and respect for target sites",
+      "robotsTitle": "Honor robots.txt",
+      "robotsHint": "Respect Disallow and Crawl-delay directives",
+      "rateLimitTitle": "Respectful rate limiting",
+      "rateLimitHint": "Default cap of 1 request per second per domain",
+      "dsrTitle": "DSR handling",
+      "dsrHint": "Endpoints for deletion, portability, and rectification",
+      "retentionTitle": "Data retention",
+      "retentionLabel": "Days",
+      "piiTitle": "PII detection",
+      "piiHint": "Auto-hash emails, phone numbers, and addresses",
+      "auditTitle": "Immutable audit log"
+    },
+    "logs": {
+      "starting": "[INFO] Starting run for",
+      "proxy": "[NET] Proxy selected",
+      "request": "[NET] GET",
+      "parse": "[PARSE] Extracted",
+      "captcha": "[BOT] Captcha detected · solving with",
+      "retry": "[WARN] Retrying after 429",
+      "success": "[OK] Run completed",
+      "error": "[ERR] Selector failed",
+      "autofix": "[AI] Selector regenerated by LLM"
+    }
+  }
+}

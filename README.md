@@ -24,6 +24,7 @@ Cada demo es una aplicación interactiva navegable, con datos simulados realista
 | SaaS Boilerplate Multi-tenant | Platform | Auth SSO + MFA, billing Stripe + Paddle, multi-tenancy configurable, audit logs y observability lista. | [Ver demo](./apps/web/src/app/demo/saas-boilerplate/) |
 | Voice AI / Call Center | Voice AI | IVR conversacional sin menús, STT/TTS sub-300ms, llamadas inbound + outbound y compliance PCI redaction. | [Ver demo](./apps/web/src/app/demo/voice-ai/) |
 | Firma Electrónica | LegalTech | Firma simple, avanzada y cualificada (eIDAS, Ley 527 CO) con audit trail criptográfico y blockchain timestamp. | [Ver demo](./apps/web/src/app/demo/firma-electronica/) |
+| Scraping & Data Extraction | Data | Visual scraper builder con AI extraction, proxy rotation, captcha solving y auto-fix cuando cambia el DOM. | [Ver demo](./apps/web/src/app/demo/scraping/) |
 
 ## 🚀 Stack Tecnológico
 
