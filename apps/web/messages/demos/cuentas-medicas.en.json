@@ -1,0 +1,9 @@
+{
+  "demoMedicalAccounts": {
+    "backToDemos": "Back to Demos",
+    "title": "🏥 Medical Accounts Audit",
+    "subtitle": "Expert AI system for automatic auditing of health invoices",
+    "adminButton": "Administration",
+    "viewProcess": "View Process"
+  }
+}

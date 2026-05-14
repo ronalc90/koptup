@@ -1,0 +1,18 @@
+{
+  "demoExpertSystem": {
+    "back": "Back to Medical Accounts",
+    "title": "Expert Audit System",
+    "subtitle": "Intelligent medical claims processing with AI",
+    "systemActive": "● System Active",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "dashboardDesc": "Statistics and metrics",
+      "search": "Semantic Search",
+      "searchDesc": "Find CUPS with AI",
+      "config": "Configuration",
+      "configDesc": "Rules engine",
+      "docs": "Documentation",
+      "docsDesc": "Guides and API"
+    }
+  }
+}

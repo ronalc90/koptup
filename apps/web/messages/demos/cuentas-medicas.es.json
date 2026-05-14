@@ -1,0 +1,9 @@
+{
+  "demoMedicalAccounts": {
+    "backToDemos": "Volver a Demos",
+    "title": "🏥 Auditoría de Cuentas Médicas",
+    "subtitle": "Sistema experto con IA para auditoría automática de facturas de salud",
+    "adminButton": "Administración",
+    "viewProcess": "Ver Proceso"
+  }
+}
