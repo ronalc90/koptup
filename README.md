@@ -23,6 +23,7 @@ Cada demo es una aplicación interactiva navegable, con datos simulados realista
 | Automatización Workflows | AI Ops | Plataforma estilo n8n / Zapier con 500+ integraciones, AI nodes nativos y self-hosted opcional. | [Ver demo](./apps/web/src/app/demo/automatizacion/) |
 | SaaS Boilerplate Multi-tenant | Platform | Auth SSO + MFA, billing Stripe + Paddle, multi-tenancy configurable, audit logs y observability lista. | [Ver demo](./apps/web/src/app/demo/saas-boilerplate/) |
 | Voice AI / Call Center | Voice AI | IVR conversacional sin menús, STT/TTS sub-300ms, llamadas inbound + outbound y compliance PCI redaction. | [Ver demo](./apps/web/src/app/demo/voice-ai/) |
+| Firma Electrónica | LegalTech | Firma simple, avanzada y cualificada (eIDAS, Ley 527 CO) con audit trail criptográfico y blockchain timestamp. | [Ver demo](./apps/web/src/app/demo/firma-electronica/) |
 
 ## 🚀 Stack Tecnológico
 
