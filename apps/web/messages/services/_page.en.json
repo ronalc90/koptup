@@ -1,0 +1,78 @@
+{
+  "servicesCatalog": {
+    "title": "Services and plans",
+    "subtitle": "Turnkey solutions with prices in Colombian pesos.",
+    "search": "Search service",
+    "filterByCategory": "Filter by category",
+    "categories": {
+      "all": "All",
+      "sales": "Sales",
+      "finance": "Finance",
+      "operations": "Operations",
+      "productivity": "Productivity",
+      "aiPlatform": "AI Platform",
+      "security": "Security",
+      "healthcare": "HealthTech",
+      "education": "Education",
+      "commerce": "Commerce",
+      "support": "Support",
+      "devTools": "DevTools",
+      "voice": "Voice AI",
+      "data": "Data",
+      "engagement": "Engagement"
+    },
+    "card": {
+      "viewDetails": "View plans",
+      "viewDemo": "Try demo",
+      "fromPrice": "From",
+      "perMonth": "/mo"
+    },
+    "tier": {
+      "inicial": "Starter",
+      "profesional": "Professional",
+      "enterprise": "Enterprise",
+      "recommended": "Recommended"
+    },
+    "setup": {
+      "label": "Initial investment (one-time)",
+      "labelShort": "Setup",
+      "includes": "What setup includes",
+      "deliveryTime": "Delivery time",
+      "weeks": "weeks"
+    },
+    "maintenance": {
+      "label": "Monthly maintenance",
+      "labelShort": "Monthly",
+      "includes": "What maintenance includes",
+      "noticeBody": "Maintenance is independent of setup and billed monthly (or annually with a discount)."
+    },
+    "cycle": {
+      "title": "Choose your billing cycle",
+      "monthly": "Monthly",
+      "monthlyBadge": "No commitment",
+      "semestral": "Semi-annual",
+      "semestralBadge": "Save 10%",
+      "annual": "Annual",
+      "annualBadge": "Save 20%",
+      "effectiveMonthly": "Equivalent to {price}/mo",
+      "totalUpfront": "Single payment of {price}",
+      "savings": "You save {price}"
+    },
+    "totalCost": {
+      "year1": "Total cost year 1",
+      "year2plus": "From year 2 onwards",
+      "explanation": "Year 1 includes setup. Maintenance is billed from month 1."
+    },
+    "modal": {
+      "title": "Plans and pricing",
+      "close": "Close",
+      "quote": "Quote this plan",
+      "soporte": "Support",
+      "idealPara": "Ideal for"
+    },
+    "noResults": "We did not find services matching your search.",
+    "ctaTitle": "Not sure which plan to pick?",
+    "ctaBody": "Talk to us and we will design the right scope for your company together.",
+    "ctaButton": "Talk to an expert"
+  }
+}

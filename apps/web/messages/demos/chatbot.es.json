@@ -1,0 +1,560 @@
+{
+  "demoChatbot": {
+    "pageTitle": "Enterprise RAG Chatbot",
+    "pageSubtitle": "Plataforma RAG completa con orquestación de agentes, hybrid retrieval, observabilidad y seguridad enterprise",
+    "topBar": {
+      "tenant": "Tenant",
+      "model": "Modelo",
+      "language": "Idioma",
+      "runSample": "Correr query de ejemplo",
+      "newSession": "Nueva sesión",
+      "online": "Online"
+    },
+    "sidebar": {
+      "title": "Capas de plataforma",
+      "subtitle": "Hacé click en cualquier capa para ver el detalle",
+      "search": "Buscar capacidad..."
+    },
+    "layers": {
+      "ingestion": {
+        "title": "Ingesta y procesamiento",
+        "summary": "Pipeline multi-fuente con OCR, parsing estructurado, dedupe y versionado.",
+        "items": [
+          "Conectores: PDF, Office, HTML, email, Slack, Notion, Confluence, GitHub, Jira",
+          "Bases de datos: Postgres, MySQL, Snowflake, BigQuery, MongoDB",
+          "Audio y video con transcripción automática (Whisper-class)",
+          "OCR avanzado con LayoutLM y detección de tablas",
+          "Extracción de entidades, deduplicación SHA-256, versionado documental",
+          "Pipeline ETL distribuido con metadata enrichment automático"
+        ]
+      },
+      "chunking": {
+        "title": "Chunking avanzado",
+        "summary": "Estrategias context-aware con jerarquías padre-hijo y ventanas deslizantes.",
+        "items": [
+          "Semantic chunking guiado por embeddings y boundaries gramaticales",
+          "Parent-child chunks para hierarchical retrieval",
+          "Sliding windows con solapamiento adaptativo",
+          "Adaptive chunk sizing según densidad informacional",
+          "Code-aware y table-aware chunking",
+          "Multi-modal chunking (texto, imágenes, audio sincronizado)"
+        ]
+      },
+      "retrieval": {
+        "title": "Retrieval",
+        "summary": "Hybrid search dense + sparse + BM25, multi-index, multi-hop y federated.",
+        "items": [
+          "Dense vectors (1536-d) + sparse (SPLADE) + BM25 + keyword",
+          "Multi-index retrieval con metadata filtering",
+          "Temporal y graph retrieval",
+          "Semantic routing entre tenants y dominios",
+          "Federated retrieval cross-region",
+          "Multi-hop y recursive retrieval con cross-document reasoning"
+        ]
+      },
+      "query": {
+        "title": "Query understanding",
+        "summary": "Reescritura, HyDE, expansión y descomposición multi-query.",
+        "items": [
+          "Query rewriting con LLM y plantillas dominio-específicas",
+          "HyDE (Hypothetical Document Embeddings)",
+          "Query expansion y multi-query generation",
+          "Intent classification y decomposition",
+          "Semantic normalization y temporal understanding",
+          "Domain-aware parsing por tenant"
+        ]
+      },
+      "ranking": {
+        "title": "Ranking",
+        "summary": "Cross-encoder reranking multi-stage con diversidad y frescura.",
+        "items": [
+          "Cross-encoder reranking (bge-reranker-large)",
+          "Multi-stage reranking (recall → precision)",
+          "Diversity reranking (MMR)",
+          "Freshness reranking con decay temporal",
+          "Citation-aware reranking",
+          "Personalization reranking por usuario/rol"
+        ]
+      },
+      "context": {
+        "title": "Context engineering",
+        "summary": "Compresión, dedupe, citation alignment y ventanas dinámicas.",
+        "items": [
+          "Context compression con LLMLingua",
+          "Noise removal y dedupe semántico",
+          "Token optimization y context prioritization",
+          "Citation alignment chunk → token",
+          "Structured prompt assembly con Jinja",
+          "Dynamic context windows y memory-aware injection"
+        ]
+      },
+      "agents": {
+        "title": "Agentes",
+        "summary": "Agentic RAG con planner/executor, reflexión y workflow graphs.",
+        "items": [
+          "Planner/executor con tool calling",
+          "Multi-agent orchestration (ReAct, Reflexion)",
+          "Reflection loops y self-correction",
+          "Retry strategies con exponential backoff",
+          "Workflow graphs (LangGraph-style)",
+          "Autonomous task decomposition"
+        ]
+      },
+      "tools": {
+        "title": "Tools integradas",
+        "summary": "SQL, web, código, knowledge graph, browser automation.",
+        "items": [
+          "SQL querying contra warehouses",
+          "Web search y browser automation",
+          "Code execution sandbox (Python, Node)",
+          "API orchestration y SaaS integrations",
+          "Knowledge graph queries (Cypher, SPARQL)",
+          "File manipulation y data analysis"
+        ]
+      },
+      "memory": {
+        "title": "Memoria",
+        "summary": "Conversational, long-term, episódica y organizacional.",
+        "items": [
+          "Conversational memory por sesión",
+          "Long-term semantic memory por usuario",
+          "Episodic memory de interacciones pasadas",
+          "User personalization y preferencias",
+          "Organizational memory compartida por tenant",
+          "Editable memory con audit trail"
+        ]
+      },
+      "multimodal": {
+        "title": "Multi-modalidad",
+        "summary": "Texto, imágenes, audio, video y diagramas.",
+        "items": [
+          "Text embeddings (text-embedding-3-large)",
+          "Image embeddings (CLIP) con OCR fallback",
+          "Audio embeddings y transcripción",
+          "Video frame sampling + transcripción",
+          "Vision-language retrieval cross-modal",
+          "Diagramas con extracción de relaciones"
+        ]
+      },
+      "models": {
+        "title": "Modelos",
+        "summary": "Multi-LLM routing, embeddings ensemble, rerankers fine-tuned.",
+        "items": [
+          "Claude Sonnet, Opus, Haiku",
+          "GPT-4o, GPT-4o-mini, o1",
+          "Llama 3.1 70B, Mistral Large self-hosted",
+          "Embedding ensembles con domain adapters",
+          "Fine-tuned rerankers por vertical",
+          "Quantized inference (AWQ, GPTQ)"
+        ]
+      },
+      "infra": {
+        "title": "Infraestructura",
+        "summary": "Distribuida, GPU clusters, async, streaming, multi-region HA.",
+        "items": [
+          "Arquitectura distribuida sobre Kubernetes",
+          "GPU inference clusters (A100, H100)",
+          "Horizontal scaling y async pipelines",
+          "Streaming responses sobre SSE/WebSocket",
+          "Smart caching y load balancing",
+          "Sharded vector stores multi-region con failover"
+        ]
+      },
+      "security": {
+        "title": "Seguridad enterprise",
+        "summary": "RBAC, ACL, tenant isolation, PII masking, anti-injection.",
+        "items": [
+          "RBAC y ACL filtering en retrieval",
+          "Tenant isolation con Row-Level Security",
+          "Encryption at rest (AES-256) y in transit (TLS 1.3)",
+          "Secrets management (Vault, AWS KMS)",
+          "PII masking automático y audit logs inmutables",
+          "Prompt injection y jailbreak defense"
+        ]
+      },
+      "observability": {
+        "title": "Observabilidad",
+        "summary": "Tracing, token y latency analytics, hallucination tracking.",
+        "items": [
+          "Full request tracing (OpenTelemetry)",
+          "Retrieval tracing con chunk inspection",
+          "Token, latency y cost analytics por tenant",
+          "Hallucination tracking y groundedness scores",
+          "User behavior analytics",
+          "Failure diagnostics con replay"
+        ]
+      },
+      "eval": {
+        "title": "Evaluación",
+        "summary": "Precision/recall, faithfulness, citation accuracy, benchmarks.",
+        "items": [
+          "Retrieval precision/recall@k",
+          "Faithfulness y groundedness automáticos",
+          "Citation accuracy y hallucination detection",
+          "Response quality (LLM-as-judge)",
+          "Benchmark suites: RAGAS, TruLens",
+          "Human-in-the-loop y regression testing"
+        ]
+      },
+      "optimization": {
+        "title": "Optimización avanzada",
+        "summary": "Semantic caching, adaptive retrieval, speculative decoding.",
+        "items": [
+          "Semantic cache con embedding similarity",
+          "Adaptive retrieval y dynamic top-k",
+          "Speculative decoding y prompt optimization",
+          "Context pruning agresivo",
+          "Embedding optimization (PQ, OPQ)",
+          "Latency-aware y cost-aware routing"
+        ]
+      },
+      "knowledge": {
+        "title": "Conocimiento avanzado",
+        "summary": "Knowledge graphs, ontologías y graph neural retrieval.",
+        "items": [
+          "Knowledge graphs construidos automáticamente",
+          "Entity linking contra Wikidata y catálogos internos",
+          "Ontologías por dominio",
+          "Relationship reasoning multi-hop",
+          "Semantic graphs versionados",
+          "Graph neural retrieval (GNN re-ranking)"
+        ]
+      },
+      "production": {
+        "title": "Producción real",
+        "summary": "CI/CD, canary, A/B, feature flags, auto rollback.",
+        "items": [
+          "CI/CD con pipelines de evaluación bloqueantes",
+          "Canary deployments y A/B testing",
+          "Feature flags por tenant",
+          "Monitoring con SLOs y alerting",
+          "Auto rollback ante regresión de eval",
+          "Disaster recovery y SLA management"
+        ]
+      },
+      "nextLevel": {
+        "title": "Capacidades next-level",
+        "summary": "Self-improving retrieval, autonomous indexing, research agents.",
+        "items": [
+          "Self-improving retrieval con feedback loops",
+          "Autonomous indexing y continuous learning",
+          "Synthetic data generation para eval",
+          "Automatic eval generation",
+          "Multi-step reasoning graphs",
+          "Research-agent behavior y self-healing pipelines",
+          "Long-context orchestration y enterprise knowledge mesh"
+        ]
+      }
+    },
+    "pipeline": {
+      "title": "Pipeline en vivo",
+      "subtitle": "Cada query atraviesa estos pasos. Tiempos y tokens reales del run.",
+      "totalLatency": "Latencia total",
+      "totalTokens": "Tokens totales",
+      "estCost": "Costo estimado",
+      "idle": "Esperando una nueva query...",
+      "steps": {
+        "rewrite": "Query rewriting + HyDE",
+        "retrieve": "Hybrid retrieval (dense + sparse + BM25)",
+        "rerank": "Cross-encoder reranking",
+        "context": "Context engineering",
+        "llm": "LLM generation",
+        "cite": "Citation alignment",
+        "respond": "Respuesta final"
+      }
+    },
+    "chat": {
+      "title": "Conversación",
+      "subtitle": "Streaming token-by-token con citas inline clickeables",
+      "placeholder": "Hacé una pregunta sobre tus documentos...",
+      "send": "Enviar",
+      "you": "Vos",
+      "assistant": "Koptup RAG",
+      "thinking": "Pensando...",
+      "confidence": "Confianza",
+      "sources": "Fuentes",
+      "viewSource": "Ver fuente",
+      "viewPipeline": "Ver pipeline",
+      "regenerate": "Regenerar",
+      "feedbackUp": "Buena respuesta",
+      "feedbackDown": "Respuesta a mejorar",
+      "scenarios": "Escenarios mock",
+      "scenarioLabels": {
+        "docs": "RAG sobre documentos",
+        "multiHop": "Multi-hop reasoning",
+        "code": "Sobre código",
+        "sql": "Pregunta sobre SQL",
+        "graph": "Knowledge graph"
+      }
+    },
+    "scenarios": {
+      "docs": {
+        "question": "¿Cuál es nuestra política de retención de datos para clientes enterprise?",
+        "answer": "Según la política vigente, los clientes Enterprise tienen retención de **7 años** para datos transaccionales [1] y **3 años** para logs de aplicación [2]. La purga se hace automáticamente con jobs nocturnos y queda registrada en el audit trail [1]. Los datos sensibles (PII) se anonimizan a los 90 días si el usuario solicita borrado [2]."
+      },
+      "multiHop": {
+        "question": "¿Qué tickets de soporte de la semana pasada se relacionan con el incidente del payments-svc del lunes?",
+        "answer": "Encontré **4 tickets** correlacionados con el incidente #INC-2049 del lunes en payments-svc [1]: dos reportan timeouts en `/charge` [2], uno reporta refunds duplicados [3] y el cuarto reporta latencias en el dashboard de finanzas [1]. La causa raíz común es el retry loop sin idempotency-key descrito en el RCA [3]."
+      },
+      "code": {
+        "question": "Mostrame cómo implementamos rotación de refresh tokens.",
+        "answer": "La rotación vive en `RefreshService.rotate()` [1]. Verifica la firma JWT, consulta una denylist en Redis, agrega el `jti` consumido y emite un nuevo par access/refresh [2]. El controller usa `validate(RefreshDto)` y maneja `RevokedTokenError` con un 401 [1]."
+      },
+      "sql": {
+        "question": "¿Cuánto facturamos en LATAM el último trimestre?",
+        "answer": "Ejecuté la query contra el warehouse de Snowflake [1]: **USD 4.82M** en Q4 LATAM, +18% YoY. El detalle por país está en el adjunto [2]. La fuente es la vista `analytics.fct_revenue_country` materializada cada hora [1]."
+      },
+      "graph": {
+        "question": "¿Qué equipos dependen del servicio auth-core?",
+        "answer": "El knowledge graph muestra **6 equipos** consumiendo `auth-core` [1]: web-platform, mobile, payments-svc, billing, helpdesk y partners-api [2]. payments-svc es el de mayor tráfico (p95 12k req/min) [1]. Hay 2 deprecations pendientes en mobile a Q1 [2]."
+      }
+    },
+    "sourcePanel": {
+      "title": "Fragmento original",
+      "subtitle": "El chunk recuperado y rerankeado que sustenta la cita",
+      "source": "Fuente",
+      "chunkScore": "Score de chunk",
+      "rerankScore": "Score de rerank",
+      "page": "Página",
+      "updated": "Actualizado",
+      "close": "Cerrar",
+      "openOriginal": "Abrir documento original"
+    },
+    "stats": {
+      "tokens": "Tokens",
+      "latency": "Latencia",
+      "cost": "Costo",
+      "cacheHit": "Cache hit",
+      "drift": "Drift",
+      "faithfulness": "Faithfulness",
+      "hallucination": "Hallucination",
+      "title": "Telemetría en vivo"
+    },
+    "sources": {
+      "notion": "Notion · Engineering",
+      "slack": "Slack · #engineering",
+      "confluence": "Confluence · Product Wiki",
+      "github": "GitHub · koptup/api-core",
+      "snowflake": "Snowflake · analytics.fct_revenue_country",
+      "graph": "Knowledge graph · services"
+    },
+    "tenants": {
+      "acme": "Acme Corp (Enterprise)",
+      "globex": "Globex Industries",
+      "umbrella": "Umbrella Group"
+    },
+    "ingestionStats": {
+      "title": "Fuentes conectadas",
+      "docs": "documentos",
+      "messages": "mensajes",
+      "pages": "páginas",
+      "lastSync": "Última sincro"
+    },
+    "common": {
+      "items": "elementos",
+      "active": "activo",
+      "passive": "pasivo",
+      "ms": "ms",
+      "tokens": "tokens",
+      "back": "Volver",
+      "viewAll": "Ver todo"
+    },
+    "modes": {
+      "playground": "Playground RAG",
+      "playgroundHint": "Showcase enterprise: 19 capas, pipeline en vivo, citas",
+      "builder": "Builder & Embed",
+      "builderHint": "Personalizá el widget, generá el snippet y embebé en tu sitio"
+    },
+    "builder": {
+      "title": "Builder de chatbot embebible",
+      "subtitle": "Personalizá el look, el comportamiento y exportá el snippet de embed",
+      "configTitle": "Configuración del widget",
+      "sections": {
+        "identity": "Identidad",
+        "appearance": "Apariencia",
+        "behavior": "Comportamiento",
+        "knowledge": "Base de conocimiento"
+      },
+      "fields": {
+        "botName": "Nombre del bot",
+        "botNamePh": "Ej: Koptup Assistant",
+        "welcome": "Mensaje de bienvenida",
+        "welcomePh": "Ej: ¡Hola! ¿En qué te puedo ayudar?",
+        "placeholder": "Placeholder del input",
+        "placeholderPh": "Ej: Escribí tu pregunta...",
+        "systemPrompt": "System prompt / instrucciones",
+        "systemPromptPh": "Sos un asistente experto en... Respondé siempre en español, con tono profesional...",
+        "primaryColor": "Color primario",
+        "accentColor": "Color de acento",
+        "position": "Posición del widget",
+        "positionBR": "Inferior derecha",
+        "positionBL": "Inferior izquierda",
+        "positionTR": "Superior derecha",
+        "positionTL": "Superior izquierda",
+        "avatar": "Avatar del bot",
+        "tone": "Tono de voz",
+        "tones": {
+          "professional": "Profesional",
+          "friendly": "Amigable",
+          "technical": "Técnico",
+          "casual": "Casual"
+        },
+        "languages": "Idiomas habilitados",
+        "shape": "Forma del botón",
+        "shapeRound": "Redonda",
+        "shapeSquare": "Cuadrada",
+        "openOnLoad": "Abrir al cargar",
+        "showBranding": "Mostrar branding 'Powered by Koptup'"
+      },
+      "knowledge": {
+        "title": "Documentos cargados",
+        "drop": "Arrastrá archivos o hacé click para seleccionar",
+        "hint": "PDF, DOCX, TXT, MD, CSV · máx. 10MB por archivo",
+        "addMock": "Agregar documento de ejemplo",
+        "empty": "Aún no cargaste documentos. Subí PDFs, docs o notas para que el bot los use como contexto.",
+        "remove": "Quitar",
+        "indexed": "Indexado",
+        "chunks": "chunks",
+        "uploading": "Subiendo archivos..."
+      },
+      "preview": {
+        "title": "Preview en vivo",
+        "subtitle": "Así se va a ver el widget en tu sitio. Hacé click en el botón para abrirlo.",
+        "subtitleReal": "Iframe real apuntando a /embed/chatbot/{botId}",
+        "saveHint": "Guardá el bot para ver el preview real con iframe.",
+        "notSaved": "Sin guardar · simulación",
+        "bubbleHint": "Click para abrir",
+        "send": "Enviar",
+        "sampleUser": "¿Tienen plan empresa?",
+        "sampleBot": "Sí, contamos con planes Pro, Business y Enterprise con SLA, SSO y soporte prioritario. ¿Querés que te muestre los precios?",
+        "poweredBy": "Powered by Koptup"
+      },
+      "embed": {
+        "title": "Snippet de embed",
+        "subtitle": "Pegá este snippet antes del cierre de </body> en tu sitio",
+        "tabs": {
+          "script": "Script tag",
+          "iframe": "iframe",
+          "react": "React",
+          "webhook": "Webhook"
+        },
+        "copy": "Copiar",
+        "copied": "¡Copiado!",
+        "botId": "Bot ID",
+        "regenerate": "Regenerar ID",
+        "webhookTitle": "URL del webhook",
+        "webhookHint": "Configurá esta URL en tu backend para recibir cada conversación",
+        "saveFirst": "Guardá el bot para activar el embed"
+      },
+      "actions": {
+        "save": "Guardar bot",
+        "saving": "Guardando...",
+        "share": "Compartir micrositio"
+      }
+    },
+    "ux": {
+      "device": {
+        "label": "Vista previa",
+        "desktop": "Desktop",
+        "mobile": "Móvil",
+        "switchToDesktop": "Ver en escritorio",
+        "switchToMobile": "Ver en móvil",
+        "mobileFrameLabel": "Cómo se ve en un teléfono"
+      },
+      "tooltips": {
+        "tenant": "Tenant activo: aísla datos, permisos y métricas por organización (multi-tenant con RLS).",
+        "model": "Modelo LLM que responde. Se enruta por costo/latencia/contexto desde el orquestador.",
+        "language": "Idioma de la interfaz. Aplica al locale de next-intl al recargar.",
+        "runSample": "Ejecuta una query mock pre-armada para ver el pipeline en vivo.",
+        "online": "Sistema operativo: cluster GPU activo y vector store accesible.",
+        "toggleSidebar": "Mostrar/ocultar el catálogo de capas de plataforma.",
+        "togglePipeline": "Mostrar/ocultar el panel del pipeline en vivo.",
+        "toggleSources": "Abrir el panel de fuentes conectadas.",
+        "toggleStats": "Abrir/cerrar la telemetría agregada.",
+        "newSession": "Reinicia la conversación sin perder configuración.",
+        "settings": "Configuración avanzada del playground.",
+        "settingsHint": "Para personalizar nombre, colores, prompt y embed, cambiá a Builder Mode.",
+        "citation": "Fragmento citado por el modelo. Click para ver el chunk original con score.",
+        "confidence": "Confianza calibrada del modelo en la respuesta basada en groundedness y citations.",
+        "scenarioPicker": "Queries pre-armadas que cubren RAG sobre docs, multi-hop, código, SQL y graph.",
+        "feedbackUp": "Marcar esta respuesta como buena (alimenta el reranker y eval).",
+        "feedbackDown": "Marcar esta respuesta como mejorable (genera ticket en eval suite).",
+        "regenerate": "Volver a generar la respuesta con el mismo contexto.",
+        "send": "Enviar la pregunta. Enter para mandar, Shift+Enter para salto de línea."
+      },
+      "sectionInfo": {
+        "sidebar": "Catálogo de las 19 capas de la plataforma RAG. Click en una para ver capacidades.",
+        "pipeline": "Cada query atraviesa estos pasos: rewrite → retrieve → rerank → context → LLM → cite → respond.",
+        "stats": "Métricas agregadas de la sesión. Algunas (cache, drift, faithfulness) se simulan en vivo.",
+        "sources": "Conectores activos al vector store. Sincronizados cron + webhook + CDC."
+      },
+      "sidebarMore": {
+        "showMore": "+{count} más",
+        "hide": "Ocultar",
+        "advanced": "Avanzadas"
+      },
+      "layers": {
+        "ingestion": "Pipeline multi-fuente que normaliza PDFs, DBs, audio y video al vector store.",
+        "chunking": "Cómo se parten los documentos para que los chunks sean óptimos para retrieval.",
+        "retrieval": "Cómo se encuentran los chunks más relevantes (dense + sparse + BM25).",
+        "query": "Cómo se entiende la pregunta del usuario: rewrite, HyDE y descomposición.",
+        "ranking": "Reordenamiento cross-encoder para precisión, diversidad y frescura.",
+        "context": "Compresión, dedup y armado del prompt final con citations.",
+        "agents": "Planner/executor, ReAct, Reflexion y workflow graphs.",
+        "tools": "Herramientas externas: SQL, web, code sandbox, knowledge graph.",
+        "memory": "Memoria conversacional, semántica de largo plazo y organizacional.",
+        "multimodal": "Texto, imágenes, audio, video y diagramas en un solo espacio embebido.",
+        "models": "Multi-LLM routing: cada query va al mejor modelo por costo/latencia.",
+        "infra": "Infra distribuida: Kubernetes, GPU clusters, streaming, multi-región.",
+        "security": "RBAC, ACL, tenant isolation, encryption, audit logs, anti-injection.",
+        "observability": "Tracing, métricas, hallucination tracking y replay de fallos.",
+        "eval": "Evaluación automática: faithfulness, citation accuracy y benchmarks.",
+        "optimization": "Caching semántico, retrieval adaptativo y speculative decoding.",
+        "knowledge": "Knowledge graphs, ontologías y graph neural retrieval.",
+        "production": "CI/CD, canary, A/B, feature flags y auto rollback.",
+        "nextLevel": "Self-improving, autonomous indexing y research agents."
+      },
+      "stats": {
+        "tokens": "Total de tokens consumidos en la sesión (input + output).",
+        "latency": "Latencia del último run end-to-end (rewrite → respond).",
+        "cost": "Costo agregado estimado en USD para la sesión actual.",
+        "cacheHit": "Porcentaje de queries servidas por el semantic cache (sin LLM call).",
+        "drift": "Desvío del distribución de embeddings vs baseline. >2% requiere atención.",
+        "faithfulness": "Cuán fielmente la respuesta refleja los chunks recuperados. Ideal ≥90%.",
+        "hallucination": "Detección automática de afirmaciones no fundamentadas. Ideal <1%."
+      },
+      "pipelineMini": {
+        "title": "Pipeline",
+        "idle": "Idle",
+        "running": "Corriendo",
+        "done": "Listo",
+        "openFull": "Ver pipeline completo"
+      },
+      "empty": {
+        "title": "Probá una query",
+        "subtitle": "Elegí un escenario mock o escribí tu propia pregunta abajo.",
+        "tryThis": "Probá esto"
+      },
+      "onboarding": {
+        "title": "Bienvenido al Playground RAG",
+        "skip": "Saltar tour",
+        "next": "Siguiente",
+        "done": "Listo",
+        "step1Title": "Esto es el chat",
+        "step1Body": "Hacé una pregunta o corré un escenario. Las respuestas vienen con citas clickeables.",
+        "step2Title": "19 capas enterprise",
+        "step2Body": "Cada ítem representa una capa de la plataforma. Click para explorar capacidades.",
+        "step3Title": "Pipeline en vivo",
+        "step3Body": "Mirá cada paso (rewrite, retrieve, rerank, LLM...) con tiempos y tokens reales.",
+        "step4Title": "Builder Mode",
+        "step4Body": "Personalizá colores, prompt y exportá el snippet para embeber en tu sitio."
+      },
+      "advancedConfig": {
+        "title": "Configuración avanzada",
+        "body": "Para personalizar nombre, colores, prompt del sistema y generar un snippet de embed listo para producción, cambiá al modo Builder.",
+        "cta": "Ir a Builder Mode",
+        "close": "Cerrar"
+      }
+    }
+  }
+}

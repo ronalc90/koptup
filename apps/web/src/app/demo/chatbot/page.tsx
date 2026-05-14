@@ -1,1025 +1,717 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
-import Image from 'next/image';
+/**
+ * Enterprise RAG Chatbot — flagship demo.
+ *
+ * Orquesta:
+ *  - Sidebar de 19 capas de plataforma (primarias + collapse "más")
+ *  - Chat central con streaming token-by-token y citas inline
+ *  - PipelinePanel en vivo a la derecha (collapse on demand)
+ *  - SourcePanel para "source highlighting" del chunk citado
+ *  - CapabilityPanel modal con bullets por capa
+ *  - StatsWidget flotante colapsable con telemetría agregada
+ *  - TopBar con tenant / model / locale / device toggle / run sample
+ *  - Onboarding tour de 4 pasos (dismiss persistido en localStorage)
+ *
+ * Toda la data es mock (ver components/data.ts). Llamada real opcional via chatWithBot.
+ */
+
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
 import {
-  DocumentArrowUpIcon,
+  BookOpenIcon,
   ChatBubbleLeftRightIcon,
-  PaintBrushIcon,
-  TrashIcon,
-  PaperAirplaneIcon,
   XMarkIcon,
-  CodeBracketIcon,
-  EyeIcon,
-  ArrowTopRightOnSquareIcon,
-  ShieldExclamationIcon,
-  PhotoIcon,
-  DocumentTextIcon,
-  ClipboardDocumentIcon,
-  CheckIcon,
+  ChevronDoubleRightIcon,
+  ChevronDoubleLeftIcon,
+  ArrowRightIcon,
 } from '@heroicons/react/24/outline';
+
+import Sidebar from './components/Sidebar';
+import ChatPanel, { type ChatMessage } from './components/ChatPanel';
+import PipelinePanel from './components/PipelinePanel';
+import CapabilityPanel from './components/CapabilityPanel';
+import SourcePanel from './components/SourcePanel';
+import StatsWidget from './components/StatsWidget';
+import TopBar from './components/TopBar';
+import ModeToggle, { type ChatbotMode } from './components/builder/ModeToggle';
+import BuilderMode from './components/builder/BuilderMode';
+import { chatWithBot } from './components/builder/api';
+import Tooltip from './components/ui/Tooltip';
+import InfoIcon from './components/ui/InfoIcon';
+import DeviceFrame, { type DeviceKind } from './components/ui/DeviceFrame';
 import {
-  FaRegCommentDots,
-  FaComments,
-  FaRocketchat,
-  FaRobot,
-  FaComment,
-  FaFont,
-} from 'react-icons/fa';
-import { useChatbot } from '@/hooks/useChatbot';
+  CONNECTED_SOURCES,
+  SCENARIO_DATA,
+  type LayerKey,
+  type PipelineStepData,
+  type ScenarioKey,
+  type SourceChunk,
+  TENANTS,
+} from './components/data';
 
-type TabType = 'documents' | 'chat' | 'design' | 'typography' | 'restrictions' | 'embed';
+type TenantId = (typeof TENANTS)[number]['id'];
 
-interface ChatConfig {
-  greeting: string;
-  title: string;
-  placeholder: string;
-}
+const STREAM_CHAR_INTERVAL_MS = 18;
+const ONBOARDING_LS_KEY = 'koptup.demo.chatbot.onboarded';
 
-interface DesignConfig {
-  textColor: string;
-  headerColor: string;
-  backgroundColor: string;
-  icon: string;
-  customIconUrl?: string;
-}
+/**
+ * Hook auxiliar: simula la animación step-by-step del pipeline.
+ * Devuelve el índice del step activo (o -1/length para idle/done).
+ */
+function usePipelineRunner(steps: PipelineStepData[], running: boolean): number {
+  const [stepIndex, setStepIndex] = useState<number>(-1);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-interface TypographyConfig {
-  fontFamily: string;
-}
-
-interface RestrictionsConfig {
-  restrictedTopics: string[];
-}
-
-export default function DemoPage() {
-  const tcb = useTranslations('chatbotBuilder');
-
-  const [activeTab, setActiveTab] = useState<TabType>('documents');
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const [chatConfig, setChatConfig] = useState<ChatConfig>({
-    greeting: tcb('defaults.greeting'),
-    title: tcb('defaults.title'),
-    placeholder: tcb('defaults.placeholder'),
-  });
-  const [designConfig, setDesignConfig] = useState<DesignConfig>({
-    textColor: '#1F2937',
-    headerColor: '#4F46E5',
-    backgroundColor: '#FFFFFF',
-    icon: 'FaComments',
-  });
-  const [typographyConfig, setTypographyConfig] = useState<TypographyConfig>({
-    fontFamily: 'Inter',
-  });
-  const [restrictionsConfig, setRestrictionsConfig] = useState<RestrictionsConfig>({
-    restrictedTopics: [],
-  });
-  const [newRestrictedTopic, setNewRestrictedTopic] = useState('');
-  const [previewInput, setPreviewInput] = useState('');
-  const [isChatOpen, setIsChatOpen] = useState(true);
-  const [isUploading, setIsUploading] = useState(false);
-  const [customIconFile, setCustomIconFile] = useState<File | null>(null);
-  const [embedCopied, setEmbedCopied] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const messagesContainerRef = useRef<HTMLDivElement>(null);
-
-  const chatIcons = [
-    { id: 'FaComments', icon: FaComments, label: tcb('design.icons.bubbles') },
-    { id: 'FaRegCommentDots', icon: FaRegCommentDots, label: tcb('design.icons.dots') },
-    { id: 'FaRocketchat', icon: FaRocketchat, label: tcb('design.icons.rocket') },
-    { id: 'FaRobot', icon: FaRobot, label: tcb('design.icons.robot') },
-    { id: 'FaComment', icon: FaComment, label: tcb('design.icons.comment') },
-  ];
-
-  const fontOptions = [
-    { id: 'Inter', label: 'Inter', preview: 'font-sans' },
-    { id: 'Roboto', label: 'Roboto', preview: 'font-sans' },
-    { id: 'Open Sans', label: 'Open Sans', preview: 'font-sans' },
-    { id: 'Lato', label: 'Lato', preview: 'font-sans' },
-    { id: 'Montserrat', label: 'Montserrat', preview: 'font-sans' },
-    { id: 'Poppins', label: 'Poppins', preview: 'font-sans' },
-    { id: 'Raleway', label: 'Raleway', preview: 'font-sans' },
-    { id: 'Playfair Display', label: 'Playfair Display', preview: 'font-serif' },
-    { id: 'Merriweather', label: 'Merriweather', preview: 'font-serif' },
-  ];
-
-  // Memoize chatbot config to prevent unnecessary re-renders and API calls
-  const chatbotConfig = useMemo(() => ({
-    title: chatConfig.title,
-    greeting: chatConfig.greeting,
-    placeholder: chatConfig.placeholder,
-    textColor: designConfig.textColor,
-    headerColor: designConfig.headerColor,
-    backgroundColor: designConfig.backgroundColor,
-    icon: designConfig.icon,
-    fontFamily: typographyConfig.fontFamily,
-    customIconUrl: designConfig.customIconUrl,
-    restrictedTopics: restrictionsConfig.restrictedTopics,
-  }), [
-    chatConfig.title,
-    chatConfig.greeting,
-    chatConfig.placeholder,
-    designConfig.textColor,
-    designConfig.headerColor,
-    designConfig.backgroundColor,
-    designConfig.icon,
-    typographyConfig.fontFamily,
-    designConfig.customIconUrl,
-    restrictionsConfig.restrictedTopics,
-  ]);
-
-  // Initialize chatbot hook with memoized config
-  const {
-    messages,
-    isLoading,
-    error,
-    uploadedDocuments,
-    uploadDocuments,
-    sendMessage,
-    addMessage,
-    clearMessages,
-  } = useChatbot(chatbotConfig);
-
-  // Auto-scroll al último mensaje dentro del contenedor del chat
   useEffect(() => {
-    const container = messagesContainerRef.current;
-    if (container) {
-      container.scrollTop = container.scrollHeight;
+    if (!running || steps.length === 0) return;
+    setStepIndex(0);
+    let i = 0;
+    const tick = () => {
+      i += 1;
+      if (i >= steps.length) {
+        setStepIndex(steps.length);
+        return;
+      }
+      setStepIndex(i);
+      const wait = Math.max(80, Math.min(420, steps[i].durationMs / 3));
+      timeoutRef.current = setTimeout(tick, wait);
+    };
+    const firstWait = Math.max(80, Math.min(420, steps[0].durationMs / 3));
+    timeoutRef.current = setTimeout(tick, firstWait);
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [running, steps]);
+
+  // Reset when steps reference changes and we're not running.
+  useEffect(() => {
+    if (!running) setStepIndex(steps.length > 0 ? steps.length : -1);
+  }, [running, steps]);
+
+  return stepIndex;
+}
+
+/**
+ * Hook auxiliar: anima la escritura char-by-char del último mensaje del assistant.
+ */
+function useStreamingMessage(
+  messageId: string | null,
+  fullText: string | null,
+  onDone: () => void,
+): number {
+  const [chars, setChars] = useState(0);
+  const onDoneRef = useRef(onDone);
+  onDoneRef.current = onDone;
+
+  useEffect(() => {
+    if (!messageId || !fullText) {
+      setChars(0);
+      return;
     }
-  }, [messages, isLoading]);
+    setChars(0);
+    let i = 0;
+    const step = () => {
+      i = Math.min(i + 2, fullText.length);
+      setChars(i);
+      if (i >= fullText.length) {
+        onDoneRef.current();
+        return;
+      }
+      timer = setTimeout(step, STREAM_CHAR_INTERVAL_MS);
+    };
+    let timer = setTimeout(step, 350);
+    return () => clearTimeout(timer);
+  }, [messageId, fullText]);
 
-  // Load Google Fonts dynamically
+  return chars;
+}
+
+export default function ChatbotDemoPage() {
+  const t = useTranslations('demoChatbot');
+
+  // UI state
+  const [mode, setMode] = useState<ChatbotMode>('playground');
+  const [tenant, setTenant] = useState<TenantId>('acme');
+  const [modelId, setModelId] = useState<string>('claude-sonnet-4.7');
+  const [locale, setLocale] = useState<'es' | 'en'>('es');
+  const [activeLayer, setActiveLayer] = useState<LayerKey | null>(null);
+  const [openChunk, setOpenChunk] = useState<SourceChunk | null>(null);
+  const [showPipeline, setShowPipeline] = useState(true);
+  const [showSidebar, setShowSidebar] = useState(true);
+  const [showSources, setShowSources] = useState(false);
+  const [device, setDevice] = useState<DeviceKind>('desktop');
+  const [showSettings, setShowSettings] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState(0);
+
+  // Chat state
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [input, setInput] = useState('');
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [thinkingId, setThinkingId] = useState<string | null>(null);
+
+  // Pipeline state
+  const [pipelineSteps, setPipelineSteps] = useState<PipelineStepData[]>([]);
+  const [pipelineTotals, setPipelineTotals] = useState<{
+    latencyMs: number;
+    tokens: number;
+    cost: number;
+  }>({ latencyMs: 0, tokens: 0, cost: 0 });
+  const [pipelineRunning, setPipelineRunning] = useState(false);
+  const stepIndex = usePipelineRunner(pipelineSteps, pipelineRunning);
+
+  // Telemetría agregada
+  const [aggTokens, setAggTokens] = useState(0);
+  const [aggLatency, setAggLatency] = useState(0);
+  const [aggCost, setAggCost] = useState(0);
+  const [cacheHit, setCacheHit] = useState(64.2);
+  const [drift, setDrift] = useState(0.8);
+  const [faithfulness, setFaithfulness] = useState(94);
+  const [hallucination, setHallucination] = useState(0.6);
+
+  // Drift / faithfulness / hallucination drift cada 4s (visual)
   useEffect(() => {
-    const fonts = fontOptions.map(f => f.id.replace(' ', '+')).join('&family=');
-    const link = document.createElement('link');
-    link.href = `https://fonts.googleapis.com/css2?${fonts.split('&family=').map(f => `family=${f}:wght@400;500;600;700`).join('&')}&display=swap`;
-    link.rel = 'stylesheet';
-    document.head.appendChild(link);
+    const id = setInterval(() => {
+      setCacheHit((v) => Math.max(40, Math.min(95, v + (Math.random() - 0.5) * 4)));
+      setDrift((v) => Math.max(0.1, Math.min(3.5, v + (Math.random() - 0.5) * 0.4)));
+      setFaithfulness((v) => Math.max(80, Math.min(99, v + (Math.random() - 0.5) * 2)));
+      setHallucination((v) => Math.max(0.1, Math.min(3, v + (Math.random() - 0.5) * 0.3)));
+    }, 4000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Animación de streaming
+  const streamingMsg = messages.find((m) => m.id === thinkingId && m.role === 'assistant');
+  const targetText = streamingMsg && !streamingMsg.done ? streamingMsg.content : null;
+  const streamedChars = useStreamingMessage(thinkingId, targetText, () => {
+    setMessages((prev) =>
+      prev.map((m) =>
+        m.id === thinkingId ? { ...m, done: true, streamedChars: m.content.length } : m,
+      ),
+    );
+    setIsStreaming(false);
+    setThinkingId(null);
+    setPipelineRunning(false);
+  });
+
+  // Reflejar streamedChars en el mensaje
+  useEffect(() => {
+    if (!thinkingId) return;
+    setMessages((prev) =>
+      prev.map((m) => (m.id === thinkingId ? { ...m, streamedChars } : m)),
+    );
+  }, [streamedChars, thinkingId]);
+
+  const runScenario = useCallback(
+    (key: ScenarioKey) => {
+      if (isStreaming) return;
+      const payload = SCENARIO_DATA[key];
+      const question = t(`scenarios.${key}.question`);
+      const answer = t(`scenarios.${key}.answer`);
+
+      const userMsg: ChatMessage = {
+        id: `u-${Date.now()}`,
+        role: 'user',
+        content: question,
+      };
+      const asstId = `a-${Date.now() + 1}`;
+      const asstMsg: ChatMessage = {
+        id: asstId,
+        role: 'assistant',
+        content: answer,
+        scenario: key,
+        sources: payload.sources,
+        confidence: payload.confidence,
+        streamedChars: 0,
+        done: false,
+      };
+
+      setMessages((prev) => [...prev, userMsg, asstMsg]);
+      setInput('');
+      setPipelineSteps(payload.pipeline);
+      setPipelineTotals({
+        latencyMs: payload.totalLatencyMs,
+        tokens: payload.totalTokens,
+        cost: payload.costUsd,
+      });
+      setAggTokens((v) => v + payload.totalTokens);
+      setAggLatency(payload.totalLatencyMs);
+      setAggCost((v) => v + payload.costUsd);
+      setPipelineRunning(true);
+      setIsStreaming(true);
+      setThinkingId(asstId);
+    },
+    [isStreaming, t],
+  );
+
+  const handleSend = useCallback(() => {
+    if (!input.trim() || isStreaming) return;
+    const q = input.toLowerCase();
+    const key: ScenarioKey =
+      /sql|revenue|facturar|warehouse|snowflake/.test(q) ? 'sql'
+      : /code|funcion|función|class|implement|refresh|token/.test(q) ? 'code'
+      : /graph|depend|teams|service|equipo/.test(q) ? 'graph'
+      : /ticket|incident|payments|multi-hop|relacion/.test(q) ? 'multiHop'
+      : 'docs';
+    const payload = SCENARIO_DATA[key];
+    const userMsg: ChatMessage = { id: `u-${Date.now()}`, role: 'user', content: input };
+    const asstId = `a-${Date.now() + 1}`;
+
+    // Mensaje provisional con la respuesta de escenario; lo reemplazamos cuando
+    // llegue la respuesta del backend (que cita los docs realmente cargados).
+    const provisional = t(`scenarios.${key}.answer`);
+    const asstMsg: ChatMessage = {
+      id: asstId,
+      role: 'assistant',
+      content: provisional,
+      scenario: key,
+      sources: payload.sources,
+      confidence: payload.confidence,
+      streamedChars: 0,
+      done: false,
+    };
+    setMessages((prev) => [...prev, userMsg, asstMsg]);
+    const sentInput = input;
+    setInput('');
+    setPipelineSteps(payload.pipeline);
+    setPipelineTotals({
+      latencyMs: payload.totalLatencyMs,
+      tokens: payload.totalTokens,
+      cost: payload.costUsd,
+    });
+    setAggTokens((v) => v + payload.totalTokens);
+    setAggLatency(payload.totalLatencyMs);
+    setAggCost((v) => v + payload.costUsd);
+    setPipelineRunning(true);
+    setIsStreaming(true);
+    setThinkingId(asstId);
+
+    // Disparamos la llamada real al backend (bot "demo" o el botId del URL).
+    let botId: string = 'demo';
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const fromUrl = params.get('botId');
+      if (fromUrl) botId = fromUrl;
+    }
+    chatWithBot(botId, sentInput, [])
+      .then((res) => {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === asstId ? { ...m, content: res.reply || provisional } : m,
+          ),
+        );
+      })
+      .catch(() => {
+        /* mantenemos el provisional */
+      });
+  }, [input, isStreaming, t]);
+
+  const handleCiteClick = useCallback((c: SourceChunk) => setOpenChunk(c), []);
+
+  // Inicializar con un saludo
+  useEffect(() => {
+    if (messages.length === 0) {
+      setMessages([
+        {
+          id: 'welcome',
+          role: 'assistant',
+          content:
+            t('chat.assistant') +
+            ' · ' +
+            t('chat.subtitle') +
+            '\n\n→ ' +
+            t('chat.scenarios') +
+            ': ' +
+            [t('chat.scenarioLabels.docs'), t('chat.scenarioLabels.multiHop'), t('chat.scenarioLabels.code'), t('chat.scenarioLabels.sql'), t('chat.scenarioLabels.graph')].join(' · '),
+          done: true,
+          streamedChars: undefined,
+        },
+      ]);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Sync uploadedFiles with uploadedDocuments from backend on page load
+  // Onboarding: si nunca se completó, mostrar el tour. Se persiste en localStorage.
   useEffect(() => {
-    if (uploadedDocuments.length > 0 && uploadedFiles.length === 0) {
-      const files = uploadedDocuments.map(docName => {
-        return new File([], docName, { type: 'application/octet-stream' });
-      });
-      setUploadedFiles(files);
+    if (typeof window === 'undefined') return;
+    try {
+      const dismissed = window.localStorage.getItem(ONBOARDING_LS_KEY);
+      if (!dismissed) setShowOnboarding(true);
+    } catch {
+      // localStorage no disponible (modo privado, etc.); no bloqueamos.
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uploadedDocuments]);
+  }, []);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
-      const newFiles = Array.from(files);
-      setUploadedFiles([...uploadedFiles, ...newFiles]);
-
-      setIsUploading(true);
-      const success = await uploadDocuments(newFiles);
-      setIsUploading(false);
-
-      if (success) {
-        const names = newFiles.map(f => `"${f.name}"`).join(', ');
-        const plural = newFiles.length > 1;
-        addMessage({
-          role: 'assistant',
-          content: plural
-            ? tcb('upload.plural', { names })
-            : tcb('upload.single', { name: names }),
-        });
-        setIsChatOpen(true);
-        setActiveTab('chat');
-      } else {
-        setUploadedFiles(prev => prev.filter(f => !newFiles.includes(f)));
+  const dismissOnboarding = useCallback(() => {
+    setShowOnboarding(false);
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.setItem(ONBOARDING_LS_KEY, '1');
+      } catch {
+        /* noop */
       }
     }
-  };
+  }, []);
 
-  const handleCustomIconUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && file.type.startsWith('image/')) {
-      setCustomIconFile(file);
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setDesignConfig({ ...designConfig, customIconUrl: event.target?.result as string });
-      };
-      reader.readAsDataURL(file);
+  // Cuando cambia locale via dropdown, actualizamos cookie + recargamos (best-effort).
+  const handleLocaleChange = useCallback((l: 'es' | 'en') => {
+    setLocale(l);
+    if (typeof document !== 'undefined') {
+      document.cookie = `locale=${l}; path=/; max-age=31536000`;
+      // Soft reload para que next-intl tome el nuevo locale.
+      if (typeof window !== 'undefined') window.location.reload();
     }
-  };
+  }, []);
 
-  const handleRemoveFile = (index: number) => {
-    setUploadedFiles(uploadedFiles.filter((_, i) => i !== index));
-  };
+  const sourcesPanel = useMemo(
+    () => (
+      <div className="border-b border-secondary-200 px-4 py-3 dark:border-secondary-800">
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-secondary-500 dark:text-secondary-400">
+            {t('ingestionStats.title')}
+          </p>
+          <InfoIcon content={t('ux.sectionInfo.sources')} side="bottom" align="end" />
+        </div>
+        <ul className="mt-2 space-y-1.5">
+          {CONNECTED_SOURCES.map((s) => (
+            <li
+              key={s.key}
+              className="flex items-center justify-between gap-2 rounded-md bg-secondary-50 px-2.5 py-1.5 text-xs ring-1 ring-secondary-100 transition hover:ring-primary-200 dark:bg-secondary-800/60 dark:ring-secondary-700/60 dark:hover:ring-primary-800"
+            >
+              <div className="min-w-0">
+                <div className="truncate font-semibold text-secondary-800 dark:text-secondary-100">
+                  {t(`sources.${s.key}`)}
+                </div>
+                <div className="text-[10px] text-secondary-500 dark:text-secondary-400">
+                  {t('ingestionStats.lastSync')}: {s.lastSync}
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="font-mono text-xs font-bold text-secondary-900 dark:text-white">
+                  {s.count.toLocaleString()}
+                </div>
+                <div className="text-[10px] text-secondary-500 dark:text-secondary-400">
+                  {t(`ingestionStats.${s.unitKey}`)}
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ),
+    [t],
+  );
 
-  const handleSendPreviewMessage = async () => {
-    if (previewInput.trim() && !isLoading) {
-      const message = previewInput;
-      setPreviewInput('');
-      await sendMessage(message);
-    }
-  };
-
-  const handleAddRestrictedTopic = () => {
-    if (newRestrictedTopic.trim() && !restrictionsConfig.restrictedTopics.includes(newRestrictedTopic.trim())) {
-      setRestrictionsConfig({
-        restrictedTopics: [...restrictionsConfig.restrictedTopics, newRestrictedTopic.trim()]
-      });
-      setNewRestrictedTopic('');
-    }
-  };
-
-  const handleRemoveRestrictedTopic = (topic: string) => {
-    setRestrictionsConfig({
-      restrictedTopics: restrictionsConfig.restrictedTopics.filter(t => t !== topic)
-    });
-  };
-
-  const generateEmbedCode = () => {
-    const params = new URLSearchParams({
-      title: chatConfig.title,
-      greeting: chatConfig.greeting,
-      placeholder: chatConfig.placeholder,
-      textColor: designConfig.textColor,
-      headerColor: designConfig.headerColor,
-      backgroundColor: designConfig.backgroundColor,
-      icon: designConfig.icon,
-      fontFamily: typographyConfig.fontFamily,
-    });
-
-    if (restrictionsConfig.restrictedTopics.length > 0) {
-      params.append('restrictedTopics', JSON.stringify(restrictionsConfig.restrictedTopics));
-    }
-
-    if (designConfig.customIconUrl) {
-      params.append('customIconUrl', designConfig.customIconUrl);
-    }
-
-    const embedUrl = `${window.location.origin}/demo/chatbot/preview?${params.toString()}`;
-
-    return `<iframe
-  src="${embedUrl}"
-  width="100%"
-  height="600px"
-  frameborder="0"
-  style="border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);"
-  allow="clipboard-write"
-></iframe>`;
-  };
-
-  const savePreviewConfig = () => {
-    const previewData = {
-      chatConfig,
-      designConfig,
-      typographyConfig,
-      restrictionsConfig,
-      uploadedDocuments,
-    };
-
-    sessionStorage.setItem('chatbot_preview_config', JSON.stringify(previewData));
-  };
-
-  const handleOpenPreview = () => {
-    savePreviewConfig();
-    window.open('/demo/chatbot/preview', '_blank');
-  };
-
-  const copyEmbedCode = () => {
-    navigator.clipboard.writeText(generateEmbedCode());
-    setEmbedCopied(true);
-    setTimeout(() => setEmbedCopied(false), 2000);
-  };
-
-  const SelectedIcon = chatIcons.find(i => i.id === designConfig.icon)?.icon || FaComments;
-
-  const tabs = [
-    { id: 'documents' as TabType, label: tcb('tabs.documents'), icon: DocumentArrowUpIcon },
-    { id: 'chat' as TabType, label: tcb('tabs.chat'), icon: ChatBubbleLeftRightIcon },
-    { id: 'design' as TabType, label: tcb('tabs.design'), icon: PaintBrushIcon },
-    { id: 'typography' as TabType, label: tcb('tabs.typography'), icon: FaFont },
-    { id: 'restrictions' as TabType, label: tcb('tabs.restrictions'), icon: ShieldExclamationIcon },
-    { id: 'embed' as TabType, label: tcb('tabs.embed'), icon: CodeBracketIcon },
-  ];
+  const isDesktop = device === 'desktop';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:from-secondary-950 dark:via-black dark:to-primary-950 py-12 sm:py-16 lg:py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-8 sm:mb-12">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-secondary-900 dark:text-white mb-3 sm:mb-4">
-            {tcb('pageTitle')}
-          </h1>
-          <p className="text-base sm:text-lg lg:text-xl text-secondary-600 dark:text-secondary-400 px-4 mb-6">
-            {tcb('pageSubtitle')}
-          </p>
+    <div className="flex h-screen flex-col bg-secondary-50 text-secondary-900 dark:bg-secondary-950 dark:text-secondary-100">
+      <TopBar
+        tenant={tenant}
+        onTenantChange={setTenant}
+        modelId={modelId}
+        onModelChange={setModelId}
+        locale={locale}
+        onLocaleChange={handleLocaleChange}
+        onRunSample={runScenario}
+        isStreaming={isStreaming}
+        device={device}
+        onDeviceChange={setDevice}
+        onOpenSettings={() => setShowSettings(true)}
+      />
 
-          {/* Preview Button */}
-          <button
-            onClick={handleOpenPreview}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors shadow-lg hover:shadow-xl"
-          >
-            <EyeIcon className="h-5 w-5" />
-            {tcb('openPreview')}
-            <ArrowTopRightOnSquareIcon className="h-4 w-4" />
-          </button>
-        </div>
+      <ModeToggle mode={mode} onChange={setMode} />
 
-        {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-          {/* Left Panel - Configuration */}
-          <div className="lg:col-span-2">
-            <Card variant="elevated" className="shadow-xl">
-              <CardHeader>
-                {/* Tabs */}
-                <div className="flex border-b border-secondary-200 dark:border-secondary-700 overflow-x-auto">
-                  {tabs.map((tab) => {
-                    const Icon = tab.icon;
-                    return (
-                      <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 font-medium transition-colors border-b-2 whitespace-nowrap ${
-                          activeTab === tab.id
-                            ? 'border-primary-600 text-primary-600 dark:text-primary-400'
-                            : 'border-transparent text-secondary-600 dark:text-secondary-400 hover:text-secondary-900 dark:hover:text-white'
-                        }`}
-                      >
-                        <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
-                        <span className="text-sm sm:text-base">{tab.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </CardHeader>
+      {mode === 'builder' ? <BuilderMode /> : (
+      <>
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar (oculto en mobile-view) */}
+        {showSidebar && isDesktop ? (
+          <div className="hidden w-72 shrink-0 flex-col md:flex">
+            {sourcesPanel}
+            <Sidebar activeLayer={activeLayer} onSelect={(k) => setActiveLayer(k)} />
+          </div>
+        ) : null}
 
-              <CardContent className="p-4 sm:p-6">
-                {/* Documents Tab */}
-                {activeTab === 'documents' && (
-                  <div className="space-y-4 sm:space-y-6">
-                    <div>
-                      <h3 className="text-base sm:text-lg font-semibold text-secondary-900 dark:text-white mb-3 sm:mb-4">
-                        {tcb('documents.title')}
-                      </h3>
-                      <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-3 sm:mb-4">
-                        {tcb('documents.description')}
-                      </p>
-                    </div>
-
-                    {/* Upload Area */}
-                    <div className="border-2 border-dashed border-secondary-300 dark:border-secondary-700 rounded-lg p-6 sm:p-8 text-center hover:border-primary-500 dark:hover:border-primary-500 transition-colors">
-                      <input
-                        type="file"
-                        id="file-upload"
-                        multiple
-                        accept=".pdf,.docx,.txt,.csv"
-                        onChange={handleFileUpload}
-                        className="hidden"
-                      />
-                      <div
-                        onClick={() => document.getElementById('file-upload')?.click()}
-                        className="cursor-pointer flex flex-col items-center gap-3 sm:gap-4"
-                      >
-                        <DocumentArrowUpIcon className="h-12 w-12 sm:h-16 sm:w-16 text-secondary-400" />
-                        <div>
-                          <p className="text-base sm:text-lg font-medium text-secondary-900 dark:text-white mb-1">
-                            {tcb('documents.dragDrop')}
-                          </p>
-                          <p className="text-xs sm:text-sm text-secondary-500">
-                            {tcb('documents.fileTypes')}
-                          </p>
-                        </div>
-                        <Button variant="outline" className="text-sm">
-                          {tcb('documents.selectFiles')}
-                        </Button>
-                      </div>
-                    </div>
-
-                    {isUploading && (
-                      <div className="p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
-                        <p className="text-sm text-blue-800 dark:text-blue-200">
-                          {tcb('documents.uploading')}
-                        </p>
-                      </div>
-                    )}
-
-                    {error && (
-                      <div className="p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">
-                        <p className="text-sm text-red-800 dark:text-red-200">
-                          {error}
-                        </p>
-                      </div>
-                    )}
-
-                    {uploadedFiles.length > 0 && (
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-secondary-900 dark:text-white">
-                          {tcb('documents.uploadedFiles')} ({uploadedFiles.length})
-                        </h4>
-                        <div className="space-y-2">
-                          {uploadedFiles.map((file, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center justify-between p-3 bg-secondary-50 dark:bg-secondary-900 rounded-lg"
-                            >
-                              <div className="flex items-center gap-3">
-                                <DocumentArrowUpIcon className="h-5 w-5 text-primary-600 dark:text-primary-400" />
-                                <div>
-                                  <p className="text-sm font-medium text-secondary-900 dark:text-white">
-                                    {file.name}
-                                  </p>
-                                  <p className="text-xs text-secondary-500">
-                                    {(file.size / 1024).toFixed(2)} KB
-                                  </p>
-                                </div>
-                              </div>
-                              <button
-                                onClick={() => handleRemoveFile(index)}
-                                className="p-2 hover:bg-red-100 dark:hover:bg-red-950 rounded-lg transition-colors"
-                              >
-                                <TrashIcon className="h-4 w-4 text-red-600 dark:text-red-400" />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
+        {/* Center: chat (envuelto en device frame cuando device=mobile) */}
+        <main className="flex flex-1 flex-col overflow-hidden">
+          <div className="flex items-center justify-between gap-2 border-b border-secondary-200 bg-white/85 px-3 py-2 backdrop-blur dark:border-secondary-800 dark:bg-secondary-900/85">
+            <Tooltip content={t('ux.tooltips.toggleSidebar')} side="bottom">
+              <button
+                type="button"
+                onClick={() => setShowSidebar((v) => !v)}
+                disabled={!isDesktop}
+                className="hidden items-center gap-1 rounded-md border border-secondary-200 px-2 py-1 text-[11px] font-medium text-secondary-600 transition hover:border-primary-300 hover:bg-secondary-50 hover:text-secondary-900 disabled:cursor-not-allowed disabled:opacity-50 dark:border-secondary-700 dark:text-secondary-300 dark:hover:bg-secondary-800 dark:hover:text-white md:inline-flex"
+                aria-label={t('ux.tooltips.toggleSidebar')}
+              >
+                {showSidebar ? (
+                  <ChevronDoubleLeftIcon className="h-3.5 w-3.5" />
+                ) : (
+                  <ChevronDoubleRightIcon className="h-3.5 w-3.5" />
                 )}
-
-                {/* Chat Configuration Tab */}
-                {activeTab === 'chat' && (
-                  <div className="space-y-4 sm:space-y-6">
-                    <div>
-                      <h3 className="text-base sm:text-lg font-semibold text-secondary-900 dark:text-white mb-3 sm:mb-4">
-                        {tcb('chat.title')}
-                      </h3>
-                      <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-3 sm:mb-4">
-                        {tcb('chat.description')}
-                      </p>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                          {tcb('chat.titleLabel')}
-                        </label>
-                        <input
-                          type="text"
-                          value={chatConfig.title}
-                          onChange={(e) => setChatConfig({ ...chatConfig, title: e.target.value })}
-                          className="w-full px-4 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                          placeholder={tcb('chat.titlePlaceholder')}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                          {tcb('chat.greetingLabel')}
-                        </label>
-                        <textarea
-                          value={chatConfig.greeting}
-                          onChange={(e) => setChatConfig({ ...chatConfig, greeting: e.target.value })}
-                          rows={3}
-                          className="w-full px-4 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                          placeholder={tcb('chat.greetingPlaceholder')}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                          {tcb('chat.placeholderLabel')}
-                        </label>
-                        <input
-                          type="text"
-                          value={chatConfig.placeholder}
-                          onChange={(e) => setChatConfig({ ...chatConfig, placeholder: e.target.value })}
-                          className="w-full px-4 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                          placeholder={tcb('chat.placeholderPlaceholder')}
-                        />
-                      </div>
-
-                      {messages.length > 0 && (
-                        <div className="pt-4 border-t border-secondary-200 dark:border-secondary-700">
-                          <Button
-                            variant="outline"
-                            onClick={() => clearMessages()}
-                            className="w-full text-red-600 hover:text-red-700 hover:border-red-300 dark:text-red-400 dark:hover:text-red-300"
-                          >
-                            <TrashIcon className="h-4 w-4 mr-2" />
-                            {tcb('chat.clearChat')}
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                <BookOpenIcon className="h-3.5 w-3.5" />
+                {t('sidebar.title')}
+              </button>
+            </Tooltip>
+            <Tooltip content={t('ux.tooltips.toggleSources')} side="bottom">
+              <button
+                type="button"
+                onClick={() => setShowSources((v) => !v)}
+                className="inline-flex items-center gap-1 rounded-md border border-secondary-200 px-2 py-1 text-[11px] font-medium text-secondary-600 transition hover:border-primary-300 hover:bg-secondary-50 hover:text-secondary-900 dark:border-secondary-700 dark:text-secondary-300 dark:hover:bg-secondary-800 dark:hover:text-white md:hidden"
+              >
+                <ChatBubbleLeftRightIcon className="h-3.5 w-3.5" />
+                {t('ingestionStats.title')}
+              </button>
+            </Tooltip>
+            <Tooltip content={t('ux.tooltips.togglePipeline')} side="bottom" align="end">
+              <button
+                type="button"
+                onClick={() => setShowPipeline((v) => !v)}
+                disabled={!isDesktop}
+                className="inline-flex items-center gap-1 rounded-md border border-secondary-200 px-2 py-1 text-[11px] font-medium text-secondary-600 transition hover:border-primary-300 hover:bg-secondary-50 hover:text-secondary-900 disabled:cursor-not-allowed disabled:opacity-50 dark:border-secondary-700 dark:text-secondary-300 dark:hover:bg-secondary-800 dark:hover:text-white"
+                aria-label={t('ux.tooltips.togglePipeline')}
+              >
+                {showPipeline ? (
+                  <ChevronDoubleRightIcon className="h-3.5 w-3.5" />
+                ) : (
+                  <ChevronDoubleLeftIcon className="h-3.5 w-3.5" />
                 )}
-
-                {/* Design Tab */}
-                {activeTab === 'design' && (
-                  <div className="space-y-4 sm:space-y-6">
-                    <div>
-                      <h3 className="text-base sm:text-lg font-semibold text-secondary-900 dark:text-white mb-3 sm:mb-4">
-                        {tcb('design.title')}
-                      </h3>
-                      <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-3 sm:mb-4">
-                        {tcb('design.description')}
-                      </p>
-                    </div>
-
-                    <div className="space-y-4 sm:space-y-6">
-                      {/* Custom Icon Upload */}
-                      <div>
-                        <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-3">
-                          {tcb('design.customIcon')}
-                        </label>
-                        <div className="flex items-center gap-4">
-                          <input
-                            type="file"
-                            id="icon-upload"
-                            accept="image/*"
-                            onChange={handleCustomIconUpload}
-                            className="hidden"
-                          />
-                          <button
-                            onClick={() => document.getElementById('icon-upload')?.click()}
-                            className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-secondary-300 dark:border-secondary-700 rounded-lg hover:border-primary-500 transition-colors"
-                          >
-                            <PhotoIcon className="h-5 w-5 text-secondary-500" />
-                            <span className="text-sm">{tcb('design.uploadIcon')}</span>
-                          </button>
-                          {designConfig.customIconUrl && (
-                            <div className="flex items-center gap-2">
-                              <Image
-                                src={designConfig.customIconUrl}
-                                alt="Custom icon"
-                                width={40}
-                                height={40}
-                                className="rounded-full object-cover border-2 border-primary-500"
-                                unoptimized
-                              />
-                              <button
-                                onClick={() => setDesignConfig({ ...designConfig, customIconUrl: undefined })}
-                                className="text-xs text-red-600 hover:text-red-700"
-                              >
-                                {tcb('design.removeIcon')}
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Icon Selection */}
-                      <div>
-                        <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-3">
-                          {tcb('design.predefinedIcon')}
-                        </label>
-                        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-3">
-                          {chatIcons.map((iconItem) => {
-                            const Icon = iconItem.icon;
-                            return (
-                              <button
-                                key={iconItem.id}
-                                onClick={() => {
-                                  setDesignConfig({ ...designConfig, icon: iconItem.id, customIconUrl: undefined });
-                                }}
-                                className={`p-3 sm:p-4 rounded-lg border-2 transition-all ${
-                                  designConfig.icon === iconItem.id && !designConfig.customIconUrl
-                                    ? 'border-primary-600 bg-primary-50 dark:bg-primary-950'
-                                    : 'border-secondary-200 dark:border-secondary-700 hover:border-primary-400'
-                                }`}
-                              >
-                                <Icon className="h-6 w-6 sm:h-8 sm:w-8 mx-auto text-secondary-700 dark:text-secondary-300" />
-                                <p className="text-xs mt-1.5 sm:mt-2 text-secondary-600 dark:text-secondary-400 truncate">
-                                  {iconItem.label}
-                                </p>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* Color Pickers */}
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                            {tcb('design.headerColor')}
-                          </label>
-                          <input
-                            type="color"
-                            value={designConfig.headerColor}
-                            onChange={(e) => setDesignConfig({ ...designConfig, headerColor: e.target.value })}
-                            className="w-full h-12 rounded-lg border border-secondary-300 dark:border-secondary-700 cursor-pointer"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                            {tcb('design.backgroundColor')}
-                          </label>
-                          <input
-                            type="color"
-                            value={designConfig.backgroundColor}
-                            onChange={(e) => setDesignConfig({ ...designConfig, backgroundColor: e.target.value })}
-                            className="w-full h-12 rounded-lg border border-secondary-300 dark:border-secondary-700 cursor-pointer"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                            {tcb('design.textColor')}
-                          </label>
-                          <input
-                            type="color"
-                            value={designConfig.textColor}
-                            onChange={(e) => setDesignConfig({ ...designConfig, textColor: e.target.value })}
-                            className="w-full h-12 rounded-lg border border-secondary-300 dark:border-secondary-700 cursor-pointer"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Typography Tab */}
-                {activeTab === 'typography' && (
-                  <div className="space-y-4 sm:space-y-6">
-                    <div>
-                      <h3 className="text-base sm:text-lg font-semibold text-secondary-900 dark:text-white mb-3 sm:mb-4">
-                        {tcb('typography.title')}
-                      </h3>
-                      <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-3 sm:mb-4">
-                        {tcb('typography.description')}
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {fontOptions.map((font) => (
-                        <button
-                          key={font.id}
-                          onClick={() => setTypographyConfig({ fontFamily: font.id })}
-                          className={`p-4 rounded-lg border-2 text-left transition-all ${
-                            typographyConfig.fontFamily === font.id
-                              ? 'border-primary-600 bg-primary-50 dark:bg-primary-950'
-                              : 'border-secondary-200 dark:border-secondary-700 hover:border-primary-400'
-                          }`}
-                          style={{ fontFamily: `'${font.id}', sans-serif` }}
-                        >
-                          <p className="font-semibold text-secondary-900 dark:text-white mb-1">
-                            {font.label}
-                          </p>
-                          <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                            The quick brown fox jumps
-                          </p>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Restrictions Tab */}
-                {activeTab === 'restrictions' && (
-                  <div className="space-y-4 sm:space-y-6">
-                    <div>
-                      <h3 className="text-base sm:text-lg font-semibold text-secondary-900 dark:text-white mb-3 sm:mb-4">
-                        {tcb('restrictions.title')}
-                      </h3>
-                      <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-3 sm:mb-4">
-                        {tcb('restrictions.description')}
-                      </p>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={newRestrictedTopic}
-                          onChange={(e) => setNewRestrictedTopic(e.target.value)}
-                          onKeyPress={(e) => e.key === 'Enter' && handleAddRestrictedTopic()}
-                          placeholder={tcb('restrictions.placeholder')}
-                          className="flex-1 px-4 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        />
-                        <Button
-                          onClick={handleAddRestrictedTopic}
-                          disabled={!newRestrictedTopic.trim()}
-                          className="whitespace-nowrap"
-                        >
-                          {tcb('restrictions.add')}
-                        </Button>
-                      </div>
-
-                      {restrictionsConfig.restrictedTopics.length > 0 && (
-                        <div className="space-y-2">
-                          <h4 className="font-medium text-secondary-900 dark:text-white">
-                            {tcb('restrictions.topicsTitle')} ({restrictionsConfig.restrictedTopics.length})
-                          </h4>
-                          <div className="flex flex-wrap gap-2">
-                            {restrictionsConfig.restrictedTopics.map((topic, index) => (
-                              <div
-                                key={index}
-                                className="flex items-center gap-2 px-3 py-2 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg"
-                              >
-                                <ShieldExclamationIcon className="h-4 w-4 text-red-600 dark:text-red-400" />
-                                <span className="text-sm text-red-800 dark:text-red-200">
-                                  {topic}
-                                </span>
-                                <button
-                                  onClick={() => handleRemoveRestrictedTopic(topic)}
-                                  className="ml-1 text-red-600 hover:text-red-700"
-                                >
-                                  <XMarkIcon className="h-4 w-4" />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
-                        <p className="text-sm text-blue-800 dark:text-blue-200">
-                          <strong>{tcb('restrictions.note')}:</strong> {tcb('restrictions.noteText')}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Embed Tab */}
-                {activeTab === 'embed' && (
-                  <div className="space-y-4 sm:space-y-6">
-                    <div>
-                      <h3 className="text-base sm:text-lg font-semibold text-secondary-900 dark:text-white mb-3 sm:mb-4">
-                        {tcb('embed.title')}
-                      </h3>
-                      <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-3 sm:mb-4">
-                        {tcb('embed.description')}
-                      </p>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div className="relative">
-                        <pre className="bg-secondary-900 text-secondary-100 p-4 rounded-lg overflow-x-auto text-xs sm:text-sm">
-                          <code>{generateEmbedCode()}</code>
-                        </pre>
-                        <button
-                          onClick={copyEmbedCode}
-                          className="absolute top-2 right-2 p-2 bg-secondary-800 hover:bg-secondary-700 rounded-lg transition-colors"
-                        >
-                          {embedCopied ? (
-                            <CheckIcon className="h-5 w-5 text-green-400" />
-                          ) : (
-                            <ClipboardDocumentIcon className="h-5 w-5 text-secondary-300" />
-                          )}
-                        </button>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <button
-                          onClick={handleOpenPreview}
-                          className="flex items-center justify-center gap-2 px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors"
-                        >
-                          <EyeIcon className="h-5 w-5" />
-                          {tcb('embed.viewPreview')}
-                          <ArrowTopRightOnSquareIcon className="h-4 w-4" />
-                        </button>
-
-                        <button
-                          onClick={copyEmbedCode}
-                          className="flex items-center justify-center gap-2 px-4 py-3 bg-secondary-200 dark:bg-secondary-700 hover:bg-secondary-300 dark:hover:bg-secondary-600 text-secondary-900 dark:text-white font-medium rounded-lg transition-colors"
-                        >
-                          <ClipboardDocumentIcon className="h-5 w-5" />
-                          {tcb('embed.copyCode')}
-                        </button>
-                      </div>
-
-                      <div className="p-4 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                        <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                          <strong>{tcb('embed.important')}:</strong> {tcb('embed.importantText')}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                {t('pipeline.title')}
+              </button>
+            </Tooltip>
           </div>
 
-          {/* Right Panel - Preview */}
-          <div className="lg:col-span-1">
-            <div className="lg:sticky lg:top-24">
-              <Card variant="bordered">
-                <CardHeader>
-                  <CardTitle className="text-base sm:text-lg">{tcb('preview.title')}</CardTitle>
-                </CardHeader>
-                <CardContent className="p-3 sm:p-4">
-                  <div className="bg-secondary-100 dark:bg-secondary-900 rounded-lg p-3 sm:p-4 h-[500px] sm:h-[550px] lg:h-[600px] flex items-end justify-end">
-                    {/* Chat Widget */}
-                    {isChatOpen ? (
-                      <div
-                        className="w-full max-w-sm bg-white dark:bg-secondary-800 rounded-2xl shadow-2xl flex flex-col h-[420px] sm:h-[470px] lg:h-[500px]"
-                        style={{ fontFamily: typographyConfig.fontFamily ? `'${typographyConfig.fontFamily}', sans-serif` : 'Inter, sans-serif' }}
-                      >
-                        {/* Header */}
-                        <div
-                          className="p-3 sm:p-4 rounded-t-2xl flex items-center justify-between"
-                          style={{ backgroundColor: designConfig.headerColor }}
-                        >
-                          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
-                              {designConfig.customIconUrl ? (
-                                <Image
-                                  src={designConfig.customIconUrl}
-                                  alt="Chat icon"
-                                  width={24}
-                                  height={24}
-                                  className="rounded-full object-cover"
-                                  unoptimized
-                                />
-                              ) : (
-                                <SelectedIcon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-                              )}
-                            </div>
-                            <h3 className="font-semibold text-white text-sm sm:text-base truncate">{chatConfig.title}</h3>
-                          </div>
-                          <div className="flex items-center gap-1 flex-shrink-0">
-                            {messages.length > 0 && (
-                              <button
-                                onClick={() => clearMessages()}
-                                title={tcb('preview.clearTitle')}
-                                className="p-1 hover:bg-white/20 rounded-lg transition-colors"
-                              >
-                                <TrashIcon className="h-5 w-5 text-white" />
-                              </button>
-                            )}
-                            <button
-                              onClick={() => setIsChatOpen(false)}
-                              className="p-1 hover:bg-white/20 rounded-lg transition-colors"
-                            >
-                              <XMarkIcon className="h-5 w-5 text-white" />
-                            </button>
-                          </div>
-                        </div>
+          <div className="flex-1 overflow-hidden">
+            <DeviceFrame
+              device={device}
+              label={device === 'mobile' ? t('ux.device.mobileFrameLabel') : undefined}
+              ariaLabel={t('ux.device.label')}
+            >
+              <ChatPanel
+                messages={messages}
+                input={input}
+                onInput={setInput}
+                onSend={handleSend}
+                onRunScenario={runScenario}
+                onCiteClick={handleCiteClick}
+                isStreaming={isStreaming}
+                thinkingMessageId={
+                  thinkingId && streamedChars === 0 ? thinkingId : null
+                }
+              />
+            </DeviceFrame>
+          </div>
+        </main>
 
-                        {/* Messages */}
-                        <div
-                          ref={messagesContainerRef}
-                          className="flex-1 p-3 sm:p-4 overflow-y-auto space-y-2 sm:space-y-3"
-                          style={{ backgroundColor: designConfig.backgroundColor }}
-                        >
-                          {/* Greeting */}
-                          <div className="flex gap-1.5 sm:gap-2">
-                            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary-100 dark:bg-primary-950 rounded-full flex items-center justify-center flex-shrink-0">
-                              {designConfig.customIconUrl ? (
-                                <Image
-                                  src={designConfig.customIconUrl}
-                                  alt="Assistant"
-                                  width={16}
-                                  height={16}
-                                  className="rounded-full object-cover"
-                                  unoptimized
-                                />
-                              ) : (
-                                <SelectedIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-600 dark:text-primary-400" />
-                              )}
-                            </div>
-                            <div className="bg-secondary-100 dark:bg-secondary-700 rounded-2xl rounded-tl-sm p-2.5 sm:p-3 max-w-[80%]">
-                              <p className="text-xs sm:text-sm" style={{ color: designConfig.textColor }}>
-                                {chatConfig.greeting}
-                              </p>
-                            </div>
-                          </div>
+        {/* Pipeline right (oculto en mobile-view) */}
+        {showPipeline && isDesktop ? (
+          <div className="hidden w-80 shrink-0 lg:flex">
+            <PipelinePanel
+              running={pipelineRunning}
+              activeStepIndex={stepIndex}
+              steps={pipelineSteps}
+              totalLatencyMs={pipelineTotals.latencyMs}
+              totalTokens={pipelineTotals.tokens}
+              costUsd={pipelineTotals.cost}
+            />
+          </div>
+        ) : null}
+      </div>
 
-                          {/* Real Messages from Chatbot */}
-                          {messages.map((msg, index) => (
-                            <div key={index}>
-                              <div
-                                className={`flex gap-1.5 sm:gap-2 ${msg.role === 'user' ? 'justify-end' : ''}`}
-                              >
-                                {msg.role === 'assistant' && (
-                                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary-100 dark:bg-primary-950 rounded-full flex items-center justify-center flex-shrink-0">
-                                    {designConfig.customIconUrl ? (
-                                      <Image
-                                        src={designConfig.customIconUrl}
-                                        alt="Assistant"
-                                        width={16}
-                                        height={16}
-                                        className="rounded-full object-cover"
-                                        unoptimized
-                                      />
-                                    ) : (
-                                      <SelectedIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-600 dark:text-primary-400" />
-                                    )}
-                                  </div>
-                                )}
-                                <div className="flex flex-col max-w-[80%]">
-                                  <div
-                                    className={`rounded-2xl p-2.5 sm:p-3 ${
-                                      msg.role === 'user'
-                                        ? 'rounded-tr-sm'
-                                        : 'rounded-tl-sm bg-secondary-100 dark:bg-secondary-700'
-                                    }`}
-                                    style={msg.role === 'user' ? { backgroundColor: designConfig.headerColor } : {}}
-                                  >
-                                    <p
-                                      className="text-xs sm:text-sm"
-                                      style={{ color: msg.role === 'user' ? '#FFFFFF' : designConfig.textColor }}
-                                    >
-                                      {msg.content}
-                                    </p>
-                                  </div>
-                                  {msg.role === 'assistant' && msg.source && (
-                                    <div className="flex items-center gap-1 mt-1 ml-2">
-                                      <DocumentTextIcon className="h-3 w-3 text-secondary-400" />
-                                      <span className="text-xs text-secondary-500">
-                                        {msg.source}
-                                      </span>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          ))}
+      {/* Modales */}
+      <CapabilityPanel layerKey={activeLayer} onClose={() => setActiveLayer(null)} />
+      <SourcePanel chunk={openChunk} onClose={() => setOpenChunk(null)} />
 
-                          {/* Loading Indicator */}
-                          {isLoading && (
-                            <div className="flex gap-1.5 sm:gap-2">
-                              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary-100 dark:bg-primary-950 rounded-full flex items-center justify-center flex-shrink-0">
-                                {designConfig.customIconUrl ? (
-                                  <Image
-                                    src={designConfig.customIconUrl}
-                                    alt="Assistant"
-                                    width={16}
-                                    height={16}
-                                    className="rounded-full object-cover"
-                                    unoptimized
-                                  />
-                                ) : (
-                                  <SelectedIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-600 dark:text-primary-400" />
-                                )}
-                              </div>
-                              <div className="bg-secondary-100 dark:bg-secondary-700 rounded-2xl rounded-tl-sm p-2.5 sm:p-3">
-                                <div className="flex gap-1">
-                                  <div className="w-2 h-2 bg-secondary-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                                  <div className="w-2 h-2 bg-secondary-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                                  <div className="w-2 h-2 bg-secondary-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                                </div>
-                              </div>
-                            </div>
-                          )}
+      {/* Drawer mobile de sources */}
+      {showSources ? (
+        <div
+          className="fixed inset-0 z-40 flex items-stretch bg-black/50 md:hidden"
+          onClick={() => setShowSources(false)}
+        >
+          <div
+            className="w-72 bg-white shadow-2xl dark:bg-secondary-900"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-4 py-3">
+              <span className="text-sm font-bold">{t('sidebar.title')}</span>
+              <button
+                type="button"
+                onClick={() => setShowSources(false)}
+                aria-label={t('sourcePanel.close')}
+                className="rounded p-1 hover:bg-secondary-100 dark:hover:bg-secondary-800"
+              >
+                <XMarkIcon className="h-5 w-5" />
+              </button>
+            </div>
+            {sourcesPanel}
+            <Sidebar
+              activeLayer={activeLayer}
+              onSelect={(k) => {
+                setActiveLayer(k);
+                setShowSources(false);
+              }}
+            />
+          </div>
+        </div>
+      ) : null}
 
-                          <div ref={messagesEndRef} />
-                        </div>
-
-                        {/* Input */}
-                        <div className="p-3 sm:p-4 border-t border-secondary-200 dark:border-secondary-700">
-                          <div className="flex gap-1.5 sm:gap-2">
-                            <input
-                              type="text"
-                              value={previewInput}
-                              onChange={(e) => setPreviewInput(e.target.value)}
-                              onKeyPress={(e) => e.key === 'Enter' && handleSendPreviewMessage()}
-                              placeholder={chatConfig.placeholder}
-                              disabled={isLoading}
-                              className="flex-1 px-3 sm:px-4 py-2 border border-secondary-300 dark:border-secondary-600 rounded-full text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                            />
-                            <button
-                              onClick={handleSendPreviewMessage}
-                              disabled={isLoading || !previewInput.trim()}
-                              className="p-2 rounded-full transition-colors flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
-                              style={{ backgroundColor: designConfig.headerColor }}
-                            >
-                              <PaperAirplaneIcon className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => setIsChatOpen(true)}
-                        className="w-14 h-14 sm:w-16 sm:h-16 rounded-full shadow-2xl flex items-center justify-center transition-transform hover:scale-110"
-                        style={{ backgroundColor: designConfig.headerColor }}
-                      >
-                        {designConfig.customIconUrl ? (
-                          <Image
-                            src={designConfig.customIconUrl}
-                            alt="Chat icon"
-                            width={32}
-                            height={32}
-                            className="rounded-full object-cover"
-                            unoptimized
-                          />
-                        ) : (
-                          <SelectedIcon className="h-7 w-7 sm:h-8 sm:w-8 text-white" />
-                        )}
-                      </button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+      {/* Settings drawer (presentación: explicación + CTA a Builder Mode) */}
+      {showSettings ? (
+        <div
+          className="fixed inset-0 z-40 flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="settings-title"
+          onClick={() => setShowSettings(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl border border-secondary-200 bg-white p-6 shadow-2xl dark:border-secondary-700 dark:bg-secondary-900"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2
+                  id="settings-title"
+                  className="text-lg font-bold tracking-tight text-secondary-900 dark:text-white"
+                >
+                  {t('ux.advancedConfig.title')}
+                </h2>
+                <p className="mt-1.5 text-[13px] leading-relaxed text-secondary-600 dark:text-secondary-300">
+                  {t('ux.advancedConfig.body')}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowSettings(false)}
+                aria-label={t('ux.advancedConfig.close')}
+                className="rounded-md p-1.5 text-secondary-500 transition hover:bg-secondary-100 hover:text-secondary-900 dark:hover:bg-secondary-800 dark:hover:text-white"
+              >
+                <XMarkIcon className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="mt-5 flex flex-wrap items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowSettings(false)}
+                className="rounded-md border border-secondary-200 bg-white px-3 py-1.5 text-xs font-medium text-secondary-700 transition hover:bg-secondary-50 dark:border-secondary-700 dark:bg-secondary-900 dark:text-secondary-200 dark:hover:bg-secondary-800"
+              >
+                {t('ux.advancedConfig.close')}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowSettings(false);
+                  setMode('builder');
+                }}
+                className="inline-flex items-center gap-1.5 rounded-md bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-primary-700"
+              >
+                {t('ux.advancedConfig.cta')}
+                <ArrowRightIcon className="h-3.5 w-3.5" />
+              </button>
             </div>
           </div>
+        </div>
+      ) : null}
+
+      <StatsWidget
+        tokens={aggTokens}
+        latencyMs={aggLatency}
+        costUsd={aggCost}
+        cacheHitPct={cacheHit}
+        driftPct={drift}
+        faithfulnessPct={faithfulness}
+        hallucinationPct={hallucination}
+      />
+
+      {/* Onboarding tour: 4 pasos. Persistido en localStorage. */}
+      {showOnboarding ? (
+        <OnboardingTour
+          step={onboardingStep}
+          onNext={() => setOnboardingStep((s) => Math.min(3, s + 1))}
+          onSkip={dismissOnboarding}
+          onDone={dismissOnboarding}
+        />
+      ) : null}
+      </>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Onboarding inline. Overlay sutil + tarjeta central con 4 pasos.
+ * Dismiss persistido en localStorage para no molestar en visitas siguientes.
+ */
+function OnboardingTour({
+  step,
+  onNext,
+  onSkip,
+  onDone,
+}: {
+  step: number;
+  onNext: () => void;
+  onSkip: () => void;
+  onDone: () => void;
+}) {
+  const t = useTranslations('demoChatbot');
+  const steps = [
+    { title: t('ux.onboarding.step1Title'), body: t('ux.onboarding.step1Body') },
+    { title: t('ux.onboarding.step2Title'), body: t('ux.onboarding.step2Body') },
+    { title: t('ux.onboarding.step3Title'), body: t('ux.onboarding.step3Body') },
+    { title: t('ux.onboarding.step4Title'), body: t('ux.onboarding.step4Body') },
+  ];
+  const current = steps[Math.min(step, steps.length - 1)];
+  const isLast = step >= steps.length - 1;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/30 p-4 backdrop-blur-[2px] sm:items-center"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="onboarding-title"
+    >
+      <div className="w-full max-w-md rounded-2xl border border-secondary-200 bg-white p-6 shadow-2xl dark:border-secondary-700 dark:bg-secondary-900">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary-600 dark:text-primary-300">
+          {t('ux.onboarding.title')} · {step + 1}/{steps.length}
+        </p>
+        <h2
+          id="onboarding-title"
+          className="mt-1.5 text-lg font-bold tracking-tight text-secondary-900 dark:text-white"
+        >
+          {current.title}
+        </h2>
+        <p className="mt-2 text-[13px] leading-relaxed text-secondary-600 dark:text-secondary-300">
+          {current.body}
+        </p>
+        <div className="mt-5 flex items-center justify-between gap-2">
+          <button
+            type="button"
+            onClick={onSkip}
+            className="text-[11px] font-medium text-secondary-500 transition hover:text-secondary-800 dark:text-secondary-400 dark:hover:text-secondary-100"
+          >
+            {t('ux.onboarding.skip')}
+          </button>
+          <div className="flex items-center gap-1.5">
+            {steps.map((_, i) => (
+              <span
+                key={i}
+                className={`h-1.5 w-1.5 rounded-full transition ${
+                  i === step
+                    ? 'bg-primary-600 dark:bg-primary-400'
+                    : 'bg-secondary-300 dark:bg-secondary-700'
+                }`}
+              />
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={isLast ? onDone : onNext}
+            className="inline-flex items-center gap-1.5 rounded-md bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-primary-700"
+          >
+            {isLast ? t('ux.onboarding.done') : t('ux.onboarding.next')}
+            <ArrowRightIcon className="h-3.5 w-3.5" />
+          </button>
         </div>
       </div>
     </div>
