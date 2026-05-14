@@ -16,6 +16,7 @@ Cada demo es una aplicación interactiva navegable, con datos simulados realista
 | Help Desk IA Omnichannel | Soporte IA | Ticketing inteligente con routing ML, sugerencias IA al agente, SLA management y CSAT automatizado. | [Ver demo](./apps/web/src/app/demo/helpdesk-ia/) |
 | LMS / E-learning | Educación | Plataforma educativa con AI tutor 1:1, adaptive learning, live classes y gamification completa. | [Ver demo](./apps/web/src/app/demo/lms/) |
 | Telemedicina HIPAA | HealthTech | Video consulta segura, EHR integrado, triage IA, receta electrónica y wearables Apple Health / Fitbit. | [Ver demo](./apps/web/src/app/demo/telemedicina/) |
+| Facturación Electrónica Multi-país | FinTech | Emisión y recepción de facturas DIAN, SAT, AFIP, SII, SUNAT, DGI, SET, SRI con SDK y white-label. | [Ver demo](./apps/web/src/app/demo/facturacion-electronica/) |
 
 ## 🚀 Stack Tecnológico
 
