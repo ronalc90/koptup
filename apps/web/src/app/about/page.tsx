@@ -1,260 +1,710 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import Card, { CardContent } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import {
   RocketLaunchIcon,
-  HeartIcon,
-  LightBulbIcon,
   ShieldCheckIcon,
-  UserGroupIcon,
-  TrophyIcon,
   GlobeAltIcon,
   CodeBracketIcon,
   SparklesIcon,
   CheckCircleIcon,
+  CpuChipIcon,
+  CloudIcon,
+  CircleStackIcon,
+  ChatBubbleLeftRightIcon,
+  CreditCardIcon,
+  DocumentTextIcon,
+  ShoppingBagIcon,
+  ChartBarIcon,
+  MegaphoneIcon,
+  LockClosedIcon,
+  MapIcon,
+  ArchiveBoxIcon,
+  WrenchScrewdriverIcon,
+  ScaleIcon,
+  BriefcaseIcon,
+  AcademicCapIcon,
+  TruckIcon,
+  HeartIcon,
+  BuildingOffice2Icon,
+  PaintBrushIcon,
+  ServerStackIcon,
+  CommandLineIcon,
 } from '@heroicons/react/24/outline';
 
-export default function AboutPage() {
-  const t = useTranslations('aboutPage');
-  const tc = useTranslations('common');
-
-  // Estado para la sección de tecnologías
-  const [query, setQuery] = useState('');
-  const [activeCat, setActiveCat] = useState<string>('All');
-  const [showAll, setShowAll] = useState(false);
-
-  const values = [
-    {
-      icon: RocketLaunchIcon,
-      title: t('values.items.innovation.title'),
-      description: t('values.items.innovation.description'),
-    },
-    {
-      icon: HeartIcon,
-      title: t('values.items.excellence.title'),
-      description: t('values.items.excellence.description'),
-    },
-    {
-      icon: LightBulbIcon,
-      title: t('values.items.creativity.title'),
-      description: t('values.items.creativity.description'),
-    },
-    {
-      icon: ShieldCheckIcon,
-      title: t('values.items.transparency.title'),
-      description: t('values.items.transparency.description'),
-    },
-    {
-      icon: UserGroupIcon,
-      title: t('values.items.clientFirst.title'),
-      description: t('values.items.clientFirst.description'),
-    },
-    {
-      icon: TrophyIcon,
-      title: t('values.items.results.title'),
-      description: t('values.items.results.description'),
-    },
-  ];
-
-  const team = [
-    {
-      name: t('team.members.ronald.name'),
-      role: t('team.members.ronald.role'),
-      description: t('team.members.ronald.description'),
-      avatar: 'https://media.licdn.com/dms/image/v2/C4E03AQFkHy4q8806WA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1657683263984?e=1763596800&v=beta&t=GDtxdYIv_fyBVJvzawmB0j75qUPOGyeSLLpUZy_au8M',
-      skills: ['React', 'TypeScript', 'Node.js', 'OpenAI', 'AWS'],
-    },
-  ];
-
-  const stats = [
-    { value: '100+', label: t('stats.projects') },
-    { value: '50+', label: t('stats.clients') },
-    { value: '8+', label: t('stats.experience') },
-    { value: '98%', label: t('stats.satisfaction') },
-  ];
-
- const milestones = [
-  { year: '2019', title: t('history.milestones.2019.title'), description: t('history.milestones.2019.description') },
-  { year: '2021', title: t('history.milestones.2021.title'), description: t('history.milestones.2021.description') },
-  { year: '2022', title: t('history.milestones.2022.title'), description: t('history.milestones.2022.description') },
-  { year: '2023', title: t('history.milestones.2023.title'), description: t('history.milestones.2023.description') },
-  { year: '2025', title: t('history.milestones.2025.title'), description: t('history.milestones.2025.description') }
-];
-
-
-
-// highlights = lo que muestras primero y grande
-const highlights = [
-  { name: 'React', level: 'Expert' },
-  { name: 'Node.js', level: 'Expert' },
-  { name: 'PostgreSQL', level: 'Proficient' },
-  { name: 'Docker', level: 'Proficient' },
-  { name: 'TensorFlow', level: 'Proficient' },
-  { name: 'AWS', level: 'Proficient' },
-];
-
-// grouped = mostrado en acordeones / chips
-const grouped = {
-  Frontend: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Sass'],
-  Backend: ['Node.js', 'Express', 'Python', 'Java', '.NET'],
-  DB: ['PostgreSQL', 'MongoDB', 'MySQL', 'Redis'],
-  Cloud: ['AWS', 'Azure', 'Vercel', 'AWS S3'],
-  DevOps: ['Docker', 'Kubernetes', 'CI/CD', 'Git', 'Jenkins'],
-  ML: ['TensorFlow', 'ML/DL', 'NLP', 'Embeddings', 'Semantic Search'],
-  Tools: ['VS Code', 'IntelliJ', 'Postman'],
+type TechCategory = {
+  id: string;
+  title: string;
+  icon: React.ComponentType<{ className?: string }>;
+  description: string;
+  items: { name: string; note: string }[];
 };
 
-// Categorías para los filtros
-const categories = ['All', ...Object.keys(grouped)];
+const techCategories: TechCategory[] = [
+  {
+    id: 'frontend',
+    title: 'Frontend & UI',
+    icon: PaintBrushIcon,
+    description: 'Interfaces modernas, accesibles y rápidas en cualquier dispositivo.',
+    items: [
+      { name: 'Next.js 14', note: 'App Router, Server Components, ISR' },
+      { name: 'React 18', note: 'Server/Client components, Suspense' },
+      { name: 'TypeScript', note: 'strict mode end-to-end' },
+      { name: 'TailwindCSS', note: 'utility-first + design tokens' },
+      { name: 'shadcn/ui', note: 'Radix primitives accesibles' },
+      { name: 'Framer Motion', note: 'animaciones declarativas' },
+      { name: 'next-intl', note: 'i18n server-side ES/EN/PT' },
+      { name: 'next-themes', note: 'dark mode persistente' },
+      { name: 'React Hook Form', note: 'forms performantes' },
+      { name: 'Zod', note: 'validación tipada compartida cliente/servidor' },
+      { name: 'TanStack Query', note: 'data fetching + caching' },
+      { name: 'SWR', note: 'revalidación automática' },
+      { name: 'Axios', note: 'HTTP client con interceptors' },
+      { name: 'Heroicons', note: 'iconografía SVG' },
+      { name: 'Lucide', note: 'iconos open-source' },
+      { name: 'date-fns', note: 'manejo de fechas inmutables' },
+      { name: 'Day.js', note: 'fechas ligero' },
+      { name: 'React Markdown', note: 'render Markdown + rehype/remark' },
+      { name: 'jsPDF', note: 'export PDF cliente' },
+      { name: 'pdfmake', note: 'PDFs declarativos' },
+      { name: 'Recharts', note: 'gráficos React-first' },
+      { name: 'D3.js', note: 'visualizaciones custom' },
+      { name: 'Visx', note: 'componibles low-level' },
+      { name: 'React Flow', note: 'diagramas y flujos' },
+      { name: 'Tldraw', note: 'whiteboards colaborativos' },
+      { name: 'dnd-kit', note: 'drag & drop accesible' },
+      { name: 'Excalidraw', note: 'diagramas a mano alzada' },
+      { name: 'Yjs / CRDTs', note: 'colaboración real-time' },
+      { name: 'React Native + Expo', note: 'apps móviles iOS/Android' },
+      { name: 'Flutter', note: 'cross-platform Dart' },
+      { name: 'PWA', note: 'offline + installable' },
+      { name: 'Storybook', note: 'librería UI documentada' },
+      { name: 'Playwright', note: 'E2E browser testing' },
+      { name: 'React Testing Library', note: 'unit/integration tests' },
+      { name: 'Jest', note: 'test runner' },
+    ],
+  },
+  {
+    id: 'backend',
+    title: 'Backend & APIs',
+    icon: ServerStackIcon,
+    description: 'APIs y servicios robustos, escalables y bien tipados.',
+    items: [
+      { name: 'Node.js 18/20/22', note: 'runtime principal' },
+      { name: 'Express', note: 'REST APIs maduras' },
+      { name: 'Fastify', note: 'alto throughput + plugins' },
+      { name: 'NestJS', note: 'arquitectura modular DI' },
+      { name: 'GraphQL', note: 'Apollo Server / Mercurius' },
+      { name: 'REST APIs', note: 'OpenAPI 3, versionado' },
+      { name: 'WebSockets', note: 'tiempo real bidireccional' },
+      { name: 'Socket.io', note: 'rooms, namespaces, fallback' },
+      { name: 'Server-Sent Events', note: 'streaming HTTP' },
+      { name: 'gRPC', note: 'comunicación inter-servicios' },
+      { name: 'tRPC', note: 'end-to-end typesafe' },
+      { name: 'Python', note: 'FastAPI / Django / Flask' },
+      { name: 'Java + Spring Boot', note: 'enterprise + microservicios' },
+      { name: 'Go', note: 'Gin / Fiber, alto rendimiento' },
+      { name: 'Ruby on Rails', note: 'monolitos productivos' },
+      { name: 'PHP + Laravel', note: 'integraciones con WP/Shopify' },
+      { name: 'C# .NET Core', note: 'integraciones Microsoft' },
+      { name: 'Bun', note: 'runtime ultra-rápido' },
+      { name: 'Deno', note: 'runtime secure-by-default' },
+    ],
+  },
+  {
+    id: 'databases',
+    title: 'Bases de datos',
+    icon: CircleStackIcon,
+    description: 'Persistencia relacional, documental, vectorial y analítica.',
+    items: [
+      { name: 'PostgreSQL 15/16', note: 'OLTP + pgvector + PostGIS' },
+      { name: 'MongoDB 7', note: 'documentos + agregaciones' },
+      { name: 'MySQL / MariaDB', note: 'compatibilidad legacy' },
+      { name: 'Redis', note: 'cache, pub/sub, streams' },
+      { name: 'DynamoDB', note: 'NoSQL serverless AWS' },
+      { name: 'Elasticsearch', note: 'búsqueda full-text' },
+      { name: 'OpenSearch', note: 'fork open-source' },
+      { name: 'ClickHouse', note: 'analytics columnar' },
+      { name: 'Snowflake', note: 'data warehouse cloud' },
+      { name: 'BigQuery', note: 'warehouse Google + ML' },
+      { name: 'Pinecone', note: 'vector DB managed' },
+      { name: 'Weaviate', note: 'vector + hybrid' },
+      { name: 'Qdrant', note: 'vector self-hosted' },
+      { name: 'Chroma', note: 'embeddings ligero' },
+      { name: 'DuckDB', note: 'analytics embedded' },
+      { name: 'SQLite', note: 'apps locales y edge' },
+      { name: 'Firebase Firestore', note: 'realtime + offline' },
+      { name: 'Supabase', note: 'Postgres + Auth managed' },
+      { name: 'PlanetScale', note: 'MySQL serverless' },
+    ],
+  },
+  {
+    id: 'cloud',
+    title: 'Cloud & Infraestructura',
+    icon: CloudIcon,
+    description: 'Despliegue, observabilidad y operación 24/7.',
+    items: [
+      { name: 'AWS', note: 'EC2, S3, Lambda, RDS, ECS, EKS, CloudFront, Route53, IAM' },
+      { name: 'Google Cloud', note: 'GKE, Cloud Run, Pub/Sub, BigQuery' },
+      { name: 'Microsoft Azure', note: 'AKS, Functions, CosmosDB' },
+      { name: 'Vercel', note: 'deploy frontend Next.js' },
+      { name: 'Railway', note: 'deploy backend rápido' },
+      { name: 'Render', note: 'web services + cron' },
+      { name: 'Fly.io', note: 'apps cerca del usuario' },
+      { name: 'DigitalOcean', note: 'droplets + App Platform' },
+      { name: 'Cloudflare', note: 'CDN, Workers, R2, Pages' },
+      { name: 'Docker', note: 'contenedores reproducibles' },
+      { name: 'Docker Compose', note: 'entornos locales multi-servicio' },
+      { name: 'Kubernetes', note: 'EKS/GKE/AKS/k3s' },
+      { name: 'Terraform', note: 'IaC multi-cloud' },
+      { name: 'Pulumi', note: 'IaC en TypeScript/Python' },
+      { name: 'Ansible', note: 'configuration management' },
+      { name: 'GitHub Actions', note: 'CI/CD nativo' },
+      { name: 'GitLab CI', note: 'pipelines self-hosted' },
+      { name: 'CircleCI', note: 'CI orquestada' },
+    ],
+  },
+  {
+    id: 'ai',
+    title: 'IA & Machine Learning',
+    icon: CpuChipIcon,
+    description: 'LLMs, RAG, agentes, visión, voz y ML clásico en producción.',
+    items: [
+      { name: 'OpenAI', note: 'GPT-4o, GPT-4o-mini, embeddings v3' },
+      { name: 'Anthropic Claude', note: 'Sonnet, Opus, Haiku' },
+      { name: 'Google Gemini', note: 'multimodal long-context' },
+      { name: 'Mistral', note: 'modelos europeos' },
+      { name: 'Llama', note: 'self-hosted on-prem' },
+      { name: 'LangChain', note: 'orquestación LLM' },
+      { name: 'LangGraph', note: 'flujos agentic con estado' },
+      { name: 'LlamaIndex', note: 'RAG production-ready' },
+      { name: 'Hugging Face', note: 'Transformers + Datasets' },
+      { name: 'Embeddings', note: 'OpenAI / Cohere / Voyage' },
+      { name: 'Rerankers', note: 'Cohere Rerank + cross-encoders' },
+      { name: 'Hybrid retrieval', note: 'BM25 + dense + RRF' },
+      { name: 'pgvector', note: 'búsqueda vectorial en Postgres' },
+      { name: 'TensorFlow', note: 'deep learning' },
+      { name: 'PyTorch', note: 'investigación + producción' },
+      { name: 'scikit-learn', note: 'ML clásico' },
+      { name: 'spaCy', note: 'NLP industrial' },
+      { name: 'NLTK', note: 'NLP académico' },
+      { name: 'Whisper', note: 'speech-to-text' },
+      { name: 'ElevenLabs', note: 'voces TTS premium' },
+      { name: 'Cartesia', note: 'TTS streaming baja latencia' },
+      { name: 'Deepgram', note: 'STT streaming enterprise' },
+      { name: 'AssemblyAI', note: 'STT + diarización' },
+      { name: 'GPT-4V / Claude Vision', note: 'análisis multimodal' },
+      { name: 'Tesseract OCR', note: 'extracción texto open-source' },
+      { name: 'Stable Diffusion', note: 'generación de imágenes' },
+      { name: 'ComfyUI', note: 'pipelines visuales SD' },
+    ],
+  },
+  {
+    id: 'messaging',
+    title: 'Mensajería & Comunicación',
+    icon: ChatBubbleLeftRightIcon,
+    description: 'WhatsApp, voz, email y notificaciones push multicanal.',
+    items: [
+      { name: 'Twilio', note: 'SMS, voice, WhatsApp Business' },
+      { name: 'WhatsApp Business API', note: 'oficial Meta Cloud API' },
+      { name: 'SendGrid', note: 'email transaccional' },
+      { name: 'Postmark', note: 'email confiable' },
+      { name: 'Resend', note: 'email developer-friendly' },
+      { name: 'Mailgun', note: 'email + listas' },
+      { name: 'OneSignal', note: 'push notifications' },
+      { name: 'Firebase Cloud Messaging', note: 'push iOS/Android/web' },
+      { name: 'Slack API', note: 'bots e integraciones' },
+      { name: 'Discord bots', note: 'comunidades' },
+      { name: 'Microsoft Teams', note: 'bots empresariales' },
+    ],
+  },
+  {
+    id: 'payments',
+    title: 'Pagos & Fintech',
+    icon: CreditCardIcon,
+    description: 'Pasarelas globales y locales LatAm, Open Banking, BNPL.',
+    items: [
+      { name: 'Stripe', note: 'subs, marketplace, Terminal' },
+      { name: 'PayPal', note: 'pagos internacionales' },
+      { name: 'Mercado Pago', note: 'pagos LatAm' },
+      { name: 'Wompi', note: 'pagos Colombia (Bancolombia)' },
+      { name: 'PayU', note: 'pagos LatAm multi-país' },
+      { name: 'Nequi', note: 'billetera Colombia' },
+      { name: 'Daviplata', note: 'billetera Colombia' },
+      { name: 'PSE', note: 'débito bancario Colombia' },
+      { name: 'Bre-B', note: 'pagos inmediatos Colombia' },
+      { name: 'Addi', note: 'BNPL LatAm' },
+      { name: 'Klarna', note: 'BNPL global' },
+      { name: 'Afterpay', note: 'BNPL' },
+      { name: 'Apple Pay', note: 'wallet iOS' },
+      { name: 'Google Pay', note: 'wallet Android' },
+      { name: 'Plaid', note: 'Open Banking US' },
+      { name: 'Belvo', note: 'Open Banking LatAm' },
+    ],
+  },
+  {
+    id: 'einvoicing',
+    title: 'Facturación electrónica LatAm',
+    icon: DocumentTextIcon,
+    description: 'Integraciones oficiales con los 8 organismos tributarios principales.',
+    items: [
+      { name: 'DIAN', note: 'Colombia — facturación electrónica' },
+      { name: 'SAT', note: 'México — CFDI 4.0' },
+      { name: 'AFIP', note: 'Argentina — FE electrónica' },
+      { name: 'SII', note: 'Chile — DTE' },
+      { name: 'SUNAT', note: 'Perú — comprobantes electrónicos' },
+      { name: 'DGI', note: 'Uruguay — CFE' },
+      { name: 'SET', note: 'Paraguay — KuDE' },
+      { name: 'SRI', note: 'Ecuador — comprobantes electrónicos' },
+    ],
+  },
+  {
+    id: 'ecommerce',
+    title: 'E-commerce',
+    icon: ShoppingBagIcon,
+    description: 'Tiendas headless, custom y plataformas tradicionales.',
+    items: [
+      { name: 'Shopify', note: 'apps custom + checkout extensions' },
+      { name: 'WooCommerce', note: 'WordPress commerce' },
+      { name: 'Magento', note: 'enterprise B2B/B2C' },
+      { name: 'VTEX', note: 'commerce LatAm' },
+      { name: 'Saleor', note: 'headless GraphQL' },
+      { name: 'Medusa.js', note: 'open-source Node' },
+      { name: 'Commerce Layer', note: 'composable commerce' },
+    ],
+  },
+  {
+    id: 'analytics',
+    title: 'Analytics & Observabilidad',
+    icon: ChartBarIcon,
+    description: 'Métricas de producto, errores, logs y traces distribuidos.',
+    items: [
+      { name: 'Google Analytics 4', note: 'web + app' },
+      { name: 'Mixpanel', note: 'product analytics' },
+      { name: 'Amplitude', note: 'cohortes y funnels' },
+      { name: 'Heap', note: 'auto-track' },
+      { name: 'PostHog', note: 'self-hosted all-in-one' },
+      { name: 'Hotjar', note: 'heatmaps + grabaciones' },
+      { name: 'FullStory', note: 'session replay enterprise' },
+      { name: 'Sentry', note: 'error tracking + tracing' },
+      { name: 'DataDog', note: 'APM + logs + infra' },
+      { name: 'New Relic', note: 'observability platform' },
+      { name: 'Grafana', note: 'dashboards' },
+      { name: 'Prometheus', note: 'métricas pull' },
+      { name: 'Loki', note: 'logs agregados' },
+      { name: 'Tempo', note: 'traces distribuidos' },
+      { name: 'OpenTelemetry', note: 'estándar OTel' },
+      { name: 'Better Stack', note: 'logs + uptime' },
+      { name: 'Plausible / Umami', note: 'analytics privacy-friendly' },
+    ],
+  },
+  {
+    id: 'marketing',
+    title: 'Marketing & SEO',
+    icon: MegaphoneIcon,
+    description: 'Visibilidad orgánica, automatización y growth.',
+    items: [
+      { name: 'Schema.org JSON-LD', note: 'structured data' },
+      { name: 'OpenGraph + Twitter Cards', note: 'share previews' },
+      { name: 'Sitemap.xml dinámico', note: 'cobertura completa' },
+      { name: 'robots.txt', note: 'control de crawlers' },
+      { name: 'Core Web Vitals', note: 'optimización LCP/INP/CLS' },
+      { name: 'Lighthouse audits', note: 'auditorías repetibles' },
+      { name: 'Mailchimp', note: 'email marketing clásico' },
+      { name: 'Klaviyo', note: 'email + SMS e-commerce' },
+      { name: 'Customer.io', note: 'mensajería automatizada' },
+      { name: 'HubSpot', note: 'CRM + marketing' },
+      { name: 'Iterable', note: 'cross-channel growth' },
+    ],
+  },
+  {
+    id: 'auth',
+    title: 'Auth & Identidad',
+    icon: LockClosedIcon,
+    description: 'Login social, SSO empresarial, MFA y passkeys.',
+    items: [
+      { name: 'NextAuth.js / Auth.js', note: 'auth Next nativo' },
+      { name: 'Clerk', note: 'auth managed dev-friendly' },
+      { name: 'Auth0', note: 'IdP enterprise' },
+      { name: 'Okta', note: 'IAM corporativo' },
+      { name: 'AWS Cognito', note: 'auth AWS-native' },
+      { name: 'Firebase Auth', note: 'auth Google' },
+      { name: 'Supabase Auth', note: 'auth + RLS Postgres' },
+      { name: 'Passport.js', note: 'estrategias custom' },
+      { name: 'Keycloak', note: 'IdP open-source' },
+      { name: 'SAML 2.0', note: 'SSO empresarial' },
+      { name: 'OIDC', note: 'OpenID Connect' },
+      { name: 'OAuth2', note: 'autorización delegada' },
+      { name: 'MFA', note: 'TOTP, WebAuthn passkeys, SMS' },
+      { name: 'SCIM', note: 'provisión automática usuarios' },
+    ],
+  },
+  {
+    id: 'maps',
+    title: 'Mapas & Geolocalización',
+    icon: MapIcon,
+    description: 'Routing, geocoding y visualización geoespacial.',
+    items: [
+      { name: 'Mapbox', note: 'mapas vectoriales + estilos' },
+      { name: 'Google Maps Platform', note: 'Places, Directions, Geocoding' },
+      { name: 'OpenStreetMap + Leaflet', note: 'open-source' },
+      { name: 'HERE Maps', note: 'routing logístico' },
+      { name: 'Geoapify', note: 'geocoding asequible' },
+    ],
+  },
+  {
+    id: 'storage',
+    title: 'Storage & CDN',
+    icon: ArchiveBoxIcon,
+    description: 'Archivos, imágenes y media a escala global.',
+    items: [
+      { name: 'AWS S3', note: 'object storage estándar' },
+      { name: 'Cloudflare R2', note: 'S3-compatible sin egress' },
+      { name: 'Google Cloud Storage', note: 'object storage GCP' },
+      { name: 'Cloudinary', note: 'image/video transformations' },
+      { name: 'ImageKit', note: 'imágenes on-the-fly' },
+      { name: 'imgix', note: 'imagen + CDN' },
+      { name: 'BunnyCDN', note: 'CDN económico' },
+    ],
+  },
+  {
+    id: 'devtools',
+    title: 'DevTools & DX',
+    icon: WrenchScrewdriverIcon,
+    description: 'Herramientas que mantienen la calidad alta y los ciclos cortos.',
+    items: [
+      { name: 'ESLint', note: 'reglas de calidad' },
+      { name: 'Prettier', note: 'formato consistente' },
+      { name: 'Husky', note: 'git hooks' },
+      { name: 'lint-staged', note: 'lint solo lo cambiado' },
+      { name: 'Commitlint', note: 'conventional commits' },
+      { name: 'Turborepo', note: 'monorepos rápidos' },
+      { name: 'pnpm workspaces', note: 'gestión multi-paquete' },
+      { name: 'yarn workspaces', note: 'monorepo alterno' },
+      { name: 'Storybook', note: 'docs componentes' },
+      { name: 'Chromatic', note: 'visual testing' },
+      { name: 'BrowserStack', note: 'cross-browser real devices' },
+    ],
+  },
+  {
+    id: 'compliance',
+    title: 'Compliance & Seguridad',
+    icon: ScaleIcon,
+    description: 'Marcos regulatorios para operar con seguridad y legalidad.',
+    items: [
+      { name: 'SOC 2', note: 'controles operacionales' },
+      { name: 'ISO 27001', note: 'gestión seguridad información' },
+      { name: 'GDPR', note: 'datos personales UE' },
+      { name: 'HIPAA', note: 'salud EE.UU.' },
+      { name: 'PCI-DSS', note: 'tarjetas de pago' },
+      { name: 'Habeas Data', note: 'Colombia, Ley 1581' },
+      { name: 'Ley 527', note: 'firma electrónica Colombia' },
+      { name: 'eIDAS', note: 'firma electrónica UE' },
+    ],
+  },
+];
 
-// Filtrado de tecnologías basado en búsqueda y categoría activa
-const filtered = useMemo(() => {
-  let result: Record<string, string[]> = { ...grouped };
+const aiCapabilities = [
+  {
+    title: 'RAG enterprise',
+    description: 'Hybrid retrieval (BM25 + vectorial), reranking, citaciones y workflows agentic.',
+  },
+  {
+    title: 'Chatbots conversacionales',
+    description: 'WhatsApp, web, Instagram, Messenger y Telegram con memoria y handoff humano.',
+  },
+  {
+    title: 'Procesamiento de documentos',
+    description: 'OCR, extracción de tablas, clasificación y validación de campos.',
+  },
+  {
+    title: 'Voice AI',
+    description: 'STT/TTS streaming, IVR conversacional, transcripción de llamadas.',
+  },
+  {
+    title: 'Visión por computadora',
+    description: 'Análisis de imágenes, OCR, moderación de contenido, conteo de objetos.',
+  },
+  {
+    title: 'AI Agents',
+    description: 'Planner/executor, tool calling, multi-agente con memoria persistente.',
+  },
+  {
+    title: 'ML clásico',
+    description: 'Clasificación, regresión, clustering, forecasting de demanda y series temporales.',
+  },
+  {
+    title: 'NLP',
+    description: 'Extracción de entidades, sentiment, intent classification, topic modeling.',
+  },
+  {
+    title: 'Recomendaciones',
+    description: 'Personalización producto y contenido — collaborative + content-based.',
+  },
+  {
+    title: 'Anomaly detection',
+    description: 'Detección de fraude, transacciones inusuales y comportamiento atípico.',
+  },
+  {
+    title: 'Predicción de negocio',
+    description: 'Churn, LTV, propensity scoring y next-best-action.',
+  },
+];
 
-  // Filtrar por categoría activa
-  if (activeCat !== 'All') {
-    result = { [activeCat]: grouped[activeCat as keyof typeof grouped] };
-  }
+const verticals = [
+  {
+    icon: HeartIcon,
+    title: 'Health-tech',
+    description: 'Telemedicina, EHR, integración HL7/FHIR y HIPAA. Caso reciente: SoSalud.',
+  },
+  {
+    icon: CreditCardIcon,
+    title: 'Fintech',
+    description: 'Facturación electrónica, KYC, pasarelas, billeteras y PCI-DSS.',
+  },
+  {
+    icon: ShoppingBagIcon,
+    title: 'E-commerce & Retail',
+    description: 'Multi-país, multi-warehouse, omnicanal y promociones complejas.',
+  },
+  {
+    icon: TruckIcon,
+    title: 'Logística & Delivery',
+    description: 'WMS, last-mile, routing optimizado y tracking en tiempo real.',
+  },
+  {
+    icon: AcademicCapIcon,
+    title: 'EdTech',
+    description: 'LMS, AI tutoring, evaluaciones automáticas y certificaciones.',
+  },
+  {
+    icon: DocumentTextIcon,
+    title: 'LegalTech',
+    description: 'Firma electrónica eIDAS / Ley 527, contratos inteligentes y compliance.',
+  },
+  {
+    icon: BriefcaseIcon,
+    title: 'CRM & Ventas',
+    description: 'Pipelines, automatización comercial y forecasting de ingresos.',
+  },
+  {
+    icon: BuildingOffice2Icon,
+    title: 'ERP & Operaciones',
+    description: 'Inventarios, facturación, contabilidad y nómina multi-país.',
+  },
+  {
+    icon: ChatBubbleLeftRightIcon,
+    title: 'Help desk & Customer support',
+    description: 'Mesa de servicio, SLAs, base de conocimiento con IA.',
+  },
+];
 
-  // Filtrar por búsqueda de texto
-  if (query.trim()) {
-    const lowerQuery = query.toLowerCase();
-    const newResult: Record<string, string[]> = {};
+const methodology = [
+  { step: '01', title: 'Discovery & roadmap', description: '1-2 semanas. Mapeamos objetivos, riesgos y entregables.' },
+  { step: '02', title: 'Diseño UI/UX en Figma', description: 'Mockups validables antes de escribir código de producción.' },
+  { step: '03', title: 'Sprints semanales', description: 'Reviews con cliente cada viernes, ajustes ágiles.' },
+  { step: '04', title: 'CI/CD desde día 1', description: 'Pipelines automáticas, staging permanente.' },
+  { step: '05', title: 'Tests automáticos', description: 'Unit + integration + E2E corriendo en cada PR.' },
+  { step: '06', title: 'Deploy continuo', description: 'Staging actualizado en cada merge, producción on-demand.' },
+  { step: '07', title: 'Producto en producción', description: 'Entrega real, no maquetas. Métricas desde el día uno.' },
+  { step: '08', title: 'Soporte post-entrega', description: '1-3 meses incluidos según contrato + SLA opcional.' },
+];
 
-    Object.entries(result).forEach(([cat, items]) => {
-      const filteredItems = items.filter(item =>
-        item.toLowerCase().includes(lowerQuery)
-      );
-      if (filteredItems.length > 0) {
-        newResult[cat] = filteredItems;
-      }
-    });
+const tooling = [
+  { label: 'Reuniones', items: ['Zoom', 'Google Meet', 'Microsoft Teams'] },
+  { label: 'Comunicación', items: ['Slack', 'WhatsApp', 'Email'] },
+  { label: 'Código', items: ['GitHub', 'GitLab', 'Bitbucket'] },
+  { label: 'Documentación', items: ['Notion', 'Confluence', 'GitBook'] },
+  { label: 'Issues', items: ['Linear', 'Jira', 'GitHub Issues'] },
+  { label: 'Tiempo', items: ['Toggl', 'Harvest', 'Clockify'] },
+];
 
-    return newResult;
-  }
+const caseStudies = [
+  {
+    badge: 'Health-tech · Bogotá',
+    title: 'SoSalud — VPN empresarial corporativa',
+    description:
+      'Tercero administrador de Nueva EPS. Implementación de VPN empresarial para habilitar trabajo remoto seguro de su equipo administrativo, con 2 meses de soporte post-entrega incluidos.',
+    tech: ['VPN site-to-site', 'IPsec / WireGuard', 'Hardening', 'Soporte 2 meses'],
+    metric: '$3.500.000 COP',
+    metricLabel: 'inversión total',
+  },
+  {
+    badge: 'Retail · Colombia',
+    title: 'Chatbot WhatsApp para empresa de productos',
+    description:
+      'Bot conversacional WhatsApp Business API con catálogo, captura de leads y handoff humano. Integrado a Wompi para cobros en línea y a CRM para seguimiento.',
+    tech: ['WhatsApp Business API', 'GPT-4o-mini', 'Wompi', 'PostgreSQL'],
+    metric: '+3x',
+    metricLabel: 'leads cualificados',
+  },
+  {
+    badge: 'Servicios profesionales · LatAm',
+    title: 'Dashboard ejecutivo mid-market',
+    description:
+      'Tablero unificado con métricas operativas y financieras consolidadas desde múltiples sistemas. Vista por sucursal, exportes PDF y alertas automáticas.',
+    tech: ['Next.js 14', 'PostgreSQL', 'Recharts', 'Vercel'],
+    metric: '-60%',
+    metricLabel: 'tiempo de cierre mensual',
+  },
+];
 
-  return result;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [query, activeCat]);
+const heroStats = [
+  { value: '8+', label: 'Años construyendo software' },
+  { value: '27', label: 'Demos funcionales en línea' },
+  { value: '50+', label: 'Tecnologías dominadas' },
+  { value: '8', label: 'Países LatAm en facturación electrónica' },
+];
 
+const missionPoints = [
+  'Software a medida con código fuente entregado',
+  'O SaaS hospedado por nosotros, listo para usar',
+  'Stack moderno: Next.js, Node, Python, IA',
+  'Foco LatAm — Colombia primero, todo el continente',
+];
 
+export default function AboutPage() {
   return (
     <>
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary-600 to-primary-800 text-white">
+      {/* Hero */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary-700 via-primary-800 to-secondary-900 text-white">
         <div className="absolute inset-0 bg-grid-pattern opacity-10" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary-500/20 rounded-full blur-3xl" />
+        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-secondary-500/20 rounded-full blur-3xl" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
           <div className="text-center max-w-4xl mx-auto">
-            <Badge variant="outline" size="lg" className="mb-6 border-white/30 text-white">
-              {t('badge')}
+            <Badge variant="outline" size="lg" className="mb-6 border-white/40 text-white">
+              Sobre Koptup
             </Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-              {t('hero.title')}
+              Koptup — Construimos software inteligente para LatAm
             </h1>
             <p className="text-xl md:text-2xl mb-10 text-primary-100">
-              {t('hero.subtitle')}
+              Equipo colombiano enfocado en construir productos de software a medida y plataformas SaaS,
+              con stack moderno, IA aplicada y entrega real en producción.
             </p>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-4xl md:text-5xl font-bold mb-2">
-                  {stat.value}
-                </div>
-                <div className="text-sm md:text-base text-primary-100">
-                  {stat.label}
-                </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-12">
+            {heroStats.map((s) => (
+              <div key={s.label} className="text-center">
+                <div className="text-4xl md:text-5xl font-bold mb-2">{s.value}</div>
+                <div className="text-sm md:text-base text-primary-100">{s.label}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Mission Section */}
+      {/* ¿Quiénes somos? */}
       <section className="section-padding bg-white dark:bg-secondary-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
+              <Badge variant="primary" size="md" className="mb-4">
+                ¿Quiénes somos?
+              </Badge>
               <h2 className="text-3xl md:text-5xl font-bold text-secondary-900 dark:text-white mb-6">
-                {t('mission.title')}
+                Un equipo técnico, no una agencia
               </h2>
               <p className="text-lg text-secondary-700 dark:text-secondary-300 mb-6">
-                {t('mission.text1')}
+                Koptup nace en Colombia liderado por <strong>Ronald Cipagauta</strong>, desarrollador full-stack con
+                más de 8 años construyendo productos digitales para clientes en Colombia, México, Costa Rica y otros
+                países de LatAm. Somos un equipo pequeño y altamente técnico — escribimos código, no slides.
               </p>
               <p className="text-lg text-secondary-700 dark:text-secondary-300 mb-6">
-                {t('mission.text2')}
+                Trabajamos en dos modalidades: <strong>software a medida</strong> con código fuente entregado al
+                cliente, o <strong>SaaS hospedado</strong> por nosotros listo para usar. En ambos casos garantizamos
+                stack moderno, tests automáticos, CI/CD y soporte post-entrega.
               </p>
               <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <CheckCircleIcon className="h-6 w-6 text-primary-600 dark:text-primary-400 flex-shrink-0" />
-                  <span className="text-secondary-700 dark:text-secondary-300">
-                    {t('mission.points.custom')}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircleIcon className="h-6 w-6 text-primary-600 dark:text-primary-400 flex-shrink-0" />
-                  <span className="text-secondary-700 dark:text-secondary-300">
-                    {t('mission.points.modern')}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircleIcon className="h-6 w-6 text-primary-600 dark:text-primary-400 flex-shrink-0" />
-                  <span className="text-secondary-700 dark:text-secondary-300">
-                    {t('mission.points.support')}
-                  </span>
-                </div>
+                {missionPoints.map((point) => (
+                  <div key={point} className="flex items-center gap-3">
+                    <CheckCircleIcon className="h-6 w-6 text-primary-600 dark:text-primary-400 flex-shrink-0" />
+                    <span className="text-secondary-700 dark:text-secondary-300">{point}</span>
+                  </div>
+                ))}
               </div>
             </div>
 
             <div className="relative">
-              <div className="aspect-square rounded-2xl overflow-hidden shadow-2xl">
-                <div
-                  className="w-full h-full bg-cover bg-center"
-                  style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800)' }}
-                />
+              <div className="aspect-square rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-primary-600 to-secondary-800 flex items-center justify-center">
+                <div className="text-center text-white p-8">
+                  <SparklesIcon className="h-20 w-20 mx-auto mb-6 opacity-90" />
+                  <div className="text-3xl font-bold mb-2">Ronald Cipagauta</div>
+                  <div className="text-primary-100 mb-6">Founder & CEO · Full-stack engineer</div>
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    {['Next.js', 'Node.js', 'Python', 'OpenAI', 'AWS', 'PostgreSQL'].map((s) => (
+                      <span
+                        key={s}
+                        className="px-3 py-1 bg-white/15 backdrop-blur rounded-full text-sm font-medium"
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
-              <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary-600 rounded-2xl flex items-center justify-center">
-                <SparklesIcon className="h-16 w-16 text-white" />
+              <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary-600 rounded-2xl flex items-center justify-center shadow-xl">
+                <RocketLaunchIcon className="h-16 w-16 text-white" />
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Values Section */}
+      {/* Tecnologías que dominamos */}
       <section className="section-padding bg-secondary-50 dark:bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
+            <CodeBracketIcon className="h-14 w-14 mx-auto text-primary-600 dark:text-primary-400 mb-3" />
+            <Badge variant="primary" size="md" className="mb-4">
+              Stack tecnológico
+            </Badge>
             <h2 className="text-3xl md:text-5xl font-bold text-secondary-900 dark:text-white mb-4">
-              {t('values.title')}
+              Tecnologías que dominamos
             </h2>
             <p className="text-xl text-secondary-600 dark:text-secondary-400 max-w-3xl mx-auto">
-              {t('values.subtitle')}
+              Más de 150 herramientas, frameworks y servicios productivos. Elegimos la combinación correcta para
+              cada problema — no forzamos un stack único.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {values.map((value, index) => {
-              const Icon = value.icon;
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {techCategories.map((cat) => {
+              const Icon = cat.icon;
               return (
-                <Card key={index} variant="bordered" className="text-center hover:shadow-medium transition-shadow">
-                  <CardContent className="p-8">
-                    <div className="w-16 h-16 bg-primary-100 dark:bg-primary-950 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <Icon className="h-8 w-8 text-primary-600 dark:text-primary-400" />
+                <Card key={cat.id} variant="bordered" className="overflow-hidden">
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-12 h-12 bg-primary-100 dark:bg-primary-950 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <Icon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-secondary-900 dark:text-white mb-1">
+                          {cat.title}{' '}
+                          <span className="text-sm font-normal text-secondary-500 dark:text-secondary-400">
+                            ({cat.items.length})
+                          </span>
+                        </h3>
+                        <p className="text-sm text-secondary-600 dark:text-secondary-400">{cat.description}</p>
+                      </div>
                     </div>
-                    <h3 className="text-xl font-bold text-secondary-900 dark:text-white mb-3">
-                      {value.title}
-                    </h3>
-                    <p className="text-secondary-700 dark:text-secondary-300">
-                      {value.description}
-                    </p>
+
+                    <div className="flex flex-wrap gap-2">
+                      {cat.items.map((item) => (
+                        <span
+                          key={item.name}
+                          title={item.note}
+                          className="group inline-flex items-center px-3 py-1.5 rounded-lg border border-secondary-200 dark:border-secondary-800 bg-white dark:bg-secondary-900 text-sm font-medium text-secondary-800 dark:text-secondary-200 hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-950/30 hover:text-primary-700 dark:hover:text-primary-300 transition-colors cursor-default"
+                        >
+                          {item.name}
+                        </span>
+                      ))}
+                    </div>
                   </CardContent>
                 </Card>
               );
@@ -263,44 +713,31 @@ const filtered = useMemo(() => {
         </div>
       </section>
 
-      {/* Team Section */}
+      {/* Capacidades de IA */}
       <section className="section-padding bg-white dark:bg-secondary-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
+            <CpuChipIcon className="h-14 w-14 mx-auto text-primary-600 dark:text-primary-400 mb-3" />
+            <Badge variant="primary" size="md" className="mb-4">
+              IA aplicada
+            </Badge>
             <h2 className="text-3xl md:text-5xl font-bold text-secondary-900 dark:text-white mb-4">
-              {t('team.title')}
+              Capacidades de IA en producción
             </h2>
             <p className="text-xl text-secondary-600 dark:text-secondary-400 max-w-3xl mx-auto">
-              {t('team.subtitle')}
+              No vendemos prompts. Construimos sistemas con LLMs, RAG, agentes y ML clásico operando 24/7.
             </p>
           </div>
 
-          <div className="flex justify-center">
-            {team.map((member, index) => (
-              <Card key={index} variant="bordered" className="text-center hover:shadow-large transition-shadow max-w-md w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {aiCapabilities.map((cap) => (
+              <Card key={cap.title} variant="bordered" className="hover:shadow-medium transition-shadow">
                 <CardContent className="p-6">
-                  <div className="w-32 h-32 rounded-full overflow-hidden mx-auto mb-4 ring-4 ring-primary-100 dark:ring-primary-950">
-                    <div
-                      className="w-full h-full bg-cover bg-center"
-                      style={{ backgroundImage: `url(${member.avatar})` }}
-                    />
+                  <div className="flex items-start gap-3 mb-3">
+                    <SparklesIcon className="h-6 w-6 text-primary-600 dark:text-primary-400 flex-shrink-0 mt-0.5" />
+                    <h3 className="text-lg font-bold text-secondary-900 dark:text-white">{cap.title}</h3>
                   </div>
-                  <h3 className="text-xl font-bold text-secondary-900 dark:text-white mb-1">
-                    {member.name}
-                  </h3>
-                  <p className="text-sm text-primary-600 dark:text-primary-400 mb-3 font-semibold">
-                    {member.role}
-                  </p>
-                  <p className="text-sm text-secondary-700 dark:text-secondary-300 mb-4">
-                    {member.description}
-                  </p>
-                  <div className="flex flex-wrap gap-2 justify-center">
-                    {member.skills.map((skill, idx) => (
-                      <Badge key={idx} variant="secondary" size="sm">
-                        {skill}
-                      </Badge>
-                    ))}
-                  </div>
+                  <p className="text-secondary-700 dark:text-secondary-300 text-sm">{cap.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -308,170 +745,162 @@ const filtered = useMemo(() => {
         </div>
       </section>
 
-      {/* Timeline Section */}
+      {/* Verticales */}
       <section className="section-padding bg-secondary-50 dark:bg-black">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <Badge variant="primary" size="md" className="mb-4">
+              Industrias
+            </Badge>
             <h2 className="text-3xl md:text-5xl font-bold text-secondary-900 dark:text-white mb-4">
-              {t('history.title')}
+              Verticales donde tenemos experiencia real
             </h2>
             <p className="text-xl text-secondary-600 dark:text-secondary-400 max-w-3xl mx-auto">
-              {t('history.subtitle')}
+              Conocemos los flujos, regulaciones y dolores específicos de cada sector.
             </p>
           </div>
 
-          <div className="relative">
-            {/* Timeline Line */}
-            <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-primary-200 dark:bg-primary-900 -translate-x-1/2 hidden md:block" />
-
-            <div className="space-y-12">
-              {milestones.map((milestone, index) => (
-                <div key={index} className="relative">
-                  <div className={`md:grid md:grid-cols-2 md:gap-8 ${index % 2 === 0 ? '' : 'md:flex-row-reverse'}`}>
-                    <div className={`${index % 2 === 0 ? 'md:text-right' : 'md:col-start-2'}`}>
-                      <Card variant="bordered" className="hover:shadow-medium transition-shadow">
-                        <CardContent className="p-6">
-                          <div className="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-2">
-                            {milestone.year}
-                          </div>
-                          <h3 className="text-xl font-bold text-secondary-900 dark:text-white mb-2">
-                            {milestone.title}
-                          </h3>
-                          <p className="text-secondary-700 dark:text-secondary-300">
-                            {milestone.description}
-                          </p>
-                        </CardContent>
-                      </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {verticals.map((v) => {
+              const Icon = v.icon;
+              return (
+                <Card key={v.title} variant="bordered" className="hover:shadow-medium transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="w-12 h-12 bg-primary-100 dark:bg-primary-950 rounded-xl flex items-center justify-center mb-4">
+                      <Icon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
                     </div>
-                  </div>
-
-                  {/* Timeline Dot */}
-                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:block">
-                    <div className="w-4 h-4 bg-primary-600 rounded-full ring-4 ring-white dark:ring-secondary-950" />
-                  </div>
-                </div>
-              ))}
-            </div>
+                    <h3 className="text-lg font-bold text-secondary-900 dark:text-white mb-2">{v.title}</h3>
+                    <p className="text-secondary-700 dark:text-secondary-300 text-sm">{v.description}</p>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       </section>
-<section className="section-padding bg-white dark:bg-secondary-950">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
-          <CodeBracketIcon className="h-14 w-14 mx-auto text-primary-600 dark:text-primary-400 mb-3" />
-          <h2 className="text-3xl md:text-4xl font-bold text-secondary-900 dark:text-white mb-2">
-            {t('technologies.title')}
-          </h2>
-          <p className="text-lg text-secondary-600 dark:text-secondary-400 max-w-3xl mx-auto">
-            {t('technologies.subtitle')}
-          </p>
-        </div>
 
-        {/* Highlights */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
-          {highlights.map(h => (
-            <div key={h.name} className="flex items-center gap-3 p-3 border rounded-lg shadow-sm">
-              <div aria-hidden className="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center text-sm">
-                {h.name[0]}
-              </div>
-              <div>
-                <div className="font-medium">{h.name}</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">{h.level}</div>
-              </div>
-            </div>
-          ))}
-        </div>
+      {/* Metodología */}
+      <section className="section-padding bg-white dark:bg-secondary-950">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <Badge variant="primary" size="md" className="mb-4">
+              Cómo trabajamos
+            </Badge>
+            <h2 className="text-3xl md:text-5xl font-bold text-secondary-900 dark:text-white mb-4">
+              Metodología probada en 8+ años
+            </h2>
+            <p className="text-xl text-secondary-600 dark:text-secondary-400 max-w-3xl mx-auto">
+              Iteramos en sprints semanales con producto real en staging desde el día uno.
+            </p>
+          </div>
 
-        {/* Controls */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
-          <input
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            placeholder={t('technologies.searchPlaceholder')}
-            className="flex-1 px-4 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white placeholder-secondary-400 dark:placeholder-secondary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
-          />
-          <div className="flex gap-2 flex-wrap">
-            {categories.map(c => (
-              <button
-                key={c}
-                onClick={() => { setActiveCat(c); setShowAll(false); }}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeCat === c
-                    ? 'bg-primary-600 text-white shadow-sm'
-                    : 'border border-secondary-300 dark:border-secondary-700 text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800'
-                }`}
-              >
-                {c}
-              </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {methodology.map((m) => (
+              <Card key={m.step} variant="bordered" className="hover:shadow-medium transition-shadow">
+                <CardContent className="p-6">
+                  <div className="text-4xl font-bold text-primary-600 dark:text-primary-400 mb-3">{m.step}</div>
+                  <h3 className="text-lg font-bold text-secondary-900 dark:text-white mb-2">{m.title}</h3>
+                  <p className="text-secondary-700 dark:text-secondary-300 text-sm">{m.description}</p>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
+      </section>
 
-        {/* Grouped lists */}
-        <div className="space-y-6">
-          {Object.entries(filtered).length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-secondary-600 dark:text-secondary-400">
-                {t('technologies.noResults', { query })}
-              </p>
-            </div>
-          ) : (
-            Object.entries(filtered).map(([cat, items]) => (
-              <Card key={cat} variant="bordered" className="overflow-hidden">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-bold text-secondary-900 dark:text-white">
-                      {cat}{' '}
-                      <span className="text-sm font-normal text-secondary-500 dark:text-secondary-400">
-                        ({items.length})
-                      </span>
-                    </h3>
-                    {items.length > 4 && (
-                      <button
-                        onClick={() => setShowAll(s => !s)}
-                        className="text-sm text-primary-600 dark:text-primary-400 hover:underline font-medium"
-                      >
-                        {showAll ? t('technologies.showLess') : t('technologies.viewAll')}
-                      </button>
-                    )}
+      {/* Herramientas de trabajo */}
+      <section className="section-padding bg-secondary-50 dark:bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <CommandLineIcon className="h-14 w-14 mx-auto text-primary-600 dark:text-primary-400 mb-3" />
+            <h2 className="text-3xl md:text-5xl font-bold text-secondary-900 dark:text-white mb-4">
+              Cómo nos coordinamos con el cliente
+            </h2>
+            <p className="text-xl text-secondary-600 dark:text-secondary-400 max-w-3xl mx-auto">
+              Nos adaptamos a las herramientas del cliente o sugerimos las que mejor encajan.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {tooling.map((g) => (
+              <Card key={g.label} variant="bordered">
+                <CardContent className="p-5">
+                  <div className="text-xs uppercase tracking-wide text-secondary-500 dark:text-secondary-400 font-semibold mb-3">
+                    {g.label}
                   </div>
-
                   <div className="flex flex-wrap gap-2">
-                    {(showAll ? items : items.slice(0, 8)).map(it => (
-                      <Badge
-                        key={it}
-                        variant="secondary"
-                        size="lg"
-                        className="text-sm font-medium"
-                      >
-                        {it}
+                    {g.items.map((i) => (
+                      <Badge key={i} variant="secondary" size="sm">
+                        {i}
                       </Badge>
                     ))}
                   </div>
                 </CardContent>
               </Card>
-            ))
-          )}
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-      {/* CTA Section */}
-      <section className="section-padding bg-gradient-to-br from-primary-600 to-primary-800 text-white">
+      {/* Casos reales */}
+      <section className="section-padding bg-white dark:bg-secondary-950">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <ShieldCheckIcon className="h-14 w-14 mx-auto text-primary-600 dark:text-primary-400 mb-3" />
+            <Badge variant="primary" size="md" className="mb-4">
+              Casos reales
+            </Badge>
+            <h2 className="text-3xl md:text-5xl font-bold text-secondary-900 dark:text-white mb-4">
+              Proyectos que ya entregamos
+            </h2>
+            <p className="text-xl text-secondary-600 dark:text-secondary-400 max-w-3xl mx-auto">
+              Una muestra del trabajo en producción para clientes reales en Colombia y LatAm.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {caseStudies.map((cs) => (
+              <Card key={cs.title} variant="bordered" className="hover:shadow-large transition-shadow flex flex-col">
+                <CardContent className="p-6 flex flex-col h-full">
+                  <Badge variant="info" size="sm" className="self-start mb-4">
+                    {cs.badge}
+                  </Badge>
+                  <h3 className="text-xl font-bold text-secondary-900 dark:text-white mb-3">{cs.title}</h3>
+                  <p className="text-secondary-700 dark:text-secondary-300 text-sm mb-4 flex-grow">
+                    {cs.description}
+                  </p>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {cs.tech.map((t) => (
+                      <Badge key={t} variant="secondary" size="sm">
+                        {t}
+                      </Badge>
+                    ))}
+                  </div>
+                  <div className="border-t border-secondary-200 dark:border-secondary-800 pt-4 mt-auto">
+                    <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">{cs.metric}</div>
+                    <div className="text-xs text-secondary-500 dark:text-secondary-400">{cs.metricLabel}</div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA final */}
+      <section className="section-padding bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <GlobeAltIcon className="h-16 w-16 mx-auto mb-6 opacity-90" />
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            {t('cta.title')}
-          </h2>
+          <h2 className="text-3xl md:text-5xl font-bold mb-6">¿Listo para empezar?</h2>
           <p className="text-xl mb-10 text-primary-100">
-            {t('cta.subtitle')}
+            Probá nuestras 27 demos en vivo o hablá directamente con un experto del equipo.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="outline" className="bg-white text-primary-600 hover:bg-primary-50" asChild>
-              <Link href="/contact">{t('cta.button1')}</Link>
+            <Button size="lg" variant="outline" className="bg-white text-primary-700 hover:bg-primary-50" asChild>
+              <Link href="/demo">Probar demos</Link>
             </Button>
-            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
-              <Link href="/services">{t('cta.button2')}</Link>
+            <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
+              <Link href="/contact">Hablar con un experto</Link>
             </Button>
           </div>
         </div>
