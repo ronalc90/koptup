@@ -27,6 +27,7 @@ Cada demo es una aplicación interactiva navegable, con datos simulados realista
 | Scraping & Data Extraction | Data | Visual scraper builder con AI extraction, proxy rotation, captcha solving y auto-fix cuando cambia el DOM. | [Ver demo](./apps/web/src/app/demo/scraping/) |
 | Code Review IA | DevTools | Review automatizado en PRs con SAST/DAST/SCA, test generation, refactoring y analytics de calidad. | [Ver demo](./apps/web/src/app/demo/code-review-ia/) |
 | Moderación de Contenido IA | Trust & Safety | Clasificación multi-modal NSFW/hate/spam con human-in-the-loop, wellness para moderadores y compliance DSA. | [Ver demo](./apps/web/src/app/demo/moderacion-contenido/) |
+| App de Delivery | OnDemand | 3 apps (customer / driver / merchant) con tracking en vivo, routing ML, anti-fraude y pricing dinámico. | [Ver demo](./apps/web/src/app/demo/delivery/) |
 
 ## 🚀 Stack Tecnológico
 
