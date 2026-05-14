@@ -112,7 +112,16 @@ export const metadata = {
   },
 };
 
-// Load messages based on locale (root + per-demo files in messages/demos/*.{locale}.json)
+async function loadAggregate(locale: string, name: 'demos' | 'offerings'): Promise<Record<string, any>> {
+  try {
+    const mod = await import(`../../messages/_${name}.${locale}.json`);
+    return (mod as any).default ?? mod;
+  } catch (err) {
+    console.warn(`[layout] no aggregate for ${name}.${locale} — corré "npm run merge-messages"`, err);
+    return {};
+  }
+}
+
 async function getMessages(locale: string) {
   let base: Record<string, any>;
   try {
@@ -127,47 +136,11 @@ async function getMessages(locale: string) {
     }
   }
 
-  // Merge per-demo + per-offering messages so client components resolve demoCrm, demosExtra, offering_*, etc.
-  // En producción `process.cwd()` puede no apuntar a `apps/web` (monorepo / standalone),
-  // por eso probamos varias rutas candidatas antes de rendirnos. Si todas fallan loggeamos
-  // un warning explícito que aparece en los logs de Railway/Vercel.
-  try {
-    const fs = await import('fs');
-    const path = await import('path');
-    for (const subdir of ['demos', 'offerings']) {
-      const candidates = [
-        path.join(process.cwd(), 'messages', subdir),
-        path.join(process.cwd(), 'apps', 'web', 'messages', subdir),
-        path.join(process.cwd(), '..', 'messages', subdir),
-        path.join(process.cwd(), '..', '..', 'messages', subdir),
-      ];
-      const dir = candidates.find((p) => {
-        try {
-          return fs.existsSync(p);
-        } catch {
-          return false;
-        }
-      });
-      if (!dir) {
-        console.warn(`[layout] messages dir not found for "${subdir}". cwd=${process.cwd()}`);
-        continue;
-      }
-      const files = fs.readdirSync(dir).filter((f) => f.endsWith(`.${locale}.json`));
-      for (const file of files) {
-        try {
-          const raw = fs.readFileSync(path.join(dir, file), 'utf8');
-          const json = JSON.parse(raw);
-          base = { ...base, ...json };
-        } catch (e) {
-          console.error(`[layout] failed to load ${subdir} messages: ${file}`, e);
-        }
-      }
-    }
-  } catch (e) {
-    console.error('[layout] failed to read messages subdirs', e);
-  }
-
-  return base;
+  const [demoMessages, offeringMessages] = await Promise.all([
+    loadAggregate(locale, 'demos'),
+    loadAggregate(locale, 'offerings'),
+  ]);
+  return { ...base, ...demoMessages, ...offeringMessages };
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -185,6 +158,26 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.google.com" />
         <link rel="dns-prefetch" href="https://koptup-uploads.s3.amazonaws.com" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function (regs) {
+                  for (var i = 0; i < regs.length; i++) regs[i].unregister();
+                }).catch(function () {});
+                if (window.caches && caches.keys) {
+                  caches.keys().then(function (names) {
+                    for (var i = 0; i < names.length; i++) {
+                      if (names[i].indexOf('next') !== -1 || names[i].indexOf('workbox') !== -1) {
+                        caches.delete(names[i]);
+                      }
+                    }
+                  }).catch(function () {});
+                }
+              }
+            `,
+          }}
+        />
       </head>
       <body className={`${inter.variable} ${poppins.variable} font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>

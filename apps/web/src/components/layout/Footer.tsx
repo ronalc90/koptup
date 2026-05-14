@@ -17,7 +17,7 @@ export default function Footer() {
 
   const company = [
     { name: t('nav.about'), href: '/about' },
-    { name: t('nav.pricing'), href: '/pricing' },
+    { name: t('nav.services'), href: '/services' },
     { name: t('nav.contact'), href: '/contact' },
   ];
 

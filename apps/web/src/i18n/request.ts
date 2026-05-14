@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 import { headers } from 'next/headers';
 import { getRequestConfig } from 'next-intl/server';
 
@@ -9,51 +7,14 @@ function getLocaleFromCookie(cookieHeader?: string | null) {
   return match ? match[1] : undefined;
 }
 
-/**
- * Resuelve el directorio `messages/` probando varias bases. En dev y en builds
- * standalone (Next.js + monorepo) el `process.cwd()` no siempre apunta a
- * `apps/web`. Probamos cwd y subir 1-2 niveles por si arrancó desde la raíz
- * del monorepo o desde una carpeta intermedia.
- */
-function resolveMessagesDir(subdir: string): string | null {
-  const candidates = [
-    path.join(process.cwd(), 'messages', subdir),
-    path.join(process.cwd(), 'apps', 'web', 'messages', subdir),
-    path.join(process.cwd(), '..', 'messages', subdir),
-    path.join(process.cwd(), '..', '..', 'messages', subdir),
-  ];
-  for (const candidate of candidates) {
-    try {
-      if (fs.existsSync(candidate)) return candidate;
-    } catch {
-      // ignore
-    }
-  }
-  return null;
-}
-
-function loadDirMessages(subdir: string, locale: string): Record<string, any> {
-  const dir = resolveMessagesDir(subdir);
-  const out: Record<string, any> = {};
-  if (!dir) {
-    console.warn(`[i18n] messages dir not found for "${subdir}". cwd=${process.cwd()}`);
-    return out;
-  }
+async function loadAggregate(locale: string, name: 'demos' | 'offerings'): Promise<Record<string, any>> {
   try {
-    const files = fs.readdirSync(dir).filter((f) => f.endsWith(`.${locale}.json`));
-    for (const file of files) {
-      try {
-        const raw = fs.readFileSync(path.join(dir, file), 'utf8');
-        const json = JSON.parse(raw);
-        Object.assign(out, json);
-      } catch (e) {
-        console.error(`[i18n] failed to load ${subdir} messages: ${file}`, e);
-      }
-    }
-  } catch (e) {
-    console.error(`[i18n] failed to read ${subdir} dir`, e);
+    const mod = await import(`../../messages/_${name}.${locale}.json`);
+    return (mod as any).default ?? mod;
+  } catch (err) {
+    console.warn(`[i18n/request] no aggregate for ${name}.${locale} — corré "npm run merge-messages"`, err);
+    return {};
   }
-  return out;
 }
 
 export default getRequestConfig(async () => {
@@ -70,8 +31,10 @@ export default getRequestConfig(async () => {
     messages = (await import(`../../messages/es.json`)).default;
   }
 
-  const demoMessages = loadDirMessages('demos', locale);
-  const offeringMessages = loadDirMessages('offerings', locale);
+  const [demoMessages, offeringMessages] = await Promise.all([
+    loadAggregate(locale, 'demos'),
+    loadAggregate(locale, 'offerings'),
+  ]);
   messages = { ...messages, ...demoMessages, ...offeringMessages };
 
   return {

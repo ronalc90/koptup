@@ -3,12 +3,15 @@
   "version": "1.0.3",
   "private": true,
   "scripts": {
+    "predev": "node scripts/merge-messages.mjs",
     "dev": "next dev",
+    "prebuild": "node scripts/merge-messages.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "test": "jest --passWithNoTests",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "merge-messages": "node scripts/merge-messages.mjs"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",

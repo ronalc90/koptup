@@ -107,7 +107,6 @@ export default function Navbar() {
     { name: t('nav.home'), href: '/' },
     { name: t('nav.services'), href: '/services' },
     { name: t('nav.demos'), href: '/demo' },
-    { name: t('nav.pricing'), href: '/pricing' },
     { name: t('nav.about'), href: '/about' },
     { name: t('nav.contact'), href: '/contact' },
   ];

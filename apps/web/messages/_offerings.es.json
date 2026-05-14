@@ -1,0 +1,1882 @@
+{
+  "offeringsCatalog": {
+    "hero": {
+      "title": "Planes y servicios",
+      "subtitle": "Elegí cómo querés trabajar con nosotros: comprá el software (te entregamos el código) o suscribite al SaaS mensual (lo hospedamos nosotros)."
+    },
+    "search": "Buscar...",
+    "modality": {
+      "label": "Modalidad",
+      "compra": "Comprar el software",
+      "compraDesc": "One-time setup + mantenimiento opcional. El código fuente queda en tu poder.",
+      "saas": "Suscripción SaaS mensual",
+      "saasDesc": "Lo hospedamos nosotros, pagás mensualidad, cancelás cuando quieras."
+    },
+    "tier": {
+      "basico": "Básico",
+      "profesional": "Profesional",
+      "avanzado": "Avanzado",
+      "enterprise": "Enterprise"
+    },
+    "currency": {
+      "label": "Moneda",
+      "cop": "COP",
+      "usd": "USD",
+      "trmLive": "TRM en vivo {value} (datos.gov.co)",
+      "trmCached": "TRM ~{value}"
+    },
+    "card": {
+      "viewMore": "Ver más detalles",
+      "viewDemo": "Probar demo",
+      "fromPrice": "Desde",
+      "perMonth": "/mes",
+      "setupOnce": "Setup único"
+    },
+    "modal": {
+      "close": "Cerrar",
+      "quote": "Cotizar este tier",
+      "incluye": "Qué incluye",
+      "limits": "Límites del tier",
+      "limitsAdminUsers": "Usuarios administradores",
+      "limitsEndUsers": "Usuarios finales",
+      "limitsAccounts": "Cuentas / tenants",
+      "limitsVolume": "Volumen mensual",
+      "limitsStorage": "Almacenamiento",
+      "limitsUnlimited": "Ilimitado",
+      "limitsNotApplicable": "N/A",
+      "support": "Soporte",
+      "costosCliente": "Costos que paga el cliente",
+      "costosClienteNote": "Los costos de APIs (OpenAI, Twilio) e infraestructura (AWS, GCP) los factura el proveedor directamente al cliente. No los marcamos.",
+      "implementacion": "Tiempo de implementación",
+      "weeks": "semanas",
+      "hours": "horas",
+      "month": "mes",
+      "comparison": "Comparar tiers",
+      "maintenanceLabel": "Mantenimiento mensual (opcional)",
+      "maintenanceNote": "Podés mantenerlo vos mismo o contratar nuestro mantenimiento mes a mes.",
+      "monthlyLabel": "Mensualidad",
+      "monthlyNote": "Incluye hosting, monitoreo y soporte. Sin permanencia."
+    },
+    "banner": {
+      "title": "Cómo escalamos",
+      "body": "Equipo basado en Colombia opera Lun–Vie 8AM–5PM. Construimos software alineado con HIPAA/SOC 2/ISO 27001 pero la certificación formal corre por cuenta del cliente. Si necesitás un alcance mayor al Enterprise, cotizamos personalizado en 48h hábiles."
+    },
+    "supportSLA": {
+      "email-24h": "Email horario laboral · 24h hábiles",
+      "email-whatsapp-4h": "Email + WhatsApp · 4h hábiles",
+      "email-whatsapp-slack-2h": "Email + WhatsApp + Slack · 2h hábiles",
+      "tickets-jira-zendesk-1h": "Jira/Zendesk con auditoría · 1h crítico"
+    },
+    "integraciones": {
+      "basicas": "Básicas",
+      "medias": "Medias",
+      "avanzadas": "Avanzadas",
+      "empresariales": "Empresariales"
+    },
+    "categories": {
+      "all": "Todos",
+      "sales": "Ventas",
+      "finance": "Finanzas",
+      "operations": "Operaciones",
+      "productivity": "Productividad",
+      "aiPlatform": "Plataforma IA",
+      "security": "Seguridad",
+      "healthcare": "HealthTech",
+      "education": "Educación",
+      "commerce": "Comercio",
+      "support": "Soporte",
+      "devTools": "DevTools",
+      "voice": "Voz IA",
+      "data": "Datos",
+      "engagement": "Engagement"
+    },
+    "noResults": "No encontramos resultados para tu búsqueda.",
+    "cta": {
+      "title": "¿No sabés cuál elegir?",
+      "body": "Hablá con nosotros y te ayudamos a definir si comprás el software o usás nuestro SaaS.",
+      "button": "Hablar con un experto"
+    }
+  },
+  "offering_appDelivery": {
+    "name": "App de delivery",
+    "tagline": "Pedidos, rutas dinámicas y app de repartidor con mapas en vivo",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"App de delivery\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Operaciones",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con entregas completadas",
+        "incluye": [
+          "Hasta 1.000 pedidos/mes (1 ciudad)",
+          "Stripe/Wompi",
+          "Google Maps básico",
+          "App de pedido + tracking",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y entregas completadas",
+        "incluye": [
+          "Hasta 20.000 pedidos/mes (10 ciudades)",
+          "Multi-pasarela (Stripe/Wompi/PayU)",
+          "Rutas dinámicas con TMS",
+          "WhatsApp Business",
+          "POS restaurantes",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de entregas completadas",
+        "incluye": [
+          "Hasta 200.000 pedidos/mes (50 ciudades)",
+          "ML routing por demanda",
+          "Marketplace multi-restaurante",
+          "Loyalty/cashback integrado",
+          "Compliance laboral de riders",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de entregas completadas",
+        "incluye": [
+          "Hasta 2.5M+ pedidos/mes (ciudades ilimitadas)",
+          "OMS/ERP enterprise",
+          "Maps Platform enterprise",
+          "Multi-tenant para franquicias",
+          "Fraud + chargeback ML",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "Maps Platform (~$150–30.000 USD/mes), telefonía y push los paga el cliente directo al proveedor."
+  },
+  "offering_automatizacionWorkflows": {
+    "name": "Automatización de workflows",
+    "tagline": "Conectá tus apps y automatizá procesos con steps de IA",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Automatización de workflows\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Plataforma IA",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con workflows automatizados",
+        "incluye": [
+          "Hasta 10.000 ejecuciones/mes",
+          "HTTP/REST steps",
+          "Email + Sheets",
+          "Slack notify",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y workflows automatizados",
+        "incluye": [
+          "Hasta 250.000 ejecuciones/mes",
+          "CRM/ERP connectors",
+          "Cloud storage (S3/Drive)",
+          "WhatsApp Business",
+          "Webhooks bidireccionales",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de workflows automatizados",
+        "incluye": [
+          "Hasta 2.5M ejecuciones/mes",
+          "Workflows long-running con retries",
+          "Branching condicional con IA",
+          "Workers dedicados",
+          "Auditoría de ejecuciones",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de workflows automatizados",
+        "incluye": [
+          "Hasta 25M+ ejecuciones/mes",
+          "iPaaS enterprise (MuleSoft/Boomi)",
+          "EDI multi-protocolo",
+          "Kafka/RabbitMQ event bus",
+          "Temporal cluster",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "LLM (~$50–10.000 USD/mes) e iPaaS premium los paga el cliente directo al proveedor."
+  },
+  "offering_biDashboard": {
+    "name": "Dashboard ejecutivo con IA",
+    "tagline": "Tus KPIs en un solo tablero, con resúmenes generados por IA",
+    "description": "Visualizá ventas, finanzas y operaciones en tiempo real con explicaciones automáticas y forecasting. Lo entregamos como software o como SaaS mensual.",
+    "categoryLabel": "Plataforma IA",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para PYMEs que quieren KPIs claros sin contratar un BI Manager",
+        "idealPara": "Equipos hasta 50 personas con datos en Sheets o Postgres",
+        "incluye": [
+          "Procesamiento hasta 100.000 filas al mes",
+          "Conectores CSV, Google Sheets y Postgres directo",
+          "Hasta 5 tableros con widgets prediseñados",
+          "Resúmenes ejecutivos automáticos opcionales",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "BI con warehouse y forecasting para empresas medianas",
+        "idealPara": "Empresas con datos en ERP, CRM y marketing tools",
+        "incluye": [
+          "Procesamiento hasta 1M de filas al mes",
+          "Warehouse opcional (BigQuery o Snowflake)",
+          "Conectores ERP (Siigo, SAP B1) y CRM (HubSpot)",
+          "Forecasting con IA por línea de negocio",
+          "Alertas Slack/Teams por desvíos de KPI",
+          "Permisos por equipo y row-level security básico",
+          "Soporte por email + WhatsApp, 4h hábiles"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "BI multi-fuente con dashboards real-time",
+        "idealPara": "Operaciones medianas–grandes con análisis multi-canal",
+        "incluye": [
+          "Procesamiento hasta 25M de filas al mes",
+          "Warehouse enterprise con CDC casi en tiempo real",
+          "Federación de fuentes (ERP + CRM + marketing + ops)",
+          "Forecasting avanzado y detección de anomalías con IA",
+          "Row-level security granular por usuario",
+          "Exportes programados a Excel/PowerPoint",
+          "Workspaces para equipos con dashboards privados",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "BI corporativo con governance y multi-warehouse",
+        "idealPara": "Corporaciones con compliance y múltiples unidades de negocio",
+        "incluye": [
+          "Procesamiento de 250M+ filas al mes",
+          "Multi-warehouse federation (Snowflake + Databricks)",
+          "Data lineage y governance corporativos",
+          "Arquitectura alineada con SOC 2/ISO 27001 (certificación a cargo del cliente)",
+          "Row-level security multi-tenant por unidad",
+          "SSO SAML/OIDC + SCIM provisioning",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes ejecutivos mensuales para tu comité"
+        ]
+      }
+    },
+    "costoNote": "Los costos del warehouse (BigQuery/Snowflake ~$50–20.000 USD/mes) y de los LLMs los paga el cliente directo al proveedor."
+  },
+  "offering_chatbotRagIa": {
+    "name": "Chatbot RAG con IA",
+    "tagline": "Asistente virtual que entiende tu negocio",
+    "description": "Bot conversacional entrenado con tu base de conocimiento. Lo podés comprar como software a medida (te entregamos el código) o suscribirte al SaaS mensual hospedado por nosotros.",
+    "categoryLabel": "Plataforma IA",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "PYMEs con hasta 5.000 conversaciones al mes",
+        "incluye": [
+          "Hasta 5.000 conversaciones al mes",
+          "1 fuente de conocimiento (PDF, Notion o sitio web)",
+          "Widget embebible para web",
+          "Branding KopTup discreto en el widget",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para PYMEs con servicio al cliente activo",
+        "idealPara": "Equipos con 10–30 personas atendiendo a 25k conversaciones/mes",
+        "incluye": [
+          "Hasta 25.000 conversaciones al mes",
+          "Hasta 5 fuentes de conocimiento con reentrenamiento programado",
+          "WhatsApp Business + 2 canales adicionales",
+          "Handoff a humano y reportes semanales",
+          "Integración con tu CRM (HubSpot, Salesforce)",
+          "Panel de métricas con CSAT y temas más consultados",
+          "Soporte por email + WhatsApp, 4h hábiles"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alta personalización",
+        "idealPara": "Empresas medianas con tráfico constante y procesos automatizables",
+        "incluye": [
+          "Hasta 100.000 conversaciones al mes",
+          "Hasta 25 fuentes con sync automático cada hora",
+          "Multi-canal (web, WhatsApp, Telegram, Messenger)",
+          "Workflows configurables y A/B testing de respuestas",
+          "Integración con helpdesk (Zendesk, Jira Service Desk)",
+          "Reportes ejecutivos y exportes a Data Warehouse",
+          "Panel de fine-tuning de prompts por equipo",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Multi-tenant con arquitectura alineada con compliance",
+        "idealPara": "Corporaciones con varios verticales y requisitos de cumplimiento",
+        "incluye": [
+          "Volumen de 500.000+ conversaciones al mes",
+          "Fuentes ilimitadas con sync en tiempo real",
+          "Multi-tenant para varias marcas o unidades de negocio",
+          "Modelos privados u on-prem opcionales",
+          "SSO SAML/OIDC + auditoría de accesos",
+          "Arquitectura alineada con HIPAA/SOC 2/ISO 27001 (certificación a cargo del cliente)",
+          "PM + tech lead asignados durante la implementación",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes ejecutivos mensuales para tu comité"
+        ]
+      }
+    },
+    "costoNote": "Los costos de OpenAI/Anthropic (~$80–4.500 USD/mes según uso) y hosting/vector DB (~$50–10.000 USD/mes) los factura el proveedor directamente al cliente."
+  },
+  "offering_cmsHeadless": {
+    "name": "CMS headless",
+    "tagline": "Gestioná tu contenido desde un panel y publicalo en cualquier frontend",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"CMS headless\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Engagement",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con contenidos publicables",
+        "incluye": [
+          "Hasta 50.000 vistas/mes",
+          "Editor visual con bloques",
+          "Webhook a un frontend",
+          "Imágenes vía Cloudinary",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y contenidos publicables",
+        "incluye": [
+          "Hasta 1M vistas/mes",
+          "Multi-frontend (web + app + email)",
+          "GraphQL federado",
+          "A/B testing básico",
+          "PIM/DAM integrados",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de contenidos publicables",
+        "incluye": [
+          "Hasta 25M vistas/mes",
+          "Workflow editorial con aprobaciones",
+          "Personalización por segmento",
+          "Translation memory",
+          "Web vitals SLA aproximado",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de contenidos publicables",
+        "incluye": [
+          "Hasta 250M+ vistas/mes",
+          "Multi-marca y multi-idioma",
+          "DXP completo",
+          "SSO empresarial",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "CDN (~$20–6.000 USD/mes) y DAM premium los paga el cliente directo al proveedor."
+  },
+  "offering_codeReviewIa": {
+    "name": "Code review con IA",
+    "tagline": "Recibí comentarios automáticos en cada PR con sugerencias y bugs",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Code review con IA\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "DevTools",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con pull requests revisados",
+        "incluye": [
+          "Hasta 200 PRs/mes",
+          "GitHub 1 repo",
+          "Comentarios automáticos en PRs",
+          "Slack notify",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y pull requests revisados",
+        "incluye": [
+          "Hasta 3.000 PRs/mes",
+          "Multi-repo GitHub/GitLab/Bitbucket",
+          "Jira/Linear ticket sync",
+          "SAST básico (Semgrep)",
+          "IDE plugin VSCode",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de pull requests revisados",
+        "incluye": [
+          "Hasta 30.000 PRs/mes",
+          "LLMs reasoning para análisis profundo",
+          "Custom security rules",
+          "Coverage + DORA metrics",
+          "Policy as code básico",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de pull requests revisados",
+        "incluye": [
+          "Hasta 300.000+ PRs/mes",
+          "Azure DevOps + Perforce",
+          "Sonar/Snyk/Checkmarx adapter",
+          "Air-gapped option",
+          "Multi-org + SSO",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "LLM (~$80–25.000 USD/mes) y herramientas SAST/SCA enterprise los paga el cliente directo al proveedor."
+  },
+  "offering_crmIa": {
+    "name": "CRM con IA",
+    "tagline": "Cerrá más negocios con lead scoring y drafting automático",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"CRM con IA\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Ventas",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con leads gestionados",
+        "incluye": [
+          "Hasta 2.000 contactos + 500 deals/mes",
+          "Gmail/Outlook 1 cuenta",
+          "CSV import",
+          "Lead scoring con IA",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y leads gestionados",
+        "incluye": [
+          "Hasta 15.000 contactos + 5k deals/mes",
+          "Gmail multi-cuenta",
+          "WhatsApp Business API",
+          "Marketing emails (Mailchimp)",
+          "Telefonía Twilio",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de leads gestionados",
+        "incluye": [
+          "Hasta 75.000 contactos + 25k deals/mes",
+          "Drafting de emails con IA",
+          "Pipeline forecasting",
+          "Marketing automation con segmentos",
+          "CPQ básico",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de leads gestionados",
+        "incluye": [
+          "Hasta 250k+ contactos + 100k deals/mes",
+          "Marketing enterprise (Marketo/Eloqua)",
+          "Call center omnicanal",
+          "Data warehouse + reverse ETL",
+          "SSO + SCIM",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "LLM para scoring (~$50–10.000 USD/mes), telefonía y email Pro los paga el cliente directo al proveedor."
+  },
+  "offering_ecommerce": {
+    "name": "Tienda en línea",
+    "tagline": "Vendé en línea con catálogo, carrito y pagos integrados",
+    "description": "Plataforma de ecommerce con catálogo, checkout y pasarela. Comprala como software (con código fuente) o usá la suscripción mensual hospedada por nosotros.",
+    "categoryLabel": "Comercio",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Tienda lista para los primeros 1.000 pedidos/mes",
+        "idealPara": "Emprendimientos y pymes que recién arrancan online",
+        "incluye": [
+          "Hasta 1.000 órdenes al mes",
+          "Catálogo con variantes y stock simple",
+          "Pasarela Stripe o Wompi",
+          "Envíos por Servientrega/Coordinadora (manual)",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para tiendas con 10k órdenes y tracking automatizado",
+        "idealPara": "Marcas en crecimiento con varias categorías y envíos en Colombia",
+        "incluye": [
+          "Hasta 10.000 órdenes al mes",
+          "Multi-pasarela (Stripe, Wompi, PayU)",
+          "Tracking automático Servientrega/TCC/Coordinadora",
+          "Marketing email con segmentación básica",
+          "Integración con ERP (Siigo) o marketplaces (Mercado Libre)",
+          "Dashboard de ventas y reportes semanales",
+          "Soporte por email + WhatsApp, 4h hábiles"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con búsqueda avanzada y anti-fraude",
+        "idealPara": "Retailers medianos con catálogo grande y promociones complejas",
+        "incluye": [
+          "Hasta 75.000 órdenes al mes",
+          "Búsqueda Algolia y filtros facetados",
+          "Anti-fraude con reglas + Stripe Radar",
+          "OMS/WMS conectado para multi-bodega",
+          "B2B y B2C en la misma tienda",
+          "Marketing automation con segmentos dinámicos",
+          "Reportes ejecutivos y exportes a Data Warehouse",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Multi-país con arquitectura PCI-DSS y EDI",
+        "idealPara": "Cadenas y holdings con presencia en varios países",
+        "incluye": [
+          "Volúmenes de 250.000+ órdenes al mes",
+          "Multi-país, multi-moneda y multi-idioma",
+          "Catálogos B2B privados con precios negociados",
+          "EDI con proveedores y carriers",
+          "PIM dedicado y DAM para activos",
+          "Arquitectura alineada con PCI-DSS (certificación a cargo del cliente)",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes ejecutivos mensuales para tu comité"
+        ]
+      }
+    },
+    "costoNote": "Comisiones de pasarela (Stripe/Wompi ~2,9% + $0,30 por transacción), hosting y email transaccional los paga el cliente directo al proveedor."
+  },
+  "offering_erpModular": {
+    "name": "ERP modular",
+    "tagline": "Contabilidad, inventarios, compras y facturación electrónica en un solo lugar",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"ERP modular\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Finanzas",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con asientos contables",
+        "incluye": [
+          "Hasta 1.500 transacciones/mes",
+          "Facturación electrónica DIAN",
+          "Inventarios simples",
+          "Wompi/PSE para cobros",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y asientos contables",
+        "incluye": [
+          "Hasta 30.000 transacciones/mes",
+          "Multi-empresa",
+          "Bancos vía PSE/API",
+          "WMS/POS integrados",
+          "Nómina electrónica",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de asientos contables",
+        "incluye": [
+          "Hasta 250.000 transacciones/mes",
+          "Treasury + cash pooling",
+          "Consolidación multi-NIIF",
+          "BI corporativo",
+          "EDI con proveedores",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de asientos contables",
+        "incluye": [
+          "Hasta 2.5M+ transacciones/mes",
+          "SAP/Oracle interop",
+          "Auditoría continua (SOX)",
+          "Multi-país (CO/MX/PE/CL)",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "Proveedor tecnológico DIAN (~$30–8.000 USD/mes) y conectores bancarios los paga el cliente directo al proveedor."
+  },
+  "offering_facturacionElectronica": {
+    "name": "Facturación electrónica",
+    "tagline": "Emití facturas DIAN con multi-resolución y nómina electrónica",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Facturación electrónica\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Finanzas",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con documentos electrónicos",
+        "incluye": [
+          "Hasta 200 facturas/mes",
+          "Emisión DIAN",
+          "Envío por email",
+          "CSV import",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y documentos electrónicos",
+        "incluye": [
+          "Hasta 5.000 facturas/mes",
+          "ERP (Siigo/SAP B1/World Office)",
+          "Bancos para conciliación",
+          "POS integrado",
+          "Multi-resoluciones DIAN",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de documentos electrónicos",
+        "incluye": [
+          "Hasta 50.000 facturas/mes",
+          "Multi-país (CO/MX/PE/CL)",
+          "RADIAN + nómina electrónica",
+          "Auditoría + libros oficiales",
+          "EDI con clientes B2B",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de documentos electrónicos",
+        "incluye": [
+          "Hasta 500.000+ facturas/mes",
+          "SAP S/4HANA / Oracle adapter",
+          "Arquitectura alineada con SOX (certificación a cargo del cliente)",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "Proveedor tecnológico DIAN (~$30–6.000 USD/mes) lo paga el cliente directo al proveedor."
+  },
+  "offering_firmaElectronica": {
+    "name": "Firma electrónica",
+    "tagline": "Firmas válidas legalmente con KYC y estampa cronológica",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Firma electrónica\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Seguridad",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con documentos firmados",
+        "incluye": [
+          "Hasta 100 firmas/mes",
+          "Upload PDF/Word",
+          "Envío por email + link público",
+          "Verificación pública",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y documentos firmados",
+        "incluye": [
+          "Hasta 2.000 firmas/mes",
+          "CRM/ERP adapters",
+          "KYC biométrico",
+          "WhatsApp Business para entrega",
+          "API REST + webhooks",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de documentos firmados",
+        "incluye": [
+          "Hasta 25.000 firmas/mes",
+          "Multi-firmante con orden",
+          "Estampa cronológica + LTV",
+          "Templates dinámicos",
+          "Auditoría por documento",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de documentos firmados",
+        "incluye": [
+          "Hasta 500.000+ firmas/mes",
+          "PKI corporativa + HSM",
+          "eIDAS cualificada multi-país",
+          "DocuSign/Adobe Sign migration",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "Certificado digital, estampa cronológica y KYC los paga el cliente directo al proveedor."
+  },
+  "offering_gestionProyectos": {
+    "name": "Gestión de proyectos",
+    "tagline": "Controlá proyectos, tareas y tiempos con tableros e integraciones",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Gestión de proyectos\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Productividad",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con proyectos en simultáneo",
+        "incluye": [
+          "Hasta 25 proyectos activos",
+          "Tableros Kanban + listas",
+          "Time tracking básico",
+          "Comentarios y menciones",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y proyectos en simultáneo",
+        "incluye": [
+          "Hasta 250 proyectos activos",
+          "Jira/Linear sync",
+          "GitHub/GitLab branch sync",
+          "Reportes de capacity por equipo",
+          "Tempo/Harvest tiempos",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de proyectos en simultáneo",
+        "incluye": [
+          "Hasta 2.500 proyectos activos",
+          "Gantt y dependencias",
+          "Forecasting con IA",
+          "ResourceManager por skill",
+          "Multi-portafolio",
+          "Custom fields",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de proyectos en simultáneo",
+        "incluye": [
+          "Hasta 25.000+ proyectos activos",
+          "Azure DevOps + ServiceNow",
+          "PPM portfolio management",
+          "Power BI/Tableau dashboards",
+          "SSO + SCIM",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "Conectores premium e integraciones enterprise los paga el cliente directo al proveedor."
+  },
+  "offering_gestorDocumental": {
+    "name": "Gestor documental con IA",
+    "tagline": "Ordená, buscá y firmá tus documentos con OCR e indexado por IA",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Gestor documental con IA\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Datos",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con PDF, Word y scans",
+        "incluye": [
+          "Hasta 2.000 documentos/mes",
+          "Upload manual y desde email",
+          "OCR básico Tesseract",
+          "Búsqueda por texto plano",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y PDF, Word y scans",
+        "incluye": [
+          "Hasta 50.000 documentos/mes",
+          "OCR avanzado (AWS Textract)",
+          "Integración SharePoint/OneDrive",
+          "Firmas electrónicas integradas",
+          "API REST + webhooks",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de PDF, Word y scans",
+        "incluye": [
+          "Hasta 500.000 documentos/mes",
+          "IDP con clasificación automática",
+          "Workflows BPMN configurables",
+          "Retention policies por tipo doc",
+          "DLP básico",
+          "Búsqueda semántica con LLM",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de PDF, Word y scans",
+        "incluye": [
+          "Hasta 5M+ documentos/mes",
+          "ECM enterprise (Documentum/OpenText)",
+          "SAP ArchiveLink adapter",
+          "eDiscovery legal",
+          "Retención WORM",
+          "Clasificación con custom ML",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "OCR (~$30–10.000 USD/mes), storage y LLM los paga el cliente directo al proveedor."
+  },
+  "offering_helpdeskIa": {
+    "name": "Helpdesk con IA",
+    "tagline": "Atendé tickets con respuestas sugeridas y enrutamiento automático",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Helpdesk con IA\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Soporte",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con casos atendidos",
+        "incluye": [
+          "Hasta 500 tickets/mes",
+          "Email a ticket",
+          "Widget web",
+          "Respuestas sugeridas con IA",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y casos atendidos",
+        "incluye": [
+          "Hasta 10.000 tickets/mes",
+          "WhatsApp + Messenger + Telegram",
+          "Jira/Linear sync",
+          "CRM HubSpot",
+          "Knowledge base autoservicio",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de casos atendidos",
+        "incluye": [
+          "Hasta 100.000 tickets/mes",
+          "Omnicanal con cola unificada",
+          "IVR + voice AI",
+          "QM con speech analytics básico",
+          "BI con CSAT/NPS",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de casos atendidos",
+        "incluye": [
+          "Hasta 1M+ tickets/mes",
+          "Workforce management (NICE/Verint)",
+          "BPO/outsourcing handoff",
+          "SSO + GDPR alineado",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "LLM (~$80–10.000 USD/mes) y telefonía cloud los paga el cliente directo al proveedor."
+  },
+  "offering_hrms": {
+    "name": "HRMS",
+    "tagline": "Gestioná empleados, nómina y compliance laboral",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"HRMS\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Ventas",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con colaboradores en planta",
+        "incluye": [
+          "Hasta 50 empleados",
+          "Nómina electrónica DIAN",
+          "PILA/Aportes en Línea",
+          "Email a empleados",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y colaboradores en planta",
+        "incluye": [
+          "Hasta 1.500 empleados",
+          "ATS reclutamiento",
+          "LMS de capacitación",
+          "Bonos/Sodexo",
+          "Performance reviews 360",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de colaboradores en planta",
+        "incluye": [
+          "Hasta 12.000 empleados",
+          "Talent + Comp + Performance",
+          "BI con HR analytics",
+          "Multi-empresa",
+          "Workflow de onboarding",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de colaboradores en planta",
+        "incluye": [
+          "Hasta 100.000+ empleados",
+          "SAP SuccessFactors / Workday adapter",
+          "Compliance multi-país (CO/MX/PE)",
+          "SSO + SCIM",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "PILA/Aportes en Línea (~$30–6.000 USD/mes) lo paga el cliente directo al proveedor."
+  },
+  "offering_lmsElearning": {
+    "name": "LMS de e-learning",
+    "tagline": "Lanzá cursos online con pagos, certificados y proctoring",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"LMS de e-learning\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Educación",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con estudiantes activos",
+        "incluye": [
+          "Hasta 1.000 inscripciones/mes",
+          "Stripe/Wompi para pagos",
+          "Zoom manual",
+          "Email recordatorios",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y estudiantes activos",
+        "incluye": [
+          "Hasta 20.000 inscripciones/mes",
+          "Zoom auto-create",
+          "SCORM/xAPI compatible",
+          "HRMS para certificaciones",
+          "Proctoring básico",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de estudiantes activos",
+        "incluye": [
+          "Hasta 200.000 inscripciones/mes",
+          "LTI 1.3",
+          "Proctoring AI (ProctorU)",
+          "Talent Management adapter",
+          "Multi-tenant por sede",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de estudiantes activos",
+        "incluye": [
+          "Hasta 2M+ inscripciones/mes",
+          "SAP SuccessFactors / Workday Learning",
+          "Live streaming HD multi-región",
+          "SSO + SCIM",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "Video hosting (~$50–20.000 USD/mes), proctoring y LLM los paga el cliente directo al proveedor."
+  },
+  "offering_loyaltyFidelizacion": {
+    "name": "Programa de fidelización",
+    "tagline": "Premiá a tus clientes con puntos, niveles y campañas segmentadas",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Programa de fidelización\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Engagement",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con miembros activos",
+        "incluye": [
+          "Hasta 5.000 miembros + 10k tx/mes",
+          "POS retail",
+          "Email basic",
+          "Puntos por compra",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y miembros activos",
+        "incluye": [
+          "Hasta 200k miembros + 1M tx/mes",
+          "POS multi-sucursal",
+          "Ecommerce (Shopify/Woo)",
+          "WhatsApp campañas",
+          "CRM HubSpot",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de miembros activos",
+        "incluye": [
+          "Hasta 2M miembros + 25M tx/mes",
+          "Niveles y badges",
+          "Campañas segmentadas con LLM",
+          "Marketing automation",
+          "BI con churn forecasting",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de miembros activos",
+        "incluye": [
+          "Hasta 20M+ miembros + 250M+ tx/mes",
+          "CDP enterprise (Segment/RudderStack)",
+          "CRM enterprise (Salesforce/Dynamics)",
+          "Marketing automation (Braze/Iterable)",
+          "Multi-marca coalición",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "SMS/WhatsApp masivo (~$30–25.000 USD/mes) y CDP enterprise los paga el cliente directo al proveedor."
+  },
+  "offering_moderacionContenido": {
+    "name": "Moderación de contenido",
+    "tagline": "Filtrá texto, imágenes y video con clasificadores combinados",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Moderación de contenido\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Seguridad",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con contenidos analizados",
+        "incluye": [
+          "Hasta 25.000 items moderados/mes",
+          "API REST",
+          "Dashboard de revisión",
+          "OpenAI moderation + GPT-4o-mini",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y contenidos analizados",
+        "incluye": [
+          "Hasta 1M items moderados/mes",
+          "Multi-modal (texto + imagen)",
+          "Queue para revisores humanos",
+          "CMS/CRM hooks",
+          "Discord/Slack alerts",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de contenidos analizados",
+        "incluye": [
+          "Hasta 25M items moderados/mes",
+          "Audio/video moderation",
+          "Custom rules por canal",
+          "Trust & Safety workflow",
+          "Métricas por categoría",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de contenidos analizados",
+        "incluye": [
+          "Hasta 250M+ items moderados/mes",
+          "Custom ML entrenado con tu data",
+          "Cumplimiento DSA (UE) + COPPA",
+          "BPO/outsourcing handoff",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "OpenAI Moderation + Hive/Rekognition (~$80–25.000 USD/mes) los paga el cliente directo al proveedor."
+  },
+  "offering_posRetail": {
+    "name": "POS retail",
+    "tagline": "Punto de venta multi-sucursal con DIAN y datafono integrados",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"POS retail\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Comercio",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con tickets de venta",
+        "incluye": [
+          "Hasta 1.000 ventas/mes (1 sucursal)",
+          "DIAN integrado",
+          "Datafono manual",
+          "Caja simple",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y tickets de venta",
+        "incluye": [
+          "Hasta 25.000 ventas/mes (10 sucursales)",
+          "ERP inventario",
+          "Ecommerce sync (Shopify/WooCommerce)",
+          "Datafonos integrados",
+          "Loyalty/CRM",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de tickets de venta",
+        "incluye": [
+          "Hasta 250.000 ventas/mes (50 sucursales)",
+          "Central pricing & promotions",
+          "Multi-tax por país",
+          "WMS conectado",
+          "Reportes Power BI",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de tickets de venta",
+        "incluye": [
+          "Hasta 2.5M+ ventas/mes (sucursales ilimitadas)",
+          "SAP Retail / Oracle Retail adapter",
+          "Self-checkout + kiosks",
+          "Loss prevention con IA",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "Datafono y proveedor DIAN los paga el cliente directo al adquirente."
+  },
+  "offering_qaAutomatizadoIa": {
+    "name": "QA automatizado con IA",
+    "tagline": "Generá y mantené suites de tests E2E con IA",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"QA automatizado con IA\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "DevTools",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con corridas de pruebas",
+        "incluye": [
+          "Hasta 1.000 test runs/mes",
+          "GitHub Actions",
+          "Slack notify",
+          "Playwright runners",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y corridas de pruebas",
+        "incluye": [
+          "Hasta 25.000 test runs/mes",
+          "Multi-CI (GitHub/GitLab/Bitbucket)",
+          "Jira/TestRail sync",
+          "BrowserStack/Sauce",
+          "Code coverage reports",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de corridas de pruebas",
+        "incluye": [
+          "Hasta 250.000 test runs/mes",
+          "Mantenimiento automático de selectores",
+          "Visual regression",
+          "API contract testing (Pact)",
+          "Performance básico (k6)",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de corridas de pruebas",
+        "incluye": [
+          "Hasta 2.5M+ test runs/mes",
+          "Azure DevOps + Jenkins",
+          "XRay enterprise",
+          "Device farm enterprise",
+          "DORA + flaky tests analytics",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "LLMs (~$80–25.000 USD/mes), BrowserStack/Sauce y device farms los paga el cliente directo al proveedor."
+  },
+  "offering_saasMultiTenant": {
+    "name": "Plataforma SaaS multi-tenant",
+    "tagline": "Lanzá tu propio SaaS con billing, auth y aislamiento por tenant",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Plataforma SaaS multi-tenant\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Seguridad",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con requests procesados",
+        "incluye": [
+          "Hasta 10k requests/mes + 5 tenants",
+          "Stripe billing",
+          "Auth email/password",
+          "Tenant isolation por row",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y requests procesados",
+        "incluye": [
+          "Hasta 1M requests/mes + 50 tenants",
+          "Stripe metered",
+          "OAuth (Google/MS/Apple)",
+          "Custom domains por tenant",
+          "Audit log básico",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de requests procesados",
+        "incluye": [
+          "Hasta 25M requests/mes + 200 tenants",
+          "MFA + audit logs avanzados",
+          "Tenant isolation por schema",
+          "Data residency regional",
+          "API gateway con rate limit",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de requests procesados",
+        "incluye": [
+          "Hasta 250M+ requests/mes (tenants ilimitados)",
+          "SSO SAML/OIDC por tenant",
+          "SCIM provisioning",
+          "Tenant isolation por DB dedicada",
+          "Arquitectura alineada con SOC 2/ISO 27001 (certificación a cargo del cliente)",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "Auth0/Clerk (~$50–6.000 USD/mes) e infraestructura multi-región los paga el cliente directo al proveedor."
+  },
+  "offering_scrapingExtraccion": {
+    "name": "Scraping y extracción de datos",
+    "tagline": "Recolectá datos de la web con proxies y parsing inteligente",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Scraping y extracción de datos\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Datos",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con páginas procesadas",
+        "incluye": [
+          "Hasta 25.000 páginas/mes",
+          "Selectores CSS/XPath",
+          "CSV/JSON export",
+          "Webhook por job",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y páginas procesadas",
+        "incluye": [
+          "Hasta 500.000 páginas/mes",
+          "Headless browsers managed",
+          "Proxies residenciales",
+          "Slack/Teams alertas",
+          "API REST para queries",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de páginas procesadas",
+        "incluye": [
+          "Hasta 10M páginas/mes",
+          "Browser farm dedicada",
+          "CDC + reverse ETL",
+          "Data quality checks",
+          "Snowflake/BigQuery output",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de páginas procesadas",
+        "incluye": [
+          "Hasta 100M+ páginas/mes",
+          "Cluster k8s con Playwright",
+          "Proxies enterprise multi-país",
+          "Kafka stream output",
+          "Auditoría legal (robots.txt, ToS)",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "Proxies (~$50–25.000 USD/mes), browser farms y captcha solvers los paga el cliente directo al proveedor."
+  },
+  "offering_sistemaReservas": {
+    "name": "Sistema de reservas",
+    "tagline": "Agendá citas, clases o turnos con calendarios sincronizados",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Sistema de reservas\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Productividad",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con reservas con confirmación",
+        "incluye": [
+          "Hasta 500 reservas/mes",
+          "Google Calendar 1 vía",
+          "Email recordatorios",
+          "Pasarela Stripe/Wompi",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y reservas con confirmación",
+        "incluye": [
+          "Hasta 8.000 reservas/mes",
+          "Outlook + Apple Calendar",
+          "Zoom auto-link",
+          "CRM HubSpot",
+          "WhatsApp recordatorios",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de reservas con confirmación",
+        "incluye": [
+          "Hasta 60.000 reservas/mes",
+          "Multi-sucursal con franquicias",
+          "Recursos compartidos (salas/equipos)",
+          "Marketplace privado",
+          "Reportes por sede",
+          "API GraphQL",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de reservas con confirmación",
+        "incluye": [
+          "Hasta 500.000+ reservas/mes",
+          "SIS/EHR adapter para salud",
+          "ERP/HRMS con disponibilidad de profesionales",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "SMS/WhatsApp (~$20–6.000 USD/mes) y pasarela de pagos los paga el cliente directo al proveedor."
+  },
+  "offering_telemedicina": {
+    "name": "Plataforma de telemedicina",
+    "tagline": "Consultas remotas con historia clínica y recetas digitales",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Plataforma de telemedicina\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "HealthTech",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con consultas con video",
+        "incluye": [
+          "Hasta 300 consultas/mes",
+          "Video WebRTC",
+          "Historia clínica básica",
+          "Recordatorios email + WhatsApp",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y consultas con video",
+        "incluye": [
+          "Hasta 5.000 consultas/mes",
+          "Recetas digitales",
+          "Lab HL7 básico",
+          "Wearables (Apple Health/Fitbit)",
+          "eRX integrado",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de consultas con video",
+        "incluye": [
+          "Hasta 50.000 consultas/mes",
+          "HL7 FHIR completo",
+          "EHR clínicas (varias marcas)",
+          "Aseguradoras / EPS / IPS",
+          "Cumplimiento HABEAS DATA",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de consultas con video",
+        "incluye": [
+          "Hasta 500.000+ consultas/mes",
+          "Arquitectura alineada con HIPAA + Resolución 2654 (certificación a cargo del cliente)",
+          "PACS DICOM",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "Video managed (~$50–10.000 USD/mes), compliance y LLM los paga el cliente directo al proveedor."
+  },
+  "offering_voiceAiCallcenter": {
+    "name": "Voice AI para call center",
+    "tagline": "Bots por teléfono con STT, TTS y enrutamiento inteligente",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Voice AI para call center\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Voz IA",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con minutos de conversación",
+        "incluye": [
+          "Hasta 1.000 minutos/mes",
+          "1 línea telefónica",
+          "STT con Whisper o Deepgram",
+          "TTS básico",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y minutos de conversación",
+        "incluye": [
+          "Hasta 30.000 minutos/mes",
+          "Multi-línea + IVR",
+          "CRM con call logging",
+          "Helpdesk con tickets desde llamada",
+          "WhatsApp voice notes",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de minutos de conversación",
+        "incluye": [
+          "Hasta 250.000 minutos/mes",
+          "Voces premium clonadas",
+          "Speech analytics básico",
+          "Compliance grabaciones (PCI redaction)",
+          "Multi-idioma",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de minutos de conversación",
+        "incluye": [
+          "Hasta 2.5M+ minutos/mes",
+          "PBX/SIP enterprise (Asterisk/Genesys)",
+          "WFM + QM + analytics avanzados",
+          "Multi-país + DR",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "Twilio + Deepgram + ElevenLabs (~$300–50.000 USD/mes) los paga el cliente directo al proveedor."
+  },
+  "offering_vpnEmpresarial": {
+    "name": "VPN empresarial",
+    "tagline": "Acceso remoto seguro con WireGuard, MFA y SIEM",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"VPN empresarial\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Seguridad",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con colaboradores conectados",
+        "incluye": [
+          "Hasta 25 usuarios concurrentes",
+          "WireGuard/OpenVPN clients",
+          "LDAP/Email auth",
+          "Logs locales",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y colaboradores conectados",
+        "incluye": [
+          "Hasta 200 usuarios concurrentes",
+          "SSO con Google/Microsoft",
+          "MFA (TOTP/U2F)",
+          "SIEM básico (Wazuh/Elastic)",
+          "Split tunneling",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de colaboradores conectados",
+        "incluye": [
+          "Hasta 1.500 usuarios concurrentes",
+          "Backbone multi-país",
+          "SIEM corporativo",
+          "Policy as code",
+          "Auditoría de sesiones",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de colaboradores conectados",
+        "incluye": [
+          "Hasta 25.000+ usuarios concurrentes",
+          "ZTNA enterprise (Zscaler/Cloudflare)",
+          "SIEM (Splunk/Sentinel)",
+          "EDR/XDR + DLP",
+          "Arquitectura alineada con SOC 2/ISO 27001 (certificación a cargo del cliente)",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "Servidores VPN (~$30–25.000 USD/mes), SIEM y ZTNA enterprise los paga el cliente directo al proveedor."
+  },
+  "offering_wmsLogistica": {
+    "name": "WMS logística",
+    "tagline": "Controlá tu bodega con scanner, picking y carriers integrados",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"WMS logística\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Operaciones",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con pedidos despachados",
+        "incluye": [
+          "Hasta 1.000 órdenes/mes (1 bodega)",
+          "Scanner USB/Bluetooth",
+          "CSV import de SKUs",
+          "Picking + packing básicos",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y pedidos despachados",
+        "incluye": [
+          "Hasta 20.000 órdenes/mes (5 bodegas)",
+          "ERP (SAP B1/Siigo) sync",
+          "Carriers Servientrega/TCC/Coordinadora",
+          "Marketplaces (ML/Amazon)",
+          "RFID readers",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de pedidos despachados",
+        "incluye": [
+          "Hasta 200.000 órdenes/mes (25 bodegas)",
+          "Multi-bodega",
+          "TMS rutas dinámicas",
+          "IoT cadena de frío básico",
+          "Reportes Power BI",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de pedidos despachados",
+        "incluye": [
+          "Hasta 2.5M+ órdenes/mes (bodegas ilimitadas)",
+          "SAP EWM / Oracle WMS interop",
+          "Multi-país multi-modal",
+          "Yard management",
+          "ASN/EDI con proveedores",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "APIs de carriers (~$50–6.000 USD/mes) e IoT cadena de frío los paga el cliente directo al proveedor."
+  }
+}
