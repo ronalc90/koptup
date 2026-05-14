@@ -43,6 +43,20 @@ yarn-error.log*
 *~
 .md
 
+# Asistentes / herramientas locales (no subir)
+.claude/
+**/.claude/
+CLAUDE.md
+MEMORY.md
+memory/
+.aider*
+plan_trabajo.md
+qa-demos.mjs
+qa-i18n.mjs
+qa-scripts/
+qa-screenshots/
+ONBOARDING.md
+
 # Docker
 *.log
 docker-compose.override.yml
