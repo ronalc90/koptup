@@ -469,7 +469,26 @@
         "send": "Enviar",
         "sampleUser": "¿Tienen plan empresa?",
         "sampleBot": "Sí, contamos con planes Pro, Business y Enterprise con SLA, SSO y soporte prioritario. ¿Querés que te muestre los precios?",
-        "poweredBy": "Powered by Koptup"
+        "poweredBy": "Powered by Koptup",
+        "modeLabel": "Modo de previsualización",
+        "modes": {
+          "desktop": "Escritorio",
+          "mobile": "Celular",
+          "bubble": "Burbuja"
+        },
+        "bubble": {
+          "intro": "Así se ve el widget cuando un usuario aterriza en tu sitio. Hacé click en la burbuja para ver el panel del chat.",
+          "openButton": "Abrir chat",
+          "closeButton": "Cerrar chat",
+          "snippetComment": "Integralo así en tu sitio:"
+        },
+        "defaultName": "Asistente",
+        "defaultWelcome": "¡Hola! ¿En qué te puedo ayudar?",
+        "inputPlaceholder": "Escribí tu mensaje...",
+        "mobileFrame": {
+          "time": "9:41",
+          "status": "5G ●●● 100%"
+        }
       },
       "embed": {
         "title": "Snippet de embed",

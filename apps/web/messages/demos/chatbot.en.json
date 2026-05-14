@@ -469,7 +469,26 @@
         "send": "Send",
         "sampleUser": "Do you have an enterprise plan?",
         "sampleBot": "Yes, we offer Pro, Business and Enterprise plans with SLA, SSO and priority support. Want me to show you the pricing?",
-        "poweredBy": "Powered by Koptup"
+        "poweredBy": "Powered by Koptup",
+        "modeLabel": "Preview mode",
+        "modes": {
+          "desktop": "Desktop",
+          "mobile": "Mobile",
+          "bubble": "Bubble"
+        },
+        "bubble": {
+          "intro": "This is what the widget looks like when a visitor lands on your site. Click the bubble to open the chat panel.",
+          "openButton": "Open chat",
+          "closeButton": "Close chat",
+          "snippetComment": "Embed it on your site like this:"
+        },
+        "defaultName": "Assistant",
+        "defaultWelcome": "Hi! How can I help you today?",
+        "inputPlaceholder": "Type your message...",
+        "mobileFrame": {
+          "time": "9:41",
+          "status": "5G ●●● 100%"
+        }
       },
       "embed": {
         "title": "Embed snippet",
