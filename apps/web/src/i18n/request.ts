@@ -9,11 +9,37 @@ function getLocaleFromCookie(cookieHeader?: string | null) {
   return match ? match[1] : undefined;
 }
 
+/**
+ * Resuelve el directorio `messages/` probando varias bases. En dev y en builds
+ * standalone (Next.js + monorepo) el `process.cwd()` no siempre apunta a
+ * `apps/web`. Probamos cwd y subir 1-2 niveles por si arrancó desde la raíz
+ * del monorepo o desde una carpeta intermedia.
+ */
+function resolveMessagesDir(subdir: string): string | null {
+  const candidates = [
+    path.join(process.cwd(), 'messages', subdir),
+    path.join(process.cwd(), 'apps', 'web', 'messages', subdir),
+    path.join(process.cwd(), '..', 'messages', subdir),
+    path.join(process.cwd(), '..', '..', 'messages', subdir),
+  ];
+  for (const candidate of candidates) {
+    try {
+      if (fs.existsSync(candidate)) return candidate;
+    } catch {
+      // ignore
+    }
+  }
+  return null;
+}
+
 function loadDirMessages(subdir: string, locale: string): Record<string, any> {
-  const dir = path.join(process.cwd(), 'messages', subdir);
+  const dir = resolveMessagesDir(subdir);
   const out: Record<string, any> = {};
+  if (!dir) {
+    console.warn(`[i18n] messages dir not found for "${subdir}". cwd=${process.cwd()}`);
+    return out;
+  }
   try {
-    if (!fs.existsSync(dir)) return out;
     const files = fs.readdirSync(dir).filter((f) => f.endsWith(`.${locale}.json`));
     for (const file of files) {
       try {

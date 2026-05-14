@@ -270,6 +270,31 @@ export const seoConfig: Record<string, PageSEO> = {
     canonical: `${baseUrl}/demo/chatbot`,
   },
 
+  // Demo: Generador LinkedIn (marketing engine)
+  'demo-linkedin-ads': {
+    title: 'Generador de Contenido LinkedIn con IA | Marketing Engine Koptup',
+    description:
+      'Genera 30 días de posts para LinkedIn en minutos: calendario editorial, hooks, cuerpo, CTA y hashtags por demo. Plantillas visuales 1200×627 exportables a PNG y captura real del demo en foto/video. Para founders y equipos de marketing que necesitan publicar consistente sin contratar una agencia.',
+    keywords: [
+      'generador contenido LinkedIn',
+      'marketing automation IA',
+      'posts LinkedIn automáticos',
+      'calendario editorial LinkedIn',
+      'ad copy LinkedIn',
+      'plantillas visuales LinkedIn',
+      'screenshot demo automatico',
+      'captura pantalla SaaS',
+      'social media B2B',
+      'marketing startups LATAM',
+      'content engine startup',
+      'LinkedIn marketing tool',
+      'B2B content automation',
+      'plan editorial 30 días',
+      'sponsored content LinkedIn',
+    ],
+    canonical: `${baseUrl}/demo/linkedin-ads`,
+  },
+
   // Demo: Gestor de Contenido
   'demo-gestor-contenido': {
     title: 'Gestor de Contenido con IA | Emails y Documentos Médicos',

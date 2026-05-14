@@ -128,12 +128,30 @@ async function getMessages(locale: string) {
   }
 
   // Merge per-demo + per-offering messages so client components resolve demoCrm, demosExtra, offering_*, etc.
+  // En producción `process.cwd()` puede no apuntar a `apps/web` (monorepo / standalone),
+  // por eso probamos varias rutas candidatas antes de rendirnos. Si todas fallan loggeamos
+  // un warning explícito que aparece en los logs de Railway/Vercel.
   try {
     const fs = await import('fs');
     const path = await import('path');
     for (const subdir of ['demos', 'offerings']) {
-      const dir = path.join(process.cwd(), 'messages', subdir);
-      if (!fs.existsSync(dir)) continue;
+      const candidates = [
+        path.join(process.cwd(), 'messages', subdir),
+        path.join(process.cwd(), 'apps', 'web', 'messages', subdir),
+        path.join(process.cwd(), '..', 'messages', subdir),
+        path.join(process.cwd(), '..', '..', 'messages', subdir),
+      ];
+      const dir = candidates.find((p) => {
+        try {
+          return fs.existsSync(p);
+        } catch {
+          return false;
+        }
+      });
+      if (!dir) {
+        console.warn(`[layout] messages dir not found for "${subdir}". cwd=${process.cwd()}`);
+        continue;
+      }
       const files = fs.readdirSync(dir).filter((f) => f.endsWith(`.${locale}.json`));
       for (const file of files) {
         try {

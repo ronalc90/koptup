@@ -38,6 +38,7 @@ import {
   ShieldCheckIcon,
   MapIcon,
   StarIcon,
+  MegaphoneIcon,
 } from '@heroicons/react/24/outline';
 
 export default function DemosPage() {
@@ -195,6 +196,22 @@ export default function DemosPage() {
     buildExtra('moderation', '/demo/moderacion-contenido', ShieldCheckIcon, 'from-red-700 to-red-900'),
     buildExtra('delivery', '/demo/delivery', MapIcon, 'from-orange-500 to-red-600'),
     buildExtra('loyalty', '/demo/loyalty', StarIcon, 'from-yellow-500 to-amber-600'),
+    {
+      id: 'linkedin-ads',
+      title: 'Generador LinkedIn con IA',
+      description:
+        'Plan editorial de 30 días + generación con OpenAI: posts, ad copy, carruseles y capturas listas para promocionar tu negocio.',
+      icon: MegaphoneIcon,
+      href: '/demo/linkedin-ads',
+      color: 'from-blue-600 to-violet-700',
+      badge: 'Marketing IA',
+      features: [
+        'Calendario editorial de 30 días con plan demo a demo',
+        'Generación 1-click con OpenAI: post + ad + carrusel',
+        'Vista previa real de LinkedIn + 8 ángulos × 5 tonos',
+        'Captura PNG diseñada + foto y video del demo real',
+      ],
+    },
   ];
 
   const handleCodeSubmit = () => {

@@ -21,6 +21,17 @@ const nextConfig = {
   },
   trailingSlash: false,
 
+  // En producción Next no traza accesos fs.readdirSync dinámicos. Sin esto,
+  // `messages/{demos,offerings}/*.json` queda fuera del bundle serverless
+  // y vemos claves crudas como `offeringsCatalog.hero.title` en koptup.com.
+  // Solo afecta `next build`, no influye en `next dev`.
+  experimental: {
+    outputFileTracingIncludes: {
+      '/**/*': ['./messages/**/*.json'],
+    },
+  },
+
+
   // Image optimization
   images: {
     domains: ['localhost', 'koptup-uploads.s3.amazonaws.com', 'images.unsplash.com'],
