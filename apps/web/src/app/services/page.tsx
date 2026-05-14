@@ -510,7 +510,7 @@ function ServiceModal({ offering, onClose }: ServiceModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto"
+      className="fixed inset-0 z-[200] flex items-start sm:items-center justify-center p-0 sm:p-4 bg-black/70 backdrop-blur-sm overflow-y-auto"
       onClick={onClose}
     >
       <div
@@ -518,10 +518,19 @@ function ServiceModal({ offering, onClose }: ServiceModalProps) {
         aria-modal="true"
         aria-labelledby="service-modal-title"
         onClick={(e) => e.stopPropagation()}
-        className="bg-white dark:bg-secondary-900 sm:rounded-2xl max-w-5xl w-full sm:my-8 shadow-2xl min-h-screen sm:min-h-0 sm:max-h-[92vh] flex flex-col"
+        className="bg-white dark:bg-secondary-900 sm:rounded-2xl max-w-5xl w-full sm:my-8 shadow-2xl min-h-screen sm:min-h-0 sm:max-h-[92vh] flex flex-col relative"
       >
+        {/* Botón X sticky siempre visible — encima del hero gradient */}
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={tp('modal.close')}
+          className="fixed sm:absolute top-4 right-4 z-[210] rounded-full bg-white text-secondary-900 shadow-2xl hover:bg-secondary-100 dark:bg-secondary-800 dark:text-white dark:hover:bg-secondary-700 p-3 ring-2 ring-white/40 dark:ring-secondary-700 transition"
+        >
+          <XMarkIcon className="h-6 w-6" />
+        </button>
         {/* Hero del modal */}
-        <div className={`bg-gradient-to-br ${offering.gradient} p-6 text-white sm:rounded-t-2xl`}>
+        <div className={`bg-gradient-to-br ${offering.gradient} p-6 pr-20 text-white sm:rounded-t-2xl`}>
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center flex-shrink-0">
@@ -540,14 +549,6 @@ function ServiceModal({ offering, onClose }: ServiceModalProps) {
                 <p className="mt-2 text-white/85">{t('tagline')}</p>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label={tp('modal.close')}
-              className="rounded-full bg-white/15 hover:bg-white/25 p-2 text-white flex-shrink-0"
-            >
-              <XMarkIcon className="h-5 w-5" />
-            </button>
           </div>
         </div>
 
@@ -775,7 +776,7 @@ function PlanModal({ offering, onClose }: PlanModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto"
+      className="fixed inset-0 z-[200] flex items-start sm:items-center justify-center p-0 sm:p-4 bg-black/70 backdrop-blur-sm overflow-y-auto"
       onClick={onClose}
     >
       <div
@@ -783,9 +784,18 @@ function PlanModal({ offering, onClose }: PlanModalProps) {
         aria-modal="true"
         aria-labelledby="plan-modal-title"
         onClick={(e) => e.stopPropagation()}
-        className="bg-white dark:bg-secondary-900 sm:rounded-2xl max-w-5xl w-full sm:my-8 shadow-2xl min-h-screen sm:min-h-0 sm:max-h-[92vh] flex flex-col"
+        className="bg-white dark:bg-secondary-900 sm:rounded-2xl max-w-5xl w-full sm:my-8 shadow-2xl min-h-screen sm:min-h-0 sm:max-h-[92vh] flex flex-col relative"
       >
-        <div className={`bg-gradient-to-br ${offering.gradient} p-6 text-white sm:rounded-t-2xl`}>
+        {/* Botón X sticky siempre visible */}
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={tp('modal.close')}
+          className="fixed sm:absolute top-4 right-4 z-[210] rounded-full bg-white text-secondary-900 shadow-2xl hover:bg-secondary-100 dark:bg-secondary-800 dark:text-white dark:hover:bg-secondary-700 p-3 ring-2 ring-white/40 dark:ring-secondary-700 transition"
+        >
+          <XMarkIcon className="h-6 w-6" />
+        </button>
+        <div className={`bg-gradient-to-br ${offering.gradient} p-6 pr-20 text-white sm:rounded-t-2xl`}>
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center flex-shrink-0">
@@ -801,14 +811,6 @@ function PlanModal({ offering, onClose }: PlanModalProps) {
                 <p className="mt-2 text-white/85">{t('tagline')}</p>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label={tp('modal.close')}
-              className="rounded-full bg-white/15 hover:bg-white/25 p-2 text-white flex-shrink-0"
-            >
-              <XMarkIcon className="h-5 w-5" />
-            </button>
           </div>
         </div>
 
