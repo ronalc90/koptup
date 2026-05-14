@@ -38,6 +38,8 @@ Cada demo es una aplicación interactiva navegable, con datos simulados realista
 
 | Code review con IA | DevTools | Análisis automático de PRs con detección de bugs, sugerencias de refactor, seguridad y cobertura de tests. | [Ver demo](./apps/web/src/app/demo/code-review-ia/) |
 
+| Moderación de contenido | Seguridad | Detección de toxicidad, spam, NSFW y phishing en texto/imágenes con escalamiento a revisión humana. | [Ver demo](./apps/web/src/app/demo/moderacion-contenido/) |
+
 ## 🚀 Stack Tecnológico
 
 ### Frontend
