@@ -392,6 +392,12 @@
         "positionTR": "Superior derecha",
         "positionTL": "Superior izquierda",
         "avatar": "Avatar del bot",
+        "avatarImage": "Logo del bot (opcional)",
+        "avatarImageBtn": "Subir logo",
+        "avatarImageRemove": "Quitar",
+        "avatarImageHint": "PNG, JPG o WebP · máx. 500 KB",
+        "avatarImageBadType": "Formato no soportado. Usá PNG, JPG o WebP.",
+        "avatarImageTooBig": "El archivo supera 500 KB. Reducí el tamaño.",
         "tone": "Tono de voz",
         "tones": {
           "professional": "Profesional",

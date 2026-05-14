@@ -36,7 +36,7 @@ import StatsWidget from './components/StatsWidget';
 import TopBar from './components/TopBar';
 import ModeToggle, { type ChatbotMode } from './components/builder/ModeToggle';
 import BuilderMode from './components/builder/BuilderMode';
-import { chatWithBot } from './components/builder/api';
+import { chatWithBot, createBot, type RemoteChatReplySource } from './components/builder/api';
 import Tooltip from './components/ui/Tooltip';
 import InfoIcon from './components/ui/InfoIcon';
 import DeviceFrame, { type DeviceKind } from './components/ui/DeviceFrame';
@@ -54,6 +54,48 @@ type TenantId = (typeof TENANTS)[number]['id'];
 
 const STREAM_CHAR_INTERVAL_MS = 18;
 const ONBOARDING_LS_KEY = 'koptup.demo.chatbot.onboarded';
+const PLAYGROUND_BOT_LS_KEY = 'koptup.chatbot.demoBotId';
+
+/**
+ * Convierte las citas que devuelve el backend (RAG real sobre docs subidos
+ * por el usuario) al shape `SourceChunk` que esperan ChatPanel/SourcePanel.
+ * Si el backend no envía sources, devolvemos undefined para que la UI caiga
+ * al payload del escenario.
+ */
+function mapRemoteSources(remote: RemoteChatReplySource[] | undefined): SourceChunk[] | undefined {
+  if (!remote || remote.length === 0) return undefined;
+  return remote.map((s) => ({
+    id: s.id,
+    // El backend no clasifica la fuente; usamos 'confluence' como placeholder
+    // y exponemos `sourceName` para que la UI muestre el nombre real del doc.
+    sourceKey: 'confluence' as SourceChunk['sourceKey'],
+    sourceName: s.name,
+    score: typeof s.score === 'number' ? s.score : 0,
+    rerankScore: typeof s.score === 'number' ? s.score : 0,
+    updated: new Date().toISOString().slice(0, 10),
+    snippet: s.chunk ?? '',
+  }));
+}
+
+/**
+ * Resuelve el botId del Playground: 1) URL `?botId=`, 2) localStorage,
+ * 3) si no existe ninguno, crea uno nuevo en el backend y lo cachea.
+ */
+async function resolvePlaygroundBotId(): Promise<string | null> {
+  if (typeof window === 'undefined') return null;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const fromUrl = params.get('botId');
+    if (fromUrl) return fromUrl;
+    const cached = window.localStorage.getItem(PLAYGROUND_BOT_LS_KEY);
+    if (cached) return cached;
+    const created = await createBot({ name: 'Playground Demo' });
+    window.localStorage.setItem(PLAYGROUND_BOT_LS_KEY, created.botId);
+    return created.botId;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Hook auxiliar: simula la animación step-by-step del pipeline.
@@ -287,24 +329,37 @@ export default function ChatbotDemoPage() {
     setIsStreaming(true);
     setThinkingId(asstId);
 
-    // Disparamos la llamada real al backend (bot "demo" o el botId del URL).
-    let botId: string = 'demo';
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const fromUrl = params.get('botId');
-      if (fromUrl) botId = fromUrl;
-    }
-    chatWithBot(botId, sentInput, [])
-      .then((res) => {
+    // Disparamos la llamada REAL al backend con retrieval BM25-lite sobre los
+    // documentos que el usuario haya subido. Si todavía no hay docs (o no
+    // matchea ninguno), el backend responde honestamente y la UI lo refleja.
+    void (async () => {
+      const botId = await resolvePlaygroundBotId();
+      if (!botId) return;
+      try {
+        const res = await chatWithBot(botId, sentInput, []);
+        const mappedSources = mapRemoteSources(res.sources);
         setMessages((prev) =>
           prev.map((m) =>
-            m.id === asstId ? { ...m, content: res.reply || provisional } : m,
+            m.id === asstId
+              ? {
+                  ...m,
+                  content: res.reply || provisional,
+                  // Si hay sources reales del backend, las usamos; si no,
+                  // mantenemos el payload del escenario (UX consistente).
+                  sources: mappedSources ?? m.sources,
+                  confidence:
+                    typeof res.confidence === 'number'
+                      ? Math.round(res.confidence * 100)
+                      : m.confidence,
+                }
+              : m,
           ),
         );
-      })
-      .catch(() => {
-        /* mantenemos el provisional */
-      });
+        if (typeof res.latencyMs === 'number') setAggLatency(res.latencyMs);
+      } catch {
+        /* offline / error → mantenemos el provisional */
+      }
+    })();
   }, [input, isStreaming, t]);
 
   const handleCiteClick = useCallback((c: SourceChunk) => setOpenChunk(c), []);

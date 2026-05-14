@@ -29,11 +29,33 @@ export interface RemoteBotConfig {
   docs?: RemoteBotDoc[];
 }
 
+export interface RemoteChatReplySource {
+  id: string;
+  /** 1-indexed para alinearse con las citas `[n]` del reply. */
+  index?: number;
+  /** Nombre del documento (o hostname si es una URL indexada). */
+  name: string;
+  /** Score BM25-lite del retrieval. */
+  score?: number;
+  /** Texto crudo del chunk recuperado. */
+  chunk?: string;
+}
+
 export interface RemoteChatReply {
   botId: string;
   reply: string;
-  sources: Array<{ id: string; name: string }>;
+  sources: RemoteChatReplySource[];
+  /** Confianza calibrada (0..1). */
+  confidence?: number;
+  /** Latencia simulada en milisegundos. */
+  latencyMs?: number;
   timestamp: string;
+}
+
+export interface RemoteUrlIngestResult {
+  docs: RemoteBotDoc[];
+  added: RemoteBotDoc[];
+  errors: Array<{ url: string; reason: string }>;
 }
 
 const RAW_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
@@ -110,6 +132,16 @@ export async function chatWithBot(
   return jsonFetch(`${API_BASE}/bots/${encodeURIComponent(botId)}/chat`, {
     method: 'POST',
     body: JSON.stringify({ message, history }),
+  });
+}
+
+export async function ingestBotUrls(
+  botId: string,
+  urls: string[],
+): Promise<RemoteUrlIngestResult> {
+  return jsonFetch(`${API_BASE}/bots/${encodeURIComponent(botId)}/urls`, {
+    method: 'POST',
+    body: JSON.stringify({ urls }),
   });
 }
 

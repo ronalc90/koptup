@@ -123,7 +123,16 @@ export default function LivePreview({ config, botId }: LivePreviewProps) {
                     style={{ backgroundColor: config.primaryColor }}
                   >
                     <div className="flex min-w-0 items-center gap-2">
-                      <span className="text-lg">{config.avatar}</span>
+                      {config.avatarImage ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={config.avatarImage}
+                          alt={config.botName}
+                          className="h-6 w-6 rounded-full object-cover ring-2 ring-white/40"
+                        />
+                      ) : (
+                        <span className="text-lg">{config.avatar}</span>
+                      )}
                       <span className="truncate text-sm font-semibold">
                         {config.botName}
                       </span>
@@ -140,7 +149,16 @@ export default function LivePreview({ config, botId }: LivePreviewProps) {
 
                   <div className="max-h-56 space-y-2 overflow-y-auto bg-secondary-50 px-3 py-3 text-xs text-secondary-800 dark:bg-secondary-950 dark:text-secondary-100">
                     <div className="flex gap-2">
-                      <span className="text-base">{config.avatar}</span>
+                      {config.avatarImage ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={config.avatarImage}
+                          alt={config.botName}
+                          className="h-5 w-5 shrink-0 rounded-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-base">{config.avatar}</span>
+                      )}
                       <div className="rounded-lg bg-white px-2.5 py-1.5 shadow-sm dark:bg-secondary-800">
                         {config.welcome}
                       </div>
@@ -154,7 +172,16 @@ export default function LivePreview({ config, botId }: LivePreviewProps) {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <span className="text-base">{config.avatar}</span>
+                      {config.avatarImage ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={config.avatarImage}
+                          alt={config.botName}
+                          className="h-5 w-5 shrink-0 rounded-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-base">{config.avatar}</span>
+                      )}
                       <div className="rounded-lg bg-white px-2.5 py-1.5 shadow-sm dark:bg-secondary-800">
                         {t('preview.sampleBot')}
                       </div>
@@ -190,12 +217,19 @@ export default function LivePreview({ config, botId }: LivePreviewProps) {
                 type="button"
                 onClick={() => setOpen((v) => !v)}
                 style={{ backgroundColor: config.primaryColor }}
-                className="flex h-12 w-12 items-center justify-center rounded-full text-2xl text-white shadow-lg ring-2 ring-white transition hover:scale-105 dark:ring-secondary-900"
+                className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full text-2xl text-white shadow-lg ring-2 ring-white transition hover:scale-105 dark:ring-secondary-900"
                 aria-expanded={open}
                 aria-label={config.botName}
               >
                 {open ? (
                   <XMarkIcon className="h-5 w-5" />
+                ) : config.avatarImage ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={config.avatarImage}
+                    alt={config.botName}
+                    className="h-full w-full object-cover"
+                  />
                 ) : (
                   <span className="leading-none">{config.avatar}</span>
                 )}

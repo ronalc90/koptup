@@ -57,7 +57,7 @@ export default function SourcePanel({ chunk, onClose }: SourcePanelProps) {
               {t('sourcePanel.source')}
             </div>
             <div className="font-semibold text-secondary-900 dark:text-secondary-100">
-              {t(`sources.${chunk.sourceKey}`)}
+              {chunk.sourceName ?? t(`sources.${chunk.sourceKey}`)}
             </div>
           </div>
           <div>
