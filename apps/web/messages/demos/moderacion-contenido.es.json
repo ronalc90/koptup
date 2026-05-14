@@ -1,0 +1,233 @@
+{
+  "demoModeration": {
+    "pageTitle": "Moderación de Contenido con IA",
+    "pageSubtitle": "Clasificación multi-modal, workflows configurables, bienestar de moderadores y trazabilidad completa para plataformas a escala.",
+    "status": "Sistema activo",
+    "backToCatalog": "Volver al catálogo",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "queue": "Cola de moderación",
+      "classifiers": "Clasificadores",
+      "workflows": "Workflows",
+      "appeals": "Apelaciones",
+      "audit": "Auditoría",
+      "transparency": "Transparencia",
+      "api": "API",
+      "metrics": "Métricas"
+    },
+    "verticals": {
+      "label": "Vertical activa",
+      "gaming": "Gaming",
+      "dating": "Dating",
+      "kids": "Kids",
+      "finance": "Finanzas",
+      "social": "Social"
+    },
+    "dashboard": {
+      "title": "Resumen operativo",
+      "subtitle": "Métricas en tiempo real de la operación de moderación",
+      "moderatedToday": "Moderados hoy",
+      "queueNow": "En cola ahora",
+      "accuracy": "Accuracy (P/R)",
+      "avgTime": "Tiempo medio",
+      "fpr": "False positive rate",
+      "autoActioned": "Auto-resueltos",
+      "humanReviewed": "Revisión humana",
+      "escalations": "Escalaciones",
+      "sla": "SLA cumplido",
+      "compareYesterday": "vs. ayer",
+      "trendUp": "↑",
+      "trendDown": "↓"
+    },
+    "queue": {
+      "title": "Cola priorizada",
+      "subtitle": "Routing automático por riesgo, vertical y SLA",
+      "filterAll": "Todos",
+      "filterText": "Texto",
+      "filterImage": "Imagen",
+      "filterVideo": "Video",
+      "filterAudio": "Audio",
+      "priority": "Prioridad",
+      "type": "Tipo",
+      "preview": "Preview",
+      "classification": "Clasificación IA",
+      "confidence": "Confianza",
+      "actions": "Acciones",
+      "showPreview": "Mostrar",
+      "hidePreview": "Ocultar",
+      "blurred": "Visualización segura activada",
+      "selectItem": "Selecciona un ítem para ver detalle",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "escalate": "Escalar",
+      "editTag": "Editar tag",
+      "details": "Detalle",
+      "reporter": "Reportado por",
+      "user": "Usuario",
+      "channel": "Canal",
+      "submittedAt": "Recibido",
+      "context": "Contexto",
+      "history": "Historial del usuario",
+      "previousStrikes": "Strikes previos",
+      "accountAge": "Antigüedad",
+      "classifications": {
+        "nsfw": "NSFW",
+        "violence": "Violencia",
+        "hate": "Discurso de odio",
+        "spam": "Spam",
+        "fraud": "Fraude",
+        "childSafety": "Seguridad infantil",
+        "selfHarm": "Auto-lesión",
+        "harassment": "Acoso"
+      },
+      "priorities": {
+        "critical": "Crítica",
+        "high": "Alta",
+        "medium": "Media",
+        "low": "Baja"
+      }
+    },
+    "classifiers": {
+      "title": "Clasificadores multi-modales",
+      "subtitle": "Cada modalidad usa modelos especializados con métricas independientes",
+      "text": "Texto",
+      "image": "Imagen",
+      "video": "Video",
+      "audio": "Audio",
+      "model": "Modelo activo",
+      "version": "Versión",
+      "languages": "Idiomas",
+      "throughput": "Throughput",
+      "latencyP95": "Latencia P95",
+      "precision": "Precision",
+      "recall": "Recall",
+      "categoriesCovered": "Categorías cubiertas",
+      "lastTrained": "Último reentrenamiento",
+      "perCategory": "Desempeño por categoría"
+    },
+    "workflows": {
+      "title": "Workflows configurables",
+      "subtitle": "Editor de reglas if/elif por score, sin código",
+      "addRule": "Agregar regla",
+      "saveAll": "Guardar cambios",
+      "ruleIf": "Si",
+      "and": "Y",
+      "then": "Entonces",
+      "score": "score",
+      "actions": {
+        "autoReject": "Auto-rechazar",
+        "humanReview": "Revisión humana",
+        "autoApprove": "Auto-aprobar",
+        "shadowBan": "Shadow ban",
+        "warnUser": "Advertir al usuario",
+        "escalateLegal": "Escalar a legal"
+      },
+      "operators": {
+        "gt": "mayor que",
+        "lt": "menor que",
+        "between": "entre"
+      },
+      "preview": "Vista previa: ítems afectados últimas 24h",
+      "active": "Activa",
+      "paused": "Pausada"
+    },
+    "appeals": {
+      "title": "Apelaciones pendientes",
+      "subtitle": "Resolución dentro de SLA según DSA (24h estándar)",
+      "case": "Caso",
+      "originalDecision": "Decisión original",
+      "appealReason": "Motivo de apelación",
+      "submitted": "Recibida",
+      "slaRemaining": "SLA restante",
+      "reviewer": "Revisor asignado",
+      "resolutionPath": "Ruta de resolución",
+      "upholdDecision": "Mantener decisión",
+      "reverseDecision": "Revertir decisión",
+      "requestMoreInfo": "Pedir más info",
+      "statuses": {
+        "open": "Abierta",
+        "inReview": "En revisión",
+        "resolved": "Resuelta",
+        "overdue": "Vencida"
+      }
+    },
+    "wellness": {
+      "title": "Bienestar del equipo",
+      "message": "Pausas programadas, blur por defecto y rotación de categorías para reducir fatiga emocional.",
+      "nextBreak": "Próxima pausa",
+      "categoryRotation": "Rotación de categoría",
+      "blurByDefault": "Blur por defecto",
+      "takeBreak": "Tomar pausa ahora",
+      "supportLine": "Línea de apoyo psicológico",
+      "shiftProgress": "Progreso del turno",
+      "itemsThisShift": "Ítems este turno",
+      "mentalHealthCheck": "Check-in de salud mental"
+    },
+    "audit": {
+      "title": "Audit trail",
+      "subtitle": "Registro inmutable de todas las acciones",
+      "export": "Exportar CSV",
+      "filterByActor": "Filtrar por moderador",
+      "filterByAction": "Filtrar por acción",
+      "when": "Cuándo",
+      "who": "Quién",
+      "what": "Qué",
+      "target": "Objetivo",
+      "reason": "Motivo",
+      "actions": {
+        "approve": "Aprobó",
+        "reject": "Rechazó",
+        "escalate": "Escaló",
+        "editTag": "Editó tag",
+        "appealUphold": "Mantuvo apelación",
+        "appealReverse": "Revirtió decisión",
+        "ruleEdit": "Editó regla"
+      }
+    },
+    "transparency": {
+      "title": "Reporte de transparencia",
+      "subtitle": "Takedowns públicos por categoría y mes — compatible con DSA Art. 24",
+      "byCategory": "Por categoría",
+      "byMonth": "Por mes",
+      "totalTakedowns": "Takedowns totales (90d)",
+      "reinstated": "Restituidos tras apelación",
+      "downloadFull": "Descargar reporte completo"
+    },
+    "api": {
+      "title": "Integración",
+      "subtitle": "Real-time API para inline moderation o batch para backfills",
+      "realtime": "Tiempo real",
+      "batch": "Batch",
+      "endpoint": "Endpoint",
+      "curl": "cURL",
+      "ts": "TypeScript",
+      "python": "Python",
+      "copy": "Copiar",
+      "copied": "Copiado",
+      "rateLimit": "Rate limit",
+      "auth": "Autenticación"
+    },
+    "metrics": {
+      "title": "Métricas por categoría",
+      "subtitle": "Precision, recall, FPR y tiempo medio de moderación",
+      "category": "Categoría",
+      "precision": "Precision",
+      "recall": "Recall",
+      "fpr": "FPR",
+      "ttm": "TTM",
+      "volume": "Volumen 30d"
+    },
+    "compliance": {
+      "title": "Cumplimiento",
+      "dsa": "DSA EU",
+      "coppa": "COPPA",
+      "lgpd": "LGPD Brasil",
+      "gdpr": "GDPR",
+      "localLaws": "Leyes locales",
+      "auditReady": "Audit-ready"
+    },
+    "modal": {
+      "close": "Cerrar"
+    }
+  }
+}
