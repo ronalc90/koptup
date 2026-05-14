@@ -13,7 +13,8 @@
     "sidebar": {
       "title": "Capas de plataforma",
       "subtitle": "Hacé click en cualquier capa para ver el detalle",
-      "search": "Buscar capacidad..."
+      "search": "Buscar capacidad...",
+      "noResults": "Sin resultados para tu búsqueda."
     },
     "layers": {
       "ingestion": {
