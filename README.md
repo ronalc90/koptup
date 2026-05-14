@@ -18,6 +18,7 @@ Cada demo es una aplicación interactiva navegable, con datos simulados realista
 | Telemedicina HIPAA | HealthTech | Video consulta segura, EHR integrado, triage IA, receta electrónica y wearables Apple Health / Fitbit. | [Ver demo](./apps/web/src/app/demo/telemedicina/) |
 | Facturación Electrónica Multi-país | FinTech | Emisión y recepción de facturas DIAN, SAT, AFIP, SII, SUNAT, DGI, SET, SRI con SDK y white-label. | [Ver demo](./apps/web/src/app/demo/facturacion-electronica/) |
 | WMS / Logística | Logística | Multi-warehouse, picking optimizado, route optimization ML, last-mile con app driver y carriers integrados. | [Ver demo](./apps/web/src/app/demo/wms-logistica/) |
+| POS Punto de Venta | Retail | POS offline-first con multi-payment, KDS para restaurantes, facturación electrónica y hardware integrado. | [Ver demo](./apps/web/src/app/demo/pos/) |
 
 ## 🚀 Stack Tecnológico
 
