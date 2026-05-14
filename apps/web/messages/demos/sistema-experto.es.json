@@ -1,0 +1,18 @@
+{
+  "demoExpertSystem": {
+    "back": "Volver a Cuentas Médicas",
+    "title": "Sistema Experto de Auditoría",
+    "subtitle": "Procesamiento inteligente de cuentas médicas con IA",
+    "systemActive": "● Sistema Activo",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "dashboardDesc": "Estadísticas y métricas",
+      "search": "Búsqueda Semántica",
+      "searchDesc": "Buscar CUPS con IA",
+      "config": "Configuración",
+      "configDesc": "Motor de reglas",
+      "docs": "Documentación",
+      "docsDesc": "Guías y API"
+    }
+  }
+}
