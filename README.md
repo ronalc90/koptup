@@ -15,6 +15,7 @@ Cada demo es una aplicación interactiva navegable, con datos simulados realista
 | ERP Modular Multi-país | ERP | Contabilidad doble entrada, finanzas, inventario, ventas y manufactura con facturación electrónica DIAN/SAT/AFIP/SII/SUNAT. | [Ver demo](./apps/web/src/app/demo/erp/) |
 | Help Desk IA Omnichannel | Soporte IA | Ticketing inteligente con routing ML, sugerencias IA al agente, SLA management y CSAT automatizado. | [Ver demo](./apps/web/src/app/demo/helpdesk-ia/) |
 | LMS / E-learning | Educación | Plataforma educativa con AI tutor 1:1, adaptive learning, live classes y gamification completa. | [Ver demo](./apps/web/src/app/demo/lms/) |
+| Telemedicina HIPAA | HealthTech | Video consulta segura, EHR integrado, triage IA, receta electrónica y wearables Apple Health / Fitbit. | [Ver demo](./apps/web/src/app/demo/telemedicina/) |
 
 ## 🚀 Stack Tecnológico
 
