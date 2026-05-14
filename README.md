@@ -40,6 +40,8 @@ Cada demo es una aplicación interactiva navegable, con datos simulados realista
 
 | Moderación de contenido | Seguridad | Detección de toxicidad, spam, NSFW y phishing en texto/imágenes con escalamiento a revisión humana. | [Ver demo](./apps/web/src/app/demo/moderacion-contenido/) |
 
+| Delivery y last-mile | Logística | Asignación de pedidos a riders, ruteo optimizado, tracking en vivo y ETA dinámico. | [Ver demo](./apps/web/src/app/demo/delivery/) |
+
 ## 🚀 Stack Tecnológico
 
 ### Frontend
