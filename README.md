@@ -5,6 +5,45 @@
 
 Plataforma web profesional, moderna y responsiva para una empresa que vende soluciones tecnológicas personalizadas. Incluye e-commerce, chatbots inteligentes, integración con APIs, aplicaciones móviles y más.
 
+## 🧩 Catálogo de Soluciones
+
+Cada demo es una aplicación interactiva navegable, con datos simulados realistas, i18n ES/EN, modo oscuro y diseño responsive.
+
+| Demo | Categoría | Descripción | Enlace |
+| --- | --- | --- | --- |
+| CRM con IA | Ventas IA | Pipeline visual, lead scoring ML, conversation intelligence y sequences multi-canal con copiloto de IA. | [Ver demo](./apps/web/src/app/demo/crm-ia/) |
+| ERP modular multi-país | Operaciones | Contabilidad doble entrada, finanzas, inventario, ventas y manufactura con facturación electrónica LatAm. | [Ver demo](./apps/web/src/app/demo/erp/) |
+
+| Helpdesk con IA | Soporte | Tickets omnicanal con priorización ML, sugerencia de respuestas, base de conocimiento y SLA tracking. | [Ver demo](./apps/web/src/app/demo/helpdesk-ia/) |
+
+| LMS | Educación | Plataforma de cursos con tracks de aprendizaje, quizzes, certificados, gamificación y analytics de progreso. | [Ver demo](./apps/web/src/app/demo/lms/) |
+
+| Telemedicina | Salud | Videoconsultas, agenda médica, historia clínica electrónica, prescripciones digitales y triage con IA. | [Ver demo](./apps/web/src/app/demo/telemedicina/) |
+
+| Facturación electrónica | Fiscal | Emisión de facturas electrónicas multipaís con firma digital, reportes fiscales y notificación al SRI/DIAN/SUNAT. | [Ver demo](./apps/web/src/app/demo/facturacion-electronica/) |
+
+| POS | Retail | Punto de venta con caja, inventario en tiempo real, múltiples métodos de pago y cierre de turno. | [Ver demo](./apps/web/src/app/demo/pos/) |
+
+| HRMS | Recursos Humanos | Gestión integral de empleados, nómina, vacaciones, evaluaciones de desempeño y onboarding. | [Ver demo](./apps/web/src/app/demo/hrms/) |
+
+| Automatización de procesos | Productividad | Constructor visual de workflows tipo low-code con triggers, acciones y conectores a APIs externas. | [Ver demo](./apps/web/src/app/demo/automatizacion/) |
+
+| SaaS boilerplate | Plataforma | Base multitenant con autenticación, planes y suscripciones, billing, RBAC y panel de administración. | [Ver demo](./apps/web/src/app/demo/saas-boilerplate/) |
+
+| Voice AI | IA conversacional | Agente de voz con reconocimiento de habla, NLU, síntesis de voz y orquestación de llamadas inbound/outbound. | [Ver demo](./apps/web/src/app/demo/voice-ai/) |
+
+| Firma electrónica | Legal | Firma digital con validez legal, flujo de aprobaciones, plantillas reutilizables y audit trail completo. | [Ver demo](./apps/web/src/app/demo/firma-electronica/) |
+
+| Scraping y monitoreo | Datos | Pipeline de scraping con selectores visuales, scheduling, rotación de proxies y alertas por cambios. | [Ver demo](./apps/web/src/app/demo/scraping/) |
+
+| Code review con IA | DevTools | Análisis automático de PRs con detección de bugs, sugerencias de refactor, seguridad y cobertura de tests. | [Ver demo](./apps/web/src/app/demo/code-review-ia/) |
+
+| Moderación de contenido | Seguridad | Detección de toxicidad, spam, NSFW y phishing en texto/imágenes con escalamiento a revisión humana. | [Ver demo](./apps/web/src/app/demo/moderacion-contenido/) |
+
+| Delivery y last-mile | Logística | Asignación de pedidos a riders, ruteo optimizado, tracking en vivo y ETA dinámico. | [Ver demo](./apps/web/src/app/demo/delivery/) |
+
+| Programa de lealtad | Marketing | Programa de puntos, tiers, beneficios, campañas segmentadas y analítica de retención de clientes. | [Ver demo](./apps/web/src/app/demo/loyalty/) |
+
 ## 🚀 Stack Tecnológico
 
 ### Frontend
