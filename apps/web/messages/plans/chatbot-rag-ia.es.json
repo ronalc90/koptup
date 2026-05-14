@@ -2,7 +2,7 @@
   "plan_chatbotRagIa": {
     "name": "Chatbot RAG con IA",
     "tagline": "Bot inteligente listo en horas, sin instalar nada",
-    "description": "Activá un asistente virtual entrenado con tus documentos en menos de 24 horas. Lo hospedamos nosotros, vos solo pagás el plan que necesitás.",
+    "description": "Activá un asistente virtual entrenado con tus documentos en menos de un día hábil. Lo hospedamos nosotros, vos solo pagás el plan que necesitás.",
     "categoryLabel": "Plataforma IA",
     "plans": {
       "starter": {
@@ -42,11 +42,13 @@
           "Modelos privados u on-prem opcionales",
           "Compliance HIPAA, GDPR e ISO 27001",
           "Dedicated success manager",
-          "Soporte 24/7 y on-call para incidentes críticos",
+          "Soporte prioritario en horario laboral Colombia (Lun-Vie 8 AM - 5 PM), SLA 1h hábil para incidentes críticos",
           "Auditorías y reportes mensuales para tu comité"
         ],
         "idealPara": "Empresas grandes con miles de usuarios y requisitos de cumplimiento"
       }
-    }
+    },
+    "costoNote": "El plan incluye hosting, base de datos y monitoreo. Los consumos variables (LLMs, WhatsApp, mapas, pasarelas de pago) los pagás directamente al proveedor según uso real.",
+    "limitsLabel": "Lo que incluye este plan"
   }
 }

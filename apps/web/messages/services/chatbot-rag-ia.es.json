@@ -56,7 +56,7 @@
         "mantenimientoIncluye": [
           "Soporte por WhatsApp y email durante 6 meses",
           "Fix de bugs y mejoras menores (hasta 10 horas/mes)",
-          "Monitoreo proactivo 24/7 con alertas automáticas",
+          "Monitoreo proactivo automatizado con alertas (sin guardia humana fuera de horario laboral)",
           "Backups diarios verificados",
           "Reuniones de revisión mensuales con tu equipo",
           "Reporte ejecutivo mensual con KPIs"
@@ -74,7 +74,7 @@
           "Integración con sistemas legacy y mainframes",
           "Alta disponibilidad multi-región con SLA 99,9%",
           "Auditorías de seguridad e infraestructura dedicada",
-          "Dedicated team y soporte 24/7"
+          "Dedicated team y soporte prioritario en horario laboral Colombia"
         ],
         "setupIncluye": [
           "Discovery profundo con C-level y workshops por área (3-4 semanas)",
@@ -87,7 +87,7 @@
         ],
         "mantenimientoIncluye": [
           "Dedicated team con SLA 99,9% durante 12 meses",
-          "Soporte 24/7 y on-call para incidentes críticos",
+          "Soporte prioritario en horario laboral Colombia (Lun-Vie 8 AM - 5 PM), SLA 1h hábil para incidentes críticos",
           "Hasta 40 horas/mes de evolutivos incluidos",
           "Multi-región y disaster recovery testing trimestral",
           "Auditorías de seguridad y compliance semestrales",
@@ -95,6 +95,8 @@
           "Reportes ejecutivos mensuales para tu comité directivo"
         ]
       }
-    }
+    },
+    "costoNote": "Las APIs (OpenAI, Pinecone, etc.) y la infraestructura (AWS, Vercel, MongoDB Atlas) las pagás directamente a los proveedores. Nosotros desarrollamos, integramos y mantenemos, pero esos costos no están incluidos en nuestras tarifas.",
+    "limitsLabel": "Lo que incluye este plan"
   }
 }
