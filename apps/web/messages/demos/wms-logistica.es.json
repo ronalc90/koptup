@@ -1,0 +1,326 @@
+{
+  "demoWms": {
+    "pageTitle": "WMS & Logística inteligente",
+    "pageSubtitle": "Gestión de bodegas, picking optimizado, ruteo VRP, last-mile y 3PL multi-cliente en una sola plataforma.",
+    "statusLive": "Operación en vivo",
+    "tms": {
+      "label": "TMS integrado",
+      "on": "Activado",
+      "off": "Desactivado"
+    },
+    "tabs": {
+      "warehouse": "Bodega",
+      "receiving": "Recibo",
+      "picking": "Picking",
+      "cycleCount": "Conteo cíclico",
+      "crossDock": "Cross-dock",
+      "carriers": "Transportadoras",
+      "driver": "App conductor",
+      "routes": "Ruteo VRP",
+      "tracking": "Tracking",
+      "returns": "Devoluciones",
+      "tpl": "3PL & Billing"
+    },
+    "warehouses": {
+      "title": "Bodegas",
+      "subtitle": "Selecciona una bodega para ver su operación en detalle.",
+      "occupancy": "Ocupación",
+      "picksDay": "Picks/día",
+      "accuracy": "Accuracy",
+      "skus": "SKUs",
+      "active": "Activa",
+      "list": {
+        "bog01": {
+          "name": "CEDI Bogotá Norte",
+          "city": "Bogotá, CO",
+          "type": "Multi-cliente"
+        },
+        "mde02": {
+          "name": "CD Medellín Sur",
+          "city": "Medellín, CO",
+          "type": "Dedicada Retail"
+        },
+        "bar03": {
+          "name": "Hub Barranquilla",
+          "city": "Barranquilla, CO",
+          "type": "Cross-dock"
+        }
+      }
+    },
+    "warehouse": {
+      "title": "Mapa de zonas y bins",
+      "subtitle": "Hover sobre un bin para ver SKU, stock y rotación.",
+      "legend": {
+        "high": "Alta rotación",
+        "medium": "Rotación media",
+        "low": "Baja rotación",
+        "quarantine": "Cuarentena",
+        "empty": "Disponible"
+      },
+      "zone": "Zona",
+      "bin": "Bin",
+      "sku": "SKU",
+      "stock": "Stock",
+      "rotation": "Rotación",
+      "lastMove": "Último movimiento",
+      "empty": "Bin vacío",
+      "hoverHint": "Pasa el mouse sobre un bin",
+      "zones": {
+        "A": "Picking rápido",
+        "B": "Reserva",
+        "C": "Voluminosos",
+        "Q": "Cuarentena"
+      },
+      "kpis": {
+        "totalBins": "Bins totales",
+        "occupied": "Ocupados",
+        "available": "Disponibles",
+        "quarantine": "Cuarentena"
+      }
+    },
+    "receiving": {
+      "title": "Recibo de mercancía",
+      "subtitle": "Órdenes de compra entrantes, scan-to-receive y discrepancias.",
+      "incomingPos": "POs entrantes",
+      "scanTitle": "Scan-to-receive",
+      "scanPlaceholder": "Escanea o digita el código del bulto...",
+      "scanBtn": "Escanear",
+      "scanLog": "Log de escaneos",
+      "scanEmpty": "Aún no has escaneado ningún bulto.",
+      "scanned": "Escaneado",
+      "discrepancies": "Discrepancias",
+      "supplier": "Proveedor",
+      "eta": "ETA",
+      "items": "ítems",
+      "status": {
+        "expected": "Esperada",
+        "arrived": "Arribada",
+        "checking": "Verificando",
+        "completed": "Recibida",
+        "discrepancy": "Con discrepancia"
+      },
+      "discrepancyTypes": {
+        "missing": "Faltante",
+        "damaged": "Daño",
+        "extra": "Sobrante",
+        "wrongSku": "SKU incorrecto"
+      }
+    },
+    "putaway": {
+      "title": "Putaway sugerido por ML",
+      "subtitle": "El modelo recomienda la ubicación óptima según rotación, peso y afinidad de SKU.",
+      "sku": "SKU",
+      "description": "Descripción",
+      "suggested": "Bin sugerido",
+      "score": "Score IA",
+      "reason": "Razón",
+      "confirm": "Confirmar",
+      "override": "Cambiar",
+      "confirmed": "Ubicado",
+      "reasons": {
+        "highRotation": "Alta rotación, asignar a Zona A",
+        "heavy": "Volumen y peso alto, Zona C nivel bajo",
+        "affinity": "Co-picking frecuente con SKU vecino",
+        "fefo": "Próximo a vencer (FEFO)"
+      }
+    },
+    "picking": {
+      "title": "Picking optimizado",
+      "subtitle": "Elige la estrategia y revisa la ruta sugerida.",
+      "modeLabel": "Estrategia",
+      "modes": {
+        "wave": "Wave",
+        "batch": "Batch",
+        "zone": "Zone",
+        "cluster": "Cluster"
+      },
+      "modeDesc": {
+        "wave": "Olas programadas por corte horario",
+        "batch": "Agrupa múltiples pedidos en un recorrido",
+        "zone": "Cada picker trabaja su zona asignada",
+        "cluster": "Un picker, varias órdenes simultáneas"
+      },
+      "route": "Ruta optimizada",
+      "stops": "paradas",
+      "estTime": "Tiempo estimado",
+      "distance": "Distancia",
+      "savings": "Ahorro vs ruta naive",
+      "pickList": "Lista de picks",
+      "order": "Pedido",
+      "qty": "Cant.",
+      "bin": "Bin",
+      "sku": "SKU",
+      "status": {
+        "pending": "Pendiente",
+        "inProgress": "En curso",
+        "picked": "Recolectado"
+      },
+      "startWave": "Iniciar wave",
+      "waveStarted": "Wave iniciada"
+    },
+    "cycleCount": {
+      "title": "Conteo cíclico (ABC)",
+      "subtitle": "Análisis ABC para programar conteos según valor y rotación.",
+      "classA": "Clase A",
+      "classB": "Clase B",
+      "classC": "Clase C",
+      "classADesc": "Alto valor / alta rotación · conteo semanal",
+      "classBDesc": "Valor medio · conteo mensual",
+      "classCDesc": "Bajo valor · conteo trimestral",
+      "skusInClass": "SKUs",
+      "valuePct": "% del valor",
+      "nextCount": "Próximo conteo",
+      "schedule": "Calendario sugerido",
+      "task": "Tarea",
+      "due": "Fecha",
+      "assignee": "Responsable",
+      "status": {
+        "scheduled": "Programado",
+        "inProgress": "En curso",
+        "done": "Completado"
+      }
+    },
+    "crossDock": {
+      "title": "Cross-docking & kitting",
+      "subtitle": "Flujos visuales para mover mercancía sin almacenarla y para armar kits.",
+      "flowCrossDock": "Flujo cross-dock",
+      "flowKitting": "Flujo kitting",
+      "steps": {
+        "inbound": "Recibo",
+        "sort": "Clasificación",
+        "consolidate": "Consolidación",
+        "outbound": "Despacho",
+        "components": "Componentes",
+        "assemble": "Ensamble",
+        "qc": "QA",
+        "packed": "Empacado"
+      },
+      "activeOrders": "Órdenes activas",
+      "completed": "Completadas hoy",
+      "avgTime": "Tiempo promedio"
+    },
+    "carriers": {
+      "title": "Transportadoras integradas",
+      "subtitle": "Comparativa de SLA, tarifa y cobertura entre operadores.",
+      "sla": "SLA",
+      "rate": "Tarifa",
+      "coverage": "Cobertura",
+      "rating": "Rating",
+      "preferred": "Preferida",
+      "select": "Seleccionar",
+      "national": "Nacional",
+      "international": "Internacional",
+      "lastMile": "Última milla"
+    },
+    "driver": {
+      "title": "App del conductor",
+      "subtitle": "Vista preview de la app móvil: ruta, asignaciones y POD.",
+      "deviceLabel": "Driver-07",
+      "route": "Ruta del día",
+      "stops": "paradas",
+      "completed": "completadas",
+      "next": "Próxima parada",
+      "navigate": "Navegar",
+      "callClient": "Llamar",
+      "deliveries": "Entregas",
+      "pod": "Prueba de entrega",
+      "signature": "Firma",
+      "photo": "Foto",
+      "captureSignature": "Capturar firma",
+      "capturePhoto": "Tomar foto",
+      "podCaptured": "POD capturado",
+      "status": {
+        "pending": "Pendiente",
+        "arrived": "En sitio",
+        "delivered": "Entregada",
+        "failed": "Fallida"
+      }
+    },
+    "routes": {
+      "title": "Optimización de rutas (VRP)",
+      "subtitle": "Resolución multi-vehículo con ventanas horarias y capacidad.",
+      "vehicles": "Vehículos",
+      "stops": "Paradas",
+      "kmSaved": "Km ahorrados",
+      "timeSaved": "Tiempo ahorrado",
+      "before": "Antes",
+      "after": "Optimizada",
+      "timeWindow": "Ventana",
+      "load": "Carga",
+      "vehicle": "Vehículo",
+      "reoptimize": "Re-optimizar",
+      "optimized": "Optimización completa"
+    },
+    "tracking": {
+      "title": "Tracking en tiempo real",
+      "subtitle": "Seguimiento de envíos con eventos en vivo.",
+      "filterAll": "Todos",
+      "tracking": "Guía",
+      "client": "Cliente",
+      "carrier": "Transportadora",
+      "destination": "Destino",
+      "eta": "ETA",
+      "status": "Estado",
+      "events": "Eventos",
+      "statuses": {
+        "picked": "Recolectado",
+        "inTransit": "En tránsito",
+        "outForDelivery": "En reparto",
+        "delivered": "Entregado",
+        "exception": "Excepción"
+      }
+    },
+    "returns": {
+      "title": "Portal de devoluciones (RMA)",
+      "subtitle": "Gestión de devoluciones de clientes y trazabilidad de motivo.",
+      "newRma": "Nueva RMA",
+      "orderId": "N° pedido",
+      "orderIdPh": "Ej: ORD-10245",
+      "reason": "Motivo",
+      "reasons": {
+        "damaged": "Producto dañado",
+        "wrong": "Producto incorrecto",
+        "notNeeded": "Ya no lo necesita",
+        "defect": "Defecto de fábrica"
+      },
+      "comments": "Comentarios",
+      "commentsPh": "Detalle del estado del producto...",
+      "submit": "Crear RMA",
+      "created": "RMA creada",
+      "list": "RMAs activas",
+      "rmaId": "RMA",
+      "client": "Cliente",
+      "date": "Fecha",
+      "status": "Estado",
+      "statuses": {
+        "requested": "Solicitada",
+        "approved": "Aprobada",
+        "received": "Recibida",
+        "refunded": "Reembolsada",
+        "rejected": "Rechazada"
+      }
+    },
+    "tpl": {
+      "title": "3PL multi-cliente & billing",
+      "subtitle": "Operación tercerizada con facturación por cliente y SLA.",
+      "client": "Cliente",
+      "skusStored": "SKUs almacenados",
+      "ordersMonth": "Órdenes/mes",
+      "slaCompliance": "Cumplimiento SLA",
+      "monthlyBill": "Factura del mes",
+      "viewDetail": "Ver detalle",
+      "billingBreakdown": "Desglose de facturación",
+      "concept": "Concepto",
+      "qty": "Cantidad",
+      "unit": "Unitario",
+      "total": "Total",
+      "concepts": {
+        "storage": "Almacenamiento (pallet/día)",
+        "picking": "Picking (línea)",
+        "packing": "Empaque (pedido)",
+        "shipping": "Despacho (bulto)",
+        "returns": "Procesamiento de devoluciones"
+      }
+    }
+  }
+}

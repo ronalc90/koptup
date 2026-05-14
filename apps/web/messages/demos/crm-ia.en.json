@@ -1,0 +1,248 @@
+{
+  "demoCrm": {
+    "pageTitle": "AI CRM",
+    "pageSubtitle": "Smart sales platform: visual pipeline, ML lead scoring, predictive forecasting, and an AI assistant for your sales team.",
+    "tabs": {
+      "pipeline": "Pipeline",
+      "contacts": "Contacts",
+      "forecast": "Forecast",
+      "assistant": "AI Assistant",
+      "conversations": "Conversations",
+      "sequences": "Sequences"
+    },
+    "metrics": {
+      "title": "Executive overview",
+      "dealsActive": "Active deals",
+      "dealsActiveSub": "in pipeline",
+      "pipelineValue": "Pipeline value",
+      "pipelineValueSub": "AI-weighted",
+      "winRate": "Win rate",
+      "winRateSub": "last 90 days",
+      "avgCycle": "Avg cycle",
+      "avgCycleSub": "days to close",
+      "trendUp": "vs last month",
+      "trendDown": "vs last month"
+    },
+    "pipeline": {
+      "title": "Visual pipeline",
+      "subtitle": "Drag deals between stages — AI recalculates close probability in real time.",
+      "stages": {
+        "prospect": "Prospect",
+        "qualified": "Qualified",
+        "proposal": "Proposal",
+        "negotiation": "Negotiation",
+        "closed": "Closed won"
+      },
+      "deals": "deals",
+      "probability": "Prob.",
+      "owner": "Owner",
+      "closeDate": "Closes",
+      "viewDetails": "View details",
+      "emptyStage": "No deals in this stage",
+      "addDeal": "New deal"
+    },
+    "contacts": {
+      "title": "Contacts & leads",
+      "subtitle": "Unified database with AI scoring, next best action, and automatic enrichment.",
+      "searchPlaceholder": "Search by name, company or email...",
+      "filters": {
+        "all": "All",
+        "hot": "Hot",
+        "warm": "Warm",
+        "cold": "Cold",
+        "untouched": "Untouched"
+      },
+      "columns": {
+        "name": "Name",
+        "company": "Company",
+        "score": "AI Score",
+        "dealValue": "Deal value",
+        "nextAction": "Next action",
+        "lastContact": "Last contact",
+        "actions": ""
+      },
+      "scoreLabels": {
+        "hot": "Hot",
+        "warm": "Warm",
+        "cold": "Cold"
+      },
+      "viewProfile": "View profile",
+      "openCustomer360": "Open Customer 360",
+      "noResults": "No contacts match those filters.",
+      "results": "{count} contacts"
+    },
+    "customer360": {
+      "title": "Customer 360",
+      "subtitle": "Unified customer view",
+      "tabs": {
+        "timeline": "Timeline",
+        "deals": "Deals",
+        "tickets": "Tickets",
+        "files": "Files"
+      },
+      "score": "AI Score",
+      "lifetimeValue": "Lifetime value",
+      "totalDeals": "Total deals",
+      "openTickets": "Open tickets",
+      "lastInteraction": "Last interaction",
+      "aiInsights": "AI insights",
+      "insight1": "High likelihood of upsell within the next 30 days.",
+      "insight2": "Positive sentiment trending up across the last 3 interactions.",
+      "insight3": "Active customer; best contact channel is morning email.",
+      "timeline": {
+        "title": "Timeline",
+        "emailSent": "Email sent",
+        "callMade": "Call placed",
+        "meetingHeld": "Meeting held",
+        "dealCreated": "Deal created",
+        "ticketOpened": "Ticket opened",
+        "transactionCompleted": "Transaction completed"
+      },
+      "summaries": {
+        "discovery": "Discovery call · 45min",
+        "proposalSent": "Proposal v2 sent",
+        "followUp": "Follow-up call",
+        "renewal": "Pro plan renewal · $4.8k",
+        "supportApi": "Support: API integration",
+        "newDeal": "New deal · {value}",
+        "firstOutbound": "First outbound contact"
+      },
+      "deals": {
+        "q2": "{company} deal · Q2",
+        "annualRenewal": "Annual renewal",
+        "expansion": "Expansion · Add-on"
+      },
+      "tickets": {
+        "t1": "REST API integration fails with code 429",
+        "t2": "Request for new admin user"
+      },
+      "ticketStatus": {
+        "open": "Open",
+        "resolved": "Resolved"
+      },
+      "priorities": {
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      },
+      "noFiles": "No shared files yet.",
+      "close": "Close"
+    },
+    "forecast": {
+      "title": "Sales forecast",
+      "subtitle": "Quarterly close predictions calibrated by the AI model using historical data.",
+      "thisQuarter": "This quarter",
+      "quotaAttainment": "Quota attainment",
+      "quota": "Quota",
+      "categories": {
+        "commit": "Commit",
+        "commitSub": "Firm team commitments",
+        "best": "Best case",
+        "bestSub": "Realistic upside scenario",
+        "weighted": "Weighted pipeline",
+        "weightedSub": "Value × AI probability"
+      },
+      "byOwner": "Forecast by owner",
+      "byStage": "Stage distribution",
+      "trend": "6-month trend",
+      "monthLabels": {
+        "jan": "Jan",
+        "feb": "Feb",
+        "mar": "Mar",
+        "apr": "Apr",
+        "may": "May",
+        "jun": "Jun"
+      },
+      "aiCommentary": "Model commentary",
+      "aiCommentaryText": "Medium risk on Acme Corp ($85k): decision-maker has gone silent. Suggestion: re-engage with a relevant case study. Weighted pipeline is 12% above target."
+    },
+    "assistant": {
+      "title": "AI sales assistant",
+      "subtitle": "Compose emails, generate scripts, and get contextual suggestions.",
+      "emailComposer": "AI email composer",
+      "selectContact": "Select contact",
+      "objective": "Email objective",
+      "objectives": {
+        "intro": "First contact",
+        "followUp": "Follow up",
+        "proposal": "Send proposal",
+        "reEngage": "Re-engage lead",
+        "closing": "Closing"
+      },
+      "tone": "Tone",
+      "tones": {
+        "professional": "Professional",
+        "friendly": "Friendly",
+        "direct": "Direct",
+        "consultative": "Consultative"
+      },
+      "context": "Extra context (optional)",
+      "contextPlaceholder": "e.g., the customer mentioned they're also evaluating a competitor...",
+      "generate": "Generate draft",
+      "generating": "Generating...",
+      "generated": "Draft ready",
+      "subject": "Subject",
+      "body": "Body",
+      "copy": "Copy",
+      "copied": "Copied",
+      "regenerate": "Regenerate",
+      "send": "Send",
+      "subjectDraft": "Next steps for {company} — quick alignment",
+      "bodyDraft": "Hi {name},\n\nThanks for your time last week. To recap what we discussed, we believe we can help {company}:\n\n- Cut sales cycle by ~25% with pipeline automation.\n- Lift win rate through data-driven lead scoring.\n- Centralize sales ops in a single view.\n\nWould you have 20 minutes this week to review a tailored proposal? I'll send a couple of slots from my calendar.\n\nBest,\nRonald",
+      "quickActions": "Quick actions",
+      "quickActionItems": {
+        "summarize": "Summarize last call",
+        "nextStep": "Suggest next step",
+        "competitor": "Competitive analysis",
+        "objection": "Handle common objection"
+      }
+    },
+    "conversations": {
+      "title": "Conversation intelligence",
+      "subtitle": "AI-analyzed call recordings: sentiment, topics, and action items detected automatically.",
+      "sentiment": {
+        "positive": "Positive",
+        "neutral": "Neutral",
+        "negative": "Negative"
+      },
+      "duration": "Duration",
+      "topics": "Detected topics",
+      "actionItems": "Action items",
+      "talkRatio": "Talk ratio",
+      "rep": "Rep",
+      "client": "Customer",
+      "playRecording": "Play",
+      "viewTranscript": "View transcript",
+      "noConversations": "No conversations this week."
+    },
+    "sequences": {
+      "title": "Multi-channel sequences",
+      "subtitle": "Automated cadences combining email, WhatsApp, and call tasks.",
+      "activeSequence": "Active sequence",
+      "stepsCompleted": "{done} of {total} steps",
+      "enrolled": "Enrolled leads",
+      "openRate": "Open rate",
+      "replyRate": "Reply rate",
+      "channels": {
+        "email": "Email",
+        "whatsapp": "WhatsApp",
+        "call": "Call",
+        "linkedin": "LinkedIn",
+        "task": "Task"
+      },
+      "stepStatus": {
+        "done": "Done",
+        "current": "In progress",
+        "pending": "Pending"
+      },
+      "stepDay": "Day {day}"
+    },
+    "common": {
+      "loading": "Loading...",
+      "viewAll": "View all",
+      "close": "Close",
+      "deal": "deal",
+      "deals": "deals"
+    }
+  }
+}

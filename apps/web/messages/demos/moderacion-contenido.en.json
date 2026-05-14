@@ -1,0 +1,233 @@
+{
+  "demoModeration": {
+    "pageTitle": "AI content moderation",
+    "pageSubtitle": "Multimodal classification, configurable workflows, moderator wellness, and full traceability for platforms at scale.",
+    "status": "System online",
+    "backToCatalog": "Back to catalog",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "queue": "Moderation queue",
+      "classifiers": "Classifiers",
+      "workflows": "Workflows",
+      "appeals": "Appeals",
+      "audit": "Audit",
+      "transparency": "Transparency",
+      "api": "API",
+      "metrics": "Metrics"
+    },
+    "verticals": {
+      "label": "Active vertical",
+      "gaming": "Gaming",
+      "dating": "Dating",
+      "kids": "Kids",
+      "finance": "Finance",
+      "social": "Social"
+    },
+    "dashboard": {
+      "title": "Operations overview",
+      "subtitle": "Real-time metrics across moderation",
+      "moderatedToday": "Moderated today",
+      "queueNow": "In queue now",
+      "accuracy": "Accuracy · P/R",
+      "avgTime": "Avg time",
+      "fpr": "False positive rate",
+      "autoActioned": "Auto-resolved",
+      "humanReviewed": "Human-reviewed",
+      "escalations": "Escalations",
+      "sla": "SLA met",
+      "compareYesterday": "vs. yesterday",
+      "trendUp": "↑",
+      "trendDown": "↓"
+    },
+    "queue": {
+      "title": "Prioritized queue",
+      "subtitle": "Routes items automatically by risk, vertical, and SLA",
+      "filterAll": "All",
+      "filterText": "Text",
+      "filterImage": "Image",
+      "filterVideo": "Video",
+      "filterAudio": "Audio",
+      "priority": "Priority",
+      "type": "Type",
+      "preview": "Preview",
+      "classification": "AI classification",
+      "confidence": "Confidence",
+      "actions": "Actions",
+      "showPreview": "Show",
+      "hidePreview": "Hide",
+      "blurred": "Safe view is on",
+      "selectItem": "Select an item to see details",
+      "approve": "Approve",
+      "reject": "Reject",
+      "escalate": "Escalate",
+      "editTag": "Edit tag",
+      "details": "Details",
+      "reporter": "Reported by",
+      "user": "User",
+      "channel": "Channel",
+      "submittedAt": "Received at",
+      "context": "Context",
+      "history": "User history",
+      "previousStrikes": "Prior strikes",
+      "accountAge": "Account age",
+      "classifications": {
+        "nsfw": "NSFW",
+        "violence": "Violence",
+        "hate": "Hate speech",
+        "spam": "Spam",
+        "fraud": "Fraud",
+        "childSafety": "Child safety",
+        "selfHarm": "Self-harm",
+        "harassment": "Harassment"
+      },
+      "priorities": {
+        "critical": "Critical",
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      }
+    },
+    "classifiers": {
+      "title": "Multimodal classifiers",
+      "subtitle": "Specialized models per modality, each with its own metrics",
+      "text": "Text",
+      "image": "Image",
+      "video": "Video",
+      "audio": "Audio",
+      "model": "Active model",
+      "version": "Version",
+      "languages": "Languages",
+      "throughput": "Throughput",
+      "latencyP95": "P95 latency",
+      "precision": "Precision",
+      "recall": "Recall",
+      "categoriesCovered": "Categories covered",
+      "lastTrained": "Last retrained",
+      "perCategory": "Per-category performance"
+    },
+    "workflows": {
+      "title": "Configurable workflows",
+      "subtitle": "No-code rules editor with score-driven if/elif logic",
+      "addRule": "Add rule",
+      "saveAll": "Save changes",
+      "ruleIf": "If",
+      "and": "And",
+      "then": "Then",
+      "score": "score",
+      "actions": {
+        "autoReject": "Auto-reject",
+        "humanReview": "Human review",
+        "autoApprove": "Auto-approve",
+        "shadowBan": "Shadow ban",
+        "warnUser": "Warn user",
+        "escalateLegal": "Escalate to legal"
+      },
+      "operators": {
+        "gt": "greater than",
+        "lt": "less than",
+        "between": "between"
+      },
+      "preview": "Preview · items affected in the last 24h",
+      "active": "Active",
+      "paused": "Paused"
+    },
+    "appeals": {
+      "title": "Pending appeals",
+      "subtitle": "Resolve within the DSA-mandated SLA · 24h standard",
+      "case": "Case",
+      "originalDecision": "Original decision",
+      "appealReason": "Appeal reason",
+      "submitted": "Submitted",
+      "slaRemaining": "SLA remaining",
+      "reviewer": "Assigned reviewer",
+      "resolutionPath": "Resolution path",
+      "upholdDecision": "Uphold decision",
+      "reverseDecision": "Reverse decision",
+      "requestMoreInfo": "Request more info",
+      "statuses": {
+        "open": "Open",
+        "inReview": "In review",
+        "resolved": "Resolved",
+        "overdue": "Overdue"
+      }
+    },
+    "wellness": {
+      "title": "Team wellness",
+      "message": "Scheduled breaks, blur-by-default, and category rotation help reduce emotional fatigue.",
+      "nextBreak": "Next break",
+      "categoryRotation": "Category rotation",
+      "blurByDefault": "Blur by default",
+      "takeBreak": "Take a break now",
+      "supportLine": "Mental health support line",
+      "shiftProgress": "Shift progress",
+      "itemsThisShift": "Items this shift",
+      "mentalHealthCheck": "Mental health check-in"
+    },
+    "audit": {
+      "title": "Audit trail",
+      "subtitle": "Immutable log of every action",
+      "export": "Export CSV",
+      "filterByActor": "Filter by moderator",
+      "filterByAction": "Filter by action",
+      "when": "When",
+      "who": "Who",
+      "what": "What",
+      "target": "Target",
+      "reason": "Reason",
+      "actions": {
+        "approve": "Approved",
+        "reject": "Rejected",
+        "escalate": "Escalated",
+        "editTag": "Edited tag",
+        "appealUphold": "Upheld appeal",
+        "appealReverse": "Reversed decision",
+        "ruleEdit": "Edited rule"
+      }
+    },
+    "transparency": {
+      "title": "Transparency report",
+      "subtitle": "Public takedowns by category and month · DSA Art. 24 compliant",
+      "byCategory": "By category",
+      "byMonth": "By month",
+      "totalTakedowns": "Total takedowns · 90d",
+      "reinstated": "Reinstated on appeal",
+      "downloadFull": "Download full report"
+    },
+    "api": {
+      "title": "Integration",
+      "subtitle": "Real-time API for inline moderation, batch jobs for backfills",
+      "realtime": "Real-time",
+      "batch": "Batch",
+      "endpoint": "Endpoint",
+      "curl": "cURL",
+      "ts": "TypeScript",
+      "python": "Python",
+      "copy": "Copy",
+      "copied": "Copied",
+      "rateLimit": "Rate limit",
+      "auth": "Authentication"
+    },
+    "metrics": {
+      "title": "Per-category metrics",
+      "subtitle": "Precision, recall, FPR, and average moderation time",
+      "category": "Category",
+      "precision": "Precision",
+      "recall": "Recall",
+      "fpr": "FPR",
+      "ttm": "TTM",
+      "volume": "Volume · 30d"
+    },
+    "compliance": {
+      "title": "Compliance",
+      "dsa": "EU DSA",
+      "coppa": "COPPA",
+      "lgpd": "LGPD (Brazil)",
+      "gdpr": "GDPR",
+      "localLaws": "Local laws",
+      "auditReady": "Audit-ready"
+    },
+    "modal": {
+      "close": "Close"
+    }
+  }
+}

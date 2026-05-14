@@ -1,0 +1,251 @@
+{
+  "demoCodeReview": {
+    "pageTitle": "AI code review",
+    "pageSubtitle": "Dev platform with automated PR reviews, test generation, security scanning, license compliance, and engineering analytics.",
+    "header": {
+      "newPr": "New PR",
+      "search": "Search code semantically...",
+      "settings": "Settings",
+      "syncing": "Syncing repositories"
+    },
+    "stats": {
+      "openPrs": "Open PRs",
+      "openPrsSub": "Awaiting review",
+      "avgScore": "Avg AI score",
+      "avgScoreSub": "Last 30 days",
+      "leadTime": "Lead time",
+      "leadTimeSub": "Hours to merge",
+      "coverage": "Coverage",
+      "coverageSub": "Lines covered by tests"
+    },
+    "sidebar": {
+      "title": "Pull requests",
+      "filter": "Filter",
+      "all": "All",
+      "mine": "Mine",
+      "review": "To review",
+      "score": "AI score",
+      "draft": "Draft"
+    },
+    "pr": {
+      "statuses": {
+        "open": "Open",
+        "inReview": "In review",
+        "approved": "Approved",
+        "merged": "Merged",
+        "changesRequested": "Changes requested"
+      },
+      "sizes": {
+        "xs": "XS",
+        "s": "S",
+        "m": "M",
+        "l": "L",
+        "xl": "XL"
+      },
+      "tags": {
+        "tests": "tests",
+        "security": "sec-issues",
+        "perf": "perf",
+        "docs": "docs",
+        "design": "design"
+      },
+      "branch": "Branch",
+      "author": "Author",
+      "reviewers": "Reviewers",
+      "commits": "commits",
+      "filesChanged": "files",
+      "additions": "additions",
+      "deletions": "deletions",
+      "createdAt": "Opened",
+      "hoursAgo": "h ago",
+      "approve": "Approve",
+      "requestChanges": "Request changes",
+      "merge": "Merge"
+    },
+    "tabs": {
+      "files": "Files",
+      "aiReview": "AI Review",
+      "tests": "Tests",
+      "security": "Security",
+      "performance": "Performance",
+      "design": "Design",
+      "docs": "Docs",
+      "search": "Search",
+      "refactor": "Refactor",
+      "analytics": "Analytics",
+      "compliance": "Compliance"
+    },
+    "files": {
+      "title": "Changed files",
+      "additions": "+",
+      "deletions": "-",
+      "viewDiff": "View diff",
+      "diffTitle": "Side-by-side diff",
+      "oldVersion": "Before",
+      "newVersion": "After",
+      "lineComment": "Inline comment",
+      "addComment": "Add comment"
+    },
+    "aiReview": {
+      "title": "AI comments",
+      "subtitle": "Per-file analysis with auto-fix suggestions.",
+      "severities": {
+        "info": "Info",
+        "suggestion": "Suggestion",
+        "warning": "Warning",
+        "blocking": "Blocking"
+      },
+      "categories": {
+        "style": "Style",
+        "bug": "Potential bug",
+        "security": "Security",
+        "perf": "Performance",
+        "design": "Design"
+      },
+      "applyFix": "Apply auto-fix",
+      "viewFix": "View fix",
+      "dismiss": "Dismiss",
+      "fixed": "Fix applied",
+      "openPr": "Fix PR created",
+      "regen": "Regenerate",
+      "explanation": "Explanation",
+      "suggestion": "Suggestion"
+    },
+    "tests": {
+      "title": "Auto-generated tests",
+      "subtitle": "Unit and integration tests generated from the diff.",
+      "type": "Type",
+      "unit": "Unit",
+      "integration": "Integration",
+      "e2e": "E2E",
+      "coverageDelta": "Δ Coverage",
+      "addedTests": "Tests added",
+      "passing": "Passing",
+      "failing": "Failing",
+      "skipped": "Skipped",
+      "runAll": "Run all",
+      "addToPr": "Add to PR",
+      "coverageBefore": "Before",
+      "coverageAfter": "After"
+    },
+    "security": {
+      "title": "Security scan",
+      "subtitle": "SAST, DAST, SCA, and secret scanning on every push.",
+      "severity": "Severity",
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "cve": "CVE",
+      "fix": "Recommended fix",
+      "pkg": "Package",
+      "vector": "Vector",
+      "fixedIn": "Fixed in",
+      "openAdvisory": "Open advisory",
+      "applyUpgrade": "Apply upgrade",
+      "secrets": "Secrets",
+      "noSecrets": "No exposed secrets",
+      "scanTypes": {
+        "sast": "SAST",
+        "dast": "DAST",
+        "sca": "SCA",
+        "secrets": "Secrets"
+      }
+    },
+    "license": {
+      "title": "License compliance",
+      "subtitle": "License and compatibility checks for every dependency. SBOM exported in CycloneDX.",
+      "dep": "Dependency",
+      "version": "Version",
+      "licenseCol": "License",
+      "compat": "Compatibility",
+      "ok": "OK",
+      "warn": "Review",
+      "blocked": "Blocked",
+      "downloadSbom": "Download SBOM",
+      "policy": "Policy: permissive + LGPL"
+    },
+    "performance": {
+      "title": "Performance analysis",
+      "subtitle": "Benchmarks comparing the PR branch against main.",
+      "metric": "Metric",
+      "before": "Main",
+      "after": "PR",
+      "delta": "Δ",
+      "regression": "Regression",
+      "improvement": "Improvement",
+      "viewFlamegraph": "View flamegraph"
+    },
+    "design": {
+      "title": "Design review",
+      "subtitle": "Check against design-system tokens and accessibility rules.",
+      "tokens": "Tokens",
+      "a11y": "Accessibility",
+      "consistency": "Consistency",
+      "passes": "Pass",
+      "fails": "Fail",
+      "viewFigma": "Open Figma"
+    },
+    "docs": {
+      "title": "Auto-generated docs",
+      "subtitle": "Preview of README and JSDoc generated from the PR.",
+      "regenerate": "Regenerate",
+      "copy": "Copy",
+      "commit": "Commit to PR",
+      "readme": "README.md",
+      "jsdoc": "JSDoc"
+    },
+    "search": {
+      "title": "Semantic search",
+      "subtitle": "Search across repos by meaning, not keywords.",
+      "placeholder": "e.g. \"function that validates JWT with refresh\"",
+      "results": "Results",
+      "repo": "Repo",
+      "openInIde": "Open in IDE"
+    },
+    "refactor": {
+      "title": "Refactor suggestions",
+      "subtitle": "AI flags duplicated code, smells, and simplification opportunities.",
+      "before": "Before",
+      "after": "After",
+      "impact": "Impact",
+      "lines": "lines",
+      "apply": "Apply refactor",
+      "previewPr": "Preview PR"
+    },
+    "analytics": {
+      "title": "Code review analytics",
+      "subtitle": "DORA and team metrics.",
+      "leadTime": "PR Lead time",
+      "leadTimeSub": "open → merge",
+      "reviewDepth": "Review depth",
+      "reviewDepthSub": "comments per PR",
+      "busFactor": "Bus factor",
+      "busFactorSub": "Critical people",
+      "mttm": "Mean time to merge",
+      "mttmSub": "Hours",
+      "throughput": "Throughput",
+      "throughputSub": "PRs per week",
+      "rework": "Rework rate",
+      "reworkSub": "% of PRs reworked"
+    },
+    "compliance": {
+      "title": "Supply chain & compliance",
+      "subtitle": "SLSA, signed attestations, and an auditable supply chain.",
+      "slsa": "SLSA Level",
+      "attestation": "Attestations",
+      "signed": "Signed",
+      "provenance": "Provenance",
+      "verified": "Verified",
+      "viewBundle": "View bundle",
+      "integrations": "Integrations",
+      "ide": "IDE plugin",
+      "vscode": "VS Code",
+      "jetbrains": "JetBrains",
+      "github": "GitHub",
+      "gitlab": "GitLab",
+      "bitbucket": "Bitbucket",
+      "azure": "Azure DevOps"
+    }
+  }
+}

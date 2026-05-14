@@ -1,0 +1,240 @@
+{
+  "demoHelpdesk": {
+    "pageTitle": "AI help desk",
+    "pageSubtitle": "Omnichannel ticketing hub with smart routing, assisted replies, and live SLA",
+    "brandLabel": "Brand",
+    "departmentLabel": "Department",
+    "brands": {
+      "all": "All brands",
+      "alpha": "Alpha Retail",
+      "beta": "Beta Telecom",
+      "gamma": "Gamma Banking"
+    },
+    "departments": {
+      "all": "All departments",
+      "billing": "Billing",
+      "support": "Tech support",
+      "sales": "Sales",
+      "retention": "Retention"
+    },
+    "metrics": {
+      "title": "Live SLA dashboard",
+      "frt": "First response time",
+      "frtUnit": "min",
+      "aht": "Avg handle time",
+      "ahtUnit": "min",
+      "fcr": "First call resolution",
+      "csat": "CSAT",
+      "deflection": "AI deflection",
+      "trendUp": "vs last week",
+      "trendDown": "vs last week"
+    },
+    "channels": {
+      "title": "Channels",
+      "all": "All",
+      "email": "Email",
+      "whatsapp": "WhatsApp",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "twitter": "X / Twitter",
+      "chat": "Web chat",
+      "voice": "Voice"
+    },
+    "priorities": {
+      "title": "Priority",
+      "all": "All",
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "sentiments": {
+      "positive": "Positive",
+      "neutral": "Neutral",
+      "negative": "Negative"
+    },
+    "statuses": {
+      "open": "Open",
+      "pending": "Pending",
+      "resolved": "Resolved"
+    },
+    "inbox": {
+      "title": "Ticket inbox",
+      "search": "Search tickets, customers or subjects…",
+      "noResults": "No tickets match the current filters",
+      "newTicketCta": "Simulate incoming ticket",
+      "slaIn": "SLA in",
+      "slaBreached": "SLA breached",
+      "assigned": "Assigned to",
+      "unassigned": "Unassigned",
+      "ticketsCount": "{count} tickets"
+    },
+    "routing": {
+      "title": "Smart routing",
+      "incoming": "Incoming ticket",
+      "analyzing": "Analyzing intent and required skills…",
+      "matched": "ML: Skill matched",
+      "agentSuggested": "Suggested agent",
+      "confidence": "Confidence",
+      "accept": "Auto-assign",
+      "manual": "Assign manually",
+      "done": "Routing completed",
+      "tag": "Tags"
+    },
+    "detail": {
+      "empty": "Select a ticket to see the details",
+      "subject": "Subject",
+      "customer": "Customer",
+      "channel": "Channel",
+      "priority": "Priority",
+      "sentiment": "Sentiment",
+      "createdAt": "Created",
+      "conversation": "Conversation",
+      "agent": "Agent",
+      "you": "You",
+      "customerRole": "Customer",
+      "internalNotes": "Internal notes",
+      "addNote": "Add an internal note…",
+      "addNoteCta": "Save note",
+      "noNotes": "No internal notes yet",
+      "suggestedReplies": "AI suggested replies",
+      "insertSuggestion": "Insert suggestion",
+      "regenerate": "Regenerate",
+      "replyPlaceholder": "Type your reply to the customer…",
+      "send": "Send reply",
+      "resolve": "Mark resolved",
+      "escalate": "Escalate",
+      "tags": "Tags",
+      "messageInserted": "Suggestion inserted into draft",
+      "replySent": "Reply sent to the customer",
+      "noteAdded": "Internal note saved",
+      "resolvedToast": "Ticket marked as resolved"
+    },
+    "kb": {
+      "title": "Knowledge base",
+      "search": "Search articles…",
+      "contextual": "Contextual suggestions",
+      "views": "views",
+      "useArticle": "Use article",
+      "noResults": "No articles match this query",
+      "articles": {
+        "a1Title": "How to issue a refund",
+        "a1Snippet": "Step-by-step guide to process partial or full refunds in under 3 minutes.",
+        "a2Title": "Reset account password",
+        "a2Snippet": "Secure recovery flow with two-step verification.",
+        "a3Title": "Update shipping address",
+        "a3Snippet": "Change the address after order confirmation without restarting the flow.",
+        "a4Title": "Extended warranty policy",
+        "a4Snippet": "Coverage, deadlines and exclusions for Premium warranty.",
+        "a5Title": "Set up 2FA in the app",
+        "a5Snippet": "Quick activation via authenticator app or SMS.",
+        "a6Title": "Slow connection troubleshooting",
+        "a6Snippet": "8-step checklist before escalating to tier 2."
+      }
+    },
+    "autoReply": {
+      "title": "AI auto-reply",
+      "subtitle": "AI replies automatically when confidence exceeds the configured threshold",
+      "enable": "Enable auto-reply",
+      "threshold": "Confidence threshold",
+      "log": "Recent log",
+      "channel": "Channel",
+      "time": "Time",
+      "intent": "Intent",
+      "confidence": "Confidence",
+      "result": "Result",
+      "results": {
+        "sent": "Sent",
+        "escalated": "Escalated",
+        "queued": "Queued"
+      },
+      "empty": "No auto-replies have been triggered yet"
+    },
+    "csat": {
+      "title": "Post-resolution CSAT / NPS",
+      "subtitle": "Surveys sent after closing a ticket",
+      "openSurvey": "Preview survey",
+      "modalTitle": "How would you rate the support you received?",
+      "modalSubtitle": "Ticket {id} resolved by {agent}",
+      "comment": "Optional comment",
+      "commentPlaceholder": "Tell us what we can improve…",
+      "submit": "Submit rating",
+      "cancel": "Cancel",
+      "thanks": "Thanks for your feedback!",
+      "byAgent": "Avg by agent",
+      "tickets": "tickets"
+    },
+    "macros": {
+      "title": "Macros & automations",
+      "subtitle": "If-then rules your team can apply in one click",
+      "if": "IF",
+      "then": "THEN",
+      "runs": "runs",
+      "addNew": "Create macro",
+      "items": {
+        "m1If": "Subject contains 'refund' and priority ≥ High",
+        "m1Then": "Assign to Finance + 'refund-express' template + tag 'urgent'",
+        "m2If": "Negative sentiment and previous CSAT < 3",
+        "m2Then": "Escalate to Retention + notify supervisor",
+        "m3If": "WhatsApp channel and out-of-office hours",
+        "m3Then": "Send ack + schedule 09:00 callback",
+        "m4If": "VIP customer and SLA < 15 min",
+        "m4Then": "Bump priority to Urgent + assign best agent available"
+      }
+    },
+    "skills": {
+      "billing": "Billing",
+      "spanish": "Spanish",
+      "english": "English",
+      "tech": "Technical",
+      "vip": "VIP",
+      "retention": "Retention"
+    },
+    "tickets": {
+      "t1Subject": "Duplicate charge on March invoice",
+      "t1Preview": "Hi, I see two identical $129.90 charges on the same day and haven't gotten a reply…",
+      "t2Subject": "Can't sign in from the app",
+      "t2Preview": "Every time I enter my password it says invalid user, but I'm sure that…",
+      "t3Subject": "I want to cancel my Premium subscription",
+      "t3Preview": "I haven't used the service for three months and need to cancel before the next charge.",
+      "t4Subject": "Change shipping address for order #88421",
+      "t4Preview": "I just placed the order and entered the wrong street — can you update it before shipping?",
+      "t5Subject": "Praise for the agent who helped me yesterday",
+      "t5Preview": "Just wanted to say thanks — María was amazing and solved everything in minutes.",
+      "t6Subject": "Flaky internet since Monday",
+      "t6Preview": "It drops every 10 minutes and I've rebooted the router five times. This is unacceptable.",
+      "t7Subject": "Question about extended warranty",
+      "t7Preview": "I bought a laptop 11 months ago and want to know whether Premium warranty applies.",
+      "t8Subject": "Refund pending for two weeks",
+      "t8Preview": "They told me it would arrive in 5 business days and nothing. I'll file a complaint."
+    },
+    "messages": {
+      "agent1": "Good morning — I'm really sorry for the inconvenience. I'm reviewing the invoice details right now.",
+      "customer1": "Hello, I've been waiting days for a reply. This is really frustrating.",
+      "agent2": "Completely understand. I can see the two charges and I'll process the duplicate refund right away.",
+      "customer2": "Thanks so much for the quick action."
+    },
+    "suggestions": {
+      "s1": "Hi {name}, sorry for the inconvenience. We've confirmed the duplicate charge and will process the $129.90 refund within 24 hours. You'll receive an email confirmation.",
+      "s2": "Hi {name}, to reset your password please visit /recover — you'll receive a link valid for 15 minutes. If it doesn't arrive, check your spam folder or let us know.",
+      "s3": "Hi {name}, we can pause your subscription for 30 days at no cost while you decide. Want me to do that now?"
+    },
+    "agents": {
+      "maria": "María González",
+      "carlos": "Carlos Ruiz",
+      "ana": "Ana Pereira",
+      "luis": "Luis Martínez",
+      "you": "You (Demo)"
+    },
+    "common": {
+      "minutesAgo": "{n} min ago",
+      "hoursAgo": "{n} h ago",
+      "daysAgo": "{n} d ago",
+      "close": "Close",
+      "save": "Save",
+      "cancel": "Cancel",
+      "showMore": "Show more",
+      "showLess": "Show less"
+    }
+  }
+}

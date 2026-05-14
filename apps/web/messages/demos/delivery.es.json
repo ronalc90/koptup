@@ -1,0 +1,262 @@
+{
+  "demoDelivery": {
+    "meta": {
+      "title": "App de Delivery",
+      "subtitle": "Plataforma multi-rol: Customer, Driver, Merchant y Operaciones con tracking en vivo, pagos in-app y routing ML.",
+      "demo": "Demo interactivo"
+    },
+    "tabs": {
+      "customer": "Cliente",
+      "driver": "Repartidor",
+      "merchant": "Comercio",
+      "ops": "Operaciones"
+    },
+    "common": {
+      "back": "Volver",
+      "next": "Continuar",
+      "confirm": "Confirmar",
+      "cancel": "Cancelar",
+      "accept": "Aceptar",
+      "reject": "Rechazar",
+      "online": "En línea",
+      "offline": "Desconectado",
+      "min": "min",
+      "km": "km",
+      "from": "Desde",
+      "save": "Guardar",
+      "search": "Buscar",
+      "viewAll": "Ver todo"
+    },
+    "customer": {
+      "greeting": "Hola, Sofía",
+      "address": "Av. Reforma 245, Polanco",
+      "searchPlaceholder": "¿Qué se te antoja hoy?",
+      "categoriesTitle": "Categorías",
+      "categories": {
+        "food": "Comida",
+        "groceries": "Mercado",
+        "pharmacy": "Farmacia",
+        "tech": "Tech"
+      },
+      "near": "Cerca de ti",
+      "promoBanner": "Membership Prime · 30 días gratis · envíos sin costo",
+      "loyalty": "{points} puntos KopUp",
+      "restaurant": {
+        "fee": "Envío {fee}",
+        "eta": "{eta} min",
+        "rating": "{rating}",
+        "free": "Gratis",
+        "categoriesTitle": "Menú",
+        "popular": "Popular",
+        "addToCart": "Añadir · {price}",
+        "modifiers": "Personaliza",
+        "noteLabel": "Nota para el restaurante",
+        "notePlaceholder": "Sin cebolla, picante aparte..."
+      },
+      "cart": {
+        "title": "Tu carrito",
+        "empty": "Aún no agregas productos",
+        "subtotal": "Subtotal",
+        "deliveryFee": "Envío",
+        "service": "Servicio",
+        "tip": "Propina",
+        "total": "Total",
+        "checkout": "Pagar {total}",
+        "tipLabel": "Elige propina",
+        "splitPayment": "Dividir pago",
+        "splitWith": "Dividir con {n} amigos",
+        "paymentMethod": "Método de pago",
+        "cards": {
+          "visa": "Visa ••4521",
+          "mc": "Mastercard ••8800",
+          "wallet": "Wallet KopUp"
+        }
+      },
+      "tracking": {
+        "title": "Tu pedido va en camino",
+        "etaLabel": "Llega en",
+        "driverName": "Diego R.",
+        "driverRating": "4.9",
+        "driverPlate": "Moto · ABC-123",
+        "chat": "Chatear",
+        "call": "Llamar",
+        "status": {
+          "confirmed": "Confirmado",
+          "preparing": "Preparando",
+          "onTheWay": "En camino",
+          "delivered": "Entregado"
+        },
+        "mapHint": "Mapa en vivo",
+        "you": "Tú",
+        "driver": "Driver",
+        "store": "Comercio"
+      },
+      "chat": {
+        "title": "Chat con {name}",
+        "placeholder": "Escribe un mensaje...",
+        "quick": {
+          "outside": "Estoy afuera",
+          "ring": "Toca el timbre",
+          "leave": "Déjalo en la puerta"
+        },
+        "driverHi": "Hola, voy en camino. ETA 8 min.",
+        "driverArrived": "Estoy en la entrada del edificio."
+      },
+      "membership": {
+        "title": "KopUp Prime",
+        "perks": [
+          "Envíos $0 en pedidos +$150",
+          "10% cashback en farmacia",
+          "Soporte prioritario 24/7"
+        ],
+        "cta": "Activar 30 días gratis",
+        "active": "Membresía activa"
+      }
+    },
+    "driver": {
+      "header": "Hola, Diego",
+      "statusOnline": "Online · aceptando pedidos",
+      "statusOffline": "Offline",
+      "earnings": {
+        "today": "Hoy",
+        "week": "Semana",
+        "trips": "{n} viajes",
+        "hours": "{h} h conectado"
+      },
+      "nextPickup": {
+        "title": "Próxima recogida",
+        "store": "Sushi Lab · Polanco",
+        "items": "{n} artículos",
+        "distance": "{km} km · {min} min",
+        "accept": "Aceptar",
+        "skip": "Pasar"
+      },
+      "batch": {
+        "title": "Pickup múltiple",
+        "badge": "Routing ML · 2 stops",
+        "stop1": "1. Recoger en Sushi Lab",
+        "stop2": "2. Recoger en Bao Bar",
+        "stop3": "3. Entregar a Sofía M.",
+        "stop4": "4. Entregar a Luis G."
+      },
+      "navigation": {
+        "title": "Navegación",
+        "steps": [
+          "Sigue derecho 200 m por Av. Reforma",
+          "Gira a la derecha en C. Schiller",
+          "Continúa 600 m hasta el destino",
+          "Has llegado a Polanco 102"
+        ]
+      },
+      "pod": {
+        "title": "Prueba de entrega",
+        "photo": "Tomar foto",
+        "signature": "Firma del cliente",
+        "submit": "Confirmar entrega",
+        "captured": "Foto capturada",
+        "signed": "Firma capturada"
+      },
+      "ratings": {
+        "title": "Calificaciones recientes",
+        "items": [
+          "5★ · entrega impecable",
+          "5★ · súper amable",
+          "4★ · llegó a tiempo"
+        ]
+      },
+      "kyc": {
+        "title": "Onboarding driver",
+        "step1": "Subir INE / DNI",
+        "step2": "Subir licencia",
+        "step3": "Selfie verificación",
+        "step4": "Aprobado",
+        "uploadedBadge": "Verificado"
+      }
+    },
+    "merchant": {
+      "header": "Sushi Lab · Polanco",
+      "openLabel": "Tienda abierta",
+      "kpis": {
+        "salesToday": "Ventas hoy",
+        "aov": "Ticket promedio",
+        "orders": "Pedidos",
+        "peakHour": "Hora pico"
+      },
+      "incoming": {
+        "title": "Pedidos entrantes",
+        "newOrder": "Nuevo pedido",
+        "timer": "{s}s para responder",
+        "items": "{n} artículos · {total}",
+        "prepTime": "Tiempo prep: {min} min"
+      },
+      "menu": {
+        "title": "Menú",
+        "categories": ["Entradas", "Rolls", "Bebidas", "Postres"],
+        "stock": "Stock: {n}",
+        "outOfStock": "Agotado (86)",
+        "markOut": "Marcar 86",
+        "markIn": "Reactivar",
+        "edit": "Editar"
+      },
+      "analytics": {
+        "title": "Analytics",
+        "topSellers": "Top sellers",
+        "salesTrend": "Tendencia semanal",
+        "ratingsAvg": "Rating promedio"
+      },
+      "items": {
+        "philly": "Philly Roll",
+        "spicy": "Spicy Tuna",
+        "tempura": "Tempura Roll",
+        "edamame": "Edamame",
+        "miso": "Sopa Miso",
+        "matcha": "Matcha Latte"
+      }
+    },
+    "ops": {
+      "header": "Centro de Operaciones",
+      "activeDeliveries": "Entregas activas",
+      "driversOnline": "Drivers online",
+      "avgEta": "ETA promedio",
+      "surgeNow": "Surge actual",
+      "heatmap": {
+        "title": "Demanda por zona · próxima hora",
+        "zones": ["Polanco", "Roma", "Condesa", "Centro", "Reforma", "Coyoacán"],
+        "legendLow": "Baja",
+        "legendHigh": "Alta"
+      },
+      "surge": {
+        "title": "Pricing dinámico",
+        "multiplier": "Multiplicador",
+        "reason": "Razón",
+        "reasons": {
+          "rain": "Lluvia detectada",
+          "peak": "Hora pico",
+          "event": "Evento masivo"
+        },
+        "apply": "Aplicar surge"
+      },
+      "dispatch": {
+        "title": "Dispatch · override manual",
+        "order": "Orden #{id}",
+        "assignedTo": "Asignado a {driver}",
+        "reassign": "Reasignar",
+        "candidates": "Drivers cercanos"
+      },
+      "fraud": {
+        "title": "Anti-fraude",
+        "alerts": {
+          "gps": "GPS spoofing detectado · driver #{id}",
+          "multi": "Multi-account sospechoso · cliente #{id}",
+          "chargeback": "Riesgo chargeback · pedido #{id}"
+        },
+        "review": "Revisar"
+      },
+      "forecast": {
+        "title": "Forecast demanda",
+        "nextHour": "Próxima hora: +{pct}%",
+        "model": "Modelo: GBM v3.1"
+      }
+    }
+  }
+}

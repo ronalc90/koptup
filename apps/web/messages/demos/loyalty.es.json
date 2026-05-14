@@ -1,0 +1,297 @@
+{
+  "demoLoyalty": {
+    "pageTitle": "Loyalty — Fidelización Omnicanal",
+    "pageSubtitle": "Plataforma integral de puntos, tiers, misiones, coaliciones y analítica de retención para retail, banca y servicios.",
+    "tabs": {
+      "member": "Vista cliente",
+      "admin": "Admin",
+      "analytics": "Analytics"
+    },
+    "common": {
+      "active": "Activo",
+      "paused": "Pausado",
+      "draft": "Borrador",
+      "save": "Guardar",
+      "edit": "Editar",
+      "create": "Crear",
+      "view": "Ver",
+      "redeem": "Canjear",
+      "share": "Compartir",
+      "invite": "Invitar",
+      "points": "puntos",
+      "pts": "pts",
+      "available": "disponibles",
+      "expiringSoon": "vencen pronto",
+      "members": "miembros"
+    },
+    "member": {
+      "greeting": "Hola, Ronald",
+      "memberSince": "Miembro desde Marzo 2022",
+      "pointsLabel": "Puntos disponibles",
+      "expiringSoon": "{count} pts vencen el 30 de Junio",
+      "tier": {
+        "current": "Tier actual",
+        "next": "Siguiente tier",
+        "progressTo": "Te faltan {points} pts para {tier}",
+        "perks": "Beneficios",
+        "bronze": "Bronce",
+        "silver": "Plata",
+        "gold": "Oro",
+        "platinum": "Platino",
+        "perksList": {
+          "freeShipping": "Envío gratis",
+          "doublePoints": "2x puntos en cumpleaños",
+          "earlyAccess": "Acceso anticipado a sales",
+          "conciergeSupport": "Soporte concierge 24/7",
+          "vipEvents": "Eventos VIP exclusivos",
+          "personalShopper": "Personal shopper"
+        }
+      },
+      "wallet": {
+        "title": "Wallet Pass",
+        "subtitle": "Agrégalo a tu Apple/Google Wallet",
+        "memberCode": "Código de miembro",
+        "addApple": "Añadir a Apple Wallet",
+        "addGoogle": "Añadir a Google Wallet",
+        "tapToFlip": "Toca para girar"
+      },
+      "rewards": {
+        "title": "Catálogo de recompensas",
+        "subtitle": "Canjea tus puntos por experiencias y partners",
+        "categories": {
+          "all": "Todos",
+          "giftcards": "Gift cards",
+          "experiences": "Experiencias",
+          "products": "Productos",
+          "donations": "Donaciones"
+        },
+        "items": {
+          "starbucks": "Starbucks $10",
+          "amazon": "Amazon $25",
+          "netflix": "Netflix 1 mes",
+          "spotify": "Spotify Premium",
+          "uber": "Uber $20",
+          "concert": "Entrada a concierto VIP",
+          "spa": "Sesión de spa de lujo",
+          "donation": "Donación a UNICEF"
+        },
+        "stockLow": "Últimas unidades",
+        "redeemed": "¡Canjeado!",
+        "insufficientPoints": "Puntos insuficientes"
+      },
+      "missions": {
+        "title": "Misiones de la semana",
+        "subtitle": "Completa retos y gana puntos extra",
+        "items": {
+          "buy3": {
+            "title": "Compra 3x esta semana",
+            "reward": "+500 pts"
+          },
+          "review": {
+            "title": "Escribe 2 reseñas",
+            "reward": "+150 pts"
+          },
+          "refer": {
+            "title": "Invita 1 amigo",
+            "reward": "+300 pts"
+          },
+          "app": {
+            "title": "Activa notificaciones push",
+            "reward": "+50 pts"
+          }
+        },
+        "progress": "{current}/{total}",
+        "claim": "Reclamar"
+      },
+      "referrals": {
+        "title": "Invita amigos, gana puntos",
+        "subtitle": "Recibe 500 pts por cada amigo que se una",
+        "yourLink": "Tu link único",
+        "friendsInvited": "Amigos invitados",
+        "pointsEarned": "Puntos ganados",
+        "copy": "Copiar",
+        "copied": "¡Copiado!",
+        "channels": "Compartir por"
+      },
+      "birthday": {
+        "title": "¡Feliz mes de cumpleaños, Ronald!",
+        "subtitle": "Tienes un regalo especial esperándote",
+        "cta": "Reclamar regalo"
+      },
+      "streak": {
+        "title": "Racha de visitas",
+        "days": "{days} días",
+        "subtitle": "¡Sigue así para conseguir bonus!"
+      },
+      "leaderboard": {
+        "title": "Top 10 del mes",
+        "subtitle": "Compite con otros miembros",
+        "you": "Tú",
+        "rank": "Pos."
+      }
+    },
+    "admin": {
+      "title": "Panel administrativo",
+      "subtitle": "Configura programas, reglas, campañas y monitoreo",
+      "tabs": {
+        "points": "Puntos",
+        "tiers": "Tiers",
+        "missions": "Misiones",
+        "referrals": "Referidos",
+        "cashback": "Cashback",
+        "sweepstakes": "Sorteos"
+      },
+      "programs": {
+        "points": {
+          "title": "Earning Rules — Motor de reglas",
+          "subtitle": "Define cómo se ganan puntos por categoría y canal",
+          "baseRate": "Tasa base",
+          "baseHelp": "1 punto por cada $1 gastado",
+          "multipliers": "Multiplicadores por categoría",
+          "categories": {
+            "groceries": "Supermercado",
+            "fashion": "Moda",
+            "electronics": "Electrónica",
+            "travel": "Viajes",
+            "dining": "Restaurantes"
+          },
+          "channels": "Multiplicadores por canal",
+          "channelList": {
+            "web": "Web",
+            "app": "App móvil",
+            "pos": "Punto de venta",
+            "marketplace": "Marketplace"
+          }
+        },
+        "tiers": {
+          "title": "Configurador de Tiers",
+          "subtitle": "Ajusta umbrales de upgrade/downgrade",
+          "upgradeAt": "Subir a {tier} con",
+          "downgradeAfter": "Bajar tras {months} meses sin actividad",
+          "membersIn": "{count} miembros"
+        },
+        "missions": {
+          "title": "Misiones y retos",
+          "subtitle": "Crea misiones gamificadas multi-canal",
+          "running": "En curso",
+          "completion": "Completion",
+          "uplift": "Uplift"
+        },
+        "referrals": {
+          "title": "Programa de referidos",
+          "subtitle": "Tracking y reward dual (referrer + referee)",
+          "rewardReferrer": "Recompensa referido",
+          "rewardReferee": "Recompensa nuevo miembro",
+          "totalReferrals": "Referidos totales",
+          "conversion": "Conversión"
+        },
+        "cashback": {
+          "title": "Cashback inteligente",
+          "subtitle": "Devolución en puntos o saldo según segmento",
+          "rate": "Tasa promedio",
+          "redeemed": "Redimido este mes",
+          "segments": "Segmentos activos"
+        },
+        "sweepstakes": {
+          "title": "Sorteos y experiencias",
+          "subtitle": "Tickets canjeables por entradas a sorteos premium",
+          "activeDraws": "Sorteos activos",
+          "tickets": "Tickets emitidos",
+          "winners": "Ganadores anunciados"
+        }
+      },
+      "campaigns": {
+        "title": "Templates de campañas multi-canal",
+        "subtitle": "Lanza la misma campaña en web, app, POS, email y WhatsApp",
+        "channels": {
+          "web": "Web",
+          "app": "App",
+          "pos": "POS",
+          "email": "Email",
+          "whatsapp": "WhatsApp"
+        },
+        "items": {
+          "doublePoints": "Double Points Weekend",
+          "winback": "Winback miembros inactivos",
+          "vipDay": "VIP Day exclusivo",
+          "birthday": "Birthday Auto-Trigger"
+        },
+        "audience": "Audiencia",
+        "scheduled": "Programada"
+      },
+      "coalitions": {
+        "title": "Coaliciones de partners",
+        "subtitle": "Pool de puntos compartido entre marcas",
+        "partners": "Partners",
+        "sharedPool": "Pool compartido",
+        "addPartner": "Añadir partner"
+      },
+      "fraud": {
+        "title": "Detección de fraude",
+        "subtitle": "Alertas en tiempo real",
+        "alerts": {
+          "farming": "Point farming detectado",
+          "multiAccount": "Multi-account sospechoso",
+          "fakeReferral": "Referido falso bloqueado",
+          "abnormalRedeem": "Patrón de canje anómalo"
+        },
+        "severity": {
+          "high": "Alta",
+          "medium": "Media",
+          "low": "Baja"
+        },
+        "review": "Revisar"
+      },
+      "experiments": {
+        "title": "A/B testing de mecánicas",
+        "subtitle": "Experimenta con earning, redemption y UX",
+        "running": "En curso",
+        "uplift": "Uplift",
+        "items": {
+          "tripleMultiplier": "Triple puntos vs. doble",
+          "tierFastTrack": "Fast-track silver vs. control",
+          "missionLayout": "Layout de misiones A/B"
+        }
+      }
+    },
+    "analytics": {
+      "title": "Analytics & Insights",
+      "subtitle": "KPIs en tiempo real del programa",
+      "kpis": {
+        "activeMembers": "Miembros activos",
+        "redemptionRate": "Tasa de redención",
+        "engagement": "Engagement",
+        "ltvUplift": "Uplift en LTV",
+        "breakage": "Breakage (puntos expirados)",
+        "aovDelta": "AOV vs. no-miembros"
+      },
+      "cohort": {
+        "title": "Retención por cohorte",
+        "subtitle": "% de miembros activos por mes de alta",
+        "month": "Mes"
+      },
+      "topRewards": {
+        "title": "Top recompensas canjeadas",
+        "subtitle": "Últimos 30 días",
+        "redemptions": "Canjes",
+        "pointsBurned": "Puntos quemados"
+      },
+      "tierDistribution": {
+        "title": "Distribución por tier",
+        "subtitle": "Base actual de miembros"
+      },
+      "ml": {
+        "title": "Personalización con ML",
+        "subtitle": "Recomendaciones por segmento",
+        "segments": {
+          "vip": "VIP de alto valor",
+          "atRisk": "En riesgo de churn",
+          "rising": "Subiendo de tier",
+          "dormant": "Dormidos > 90 días"
+        },
+        "recommendation": "Recomendación",
+        "expectedUplift": "Uplift esperado"
+      }
+    }
+  }
+}

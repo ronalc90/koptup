@@ -1,0 +1,243 @@
+{
+  "demoVoice": {
+    "pageTitle": "Voice AI / Call Center con IA",
+    "pageSubtitle": "Cockpit de voz: agente conversacional, transcripción en vivo, sentiment, function calling, campañas outbound y handoff a humano.",
+    "back": "Volver a demos",
+    "status": {
+      "live": "EN VIVO",
+      "connected": "Conectado",
+      "ringing": "Llamando",
+      "ended": "Finalizada"
+    },
+    "call": {
+      "title": "Llamada activa",
+      "agentName": "Aurora · Agente IA",
+      "agentRole": "Voicebot empresarial",
+      "customer": "Cliente",
+      "duration": "Duración",
+      "channel": "Canal",
+      "channelInbound": "Entrante",
+      "channelOutbound": "Saliente",
+      "barge": "Barge-in activado",
+      "recording": "Esta llamada está siendo grabada · Aviso reproducido",
+      "controls": {
+        "mute": "Silenciar",
+        "unmute": "Activar audio",
+        "hold": "Retener",
+        "resume": "Reanudar",
+        "transfer": "Transferir",
+        "hangup": "Colgar",
+        "start": "Simular llamada",
+        "stop": "Detener simulación"
+      }
+    },
+    "transcript": {
+      "title": "Transcripción en vivo",
+      "subtitle": "Diarización turno a turno · STT streaming",
+      "you": "Cliente",
+      "ai": "Aurora IA",
+      "human": "Agente humano",
+      "latency": "Latencia STT",
+      "ms": "ms",
+      "good": "óptima",
+      "warn": "alta",
+      "redacted": "PCI redactado",
+      "redactedHint": "Datos sensibles eliminados antes de almacenar",
+      "codeSwitch": "Code-switching ES/EN detectado",
+      "empty": "Inicia la simulación para ver la transcripción."
+    },
+    "turns": {
+      "t1": "Hola, llamo porque mi tarjeta terminada en {card} fue rechazada en una compra.",
+      "t2": "Hola, soy Aurora. Lamento el inconveniente. Ya verifiqué tu cuenta: la transacción fue bloqueada por nuestro sistema de fraude porque ocurrió fuera del país habitual.",
+      "t3": "Ah, sí. Estoy de viaje en Lima hasta el viernes. ¿Puede desbloquearla?",
+      "t4": "Claro. Voy a registrar tu viaje en el sistema y autorizar transacciones desde Perú hasta el 30 de mayo. Could you confirm your full name, please?",
+      "t5": "Ronald Coronel, RUT 18.234.567-9.",
+      "t6": "Perfecto Ronald. Confirmado: notificación de viaje registrada y tarjeta habilitada. ¿Necesitas algo más?",
+      "t7": "También quería agendar una cita con un asesor para hablar de inversiones.",
+      "t8": "Te agendé el martes 20 a las 10:00 con Mariana Soto. Te llegará confirmación por SMS."
+    },
+    "sentiment": {
+      "title": "Sentiment en vivo",
+      "subtitle": "Análisis emocional turno a turno",
+      "positive": "Positivo",
+      "neutral": "Neutro",
+      "negative": "Negativo",
+      "current": "Estado actual",
+      "trend": "Tendencia",
+      "trendImproving": "Mejorando",
+      "trendStable": "Estable",
+      "trendDeclining": "Empeorando"
+    },
+    "intent": {
+      "title": "Intent detectado",
+      "subtitle": "Clasificación NLU + confianza",
+      "confidence": "Confianza",
+      "items": {
+        "card_unblock": "Desbloqueo de tarjeta",
+        "travel_notice": "Aviso de viaje",
+        "book_appointment": "Agendar cita",
+        "balance_inquiry": "Consulta de saldo",
+        "transfer_agent": "Transferir a humano",
+        "greeting": "Saludo / Bienvenida"
+      }
+    },
+    "functions": {
+      "title": "Function calling ejecutado",
+      "subtitle": "Herramientas invocadas por el modelo durante la llamada",
+      "running": "ejecutando…",
+      "done": "completado",
+      "result": "Resultado",
+      "items": {
+        "check_balance": {
+          "name": "check_balance",
+          "desc": "Consultar saldo de cuenta",
+          "result": "Saldo disponible: $1.245.300 CLP"
+        },
+        "unblock_card": {
+          "name": "unblock_card",
+          "desc": "Desbloquear tarjeta por viaje",
+          "result": "Tarjeta ****{card} habilitada en PE hasta 30-05"
+        },
+        "schedule_appointment": {
+          "name": "schedule_appointment",
+          "desc": "Agendar cita con asesor",
+          "result": "Cita confirmada · Mar 20 10:00 · Mariana Soto"
+        },
+        "transfer_human": {
+          "name": "transfer_to_human",
+          "desc": "Escalar a agente humano",
+          "result": "Transferencia en cola · ETA 12s"
+        }
+      }
+    },
+    "providers": {
+      "title": "Stack de voz",
+      "subtitle": "Cambia de proveedor STT/TTS en caliente",
+      "stt": "Speech-to-Text",
+      "tts": "Text-to-Speech",
+      "telephony": "Telefonía",
+      "bargeIn": "Barge-in / Interrupción",
+      "bargeInHint": "Permite que el cliente interrumpa al bot mientras habla",
+      "language": "Idioma",
+      "languageEs": "Español (CL)",
+      "languageEn": "English (US)",
+      "languageMixed": "ES + EN (code-switching)",
+      "items": {
+        "whisper": "Whisper v3",
+        "deepgram": "Deepgram Nova-3",
+        "assembly": "AssemblyAI Universal",
+        "eleven": "ElevenLabs Turbo v2",
+        "cartesia": "Cartesia Sonic",
+        "playht": "Play.ht 2.0",
+        "twilio": "Twilio Voice",
+        "vonage": "Vonage",
+        "telnyx": "Telnyx"
+      }
+    },
+    "queues": {
+      "title": "Llamadas",
+      "subtitle": "Cola unificada inbound / outbound",
+      "tabs": {
+        "inbound": "Entrantes",
+        "outbound": "Salientes"
+      },
+      "columns": {
+        "number": "Número",
+        "direction": "Dirección",
+        "duration": "Duración",
+        "status": "Estado",
+        "sentiment": "Sentiment",
+        "confidence": "Confianza IA"
+      },
+      "statuses": {
+        "live": "En curso",
+        "completed": "Completada",
+        "voicemail": "Buzón",
+        "missed": "Perdida",
+        "transferred": "Transferida"
+      }
+    },
+    "campaign": {
+      "title": "Campaña outbound",
+      "subtitle": "Predictive dialer + voicemail drop",
+      "name": "Cobranza preventiva mayo",
+      "predictive": "Predictive dialer",
+      "predictiveHint": "Marca múltiples números y conecta solo respuestas humanas",
+      "metrics": {
+        "contacted": "Contactados",
+        "connected": "Conectados",
+        "voicemail": "Buzón detectado",
+        "completed": "Completadas",
+        "answerRate": "Tasa respuesta"
+      },
+      "events": {
+        "title": "Log de eventos",
+        "amd": "AMD: contestador detectado en {number}",
+        "drop": "Voicemail drop reproducido en {number}",
+        "human": "Humano detectado en {number} · ruteando a agente",
+        "dnc": "Número {number} en lista DNC · descartado"
+      }
+    },
+    "handoff": {
+      "title": "Handoff a humano",
+      "subtitle": "Transferencia con contexto completo del cliente",
+      "button": "Transferir a agente humano",
+      "transferred": "Transferido a Carla Méndez · Equipo Premium",
+      "contextTitle": "Contexto compartido",
+      "items": {
+        "intent": "Intent",
+        "history": "Historial",
+        "value": "Valor cliente",
+        "lang": "Idioma",
+        "mood": "Mood"
+      },
+      "values": {
+        "historyVal": "3 llamadas últimos 30 días",
+        "valueVal": "Premium · LTV $24.500.000"
+      }
+    },
+    "assist": {
+      "title": "Agent Assist en vivo",
+      "subtitle": "Sugerencias en tiempo real para el agente humano",
+      "kbTitle": "Base de conocimiento",
+      "kbHint": "Artículos sugeridos según la consulta del cliente",
+      "suggestions": {
+        "s1": "Confirma identidad antes de modificar la tarjeta",
+        "s2": "Ofrece seguro de viaje (cross-sell · +$8.900 CLP/mes)",
+        "s3": "Cierra con encuesta NPS al finalizar"
+      },
+      "kb": {
+        "a1": "KB-204 · Desbloqueo por viaje internacional",
+        "a2": "KB-187 · Política de aviso de viaje 2025",
+        "a3": "KB-091 · Cross-sell seguros para viajeros"
+      }
+    },
+    "compliance": {
+      "title": "Compliance & Seguridad",
+      "subtitle": "Controles regulatorios activos",
+      "dnc": "DNC list",
+      "dncOk": "Número no está en lista · OK para llamar",
+      "recording": "Aviso de grabación",
+      "recordingOk": "Disclosure reproducido al inicio",
+      "pci": "Redacción PCI",
+      "pciOk": "Tarjetas detectadas y enmascaradas en el transcript",
+      "gdpr": "Consentimiento GDPR",
+      "gdprOk": "Opt-in vigente hasta 2026-12-31"
+    },
+    "analytics": {
+      "title": "Analytics del contact center",
+      "subtitle": "KPIs en tiempo real",
+      "csat": "CSAT",
+      "csatSub": "satisfacción cliente",
+      "aht": "AHT",
+      "ahtSub": "tiempo medio manejo",
+      "fcr": "FCR",
+      "fcrSub": "resolución primer contacto",
+      "containment": "Containment",
+      "containmentSub": "resuelto sin humano",
+      "volume": "Volumen 24h",
+      "volumeSub": "llamadas procesadas"
+    },
+    "waveform": "Onda de voz en vivo"
+  }
+}

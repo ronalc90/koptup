@@ -1,0 +1,251 @@
+{
+  "demoAutomation": {
+    "pageTitle": "Automation platform",
+    "pageSubtitle": "Build visual workflows with triggers, native AI, sandboxed code, observability, and versioning. n8n + Zapier style, built for teams.",
+    "actions": {
+      "run": "Run workflow",
+      "running": "Running...",
+      "save": "Save",
+      "templates": "Templates",
+      "selfHosted": "Self-hosted",
+      "cloud": "Cloud",
+      "promote": "Promote to prod",
+      "openSdk": "Custom nodes SDK",
+      "close": "Close"
+    },
+    "header": {
+      "workflow": "Workflow",
+      "workflowName": "PRO customer onboarding",
+      "env": "Environment",
+      "envs": {
+        "dev": "dev",
+        "staging": "staging",
+        "prod": "prod"
+      },
+      "version": "v",
+      "lastRun": "Last run"
+    },
+    "palette": {
+      "title": "Node palette",
+      "searchPlaceholder": "Search node...",
+      "categories": {
+        "triggers": "Triggers",
+        "actions": "Actions",
+        "ai": "AI",
+        "logic": "Logic",
+        "code": "Code"
+      },
+      "items": {
+        "webhook": "Webhook",
+        "schedule": "Schedule (cron)",
+        "polling": "HTTP polling",
+        "fileWatch": "File watch",
+        "emailIn": "Inbound email",
+        "dbCdc": "DB CDC",
+        "http": "HTTP Request",
+        "slack": "Slack notify",
+        "email": "Send email",
+        "sheets": "Google Sheets",
+        "stripe": "Stripe charge",
+        "salesforce": "Salesforce",
+        "llm": "LLM call",
+        "embedding": "Embedding",
+        "rag": "RAG retrieval",
+        "vision": "AI Vision",
+        "stt": "Speech to text",
+        "structured": "Structured output",
+        "filter": "Filter",
+        "switch": "Switch",
+        "loop": "Loop",
+        "merge": "Merge",
+        "wait": "Wait",
+        "subflow": "Sub-workflow",
+        "js": "JavaScript",
+        "python": "Python",
+        "transform": "Transform"
+      }
+    },
+    "canvas": {
+      "title": "Canvas",
+      "subtitle": "Wire nodes together. Lines show data flow.",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "fit": "Fit",
+      "runHint": "Hit Run to simulate the workflow",
+      "nodes": {
+        "trigger": "Webhook trigger",
+        "triggerDesc": "POST /hooks/onboarding",
+        "filter": "Filter",
+        "filterDesc": "plan === 'PRO'",
+        "http": "Enrich customer",
+        "httpDesc": "GET clearbit.com/api",
+        "llm": "AI summary",
+        "llmDesc": "GPT-4o · structured",
+        "transform": "Transform",
+        "transformDesc": "Map → CRM schema",
+        "slack": "Slack notify",
+        "slackDesc": "#sales-pro",
+        "subflow": "Sub-workflow",
+        "subflowDesc": "Assign CSM"
+      },
+      "status": {
+        "idle": "Idle",
+        "running": "Running",
+        "success": "OK",
+        "error": "Error"
+      }
+    },
+    "inspector": {
+      "title": "Configuration",
+      "empty": "Select a node on the canvas to edit.",
+      "tabs": {
+        "params": "Params",
+        "auth": "Auth",
+        "retry": "Retries",
+        "test": "Test"
+      },
+      "fields": {
+        "name": "Name",
+        "method": "Method",
+        "url": "URL",
+        "headers": "Headers",
+        "body": "Body",
+        "prompt": "Prompt",
+        "model": "Model",
+        "temperature": "Temperature",
+        "condition": "Condition",
+        "channel": "Channel",
+        "message": "Message"
+      },
+      "retry": {
+        "attempts": "Retries",
+        "backoff": "Backoff",
+        "backoffOpts": {
+          "linear": "Linear",
+          "exponential": "Exponential"
+        },
+        "dlq": "Dead letter queue",
+        "alert": "Alert to"
+      },
+      "test": {
+        "run": "Run step",
+        "preview": "Response preview",
+        "mockOutput": "Mock output generated successfully"
+      }
+    },
+    "logs": {
+      "title": "Executions",
+      "subtitle": "Run history with step-by-step replay",
+      "columns": {
+        "id": "ID",
+        "started": "Started",
+        "duration": "Duration",
+        "status": "Status",
+        "trigger": "Trigger"
+      },
+      "statuses": {
+        "success": "Success",
+        "failed": "Failed",
+        "retry": "Retry",
+        "running": "Running"
+      },
+      "expand": "View detail",
+      "collapse": "Hide",
+      "step": "Step",
+      "stepDuration": "ms",
+      "viewPayload": "View payload"
+    },
+    "quotas": {
+      "title": "Plan usage",
+      "plan": "Plan",
+      "planName": "Business",
+      "executions": "Executions",
+      "tokens": "AI tokens",
+      "storage": "Storage",
+      "renewIn": "Renews in",
+      "days": "days",
+      "upgrade": "Upgrade"
+    },
+    "marketplace": {
+      "title": "Template marketplace",
+      "subtitle": "Production-ready workflows you can ship today",
+      "categories": {
+        "all": "All",
+        "sales": "Sales",
+        "ops": "Operations",
+        "ai": "AI",
+        "data": "Data",
+        "marketing": "Marketing"
+      },
+      "templates": {
+        "crm": {
+          "name": "CRM ↔ Sheets sync",
+          "desc": "Two-way sync with change detection"
+        },
+        "emailAi": {
+          "name": "AI email assistant",
+          "desc": "Classify and draft replies with an LLM"
+        },
+        "stripeAlert": {
+          "name": "Stripe → Slack alerts",
+          "desc": "Real-time alerts on failed payments"
+        },
+        "leadEnrich": {
+          "name": "Lead enrichment",
+          "desc": "Enrich leads with public data and AI"
+        },
+        "rag": {
+          "name": "RAG over docs",
+          "desc": "Embeddings + semantic search pipeline"
+        },
+        "etl": {
+          "name": "Daily ETL",
+          "desc": "Extract, transform, and load to your warehouse"
+        }
+      },
+      "use": "Use template",
+      "installs": "installs",
+      "close": "Close"
+    },
+    "version": {
+      "title": "Version history",
+      "current": "Current",
+      "promote": "Promote this version",
+      "commits": {
+        "c1": "feat: add AI summary node",
+        "c2": "fix: retry with exponential backoff",
+        "c3": "chore: update Slack credentials",
+        "c4": "feat: branch by customer plan",
+        "c5": "init: initial flow version"
+      }
+    },
+    "alerts": {
+      "title": "Alerts & DLQ",
+      "subtitle": "Manage errors and retries",
+      "dlqCount": "Messages in DLQ",
+      "alertsActive": "Active alerts",
+      "reprocess": "Reprocess",
+      "purge": "Purge"
+    },
+    "code": {
+      "title": "Code editor",
+      "language": "Language",
+      "tabs": {
+        "code": "Code",
+        "input": "Input",
+        "output": "Output"
+      },
+      "run": "Run",
+      "save": "Save",
+      "close": "Close"
+    },
+    "sdk": {
+      "title": "SDK · custom nodes",
+      "subtitle": "Build custom nodes in TypeScript",
+      "install": "Install",
+      "snippet": "Example snippet",
+      "docs": "View full docs",
+      "close": "Close"
+    }
+  }
+}

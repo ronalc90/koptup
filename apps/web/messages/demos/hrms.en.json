@@ -1,0 +1,289 @@
+{
+  "demoHrms": {
+    "pageTitle": "HRMS · Human resources platform",
+    "pageSubtitle": "End-to-end talent platform with directory, ATS, performance, payroll, learning, and AI analytics built for LatAm.",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "people": "People",
+      "talent": "Talent",
+      "performance": "Performance",
+      "payroll": "Payroll",
+      "learning": "Learning"
+    },
+    "common": {
+      "search": "Search",
+      "filter": "Filter",
+      "all": "All",
+      "viewProfile": "View profile",
+      "close": "Close",
+      "approve": "Approve",
+      "reject": "Reject",
+      "pending": "Pending",
+      "completed": "Completed",
+      "inProgress": "In progress",
+      "process": "Process",
+      "save": "Save",
+      "viewAll": "View all",
+      "country": "Country",
+      "department": "Department",
+      "site": "Site",
+      "role": "Role",
+      "actions": "Actions",
+      "showing": "Showing",
+      "of": "of",
+      "page": "Page",
+      "previous": "Previous",
+      "next": "Next",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "dashboard": {
+      "title": "Executive overview",
+      "subtitle": "A 360° view of talent, time off, costs, and workplace climate.",
+      "kpis": {
+        "headcount": "Total headcount",
+        "headcountSub": "Active employees",
+        "turnover": "Turnover",
+        "turnoverSub": "Last 12 months",
+        "enps": "eNPS",
+        "enpsSub": "Employee NPS",
+        "hrCost": "Total HR cost",
+        "hrCostSub": "Monthly, consolidated",
+        "openRoles": "Open roles",
+        "openRolesSub": "In ATS",
+        "absenteeism": "Absenteeism",
+        "absenteeismSub": "Monthly average"
+      },
+      "birthdays": {
+        "title": "Upcoming birthdays",
+        "subtitle": "Next 14 days",
+        "empty": "No upcoming birthdays"
+      },
+      "vacations": {
+        "title": "Time off pending approval",
+        "days": "days",
+        "requested": "Requested",
+        "approve": "Approve",
+        "reject": "Reject",
+        "empty": "No requests pending"
+      },
+      "moodChart": {
+        "title": "Workplace mood · 30 days",
+        "subtitle": "Continuous pulse from surveys and feedback",
+        "current": "Current",
+        "trend": "Trend"
+      },
+      "aiInsights": {
+        "title": "AI insights",
+        "subtitle": "Predictive models for your workforce",
+        "retention": "90-day retention forecast",
+        "retentionDesc": "Low risk for 78% of headcount",
+        "sentiment": "eNPS sentiment",
+        "sentimentDesc": "Trending positive over the last 4 weeks",
+        "promotions": "Suggested promotions",
+        "promotionsDesc": "5 employees are ready for the next band",
+        "salary": "Salary benchmark",
+        "salaryDesc": "Your Senior band sits 3% above the LatAm market"
+      },
+      "compliance": {
+        "title": "Labor compliance",
+        "subtitle": "Status by country",
+        "co": "Colombia",
+        "mx": "Mexico",
+        "ar": "Argentina",
+        "pe": "Peru",
+        "ok": "Up to date",
+        "warn": "Review",
+        "fail": "Overdue"
+      }
+    },
+    "people": {
+      "title": "People directory",
+      "subtitle": "Search, filter, and open full profiles.",
+      "searchPlaceholder": "Name, email, or role...",
+      "filters": {
+        "allDepts": "All departments",
+        "allSites": "All sites",
+        "allRoles": "All roles"
+      },
+      "card": {
+        "joined": "Joined",
+        "tenure": "Tenure",
+        "manager": "Reports to",
+        "viewProfile": "View profile"
+      },
+      "profile": {
+        "title": "Employee profile",
+        "personal": "Personal data",
+        "employment": "Employment",
+        "compensation": "Compensation",
+        "documents": "Documents",
+        "salary": "Base salary",
+        "band": "Band",
+        "contract": "Contract",
+        "permanent": "Permanent",
+        "id": "ID",
+        "phone": "Phone",
+        "email": "Email",
+        "birthDate": "Date of birth",
+        "address": "Address"
+      },
+      "orgChart": {
+        "title": "Live org chart",
+        "subtitle": "Expandable organization structure"
+      }
+    },
+    "talent": {
+      "title": "ATS · recruitment pipeline",
+      "subtitle": "Kanban with AI resume scoring, screening calls, and onboarding flows.",
+      "stages": {
+        "sourced": "Sourced",
+        "screening": "Screening",
+        "interview": "Interview",
+        "offer": "Offer",
+        "hired": "Hired"
+      },
+      "scoring": {
+        "great": "Great fit",
+        "good": "Good fit",
+        "avg": "Average fit"
+      },
+      "actions": {
+        "screeningCall": "AI screening call",
+        "schedule": "Schedule",
+        "viewCv": "View resume"
+      },
+      "candidate": {
+        "applied": "Applied",
+        "source": "Source",
+        "experience": "Experience",
+        "years": "yrs"
+      },
+      "onboarding": {
+        "title": "Onboarding and offboarding",
+        "subtitle": "Workflows with stage-by-stage checklists and e-signature",
+        "newJoiners": "New joiners",
+        "exits": "Exits",
+        "tabOnboarding": "Onboarding",
+        "tabOffboarding": "Offboarding",
+        "owner": "Owner",
+        "progress": "Progress",
+        "eSign": "E-sign",
+        "signed": "Signed",
+        "pending": "Pending"
+      }
+    },
+    "performance": {
+      "title": "Performance and 360° reviews",
+      "subtitle": "Reviews tied to OKRs, plus succession planning.",
+      "review": {
+        "title": "Active review",
+        "cycle": "Cycle",
+        "scale": "Scale 1-5",
+        "submit": "Submit review",
+        "selfReview": "Self-review",
+        "peerReview": "Peers",
+        "managerReview": "Manager",
+        "subordinateReview": "Reports"
+      },
+      "questions": {
+        "q1": "Hits role objectives",
+        "q2": "Collaborates effectively across the team",
+        "q3": "Shows initiative and proposes improvements",
+        "q4": "Communicates clearly and on time",
+        "q5": "Demonstrates leadership and positive influence"
+      },
+      "okrs": {
+        "title": "Linked OKRs",
+        "progress": "Progress",
+        "owner": "Owner"
+      },
+      "succession": {
+        "title": "Succession plan",
+        "subtitle": "Successors identified for critical roles",
+        "readyNow": "Ready now",
+        "ready1y": "Ready in 1 year",
+        "ready2y": "Ready in 2+ years"
+      },
+      "timeOff": {
+        "title": "Time off calendar",
+        "subtitle": "Days taken and accruals by country",
+        "taken": "Taken",
+        "accrual": "Accrual",
+        "balance": "Balance",
+        "country": "Country"
+      }
+    },
+    "payroll": {
+      "title": "Payroll · current run",
+      "subtitle": "Line items, totals, and per-country compliance before close.",
+      "period": "Period",
+      "employees": "Employees",
+      "gross": "Total gross",
+      "deductions": "Deductions",
+      "net": "Net to pay",
+      "process": "Process payroll",
+      "status": "Status",
+      "draft": "Draft",
+      "concepts": {
+        "title": "Line items this period",
+        "salary": "Base salary",
+        "overtime": "Overtime",
+        "bonus": "Bonuses",
+        "severance": "Severance (CO)",
+        "health": "Health",
+        "pension": "Pension",
+        "tax": "Income tax withholding",
+        "amount": "Amount",
+        "type": "Type",
+        "earning": "Earning",
+        "deduction": "Deduction"
+      },
+      "benefits": {
+        "title": "Benefits catalog",
+        "subtitle": "Total rewards statement, per employee",
+        "enroll": "Enroll",
+        "enrolled": "Enrolled",
+        "totalRewards": "Annual total rewards"
+      }
+    },
+    "learning": {
+      "title": "Learning and development",
+      "subtitle": "Required and recommended paths with compliance tracking.",
+      "mandatory": "Mandatory",
+      "recommended": "Recommended",
+      "compliance": "Compliance training",
+      "course": "Course",
+      "duration": "Duration",
+      "progress": "Progress",
+      "status": "Status",
+      "due": "Due",
+      "completed": "Completed",
+      "inProgress": "In progress",
+      "overdue": "Overdue",
+      "notStarted": "Not started",
+      "start": "Start"
+    },
+    "surveys": {
+      "title": "Surveys and pulse",
+      "subtitle": "Continuous feedback and team sentiment",
+      "active": "Active",
+      "participation": "Participation",
+      "lastResult": "Last result",
+      "launch": "Launch pulse"
+    },
+    "mobile": {
+      "title": "Mobile self-service",
+      "subtitle": "Employee experience on mobile",
+      "show": "Show wireframe",
+      "hide": "Hide wireframe",
+      "myProfile": "My profile",
+      "myVacations": "My time off",
+      "myPayslip": "My payslip",
+      "myCourses": "My courses",
+      "requestTimeOff": "Request time off",
+      "available": "available",
+      "days": "days"
+    }
+  }
+}
