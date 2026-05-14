@@ -16,6 +16,8 @@ Cada demo es una aplicación interactiva navegable, con datos simulados realista
 
 | Helpdesk con IA | Soporte | Tickets omnicanal con priorización ML, sugerencia de respuestas, base de conocimiento y SLA tracking. | [Ver demo](./apps/web/src/app/demo/helpdesk-ia/) |
 
+| LMS | Educación | Plataforma de cursos con tracks de aprendizaje, quizzes, certificados, gamificación y analytics de progreso. | [Ver demo](./apps/web/src/app/demo/lms/) |
+
 ## 🚀 Stack Tecnológico
 
 ### Frontend
