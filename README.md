@@ -20,6 +20,8 @@ Cada demo es una aplicación interactiva navegable, con datos simulados realista
 
 | Telemedicina | Salud | Videoconsultas, agenda médica, historia clínica electrónica, prescripciones digitales y triage con IA. | [Ver demo](./apps/web/src/app/demo/telemedicina/) |
 
+| Facturación electrónica | Fiscal | Emisión de facturas electrónicas multipaís con firma digital, reportes fiscales y notificación al SRI/DIAN/SUNAT. | [Ver demo](./apps/web/src/app/demo/facturacion-electronica/) |
+
 ## 🚀 Stack Tecnológico
 
 ### Frontend
