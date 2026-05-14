@@ -1,0 +1,160 @@
+{
+  "demoDocsPro": {
+    "section": {
+      "title": "Enterprise DMS Capabilities",
+      "subtitle": "Advanced features for enterprises with high document volumes and strict compliance needs."
+    },
+    "tabs": {
+      "ingesta": "Multi-channel ingestion",
+      "ocr": "OCR + extraction",
+      "search": "Hybrid Search",
+      "clauses": "Clauses",
+      "compare": "Version compare",
+      "watermark": "Dynamic watermarks",
+      "retention": "Retention & Legal Hold",
+      "encryption": "Zero-knowledge",
+      "ediscovery": "E-discovery",
+      "sign": "E-signature"
+    },
+    "ingesta": {
+      "title": "Multi-channel ingestion",
+      "subtitle": "Five official paths to send documents into the vault, all with audit and antivirus.",
+      "channels": {
+        "email": { "name": "Email-to-vault", "desc": "Forward any email and attachments get indexed." },
+        "scan": { "name": "Mobile Scan-to-vault", "desc": "iOS/Android app with JPEG capture + auto OCR." },
+        "office": { "name": "Office plugin", "desc": "Save from Word, Excel and Outlook with one click." },
+        "drive": { "name": "Drive sync", "desc": "Sync folders from Google Drive and OneDrive." },
+        "api": { "name": "API upload", "desc": "REST endpoint with HMAC signing and per-tenant quotas." }
+      },
+      "emailLabel": "Your Email-to-vault address",
+      "copy": "Copy",
+      "copied": "Copied!"
+    },
+    "ocr": {
+      "title": "OCR + data extraction",
+      "subtitle": "Upload an invoice or contract and AI extracts entities, tables and bounding boxes.",
+      "drop": "Drop a PDF here or click to simulate",
+      "supports": "PDF · PNG · JPG · TIFF (up to 50 MB)",
+      "preview": "Preview with bounding boxes",
+      "table": "Extracted table",
+      "entities": "Recognized entities",
+      "headers": { "concept": "Concept", "qty": "Qty", "unit": "Unit", "total": "Total" },
+      "entity": {
+        "name": "Company name",
+        "nit": "Tax ID",
+        "date": "Issue date",
+        "amount": "Total amount",
+        "city": "City"
+      }
+    },
+    "search": {
+      "title": "Hybrid Search (BM25 + Dense)",
+      "subtitle": "Combines lexical matching with embeddings for maximum precision.",
+      "placeholder": "E.g. confidentiality clause in 2025 contracts",
+      "go": "Search",
+      "modes": { "bm25": "BM25", "dense": "Dense", "hybrid": "Hybrid" },
+      "score": "score",
+      "results": "results"
+    },
+    "clauses": {
+      "title": "Contract clause extraction",
+      "subtitle": "Detects and classifies critical clauses with automatic risk level.",
+      "doc": "Service_Agreement_2026.pdf",
+      "items": {
+        "confidentiality": { "name": "Confidentiality", "snippet": "The parties shall keep strict confidentiality..." },
+        "payment": { "name": "Payment", "snippet": "Payment shall be made within 30 days after..." },
+        "indemnity": { "name": "Indemnity", "snippet": "The provider shall be liable for any direct damages..." },
+        "termination": { "name": "Termination", "snippet": "Either party may terminate the agreement..." }
+      },
+      "risk": { "low": "Low", "medium": "Medium", "high": "High" }
+    },
+    "compare": {
+      "title": "Smart version comparison",
+      "subtitle": "Side-by-side diff with additions, deletions and semantic changes highlighted.",
+      "before": "v1.0 — original",
+      "after": "v1.1 — proposal",
+      "summary": "3 additions · 2 deletions · 1 clause change"
+    },
+    "watermark": {
+      "title": "Dynamic watermarks",
+      "subtitle": "Personalized watermark per user and session, embedded on export.",
+      "label": "Viewed by",
+      "id": "ID"
+    },
+    "retention": {
+      "title": "Retention & Legal Hold",
+      "subtitle": "Per-folder policies with WORM (Write Once Read Many) lock and legal notice.",
+      "headers": { "folder": "Folder", "policy": "Policy", "expires": "Expires", "worm": "WORM", "hold": "Legal Hold" },
+      "policies": { "p7": "7 years", "p10": "10 years", "p3": "3 years", "perm": "Permanent" },
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "encryption": {
+      "title": "Zero-knowledge encryption",
+      "subtitle": "The client owns the keys. Not even Koptup can read the content.",
+      "toggle": "Enable BYO-key encryption",
+      "badge": "BYO-key active",
+      "flow": {
+        "1": "1. Client generates local key",
+        "2": "2. Document is encrypted in the browser",
+        "3": "3. Only ciphertext travels to the server",
+        "4": "4. Decryption only with your key"
+      }
+    },
+    "ediscovery": {
+      "title": "E-discovery export",
+      "subtitle": "Complex search with legal filters and EDRM-format export.",
+      "keywords": "Keywords",
+      "custodian": "Custodian",
+      "dateFrom": "From",
+      "dateTo": "To",
+      "format": "Format",
+      "generate": "Generate bundle",
+      "ready": "Bundle ready: 248 documents · 1.4 GB"
+    },
+    "sign": {
+      "title": "Integrated e-signature",
+      "subtitle": "Four signature levels compatible with eIDAS and Colombia's Law 527.",
+      "button": "Sign electronically",
+      "menuTitle": "Choose signature level",
+      "levels": {
+        "simple": { "name": "Simple", "desc": "Click acceptance + IP + timestamp" },
+        "advanced": { "name": "Advanced", "desc": "Identification + biometric authentication" },
+        "qualified": { "name": "Qualified", "desc": "Certificate issued by accredited entity" },
+        "ley527": { "name": "Law 527 CO", "desc": "Digital signature with recognized entity certificate" }
+      }
+    },
+    "topbar": {
+      "modeLabel": "Mode",
+      "modeHint": "Switch the search algorithm"
+    },
+    "uploadMenu": {
+      "label": "Upload document",
+      "title": "Pick an ingestion channel",
+      "subtitle": "Five official paths to send documents into the vault."
+    },
+    "viewer": {
+      "actionsTitle": "PRO actions",
+      "processOcr": "Process with OCR",
+      "detectClauses": "Detect clauses",
+      "compareVersions": "Compare versions",
+      "watermarkToggle": "Apply watermark",
+      "watermarkOn": "Watermark active",
+      "encryptionBadge": "Zero-knowledge BYO-key encryption",
+      "encryptionTooltip": "Only the client holds the keys; content never travels in cleartext.",
+      "close": "Close"
+    },
+    "globalActions": {
+      "ediscovery": "E-discovery",
+      "encryption": "Encryption",
+      "ediscoveryTitle": "E-discovery search",
+      "encryptionTitle": "Encryption settings"
+    },
+    "folderBadges": {
+      "worm": "WORM",
+      "hold": "Legal Hold",
+      "policyShort": "Retention",
+      "openPanel": "View retention policies"
+    }
+  }
+}

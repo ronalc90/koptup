@@ -18,9 +18,20 @@ import {
   ListBulletIcon,
   TableCellsIcon,
   XMarkIcon,
-  CheckIcon,
 } from '@heroicons/react/24/outline';
 import * as contentService from '@/services/contentManagerService';
+import CmsTopbar from './components/CmsTopbar';
+import CmsSidebar, { SidebarView } from './components/CmsSidebar';
+import {
+  AiDrawer,
+  WorkflowDrawer,
+  I18nDrawer,
+  SeoDrawer,
+  PersonalizationDrawer,
+  TechConfigModal,
+} from './components/CmsDrawers';
+import { BlocksView, DamView, WorkflowView } from './components/CmsViews';
+import { SiteKey, WorkflowStep } from './components/CmsProShared';
 
 interface Template {
   id: number;
@@ -55,6 +66,18 @@ export default function GestorContenido() {
   const [editableFields, setEditableFields] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const [generatedVersions, setGeneratedVersions] = useState<contentService.ContentVersion[]>([]);
+
+  // Estado de integración PRO: sitio, workflow, sidebar, drawers y modal técnica.
+  const [site, setSite] = useState<SiteKey>('corp');
+  const [workflow, setWorkflow] = useState<WorkflowStep>('draft');
+  const [sidebarView, setSidebarView] = useState<SidebarView>('editor');
+  const [experimentMode, setExperimentMode] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
+  const [workflowOpen, setWorkflowOpen] = useState(false);
+  const [i18nOpen, setI18nOpen] = useState(false);
+  const [seoOpen, setSeoOpen] = useState(false);
+  const [personalizationOpen, setPersonalizationOpen] = useState(false);
+  const [techConfigOpen, setTechConfigOpen] = useState(false);
 
   const templates: Template[] = [
     {
@@ -192,6 +215,7 @@ export default function GestorContenido() {
     setContent('');
     setPreviewContent('');
     setError(null);
+    setSidebarView('editor');
     setView('editor');
   };
 
@@ -203,6 +227,7 @@ export default function GestorContenido() {
       setPreviewContent('');
       setError(null);
       setEditableFields({});
+      setSidebarView('editor');
       setView('editor');
     }
   };
@@ -433,10 +458,55 @@ export default function GestorContenido() {
     window.scrollTo(0, 0);
   }, [view]);
 
+  // SEO score mock que escala con la longitud del contenido editado.
+  const seoScore = Math.min(100, 70 + Math.min(30, Math.floor(content.length / 50)));
+
+  const proDrawers = (
+    <>
+      <AiDrawer open={aiOpen} onClose={() => setAiOpen(false)} />
+      <WorkflowDrawer
+        open={workflowOpen}
+        onClose={() => setWorkflowOpen(false)}
+        current={workflow}
+        onChange={setWorkflow}
+        site={site}
+      />
+      <I18nDrawer open={i18nOpen} onClose={() => setI18nOpen(false)} />
+      <SeoDrawer
+        open={seoOpen}
+        onClose={() => setSeoOpen(false)}
+        experimentMode={experimentMode}
+      />
+      <PersonalizationDrawer
+        open={personalizationOpen}
+        onClose={() => setPersonalizationOpen(false)}
+      />
+      <TechConfigModal open={techConfigOpen} onClose={() => setTechConfigOpen(false)} />
+    </>
+  );
+
+  const topbar = (
+    <CmsTopbar
+      site={site}
+      onSiteChange={setSite}
+      workflow={workflow}
+      onWorkflowClick={() => setWorkflowOpen(true)}
+      onAiClick={() => setAiOpen(true)}
+      onTranslateClick={() => setI18nOpen(true)}
+      onSeoClick={() => setSeoOpen(true)}
+      onPersonalizeClick={() => setPersonalizationOpen(true)}
+      onTechConfigClick={() => setTechConfigOpen(true)}
+      seoScore={seoScore}
+      experimentMode={experimentMode}
+      onExperimentToggle={() => setExperimentMode((v) => !v)}
+    />
+  );
+
   if (view === 'templates') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        {topbar}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Header */}
           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-3 mb-4">
@@ -522,6 +592,7 @@ export default function GestorContenido() {
             })}
           </div>
         </div>
+        {proDrawers}
       </div>
     );
   }
@@ -530,13 +601,14 @@ export default function GestorContenido() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       <div className="h-screen flex flex-col">
+        {topbar}
         {/* Header */}
-        <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4">
+        <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setView('templates')}
-                className="text-pink-600 dark:text-pink-400 hover:underline"
+                className="text-pink-600 dark:text-pink-400 hover:underline text-sm"
               >
                 {t('backToTemplates')}
               </button>
@@ -606,8 +678,25 @@ export default function GestorContenido() {
           </div>
         </header>
 
-        {/* Editor and Preview */}
+        {/* Sidebar + Editor/Preview o vistas alternativas */}
         <div className="flex-1 flex overflow-hidden">
+          <CmsSidebar
+            current={sidebarView}
+            onSelect={(v) => {
+              if (v === 'templates') {
+                setView('templates');
+              } else {
+                setSidebarView(v);
+              }
+            }}
+          />
+          {sidebarView === 'blocks' && <BlocksView />}
+          {sidebarView === 'dam' && <DamView />}
+          {sidebarView === 'workflow' && (
+            <WorkflowView current={workflow} onChange={setWorkflow} site={site} />
+          )}
+          {sidebarView === 'editor' && (
+          <div className="flex-1 flex overflow-hidden">
           {/* Editor Panel */}
           <div className="flex-1 flex flex-col border-r border-slate-200 dark:border-slate-800">
             {/* Toolbar */}
@@ -769,6 +858,8 @@ export default function GestorContenido() {
               </div>
             </div>
           </div>
+          </div>
+          )}
         </div>
       </div>
 
@@ -910,6 +1001,8 @@ export default function GestorContenido() {
           </div>
         </div>
       )}
+
+      {proDrawers}
     </div>
   );
 }

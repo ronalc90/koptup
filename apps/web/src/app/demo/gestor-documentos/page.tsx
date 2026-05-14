@@ -8,31 +8,47 @@ import {
   ClockIcon,
   TrashIcon,
   Cog6ToothIcon,
-  MagnifyingGlassIcon,
   CloudArrowUpIcon,
   XMarkIcon,
   DocumentIcon,
   SparklesIcon,
   TagIcon,
-  ArrowsRightLeftIcon,
-  AdjustmentsHorizontalIcon,
   ArrowPathIcon,
   PencilIcon,
   FolderPlusIcon,
   ExclamationTriangleIcon,
+  ShieldCheckIcon,
+  DocumentDuplicateIcon,
+  DocumentMagnifyingGlassIcon,
+  ScaleIcon,
+  LockClosedIcon,
+  ArchiveBoxIcon,
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import { useDocuments, Document as DocumentType } from '@/hooks/useDocuments';
 import { useTranslations } from 'next-intl';
+import DocsTopbar, { type SearchMode } from './components/DocsTopbar';
+import UploadMenu from './components/UploadMenu';
+import OcrDrawer from './components/OcrDrawer';
+import ClausesDrawer from './components/ClausesDrawer';
+import VersionsDiffModal from './components/VersionsDiffModal';
+import WatermarkToggle, { WatermarkOverlay } from './components/WatermarkToggle';
+import RetentionBadges, { getPolicyForFolder } from './components/RetentionBadges';
+import RetentionPanel from './components/RetentionPanel';
+import EDiscoveryModal from './components/EDiscoveryModal';
+import EncryptionSettingsModal from './components/EncryptionSettingsModal';
+import SignatureMenu from './components/SignatureMenu';
 
 type ViewType = 'all' | 'favorites' | 'recent' | 'trash' | 'settings' | 'folder';
 
 export default function GestorDocumentos() {
   const t = useTranslations('docManager');
+  const tp = useTranslations('demoDocsPro');
   const [activeView, setActiveView] = useState<ViewType>('all');
   const [selectedFolder, setSelectedFolder] = useState<string>('');
   const [selectedDoc, setSelectedDoc] = useState<DocumentType | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchMode, setSearchMode] = useState<SearchMode>('hybrid');
   const [showFilters, setShowFilters] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
@@ -52,6 +68,17 @@ export default function GestorDocumentos() {
   const [showSimilarityModal, setShowSimilarityModal] = useState(false);
   const [similarityExplanation, setSimilarityExplanation] = useState('');
   const [loadingSimilarity, setLoadingSimilarity] = useState(false);
+  // PRO state
+  const [showOcrDrawer, setShowOcrDrawer] = useState(false);
+  const [showClausesDrawer, setShowClausesDrawer] = useState(false);
+  const [showCompareModal, setShowCompareModal] = useState(false);
+  const [watermarkOn, setWatermarkOn] = useState(false);
+  const [showEDiscovery, setShowEDiscovery] = useState(false);
+  const [showEncryption, setShowEncryption] = useState(false);
+  const [encryptionEnabled, setEncryptionEnabled] = useState(false);
+  const [showRetentionPanel, setShowRetentionPanel] = useState(false);
+  const [retentionFocusedFolder, setRetentionFocusedFolder] = useState<string | undefined>(undefined);
+
   const [settings, setSettings] = useState({
     autoProcess: true,
     semanticSearchEnabled: true,
@@ -82,7 +109,6 @@ export default function GestorDocumentos() {
   // Búsqueda con debounce
   useEffect(() => {
     if (searchQuery.trim() === '') {
-      // Si la búsqueda está vacía, recargar documentos normales
       const timer = setTimeout(() => {
         refetch?.();
       }, 300);
@@ -228,7 +254,7 @@ export default function GestorDocumentos() {
       setShowPinModal(false);
       setDocumentToDelete(null);
       setPinInput('');
-      setSelectedDoc(null); // Cerrar el panel de detalles si estaba abierto
+      setSelectedDoc(null);
     } catch (error: any) {
       console.error('Error deleting document:', error);
       alert(error.message || 'Error al eliminar el documento');
@@ -253,6 +279,15 @@ export default function GestorDocumentos() {
   const saveSettings = () => {
     setSettingsSaved(true);
     setTimeout(() => setSettingsSaved(false), 3000);
+  };
+
+  const triggerLocalUpload = () => {
+    document.getElementById('file-upload')?.click();
+  };
+
+  const openRetentionForFolder = (folder: string) => {
+    setRetentionFocusedFolder(folder);
+    setShowRetentionPanel(true);
   };
 
   const renderSettingsView = () => (
@@ -314,6 +349,23 @@ export default function GestorDocumentos() {
                   settings.autoTagging ? 'translate-x-6' : 'translate-x-1'
                 }`}
               />
+            </button>
+          </div>
+
+          {/* Zero-knowledge encryption inline en settings */}
+          <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+            <div className="flex-1 min-w-0">
+              <h4 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                <LockClosedIcon className="w-5 h-5 text-emerald-600" />
+                {tp('encryption.title')}
+              </h4>
+              <p className="text-sm text-slate-500">{tp('encryption.subtitle')}</p>
+            </div>
+            <button
+              onClick={() => setShowEncryption(true)}
+              className="ml-3 px-3 py-2 text-sm bg-slate-200 dark:bg-slate-700 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors shrink-0"
+            >
+              {tp('globalActions.encryptionTitle')}
             </button>
           </div>
         </div>
@@ -381,10 +433,23 @@ export default function GestorDocumentos() {
               {t('settings.autoTaggingLabel')}: <strong>{settings.autoTagging ? t('settings.on') : t('settings.off')}</strong>
             </span>
           </div>
+          <div className="flex items-center gap-3 text-sm">
+            <div className={`w-2 h-2 rounded-full ${encryptionEnabled ? 'bg-emerald-500' : 'bg-slate-400'}`}></div>
+            <span className="text-slate-700 dark:text-slate-300">
+              {tp('encryption.title')}: <strong>{encryptionEnabled ? t('settings.on') : t('settings.off')}</strong>
+            </span>
+          </div>
         </div>
       </div>
     </div>
   );
+
+  // Detecta si el documento parece un contrato (para mostrar "Detectar cláusulas").
+  const isContractLike = (doc: DocumentType | null) => {
+    if (!doc) return false;
+    const n = `${doc.name} ${doc.folder} ${(doc.tags || []).join(' ')}`.toLowerCase();
+    return /contrat|nda|agreement|acuerdo|servicio/.test(n);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
@@ -407,13 +472,8 @@ export default function GestorDocumentos() {
               multiple
               accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv"
             />
-              <button
-                onClick={() => document.getElementById('file-upload')?.click()}
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg px-4 py-3 font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg flex items-center justify-center gap-2"
-              >
-                <CloudArrowUpIcon className="w-5 h-5" />
-                {t('buttons.uploadFile')}
-              </button>
+            {/* Upload con menú de ingesta multi-canal (5 vías) */}
+            <UploadMenu onLocalUpload={triggerLocalUpload} />
           </div>
 
           <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
@@ -450,73 +510,91 @@ export default function GestorDocumentos() {
                 <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
                   {t('folders.title')}
                 </h3>
-                <button
-                  onClick={() => setShowNewFolderModal(true)}
-                  className="text-blue-600 hover:text-blue-700"
-                  title={t('folders.newFolder')}
-                >
-                  <FolderPlusIcon className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => {
+                      setRetentionFocusedFolder(undefined);
+                      setShowRetentionPanel(true);
+                    }}
+                    className="text-slate-500 hover:text-indigo-600"
+                    title={tp('folderBadges.openPanel')}
+                  >
+                    <ArchiveBoxIcon className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setShowNewFolderModal(true)}
+                    className="text-blue-600 hover:text-blue-700"
+                    title={t('folders.newFolder')}
+                  >
+                    <FolderPlusIcon className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-              {folders.map((folder) => (
-                <button
-                  key={folder.name}
-                  onClick={() => {
-                    setActiveView('folder');
-                    setSelectedFolder(folder.name);
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
-                    activeView === 'folder' && selectedFolder === folder.name
-                      ? 'bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400'
-                      : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <FolderIcon className="w-5 h-5" />
-                    <span className="text-sm font-medium">{folder.name}</span>
+              {folders.map((folder) => {
+                const policy = getPolicyForFolder(folder.name);
+                return (
+                  <div key={folder.name} className="group">
+                    <button
+                      onClick={() => {
+                        setActiveView('folder');
+                        setSelectedFolder(folder.name);
+                      }}
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+                        activeView === 'folder' && selectedFolder === folder.name
+                          ? 'bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400'
+                          : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <FolderIcon className="w-5 h-5 shrink-0" />
+                        <span className="text-sm font-medium truncate">{folder.name}</span>
+                      </div>
+                      <span className="text-xs bg-slate-200 dark:bg-slate-700 px-2 py-1 rounded-full">
+                        {folder.count}
+                      </span>
+                    </button>
+                    {policy && (
+                      <button
+                        type="button"
+                        onClick={() => openRetentionForFolder(folder.name)}
+                        className="w-full pl-11 pr-3 pb-2 -mt-0.5 text-left"
+                        title={tp('folderBadges.openPanel')}
+                      >
+                        <RetentionBadges folder={folder.name} />
+                      </button>
+                    )}
                   </div>
-                  <span className="text-xs bg-slate-200 dark:bg-slate-700 px-2 py-1 rounded-full">
-                    {folder.count}
-                  </span>
-                </button>
-              ))}
+                );
+              })}
             </div>
           </nav>
         </aside>
 
         {/* Main Content */}
         <main className="flex-1 flex flex-col overflow-hidden">
-          {/* Header - Fixed position */}
+          {/* Header con topbar de búsqueda inteligente */}
           <header className="relative bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 sm:p-6 z-10">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="flex-1 relative">
-                <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={t('search.placeholder')}
-                  className="w-full pl-10 pr-4 py-3 bg-slate-100 dark:bg-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <button
-                onClick={handleSemanticSearch}
-                className="px-3 py-2 text-sm sm:px-4 sm:py-3 sm:text-base bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all flex items-center gap-2 shadow-lg"
-              >
-                <SparklesIcon className="w-5 h-5" />
-                {t('search.aiSearch')}
-              </button>
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="px-3 py-2 text-sm sm:px-4 sm:py-3 sm:text-base bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
-              >
-                <AdjustmentsHorizontalIcon className="w-5 h-5" />
-                {t('filters.title')}
-              </button>
-            </div>
+            <DocsTopbar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              onSemanticSearch={handleSemanticSearch}
+              onToggleFilters={() => setShowFilters((v) => !v)}
+              searchMode={searchMode}
+              onSearchModeChange={setSearchMode}
+              rightExtras={
+                <button
+                  onClick={() => setShowEDiscovery(true)}
+                  className="px-3 py-2 text-sm sm:px-4 sm:py-3 sm:text-base bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
+                  title={tp('globalActions.ediscoveryTitle')}
+                >
+                  <ScaleIcon className="w-5 h-5" />
+                  <span className="hidden md:inline">{tp('globalActions.ediscovery')}</span>
+                </button>
+              }
+            />
 
             {showFilters && (
-              <div className="flex gap-3 flex-wrap">
+              <div className="flex gap-3 flex-wrap mt-3">
                 <select className="px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm">
                   <option>{t('filters.typeAll')}</option>
                   <option>PDF</option>
@@ -547,7 +625,7 @@ export default function GestorDocumentos() {
                 onDrop={handleDrop}
               >
                 <div
-                  onClick={() => document.getElementById('file-upload')?.click()}
+                  onClick={triggerLocalUpload}
                   className={`border-2 border-dashed rounded-2xl p-8 transition-all cursor-pointer ${
                     dragActive
                       ? 'border-blue-500 bg-blue-50 dark:bg-blue-950'
@@ -607,6 +685,29 @@ export default function GestorDocumentos() {
                       {t('trash.warning')}
                     </p>
                   </div>
+                )}
+
+                {/* Banner contextual cuando estás dentro de una carpeta con políticas */}
+                {activeView === 'folder' && selectedFolder && getPolicyForFolder(selectedFolder) && (
+                  <button
+                    onClick={() => openRetentionForFolder(selectedFolder)}
+                    className="w-full mb-4 p-3 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 rounded-lg flex items-center justify-between text-left hover:bg-indigo-100 dark:hover:bg-indigo-950 transition-colors"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <ArchiveBoxIcon className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                      <div className="min-w-0">
+                        <div className="text-sm font-semibold text-indigo-900 dark:text-indigo-200 truncate">
+                          {selectedFolder}
+                        </div>
+                        <div className="mt-1 flex items-center gap-1">
+                          <RetentionBadges folder={selectedFolder} size="sm" />
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-xs text-indigo-700 dark:text-indigo-300 shrink-0 ml-3">
+                      {tp('folderBadges.openPanel')} →
+                    </span>
+                  </button>
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -669,13 +770,19 @@ export default function GestorDocumentos() {
                         <h3 className="font-semibold text-sm mb-2 text-slate-900 dark:text-white line-clamp-2">
                           {doc.name}
                         </h3>
-                        <div className="flex items-center gap-2 text-xs text-slate-500 mb-3">
+                        <div className="flex items-center gap-2 text-xs text-slate-500 mb-3 flex-wrap">
                           <span>{doc.type}</span>
                           <span>•</span>
                           <span>{doc.size}</span>
                           <span>•</span>
                           <span>{doc.date}</span>
                         </div>
+                        {/* Retention badges del folder del doc */}
+                        {getPolicyForFolder(doc.folder) && (
+                          <div className="mb-3">
+                            <RetentionBadges folder={doc.folder} />
+                          </div>
+                        )}
                         {doc.tags && doc.tags.length > 0 && (
                           <div className="flex flex-wrap gap-1">
                             {doc.tags.slice(0, 3).map((tag, index) => (
@@ -709,17 +816,35 @@ export default function GestorDocumentos() {
             <div className="fixed right-0 top-16 md:top-20 bottom-0 w-full max-w-[95vw] sm:max-w-[600px] bg-white dark:bg-slate-900 z-[200] shadow-2xl overflow-y-auto">
               <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-6 z-10">
                 <div className="flex items-start justify-between">
-                  <div>
+                  <div className="min-w-0">
                     <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
                       {selectedDoc.name}
                     </h2>
-                    <div className="flex items-center gap-3 text-sm text-slate-500">
+                    <div className="flex items-center gap-3 text-sm text-slate-500 flex-wrap">
                       <span>{selectedDoc.type}</span>
                       <span>•</span>
                       <span>{selectedDoc.size}</span>
                       <span>•</span>
                       <span>{selectedDoc.date}</span>
                     </div>
+                    {/* Retention badges del folder */}
+                    {getPolicyForFolder(selectedDoc.folder) && (
+                      <div className="mt-2">
+                        <RetentionBadges folder={selectedDoc.folder} size="sm" />
+                      </div>
+                    )}
+                    {/* Encryption badge */}
+                    {encryptionEnabled && (
+                      <button
+                        type="button"
+                        onClick={() => setShowEncryption(true)}
+                        title={tp('viewer.encryptionTooltip')}
+                        className="mt-2 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-[11px] font-semibold border border-emerald-200 dark:border-emerald-900"
+                      >
+                        <LockClosedIcon className="w-3.5 h-3.5" />
+                        {tp('viewer.encryptionBadge')}
+                      </button>
+                    )}
                   </div>
                   <button
                     onClick={() => setSelectedDoc(null)}
@@ -731,6 +856,24 @@ export default function GestorDocumentos() {
               </div>
 
               <div className="p-6">
+                {/* Preview con watermark overlay si activa */}
+                <div className="relative mb-6 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+                  <div className="aspect-[4/3] bg-white dark:bg-slate-100 relative">
+                    <div className="absolute inset-4 space-y-2">
+                      <div className="h-3 bg-slate-200 rounded w-2/3" />
+                      <div className="h-2 bg-slate-100 rounded w-1/2" />
+                      <div className="h-2 bg-slate-100 rounded w-3/4" />
+                      <div className="h-2 bg-slate-100 rounded w-1/3" />
+                      <div className="h-16 bg-slate-50 border border-slate-200 rounded mt-4" />
+                      <div className="h-2 bg-slate-100 rounded w-1/2 mt-3" />
+                      <div className="h-2 bg-slate-100 rounded w-2/3" />
+                    </div>
+                    {watermarkOn && (
+                      <WatermarkOverlay text="Ronald @ 2026-05-14" id="WM-9f3a-2b7c" />
+                    )}
+                  </div>
+                </div>
+
                 {/* AI Summary */}
                 {selectedDoc.summary && (
                   <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 rounded-xl p-6 mb-6">
@@ -801,6 +944,44 @@ export default function GestorDocumentos() {
                       </option>
                     ))}
                   </select>
+                </div>
+
+                {/* Acciones PRO */}
+                <div className="mb-6">
+                  <h3 className="font-bold text-slate-900 dark:text-white mb-3">{tp('viewer.actionsTitle')}</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <button
+                      onClick={() => setShowOcrDrawer(true)}
+                      className="flex items-center gap-2 px-3 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-200 hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors"
+                    >
+                      <DocumentMagnifyingGlassIcon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                      <span className="truncate">{tp('viewer.processOcr')}</span>
+                    </button>
+                    {isContractLike(selectedDoc) && (
+                      <button
+                        onClick={() => setShowClausesDrawer(true)}
+                        className="flex items-center gap-2 px-3 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-200 hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors"
+                      >
+                        <ShieldCheckIcon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                        <span className="truncate">{tp('viewer.detectClauses')}</span>
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setShowCompareModal(true)}
+                      className="flex items-center gap-2 px-3 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-200 hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors"
+                    >
+                      <DocumentDuplicateIcon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                      <span className="truncate">{tp('viewer.compareVersions')}</span>
+                    </button>
+                  </div>
+
+                  <div className="mt-2">
+                    <WatermarkToggle enabled={watermarkOn} onToggle={() => setWatermarkOn((v) => !v)} />
+                  </div>
+
+                  <div className="mt-2">
+                    <SignatureMenu />
+                  </div>
                 </div>
 
                 {/* Action Buttons */}
@@ -1101,6 +1282,35 @@ export default function GestorDocumentos() {
             </div>
           </>
         )}
+
+        {/* Drawers/Modales PRO */}
+        <OcrDrawer
+          open={showOcrDrawer}
+          onClose={() => setShowOcrDrawer(false)}
+          documentName={selectedDoc?.name}
+        />
+        <ClausesDrawer
+          open={showClausesDrawer}
+          onClose={() => setShowClausesDrawer(false)}
+          documentName={selectedDoc?.name}
+        />
+        <VersionsDiffModal
+          open={showCompareModal}
+          onClose={() => setShowCompareModal(false)}
+          documentName={selectedDoc?.name}
+        />
+        <EDiscoveryModal open={showEDiscovery} onClose={() => setShowEDiscovery(false)} />
+        <EncryptionSettingsModal
+          open={showEncryption}
+          onClose={() => setShowEncryption(false)}
+          enabled={encryptionEnabled}
+          onToggle={() => setEncryptionEnabled((v) => !v)}
+        />
+        <RetentionPanel
+          open={showRetentionPanel}
+          onClose={() => setShowRetentionPanel(false)}
+          focusedFolder={retentionFocusedFolder}
+        />
       </div>
     </div>
   );

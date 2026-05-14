@@ -1,0 +1,256 @@
+{
+  "demoEcommercePro": {
+    "section": { "title": "Enterprise capabilities", "subtitle": "Production-ready PRO features", "badge": "PRO" },
+    "tabs": { "aiSearch": "AI Search", "recommendations": "Recommendations", "checkout": "Checkout", "fraud": "Fraud", "invoicing": "DIAN Invoice", "inventory": "Inventory", "marketing": "Marketing" },
+    "aiSearch": {
+      "title": "AI-powered search",
+      "description": "Typeahead autocomplete, visual search, voice search and personalized ranking per user.",
+      "placeholder": "Search product (e.g. laptop, headphones, watch)",
+      "suggestionsLabel": "Suggestions",
+      "noResults": "Start typing to see suggestions",
+      "badges": { "visual": "Visual Search", "voice": "Voice Search", "ranking": "Personalized ranking", "semantic": "Semantic search" },
+      "categories": { "laptop": "Electronics", "headphones": "Audio", "watch": "Wearables", "backpack": "Fashion", "shoes": "Footwear", "coffee": "Home", "mouse": "Gaming", "keyboard": "Gaming", "yoga": "Sports", "charger": "Accessories", "sunglasses": "Fashion", "lamp": "Home" }
+    },
+    "recommendations": {
+      "title": "AI Recommendations",
+      "description": "Recommendation engine that increases AOV and conversion.",
+      "boughtTogether": "Frequently bought together",
+      "alsoViewed": "Customers also viewed",
+      "completeLook": "Complete the look",
+      "addBundle": "Add bundle",
+      "viewAll": "View all",
+      "boost": "+%{value}% conversion"
+    },
+    "checkout": {
+      "title": "Omnichannel checkout",
+      "description": "Optimized 4-step flow with local payment methods and BNPL.",
+      "steps": { "cart": "Cart", "address": "Address", "payment": "Payment", "confirm": "Confirm" },
+      "methodsTitle": "Supported payment methods",
+      "methods": { "applePay": "Apple Pay", "googlePay": "Google Pay", "pse": "PSE", "addi": "BNPL Addi", "mercadoPago": "Mercado Pago", "wompi": "Wompi", "card": "Card", "nequi": "Nequi" },
+      "metrics": { "conversion": "Checkout conversion", "abandonment": "Abandonment rate", "time": "Average time" }
+    },
+    "fraud": {
+      "title": "Fraud detection",
+      "description": "Real-time AI fraud score with contextual signals.",
+      "score": "Fraud score", "low": "Low risk", "medium": "Medium risk", "high": "High risk",
+      "signalsTitle": "Detected signals",
+      "signals": { "device": "Known device", "geo": "Consistent geolocation", "velocity": "Normal purchase velocity", "card": "Verified card BIN", "email": "Email with history", "ip": "IP not VPN/Tor" },
+      "action": "Recommended action", "actionValue": "Approve transaction"
+    },
+    "invoicing": {
+      "title": "DIAN electronic invoicing",
+      "description": "Automatic e-invoice issuance with DIAN validation and customer delivery.",
+      "issue": "Issue invoice", "issuing": "Issuing...", "issued": "Invoice issued",
+      "cufe": "CUFE", "number": "Number", "date": "Issue date", "status": "Status", "statusValue": "Accepted by DIAN",
+      "download": "Download PDF", "send": "Send to customer"
+    },
+    "inventory": {
+      "title": "Multi-warehouse inventory",
+      "description": "Real-time stock, low-stock alerts and automatic replenishment.",
+      "sku": "SKU", "product": "Product",
+      "warehouse1": "Bogotá", "warehouse2": "Medellín", "warehouse3": "Cali",
+      "total": "Total", "status": "Status",
+      "ok": "OK", "low": "Low", "critical": "Critical", "reorder": "Reorder"
+    },
+    "marketing": {
+      "title": "Marketing automation",
+      "description": "Automated email lifecycle campaigns with AI segmentation.",
+      "abandonment":   { "title": "Cart abandonment", "desc": "Recover sales with automated emails at 1h, 24h and 72h.", "metric": "Recovery" },
+      "postPurchase":  { "title": "Post-purchase",    "desc": "Thank-you email, tracking and review request.",          "metric": "Reviews"  },
+      "winBack":       { "title": "Win-back",         "desc": "Re-engage inactive customers with personalized offers.", "metric": "Reactivation" },
+      "replenishment": { "title": "Replenishment",    "desc": "Reminders for consumable products with recurring purchase.", "metric": "Recurrence" },
+      "active": "Active", "sent": "Sent", "openRate": "Open rate"
+    }
+  },
+  "demoEcommerce2": {
+    "viewSelector": "View selector",
+    "views": { "storefront": "Storefront", "checkout": "Checkout", "vendor": "Vendor", "operations": "Operations", "admin": "Admin" },
+    "hero": {
+      "badge": "Enterprise demo",
+      "title": "Enterprise-grade e-commerce platform",
+      "subtitle": "Catalog, payments, logistics and analytics unified in a single platform.",
+      "freeShipping": "Free shipping over $100",
+      "priceGuarantee": "Best price guaranteed"
+    },
+    "search": {
+      "placeholder": "Search products, brands or categories...",
+      "suggestions": "Suggestions",
+      "resultsFor": "Results for"
+    },
+    "categories": { "all": "All", "tech": "Technology", "fashion": "Fashion", "home": "Home", "sports": "Sports", "beauty": "Beauty", "wines": "Wines" },
+    "sections": {
+      "recommended": "Recommended for you",
+      "recommendedHint": "AI-generated suggestions",
+      "allProducts": "All products",
+      "recentlyViewed": "Recently viewed",
+      "empty": "No products found matching your criteria."
+    },
+    "product": {
+      "addToCart": "Add", "buyNow": "Buy now",
+      "quickView": "Quick view", "wishlist": "Wishlist", "compare": "Compare",
+      "reviewsCount": "reviews", "category": "Category", "stock": "Stock",
+      "description": "Premium product with official warranty and fast shipping from our warehouses in Colombia."
+    },
+    "productNames": {
+      "macbookPro15": "MacBook Pro 15\"",
+      "iphone15Pro": "iPhone 15 Pro",
+      "ipadAir": "iPad Air",
+      "wirelessHeadphones": "Premium Wireless Headphones",
+      "smartwatchPro": "Smartwatch Pro Series",
+      "vintageCamera": "Vintage 35mm Camera",
+      "earbuds": "Pro In-Ear Earbuds",
+      "redSneakers": "Limited Edition Red Sneakers",
+      "adidasRunner": "Adidas Runner Shoes",
+      "leatherJacket": "Genuine Leather Jacket",
+      "urbanBackpack": "Recycled Urban Backpack",
+      "sunglasses": "Premium Sunglasses",
+      "premiumCoffee": "Premium Coffee Beans 500g",
+      "deskLamp": "LED Desk Lamp",
+      "coffeeMaker": "Pro Automatic Coffee Maker",
+      "kitchenSet": "Stainless Steel Kitchen Set",
+      "runningShoes": "Pro Running Shoes",
+      "fitnessTracker": "Advanced Fitness Tracker",
+      "yogaMat": "Eco-Premium Yoga Mat",
+      "gymBag": "Professional Gym Bag",
+      "fragrance": "Eau de Parfum 100ml",
+      "skincareSet": "Natural Skincare Set",
+      "reserveMalbec": "Reserve Malbec 2020",
+      "chardonnay": "Premium Chardonnay 2022"
+    },
+    "cart": { "goToCheckout": "Go to checkout", "items": "items" },
+    "checkout": {
+      "backToStore": "Back to store",
+      "steps": { "cart": "Cart", "address": "Address", "payment": "Payment", "confirmation": "Confirmation" },
+      "back": "Back", "continue": "Continue", "placeOrder": "Place order",
+      "cart": {
+        "title": "Your cart",
+        "empty": "Your cart is empty. Go back to the store and add products.",
+        "remove": "Remove",
+        "couponPlaceholder": "Coupon code (KOP10 / KOP20)",
+        "applyCoupon": "Apply",
+        "couponApplied": "Coupon applied: {value}% off"
+      },
+      "address": {
+        "title": "Shipping address",
+        "fullName": "Full name", "email": "Email", "phone": "Phone",
+        "address": "Address", "city": "City", "zip": "ZIP code",
+        "mapHint": "Delivery map (mock)"
+      },
+      "payment": {
+        "title": "Payment method",
+        "subtitle": "Choose how you want to pay — we support the main Latin American methods.",
+        "methods": { "card": "Card", "pse": "PSE", "nequi": "Nequi", "daviplata": "Daviplata", "mercadoPago": "Mercado Pago", "wompi": "Wompi", "applePay": "Apple Pay", "googlePay": "Google Pay", "addi": "Addi BNPL" },
+        "cardNumber": "Card number",
+        "cardName": "Cardholder name",
+        "addiHint": "Pay in 4 interest-free installments with Addi. Instant approval.",
+        "redirectHint": "You will be redirected to the provider portal to complete the payment.",
+        "walletHint": "Confirm the payment from your digital wallet."
+      },
+      "confirmation": {
+        "title": "Payment confirmed!",
+        "subtitle": "Your order was processed successfully.",
+        "orderNumber": "Order number",
+        "cufe": "CUFE (DIAN)",
+        "email": "Confirmation email",
+        "total": "Total paid",
+        "delivery": "Estimated delivery in 3 to 5 business days",
+        "continueShopping": "Continue shopping"
+      },
+      "summary": {
+        "title": "Summary", "subtotal": "Subtotal", "discount": "Discount",
+        "shipping": "Shipping", "tax": "Tax (8%)", "total": "Total",
+        "free": "Free", "freeShippingApplied": "Free shipping applied"
+      }
+    },
+    "vendor": {
+      "title": "Vendor dashboard",
+      "subtitle": "Manage your catalog, orders and pricing rules in real time.",
+      "createProduct": "Create product",
+      "live": "Live", "liveOrders": "Live orders",
+      "topProducts": "Top products (30 days)", "lowStock": "Low stock",
+      "unitsSold": "sold", "units": "u.",
+      "kpis": { "todaySales": "Today's sales", "aov": "AOV", "conversion": "Conversion", "activeProducts": "Active products" },
+      "order": {
+        "customer": "Customer", "items": "Items", "total": "Total", "status": "Status", "action": "Action",
+        "advance": "Advance →",
+        "status_new": "New", "status_preparing": "Preparing", "status_shipped": "Shipped", "status_delivered": "Delivered"
+      },
+      "pricing": {
+        "title": "Pricing rules",
+        "subtitle": "Live rules engine",
+        "rule1": "10% off if cart > $200",
+        "rule2": "Free shipping for VIP customers",
+        "rule3": "Dynamic pricing by demand (Tech category)",
+        "rule4": "Bundle: 3x2 on coffee and wines"
+      },
+      "createForm": {
+        "title": "New product", "name": "Name", "sku": "SKU",
+        "price": "Price", "stock": "Stock", "description": "Description",
+        "dropImages": "Drag images here or click to select",
+        "cancel": "Cancel", "save": "Save product"
+      }
+    },
+    "ops": {
+      "title": "Operations & Logistics",
+      "subtitle": "Warehouses, picking, carriers and returns in a single view.",
+      "warehouses": { "title": "Warehouses", "capacity": "Capacity", "pendingOrders": "Pending orders" },
+      "picking": {
+        "title": "Active picking", "items": "items",
+        "wave1": "Wave 1 (express)", "wave2": "Wave 2 (24h)", "wave3": "Wave 3 (48h)",
+        "complete": "Complete", "inProgress": "In progress", "queued": "Queued"
+      },
+      "carriers": {
+        "title": "Integrated carriers",
+        "carrier": "Carrier", "sla": "SLA", "cost": "Cost", "rating": "Rating", "status": "Status",
+        "active": "Active",
+        "names": { "fedex": "FedEx", "dhl": "DHL", "servientrega": "Servientrega", "coordinadora": "Coordinadora", "interrapidisimo": "Inter Rapidisimo", "tcc": "TCC" }
+      },
+      "tracking": {
+        "title": "Real-time tracking",
+        "status": { "in_transit": "In transit", "out_for_delivery": "Out for delivery", "delivered": "Delivered" }
+      },
+      "returns": {
+        "title": "RMA / Returns", "openPortal": "Open RMA portal",
+        "reason": "Reason", "statusLabel": "Status",
+        "reasons": { "defective": "Defective product", "size": "Wrong size", "notAsDescribed": "Not as described", "changeMind": "Change of mind" },
+        "status": { "approved": "Approved", "pending": "Pending", "reviewing": "Reviewing" }
+      }
+    },
+    "admin": {
+      "title": "Admin & Analytics",
+      "subtitle": "Executive view, AI insights and compliance.",
+      "kpis": { "revenue": "Revenue", "gmv": "GMV", "customers": "Customers", "aov": "AOV", "ltv": "LTV", "cac": "CAC" },
+      "charts": { "sales30d": "Sales last 30 days", "topCategories": "Top categories" },
+      "ai": {
+        "title": "AI Insights",
+        "tone": { "up": "Trend", "down": "Alert", "warn": "Attention", "insight": "Insight" },
+        "i1": "Beauty sales dropped 12% due to lower ad spend. Review campaign.",
+        "i2": "Forecast: Wine demand will rise 28% in the next 14 days.",
+        "i3": "Customers who buy coffee also buy coffee makers 41% of the time.",
+        "i4": "3 Tech SKUs will run out of stock in 5 days at current pace."
+      },
+      "marketing": {
+        "title": "Marketing automation",
+        "active": "Active", "openRate": "Open rate",
+        "campaigns": {
+          "abandonment":   { "title": "Cart abandonment", "desc": "Recover sales with automated emails at 1h, 24h and 72h." },
+          "postPurchase":  { "title": "Post-purchase",    "desc": "Thank-you, tracking and review request." },
+          "winBack":       { "title": "Win-back",         "desc": "Re-engage inactive customers with personalized offers." },
+          "replenishment": { "title": "Replenishment",    "desc": "Reminders for consumable products." }
+        }
+      },
+      "fraud": {
+        "title": "Fraud detection",
+        "score": "Avg fraud score",
+        "blocked": "Blocked today",
+        "review": "Under review",
+        "approved": "Approved",
+        "summary": "Global risk under control — AI monitoring in real time."
+      },
+      "compliance": {
+        "title": "Compliance & Certifications",
+        "subtitle": "We comply with local and international standards."
+      }
+    }
+  }
+}

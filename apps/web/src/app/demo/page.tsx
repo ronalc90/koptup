@@ -20,12 +20,52 @@ import {
   CalendarIcon,
   PencilSquareIcon,
   RectangleStackIcon,
+  BriefcaseIcon,
+  BuildingOfficeIcon,
+  LifebuoyIcon,
+  AcademicCapIcon,
+  HeartIcon,
+  DocumentCheckIcon,
+  TruckIcon,
+  ComputerDesktopIcon,
+  UserGroupIcon,
+  BoltIcon,
+  Squares2X2Icon,
+  MicrophoneIcon,
+  PencilIcon,
+  GlobeAltIcon,
+  CommandLineIcon,
+  ShieldCheckIcon,
+  MapIcon,
+  StarIcon,
 } from '@heroicons/react/24/outline';
 
 export default function DemosPage() {
   const t = useTranslations('demos');
+  const te = useTranslations('demosExtra');
   const tc = useTranslations('common');
   const router = useRouter();
+
+  const buildExtra = (
+    key: string,
+    href: string,
+    icon: typeof ChatBubbleLeftRightIcon,
+    color: string,
+  ) => ({
+    id: key,
+    title: te(`${key}.title`),
+    description: te(`${key}.description`),
+    icon,
+    href,
+    color,
+    badge: te(`${key}.badge`),
+    features: [
+      te(`${key}.features.0`),
+      te(`${key}.features.1`),
+      te(`${key}.features.2`),
+      te(`${key}.features.3`),
+    ],
+  });
 
   const [showCodeModal, setShowCodeModal] = useState(false);
   const [accessCode, setAccessCode] = useState('');
@@ -137,6 +177,24 @@ export default function DemosPage() {
         t('projects.features.3'),
       ],
     },
+    buildExtra('crm', '/demo/crm-ia', BriefcaseIcon, 'from-indigo-600 to-indigo-800'),
+    buildExtra('erp', '/demo/erp', BuildingOfficeIcon, 'from-amber-600 to-amber-800'),
+    buildExtra('helpdesk', '/demo/helpdesk-ia', LifebuoyIcon, 'from-rose-600 to-rose-800'),
+    buildExtra('lms', '/demo/lms', AcademicCapIcon, 'from-cyan-600 to-cyan-800'),
+    buildExtra('telemedicina', '/demo/telemedicina', HeartIcon, 'from-red-600 to-rose-800'),
+    buildExtra('billing', '/demo/facturacion-electronica', DocumentCheckIcon, 'from-emerald-600 to-emerald-800'),
+    buildExtra('wms', '/demo/wms-logistica', TruckIcon, 'from-stone-600 to-stone-800'),
+    buildExtra('pos', '/demo/pos', ComputerDesktopIcon, 'from-fuchsia-600 to-fuchsia-800'),
+    buildExtra('hrms', '/demo/hrms', UserGroupIcon, 'from-violet-600 to-violet-800'),
+    buildExtra('automation', '/demo/automatizacion', BoltIcon, 'from-yellow-600 to-orange-700'),
+    buildExtra('saas', '/demo/saas-boilerplate', Squares2X2Icon, 'from-slate-600 to-slate-800'),
+    buildExtra('voice', '/demo/voice-ai', MicrophoneIcon, 'from-sky-600 to-sky-800'),
+    buildExtra('sign', '/demo/firma-electronica', PencilIcon, 'from-lime-600 to-lime-800'),
+    buildExtra('scraping', '/demo/scraping', GlobeAltIcon, 'from-zinc-600 to-zinc-800'),
+    buildExtra('codeReview', '/demo/code-review-ia', CommandLineIcon, 'from-neutral-700 to-neutral-900'),
+    buildExtra('moderation', '/demo/moderacion-contenido', ShieldCheckIcon, 'from-red-700 to-red-900'),
+    buildExtra('delivery', '/demo/delivery', MapIcon, 'from-orange-500 to-red-600'),
+    buildExtra('loyalty', '/demo/loyalty', StarIcon, 'from-yellow-500 to-amber-600'),
   ];
 
   const handleCodeSubmit = () => {

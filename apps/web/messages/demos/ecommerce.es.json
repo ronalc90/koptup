@@ -1,0 +1,256 @@
+{
+  "demoEcommercePro": {
+    "section": { "title": "Capacidades enterprise", "subtitle": "Funcionalidades PRO listas para producción", "badge": "PRO" },
+    "tabs": { "aiSearch": "Búsqueda IA", "recommendations": "Recomendaciones", "checkout": "Checkout", "fraud": "Antifraude", "invoicing": "Factura DIAN", "inventory": "Inventario", "marketing": "Marketing" },
+    "aiSearch": {
+      "title": "Búsqueda inteligente con IA",
+      "description": "Autocompletado typeahead, búsqueda visual, búsqueda por voz y ranking personalizado por usuario.",
+      "placeholder": "Buscar producto (ej: laptop, audífonos, reloj)",
+      "suggestionsLabel": "Sugerencias",
+      "noResults": "Empezá a tipear para ver sugerencias",
+      "badges": { "visual": "Visual Search", "voice": "Voice Search", "ranking": "Ranking personalizado", "semantic": "Búsqueda semántica" },
+      "categories": { "laptop": "Electrónica", "headphones": "Audio", "watch": "Wearables", "backpack": "Moda", "shoes": "Calzado", "coffee": "Hogar", "mouse": "Gaming", "keyboard": "Gaming", "yoga": "Deportes", "charger": "Accesorios", "sunglasses": "Moda", "lamp": "Hogar" }
+    },
+    "recommendations": {
+      "title": "Recomendaciones IA",
+      "description": "Motor de recomendaciones que aumenta el ticket promedio y la conversión.",
+      "boughtTogether": "Frecuentemente comprados juntos",
+      "alsoViewed": "Clientes también vieron",
+      "completeLook": "Completá el look",
+      "addBundle": "Agregar combo",
+      "viewAll": "Ver todos",
+      "boost": "+%{value}% conversión"
+    },
+    "checkout": {
+      "title": "Checkout omnicanal",
+      "description": "Flujo de 4 pasos optimizado con métodos de pago locales y BNPL.",
+      "steps": { "cart": "Carrito", "address": "Dirección", "payment": "Pago", "confirm": "Confirmar" },
+      "methodsTitle": "Métodos de pago soportados",
+      "methods": { "applePay": "Apple Pay", "googlePay": "Google Pay", "pse": "PSE", "addi": "BNPL Addi", "mercadoPago": "Mercado Pago", "wompi": "Wompi", "card": "Tarjeta", "nequi": "Nequi" },
+      "metrics": { "conversion": "Conversión checkout", "abandonment": "Tasa abandono", "time": "Tiempo promedio" }
+    },
+    "fraud": {
+      "title": "Detección de fraude",
+      "description": "Score de fraude en tiempo real con IA y señales contextuales.",
+      "score": "Fraud score", "low": "Riesgo bajo", "medium": "Riesgo medio", "high": "Riesgo alto",
+      "signalsTitle": "Señales detectadas",
+      "signals": { "device": "Dispositivo conocido", "geo": "Geolocalización consistente", "velocity": "Velocidad de compra normal", "card": "BIN tarjeta verificado", "email": "Email con historial", "ip": "IP no es VPN/Tor" },
+      "action": "Acción recomendada", "actionValue": "Aprobar transacción"
+    },
+    "invoicing": {
+      "title": "Facturación electrónica DIAN",
+      "description": "Emisión automática de factura electrónica con validación DIAN y envío al cliente.",
+      "issue": "Emitir factura", "issuing": "Emitiendo...", "issued": "Factura emitida",
+      "cufe": "CUFE", "number": "Número", "date": "Fecha emisión", "status": "Estado", "statusValue": "Aceptada DIAN",
+      "download": "Descargar PDF", "send": "Enviar al cliente"
+    },
+    "inventory": {
+      "title": "Inventario multi-bodega",
+      "description": "Stock en tiempo real, alertas low-stock y reposición automática.",
+      "sku": "SKU", "product": "Producto",
+      "warehouse1": "Bogotá", "warehouse2": "Medellín", "warehouse3": "Cali",
+      "total": "Total", "status": "Estado",
+      "ok": "OK", "low": "Bajo", "critical": "Crítico", "reorder": "Reabastecer"
+    },
+    "marketing": {
+      "title": "Marketing automation",
+      "description": "Campañas de email lifecycle automatizadas con segmentación IA.",
+      "abandonment":   { "title": "Abandono de carrito", "desc": "Recuperá ventas con emails automáticos a las 1h, 24h y 72h.", "metric": "Recuperación" },
+      "postPurchase":  { "title": "Post-compra",         "desc": "Email de agradecimiento, tracking y solicitud de reseña.",  "metric": "Reseñas"        },
+      "winBack":       { "title": "Win-back",            "desc": "Reactivá clientes inactivos con ofertas personalizadas.",   "metric": "Reactivación"   },
+      "replenishment": { "title": "Reposición",          "desc": "Recordatorios para productos consumibles con compra recurrente.", "metric": "Recurrencia" },
+      "active": "Activa", "sent": "Enviados", "openRate": "Open rate"
+    }
+  },
+  "demoEcommerce2": {
+    "viewSelector": "Selector de vista",
+    "views": { "storefront": "Tienda", "checkout": "Checkout", "vendor": "Vendedor", "operations": "Operaciones", "admin": "Admin" },
+    "hero": {
+      "badge": "Demo enterprise",
+      "title": "Comercio electrónico de nivel empresa",
+      "subtitle": "Catálogo, pagos, logística y analítica unificados en una sola plataforma.",
+      "freeShipping": "Envío gratis +$100",
+      "priceGuarantee": "Mejor precio garantizado"
+    },
+    "search": {
+      "placeholder": "Buscar productos, marcas o categorías...",
+      "suggestions": "Sugerencias",
+      "resultsFor": "Resultados para"
+    },
+    "categories": { "all": "Todas", "tech": "Tecnología", "fashion": "Moda", "home": "Hogar", "sports": "Deportes", "beauty": "Belleza", "wines": "Vinos" },
+    "sections": {
+      "recommended": "Recomendado para vos",
+      "recommendedHint": "Sugerencias generadas con IA",
+      "allProducts": "Todos los productos",
+      "recentlyViewed": "Visto recientemente",
+      "empty": "No encontramos productos con esos criterios."
+    },
+    "product": {
+      "addToCart": "Agregar", "buyNow": "Comprar ahora",
+      "quickView": "Vista rápida", "wishlist": "Lista de deseos", "compare": "Comparar",
+      "reviewsCount": "reseñas", "category": "Categoría", "stock": "Stock",
+      "description": "Producto premium con garantía oficial y envío rápido desde nuestras bodegas en Colombia."
+    },
+    "productNames": {
+      "macbookPro15": "MacBook Pro 15\"",
+      "iphone15Pro": "iPhone 15 Pro",
+      "ipadAir": "iPad Air",
+      "wirelessHeadphones": "Auriculares Inalámbricos Premium",
+      "smartwatchPro": "Smartwatch Pro Series",
+      "vintageCamera": "Cámara Vintage 35mm",
+      "earbuds": "Audífonos In-Ear Pro",
+      "redSneakers": "Sneakers Rojas Edición Limitada",
+      "adidasRunner": "Zapatillas Runner Adidas",
+      "leatherJacket": "Chaqueta de Cuero Genuino",
+      "urbanBackpack": "Mochila Urbana Reciclada",
+      "sunglasses": "Lentes de Sol Premium",
+      "premiumCoffee": "Café Premium en Grano 500g",
+      "deskLamp": "Lámpara LED de Escritorio",
+      "coffeeMaker": "Cafetera Pro Automática",
+      "kitchenSet": "Set de Cocina Acero Inox",
+      "runningShoes": "Tenis Running Pro",
+      "fitnessTracker": "Fitness Tracker Avanzado",
+      "yogaMat": "Mat de Yoga Eco-Premium",
+      "gymBag": "Bolso Deportivo Profesional",
+      "fragrance": "Perfume Eau de Parfum 100ml",
+      "skincareSet": "Set Skincare Natural",
+      "reserveMalbec": "Malbec Reserva 2020",
+      "chardonnay": "Chardonnay Premium 2022"
+    },
+    "cart": { "goToCheckout": "Ir al checkout", "items": "items" },
+    "checkout": {
+      "backToStore": "Volver a la tienda",
+      "steps": { "cart": "Carrito", "address": "Dirección", "payment": "Pago", "confirmation": "Confirmación" },
+      "back": "Atrás", "continue": "Continuar", "placeOrder": "Confirmar pago",
+      "cart": {
+        "title": "Tu carrito",
+        "empty": "Tu carrito está vacío. Volvé a la tienda y agregá productos.",
+        "remove": "Quitar",
+        "couponPlaceholder": "Código de descuento (KOP10 / KOP20)",
+        "applyCoupon": "Aplicar",
+        "couponApplied": "Cupón aplicado: {value}% de descuento"
+      },
+      "address": {
+        "title": "Dirección de envío",
+        "fullName": "Nombre completo", "email": "Email", "phone": "Teléfono",
+        "address": "Dirección", "city": "Ciudad", "zip": "Código postal",
+        "mapHint": "Mapa de entrega (mock)"
+      },
+      "payment": {
+        "title": "Método de pago",
+        "subtitle": "Elegí cómo querés pagar — soportamos los principales métodos de Latinoamérica.",
+        "methods": { "card": "Tarjeta", "pse": "PSE", "nequi": "Nequi", "daviplata": "Daviplata", "mercadoPago": "Mercado Pago", "wompi": "Wompi", "applePay": "Apple Pay", "googlePay": "Google Pay", "addi": "Addi BNPL" },
+        "cardNumber": "Número de tarjeta",
+        "cardName": "Nombre en la tarjeta",
+        "addiHint": "Pagá en 4 cuotas sin interés con Addi. Aprobación inmediata.",
+        "redirectHint": "Serás redirigido al portal del proveedor para completar el pago.",
+        "walletHint": "Confirmá el pago desde tu billetera digital."
+      },
+      "confirmation": {
+        "title": "¡Pago confirmado!",
+        "subtitle": "Tu pedido fue procesado correctamente.",
+        "orderNumber": "Número de pedido",
+        "cufe": "CUFE (DIAN)",
+        "email": "Email confirmación",
+        "total": "Total pagado",
+        "delivery": "Entrega estimada en 3 a 5 días hábiles",
+        "continueShopping": "Seguir comprando"
+      },
+      "summary": {
+        "title": "Resumen", "subtotal": "Subtotal", "discount": "Descuento",
+        "shipping": "Envío", "tax": "Impuestos (8%)", "total": "Total",
+        "free": "Gratis", "freeShippingApplied": "Envío gratis aplicado"
+      }
+    },
+    "vendor": {
+      "title": "Dashboard del vendedor",
+      "subtitle": "Gestioná tu catálogo, pedidos y reglas de pricing en tiempo real.",
+      "createProduct": "Crear producto",
+      "live": "En vivo", "liveOrders": "Pedidos en vivo",
+      "topProducts": "Productos top (30 días)", "lowStock": "Stock bajo",
+      "unitsSold": "vendidos", "units": "u.",
+      "kpis": { "todaySales": "Ventas hoy", "aov": "AOV", "conversion": "Conversión", "activeProducts": "Productos activos" },
+      "order": {
+        "customer": "Cliente", "items": "Items", "total": "Total", "status": "Estado", "action": "Acción",
+        "advance": "Avanzar →",
+        "status_new": "Nuevo", "status_preparing": "Preparando", "status_shipped": "Enviado", "status_delivered": "Entregado"
+      },
+      "pricing": {
+        "title": "Reglas de pricing",
+        "subtitle": "Motor de reglas en vivo",
+        "rule1": "Descuento 10% si carrito > $200",
+        "rule2": "Envío gratis a clientes VIP",
+        "rule3": "Precio dinámico por demanda (categoría Tecnología)",
+        "rule4": "Bundle: 3x2 en café y vinos"
+      },
+      "createForm": {
+        "title": "Nuevo producto", "name": "Nombre", "sku": "SKU",
+        "price": "Precio", "stock": "Stock", "description": "Descripción",
+        "dropImages": "Arrastrá imágenes acá o hacé click para seleccionar",
+        "cancel": "Cancelar", "save": "Guardar producto"
+      }
+    },
+    "ops": {
+      "title": "Operaciones & Logística",
+      "subtitle": "Bodegas, picking, transportadoras y devoluciones en una sola vista.",
+      "warehouses": { "title": "Bodegas", "capacity": "Capacidad", "pendingOrders": "Pedidos pendientes" },
+      "picking": {
+        "title": "Picking activo", "items": "items",
+        "wave1": "Wave 1 (express)", "wave2": "Wave 2 (24h)", "wave3": "Wave 3 (48h)",
+        "complete": "Completo", "inProgress": "En curso", "queued": "En cola"
+      },
+      "carriers": {
+        "title": "Transportadoras integradas",
+        "carrier": "Transportadora", "sla": "SLA", "cost": "Costo", "rating": "Rating", "status": "Estado",
+        "active": "Activa",
+        "names": { "fedex": "FedEx", "dhl": "DHL", "servientrega": "Servientrega", "coordinadora": "Coordinadora", "interrapidisimo": "Inter Rapídisimo", "tcc": "TCC" }
+      },
+      "tracking": {
+        "title": "Tracking en tiempo real",
+        "status": { "in_transit": "En tránsito", "out_for_delivery": "Salió a entrega", "delivered": "Entregado" }
+      },
+      "returns": {
+        "title": "RMA / Devoluciones", "openPortal": "Abrir portal RMA",
+        "reason": "Motivo", "statusLabel": "Estado",
+        "reasons": { "defective": "Producto defectuoso", "size": "Talla incorrecta", "notAsDescribed": "No es como se describe", "changeMind": "Cambio de opinión" },
+        "status": { "approved": "Aprobada", "pending": "Pendiente", "reviewing": "En revisión" }
+      }
+    },
+    "admin": {
+      "title": "Admin & Analytics",
+      "subtitle": "Visión ejecutiva, IA insights y compliance.",
+      "kpis": { "revenue": "Revenue", "gmv": "GMV", "customers": "Clientes", "aov": "AOV", "ltv": "LTV", "cac": "CAC" },
+      "charts": { "sales30d": "Ventas últimos 30 días", "topCategories": "Categorías top" },
+      "ai": {
+        "title": "AI Insights",
+        "tone": { "up": "Tendencia", "down": "Alerta", "warn": "Atención", "insight": "Insight" },
+        "i1": "Las ventas de Belleza bajaron 12% por menor inversión en ads. Revisar campaña.",
+        "i2": "Predicción: la demanda de Vinos subirá 28% en los próximos 14 días.",
+        "i3": "Los clientes que compran café también compran cafeteras en 41% de los casos.",
+        "i4": "3 SKUs de Tecnología quedarán sin stock en 5 días al ritmo actual."
+      },
+      "marketing": {
+        "title": "Marketing automation",
+        "active": "Activa", "openRate": "Open rate",
+        "campaigns": {
+          "abandonment":   { "title": "Abandono de carrito", "desc": "Recuperá ventas con emails automáticos a 1h, 24h y 72h." },
+          "postPurchase":  { "title": "Post-compra",         "desc": "Agradecimiento, tracking y solicitud de reseña." },
+          "winBack":       { "title": "Win-back",            "desc": "Reactivá clientes inactivos con ofertas personalizadas." },
+          "replenishment": { "title": "Reposición",          "desc": "Recordatorios para productos consumibles." }
+        }
+      },
+      "fraud": {
+        "title": "Detección de fraude",
+        "score": "Fraud score promedio",
+        "blocked": "Bloqueadas hoy",
+        "review": "En revisión",
+        "approved": "Aprobadas",
+        "summary": "Riesgo global controlado — IA monitoreando en tiempo real."
+      },
+      "compliance": {
+        "title": "Compliance & Certificaciones",
+        "subtitle": "Cumplimos con los estándares locales e internacionales."
+      }
+    }
+  }
+}

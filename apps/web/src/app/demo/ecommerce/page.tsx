@@ -43,7 +43,6 @@ function ViewShell() {
 
   return (
     <div className="min-h-screen bg-secondary-50 dark:bg-secondary-950">
-      {/* Sticky view selector */}
       <nav
         className="sticky top-16 md:top-20 z-40 bg-white/95 dark:bg-secondary-900/95 backdrop-blur border-b border-secondary-200 dark:border-secondary-800 shadow-sm"
         aria-label={t('viewSelector')}
