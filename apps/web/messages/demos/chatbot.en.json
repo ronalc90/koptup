@@ -13,7 +13,8 @@
     "sidebar": {
       "title": "Platform layers",
       "subtitle": "Click any layer to inspect it",
-      "search": "Search capability..."
+      "search": "Search capability...",
+      "noResults": "No results for your search."
     },
     "layers": {
       "ingestion": {

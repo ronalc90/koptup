@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { LAYERS, type LayerKey } from './data';
 import Tooltip from './ui/Tooltip';
 import InfoIcon from './ui/InfoIcon';
@@ -14,45 +13,22 @@ interface SidebarProps {
 
 /**
  * Navegación lateral por las 19 capas de la plataforma RAG.
- *
- * Reducción de densidad:
- *  - Las 6 capas primarias quedan visibles por defecto.
- *  - Las 13 restantes se agrupan bajo "Más capacidades" (collapse-by-default).
- *  - Cada item tiene tooltip con descripción breve al hover (sin click).
+ * Todas las capas visibles por defecto con scroll vertical.
+ * Buscador en el header filtra in-line.
  */
-const PRIMARY_LAYERS: ReadonlySet<LayerKey> = new Set([
-  'ingestion',
-  'retrieval',
-  'ranking',
-  'models',
-  'security',
-  'observability',
-]);
-
 export default function Sidebar({ activeLayer, onSelect }: SidebarProps) {
   const t = useTranslations('demoChatbot');
   const [filter, setFilter] = useState('');
-  const [showMore, setShowMore] = useState(false);
 
   const filtered = useMemo(() => {
     const q = filter.trim().toLowerCase();
     if (!q) return LAYERS;
     return LAYERS.filter((l) => {
       const title = t(`layers.${l.key}.title`).toLowerCase();
-      return title.includes(q);
+      const summary = t(`layers.${l.key}.summary`).toLowerCase();
+      return title.includes(q) || summary.includes(q);
     });
   }, [filter, t]);
-
-  // Cuando se filtra, mostramos todos los matches; sino, dividimos primarias/avanzadas.
-  const isFiltering = filter.trim().length > 0;
-  const primary = useMemo(
-    () => filtered.filter((l) => PRIMARY_LAYERS.has(l.key)),
-    [filtered],
-  );
-  const advanced = useMemo(
-    () => filtered.filter((l) => !PRIMARY_LAYERS.has(l.key)),
-    [filtered],
-  );
 
   const renderItem = (layer: (typeof LAYERS)[number]) => {
     const isActive = activeLayer === layer.key;
@@ -118,41 +94,17 @@ export default function Sidebar({ activeLayer, onSelect }: SidebarProps) {
         />
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-2 py-3">
-        {isFiltering ? (
-          <ul className="space-y-1">{filtered.map(renderItem)}</ul>
+      <nav className="flex-1 overflow-y-auto px-2 py-3 max-h-[calc(100vh-220px)]">
+        {filtered.length === 0 ? (
+          <p className="px-3 py-6 text-center text-xs text-secondary-400">
+            {t('sidebar.noResults')}
+          </p>
         ) : (
-          <>
-            <ul className="space-y-1">{primary.map(renderItem)}</ul>
-            {advanced.length > 0 ? (
-              <div className="mt-3 border-t border-secondary-200/70 pt-3 dark:border-secondary-800/70">
-                <button
-                  type="button"
-                  onClick={() => setShowMore((v) => !v)}
-                  className="flex w-full items-center justify-between gap-1 rounded-md px-2 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-secondary-500 transition hover:bg-secondary-100 hover:text-secondary-700 dark:text-secondary-400 dark:hover:bg-secondary-800/50 dark:hover:text-secondary-200"
-                  aria-expanded={showMore}
-                >
-                  <span className="flex items-center gap-1.5">
-                    {showMore ? (
-                      <ChevronDownIcon className="h-3 w-3" />
-                    ) : (
-                      <ChevronRightIcon className="h-3 w-3" />
-                    )}
-                    {showMore
-                      ? t('ux.sidebarMore.hide')
-                      : t('ux.sidebarMore.showMore', { count: advanced.length })}
-                  </span>
-                  <span className="font-mono normal-case tracking-normal text-secondary-400">
-                    {advanced.length}
-                  </span>
-                </button>
-                {showMore ? (
-                  <ul className="mt-2 space-y-1">{advanced.map(renderItem)}</ul>
-                ) : null}
-              </div>
-            ) : null}
-          </>
+          <ul className="space-y-1">{filtered.map(renderItem)}</ul>
         )}
+        <p className="mt-3 px-3 text-[10px] text-secondary-400 dark:text-secondary-500">
+          {filtered.length} / {LAYERS.length} capacidades
+        </p>
       </nav>
     </aside>
   );
