@@ -1,0 +1,202 @@
+{
+  "demosExtra": {
+    "crm": {
+      "title": "CRM con IA",
+      "description": "Pipeline visual, lead scoring ML, conversation intelligence y secuencias multicanal con copiloto de IA.",
+      "badge": "Ventas IA",
+      "features": {
+        "0": "Lead scoring ML y propensity to buy",
+        "1": "AI email composer y secuencias omnicanal",
+        "2": "Conversation intelligence (grabación, sentiment, action items)",
+        "3": "Customer 360 unificado y forecasting con escenarios"
+      }
+    },
+    "erp": {
+      "title": "ERP Modular Multi-país",
+      "description": "Contabilidad doble entrada, finanzas, inventario, ventas y manufactura con facturación electrónica DIAN/SAT/AFIP/SII/SUNAT.",
+      "badge": "ERP",
+      "features": {
+        "0": "Contabilidad multi-currency y multi-company",
+        "1": "Facturación electrónica multi-país",
+        "2": "Bank reconciliation con Open Banking + AI matching",
+        "3": "MRP, BOM, work orders y forecasting de demanda con ML"
+      }
+    },
+    "helpdesk": {
+      "title": "Help Desk IA Omnichannel",
+      "description": "Ticketing inteligente con routing ML, sugerencias IA al agente, SLA management y CSAT automatizado.",
+      "badge": "Soporte IA",
+      "features": {
+        "0": "Omnichannel: email, WhatsApp, IG, FB, X, voz, chat",
+        "1": "Routing inteligente con ML (skills, sentiment, idioma)",
+        "2": "Sugerencias IA en vivo y auto-respuestas con confidence",
+        "3": "SLA escalations, CSAT/NPS post-resolución y QA con IA"
+      }
+    },
+    "lms": {
+      "title": "LMS / E-learning",
+      "description": "Plataforma educativa con AI tutor 1:1, adaptive learning, clases en vivo y gamification completa.",
+      "badge": "Educación",
+      "features": {
+        "0": "AI Tutor 1:1 conversacional y quizzes auto-generados",
+        "1": "Adaptive learning paths basados en performance",
+        "2": "Clases en vivo con breakout rooms y subtítulos multi-idioma",
+        "3": "Gamification: XP, badges, leaderboards, certificados verificables"
+      }
+    },
+    "telemedicina": {
+      "title": "Telemedicina HIPAA",
+      "description": "Video consulta segura, EHR integrado, triage IA, receta electrónica y wearables Apple Health / Fitbit.",
+      "badge": "HealthTech",
+      "features": {
+        "0": "Video call HIPAA-compliant con WebRTC propio",
+        "1": "EHR/EMR + receta electrónica con firma digital",
+        "2": "Triage IA con síntomas y derivación por especialidad",
+        "3": "Integración wearables, laboratorios HL7/FHIR y farmacias"
+      }
+    },
+    "billing": {
+      "title": "Facturación Electrónica Multi-país",
+      "description": "Emisión y recepción de facturas DIAN, SAT, AFIP, SII, SUNAT, DGI, SET, SRI con SDK y white-label.",
+      "badge": "FinTech",
+      "features": {
+        "0": "8 países LatAm: CO, MX, AR, CL, PE, UY, PY, EC",
+        "1": "Factura, NC, ND, POS y validación NIT en tiempo real",
+        "2": "Recepción de proveedores con OCR + validación automática",
+        "3": "API + SDKs + plugins ERP/POS + modo white-label"
+      }
+    },
+    "wms": {
+      "title": "WMS / Logística",
+      "description": "Multi-warehouse, picking optimizado, route optimization ML, last-mile con app driver y carriers integrados.",
+      "badge": "Logística",
+      "features": {
+        "0": "Multi-warehouse con zonas, bins y slotting ML",
+        "1": "Picking wave/batch/zone/cluster y cycle counting ABC",
+        "2": "Route optimization VRP + last-mile con POD",
+        "3": "Carriers: FedEx, DHL, Servientrega, Coordinadora, Inter, TCC"
+      }
+    },
+    "pos": {
+      "title": "POS Punto de Venta",
+      "description": "POS offline-first con multi-payment, KDS para restaurantes, facturación electrónica y hardware integrado.",
+      "badge": "Retail",
+      "features": {
+        "0": "Offline-first con CRDT sync y conflict resolution",
+        "1": "Multi-payment: efectivo, tarjeta, QR, wallets, BNPL, split",
+        "2": "KDS, mesas, modificadores, combos y happy hour",
+        "3": "Hardware: scanners Bluetooth, balanzas, impresoras"
+      }
+    },
+    "hrms": {
+      "title": "HRMS / Gestión RRHH",
+      "description": "ATS, onboarding, performance, payroll multi-país y AI insights de retención y eNPS.",
+      "badge": "People",
+      "features": {
+        "0": "ATS con scoring CV IA y screening calls automáticas",
+        "1": "Onboarding/offboarding con e-sign de contratos",
+        "2": "Payroll multi-país con compliance laboral (CO, MX, AR)",
+        "3": "AI: retención predicha, eNPS y salary benchmarks"
+      }
+    },
+    "automation": {
+      "title": "Automatización Workflows",
+      "description": "Plataforma estilo n8n / Zapier con 500+ integraciones, AI nodes nativos y self-hosted opcional.",
+      "badge": "AI Ops",
+      "features": {
+        "0": "Visual workflow builder drag-drop con 500+ integraciones",
+        "1": "AI nodes: LLM, embedding, RAG, vision, STT/TTS",
+        "2": "Code nodes JS/Python sandboxed + SDK custom",
+        "3": "Versioning git-backed, environments y replay"
+      }
+    },
+    "saas": {
+      "title": "SaaS Boilerplate Multi-tenant",
+      "description": "Auth SSO + MFA, billing Stripe + Paddle, multi-tenancy configurable, audit logs y observability lista.",
+      "badge": "Platform",
+      "features": {
+        "0": "Multi-tenancy: shared-DB con RLS, schema o DB por tenant",
+        "1": "Auth completo: SSO SAML/OIDC, MFA, passkeys, magic links",
+        "2": "Billing Stripe + Paddle con trials y usage-based",
+        "3": "Audit logs Vanta-style, feature flags e i18n"
+      }
+    },
+    "voice": {
+      "title": "Voice AI / Call Center",
+      "description": "IVR conversacional sin menús, STT/TTS sub-300ms, llamadas inbound + outbound y compliance PCI redaction.",
+      "badge": "Voice AI",
+      "features": {
+        "0": "STT streaming (Whisper, Deepgram, AssemblyAI) <300ms",
+        "1": "TTS realista (ElevenLabs, Cartesia, Play.ht) con barge-in",
+        "2": "Function calling: transferir, agendar, consultar en vivo",
+        "3": "Compliance: DNC, recording disclosure, PCI redaction"
+      }
+    },
+    "sign": {
+      "title": "Firma Electrónica",
+      "description": "Firma simple, avanzada y cualificada (eIDAS, Ley 527 CO) con audit trail criptográfico y blockchain timestamp.",
+      "badge": "LegalTech",
+      "features": {
+        "0": "Simple, avanzada y cualificada (eIDAS, Ley 527 CO)",
+        "1": "KYC firmante: SMS OTP, email, ID+selfie, video, biometría",
+        "2": "Audit trail criptográfico con hash chain y RFC 3161",
+        "3": "Multi-firmante con orden, condicional, paralelo + bulk send"
+      }
+    },
+    "scraping": {
+      "title": "Scraping & Data Extraction",
+      "description": "Visual scraper builder con AI extraction, proxy rotation, captcha solving y auto-fix cuando cambia el DOM.",
+      "badge": "Data",
+      "features": {
+        "0": "Visual builder point-and-click + AI extraction con schemas",
+        "1": "Proxy rotation (datacenter, residential, mobile) + captchas",
+        "2": "Anti-bot evasion: fingerprinting, stealth, human-like",
+        "3": "Auto-fix con LLM cuando cambia el DOM + diff detection"
+      }
+    },
+    "codeReview": {
+      "title": "Code Review IA",
+      "description": "Revisión automatizada de PRs con SAST/DAST/SCA, test generation, refactoring y analytics de calidad.",
+      "badge": "DevTools",
+      "features": {
+        "0": "AI review por archivo (style, bugs, security, perf, design)",
+        "1": "SAST + DAST + SCA + SBOM + license compliance",
+        "2": "Test generation auto y refactoring suggestions con LLM",
+        "3": "Integraciones: GitHub, GitLab, Bitbucket, Azure DevOps"
+      }
+    },
+    "moderation": {
+      "title": "Moderación de Contenido IA",
+      "description": "Clasificación multi-modal NSFW/hate/spam con human-in-the-loop, wellness para moderadores y compliance DSA.",
+      "badge": "Trust & Safety",
+      "features": {
+        "0": "Multi-modal: texto, imagen, video, audio en tiempo real",
+        "1": "Custom models por vertical (gaming, dating, kids, fintech)",
+        "2": "Human-in-the-loop con priority routing y appeals",
+        "3": "Wellness: blur, breaks, rotación + compliance DSA"
+      }
+    },
+    "delivery": {
+      "title": "App de Delivery",
+      "description": "3 apps (customer / driver / merchant) con tracking en vivo, routing ML, anti-fraude y pricing dinámico.",
+      "badge": "OnDemand",
+      "features": {
+        "0": "3 apps: customer, driver, merchant + ops dashboard",
+        "1": "Routing ML multi-pickup + tracking en vivo + ETA ML",
+        "2": "Pricing dinámico (surge), loyalty y suscripción membership",
+        "3": "Anti-fraude: GPS spoofing, multi-account, KYC drivers"
+      }
+    },
+    "loyalty": {
+      "title": "Loyalty / Fidelización",
+      "description": "Programas points/tiers/missions con coalitions multi-marca, gamification y personalization ML.",
+      "badge": "Engagement",
+      "features": {
+        "0": "Points, tiers, missions, referrals, cashback, sweepstakes",
+        "1": "Coalitions multi-marca con shared points pool",
+        "2": "Gamification: badges, streaks, challenges, leaderboards",
+        "3": "Personalization ML + A/B testing + Wallet pass"
+      }
+    }
+  }
+}

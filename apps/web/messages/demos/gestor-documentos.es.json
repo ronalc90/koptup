@@ -1,0 +1,160 @@
+{
+  "demoDocsPro": {
+    "section": {
+      "title": "Capacidades Enterprise DMS",
+      "subtitle": "Funcionalidades avanzadas listas para empresas con altos volúmenes documentales y cumplimiento normativo estricto."
+    },
+    "tabs": {
+      "ingesta": "Ingesta multi-canal",
+      "ocr": "OCR + extracción",
+      "search": "Hybrid Search",
+      "clauses": "Cláusulas",
+      "compare": "Comparación de versiones",
+      "watermark": "Watermarks dinámicas",
+      "retention": "Retención & Legal Hold",
+      "encryption": "Zero-knowledge",
+      "ediscovery": "E-discovery",
+      "sign": "Firma electrónica"
+    },
+    "ingesta": {
+      "title": "Ingesta multi-canal",
+      "subtitle": "Cinco vías oficiales para entrar documentos al vault, todas con auditoría y antivirus.",
+      "channels": {
+        "email": { "name": "Email-to-vault", "desc": "Reenvía cualquier correo y los adjuntos quedan indexados." },
+        "scan": { "name": "Scan-to-vault móvil", "desc": "App iOS/Android con captura en JPEG + OCR auto." },
+        "office": { "name": "Plugin Office", "desc": "Guardar desde Word, Excel y Outlook con un clic." },
+        "drive": { "name": "Drive sync", "desc": "Sincroniza carpetas de Google Drive y OneDrive." },
+        "api": { "name": "API upload", "desc": "Endpoint REST con firma HMAC y cuotas por tenant." }
+      },
+      "emailLabel": "Tu dirección Email-to-vault",
+      "copy": "Copiar",
+      "copied": "¡Copiado!"
+    },
+    "ocr": {
+      "title": "OCR + extracción de datos",
+      "subtitle": "Sube una factura o contrato y la IA extrae entidades, tablas y bounding boxes.",
+      "drop": "Suelta el PDF aquí o haz clic para simular",
+      "supports": "PDF · PNG · JPG · TIFF (hasta 50 MB)",
+      "preview": "Vista previa con bounding boxes",
+      "table": "Tabla extraída",
+      "entities": "Entidades reconocidas",
+      "headers": { "concept": "Concepto", "qty": "Cant.", "unit": "Unitario", "total": "Total" },
+      "entity": {
+        "name": "Razón social",
+        "nit": "NIT",
+        "date": "Fecha emisión",
+        "amount": "Monto total",
+        "city": "Ciudad"
+      }
+    },
+    "search": {
+      "title": "Hybrid Search (BM25 + Dense)",
+      "subtitle": "Combina coincidencia léxica con embeddings para máxima precisión.",
+      "placeholder": "Ej: cláusula de confidencialidad en contratos 2025",
+      "go": "Buscar",
+      "modes": { "bm25": "BM25", "dense": "Dense", "hybrid": "Hybrid" },
+      "score": "score",
+      "results": "resultados"
+    },
+    "clauses": {
+      "title": "Extracción de cláusulas en contratos",
+      "subtitle": "Detecta y clasifica cláusulas críticas con nivel de riesgo automático.",
+      "doc": "Contrato_Prestacion_Servicios_2026.pdf",
+      "items": {
+        "confidentiality": { "name": "Confidencialidad", "snippet": "Las partes se obligan a mantener en estricta reserva..." },
+        "payment": { "name": "Pago", "snippet": "El pago se efectuará dentro de los 30 días siguientes..." },
+        "indemnity": { "name": "Indemnización", "snippet": "El proveedor responderá por todo daño directo causado..." },
+        "termination": { "name": "Terminación", "snippet": "Cualquiera de las partes podrá dar por terminado el contrato..." }
+      },
+      "risk": { "low": "Bajo", "medium": "Medio", "high": "Alto" }
+    },
+    "compare": {
+      "title": "Comparación inteligente entre versiones",
+      "subtitle": "Diff lado a lado con resaltado de adiciones, eliminaciones y cambios semánticos.",
+      "before": "v1.0 — original",
+      "after": "v1.1 — propuesta",
+      "summary": "3 adiciones · 2 eliminaciones · 1 cambio de cláusula"
+    },
+    "watermark": {
+      "title": "Watermarks dinámicas",
+      "subtitle": "Marca de agua personalizada por usuario y sesión, embebida al exportar.",
+      "label": "Visto por",
+      "id": "ID"
+    },
+    "retention": {
+      "title": "Retención & Legal Hold",
+      "subtitle": "Políticas por carpeta con bloqueo WORM (Write Once Read Many) y notificación legal.",
+      "headers": { "folder": "Carpeta", "policy": "Política", "expires": "Vence", "worm": "WORM", "hold": "Legal Hold" },
+      "policies": { "p7": "7 años", "p10": "10 años", "p3": "3 años", "perm": "Permanente" },
+      "active": "Activo",
+      "inactive": "Inactivo"
+    },
+    "encryption": {
+      "title": "Zero-knowledge encryption",
+      "subtitle": "El cliente posee las llaves. Ni siquiera Koptup puede leer el contenido.",
+      "toggle": "Activar cifrado BYO-key",
+      "badge": "BYO-key activo",
+      "flow": {
+        "1": "1. Cliente genera key local",
+        "2": "2. Documento se cifra en el navegador",
+        "3": "3. Solo el ciphertext viaja al servidor",
+        "4": "4. Descifrado solo con tu key"
+      }
+    },
+    "ediscovery": {
+      "title": "E-discovery export",
+      "subtitle": "Búsqueda compleja con filtros legales y exportación en formato EDRM.",
+      "keywords": "Palabras clave",
+      "custodian": "Custodio",
+      "dateFrom": "Desde",
+      "dateTo": "Hasta",
+      "format": "Formato",
+      "generate": "Generar bundle",
+      "ready": "Bundle listo: 248 documentos · 1.4 GB"
+    },
+    "sign": {
+      "title": "Firma electrónica integrada",
+      "subtitle": "Cuatro niveles de firma compatibles con eIDAS y Ley 527 de Colombia.",
+      "button": "Firmar electrónicamente",
+      "menuTitle": "Selecciona el nivel de firma",
+      "levels": {
+        "simple": { "name": "Simple", "desc": "Aceptación clic + IP + timestamp" },
+        "advanced": { "name": "Avanzada", "desc": "Identificación + autenticación biométrica" },
+        "qualified": { "name": "Cualificada", "desc": "Certificado emitido por entidad acreditada" },
+        "ley527": { "name": "Ley 527 CO", "desc": "Firma digital con certificado de entidad reconocida" }
+      }
+    },
+    "topbar": {
+      "modeLabel": "Modo",
+      "modeHint": "Cambia el algoritmo de búsqueda"
+    },
+    "uploadMenu": {
+      "label": "Subir documento",
+      "title": "Elige un canal de ingesta",
+      "subtitle": "Cinco vías oficiales para entrar documentos al vault."
+    },
+    "viewer": {
+      "actionsTitle": "Acciones PRO",
+      "processOcr": "Procesar con OCR",
+      "detectClauses": "Detectar cláusulas",
+      "compareVersions": "Comparar versiones",
+      "watermarkToggle": "Aplicar marca de agua",
+      "watermarkOn": "Marca de agua activa",
+      "encryptionBadge": "Cifrado zero-knowledge BYO-key",
+      "encryptionTooltip": "Solo el cliente posee las llaves; el contenido nunca viaja en claro.",
+      "close": "Cerrar"
+    },
+    "globalActions": {
+      "ediscovery": "E-discovery",
+      "encryption": "Cifrado",
+      "ediscoveryTitle": "Búsqueda E-discovery",
+      "encryptionTitle": "Configuración de cifrado"
+    },
+    "folderBadges": {
+      "worm": "WORM",
+      "hold": "Legal Hold",
+      "policyShort": "Retención",
+      "openPanel": "Ver políticas de retención"
+    }
+  }
+}

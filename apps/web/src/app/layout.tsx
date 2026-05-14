@@ -112,19 +112,44 @@ export const metadata = {
   },
 };
 
-// Load messages based on locale
+// Load messages based on locale (root + per-demo files in messages/demos/*.{locale}.json)
 async function getMessages(locale: string) {
+  let base: Record<string, any>;
   try {
-    return (await import(`../../messages/${locale}.json`)).default;
+    base = (await import(`../../messages/${locale}.json`)).default;
   } catch (error) {
     console.error(`Failed to load messages for ${locale}, falling back to es`, error);
     try {
-      return (await import('../../messages/es.json')).default;
+      base = (await import('../../messages/es.json')).default;
     } catch (fallbackError) {
       console.error('Failed to load fallback messages', fallbackError);
-      return {};
+      base = {};
     }
   }
+
+  // Merge per-demo + per-service messages so client components resolve demoCrm, demosExtra, service_*, etc.
+  try {
+    const fs = await import('fs');
+    const path = await import('path');
+    for (const subdir of ['demos', 'services']) {
+      const dir = path.join(process.cwd(), 'messages', subdir);
+      if (!fs.existsSync(dir)) continue;
+      const files = fs.readdirSync(dir).filter((f) => f.endsWith(`.${locale}.json`));
+      for (const file of files) {
+        try {
+          const raw = fs.readFileSync(path.join(dir, file), 'utf8');
+          const json = JSON.parse(raw);
+          base = { ...base, ...json };
+        } catch (e) {
+          console.error(`[layout] failed to load ${subdir} messages: ${file}`, e);
+        }
+      }
+    }
+  } catch (e) {
+    console.error('[layout] failed to read messages subdirs', e);
+  }
+
+  return base;
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

@@ -6,16 +6,10 @@ import {
   RectangleStackIcon,
   PlusIcon,
   EllipsisVerticalIcon,
-  UserCircleIcon,
   CalendarIcon,
-  FlagIcon,
-  TagIcon,
   ChatBubbleLeftRightIcon,
   PaperClipIcon,
-  ClockIcon,
   XMarkIcon,
-  CheckIcon,
-  ArrowPathIcon,
   StarIcon,
   BellIcon,
   Cog6ToothIcon,
@@ -23,53 +17,45 @@ import {
   TrashIcon,
   PencilIcon,
   DocumentDuplicateIcon,
+  SparklesIcon,
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid, BellAlertIcon } from '@heroicons/react/24/solid';
 
-interface Task {
-  id: number;
-  title: string;
-  description: string;
-  assignee: string;
-  dueDate: string;
-  priority: 'alta' | 'media' | 'baja';
-  tags: string[];
-  column: string;
-  comments: Comment[];
-  attachments: number;
-  checklist: { item: string; done: boolean }[];
-}
+import type { Task, Comment, Project, Notification, Column, ViewId } from './types';
+import { getPriorityColor, getTaskProgress } from './taskHelpers';
+import SprintHeader from './components/SprintHeader';
+import ViewSelector from './components/ViewSelector';
+import TaskCardBadges from './components/TaskCardBadges';
+import AIInsightsDrawer from './components/AIInsightsDrawer';
+import ProjectSettingsModal from './components/ProjectSettingsModal';
+import TemplatesModal from './components/TemplatesModal';
+import IntegrationsPanel from './components/IntegrationsPanel';
+import ListView from './components/ListView';
+import GanttView from './components/GanttView';
+import TimelineView from './components/TimelineView';
+import CalendarView from './components/CalendarView';
+import MindmapView from './components/MindmapView';
+import SwimlanesView from './components/SwimlanesView';
+import BoardView from './components/BoardView';
+import WikiTab from './components/WikiTab';
+import AnalyticsTab from './components/AnalyticsTab';
 
-interface Comment {
-  id: number;
-  author: string;
-  text: string;
-  timestamp: string;
-}
-
-interface Project {
-  id: number;
-  name: string;
-  color: string;
-  favorite: boolean;
-}
-
-interface Notification {
-  id: number;
-  title: string;
-  message: string;
-  time: string;
-  read: boolean;
-}
+type SectionId = 'board' | 'project' | 'favorites' | 'notifications' | 'settings';
 
 export default function ControlProyectos() {
   const t = useTranslations('projectManager');
+  const tShell = useTranslations('demoProjectsPro.shell');
 
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [view, setView] = useState<'board' | 'project' | 'calendar' | 'favorites' | 'notifications' | 'settings'>('board');
+  const [section, setSection] = useState<SectionId>('board');
+  const [view, setView] = useState<ViewId>('kanban');
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
+  const [showTemplatesModal, setShowTemplatesModal] = useState(false);
   const [showNewTaskModal, setShowNewTaskModal] = useState<string | null>(null);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [showAIDrawer, setShowAIDrawer] = useState(false);
+  const [hasAIUpdate, setHasAIUpdate] = useState(true);
   const [newComment, setNewComment] = useState('');
   const [taskMenuOpen, setTaskMenuOpen] = useState<number | null>(null);
 
@@ -97,7 +83,7 @@ export default function ControlProyectos() {
       tags: ['Diseño', 'Frontend'],
       column: 'todo',
       comments: [
-        { id: 1, author: 'María G.', text: 'Iniciando con los wireframes', timestamp: 'Hace 3 horas' }
+        { id: 1, author: 'María G.', text: 'Iniciando con los wireframes', timestamp: 'Hace 3 horas' },
       ],
       attachments: 2,
       checklist: [
@@ -116,7 +102,7 @@ export default function ControlProyectos() {
       tags: ['Backend', 'API'],
       column: 'progress',
       comments: [
-        { id: 1, author: 'Carlos R.', text: 'Ya terminé los endpoints de usuarios, ahora voy con productos.', timestamp: 'Hace 2 horas' }
+        { id: 1, author: 'Carlos R.', text: 'Ya terminé los endpoints de usuarios, ahora voy con productos.', timestamp: 'Hace 2 horas' },
       ],
       attachments: 1,
       checklist: [
@@ -195,25 +181,12 @@ export default function ControlProyectos() {
     },
   ]);
 
-  const columns = [
+  const columns: Column[] = [
     { id: 'todo', title: 'Por Hacer', color: 'bg-slate-200 dark:bg-slate-800' },
     { id: 'progress', title: 'En Progreso', color: 'bg-blue-200 dark:bg-blue-950' },
     { id: 'review', title: 'En Revisión', color: 'bg-yellow-200 dark:bg-yellow-950' },
     { id: 'done', title: 'Terminado', color: 'bg-green-200 dark:bg-green-950' },
   ];
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'alta':
-        return 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400';
-      case 'media':
-        return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-400';
-      case 'baja':
-        return 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400';
-      default:
-        return 'bg-slate-100 text-slate-700';
-    }
-  };
 
   const handleDragStart = (task: Task) => {
     setDraggedTask(task);
@@ -225,36 +198,26 @@ export default function ControlProyectos() {
 
   const handleDrop = (columnId: string) => {
     if (draggedTask) {
-      setTasks(tasks.map(task =>
-        task.id === draggedTask.id ? { ...task, column: columnId } : task
-      ));
+      setTasks(tasks.map((task) => (task.id === draggedTask.id ? { ...task, column: columnId } : task)));
       setDraggedTask(null);
     }
   };
 
-  const getTaskProgress = (task: Task) => {
-    const total = task.checklist.length;
-    const done = task.checklist.filter(item => item.done).length;
-    return total > 0 ? Math.round((done / total) * 100) : 0;
-  };
-
   const getTotalProgress = () => {
-    const doneTasks = tasks.filter(t => t.column === 'done').length;
+    const doneTasks = tasks.filter((tk) => tk.column === 'done').length;
     return Math.round((doneTasks / tasks.length) * 100);
   };
 
   const getOverdueTasks = () => {
     const today = new Date();
-    return tasks.filter(t => {
-      const dueDate = new Date(t.dueDate);
-      return dueDate < today && t.column !== 'done';
+    return tasks.filter((tk) => {
+      const dueDate = new Date(tk.dueDate);
+      return dueDate < today && tk.column !== 'done';
     });
   };
 
   const toggleFavorite = (projectId: number) => {
-    setProjects(projects.map(p =>
-      p.id === projectId ? { ...p, favorite: !p.favorite } : p
-    ));
+    setProjects(projects.map((p) => (p.id === projectId ? { ...p, favorite: !p.favorite } : p)));
   };
 
   const addNewProject = (name: string, color: string) => {
@@ -287,7 +250,7 @@ export default function ControlProyectos() {
   };
 
   const deleteTask = (taskId: number) => {
-    setTasks(tasks.filter(t => t.id !== taskId));
+    setTasks(tasks.filter((tk) => tk.id !== taskId));
     setTaskMenuOpen(null);
     setSelectedTask(null);
   };
@@ -303,17 +266,19 @@ export default function ControlProyectos() {
   };
 
   const toggleChecklistItem = (taskId: number, itemIndex: number) => {
-    setTasks(tasks.map(task => {
-      if (task.id === taskId) {
-        const newChecklist = [...task.checklist];
-        newChecklist[itemIndex] = { ...newChecklist[itemIndex], done: !newChecklist[itemIndex].done };
-        return { ...task, checklist: newChecklist };
-      }
-      return task;
-    }));
+    setTasks(
+      tasks.map((task) => {
+        if (task.id === taskId) {
+          const newChecklist = [...task.checklist];
+          newChecklist[itemIndex] = { ...newChecklist[itemIndex], done: !newChecklist[itemIndex].done };
+          return { ...task, checklist: newChecklist };
+        }
+        return task;
+      })
+    );
 
     if (selectedTask && selectedTask.id === taskId) {
-      const updatedTask = tasks.find(t => t.id === taskId);
+      const updatedTask = tasks.find((tk) => tk.id === taskId);
       if (updatedTask) {
         const newChecklist = [...updatedTask.checklist];
         newChecklist[itemIndex] = { ...newChecklist[itemIndex], done: !newChecklist[itemIndex].done };
@@ -332,11 +297,11 @@ export default function ControlProyectos() {
       timestamp: t('justNow'),
     };
 
-    setTasks(tasks.map(task =>
-      task.id === selectedTask.id
-        ? { ...task, comments: [...task.comments, comment] }
-        : task
-    ));
+    setTasks(
+      tasks.map((task) =>
+        task.id === selectedTask.id ? { ...task, comments: [...task.comments, comment] } : task
+      )
+    );
 
     setSelectedTask({
       ...selectedTask,
@@ -347,18 +312,22 @@ export default function ControlProyectos() {
   };
 
   const markNotificationAsRead = (notifId: number) => {
-    setNotifications(notifications.map(n =>
-      n.id === notifId ? { ...n, read: true } : n
-    ));
+    setNotifications(notifications.map((n) => (n.id === notifId ? { ...n, read: true } : n)));
   };
 
-  // Notifications View
-  if (view === 'notifications') {
+  const openAIDrawer = () => {
+    setShowAIDrawer(true);
+    setHasAIUpdate(false);
+  };
+
+  // ---------- SECONDARY SECTIONS (sidebar destinations) ----------
+
+  if (section === 'notifications') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-8">
         <div className="max-w-4xl mx-auto">
           <button
-            onClick={() => setView('board')}
+            onClick={() => setSection('board')}
             className="text-teal-600 dark:text-teal-400 hover:underline mb-6"
           >
             {t('backToBoard')}
@@ -368,7 +337,7 @@ export default function ControlProyectos() {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{t('notifications')}</h2>
               <button
-                onClick={() => setNotifications(notifications.map(n => ({ ...n, read: true })))}
+                onClick={() => setNotifications(notifications.map((n) => ({ ...n, read: true })))}
                 className="text-sm text-teal-600 dark:text-teal-400 hover:underline"
               >
                 {t('markAllRead')}
@@ -389,12 +358,14 @@ export default function ControlProyectos() {
                   <div className="flex items-start gap-3">
                     <BellAlertIcon className={`w-5 h-5 mt-0.5 ${notif.read ? 'text-slate-400' : 'text-teal-600'}`} />
                     <div className="flex-1">
-                      <h3 className={`font-semibold mb-1 ${notif.read ? 'text-slate-700 dark:text-slate-300' : 'text-slate-900 dark:text-white'}`}>
+                      <h3
+                        className={`font-semibold mb-1 ${
+                          notif.read ? 'text-slate-700 dark:text-slate-300' : 'text-slate-900 dark:text-white'
+                        }`}
+                      >
                         {notif.title}
                       </h3>
-                      <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">
-                        {notif.message}
-                      </p>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">{notif.message}</p>
                       <p className="text-xs text-slate-500">{notif.time}</p>
                     </div>
                   </div>
@@ -407,13 +378,12 @@ export default function ControlProyectos() {
     );
   }
 
-  // Favorites View
-  if (view === 'favorites') {
+  if (section === 'favorites') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-8">
         <div className="max-w-6xl mx-auto">
           <button
-            onClick={() => setView('board')}
+            onClick={() => setSection('board')}
             className="text-teal-600 dark:text-teal-400 hover:underline mb-6"
           >
             {t('backToBoard')}
@@ -422,46 +392,47 @@ export default function ControlProyectos() {
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-8">{t('favoriteProjects')}</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {projects.filter(p => p.favorite).map((project) => (
-              <div key={project.id} className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-4 h-4 ${project.color} rounded-full`} />
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">{project.name}</h3>
+            {projects
+              .filter((p) => p.favorite)
+              .map((project) => (
+                <div key={project.id} className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-4 h-4 ${project.color} rounded-full`} />
+                      <h3 className="text-xl font-bold text-slate-900 dark:text-white">{project.name}</h3>
+                    </div>
+                    <button
+                      onClick={() => toggleFavorite(project.id)}
+                      className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                    >
+                      <StarIconSolid className="w-6 h-6 text-yellow-500" />
+                    </button>
                   </div>
-                  <button
-                    onClick={() => toggleFavorite(project.id)}
-                    className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                  >
-                    <StarIconSolid className="w-6 h-6 text-yellow-500" />
-                  </button>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    {tasks.filter(t => t.column !== 'done').length} {t('activeTasks')}
-                  </p>
-                  <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full ${project.color} rounded-full transition-all`}
-                      style={{ width: `${getTotalProgress()}%` }}
-                    />
+                  <div className="space-y-2">
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                      {tasks.filter((tk) => tk.column !== 'done').length} {t('activeTasks')}
+                    </p>
+                    <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full ${project.color} rounded-full transition-all`}
+                        style={{ width: `${getTotalProgress()}%` }}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       </div>
     );
   }
 
-  // Settings View
-  if (view === 'settings') {
+  if (section === 'settings') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-8">
         <div className="max-w-4xl mx-auto">
           <button
-            onClick={() => setView('board')}
+            onClick={() => setSection('board')}
             className="text-teal-600 dark:text-teal-400 hover:underline mb-6"
           >
             {t('backToBoard')}
@@ -474,7 +445,10 @@ export default function ControlProyectos() {
               <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">{t('settingsProjects')}</h3>
               <div className="space-y-3">
                 {projects.map((project) => (
-                  <div key={project.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  <div
+                    key={project.id}
+                    className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <div className={`w-4 h-4 ${project.color} rounded-full`} />
                       <span className="font-medium">{project.name}</span>
@@ -547,23 +521,20 @@ export default function ControlProyectos() {
     );
   }
 
-  if (view === 'project') {
+  if (section === 'project') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-8">
         <div className="max-w-7xl mx-auto">
           <button
-            onClick={() => setView('board')}
+            onClick={() => setSection('board')}
             className="text-teal-600 dark:text-teal-400 hover:underline mb-6"
           >
             {t('backToBoard')}
           </button>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            {/* Progress Card */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-                {t('totalProgress')}
-              </h3>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">{t('totalProgress')}</h3>
               <div className="flex items-center justify-center">
                 <div className="relative w-32 h-32">
                   <svg className="transform -rotate-90 w-32 h-32">
@@ -588,65 +559,49 @@ export default function ControlProyectos() {
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-3xl font-bold text-slate-900 dark:text-white">
-                      {getTotalProgress()}%
-                    </span>
+                    <span className="text-3xl font-bold text-slate-900 dark:text-white">{getTotalProgress()}%</span>
                   </div>
                 </div>
               </div>
               <p className="text-center text-sm text-slate-600 dark:text-slate-400 mt-4">
-                {tasks.filter(t => t.column === 'done').length} {t('tasksCompleted', { total: tasks.length })}
+                {tasks.filter((tk) => tk.column === 'done').length} {t('tasksCompleted', { total: tasks.length })}
               </p>
             </div>
 
-            {/* Overdue Tasks */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-                {t('overdueTasks')}
-              </h3>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">{t('overdueTasks')}</h3>
               <div className="text-center">
-                <div className="text-5xl font-bold text-red-600 mb-2">
-                  {getOverdueTasks().length}
-                </div>
-                <p className="text-sm text-slate-600 dark:text-slate-400">
-                  {t('requireAttention')}
-                </p>
+                <div className="text-5xl font-bold text-red-600 mb-2">{getOverdueTasks().length}</div>
+                <p className="text-sm text-slate-600 dark:text-slate-400">{t('requireAttention')}</p>
               </div>
               <div className="mt-4 space-y-2">
-                {getOverdueTasks().slice(0, 3).map((task) => (
-                  <div key={task.id} className="p-2 bg-red-50 dark:bg-red-950 rounded-lg">
-                    <p className="text-sm font-medium text-slate-900 dark:text-white">
-                      {task.title}
-                    </p>
-                    <p className="text-xs text-red-600 dark:text-red-400">
-                      {t('dueDateLabel')} {task.dueDate}
-                    </p>
-                  </div>
-                ))}
+                {getOverdueTasks()
+                  .slice(0, 3)
+                  .map((task) => (
+                    <div key={task.id} className="p-2 bg-red-50 dark:bg-red-950 rounded-lg">
+                      <p className="text-sm font-medium text-slate-900 dark:text-white">{task.title}</p>
+                      <p className="text-xs text-red-600 dark:text-red-400">
+                        {t('dueDateLabel')} {task.dueDate}
+                      </p>
+                    </div>
+                  ))}
               </div>
             </div>
 
-            {/* Stats */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-                {t('statistics')}
-              </h3>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">{t('statistics')}</h3>
               <div className="space-y-4">
                 {columns.map((col) => (
                   <div key={col.id}>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm text-slate-600 dark:text-slate-400">
-                        {col.title}
-                      </span>
-                      <span className="text-sm font-semibold">
-                        {tasks.filter(t => t.column === col.id).length}
-                      </span>
+                      <span className="text-sm text-slate-600 dark:text-slate-400">{col.title}</span>
+                      <span className="text-sm font-semibold">{tasks.filter((tk) => tk.column === col.id).length}</span>
                     </div>
                     <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-teal-600 rounded-full transition-all"
                         style={{
-                          width: `${(tasks.filter(t => t.column === col.id).length / tasks.length) * 100}%`
+                          width: `${(tasks.filter((tk) => tk.column === col.id).length / tasks.length) * 100}%`,
                         }}
                       />
                     </div>
@@ -656,11 +611,8 @@ export default function ControlProyectos() {
             </div>
           </div>
 
-          {/* Calendar View */}
           <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-6">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-              {t('deadlineCalendar')}
-            </h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">{t('deadlineCalendar')}</h3>
             <div className="grid grid-cols-7 gap-2">
               {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((day) => (
                 <div key={day} className="text-center text-sm font-semibold text-slate-500 py-2">
@@ -669,7 +621,7 @@ export default function ControlProyectos() {
               ))}
               {Array.from({ length: 35 }, (_, i) => {
                 const day = i - 2;
-                const hasDeadline = tasks.some(t => new Date(t.dueDate).getDate() === day + 1);
+                const hasDeadline = tasks.some((tk) => new Date(tk.dueDate).getDate() === day + 1);
                 return (
                   <div
                     key={i}
@@ -692,10 +644,11 @@ export default function ControlProyectos() {
     );
   }
 
-  // Board View
+  // ---------- MAIN BOARD SECTION ----------
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-      <div className="flex h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex flex-col">
+      <div className="flex flex-1 min-h-0">
         {/* Sidebar */}
         <aside className="hidden md:flex md:w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex-col">
           <div className="p-6 border-b border-slate-200 dark:border-slate-800">
@@ -707,7 +660,7 @@ export default function ControlProyectos() {
             </div>
 
             <button
-              onClick={() => setShowNewProjectModal(true)}
+              onClick={() => setShowTemplatesModal(true)}
               className="w-full bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-lg px-4 py-3 font-semibold hover:from-teal-700 hover:to-cyan-700 transition-all shadow-lg flex items-center justify-center gap-2"
             >
               <PlusIcon className="w-5 h-5" />
@@ -736,26 +689,26 @@ export default function ControlProyectos() {
 
             <div className="border-t border-slate-200 dark:border-slate-800 pt-4 mt-4">
               <button
-                onClick={() => setView('favorites')}
+                onClick={() => setSection('favorites')}
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors"
               >
                 <StarIcon className="w-5 h-5" />
                 <span className="text-sm font-medium">{t('favorites')}</span>
               </button>
               <button
-                onClick={() => setView('notifications')}
+                onClick={() => setSection('notifications')}
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors"
               >
                 <BellIcon className="w-5 h-5" />
                 <span className="text-sm font-medium">{t('notifications')}</span>
-                {notifications.filter(n => !n.read).length > 0 && (
+                {notifications.filter((n) => !n.read).length > 0 && (
                   <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-                    {notifications.filter(n => !n.read).length}
+                    {notifications.filter((n) => !n.read).length}
                   </span>
                 )}
               </button>
               <button
-                onClick={() => setView('settings')}
+                onClick={() => setSection('settings')}
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors"
               >
                 <Cog6ToothIcon className="w-5 h-5" />
@@ -769,28 +722,48 @@ export default function ControlProyectos() {
         <main className="flex-1 flex flex-col overflow-hidden">
           {/* Header */}
           <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-3 sm:px-6 sm:py-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">
-                  {t('mainProject')}
-                </h1>
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div className="min-w-0">
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1 truncate">{t('mainProject')}</h1>
                 <p className="text-sm text-slate-600 dark:text-slate-400">
                   {t('tasksCount', { count: tasks.length, progress: getTotalProgress() })}
                 </p>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                 <button
-                  onClick={() => setView('project')}
+                  onClick={openAIDrawer}
+                  className="relative px-3 py-2 text-sm sm:text-base rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow flex items-center gap-2 transition-all"
+                  aria-label={tShell('aiInsights')}
+                >
+                  <SparklesIcon className="w-5 h-5" />
+                  <span className="hidden sm:inline">{tShell('aiInsights')}</span>
+                  {hasAIUpdate && (
+                    <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-pink-500" />
+                    </span>
+                  )}
+                </button>
+                <button
+                  onClick={() => setShowSettingsModal(true)}
+                  className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                  aria-label={tShell('configure')}
+                  title={tShell('configure')}
+                >
+                  <Cog6ToothIcon className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => setSection('project')}
                   className="px-3 py-2 text-sm sm:px-4 sm:py-2 sm:text-base bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
                 >
                   <ChartPieIcon className="w-5 h-5" />
-                  {t('viewProjectBtn')}
+                  <span className="hidden sm:inline">{t('viewProjectBtn')}</span>
                 </button>
-                <div className="flex -space-x-2">
+                <div className="hidden lg:flex -space-x-2">
                   {['MG', 'CR', 'AM', 'PL'].map((initials, i) => (
                     <div
                       key={i}
-                      className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-400 to-cyan-400 flex items-center justify-center text-white font-semibold text-sm border-2 border-white dark:border-slate-900"
+                      className="w-9 h-9 rounded-full bg-gradient-to-br from-teal-400 to-cyan-400 flex items-center justify-center text-white font-semibold text-sm border-2 border-white dark:border-slate-900"
                     >
                       {initials}
                     </div>
@@ -800,155 +773,203 @@ export default function ControlProyectos() {
             </div>
           </header>
 
-          {/* Kanban Board */}
-          <div className="flex-1 overflow-x-auto p-6">
-            <div className="flex gap-6 h-full">
-              {columns.map((column) => (
-                <div
-                  key={column.id}
-                  className="flex-shrink-0 w-80 flex flex-col"
-                  onDragOver={handleDragOver}
-                  onDrop={() => handleDrop(column.id)}
-                >
-                  <div className="mb-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <h2 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                        {column.title}
-                        <span className="text-sm font-normal text-slate-500">
-                          {tasks.filter(t => t.column === column.id).length}
-                        </span>
-                      </h2>
-                      <button
-                        onClick={() => setShowNewTaskModal(column.id)}
-                        className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors"
-                      >
-                        <PlusIcon className="w-5 h-5 text-slate-500" />
-                      </button>
-                    </div>
-                    <div className={`h-1 ${column.color} rounded-full`} />
-                  </div>
+          {/* Sprint Header (mini burndown + velocity + capacity inline) */}
+          <SprintHeader />
 
-                  <div className="flex-1 space-y-3 overflow-y-auto">
-                    {tasks
-                      .filter(task => task.column === column.id)
-                      .map((task) => (
-                        <div
-                          key={task.id}
-                          draggable
-                          onDragStart={() => handleDragStart(task)}
-                          onClick={() => setSelectedTask(task)}
-                          className="bg-white dark:bg-slate-900 rounded-xl shadow-md hover:shadow-xl transition-all cursor-move p-4 border-2 border-transparent hover:border-teal-500"
-                        >
-                          <div className="flex items-start justify-between mb-3">
-                            <h3 className="font-semibold text-slate-900 dark:text-white flex-1">
-                              {task.title}
-                            </h3>
-                            <div className="relative">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setTaskMenuOpen(taskMenuOpen === task.id ? null : task.id);
-                                }}
-                                className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors"
-                              >
-                                <EllipsisVerticalIcon className="w-5 h-5 text-slate-400" />
-                              </button>
+          {/* View Selector tabs: 8 views + analytics + wiki */}
+          <ViewSelector active={view} onChange={setView} />
 
-                              {taskMenuOpen === task.id && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 z-10">
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      duplicateTask(task);
-                                    }}
-                                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                                  >
-                                    <DocumentDuplicateIcon className="w-4 h-4" />
-                                    {t('duplicate')}
-                                  </button>
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      deleteTask(task.id);
-                                    }}
-                                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 transition-colors"
-                                  >
-                                    <TrashIcon className="w-4 h-4" />
-                                    {t('delete')}
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-
-                          <p className="text-sm text-slate-600 dark:text-slate-400 mb-3 line-clamp-2">
-                            {task.description}
-                          </p>
-
-                          <div className="flex flex-wrap gap-1 mb-3">
-                            {task.tags.map((tag, i) => (
-                              <span
-                                key={i}
-                                className="px-2 py-1 bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-400 rounded text-xs font-medium"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-
-                          {task.checklist.length > 0 && (
-                            <div className="mb-3">
-                              <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-                                <span>{t('progress')}</span>
-                                <span>{getTaskProgress(task)}%</span>
-                              </div>
-                              <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-teal-600 rounded-full transition-all"
-                                  style={{ width: `${getTaskProgress(task)}%` }}
-                                />
-                              </div>
-                            </div>
-                          )}
-
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3 text-slate-500 text-sm">
-                              {task.comments.length > 0 && (
-                                <div className="flex items-center gap-1">
-                                  <ChatBubbleLeftRightIcon className="w-4 h-4" />
-                                  <span>{task.comments.length}</span>
-                                </div>
-                              )}
-                              {task.attachments > 0 && (
-                                <div className="flex items-center gap-1">
-                                  <PaperClipIcon className="w-4 h-4" />
-                                  <span>{task.attachments}</span>
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className={`px-2 py-1 rounded text-xs font-semibold ${getPriorityColor(task.priority)}`}>
-                                {task.priority}
-                              </span>
-                              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-teal-400 to-cyan-400 flex items-center justify-center text-white text-xs font-semibold">
-                                {task.assignee.split(' ').map(n => n[0]).join('')}
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-1 mt-3 pt-3 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500">
-                            <CalendarIcon className="w-4 h-4" />
-                            <span>{task.dueDate}</span>
-                          </div>
+          {/* View Content */}
+          <div className="flex-1 overflow-y-auto">
+            {view === 'kanban' && (
+              <div className="overflow-x-auto p-6">
+                <div className="flex gap-6 h-full">
+                  {columns.map((column) => (
+                    <div
+                      key={column.id}
+                      className="flex-shrink-0 w-80 flex flex-col"
+                      onDragOver={handleDragOver}
+                      onDrop={() => handleDrop(column.id)}
+                    >
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <h2 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            {column.title}
+                            <span className="text-sm font-normal text-slate-500">
+                              {tasks.filter((tk) => tk.column === column.id).length}
+                            </span>
+                          </h2>
+                          <button
+                            onClick={() => setShowNewTaskModal(column.id)}
+                            className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors"
+                            aria-label={t('newTask')}
+                          >
+                            <PlusIcon className="w-5 h-5 text-slate-500" />
+                          </button>
                         </div>
-                      ))}
-                  </div>
+                        <div className={`h-1 ${column.color} rounded-full`} />
+                      </div>
+
+                      <div className="flex-1 space-y-3 overflow-y-auto">
+                        {tasks
+                          .filter((task) => task.column === column.id)
+                          .map((task) => (
+                            <div
+                              key={task.id}
+                              draggable
+                              onDragStart={() => handleDragStart(task)}
+                              onClick={() => setSelectedTask(task)}
+                              className="bg-white dark:bg-slate-900 rounded-xl shadow-md hover:shadow-xl transition-all cursor-move p-4 border-2 border-transparent hover:border-teal-500"
+                            >
+                              <div className="flex items-start justify-between mb-3">
+                                <h3 className="font-semibold text-slate-900 dark:text-white flex-1">{task.title}</h3>
+                                <div className="relative">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setTaskMenuOpen(taskMenuOpen === task.id ? null : task.id);
+                                    }}
+                                    className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors"
+                                    aria-label="task-menu"
+                                  >
+                                    <EllipsisVerticalIcon className="w-5 h-5 text-slate-400" />
+                                  </button>
+
+                                  {taskMenuOpen === task.id && (
+                                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 z-10">
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          duplicateTask(task);
+                                        }}
+                                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                                      >
+                                        <DocumentDuplicateIcon className="w-4 h-4" />
+                                        {t('duplicate')}
+                                      </button>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          deleteTask(task.id);
+                                        }}
+                                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 transition-colors"
+                                      >
+                                        <TrashIcon className="w-4 h-4" />
+                                        {t('delete')}
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              <p className="text-sm text-slate-600 dark:text-slate-400 mb-3 line-clamp-2">
+                                {task.description}
+                              </p>
+
+                              <div className="flex flex-wrap gap-1 mb-2">
+                                {task.tags.map((tag, i) => (
+                                  <span
+                                    key={i}
+                                    className="px-2 py-1 bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-400 rounded text-xs font-medium"
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+
+                              {/* AI badges: priority score + deps + risk + time logged */}
+                              <TaskCardBadges taskId={task.id} />
+
+                              {task.checklist.length > 0 && (
+                                <div className="mt-3">
+                                  <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+                                    <span>{t('progress')}</span>
+                                    <span>{getTaskProgress(task)}%</span>
+                                  </div>
+                                  <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                    <div
+                                      className="h-full bg-teal-600 rounded-full transition-all"
+                                      style={{ width: `${getTaskProgress(task)}%` }}
+                                    />
+                                  </div>
+                                </div>
+                              )}
+
+                              <div className="flex items-center justify-between mt-3">
+                                <div className="flex items-center gap-3 text-slate-500 text-sm">
+                                  {task.comments.length > 0 && (
+                                    <div className="flex items-center gap-1">
+                                      <ChatBubbleLeftRightIcon className="w-4 h-4" />
+                                      <span>{task.comments.length}</span>
+                                    </div>
+                                  )}
+                                  {task.attachments > 0 && (
+                                    <div className="flex items-center gap-1">
+                                      <PaperClipIcon className="w-4 h-4" />
+                                      <span>{task.attachments}</span>
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className={`px-2 py-1 rounded text-xs font-semibold ${getPriorityColor(task.priority)}`}
+                                  >
+                                    {task.priority}
+                                  </span>
+                                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-teal-400 to-cyan-400 flex items-center justify-center text-white text-xs font-semibold">
+                                    {task.assignee.split(' ').map((n) => n[0]).join('')}
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-1 mt-3 pt-3 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500">
+                                <CalendarIcon className="w-4 h-4" />
+                                <span>{task.dueDate}</span>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
+
+            {view === 'list' && <ListView tasks={tasks} columns={columns} onSelect={setSelectedTask} />}
+            {view === 'gantt' && <GanttView tasks={tasks} onSelect={setSelectedTask} />}
+            {view === 'timeline' && <TimelineView tasks={tasks} onSelect={setSelectedTask} />}
+            {view === 'calendar' && <CalendarView tasks={tasks} onSelect={setSelectedTask} />}
+            {view === 'board' && <BoardView tasks={tasks} columns={columns} onSelect={setSelectedTask} />}
+            {view === 'mindmap' && <MindmapView tasks={tasks} onSelect={setSelectedTask} />}
+            {view === 'swimlanes' && <SwimlanesView tasks={tasks} columns={columns} onSelect={setSelectedTask} />}
+            {view === 'analytics' && <AnalyticsTab />}
+            {view === 'wiki' && <WikiTab />}
           </div>
         </main>
       </div>
+
+      {/* Footer: integrations collapsible */}
+      <IntegrationsPanel />
+
+      {/* AI Insights Drawer */}
+      <AIInsightsDrawer open={showAIDrawer} onClose={() => setShowAIDrawer(false)} />
+
+      {/* Project Settings Modal */}
+      <ProjectSettingsModal open={showSettingsModal} onClose={() => setShowSettingsModal(false)} />
+
+      {/* Templates Modal */}
+      <TemplatesModal
+        open={showTemplatesModal}
+        onClose={() => setShowTemplatesModal(false)}
+        onUseTemplate={(name) => {
+          addNewProject(name, 'bg-teal-500');
+          setShowTemplatesModal(false);
+        }}
+        onStartFromScratch={() => {
+          setShowTemplatesModal(false);
+          setShowNewProjectModal(true);
+        }}
+      />
 
       {/* New Project Modal */}
       {showNewProjectModal && (
@@ -960,14 +981,13 @@ export default function ControlProyectos() {
           <div className="fixed inset-0 flex items-center justify-center z-50">
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-6 w-full max-w-md z-[200]">
               <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">{t('newProjectTitle')}</h3>
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                const formData = new FormData(e.currentTarget);
-                addNewProject(
-                  formData.get('name') as string,
-                  formData.get('color') as string
-                );
-              }}>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const formData = new FormData(e.currentTarget);
+                  addNewProject(formData.get('name') as string, formData.get('color') as string);
+                }}
+              >
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
@@ -1030,15 +1050,17 @@ export default function ControlProyectos() {
           <div className="fixed inset-0 flex items-center justify-center z-50">
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-6 w-full max-w-md z-[200]">
               <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">{t('newTask')}</h3>
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                const formData = new FormData(e.currentTarget);
-                addNewTask(
-                  showNewTaskModal,
-                  formData.get('title') as string,
-                  formData.get('description') as string
-                );
-              }}>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const formData = new FormData(e.currentTarget);
+                  addNewTask(
+                    showNewTaskModal,
+                    formData.get('title') as string,
+                    formData.get('description') as string
+                  );
+                }}
+              >
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
@@ -1096,16 +1118,17 @@ export default function ControlProyectos() {
             <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-6 z-10">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-                    {selectedTask.title}
-                  </h2>
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{selectedTask.title}</h2>
                   <div className="flex items-center gap-2 text-sm text-slate-500">
-                    <span>{t('inColumn', { column: columns.find(c => c.id === selectedTask.column)?.title ?? '' })}</span>
+                    <span>
+                      {t('inColumn', { column: columns.find((c) => c.id === selectedTask.column)?.title ?? '' })}
+                    </span>
                   </div>
                 </div>
                 <button
                   onClick={() => setSelectedTask(null)}
                   className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                  aria-label="close-task-detail"
                 >
                   <XMarkIcon className="w-6 h-6" />
                 </button>
@@ -1113,21 +1136,17 @@ export default function ControlProyectos() {
             </div>
 
             <div className="p-6 space-y-6">
-              {/* Description */}
               <div>
                 <h3 className="font-bold text-slate-900 dark:text-white mb-2">{t('description')}</h3>
-                <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-                  {selectedTask.description}
-                </p>
+                <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{selectedTask.description}</p>
               </div>
 
-              {/* Details */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <h4 className="text-sm font-semibold text-slate-500 mb-1">{t('assignedTo')}</h4>
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-400 to-cyan-400 flex items-center justify-center text-white text-sm font-semibold">
-                      {selectedTask.assignee.split(' ').map(n => n[0]).join('')}
+                      {selectedTask.assignee.split(' ').map((n) => n[0]).join('')}
                     </div>
                     <span className="font-medium">{selectedTask.assignee}</span>
                   </div>
@@ -1138,7 +1157,9 @@ export default function ControlProyectos() {
                 </div>
                 <div>
                   <h4 className="text-sm font-semibold text-slate-500 mb-1">{t('priority')}</h4>
-                  <span className={`inline-block px-3 py-1 rounded text-sm font-semibold ${getPriorityColor(selectedTask.priority)}`}>
+                  <span
+                    className={`inline-block px-3 py-1 rounded text-sm font-semibold ${getPriorityColor(selectedTask.priority)}`}
+                  >
                     {selectedTask.priority.charAt(0).toUpperCase() + selectedTask.priority.slice(1)}
                   </span>
                 </div>
@@ -1157,32 +1178,33 @@ export default function ControlProyectos() {
                 </div>
               </div>
 
-              {/* Checklist */}
+              {/* AI badges in detail */}
+              <div className="border-t border-slate-200 dark:border-slate-800 pt-4">
+                <TaskCardBadges taskId={selectedTask.id} />
+              </div>
+
               <div>
                 <h3 className="font-bold text-slate-900 dark:text-white mb-3">
-                  {t('checklist', { done: selectedTask.checklist.filter(item => item.done).length, total: selectedTask.checklist.length })}
+                  {t('checklist', {
+                    done: selectedTask.checklist.filter((item) => item.done).length,
+                    total: selectedTask.checklist.length,
+                  })}
                 </h3>
                 <div className="space-y-2">
                   {selectedTask.checklist.map((item, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg"
-                    >
+                    <div key={i} className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
                       <input
                         type="checkbox"
                         checked={item.done}
                         onChange={() => toggleChecklistItem(selectedTask.id, i)}
                         className="w-5 h-5 text-teal-600 rounded cursor-pointer"
                       />
-                      <span className={item.done ? 'line-through text-slate-400' : ''}>
-                        {item.item}
-                      </span>
+                      <span className={item.done ? 'line-through text-slate-400' : ''}>{item.item}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Comments */}
               <div>
                 <h3 className="font-bold text-slate-900 dark:text-white mb-3">
                   {t('comments', { count: selectedTask.comments.length })}
@@ -1192,16 +1214,14 @@ export default function ControlProyectos() {
                     <div key={comment.id} className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
                       <div className="flex items-start gap-3 mb-2">
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white text-sm font-semibold">
-                          {comment.author.split(' ').map(n => n[0]).join('')}
+                          {comment.author.split(' ').map((n) => n[0]).join('')}
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="font-semibold text-sm">{comment.author}</span>
                             <span className="text-xs text-slate-500">{comment.timestamp}</span>
                           </div>
-                          <p className="text-sm text-slate-600 dark:text-slate-400">
-                            {comment.text}
-                          </p>
+                          <p className="text-sm text-slate-600 dark:text-slate-400">{comment.text}</p>
                         </div>
                       </div>
                     </div>
@@ -1225,7 +1245,6 @@ export default function ControlProyectos() {
                 </div>
               </div>
 
-              {/* Attachments */}
               <div>
                 <h3 className="font-bold text-slate-900 dark:text-white mb-3">
                   {t('attachments', { count: selectedTask.attachments })}
@@ -1237,14 +1256,11 @@ export default function ControlProyectos() {
                       <p className="font-medium text-sm">diagrama-api.pdf</p>
                       <p className="text-xs text-slate-500">245 KB</p>
                     </div>
-                    <button className="text-teal-600 hover:text-teal-700 text-sm font-medium">
-                      {t('download')}
-                    </button>
+                    <button className="text-teal-600 hover:text-teal-700 text-sm font-medium">{t('download')}</button>
                   </div>
                 )}
               </div>
 
-              {/* Activity History */}
               <div>
                 <h3 className="font-bold text-slate-900 dark:text-white mb-3">{t('activityHistory')}</h3>
                 <div className="space-y-3">
@@ -1253,7 +1269,7 @@ export default function ControlProyectos() {
                     <div className="flex-1">
                       <p className="text-sm">
                         <span className="font-semibold">{selectedTask.assignee}</span> {t('movedTask')}{' '}
-                        <span className="font-semibold">{columns.find(c => c.id === selectedTask.column)?.title}</span>
+                        <span className="font-semibold">{columns.find((c) => c.id === selectedTask.column)?.title}</span>
                       </p>
                       <p className="text-xs text-slate-500">{t('hoursAgo')}</p>
                     </div>
