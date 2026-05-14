@@ -1,8 +1,52 @@
-# KopTup — Soluciones tecnológicas a medida
+<div align="center">
 
-[![CI/CD](https://github.com/ronalc90/koptup/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ronalc90/koptup/actions/workflows/ci.yml)
+# Koptup
 
-![KopTup Logo](https://via.placeholder.com/800x200/2563eb/ffffff?text=KopTup+Tech+Solutions)
+### Plataforma enterprise de soluciones tecnológicas a medida y SaaS
+
+[![CI/CD](https://github.com/ronalc90/koptup/actions/workflows/ci.yml/badge.svg)](https://github.com/ronalc90/koptup/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org)
+[![TailwindCSS](https://img.shields.io/badge/Tailwind-3-38bdf8?logo=tailwindcss)](https://tailwindcss.com)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green?logo=node.js)](https://nodejs.org)
+[![MongoDB](https://img.shields.io/badge/MongoDB-7-47A248?logo=mongodb)](https://www.mongodb.com)
+[![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o-412991?logo=openai)](https://openai.com)
+[![Vercel](https://img.shields.io/badge/Vercel-Deploy-black?logo=vercel)](https://vercel.com)
+[![Railway](https://img.shields.io/badge/Railway-Deploy-7B1FA2?logo=railway)](https://railway.app)
+
+**Empresa colombiana de desarrollo de software a medida con IA · 27 demos interactivos · 4 tiers por producto · Precios en COP y USD**
+
+[Demos en vivo](https://koptup.com/demo) · [Servicios y planes](https://koptup.com/services) · [Documentación](./README.md) · [Contribuir](./CONTRIBUTING.md)
+
+</div>
+
+---
+
+## Demo en vivo
+
+> **https://koptup.com** — Probá las 27 demos interactivas sin registrarte
+
+## Screenshots
+
+| Catálogo de demos | Chatbot RAG enterprise | Catálogo de servicios |
+|---|---|---|
+| ![Demos](https://github.com/ronalc90/koptup/raw/main/docs/screenshots/demos.png) | ![Chatbot](https://github.com/ronalc90/koptup/raw/main/docs/screenshots/chatbot.png) | ![Services](https://github.com/ronalc90/koptup/raw/main/docs/screenshots/services.png) |
+
+> Screenshots en preparación — las imágenes aparecerán cuando se publiquen los archivos en `docs/screenshots/`.
+
+## Stats
+
+| | |
+|---|---|
+| **27** | Demos enterprise funcionales |
+| **170+** | Tecnologías dominadas |
+| **8** | Países LatAm en facturación electrónica |
+| **4 × 2** | Tiers × Modalidades (compra/SaaS) por producto |
+| **2** | Idiomas (ES/EN) en toda la plataforma |
+| **GPT-4o** | LLM real integrado con OpenAI |
+
+---
 
 > Empresa colombiana de desarrollo de software a medida e implementación de soluciones con inteligencia artificial para PyMEs y compañías enterprise de LATAM.
 
