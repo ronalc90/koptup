@@ -1,0 +1,68 @@
+{
+  "offering_telemedicina": {
+    "name": "Plataforma de telemedicina",
+    "tagline": "Consultas remotas con historia clínica y recetas digitales",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Plataforma de telemedicina\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "HealthTech",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con consultas con video",
+        "incluye": [
+          "Hasta 300 consultas/mes",
+          "Video WebRTC",
+          "Historia clínica básica",
+          "Recordatorios email + WhatsApp",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y consultas con video",
+        "incluye": [
+          "Hasta 5.000 consultas/mes",
+          "Recetas digitales",
+          "Lab HL7 básico",
+          "Wearables (Apple Health/Fitbit)",
+          "eRX integrado",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de consultas con video",
+        "incluye": [
+          "Hasta 50.000 consultas/mes",
+          "HL7 FHIR completo",
+          "EHR clínicas (varias marcas)",
+          "Aseguradoras / EPS / IPS",
+          "Cumplimiento HABEAS DATA",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de consultas con video",
+        "incluye": [
+          "Hasta 500.000+ consultas/mes",
+          "Arquitectura alineada con HIPAA + Resolución 2654 (certificación a cargo del cliente)",
+          "PACS DICOM",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "Video managed (~$50–10.000 USD/mes), compliance y LLM los paga el cliente directo al proveedor."
+  }
+}

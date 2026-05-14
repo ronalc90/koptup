@@ -1,0 +1,68 @@
+{
+  "offering_sistemaReservas": {
+    "name": "Sistema de reservas",
+    "tagline": "Agendá citas, clases o turnos con calendarios sincronizados",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Sistema de reservas\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Productividad",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con reservas con confirmación",
+        "incluye": [
+          "Hasta 500 reservas/mes",
+          "Google Calendar 1 vía",
+          "Email recordatorios",
+          "Pasarela Stripe/Wompi",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y reservas con confirmación",
+        "incluye": [
+          "Hasta 8.000 reservas/mes",
+          "Outlook + Apple Calendar",
+          "Zoom auto-link",
+          "CRM HubSpot",
+          "WhatsApp recordatorios",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de reservas con confirmación",
+        "incluye": [
+          "Hasta 60.000 reservas/mes",
+          "Multi-sucursal con franquicias",
+          "Recursos compartidos (salas/equipos)",
+          "Marketplace privado",
+          "Reportes por sede",
+          "API GraphQL",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de reservas con confirmación",
+        "incluye": [
+          "Hasta 500.000+ reservas/mes",
+          "SIS/EHR adapter para salud",
+          "ERP/HRMS con disponibilidad de profesionales",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "SMS/WhatsApp (~$20–6.000 USD/mes) y pasarela de pagos los paga el cliente directo al proveedor."
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "offering_lmsElearning": {
+    "name": "E-learning LMS",
+    "tagline": "Launch online courses with payments, certificates and proctoring",
+    "description": "Custom build or monthly SaaS subscription of \"E-learning LMS\". Buy it as software (we hand over the code) or pay monthly while we host it for you.",
+    "categoryLabel": "Education",
+    "tiers": {
+      "basico": {
+        "name": "Basic",
+        "description": "To validate the idea with a limited scope",
+        "idealPara": "Small teams getting started with active students",
+        "incluye": [
+          "Up to 1,000 enrollments/month",
+          "Stripe/Wompi payments",
+          "Manual Zoom",
+          "Email reminders",
+          "Email support Mon–Fri 8AM–5PM Colombia, 24h business response"
+        ]
+      },
+      "profesional": {
+        "name": "Professional",
+        "description": "For teams with steady usage",
+        "idealPara": "SMBs with steady flow and active students",
+        "incluye": [
+          "Up to 20,000 enrollments/month",
+          "Auto-create Zoom meetings",
+          "SCORM/xAPI compatible",
+          "HRMS for certifications",
+          "Basic proctoring",
+          "Email + WhatsApp support, 4h business response",
+          "Monthly tier reports"
+        ]
+      },
+      "avanzado": {
+        "name": "Advanced",
+        "description": "Multi-channel with high volume and personalization",
+        "idealPara": "Mid-market companies with high volumes of active students",
+        "incluye": [
+          "Up to 200,000 enrollments/month",
+          "LTI 1.3",
+          "AI proctoring (ProctorU)",
+          "Talent Management adapter",
+          "Multi-tenant per campus",
+          "Email + WhatsApp + Slack Connect support, 2h business response",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Corporate architecture with compliance alignment",
+        "idealPara": "Enterprises with compliance and thousands of active students",
+        "incluye": [
+          "Up to 2M+ enrollments/month",
+          "SAP SuccessFactors / Workday Learning",
+          "HD live streaming multi-region",
+          "SSO + SCIM",
+          "Dedicated PM + tech lead",
+          "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",
+          "Monthly tier reports",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      }
+    },
+    "costoNote": "Video hosting (~$50–$20,000 USD/mo), proctoring and LLM are paid by the customer directly to the provider."
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "offering_biDashboard": {
+    "name": "Dashboard ejecutivo con IA",
+    "tagline": "Tus KPIs en un solo tablero, con resúmenes generados por IA",
+    "description": "Visualizá ventas, finanzas y operaciones en tiempo real con explicaciones automáticas y forecasting. Lo entregamos como software o como SaaS mensual.",
+    "categoryLabel": "Plataforma IA",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para PYMEs que quieren KPIs claros sin contratar un BI Manager",
+        "idealPara": "Equipos hasta 50 personas con datos en Sheets o Postgres",
+        "incluye": [
+          "Procesamiento hasta 100.000 filas al mes",
+          "Conectores CSV, Google Sheets y Postgres directo",
+          "Hasta 5 tableros con widgets prediseñados",
+          "Resúmenes ejecutivos automáticos opcionales",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "BI con warehouse y forecasting para empresas medianas",
+        "idealPara": "Empresas con datos en ERP, CRM y marketing tools",
+        "incluye": [
+          "Procesamiento hasta 1M de filas al mes",
+          "Warehouse opcional (BigQuery o Snowflake)",
+          "Conectores ERP (Siigo, SAP B1) y CRM (HubSpot)",
+          "Forecasting con IA por línea de negocio",
+          "Alertas Slack/Teams por desvíos de KPI",
+          "Permisos por equipo y row-level security básico",
+          "Soporte por email + WhatsApp, 4h hábiles"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "BI multi-fuente con dashboards real-time",
+        "idealPara": "Operaciones medianas–grandes con análisis multi-canal",
+        "incluye": [
+          "Procesamiento hasta 25M de filas al mes",
+          "Warehouse enterprise con CDC casi en tiempo real",
+          "Federación de fuentes (ERP + CRM + marketing + ops)",
+          "Forecasting avanzado y detección de anomalías con IA",
+          "Row-level security granular por usuario",
+          "Exportes programados a Excel/PowerPoint",
+          "Workspaces para equipos con dashboards privados",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "BI corporativo con governance y multi-warehouse",
+        "idealPara": "Corporaciones con compliance y múltiples unidades de negocio",
+        "incluye": [
+          "Procesamiento de 250M+ filas al mes",
+          "Multi-warehouse federation (Snowflake + Databricks)",
+          "Data lineage y governance corporativos",
+          "Arquitectura alineada con SOC 2/ISO 27001 (certificación a cargo del cliente)",
+          "Row-level security multi-tenant por unidad",
+          "SSO SAML/OIDC + SCIM provisioning",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes ejecutivos mensuales para tu comité"
+        ]
+      }
+    },
+    "costoNote": "Los costos del warehouse (BigQuery/Snowflake ~$50–20.000 USD/mes) y de los LLMs los paga el cliente directo al proveedor."
+  }
+}

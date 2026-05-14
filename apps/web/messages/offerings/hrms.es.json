@@ -1,0 +1,68 @@
+{
+  "offering_hrms": {
+    "name": "HRMS",
+    "tagline": "Gestioná empleados, nómina y compliance laboral",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"HRMS\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Ventas",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con colaboradores en planta",
+        "incluye": [
+          "Hasta 50 empleados",
+          "Nómina electrónica DIAN",
+          "PILA/Aportes en Línea",
+          "Email a empleados",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y colaboradores en planta",
+        "incluye": [
+          "Hasta 1.500 empleados",
+          "ATS reclutamiento",
+          "LMS de capacitación",
+          "Bonos/Sodexo",
+          "Performance reviews 360",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de colaboradores en planta",
+        "incluye": [
+          "Hasta 12.000 empleados",
+          "Talent + Comp + Performance",
+          "BI con HR analytics",
+          "Multi-empresa",
+          "Workflow de onboarding",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de colaboradores en planta",
+        "incluye": [
+          "Hasta 100.000+ empleados",
+          "SAP SuccessFactors / Workday adapter",
+          "Compliance multi-país (CO/MX/PE)",
+          "SSO + SCIM",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "PILA/Aportes en Línea (~$30–6.000 USD/mes) lo paga el cliente directo al proveedor."
+  }
+}

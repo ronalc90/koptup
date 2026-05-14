@@ -1,0 +1,68 @@
+{
+  "offering_voiceAiCallcenter": {
+    "name": "Voice AI for call centers",
+    "tagline": "Phone bots with STT, TTS and intelligent routing",
+    "description": "Custom build or monthly SaaS subscription of \"Voice AI for call centers\". Buy it as software (we hand over the code) or pay monthly while we host it for you.",
+    "categoryLabel": "Voice AI",
+    "tiers": {
+      "basico": {
+        "name": "Basic",
+        "description": "To validate the idea with a limited scope",
+        "idealPara": "Small teams getting started with conversation minutes",
+        "incluye": [
+          "Up to 1,000 minutes/month",
+          "1 phone line",
+          "STT with Whisper or Deepgram",
+          "Basic TTS",
+          "Email support Mon–Fri 8AM–5PM Colombia, 24h business response"
+        ]
+      },
+      "profesional": {
+        "name": "Professional",
+        "description": "For teams with steady usage",
+        "idealPara": "SMBs with steady flow and conversation minutes",
+        "incluye": [
+          "Up to 30,000 minutes/month",
+          "Multi-line + IVR",
+          "CRM with call logging",
+          "Helpdesk with call-to-ticket",
+          "WhatsApp voice notes",
+          "Email + WhatsApp support, 4h business response",
+          "Monthly tier reports"
+        ]
+      },
+      "avanzado": {
+        "name": "Advanced",
+        "description": "Multi-channel with high volume and personalization",
+        "idealPara": "Mid-market companies with high volumes of conversation minutes",
+        "incluye": [
+          "Up to 250,000 minutes/month",
+          "Premium cloned voices",
+          "Basic speech analytics",
+          "Recording compliance (PCI redaction)",
+          "Multi-language",
+          "Email + WhatsApp + Slack Connect support, 2h business response",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Corporate architecture with compliance alignment",
+        "idealPara": "Enterprises with compliance and thousands of conversation minutes",
+        "incluye": [
+          "Up to 2.5M+ minutes/month",
+          "Enterprise PBX/SIP (Asterisk/Genesys)",
+          "WFM + QM + advanced analytics",
+          "Multi-country + DR",
+          "Dedicated PM + tech lead",
+          "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",
+          "Monthly tier reports",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      }
+    },
+    "costoNote": "Twilio + Deepgram + ElevenLabs (~$300–$50,000 USD/mo) are paid by the customer directly to the provider."
+  }
+}

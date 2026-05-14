@@ -1,0 +1,68 @@
+{
+  "offering_firmaElectronica": {
+    "name": "E-signature",
+    "tagline": "Legally valid signatures with KYC and timestamping",
+    "description": "Custom build or monthly SaaS subscription of \"E-signature\". Buy it as software (we hand over the code) or pay monthly while we host it for you.",
+    "categoryLabel": "Security",
+    "tiers": {
+      "basico": {
+        "name": "Basic",
+        "description": "To validate the idea with a limited scope",
+        "idealPara": "Small teams getting started with documents signed",
+        "incluye": [
+          "Up to 100 signatures/month",
+          "Upload PDF/Word",
+          "Email + public link delivery",
+          "Public verification",
+          "Email support Mon–Fri 8AM–5PM Colombia, 24h business response"
+        ]
+      },
+      "profesional": {
+        "name": "Professional",
+        "description": "For teams with steady usage",
+        "idealPara": "SMBs with steady flow and documents signed",
+        "incluye": [
+          "Up to 2,000 signatures/month",
+          "CRM/ERP adapters",
+          "Biometric KYC",
+          "WhatsApp Business delivery",
+          "REST API + webhooks",
+          "Email + WhatsApp support, 4h business response",
+          "Monthly tier reports"
+        ]
+      },
+      "avanzado": {
+        "name": "Advanced",
+        "description": "Multi-channel with high volume and personalization",
+        "idealPara": "Mid-market companies with high volumes of documents signed",
+        "incluye": [
+          "Up to 25,000 signatures/month",
+          "Multi-signer with order",
+          "Timestamping + LTV",
+          "Dynamic templates",
+          "Per-document audit",
+          "Email + WhatsApp + Slack Connect support, 2h business response",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Corporate architecture with compliance alignment",
+        "idealPara": "Enterprises with compliance and thousands of documents signed",
+        "incluye": [
+          "Up to 500,000+ signatures/month",
+          "Corporate PKI + HSM",
+          "Multi-country qualified eIDAS",
+          "DocuSign/Adobe Sign migration",
+          "Dedicated PM + tech lead",
+          "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",
+          "Monthly tier reports",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      }
+    },
+    "costoNote": "Digital certificate, timestamping and KYC are paid by the customer directly to the provider."
+  }
+}

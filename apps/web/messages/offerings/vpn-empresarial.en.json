@@ -1,0 +1,68 @@
+{
+  "offering_vpnEmpresarial": {
+    "name": "Enterprise VPN",
+    "tagline": "Secure remote access with WireGuard, MFA and SIEM",
+    "description": "Custom build or monthly SaaS subscription of \"Enterprise VPN\". Buy it as software (we hand over the code) or pay monthly while we host it for you.",
+    "categoryLabel": "Security",
+    "tiers": {
+      "basico": {
+        "name": "Basic",
+        "description": "To validate the idea with a limited scope",
+        "idealPara": "Small teams getting started with connected employees",
+        "incluye": [
+          "Up to 25 concurrent users",
+          "WireGuard/OpenVPN clients",
+          "LDAP/Email auth",
+          "Local logs",
+          "Email support Mon–Fri 8AM–5PM Colombia, 24h business response"
+        ]
+      },
+      "profesional": {
+        "name": "Professional",
+        "description": "For teams with steady usage",
+        "idealPara": "SMBs with steady flow and connected employees",
+        "incluye": [
+          "Up to 200 concurrent users",
+          "Google/Microsoft SSO",
+          "MFA (TOTP/U2F)",
+          "Basic SIEM (Wazuh/Elastic)",
+          "Split tunneling",
+          "Email + WhatsApp support, 4h business response",
+          "Monthly tier reports"
+        ]
+      },
+      "avanzado": {
+        "name": "Advanced",
+        "description": "Multi-channel with high volume and personalization",
+        "idealPara": "Mid-market companies with high volumes of connected employees",
+        "incluye": [
+          "Up to 1,500 concurrent users",
+          "Multi-country backbone",
+          "Corporate SIEM",
+          "Policy as code",
+          "Session auditing",
+          "Email + WhatsApp + Slack Connect support, 2h business response",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Corporate architecture with compliance alignment",
+        "idealPara": "Enterprises with compliance and thousands of connected employees",
+        "incluye": [
+          "Up to 25,000+ concurrent users",
+          "Enterprise ZTNA (Zscaler/Cloudflare)",
+          "SIEM (Splunk/Sentinel)",
+          "EDR/XDR + DLP",
+          "Architecture aligned with SOC 2/ISO 27001 (certification at customer expense)",
+          "Dedicated PM + tech lead",
+          "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      }
+    },
+    "costoNote": "VPN servers (~$30–$25,000 USD/mo), SIEM and enterprise ZTNA are paid by the customer directly to the provider."
+  }
+}

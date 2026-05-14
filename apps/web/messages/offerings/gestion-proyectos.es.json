@@ -1,0 +1,68 @@
+{
+  "offering_gestionProyectos": {
+    "name": "Gestión de proyectos",
+    "tagline": "Controlá proyectos, tareas y tiempos con tableros e integraciones",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Gestión de proyectos\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Productividad",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con proyectos en simultáneo",
+        "incluye": [
+          "Hasta 25 proyectos activos",
+          "Tableros Kanban + listas",
+          "Time tracking básico",
+          "Comentarios y menciones",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y proyectos en simultáneo",
+        "incluye": [
+          "Hasta 250 proyectos activos",
+          "Jira/Linear sync",
+          "GitHub/GitLab branch sync",
+          "Reportes de capacity por equipo",
+          "Tempo/Harvest tiempos",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de proyectos en simultáneo",
+        "incluye": [
+          "Hasta 2.500 proyectos activos",
+          "Gantt y dependencias",
+          "Forecasting con IA",
+          "ResourceManager por skill",
+          "Multi-portafolio",
+          "Custom fields",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de proyectos en simultáneo",
+        "incluye": [
+          "Hasta 25.000+ proyectos activos",
+          "Azure DevOps + ServiceNow",
+          "PPM portfolio management",
+          "Power BI/Tableau dashboards",
+          "SSO + SCIM",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "Conectores premium e integraciones enterprise los paga el cliente directo al proveedor."
+  }
+}

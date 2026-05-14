@@ -1,0 +1,68 @@
+{
+  "offering_cmsHeadless": {
+    "name": "Headless CMS",
+    "tagline": "Manage your content from one panel and publish to any frontend",
+    "description": "Custom build or monthly SaaS subscription of \"Headless CMS\". Buy it as software (we hand over the code) or pay monthly while we host it for you.",
+    "categoryLabel": "Engagement",
+    "tiers": {
+      "basico": {
+        "name": "Basic",
+        "description": "To validate the idea with a limited scope",
+        "idealPara": "Small teams getting started with publishable content",
+        "incluye": [
+          "Up to 50,000 page views/month",
+          "Block-based visual editor",
+          "Webhook to one frontend",
+          "Images via Cloudinary",
+          "Email support Mon–Fri 8AM–5PM Colombia, 24h business response"
+        ]
+      },
+      "profesional": {
+        "name": "Professional",
+        "description": "For teams with steady usage",
+        "idealPara": "SMBs with steady flow and publishable content",
+        "incluye": [
+          "Up to 1M page views/month",
+          "Multi-frontend (web + app + email)",
+          "Federated GraphQL",
+          "Basic A/B testing",
+          "Integrated PIM/DAM",
+          "Email + WhatsApp support, 4h business response",
+          "Monthly tier reports"
+        ]
+      },
+      "avanzado": {
+        "name": "Advanced",
+        "description": "Multi-channel with high volume and personalization",
+        "idealPara": "Mid-market companies with high volumes of publishable content",
+        "incluye": [
+          "Up to 25M page views/month",
+          "Editorial workflow with approvals",
+          "Segment-based personalization",
+          "Translation memory",
+          "Approximate web vitals SLA",
+          "Email + WhatsApp + Slack Connect support, 2h business response",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Corporate architecture with compliance alignment",
+        "idealPara": "Enterprises with compliance and thousands of publishable content",
+        "incluye": [
+          "Up to 250M+ page views/month",
+          "Multi-brand and multi-language",
+          "Full DXP",
+          "Enterprise SSO",
+          "Dedicated PM + tech lead",
+          "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",
+          "Monthly tier reports",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      }
+    },
+    "costoNote": "CDN (~$20–$6,000 USD/mo) and premium DAM are paid by the customer directly to the provider."
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "offering_facturacionElectronica": {
+    "name": "Electronic invoicing",
+    "tagline": "Issue DIAN invoices with multi-resolution and electronic payroll",
+    "description": "Custom build or monthly SaaS subscription of \"Electronic invoicing\". Buy it as software (we hand over the code) or pay monthly while we host it for you.",
+    "categoryLabel": "Finance",
+    "tiers": {
+      "basico": {
+        "name": "Basic",
+        "description": "To validate the idea with a limited scope",
+        "idealPara": "Small teams getting started with electronic documents",
+        "incluye": [
+          "Up to 200 invoices/month",
+          "DIAN issuance",
+          "Email delivery",
+          "CSV import",
+          "Email support Mon–Fri 8AM–5PM Colombia, 24h business response"
+        ]
+      },
+      "profesional": {
+        "name": "Professional",
+        "description": "For teams with steady usage",
+        "idealPara": "SMBs with steady flow and electronic documents",
+        "incluye": [
+          "Up to 5,000 invoices/month",
+          "ERP (Siigo/SAP B1/World Office)",
+          "Banks for reconciliation",
+          "Integrated POS",
+          "Multi-resolution DIAN",
+          "Email + WhatsApp support, 4h business response",
+          "Monthly tier reports"
+        ]
+      },
+      "avanzado": {
+        "name": "Advanced",
+        "description": "Multi-channel with high volume and personalization",
+        "idealPara": "Mid-market companies with high volumes of electronic documents",
+        "incluye": [
+          "Up to 50,000 invoices/month",
+          "Multi-country (CO/MX/PE/CL)",
+          "RADIAN + electronic payroll",
+          "Audit + official books",
+          "EDI with B2B customers",
+          "Email + WhatsApp + Slack Connect support, 2h business response",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Corporate architecture with compliance alignment",
+        "idealPara": "Enterprises with compliance and thousands of electronic documents",
+        "incluye": [
+          "Up to 500,000+ invoices/month",
+          "SAP S/4HANA / Oracle adapter",
+          "Architecture aligned with SOX (certification at customer expense)",
+          "Dedicated PM + tech lead",
+          "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",
+          "Monthly tier reports",
+          "Monthly tier reports",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      }
+    },
+    "costoNote": "DIAN technology provider (~$30–$6,000 USD/mo) is paid by the customer directly to the provider."
+  }
+}

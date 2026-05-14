@@ -1,0 +1,68 @@
+{
+  "offering_automatizacionWorkflows": {
+    "name": "Workflow automation",
+    "tagline": "Connect your apps and automate processes with AI steps",
+    "description": "Custom build or monthly SaaS subscription of \"Workflow automation\". Buy it as software (we hand over the code) or pay monthly while we host it for you.",
+    "categoryLabel": "AI Platform",
+    "tiers": {
+      "basico": {
+        "name": "Basic",
+        "description": "To validate the idea with a limited scope",
+        "idealPara": "Small teams getting started with automated workflows",
+        "incluye": [
+          "Up to 10,000 runs/month",
+          "HTTP/REST steps",
+          "Email + Sheets",
+          "Slack notify",
+          "Email support Mon–Fri 8AM–5PM Colombia, 24h business response"
+        ]
+      },
+      "profesional": {
+        "name": "Professional",
+        "description": "For teams with steady usage",
+        "idealPara": "SMBs with steady flow and automated workflows",
+        "incluye": [
+          "Up to 250,000 runs/month",
+          "CRM/ERP connectors",
+          "Cloud storage (S3/Drive)",
+          "WhatsApp Business",
+          "Bidirectional webhooks",
+          "Email + WhatsApp support, 4h business response",
+          "Monthly tier reports"
+        ]
+      },
+      "avanzado": {
+        "name": "Advanced",
+        "description": "Multi-channel with high volume and personalization",
+        "idealPara": "Mid-market companies with high volumes of automated workflows",
+        "incluye": [
+          "Up to 2.5M runs/month",
+          "Long-running workflows with retries",
+          "AI conditional branching",
+          "Dedicated workers",
+          "Execution audit",
+          "Email + WhatsApp + Slack Connect support, 2h business response",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Corporate architecture with compliance alignment",
+        "idealPara": "Enterprises with compliance and thousands of automated workflows",
+        "incluye": [
+          "Up to 25M+ runs/month",
+          "Enterprise iPaaS (MuleSoft/Boomi)",
+          "Multi-protocol EDI",
+          "Kafka/RabbitMQ event bus",
+          "Temporal cluster",
+          "Dedicated PM + tech lead",
+          "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      }
+    },
+    "costoNote": "LLM (~$50–$10,000 USD/mo) and premium iPaaS are paid by the customer directly to the provider."
+  }
+}

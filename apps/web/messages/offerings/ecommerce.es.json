@@ -1,0 +1,68 @@
+{
+  "offering_ecommerce": {
+    "name": "Tienda en línea",
+    "tagline": "Vendé en línea con catálogo, carrito y pagos integrados",
+    "description": "Plataforma de ecommerce con catálogo, checkout y pasarela. Comprala como software (con código fuente) o usá la suscripción mensual hospedada por nosotros.",
+    "categoryLabel": "Comercio",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Tienda lista para los primeros 1.000 pedidos/mes",
+        "idealPara": "Emprendimientos y pymes que recién arrancan online",
+        "incluye": [
+          "Hasta 1.000 órdenes al mes",
+          "Catálogo con variantes y stock simple",
+          "Pasarela Stripe o Wompi",
+          "Envíos por Servientrega/Coordinadora (manual)",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para tiendas con 10k órdenes y tracking automatizado",
+        "idealPara": "Marcas en crecimiento con varias categorías y envíos en Colombia",
+        "incluye": [
+          "Hasta 10.000 órdenes al mes",
+          "Multi-pasarela (Stripe, Wompi, PayU)",
+          "Tracking automático Servientrega/TCC/Coordinadora",
+          "Marketing email con segmentación básica",
+          "Integración con ERP (Siigo) o marketplaces (Mercado Libre)",
+          "Dashboard de ventas y reportes semanales",
+          "Soporte por email + WhatsApp, 4h hábiles"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con búsqueda avanzada y anti-fraude",
+        "idealPara": "Retailers medianos con catálogo grande y promociones complejas",
+        "incluye": [
+          "Hasta 75.000 órdenes al mes",
+          "Búsqueda Algolia y filtros facetados",
+          "Anti-fraude con reglas + Stripe Radar",
+          "OMS/WMS conectado para multi-bodega",
+          "B2B y B2C en la misma tienda",
+          "Marketing automation con segmentos dinámicos",
+          "Reportes ejecutivos y exportes a Data Warehouse",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Multi-país con arquitectura PCI-DSS y EDI",
+        "idealPara": "Cadenas y holdings con presencia en varios países",
+        "incluye": [
+          "Volúmenes de 250.000+ órdenes al mes",
+          "Multi-país, multi-moneda y multi-idioma",
+          "Catálogos B2B privados con precios negociados",
+          "EDI con proveedores y carriers",
+          "PIM dedicado y DAM para activos",
+          "Arquitectura alineada con PCI-DSS (certificación a cargo del cliente)",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes ejecutivos mensuales para tu comité"
+        ]
+      }
+    },
+    "costoNote": "Comisiones de pasarela (Stripe/Wompi ~2,9% + $0,30 por transacción), hosting y email transaccional los paga el cliente directo al proveedor."
+  }
+}

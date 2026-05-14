@@ -1,0 +1,68 @@
+{
+  "offering_sistemaReservas": {
+    "name": "Booking system",
+    "tagline": "Book appointments, classes or shifts with synced calendars",
+    "description": "Custom build or monthly SaaS subscription of \"Booking system\". Buy it as software (we hand over the code) or pay monthly while we host it for you.",
+    "categoryLabel": "Productivity",
+    "tiers": {
+      "basico": {
+        "name": "Basic",
+        "description": "To validate the idea with a limited scope",
+        "idealPara": "Small teams getting started with reservations with confirmation",
+        "incluye": [
+          "Up to 500 reservations/month",
+          "One-way Google Calendar sync",
+          "Email reminders",
+          "Stripe/Wompi gateway",
+          "Email support Mon–Fri 8AM–5PM Colombia, 24h business response"
+        ]
+      },
+      "profesional": {
+        "name": "Professional",
+        "description": "For teams with steady usage",
+        "idealPara": "SMBs with steady flow and reservations with confirmation",
+        "incluye": [
+          "Up to 8,000 reservations/month",
+          "Outlook + Apple Calendar",
+          "Auto-link Zoom meetings",
+          "HubSpot CRM",
+          "WhatsApp reminders",
+          "Email + WhatsApp support, 4h business response",
+          "Monthly tier reports"
+        ]
+      },
+      "avanzado": {
+        "name": "Advanced",
+        "description": "Multi-channel with high volume and personalization",
+        "idealPara": "Mid-market companies with high volumes of reservations with confirmation",
+        "incluye": [
+          "Up to 60,000 reservations/month",
+          "Multi-branch with franchises",
+          "Shared resources (rooms/equipment)",
+          "Private marketplace",
+          "Per-location reports",
+          "GraphQL API",
+          "Email + WhatsApp + Slack Connect support, 2h business response",
+          "Monthly tier reports"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Corporate architecture with compliance alignment",
+        "idealPara": "Enterprises with compliance and thousands of reservations with confirmation",
+        "incluye": [
+          "Up to 500,000+ reservations/month",
+          "SIS/EHR adapter for healthcare",
+          "ERP/HRMS with staff availability",
+          "Dedicated PM + tech lead",
+          "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",
+          "Monthly tier reports",
+          "Monthly tier reports",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      }
+    },
+    "costoNote": "SMS/WhatsApp (~$20–$6,000 USD/mo) and payment gateway are paid by the customer directly to the provider."
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "offering_helpdeskIa": {
+    "name": "AI-powered Helpdesk",
+    "tagline": "Handle tickets with suggested answers and auto-routing",
+    "description": "Custom build or monthly SaaS subscription of \"AI-powered Helpdesk\". Buy it as software (we hand over the code) or pay monthly while we host it for you.",
+    "categoryLabel": "Support",
+    "tiers": {
+      "basico": {
+        "name": "Basic",
+        "description": "To validate the idea with a limited scope",
+        "idealPara": "Small teams getting started with cases handled",
+        "incluye": [
+          "Up to 500 tickets/month",
+          "Email to ticket",
+          "Web widget",
+          "AI-suggested replies",
+          "Email support Mon–Fri 8AM–5PM Colombia, 24h business response"
+        ]
+      },
+      "profesional": {
+        "name": "Professional",
+        "description": "For teams with steady usage",
+        "idealPara": "SMBs with steady flow and cases handled",
+        "incluye": [
+          "Up to 10,000 tickets/month",
+          "WhatsApp + Messenger + Telegram",
+          "Jira/Linear sync",
+          "HubSpot CRM",
+          "Self-service knowledge base",
+          "Email + WhatsApp support, 4h business response",
+          "Monthly tier reports"
+        ]
+      },
+      "avanzado": {
+        "name": "Advanced",
+        "description": "Multi-channel with high volume and personalization",
+        "idealPara": "Mid-market companies with high volumes of cases handled",
+        "incluye": [
+          "Up to 100,000 tickets/month",
+          "Omnichannel unified queue",
+          "IVR + voice AI",
+          "Basic speech analytics QM",
+          "BI with CSAT/NPS",
+          "Email + WhatsApp + Slack Connect support, 2h business response",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Corporate architecture with compliance alignment",
+        "idealPara": "Enterprises with compliance and thousands of cases handled",
+        "incluye": [
+          "Up to 1M+ tickets/month",
+          "Workforce management (NICE/Verint)",
+          "BPO/outsourcing handoff",
+          "SSO + GDPR-aligned",
+          "Dedicated PM + tech lead",
+          "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",
+          "Monthly tier reports",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      }
+    },
+    "costoNote": "LLM (~$80–$10,000 USD/mo) and cloud telephony are paid by the customer directly to the provider."
+  }
+}

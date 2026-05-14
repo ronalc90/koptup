@@ -1,0 +1,68 @@
+{
+  "offering_helpdeskIa": {
+    "name": "Helpdesk con IA",
+    "tagline": "Atendé tickets con respuestas sugeridas y enrutamiento automático",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Helpdesk con IA\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Soporte",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con casos atendidos",
+        "incluye": [
+          "Hasta 500 tickets/mes",
+          "Email a ticket",
+          "Widget web",
+          "Respuestas sugeridas con IA",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y casos atendidos",
+        "incluye": [
+          "Hasta 10.000 tickets/mes",
+          "WhatsApp + Messenger + Telegram",
+          "Jira/Linear sync",
+          "CRM HubSpot",
+          "Knowledge base autoservicio",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de casos atendidos",
+        "incluye": [
+          "Hasta 100.000 tickets/mes",
+          "Omnicanal con cola unificada",
+          "IVR + voice AI",
+          "QM con speech analytics básico",
+          "BI con CSAT/NPS",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de casos atendidos",
+        "incluye": [
+          "Hasta 1M+ tickets/mes",
+          "Workforce management (NICE/Verint)",
+          "BPO/outsourcing handoff",
+          "SSO + GDPR alineado",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "LLM (~$80–10.000 USD/mes) y telefonía cloud los paga el cliente directo al proveedor."
+  }
+}

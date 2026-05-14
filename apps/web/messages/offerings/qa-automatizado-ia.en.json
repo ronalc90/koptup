@@ -1,0 +1,68 @@
+{
+  "offering_qaAutomatizadoIa": {
+    "name": "AI-driven QA automation",
+    "tagline": "Generate and maintain E2E test suites with AI",
+    "description": "Custom build or monthly SaaS subscription of \"AI-driven QA automation\". Buy it as software (we hand over the code) or pay monthly while we host it for you.",
+    "categoryLabel": "DevTools",
+    "tiers": {
+      "basico": {
+        "name": "Basic",
+        "description": "To validate the idea with a limited scope",
+        "idealPara": "Small teams getting started with test runs",
+        "incluye": [
+          "Up to 1,000 test runs/month",
+          "GitHub Actions",
+          "Slack notify",
+          "Playwright runners",
+          "Email support Mon–Fri 8AM–5PM Colombia, 24h business response"
+        ]
+      },
+      "profesional": {
+        "name": "Professional",
+        "description": "For teams with steady usage",
+        "idealPara": "SMBs with steady flow and test runs",
+        "incluye": [
+          "Up to 25,000 test runs/month",
+          "Multi-CI (GitHub/GitLab/Bitbucket)",
+          "Jira/TestRail sync",
+          "BrowserStack/Sauce",
+          "Code coverage reports",
+          "Email + WhatsApp support, 4h business response",
+          "Monthly tier reports"
+        ]
+      },
+      "avanzado": {
+        "name": "Advanced",
+        "description": "Multi-channel with high volume and personalization",
+        "idealPara": "Mid-market companies with high volumes of test runs",
+        "incluye": [
+          "Up to 250,000 test runs/month",
+          "Automatic selector maintenance",
+          "Visual regression",
+          "API contract testing (Pact)",
+          "Basic performance (k6)",
+          "Email + WhatsApp + Slack Connect support, 2h business response",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Corporate architecture with compliance alignment",
+        "idealPara": "Enterprises with compliance and thousands of test runs",
+        "incluye": [
+          "Up to 2.5M+ test runs/month",
+          "Azure DevOps + Jenkins",
+          "Enterprise XRay",
+          "Enterprise device farm",
+          "DORA + flaky tests analytics",
+          "Dedicated PM + tech lead",
+          "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      }
+    },
+    "costoNote": "LLMs (~$80–$25,000 USD/mo), BrowserStack/Sauce and device farms are paid by the customer directly to the provider."
+  }
+}

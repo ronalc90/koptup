@@ -1,0 +1,68 @@
+{
+  "offering_telemedicina": {
+    "name": "Telemedicine platform",
+    "tagline": "Remote consultations with medical history and digital prescriptions",
+    "description": "Custom build or monthly SaaS subscription of \"Telemedicine platform\". Buy it as software (we hand over the code) or pay monthly while we host it for you.",
+    "categoryLabel": "HealthTech",
+    "tiers": {
+      "basico": {
+        "name": "Basic",
+        "description": "To validate the idea with a limited scope",
+        "idealPara": "Small teams getting started with video consultations",
+        "incluye": [
+          "Up to 300 consultations/month",
+          "WebRTC video",
+          "Basic clinical history",
+          "Email + WhatsApp reminders",
+          "Email support Mon–Fri 8AM–5PM Colombia, 24h business response"
+        ]
+      },
+      "profesional": {
+        "name": "Professional",
+        "description": "For teams with steady usage",
+        "idealPara": "SMBs with steady flow and video consultations",
+        "incluye": [
+          "Up to 5,000 consultations/month",
+          "Digital prescriptions",
+          "Basic HL7 labs",
+          "Wearables (Apple Health/Fitbit)",
+          "Integrated eRX",
+          "Email + WhatsApp support, 4h business response",
+          "Monthly tier reports"
+        ]
+      },
+      "avanzado": {
+        "name": "Advanced",
+        "description": "Multi-channel with high volume and personalization",
+        "idealPara": "Mid-market companies with high volumes of video consultations",
+        "incluye": [
+          "Up to 50,000 consultations/month",
+          "Full HL7 FHIR",
+          "Multi-brand clinical EHR",
+          "Insurers / EPS / IPS",
+          "HABEAS DATA compliance",
+          "Email + WhatsApp + Slack Connect support, 2h business response",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Corporate architecture with compliance alignment",
+        "idealPara": "Enterprises with compliance and thousands of video consultations",
+        "incluye": [
+          "Up to 500,000+ consultations/month",
+          "Architecture aligned with HIPAA + Resolución 2654 (certification at customer expense)",
+          "PACS DICOM",
+          "Dedicated PM + tech lead",
+          "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",
+          "Monthly tier reports",
+          "Monthly tier reports",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      }
+    },
+    "costoNote": "Managed video (~$50–$10,000 USD/mo), compliance and LLM are paid by the customer directly to the provider."
+  }
+}

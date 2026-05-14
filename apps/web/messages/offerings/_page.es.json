@@ -1,0 +1,100 @@
+{
+  "offeringsCatalog": {
+    "hero": {
+      "title": "Planes y servicios",
+      "subtitle": "Elegí cómo querés trabajar con nosotros: comprá el software (te entregamos el código) o suscribite al SaaS mensual (lo hospedamos nosotros)."
+    },
+    "search": "Buscar...",
+    "modality": {
+      "label": "Modalidad",
+      "compra": "Comprar el software",
+      "compraDesc": "One-time setup + mantenimiento opcional. El código fuente queda en tu poder.",
+      "saas": "Suscripción SaaS mensual",
+      "saasDesc": "Lo hospedamos nosotros, pagás mensualidad, cancelás cuando quieras."
+    },
+    "tier": {
+      "basico": "Básico",
+      "profesional": "Profesional",
+      "avanzado": "Avanzado",
+      "enterprise": "Enterprise"
+    },
+    "currency": {
+      "label": "Moneda",
+      "cop": "COP",
+      "usd": "USD",
+      "trmLive": "TRM en vivo {value} (datos.gov.co)",
+      "trmCached": "TRM ~{value}"
+    },
+    "card": {
+      "viewMore": "Ver más detalles",
+      "viewDemo": "Probar demo",
+      "fromPrice": "Desde",
+      "perMonth": "/mes",
+      "setupOnce": "Setup único"
+    },
+    "modal": {
+      "close": "Cerrar",
+      "quote": "Cotizar este tier",
+      "incluye": "Qué incluye",
+      "limits": "Límites del tier",
+      "limitsAdminUsers": "Usuarios administradores",
+      "limitsEndUsers": "Usuarios finales",
+      "limitsAccounts": "Cuentas / tenants",
+      "limitsVolume": "Volumen mensual",
+      "limitsStorage": "Almacenamiento",
+      "limitsUnlimited": "Ilimitado",
+      "limitsNotApplicable": "N/A",
+      "support": "Soporte",
+      "costosCliente": "Costos que paga el cliente",
+      "costosClienteNote": "Los costos de APIs (OpenAI, Twilio) e infraestructura (AWS, GCP) los factura el proveedor directamente al cliente. No los marcamos.",
+      "implementacion": "Tiempo de implementación",
+      "weeks": "semanas",
+      "hours": "horas",
+      "month": "mes",
+      "comparison": "Comparar tiers",
+      "maintenanceLabel": "Mantenimiento mensual (opcional)",
+      "maintenanceNote": "Podés mantenerlo vos mismo o contratar nuestro mantenimiento mes a mes.",
+      "monthlyLabel": "Mensualidad",
+      "monthlyNote": "Incluye hosting, monitoreo y soporte. Sin permanencia."
+    },
+    "banner": {
+      "title": "Cómo escalamos",
+      "body": "Equipo basado en Colombia opera Lun–Vie 8AM–5PM. Construimos software alineado con HIPAA/SOC 2/ISO 27001 pero la certificación formal corre por cuenta del cliente. Si necesitás un alcance mayor al Enterprise, cotizamos personalizado en 48h hábiles."
+    },
+    "supportSLA": {
+      "email-24h": "Email horario laboral · 24h hábiles",
+      "email-whatsapp-4h": "Email + WhatsApp · 4h hábiles",
+      "email-whatsapp-slack-2h": "Email + WhatsApp + Slack · 2h hábiles",
+      "tickets-jira-zendesk-1h": "Jira/Zendesk con auditoría · 1h crítico"
+    },
+    "integraciones": {
+      "basicas": "Básicas",
+      "medias": "Medias",
+      "avanzadas": "Avanzadas",
+      "empresariales": "Empresariales"
+    },
+    "categories": {
+      "all": "Todos",
+      "sales": "Ventas",
+      "finance": "Finanzas",
+      "operations": "Operaciones",
+      "productivity": "Productividad",
+      "aiPlatform": "Plataforma IA",
+      "security": "Seguridad",
+      "healthcare": "HealthTech",
+      "education": "Educación",
+      "commerce": "Comercio",
+      "support": "Soporte",
+      "devTools": "DevTools",
+      "voice": "Voz IA",
+      "data": "Datos",
+      "engagement": "Engagement"
+    },
+    "noResults": "No encontramos resultados para tu búsqueda.",
+    "cta": {
+      "title": "¿No sabés cuál elegir?",
+      "body": "Hablá con nosotros y te ayudamos a definir si comprás el software o usás nuestro SaaS.",
+      "button": "Hablar con un experto"
+    }
+  }
+}
