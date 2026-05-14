@@ -302,45 +302,114 @@
     },
     "s1": {
       "title": "1. Información que Recopilamos",
-      "c1": { "subtitle": "1.1 Información Personal", "text": "Recopilamos información que usted nos proporciona directamente, incluyendo: nombre, correo electrónico, número de teléfono, empresa, información de facturación y cualquier otra información que decida compartir con nosotros al utilizar nuestros servicios." },
-      "c2": { "subtitle": "1.2 Información de Uso", "text": "Recopilamos automáticamente información sobre su interacción con nuestros servicios, incluyendo: dirección IP, tipo de navegador, páginas visitadas, tiempo de permanencia, cookies y datos de análisis web." },
-      "c3": { "subtitle": "1.3 Información de Proyectos", "text": "Cuando contrata nuestros servicios, recopilamos información relacionada con el proyecto: requisitos técnicos, documentación, archivos compartidos y comunicaciones relacionadas con el desarrollo." }
+      "c1": {
+        "subtitle": "1.1 Información Personal",
+        "text": "Recopilamos información que usted nos proporciona directamente, incluyendo: nombre, correo electrónico, número de teléfono, empresa, información de facturación y cualquier otra información que decida compartir con nosotros al utilizar nuestros servicios."
+      },
+      "c2": {
+        "subtitle": "1.2 Información de Uso",
+        "text": "Recopilamos automáticamente información sobre su interacción con nuestros servicios, incluyendo: dirección IP, tipo de navegador, páginas visitadas, tiempo de permanencia, cookies y datos de análisis web."
+      },
+      "c3": {
+        "subtitle": "1.3 Información de Proyectos",
+        "text": "Cuando contrata nuestros servicios, recopilamos información relacionada con el proyecto: requisitos técnicos, documentación, archivos compartidos y comunicaciones relacionadas con el desarrollo."
+      }
     },
     "s2": {
       "title": "2. Cómo Utilizamos su Información",
-      "c1": { "subtitle": "2.1 Prestación de Servicios", "text": "Utilizamos su información para proporcionar, mantener y mejorar nuestros servicios de desarrollo de software, consultoría tecnológica y soluciones digitales." },
-      "c2": { "subtitle": "2.2 Comunicación", "text": "Para comunicarnos con usted sobre sus proyectos, actualizaciones de servicios, soporte técnico y responder a sus consultas." },
-      "c3": { "subtitle": "2.3 Mejora de Servicios", "text": "Analizamos el uso de nuestros servicios para mejorar la experiencia del usuario, desarrollar nuevas funcionalidades y optimizar nuestros procesos." },
-      "c4": { "subtitle": "2.4 Marketing", "text": "Con su consentimiento, podemos enviarle información sobre nuevos servicios, actualizaciones y ofertas especiales. Puede cancelar la suscripción en cualquier momento." }
+      "c1": {
+        "subtitle": "2.1 Prestación de Servicios",
+        "text": "Utilizamos su información para proporcionar, mantener y mejorar nuestros servicios de desarrollo de software, consultoría tecnológica y soluciones digitales."
+      },
+      "c2": {
+        "subtitle": "2.2 Comunicación",
+        "text": "Para comunicarnos con usted sobre sus proyectos, actualizaciones de servicios, soporte técnico y responder a sus consultas."
+      },
+      "c3": {
+        "subtitle": "2.3 Mejora de Servicios",
+        "text": "Analizamos el uso de nuestros servicios para mejorar la experiencia del usuario, desarrollar nuevas funcionalidades y optimizar nuestros procesos."
+      },
+      "c4": {
+        "subtitle": "2.4 Marketing",
+        "text": "Con su consentimiento, podemos enviarle información sobre nuevos servicios, actualizaciones y ofertas especiales. Puede cancelar la suscripción en cualquier momento."
+      }
     },
     "s3": {
       "title": "3. Protección de Datos",
-      "c1": { "subtitle": "3.1 Medidas de Seguridad", "text": "Implementamos medidas de seguridad técnicas y organizativas apropiadas para proteger su información personal contra acceso no autorizado, alteración, divulgación o destrucción. Esto incluye encriptación SSL/TLS, firewalls, controles de acceso y auditorías de seguridad regulares." },
-      "c2": { "subtitle": "3.2 Acceso Limitado", "text": "El acceso a su información personal está limitado a empleados, contratistas y agentes que necesitan conocer dicha información para procesarla en nuestro nombre y están sujetos a obligaciones de confidencialidad." },
-      "c3": { "subtitle": "3.3 Almacenamiento", "text": "Sus datos se almacenan en servidores seguros ubicados en centros de datos certificados. Utilizamos proveedores de servicios en la nube de confianza como AWS que cumplen con estándares internacionales de seguridad." }
+      "c1": {
+        "subtitle": "3.1 Medidas de Seguridad",
+        "text": "Implementamos medidas de seguridad técnicas y organizativas apropiadas para proteger su información personal contra acceso no autorizado, alteración, divulgación o destrucción. Esto incluye encriptación SSL/TLS, firewalls, controles de acceso y auditorías de seguridad regulares."
+      },
+      "c2": {
+        "subtitle": "3.2 Acceso Limitado",
+        "text": "El acceso a su información personal está limitado a empleados, contratistas y agentes que necesitan conocer dicha información para procesarla en nuestro nombre y están sujetos a obligaciones de confidencialidad."
+      },
+      "c3": {
+        "subtitle": "3.3 Almacenamiento",
+        "text": "Sus datos se almacenan en servidores seguros ubicados en centros de datos certificados. Utilizamos proveedores de servicios en la nube de confianza como AWS que cumplen con estándares internacionales de seguridad."
+      }
     },
     "s4": {
       "title": "4. Compartir Información",
-      "c1": { "subtitle": "4.1 Proveedores de Servicios", "text": "Compartimos información con proveedores de servicios externos que nos ayudan a operar nuestro negocio (hosting, análisis, procesamiento de pagos), quienes están obligados a proteger su información." },
-      "c2": { "subtitle": "4.2 Requisitos Legales", "text": "Podemos divulgar su información si lo requiere la ley, una orden judicial o para proteger nuestros derechos, propiedad o seguridad." },
-      "c3": { "subtitle": "4.3 Transferencias Empresariales", "text": "En caso de fusión, adquisición o venta de activos, su información personal puede ser transferida. Le notificaremos antes de que su información sea transferida y esté sujeta a una política de privacidad diferente." },
-      "c4": { "subtitle": "4.4 No Venta de Datos", "text": "KopTup NO vende, alquila ni comercializa su información personal a terceros para fines publicitarios." }
+      "c1": {
+        "subtitle": "4.1 Proveedores de Servicios",
+        "text": "Compartimos información con proveedores de servicios externos que nos ayudan a operar nuestro negocio (hosting, análisis, procesamiento de pagos), quienes están obligados a proteger su información."
+      },
+      "c2": {
+        "subtitle": "4.2 Requisitos Legales",
+        "text": "Podemos divulgar su información si lo requiere la ley, una orden judicial o para proteger nuestros derechos, propiedad o seguridad."
+      },
+      "c3": {
+        "subtitle": "4.3 Transferencias Empresariales",
+        "text": "En caso de fusión, adquisición o venta de activos, su información personal puede ser transferida. Le notificaremos antes de que su información sea transferida y esté sujeta a una política de privacidad diferente."
+      },
+      "c4": {
+        "subtitle": "4.4 No Venta de Datos",
+        "text": "KopTup NO vende, alquila ni comercializa su información personal a terceros para fines publicitarios."
+      }
     },
     "s5": {
       "title": "5. Retención de Datos",
-      "c1": { "subtitle": "5.1 Período de Retención", "text": "Retenemos su información personal durante el tiempo necesario para cumplir con los fines establecidos en esta política, a menos que la ley requiera o permita un período de retención más largo." },
-      "c2": { "subtitle": "5.2 Datos de Proyectos", "text": "Los datos relacionados con proyectos se mantienen durante la duración del proyecto y un período adicional para fines de soporte y garantía, típicamente entre 1-3 años después de la finalización." },
-      "c3": { "subtitle": "5.3 Eliminación", "text": "Cuando ya no necesitemos su información, la eliminaremos de forma segura o la anonimizaremos de manera que no pueda identificarlo." }
+      "c1": {
+        "subtitle": "5.1 Período de Retención",
+        "text": "Retenemos su información personal durante el tiempo necesario para cumplir con los fines establecidos en esta política, a menos que la ley requiera o permita un período de retención más largo."
+      },
+      "c2": {
+        "subtitle": "5.2 Datos de Proyectos",
+        "text": "Los datos relacionados con proyectos se mantienen durante la duración del proyecto y un período adicional para fines de soporte y garantía, típicamente entre 1-3 años después de la finalización."
+      },
+      "c3": {
+        "subtitle": "5.3 Eliminación",
+        "text": "Cuando ya no necesitemos su información, la eliminaremos de forma segura o la anonimizaremos de manera que no pueda identificarlo."
+      }
     },
     "rights": {
       "title": "Sus Derechos",
       "subtitle": "Usted tiene derecho a controlar su información personal. A continuación se detallan sus derechos:",
-      "r1": { "title": "Acceso", "description": "Solicitar una copia de la información personal que tenemos sobre usted." },
-      "r2": { "title": "Rectificación", "description": "Solicitar la corrección de información inexacta o incompleta." },
-      "r3": { "title": "Eliminación", "description": "Solicitar la eliminación de su información personal bajo ciertas circunstancias." },
-      "r4": { "title": "Portabilidad", "description": "Recibir su información en un formato estructurado y de uso común." },
-      "r5": { "title": "Oposición", "description": "Oponerse al procesamiento de su información para ciertos fines." },
-      "r6": { "title": "Limitación", "description": "Solicitar que limitemos el procesamiento de su información." },
+      "r1": {
+        "title": "Acceso",
+        "description": "Solicitar una copia de la información personal que tenemos sobre usted."
+      },
+      "r2": {
+        "title": "Rectificación",
+        "description": "Solicitar la corrección de información inexacta o incompleta."
+      },
+      "r3": {
+        "title": "Eliminación",
+        "description": "Solicitar la eliminación de su información personal bajo ciertas circunstancias."
+      },
+      "r4": {
+        "title": "Portabilidad",
+        "description": "Recibir su información en un formato estructurado y de uso común."
+      },
+      "r5": {
+        "title": "Oposición",
+        "description": "Oponerse al procesamiento de su información para ciertos fines."
+      },
+      "r6": {
+        "title": "Limitación",
+        "description": "Solicitar que limitemos el procesamiento de su información."
+      },
       "exerciseTitle": "Cómo Ejercer sus Derechos",
       "exerciseText": "Para ejercer cualquiera de estos derechos, contáctenos a través de:",
       "responseTime": "Responderemos a su solicitud dentro de 30 días hábiles."
@@ -392,53 +461,134 @@
     },
     "s1": {
       "title": "1. Aceptación de los Términos",
-      "c1": { "text": "Al acceder y utilizar los servicios de KopTup - Soluciones Tecnológicas (\"KopTup\", \"nosotros\", \"nuestro\"), usted acepta estar legalmente vinculado por estos Términos y Condiciones. Si no está de acuerdo con alguna parte de estos términos, no debe utilizar nuestros servicios." },
-      "c2": { "text": "Estos términos se aplican a todos los usuarios, clientes y visitantes de nuestro sitio web y servicios, incluyendo pero no limitado a: desarrollo de software, desarrollo web, aplicaciones móviles, inteligencia artificial, chatbots, e-commerce, consultoría tecnológica y cualquier otro servicio ofrecido por KopTup." },
-      "c3": { "text": "Nos reservamos el derecho de modificar estos términos en cualquier momento. Los cambios entrarán en vigencia inmediatamente después de su publicación en nuestro sitio web. Su uso continuado de nuestros servicios constituye su aceptación de los términos modificados." }
+      "c1": {
+        "text": "Al acceder y utilizar los servicios de KopTup - Soluciones Tecnológicas (\"KopTup\", \"nosotros\", \"nuestro\"), usted acepta estar legalmente vinculado por estos Términos y Condiciones. Si no está de acuerdo con alguna parte de estos términos, no debe utilizar nuestros servicios."
+      },
+      "c2": {
+        "text": "Estos términos se aplican a todos los usuarios, clientes y visitantes de nuestro sitio web y servicios, incluyendo pero no limitado a: desarrollo de software, desarrollo web, aplicaciones móviles, inteligencia artificial, chatbots, e-commerce, consultoría tecnológica y cualquier otro servicio ofrecido por KopTup."
+      },
+      "c3": {
+        "text": "Nos reservamos el derecho de modificar estos términos en cualquier momento. Los cambios entrarán en vigencia inmediatamente después de su publicación en nuestro sitio web. Su uso continuado de nuestros servicios constituye su aceptación de los términos modificados."
+      }
     },
     "s2": {
       "title": "2. Servicios Ofrecidos",
-      "c1": { "subtitle": "2.1 Descripción de Servicios", "text": "KopTup ofrece servicios profesionales de desarrollo de software y soluciones tecnológicas, incluyendo pero no limitado a: desarrollo de aplicaciones web y móviles, sistemas de inteligencia artificial, chatbots, plataformas de e-commerce, integraciones API, consultoría tecnológica, diseño UX/UI y servicios de mantenimiento." },
-      "c2": { "subtitle": "2.2 Alcance del Proyecto", "text": "El alcance específico de cada proyecto se definirá en una propuesta comercial o contrato separado. Cada proyecto incluirá: objetivos específicos, entregables, cronograma, presupuesto y condiciones de pago." },
-      "c3": { "subtitle": "2.3 Modificaciones al Alcance", "text": "Cualquier modificación al alcance original del proyecto debe ser acordada por escrito y puede resultar en ajustes al cronograma y presupuesto. Los cambios significativos pueden requerir una adenda al contrato original." }
+      "c1": {
+        "subtitle": "2.1 Descripción de Servicios",
+        "text": "KopTup ofrece servicios profesionales de desarrollo de software y soluciones tecnológicas, incluyendo pero no limitado a: desarrollo de aplicaciones web y móviles, sistemas de inteligencia artificial, chatbots, plataformas de e-commerce, integraciones API, consultoría tecnológica, diseño UX/UI y servicios de mantenimiento."
+      },
+      "c2": {
+        "subtitle": "2.2 Alcance del Proyecto",
+        "text": "El alcance específico de cada proyecto se definirá en una propuesta comercial o contrato separado. Cada proyecto incluirá: objetivos específicos, entregables, cronograma, presupuesto y condiciones de pago."
+      },
+      "c3": {
+        "subtitle": "2.3 Modificaciones al Alcance",
+        "text": "Cualquier modificación al alcance original del proyecto debe ser acordada por escrito y puede resultar en ajustes al cronograma y presupuesto. Los cambios significativos pueden requerir una adenda al contrato original."
+      }
     },
     "s3": {
       "title": "3. Precios y Pagos",
-      "c1": { "subtitle": "3.1 Precios", "text": "Los precios de nuestros servicios se especificarán en la propuesta comercial correspondiente. Todos los precios están expresados en pesos colombianos (COP) o dólares estadounidenses (USD), según se acuerde, y no incluyen impuestos aplicables a menos que se especifique lo contrario." },
-      "c2": { "subtitle": "3.2 Condiciones de Pago", "text": "Generalmente requerimos un anticipo del 50% al inicio del proyecto y el 50% restante al finalizar. Para proyectos de mayor envergadura, podemos establecer hitos de pago específicos. Los pagos deben realizarse dentro de los 15 días posteriores a la emisión de la factura." },
-      "c3": { "subtitle": "3.3 Pagos Atrasados", "text": "Los pagos no realizados en la fecha de vencimiento estarán sujetos a un interés moratorio del 1.5% mensual. KopTup se reserva el derecho de suspender los servicios hasta que se regularice el pago." },
-      "c4": { "subtitle": "3.4 Gastos Adicionales", "text": "Cualquier gasto adicional requerido para el proyecto (licencias de software, servicios de terceros, hosting, etc.) será facturado por separado o incluido en la propuesta si se conoce de antemano." }
+      "c1": {
+        "subtitle": "3.1 Precios",
+        "text": "Los precios de nuestros servicios se especificarán en la propuesta comercial correspondiente. Todos los precios están expresados en pesos colombianos (COP) o dólares estadounidenses (USD), según se acuerde, y no incluyen impuestos aplicables a menos que se especifique lo contrario."
+      },
+      "c2": {
+        "subtitle": "3.2 Condiciones de Pago",
+        "text": "Generalmente requerimos un anticipo del 50% al inicio del proyecto y el 50% restante al finalizar. Para proyectos de mayor envergadura, podemos establecer hitos de pago específicos. Los pagos deben realizarse dentro de los 15 días posteriores a la emisión de la factura."
+      },
+      "c3": {
+        "subtitle": "3.3 Pagos Atrasados",
+        "text": "Los pagos no realizados en la fecha de vencimiento estarán sujetos a un interés moratorio del 1.5% mensual. KopTup se reserva el derecho de suspender los servicios hasta que se regularice el pago."
+      },
+      "c4": {
+        "subtitle": "3.4 Gastos Adicionales",
+        "text": "Cualquier gasto adicional requerido para el proyecto (licencias de software, servicios de terceros, hosting, etc.) será facturado por separado o incluido en la propuesta si se conoce de antemano."
+      }
     },
     "s4": {
       "title": "4. Propiedad Intelectual",
-      "c1": { "subtitle": "4.1 Derechos del Cliente", "text": "Una vez completado el pago total del proyecto, el cliente recibirá los derechos de uso del software desarrollado específicamente para su proyecto. Esto incluye el código fuente personalizado y los diseños creados exclusivamente para el cliente." },
-      "c2": { "subtitle": "4.2 Derechos de KopTup", "text": "KopTup retiene la propiedad de: frameworks, herramientas, componentes reutilizables, metodologías y cualquier código o material preexistente utilizado en el proyecto. También nos reservamos el derecho de utilizar el conocimiento general y experiencia adquirida en proyectos futuros." },
-      "c3": { "subtitle": "4.3 Licencias de Terceros", "text": "El software puede incluir componentes de código abierto o licencias de terceros. El cliente es responsable de cumplir con los términos de dichas licencias. KopTup proporcionará documentación de las licencias utilizadas." },
-      "c4": { "subtitle": "4.4 Portfolio y Marketing", "text": "KopTup se reserva el derecho de incluir el proyecto en su portfolio, materiales de marketing y estudios de caso, a menos que exista un acuerdo de confidencialidad específico que lo prohíba." }
+      "c1": {
+        "subtitle": "4.1 Derechos del Cliente",
+        "text": "Una vez completado el pago total del proyecto, el cliente recibirá los derechos de uso del software desarrollado específicamente para su proyecto. Esto incluye el código fuente personalizado y los diseños creados exclusivamente para el cliente."
+      },
+      "c2": {
+        "subtitle": "4.2 Derechos de KopTup",
+        "text": "KopTup retiene la propiedad de: frameworks, herramientas, componentes reutilizables, metodologías y cualquier código o material preexistente utilizado en el proyecto. También nos reservamos el derecho de utilizar el conocimiento general y experiencia adquirida en proyectos futuros."
+      },
+      "c3": {
+        "subtitle": "4.3 Licencias de Terceros",
+        "text": "El software puede incluir componentes de código abierto o licencias de terceros. El cliente es responsable de cumplir con los términos de dichas licencias. KopTup proporcionará documentación de las licencias utilizadas."
+      },
+      "c4": {
+        "subtitle": "4.4 Portfolio y Marketing",
+        "text": "KopTup se reserva el derecho de incluir el proyecto en su portfolio, materiales de marketing y estudios de caso, a menos que exista un acuerdo de confidencialidad específico que lo prohíba."
+      }
     },
     "s5": {
       "title": "5. Confidencialidad",
-      "c1": { "subtitle": "5.1 Información Confidencial", "text": "Ambas partes acuerdan mantener confidencial toda información propietaria, comercial o técnica compartida durante la relación comercial. Esto incluye pero no se limita a: código fuente, diseños, estrategias de negocio, datos de clientes y información financiera." },
-      "c2": { "subtitle": "5.2 Excepciones", "text": "La obligación de confidencialidad no se aplica a información que: sea de dominio público, sea desarrollada independientemente, sea requerida por ley, o sea autorizada por escrito para su divulgación." },
-      "c3": { "subtitle": "5.3 Duración", "text": "Las obligaciones de confidencialidad permanecerán vigentes durante la relación comercial y por un período de 3 años después de su terminación." }
+      "c1": {
+        "subtitle": "5.1 Información Confidencial",
+        "text": "Ambas partes acuerdan mantener confidencial toda información propietaria, comercial o técnica compartida durante la relación comercial. Esto incluye pero no se limita a: código fuente, diseños, estrategias de negocio, datos de clientes y información financiera."
+      },
+      "c2": {
+        "subtitle": "5.2 Excepciones",
+        "text": "La obligación de confidencialidad no se aplica a información que: sea de dominio público, sea desarrollada independientemente, sea requerida por ley, o sea autorizada por escrito para su divulgación."
+      },
+      "c3": {
+        "subtitle": "5.3 Duración",
+        "text": "Las obligaciones de confidencialidad permanecerán vigentes durante la relación comercial y por un período de 3 años después de su terminación."
+      }
     },
     "s6": {
       "title": "6. Plazos y Entregas",
-      "c1": { "subtitle": "6.1 Cronograma", "text": "Los plazos de entrega se especificarán en la propuesta del proyecto y se consideran estimaciones basadas en el alcance acordado. Haremos nuestro mejor esfuerzo para cumplir con los plazos establecidos." },
-      "c2": { "subtitle": "6.2 Retrasos", "text": "Los plazos pueden extenderse debido a: cambios en el alcance solicitados por el cliente, retrasos en la provisión de información o materiales necesarios, circunstancias de fuerza mayor, o problemas técnicos imprevistos." },
-      "c3": { "subtitle": "6.3 Colaboración del Cliente", "text": "El cumplimiento de los plazos depende de la colaboración oportuna del cliente, incluyendo: provisión de contenidos, feedback en tiempo, aprobaciones y acceso a sistemas necesarios." }
+      "c1": {
+        "subtitle": "6.1 Cronograma",
+        "text": "Los plazos de entrega se especificarán en la propuesta del proyecto y se consideran estimaciones basadas en el alcance acordado. Haremos nuestro mejor esfuerzo para cumplir con los plazos establecidos."
+      },
+      "c2": {
+        "subtitle": "6.2 Retrasos",
+        "text": "Los plazos pueden extenderse debido a: cambios en el alcance solicitados por el cliente, retrasos en la provisión de información o materiales necesarios, circunstancias de fuerza mayor, o problemas técnicos imprevistos."
+      },
+      "c3": {
+        "subtitle": "6.3 Colaboración del Cliente",
+        "text": "El cumplimiento de los plazos depende de la colaboración oportuna del cliente, incluyendo: provisión de contenidos, feedback en tiempo, aprobaciones y acceso a sistemas necesarios."
+      }
     },
     "s7": {
       "title": "7. Garantías y Limitaciones",
-      "c1": { "subtitle": "7.1 Garantía de Servicios", "text": "Garantizamos que los servicios se realizarán con profesionalismo y de acuerdo con los estándares de la industria. Proporcionamos un período de garantía de 30-90 días (según lo acordado) para corregir errores o defectos en el código entregado." },
-      "c2": { "subtitle": "7.2 Exclusiones de Garantía", "text": "La garantía no cubre: problemas causados por modificaciones del cliente, uso inadecuado, cambios en el entorno de hosting, servicios de terceros, o problemas en equipos/software del cliente." },
-      "c3": { "subtitle": "7.3 Limitación de Responsabilidad", "text": "En ningún caso KopTup será responsable por daños indirectos, incidentales, especiales o consecuentes. Nuestra responsabilidad total no excederá el monto pagado por el cliente para el proyecto específico." },
-      "c4": { "subtitle": "7.4 Descargo de Responsabilidad", "text": "Los servicios se proporcionan \"tal cual\". No garantizamos que el software estará libre de errores o que funcionará sin interrupciones. El cliente es responsable de mantener respaldos adecuados de sus datos." }
+      "c1": {
+        "subtitle": "7.1 Garantía de Servicios",
+        "text": "Garantizamos que los servicios se realizarán con profesionalismo y de acuerdo con los estándares de la industria. Proporcionamos un período de garantía de 30-90 días (según lo acordado) para corregir errores o defectos en el código entregado."
+      },
+      "c2": {
+        "subtitle": "7.2 Exclusiones de Garantía",
+        "text": "La garantía no cubre: problemas causados por modificaciones del cliente, uso inadecuado, cambios en el entorno de hosting, servicios de terceros, o problemas en equipos/software del cliente."
+      },
+      "c3": {
+        "subtitle": "7.3 Limitación de Responsabilidad",
+        "text": "En ningún caso KopTup será responsable por daños indirectos, incidentales, especiales o consecuentes. Nuestra responsabilidad total no excederá el monto pagado por el cliente para el proyecto específico."
+      },
+      "c4": {
+        "subtitle": "7.4 Descargo de Responsabilidad",
+        "text": "Los servicios se proporcionan \"tal cual\". No garantizamos que el software estará libre de errores o que funcionará sin interrupciones. El cliente es responsable de mantener respaldos adecuados de sus datos."
+      }
     },
-    "at1": { "title": "8. Soporte y Mantenimiento", "content": "El soporte posterior a la entrega se especifica en el contrato del proyecto. El soporte de garantía cubre la corrección de errores en el código entregado. Los servicios de mantenimiento continuo, actualizaciones de funcionalidades y soporte técnico extendido están disponibles mediante contratos separados." },
-    "at2": { "title": "9. Terminación del Servicio", "content": "Cualquiera de las partes puede terminar el contrato con 30 días de aviso por escrito. En caso de terminación, el cliente pagará por todo el trabajo completado hasta la fecha. Si el cliente termina el contrato sin causa justificada, el anticipo no será reembolsable. KopTup puede terminar inmediatamente el contrato en caso de incumplimiento material del cliente." },
-    "at3": { "title": "10. Ley Aplicable y Jurisdicción", "content": "Estos términos se regirán e interpretarán de acuerdo con las leyes de la República de Colombia. Cualquier disputa derivada de estos términos estará sujeta a la jurisdicción exclusiva de los tribunales de Bogotá, Colombia. Las partes intentarán resolver cualquier disputa mediante negociación de buena fe antes de recurrir a procedimientos legales." },
-    "at4": { "title": "11. Acuerdo Completo", "content": "Estos términos, junto con cualquier propuesta o contrato específico del proyecto, constituyen el acuerdo completo entre las partes. Cualquier modificación debe realizarse por escrito y ser firmada por ambas partes. Si alguna disposición se considera inválida, las disposiciones restantes permanecerán en vigor." },
+    "at1": {
+      "title": "8. Soporte y Mantenimiento",
+      "content": "El soporte posterior a la entrega se especifica en el contrato del proyecto. El soporte de garantía cubre la corrección de errores en el código entregado. Los servicios de mantenimiento continuo, actualizaciones de funcionalidades y soporte técnico extendido están disponibles mediante contratos separados."
+    },
+    "at2": {
+      "title": "9. Terminación del Servicio",
+      "content": "Cualquiera de las partes puede terminar el contrato con 30 días de aviso por escrito. En caso de terminación, el cliente pagará por todo el trabajo completado hasta la fecha. Si el cliente termina el contrato sin causa justificada, el anticipo no será reembolsable. KopTup puede terminar inmediatamente el contrato en caso de incumplimiento material del cliente."
+    },
+    "at3": {
+      "title": "10. Ley Aplicable y Jurisdicción",
+      "content": "Estos términos se regirán e interpretarán de acuerdo con las leyes de la República de Colombia. Cualquier disputa derivada de estos términos estará sujeta a la jurisdicción exclusiva de los tribunales de Bogotá, Colombia. Las partes intentarán resolver cualquier disputa mediante negociación de buena fe antes de recurrir a procedimientos legales."
+    },
+    "at4": {
+      "title": "11. Acuerdo Completo",
+      "content": "Estos términos, junto con cualquier propuesta o contrato específico del proyecto, constituyen el acuerdo completo entre las partes. Cualquier modificación debe realizarse por escrito y ser firmada por ambas partes. Si alguna disposición se considera inválida, las disposiciones restantes permanecerán en vigor."
+    },
     "contact": {
       "title": "12. Información de Contacto",
       "text": "Si tiene preguntas sobre estos Términos y Condiciones, contáctenos:",
@@ -478,24 +628,64 @@
       "ct1": {
         "title": "Cookies Esenciales",
         "description": "Cookies necesarias para el funcionamiento básico del sitio web",
-        "ck1": { "purpose": "Mantener la sesión del usuario", "duration": "Sesión", "type": "Primera parte" },
-        "ck2": { "purpose": "Autenticación y seguridad", "duration": "7 días", "type": "Primera parte" },
-        "ck3": { "purpose": "Protección contra ataques CSRF", "duration": "Sesión", "type": "Primera parte" },
-        "ck4": { "purpose": "Almacenar preferencias de cookies", "duration": "1 año", "type": "Primera parte" }
+        "ck1": {
+          "purpose": "Mantener la sesión del usuario",
+          "duration": "Sesión",
+          "type": "Primera parte"
+        },
+        "ck2": {
+          "purpose": "Autenticación y seguridad",
+          "duration": "7 días",
+          "type": "Primera parte"
+        },
+        "ck3": {
+          "purpose": "Protección contra ataques CSRF",
+          "duration": "Sesión",
+          "type": "Primera parte"
+        },
+        "ck4": {
+          "purpose": "Almacenar preferencias de cookies",
+          "duration": "1 año",
+          "type": "Primera parte"
+        }
       },
       "ct2": {
         "title": "Cookies Funcionales",
         "description": "Cookies que mejoran la funcionalidad y personalización",
-        "ck1": { "purpose": "Recordar preferencia de idioma", "duration": "1 año", "type": "Primera parte" },
-        "ck2": { "purpose": "Recordar tema (claro/oscuro)", "duration": "1 año", "type": "Primera parte" },
-        "ck3": { "purpose": "Almacenar configuraciones del usuario", "duration": "6 meses", "type": "Primera parte" }
+        "ck1": {
+          "purpose": "Recordar preferencia de idioma",
+          "duration": "1 año",
+          "type": "Primera parte"
+        },
+        "ck2": {
+          "purpose": "Recordar tema (claro/oscuro)",
+          "duration": "1 año",
+          "type": "Primera parte"
+        },
+        "ck3": {
+          "purpose": "Almacenar configuraciones del usuario",
+          "duration": "6 meses",
+          "type": "Primera parte"
+        }
       },
       "ct3": {
         "title": "Cookies Analíticas",
         "description": "Cookies que nos ayudan a entender cómo se utiliza el sitio",
-        "ck1": { "purpose": "Google Analytics - Distinguir usuarios", "duration": "2 años", "type": "Terceros (Google)" },
-        "ck2": { "purpose": "Google Analytics - Distinguir usuarios", "duration": "24 horas", "type": "Terceros (Google)" },
-        "ck3": { "purpose": "Google Analytics - Limitar tasa de solicitudes", "duration": "1 minuto", "type": "Terceros (Google)" }
+        "ck1": {
+          "purpose": "Google Analytics - Distinguir usuarios",
+          "duration": "2 años",
+          "type": "Terceros (Google)"
+        },
+        "ck2": {
+          "purpose": "Google Analytics - Distinguir usuarios",
+          "duration": "24 horas",
+          "type": "Terceros (Google)"
+        },
+        "ck3": {
+          "purpose": "Google Analytics - Limitar tasa de solicitudes",
+          "duration": "1 minuto",
+          "type": "Terceros (Google)"
+        }
       }
     },
     "preferences": {
@@ -2049,6 +2239,219 @@
     "close": "Cerrar",
     "copyEmail": "Copiar Email"
   },
+  "demoCmsPro": {
+    "topbar": {
+      "currentSite": "Sitio actual",
+      "workflowBadge": "Workflow",
+      "aiAssistant": "Asistente IA",
+      "translate": "Traducir",
+      "seoScore": "SEO score",
+      "experimentMode": "Modo experimento",
+      "personalize": "Personalizar",
+      "settings": "Configuración técnica"
+    },
+    "sidebar": {
+      "title": "Navegación CMS",
+      "editor": "Editor",
+      "blocks": "Bloques",
+      "dam": "Biblioteca DAM",
+      "workflow": "Workflow",
+      "templates": "Plantillas",
+      "collapse": "Colapsar",
+      "expand": "Expandir"
+    },
+    "drawer": {
+      "close": "Cerrar"
+    },
+    "techConfig": {
+      "title": "Configuración técnica",
+      "subtitle": "Arquitectura headless e ISR + revalidación",
+      "tabs": {
+        "headless": "Arquitectura headless",
+        "isr": "ISR + Revalidación"
+      }
+    },
+    "multisite": {
+      "sites": {
+        "corp": "KopTup Corporate",
+        "blog": "Blog KopTup",
+        "docs": "Docs Developers",
+        "shop": "Shop KopTup",
+        "support": "Support Center"
+      },
+      "metrics": {
+        "pages": "Páginas",
+        "drafts": "Borradores",
+        "published": "Publicadas",
+        "traffic": "Tráfico 30d"
+      }
+    },
+    "workflow": {
+      "title": "Workflow editorial",
+      "desc": "Estados Draft, Review, Approved, Scheduled, Published.",
+      "changeState": "Cambiar estado",
+      "steps": {
+        "draft": "Borrador",
+        "review": "Revisión",
+        "approved": "Aprobado",
+        "scheduled": "Programado",
+        "published": "Publicado"
+      },
+      "approvals": "Aprobaciones requeridas",
+      "approver1": "Editor jefe",
+      "approver2": "Legal",
+      "approver3": "Dirección",
+      "scheduledFor": "Programado para",
+      "currentDoc": "Documento en flujo"
+    },
+    "i18n": {
+      "title": "Traducción multi-idioma",
+      "desc": "Workflow con motores neuronales y QA editorial.",
+      "engine": "Motor: DeepL Pro + GPT-4o revisión",
+      "headers": {
+        "doc": "Documento",
+        "lang": "Idioma",
+        "status": "Estado",
+        "engine": "Motor"
+      },
+      "status": {
+        "pending": "Pendiente",
+        "review": "En revisión",
+        "approved": "Aprobado"
+      }
+    },
+    "ai": {
+      "title": "Generación de contenido con IA",
+      "desc": "Streaming, brand voice y SEO assist.",
+      "prompt": "Prompt",
+      "promptPlaceholder": "Ej: artículo sobre lanzamiento de producto en LATAM",
+      "generate": "Generar",
+      "brand": "Brand voice tune",
+      "seo": "SEO suggest",
+      "tone": "Tone adjust",
+      "outputTitle": "Output (streaming mock)",
+      "outputBody": "El lanzamiento del nuevo producto en LATAM marca un hito estratégico..."
+    },
+    "seo": {
+      "title": "SEO técnico automático",
+      "desc": "Schema.org, sitemap dinámico, hreflang y previews sociales.",
+      "cards": {
+        "schema": "Schema.org auto",
+        "schemaDesc": "JSON-LD inyectado por tipo de contenido.",
+        "sitemap": "Sitemap dinámico",
+        "sitemapDesc": "Regeneración incremental, prioridades y lastmod.",
+        "hreflang": "hreflang",
+        "hreflangDesc": "Etiquetas por idioma/región con fallback.",
+        "og": "Open Graph",
+        "ogDesc": "Imágenes OG dinámicas vía edge function."
+      },
+      "serp": "Preview SERP",
+      "serpTitle": "Lanzamiento KopTup CMS · Headless enterprise",
+      "serpUrl": "koptup.com › productos › cms-headless",
+      "serpDesc": "CMS headless con workflows editoriales, multi-idioma e IA generativa."
+    },
+    "ab": {
+      "title": "A/B testing nativo",
+      "desc": "Experimentos por variant con corte estadístico.",
+      "headers": {
+        "exp": "Experimento",
+        "variants": "Variantes",
+        "traffic": "Tráfico",
+        "winner": "Ganadora",
+        "significance": "Significancia"
+      },
+      "exps": {
+        "hero": "Hero homepage",
+        "cta": "CTA pricing",
+        "checkout": "Checkout copy"
+      }
+    },
+    "edge": {
+      "title": "Edge personalization",
+      "desc": "Contenido por segmento entregado desde el edge.",
+      "selectors": {
+        "cookie": "Cookie",
+        "utm": "UTM",
+        "geo": "Geo"
+      },
+      "segments": {
+        "anon": "Anónimo",
+        "lead": "Lead",
+        "customer": "Cliente",
+        "enterprise": "Enterprise"
+      },
+      "contents": {
+        "hero": "Hero",
+        "cta": "CTA",
+        "pricing": "Pricing",
+        "case": "Case study"
+      }
+    },
+    "blocks": {
+      "title": "Editor de bloques estilo Notion",
+      "desc": "Bloques arrastrables con handle, autosave y comentarios inline.",
+      "addBlock": "Añadir bloque",
+      "heading": "Título: Roadmap Q2 2026",
+      "paragraph": "Resumen ejecutivo del trimestre con métricas clave.",
+      "image": "Imagen: hero-launch.jpg (WebP · LQIP)",
+      "code": "Code: snippet TypeScript · 12 líneas",
+      "embed": "Embed: YouTube · video institucional · 2:34",
+      "table": "Tabla: KPIs por país (5 columnas · 8 filas)",
+      "types": {
+        "heading": "Encabezado",
+        "paragraph": "Párrafo",
+        "image": "Imagen",
+        "code": "Código",
+        "embed": "Embed",
+        "table": "Tabla"
+      }
+    },
+    "dam": {
+      "title": "Digital Asset Management",
+      "desc": "Biblioteca con AI tags, detección facial y transformación on-the-fly.",
+      "faceDetection": "Detección facial",
+      "transform": "Transform URL",
+      "tags": "Tags IA",
+      "assets": {
+        "a1": "team-photo-2025.jpg",
+        "a2": "product-hero.webp",
+        "a3": "office-bogota.jpg",
+        "a4": "launch-event.png",
+        "a5": "client-logos.svg",
+        "a6": "ceo-portrait.jpg"
+      }
+    },
+    "headless": {
+      "title": "Arquitectura headless multi-frontend",
+      "desc": "API agnóstica del canal con entrega vía Edge CDN.",
+      "cms": "CMS API",
+      "api": "GraphQL / REST",
+      "edge": "Edge CDN",
+      "frontends": "Frontends",
+      "next": "Next.js",
+      "astro": "Astro",
+      "mobile": "Mobile React Native",
+      "latencyP95": "Latencia p95 edge",
+      "uptime": "Uptime SLA",
+      "regions": "Regiones edge"
+    },
+    "isr": {
+      "title": "ISR + revalidación on-demand",
+      "desc": "Cache inteligente por ruta con invalidación inmediata.",
+      "timeline": "Timeline cache",
+      "revalidate": "Revalidar ahora",
+      "events": {
+        "publish": "Publicación de artículo",
+        "cacheHit": "Cache HIT (edge SFO)",
+        "purge": "Purge selectivo",
+        "rebuild": "Rebuild incremental",
+        "ready": "Listo"
+      },
+      "ttl": "TTL configurado",
+      "lastBuild": "Último build",
+      "revalidated": "Revalidación disparada"
+    }
+  },
   "projectManager": {
     "appName": "ProyectHub",
     "newProject": "Nuevo Proyecto",
@@ -2134,10 +2537,14 @@
       "cta2": "Solicitar Cotización"
     },
     "stats": {
-      "s1v": "80%", "s1l": "Reducción en tiempos de respuesta",
-      "s2v": "24/7", "s2l": "Atención sin interrupciones",
-      "s3v": "3x", "s3l": "Más leads calificados",
-      "s4v": "60%", "s4l": "Menos carga en soporte"
+      "s1v": "80%",
+      "s1l": "Reducción en tiempos de respuesta",
+      "s2v": "24/7",
+      "s2l": "Atención sin interrupciones",
+      "s3v": "3x",
+      "s3l": "Más leads calificados",
+      "s4v": "60%",
+      "s4l": "Menos carga en soporte"
     },
     "why": {
       "title": "¿Por qué implementar un Chatbot con IA?",
@@ -2233,10 +2640,12 @@
   },
   "devWebPage": {
     "badge": "Desarrollo Web Colombia",
-    "hero.title": "Empresa de Desarrollo Web y Software a Medida en Colombia",
-    "hero.subtitle": "Contrata a KopTup para desarrollar tu aplicación web, chatbot, e-commerce o sistema empresarial. Más de 100 proyectos entregados en Colombia y Latinoamérica. Cotización gratis.",
-    "hero.cta1": "Solicitar Cotización Gratis",
-    "hero.cta2": "Ver Demos",
+    "hero": {
+      "title": "Empresa de Desarrollo Web y Software a Medida en Colombia",
+      "subtitle": "Contrata a KopTup para desarrollar tu aplicación web, chatbot, e-commerce o sistema empresarial. Más de 100 proyectos entregados en Colombia y Latinoamérica. Cotización gratis.",
+      "cta1": "Solicitar Cotización Gratis",
+      "cta2": "Ver Demos"
+    },
     "statsTitle": "Números que respaldan nuestra experiencia",
     "s1v": "+100",
     "s1l": "Proyectos entregados",

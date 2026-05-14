@@ -6,6 +6,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import ThemeProvider from '@/components/providers/ThemeProvider';
 import ConditionalLayout from '@/components/layout/ConditionalLayout';
 import ClientToaster from '../components/ClientToaster';
+import { getOrganizationSchema, getWebSiteSchema } from '@/lib/seo-config';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
@@ -142,6 +143,19 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.google.com" />
         <link rel="dns-prefetch" href="https://koptup-uploads.s3.amazonaws.com" />
+        {/* DNS prefetch para imágenes externas usadas en marketing pages */}
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://media.licdn.com" />
+        <link rel="dns-prefetch" href="https://picsum.photos" />
+        {/* JSON-LD global: Organization + WebSite (SearchAction) */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(getOrganizationSchema()) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(getWebSiteSchema()) }}
+        />
       </head>
       <body className={`${inter.variable} ${poppins.variable} font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>

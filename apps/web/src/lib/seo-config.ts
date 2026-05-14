@@ -421,6 +421,295 @@ export const seoConfig: Record<string, PageSEO> = {
     ],
     canonical: `${baseUrl}/demo/sistema-experto`,
   },
+
+  // DEMOS EXTRA (catálogo nuevo)
+
+  'demo-automatizacion': {
+    title: 'Plataforma de Automatización de Workflows | n8n / Zapier con IA',
+    description:
+      'Plataforma de automatización visual estilo n8n / Zapier con 500+ integraciones, AI nodes nativos (LLM, RAG, vision, STT/TTS), code nodes JS/Python y self-hosted opcional. Conectá Gmail, Slack, WhatsApp, Salesforce y más sin programar.',
+    keywords: [
+      'automatización workflows',
+      'plataforma automatización Colombia',
+      'alternativa zapier',
+      'alternativa n8n',
+      'integraciones empresariales',
+      'AI workflow automation',
+      'orquestación procesos IA',
+      'low-code automatización',
+    ],
+    canonical: `${baseUrl}/demo/automatizacion`,
+  },
+
+  'demo-code-review-ia': {
+    title: 'Code Review con IA | Revisión Automática de Pull Requests',
+    description:
+      'Plataforma de code review con inteligencia artificial que analiza pull requests buscando bugs, vulnerabilidades (SAST/DAST/SCA), problemas de performance y diseño. Genera tests automáticos y sugiere refactors. Integración con GitHub, GitLab, Bitbucket.',
+    keywords: [
+      'code review IA',
+      'revisión código automatizada',
+      'SAST DAST SCA',
+      'seguridad código',
+      'generación tests automáticos',
+      'devtools IA Colombia',
+      'github code review bot',
+      'static analysis',
+    ],
+    canonical: `${baseUrl}/demo/code-review-ia`,
+  },
+
+  'demo-delivery': {
+    title: 'App de Delivery tipo Rappi / Uber Eats | Customer, Driver, Merchant',
+    description:
+      'Ecosistema completo para crear tu app de delivery: app de cliente, conductor, comercio y dashboard de operaciones. Tracking en vivo, routing ML, pricing dinámico (surge), anti-fraude y carriers integrados. Listo para lanzar al mercado.',
+    keywords: [
+      'app delivery Colombia',
+      'alternativa rappi',
+      'desarrollo app delivery',
+      'last-mile delivery software',
+      'route optimization ML',
+      'surge pricing',
+      'app conductor driver',
+      'plataforma delivery on-demand',
+    ],
+    canonical: `${baseUrl}/demo/delivery`,
+  },
+
+  'demo-facturacion-electronica': {
+    title: 'Facturación Electrónica Multi-país LatAm | DIAN, SAT, AFIP, SII, SUNAT',
+    description:
+      'Plataforma de facturación electrónica para 8 países de Latinoamérica (Colombia DIAN, México SAT, Argentina AFIP, Chile SII, Perú SUNAT, Uruguay DGI, Paraguay SET, Ecuador SRI). Emisión, recepción, OCR, validación NIT en tiempo real y modo white-label.',
+    keywords: [
+      'facturación electrónica Colombia DIAN',
+      'facturación electrónica México SAT',
+      'facturación electrónica multi-país',
+      'API facturación electrónica',
+      'facturación electrónica white-label',
+      'integración DIAN',
+      'sdk facturación electrónica',
+      'fintech LatAm',
+    ],
+    canonical: `${baseUrl}/demo/facturacion-electronica`,
+  },
+
+  'demo-firma-electronica': {
+    title: 'Firma Electrónica Avanzada | eIDAS y Ley 527 Colombia',
+    description:
+      'Firma electrónica simple, avanzada y cualificada con validez legal eIDAS (Europa) y Ley 527 (Colombia). KYC con SMS, email, ID+selfie, video y biometría. Audit trail criptográfico, RFC 3161 timestamp y blockchain. Multi-firmante con orden y bulk send.',
+    keywords: [
+      'firma electrónica Colombia',
+      'firma digital Ley 527',
+      'firma electrónica avanzada',
+      'firma cualificada eIDAS',
+      'firma electrónica empresas',
+      'audit trail firma',
+      'firma documentos online',
+      'legaltech Colombia',
+    ],
+    canonical: `${baseUrl}/demo/firma-electronica`,
+  },
+
+  'demo-helpdesk-ia': {
+    title: 'Help Desk Omnichannel con IA | Ticketing Inteligente',
+    description:
+      'Mesa de ayuda omnichannel con IA: email, WhatsApp, Instagram, Facebook, X, voice y chat unificados. Routing ML por skills, sentiment e idioma. Sugerencias IA en vivo, SLA management, CSAT/NPS automatizado y QA con IA. Escala soporte sin contratar más agentes.',
+    keywords: [
+      'help desk IA',
+      'ticketing inteligente',
+      'mesa ayuda omnichannel',
+      'soporte WhatsApp IA',
+      'software help desk Colombia',
+      'CSAT NPS automatizado',
+      'alternativa zendesk',
+      'AI customer support',
+    ],
+    canonical: `${baseUrl}/demo/helpdesk-ia`,
+  },
+
+  'demo-hrms': {
+    title: 'HRMS Software de Gestión de RRHH | ATS, Nómina y AI Insights',
+    description:
+      'Sistema HRMS completo con ATS (scoring CV IA), onboarding/offboarding con e-sign, performance, payroll multi-país (Colombia, México, Argentina) y AI insights de retención y eNPS. Predice qué empleados van a renunciar antes que ocurra.',
+    keywords: [
+      'HRMS Colombia',
+      'software RRHH a medida',
+      'ATS recursos humanos',
+      'payroll multi-país LatAm',
+      'gestión nómina Colombia',
+      'people analytics IA',
+      'eNPS retención predictiva',
+      'sistema gestión talento',
+    ],
+    canonical: `${baseUrl}/demo/hrms`,
+  },
+
+  'demo-lms': {
+    title: 'LMS Plataforma E-Learning con IA | AI Tutor y Adaptive Learning',
+    description:
+      'Plataforma LMS / e-learning con AI Tutor 1:1 conversacional, adaptive learning paths, live classes con breakout rooms, subtítulos multi-idioma y gamification (XP, badges, leaderboards). Certificados verificables en blockchain. Para empresas y academias.',
+    keywords: [
+      'plataforma e-learning Colombia',
+      'LMS a medida',
+      'AI tutor educación',
+      'adaptive learning',
+      'capacitación corporativa online',
+      'academia online IA',
+      'cursos online empresas',
+      'gamification educación',
+    ],
+    canonical: `${baseUrl}/demo/lms`,
+  },
+
+  'demo-loyalty': {
+    title: 'Loyalty / Fidelización con IA | Points, Tiers, Misiones y Gamification',
+    description:
+      'Plataforma de fidelización con programas points/tiers/missions, coalitions multi-marca con shared points pool, gamification (badges, streaks, leaderboards), personalization ML, A/B testing y Apple/Google Wallet pass. Aumenta retención y ticket promedio.',
+    keywords: [
+      'programa fidelización Colombia',
+      'loyalty software empresas',
+      'puntos recompensas digital',
+      'gamification retail',
+      'coalición marcas puntos',
+      'engagement clientes',
+      'Apple Wallet pass loyalty',
+      'personalization marketing ML',
+    ],
+    canonical: `${baseUrl}/demo/loyalty`,
+  },
+
+  'demo-moderacion-contenido': {
+    title: 'Moderación de Contenido con IA | NSFW, Hate Speech y Spam',
+    description:
+      'Plataforma de moderación de contenido multi-modal con IA: texto, imagen, video y audio en tiempo real. Custom models por vertical (gaming, dating, kids, fintech), human-in-the-loop con priority routing y appeals, wellness program para moderadores y compliance DSA.',
+    keywords: [
+      'moderación contenido IA',
+      'trust and safety platform',
+      'detección NSFW',
+      'detección hate speech',
+      'moderación imágenes IA',
+      'compliance DSA',
+      'plataforma user-generated content',
+      'AI content moderation Colombia',
+    ],
+    canonical: `${baseUrl}/demo/moderacion-contenido`,
+  },
+
+  'demo-pos': {
+    title: 'POS Punto de Venta Offline-First | Restaurantes y Retail',
+    description:
+      'Punto de venta moderno offline-first con CRDT sync, multi-payment (efectivo, tarjeta, QR, Nequi, Daviplata, BNPL, split), KDS para restaurantes, mesas, modificadores, hardware integrado (scanners, balanzas, impresoras) y facturación electrónica DIAN.',
+    keywords: [
+      'POS punto de venta Colombia',
+      'POS restaurante',
+      'POS offline-first',
+      'sistema cajas registradoras',
+      'POS retail Colombia',
+      'integración Nequi Daviplata',
+      'KDS cocina restaurante',
+      'POS con facturación electrónica',
+    ],
+    canonical: `${baseUrl}/demo/pos`,
+  },
+
+  'demo-saas-boilerplate': {
+    title: 'SaaS Boilerplate Multi-tenant | Auth, Billing, Audit y Compliance',
+    description:
+      'Boilerplate de SaaS multi-tenant listo para producción: auth completo (SSO SAML/OIDC, MFA, passkeys, magic links), billing Stripe + Paddle con trials y usage-based, multi-tenancy (shared-DB con RLS, schema o DB por tenant), audit logs Vanta-style e i18n.',
+    keywords: [
+      'SaaS boilerplate',
+      'multi-tenant SaaS',
+      'SSO SAML OIDC',
+      'billing Stripe Paddle',
+      'audit logs SOC 2',
+      'starter SaaS empresarial',
+      'plantilla SaaS Next.js',
+      'multi-tenancy RLS',
+    ],
+    canonical: `${baseUrl}/demo/saas-boilerplate`,
+  },
+
+  'demo-scraping': {
+    title: 'Scraping y Data Extraction con IA | Visual Builder + Auto-Fix',
+    description:
+      'Plataforma de scraping y extracción de datos con visual builder point-and-click, AI extraction con schemas, proxy rotation (datacenter, residencial, móvil), captcha solving, anti-bot evasion y auto-fix con LLM cuando cambia el DOM del sitio.',
+    keywords: [
+      'web scraping Colombia',
+      'data extraction IA',
+      'monitoreo precios competencia',
+      'proxy rotation scraping',
+      'captcha solving',
+      'visual scraper builder',
+      'extracción datos automatizada',
+      'competitive intelligence',
+    ],
+    canonical: `${baseUrl}/demo/scraping`,
+  },
+
+  'demo-telemedicina': {
+    title: 'Telemedicina HIPAA Compliant | Video Consulta, EHR y Receta Digital',
+    description:
+      'Plataforma de telemedicina HIPAA-compliant con video call WebRTC propio, EHR/EMR integrado, receta electrónica con firma digital, triage IA por síntomas y integración con wearables (Apple Health, Fitbit, Garmin) y laboratorios HL7/FHIR.',
+    keywords: [
+      'telemedicina Colombia',
+      'plataforma telemedicina HIPAA',
+      'video consulta médica',
+      'EHR EMR Colombia',
+      'receta electrónica',
+      'triage IA salud',
+      'historia clínica digital',
+      'integración HL7 FHIR',
+    ],
+    canonical: `${baseUrl}/demo/telemedicina`,
+  },
+
+  'demo-voice-ai': {
+    title: 'Voice AI / IVR Conversacional | Call Center con IA en Tiempo Real',
+    description:
+      'Plataforma Voice AI con IVR conversacional sin menús, STT/TTS sub-300ms (Whisper, Deepgram, ElevenLabs, Cartesia), barge-in natural, function calling para transferir, agendar y consultar en vivo. Compliance DNC, grabación y PCI redaction automático.',
+    keywords: [
+      'voice AI Colombia',
+      'IVR conversacional',
+      'agente telefónico IA',
+      'call center IA',
+      'cobranza automatizada IA',
+      'agendamiento telefónico IA',
+      'asistente voz tiempo real',
+      'alternativa IVR tradicional',
+    ],
+    canonical: `${baseUrl}/demo/voice-ai`,
+  },
+
+  'demo-wms-logistica': {
+    title: 'WMS Sistema de Gestión de Almacenes | Logística con IA',
+    description:
+      'WMS multi-warehouse con picking optimizado (wave, batch, zone, cluster), route optimization ML (VRP), last-mile con POD y app driver, y carriers integrados (FedEx, DHL, Servientrega, Coordinadora, Inter, TCC). Detecta fraude de conductores con IA.',
+    keywords: [
+      'WMS Colombia',
+      'sistema gestión almacenes',
+      'software logística Colombia',
+      'last-mile delivery',
+      'route optimization VRP',
+      'picking optimizado IA',
+      'integración Servientrega Coordinadora',
+      'logística e-commerce',
+    ],
+    canonical: `${baseUrl}/demo/wms-logistica`,
+  },
+
+  // Landing extra: bienvenido-producthunt
+  'bienvenido-producthunt': {
+    title: 'Bienvenido desde Product Hunt | KopTup - Software a Medida',
+    description:
+      'Bienvenido cazador de productos. Conocé KopTup: empresa de desarrollo de software a medida con 27+ demos interactivas funcionales, chatbots con IA, e-commerce, dashboards y soluciones para empresas en Colombia y LatAm.',
+    keywords: [
+      'product hunt koptup',
+      'startup software latam',
+      'software demos interactivas',
+      'desarrollo software a medida',
+      'startup colombia tech',
+    ],
+    canonical: `${baseUrl}/bienvenido-producthunt`,
+  },
 };
 
 /**
@@ -490,5 +779,239 @@ export function getBreadcrumbSchema(items: { name: string; url: string }[]) {
       name: item.name,
       item: `${baseUrl}${item.url}`,
     })),
+  };
+}
+
+/**
+ * SoftwareApplication schema reutilizable para demos.
+ * Genera JSON-LD con applicationCategory, offers (rango USD) y aggregateRating
+ * realista. Pensado para inyectarse desde cada demo/<slug>/layout.tsx.
+ */
+export interface DemoSoftwareSchemaInput {
+  name: string;
+  description: string;
+  url: string;
+  applicationCategory?: string;
+  /** Precio bajo USD (default 499). */
+  lowPrice?: number;
+  /** Precio alto USD (default 25000). */
+  highPrice?: number;
+  /** Cantidad de reviews mock (default 47). */
+  reviewCount?: number;
+  /** Rating mock (default 4.8). */
+  ratingValue?: number;
+  featureList?: string[];
+}
+
+export function getSoftwareApplicationSchema(input: DemoSoftwareSchemaInput) {
+  const {
+    name,
+    description,
+    url,
+    applicationCategory = 'BusinessApplication',
+    lowPrice = 499,
+    highPrice = 25000,
+    reviewCount = 47,
+    ratingValue = 4.8,
+    featureList = [],
+  } = input;
+
+  const schema: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name,
+    description,
+    url,
+    applicationCategory,
+    operatingSystem: 'Web, iOS, Android',
+    offers: {
+      '@type': 'AggregateOffer',
+      lowPrice: String(lowPrice),
+      highPrice: String(highPrice),
+      priceCurrency: 'USD',
+      offerCount: '3',
+      availability: 'https://schema.org/InStock',
+      seller: {
+        '@type': 'Organization',
+        name: 'KopTup',
+        url: baseUrl,
+      },
+    },
+    provider: {
+      '@type': 'Organization',
+      name: 'KopTup',
+      url: baseUrl,
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: String(ratingValue),
+      reviewCount: String(reviewCount),
+      bestRating: '5',
+      worstRating: '1',
+    },
+    inLanguage: ['es', 'en'],
+  };
+
+  if (featureList.length > 0) {
+    schema.featureList = featureList;
+  }
+
+  return schema;
+}
+
+/**
+ * OfferCatalog completo de servicios — para inyectar en /services.
+ */
+export function getServicesOfferCatalogSchema() {
+  const services: { name: string; description: string; url?: string }[] = [
+    { name: 'Chatbots con IA', description: 'Asistentes virtuales con GPT-4, Claude AI y WhatsApp Business.', url: `${baseUrl}/chatbots-ia` },
+    { name: 'Soluciones de Inteligencia Artificial', description: 'Implementación de IA para automatización, análisis predictivo y sistemas expertos.', url: `${baseUrl}/soluciones-ia` },
+    { name: 'Desarrollo Web a Medida', description: 'Aplicaciones web personalizadas con React, Next.js y Node.js.', url: `${baseUrl}/desarrollo-web-colombia` },
+    { name: 'E-commerce', description: 'Plataformas completas de comercio electrónico con pasarela de pagos.', url: `${baseUrl}/demo/ecommerce` },
+    { name: 'Aplicaciones Móviles', description: 'Apps nativas y multiplataforma para iOS y Android.' },
+    { name: 'Dashboards Ejecutivos', description: 'KPIs y business intelligence en tiempo real.', url: `${baseUrl}/demo/dashboard-ejecutivo` },
+    { name: 'Help Desk IA Omnichannel', description: 'Ticketing inteligente con routing ML y AI suggestions.', url: `${baseUrl}/demo/helpdesk-ia` },
+    { name: 'LMS / E-learning', description: 'Plataforma educativa con AI tutor 1:1 y adaptive learning.', url: `${baseUrl}/demo/lms` },
+    { name: 'Telemedicina HIPAA', description: 'Video consulta segura, EHR integrado y receta electrónica.', url: `${baseUrl}/demo/telemedicina` },
+    { name: 'Facturación Electrónica Multi-país', description: 'Emisión y recepción para 8 países LatAm.', url: `${baseUrl}/demo/facturacion-electronica` },
+    { name: 'WMS / Logística', description: 'Multi-warehouse, picking optimizado y last-mile.', url: `${baseUrl}/demo/wms-logistica` },
+    { name: 'POS Punto de Venta', description: 'Offline-first con KDS y facturación electrónica.', url: `${baseUrl}/demo/pos` },
+    { name: 'HRMS / Gestión RRHH', description: 'ATS, onboarding, payroll multi-país y AI insights.', url: `${baseUrl}/demo/hrms` },
+    { name: 'Automatización Workflows', description: 'Plataforma estilo n8n / Zapier con AI nodes nativos.', url: `${baseUrl}/demo/automatizacion` },
+    { name: 'SaaS Boilerplate Multi-tenant', description: 'Auth SSO+MFA, billing Stripe+Paddle y audit logs.', url: `${baseUrl}/demo/saas-boilerplate` },
+    { name: 'Voice AI / Call Center', description: 'IVR conversacional sub-300ms con STT/TTS realista.', url: `${baseUrl}/demo/voice-ai` },
+    { name: 'Firma Electrónica', description: 'Simple, avanzada y cualificada (eIDAS, Ley 527 CO).', url: `${baseUrl}/demo/firma-electronica` },
+    { name: 'Scraping & Data Extraction', description: 'Visual builder con AI extraction y proxy rotation.', url: `${baseUrl}/demo/scraping` },
+    { name: 'Code Review IA', description: 'Review automatizado en PRs con SAST/DAST/SCA.', url: `${baseUrl}/demo/code-review-ia` },
+    { name: 'Moderación de Contenido IA', description: 'Multi-modal NSFW/hate/spam con human-in-the-loop.', url: `${baseUrl}/demo/moderacion-contenido` },
+    { name: 'App de Delivery', description: '3 apps (customer/driver/merchant) con tracking en vivo.', url: `${baseUrl}/demo/delivery` },
+    { name: 'Loyalty / Fidelización', description: 'Programas points/tiers/missions con coalitions.', url: `${baseUrl}/demo/loyalty` },
+    { name: 'Sistema de Reservas Online', description: 'Calendario inteligente con confirmaciones automáticas.', url: `${baseUrl}/demo/sistema-reservas` },
+    { name: 'Sistema Experto con IA', description: 'Motor de inferencia y base de conocimiento.', url: `${baseUrl}/demo/sistema-experto` },
+    { name: 'Gestor Documental Médico', description: 'Organización de archivos clínicos con búsqueda inteligente.', url: `${baseUrl}/demo/gestor-documentos` },
+    { name: 'Gestor de Contenido con IA', description: 'Generación automática de emails y documentos médicos.', url: `${baseUrl}/demo/gestor-contenido` },
+    { name: 'Auditoría de Cuentas Médicas con IA', description: 'Validación automatizada y gestión de glosas para IPS y EPS.', url: `${baseUrl}/demo/cuentas-medicas` },
+    { name: 'Chatbot Médico con IA', description: 'Asistente virtual especializado en salud con RAG.', url: `${baseUrl}/demo/chatbot` },
+  ];
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'OfferCatalog',
+    name: 'Catálogo Completo de Servicios KopTup',
+    url: `${baseUrl}/services`,
+    itemListElement: services.map((s, i) => ({
+      '@type': 'Offer',
+      position: i + 1,
+      itemOffered: {
+        '@type': 'Service',
+        name: s.name,
+        description: s.description,
+        ...(s.url ? { url: s.url } : {}),
+        provider: {
+          '@type': 'Organization',
+          name: 'KopTup',
+          url: baseUrl,
+        },
+      },
+    })),
+  };
+}
+
+/**
+ * Organization schema global — para root layout.
+ */
+export function getOrganizationSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': `${baseUrl}/#organization`,
+    name: 'KopTup',
+    alternateName: 'KopTup Soluciones Tecnológicas',
+    url: baseUrl,
+    logo: {
+      '@type': 'ImageObject',
+      url: `${baseUrl}/og-image.png`,
+      width: 1200,
+      height: 630,
+    },
+    description:
+      'Empresa de desarrollo de software a medida fundada en Colombia. Aplicaciones web, móviles, chatbots con IA, e-commerce, dashboards y soluciones empresariales para LatAm, España y EEUU.',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'Av. 68 #1-63',
+      addressLocality: 'Bogotá',
+      addressRegion: 'Cundinamarca',
+      addressCountry: 'CO',
+      postalCode: '111321',
+    },
+    contactPoint: [
+      {
+        '@type': 'ContactPoint',
+        contactType: 'sales',
+        telephone: '+57-302-479-4842',
+        email: 'ronald@koptup.com',
+        availableLanguage: ['Spanish', 'English'],
+        areaServed: 'Worldwide',
+      },
+      {
+        '@type': 'ContactPoint',
+        contactType: 'customer support',
+        url: `${baseUrl}/contact`,
+        availableLanguage: ['Spanish', 'English'],
+      },
+    ],
+    sameAs: [
+      'https://www.linkedin.com/company/koptup',
+      'https://github.com/koptup',
+      'https://www.instagram.com/koptup',
+      'https://x.com/koptup',
+    ],
+    founder: {
+      '@type': 'Person',
+      name: 'Ronald Cipagauta',
+      jobTitle: 'CEO & Founder',
+    },
+    foundingDate: '2019',
+    areaServed: [
+      { '@type': 'Country', name: 'Colombia' },
+      { '@type': 'Country', name: 'México' },
+      { '@type': 'Country', name: 'Argentina' },
+      { '@type': 'Country', name: 'Chile' },
+      { '@type': 'Country', name: 'Perú' },
+      { '@type': 'Country', name: 'España' },
+      { '@type': 'Country', name: 'United States' },
+    ],
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.9',
+      reviewCount: '67',
+      bestRating: '5',
+      worstRating: '1',
+    },
+  };
+}
+
+/**
+ * WebSite schema con SearchAction — para root layout.
+ */
+export function getWebSiteSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${baseUrl}/#website`,
+    name: 'KopTup',
+    url: baseUrl,
+    description:
+      'Desarrollo de software a medida con 27+ demos interactivas funcionales: e-commerce, chatbots IA, dashboards, gestión documental, telemedicina y más.',
+    inLanguage: ['es-CO', 'en-US'],
+    publisher: { '@id': `${baseUrl}/#organization` },
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${baseUrl}/search?q={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
   };
 }
