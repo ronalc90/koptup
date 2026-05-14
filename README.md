@@ -12,6 +12,7 @@ Cada demo es una aplicación interactiva navegable, con datos simulados realista
 | Demo | Categoría | Descripción | Ver demo |
 | --- | --- | --- | --- |
 | CRM con IA | Ventas IA | Pipeline visual, lead scoring ML, conversation intelligence y sequences multi-canal con copiloto de IA. | [Ver demo](./apps/web/src/app/demo/crm-ia/) |
+| ERP Modular Multi-país | ERP | Contabilidad doble entrada, finanzas, inventario, ventas y manufactura con facturación electrónica DIAN/SAT/AFIP/SII/SUNAT. | [Ver demo](./apps/web/src/app/demo/erp/) |
 
 ## 🚀 Stack Tecnológico
 
