@@ -28,6 +28,8 @@ Cada demo es una aplicación interactiva navegable, con datos simulados realista
 
 | Automatización de procesos | Productividad | Constructor visual de workflows tipo low-code con triggers, acciones y conectores a APIs externas. | [Ver demo](./apps/web/src/app/demo/automatizacion/) |
 
+| SaaS boilerplate | Plataforma | Base multitenant con autenticación, planes y suscripciones, billing, RBAC y panel de administración. | [Ver demo](./apps/web/src/app/demo/saas-boilerplate/) |
+
 ## 🚀 Stack Tecnológico
 
 ### Frontend
