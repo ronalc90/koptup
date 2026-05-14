@@ -20,6 +20,7 @@ Cada demo es una aplicación interactiva navegable, con datos simulados realista
 | WMS / Logística | Logística | Multi-warehouse, picking optimizado, route optimization ML, last-mile con app driver y carriers integrados. | [Ver demo](./apps/web/src/app/demo/wms-logistica/) |
 | POS Punto de Venta | Retail | POS offline-first con multi-payment, KDS para restaurantes, facturación electrónica y hardware integrado. | [Ver demo](./apps/web/src/app/demo/pos/) |
 | HRMS / Gestión RRHH | People | ATS, onboarding, performance, payroll multi-país y AI insights de retención y eNPS. | [Ver demo](./apps/web/src/app/demo/hrms/) |
+| Automatización Workflows | AI Ops | Plataforma estilo n8n / Zapier con 500+ integraciones, AI nodes nativos y self-hosted opcional. | [Ver demo](./apps/web/src/app/demo/automatizacion/) |
 
 ## 🚀 Stack Tecnológico
 
