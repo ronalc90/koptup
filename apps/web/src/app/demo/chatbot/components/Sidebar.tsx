@@ -71,7 +71,7 @@ export default function Sidebar({ activeLayer, onSelect }: SidebarProps) {
 
   return (
     <aside
-      className="flex h-full w-full flex-col border-r border-secondary-200 bg-white/70 backdrop-blur dark:border-secondary-800 dark:bg-secondary-900/70"
+      className="flex min-h-0 w-full flex-1 flex-col border-r border-secondary-200 bg-white/70 backdrop-blur dark:border-secondary-800 dark:bg-secondary-900/70"
       aria-label={t('sidebar.title')}
     >
       <div className="border-b border-secondary-200 px-4 py-4 dark:border-secondary-800">
@@ -94,7 +94,7 @@ export default function Sidebar({ activeLayer, onSelect }: SidebarProps) {
         />
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-2 py-3 max-h-[calc(100vh-220px)]">
+      <nav className="min-h-0 flex-1 overflow-y-auto px-2 py-3">
         {filtered.length === 0 ? (
           <p className="px-3 py-6 text-center text-xs text-secondary-400">
             {t('sidebar.noResults')}
