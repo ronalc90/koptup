@@ -72,7 +72,7 @@ export const metadata = {
     siteName: 'KopTup',
     title: 'KopTup - Desarrollo de Software a Medida | Demos Interactivas',
     description:
-      'Desarrollo de software personalizado para empresas. E-commerce, chatbots con IA, dashboards, gestión documental y más. Prueba nuestras demos funcionales.',
+      'Desarrollo de software personalizado para empresas. E-commerce, chatbots con IA, dashboards, gestión documental y más. Prueba 27 prototipos interactivos sin registro.',
     images: [
       {
         url: '/og-image.png',
@@ -86,7 +86,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'KopTup - Desarrollo de Software a Medida | Demos Interactivas',
     description:
-      'Desarrollo de software personalizado para empresas. E-commerce, chatbots con IA, dashboards y más. Prueba nuestras demos funcionales.',
+      'Desarrollo de software personalizado para empresas. E-commerce, chatbots con IA, dashboards y más. Prueba 27 prototipos interactivos sin registro.',
     images: ['/og-image.png'],
     creator: '@koptup',
   },

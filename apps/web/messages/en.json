@@ -36,7 +36,7 @@
     "demos": {
       "sectionBadge": "Interactive Demos",
       "sectionTitle": "Solutions for Every Industry",
-      "sectionSubtitle": "Explore our fully functional demos and discover how we turn ideas into real software. From e-commerce to AI-powered dashboards, we have the expertise to drive your business forward.",
+      "sectionSubtitle": "Explore 27 navigable prototypes that showcase the range of solutions we build. Two of them (RAG chatbot and LinkedIn Ads generator) use live OpenAI; the rest are interactive mockups with simulated data so you can feel how each solution would look before hiring us to build it.",
       "exploreDemo": "Explore demo →",
       "ecommerce": {
         "title": "Full E-Commerce",
@@ -1127,9 +1127,9 @@
     }
   },
   "demos": {
-    "badge": "Interactive Demos",
+    "badge": "Interactive Prototypes",
     "title": "Try Our Solutions",
-    "subtitle": "Explore functional demos of our products and services",
+    "subtitle": "Explore navigable prototypes with simulated data — two of them (RAG chatbot and LinkedIn Ads) use live OpenAI",
     "interactive": "100% Interactive - No registration",
     "includes": "Includes:",
     "tryDemo": "Try Demo",
@@ -2701,7 +2701,7 @@
     "q5q": "Do you offer maintenance after delivering the project?",
     "q5a": "Yes. We offer monthly maintenance and support plans. We also evolve the product according to your business needs. We don't leave you alone after launch.",
     "q6q": "Can I see examples of KopTup's work?",
-    "q6a": "Yes. We have interactive and functional demos of our solutions at koptup.com/demo. You can try the AI chatbot, e-commerce, executive dashboard and more, without registration or credit card.",
+    "q6a": "Yes. We have 27 navigable prototypes at koptup.com/demo — two of them (RAG chatbot and LinkedIn Ads generator) use live OpenAI; the rest are interactive mockups with simulated data so you can see how each solution would look before hiring us. No registration or credit card needed.",
     "ctaTitle": "Ready to develop your project?",
     "ctaSubtitle": "Tell us what you need. We respond within 24 hours with a personalized proposal.",
     "ctaButton": "Request Free Quote"

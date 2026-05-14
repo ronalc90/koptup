@@ -36,7 +36,7 @@
     "demos": {
       "sectionBadge": "Demos Interactivas",
       "sectionTitle": "Soluciones para Cada Industria",
-      "sectionSubtitle": "Explora nuestras demos funcionales y descubre cómo transformamos ideas en software real. Desde e-commerce hasta dashboards con IA, tenemos la experiencia para impulsar tu negocio.",
+      "sectionSubtitle": "Explora 27 prototipos navegables que muestran el rango de soluciones que construimos. Dos de ellos (chatbot RAG y generador de LinkedIn Ads) usan OpenAI real; el resto son mockups interactivos con datos simulados para que sientas cómo se vería cada solución antes de contratarnos.",
       "exploreDemo": "Explorar demo →",
       "ecommerce": {
         "title": "E-Commerce Completo",
@@ -1127,9 +1127,9 @@
     }
   },
   "demos": {
-    "badge": "Demos Interactivas",
+    "badge": "Prototipos Interactivos",
     "title": "Prueba Nuestras Soluciones",
-    "subtitle": "Explora demos funcionales de nuestros productos y servicios",
+    "subtitle": "Explora prototipos navegables con datos simulados — dos de ellos (chatbot RAG y LinkedIn Ads) usan OpenAI real",
     "interactive": "100% Interactivo - Sin registro",
     "includes": "Incluye:",
     "tryDemo": "Probar Demo",
@@ -2701,7 +2701,7 @@
     "q5q": "¿Ofrecen mantenimiento después de entregar el proyecto?",
     "q5a": "Sí. Ofrecemos planes de mantenimiento y soporte mensual. También evolucionamos el producto según las necesidades de tu negocio. No te dejamos solo después del lanzamiento.",
     "q6q": "¿Puedo ver ejemplos del trabajo de KopTup?",
-    "q6a": "Sí. Tenemos demos interactivos y funcionales de nuestras soluciones en koptup.com/demo. Puedes probar el chatbot con IA, el e-commerce, el dashboard ejecutivo y más, sin registro ni tarjeta de crédito.",
+    "q6a": "Sí. Tenemos 27 prototipos navegables en koptup.com/demo — dos de ellos (chatbot RAG y generador de LinkedIn Ads) usan OpenAI real; el resto son mockups interactivos con datos simulados para que veas cómo se vería cada solución antes de contratarnos. Sin registro ni tarjeta de crédito.",
     "ctaTitle": "¿Listo para desarrollar tu proyecto?",
     "ctaSubtitle": "Cuéntanos qué necesitas. Respondemos en menos de 24 horas con una propuesta personalizada.",
     "ctaButton": "Solicitar Cotización Gratis"

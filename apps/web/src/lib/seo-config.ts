@@ -113,9 +113,9 @@ export const seoConfig: Record<string, PageSEO> = {
 
   // Demo hub page
   demo: {
-    title: 'Demos Interactivas | Prueba Gratis Nuestras Soluciones de Software',
+    title: '27 Prototipos Interactivos | Probá Nuestro Trabajo Antes de Contratar',
     description:
-      'Explora demos interactivas y funcionales de nuestras soluciones: e-commerce, chatbot IA, dashboard ejecutivo, gestor de documentos, sistema de reservas, CMS y más. Sin registro ni tarjeta de crédito.',
+      'Explora 27 prototipos navegables que muestran el rango de soluciones que construimos. Dos usan OpenAI real (chatbot RAG y LinkedIn Ads); el resto son mockups interactivos con datos simulados. Sin registro ni tarjeta de crédito.',
     keywords: [
       'demos software interactivas',
       'prueba software gratis',

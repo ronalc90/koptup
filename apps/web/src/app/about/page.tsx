@@ -38,382 +38,96 @@ import {
   CalendarDaysIcon,
 } from '@heroicons/react/24/outline';
 
+type TechItem = { name: string; note: string };
 type TechCategory = {
   id: string;
   title: string;
   icon: React.ComponentType<{ className?: string }>;
   description: string;
-  items: { name: string; note: string }[];
+  items: TechItem[];
 };
 
 const techCategories: TechCategory[] = [
   {
-    id: 'frontend',
-    title: 'Frontend & UI',
-    icon: PaintBrushIcon,
-    description: 'Interfaces modernas, accesibles y rápidas en cualquier dispositivo.',
+    id: 'core-stack',
+    title: 'Stack que usamos a diario',
+    icon: CodeBracketIcon,
+    description:
+      'Lo que escribimos en este repo y entregamos a clientes. Si lo ves acá, lo dominamos a nivel de producción.',
     items: [
-      { name: 'Next.js 14', note: 'App Router, Server Components, ISR' },
-      { name: 'React 18', note: 'Server/Client components, Suspense' },
-      { name: 'TypeScript', note: 'strict mode end-to-end' },
+      { name: 'Next.js 14', note: 'App Router · Server Components · ISR' },
+      { name: 'React 18', note: 'hooks, Suspense, server components' },
+      { name: 'TypeScript', note: 'strict mode en frontend y backend' },
       { name: 'TailwindCSS', note: 'utility-first + design tokens' },
-      { name: 'shadcn/ui', note: 'Radix primitives accesibles' },
-      { name: 'Framer Motion', note: 'animaciones declarativas' },
-      { name: 'next-intl', note: 'i18n server-side ES/EN/PT' },
-      { name: 'next-themes', note: 'dark mode persistente' },
-      { name: 'React Hook Form', note: 'forms performantes' },
-      { name: 'Zod', note: 'validación tipada compartida cliente/servidor' },
-      { name: 'TanStack Query', note: 'data fetching + caching' },
-      { name: 'SWR', note: 'revalidación automática' },
-      { name: 'Axios', note: 'HTTP client con interceptors' },
-      { name: 'Heroicons', note: 'iconografía SVG' },
-      { name: 'Lucide', note: 'iconos open-source' },
-      { name: 'date-fns', note: 'manejo de fechas inmutables' },
-      { name: 'Day.js', note: 'fechas ligero' },
-      { name: 'React Markdown', note: 'render Markdown + rehype/remark' },
-      { name: 'jsPDF', note: 'export PDF cliente' },
-      { name: 'pdfmake', note: 'PDFs declarativos' },
-      { name: 'Recharts', note: 'gráficos React-first' },
-      { name: 'D3.js', note: 'visualizaciones custom' },
-      { name: 'Visx', note: 'componibles low-level' },
-      { name: 'React Flow', note: 'diagramas y flujos' },
-      { name: 'Tldraw', note: 'whiteboards colaborativos' },
-      { name: 'dnd-kit', note: 'drag & drop accesible' },
-      { name: 'Excalidraw', note: 'diagramas a mano alzada' },
-      { name: 'Yjs / CRDTs', note: 'colaboración real-time' },
-      { name: 'React Native + Expo', note: 'apps móviles iOS/Android' },
-      { name: 'Flutter', note: 'cross-platform Dart' },
-      { name: 'PWA', note: 'offline + installable' },
-      { name: 'Storybook', note: 'librería UI documentada' },
-      { name: 'Playwright', note: 'E2E browser testing' },
-      { name: 'React Testing Library', note: 'unit/integration tests' },
-      { name: 'Jest', note: 'test runner' },
+      { name: 'next-intl', note: 'i18n cookie-based ES/EN' },
+      { name: 'Framer Motion', note: 'microinteracciones declarativas' },
+      { name: 'React Hook Form + Zod', note: 'forms + validación tipada' },
+      { name: 'SWR', note: 'data fetching con revalidación' },
+      { name: 'Recharts', note: 'gráficas para dashboards' },
+      { name: 'Node.js 18+', note: 'runtime del backend' },
+      { name: 'Express', note: 'APIs REST simples y maduras' },
+      { name: 'Mongoose + MongoDB 7', note: 'persistencia principal' },
+      { name: 'OpenAI SDK', note: 'GPT-4o, embeddings, function calling' },
+      { name: 'JWT + bcryptjs', note: 'auth stateless con hash seguro' },
+      { name: 'AWS S3 SDK', note: 'uploads y storage de archivos' },
+      { name: 'Docker', note: 'entornos local + production-like' },
+      { name: 'Turborepo', note: 'monorepo con cache de builds' },
+      { name: 'Vercel', note: 'deploy del frontend' },
+      { name: 'Railway', note: 'hosting del backend + Mongo' },
+      { name: 'Jest', note: 'unit + integration tests' },
+      { name: 'Playwright', note: 'E2E cross-browser' },
+      { name: 'React Testing Library', note: 'tests de componentes' },
+      { name: 'ESLint + Prettier', note: 'lint y formato consistentes' },
+      { name: 'Swagger / OpenAPI 3', note: 'documentación de APIs' },
+      { name: 'BM25 (custom)', note: 'retrieval keyword para el RAG' },
     ],
   },
   {
-    id: 'backend',
-    title: 'Backend & APIs',
-    icon: ServerStackIcon,
-    description: 'APIs y servicios robustos, escalables y bien tipados.',
-    items: [
-      { name: 'Node.js 18/20/22', note: 'runtime principal' },
-      { name: 'Express', note: 'REST APIs maduras' },
-      { name: 'Fastify', note: 'alto throughput + plugins' },
-      { name: 'NestJS', note: 'arquitectura modular DI' },
-      { name: 'GraphQL', note: 'Apollo Server / Mercurius' },
-      { name: 'REST APIs', note: 'OpenAPI 3, versionado' },
-      { name: 'WebSockets', note: 'tiempo real bidireccional' },
-      { name: 'Socket.io', note: 'rooms, namespaces, fallback' },
-      { name: 'Server-Sent Events', note: 'streaming HTTP' },
-      { name: 'gRPC', note: 'comunicación inter-servicios' },
-      { name: 'tRPC', note: 'end-to-end typesafe' },
-      { name: 'Python', note: 'FastAPI / Django / Flask' },
-      { name: 'Java + Spring Boot', note: 'enterprise + microservicios' },
-      { name: 'Go', note: 'Gin / Fiber, alto rendimiento' },
-      { name: 'Ruby on Rails', note: 'monolitos productivos' },
-      { name: 'PHP + Laravel', note: 'integraciones con WP/Shopify' },
-      { name: 'C# .NET Core', note: 'integraciones Microsoft' },
-      { name: 'Bun', note: 'runtime ultra-rápido' },
-      { name: 'Deno', note: 'runtime secure-by-default' },
-    ],
-  },
-  {
-    id: 'databases',
-    title: 'Bases de datos',
-    icon: CircleStackIcon,
-    description: 'Persistencia relacional, documental, vectorial y analítica.',
-    items: [
-      { name: 'PostgreSQL 15/16', note: 'OLTP + pgvector + PostGIS' },
-      { name: 'MongoDB 7', note: 'documentos + agregaciones' },
-      { name: 'MySQL / MariaDB', note: 'compatibilidad legacy' },
-      { name: 'Redis', note: 'cache, pub/sub, streams' },
-      { name: 'DynamoDB', note: 'NoSQL serverless AWS' },
-      { name: 'Elasticsearch', note: 'búsqueda full-text' },
-      { name: 'OpenSearch', note: 'fork open-source' },
-      { name: 'ClickHouse', note: 'analytics columnar' },
-      { name: 'Snowflake', note: 'data warehouse cloud' },
-      { name: 'BigQuery', note: 'warehouse Google + ML' },
-      { name: 'Pinecone', note: 'vector DB managed' },
-      { name: 'Weaviate', note: 'vector + hybrid' },
-      { name: 'Qdrant', note: 'vector self-hosted' },
-      { name: 'Chroma', note: 'embeddings ligero' },
-      { name: 'DuckDB', note: 'analytics embedded' },
-      { name: 'SQLite', note: 'apps locales y edge' },
-      { name: 'Firebase Firestore', note: 'realtime + offline' },
-      { name: 'Supabase', note: 'Postgres + Auth managed' },
-      { name: 'PlanetScale', note: 'MySQL serverless' },
-    ],
-  },
-  {
-    id: 'cloud',
-    title: 'Cloud & Infraestructura',
-    icon: CloudIcon,
-    description: 'Despliegue, observabilidad y operación 24/7.',
-    items: [
-      { name: 'AWS', note: 'EC2, S3, Lambda, RDS, ECS, EKS, CloudFront, Route53, IAM' },
-      { name: 'Google Cloud', note: 'GKE, Cloud Run, Pub/Sub, BigQuery' },
-      { name: 'Microsoft Azure', note: 'AKS, Functions, CosmosDB' },
-      { name: 'Vercel', note: 'deploy frontend Next.js' },
-      { name: 'Railway', note: 'deploy backend rápido' },
-      { name: 'Render', note: 'web services + cron' },
-      { name: 'Fly.io', note: 'apps cerca del usuario' },
-      { name: 'DigitalOcean', note: 'droplets + App Platform' },
-      { name: 'Cloudflare', note: 'CDN, Workers, R2, Pages' },
-      { name: 'Docker', note: 'contenedores reproducibles' },
-      { name: 'Docker Compose', note: 'entornos locales multi-servicio' },
-      { name: 'Kubernetes', note: 'EKS/GKE/AKS/k3s' },
-      { name: 'Terraform', note: 'IaC multi-cloud' },
-      { name: 'Pulumi', note: 'IaC en TypeScript/Python' },
-      { name: 'Ansible', note: 'configuration management' },
-      { name: 'GitHub Actions', note: 'CI/CD nativo' },
-      { name: 'GitLab CI', note: 'pipelines self-hosted' },
-      { name: 'CircleCI', note: 'CI orquestada' },
-    ],
-  },
-  {
-    id: 'ai',
-    title: 'IA & Machine Learning',
-    icon: CpuChipIcon,
-    description: 'LLMs, RAG, agentes, visión, voz y ML clásico en producción.',
-    items: [
-      { name: 'OpenAI', note: 'GPT-4o, GPT-4o-mini, embeddings v3' },
-      { name: 'Anthropic Claude', note: 'Sonnet, Opus, Haiku' },
-      { name: 'Google Gemini', note: 'multimodal long-context' },
-      { name: 'Mistral', note: 'modelos europeos' },
-      { name: 'Llama', note: 'self-hosted on-prem' },
-      { name: 'LangChain', note: 'orquestación LLM' },
-      { name: 'LangGraph', note: 'flujos agentic con estado' },
-      { name: 'LlamaIndex', note: 'RAG production-ready' },
-      { name: 'Hugging Face', note: 'Transformers + Datasets' },
-      { name: 'Embeddings', note: 'OpenAI / Cohere / Voyage' },
-      { name: 'Rerankers', note: 'Cohere Rerank + cross-encoders' },
-      { name: 'Hybrid retrieval', note: 'BM25 + dense + RRF' },
-      { name: 'pgvector', note: 'búsqueda vectorial en Postgres' },
-      { name: 'TensorFlow', note: 'deep learning' },
-      { name: 'PyTorch', note: 'investigación + producción' },
-      { name: 'scikit-learn', note: 'ML clásico' },
-      { name: 'spaCy', note: 'NLP industrial' },
-      { name: 'NLTK', note: 'NLP académico' },
-      { name: 'Whisper', note: 'speech-to-text' },
-      { name: 'ElevenLabs', note: 'voces TTS premium' },
-      { name: 'Cartesia', note: 'TTS streaming baja latencia' },
-      { name: 'Deepgram', note: 'STT streaming enterprise' },
-      { name: 'AssemblyAI', note: 'STT + diarización' },
-      { name: 'GPT-4V / Claude Vision', note: 'análisis multimodal' },
-      { name: 'Tesseract OCR', note: 'extracción texto open-source' },
-      { name: 'Stable Diffusion', note: 'generación de imágenes' },
-      { name: 'ComfyUI', note: 'pipelines visuales SD' },
-    ],
-  },
-  {
-    id: 'messaging',
-    title: 'Mensajería & Comunicación',
-    icon: ChatBubbleLeftRightIcon,
-    description: 'WhatsApp, voz, email y notificaciones push multicanal.',
-    items: [
-      { name: 'Twilio', note: 'SMS, voice, WhatsApp Business' },
-      { name: 'WhatsApp Business API', note: 'oficial Meta Cloud API' },
-      { name: 'SendGrid', note: 'email transaccional' },
-      { name: 'Postmark', note: 'email confiable' },
-      { name: 'Resend', note: 'email developer-friendly' },
-      { name: 'Mailgun', note: 'email + listas' },
-      { name: 'OneSignal', note: 'push notifications' },
-      { name: 'Firebase Cloud Messaging', note: 'push iOS/Android/web' },
-      { name: 'Slack API', note: 'bots e integraciones' },
-      { name: 'Discord bots', note: 'comunidades' },
-      { name: 'Microsoft Teams', note: 'bots empresariales' },
-    ],
-  },
-  {
-    id: 'payments',
-    title: 'Pagos & Fintech',
-    icon: CreditCardIcon,
-    description: 'Pasarelas globales y locales LatAm, Open Banking, BNPL.',
-    items: [
-      { name: 'Stripe', note: 'subs, marketplace, Terminal' },
-      { name: 'PayPal', note: 'pagos internacionales' },
-      { name: 'Mercado Pago', note: 'pagos LatAm' },
-      { name: 'Wompi', note: 'pagos Colombia (Bancolombia)' },
-      { name: 'PayU', note: 'pagos LatAm multi-país' },
-      { name: 'Nequi', note: 'billetera Colombia' },
-      { name: 'Daviplata', note: 'billetera Colombia' },
-      { name: 'PSE', note: 'débito bancario Colombia' },
-      { name: 'Bre-B', note: 'pagos inmediatos Colombia' },
-      { name: 'Addi', note: 'BNPL LatAm' },
-      { name: 'Klarna', note: 'BNPL global' },
-      { name: 'Afterpay', note: 'BNPL' },
-      { name: 'Apple Pay', note: 'wallet iOS' },
-      { name: 'Google Pay', note: 'wallet Android' },
-      { name: 'Plaid', note: 'Open Banking US' },
-      { name: 'Belvo', note: 'Open Banking LatAm' },
-    ],
-  },
-  {
-    id: 'einvoicing',
-    title: 'Facturación electrónica LatAm',
-    icon: DocumentTextIcon,
-    description: 'Integraciones oficiales con los 8 organismos tributarios principales.',
-    items: [
-      { name: 'DIAN', note: 'Colombia — facturación electrónica' },
-      { name: 'SAT', note: 'México — CFDI 4.0' },
-      { name: 'AFIP', note: 'Argentina — FE electrónica' },
-      { name: 'SII', note: 'Chile — DTE' },
-      { name: 'SUNAT', note: 'Perú — comprobantes electrónicos' },
-      { name: 'DGI', note: 'Uruguay — CFE' },
-      { name: 'SET', note: 'Paraguay — KuDE' },
-      { name: 'SRI', note: 'Ecuador — comprobantes electrónicos' },
-    ],
-  },
-  {
-    id: 'ecommerce',
-    title: 'E-commerce',
-    icon: ShoppingBagIcon,
-    description: 'Tiendas headless, custom y plataformas tradicionales.',
-    items: [
-      { name: 'Shopify', note: 'apps custom + checkout extensions' },
-      { name: 'WooCommerce', note: 'WordPress commerce' },
-      { name: 'Magento', note: 'enterprise B2B/B2C' },
-      { name: 'VTEX', note: 'commerce LatAm' },
-      { name: 'Saleor', note: 'headless GraphQL' },
-      { name: 'Medusa.js', note: 'open-source Node' },
-      { name: 'Commerce Layer', note: 'composable commerce' },
-    ],
-  },
-  {
-    id: 'analytics',
-    title: 'Analytics & Observabilidad',
-    icon: ChartBarIcon,
-    description: 'Métricas de producto, errores, logs y traces distribuidos.',
-    items: [
-      { name: 'Google Analytics 4', note: 'web + app' },
-      { name: 'Mixpanel', note: 'product analytics' },
-      { name: 'Amplitude', note: 'cohortes y funnels' },
-      { name: 'Heap', note: 'auto-track' },
-      { name: 'PostHog', note: 'self-hosted all-in-one' },
-      { name: 'Hotjar', note: 'heatmaps + grabaciones' },
-      { name: 'FullStory', note: 'session replay enterprise' },
-      { name: 'Sentry', note: 'error tracking + tracing' },
-      { name: 'DataDog', note: 'APM + logs + infra' },
-      { name: 'New Relic', note: 'observability platform' },
-      { name: 'Grafana', note: 'dashboards' },
-      { name: 'Prometheus', note: 'métricas pull' },
-      { name: 'Loki', note: 'logs agregados' },
-      { name: 'Tempo', note: 'traces distribuidos' },
-      { name: 'OpenTelemetry', note: 'estándar OTel' },
-      { name: 'Better Stack', note: 'logs + uptime' },
-      { name: 'Plausible / Umami', note: 'analytics privacy-friendly' },
-    ],
-  },
-  {
-    id: 'marketing',
-    title: 'Marketing & SEO',
-    icon: MegaphoneIcon,
-    description: 'Visibilidad orgánica, automatización y growth.',
-    items: [
-      { name: 'Schema.org JSON-LD', note: 'structured data' },
-      { name: 'OpenGraph + Twitter Cards', note: 'share previews' },
-      { name: 'Sitemap.xml dinámico', note: 'cobertura completa' },
-      { name: 'robots.txt', note: 'control de crawlers' },
-      { name: 'Core Web Vitals', note: 'optimización LCP/INP/CLS' },
-      { name: 'Lighthouse audits', note: 'auditorías repetibles' },
-      { name: 'Mailchimp', note: 'email marketing clásico' },
-      { name: 'Klaviyo', note: 'email + SMS e-commerce' },
-      { name: 'Customer.io', note: 'mensajería automatizada' },
-      { name: 'HubSpot', note: 'CRM + marketing' },
-      { name: 'Iterable', note: 'cross-channel growth' },
-    ],
-  },
-  {
-    id: 'auth',
-    title: 'Auth & Identidad',
-    icon: LockClosedIcon,
-    description: 'Login social, SSO empresarial, MFA y passkeys.',
-    items: [
-      { name: 'NextAuth.js / Auth.js', note: 'auth Next nativo' },
-      { name: 'Clerk', note: 'auth managed dev-friendly' },
-      { name: 'Auth0', note: 'IdP enterprise' },
-      { name: 'Okta', note: 'IAM corporativo' },
-      { name: 'AWS Cognito', note: 'auth AWS-native' },
-      { name: 'Firebase Auth', note: 'auth Google' },
-      { name: 'Supabase Auth', note: 'auth + RLS Postgres' },
-      { name: 'Passport.js', note: 'estrategias custom' },
-      { name: 'Keycloak', note: 'IdP open-source' },
-      { name: 'SAML 2.0', note: 'SSO empresarial' },
-      { name: 'OIDC', note: 'OpenID Connect' },
-      { name: 'OAuth2', note: 'autorización delegada' },
-      { name: 'MFA', note: 'TOTP, WebAuthn passkeys, SMS' },
-      { name: 'SCIM', note: 'provisión automática usuarios' },
-    ],
-  },
-  {
-    id: 'maps',
-    title: 'Mapas & Geolocalización',
-    icon: MapIcon,
-    description: 'Routing, geocoding y visualización geoespacial.',
-    items: [
-      { name: 'Mapbox', note: 'mapas vectoriales + estilos' },
-      { name: 'Google Maps Platform', note: 'Places, Directions, Geocoding' },
-      { name: 'OpenStreetMap + Leaflet', note: 'open-source' },
-      { name: 'HERE Maps', note: 'routing logístico' },
-      { name: 'Geoapify', note: 'geocoding asequible' },
-    ],
-  },
-  {
-    id: 'storage',
-    title: 'Storage & CDN',
-    icon: ArchiveBoxIcon,
-    description: 'Archivos, imágenes y media a escala global.',
-    items: [
-      { name: 'AWS S3', note: 'object storage estándar' },
-      { name: 'Cloudflare R2', note: 'S3-compatible sin egress' },
-      { name: 'Google Cloud Storage', note: 'object storage GCP' },
-      { name: 'Cloudinary', note: 'image/video transformations' },
-      { name: 'ImageKit', note: 'imágenes on-the-fly' },
-      { name: 'imgix', note: 'imagen + CDN' },
-      { name: 'BunnyCDN', note: 'CDN económico' },
-    ],
-  },
-  {
-    id: 'devtools',
-    title: 'DevTools & DX',
+    id: 'familiarity',
+    title: 'Familiaridad — usamos cuando el proyecto lo pide',
     icon: WrenchScrewdriverIcon,
-    description: 'Herramientas que mantienen la calidad alta y los ciclos cortos.',
+    description:
+      'Tecnologías que hemos puesto en producción en proyectos pasados pero no son nuestro día a día. Cuando un cliente las necesita, las traemos sin curva de aprendizaje extra.',
     items: [
-      { name: 'ESLint', note: 'reglas de calidad' },
-      { name: 'Prettier', note: 'formato consistente' },
-      { name: 'Husky', note: 'git hooks' },
-      { name: 'lint-staged', note: 'lint solo lo cambiado' },
-      { name: 'Commitlint', note: 'conventional commits' },
-      { name: 'Turborepo', note: 'monorepos rápidos' },
-      { name: 'pnpm workspaces', note: 'gestión multi-paquete' },
-      { name: 'yarn workspaces', note: 'monorepo alterno' },
-      { name: 'Storybook', note: 'docs componentes' },
-      { name: 'Chromatic', note: 'visual testing' },
-      { name: 'BrowserStack', note: 'cross-browser real devices' },
+      { name: 'Python', note: 'FastAPI / Django / Flask' },
+      { name: 'Java + Spring Boot', note: 'microservicios enterprise' },
+      { name: 'PostgreSQL + pgvector', note: 'relacional con vectores' },
+      { name: 'Redis', note: 'caché y sesiones' },
+      { name: 'Pinecone', note: 'vector DB managed' },
+      { name: 'Anthropic Claude SDK', note: 'multi-LLM routing' },
+      { name: 'GraphQL (Apollo)', note: 'cuando el cliente lo pide' },
+      { name: 'WebSockets / Socket.io', note: 'real-time bidireccional' },
+      { name: 'React Native + Expo', note: 'apps móviles cross-platform' },
+      { name: 'Kubernetes', note: 'cuando el cliente ya lo opera' },
+      { name: 'Terraform', note: 'IaC stubs' },
+      { name: 'GitHub Actions', note: 'CI/CD pipelines' },
+      { name: 'Stripe / PayU', note: 'pagos online' },
+      { name: 'Twilio', note: 'SMS y WhatsApp Business' },
+      { name: 'DIAN e-invoicing', note: 'facturación electrónica Colombia' },
     ],
   },
   {
-    id: 'compliance',
-    title: 'Compliance & Seguridad',
-    icon: ScaleIcon,
-    description: 'Marcos regulatorios para operar con seguridad y legalidad.',
+    id: 'aware',
+    title: 'Conceptualmente sólidos — no son nuestro core',
+    icon: SparklesIcon,
+    description:
+      'Sabemos qué son, cuándo aplican y cómo encajan en una arquitectura. Si un proyecto los requiere de forma intensiva, sumamos a un colaborador especialista en lugar de fingir experiencia profunda.',
     items: [
-      { name: 'SOC 2', note: 'controles operacionales' },
-      { name: 'ISO 27001', note: 'gestión seguridad información' },
-      { name: 'GDPR', note: 'datos personales UE' },
-      { name: 'HIPAA', note: 'salud EE.UU.' },
-      { name: 'PCI-DSS', note: 'tarjetas de pago' },
-      { name: 'Habeas Data', note: 'Colombia, Ley 1581' },
-      { name: 'Ley 527', note: 'firma electrónica Colombia' },
-      { name: 'eIDAS', note: 'firma electrónica UE' },
+      { name: 'gRPC / Protobuf', note: 'comunicación inter-servicios' },
+      { name: 'Kafka / RabbitMQ', note: 'event streaming a escala' },
+      { name: 'ClickHouse / Snowflake', note: 'analytics OLAP' },
+      { name: 'Flutter / Swift / Kotlin', note: 'mobile nativo' },
+      { name: 'ML clásico (sklearn, XGBoost)', note: 'modelos tabulares' },
+      { name: 'Deepgram / ElevenLabs', note: 'STT/TTS streaming' },
+      { name: 'Compliance (HIPAA, SOC2, ISO 27001)', note: 'alineación, no certificación formal' },
     ],
   },
 ];
 
 const aiCapabilities = [
   {
-    title: 'RAG enterprise',
-    description: 'Hybrid retrieval (BM25 + vectorial), reranking, citaciones y workflows agentic.',
+    title: 'RAG con citas verificables',
+    description: 'Hybrid retrieval (BM25 + vectorial), reranking y respuestas con citaciones inline clickeables. Implementado en el chatbot demo.',
   },
   {
     title: 'Chatbots conversacionales',
@@ -557,34 +271,34 @@ const caseStudies = [
 
 const heroStats = [
   { value: '8+', label: 'Años construyendo software' },
-  { value: '27', label: 'Demos funcionales en línea' },
-  { value: '170+', label: 'Tecnologías dominadas' },
-  { value: '8', label: 'Países LatAm en facturación electrónica' },
+  { value: '2', label: 'Apps reales con OpenAI' },
+  { value: '25', label: 'Prototipos navegables' },
+  { value: '~25', label: 'Tecnologías core que usamos' },
 ];
 
 const bigMetrics: { value: string; label: string; sub: string; gradient: string }[] = [
   {
-    value: '27',
-    label: 'Demos enterprise',
-    sub: 'Funcionales, navegables y con backend mock',
+    value: '2',
+    label: 'Apps reales con IA',
+    sub: 'Chatbot RAG con OpenAI + Generador LinkedIn Ads',
     gradient: 'from-primary-500 to-primary-700',
   },
   {
-    value: '170+',
-    label: 'Tecnologías',
-    sub: 'Frontend, backend, IA, cloud, data y mobile',
+    value: '25',
+    label: 'Prototipos navegables',
+    sub: 'Mockups interactivos con datos simulados realistas',
     gradient: 'from-secondary-500 to-secondary-800',
   },
   {
-    value: '8',
-    label: 'Países LatAm',
-    sub: 'DIAN · SAT · AFIP · SII · SUNAT · DGI · SET · SRI',
+    value: '~25',
+    label: 'Tecnologías core',
+    sub: 'Las que dominamos y usamos a diario en el repo',
     gradient: 'from-emerald-500 to-emerald-700',
   },
   {
     value: '2026',
     label: 'Año fundación',
-    sub: 'Plataforma comercial Koptup',
+    sub: 'Estudio comercial Koptup',
     gradient: 'from-amber-500 to-orange-700',
   },
   {
@@ -607,47 +321,19 @@ type TeamMember = {
 const team: TeamMember[] = [
   {
     name: 'Ronald Cipagauta',
-    role: 'Founder & Tech Lead',
-    bio: 'Full-stack engineer con 8+ años construyendo productos en Colombia y LatAm. Lidera arquitectura, IA aplicada y producto.',
+    role: 'Founder · Full-stack & IA aplicada',
+    bio: 'Full-stack engineer con 8+ años construyendo productos en Colombia y LATAM. Diseña, escribe y opera el stack — frontend, backend, IA aplicada y deploy.',
     initials: 'RC',
     gradient: 'from-primary-500 to-primary-800',
     photo:
       'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&q=80&auto=format',
   },
   {
-    name: 'Full-stack Engineer',
-    role: 'Web & APIs',
-    bio: 'Next.js, Node, TypeScript end-to-end. Diseña y mantiene las 27 demos y la plataforma de servicios.',
-    initials: 'FS',
+    name: 'Red de colaboradores',
+    role: 'Diseño, IA, DevOps, QA · bajo demanda',
+    bio: 'Cuando un proyecto requiere especialización extra (UI/UX dedicado, ML engineer para casos no estándar, DevOps para infraestructura compleja, QA con Playwright), sumamos colaboradores freelance de confianza. Estructura flexible, no headcount fijo.',
+    initials: 'C+',
     gradient: 'from-emerald-500 to-emerald-800',
-  },
-  {
-    name: 'AI / ML Engineer',
-    role: 'RAG, agentes y modelos',
-    bio: 'OpenAI, RAG enterprise, agentes con tool calling, embeddings y evaluación de prompts en producción.',
-    initials: 'AI',
-    gradient: 'from-fuchsia-500 to-rose-700',
-  },
-  {
-    name: 'UX / UI Designer',
-    role: 'Producto y design system',
-    bio: 'Wireframes en Figma, design tokens y diseño accesible para web y móvil.',
-    initials: 'UX',
-    gradient: 'from-amber-500 to-orange-700',
-  },
-  {
-    name: 'DevOps Engineer',
-    role: 'Cloud & CI/CD',
-    bio: 'AWS, Vercel, Railway, Docker y Kubernetes. Pipelines verdes desde el día uno.',
-    initials: 'DO',
-    gradient: 'from-sky-500 to-blue-800',
-  },
-  {
-    name: 'QA Engineer',
-    role: 'Calidad y testing',
-    bio: 'Playwright, Jest, smoke tests y revisiones de release antes de cada deploy a producción.',
-    initials: 'QA',
-    gradient: 'from-violet-500 to-purple-800',
   },
 ];
 
@@ -661,28 +347,28 @@ type TimelineItem = {
 const timeline: TimelineItem[] = [
   {
     year: '2024',
-    title: 'Primeras demos funcionales',
+    title: 'Primeros prototipos',
     description:
-      'Arranca la idea de Koptup como vitrina: prototipos navegables de chatbot, e-commerce y dashboards con datos simulados.',
+      'Arranca la idea de Koptup como vitrina: prototipos navegables de chatbot, e-commerce y dashboards con datos simulados para mostrar capacidad de UI/UX.',
   },
   {
     year: '2025',
     title: 'Primer cliente real — SoSalud',
     description:
-      'Implementación de VPN empresarial para SoSalud (tercero administrador de Nueva EPS). Expansión del catálogo a 18 demos enterprise.',
+      'Implementación de VPN empresarial para SoSalud (tercero administrador de Nueva EPS) por $3.5M COP. Ese ingreso financia la expansión del catálogo de prototipos.',
   },
   {
     year: '2026',
-    title: 'Plataforma completa',
+    title: 'Vitrina y dos apps reales',
     description:
-      '27 demos enterprise, RAG con GPT-4o, planes en COP y USD, facturación electrónica en 8 países y servicios SaaS hospedados.',
+      '27 vistas interactivas en línea (2 con integración real a OpenAI: chatbot RAG y generador de LinkedIn Ads, el resto mockups), planes en COP/USD con TRM en vivo, sitio comercial completo.',
     highlight: true,
   },
   {
     year: '2027+',
-    title: 'Expansión LatAm',
+    title: 'Convertir prototipos en productos',
     description:
-      'Roadmap: presencia comercial en México y Argentina, alianzas con integradores locales y nuevas verticales (fintech regulada, salud).',
+      'Roadmap: convertir 2-3 prototipos más en apps reales según demanda de clientes (CRM IA, helpdesk IA, automatización de workflows). Alianzas con integradores en México y Argentina.',
   },
 ];
 
@@ -718,12 +404,12 @@ export default function AboutPage() {
             </Badge>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">Koptup</h1>
             <p className="text-2xl md:text-3xl mb-8 max-w-3xl text-primary-50">
-              Construimos software a medida con IA para empresas de LatAm que quieren crecer rápido sin
-              atarse a un SaaS extranjero.
+              Estudio de desarrollo a medida en Bogotá. Construimos software para empresas de LATAM con stack moderno —
+              dos apps reales con IA online + 25 prototipos navegables para que veas lo que podemos construirte.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" variant="outline" className="bg-white text-primary-700 hover:bg-primary-50" asChild>
-                <Link href="/demo">Ver las 27 demos</Link>
+                <Link href="/demo">Ver los 27 prototipos</Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
                 <Link href="/contact">Hablar con nosotros</Link>
@@ -786,14 +472,17 @@ export default function AboutPage() {
                 Un equipo técnico, no una agencia
               </h2>
               <p className="text-lg text-secondary-700 dark:text-secondary-300 mb-6">
-                Koptup nace en Colombia liderado por <strong>Ronald Cipagauta</strong>, desarrollador full-stack con
-                más de 8 años construyendo productos digitales para clientes en Colombia, México, Costa Rica y otros
-                países de LatAm. Somos un equipo pequeño y altamente técnico — escribimos código, no slides.
+                Koptup es el estudio de <strong>Ronald Cipagauta</strong> en Bogotá. Desarrollador full-stack
+                con 8+ años construyendo productos para clientes en Colombia y LATAM. Cuando un proyecto lo requiere
+                sumamos colaboradores especializados en diseño, IA y DevOps — somos un equipo flexible, no una agencia
+                con headcount fijo.
               </p>
               <p className="text-lg text-secondary-700 dark:text-secondary-300 mb-6">
                 Trabajamos en dos modalidades: <strong>software a medida</strong> con código fuente entregado al
-                cliente, o <strong>SaaS hospedado</strong> por nosotros listo para usar. En ambos casos garantizamos
-                stack moderno, tests automáticos, CI/CD y soporte post-entrega.
+                cliente, o <strong>SaaS hospedado</strong> por nosotros cuando el cliente prefiere no operar la
+                infraestructura. Lo que ves online son <strong>2 apps reales</strong> (chatbot RAG con OpenAI y
+                generador de LinkedIn Ads) y <strong>25 prototipos navegables</strong> con datos simulados que
+                muestran el rango de soluciones que podemos construirte.
               </p>
               <div className="space-y-3">
                 {missionPoints.map((point) => (
@@ -1190,14 +879,14 @@ export default function AboutPage() {
           <GlobeAltIcon className="h-16 w-16 mx-auto mb-6 opacity-90" />
           <h2 className="text-4xl md:text-6xl font-bold mb-6">¿Empezamos?</h2>
           <p className="text-xl mb-10 text-white/90">
-            Probá las demos sin registrarte o agendá una llamada de 30 minutos para evaluar tu proyecto.
+            Probá los prototipos sin registrarte o agendá una llamada de 30 minutos para evaluar tu proyecto.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/demo"
               className="bg-white text-primary-700 px-8 py-4 rounded-xl font-bold text-lg hover:scale-105 transition shadow-xl"
             >
-              Ver las 27 demos
+              Ver los 27 prototipos
             </Link>
             <Link
               href="/contact"

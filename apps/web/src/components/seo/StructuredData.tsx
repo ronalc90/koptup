@@ -318,7 +318,7 @@ export function FAQStructuredData() {
         name: '¿Puedo probar el software antes de contratar?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Sí. Ofrecemos demos interactivas y completamente funcionales de cada tipo de solución que desarrollamos. Puedes probar e-commerce, chatbot IA, dashboards, gestión documental, reservas y más directamente en nuestro sitio web antes de tomar cualquier decisión.',
+          text: 'Sí. Ofrecemos 27 prototipos navegables del tipo de soluciones que construimos. Dos de ellos (chatbot RAG y generador de LinkedIn Ads) usan OpenAI real; el resto son mockups interactivos con datos simulados para que veas el flujo y la UX antes de contratarnos.',
         },
       },
       {

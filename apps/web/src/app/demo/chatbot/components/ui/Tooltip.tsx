@@ -54,7 +54,7 @@ export default function Tooltip({
       {children}
       <span
         role="tooltip"
-        className={`pointer-events-none absolute z-50 ${sideClass} ${alignClass} hidden whitespace-normal rounded-md border border-secondary-700/40 bg-secondary-900/95 px-2.5 py-1.5 text-[11px] font-medium leading-snug text-white opacity-0 shadow-xl backdrop-blur-sm transition-opacity duration-150 group-hover/tt:opacity-100 group-focus-within/tt:opacity-100 dark:border-secondary-600 dark:bg-secondary-800/95 sm:block`}
+        className={`pointer-events-none absolute z-50 w-max ${sideClass} ${alignClass} hidden whitespace-normal rounded-md border border-secondary-700/40 bg-secondary-900/95 px-2.5 py-1.5 text-[11px] font-medium leading-snug text-white opacity-0 shadow-xl backdrop-blur-sm transition-opacity duration-150 group-hover/tt:opacity-100 group-focus-within/tt:opacity-100 dark:border-secondary-600 dark:bg-secondary-800/95 sm:block`}
         style={{ maxWidth }}
       >
         {content}
