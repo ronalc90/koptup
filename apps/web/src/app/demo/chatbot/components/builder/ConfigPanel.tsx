@@ -18,7 +18,6 @@ import {
 } from '@heroicons/react/24/outline';
 
 import type {
-  BuilderLangCode,
   BuilderToneKey,
   BuilderWidgetConfig,
   MockKnowledgeDoc,
@@ -35,7 +34,6 @@ interface ConfigPanelProps {
   onChange: (patch: Partial<BuilderWidgetConfig>) => void;
   avatarChoices: readonly string[];
   toneChoices: readonly BuilderToneKey[];
-  langChoices: readonly { code: BuilderLangCode; label: string }[];
   positions: readonly WidgetCornerPosition[];
   /**
    * Subir archivos reales al backend. Si no se pasa, el panel cae al modo
@@ -59,7 +57,6 @@ export default function ConfigPanel({
   onChange,
   avatarChoices,
   toneChoices,
-  langChoices,
   positions,
   onUpload,
   onRemoveDoc,
@@ -100,18 +97,6 @@ export default function ConfigPanel({
     onChange({ avatarImage: undefined });
     if (logoInputRef.current) logoInputRef.current.value = '';
   }, [onChange]);
-
-  const toggleLang = useCallback(
-    (code: BuilderLangCode) => {
-      const isOn = config.languages.includes(code);
-      const next = isOn
-        ? config.languages.filter((c) => c !== code)
-        : [...config.languages, code];
-      // Mantener al menos un idioma para no romper el bot.
-      onChange({ languages: next.length === 0 ? config.languages : next });
-    },
-    [config.languages, onChange],
-  );
 
   const addMockDoc = useCallback(() => {
     const used = new Set(config.docs.map((d) => d.id));
@@ -380,34 +365,13 @@ export default function ConfigPanel({
           </select>
         </label>
 
-        <div>
-          <span className="text-xs font-medium text-secondary-700 dark:text-secondary-300">
-            {t('fields.languages')}
-          </span>
-          <div className="mt-1 flex flex-wrap gap-2">
-            {langChoices.map((l) => {
-              const checked = config.languages.includes(l.code);
-              return (
-                <label
-                  key={l.code}
-                  className={`flex cursor-pointer items-center gap-1.5 rounded-md border px-2 py-1 text-xs ${
-                    checked
-                      ? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-950 dark:text-primary-200'
-                      : 'border-secondary-300 text-secondary-600 dark:border-secondary-700 dark:text-secondary-300'
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    className="accent-primary-600"
-                    checked={checked}
-                    onChange={() => toggleLang(l.code)}
-                  />
-                  {l.label}
-                </label>
-              );
-            })}
-          </div>
-        </div>
+        {/*
+         * Selector de idioma intencionalmente removido: el idioma del widget
+         * lo determina el header global del sitio (cookie locale + next-intl).
+         * Mantener un selector independiente acá rompía la UX y duplicaba la
+         * fuente de verdad. La config sigue exponiendo `languages` para el
+         * backend pero la UI ya no lo edita.
+         */}
       </fieldset>
 
       {/* Knowledge base */}

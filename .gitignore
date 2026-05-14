@@ -69,3 +69,6 @@ temp/
 nul
 **/nul
 test-pdfs/
+
+# Chatbot file-based store (no commitear conversaciones)
+apps/backend/data/

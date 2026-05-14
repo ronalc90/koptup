@@ -280,6 +280,21 @@
       "feedbackUp": "Buena respuesta",
       "feedbackDown": "Respuesta a mejorar",
       "scenarios": "Escenarios mock",
+      "suggestions": "Probá una de estas preguntas",
+      "emptyHint": "Tu chatbot está listo. Subí documentos o lanzá una pregunta de muestra.",
+      "relativeTime": {
+        "now": "ahora",
+        "secondsAgo": "hace {seconds}s",
+        "minutesAgo": "hace {minutes} min",
+        "hoursAgo": "hace {hours} h",
+        "daysAgo": "hace {days} d"
+      },
+      "suggestionPrompts": {
+        "summary": "Resumime lo principal de mis documentos",
+        "search": "¿Qué dicen los docs sobre {topic}?",
+        "compare": "Compará los dos documentos más relevantes",
+        "lookup": "¿Qué hay cargado actualmente en el bot?"
+      },
       "scenarioLabels": {
         "docs": "RAG sobre documentos",
         "multiHop": "Multi-hop reasoning",
@@ -342,7 +357,27 @@
     "tenants": {
       "acme": "Acme Corp (Enterprise)",
       "globex": "Globex Industries",
-      "umbrella": "Umbrella Group"
+      "umbrella": "Umbrella Group",
+      "selectBot": "Seleccionar bot",
+      "createBot": "Crear nuevo bot",
+      "deleteBot": "Eliminar bot",
+      "deleteConfirm": "¿Eliminar el bot \"{name}\"? Se borran documentos, fragmentos y conversaciones.",
+      "deleted": "Bot \"{name}\" eliminado",
+      "deleteFailed": "No pude eliminar el bot",
+      "empty": "Todavía no creaste ningún bot. Configurá uno arriba y tocá Guardar.",
+      "docsCount": "{count, plural, =0 {sin docs} one {1 doc} other {# docs}}",
+      "conversationsCount": "{count, plural, =0 {sin conversaciones} one {1 conversación} other {# conversaciones}}"
+    },
+    "models": {
+      "selectModel": "Modelo LLM",
+      "providerOpenAI": "OpenAI",
+      "providerRequires": "requiere API key",
+      "activeModel": "{name} activo",
+      "activeModelTooltip": "Modelo LLM real respondiendo. Las respuestas consumen tokens del proveedor.",
+      "extractiveMode": "Sin LLM (modo extractivo)",
+      "extractiveModeTooltip": "No hay API key del proveedor. El bot cita fragmentos sin generar lenguaje natural.",
+      "costThisMonth": "Costo estimado este mes",
+      "costPerRequest": "Costo de este request"
     },
     "ingestionStats": {
       "title": "Fuentes conectadas",

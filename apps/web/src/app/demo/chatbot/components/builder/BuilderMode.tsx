@@ -23,11 +23,11 @@ import toast from 'react-hot-toast';
 import ConfigPanel from './ConfigPanel';
 import LivePreview from './LivePreview';
 import EmbedCode from './EmbedCode';
+import TenantSelector, { CURRENT_BOT_LS_KEY } from './TenantSelector';
 import type { BuilderWidgetConfig, MockKnowledgeDoc, WidgetCornerPosition } from './widgetConfig';
 import {
   AVATAR_CHOICES,
   DEFAULT_BOT_ID,
-  LANG_CHOICES,
   MOCK_DOCS,
   TONE_CHOICES,
 } from './widgetConfig';
@@ -267,6 +267,65 @@ export default function BuilderMode() {
     [config, persistLocal, persistedBotId],
   );
 
+  /**
+   * Cambia el tenant activo. Trae la config del bot seleccionado del backend
+   * y actualiza la URL (`?botId=…`) para que el resto de la página (Playground
+   * incluido) lo levante en el próximo render.
+   */
+  const handleSelectTenant = useCallback(
+    async (botId: string) => {
+      try {
+        const remote = await getBot(botId);
+        const local = readLocal();
+        const cached = local[botId];
+        const fromRemote = toBuilderConfig(remote);
+        const next = cached?.avatarImage
+          ? { ...fromRemote, avatarImage: cached.avatarImage }
+          : fromRemote;
+        setConfig(next);
+        setPersistedBotId(botId);
+        persistLocal(botId, next);
+        if (typeof window !== 'undefined') {
+          try {
+            window.localStorage.setItem(CURRENT_BOT_LS_KEY, botId);
+            window.localStorage.setItem('koptup.chatbot.demoBotId', botId);
+          } catch {
+            /* ignore */
+          }
+        }
+        router.replace(`?botId=${encodeURIComponent(botId)}`);
+        toast.success(`Tenant activo: ${remote.name}`);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'error';
+        toast.error(`No pude cargar el bot: ${msg}`);
+      }
+    },
+    [persistLocal, router],
+  );
+
+  /** Limpia el estado para empezar un bot nuevo (no toca el backend hasta save). */
+  const handleCreateNewTenant = useCallback(() => {
+    setConfig({ ...DEFAULT_CONFIG, botId: DEFAULT_BOT_ID });
+    setPersistedBotId(null);
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.removeItem(CURRENT_BOT_LS_KEY);
+        window.localStorage.removeItem('koptup.chatbot.demoBotId');
+      } catch {
+        /* ignore */
+      }
+    }
+    router.replace('?');
+    toast.success('Nuevo bot listo. Configurá y guardá para persistir.');
+  }, [router]);
+
+  /** El bot activo fue eliminado: volvemos al estado "sin guardar". */
+  const handleTenantDeleted = useCallback(() => {
+    setConfig({ ...DEFAULT_CONFIG, botId: DEFAULT_BOT_ID });
+    setPersistedBotId(null);
+    router.replace('?');
+  }, [router]);
+
   const handleShareMicrosite = useCallback(async () => {
     try {
       const id = persistedBotId ?? (await ensureSaved());
@@ -295,6 +354,12 @@ export default function BuilderMode() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <TenantSelector
+            currentBotId={persistedBotId}
+            onSelect={handleSelectTenant}
+            onCreateNew={handleCreateNewTenant}
+            onDeleted={handleTenantDeleted}
+          />
           {persistedBotId ? (
             <span className="rounded-md bg-secondary-100 px-2 py-1 font-mono text-[11px] text-secondary-700 dark:bg-secondary-800 dark:text-secondary-200">
               {persistedBotId}
@@ -325,7 +390,6 @@ export default function BuilderMode() {
             onChange={patchConfig}
             avatarChoices={AVATAR_CHOICES}
             toneChoices={TONE_CHOICES}
-            langChoices={LANG_CHOICES}
             positions={POSITIONS}
             onUpload={handleUploadFiles}
             onRemoveDoc={handleRemoveDoc}

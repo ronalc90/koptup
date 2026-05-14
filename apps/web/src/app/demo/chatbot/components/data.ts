@@ -297,13 +297,15 @@ export const CONNECTED_SOURCES: readonly SourceMeta[] = [
   { key: 'confluence', count: 854,  unitKey: 'pages',    lastSync: '5 min' },
 ] as const;
 
+/**
+ * Catálogo de modelos LLM. Sólo OpenAI (no se incluyen Claude/Gemini porque
+ * el backend sólo tiene esa key configurada). El estado `enabled` real viene
+ * del endpoint `GET /api/chatbot/models`; este array es el fallback estático.
+ */
 export const MODELS: readonly { id: string; label: string; cost: string }[] = [
-  { id: 'claude-sonnet-4.7',  label: 'Claude Sonnet 4.7', cost: '$3 / $15 per Mtok' },
-  { id: 'claude-opus-4.7',    label: 'Claude Opus 4.7',   cost: '$15 / $75 per Mtok' },
-  { id: 'claude-haiku-4',     label: 'Claude Haiku 4',    cost: '$0.8 / $4 per Mtok' },
-  { id: 'gpt-4o',             label: 'GPT-4o',            cost: '$2.5 / $10 per Mtok' },
-  { id: 'gpt-4o-mini',        label: 'GPT-4o mini',       cost: '$0.15 / $0.6 per Mtok' },
-  { id: 'llama-3.1-70b',      label: 'Llama 3.1 70B',     cost: 'self-hosted' },
+  { id: 'gpt-4o-mini', label: 'GPT-4o mini', cost: '$0.15 / $0.60 per Mtok' },
+  { id: 'gpt-4o',      label: 'GPT-4o',      cost: '$2.50 / $10.00 per Mtok' },
+  { id: 'gpt-4-turbo', label: 'GPT-4 Turbo', cost: '$10.00 / $30.00 per Mtok' },
 ] as const;
 
 export const TENANTS: readonly { id: 'acme' | 'globex' | 'umbrella' }[] = [
