@@ -18,7 +18,7 @@ interface DemoCaptureProps {
   onImageCaptured?: (dataUrl: string) => void;
 }
 
-type ModoCaptura = 'visual' | 'pantalla';
+type ModoCaptura = 'auto' | 'visual' | 'pantalla';
 
 /**
  * Captura visual del demo. Dos modos:
@@ -32,7 +32,7 @@ export default function DemoCapture({
   onImageCaptured,
 }: DemoCaptureProps) {
   const demo = KOPTUP_DEMOS.find((d) => d.id === demoId) ?? KOPTUP_DEMOS[0];
-  const [modo, setModo] = useState<ModoCaptura>('visual');
+  const [modo, setModo] = useState<ModoCaptura>('auto');
   const [iframeUrl, setIframeUrl] = useState<string>('');
 
   useEffect(() => {
@@ -68,8 +68,9 @@ export default function DemoCapture({
       <div className="flex items-center gap-1 rounded-lg bg-secondary-100 p-1 text-xs dark:bg-secondary-800">
         {(
           [
-            { key: 'visual', label: 'Visual diseñado (instantáneo)', Icon: PhotoIcon },
-            { key: 'pantalla', label: 'Captura en vivo (pantalla)', Icon: VideoCameraIcon },
+            { key: 'auto', label: 'Auto (real, sin permisos)', Icon: CameraIcon },
+            { key: 'visual', label: 'Mockup diseñado', Icon: PhotoIcon },
+            { key: 'pantalla', label: 'Grabar pantalla', Icon: VideoCameraIcon },
           ] as { key: ModoCaptura; label: string; Icon: typeof PhotoIcon }[]
         ).map(({ key, label, Icon }) => {
           const activo = modo === key;
@@ -91,11 +92,320 @@ export default function DemoCapture({
         })}
       </div>
 
-      {modo === 'visual' ? (
+      {modo === 'auto' ? (
+        <AutoCapture iframeUrl={iframeUrl} demo={demo} onImageCaptured={onImageCaptured} />
+      ) : modo === 'visual' ? (
         <VisualGenerator demo={demo} onImageCaptured={onImageCaptured} />
       ) : (
         <ScreenCapture iframeUrl={iframeUrl} demo={demo} onImageCaptured={onImageCaptured} />
       )}
+    </div>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────────────── */
+/*  Modo 0: AUTO — captura real del iframe sin pedir permisos                 */
+/*  Same-origin → podemos acceder a contentDocument y renderizarlo a canvas   */
+/*  vía html-to-image. Para video, capturamos el canvas con captureStream().  */
+/* ────────────────────────────────────────────────────────────────────────── */
+
+function AutoCapture({
+  iframeUrl,
+  demo,
+  onImageCaptured,
+}: {
+  iframeUrl: string;
+  demo: KoptupDemo;
+  onImageCaptured?: (dataUrl: string) => void;
+}) {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [generando, setGenerando] = useState(false);
+  const [grabando, setGrabando] = useState(false);
+  const [duracion, setDuracion] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const rafRef = useRef<number | null>(null);
+
+  const esperarCargaIframe = (): Promise<HTMLIFrameElement> =>
+    new Promise((resolve, reject) => {
+      const el = iframeRef.current;
+      if (!el) return reject(new Error('iframe no montado'));
+      const doc = el.contentDocument;
+      if (doc && doc.readyState === 'complete' && doc.body && doc.body.childElementCount > 0) {
+        return resolve(el);
+      }
+      const onLoad = () => {
+        el.removeEventListener('load', onLoad);
+        setTimeout(() => resolve(el), 400); // breathing room para hydration React
+      };
+      el.addEventListener('load', onLoad);
+      setTimeout(() => resolve(el), 8000); // timeout duro
+    });
+
+  const tomarFoto = async () => {
+    setError(null);
+    setGenerando(true);
+    try {
+      const el = await esperarCargaIframe();
+      const doc = el.contentDocument;
+      if (!doc || !doc.body) throw new Error('Sin acceso al contenido del iframe');
+      // Forzar scroll al top para captura consistente
+      doc.documentElement.scrollTop = 0;
+      doc.body.scrollTop = 0;
+      // Import dinámico para que html-to-image no entre en el bundle SSR
+      const { toPng } = await import('html-to-image');
+      const dataUrl = await toPng(doc.body, {
+        backgroundColor: '#ffffff',
+        cacheBust: true,
+        pixelRatio: 2,
+        width: doc.documentElement.scrollWidth,
+        height: Math.max(doc.documentElement.scrollHeight, 627),
+        style: { transform: 'translate(0, 0)' },
+        filter: (node) => {
+          // saltar scripts y elementos invisibles
+          if (node instanceof HTMLElement) {
+            if (node.tagName === 'SCRIPT' || node.tagName === 'NOSCRIPT') return false;
+          }
+          return true;
+        },
+      });
+      setPhotoUrl(dataUrl);
+      onImageCaptured?.(dataUrl);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setError(`No se pudo capturar el iframe: ${msg}`);
+    } finally {
+      setGenerando(false);
+    }
+  };
+
+  const iniciarVideo = async () => {
+    setError(null);
+    setVideoUrl(null);
+    chunksRef.current = [];
+    try {
+      const el = await esperarCargaIframe();
+      const doc = el.contentDocument;
+      if (!doc || !doc.body) throw new Error('Sin acceso al contenido del iframe');
+      const { toCanvas } = await import('html-to-image');
+
+      // Canvas que se redibuja periódicamente desde el iframe
+      const W = 1280;
+      const H = 720;
+      const canvas = document.createElement('canvas');
+      canvas.width = W;
+      canvas.height = H;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Canvas 2D no disponible');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, W, H);
+
+      let frameInFlight = false;
+      const renderFrame = async () => {
+        if (frameInFlight) return;
+        frameInFlight = true;
+        try {
+          const sourceCanvas = await toCanvas(doc.body, {
+            backgroundColor: '#ffffff',
+            cacheBust: false,
+            pixelRatio: 1,
+            width: Math.max(doc.body.scrollWidth, 1200),
+            height: Math.max(doc.body.scrollHeight, 627),
+            filter: (node) =>
+              !(node instanceof HTMLElement && (node.tagName === 'SCRIPT' || node.tagName === 'NOSCRIPT')),
+          });
+          // Encajar manteniendo aspecto (cover)
+          const sw = sourceCanvas.width;
+          const sh = sourceCanvas.height;
+          const ratio = Math.max(W / sw, H / sh);
+          const dw = sw * ratio;
+          const dh = sh * ratio;
+          ctx.drawImage(sourceCanvas, (W - dw) / 2, 0, dw, dh);
+        } catch {
+          // ignorar frames con error
+        } finally {
+          frameInFlight = false;
+        }
+      };
+
+      // Stream del canvas (15 fps)
+      const stream = (canvas as HTMLCanvasElement & { captureStream(fps: number): MediaStream }).captureStream(15);
+      const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+        ? 'video/webm;codecs=vp9'
+        : 'video/webm';
+      const recorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 4_000_000 });
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
+      };
+      recorder.onstop = () => {
+        stream.getTracks().forEach((t) => t.stop());
+        const blob = new Blob(chunksRef.current, { type: mime });
+        setVideoUrl(URL.createObjectURL(blob));
+        setGrabando(false);
+        if (rafRef.current !== null) {
+          cancelAnimationFrame(rafRef.current);
+          rafRef.current = null;
+        }
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+        }
+      };
+      recorder.start(250);
+      recorderRef.current = recorder;
+      setGrabando(true);
+      setDuracion(0);
+      timerRef.current = setInterval(() => setDuracion((d) => d + 1), 1000);
+
+      // Loop de renderizado a ~10 fps (html-to-image es lento, no más rápido)
+      const loop = () => {
+        renderFrame();
+        rafRef.current = window.setTimeout(loop, 100) as unknown as number;
+      };
+      loop();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setError(`No se pudo iniciar grabación: ${msg}`);
+    }
+  };
+
+  const detenerVideo = () => {
+    recorderRef.current?.stop();
+  };
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) clearTimeout(rafRef.current);
+      if (timerRef.current) clearInterval(timerRef.current);
+      recorderRef.current?.stop();
+    };
+  }, []);
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs leading-relaxed text-emerald-900 dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-200">
+        <CameraIcon className="mr-1 inline h-4 w-4" />
+        <strong>Modo automático:</strong> capturamos el demo real renderizado en el iframe.
+        Sin permisos, sin compartir pantalla, 100% del DOM real. La foto sale en 1-3 segundos;
+        para video grabamos a 10 fps mientras interactuás con el demo.
+      </div>
+
+      <div className="overflow-hidden rounded-xl border border-secondary-200 bg-white shadow-sm dark:border-secondary-700 dark:bg-secondary-900">
+        <div className="flex items-center justify-between border-b border-secondary-200 bg-secondary-50 px-3 py-2 dark:border-secondary-700 dark:bg-secondary-800">
+          <div className="flex items-center gap-2">
+            <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
+            <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
+            <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+            <span className="ml-3 truncate text-xs text-secondary-600 dark:text-secondary-300">
+              {iframeUrl}
+            </span>
+          </div>
+          <a
+            href={iframeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-xs font-medium text-primary-600 hover:text-primary-700"
+          >
+            Abrir en pestaña
+            <ArrowTopRightOnSquareIcon className="h-3.5 w-3.5" />
+          </a>
+        </div>
+        {iframeUrl ? (
+          <iframe
+            ref={iframeRef}
+            src={iframeUrl}
+            title={`Preview ${demo.titulo}`}
+            className="block aspect-video w-full bg-white"
+            sandbox="allow-scripts allow-same-origin allow-forms"
+          />
+        ) : null}
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={tomarFoto}
+          disabled={generando || grabando}
+          className="inline-flex items-center gap-2 rounded-md bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 disabled:opacity-60"
+        >
+          <CameraIcon className="h-4 w-4" />
+          {generando ? 'Capturando…' : 'Tomar foto del demo'}
+        </button>
+        {!grabando ? (
+          <button
+            type="button"
+            onClick={iniciarVideo}
+            disabled={generando}
+            className="inline-flex items-center gap-2 rounded-md bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-rose-700 disabled:opacity-60"
+          >
+            <VideoCameraIcon className="h-4 w-4" />
+            Grabar video (10 fps)
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={detenerVideo}
+            className="inline-flex items-center gap-2 rounded-md bg-rose-700 px-4 py-2 text-sm font-semibold text-white shadow-md transition"
+          >
+            <StopCircleIcon className="h-4 w-4 animate-pulse" />
+            Detener ({duracion}s)
+          </button>
+        )}
+      </div>
+
+      {error ? (
+        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-800/60 dark:bg-red-950/40 dark:text-red-200">
+          {error}
+        </div>
+      ) : null}
+
+      {photoUrl ? (
+        <div className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-secondary-500 dark:text-secondary-400">
+            Foto del demo real
+          </p>
+          <div className="overflow-hidden rounded-lg border border-secondary-200 dark:border-secondary-700">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={photoUrl} alt="Captura automática" className="w-full" />
+          </div>
+          <a
+            href={photoUrl}
+            download={`koptup-${demo.slug}-real.png`}
+            className="inline-flex items-center gap-2 rounded-md bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700"
+          >
+            <ArrowDownTrayIcon className="h-4 w-4" />
+            Descargar PNG
+          </a>
+        </div>
+      ) : null}
+
+      {videoUrl ? (
+        <div className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-secondary-500 dark:text-secondary-400">
+            Video del demo (WebM)
+          </p>
+          <video src={videoUrl} controls className="w-full rounded-lg border border-secondary-200 dark:border-secondary-700" />
+          <a
+            href={videoUrl}
+            download={`koptup-${demo.slug}-real.webm`}
+            className="inline-flex items-center gap-2 rounded-md bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-rose-700"
+          >
+            <ArrowDownTrayIcon className="h-4 w-4" />
+            Descargar WebM
+          </a>
+          <p className="text-[11px] text-secondary-500 dark:text-secondary-400">
+            LinkedIn no acepta WebM directo. Convertí a MP4 con{' '}
+            <a className="underline" href="https://cloudconvert.com/webm-to-mp4" target="_blank" rel="noreferrer">
+              CloudConvert
+            </a>{' '}
+            o ffmpeg: <code>ffmpeg -i input.webm -c:v libx264 -crf 18 output.mp4</code>
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }
