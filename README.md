@@ -34,6 +34,8 @@ Cada demo es una aplicación interactiva navegable, con datos simulados realista
 
 | Firma electrónica | Legal | Firma digital con validez legal, flujo de aprobaciones, plantillas reutilizables y audit trail completo. | [Ver demo](./apps/web/src/app/demo/firma-electronica/) |
 
+| Scraping y monitoreo | Datos | Pipeline de scraping con selectores visuales, scheduling, rotación de proxies y alertas por cambios. | [Ver demo](./apps/web/src/app/demo/scraping/) |
+
 ## 🚀 Stack Tecnológico
 
 ### Frontend
