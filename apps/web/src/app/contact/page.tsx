@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import Button from '@/components/ui/Button';
@@ -15,11 +17,30 @@ import {
   PaperAirplaneIcon,
   CheckCircleIcon,
   CalendarDaysIcon,
+  SparklesIcon,
 } from '@heroicons/react/24/outline';
 import { FaWhatsapp, FaLinkedin } from 'react-icons/fa';
 
-export default function ContactPage() {
+// TODO: extract to i18n
+const SERVICE_NAME_BY_SLUG: Record<string, string> = {
+  'chatbot-rag-ia': 'Chatbot RAG con IA',
+  'agente-ia-ventas': 'Agente IA de Ventas',
+  'desarrollo-web': 'Desarrollo web a medida',
+  'ecommerce': 'E-commerce',
+  'auditoria-cups': 'Auditoría CUPS',
+  'liquidacion': 'Liquidación de salud',
+};
+
+function ContactPageInner() {
   const t = useTranslations('contactPage');
+  const searchParams = useSearchParams();
+  const queryService = searchParams.get('service');
+  const queryPlan = searchParams.get('plan');
+
+  const cotizandoLabel = queryService
+    ? (SERVICE_NAME_BY_SLUG[queryService] || queryService.replace(/-/g, ' '))
+    : null;
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -28,11 +49,26 @@ export default function ContactPage() {
     service: '',
     budget: '',
     message: '',
+    timeline: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isScheduling, setIsScheduling] = useState(false);
   const [error, setError] = useState('');
+
+  // Pre-llenar form si vienen query params
+  useEffect(() => {
+    if (cotizandoLabel) {
+      setFormData((prev) => ({
+        ...prev,
+        service: cotizandoLabel,
+        message: prev.message
+          ? prev.message
+          : `Hola, estoy interesado en cotizar ${cotizandoLabel}${queryPlan ? ` (plan ${queryPlan})` : ''}.`,
+      }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cotizandoLabel, queryPlan]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +80,7 @@ export default function ContactPage() {
 
       setIsSubmitted(true);
 
-      // Reset form después de 3 segundos
+      // Reset form después de 6 segundos (más tiempo para que el usuario vea el CTA)
       setTimeout(() => {
         setIsSubmitted(false);
         setFormData({
@@ -55,8 +91,9 @@ export default function ContactPage() {
           service: '',
           budget: '',
           message: '',
+          timeline: '',
         });
-      }, 3000);
+      }, 6000);
     } catch (err: any) {
       console.error('Error submitting contact form:', err);
       setError(t('form.errorSubmit'));
@@ -176,6 +213,31 @@ export default function ContactPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Contact Form */}
             <div className="lg:col-span-2">
+              {/* Banner cotizando — pre-fill desde /services o /pricing */}
+              {/* TODO: extract to i18n */}
+              {cotizandoLabel && (
+                <Card
+                  variant="bordered"
+                  className="mb-6 border-primary-300 dark:border-primary-700 bg-gradient-to-r from-primary-50 to-white dark:from-primary-950 dark:to-secondary-950"
+                >
+                  <CardContent className="p-5 flex items-center gap-4 flex-wrap">
+                    <div className="w-10 h-10 rounded-lg bg-primary-600 flex items-center justify-center flex-shrink-0">
+                      <SparklesIcon className="h-5 w-5 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs uppercase tracking-wide font-semibold text-primary-700 dark:text-primary-300">
+                        Estás cotizando
+                      </p>
+                      <p className="text-base font-bold text-secondary-900 dark:text-white">
+                        {cotizandoLabel}
+                        {queryPlan && <span className="text-secondary-600 dark:text-secondary-400"> — Plan {queryPlan}</span>}
+                      </p>
+                    </div>
+                    <Badge variant="primary" size="sm">Solicitud pre-llenada</Badge>
+                  </CardContent>
+                </Card>
+              )}
+
               <Card variant="bordered" className="shadow-xl">
                 <CardHeader>
                   <CardTitle className="text-3xl">{t('form.title')}</CardTitle>
@@ -192,9 +254,22 @@ export default function ContactPage() {
                       <h3 className="text-2xl font-bold text-secondary-900 dark:text-white mb-2">
                         {t('form.success.title')}
                       </h3>
-                      <p className="text-secondary-600 dark:text-secondary-400">
+                      <p className="text-secondary-600 dark:text-secondary-400 mb-6">
                         {t('form.success.subtitle')}
                       </p>
+                      {/* CTA crear cuenta para seguir conversación — TODO: extract to i18n */}
+                      <div className="max-w-md mx-auto p-4 rounded-lg bg-primary-50 dark:bg-primary-950 border border-primary-200 dark:border-primary-800">
+                        <p className="text-sm text-secondary-700 dark:text-secondary-300 mb-3">
+                          Creá tu cuenta para hacer seguimiento de esta solicitud desde tu dashboard.
+                        </p>
+                        <Button size="sm" fullWidth asChild>
+                          <Link
+                            href={`/register?source=contact${queryService ? `&service=${queryService}` : ''}${queryPlan ? `&plan=${queryService || ''}&tier=${queryPlan}` : ''}`}
+                          >
+                            Crear mi cuenta para seguir hablando
+                          </Link>
+                        </Button>
+                      </div>
                     </div>
                   ) : (
                     <form onSubmit={handleSubmit} className="space-y-6">
@@ -308,6 +383,26 @@ export default function ContactPage() {
                             ))}
                           </select>
                         </div>
+                      </div>
+
+                      {/* Timeline — TODO: extract to i18n */}
+                      <div>
+                        <label htmlFor="timeline" className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                          ¿Cuándo querés empezar?
+                        </label>
+                        <select
+                          id="timeline"
+                          name="timeline"
+                          value={formData.timeline}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        >
+                          <option value="">Seleccioná una opción</option>
+                          <option value="now">Ya, lo antes posible</option>
+                          <option value="1m">En el próximo mes</option>
+                          <option value="3m">En 2-3 meses</option>
+                          <option value="open">Sin definir, solo explorando</option>
+                        </select>
                       </div>
 
                       <div>
@@ -483,5 +578,19 @@ export default function ContactPage() {
         </div>
       </section>
     </>
+  );
+}
+
+export default function ContactPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-secondary-50 dark:bg-black">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600" />
+        </div>
+      }
+    >
+      <ContactPageInner />
+    </Suspense>
   );
 }
