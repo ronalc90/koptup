@@ -1,0 +1,560 @@
+{
+  "demoChatbot": {
+    "pageTitle": "Enterprise RAG Chatbot",
+    "pageSubtitle": "Full RAG platform with agent orchestration, hybrid retrieval, observability and enterprise security",
+    "topBar": {
+      "tenant": "Tenant",
+      "model": "Model",
+      "language": "Language",
+      "runSample": "Run sample query",
+      "newSession": "New session",
+      "online": "Online"
+    },
+    "sidebar": {
+      "title": "Platform layers",
+      "subtitle": "Click any layer to inspect it",
+      "search": "Search capability..."
+    },
+    "layers": {
+      "ingestion": {
+        "title": "Ingestion & processing",
+        "summary": "Multi-source pipeline with OCR, structured parsing, dedupe and versioning.",
+        "items": [
+          "Connectors: PDF, Office, HTML, email, Slack, Notion, Confluence, GitHub, Jira",
+          "Databases: Postgres, MySQL, Snowflake, BigQuery, MongoDB",
+          "Audio and video with automatic transcription (Whisper-class)",
+          "Advanced OCR with LayoutLM and table detection",
+          "Entity extraction, SHA-256 dedupe, document versioning",
+          "Distributed ETL pipeline with automatic metadata enrichment"
+        ]
+      },
+      "chunking": {
+        "title": "Advanced chunking",
+        "summary": "Context-aware strategies with parent-child hierarchies and sliding windows.",
+        "items": [
+          "Semantic chunking guided by embeddings and grammar boundaries",
+          "Parent-child chunks for hierarchical retrieval",
+          "Sliding windows with adaptive overlap",
+          "Adaptive chunk sizing based on information density",
+          "Code-aware and table-aware chunking",
+          "Multi-modal chunking (text, images, time-aligned audio)"
+        ]
+      },
+      "retrieval": {
+        "title": "Retrieval",
+        "summary": "Hybrid dense + sparse + BM25 search, multi-index, multi-hop and federated.",
+        "items": [
+          "Dense vectors (1536-d) + sparse (SPLADE) + BM25 + keyword",
+          "Multi-index retrieval with metadata filtering",
+          "Temporal and graph retrieval",
+          "Semantic routing across tenants and domains",
+          "Federated retrieval cross-region",
+          "Multi-hop and recursive retrieval with cross-document reasoning"
+        ]
+      },
+      "query": {
+        "title": "Query understanding",
+        "summary": "Rewriting, HyDE, expansion and multi-query decomposition.",
+        "items": [
+          "LLM-based query rewriting with domain-specific templates",
+          "HyDE (Hypothetical Document Embeddings)",
+          "Query expansion and multi-query generation",
+          "Intent classification and decomposition",
+          "Semantic normalization and temporal understanding",
+          "Domain-aware parsing per tenant"
+        ]
+      },
+      "ranking": {
+        "title": "Ranking",
+        "summary": "Multi-stage cross-encoder reranking with diversity and freshness.",
+        "items": [
+          "Cross-encoder reranking (bge-reranker-large)",
+          "Multi-stage reranking (recall → precision)",
+          "Diversity reranking (MMR)",
+          "Freshness reranking with temporal decay",
+          "Citation-aware reranking",
+          "Personalization reranking by user/role"
+        ]
+      },
+      "context": {
+        "title": "Context engineering",
+        "summary": "Compression, dedupe, citation alignment and dynamic windows.",
+        "items": [
+          "Context compression with LLMLingua",
+          "Noise removal and semantic dedupe",
+          "Token optimization and context prioritization",
+          "Citation alignment chunk → token",
+          "Structured prompt assembly with Jinja",
+          "Dynamic context windows and memory-aware injection"
+        ]
+      },
+      "agents": {
+        "title": "Agents",
+        "summary": "Agentic RAG with planner/executor, reflection and workflow graphs.",
+        "items": [
+          "Planner/executor with tool calling",
+          "Multi-agent orchestration (ReAct, Reflexion)",
+          "Reflection loops and self-correction",
+          "Retry strategies with exponential backoff",
+          "Workflow graphs (LangGraph-style)",
+          "Autonomous task decomposition"
+        ]
+      },
+      "tools": {
+        "title": "Integrated tools",
+        "summary": "SQL, web, code, knowledge graph, browser automation.",
+        "items": [
+          "SQL querying against warehouses",
+          "Web search and browser automation",
+          "Code execution sandbox (Python, Node)",
+          "API orchestration and SaaS integrations",
+          "Knowledge graph queries (Cypher, SPARQL)",
+          "File manipulation and data analysis"
+        ]
+      },
+      "memory": {
+        "title": "Memory",
+        "summary": "Conversational, long-term, episodic and organizational.",
+        "items": [
+          "Conversational memory per session",
+          "Long-term semantic memory per user",
+          "Episodic memory of past interactions",
+          "User personalization and preferences",
+          "Organizational memory shared by tenant",
+          "Editable memory with audit trail"
+        ]
+      },
+      "multimodal": {
+        "title": "Multi-modality",
+        "summary": "Text, images, audio, video and diagrams.",
+        "items": [
+          "Text embeddings (text-embedding-3-large)",
+          "Image embeddings (CLIP) with OCR fallback",
+          "Audio embeddings and transcription",
+          "Video frame sampling + transcription",
+          "Vision-language cross-modal retrieval",
+          "Diagrams with relationship extraction"
+        ]
+      },
+      "models": {
+        "title": "Models",
+        "summary": "Multi-LLM routing, ensemble embeddings, fine-tuned rerankers.",
+        "items": [
+          "Claude Sonnet, Opus, Haiku",
+          "GPT-4o, GPT-4o-mini, o1",
+          "Llama 3.1 70B, Mistral Large self-hosted",
+          "Embedding ensembles with domain adapters",
+          "Vertical-specific fine-tuned rerankers",
+          "Quantized inference (AWQ, GPTQ)"
+        ]
+      },
+      "infra": {
+        "title": "Infrastructure",
+        "summary": "Distributed, GPU clusters, async, streaming, multi-region HA.",
+        "items": [
+          "Kubernetes-based distributed architecture",
+          "GPU inference clusters (A100, H100)",
+          "Horizontal scaling and async pipelines",
+          "Streaming responses over SSE/WebSocket",
+          "Smart caching and load balancing",
+          "Sharded multi-region vector stores with failover"
+        ]
+      },
+      "security": {
+        "title": "Enterprise security",
+        "summary": "RBAC, ACL, tenant isolation, PII masking, anti-injection.",
+        "items": [
+          "RBAC and ACL filtering at retrieval",
+          "Tenant isolation with Row-Level Security",
+          "Encryption at rest (AES-256) and in transit (TLS 1.3)",
+          "Secrets management (Vault, AWS KMS)",
+          "Automatic PII masking and immutable audit logs",
+          "Prompt injection and jailbreak defense"
+        ]
+      },
+      "observability": {
+        "title": "Observability",
+        "summary": "Tracing, token & latency analytics, hallucination tracking.",
+        "items": [
+          "Full request tracing (OpenTelemetry)",
+          "Retrieval tracing with chunk inspection",
+          "Token, latency and cost analytics per tenant",
+          "Hallucination tracking and groundedness scores",
+          "User behavior analytics",
+          "Failure diagnostics with replay"
+        ]
+      },
+      "eval": {
+        "title": "Evaluation",
+        "summary": "Precision/recall, faithfulness, citation accuracy, benchmarks.",
+        "items": [
+          "Retrieval precision/recall@k",
+          "Automatic faithfulness and groundedness",
+          "Citation accuracy and hallucination detection",
+          "Response quality (LLM-as-judge)",
+          "Benchmark suites: RAGAS, TruLens",
+          "Human-in-the-loop and regression testing"
+        ]
+      },
+      "optimization": {
+        "title": "Advanced optimization",
+        "summary": "Semantic caching, adaptive retrieval, speculative decoding.",
+        "items": [
+          "Semantic cache via embedding similarity",
+          "Adaptive retrieval and dynamic top-k",
+          "Speculative decoding and prompt optimization",
+          "Aggressive context pruning",
+          "Embedding optimization (PQ, OPQ)",
+          "Latency-aware and cost-aware routing"
+        ]
+      },
+      "knowledge": {
+        "title": "Advanced knowledge",
+        "summary": "Knowledge graphs, ontologies and graph neural retrieval.",
+        "items": [
+          "Automatically constructed knowledge graphs",
+          "Entity linking against Wikidata and internal catalogs",
+          "Per-domain ontologies",
+          "Multi-hop relationship reasoning",
+          "Versioned semantic graphs",
+          "Graph neural retrieval (GNN re-ranking)"
+        ]
+      },
+      "production": {
+        "title": "Real production",
+        "summary": "CI/CD, canary, A/B, feature flags, auto rollback.",
+        "items": [
+          "CI/CD with blocking eval pipelines",
+          "Canary deployments and A/B testing",
+          "Per-tenant feature flags",
+          "Monitoring with SLOs and alerting",
+          "Auto rollback on eval regression",
+          "Disaster recovery and SLA management"
+        ]
+      },
+      "nextLevel": {
+        "title": "Next-level capabilities",
+        "summary": "Self-improving retrieval, autonomous indexing, research agents.",
+        "items": [
+          "Self-improving retrieval with feedback loops",
+          "Autonomous indexing and continuous learning",
+          "Synthetic data generation for eval",
+          "Automatic eval generation",
+          "Multi-step reasoning graphs",
+          "Research-agent behavior and self-healing pipelines",
+          "Long-context orchestration and enterprise knowledge mesh"
+        ]
+      }
+    },
+    "pipeline": {
+      "title": "Live pipeline",
+      "subtitle": "Every query traverses these stages. Real timings and tokens of the run.",
+      "totalLatency": "Total latency",
+      "totalTokens": "Total tokens",
+      "estCost": "Estimated cost",
+      "idle": "Waiting for a new query...",
+      "steps": {
+        "rewrite": "Query rewriting + HyDE",
+        "retrieve": "Hybrid retrieval (dense + sparse + BM25)",
+        "rerank": "Cross-encoder reranking",
+        "context": "Context engineering",
+        "llm": "LLM generation",
+        "cite": "Citation alignment",
+        "respond": "Final response"
+      }
+    },
+    "chat": {
+      "title": "Conversation",
+      "subtitle": "Token-by-token streaming with clickable inline citations",
+      "placeholder": "Ask anything about your documents...",
+      "send": "Send",
+      "you": "You",
+      "assistant": "Koptup RAG",
+      "thinking": "Thinking...",
+      "confidence": "Confidence",
+      "sources": "Sources",
+      "viewSource": "View source",
+      "viewPipeline": "View pipeline",
+      "regenerate": "Regenerate",
+      "feedbackUp": "Good answer",
+      "feedbackDown": "Answer needs work",
+      "scenarios": "Mock scenarios",
+      "scenarioLabels": {
+        "docs": "Doc RAG",
+        "multiHop": "Multi-hop reasoning",
+        "code": "Code search",
+        "sql": "SQL question",
+        "graph": "Knowledge graph"
+      }
+    },
+    "scenarios": {
+      "docs": {
+        "question": "What is our data retention policy for enterprise customers?",
+        "answer": "Per current policy, Enterprise customers have **7-year retention** for transactional data [1] and **3 years** for application logs [2]. Purging runs nightly and is logged in the audit trail [1]. Sensitive data (PII) is anonymized at 90 days upon deletion request [2]."
+      },
+      "multiHop": {
+        "question": "Which support tickets from last week relate to Monday's payments-svc incident?",
+        "answer": "I found **4 correlated tickets** with incident #INC-2049 on payments-svc [1]: two report `/charge` timeouts [2], one reports duplicated refunds [3] and a fourth reports finance dashboard latency [1]. The common root cause is the retry loop without idempotency-key described in the RCA [3]."
+      },
+      "code": {
+        "question": "Show me how we implemented refresh token rotation.",
+        "answer": "Rotation lives in `RefreshService.rotate()` [1]. It verifies the JWT signature, checks a Redis denylist, appends the consumed `jti`, and issues a new access/refresh pair [2]. The controller uses `validate(RefreshDto)` and maps `RevokedTokenError` to a 401 [1]."
+      },
+      "sql": {
+        "question": "How much did we bill in LATAM last quarter?",
+        "answer": "I ran the query against the Snowflake warehouse [1]: **USD 4.82M** in Q4 LATAM, +18% YoY. Per-country breakdown attached [2]. Source: `analytics.fct_revenue_country` materialized hourly [1]."
+      },
+      "graph": {
+        "question": "Which teams depend on the auth-core service?",
+        "answer": "The knowledge graph shows **6 teams** consuming `auth-core` [1]: web-platform, mobile, payments-svc, billing, helpdesk and partners-api [2]. payments-svc has the highest traffic (p95 12k req/min) [1]. There are 2 pending mobile deprecations in Q1 [2]."
+      }
+    },
+    "sourcePanel": {
+      "title": "Original snippet",
+      "subtitle": "The retrieved and reranked chunk backing this citation",
+      "source": "Source",
+      "chunkScore": "Chunk score",
+      "rerankScore": "Rerank score",
+      "page": "Page",
+      "updated": "Updated",
+      "close": "Close",
+      "openOriginal": "Open original document"
+    },
+    "stats": {
+      "tokens": "Tokens",
+      "latency": "Latency",
+      "cost": "Cost",
+      "cacheHit": "Cache hit",
+      "drift": "Drift",
+      "faithfulness": "Faithfulness",
+      "hallucination": "Hallucination",
+      "title": "Live telemetry"
+    },
+    "sources": {
+      "notion": "Notion · Engineering",
+      "slack": "Slack · #engineering",
+      "confluence": "Confluence · Product Wiki",
+      "github": "GitHub · koptup/api-core",
+      "snowflake": "Snowflake · analytics.fct_revenue_country",
+      "graph": "Knowledge graph · services"
+    },
+    "tenants": {
+      "acme": "Acme Corp (Enterprise)",
+      "globex": "Globex Industries",
+      "umbrella": "Umbrella Group"
+    },
+    "ingestionStats": {
+      "title": "Connected sources",
+      "docs": "documents",
+      "messages": "messages",
+      "pages": "pages",
+      "lastSync": "Last sync"
+    },
+    "common": {
+      "items": "items",
+      "active": "active",
+      "passive": "passive",
+      "ms": "ms",
+      "tokens": "tokens",
+      "back": "Back",
+      "viewAll": "View all"
+    },
+    "modes": {
+      "playground": "RAG Playground",
+      "playgroundHint": "Enterprise showcase: 19 layers, live pipeline, citations",
+      "builder": "Builder & Embed",
+      "builderHint": "Customize the widget, generate the snippet, embed it on your site"
+    },
+    "builder": {
+      "title": "Embeddable chatbot builder",
+      "subtitle": "Customize the look, behavior and export the embed snippet",
+      "configTitle": "Widget configuration",
+      "sections": {
+        "identity": "Identity",
+        "appearance": "Appearance",
+        "behavior": "Behavior",
+        "knowledge": "Knowledge base"
+      },
+      "fields": {
+        "botName": "Bot name",
+        "botNamePh": "E.g.: Koptup Assistant",
+        "welcome": "Welcome message",
+        "welcomePh": "E.g.: Hi! How can I help?",
+        "placeholder": "Input placeholder",
+        "placeholderPh": "E.g.: Type your question...",
+        "systemPrompt": "System prompt / instructions",
+        "systemPromptPh": "You are an expert assistant in... Always answer in English with a professional tone...",
+        "primaryColor": "Primary color",
+        "accentColor": "Accent color",
+        "position": "Widget position",
+        "positionBR": "Bottom right",
+        "positionBL": "Bottom left",
+        "positionTR": "Top right",
+        "positionTL": "Top left",
+        "avatar": "Bot avatar",
+        "tone": "Voice tone",
+        "tones": {
+          "professional": "Professional",
+          "friendly": "Friendly",
+          "technical": "Technical",
+          "casual": "Casual"
+        },
+        "languages": "Enabled languages",
+        "shape": "Button shape",
+        "shapeRound": "Round",
+        "shapeSquare": "Square",
+        "openOnLoad": "Open on load",
+        "showBranding": "Show 'Powered by Koptup' branding"
+      },
+      "knowledge": {
+        "title": "Uploaded documents",
+        "drop": "Drag files here or click to select",
+        "hint": "PDF, DOCX, TXT, MD, CSV · max 10MB per file",
+        "addMock": "Add sample document",
+        "empty": "No documents uploaded yet. Add PDFs, docs or notes so the bot uses them as context.",
+        "remove": "Remove",
+        "indexed": "Indexed",
+        "chunks": "chunks",
+        "uploading": "Uploading files..."
+      },
+      "preview": {
+        "title": "Live preview",
+        "subtitle": "This is how the widget will look on your site. Click the button to open it.",
+        "subtitleReal": "Real iframe pointing to /embed/chatbot/{botId}",
+        "saveHint": "Save the bot to see the real iframe preview.",
+        "notSaved": "Unsaved · simulation",
+        "bubbleHint": "Click to open",
+        "send": "Send",
+        "sampleUser": "Do you have an enterprise plan?",
+        "sampleBot": "Yes, we offer Pro, Business and Enterprise plans with SLA, SSO and priority support. Want me to show you the pricing?",
+        "poweredBy": "Powered by Koptup"
+      },
+      "embed": {
+        "title": "Embed snippet",
+        "subtitle": "Paste this snippet right before </body> on your site",
+        "tabs": {
+          "script": "Script tag",
+          "iframe": "iframe",
+          "react": "React",
+          "webhook": "Webhook"
+        },
+        "copy": "Copy",
+        "copied": "Copied!",
+        "botId": "Bot ID",
+        "regenerate": "Regenerate ID",
+        "webhookTitle": "Webhook URL",
+        "webhookHint": "Configure this URL on your backend to receive every conversation",
+        "saveFirst": "Save the bot to enable embed"
+      },
+      "actions": {
+        "save": "Save bot",
+        "saving": "Saving...",
+        "share": "Share microsite"
+      }
+    },
+    "ux": {
+      "device": {
+        "label": "Preview",
+        "desktop": "Desktop",
+        "mobile": "Mobile",
+        "switchToDesktop": "View on desktop",
+        "switchToMobile": "View on mobile",
+        "mobileFrameLabel": "How it looks on a phone"
+      },
+      "tooltips": {
+        "tenant": "Active tenant: isolates data, permissions and metrics per organization (multi-tenant with RLS).",
+        "model": "LLM that answers. Routed by cost/latency/context from the orchestrator.",
+        "language": "UI language. Applies to next-intl locale on reload.",
+        "runSample": "Run a pre-built mock query to see the pipeline live.",
+        "online": "System healthy: GPU cluster active and vector store reachable.",
+        "toggleSidebar": "Show/hide the platform layers catalog.",
+        "togglePipeline": "Show/hide the live pipeline panel.",
+        "toggleSources": "Open the connected sources panel.",
+        "toggleStats": "Open/close the aggregated telemetry.",
+        "newSession": "Restart the conversation without losing config.",
+        "settings": "Advanced playground settings.",
+        "settingsHint": "To customize name, colors, prompt and embed, switch to Builder Mode.",
+        "citation": "Snippet cited by the model. Click to view the original chunk with score.",
+        "confidence": "Calibrated model confidence based on groundedness and citations.",
+        "scenarioPicker": "Pre-built queries covering doc RAG, multi-hop, code, SQL and graph.",
+        "feedbackUp": "Mark this answer as good (feeds the reranker and eval).",
+        "feedbackDown": "Mark this answer as needing work (creates a ticket in the eval suite).",
+        "regenerate": "Regenerate the answer with the same context.",
+        "send": "Send the question. Enter to send, Shift+Enter for newline."
+      },
+      "sectionInfo": {
+        "sidebar": "Catalog of the 19 RAG platform layers. Click one to see its capabilities.",
+        "pipeline": "Every query traverses these steps: rewrite → retrieve → rerank → context → LLM → cite → respond.",
+        "stats": "Aggregated session metrics. Some (cache, drift, faithfulness) are simulated live.",
+        "sources": "Active connectors to the vector store. Synced via cron + webhook + CDC."
+      },
+      "sidebarMore": {
+        "showMore": "+{count} more",
+        "hide": "Hide",
+        "advanced": "Advanced"
+      },
+      "layers": {
+        "ingestion": "Multi-source pipeline that normalizes PDFs, DBs, audio and video into the vector store.",
+        "chunking": "How documents are split so the chunks are optimal for retrieval.",
+        "retrieval": "How the most relevant chunks are found (dense + sparse + BM25).",
+        "query": "How the user's question is understood: rewrite, HyDE and decomposition.",
+        "ranking": "Cross-encoder reordering for precision, diversity and freshness.",
+        "context": "Compression, dedup and final prompt assembly with citations.",
+        "agents": "Planner/executor, ReAct, Reflexion and workflow graphs.",
+        "tools": "External tools: SQL, web, code sandbox, knowledge graph.",
+        "memory": "Conversational, long-term semantic and organizational memory.",
+        "multimodal": "Text, images, audio, video and diagrams in one embedded space.",
+        "models": "Multi-LLM routing: each query goes to the best model by cost/latency.",
+        "infra": "Distributed infra: Kubernetes, GPU clusters, streaming, multi-region.",
+        "security": "RBAC, ACL, tenant isolation, encryption, audit logs, anti-injection.",
+        "observability": "Tracing, metrics, hallucination tracking and failure replay.",
+        "eval": "Automated evaluation: faithfulness, citation accuracy and benchmarks.",
+        "optimization": "Semantic caching, adaptive retrieval and speculative decoding.",
+        "knowledge": "Knowledge graphs, ontologies and graph neural retrieval.",
+        "production": "CI/CD, canary, A/B, feature flags and auto rollback.",
+        "nextLevel": "Self-improving, autonomous indexing and research agents."
+      },
+      "stats": {
+        "tokens": "Total tokens consumed in this session (input + output).",
+        "latency": "Latency of the last end-to-end run (rewrite → respond).",
+        "cost": "Aggregated estimated cost in USD for the current session.",
+        "cacheHit": "Percentage of queries served by the semantic cache (no LLM call).",
+        "drift": "Drift of embedding distribution vs baseline. >2% needs attention.",
+        "faithfulness": "How faithfully the answer reflects retrieved chunks. Target ≥90%.",
+        "hallucination": "Automatic detection of unsupported claims. Target <1%."
+      },
+      "pipelineMini": {
+        "title": "Pipeline",
+        "idle": "Idle",
+        "running": "Running",
+        "done": "Done",
+        "openFull": "Open full pipeline"
+      },
+      "empty": {
+        "title": "Try a query",
+        "subtitle": "Pick a mock scenario or type your own question below.",
+        "tryThis": "Try this"
+      },
+      "onboarding": {
+        "title": "Welcome to the RAG Playground",
+        "skip": "Skip tour",
+        "next": "Next",
+        "done": "Done",
+        "step1Title": "This is the chat",
+        "step1Body": "Ask a question or run a scenario. Answers come with clickable citations.",
+        "step2Title": "19 enterprise layers",
+        "step2Body": "Each item represents a platform layer. Click to explore capabilities.",
+        "step3Title": "Live pipeline",
+        "step3Body": "Watch each step (rewrite, retrieve, rerank, LLM...) with real timings and tokens.",
+        "step4Title": "Builder Mode",
+        "step4Body": "Customize colors, prompt and export the snippet to embed on your site."
+      },
+      "advancedConfig": {
+        "title": "Advanced configuration",
+        "body": "To customize name, colors, system prompt and generate a production-ready embed snippet, switch to Builder mode.",
+        "cta": "Go to Builder Mode",
+        "close": "Close"
+      }
+    }
+  }
+}
