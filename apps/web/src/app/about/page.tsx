@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import Card, { CardContent } from '@/components/ui/Card';
@@ -33,6 +34,8 @@ import {
   PaintBrushIcon,
   ServerStackIcon,
   CommandLineIcon,
+  UsersIcon,
+  CalendarDaysIcon,
 } from '@heroicons/react/24/outline';
 
 type TechCategory = {
@@ -555,8 +558,132 @@ const caseStudies = [
 const heroStats = [
   { value: '8+', label: 'Años construyendo software' },
   { value: '27', label: 'Demos funcionales en línea' },
-  { value: '50+', label: 'Tecnologías dominadas' },
+  { value: '170+', label: 'Tecnologías dominadas' },
   { value: '8', label: 'Países LatAm en facturación electrónica' },
+];
+
+const bigMetrics: { value: string; label: string; sub: string; gradient: string }[] = [
+  {
+    value: '27',
+    label: 'Demos enterprise',
+    sub: 'Funcionales, navegables y con backend mock',
+    gradient: 'from-primary-500 to-primary-700',
+  },
+  {
+    value: '170+',
+    label: 'Tecnologías',
+    sub: 'Frontend, backend, IA, cloud, data y mobile',
+    gradient: 'from-secondary-500 to-secondary-800',
+  },
+  {
+    value: '8',
+    label: 'Países LatAm',
+    sub: 'DIAN · SAT · AFIP · SII · SUNAT · DGI · SET · SRI',
+    gradient: 'from-emerald-500 to-emerald-700',
+  },
+  {
+    value: '2026',
+    label: 'Año fundación',
+    sub: 'Plataforma comercial Koptup',
+    gradient: 'from-amber-500 to-orange-700',
+  },
+  {
+    value: 'CO',
+    label: 'Base Bogotá',
+    sub: 'Trabajamos con clientes en toda LatAm',
+    gradient: 'from-fuchsia-500 to-rose-700',
+  },
+];
+
+type TeamMember = {
+  name: string;
+  role: string;
+  bio: string;
+  initials: string;
+  gradient: string;
+  photo?: string;
+};
+
+const team: TeamMember[] = [
+  {
+    name: 'Ronald Cipagauta',
+    role: 'Founder & Tech Lead',
+    bio: 'Full-stack engineer con 8+ años construyendo productos en Colombia y LatAm. Lidera arquitectura, IA aplicada y producto.',
+    initials: 'RC',
+    gradient: 'from-primary-500 to-primary-800',
+    photo:
+      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&q=80&auto=format',
+  },
+  {
+    name: 'Full-stack Engineer',
+    role: 'Web & APIs',
+    bio: 'Next.js, Node, TypeScript end-to-end. Diseña y mantiene las 27 demos y la plataforma de servicios.',
+    initials: 'FS',
+    gradient: 'from-emerald-500 to-emerald-800',
+  },
+  {
+    name: 'AI / ML Engineer',
+    role: 'RAG, agentes y modelos',
+    bio: 'OpenAI, RAG enterprise, agentes con tool calling, embeddings y evaluación de prompts en producción.',
+    initials: 'AI',
+    gradient: 'from-fuchsia-500 to-rose-700',
+  },
+  {
+    name: 'UX / UI Designer',
+    role: 'Producto y design system',
+    bio: 'Wireframes en Figma, design tokens y diseño accesible para web y móvil.',
+    initials: 'UX',
+    gradient: 'from-amber-500 to-orange-700',
+  },
+  {
+    name: 'DevOps Engineer',
+    role: 'Cloud & CI/CD',
+    bio: 'AWS, Vercel, Railway, Docker y Kubernetes. Pipelines verdes desde el día uno.',
+    initials: 'DO',
+    gradient: 'from-sky-500 to-blue-800',
+  },
+  {
+    name: 'QA Engineer',
+    role: 'Calidad y testing',
+    bio: 'Playwright, Jest, smoke tests y revisiones de release antes de cada deploy a producción.',
+    initials: 'QA',
+    gradient: 'from-violet-500 to-purple-800',
+  },
+];
+
+type TimelineItem = {
+  year: string;
+  title: string;
+  description: string;
+  highlight?: boolean;
+};
+
+const timeline: TimelineItem[] = [
+  {
+    year: '2024',
+    title: 'Primeras demos funcionales',
+    description:
+      'Arranca la idea de Koptup como vitrina: prototipos navegables de chatbot, e-commerce y dashboards con datos simulados.',
+  },
+  {
+    year: '2025',
+    title: 'Primer cliente real — SoSalud',
+    description:
+      'Implementación de VPN empresarial para SoSalud (tercero administrador de Nueva EPS). Expansión del catálogo a 18 demos enterprise.',
+  },
+  {
+    year: '2026',
+    title: 'Plataforma completa',
+    description:
+      '27 demos enterprise, RAG con GPT-4o, planes en COP y USD, facturación electrónica en 8 países y servicios SaaS hospedados.',
+    highlight: true,
+  },
+  {
+    year: '2027+',
+    title: 'Expansión LatAm',
+    description:
+      'Roadmap: presencia comercial en México y Argentina, alianzas con integradores locales y nuevas verticales (fintech regulada, salud).',
+  },
 ];
 
 const missionPoints = [
@@ -569,30 +696,78 @@ const missionPoints = [
 export default function AboutPage() {
   return (
     <>
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary-700 via-primary-800 to-secondary-900 text-white">
-        <div className="absolute inset-0 bg-grid-pattern opacity-10" />
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary-500/20 rounded-full blur-3xl" />
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-secondary-500/20 rounded-full blur-3xl" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
-          <div className="text-center max-w-4xl mx-auto">
+      {/* Hero con foto de fondo */}
+      <section className="relative min-h-[60vh] flex items-center overflow-hidden">
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&h=1080&fit=crop&q=80&auto=format')",
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-900/95 via-primary-800/90 to-secondary-950/95" />
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary-500/20 rounded-full blur-3xl" />
+          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-secondary-500/20 rounded-full blur-3xl" />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 text-white w-full">
+          <div className="max-w-4xl">
             <Badge variant="outline" size="lg" className="mb-6 border-white/40 text-white">
               Sobre Koptup
             </Badge>
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-              Koptup — Construimos software inteligente para LatAm
-            </h1>
-            <p className="text-xl md:text-2xl mb-10 text-primary-100">
-              Equipo colombiano enfocado en construir productos de software a medida y plataformas SaaS,
-              con stack moderno, IA aplicada y entrega real en producción.
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">Koptup</h1>
+            <p className="text-2xl md:text-3xl mb-8 max-w-3xl text-primary-50">
+              Construimos software a medida con IA para empresas de LatAm que quieren crecer rápido sin
+              atarse a un SaaS extranjero.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button size="lg" variant="outline" className="bg-white text-primary-700 hover:bg-primary-50" asChild>
+                <Link href="/demo">Ver las 27 demos</Link>
+              </Button>
+              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
+                <Link href="/contact">Hablar con nosotros</Link>
+              </Button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16">
+            {heroStats.map((s) => (
+              <div key={s.label} className="text-center md:text-left">
+                <div className="text-4xl md:text-5xl font-bold mb-2">{s.value}</div>
+                <div className="text-sm md:text-base text-primary-100">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Métricas grandes */}
+      <section className="section-padding bg-white dark:bg-secondary-950">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <ChartBarIcon className="h-14 w-14 mx-auto text-primary-600 dark:text-primary-400 mb-3" />
+            <Badge variant="primary" size="md" className="mb-4">
+              Métricas
+            </Badge>
+            <h2 className="text-3xl md:text-5xl font-bold text-secondary-900 dark:text-white mb-4">
+              Koptup en números
+            </h2>
+            <p className="text-xl text-secondary-600 dark:text-secondary-400 max-w-3xl mx-auto">
+              Los datos detrás de la plataforma — actualizados a 2026.
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-12">
-            {heroStats.map((s) => (
-              <div key={s.label} className="text-center">
-                <div className="text-4xl md:text-5xl font-bold mb-2">{s.value}</div>
-                <div className="text-sm md:text-base text-primary-100">{s.label}</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+            {bigMetrics.map((m) => (
+              <div
+                key={m.label}
+                className={`relative overflow-hidden rounded-3xl p-8 text-white bg-gradient-to-br ${m.gradient} shadow-xl hover:scale-[1.02] transition-transform`}
+              >
+                <div className="text-6xl md:text-7xl font-extrabold mb-3 leading-none">{m.value}</div>
+                <div className="text-lg font-bold mb-2">{m.label}</div>
+                <div className="text-sm text-white/80">{m.sub}</div>
+                <SparklesIcon className="absolute -top-4 -right-4 h-24 w-24 text-white/10" />
               </div>
             ))}
           </div>
@@ -652,6 +827,118 @@ export default function AboutPage() {
                 <RocketLaunchIcon className="h-16 w-16 text-white" />
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Equipo */}
+      <section className="section-padding bg-secondary-50 dark:bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <UsersIcon className="h-14 w-14 mx-auto text-primary-600 dark:text-primary-400 mb-3" />
+            <Badge variant="primary" size="md" className="mb-4">
+              Equipo
+            </Badge>
+            <h2 className="text-3xl md:text-5xl font-bold text-secondary-900 dark:text-white mb-4">
+              Quién está detrás de Koptup
+            </h2>
+            <p className="text-xl text-secondary-600 dark:text-secondary-400 max-w-3xl mx-auto">
+              Un núcleo técnico pequeño y enfocado. Colaboramos con especialistas senior según el proyecto.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {team.map((member) => (
+              <Card
+                key={member.name}
+                variant="bordered"
+                className="hover:shadow-large transition-shadow overflow-hidden"
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4 mb-4">
+                    {member.photo ? (
+                      <div className="relative w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 ring-2 ring-primary-200 dark:ring-primary-900">
+                        <Image
+                          src={member.photo}
+                          alt={member.name}
+                          fill
+                          sizes="80px"
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        className={`w-20 h-20 rounded-2xl flex-shrink-0 bg-gradient-to-br ${member.gradient} flex items-center justify-center text-white text-2xl font-extrabold shadow-lg`}
+                      >
+                        {member.initials}
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-lg font-bold text-secondary-900 dark:text-white leading-tight">
+                        {member.name}
+                      </h3>
+                      <div className="text-sm font-semibold text-primary-600 dark:text-primary-400 mt-1">
+                        {member.role}
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-sm text-secondary-700 dark:text-secondary-300">{member.bio}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Timeline de la empresa */}
+      <section className="section-padding bg-white dark:bg-secondary-950">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <CalendarDaysIcon className="h-14 w-14 mx-auto text-primary-600 dark:text-primary-400 mb-3" />
+            <Badge variant="primary" size="md" className="mb-4">
+              Historia
+            </Badge>
+            <h2 className="text-3xl md:text-5xl font-bold text-secondary-900 dark:text-white mb-4">
+              De idea a plataforma
+            </h2>
+            <p className="text-xl text-secondary-600 dark:text-secondary-400 max-w-3xl mx-auto">
+              Lo que pasó cada año y a dónde vamos.
+            </p>
+          </div>
+
+          <div className="relative max-w-4xl mx-auto">
+            <div
+              aria-hidden
+              className="absolute left-4 md:left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-primary-200 via-primary-400 to-primary-200 dark:from-primary-900 dark:via-primary-600 dark:to-primary-900 md:-translate-x-1/2"
+            />
+            <ol className="space-y-10">
+              {timeline.map((item, idx) => {
+                const isLeft = idx % 2 === 0;
+                return (
+                  <li key={item.year} className="relative md:grid md:grid-cols-2 md:gap-12">
+                    <div
+                      aria-hidden
+                      className={`absolute left-4 md:left-1/2 top-3 w-4 h-4 rounded-full border-4 md:-translate-x-1/2 ${
+                        item.highlight
+                          ? 'bg-primary-500 border-primary-200 dark:border-primary-900 ring-4 ring-primary-300/40'
+                          : 'bg-white dark:bg-secondary-950 border-primary-500'
+                      }`}
+                    />
+                    <div className={isLeft ? 'md:pr-12 md:text-right' : 'md:col-start-2 md:pl-12'}>
+                      <div className="pl-12 md:pl-0">
+                        <div className="text-3xl md:text-4xl font-extrabold text-primary-600 dark:text-primary-400 mb-2">
+                          {item.year}
+                        </div>
+                        <h3 className="text-xl font-bold text-secondary-900 dark:text-white mb-2">
+                          {item.title}
+                        </h3>
+                        <p className="text-secondary-700 dark:text-secondary-300">{item.description}</p>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
           </div>
         </div>
       </section>
@@ -887,21 +1174,37 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* CTA final */}
-      <section className="section-padding bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 text-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      {/* CTA final con foto/gradiente */}
+      <section className="relative py-32 overflow-hidden">
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=1920&h=1080&fit=crop&q=80&auto=format')",
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-600/95 via-primary-700/95 to-secondary-900/95" />
+        </div>
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
           <GlobeAltIcon className="h-16 w-16 mx-auto mb-6 opacity-90" />
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">¿Listo para empezar?</h2>
-          <p className="text-xl mb-10 text-primary-100">
-            Probá nuestras 27 demos en vivo o hablá directamente con un experto del equipo.
+          <h2 className="text-4xl md:text-6xl font-bold mb-6">¿Empezamos?</h2>
+          <p className="text-xl mb-10 text-white/90">
+            Probá las demos sin registrarte o agendá una llamada de 30 minutos para evaluar tu proyecto.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="outline" className="bg-white text-primary-700 hover:bg-primary-50" asChild>
-              <Link href="/demo">Probar demos</Link>
-            </Button>
-            <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
-              <Link href="/contact">Hablar con un experto</Link>
-            </Button>
+            <Link
+              href="/demo"
+              className="bg-white text-primary-700 px-8 py-4 rounded-xl font-bold text-lg hover:scale-105 transition shadow-xl"
+            >
+              Ver las 27 demos
+            </Link>
+            <Link
+              href="/contact"
+              className="bg-white/15 border-2 border-white/30 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-white/25 transition"
+            >
+              Hablar con nosotros
+            </Link>
           </div>
         </div>
       </section>
