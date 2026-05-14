@@ -8,11 +8,12 @@
  * subset de campos. Esto cumple Single Responsibility + ISP.
  */
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   ArrowUpTrayIcon,
   DocumentIcon,
+  PhotoIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
 
@@ -23,7 +24,11 @@ import type {
   MockKnowledgeDoc,
   WidgetCornerPosition,
 } from './widgetConfig';
-import { MOCK_DOCS } from './widgetConfig';
+import {
+  AVATAR_IMAGE_MAX_BYTES,
+  AVATAR_IMAGE_MIME_TYPES,
+  MOCK_DOCS,
+} from './widgetConfig';
 
 interface ConfigPanelProps {
   config: BuilderWidgetConfig;
@@ -62,6 +67,39 @@ export default function ConfigPanel({
 }: ConfigPanelProps) {
   const t = useTranslations('demoChatbot.builder');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const [logoError, setLogoError] = useState<string | null>(null);
+
+  const handleLogoFile = useCallback(
+    (file: File | null) => {
+      setLogoError(null);
+      if (!file) return;
+      if (!AVATAR_IMAGE_MIME_TYPES.includes(file.type)) {
+        setLogoError(t('fields.avatarImageBadType'));
+        return;
+      }
+      if (file.size > AVATAR_IMAGE_MAX_BYTES) {
+        setLogoError(t('fields.avatarImageTooBig'));
+        return;
+      }
+      const reader = new FileReader();
+      reader.onerror = () => setLogoError(t('fields.avatarImageBadType'));
+      reader.onload = () => {
+        const result = reader.result;
+        if (typeof result === 'string') {
+          onChange({ avatarImage: result });
+        }
+      };
+      reader.readAsDataURL(file);
+    },
+    [onChange, t],
+  );
+
+  const clearLogo = useCallback(() => {
+    setLogoError(null);
+    onChange({ avatarImage: undefined });
+    if (logoInputRef.current) logoInputRef.current.value = '';
+  }, [onChange]);
 
   const toggleLang = useCallback(
     (code: BuilderLangCode) => {
@@ -248,6 +286,61 @@ export default function ConfigPanel({
               </button>
             ))}
           </div>
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs font-medium text-secondary-700 dark:text-secondary-300">
+              {t('fields.avatarImage')}
+            </span>
+            {config.avatarImage ? (
+              <button
+                type="button"
+                onClick={clearLogo}
+                className="text-[10px] font-medium text-secondary-500 hover:text-red-500 dark:text-secondary-400"
+              >
+                {t('fields.avatarImageRemove')}
+              </button>
+            ) : null}
+          </div>
+          <div className="mt-1 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => logoInputRef.current?.click()}
+              className="inline-flex items-center gap-1.5 rounded-md border border-secondary-300 bg-white px-2.5 py-1.5 text-xs font-medium text-secondary-700 transition hover:border-primary-400 hover:bg-primary-50 dark:border-secondary-700 dark:bg-secondary-800 dark:text-secondary-200 dark:hover:bg-secondary-700"
+            >
+              <PhotoIcon className="h-3.5 w-3.5" />
+              {t('fields.avatarImageBtn')}
+            </button>
+            {config.avatarImage ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={config.avatarImage}
+                alt="logo preview"
+                className="h-9 w-9 rounded-md border border-secondary-300 object-cover dark:border-secondary-700"
+              />
+            ) : (
+              <span className="text-[10px] text-secondary-500 dark:text-secondary-400">
+                {t('fields.avatarImageHint')}
+              </span>
+            )}
+            <input
+              ref={logoInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0] ?? null;
+                handleLogoFile(file);
+                e.target.value = '';
+              }}
+            />
+          </div>
+          {logoError ? (
+            <p className="mt-1 text-[10px] font-medium text-red-600 dark:text-red-300">
+              {logoError}
+            </p>
+          ) : null}
         </div>
       </fieldset>
 

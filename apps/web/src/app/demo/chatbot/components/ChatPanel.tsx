@@ -275,7 +275,7 @@ export default function ChatPanel({
                           className="inline-flex items-center gap-1 rounded-full border border-secondary-200 bg-white px-2.5 py-1 text-[10.5px] text-secondary-700 transition hover:border-primary-400 hover:bg-primary-50 hover:text-primary-700 dark:border-secondary-700 dark:bg-secondary-900 dark:text-secondary-200 dark:hover:bg-primary-950/40 dark:hover:text-primary-200"
                         >
                           <span className="font-mono">[{i + 1}]</span>
-                          <span>{t(`sources.${s.sourceKey}`)}</span>
+                          <span>{s.sourceName ?? t(`sources.${s.sourceKey}`)}</span>
                         </button>
                       </Tooltip>
                     ))}

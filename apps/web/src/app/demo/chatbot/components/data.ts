@@ -75,6 +75,12 @@ export interface SourceChunk {
   rerankScore: number;
   /** Texto crudo del chunk para "source highlighting". */
   snippet: string;
+  /**
+   * Nombre literal de la fuente cuando el chunk viene del backend real (RAG
+   * sobre los documentos que subió el usuario). Si está presente, la UI lo
+   * usa en lugar del label fijo `sources.${sourceKey}`.
+   */
+  sourceName?: string;
 }
 
 export interface ScenarioPayload {

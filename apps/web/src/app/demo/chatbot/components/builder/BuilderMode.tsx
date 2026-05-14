@@ -143,9 +143,17 @@ export default function BuilderMode() {
       setPersistedBotId(urlBotId);
     }
     // Siempre intentar refrescar contra el backend para tener los docs actualizados.
+    // Conservamos `avatarImage` (data URL) desde la cache local: el backend no
+    // lo persiste (in-memory, sin BBDD), pero la UX del Builder lo necesita.
     getBot(urlBotId)
       .then((remote) => {
-        setConfig(toBuilderConfig(remote));
+        const fromRemote = toBuilderConfig(remote);
+        const preservedAvatarImage = cached?.avatarImage;
+        setConfig(
+          preservedAvatarImage
+            ? { ...fromRemote, avatarImage: preservedAvatarImage }
+            : fromRemote,
+        );
         setPersistedBotId(remote.botId);
       })
       .catch(() => {

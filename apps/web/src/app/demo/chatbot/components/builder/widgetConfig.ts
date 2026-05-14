@@ -21,6 +21,13 @@ export interface BuilderWidgetConfig {
   primaryColor: string;
   position: WidgetCornerPosition;
   avatar: string;
+  /**
+   * Imagen de logo opcional (data URL `data:image/...;base64,...`). Cuando
+   * está set, el widget la prioriza por sobre el emoji `avatar`. Mantener
+   * ambas posibilidades es coherente con OCP: agregamos comportamiento sin
+   * modificar el código que ya consume `avatar`.
+   */
+  avatarImage?: string;
   welcome: string;
   systemPrompt: string;
   tone: BuilderToneKey;
@@ -28,6 +35,10 @@ export interface BuilderWidgetConfig {
   docs: MockKnowledgeDoc[];
   botId: string;
 }
+
+/** Tamaño máximo aceptado para el logo subido por el usuario (500 KB). */
+export const AVATAR_IMAGE_MAX_BYTES = 500 * 1024;
+export const AVATAR_IMAGE_MIME_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
 
 /** Emoji set acotado para el selector de avatar. */
 export const AVATAR_CHOICES: readonly string[] = ['🤖', '💬', '✨', '🎯', '🚀', '🦊'];
