@@ -36,6 +36,8 @@ Cada demo es una aplicación interactiva navegable, con datos simulados realista
 
 | Scraping y monitoreo | Datos | Pipeline de scraping con selectores visuales, scheduling, rotación de proxies y alertas por cambios. | [Ver demo](./apps/web/src/app/demo/scraping/) |
 
+| Code review con IA | DevTools | Análisis automático de PRs con detección de bugs, sugerencias de refactor, seguridad y cobertura de tests. | [Ver demo](./apps/web/src/app/demo/code-review-ia/) |
+
 ## 🚀 Stack Tecnológico
 
 ### Frontend
