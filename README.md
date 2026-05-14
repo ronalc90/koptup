@@ -22,6 +22,8 @@ Cada demo es una aplicación interactiva navegable, con datos simulados realista
 
 | Facturación electrónica | Fiscal | Emisión de facturas electrónicas multipaís con firma digital, reportes fiscales y notificación al SRI/DIAN/SUNAT. | [Ver demo](./apps/web/src/app/demo/facturacion-electronica/) |
 
+| POS | Retail | Punto de venta con caja, inventario en tiempo real, múltiples métodos de pago y cierre de turno. | [Ver demo](./apps/web/src/app/demo/pos/) |
+
 ## 🚀 Stack Tecnológico
 
 ### Frontend
