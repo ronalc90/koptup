@@ -1,0 +1,251 @@
+{
+  "demoCodeReview": {
+    "pageTitle": "Code Review con IA",
+    "pageSubtitle": "Plataforma DevTools: revisión automatizada de PRs, generación de tests, escaneo de seguridad, compliance de licencias y analítica de ingeniería.",
+    "header": {
+      "newPr": "Nuevo PR",
+      "search": "Buscar código semántico…",
+      "settings": "Configuración",
+      "syncing": "Sincronizando repos"
+    },
+    "stats": {
+      "openPrs": "PRs abiertos",
+      "openPrsSub": "esperando review",
+      "avgScore": "Score IA promedio",
+      "avgScoreSub": "últimos 30 días",
+      "leadTime": "Lead time",
+      "leadTimeSub": "horas a merge",
+      "coverage": "Cobertura",
+      "coverageSub": "líneas testeadas"
+    },
+    "sidebar": {
+      "title": "Pull Requests",
+      "filter": "Filtrar",
+      "all": "Todos",
+      "mine": "Míos",
+      "review": "Por revisar",
+      "score": "Score IA",
+      "draft": "Borrador"
+    },
+    "pr": {
+      "statuses": {
+        "open": "Abierto",
+        "inReview": "En revisión",
+        "approved": "Aprobado",
+        "merged": "Merged",
+        "changesRequested": "Cambios pedidos"
+      },
+      "sizes": {
+        "xs": "XS",
+        "s": "S",
+        "m": "M",
+        "l": "L",
+        "xl": "XL"
+      },
+      "tags": {
+        "tests": "tests",
+        "security": "seg-issues",
+        "perf": "perf",
+        "docs": "docs",
+        "design": "design"
+      },
+      "branch": "Rama",
+      "author": "Autor",
+      "reviewers": "Revisores",
+      "commits": "commits",
+      "filesChanged": "archivos",
+      "additions": "adiciones",
+      "deletions": "borrados",
+      "createdAt": "Abierto hace",
+      "hoursAgo": "h",
+      "approve": "Aprobar",
+      "requestChanges": "Pedir cambios",
+      "merge": "Merge"
+    },
+    "tabs": {
+      "files": "Archivos",
+      "aiReview": "Review IA",
+      "tests": "Tests",
+      "security": "Seguridad",
+      "performance": "Performance",
+      "design": "Design",
+      "docs": "Docs",
+      "search": "Búsqueda",
+      "refactor": "Refactor",
+      "analytics": "Analítica",
+      "compliance": "Compliance"
+    },
+    "files": {
+      "title": "Archivos modificados",
+      "additions": "+",
+      "deletions": "-",
+      "viewDiff": "Ver diff",
+      "diffTitle": "Diff lado a lado",
+      "oldVersion": "Antes",
+      "newVersion": "Después",
+      "lineComment": "Comentario inline",
+      "addComment": "Agregar comentario"
+    },
+    "aiReview": {
+      "title": "Comentarios IA",
+      "subtitle": "Análisis estructurado por archivo con sugerencias de fix automático.",
+      "severities": {
+        "info": "Info",
+        "suggestion": "Sugerencia",
+        "warning": "Warning",
+        "blocking": "Blocking"
+      },
+      "categories": {
+        "style": "Estilo",
+        "bug": "Bug potencial",
+        "security": "Seguridad",
+        "perf": "Performance",
+        "design": "Diseño"
+      },
+      "applyFix": "Aplicar auto-fix",
+      "viewFix": "Ver fix",
+      "dismiss": "Descartar",
+      "fixed": "Fix aplicado",
+      "openPr": "PR de fix creado",
+      "regen": "Regenerar",
+      "explanation": "Explicación",
+      "suggestion": "Sugerencia"
+    },
+    "tests": {
+      "title": "Tests auto-generados",
+      "subtitle": "La IA generó casos unitarios e integración basados en el diff.",
+      "type": "Tipo",
+      "unit": "Unit",
+      "integration": "Integración",
+      "e2e": "E2E",
+      "coverageDelta": "Δ Cobertura",
+      "addedTests": "Tests agregados",
+      "passing": "Pasando",
+      "failing": "Falla",
+      "skipped": "Skip",
+      "runAll": "Ejecutar todos",
+      "addToPr": "Agregar al PR",
+      "coverageBefore": "Antes",
+      "coverageAfter": "Después"
+    },
+    "security": {
+      "title": "Escaneo de seguridad",
+      "subtitle": "SAST + DAST + SCA + secrets scanning, ejecutados en cada push.",
+      "severity": "Severidad",
+      "critical": "Crítica",
+      "high": "Alta",
+      "medium": "Media",
+      "low": "Baja",
+      "cve": "CVE",
+      "fix": "Fix recomendado",
+      "pkg": "Paquete",
+      "vector": "Vector",
+      "fixedIn": "Solucionado en",
+      "openAdvisory": "Ver advisory",
+      "applyUpgrade": "Aplicar upgrade",
+      "secrets": "Secrets",
+      "noSecrets": "Sin secrets expuestos",
+      "scanTypes": {
+        "sast": "SAST",
+        "dast": "DAST",
+        "sca": "SCA",
+        "secrets": "Secrets"
+      }
+    },
+    "license": {
+      "title": "Compliance de licencias",
+      "subtitle": "Tabla de dependencias con licencia y compatibilidad. SBOM en formato CycloneDX.",
+      "dep": "Dependencia",
+      "version": "Versión",
+      "licenseCol": "Licencia",
+      "compat": "Compatibilidad",
+      "ok": "OK",
+      "warn": "Revisar",
+      "blocked": "Bloqueada",
+      "downloadSbom": "Descargar SBOM",
+      "policy": "Política activa: permisivas + LGPL"
+    },
+    "performance": {
+      "title": "Análisis de performance",
+      "subtitle": "Benchmarks ejecutados sobre la rama del PR comparados con main.",
+      "metric": "Métrica",
+      "before": "Main",
+      "after": "PR",
+      "delta": "Δ",
+      "regression": "Regresión",
+      "improvement": "Mejora",
+      "viewFlamegraph": "Ver flamegraph"
+    },
+    "design": {
+      "title": "Revisión de diseño",
+      "subtitle": "Comparación con tokens del design system y reglas de accesibilidad.",
+      "tokens": "Tokens",
+      "a11y": "Accesibilidad",
+      "consistency": "Consistencia",
+      "passes": "Pasa",
+      "fails": "Falla",
+      "viewFigma": "Ver en Figma"
+    },
+    "docs": {
+      "title": "Documentación auto-generada",
+      "subtitle": "Preview de README y JSDoc generados desde el código del PR.",
+      "regenerate": "Regenerar",
+      "copy": "Copiar",
+      "commit": "Commitear al PR",
+      "readme": "README.md",
+      "jsdoc": "JSDoc"
+    },
+    "search": {
+      "title": "Búsqueda semántica",
+      "subtitle": "Búsqueda cross-repo por significado, no por keywords.",
+      "placeholder": "Ej: \"función que valida token JWT con refresh\"",
+      "results": "Resultados",
+      "repo": "Repo",
+      "openInIde": "Abrir en IDE"
+    },
+    "refactor": {
+      "title": "Sugerencias de refactor",
+      "subtitle": "La IA detectó código duplicado, smells y oportunidades de simplificación.",
+      "before": "Antes",
+      "after": "Después",
+      "impact": "Impacto",
+      "lines": "líneas",
+      "apply": "Aplicar refactor",
+      "previewPr": "Preview PR"
+    },
+    "analytics": {
+      "title": "Analítica de code review",
+      "subtitle": "Métricas DORA + métricas de equipo.",
+      "leadTime": "Lead time PR",
+      "leadTimeSub": "creación → merge",
+      "reviewDepth": "Profundidad de review",
+      "reviewDepthSub": "comentarios por PR",
+      "busFactor": "Bus factor",
+      "busFactorSub": "personas críticas",
+      "mttm": "Mean Time To Merge",
+      "mttmSub": "horas",
+      "throughput": "Throughput",
+      "throughputSub": "PRs/semana",
+      "rework": "Rework rate",
+      "reworkSub": "% PRs con cambios"
+    },
+    "compliance": {
+      "title": "Supply chain & compliance",
+      "subtitle": "SLSA, atestaciones firmadas y cadena de suministro auditable.",
+      "slsa": "Nivel SLSA",
+      "attestation": "Atestaciones",
+      "signed": "Firmado",
+      "provenance": "Procedencia",
+      "verified": "Verificada",
+      "viewBundle": "Ver bundle",
+      "integrations": "Integraciones",
+      "ide": "IDE Plugin",
+      "vscode": "VS Code",
+      "jetbrains": "JetBrains",
+      "github": "GitHub",
+      "gitlab": "GitLab",
+      "bitbucket": "Bitbucket",
+      "azure": "Azure DevOps"
+    }
+  }
+}
