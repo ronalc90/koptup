@@ -175,7 +175,7 @@ export default function ChatbotDemoPage() {
   // UI state
   const [mode, setMode] = useState<ChatbotMode>('playground');
   const [tenant, setTenant] = useState<TenantId>('acme');
-  const [modelId, setModelId] = useState<string>('claude-sonnet-4.7');
+  const [modelId, setModelId] = useState<string>('gpt-4o-mini');
   const [locale, setLocale] = useState<'es' | 'en'>('es');
   const [activeLayer, setActiveLayer] = useState<LayerKey | null>(null);
   const [openChunk, setOpenChunk] = useState<SourceChunk | null>(null);
@@ -336,7 +336,7 @@ export default function ChatbotDemoPage() {
       const botId = await resolvePlaygroundBotId();
       if (!botId) return;
       try {
-        const res = await chatWithBot(botId, sentInput, []);
+        const res = await chatWithBot(botId, sentInput, [], modelId);
         const mappedSources = mapRemoteSources(res.sources);
         setMessages((prev) =>
           prev.map((m) =>
@@ -356,11 +356,13 @@ export default function ChatbotDemoPage() {
           ),
         );
         if (typeof res.latencyMs === 'number') setAggLatency(res.latencyMs);
+        if (typeof res.costUSD === 'number') setAggCost((v) => v + res.costUSD!);
+        if (res.tokens?.total) setAggTokens((v) => v + res.tokens!.total!);
       } catch {
         /* offline / error → mantenemos el provisional */
       }
     })();
-  }, [input, isStreaming, t]);
+  }, [input, isStreaming, modelId, t]);
 
   const handleCiteClick = useCallback((c: SourceChunk) => setOpenChunk(c), []);
 
@@ -461,7 +463,7 @@ export default function ChatbotDemoPage() {
   const isDesktop = device === 'desktop';
 
   return (
-    <div className="flex h-screen flex-col bg-secondary-50 text-secondary-900 dark:bg-secondary-950 dark:text-secondary-100">
+    <div className="flex h-[calc(100vh-4rem)] flex-col bg-secondary-50 text-secondary-900 dark:bg-secondary-950 dark:text-secondary-100 md:h-[calc(100vh-5rem)]">
       <TopBar
         tenant={tenant}
         onTenantChange={setTenant}
@@ -483,7 +485,7 @@ export default function ChatbotDemoPage() {
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar (oculto en mobile-view) */}
         {showSidebar && isDesktop ? (
-          <div className="hidden w-72 shrink-0 flex-col md:flex">
+          <div className="hidden w-72 shrink-0 flex-col overflow-hidden md:flex">
             {sourcesPanel}
             <Sidebar activeLayer={activeLayer} onSelect={(k) => setActiveLayer(k)} />
           </div>

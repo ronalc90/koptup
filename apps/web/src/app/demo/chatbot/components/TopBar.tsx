@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   BuildingOffice2Icon,
@@ -9,10 +10,13 @@ import {
   ComputerDesktopIcon,
   DevicePhoneMobileIcon,
   Cog6ToothIcon,
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
 import { MODELS, TENANTS, type ScenarioKey } from './data';
 import type { DeviceKind } from './ui/DeviceFrame';
 import Tooltip from './ui/Tooltip';
+import { listModels, type RemoteModelMeta } from './builder/api';
 
 interface TopBarProps {
   tenant: typeof TENANTS[number]['id'];
@@ -46,6 +50,53 @@ export default function TopBar({
   onOpenSettings,
 }: TopBarProps) {
   const t = useTranslations('demoChatbot');
+
+  /**
+   * Catálogo real de modelos desde el backend. Si la fetch falla (offline o
+   * 404), caemos al catálogo estático de `MODELS` con `enabled=false` para
+   * que la UI no se rompa pero el usuario vea claramente el estado "sin LLM".
+   */
+  const [remoteModels, setRemoteModels] = useState<RemoteModelMeta[]>([]);
+  const [activeProvider, setActiveProvider] = useState<'openai' | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const data = await listModels();
+        if (cancelled) return;
+        setRemoteModels(data.available);
+        setActiveProvider(data.activeProvider);
+      } catch {
+        if (cancelled) return;
+        setRemoteModels(
+          MODELS.map((m) => ({
+            id: m.id,
+            name: m.label,
+            provider: 'openai' as const,
+            enabled: false,
+            costInputUSDper1M: 0,
+            costOutputUSDper1M: 0,
+          })),
+        );
+        setActiveProvider(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const fallbackOptions: RemoteModelMeta[] = remoteModels.length > 0
+    ? remoteModels
+    : MODELS.map((m) => ({
+        id: m.id,
+        name: m.label,
+        provider: 'openai' as const,
+        enabled: false,
+        costInputUSDper1M: 0,
+        costOutputUSDper1M: 0,
+      }));
 
   const fieldClass =
     'inline-flex items-center gap-1.5 rounded-md border border-secondary-200 bg-white px-2.5 py-1.5 text-xs transition focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-500/20 hover:border-secondary-300 dark:border-secondary-700 dark:bg-secondary-900 dark:hover:border-secondary-600';
@@ -139,6 +190,23 @@ export default function TopBar({
           </label>
         </Tooltip>
 
+        {/* Badge de estado del LLM */}
+        {activeProvider === 'openai' ? (
+          <Tooltip content={t('models.activeModelTooltip')} side="bottom">
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:ring-emerald-800/40">
+              <CheckCircleIcon className="h-3 w-3" />
+              {t('models.activeModel', { name: modelId })}
+            </span>
+          </Tooltip>
+        ) : (
+          <Tooltip content={t('models.extractiveModeTooltip')} side="bottom">
+            <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700 ring-1 ring-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:ring-amber-800/40">
+              <ExclamationTriangleIcon className="h-3 w-3" />
+              {t('models.extractiveMode')}
+            </span>
+          </Tooltip>
+        )}
+
         <Tooltip content={t('ux.tooltips.model')} side="bottom">
           <label className={fieldClass}>
             <CpuChipIcon className="h-3.5 w-3.5 text-secondary-500" />
@@ -151,9 +219,11 @@ export default function TopBar({
               className="bg-transparent text-secondary-800 focus:outline-none dark:text-secondary-100"
               aria-label={t('topBar.model')}
             >
-              {MODELS.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.label}
+              {fallbackOptions.map((m) => (
+                <option key={m.id} value={m.id} disabled={!m.enabled}>
+                  {m.name}
+                  {m.recommended ? ' ⭐' : ''}
+                  {!m.enabled ? ` · ${t('models.providerRequires')}` : ''}
                 </option>
               ))}
             </select>

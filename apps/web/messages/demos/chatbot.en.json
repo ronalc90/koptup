@@ -280,6 +280,21 @@
       "feedbackUp": "Good answer",
       "feedbackDown": "Answer needs work",
       "scenarios": "Mock scenarios",
+      "suggestions": "Try one of these questions",
+      "emptyHint": "Your chatbot is ready. Upload documents or fire a sample question.",
+      "relativeTime": {
+        "now": "now",
+        "secondsAgo": "{seconds}s ago",
+        "minutesAgo": "{minutes} min ago",
+        "hoursAgo": "{hours} h ago",
+        "daysAgo": "{days} d ago"
+      },
+      "suggestionPrompts": {
+        "summary": "Summarize the main points of my documents",
+        "search": "What do the docs say about {topic}?",
+        "compare": "Compare the two most relevant documents",
+        "lookup": "What is currently loaded in the bot?"
+      },
       "scenarioLabels": {
         "docs": "Doc RAG",
         "multiHop": "Multi-hop reasoning",
@@ -342,7 +357,27 @@
     "tenants": {
       "acme": "Acme Corp (Enterprise)",
       "globex": "Globex Industries",
-      "umbrella": "Umbrella Group"
+      "umbrella": "Umbrella Group",
+      "selectBot": "Select bot",
+      "createBot": "Create new bot",
+      "deleteBot": "Delete bot",
+      "deleteConfirm": "Delete bot \"{name}\"? Documents, chunks and conversations will be removed.",
+      "deleted": "Bot \"{name}\" deleted",
+      "deleteFailed": "Could not delete the bot",
+      "empty": "You haven't created any bot yet. Configure one above and hit Save.",
+      "docsCount": "{count, plural, =0 {no docs} one {1 doc} other {# docs}}",
+      "conversationsCount": "{count, plural, =0 {no conversations} one {1 conversation} other {# conversations}}"
+    },
+    "models": {
+      "selectModel": "LLM model",
+      "providerOpenAI": "OpenAI",
+      "providerRequires": "requires API key",
+      "activeModel": "{name} active",
+      "activeModelTooltip": "Real LLM model answering. Each request consumes provider tokens.",
+      "extractiveMode": "No LLM (extractive mode)",
+      "extractiveModeTooltip": "No provider API key. The bot cites chunks without generating natural language.",
+      "costThisMonth": "Estimated cost this month",
+      "costPerRequest": "Cost of this request"
     },
     "ingestionStats": {
       "title": "Connected sources",

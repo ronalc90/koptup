@@ -47,9 +47,56 @@ export interface RemoteChatReply {
   sources: RemoteChatReplySource[];
   /** Confianza calibrada (0..1). */
   confidence?: number;
-  /** Latencia simulada en milisegundos. */
+  /** Latencia real (ms) si se llamó a OpenAI, simulada si fue extractivo. */
   latencyMs?: number;
+  /**
+   * Identificador del modelo que respondió. Puede ser un GPT (`gpt-4o-mini`,
+   * `gpt-4o`, `gpt-4-turbo`) o `extractive-bm25` / `extractive-bm25-fallback`
+   * cuando el LLM no estaba disponible.
+   */
+  model?: string;
+  tokens?: { prompt?: number; completion?: number; total?: number };
+  /** Costo estimado del request en USD (sólo cuando hubo llamada LLM real). */
+  costUSD?: number;
+  /** Si el LLM falló, el backend reporta el motivo (sin filtrar la API key). */
+  error?: string;
   timestamp: string;
+}
+
+export interface RemoteModelMeta {
+  id: string;
+  name: string;
+  provider: 'openai';
+  enabled: boolean;
+  costInputUSDper1M: number;
+  costOutputUSDper1M: number;
+  recommended?: boolean;
+}
+
+export interface RemoteModelsResponse {
+  available: RemoteModelMeta[];
+  activeProvider: 'openai' | null;
+}
+
+export interface RemoteBotSummary {
+  botId: string;
+  name: string;
+  color: string;
+  avatar: string;
+  createdAt: string;
+  updatedAt?: string;
+  docsCount: number;
+  chunksCount?: number;
+  conversationsCount: number;
+}
+
+export interface RemoteConversationTurn {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: string;
+  sources?: Array<{ id: string; name: string; score?: number; chunk?: string }>;
+  confidence?: number;
 }
 
 export interface RemoteUrlIngestResult {
@@ -128,10 +175,40 @@ export async function chatWithBot(
   botId: string,
   message: string,
   history: Array<{ role: string; content: string }>,
+  model?: string,
 ): Promise<RemoteChatReply> {
   return jsonFetch(`${API_BASE}/bots/${encodeURIComponent(botId)}/chat`, {
     method: 'POST',
-    body: JSON.stringify({ message, history }),
+    body: JSON.stringify({ message, history, model }),
+  });
+}
+
+/** Lista los modelos LLM soportados por el backend (flag `enabled` real). */
+export async function listModels(): Promise<RemoteModelsResponse> {
+  return jsonFetch<RemoteModelsResponse>(`${API_BASE}/models`);
+}
+
+/** Lista todos los bots (tenants) creados. */
+export async function listBots(): Promise<RemoteBotSummary[]> {
+  return jsonFetch<RemoteBotSummary[]>(`${API_BASE}/bots`);
+}
+
+/** Borra un bot completo (incluye docs, chunks y conversaciones). */
+export async function deleteBot(botId: string): Promise<{ deleted: true; botId: string }> {
+  return jsonFetch(`${API_BASE}/bots/${encodeURIComponent(botId)}`, { method: 'DELETE' });
+}
+
+/** Trae el histórico de mensajes de un bot. */
+export async function getConversations(botId: string): Promise<RemoteConversationTurn[]> {
+  return jsonFetch<RemoteConversationTurn[]>(
+    `${API_BASE}/bots/${encodeURIComponent(botId)}/conversations`,
+  );
+}
+
+/** Limpia el histórico de un bot (idempotente). */
+export async function clearConversations(botId: string): Promise<{ cleared: true; botId: string }> {
+  return jsonFetch(`${API_BASE}/bots/${encodeURIComponent(botId)}/conversations`, {
+    method: 'DELETE',
   });
 }
 

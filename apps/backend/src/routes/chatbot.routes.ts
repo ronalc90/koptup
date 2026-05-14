@@ -11,6 +11,7 @@ import {
   clearMessages,
   clearDocuments,
 } from '../controllers/chatbot.controller';
+import { load as loadState, persist as persistState } from '../data/chatbot-store';
 
 const router = Router();
 
@@ -94,8 +95,51 @@ interface BotChunk {
   tokens: string[];
 }
 
+interface ConversationTurn {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: string;
+  sources?: Array<{ id: string; name: string; score?: number; chunk?: string }>;
+  confidence?: number;
+}
+
 const botsStore = new Map<string, BotConfig>();
 const chunksStore = new Map<string, BotChunk[]>();
+const conversationsStore = new Map<string, ConversationTurn[]>();
+const docsStore = new Map<string, BotDocMeta[]>();
+
+// --- Persistencia file-based ------------------------------------------------
+//
+// Al arrancar el módulo rehidratamos los Maps desde disco; tras cada mutación
+// importante volcamos el estado a `data/chatbots/state.json`. Esto NO es una
+// BBDD: es un fallback liviano para que el demo "100% funcional" sobreviva
+// reinicios del proceso (`npm run dev`, despliegues, etc.).
+
+(function hydrateFromDisk() {
+  const initial = loadState();
+  for (const [k, v] of initial.bots) botsStore.set(k, v as BotConfig);
+  for (const [k, v] of initial.docs) docsStore.set(k, v as BotDocMeta[]);
+  for (const [k, v] of initial.chunks) chunksStore.set(k, v as BotChunk[]);
+  for (const [k, v] of initial.conversations) {
+    conversationsStore.set(k, v as ConversationTurn[]);
+  }
+  // Reconstruir `bot.docs` desde docsStore para mantener la API contractual.
+  for (const [botId, bot] of botsStore) {
+    const docs = docsStore.get(botId);
+    if (docs) bot.docs = docs;
+  }
+})();
+
+function snapshot() {
+  persistState({
+    bots: [...botsStore.entries()],
+    docs: [...docsStore.entries()],
+    chunks: [...chunksStore.entries()],
+    conversations: [...conversationsStore.entries()],
+    updatedAt: new Date().toISOString(),
+  });
+}
 
 // --- Helpers de texto -------------------------------------------------------
 
@@ -258,8 +302,15 @@ function ensureBot(botId: string): BotConfig {
       docs: [],
     };
     botsStore.set(botId, bot);
+    docsStore.set(botId, bot.docs);
+    snapshot();
   }
   return bot;
+}
+
+/** Mantiene `docsStore` sincronizado con `bot.docs` (single source of truth). */
+function syncDocs(bot: BotConfig): void {
+  docsStore.set(bot.botId, bot.docs);
 }
 
 function serializeBot(bot: BotConfig): BotConfig {
@@ -301,8 +352,35 @@ router.post('/bots', (req: Request, res: Response) => {
     bot.updatedAt = now;
   }
   botsStore.set(id, bot);
+  syncDocs(bot);
+  snapshot();
   res.status(existing ? 200 : 201).json(serializeBot(bot));
   return;
+});
+
+/**
+ * GET /bots — listar todos los tenants. Paginación opcional via `?limit` y
+ * `?offset`. Devuelve un resumen liviano (sin docs ni chunks completos):
+ * `{ botId, name, color, createdAt, updatedAt, docsCount, conversationsCount }`.
+ */
+router.get('/bots', (req: Request, res: Response) => {
+  const limit = Math.max(1, Math.min(500, Number(req.query.limit) || 100));
+  const offset = Math.max(0, Number(req.query.offset) || 0);
+  const all = [...botsStore.values()].sort((a, b) =>
+    (b.updatedAt || '').localeCompare(a.updatedAt || ''),
+  );
+  const slice = all.slice(offset, offset + limit).map((b) => ({
+    botId: b.botId,
+    name: b.name,
+    color: b.color,
+    avatar: b.avatar,
+    createdAt: b.createdAt,
+    updatedAt: b.updatedAt,
+    docsCount: b.docs.length,
+    chunksCount: (chunksStore.get(b.botId) ?? []).length,
+    conversationsCount: (conversationsStore.get(b.botId) ?? []).length,
+  }));
+  res.json(slice);
 });
 
 /** GET /bots/:botId — obtener config + docs. */
@@ -332,7 +410,29 @@ router.patch('/bots/:botId', (req: Request, res: Response) => {
   if (body.tone !== undefined) bot.tone = body.tone;
   if (Array.isArray(body.languages)) bot.languages = body.languages;
   bot.updatedAt = new Date().toISOString();
+  syncDocs(bot);
+  snapshot();
   res.json(serializeBot(bot));
+});
+
+/**
+ * DELETE /bots/:botId — borra el bot y todas sus dependencias: docs, chunks
+ * y conversaciones. Idempotente: si no existe devuelve 404, si existe limpia
+ * todo y persiste.
+ */
+router.delete('/bots/:botId', (req: Request, res: Response) => {
+  const botId = req.params.botId;
+  const bot = botsStore.get(botId);
+  if (!bot) {
+    res.status(404).json({ error: 'bot_not_found' });
+    return;
+  }
+  botsStore.delete(botId);
+  docsStore.delete(botId);
+  chunksStore.delete(botId);
+  conversationsStore.delete(botId);
+  snapshot();
+  res.json({ deleted: true, botId });
 });
 
 /** POST /bots/:botId/docs — ingesta de archivos en base64. */
@@ -377,6 +477,8 @@ router.post('/bots/:botId/docs', (req: Request, res: Response) => {
   }
   chunksStore.set(bot.botId, existingChunks);
   bot.updatedAt = new Date().toISOString();
+  syncDocs(bot);
+  snapshot();
 
   res.status(201).json({ docs: bot.docs, added });
 });
@@ -393,6 +495,8 @@ router.delete('/bots/:botId/docs/:docId', (req: Request, res: Response) => {
   const chunks = chunksStore.get(bot.botId) ?? [];
   chunksStore.set(bot.botId, chunks.filter((c) => c.docId !== docId));
   bot.updatedAt = new Date().toISOString();
+  syncDocs(bot);
+  snapshot();
   res.json({ docs: bot.docs });
 });
 
@@ -459,11 +563,210 @@ router.post('/bots/:botId/urls', async (req: Request, res: Response) => {
   }
   chunksStore.set(bot.botId, existingChunks);
   bot.updatedAt = new Date().toISOString();
+  syncDocs(bot);
+  snapshot();
   res.json({ docs: bot.docs, added, errors });
 });
 
-/** POST /bots/:botId/chat — retrieval real sobre los chunks del bot. */
-router.post('/bots/:botId/chat', (req: Request, res: Response) => {
+/** Agrega un turno a la conversación del bot. Conserva últimos 200 turnos. */
+function appendConversation(botId: string, turn: ConversationTurn): void {
+  const list = conversationsStore.get(botId) ?? [];
+  list.push(turn);
+  if (list.length > 200) list.splice(0, list.length - 200);
+  conversationsStore.set(botId, list);
+}
+
+// ---------------------------------------------------------------------------
+//   Catálogo de modelos LLM soportados
+// ---------------------------------------------------------------------------
+//
+// SRP: este objeto es la única fuente de verdad para los modelos disponibles
+// y sus precios. El endpoint /models lo expone tal cual y el handler /chat
+// lo usa para validar/whitelisting + estimar el costo del request.
+//
+// Sólo modelos GPT de OpenAI: el cliente confirmó que no tiene API key de
+// Claude/Gemini. Si en el futuro se agregan otros providers, agregar la
+// entrada acá y exponer el flag `enabled` en función de su env var.
+interface ModelMeta {
+  id: string;
+  name: string;
+  provider: 'openai';
+  /** USD por 1M tokens de input. */
+  costInputUSDper1M: number;
+  /** USD por 1M tokens de output. */
+  costOutputUSDper1M: number;
+  recommended?: boolean;
+}
+
+const OPENAI_MODELS: ReadonlyArray<ModelMeta> = [
+  {
+    id: 'gpt-4o-mini',
+    name: 'GPT-4o mini',
+    provider: 'openai',
+    costInputUSDper1M: 0.15,
+    costOutputUSDper1M: 0.6,
+    recommended: true,
+  },
+  {
+    id: 'gpt-4o',
+    name: 'GPT-4o',
+    provider: 'openai',
+    costInputUSDper1M: 2.5,
+    costOutputUSDper1M: 10,
+  },
+  {
+    id: 'gpt-4-turbo',
+    name: 'GPT-4 Turbo',
+    provider: 'openai',
+    costInputUSDper1M: 10,
+    costOutputUSDper1M: 30,
+  },
+];
+
+const DEFAULT_MODEL_ID = 'gpt-4o-mini';
+const ALLOWED_MODEL_IDS = new Set(OPENAI_MODELS.map((m) => m.id));
+
+function estimateCostUSD(modelId: string, promptTokens: number, completionTokens: number): number {
+  const meta = OPENAI_MODELS.find((m) => m.id === modelId) ?? OPENAI_MODELS[0];
+  const cost =
+    (promptTokens / 1e6) * meta.costInputUSDper1M +
+    (completionTokens / 1e6) * meta.costOutputUSDper1M;
+  return Number(cost.toFixed(6));
+}
+
+/**
+ * GET /models — reporta los modelos LLM soportados y si están habilitados
+ * (es decir, si hay una API key del provider configurada). El front consume
+ * este endpoint para deshabilitar opciones que no se pueden usar.
+ *
+ * Notar que NUNCA exponemos el valor de la API key, sólo el booleano de su
+ * presencia. Mantiene SRP (config introspection, no auth).
+ */
+router.get('/models', (_req: Request, res: Response) => {
+  const hasOpenAI = !!process.env.OPENAI_API_KEY;
+  res.json({
+    available: OPENAI_MODELS.map((m) => ({
+      ...m,
+      enabled: hasOpenAI,
+    })),
+    activeProvider: hasOpenAI ? 'openai' : null,
+  });
+});
+
+/**
+ * Llama a OpenAI Chat Completions. Aislado en un helper para mantener el
+ * handler de /chat liviano y testeable. Devuelve el texto generado más
+ * metadatos (usage, costo, modelo efectivo, latencia).
+ *
+ * Reintentos y backoff los maneja el caller; acá hacemos un único request
+ * con timeout de 30s (suficiente para gpt-4o sin streaming).
+ */
+async function callOpenAI(args: {
+  apiKey: string;
+  model: string;
+  systemPrompt: string;
+  context: string;
+  history: Array<{ role: string; content: string }>;
+  userMessage: string;
+}): Promise<{
+  reply: string;
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+  latencyMs: number;
+}> {
+  const t0 = Date.now();
+  const messages = [
+    { role: 'system', content: args.systemPrompt },
+    ...args.history
+      .filter((m) => m && typeof m.content === 'string' && (m.role === 'user' || m.role === 'assistant'))
+      .slice(-10)
+      .map((m) => ({ role: m.role, content: m.content })),
+    {
+      role: 'user',
+      content: `Fragmentos disponibles:\n${args.context}\n\nPregunta del usuario: ${args.userMessage}`,
+    },
+  ];
+
+  const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${args.apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: args.model,
+      messages,
+      temperature: 0.3,
+      max_tokens: 800,
+    }),
+    signal: AbortSignal.timeout(30_000),
+  });
+  const latencyMs = Date.now() - t0;
+
+  if (!resp.ok) {
+    const text = await resp.text().catch(() => '');
+    const err = new Error(`OpenAI HTTP ${resp.status}: ${text.slice(0, 300)}`) as Error & {
+      status?: number;
+      latencyMs?: number;
+    };
+    err.status = resp.status;
+    err.latencyMs = latencyMs;
+    throw err;
+  }
+
+  const data = (await resp.json()) as {
+    choices?: Array<{ message?: { content?: string } }>;
+    usage?: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number };
+  };
+  const reply = data.choices?.[0]?.message?.content?.trim() || '(Sin respuesta del modelo)';
+  return {
+    reply,
+    promptTokens: data.usage?.prompt_tokens ?? 0,
+    completionTokens: data.usage?.completion_tokens ?? 0,
+    totalTokens: data.usage?.total_tokens ?? 0,
+    latencyMs,
+  };
+}
+
+function composeExtractiveReply(
+  retrieved: Array<{ chunk: BotChunk; score: number }>,
+  message: string,
+): string {
+  if (retrieved.length === 0) {
+    return `No encontré información relacionada con "${message}". Probá reformular o subir más documentos.`;
+  }
+  return retrieved
+    .map(
+      (r, idx) =>
+        `[${idx + 1}] ${r.chunk.text.slice(0, 280)}${r.chunk.text.length > 280 ? '…' : ''}`,
+    )
+    .join('\n\n');
+}
+
+function formatSource(
+  r: { chunk: BotChunk; score: number },
+  idx: number,
+): { id: string; index: number; name: string; score: number; chunk: string } {
+  return {
+    id: r.chunk.id,
+    index: idx + 1,
+    name: r.chunk.docName,
+    score: Number(r.score.toFixed(3)),
+    chunk: r.chunk.text,
+  };
+}
+
+/**
+ * POST /bots/:botId/chat — flujo:
+ *   1. Recupera top-5 chunks por BM25-lite sobre los docs del bot.
+ *   2. Si hay `OPENAI_API_KEY`, arma prompt con system + history + contexto
+ *      citado y dispara la llamada a OpenAI Chat Completions.
+ *   3. Si no hay key, cae al modo extractivo (cita los chunks).
+ *   4. Si OpenAI falla, cae al modo extractivo + reporta el error.
+ *   5. Persiste el turno user + assistant en `conversationsStore` y snapshot.
+ */
+router.post('/bots/:botId/chat', async (req: Request, res: Response) => {
   const botId = req.params.botId;
   const message = String(req.body?.message || '').trim();
   if (!message) {
@@ -473,75 +776,168 @@ router.post('/bots/:botId/chat', (req: Request, res: Response) => {
 
   const bot = botsStore.get(botId);
   const allChunks = chunksStore.get(botId) ?? [];
-  const timestamp = new Date().toISOString();
+  const requestedModel = typeof req.body?.model === 'string' ? req.body.model : DEFAULT_MODEL_ID;
+  const safeModel = ALLOWED_MODEL_IDS.has(requestedModel) ? requestedModel : DEFAULT_MODEL_ID;
+  const history = Array.isArray(req.body?.history) ? req.body.history : [];
+  const timestampStart = new Date().toISOString();
 
-  if (!bot) {
+  const retrieved = retrieve(message, allChunks, 5);
+  const sources = retrieved.map((r, i) => formatSource(r, i));
+
+  /**
+   * Cierra la respuesta: persiste el turno user + assistant y devuelve el
+   * payload al cliente. Centralizado para que ambas ramas (LLM y fallback)
+   * compartan el mismo formato.
+   */
+  function finish(payload: {
+    reply: string;
+    confidence: number;
+    latencyMs: number;
+    model: string;
+    tokens?: { prompt: number; completion: number; total: number };
+    costUSD?: number;
+    error?: string;
+  }) {
+    if (bot) {
+      const userTurn: ConversationTurn = {
+        id: 'msg_' + crypto.randomBytes(6).toString('hex'),
+        role: 'user',
+        content: message,
+        timestamp: timestampStart,
+      };
+      const botTurn: ConversationTurn = {
+        id: 'msg_' + crypto.randomBytes(6).toString('hex'),
+        role: 'assistant',
+        content: payload.reply,
+        timestamp: new Date().toISOString(),
+        sources: sources.map((s) => ({
+          id: s.id,
+          name: s.name,
+          score: s.score,
+          chunk: s.chunk,
+        })),
+        confidence: payload.confidence,
+      };
+      appendConversation(botId, userTurn);
+      appendConversation(botId, botTurn);
+      snapshot();
+    }
     res.json({
       botId,
-      reply:
-        'Aún no tenés documentos cargados. Subí PDFs, Word, TXT, HTML o agregá una URL en el Builder y volvé a preguntarme.',
-      sources: [],
-      confidence: 0,
-      latencyMs: 8,
-      timestamp,
+      reply: payload.reply,
+      sources,
+      confidence: Number(payload.confidence.toFixed(2)),
+      latencyMs: payload.latencyMs,
+      model: payload.model,
+      tokens: payload.tokens,
+      costUSD: payload.costUSD,
+      error: payload.error,
+      timestamp: timestampStart,
+    });
+  }
+
+  const hasOpenAI = !!process.env.OPENAI_API_KEY;
+
+  // --- Sin LLM: fallback extractivo puro ----------------------------------
+  if (!hasOpenAI) {
+    const replyText =
+      retrieved.length > 0
+        ? composeExtractiveReply(retrieved, message)
+        : allChunks.length === 0
+          ? 'Aún no tenés documentos cargados. Subí PDFs, Word, TXT, HTML o agregá una URL en el Builder y volvé a preguntarme.'
+          : `No encontré información relacionada con "${message}" en los documentos cargados.`;
+    finish({
+      reply: replyText,
+      confidence: retrieved.length > 0 ? 0.3 : 0,
+      latencyMs: 50,
+      model: 'extractive-bm25',
     });
     return;
   }
 
-  if (allChunks.length === 0) {
-    res.json({
-      botId,
-      reply:
-        'Aún no tenés documentos cargados. Subí PDFs, Word, TXT, HTML o agregá una URL en el Builder y volvé a preguntarme.',
-      sources: [],
-      confidence: 0,
-      latencyMs: 12,
-      timestamp,
+  // --- Con LLM: armamos contexto y llamamos a OpenAI ----------------------
+  const tone = bot?.tone || 'professional';
+  const systemPrompt =
+    bot?.systemPrompt && bot.systemPrompt.trim().length > 0
+      ? bot.systemPrompt
+      : `Sos un asistente virtual con tono ${tone}. Respondé en base a los fragmentos provistos cuando estén disponibles, citando las fuentes con [1], [2], etc. Si no hay fragmentos o no encontrás la respuesta, decilo honestamente y ofrecé al usuario subir más contenido. Sé conciso y directo.`;
+
+  const context =
+    retrieved.length > 0
+      ? retrieved
+          .map((r, i) => `[${i + 1}] (${r.chunk.docName}) ${r.chunk.text}`)
+          .join('\n\n')
+      : '(El bot todavía no tiene documentos cargados. Respondé brevemente y sugerí al usuario subir contenido.)';
+
+  try {
+    const result = await callOpenAI({
+      apiKey: process.env.OPENAI_API_KEY!,
+      model: safeModel,
+      systemPrompt,
+      context,
+      history,
+      userMessage: message,
     });
+    const costUSD = estimateCostUSD(safeModel, result.promptTokens, result.completionTokens);
+    finish({
+      reply: result.reply,
+      confidence: retrieved.length > 0 ? 0.85 : 0.5,
+      latencyMs: result.latencyMs,
+      model: safeModel,
+      tokens: {
+        prompt: result.promptTokens,
+        completion: result.completionTokens,
+        total: result.totalTokens,
+      },
+      costUSD,
+    });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    const latencyMs =
+      err && typeof err === 'object' && 'latencyMs' in err && typeof (err as { latencyMs?: unknown }).latencyMs === 'number'
+        ? ((err as { latencyMs: number }).latencyMs)
+        : 200;
+    // Log sin exponer la API key (msg solo lleva la respuesta de OpenAI).
+    console.error('[chatbot] OpenAI call failed:', msg.slice(0, 300));
+    const fallbackReply =
+      retrieved.length > 0
+        ? `(Modo extractivo por error del proveedor LLM) ${composeExtractiveReply(retrieved, message)}`
+        : 'No pude generar la respuesta (error del proveedor LLM) y todavía no tenés documentos cargados.';
+    finish({
+      reply: fallbackReply,
+      confidence: retrieved.length > 0 ? 0.3 : 0,
+      latencyMs,
+      model: 'extractive-bm25-fallback',
+      error: 'llm_provider_error',
+    });
+  }
+});
+
+/**
+ * GET /bots/:botId/conversations — últimos N turnos (default 50, máx 200).
+ * Útil para rehidratar el chat del lado cliente y para inspección.
+ */
+router.get('/bots/:botId/conversations', (req: Request, res: Response) => {
+  const botId = req.params.botId;
+  if (!botsStore.has(botId)) {
+    res.status(404).json({ error: 'bot_not_found' });
     return;
   }
+  const limit = Math.max(1, Math.min(200, Number(req.query.limit) || 50));
+  const list = conversationsStore.get(botId) ?? [];
+  res.json(list.slice(-limit));
+});
 
-  const retrieved = retrieve(message, allChunks, 3);
-  if (retrieved.length === 0) {
-    res.json({
-      botId,
-      reply: `No encontré información relacionada con "${message}" en los ${allChunks.length} fragmento(s) cargado(s). Probá reformular la pregunta o cargar más documentos.`,
-      sources: [],
-      confidence: 0.05,
-      latencyMs: 18,
-      timestamp,
-    });
+/** DELETE /bots/:botId/conversations — limpia el histórico del bot. */
+router.delete('/bots/:botId/conversations', (req: Request, res: Response) => {
+  const botId = req.params.botId;
+  if (!botsStore.has(botId)) {
+    res.status(404).json({ error: 'bot_not_found' });
     return;
   }
-
-  const lines = retrieved
-    .map(
-      (r, idx) =>
-        `[${idx + 1}] ${r.chunk.text.slice(0, 280)}${r.chunk.text.length > 280 ? '…' : ''}`,
-    )
-    .join('\n\n');
-  const sources = retrieved.map((r, idx) => ({
-    id: r.chunk.id,
-    index: idx + 1,
-    name: r.chunk.docName,
-    score: Number(r.score.toFixed(3)),
-    chunk: r.chunk.text,
-  }));
-  const queryTokenCount = Math.max(1, tokenize(message).length);
-  const confidence = Math.min(0.95, retrieved[0].score / (queryTokenCount * 2));
-
-  const reply = `Esto encontré en tus documentos sobre "${message}":\n\n${lines}\n\nFuentes citadas: ${retrieved
-    .map((r, i) => `[${i + 1}] ${r.chunk.docName}`)
-    .join(' · ')}`;
-
-  res.json({
-    botId,
-    reply,
-    sources,
-    confidence: Number(confidence.toFixed(2)),
-    latencyMs: 60 + Math.round(Math.random() * 80),
-    timestamp,
-  });
+  conversationsStore.set(botId, []);
+  snapshot();
+  res.json({ cleared: true, botId });
 });
 
 export default router;
