@@ -46,7 +46,8 @@ export default getRequestConfig(async () => {
 
   const demoMessages = loadDirMessages('demos', locale);
   const serviceMessages = loadDirMessages('services', locale);
-  messages = { ...messages, ...demoMessages, ...serviceMessages };
+  const planMessages = loadDirMessages('plans', locale);
+  messages = { ...messages, ...demoMessages, ...serviceMessages, ...planMessages };
 
   return {
     locale,

@@ -2,8 +2,24 @@
   "servicesCatalog": {
     "title": "Servicios y planes",
     "subtitle": "Soluciones llave en mano con precios en pesos colombianos.",
-    "search": "Buscar servicio",
+    "search": "Buscar...",
     "filterByCategory": "Filtrar por categoría",
+    "hero": {
+      "title": "Software a medida o suscripción mensual",
+      "subtitle": "Elegí cómo querés trabajar con nosotros: te entregamos tu propio software o usás nuestra plataforma como servicio."
+    },
+    "tabs": {
+      "services": "Servicios (te entregamos el software)",
+      "plans": "Planes (usás nuestro SaaS mensual)"
+    },
+    "servicesIntro": {
+      "title": "Servicios — desarrollo a medida",
+      "body": "Construimos software completamente personalizado para tu empresa. Te entregamos el código fuente, la documentación y los accesos. El software es de tu propiedad, lo hospedás donde quieras."
+    },
+    "plansIntro": {
+      "title": "Planes — software como servicio",
+      "body": "Usá nuestras soluciones listas para producción pagando una mensualidad. Nosotros nos encargamos de hostear, mantener, actualizar y escalar. Cancelás cuando quieras."
+    },
     "categories": {
       "all": "Todos",
       "sales": "Ventas",
@@ -26,6 +42,27 @@
       "viewDemo": "Probar demo",
       "fromPrice": "Desde",
       "perMonth": "/mes"
+    },
+    "service": {
+      "tierInicial": "Inicial",
+      "tierProfesional": "Profesional",
+      "tierEnterprise": "Enterprise",
+      "setupLabel": "Inversión inicial (única vez)",
+      "monthlyOptional": "Mantenimiento opcional",
+      "deliveryTime": "Tiempo de entrega",
+      "weeks": "semanas",
+      "ownership": "Vos sos dueño del código fuente al terminar"
+    },
+    "plan": {
+      "tierStarter": "Starter",
+      "tierGrowth": "Growth",
+      "tierBusiness": "Business",
+      "monthly": "/mes",
+      "setupOnce": "Setup único",
+      "monthlyBadge": "Sin compromiso, cancelás cuando quieras",
+      "semestralBadge": "Ahorrás 10%",
+      "annualBadge": "Ahorrás 20%",
+      "noOwnership": "Software hospedado por nosotros — vos lo usás, nosotros lo mantenemos"
     },
     "tier": {
       "inicial": "Inicial",
@@ -66,13 +103,16 @@
     "modal": {
       "title": "Planes y precios",
       "close": "Cerrar",
-      "quote": "Cotizar este plan",
+      "quote": "Quiero este plan",
       "soporte": "Soporte",
-      "idealPara": "Ideal para"
+      "idealPara": "Ideal para",
+      "incluye": "Qué incluye",
+      "setupIncluye": "Qué incluye el setup",
+      "mantenimientoIncluye": "Qué incluye el mantenimiento"
     },
-    "noResults": "No encontramos servicios para tu búsqueda.",
-    "ctaTitle": "¿No estás seguro qué plan elegir?",
-    "ctaBody": "Hablá con nosotros y armamos juntos el alcance ideal para tu empresa.",
+    "noResults": "No encontramos resultados para tu búsqueda.",
+    "ctaTitle": "¿No sabés cuál elegir?",
+    "ctaBody": "Hablá con nosotros — te ayudamos a decidir si te conviene tener el software o usar nuestro SaaS.",
     "ctaButton": "Hablar con un experto"
   }
 }

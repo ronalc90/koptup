@@ -131,7 +131,7 @@ async function getMessages(locale: string) {
   try {
     const fs = await import('fs');
     const path = await import('path');
-    for (const subdir of ['demos', 'services']) {
+    for (const subdir of ['demos', 'services', 'plans']) {
       const dir = path.join(process.cwd(), 'messages', subdir);
       if (!fs.existsSync(dir)) continue;
       const files = fs.readdirSync(dir).filter((f) => f.endsWith(`.${locale}.json`));

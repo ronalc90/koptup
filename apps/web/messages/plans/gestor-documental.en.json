@@ -1,0 +1,52 @@
+{
+  "plan_gestorDocumental": {
+    "name": "Document management",
+    "tagline": "Your digital desk with nothing to install",
+    "description": "Start using Document management hosted by us with an affordable monthly fee. We take care of hosting, updates and scaling.",
+    "categoryLabel": "Data",
+    "plans": {
+      "starter": {
+        "name": "Starter",
+        "tagline": "Validate the idea with zero commitment",
+        "incluye": [
+          "Up to 50 GB of storage",
+          "1 administrator user",
+          "Core functionality ready to use",
+          "Discreet KopTup branding in the interface",
+          "Business-hours email support"
+        ],
+        "idealPara": "Founders and SMBs validating the proposition"
+      },
+      "growth": {
+        "name": "Growth",
+        "tagline": "When you have a steady customer base",
+        "incluye": [
+          "Up to 500 GB and approval workflows",
+          "Up to 5 users with differentiated roles",
+          "Partial white-label with your logo and colors",
+          "Basic integrations with WhatsApp and email marketing",
+          "Daily backups and 1-click restore",
+          "Weekly automated reports",
+          "WhatsApp support with response under 4 business hours"
+        ],
+        "idealPara": "SMBs and mid-size companies with steady operations"
+      },
+      "business": {
+        "name": "Business",
+        "tagline": "Unlimited scale with an annual commitment",
+        "incluye": [
+          "Unlimited storage and workflows",
+          "Unlimited users and roles",
+          "Multi-tenant and multi-brand",
+          "Full white-label with your own domain",
+          "99.9% SLA with credits for non-compliance",
+          "Compliance (GDPR, ISO 27001, HIPAA if applicable)",
+          "Dedicated Success Manager",
+          "24/7 support and on-call for critical incidents",
+          "Monthly audits and reports for your committee"
+        ],
+        "idealPara": "Large enterprises with thousands of users and compliance needs"
+      }
+    }
+  }
+}

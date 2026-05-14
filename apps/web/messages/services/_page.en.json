@@ -2,8 +2,24 @@
   "servicesCatalog": {
     "title": "Services and plans",
     "subtitle": "Turnkey solutions with prices in Colombian pesos.",
-    "search": "Search service",
+    "search": "Search...",
     "filterByCategory": "Filter by category",
+    "hero": {
+      "title": "Custom software or monthly subscription",
+      "subtitle": "Choose how you want to work with us: we deliver your own software or you use our platform as a service."
+    },
+    "tabs": {
+      "services": "Services (we deliver the software)",
+      "plans": "Plans (use our monthly SaaS)"
+    },
+    "servicesIntro": {
+      "title": "Services — custom development",
+      "body": "We build fully custom software for your company. We hand over the source code, documentation and access. The software is yours — host it anywhere."
+    },
+    "plansIntro": {
+      "title": "Plans — software as a service",
+      "body": "Use our production-ready solutions with a monthly fee. We take care of hosting, maintenance, updates and scaling. Cancel anytime."
+    },
     "categories": {
       "all": "All",
       "sales": "Sales",
@@ -26,6 +42,27 @@
       "viewDemo": "Try demo",
       "fromPrice": "From",
       "perMonth": "/mo"
+    },
+    "service": {
+      "tierInicial": "Starter",
+      "tierProfesional": "Professional",
+      "tierEnterprise": "Enterprise",
+      "setupLabel": "Initial investment (one-time)",
+      "monthlyOptional": "Optional maintenance",
+      "deliveryTime": "Delivery time",
+      "weeks": "weeks",
+      "ownership": "You own the source code when we are done"
+    },
+    "plan": {
+      "tierStarter": "Starter",
+      "tierGrowth": "Growth",
+      "tierBusiness": "Business",
+      "monthly": "/mo",
+      "setupOnce": "One-time setup",
+      "monthlyBadge": "No commitment, cancel anytime",
+      "semestralBadge": "Save 10%",
+      "annualBadge": "Save 20%",
+      "noOwnership": "Software hosted by us — you use it, we keep it running"
     },
     "tier": {
       "inicial": "Starter",
@@ -66,13 +103,16 @@
     "modal": {
       "title": "Plans and pricing",
       "close": "Close",
-      "quote": "Quote this plan",
+      "quote": "I want this plan",
       "soporte": "Support",
-      "idealPara": "Ideal for"
+      "idealPara": "Ideal for",
+      "incluye": "What is included",
+      "setupIncluye": "What setup includes",
+      "mantenimientoIncluye": "What maintenance includes"
     },
-    "noResults": "We did not find services matching your search.",
-    "ctaTitle": "Not sure which plan to pick?",
-    "ctaBody": "Talk to us and we will design the right scope for your company together.",
+    "noResults": "We did not find results for your search.",
+    "ctaTitle": "Not sure which one to pick?",
+    "ctaBody": "Talk to us — we will help you decide whether to own the software or use our SaaS.",
     "ctaButton": "Talk to an expert"
   }
 }
