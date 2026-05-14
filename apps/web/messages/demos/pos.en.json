@@ -1,0 +1,249 @@
+{
+  "demoPos": {
+    "meta": {
+      "title": "POS · point of sale",
+      "subtitle": "Omnichannel suite for restaurant, retail, self-checkout, and kiosk, with e-invoicing, loyalty, and integrated hardware.",
+      "demo": "Interactive demo"
+    },
+    "topbar": {
+      "store": "Store",
+      "stores": {
+        "main": "Downtown",
+        "north": "North branch",
+        "airport": "Airport T1"
+      },
+      "currency": "Currency",
+      "language": "Language",
+      "online": "Online",
+      "offline": "Offline mode",
+      "offlineHint": "Sync pending · {n} tickets",
+      "searchPlaceholder": "Search by product, SKU, or barcode",
+      "scan": "Scan",
+      "shift": "Shift open",
+      "shiftBy": "Cashier · {name}"
+    },
+    "modes": {
+      "restaurant": "Restaurant",
+      "retail": "Retail",
+      "selfcheckout": "Self-checkout",
+      "kiosk": "Kiosk"
+    },
+    "categories": {
+      "all": "All",
+      "drinks": "Drinks",
+      "food": "Food",
+      "snacks": "Snacks",
+      "desserts": "Desserts"
+    },
+    "products": {
+      "title": "Catalog",
+      "happyHour": "Happy hour",
+      "combo": "Combo",
+      "lowStock": "Low stock",
+      "stock": "Stock · {n}",
+      "addedToast": "{name} added"
+    },
+    "ticket": {
+      "title": "Current ticket",
+      "empty": "No items yet. Add products from the catalog.",
+      "table": "Table {n}",
+      "waiter": "Server · {name}",
+      "customer": "Customer",
+      "noCustomer": "No customer assigned",
+      "addCustomer": "Assign customer",
+      "removeCustomer": "Remove",
+      "modifiers": "Modifiers",
+      "note": "Note",
+      "discount": "Discount",
+      "applyDiscount": "Apply discount",
+      "subtotal": "Subtotal",
+      "tax": "Tax · 19%",
+      "tip": "Tip",
+      "total": "Total",
+      "pay": "Charge",
+      "send": "Send to kitchen",
+      "void": "Void item",
+      "clear": "Clear ticket"
+    },
+    "modifiers": {
+      "title": "Modifiers · {name}",
+      "size": "Size",
+      "sizes": {
+        "small": "Small",
+        "medium": "Medium",
+        "large": "Large"
+      },
+      "extras": "Extras",
+      "extrasItems": {
+        "cheese": "Extra cheese",
+        "bacon": "Bacon",
+        "sauce": "BBQ sauce",
+        "ice": "No ice",
+        "sugar": "No sugar"
+      },
+      "notes": "Kitchen notes",
+      "notesPlaceholder": "e.g. no onions, cook it medium rare...",
+      "cancel": "Cancel",
+      "add": "Add to ticket"
+    },
+    "loyalty": {
+      "title": "Loyalty program",
+      "lookupPlaceholder": "ID or phone number",
+      "search": "Search",
+      "found": "{name} · {points} points",
+      "tier": "Tier · {tier}",
+      "tiers": {
+        "bronze": "Bronze",
+        "silver": "Silver",
+        "gold": "Gold"
+      },
+      "redeem": "Redeem {points} pts (-{amount})",
+      "notFound": "Customer not found",
+      "ptsEarned": "Earns {points} pts on this sale"
+    },
+    "checkout": {
+      "title": "Take payment",
+      "total": "Total due",
+      "pending": "Pending",
+      "received": "Received",
+      "change": "Change",
+      "methods": {
+        "cash": "Cash",
+        "card": "Card",
+        "qr": "QR / Bank",
+        "wallet": "Digital wallet",
+        "bnpl": "BNPL · 3 installments"
+      },
+      "cardModes": {
+        "chip": "Chip",
+        "tap": "Contactless",
+        "swipe": "Swipe"
+      },
+      "split": "Split payment",
+      "splitHint": "Combine methods to cover the full total",
+      "addPayment": "Add payment",
+      "remove": "Remove",
+      "cancel": "Cancel",
+      "confirm": "Confirm payment",
+      "processing": "Processing...",
+      "approved": "Approved",
+      "tip": "Suggested tip"
+    },
+    "receipt": {
+      "title": "Electronic receipt",
+      "thermal": "Thermal 80mm preview",
+      "store": "KopTup · Downtown",
+      "address": "11th Ave # 93-46 · Bogotá",
+      "nit": "Tax ID 900.123.456-7",
+      "ticket": "Ticket #{n}",
+      "cashier": "Cashier · {name}",
+      "thanks": "Thanks for your purchase!",
+      "dian": "DIAN · e-invoice accepted",
+      "cufe": "CUFE · {code}",
+      "send": "Send receipt",
+      "email": "Email",
+      "whatsapp": "WhatsApp",
+      "sms": "SMS",
+      "print": "Print",
+      "newSale": "New sale",
+      "sent": "Sent via {channel}"
+    },
+    "kds": {
+      "title": "Kitchen display · KDS",
+      "subtitle": "Live kitchen orders",
+      "order": "Order #{n}",
+      "table": "Table {n}",
+      "elapsed": "{min} min",
+      "states": {
+        "new": "New",
+        "cooking": "Cooking",
+        "ready": "Ready"
+      },
+      "markReady": "Mark ready",
+      "deliver": "Deliver",
+      "empty": "No pending orders"
+    },
+    "tables": {
+      "title": "Table management",
+      "subtitle": "Assign a server and a ticket to each table",
+      "table": "Table {n}",
+      "seats": "{n} seats",
+      "states": {
+        "free": "Free",
+        "busy": "Busy",
+        "bill": "Bill requested"
+      },
+      "openTicket": "Open ticket",
+      "assignWaiter": "Assign server",
+      "waiters": {
+        "ana": "Ana M.",
+        "luis": "Luis G.",
+        "sofia": "Sofía P.",
+        "diego": "Diego R."
+      }
+    },
+    "employees": {
+      "title": "Employees",
+      "clockIn": "Clock in",
+      "clockOut": "Clock out",
+      "active": "On shift",
+      "off": "Off",
+      "hours": "{h}h worked",
+      "commission": "Commission · {amount}",
+      "punch": "Punch"
+    },
+    "reports": {
+      "title": "X / Z report",
+      "subtitle": "Summary of the current shift",
+      "sales": "Sales",
+      "tickets": "Tickets issued",
+      "avgTicket": "Avg ticket",
+      "cash": "Cash",
+      "card": "Card",
+      "digital": "Digital",
+      "voids": "Voids",
+      "refunds": "Refunds",
+      "topProduct": "Top product",
+      "closeShift": "Close shift · Z",
+      "printX": "Print X"
+    },
+    "cash": {
+      "title": "Cash management",
+      "open": "Open drawer",
+      "close": "Close drawer",
+      "opening": "Opening float",
+      "expected": "Expected in drawer",
+      "counted": "Counted",
+      "diff": "Variance",
+      "confirm": "Confirm",
+      "withdraw": "Withdraw",
+      "deposit": "Deposit"
+    },
+    "hardware": {
+      "title": "Hardware",
+      "subtitle": "Connected peripherals",
+      "printer": "Thermal printer",
+      "scanner": "Bluetooth scanner",
+      "scale": "Scale",
+      "reader": "Chip / NFC reader",
+      "drawer": "Cash drawer",
+      "connected": "Connected",
+      "disconnected": "Disconnected",
+      "reconnect": "Reconnect"
+    },
+    "tabs": {
+      "sale": "Sale",
+      "tables": "Tables",
+      "kds": "Kitchen · KDS",
+      "reports": "Reports",
+      "employees": "Employees"
+    },
+    "common": {
+      "close": "Close",
+      "save": "Save",
+      "back": "Back",
+      "yes": "Yes",
+      "no": "No"
+    }
+  }
+}

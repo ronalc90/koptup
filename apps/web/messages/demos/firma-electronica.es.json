@@ -1,0 +1,247 @@
+{
+  "demoSign": {
+    "pageTitle": "Plataforma de Firma Electrónica",
+    "pageSubtitle": "Firma documentos legalmente vinculantes en minutos. Simple, Avanzada, Cualificada eIDAS y Ley 527 CO con audit trail criptográfico.",
+    "back": "Volver a demos",
+    "compliance": {
+      "title": "Cumplimiento normativo",
+      "eidas": "eIDAS",
+      "esign": "ESIGN Act",
+      "ueta": "UETA",
+      "ley527": "Ley 527 CO",
+      "nom151": "NOM 151 MX"
+    },
+    "tabs": {
+      "dashboard": "Dashboard",
+      "create": "Crear sobre",
+      "templates": "Plantillas",
+      "audit": "Audit trail",
+      "api": "API & Embed",
+      "signer": "Vista firmante",
+      "integrations": "Integraciones"
+    },
+    "metrics": {
+      "pending": "Documentos pendientes",
+      "signedMonth": "Firmados este mes",
+      "completion": "Tasa de completitud",
+      "avgTime": "Tiempo promedio",
+      "minutes": "min"
+    },
+    "documents": {
+      "title": "Documentos recientes",
+      "headers": {
+        "name": "Documento",
+        "signers": "Firmantes",
+        "type": "Tipo firma",
+        "status": "Estado",
+        "updated": "Actualizado",
+        "actions": "Acciones"
+      },
+      "status": {
+        "sent": "Enviado",
+        "viewed": "Visto",
+        "signed": "Firmado",
+        "expired": "Vencido",
+        "draft": "Borrador"
+      },
+      "actions": {
+        "view": "Ver",
+        "audit": "Audit",
+        "remind": "Recordar",
+        "void": "Anular"
+      },
+      "newEnvelope": "Nuevo sobre",
+      "filter": "Filtrar",
+      "search": "Buscar documento..."
+    },
+    "wizard": {
+      "title": "Crear sobre de firma",
+      "subtitle": "Configura el documento, los firmantes y la seguridad en 4 pasos.",
+      "next": "Siguiente",
+      "back": "Atrás",
+      "send": "Enviar para firma",
+      "saveDraft": "Guardar borrador",
+      "steps": {
+        "upload": {
+          "label": "Documento",
+          "title": "Sube tu documento",
+          "subtitle": "Admite PDF, Word y plantillas con variables dinámicas.",
+          "drag": "Arrastra archivos aquí o haz clic para subir",
+          "types": "PDF, DOCX, DOC — hasta 25 MB",
+          "useTemplate": "Usar plantilla",
+          "uploaded": "Documento cargado",
+          "pages": "páginas",
+          "vars": "variables detectadas"
+        },
+        "signers": {
+          "label": "Firmantes",
+          "title": "Agrega firmantes",
+          "subtitle": "Define orden de firma, asigna roles y permisos.",
+          "addSigner": "Agregar firmante",
+          "name": "Nombre",
+          "email": "Email",
+          "role": "Rol",
+          "order": "Orden",
+          "modes": {
+            "parallel": "Paralelo",
+            "sequential": "Secuencial",
+            "conditional": "Condicional"
+          },
+          "roles": {
+            "signer": "Firmante",
+            "approver": "Aprobador",
+            "viewer": "Solo lectura",
+            "witness": "Testigo"
+          }
+        },
+        "fields": {
+          "label": "Campos",
+          "title": "Posiciona campos en el documento",
+          "subtitle": "Arrastra los campos a la posición deseada del documento.",
+          "palette": "Paleta",
+          "types": {
+            "signature": "Firma",
+            "initials": "Iniciales",
+            "date": "Fecha",
+            "text": "Texto",
+            "checkbox": "Checkbox"
+          },
+          "preview": "Vista previa del documento",
+          "pagePlaceholder": "Página 1 de 3",
+          "dropHere": "Suelta aquí",
+          "fieldsPlaced": "campos posicionados"
+        },
+        "security": {
+          "label": "Seguridad",
+          "title": "Autenticación y configuración",
+          "subtitle": "Define cómo se autentica cada firmante y los recordatorios.",
+          "authMethod": "Método de autenticación",
+          "auth": {
+            "sms": "SMS OTP",
+            "email": "Email OTP",
+            "kyc": "KYC (ID + selfie)",
+            "video": "Video grabado",
+            "biometric": "Biometría"
+          },
+          "expiry": "Expiración (días)",
+          "reminders": "Recordatorios cada",
+          "days": "días",
+          "signatureType": "Tipo de firma",
+          "redlines": "Negociación previa (redlines)",
+          "redlinesHelp": "Permite que las partes comenten y propongan cambios antes de firmar."
+        }
+      }
+    },
+    "types": {
+      "title": "Tipos de firma soportados",
+      "simple": "Simple",
+      "simpleDesc": "Firma con un clic, ideal para acuerdos internos.",
+      "advanced": "Avanzada",
+      "advancedDesc": "Identificación del firmante, vinculación única y auditoría.",
+      "qualified": "Cualificada (eIDAS)",
+      "qualifiedDesc": "Certificado digital cualificado, equivalente legal a firma manuscrita en la UE.",
+      "ley527": "Ley 527 CO",
+      "ley527Desc": "Firma electrónica certificada bajo la Ley 527 de 1999 de Colombia."
+    },
+    "audit": {
+      "title": "Audit trail criptográfico",
+      "subtitle": "Historial inmutable con hash chain y timestamping RFC 3161.",
+      "documentHash": "Hash del documento",
+      "blockchainTs": "Timestamp blockchain RFC 3161",
+      "blockchainEnabled": "Activado — anclado en cadena pública",
+      "blockchainDisabled": "Desactivado",
+      "downloadCert": "Descargar certificado",
+      "timeline": "Línea de tiempo",
+      "events": {
+        "created": "Sobre creado",
+        "sent": "Enviado por email",
+        "viewed": "Documento visto",
+        "authenticated": "Firmante autenticado",
+        "signed": "Documento firmado",
+        "completed": "Sobre completado",
+        "sealed": "Sellado criptográficamente"
+      },
+      "fields": {
+        "ip": "IP",
+        "device": "Dispositivo",
+        "geo": "Ubicación",
+        "hash": "Hash"
+      },
+      "close": "Cerrar"
+    },
+    "templates": {
+      "title": "Plantillas con campos dinámicos",
+      "subtitle": "Reutiliza documentos frecuentes y envía en lote desde CSV.",
+      "new": "Nueva plantilla",
+      "items": {
+        "nda": "Acuerdo de confidencialidad (NDA)",
+        "labor": "Contrato laboral",
+        "service": "Contrato de servicios",
+        "saas": "Acuerdo SaaS",
+        "consent": "Consentimiento informado",
+        "vendor": "Acuerdo de proveedor"
+      },
+      "fields": "campos",
+      "uses": "usos",
+      "bulk": "Envío masivo desde CSV",
+      "bulkDesc": "Sube un CSV con los datos de los firmantes y envía cientos de sobres a la vez.",
+      "uploadCsv": "Subir CSV",
+      "previewBulk": "Vista previa lote",
+      "send": "Usar plantilla"
+    },
+    "api": {
+      "title": "API & iframe embebido",
+      "subtitle": "Integra la firma en tu producto con nuestra API REST o el componente embebido.",
+      "tabs": {
+        "curl": "cURL",
+        "ts": "TypeScript",
+        "python": "Python"
+      },
+      "embedTitle": "Preview signing page embebida",
+      "embedDesc": "Inyecta una pantalla limpia de firma dentro de tu app con un iframe firmado.",
+      "openDocs": "Abrir documentación",
+      "copy": "Copiar",
+      "copied": "Copiado"
+    },
+    "redlines": {
+      "title": "Negociación previa",
+      "subtitle": "Comentarios y modo sugerencia antes de firmar.",
+      "suggestMode": "Modo sugerencia",
+      "comments": "Comentarios",
+      "addComment": "Agregar comentario",
+      "accept": "Aceptar",
+      "reject": "Rechazar"
+    },
+    "integrations": {
+      "title": "Integraciones nativas",
+      "subtitle": "Conecta tu CRM, ATS o HRIS sin escribir código.",
+      "items": {
+        "salesforce": "Salesforce",
+        "hubspot": "HubSpot",
+        "pipedrive": "Pipedrive",
+        "workday": "Workday",
+        "greenhouse": "Greenhouse",
+        "bamboohr": "BambooHR",
+        "slack": "Slack",
+        "googleDrive": "Google Drive"
+      },
+      "connect": "Conectar"
+    },
+    "signer": {
+      "title": "Vista del firmante",
+      "subtitle": "Pantalla limpia, sin distracciones — listo para móvil.",
+      "from": "De",
+      "subject": "Firma requerida",
+      "instructions": "Por favor revisa el documento y completa los campos resaltados.",
+      "field": "Campo requerido",
+      "signHere": "Firma aquí",
+      "typeName": "Escribe tu nombre",
+      "draw": "Dibuja",
+      "type": "Escribe",
+      "upload": "Sube imagen",
+      "agree": "Acepto los términos electrónicos y consiento firmar este documento.",
+      "continue": "Firmar y continuar",
+      "secured": "Sesión segura — cifrado TLS y vinculación al dispositivo"
+    }
+  }
+}

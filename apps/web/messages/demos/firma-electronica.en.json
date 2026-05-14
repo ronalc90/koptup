@@ -1,0 +1,247 @@
+{
+  "demoSign": {
+    "pageTitle": "Electronic signature platform",
+    "pageSubtitle": "Sign legally binding documents in minutes. Simple, advanced, and qualified signatures under eIDAS and Colombian Law 527, backed by a cryptographic audit trail.",
+    "back": "Back to demos",
+    "compliance": {
+      "title": "Regulatory compliance",
+      "eidas": "eIDAS",
+      "esign": "ESIGN Act",
+      "ueta": "UETA",
+      "ley527": "Law 527 CO",
+      "nom151": "NOM 151 MX"
+    },
+    "tabs": {
+      "dashboard": "Dashboard",
+      "create": "Create envelope",
+      "templates": "Templates",
+      "audit": "Audit trail",
+      "api": "API & embed",
+      "signer": "Signer view",
+      "integrations": "Integrations"
+    },
+    "metrics": {
+      "pending": "Pending documents",
+      "signedMonth": "Signed this month",
+      "completion": "Completion rate",
+      "avgTime": "Average time",
+      "minutes": "min"
+    },
+    "documents": {
+      "title": "Recent documents",
+      "headers": {
+        "name": "Document",
+        "signers": "Signers",
+        "type": "Signature type",
+        "status": "Status",
+        "updated": "Updated",
+        "actions": "Actions"
+      },
+      "status": {
+        "sent": "Sent",
+        "viewed": "Viewed",
+        "signed": "Signed",
+        "expired": "Expired",
+        "draft": "Draft"
+      },
+      "actions": {
+        "view": "View",
+        "audit": "Audit",
+        "remind": "Remind",
+        "void": "Void"
+      },
+      "newEnvelope": "New envelope",
+      "filter": "Filter",
+      "search": "Search document..."
+    },
+    "wizard": {
+      "title": "Create signing envelope",
+      "subtitle": "Configure document, signers, and security in 4 steps.",
+      "next": "Next",
+      "back": "Back",
+      "send": "Send for signature",
+      "saveDraft": "Save draft",
+      "steps": {
+        "upload": {
+          "label": "Document",
+          "title": "Upload your document",
+          "subtitle": "Supports PDF, Word and templates with dynamic variables.",
+          "drag": "Drag files here or click to upload",
+          "types": "PDF, DOCX, DOC — up to 25 MB",
+          "useTemplate": "Use template",
+          "uploaded": "Document uploaded",
+          "pages": "pages",
+          "vars": "variables detected"
+        },
+        "signers": {
+          "label": "Signers",
+          "title": "Add signers",
+          "subtitle": "Set signing order, assign roles and permissions.",
+          "addSigner": "Add signer",
+          "name": "Name",
+          "email": "Email",
+          "role": "Role",
+          "order": "Order",
+          "modes": {
+            "parallel": "Parallel",
+            "sequential": "Sequential",
+            "conditional": "Conditional"
+          },
+          "roles": {
+            "signer": "Signer",
+            "approver": "Approver",
+            "viewer": "Viewer",
+            "witness": "Witness"
+          }
+        },
+        "fields": {
+          "label": "Fields",
+          "title": "Place fields on the document",
+          "subtitle": "Drag fields onto the document at the desired position.",
+          "palette": "Palette",
+          "types": {
+            "signature": "Signature",
+            "initials": "Initials",
+            "date": "Date",
+            "text": "Text",
+            "checkbox": "Checkbox"
+          },
+          "preview": "Document preview",
+          "pagePlaceholder": "Page 1 of 3",
+          "dropHere": "Drop here",
+          "fieldsPlaced": "fields placed"
+        },
+        "security": {
+          "label": "Security",
+          "title": "Authentication and settings",
+          "subtitle": "Choose how each signer authenticates and set the reminder cadence.",
+          "authMethod": "Authentication method",
+          "auth": {
+            "sms": "SMS OTP",
+            "email": "Email OTP",
+            "kyc": "KYC (ID + selfie)",
+            "video": "Recorded video",
+            "biometric": "Biometrics"
+          },
+          "expiry": "Expiration (days)",
+          "reminders": "Reminders every",
+          "days": "days",
+          "signatureType": "Signature type",
+          "redlines": "Pre-signing negotiation (redlines)",
+          "redlinesHelp": "Lets parties comment and propose changes before signing."
+        }
+      }
+    },
+    "types": {
+      "title": "Supported signature types",
+      "simple": "Simple",
+      "simpleDesc": "Click-to-sign, ideal for internal agreements.",
+      "advanced": "Advanced",
+      "advancedDesc": "Signer identification, unique binding, and audit trail.",
+      "qualified": "Qualified (eIDAS)",
+      "qualifiedDesc": "Qualified digital certificate — legal equivalent of a handwritten signature in the EU.",
+      "ley527": "Law 527 CO",
+      "ley527Desc": "Certified electronic signature under Colombia's Law 527 of 1999."
+    },
+    "audit": {
+      "title": "Cryptographic audit trail",
+      "subtitle": "Immutable history with a hash chain and RFC 3161 timestamping.",
+      "documentHash": "Document hash",
+      "blockchainTs": "RFC 3161 blockchain timestamp",
+      "blockchainEnabled": "Enabled — anchored on public chain",
+      "blockchainDisabled": "Disabled",
+      "downloadCert": "Download certificate",
+      "timeline": "Timeline",
+      "events": {
+        "created": "Envelope created",
+        "sent": "Sent by email",
+        "viewed": "Document viewed",
+        "authenticated": "Signer authenticated",
+        "signed": "Document signed",
+        "completed": "Envelope completed",
+        "sealed": "Cryptographically sealed"
+      },
+      "fields": {
+        "ip": "IP",
+        "device": "Device",
+        "geo": "Location",
+        "hash": "Hash"
+      },
+      "close": "Close"
+    },
+    "templates": {
+      "title": "Templates with dynamic fields",
+      "subtitle": "Reuse common documents and bulk-send from CSV.",
+      "new": "New template",
+      "items": {
+        "nda": "Non-disclosure agreement (NDA)",
+        "labor": "Employment contract",
+        "service": "Service agreement",
+        "saas": "SaaS agreement",
+        "consent": "Informed consent",
+        "vendor": "Vendor agreement"
+      },
+      "fields": "fields",
+      "uses": "uses",
+      "bulk": "Bulk send from CSV",
+      "bulkDesc": "Upload a CSV with signer details and send hundreds of envelopes at once.",
+      "uploadCsv": "Upload CSV",
+      "previewBulk": "Preview batch",
+      "send": "Use template"
+    },
+    "api": {
+      "title": "API & embedded iframe",
+      "subtitle": "Embed signing in your product via our REST API or drop-in component.",
+      "tabs": {
+        "curl": "cURL",
+        "ts": "TypeScript",
+        "python": "Python"
+      },
+      "embedTitle": "Embedded signing page preview",
+      "embedDesc": "Embed a clean signing screen inside your app via signed iframe.",
+      "openDocs": "Open documentation",
+      "copy": "Copy",
+      "copied": "Copied"
+    },
+    "redlines": {
+      "title": "Pre-signing negotiation",
+      "subtitle": "Comments and suggestion mode before signing.",
+      "suggestMode": "Suggestion mode",
+      "comments": "Comments",
+      "addComment": "Add comment",
+      "accept": "Accept",
+      "reject": "Reject"
+    },
+    "integrations": {
+      "title": "Native integrations",
+      "subtitle": "Connect your CRM, ATS or HRIS without writing code.",
+      "items": {
+        "salesforce": "Salesforce",
+        "hubspot": "HubSpot",
+        "pipedrive": "Pipedrive",
+        "workday": "Workday",
+        "greenhouse": "Greenhouse",
+        "bamboohr": "BambooHR",
+        "slack": "Slack",
+        "googleDrive": "Google Drive"
+      },
+      "connect": "Connect"
+    },
+    "signer": {
+      "title": "Signer view",
+      "subtitle": "Clean, distraction-free screen — mobile ready.",
+      "from": "From",
+      "subject": "Signature required",
+      "instructions": "Please review the document and complete the highlighted fields.",
+      "field": "Required field",
+      "signHere": "Sign here",
+      "typeName": "Type your name",
+      "draw": "Draw",
+      "type": "Type",
+      "upload": "Upload image",
+      "agree": "I accept the electronic terms and consent to sign this document.",
+      "continue": "Sign and continue",
+      "secured": "Secure session — TLS encryption and device binding"
+    }
+  }
+}
