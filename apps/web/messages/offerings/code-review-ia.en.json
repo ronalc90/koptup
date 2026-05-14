@@ -1,0 +1,68 @@
+{
+  "offering_codeReviewIa": {
+    "name": "AI code review",
+    "tagline": "Get automated comments on every PR with suggestions and bug detection",
+    "description": "Custom build or monthly SaaS subscription of \"AI code review\". Buy it as software (we hand over the code) or pay monthly while we host it for you.",
+    "categoryLabel": "DevTools",
+    "tiers": {
+      "basico": {
+        "name": "Basic",
+        "description": "To validate the idea with a limited scope",
+        "idealPara": "Small teams getting started with pull requests reviewed",
+        "incluye": [
+          "Up to 200 PRs/month",
+          "GitHub 1 repo",
+          "Automated PR comments",
+          "Slack notify",
+          "Email support Mon–Fri 8AM–5PM Colombia, 24h business response"
+        ]
+      },
+      "profesional": {
+        "name": "Professional",
+        "description": "For teams with steady usage",
+        "idealPara": "SMBs with steady flow and pull requests reviewed",
+        "incluye": [
+          "Up to 3,000 PRs/month",
+          "Multi-repo GitHub/GitLab/Bitbucket",
+          "Jira/Linear ticket sync",
+          "Basic SAST (Semgrep)",
+          "VSCode IDE plugin",
+          "Email + WhatsApp support, 4h business response",
+          "Monthly tier reports"
+        ]
+      },
+      "avanzado": {
+        "name": "Advanced",
+        "description": "Multi-channel with high volume and personalization",
+        "idealPara": "Mid-market companies with high volumes of pull requests reviewed",
+        "incluye": [
+          "Up to 30,000 PRs/month",
+          "Deep-analysis reasoning LLMs",
+          "Custom security rules",
+          "Coverage + DORA metrics",
+          "Basic policy-as-code",
+          "Email + WhatsApp + Slack Connect support, 2h business response",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Corporate architecture with compliance alignment",
+        "idealPara": "Enterprises with compliance and thousands of pull requests reviewed",
+        "incluye": [
+          "Up to 300,000+ PRs/month",
+          "Azure DevOps + Perforce",
+          "Sonar/Snyk/Checkmarx adapter",
+          "Air-gapped option",
+          "Multi-org + SSO",
+          "Dedicated PM + tech lead",
+          "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      }
+    },
+    "costoNote": "LLM (~$80–$25,000 USD/mo) and enterprise SAST/SCA tools are paid by the customer directly to the provider."
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "offering_loyaltyFidelizacion": {
+    "name": "Programa de fidelización",
+    "tagline": "Premiá a tus clientes con puntos, niveles y campañas segmentadas",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Programa de fidelización\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Engagement",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con miembros activos",
+        "incluye": [
+          "Hasta 5.000 miembros + 10k tx/mes",
+          "POS retail",
+          "Email basic",
+          "Puntos por compra",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y miembros activos",
+        "incluye": [
+          "Hasta 200k miembros + 1M tx/mes",
+          "POS multi-sucursal",
+          "Ecommerce (Shopify/Woo)",
+          "WhatsApp campañas",
+          "CRM HubSpot",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de miembros activos",
+        "incluye": [
+          "Hasta 2M miembros + 25M tx/mes",
+          "Niveles y badges",
+          "Campañas segmentadas con LLM",
+          "Marketing automation",
+          "BI con churn forecasting",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de miembros activos",
+        "incluye": [
+          "Hasta 20M+ miembros + 250M+ tx/mes",
+          "CDP enterprise (Segment/RudderStack)",
+          "CRM enterprise (Salesforce/Dynamics)",
+          "Marketing automation (Braze/Iterable)",
+          "Multi-marca coalición",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "SMS/WhatsApp masivo (~$30–25.000 USD/mes) y CDP enterprise los paga el cliente directo al proveedor."
+  }
+}

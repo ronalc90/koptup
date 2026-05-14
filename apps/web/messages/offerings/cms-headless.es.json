@@ -1,0 +1,68 @@
+{
+  "offering_cmsHeadless": {
+    "name": "CMS headless",
+    "tagline": "Gestioná tu contenido desde un panel y publicalo en cualquier frontend",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"CMS headless\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Engagement",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con contenidos publicables",
+        "incluye": [
+          "Hasta 50.000 vistas/mes",
+          "Editor visual con bloques",
+          "Webhook a un frontend",
+          "Imágenes vía Cloudinary",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y contenidos publicables",
+        "incluye": [
+          "Hasta 1M vistas/mes",
+          "Multi-frontend (web + app + email)",
+          "GraphQL federado",
+          "A/B testing básico",
+          "PIM/DAM integrados",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de contenidos publicables",
+        "incluye": [
+          "Hasta 25M vistas/mes",
+          "Workflow editorial con aprobaciones",
+          "Personalización por segmento",
+          "Translation memory",
+          "Web vitals SLA aproximado",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de contenidos publicables",
+        "incluye": [
+          "Hasta 250M+ vistas/mes",
+          "Multi-marca y multi-idioma",
+          "DXP completo",
+          "SSO empresarial",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "CDN (~$20–6.000 USD/mes) y DAM premium los paga el cliente directo al proveedor."
+  }
+}

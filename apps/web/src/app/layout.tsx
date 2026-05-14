@@ -127,11 +127,11 @@ async function getMessages(locale: string) {
     }
   }
 
-  // Merge per-demo + per-service messages so client components resolve demoCrm, demosExtra, service_*, etc.
+  // Merge per-demo + per-offering messages so client components resolve demoCrm, demosExtra, offering_*, etc.
   try {
     const fs = await import('fs');
     const path = await import('path');
-    for (const subdir of ['demos', 'services', 'plans']) {
+    for (const subdir of ['demos', 'offerings']) {
       const dir = path.join(process.cwd(), 'messages', subdir);
       if (!fs.existsSync(dir)) continue;
       const files = fs.readdirSync(dir).filter((f) => f.endsWith(`.${locale}.json`));

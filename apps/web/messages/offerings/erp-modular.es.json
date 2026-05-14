@@ -1,0 +1,68 @@
+{
+  "offering_erpModular": {
+    "name": "ERP modular",
+    "tagline": "Contabilidad, inventarios, compras y facturación electrónica en un solo lugar",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"ERP modular\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Finanzas",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con asientos contables",
+        "incluye": [
+          "Hasta 1.500 transacciones/mes",
+          "Facturación electrónica DIAN",
+          "Inventarios simples",
+          "Wompi/PSE para cobros",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y asientos contables",
+        "incluye": [
+          "Hasta 30.000 transacciones/mes",
+          "Multi-empresa",
+          "Bancos vía PSE/API",
+          "WMS/POS integrados",
+          "Nómina electrónica",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de asientos contables",
+        "incluye": [
+          "Hasta 250.000 transacciones/mes",
+          "Treasury + cash pooling",
+          "Consolidación multi-NIIF",
+          "BI corporativo",
+          "EDI con proveedores",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de asientos contables",
+        "incluye": [
+          "Hasta 2.5M+ transacciones/mes",
+          "SAP/Oracle interop",
+          "Auditoría continua (SOX)",
+          "Multi-país (CO/MX/PE/CL)",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "Proveedor tecnológico DIAN (~$30–8.000 USD/mes) y conectores bancarios los paga el cliente directo al proveedor."
+  }
+}

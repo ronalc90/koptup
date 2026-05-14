@@ -1,0 +1,100 @@
+{
+  "offeringsCatalog": {
+    "hero": {
+      "title": "Plans and services",
+      "subtitle": "Choose how to work with us: buy the software (we hand over the source code) or subscribe to the monthly SaaS (we host it for you)."
+    },
+    "search": "Search...",
+    "modality": {
+      "label": "Modality",
+      "compra": "Buy the software",
+      "compraDesc": "One-time setup + optional maintenance. The source code stays with you.",
+      "saas": "Monthly SaaS subscription",
+      "saasDesc": "We host it, you pay monthly, cancel anytime."
+    },
+    "tier": {
+      "basico": "Basic",
+      "profesional": "Professional",
+      "avanzado": "Advanced",
+      "enterprise": "Enterprise"
+    },
+    "currency": {
+      "label": "Currency",
+      "cop": "COP",
+      "usd": "USD",
+      "trmLive": "Live FX rate {value} (datos.gov.co)",
+      "trmCached": "FX ~{value}"
+    },
+    "card": {
+      "viewMore": "View more details",
+      "viewDemo": "Try demo",
+      "fromPrice": "From",
+      "perMonth": "/mo",
+      "setupOnce": "One-time setup"
+    },
+    "modal": {
+      "close": "Close",
+      "quote": "Get a quote for this tier",
+      "incluye": "What's included",
+      "limits": "Tier limits",
+      "limitsAdminUsers": "Admin users",
+      "limitsEndUsers": "End users",
+      "limitsAccounts": "Accounts / tenants",
+      "limitsVolume": "Monthly volume",
+      "limitsStorage": "Storage",
+      "limitsUnlimited": "Unlimited",
+      "limitsNotApplicable": "N/A",
+      "support": "Support",
+      "costosCliente": "Costs paid by the customer",
+      "costosClienteNote": "API costs (OpenAI, Twilio) and infrastructure (AWS, GCP) are billed by the provider directly to the customer. We do not mark them up.",
+      "implementacion": "Implementation time",
+      "weeks": "weeks",
+      "hours": "hours",
+      "month": "month",
+      "comparison": "Compare tiers",
+      "maintenanceLabel": "Optional monthly maintenance",
+      "maintenanceNote": "You can maintain it yourself or hire our monthly maintenance.",
+      "monthlyLabel": "Monthly fee",
+      "monthlyNote": "Includes hosting, monitoring and support. No lock-in."
+    },
+    "banner": {
+      "title": "How we scale",
+      "body": "Colombia-based team operating Mon–Fri 8AM–5PM. We build software aligned with HIPAA/SOC 2/ISO 27001 but formal certification is the customer's responsibility. If you need more than the Enterprise tier, we provide a custom quote within 48 business hours."
+    },
+    "supportSLA": {
+      "email-24h": "Email business hours · 24h business response",
+      "email-whatsapp-4h": "Email + WhatsApp · 4h business response",
+      "email-whatsapp-slack-2h": "Email + WhatsApp + Slack · 2h business response",
+      "tickets-jira-zendesk-1h": "Jira/Zendesk with audit · 1h critical"
+    },
+    "integraciones": {
+      "basicas": "Basic",
+      "medias": "Medium",
+      "avanzadas": "Advanced",
+      "empresariales": "Enterprise"
+    },
+    "categories": {
+      "all": "All",
+      "sales": "Sales",
+      "finance": "Finance",
+      "operations": "Operations",
+      "productivity": "Productivity",
+      "aiPlatform": "AI Platform",
+      "security": "Security",
+      "healthcare": "HealthTech",
+      "education": "Education",
+      "commerce": "Commerce",
+      "support": "Support",
+      "devTools": "DevTools",
+      "voice": "Voice AI",
+      "data": "Data",
+      "engagement": "Engagement"
+    },
+    "noResults": "No results found for your search.",
+    "cta": {
+      "title": "Not sure which to pick?",
+      "body": "Talk to us and we will help you decide whether to buy the software or use our SaaS.",
+      "button": "Talk to an expert"
+    }
+  }
+}

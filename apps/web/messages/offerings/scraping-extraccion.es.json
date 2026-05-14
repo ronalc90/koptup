@@ -1,0 +1,68 @@
+{
+  "offering_scrapingExtraccion": {
+    "name": "Scraping y extracción de datos",
+    "tagline": "Recolectá datos de la web con proxies y parsing inteligente",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Scraping y extracción de datos\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Datos",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con páginas procesadas",
+        "incluye": [
+          "Hasta 25.000 páginas/mes",
+          "Selectores CSS/XPath",
+          "CSV/JSON export",
+          "Webhook por job",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y páginas procesadas",
+        "incluye": [
+          "Hasta 500.000 páginas/mes",
+          "Headless browsers managed",
+          "Proxies residenciales",
+          "Slack/Teams alertas",
+          "API REST para queries",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de páginas procesadas",
+        "incluye": [
+          "Hasta 10M páginas/mes",
+          "Browser farm dedicada",
+          "CDC + reverse ETL",
+          "Data quality checks",
+          "Snowflake/BigQuery output",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de páginas procesadas",
+        "incluye": [
+          "Hasta 100M+ páginas/mes",
+          "Cluster k8s con Playwright",
+          "Proxies enterprise multi-país",
+          "Kafka stream output",
+          "Auditoría legal (robots.txt, ToS)",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "Proxies (~$50–25.000 USD/mes), browser farms y captcha solvers los paga el cliente directo al proveedor."
+  }
+}

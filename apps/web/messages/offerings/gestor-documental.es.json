@@ -1,0 +1,68 @@
+{
+  "offering_gestorDocumental": {
+    "name": "Gestor documental con IA",
+    "tagline": "Ordená, buscá y firmá tus documentos con OCR e indexado por IA",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Gestor documental con IA\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Datos",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con PDF, Word y scans",
+        "incluye": [
+          "Hasta 2.000 documentos/mes",
+          "Upload manual y desde email",
+          "OCR básico Tesseract",
+          "Búsqueda por texto plano",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y PDF, Word y scans",
+        "incluye": [
+          "Hasta 50.000 documentos/mes",
+          "OCR avanzado (AWS Textract)",
+          "Integración SharePoint/OneDrive",
+          "Firmas electrónicas integradas",
+          "API REST + webhooks",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de PDF, Word y scans",
+        "incluye": [
+          "Hasta 500.000 documentos/mes",
+          "IDP con clasificación automática",
+          "Workflows BPMN configurables",
+          "Retention policies por tipo doc",
+          "DLP básico",
+          "Búsqueda semántica con LLM",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de PDF, Word y scans",
+        "incluye": [
+          "Hasta 5M+ documentos/mes",
+          "ECM enterprise (Documentum/OpenText)",
+          "SAP ArchiveLink adapter",
+          "eDiscovery legal",
+          "Retención WORM",
+          "Clasificación con custom ML",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "OCR (~$30–10.000 USD/mes), storage y LLM los paga el cliente directo al proveedor."
+  }
+}

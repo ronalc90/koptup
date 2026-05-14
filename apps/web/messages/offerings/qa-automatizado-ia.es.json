@@ -1,0 +1,68 @@
+{
+  "offering_qaAutomatizadoIa": {
+    "name": "QA automatizado con IA",
+    "tagline": "Generá y mantené suites de tests E2E con IA",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"QA automatizado con IA\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "DevTools",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con corridas de pruebas",
+        "incluye": [
+          "Hasta 1.000 test runs/mes",
+          "GitHub Actions",
+          "Slack notify",
+          "Playwright runners",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y corridas de pruebas",
+        "incluye": [
+          "Hasta 25.000 test runs/mes",
+          "Multi-CI (GitHub/GitLab/Bitbucket)",
+          "Jira/TestRail sync",
+          "BrowserStack/Sauce",
+          "Code coverage reports",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de corridas de pruebas",
+        "incluye": [
+          "Hasta 250.000 test runs/mes",
+          "Mantenimiento automático de selectores",
+          "Visual regression",
+          "API contract testing (Pact)",
+          "Performance básico (k6)",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de corridas de pruebas",
+        "incluye": [
+          "Hasta 2.5M+ test runs/mes",
+          "Azure DevOps + Jenkins",
+          "XRay enterprise",
+          "Device farm enterprise",
+          "DORA + flaky tests analytics",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "LLMs (~$80–25.000 USD/mes), BrowserStack/Sauce y device farms los paga el cliente directo al proveedor."
+  }
+}

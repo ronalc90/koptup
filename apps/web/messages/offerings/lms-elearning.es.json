@@ -1,0 +1,68 @@
+{
+  "offering_lmsElearning": {
+    "name": "LMS de e-learning",
+    "tagline": "Lanzá cursos online con pagos, certificados y proctoring",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"LMS de e-learning\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Educación",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con estudiantes activos",
+        "incluye": [
+          "Hasta 1.000 inscripciones/mes",
+          "Stripe/Wompi para pagos",
+          "Zoom manual",
+          "Email recordatorios",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y estudiantes activos",
+        "incluye": [
+          "Hasta 20.000 inscripciones/mes",
+          "Zoom auto-create",
+          "SCORM/xAPI compatible",
+          "HRMS para certificaciones",
+          "Proctoring básico",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de estudiantes activos",
+        "incluye": [
+          "Hasta 200.000 inscripciones/mes",
+          "LTI 1.3",
+          "Proctoring AI (ProctorU)",
+          "Talent Management adapter",
+          "Multi-tenant por sede",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de estudiantes activos",
+        "incluye": [
+          "Hasta 2M+ inscripciones/mes",
+          "SAP SuccessFactors / Workday Learning",
+          "Live streaming HD multi-región",
+          "SSO + SCIM",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "Video hosting (~$50–20.000 USD/mes), proctoring y LLM los paga el cliente directo al proveedor."
+  }
+}

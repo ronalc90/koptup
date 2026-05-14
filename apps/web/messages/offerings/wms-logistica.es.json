@@ -1,0 +1,68 @@
+{
+  "offering_wmsLogistica": {
+    "name": "WMS logística",
+    "tagline": "Controlá tu bodega con scanner, picking y carriers integrados",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"WMS logística\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Operaciones",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con pedidos despachados",
+        "incluye": [
+          "Hasta 1.000 órdenes/mes (1 bodega)",
+          "Scanner USB/Bluetooth",
+          "CSV import de SKUs",
+          "Picking + packing básicos",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y pedidos despachados",
+        "incluye": [
+          "Hasta 20.000 órdenes/mes (5 bodegas)",
+          "ERP (SAP B1/Siigo) sync",
+          "Carriers Servientrega/TCC/Coordinadora",
+          "Marketplaces (ML/Amazon)",
+          "RFID readers",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de pedidos despachados",
+        "incluye": [
+          "Hasta 200.000 órdenes/mes (25 bodegas)",
+          "Multi-bodega",
+          "TMS rutas dinámicas",
+          "IoT cadena de frío básico",
+          "Reportes Power BI",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de pedidos despachados",
+        "incluye": [
+          "Hasta 2.5M+ órdenes/mes (bodegas ilimitadas)",
+          "SAP EWM / Oracle WMS interop",
+          "Multi-país multi-modal",
+          "Yard management",
+          "ASN/EDI con proveedores",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "APIs de carriers (~$50–6.000 USD/mes) e IoT cadena de frío los paga el cliente directo al proveedor."
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "offering_erpModular": {
+    "name": "Modular ERP",
+    "tagline": "Accounting, inventory, purchasing and e-invoicing in one place",
+    "description": "Custom build or monthly SaaS subscription of \"Modular ERP\". Buy it as software (we hand over the code) or pay monthly while we host it for you.",
+    "categoryLabel": "Finance",
+    "tiers": {
+      "basico": {
+        "name": "Basic",
+        "description": "To validate the idea with a limited scope",
+        "idealPara": "Small teams getting started with accounting entries",
+        "incluye": [
+          "Up to 1,500 transactions/month",
+          "DIAN electronic invoicing",
+          "Simple inventory",
+          "Wompi/PSE for payments",
+          "Email support Mon–Fri 8AM–5PM Colombia, 24h business response"
+        ]
+      },
+      "profesional": {
+        "name": "Professional",
+        "description": "For teams with steady usage",
+        "idealPara": "SMBs with steady flow and accounting entries",
+        "incluye": [
+          "Up to 30,000 transactions/month",
+          "Multi-company",
+          "Banks via PSE/API",
+          "Integrated WMS/POS",
+          "Electronic payroll",
+          "Email + WhatsApp support, 4h business response",
+          "Monthly tier reports"
+        ]
+      },
+      "avanzado": {
+        "name": "Advanced",
+        "description": "Multi-channel with high volume and personalization",
+        "idealPara": "Mid-market companies with high volumes of accounting entries",
+        "incluye": [
+          "Up to 250,000 transactions/month",
+          "Treasury + cash pooling",
+          "Multi-IFRS consolidation",
+          "Corporate BI",
+          "EDI with suppliers",
+          "Email + WhatsApp + Slack Connect support, 2h business response",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Corporate architecture with compliance alignment",
+        "idealPara": "Enterprises with compliance and thousands of accounting entries",
+        "incluye": [
+          "Up to 2.5M+ transactions/month",
+          "SAP/Oracle interop",
+          "Continuous SOX auditing",
+          "Multi-country (CO/MX/PE/CL)",
+          "Dedicated PM + tech lead",
+          "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",
+          "Monthly tier reports",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      }
+    },
+    "costoNote": "DIAN technology provider (~$30–$8,000 USD/mo) and bank connectors are paid by the customer directly to the provider."
+  }
+}

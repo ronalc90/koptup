@@ -1,0 +1,68 @@
+{
+  "offering_gestionProyectos": {
+    "name": "Project management",
+    "tagline": "Track projects, tasks and time with boards and integrations",
+    "description": "Custom build or monthly SaaS subscription of \"Project management\". Buy it as software (we hand over the code) or pay monthly while we host it for you.",
+    "categoryLabel": "Productivity",
+    "tiers": {
+      "basico": {
+        "name": "Basic",
+        "description": "To validate the idea with a limited scope",
+        "idealPara": "Small teams getting started with concurrent projects",
+        "incluye": [
+          "Up to 25 active projects",
+          "Kanban boards + lists",
+          "Basic time tracking",
+          "Comments and mentions",
+          "Email support Mon–Fri 8AM–5PM Colombia, 24h business response"
+        ]
+      },
+      "profesional": {
+        "name": "Professional",
+        "description": "For teams with steady usage",
+        "idealPara": "SMBs with steady flow and concurrent projects",
+        "incluye": [
+          "Up to 250 active projects",
+          "Jira/Linear sync",
+          "GitHub/GitLab branch sync",
+          "Capacity reports per team",
+          "Tempo/Harvest time tracking",
+          "Email + WhatsApp support, 4h business response",
+          "Monthly tier reports"
+        ]
+      },
+      "avanzado": {
+        "name": "Advanced",
+        "description": "Multi-channel with high volume and personalization",
+        "idealPara": "Mid-market companies with high volumes of concurrent projects",
+        "incluye": [
+          "Up to 2,500 active projects",
+          "Gantt and dependencies",
+          "AI forecasting",
+          "Skill-based ResourceManager",
+          "Multi-portfolio",
+          "Custom fields",
+          "Email + WhatsApp + Slack Connect support, 2h business response",
+          "Monthly tier reports"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Corporate architecture with compliance alignment",
+        "idealPara": "Enterprises with compliance and thousands of concurrent projects",
+        "incluye": [
+          "Up to 25,000+ active projects",
+          "Azure DevOps + ServiceNow",
+          "PPM portfolio management",
+          "Power BI/Tableau dashboards",
+          "SSO + SCIM",
+          "Dedicated PM + tech lead",
+          "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      }
+    },
+    "costoNote": "Premium connectors and enterprise integrations are paid by the customer directly to the provider."
+  }
+}

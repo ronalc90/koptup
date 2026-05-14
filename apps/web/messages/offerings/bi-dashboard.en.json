@@ -1,0 +1,68 @@
+{
+  "offering_biDashboard": {
+    "name": "Executive BI Dashboard with AI",
+    "tagline": "All your KPIs in one dashboard, with AI-generated summaries",
+    "description": "Visualize sales, finance and operations in real time with automatic explanations and forecasting. Delivered as software or monthly SaaS.",
+    "categoryLabel": "AI Platform",
+    "tiers": {
+      "basico": {
+        "name": "Basic",
+        "description": "For SMBs that want clear KPIs without hiring a BI manager",
+        "idealPara": "Teams up to 50 people with data in Sheets or Postgres",
+        "incluye": [
+          "Up to 100,000 rows processed per month",
+          "CSV, Google Sheets and Postgres connectors",
+          "Up to 5 dashboards with pre-built widgets",
+          "Optional automated executive summaries",
+          "Email support Mon–Fri 8AM–5PM Colombia, 24h business response"
+        ]
+      },
+      "profesional": {
+        "name": "Professional",
+        "description": "BI with warehouse and forecasting for mid-market companies",
+        "idealPara": "Companies with data in ERP, CRM and marketing tools",
+        "incluye": [
+          "Up to 1M rows processed per month",
+          "Optional warehouse (BigQuery or Snowflake)",
+          "ERP (Siigo, SAP B1) and CRM (HubSpot) connectors",
+          "AI forecasting per business line",
+          "Slack/Teams alerts for KPI deviations",
+          "Team permissions and basic row-level security",
+          "Email + WhatsApp support, 4h business response"
+        ]
+      },
+      "avanzado": {
+        "name": "Advanced",
+        "description": "Multi-source BI with near real-time dashboards",
+        "idealPara": "Mid-large operations with multi-channel analytics",
+        "incluye": [
+          "Up to 25M rows processed per month",
+          "Enterprise warehouse with near real-time CDC",
+          "Federated sources (ERP + CRM + marketing + ops)",
+          "Advanced forecasting and AI anomaly detection",
+          "Granular row-level security per user",
+          "Scheduled exports to Excel/PowerPoint",
+          "Team workspaces with private dashboards",
+          "Email + WhatsApp + Slack Connect support, 2h business response"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Corporate BI with governance and multi-warehouse",
+        "idealPara": "Enterprises with compliance and multiple business units",
+        "incluye": [
+          "250M+ rows processed per month",
+          "Multi-warehouse federation (Snowflake + Databricks)",
+          "Corporate data lineage and governance",
+          "Architecture aligned with SOC 2/ISO 27001 (certification at customer expense)",
+          "Multi-tenant row-level security per business unit",
+          "SSO SAML/OIDC + SCIM provisioning",
+          "PM + tech lead assigned",
+          "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",
+          "Monthly executive reports for your committee"
+        ]
+      }
+    },
+    "costoNote": "Warehouse costs (BigQuery/Snowflake ~$50–$20,000 USD/mo) and LLM costs are paid by the customer directly to the provider."
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "offering_crmIa": {
+    "name": "CRM con IA",
+    "tagline": "Cerrá más negocios con lead scoring y drafting automático",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"CRM con IA\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Ventas",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con leads gestionados",
+        "incluye": [
+          "Hasta 2.000 contactos + 500 deals/mes",
+          "Gmail/Outlook 1 cuenta",
+          "CSV import",
+          "Lead scoring con IA",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y leads gestionados",
+        "incluye": [
+          "Hasta 15.000 contactos + 5k deals/mes",
+          "Gmail multi-cuenta",
+          "WhatsApp Business API",
+          "Marketing emails (Mailchimp)",
+          "Telefonía Twilio",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de leads gestionados",
+        "incluye": [
+          "Hasta 75.000 contactos + 25k deals/mes",
+          "Drafting de emails con IA",
+          "Pipeline forecasting",
+          "Marketing automation con segmentos",
+          "CPQ básico",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de leads gestionados",
+        "incluye": [
+          "Hasta 250k+ contactos + 100k deals/mes",
+          "Marketing enterprise (Marketo/Eloqua)",
+          "Call center omnicanal",
+          "Data warehouse + reverse ETL",
+          "SSO + SCIM",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "LLM para scoring (~$50–10.000 USD/mes), telefonía y email Pro los paga el cliente directo al proveedor."
+  }
+}

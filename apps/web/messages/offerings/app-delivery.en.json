@@ -1,0 +1,68 @@
+{
+  "offering_appDelivery": {
+    "name": "Delivery app",
+    "tagline": "Orders, dynamic routes and rider app with live maps",
+    "description": "Custom build or monthly SaaS subscription of \"Delivery app\". Buy it as software (we hand over the code) or pay monthly while we host it for you.",
+    "categoryLabel": "Operations",
+    "tiers": {
+      "basico": {
+        "name": "Basic",
+        "description": "To validate the idea with a limited scope",
+        "idealPara": "Small teams getting started with completed deliveries",
+        "incluye": [
+          "Up to 1,000 orders/month (1 city)",
+          "Stripe/Wompi",
+          "Basic Google Maps",
+          "Order + tracking app",
+          "Email support Mon–Fri 8AM–5PM Colombia, 24h business response"
+        ]
+      },
+      "profesional": {
+        "name": "Professional",
+        "description": "For teams with steady usage",
+        "idealPara": "SMBs with steady flow and completed deliveries",
+        "incluye": [
+          "Up to 20,000 orders/month (10 cities)",
+          "Multi-gateway (Stripe/Wompi/PayU)",
+          "Dynamic routes with TMS",
+          "WhatsApp Business",
+          "Restaurant POS",
+          "Email + WhatsApp support, 4h business response",
+          "Monthly tier reports"
+        ]
+      },
+      "avanzado": {
+        "name": "Advanced",
+        "description": "Multi-channel with high volume and personalization",
+        "idealPara": "Mid-market companies with high volumes of completed deliveries",
+        "incluye": [
+          "Up to 200,000 orders/month (50 cities)",
+          "Demand-based ML routing",
+          "Multi-restaurant marketplace",
+          "Integrated loyalty/cashback",
+          "Rider labor compliance",
+          "Email + WhatsApp + Slack Connect support, 2h business response",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Corporate architecture with compliance alignment",
+        "idealPara": "Enterprises with compliance and thousands of completed deliveries",
+        "incluye": [
+          "Up to 2.5M+ orders/month (unlimited cities)",
+          "Enterprise OMS/ERP",
+          "Enterprise Maps Platform",
+          "Multi-tenant for franchises",
+          "Fraud + chargeback ML",
+          "Dedicated PM + tech lead",
+          "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      }
+    },
+    "costoNote": "Maps Platform (~$150–$30,000 USD/mo), telephony and push are paid by the customer directly to the provider."
+  }
+}

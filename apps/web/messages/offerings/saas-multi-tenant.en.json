@@ -1,0 +1,68 @@
+{
+  "offering_saasMultiTenant": {
+    "name": "Multi-tenant SaaS platform",
+    "tagline": "Launch your own SaaS with billing, auth and tenant isolation",
+    "description": "Custom build or monthly SaaS subscription of \"Multi-tenant SaaS platform\". Buy it as software (we hand over the code) or pay monthly while we host it for you.",
+    "categoryLabel": "Security",
+    "tiers": {
+      "basico": {
+        "name": "Basic",
+        "description": "To validate the idea with a limited scope",
+        "idealPara": "Small teams getting started with requests processed",
+        "incluye": [
+          "Up to 10k requests/mo + 5 tenants",
+          "Stripe billing",
+          "Email/password auth",
+          "Row-level tenant isolation",
+          "Email support Mon–Fri 8AM–5PM Colombia, 24h business response"
+        ]
+      },
+      "profesional": {
+        "name": "Professional",
+        "description": "For teams with steady usage",
+        "idealPara": "SMBs with steady flow and requests processed",
+        "incluye": [
+          "Up to 1M requests/mo + 50 tenants",
+          "Stripe metered",
+          "OAuth (Google/MS/Apple)",
+          "Per-tenant custom domains",
+          "Basic audit log",
+          "Email + WhatsApp support, 4h business response",
+          "Monthly tier reports"
+        ]
+      },
+      "avanzado": {
+        "name": "Advanced",
+        "description": "Multi-channel with high volume and personalization",
+        "idealPara": "Mid-market companies with high volumes of requests processed",
+        "incluye": [
+          "Up to 25M requests/mo + 200 tenants",
+          "MFA + advanced audit logs",
+          "Schema-level tenant isolation",
+          "Regional data residency",
+          "API gateway with rate limit",
+          "Email + WhatsApp + Slack Connect support, 2h business response",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Corporate architecture with compliance alignment",
+        "idealPara": "Enterprises with compliance and thousands of requests processed",
+        "incluye": [
+          "Up to 250M+ requests/mo (unlimited tenants)",
+          "Per-tenant SSO SAML/OIDC",
+          "SCIM provisioning",
+          "Dedicated-DB tenant isolation",
+          "Architecture aligned with SOC 2/ISO 27001 (certification at customer expense)",
+          "Dedicated PM + tech lead",
+          "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      }
+    },
+    "costoNote": "Auth0/Clerk (~$50–$6,000 USD/mo) and multi-region infrastructure are paid by the customer directly to the provider."
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "offering_ecommerce": {
+    "name": "Ecommerce Storefront",
+    "tagline": "Sell online with catalog, cart and integrated payments",
+    "description": "Ecommerce platform with catalog, checkout and payment gateway. Buy it as software (source code included) or use the monthly hosted subscription.",
+    "categoryLabel": "Commerce",
+    "tiers": {
+      "basico": {
+        "name": "Basic",
+        "description": "Storefront ready for the first 1,000 orders/month",
+        "idealPara": "Startups and SMBs just going online",
+        "incluye": [
+          "Up to 1,000 orders per month",
+          "Catalog with variants and simple stock",
+          "Stripe or Wompi gateway",
+          "Shipping via Servientrega/Coordinadora (manual)",
+          "Email support Mon–Fri 8AM–5PM Colombia, 24h business response"
+        ]
+      },
+      "profesional": {
+        "name": "Professional",
+        "description": "For stores with 10k orders and automated tracking",
+        "idealPara": "Growing brands with multiple categories shipping in Colombia",
+        "incluye": [
+          "Up to 10,000 orders per month",
+          "Multi-gateway (Stripe, Wompi, PayU)",
+          "Automated tracking Servientrega/TCC/Coordinadora",
+          "Email marketing with basic segmentation",
+          "ERP integration (Siigo) or marketplaces (Mercado Libre)",
+          "Sales dashboard and weekly reports",
+          "Email + WhatsApp support, 4h business response"
+        ]
+      },
+      "avanzado": {
+        "name": "Advanced",
+        "description": "Multi-channel with advanced search and anti-fraud",
+        "idealPara": "Mid-market retailers with large catalogs and complex promos",
+        "incluye": [
+          "Up to 75,000 orders per month",
+          "Algolia search and faceted filters",
+          "Anti-fraud with rules + Stripe Radar",
+          "Connected OMS/WMS for multi-warehouse",
+          "B2B and B2C in the same store",
+          "Marketing automation with dynamic segments",
+          "Executive reports and Data Warehouse exports",
+          "Email + WhatsApp + Slack Connect support, 2h business response"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Multi-country with PCI-DSS-aligned architecture and EDI",
+        "idealPara": "Chains and holdings operating in multiple countries",
+        "incluye": [
+          "Volumes of 250,000+ orders per month",
+          "Multi-country, multi-currency and multi-language",
+          "Private B2B catalogs with negotiated pricing",
+          "EDI with suppliers and carriers",
+          "Dedicated PIM and DAM for assets",
+          "Architecture aligned with PCI-DSS (certification at customer expense)",
+          "PM + tech lead assigned",
+          "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",
+          "Monthly executive reports for your committee"
+        ]
+      }
+    },
+    "costoNote": "Gateway fees (Stripe/Wompi ~2.9% + $0.30 per tx), hosting and transactional email are paid by the customer directly to the provider."
+  }
+}

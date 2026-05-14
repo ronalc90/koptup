@@ -1,0 +1,68 @@
+{
+  "offering_hrms": {
+    "name": "HRMS",
+    "tagline": "Manage employees, payroll and labor compliance",
+    "description": "Custom build or monthly SaaS subscription of \"HRMS\". Buy it as software (we hand over the code) or pay monthly while we host it for you.",
+    "categoryLabel": "Sales",
+    "tiers": {
+      "basico": {
+        "name": "Basic",
+        "description": "To validate the idea with a limited scope",
+        "idealPara": "Small teams getting started with workforce headcount",
+        "incluye": [
+          "Up to 50 employees",
+          "DIAN electronic payroll",
+          "PILA/Aportes en Línea",
+          "Email to employees",
+          "Email support Mon–Fri 8AM–5PM Colombia, 24h business response"
+        ]
+      },
+      "profesional": {
+        "name": "Professional",
+        "description": "For teams with steady usage",
+        "idealPara": "SMBs with steady flow and workforce headcount",
+        "incluye": [
+          "Up to 1,500 employees",
+          "ATS recruiting",
+          "Training LMS",
+          "Bonuses/Sodexo",
+          "360 performance reviews",
+          "Email + WhatsApp support, 4h business response",
+          "Monthly tier reports"
+        ]
+      },
+      "avanzado": {
+        "name": "Advanced",
+        "description": "Multi-channel with high volume and personalization",
+        "idealPara": "Mid-market companies with high volumes of workforce headcount",
+        "incluye": [
+          "Up to 12,000 employees",
+          "Talent + Comp + Performance",
+          "BI with HR analytics",
+          "Multi-company",
+          "Onboarding workflow",
+          "Email + WhatsApp + Slack Connect support, 2h business response",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Corporate architecture with compliance alignment",
+        "idealPara": "Enterprises with compliance and thousands of workforce headcount",
+        "incluye": [
+          "Up to 100,000+ employees",
+          "SAP SuccessFactors / Workday adapter",
+          "Multi-country compliance (CO/MX/PE)",
+          "SSO + SCIM",
+          "Dedicated PM + tech lead",
+          "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",
+          "Monthly tier reports",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      }
+    },
+    "costoNote": "PILA/Aportes en Línea (~$30–$6,000 USD/mo) is paid by the customer directly to the provider."
+  }
+}

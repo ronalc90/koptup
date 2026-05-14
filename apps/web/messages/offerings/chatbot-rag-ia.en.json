@@ -1,0 +1,68 @@
+{
+  "offering_chatbotRagIa": {
+    "name": "AI RAG Chatbot",
+    "tagline": "Virtual assistant that understands your business",
+    "description": "Conversational bot trained on your knowledge base. Buy it as custom software (we hand over the code) or subscribe to the monthly SaaS hosted by us.",
+    "categoryLabel": "AI Platform",
+    "tiers": {
+      "basico": {
+        "name": "Basic",
+        "description": "To validate the idea with limited scope",
+        "idealPara": "SMBs with up to 5,000 conversations per month",
+        "incluye": [
+          "Up to 5,000 conversations per month",
+          "1 knowledge source (PDF, Notion or website)",
+          "Embeddable web widget",
+          "Subtle KopTup branding on the widget",
+          "Email support Mon–Fri 8AM–5PM Colombia, 24h business response"
+        ]
+      },
+      "profesional": {
+        "name": "Professional",
+        "description": "For SMBs with an active customer service team",
+        "idealPara": "Teams with 10–30 agents handling 25k conversations per month",
+        "incluye": [
+          "Up to 25,000 conversations per month",
+          "Up to 5 knowledge sources with scheduled retraining",
+          "WhatsApp Business + 2 extra channels",
+          "Human handoff and weekly reports",
+          "Integration with your CRM (HubSpot, Salesforce)",
+          "Metrics dashboard with CSAT and top topics",
+          "Email + WhatsApp support, 4h business response"
+        ]
+      },
+      "avanzado": {
+        "name": "Advanced",
+        "description": "Multi-channel with deep personalization",
+        "idealPara": "Mid-market companies with steady traffic and automatable processes",
+        "incluye": [
+          "Up to 100,000 conversations per month",
+          "Up to 25 sources with hourly auto-sync",
+          "Multi-channel (web, WhatsApp, Telegram, Messenger)",
+          "Configurable workflows and A/B testing of replies",
+          "Helpdesk integration (Zendesk, Jira Service Desk)",
+          "Executive reports and Data Warehouse exports",
+          "Prompt fine-tuning panel per team",
+          "Email + WhatsApp + Slack Connect support, 2h business response"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Multi-tenant with compliance-aligned architecture",
+        "idealPara": "Enterprises with multiple verticals and compliance requirements",
+        "incluye": [
+          "Volumes of 500,000+ conversations per month",
+          "Unlimited sources with real-time sync",
+          "Multi-tenant for multiple brands or business units",
+          "Optional private or on-prem models",
+          "SSO SAML/OIDC + access audit logs",
+          "Architecture aligned with HIPAA/SOC 2/ISO 27001 (certification at customer expense)",
+          "PM + tech lead assigned during rollout",
+          "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",
+          "Monthly executive reports for your committee"
+        ]
+      }
+    },
+    "costoNote": "OpenAI/Anthropic costs (~$80–$4,500 USD/mo by usage) and hosting/vector DB (~$50–$10,000 USD/mo) are billed by the provider directly to the customer."
+  }
+}

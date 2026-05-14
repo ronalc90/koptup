@@ -1,0 +1,68 @@
+{
+  "offering_moderacionContenido": {
+    "name": "Content moderation",
+    "tagline": "Filter text, images and video with combined classifiers",
+    "description": "Custom build or monthly SaaS subscription of \"Content moderation\". Buy it as software (we hand over the code) or pay monthly while we host it for you.",
+    "categoryLabel": "Security",
+    "tiers": {
+      "basico": {
+        "name": "Basic",
+        "description": "To validate the idea with a limited scope",
+        "idealPara": "Small teams getting started with content items analyzed",
+        "incluye": [
+          "Up to 25,000 items moderated/month",
+          "REST API",
+          "Review dashboard",
+          "OpenAI moderation + GPT-4o-mini",
+          "Email support Mon–Fri 8AM–5PM Colombia, 24h business response"
+        ]
+      },
+      "profesional": {
+        "name": "Professional",
+        "description": "For teams with steady usage",
+        "idealPara": "SMBs with steady flow and content items analyzed",
+        "incluye": [
+          "Up to 1M items moderated/month",
+          "Multi-modal (text + image)",
+          "Human reviewer queue",
+          "CMS/CRM hooks",
+          "Discord/Slack alerts",
+          "Email + WhatsApp support, 4h business response",
+          "Monthly tier reports"
+        ]
+      },
+      "avanzado": {
+        "name": "Advanced",
+        "description": "Multi-channel with high volume and personalization",
+        "idealPara": "Mid-market companies with high volumes of content items analyzed",
+        "incluye": [
+          "Up to 25M items moderated/month",
+          "Audio/video moderation",
+          "Per-channel custom rules",
+          "Trust & Safety workflow",
+          "Per-category metrics",
+          "Email + WhatsApp + Slack Connect support, 2h business response",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Corporate architecture with compliance alignment",
+        "idealPara": "Enterprises with compliance and thousands of content items analyzed",
+        "incluye": [
+          "Up to 250M+ items moderated/month",
+          "Custom ML trained on your data",
+          "DSA (EU) + COPPA compliance",
+          "BPO/outsourcing handoff",
+          "Dedicated PM + tech lead",
+          "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",
+          "Monthly tier reports",
+          "Monthly tier reports",
+          "Monthly tier reports"
+        ]
+      }
+    },
+    "costoNote": "OpenAI Moderation + Hive/Rekognition (~$80–$25,000 USD/mo) are paid by the customer directly to the provider."
+  }
+}

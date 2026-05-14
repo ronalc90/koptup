@@ -1,0 +1,68 @@
+{
+  "offering_facturacionElectronica": {
+    "name": "Facturación electrónica",
+    "tagline": "Emití facturas DIAN con multi-resolución y nómina electrónica",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Facturación electrónica\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "categoryLabel": "Finanzas",
+    "tiers": {
+      "basico": {
+        "name": "Básico",
+        "description": "Para validar la idea con un alcance acotado",
+        "idealPara": "Equipos pequeños que recién arrancan con documentos electrónicos",
+        "incluye": [
+          "Hasta 200 facturas/mes",
+          "Emisión DIAN",
+          "Envío por email",
+          "CSV import",
+          "Soporte por email Lun–Vie 8AM–5PM Colombia, 24h hábiles"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Para equipos con uso constante",
+        "idealPara": "PYMEs con flujo constante y documentos electrónicos",
+        "incluye": [
+          "Hasta 5.000 facturas/mes",
+          "ERP (Siigo/SAP B1/World Office)",
+          "Bancos para conciliación",
+          "POS integrado",
+          "Multi-resoluciones DIAN",
+          "Soporte por email + WhatsApp, 4h hábiles",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "avanzado": {
+        "name": "Avanzado",
+        "description": "Multi-canal con alto volumen y personalización",
+        "idealPara": "Empresas medianas con alto volumen de documentos electrónicos",
+        "incluye": [
+          "Hasta 50.000 facturas/mes",
+          "Multi-país (CO/MX/PE/CL)",
+          "RADIAN + nómina electrónica",
+          "Auditoría + libros oficiales",
+          "EDI con clientes B2B",
+          "Soporte por email + WhatsApp + Slack Connect, 2h hábiles",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Arquitectura corporativa con compliance alineado",
+        "idealPara": "Corporaciones con compliance y miles de documentos electrónicos",
+        "incluye": [
+          "Hasta 500.000+ facturas/mes",
+          "SAP S/4HANA / Oracle adapter",
+          "Arquitectura alineada con SOX (certificación a cargo del cliente)",
+          "PM + tech lead asignados",
+          "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier",
+          "Reportes mensuales del tier"
+        ]
+      }
+    },
+    "costoNote": "Proveedor tecnológico DIAN (~$30–6.000 USD/mes) lo paga el cliente directo al proveedor."
+  }
+}
