@@ -30,6 +30,8 @@ Cada demo es una aplicación interactiva navegable, con datos simulados realista
 
 | SaaS boilerplate | Plataforma | Base multitenant con autenticación, planes y suscripciones, billing, RBAC y panel de administración. | [Ver demo](./apps/web/src/app/demo/saas-boilerplate/) |
 
+| Voice AI | IA conversacional | Agente de voz con reconocimiento de habla, NLU, síntesis de voz y orquestación de llamadas inbound/outbound. | [Ver demo](./apps/web/src/app/demo/voice-ai/) |
+
 ## 🚀 Stack Tecnológico
 
 ### Frontend
