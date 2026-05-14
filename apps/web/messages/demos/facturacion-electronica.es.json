@@ -1,0 +1,319 @@
+{
+  "demoBilling": {
+    "pageTitle": "Facturación Electrónica multi-país",
+    "pageSubtitle": "Plataforma fiscal unificada para LATAM: emite, recibe, valida y almacena documentos con cumplimiento normativo en 8 países.",
+    "back": "Volver a demos",
+    "selectCountry": "País fiscal",
+    "selectCountryHelp": "Cambia el régimen, los identificadores tributarios y los impuestos aplicados.",
+    "countries": {
+      "colombia": {
+        "name": "Colombia",
+        "authority": "DIAN",
+        "currency": "COP",
+        "currencySymbol": "$",
+        "taxId": "NIT",
+        "docPrefix": "FE",
+        "vat": "IVA 19%",
+        "extraTax": "ReteIVA 15%",
+        "ica": "ICA 11.04 x mil",
+        "storageYears": "10"
+      },
+      "mexico": {
+        "name": "México",
+        "authority": "SAT",
+        "currency": "MXN",
+        "currencySymbol": "$",
+        "taxId": "RFC",
+        "docPrefix": "CFDI",
+        "vat": "IVA 16%",
+        "extraTax": "ISR 10%",
+        "ica": "IEPS variable",
+        "storageYears": "5"
+      },
+      "argentina": {
+        "name": "Argentina",
+        "authority": "AFIP",
+        "currency": "ARS",
+        "currencySymbol": "$",
+        "taxId": "CUIT",
+        "docPrefix": "FCE-A",
+        "vat": "IVA 21%",
+        "extraTax": "Percep. IIBB 3%",
+        "ica": "Imp. internos",
+        "storageYears": "10"
+      },
+      "chile": {
+        "name": "Chile",
+        "authority": "SII",
+        "currency": "CLP",
+        "currencySymbol": "$",
+        "taxId": "RUT",
+        "docPrefix": "DTE-33",
+        "vat": "IVA 19%",
+        "extraTax": "Retención 13%",
+        "ica": "Imp. específico",
+        "storageYears": "6"
+      },
+      "peru": {
+        "name": "Perú",
+        "authority": "SUNAT",
+        "currency": "PEN",
+        "currencySymbol": "S/",
+        "taxId": "RUC",
+        "docPrefix": "F001",
+        "vat": "IGV 18%",
+        "extraTax": "Retención 3%",
+        "ica": "Detracción 12%",
+        "storageYears": "5"
+      },
+      "uruguay": {
+        "name": "Uruguay",
+        "authority": "DGI",
+        "currency": "UYU",
+        "currencySymbol": "$",
+        "taxId": "RUT",
+        "docPrefix": "eFactura",
+        "vat": "IVA 22%",
+        "extraTax": "IRPF 7%",
+        "ica": "Imp. específicos",
+        "storageYears": "10"
+      },
+      "paraguay": {
+        "name": "Paraguay",
+        "authority": "SET",
+        "currency": "PYG",
+        "currencySymbol": "₲",
+        "taxId": "RUC",
+        "docPrefix": "DE",
+        "vat": "IVA 10%",
+        "extraTax": "Retención IVA 30%",
+        "ica": "Imp. selectivo",
+        "storageYears": "5"
+      },
+      "ecuador": {
+        "name": "Ecuador",
+        "authority": "SRI",
+        "currency": "USD",
+        "currencySymbol": "$",
+        "taxId": "RUC",
+        "docPrefix": "FAC-001",
+        "vat": "IVA 15%",
+        "extraTax": "Retención fuente 8%",
+        "ica": "ICE variable",
+        "storageYears": "7"
+      }
+    },
+    "topMetrics": {
+      "emittedToday": "Emitidas hoy",
+      "acceptanceRate": "Tasa aceptación",
+      "avgResponse": "Respuesta promedio",
+      "storage": "Documentos almacenados"
+    },
+    "sections": {
+      "emission": "Emisión",
+      "documents": "Documentos emitidos",
+      "reception": "Recepción proveedores",
+      "reports": "Reportes fiscales",
+      "api": "API y SDKs",
+      "whiteLabel": "White-label resellers",
+      "storage": "Almacenamiento legal"
+    },
+    "emission": {
+      "title": "Emisión de documentos",
+      "subtitle": "Construye el documento, valida en tiempo real y envíalo a {authority}.",
+      "tabs": {
+        "factura": "Factura",
+        "notaCredito": "Nota crédito",
+        "notaDebito": "Nota débito",
+        "pos": "POS",
+        "contingencia": "Contingencia"
+      },
+      "form": {
+        "client": "Cliente",
+        "fields": {
+          "taxId": "{taxId} del receptor",
+          "taxIdPlaceholder": "Escribe el {taxId}",
+          "name": "Razón social",
+          "namePlaceholder": "Nombre o empresa",
+          "email": "Correo electrónico",
+          "emailPlaceholder": "facturas@cliente.com",
+          "city": "Ciudad",
+          "cityPlaceholder": "Bogotá, CDMX, Lima..."
+        },
+        "validation": {
+          "checking": "Validando en {authority}...",
+          "valid": "Receptor verificado en {authority}",
+          "invalid": "Identificador inválido o no inscrito",
+          "format": "Formato esperado: {format}"
+        },
+        "lines": "Líneas del documento",
+        "addLine": "Agregar línea",
+        "removeLine": "Eliminar",
+        "lineFields": {
+          "description": "Descripción",
+          "qty": "Cant.",
+          "unitPrice": "Valor unitario",
+          "vatRate": "IVA %",
+          "withholding": "Reten. %"
+        },
+        "summary": "Resumen",
+        "subtotal": "Subtotal",
+        "vat": "IVA",
+        "withholding": "Retención",
+        "ica": "ICA / municipal",
+        "total": "Total a pagar",
+        "submit": "Emitir documento",
+        "submitting": "Firmando y enviando a {authority}...",
+        "reset": "Limpiar"
+      },
+      "preview": {
+        "title": "Vista previa PDF",
+        "subtitle": "Representación gráfica del documento",
+        "issuer": "Emisor",
+        "issuerName": "Koptup Tech S.A.S.",
+        "issuerTaxId": "900.555.123-4",
+        "receiver": "Receptor",
+        "noReceiver": "Completa los datos del cliente",
+        "docNumber": "Documento",
+        "issueDate": "Fecha emisión",
+        "cufeLabel": "Identificador único",
+        "cufePending": "Pendiente de firma",
+        "qrLabel": "Código QR fiscal",
+        "footer": "Documento generado por Koptup — vista demo"
+      },
+      "result": {
+        "signing": "Firmando documento con certificado digital",
+        "sending": "Enviando a {authority}",
+        "validating": "Validando estructura XML/UBL",
+        "accepted": "Aceptada por {authority}",
+        "acceptedSub": "El documento ha sido firmado y registrado correctamente.",
+        "uuidLabel": "CUFE / UUID",
+        "downloadPdf": "Descargar PDF",
+        "downloadXml": "Descargar XML",
+        "newDoc": "Emitir otro"
+      }
+    },
+    "documents": {
+      "title": "Documentos emitidos",
+      "subtitle": "Trazabilidad completa de cada documento ante la autoridad fiscal.",
+      "filters": {
+        "all": "Todos",
+        "accepted": "Aceptada",
+        "pending": "Pendiente",
+        "rejected": "Rechazada",
+        "voided": "Anulada",
+        "search": "Buscar por número, cliente o {taxId}..."
+      },
+      "table": {
+        "number": "Número",
+        "client": "Cliente",
+        "date": "Fecha",
+        "amount": "Total",
+        "status": "Estado",
+        "actions": "Acciones",
+        "resend": "Reenviar",
+        "pdf": "PDF",
+        "xml": "XML",
+        "void": "Anular"
+      },
+      "empty": "No hay documentos con esos filtros."
+    },
+    "reception": {
+      "title": "Recepción de facturas de proveedores",
+      "subtitle": "OCR automático, validación de {taxId} y conciliación contable.",
+      "stats": {
+        "incoming": "Entrantes",
+        "validated": "Validadas",
+        "rejected": "Rechazadas"
+      },
+      "list": {
+        "supplier": "Proveedor",
+        "amount": "Monto",
+        "date": "Fecha",
+        "validations": "Validaciones",
+        "ocr": "OCR",
+        "taxIdCheck": "Verif. {taxId}",
+        "duplicateCheck": "Duplicidad",
+        "approve": "Aprobar",
+        "reject": "Rechazar",
+        "approved": "Aprobada",
+        "rejectedLabel": "Rechazada"
+      }
+    },
+    "reports": {
+      "title": "Reportes fiscales",
+      "subtitle": "Libros oficiales listos para presentar a la autoridad.",
+      "period": "Período",
+      "months": {
+        "1": "Enero",
+        "2": "Febrero",
+        "3": "Marzo",
+        "4": "Abril",
+        "5": "Mayo",
+        "6": "Junio",
+        "7": "Julio",
+        "8": "Agosto",
+        "9": "Septiembre",
+        "10": "Octubre",
+        "11": "Noviembre",
+        "12": "Diciembre"
+      },
+      "books": {
+        "sales": "Libro de ventas",
+        "purchases": "Libro de compras",
+        "vat": "Resumen IVA",
+        "withholding": "Retenciones aplicadas"
+      },
+      "totalDocs": "documentos",
+      "totalAmount": "Monto total",
+      "export": "Exportar",
+      "formats": {
+        "pdf": "PDF",
+        "excel": "Excel",
+        "xml": "XML"
+      }
+    },
+    "api": {
+      "title": "API y SDKs",
+      "subtitle": "Integra Koptup en tu ERP, e-commerce o sistema POS en minutos.",
+      "languages": {
+        "ts": "TypeScript",
+        "python": "Python",
+        "go": "Go"
+      },
+      "endpoints": "Endpoints destacados",
+      "webhooks": "Eventos webhook",
+      "webhookEvents": {
+        "accepted": "invoice.accepted — el documento fue aceptado por la autoridad",
+        "rejected": "invoice.rejected — el documento fue rechazado, ver motivo",
+        "received": "invoice.received — recibiste un documento de proveedor",
+        "void": "invoice.voided — un documento fue anulado",
+        "credit": "credit_note.issued — se emitió una nota crédito ligada"
+      }
+    },
+    "whiteLabel": {
+      "title": "White-label resellers",
+      "subtitle": "Revende la plataforma con tu marca, dominio y branding.",
+      "toggle": "Modo white-label activo",
+      "toggleOff": "Activa el modo para gestionar tus marcas",
+      "addBrand": "Nueva marca",
+      "brands": {
+        "domain": "Dominio",
+        "clients": "Clientes",
+        "monthlyDocs": "Docs/mes",
+        "status": "Estado",
+        "active": "Activa",
+        "trial": "En prueba"
+      }
+    },
+    "storage": {
+      "title": "Almacenamiento legal",
+      "subtitle": "Cada país exige un período mínimo de custodia.",
+      "yearsLabel": "años requeridos",
+      "storedDocs": "documentos en custodia",
+      "encrypted": "Cifrado AES-256",
+      "immutable": "Almacenamiento inmutable",
+      "audit": "Auditoría disponible"
+    }
+  }
+}

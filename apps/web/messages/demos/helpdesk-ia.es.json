@@ -1,0 +1,240 @@
+{
+  "demoHelpdesk": {
+    "pageTitle": "Help Desk con IA",
+    "pageSubtitle": "Centro omnicanal de tickets con enrutamiento inteligente, respuestas asistidas y SLA en tiempo real",
+    "brandLabel": "Marca",
+    "departmentLabel": "Departamento",
+    "brands": {
+      "all": "Todas las marcas",
+      "alpha": "Alpha Retail",
+      "beta": "Beta Telecom",
+      "gamma": "Gamma Banking"
+    },
+    "departments": {
+      "all": "Todos los departamentos",
+      "billing": "Facturación",
+      "support": "Soporte técnico",
+      "sales": "Ventas",
+      "retention": "Retención"
+    },
+    "metrics": {
+      "title": "Panel SLA en vivo",
+      "frt": "Tiempo primera respuesta",
+      "frtUnit": "min",
+      "aht": "Tiempo medio gestión",
+      "ahtUnit": "min",
+      "fcr": "Resolución primera llamada",
+      "csat": "CSAT",
+      "deflection": "Deflexión IA",
+      "trendUp": "vs semana pasada",
+      "trendDown": "vs semana pasada"
+    },
+    "channels": {
+      "title": "Canales",
+      "all": "Todos",
+      "email": "Email",
+      "whatsapp": "WhatsApp",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "twitter": "X / Twitter",
+      "chat": "Chat web",
+      "voice": "Voz"
+    },
+    "priorities": {
+      "title": "Prioridad",
+      "all": "Todas",
+      "low": "Baja",
+      "medium": "Media",
+      "high": "Alta",
+      "urgent": "Urgente"
+    },
+    "sentiments": {
+      "positive": "Positivo",
+      "neutral": "Neutral",
+      "negative": "Negativo"
+    },
+    "statuses": {
+      "open": "Abierto",
+      "pending": "Pendiente",
+      "resolved": "Resuelto"
+    },
+    "inbox": {
+      "title": "Bandeja de tickets",
+      "search": "Buscar tickets, clientes o asuntos…",
+      "noResults": "No se encontraron tickets con esos filtros",
+      "newTicketCta": "Simular ticket entrante",
+      "slaIn": "SLA en",
+      "slaBreached": "SLA vencido",
+      "assigned": "Asignado a",
+      "unassigned": "Sin asignar",
+      "ticketsCount": "{count} tickets"
+    },
+    "routing": {
+      "title": "Enrutamiento inteligente",
+      "incoming": "Ticket entrante",
+      "analyzing": "Analizando intención y skills…",
+      "matched": "ML: Skill asignado",
+      "agentSuggested": "Agente sugerido",
+      "confidence": "Confianza",
+      "accept": "Asignar automáticamente",
+      "manual": "Asignar manualmente",
+      "done": "Asignación completada",
+      "tag": "Etiquetas"
+    },
+    "detail": {
+      "empty": "Selecciona un ticket para ver el detalle",
+      "subject": "Asunto",
+      "customer": "Cliente",
+      "channel": "Canal",
+      "priority": "Prioridad",
+      "sentiment": "Sentimiento",
+      "createdAt": "Creado",
+      "conversation": "Conversación",
+      "agent": "Agente",
+      "you": "Tú",
+      "customerRole": "Cliente",
+      "internalNotes": "Notas internas",
+      "addNote": "Agregar nota interna…",
+      "addNoteCta": "Guardar nota",
+      "noNotes": "Aún no hay notas internas",
+      "suggestedReplies": "Respuestas sugeridas por IA",
+      "insertSuggestion": "Insertar sugerencia",
+      "regenerate": "Regenerar",
+      "replyPlaceholder": "Escribe tu respuesta al cliente…",
+      "send": "Enviar respuesta",
+      "resolve": "Marcar resuelto",
+      "escalate": "Escalar",
+      "tags": "Etiquetas",
+      "messageInserted": "Sugerencia insertada en el borrador",
+      "replySent": "Respuesta enviada al cliente",
+      "noteAdded": "Nota interna añadida",
+      "resolvedToast": "Ticket marcado como resuelto"
+    },
+    "kb": {
+      "title": "Base de conocimiento",
+      "search": "Buscar artículos…",
+      "contextual": "Sugerencias contextuales",
+      "views": "vistas",
+      "useArticle": "Usar artículo",
+      "noResults": "Sin artículos para esta búsqueda",
+      "articles": {
+        "a1Title": "Cómo emitir un reembolso",
+        "a1Snippet": "Guía paso a paso para procesar reembolsos parciales o totales en menos de 3 minutos.",
+        "a2Title": "Restablecer contraseña de cuenta",
+        "a2Snippet": "Proceso seguro de recuperación con verificación en dos pasos.",
+        "a3Title": "Actualizar dirección de envío",
+        "a3Snippet": "Modificar dirección después de la confirmación del pedido sin reiniciar el proceso.",
+        "a4Title": "Política de garantía extendida",
+        "a4Snippet": "Cobertura, plazos y exclusiones de la garantía Premium.",
+        "a5Title": "Configurar 2FA en la app",
+        "a5Snippet": "Activación rápida con app autenticadora o SMS.",
+        "a6Title": "Diagnóstico de conexión lenta",
+        "a6Snippet": "Checklist de 8 pasos antes de escalar a nivel 2."
+      }
+    },
+    "autoReply": {
+      "title": "IA Auto-respuesta",
+      "subtitle": "La IA responde automáticamente cuando supera el umbral configurado",
+      "enable": "Habilitar auto-respuesta",
+      "threshold": "Umbral de confianza",
+      "log": "Registro reciente",
+      "channel": "Canal",
+      "time": "Hora",
+      "intent": "Intención",
+      "confidence": "Confianza",
+      "result": "Resultado",
+      "results": {
+        "sent": "Enviada",
+        "escalated": "Escalada",
+        "queued": "En cola"
+      },
+      "empty": "Aún no se han ejecutado auto-respuestas"
+    },
+    "csat": {
+      "title": "CSAT / NPS post-resolución",
+      "subtitle": "Encuestas enviadas tras cerrar el ticket",
+      "openSurvey": "Vista previa de encuesta",
+      "modalTitle": "¿Cómo calificarías la atención recibida?",
+      "modalSubtitle": "Ticket {id} resuelto por {agent}",
+      "comment": "Comentario opcional",
+      "commentPlaceholder": "Cuéntanos qué podemos mejorar…",
+      "submit": "Enviar valoración",
+      "cancel": "Cancelar",
+      "thanks": "¡Gracias por tu valoración!",
+      "byAgent": "Promedio por agente",
+      "tickets": "tickets"
+    },
+    "macros": {
+      "title": "Macros y automatizaciones",
+      "subtitle": "Reglas if-then que tu equipo aplica con un clic",
+      "if": "SI",
+      "then": "ENTONCES",
+      "runs": "ejecuciones",
+      "addNew": "Crear macro",
+      "items": {
+        "m1If": "Asunto contiene 'reembolso' y prioridad ≥ Alta",
+        "m1Then": "Asignar a Finanzas + plantilla 'reembolso-express' + etiquetar 'urgente'",
+        "m2If": "Sentimiento negativo y CSAT previo < 3",
+        "m2Then": "Escalar a Retención + notificar supervisor",
+        "m3If": "Canal WhatsApp y horario fuera de oficina",
+        "m3Then": "Enviar acuse + agendar callback 09:00",
+        "m4If": "Cliente VIP y SLA < 15 min",
+        "m4Then": "Subir prioridad a Urgente + asignar mejor agente disponible"
+      }
+    },
+    "skills": {
+      "billing": "Facturación",
+      "spanish": "Español",
+      "english": "Inglés",
+      "tech": "Técnico",
+      "vip": "VIP",
+      "retention": "Retención"
+    },
+    "tickets": {
+      "t1Subject": "Cobro duplicado en factura de marzo",
+      "t1Preview": "Hola, vi dos cargos idénticos por $129.90 el mismo día y no he recibido respuesta…",
+      "t2Subject": "No puedo iniciar sesión desde la app",
+      "t2Preview": "Cada vez que ingreso mi contraseña me dice usuario inválido pero estoy seguro de que…",
+      "t3Subject": "Quiero cancelar mi suscripción Premium",
+      "t3Preview": "Llevo tres meses sin usar el servicio y necesito cancelar antes del próximo cobro.",
+      "t4Subject": "Cambiar dirección de envío del pedido #88421",
+      "t4Preview": "Acabo de comprar y me equivoqué de calle, ¿pueden actualizarla antes del despacho?",
+      "t5Subject": "Felicitar al agente que me atendió ayer",
+      "t5Preview": "Solo quería agradecer, María fue increíble y resolvió todo en minutos.",
+      "t6Subject": "Internet intermitente desde el lunes",
+      "t6Preview": "Se cae cada 10 minutos y ya reinicié el router cinco veces, esto es inaceptable.",
+      "t7Subject": "Consulta sobre garantía extendida",
+      "t7Preview": "Compré un laptop hace 11 meses y quiero saber si aplica garantía Premium.",
+      "t8Subject": "Reembolso pendiente hace dos semanas",
+      "t8Preview": "Me dijeron que llegaba en 5 días hábiles y nada. Voy a poner queja en SERNAC."
+    },
+    "messages": {
+      "agent1": "Buenos días, lamento mucho la molestia. Estoy revisando ahora mismo el detalle de tu factura.",
+      "customer1": "Hola, llevo días esperando una respuesta. Esto es realmente frustrante.",
+      "agent2": "Entiendo perfectamente. Veo los dos cargos y procederé con el reembolso del duplicado de inmediato.",
+      "customer2": "Te agradezco mucho la rapidez."
+    },
+    "suggestions": {
+      "s1": "Hola {name}, lamentamos el inconveniente. Hemos validado el cobro duplicado y procesaremos el reembolso de $129.90 en las próximas 24 horas. Te enviaremos confirmación por email.",
+      "s2": "Buen día {name}, para resetear tu contraseña ingresa a /recuperar, recibirás un enlace válido por 15 minutos. Si no llega, revisa spam o avísanos.",
+      "s3": "Hola {name}, podemos pausar tu suscripción 30 días sin costo mientras decides. ¿Te gustaría que lo haga ahora?"
+    },
+    "agents": {
+      "maria": "María González",
+      "carlos": "Carlos Ruiz",
+      "ana": "Ana Pereira",
+      "luis": "Luis Martínez",
+      "you": "Tú (Demo)"
+    },
+    "common": {
+      "minutesAgo": "hace {n} min",
+      "hoursAgo": "hace {n} h",
+      "daysAgo": "hace {n} d",
+      "close": "Cerrar",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "showMore": "Ver más",
+      "showLess": "Ver menos"
+    }
+  }
+}

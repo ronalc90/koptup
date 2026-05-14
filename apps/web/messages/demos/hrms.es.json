@@ -1,0 +1,289 @@
+{
+  "demoHrms": {
+    "pageTitle": "HRMS — Gestión de Recursos Humanos",
+    "pageSubtitle": "Plataforma integral de talento: directorio, ATS, performance, payroll, learning y analítica con IA para LATAM.",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "people": "Personas",
+      "talent": "Talent",
+      "performance": "Performance",
+      "payroll": "Payroll",
+      "learning": "Learning"
+    },
+    "common": {
+      "search": "Buscar",
+      "filter": "Filtrar",
+      "all": "Todos",
+      "viewProfile": "Ver perfil",
+      "close": "Cerrar",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "pending": "Pendiente",
+      "completed": "Completado",
+      "inProgress": "En curso",
+      "process": "Procesar",
+      "save": "Guardar",
+      "viewAll": "Ver todo",
+      "country": "País",
+      "department": "Departamento",
+      "site": "Sede",
+      "role": "Rol",
+      "actions": "Acciones",
+      "showing": "Mostrando",
+      "of": "de",
+      "page": "Página",
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "yes": "Sí",
+      "no": "No"
+    },
+    "dashboard": {
+      "title": "Resumen ejecutivo",
+      "subtitle": "Visión 360° del talento, vacaciones, costos y clima organizacional.",
+      "kpis": {
+        "headcount": "Headcount total",
+        "headcountSub": "colaboradores activos",
+        "turnover": "Turnover",
+        "turnoverSub": "últimos 12 meses",
+        "enps": "eNPS",
+        "enpsSub": "score promotores",
+        "hrCost": "Costo total RRHH",
+        "hrCostSub": "mensual consolidado",
+        "openRoles": "Posiciones abiertas",
+        "openRolesSub": "en ATS",
+        "absenteeism": "Ausentismo",
+        "absenteeismSub": "promedio del mes"
+      },
+      "birthdays": {
+        "title": "Próximos cumpleaños",
+        "subtitle": "Próximos 14 días",
+        "empty": "Sin cumpleaños próximos"
+      },
+      "vacations": {
+        "title": "Vacaciones pendientes de aprobación",
+        "days": "días",
+        "requested": "Solicitado",
+        "approve": "Aprobar",
+        "reject": "Rechazar",
+        "empty": "Sin solicitudes pendientes"
+      },
+      "moodChart": {
+        "title": "Mood organizacional (30 días)",
+        "subtitle": "Pulse continuo basado en encuestas y feedback",
+        "current": "Actual",
+        "trend": "Tendencia"
+      },
+      "aiInsights": {
+        "title": "AI Insights",
+        "subtitle": "Modelos predictivos sobre tu fuerza laboral",
+        "retention": "Retención predicha 90 días",
+        "retentionDesc": "Riesgo bajo en el 78% del headcount",
+        "sentiment": "Sentiment eNPS",
+        "sentimentDesc": "Tendencia positiva últimas 4 semanas",
+        "promotions": "Promociones sugeridas",
+        "promotionsDesc": "5 talentos listos para próxima banda",
+        "salary": "Benchmark salarial",
+        "salaryDesc": "Tu banda Senior +3% vs mercado LATAM"
+      },
+      "compliance": {
+        "title": "Compliance laboral",
+        "subtitle": "Estado por país",
+        "co": "Colombia",
+        "mx": "México",
+        "ar": "Argentina",
+        "pe": "Perú",
+        "ok": "Al día",
+        "warn": "Revisar",
+        "fail": "Atrasado"
+      }
+    },
+    "people": {
+      "title": "Directorio de personas",
+      "subtitle": "Búsqueda, filtros y acceso al perfil completo.",
+      "searchPlaceholder": "Nombre, email o cargo...",
+      "filters": {
+        "allDepts": "Todos los deptos",
+        "allSites": "Todas las sedes",
+        "allRoles": "Todos los roles"
+      },
+      "card": {
+        "joined": "Ingreso",
+        "tenure": "Antigüedad",
+        "manager": "Reporta a",
+        "viewProfile": "Ver perfil"
+      },
+      "profile": {
+        "title": "Perfil del colaborador",
+        "personal": "Datos personales",
+        "employment": "Empleo",
+        "compensation": "Compensación",
+        "documents": "Documentos",
+        "salary": "Salario base",
+        "band": "Banda",
+        "contract": "Contrato",
+        "permanent": "Indefinido",
+        "id": "Identificación",
+        "phone": "Teléfono",
+        "email": "Email",
+        "birthDate": "Fecha de nacimiento",
+        "address": "Dirección"
+      },
+      "orgChart": {
+        "title": "Org chart dinámico",
+        "subtitle": "Estructura organizacional expandible"
+      }
+    },
+    "talent": {
+      "title": "ATS — Pipeline de reclutamiento",
+      "subtitle": "Kanban con scoring IA del CV, screening calls y workflows de onboarding.",
+      "stages": {
+        "sourced": "Sourced",
+        "screening": "Screening",
+        "interview": "Interview",
+        "offer": "Offer",
+        "hired": "Hired"
+      },
+      "scoring": {
+        "great": "Excelente fit",
+        "good": "Buen fit",
+        "avg": "Fit medio"
+      },
+      "actions": {
+        "screeningCall": "Screening call IA",
+        "schedule": "Agendar",
+        "viewCv": "Ver CV"
+      },
+      "candidate": {
+        "applied": "Postuló",
+        "source": "Fuente",
+        "experience": "Experiencia",
+        "years": "años"
+      },
+      "onboarding": {
+        "title": "Onboarding & Offboarding",
+        "subtitle": "Workflows con checklist por etapa y firma electrónica",
+        "newJoiners": "Nuevos ingresos",
+        "exits": "Salidas",
+        "tabOnboarding": "Onboarding",
+        "tabOffboarding": "Offboarding",
+        "owner": "Owner",
+        "progress": "Progreso",
+        "eSign": "E-sign",
+        "signed": "Firmado",
+        "pending": "Pendiente"
+      }
+    },
+    "performance": {
+      "title": "Performance & Reviews 360°",
+      "subtitle": "Evaluaciones, OKRs vinculados y planes de sucesión.",
+      "review": {
+        "title": "Review activa",
+        "cycle": "Ciclo",
+        "scale": "Escala 1-5",
+        "submit": "Enviar review",
+        "selfReview": "Auto-evaluación",
+        "peerReview": "Pares",
+        "managerReview": "Manager",
+        "subordinateReview": "Reportes"
+      },
+      "questions": {
+        "q1": "Cumple con los objetivos del rol",
+        "q2": "Colabora efectivamente con el equipo",
+        "q3": "Toma iniciativa y propone mejoras",
+        "q4": "Comunicación clara y oportuna",
+        "q5": "Liderazgo e influencia positiva"
+      },
+      "okrs": {
+        "title": "OKRs vinculados",
+        "progress": "Avance",
+        "owner": "Owner"
+      },
+      "succession": {
+        "title": "Plan de sucesión",
+        "subtitle": "Talentos identificados para puestos clave",
+        "readyNow": "Listo ahora",
+        "ready1y": "Listo en 1 año",
+        "ready2y": "Listo en 2+ años"
+      },
+      "timeOff": {
+        "title": "Calendario de vacaciones",
+        "subtitle": "Días tomados y accruals por país",
+        "taken": "Tomados",
+        "accrual": "Accrual",
+        "balance": "Saldo",
+        "country": "País"
+      }
+    },
+    "payroll": {
+      "title": "Payroll — Corrida actual",
+      "subtitle": "Conceptos, totales y compliance por país antes del cierre.",
+      "period": "Período",
+      "employees": "Empleados",
+      "gross": "Bruto total",
+      "deductions": "Deducciones",
+      "net": "Neto a pagar",
+      "process": "Procesar payroll",
+      "status": "Estado",
+      "draft": "Borrador",
+      "concepts": {
+        "title": "Conceptos del período",
+        "salary": "Salario base",
+        "overtime": "Recargos / Horas extra",
+        "bonus": "Primas y bonos",
+        "severance": "Cesantías (CO)",
+        "health": "Salud",
+        "pension": "Pensión",
+        "tax": "Retención en la fuente",
+        "amount": "Monto",
+        "type": "Tipo",
+        "earning": "Devengado",
+        "deduction": "Deducción"
+      },
+      "benefits": {
+        "title": "Benefits — Catálogo",
+        "subtitle": "Total Rewards Statement por colaborador",
+        "enroll": "Inscribirse",
+        "enrolled": "Inscrito",
+        "totalRewards": "Total Rewards Anual"
+      }
+    },
+    "learning": {
+      "title": "Learning & Development",
+      "subtitle": "Paths obligatorios y recomendados con tracking de compliance.",
+      "mandatory": "Obligatorios",
+      "recommended": "Recomendados",
+      "compliance": "Compliance training",
+      "course": "Curso",
+      "duration": "Duración",
+      "progress": "Avance",
+      "status": "Estado",
+      "due": "Vence",
+      "completed": "Completado",
+      "inProgress": "En curso",
+      "overdue": "Vencido",
+      "notStarted": "Sin iniciar",
+      "start": "Iniciar"
+    },
+    "surveys": {
+      "title": "Encuestas & Pulse",
+      "subtitle": "Feedback continuo y mood organizacional",
+      "active": "Activas",
+      "participation": "Participación",
+      "lastResult": "Último resultado",
+      "launch": "Lanzar pulse"
+    },
+    "mobile": {
+      "title": "Self-service móvil",
+      "subtitle": "Vista del colaborador en el celular",
+      "show": "Ver wireframe",
+      "hide": "Ocultar wireframe",
+      "myProfile": "Mi perfil",
+      "myVacations": "Mis vacaciones",
+      "myPayslip": "Mi recibo",
+      "myCourses": "Mis cursos",
+      "requestTimeOff": "Solicitar vacaciones",
+      "available": "disponibles",
+      "days": "días"
+    }
+  }
+}

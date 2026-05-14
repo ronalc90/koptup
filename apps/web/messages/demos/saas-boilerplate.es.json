@@ -1,0 +1,323 @@
+{
+  "demoSaas": {
+    "pageTitle": "SaaS Boilerplate Multi-tenant",
+    "pageSubtitle": "Plantilla productiva para construir SaaS B2B: auth empresarial, billing, multi-tenancy, webhooks, audit logs, feature flags y observabilidad. Todo listo desde el día uno.",
+    "stack": {
+      "title": "Stack",
+      "items": ["Next.js 14", "TypeScript", "PostgreSQL + RLS", "Redis", "Stripe", "Paddle", "OpenTelemetry", "Sentry"]
+    },
+    "tabs": {
+      "overview": "Arquitectura",
+      "tenancy": "Multi-tenancy",
+      "auth": "Auth",
+      "billing": "Billing",
+      "admin": "Admin panel",
+      "webhooks": "Webhooks",
+      "api": "API + Docs",
+      "audit": "Audit logs",
+      "flags": "Feature flags",
+      "i18n": "i18n",
+      "observability": "Observability",
+      "teams": "Teams"
+    },
+    "overview": {
+      "title": "Arquitectura de referencia",
+      "subtitle": "Servicios desacoplados, datos aislados por tenant, observabilidad de extremo a extremo.",
+      "nodes": {
+        "frontend": "Frontend Next.js",
+        "frontendSub": "SSR + RSC + Edge",
+        "api": "API Gateway",
+        "apiSub": "tRPC / REST / GraphQL",
+        "auth": "Auth Service",
+        "authSub": "SSO + MFA + SCIM",
+        "db": "Postgres + RLS",
+        "dbSub": "row-level isolation",
+        "cache": "Redis",
+        "cacheSub": "cache + rate limit",
+        "queue": "Workers",
+        "queueSub": "BullMQ / Temporal",
+        "webhooks": "Webhook Bus",
+        "webhooksSub": "retries + DLQ",
+        "billing": "Stripe / Paddle",
+        "billingSub": "subscriptions + usage"
+      },
+      "highlights": {
+        "title": "Decisiones de diseño",
+        "items": [
+          "Aislamiento por tenant con Row Level Security en Postgres",
+          "Sesiones JWT firmadas con rotación de claves (JWKS)",
+          "Cola de webhooks con reintentos exponenciales y dead letter queue",
+          "Telemetría OpenTelemetry hacia colector central",
+          "Feature flags evaluados en edge para latencia mínima"
+        ]
+      }
+    },
+    "tenancy": {
+      "title": "Patrones de multi-tenancy",
+      "subtitle": "Elige el modelo de aislamiento según el perfil de tus clientes y obligaciones de cumplimiento.",
+      "patterns": {
+        "sharedDb": {
+          "name": "Shared DB + RLS",
+          "tagline": "Una base, aislamiento por fila",
+          "pros": ["Costos bajos a gran escala", "Migraciones simples", "Operación uniforme"],
+          "cons": ["Riesgo si se omite el filtro", "Tuning fino de índices", "Backups por tenant complejos"],
+          "snippet": "-- Habilitar RLS y política por tenant\nALTER TABLE invoices ENABLE ROW LEVEL SECURITY;\n\nCREATE POLICY tenant_isolation ON invoices\n  USING (tenant_id = current_setting('app.tenant_id')::uuid);\n\n-- En cada request\nSET LOCAL app.tenant_id = '8f3a...';"
+        },
+        "schemaPerTenant": {
+          "name": "Schema per tenant",
+          "tagline": "Un schema por cliente",
+          "pros": ["Aislamiento lógico fuerte", "Backups por tenant", "Migraciones por etapas"],
+          "cons": ["Conexiones por schema", "Migraciones más lentas", "Catálogo grande"],
+          "snippet": "// Resolver schema por tenant\nconst client = await pool.connect();\nawait client.query(`SET search_path TO tenant_${tenantId}, public`);\n\nconst { rows } = await client.query(\n  'SELECT * FROM invoices LIMIT 50'\n);"
+        },
+        "dbPerTenant": {
+          "name": "DB per tenant",
+          "tagline": "Una base por cliente",
+          "pros": ["Aislamiento físico", "Cumplimiento estricto", "Restore independiente"],
+          "cons": ["Costo operativo alto", "Pool de conexiones complejo", "Cambios de schema globales caros"],
+          "snippet": "// Router de conexión por tenant\nconst dsn = await vault.getTenantDsn(tenantId);\nconst db = getOrCreatePool(dsn);\n\nreturn db.query(\n  'SELECT * FROM invoices WHERE deleted_at IS NULL'\n);"
+        }
+      },
+      "prosLabel": "Ventajas",
+      "consLabel": "Compromisos",
+      "snippetLabel": "Snippet"
+    },
+    "auth": {
+      "title": "Auth empresarial",
+      "subtitle": "SSO, MFA, social y magic links. Todo el flujo cubierto con un único provider.",
+      "methods": {
+        "sso": "SSO",
+        "mfa": "MFA",
+        "social": "Social",
+        "magic": "Magic link"
+      },
+      "sso": {
+        "title": "Single Sign-On corporativo",
+        "saml": "SAML 2.0",
+        "samlDesc": "Conector genérico para Okta, Azure AD, Google Workspace, Ping.",
+        "oidc": "OIDC",
+        "oidcDesc": "Discovery automático, refresh tokens y revocación.",
+        "scim": "Aprovisionamiento SCIM",
+        "scimDesc": "Sincronización de usuarios y grupos desde el IdP."
+      },
+      "mfa": {
+        "title": "Segundo factor obligatorio",
+        "totp": "TOTP",
+        "totpDesc": "Apps autenticadoras compatibles RFC 6238.",
+        "webauthn": "Passkeys (WebAuthn)",
+        "webauthnDesc": "Hardware keys, Face ID, Touch ID.",
+        "sms": "SMS",
+        "smsDesc": "Fallback con rate limiting y detección de fraude."
+      },
+      "social": {
+        "title": "Identidades sociales",
+        "items": ["Google", "GitHub", "Apple", "Microsoft"]
+      },
+      "magic": {
+        "title": "Acceso sin contraseña",
+        "step1": "El usuario ingresa su email",
+        "step2": "Recibe un enlace firmado válido por 10 minutos",
+        "step3": "Hace clic → sesión activa con device fingerprint"
+      },
+      "sendCode": "Enviar código",
+      "verify": "Verificar",
+      "codeSent": "Código enviado al dispositivo",
+      "linkSent": "Enlace enviado a tu correo",
+      "verified": "Identidad verificada",
+      "providersLabel": "Continuar con",
+      "email": "Email"
+    },
+    "billing": {
+      "title": "Billing y suscripciones",
+      "subtitle": "Stripe y Paddle integrados. Trials, prorrateo, usage-based metering y dunning automatizado.",
+      "plansTitle": "Planes",
+      "billed": "facturado mensualmente",
+      "trial": "14 días de prueba",
+      "currentPlan": "Plan actual",
+      "selectPlan": "Seleccionar",
+      "plans": {
+        "starter": {
+          "name": "Starter",
+          "price": "$29",
+          "features": ["Hasta 3 usuarios", "10k requests/mes", "Soporte por email", "Audit logs 30 días"]
+        },
+        "pro": {
+          "name": "Pro",
+          "price": "$99",
+          "features": ["Hasta 25 usuarios", "100k requests/mes", "SSO SAML/OIDC", "Audit logs 1 año", "Webhooks ilimitados"]
+        },
+        "enterprise": {
+          "name": "Enterprise",
+          "price": "Contactar",
+          "features": ["Usuarios ilimitados", "Volumen a medida", "SCIM + dominios verificados", "SLA 99.99%", "DPA y residencia de datos"]
+        }
+      },
+      "checkout": {
+        "title": "Checkout mock",
+        "subtitle": "Stripe Elements + 3D Secure",
+        "card": "Tarjeta",
+        "cardPlaceholder": "4242 4242 4242 4242",
+        "expiry": "MM/AA",
+        "cvc": "CVC",
+        "email": "Email de facturación",
+        "pay": "Pagar y activar",
+        "processing": "Procesando pago seguro...",
+        "success": "Suscripción activada"
+      },
+      "usage": {
+        "title": "Uso del ciclo actual",
+        "subtitle": "Metering en tiempo real con facturación por consumo.",
+        "apiCalls": "API calls",
+        "storage": "Almacenamiento",
+        "seats": "Asientos activos",
+        "of": "de"
+      },
+      "dunning": {
+        "title": "Dunning emails",
+        "subtitle": "Recordatorios automáticos ante fallos de pago.",
+        "items": [
+          { "day": "Día 0", "subject": "No pudimos cobrar tu suscripción" },
+          { "day": "Día 3", "subject": "Recordatorio: actualiza tu método de pago" },
+          { "day": "Día 7", "subject": "Tu acceso se suspenderá en 48 horas" },
+          { "day": "Día 14", "subject": "Suscripción cancelada" }
+        ]
+      }
+    },
+    "admin": {
+      "title": "Panel de administración",
+      "subtitle": "Impersonation, flags y herramientas de soporte para el equipo interno.",
+      "impersonation": {
+        "title": "Impersonation",
+        "subtitle": "Asume la identidad de un tenant para depurar incidentes (con auditoría).",
+        "selectTenant": "Seleccionar tenant",
+        "impersonate": "Impersonar",
+        "active": "Sesión impersonada activa",
+        "stop": "Detener",
+        "reason": "Motivo (obligatorio)"
+      },
+      "flags": {
+        "title": "Feature flags por tenant",
+        "subtitle": "Activa funciones beta para clientes específicos."
+      },
+      "support": {
+        "title": "Eventos recientes",
+        "subtitle": "Stream auditable del tenant seleccionado.",
+        "user": "Usuario",
+        "event": "Evento",
+        "time": "Hace"
+      }
+    },
+    "webhooks": {
+      "title": "Webhooks salientes",
+      "subtitle": "Bus de eventos confiable con reintentos exponenciales, firmas HMAC y dead letter queue.",
+      "eventsTitle": "Últimas entregas",
+      "columns": {
+        "event": "Evento",
+        "endpoint": "Endpoint",
+        "status": "Estado",
+        "attempts": "Intentos",
+        "lastDelivery": "Última entrega"
+      },
+      "status": {
+        "delivered": "Entregado",
+        "retrying": "Reintentando",
+        "failed": "Fallido"
+      },
+      "payloadTitle": "Ejemplo de payload",
+      "signatureTitle": "Firma HMAC SHA-256",
+      "signatureDesc": "Cada request incluye el header `X-Signature` para verificar autenticidad."
+    },
+    "api": {
+      "title": "API + Documentación",
+      "subtitle": "REST y OpenAPI 3.1, SDKs autogenerados y docs estilo Mintlify.",
+      "endpoints": "Endpoints",
+      "exampleTitle": "Ejemplo: crear factura",
+      "tryIt": "Probar en sandbox",
+      "languages": {
+        "ts": "TypeScript",
+        "py": "Python",
+        "go": "Go"
+      }
+    },
+    "audit": {
+      "title": "Audit logs por organización",
+      "subtitle": "Registro inmutable de quién hizo qué, cuándo y desde dónde. Exportable a SIEM.",
+      "filtersUser": "Usuario",
+      "filtersAction": "Acción",
+      "all": "Todos",
+      "columns": {
+        "actor": "Actor",
+        "action": "Acción",
+        "resource": "Recurso",
+        "ip": "IP",
+        "when": "Fecha"
+      }
+    },
+    "flags": {
+      "title": "Feature flags y experimentos",
+      "subtitle": "Rollouts graduales, targeting por atributos y A/B testing nativo.",
+      "flagsTitle": "Flags",
+      "experimentsTitle": "Experimentos activos",
+      "rollout": "rollout",
+      "variantA": "Variant A",
+      "variantB": "Variant B",
+      "conversion": "conversión"
+    },
+    "i18n": {
+      "title": "Internacionalización completa",
+      "subtitle": "Locales, monedas, husos horarios y formatos numéricos por usuario.",
+      "languageLabel": "Idioma",
+      "timezoneLabel": "Huso horario",
+      "currencyLabel": "Moneda",
+      "previewLabel": "Vista previa",
+      "examplePrice": "Precio",
+      "exampleDate": "Fecha actual"
+    },
+    "observability": {
+      "title": "Observability stack",
+      "subtitle": "Trazas, métricas, logs y disponibilidad pública con un único pipeline.",
+      "sentry": "Sentry",
+      "sentryDesc": "Errores y session replay agrupados por release.",
+      "otel": "OpenTelemetry",
+      "otelDesc": "Trazas distribuidas exportadas al colector.",
+      "grafana": "Grafana",
+      "grafanaDesc": "Dashboards de latencia p95/p99 y throughput.",
+      "status": "StatusPage",
+      "statusDesc": "Disponibilidad pública con incidentes auditados.",
+      "uptime": "Uptime últimos 90 días",
+      "p95": "Latencia p95",
+      "errors": "Errores (24h)"
+    },
+    "teams": {
+      "title": "Organización y equipo",
+      "subtitle": "Roles RBAC, invitaciones pendientes y sincronización SCIM con tu IdP.",
+      "inviteLabel": "Invitar por email",
+      "invite": "Invitar",
+      "membersTitle": "Miembros",
+      "invitesTitle": "Invitaciones pendientes",
+      "scimTitle": "Sincronización SCIM",
+      "scimDesc": "Conectado con Okta - última sincronización",
+      "scimSyncedAgo": "hace 2 minutos",
+      "scimStatus": "Activo",
+      "roles": {
+        "owner": "Owner",
+        "admin": "Admin",
+        "member": "Member",
+        "billing": "Billing",
+        "viewer": "Viewer"
+      },
+      "columns": {
+        "user": "Usuario",
+        "role": "Rol",
+        "status": "Estado",
+        "email": "Email",
+        "sentAt": "Enviada",
+        "actions": "Acciones"
+      },
+      "resend": "Reenviar",
+      "revoke": "Revocar",
+      "active": "Activo",
+      "pending": "Pendiente"
+    }
+  }
+}

@@ -1,0 +1,249 @@
+{
+  "demoPos": {
+    "meta": {
+      "title": "POS / Punto de Venta",
+      "subtitle": "Suite omnicanal: restaurante, retail, autoservicio y kiosko con facturación electrónica, fidelización y hardware integrado.",
+      "demo": "Demo interactivo"
+    },
+    "topbar": {
+      "store": "Tienda",
+      "stores": {
+        "main": "Sucursal Centro",
+        "north": "Sucursal Norte",
+        "airport": "Aeropuerto T1"
+      },
+      "currency": "Moneda",
+      "language": "Idioma",
+      "online": "En línea",
+      "offline": "Modo offline",
+      "offlineHint": "Sincronización pendiente · {n} tickets",
+      "searchPlaceholder": "Buscar producto, SKU o código de barras",
+      "scan": "Escanear",
+      "shift": "Turno abierto",
+      "shiftBy": "Cajero: {name}"
+    },
+    "modes": {
+      "restaurant": "Restaurante",
+      "retail": "Retail",
+      "selfcheckout": "Self-checkout",
+      "kiosk": "Kiosko"
+    },
+    "categories": {
+      "all": "Todo",
+      "drinks": "Bebidas",
+      "food": "Comida",
+      "snacks": "Snacks",
+      "desserts": "Postres"
+    },
+    "products": {
+      "title": "Catálogo",
+      "happyHour": "Happy Hour",
+      "combo": "Combo",
+      "lowStock": "Stock bajo",
+      "stock": "Stock: {n}",
+      "addedToast": "{name} agregado"
+    },
+    "ticket": {
+      "title": "Ticket actual",
+      "empty": "Sin productos. Agrega ítems del catálogo.",
+      "table": "Mesa {n}",
+      "waiter": "Mesero: {name}",
+      "customer": "Cliente",
+      "noCustomer": "Sin cliente asignado",
+      "addCustomer": "Asignar cliente",
+      "removeCustomer": "Quitar",
+      "modifiers": "Modificadores",
+      "note": "Nota",
+      "discount": "Descuento",
+      "applyDiscount": "Aplicar descuento",
+      "subtotal": "Subtotal",
+      "tax": "IVA (19%)",
+      "tip": "Propina",
+      "total": "Total",
+      "pay": "Cobrar",
+      "send": "Enviar a cocina",
+      "void": "Anular ítem",
+      "clear": "Limpiar ticket"
+    },
+    "modifiers": {
+      "title": "Modificadores · {name}",
+      "size": "Tamaño",
+      "sizes": {
+        "small": "Pequeño",
+        "medium": "Mediano",
+        "large": "Grande"
+      },
+      "extras": "Extras",
+      "extrasItems": {
+        "cheese": "Queso extra",
+        "bacon": "Tocineta",
+        "sauce": "Salsa BBQ",
+        "ice": "Sin hielo",
+        "sugar": "Sin azúcar"
+      },
+      "notes": "Notas para cocina",
+      "notesPlaceholder": "Ej: sin cebolla, término medio...",
+      "cancel": "Cancelar",
+      "add": "Agregar al ticket"
+    },
+    "loyalty": {
+      "title": "Programa de fidelización",
+      "lookupPlaceholder": "Cédula o teléfono",
+      "search": "Buscar",
+      "found": "{name} · {points} puntos",
+      "tier": "Nivel: {tier}",
+      "tiers": {
+        "bronze": "Bronce",
+        "silver": "Plata",
+        "gold": "Oro"
+      },
+      "redeem": "Canjear {points} pts (-{amount})",
+      "notFound": "Cliente no encontrado",
+      "ptsEarned": "Acumulará {points} pts con esta compra"
+    },
+    "checkout": {
+      "title": "Cobrar pedido",
+      "total": "Total a pagar",
+      "pending": "Pendiente",
+      "received": "Recibido",
+      "change": "Cambio",
+      "methods": {
+        "cash": "Efectivo",
+        "card": "Tarjeta",
+        "qr": "QR / PSE",
+        "wallet": "Billetera digital",
+        "bnpl": "BNPL · 3 cuotas"
+      },
+      "cardModes": {
+        "chip": "Chip",
+        "tap": "Contactless",
+        "swipe": "Banda"
+      },
+      "split": "Pago dividido",
+      "splitHint": "Suma métodos hasta cubrir el total",
+      "addPayment": "Agregar pago",
+      "remove": "Quitar",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar cobro",
+      "processing": "Procesando...",
+      "approved": "Aprobado",
+      "tip": "Propina sugerida"
+    },
+    "receipt": {
+      "title": "Recibo electrónico",
+      "thermal": "Vista térmica 80mm",
+      "store": "KopTup · Sucursal Centro",
+      "address": "Cra 11 # 93-46 · Bogotá",
+      "nit": "NIT 900.123.456-7",
+      "ticket": "Ticket #{n}",
+      "cashier": "Cajero: {name}",
+      "thanks": "¡Gracias por tu compra!",
+      "dian": "DIAN · Factura electrónica aceptada",
+      "cufe": "CUFE: {code}",
+      "send": "Enviar recibo",
+      "email": "Email",
+      "whatsapp": "WhatsApp",
+      "sms": "SMS",
+      "print": "Imprimir",
+      "newSale": "Nueva venta",
+      "sent": "Enviado a {channel}"
+    },
+    "kds": {
+      "title": "Kitchen Display (KDS)",
+      "subtitle": "Comandas activas en cocina",
+      "order": "Comanda #{n}",
+      "table": "Mesa {n}",
+      "elapsed": "{min} min",
+      "states": {
+        "new": "Nueva",
+        "cooking": "En cocina",
+        "ready": "Lista"
+      },
+      "markReady": "Marcar lista",
+      "deliver": "Entregar",
+      "empty": "Sin comandas pendientes"
+    },
+    "tables": {
+      "title": "Gestión de mesas",
+      "subtitle": "Asigna mesero y ticket por mesa",
+      "table": "Mesa {n}",
+      "seats": "{n} pers.",
+      "states": {
+        "free": "Libre",
+        "busy": "Ocupada",
+        "bill": "Cuenta pedida"
+      },
+      "openTicket": "Abrir ticket",
+      "assignWaiter": "Asignar mesero",
+      "waiters": {
+        "ana": "Ana M.",
+        "luis": "Luis G.",
+        "sofia": "Sofía P.",
+        "diego": "Diego R."
+      }
+    },
+    "employees": {
+      "title": "Empleados",
+      "clockIn": "Entrada",
+      "clockOut": "Salida",
+      "active": "En turno",
+      "off": "Fuera",
+      "hours": "{h}h trabajadas",
+      "commission": "Comisión: {amount}",
+      "punch": "Marcar"
+    },
+    "reports": {
+      "title": "Reporte X / Z",
+      "subtitle": "Resumen del turno actual",
+      "sales": "Ventas",
+      "tickets": "Tickets emitidos",
+      "avgTicket": "Ticket promedio",
+      "cash": "Efectivo",
+      "card": "Tarjeta",
+      "digital": "Digital",
+      "voids": "Anulaciones",
+      "refunds": "Devoluciones",
+      "topProduct": "Producto top",
+      "closeShift": "Cerrar turno (Z)",
+      "printX": "Imprimir X"
+    },
+    "cash": {
+      "title": "Gestión de caja",
+      "open": "Apertura de caja",
+      "close": "Cierre de caja",
+      "opening": "Monto de apertura",
+      "expected": "Esperado en caja",
+      "counted": "Conteo manual",
+      "diff": "Diferencia",
+      "confirm": "Confirmar",
+      "withdraw": "Retiro",
+      "deposit": "Ingreso"
+    },
+    "hardware": {
+      "title": "Hardware",
+      "subtitle": "Periféricos conectados",
+      "printer": "Impresora térmica",
+      "scanner": "Escáner BT",
+      "scale": "Balanza",
+      "reader": "Lector chip/NFC",
+      "drawer": "Cajón monedero",
+      "connected": "Conectado",
+      "disconnected": "Sin conexión",
+      "reconnect": "Reconectar"
+    },
+    "tabs": {
+      "sale": "Venta",
+      "tables": "Mesas",
+      "kds": "Cocina (KDS)",
+      "reports": "Reportes",
+      "employees": "Empleados"
+    },
+    "common": {
+      "close": "Cerrar",
+      "save": "Guardar",
+      "back": "Volver",
+      "yes": "Sí",
+      "no": "No"
+    }
+  }
+}
