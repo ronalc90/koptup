@@ -375,10 +375,296 @@ export function calcularCicloPago(monthlyCOP: number, cycle: BillingCycle): Cycl
 }
 
 /**
- * Convierte un slug `kebab-case` al nombre del namespace i18n
+ * Convierte un slug `kebab-case` al nombre del namespace i18n del SERVICIO
  * (`service_<camelCase>`).
  */
 export function slugToNamespace(slug: string): string {
   const camel = slug.replace(/-([a-z0-9])/g, (_, ch: string) => ch.toUpperCase());
   return `service_${camel}`;
 }
+
+/**
+ * Convierte un slug `kebab-case` al nombre del namespace i18n del PLAN SaaS
+ * (`plan_<camelCase>`).
+ */
+export function slugToPlanNamespace(slug: string): string {
+  const camel = slug.replace(/-([a-z0-9])/g, (_, ch: string) => ch.toUpperCase());
+  return `plan_${camel}`;
+}
+
+/* -------------------------------------------------------------------------- */
+/* PLANES SaaS — software hospedado por KopTup con mensualidad recurrente     */
+/* -------------------------------------------------------------------------- */
+
+export type PlanTier = 'starter' | 'growth' | 'business';
+
+export interface SaasPlan {
+  tier: PlanTier;
+  /** Setup mínimo (puede ser 0). NO confundir con SERVICIOS donde el setup es la inversión grande. */
+  setupCOP: number;
+  /** Mensualidad estándar (sin descuento por ciclo). */
+  monthlyCOP: number;
+  /** Cantidad de items en `plans.<tier>.incluye[]` del i18n. */
+  incluyeCount: number;
+}
+
+export interface SaasOffering {
+  slug: string;
+  /** Slug bajo `/demo/<demoSlug>` (vacío si no aplica). */
+  demoSlug: string;
+  category: ServiceCategory;
+  icon: string;
+  gradient: string;
+  plans: SaasPlan[];
+}
+
+const PLAN_INCLUYE_COUNTS: Record<PlanTier, number> = {
+  starter: 5,
+  growth: 7,
+  business: 9,
+};
+
+function buildSaasPlans(
+  prices: [number, number, number, number, number, number],
+): SaasPlan[] {
+  const [setupS, monthlyS, setupG, monthlyG, setupB, monthlyB] = prices;
+  return [
+    {
+      tier: 'starter',
+      setupCOP: setupS,
+      monthlyCOP: monthlyS,
+      incluyeCount: PLAN_INCLUYE_COUNTS.starter,
+    },
+    {
+      tier: 'growth',
+      setupCOP: setupG,
+      monthlyCOP: monthlyG,
+      incluyeCount: PLAN_INCLUYE_COUNTS.growth,
+    },
+    {
+      tier: 'business',
+      setupCOP: setupB,
+      monthlyCOP: monthlyB,
+      incluyeCount: PLAN_INCLUYE_COUNTS.business,
+    },
+  ];
+}
+
+export const PLANS: SaasOffering[] = [
+  {
+    slug: 'chatbot-rag-ia',
+    demoSlug: 'chatbot',
+    category: 'aiPlatform',
+    icon: 'ChatBubbleLeftRightIcon',
+    gradient: 'from-primary-600 to-primary-800',
+    plans: buildSaasPlans([290_000, 149_000, 450_000, 449_000, 0, 1_290_000]),
+  },
+  {
+    slug: 'ecommerce',
+    demoSlug: 'ecommerce',
+    category: 'commerce',
+    icon: 'ShoppingCartIcon',
+    gradient: 'from-green-600 to-emerald-800',
+    plans: buildSaasPlans([290_000, 189_000, 490_000, 590_000, 0, 1_690_000]),
+  },
+  {
+    slug: 'bi-dashboard',
+    demoSlug: 'dashboard-ejecutivo',
+    category: 'aiPlatform',
+    icon: 'ChartBarIcon',
+    gradient: 'from-purple-600 to-purple-800',
+    plans: buildSaasPlans([0, 99_000, 290_000, 349_000, 0, 990_000]),
+  },
+  {
+    slug: 'gestor-documental',
+    demoSlug: 'gestor-documentos',
+    category: 'data',
+    icon: 'DocumentTextIcon',
+    gradient: 'from-blue-600 to-blue-800',
+    plans: buildSaasPlans([0, 89_000, 290_000, 289_000, 0, 890_000]),
+  },
+  {
+    slug: 'sistema-reservas',
+    demoSlug: 'sistema-reservas',
+    category: 'productivity',
+    icon: 'CalendarIcon',
+    gradient: 'from-orange-600 to-orange-800',
+    plans: buildSaasPlans([0, 69_000, 190_000, 199_000, 0, 690_000]),
+  },
+  {
+    slug: 'cms-headless',
+    demoSlug: 'gestor-contenido',
+    category: 'engagement',
+    icon: 'PencilSquareIcon',
+    gradient: 'from-pink-600 to-pink-800',
+    plans: buildSaasPlans([0, 89_000, 290_000, 289_000, 0, 790_000]),
+  },
+  {
+    slug: 'gestion-proyectos',
+    demoSlug: 'control-proyectos',
+    category: 'productivity',
+    icon: 'RectangleStackIcon',
+    gradient: 'from-teal-600 to-teal-800',
+    plans: buildSaasPlans([0, 79_000, 190_000, 219_000, 0, 690_000]),
+  },
+  {
+    slug: 'crm-ia',
+    demoSlug: 'crm-ia',
+    category: 'sales',
+    icon: 'BriefcaseIcon',
+    gradient: 'from-indigo-600 to-indigo-800',
+    plans: buildSaasPlans([290_000, 149_000, 450_000, 449_000, 0, 1_390_000]),
+  },
+  {
+    slug: 'erp-modular',
+    demoSlug: 'erp',
+    category: 'finance',
+    icon: 'BuildingOfficeIcon',
+    gradient: 'from-amber-600 to-amber-800',
+    plans: buildSaasPlans([490_000, 399_000, 990_000, 990_000, 0, 2_890_000]),
+  },
+  {
+    slug: 'helpdesk-ia',
+    demoSlug: 'helpdesk-ia',
+    category: 'support',
+    icon: 'LifebuoyIcon',
+    gradient: 'from-rose-600 to-rose-800',
+    plans: buildSaasPlans([290_000, 129_000, 450_000, 399_000, 0, 1_190_000]),
+  },
+  {
+    slug: 'lms-elearning',
+    demoSlug: 'lms',
+    category: 'education',
+    icon: 'AcademicCapIcon',
+    gradient: 'from-cyan-600 to-cyan-800',
+    plans: buildSaasPlans([290_000, 149_000, 450_000, 449_000, 0, 1_290_000]),
+  },
+  {
+    slug: 'telemedicina',
+    demoSlug: 'telemedicina',
+    category: 'healthcare',
+    icon: 'HeartIcon',
+    gradient: 'from-red-600 to-rose-800',
+    plans: buildSaasPlans([490_000, 299_000, 690_000, 790_000, 0, 2_190_000]),
+  },
+  {
+    slug: 'facturacion-electronica',
+    demoSlug: 'facturacion-electronica',
+    category: 'finance',
+    icon: 'DocumentCheckIcon',
+    gradient: 'from-emerald-600 to-emerald-800',
+    plans: buildSaasPlans([190_000, 89_000, 290_000, 249_000, 0, 790_000]),
+  },
+  {
+    slug: 'wms-logistica',
+    demoSlug: 'wms-logistica',
+    category: 'operations',
+    icon: 'TruckIcon',
+    gradient: 'from-stone-600 to-stone-800',
+    plans: buildSaasPlans([490_000, 249_000, 690_000, 590_000, 0, 1_890_000]),
+  },
+  {
+    slug: 'pos-retail',
+    demoSlug: 'pos',
+    category: 'commerce',
+    icon: 'ComputerDesktopIcon',
+    gradient: 'from-fuchsia-600 to-fuchsia-800',
+    plans: buildSaasPlans([290_000, 99_000, 450_000, 249_000, 0, 690_000]),
+  },
+  {
+    slug: 'hrms',
+    demoSlug: 'hrms',
+    category: 'sales',
+    icon: 'UserGroupIcon',
+    gradient: 'from-violet-600 to-violet-800',
+    plans: buildSaasPlans([290_000, 199_000, 490_000, 590_000, 0, 1_690_000]),
+  },
+  {
+    slug: 'automatizacion-workflows',
+    demoSlug: 'automatizacion',
+    category: 'aiPlatform',
+    icon: 'BoltIcon',
+    gradient: 'from-yellow-600 to-orange-700',
+    plans: buildSaasPlans([290_000, 149_000, 390_000, 449_000, 0, 1_290_000]),
+  },
+  {
+    slug: 'saas-multi-tenant',
+    demoSlug: 'saas-boilerplate',
+    category: 'security',
+    icon: 'Squares2X2Icon',
+    gradient: 'from-slate-600 to-slate-800',
+    plans: buildSaasPlans([290_000, 249_000, 590_000, 690_000, 0, 1_990_000]),
+  },
+  {
+    slug: 'voice-ai-callcenter',
+    demoSlug: 'voice-ai',
+    category: 'voice',
+    icon: 'MicrophoneIcon',
+    gradient: 'from-sky-600 to-sky-800',
+    plans: buildSaasPlans([490_000, 449_000, 790_000, 990_000, 0, 2_790_000]),
+  },
+  {
+    slug: 'firma-electronica',
+    demoSlug: 'firma-electronica',
+    category: 'security',
+    icon: 'PencilIcon',
+    gradient: 'from-lime-600 to-lime-800',
+    plans: buildSaasPlans([0, 79_000, 190_000, 199_000, 0, 690_000]),
+  },
+  {
+    slug: 'scraping-extraccion',
+    demoSlug: 'scraping',
+    category: 'data',
+    icon: 'GlobeAltIcon',
+    gradient: 'from-zinc-600 to-zinc-800',
+    plans: buildSaasPlans([190_000, 99_000, 390_000, 299_000, 0, 890_000]),
+  },
+  {
+    slug: 'code-review-ia',
+    demoSlug: 'code-review-ia',
+    category: 'devTools',
+    icon: 'CommandLineIcon',
+    gradient: 'from-neutral-700 to-neutral-900',
+    plans: buildSaasPlans([0, 79_000, 290_000, 219_000, 0, 790_000]),
+  },
+  {
+    slug: 'moderacion-contenido',
+    demoSlug: 'moderacion-contenido',
+    category: 'security',
+    icon: 'ShieldCheckIcon',
+    gradient: 'from-red-700 to-red-900',
+    plans: buildSaasPlans([290_000, 149_000, 450_000, 399_000, 0, 1_290_000]),
+  },
+  {
+    slug: 'app-delivery',
+    demoSlug: 'delivery',
+    category: 'operations',
+    icon: 'MapIcon',
+    gradient: 'from-orange-500 to-red-600',
+    plans: buildSaasPlans([490_000, 299_000, 790_000, 790_000, 0, 2_390_000]),
+  },
+  {
+    slug: 'loyalty-fidelizacion',
+    demoSlug: 'loyalty',
+    category: 'engagement',
+    icon: 'StarIcon',
+    gradient: 'from-yellow-500 to-amber-600',
+    plans: buildSaasPlans([190_000, 99_000, 390_000, 299_000, 0, 990_000]),
+  },
+  {
+    slug: 'qa-automatizado-ia',
+    demoSlug: 'chatbot',
+    category: 'devTools',
+    icon: 'CheckBadgeIcon',
+    gradient: 'from-teal-700 to-emerald-900',
+    plans: buildSaasPlans([0, 99_000, 290_000, 249_000, 0, 790_000]),
+  },
+  {
+    slug: 'vpn-empresarial',
+    demoSlug: 'saas-boilerplate',
+    category: 'security',
+    icon: 'ShieldCheckIcon',
+    gradient: 'from-blue-700 to-slate-900',
+    plans: buildSaasPlans([490_000, 89_000, 690_000, 249_000, 0, 790_000]),
+  },
+];

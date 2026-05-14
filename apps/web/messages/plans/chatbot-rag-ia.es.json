@@ -1,0 +1,52 @@
+{
+  "plan_chatbotRagIa": {
+    "name": "Chatbot RAG con IA",
+    "tagline": "Bot inteligente listo en horas, sin instalar nada",
+    "description": "Activá un asistente virtual entrenado con tus documentos en menos de 24 horas. Lo hospedamos nosotros, vos solo pagás el plan que necesitás.",
+    "categoryLabel": "Plataforma IA",
+    "plans": {
+      "starter": {
+        "name": "Starter",
+        "tagline": "Para validar la idea sin compromiso",
+        "incluye": [
+          "Hasta 500 conversaciones al mes",
+          "1 fuente de conocimiento (PDF, sitio web o Notion)",
+          "Widget embebible para tu sitio",
+          "Branding KopTup discreto en el widget",
+          "Soporte por correo"
+        ],
+        "idealPara": "Emprendedores y pymes validando la propuesta"
+      },
+      "growth": {
+        "name": "Growth",
+        "tagline": "Cuando ya tenés clientes constantes",
+        "incluye": [
+          "Hasta 5.000 conversaciones al mes",
+          "5 fuentes de conocimiento con reentrenamiento automático",
+          "WhatsApp Business y 3 canales adicionales",
+          "Sin branding KopTup, tu marca al frente",
+          "Handoff a humano y reportes semanales",
+          "Integraciones con tu CRM o helpdesk",
+          "Soporte WhatsApp con respuesta menor a 4 horas hábiles"
+        ],
+        "idealPara": "PYMEs y empresas medianas con servicio al cliente activo"
+      },
+      "business": {
+        "name": "Business",
+        "tagline": "Escala sin techo con compromiso anual",
+        "incluye": [
+          "Conversaciones ilimitadas",
+          "Fuentes ilimitadas y sync en tiempo real",
+          "Multi-tenant y multi-marca",
+          "SLA 99,9% con créditos por incumplimiento",
+          "Modelos privados u on-prem opcionales",
+          "Compliance HIPAA, GDPR e ISO 27001",
+          "Dedicated success manager",
+          "Soporte 24/7 y on-call para incidentes críticos",
+          "Auditorías y reportes mensuales para tu comité"
+        ],
+        "idealPara": "Empresas grandes con miles de usuarios y requisitos de cumplimiento"
+      }
+    }
+  }
+}

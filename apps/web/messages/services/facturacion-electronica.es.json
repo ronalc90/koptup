@@ -1,0 +1,100 @@
+{
+  "service_facturacionElectronica": {
+    "name": "Facturación electrónica (a medida)",
+    "tagline": "Construimos tu facturador electrónico, el código es tuyo",
+    "description": "Desarrollamos un facturador electrónico 100% personalizado para tu empresa con tu identidad, integraciones y reglas de negocio. Te entregamos el código fuente, lo hospedás donde quieras y es de tu propiedad. Opcionalmente seguimos manteniéndolo mes a mes.",
+    "categoryLabel": "Finanzas",
+    "plans": {
+      "inicial": {
+        "name": "Inicial",
+        "description": "Implementación funcional con código fuente entregado",
+        "soporte": "Email durante 2 meses incluidos",
+        "idealPara": "Independientes y pymes que recién comienzan",
+        "incluye": [
+          "Facturación electrónica funcional entregado como código fuente",
+          "Hasta 100 facturas/mes configurados según tu operación",
+          "Integración con WhatsApp Business o tu sitio web",
+          "Documentación técnica y manual del usuario",
+          "Capacitación al equipo (4 horas)"
+        ],
+        "setupIncluye": [
+          "Análisis funcional y workshop con stakeholders (1 semana)",
+          "Diseño de arquitectura y elección de stack óptimo",
+          "Implementación y entrega del repositorio Git al cliente",
+          "Despliegue inicial en tu nube preferida (AWS / GCP / Azure)",
+          "Documentación técnica y handoff con tu equipo TI"
+        ],
+        "mantenimientoIncluye": [
+          "Soporte por correo durante 2 meses incluidos",
+          "Fix de bugs críticos cubierto en los 2 meses",
+          "Patches de seguridad incluidos",
+          "Actualizaciones menores mensuales",
+          "Reporte mensual de uso y métricas"
+        ]
+      },
+      "profesional": {
+        "name": "Profesional",
+        "description": "Implementación robusta con integraciones y CI/CD",
+        "soporte": "WhatsApp y email durante 6 meses",
+        "idealPara": "Empresas con facturación recurrente y notas crédito",
+        "incluye": [
+          "Facturación electrónica multimódulo con flujos avanzados",
+          "100 facturas/mes ilimitados",
+          "Integración con tu ERP, CRM o SSO corporativo",
+          "Panel de administración con métricas y reportes",
+          "Workflows configurables y permisos granulares",
+          "Capacitación extendida y documentación completa"
+        ],
+        "setupIncluye": [
+          "Workshop extendido y descubrimiento funcional (2 semanas)",
+          "Arquitectura escalable con CI/CD configurado",
+          "Integraciones con tus sistemas internos (ERP / CRM / SSO)",
+          "Pruebas automatizadas (unitarias + integración)",
+          "Despliegue productivo y entrega del código fuente",
+          "Capacitación de hasta 10 personas y documentación completa"
+        ],
+        "mantenimientoIncluye": [
+          "Soporte por WhatsApp y email durante 6 meses",
+          "Fix de bugs y mejoras menores (hasta 10 horas/mes)",
+          "Monitoreo proactivo 24/7 con alertas automáticas",
+          "Backups diarios verificados",
+          "Reuniones de revisión mensuales con tu equipo",
+          "Reporte ejecutivo mensual con KPIs"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Plataforma multi-tenant con compliance y dedicated team",
+        "soporte": "Dedicated team con SLA 99,9% durante 12 meses",
+        "idealPara": "Grupos empresariales multi-NIT y multi-moneda",
+        "incluye": [
+          "Facturación electrónica multi-tenant para múltiples marcas o filiales",
+          "100 facturas/mes ilimitados y procesos personalizados",
+          "Integración con sistemas legacy, SAP, Oracle o mainframes",
+          "Compliance HIPAA, GDPR e ISO 27001 listo para auditoría",
+          "Alta disponibilidad multi-región con SLA 99,9%",
+          "Auditorías de seguridad y infraestructura dedicada",
+          "Dedicated team y soporte 24/7"
+        ],
+        "setupIncluye": [
+          "Discovery profundo con C-level y workshops por área (3-4 semanas)",
+          "Arquitectura multi-región con alta disponibilidad",
+          "Integraciones complejas (legacy, SAP, Oracle, mainframes)",
+          "Suite de pruebas completa (unit, integración, E2E, carga)",
+          "CI/CD, monitoreo y observabilidad enterprise",
+          "Despliegue dedicado y entrega del código fuente más auditoría",
+          "Capacitación masiva, runbooks y handoff certificado a tu equipo"
+        ],
+        "mantenimientoIncluye": [
+          "Dedicated team con SLA 99,9% durante 12 meses",
+          "Soporte 24/7 y on-call para incidentes críticos",
+          "Hasta 40 horas/mes de evolutivos incluidos",
+          "Multi-región y disaster recovery testing trimestral",
+          "Auditorías de seguridad y compliance semestrales",
+          "Roadmap conjunto con un Customer Success Manager",
+          "Reportes ejecutivos mensuales para tu comité directivo"
+        ]
+      }
+    }
+  }
+}
