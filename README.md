@@ -42,6 +42,8 @@ Cada demo es una aplicación interactiva navegable, con datos simulados realista
 
 | Delivery y last-mile | Logística | Asignación de pedidos a riders, ruteo optimizado, tracking en vivo y ETA dinámico. | [Ver demo](./apps/web/src/app/demo/delivery/) |
 
+| Programa de lealtad | Marketing | Programa de puntos, tiers, beneficios, campañas segmentadas y analítica de retención de clientes. | [Ver demo](./apps/web/src/app/demo/loyalty/) |
+
 ## 🚀 Stack Tecnológico
 
 ### Frontend
