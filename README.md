@@ -27,13 +27,28 @@
 
 > **https://koptup.com** — Probá las 27 demos interactivas sin registrarte
 
-## Screenshots
+## Probá las demos en vivo
 
-| Catálogo de demos | Chatbot RAG enterprise | Catálogo de servicios |
-|---|---|---|
-| ![Demos](https://github.com/ronalc90/koptup/raw/main/docs/screenshots/demos.png) | ![Chatbot](https://github.com/ronalc90/koptup/raw/main/docs/screenshots/chatbot.png) | ![Services](https://github.com/ronalc90/koptup/raw/main/docs/screenshots/services.png) |
+<p align="center">
+  <a href="https://koptup.com/demo"><img src="https://img.shields.io/badge/Cat%C3%A1logo%20de%20demos-27%20aplicaciones%20interactivas-7c3aed?style=for-the-badge&logo=vercel&logoColor=white" alt="Catálogo de demos" /></a>
+  <a href="https://koptup.com/demo/chatbot"><img src="https://img.shields.io/badge/Chatbot%20RAG-OpenAI%20%2B%20BM25-2563eb?style=for-the-badge&logo=openai&logoColor=white" alt="Chatbot RAG" /></a>
+  <a href="https://koptup.com/services"><img src="https://img.shields.io/badge/Servicios%20y%20planes-Catalogo%20OFFERINGS-059669?style=for-the-badge&logo=stripe&logoColor=white" alt="Servicios y planes" /></a>
+</p>
 
-> Screenshots en preparación — las imágenes aparecerán cuando se publiquen los archivos en `docs/screenshots/`.
+<p align="center">
+  <a href="https://koptup.com/demo/pos"><img src="https://img.shields.io/badge/POS-Punto%20de%20venta-0ea5e9?style=flat-square" alt="POS" /></a>
+  <a href="https://koptup.com/demo/crm"><img src="https://img.shields.io/badge/CRM-Pipeline%20ventas-0ea5e9?style=flat-square" alt="CRM" /></a>
+  <a href="https://koptup.com/demo/erp"><img src="https://img.shields.io/badge/ERP-Inventario%20%2B%20contabilidad-0ea5e9?style=flat-square" alt="ERP" /></a>
+  <a href="https://koptup.com/demo/helpdesk"><img src="https://img.shields.io/badge/Helpdesk-Tickets%20%2B%20SLA-0ea5e9?style=flat-square" alt="Helpdesk" /></a>
+  <a href="https://koptup.com/demo/lms"><img src="https://img.shields.io/badge/LMS-E--learning-0ea5e9?style=flat-square" alt="LMS" /></a>
+  <a href="https://koptup.com/demo/telemedicina"><img src="https://img.shields.io/badge/Telemedicina-Consulta%20remota-0ea5e9?style=flat-square" alt="Telemedicina" /></a>
+  <a href="https://koptup.com/demo/facturacion-electronica"><img src="https://img.shields.io/badge/Facturaci%C3%B3n%20electr%C3%B3nica-DIAN%20%2B%20multi--pa%C3%ADs-0ea5e9?style=flat-square" alt="Facturación electrónica" /></a>
+  <a href="https://koptup.com/demo/wms"><img src="https://img.shields.io/badge/WMS-Bodega%20%26%20picking-0ea5e9?style=flat-square" alt="WMS" /></a>
+  <a href="https://koptup.com/demo/hrms"><img src="https://img.shields.io/badge/HRMS-Talento%20humano-0ea5e9?style=flat-square" alt="HRMS" /></a>
+  <a href="https://koptup.com/demo/linkedin-ads"><img src="https://img.shields.io/badge/LinkedIn%20Ads-Generador%20IA-0ea5e9?style=flat-square" alt="LinkedIn Ads" /></a>
+</p>
+
+> **Tip:** abrí <https://koptup.com/demo> para el catálogo completo con las 27 aplicaciones interactivas y filtros por categoría.
 
 ## Stats
 
