@@ -24,6 +24,8 @@ Cada demo es una aplicación interactiva navegable, con datos simulados realista
 
 | POS | Retail | Punto de venta con caja, inventario en tiempo real, múltiples métodos de pago y cierre de turno. | [Ver demo](./apps/web/src/app/demo/pos/) |
 
+| HRMS | Recursos Humanos | Gestión integral de empleados, nómina, vacaciones, evaluaciones de desempeño y onboarding. | [Ver demo](./apps/web/src/app/demo/hrms/) |
+
 ## 🚀 Stack Tecnológico
 
 ### Frontend
