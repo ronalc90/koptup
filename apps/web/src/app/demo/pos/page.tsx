@@ -574,7 +574,7 @@ export default function PosDemoPage() {
                                   <Badge key={e} size="sm" variant="outline">{t(`modifiers.extrasItems.${e}`)}</Badge>
                                 ))}
                                 {l.modifiers.note && (
-                                  <div className="text-[10px] italic text-secondary-500 w-full mt-1">"{l.modifiers.note}"</div>
+                                  <div className="text-[10px] italic text-secondary-500 w-full mt-1">&ldquo;{l.modifiers.note}&rdquo;</div>
                                 )}
                               </div>
                             )}
