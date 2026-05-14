@@ -26,6 +26,8 @@ Cada demo es una aplicación interactiva navegable, con datos simulados realista
 
 | HRMS | Recursos Humanos | Gestión integral de empleados, nómina, vacaciones, evaluaciones de desempeño y onboarding. | [Ver demo](./apps/web/src/app/demo/hrms/) |
 
+| Automatización de procesos | Productividad | Constructor visual de workflows tipo low-code con triggers, acciones y conectores a APIs externas. | [Ver demo](./apps/web/src/app/demo/automatizacion/) |
+
 ## 🚀 Stack Tecnológico
 
 ### Frontend
