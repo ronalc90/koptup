@@ -446,6 +446,348 @@ export const seoConfig: Record<string, PageSEO> = {
     ],
     canonical: `${baseUrl}/demo/sistema-experto`,
   },
+
+  // Demo: Automatización de Workflows
+  'demo-automatizacion': {
+    title: 'Automatización de Workflows | Orquestación de Procesos',
+    description:
+      'Automatiza procesos de negocio sin código: orquesta workflows, conecta integraciones y elimina tareas repetitivas. Constructor visual de flujos, disparadores y acciones encadenadas. Ahorra horas de trabajo manual cada semana. Demo interactivo.',
+    keywords: [
+      'automatización de workflows',
+      'orquestación de procesos',
+      'automatización no-code',
+      'integraciones empresariales',
+      'flujos de trabajo automáticos',
+      'automatización de tareas',
+      'workflow automation',
+      'constructor de flujos',
+      'automatización procesos negocio',
+    ],
+    canonical: `${baseUrl}/demo/automatizacion`,
+  },
+
+  // Demo: Code Review con IA
+  'demo-code-review-ia': {
+    title: 'Code Review con IA | Revisión Automática de Pull Requests',
+    description:
+      'Revisión automática de Pull Requests con inteligencia artificial. Detecta bugs, vulnerabilidades de seguridad y problemas de calidad antes del merge. Sugerencias en línea y métricas de código. Acelera tus revisiones de código. Demo interactivo.',
+    keywords: [
+      'code review con IA',
+      'revisión automática de código',
+      'revisión pull requests',
+      'calidad de código',
+      'detección de bugs IA',
+      'seguridad de código',
+      'análisis estático código',
+      'IA para desarrollo',
+      'revisión código automática',
+    ],
+    canonical: `${baseUrl}/demo/code-review-ia`,
+  },
+
+  // Demo: CRM con IA
+  'demo-crm-ia': {
+    title: 'CRM con IA | Gestión de Clientes y Pipeline de Ventas',
+    description:
+      'CRM con inteligencia artificial para gestionar clientes, contactos y el pipeline de ventas. Scoring automático de leads, automatización comercial y seguimiento de oportunidades. Prioriza los negocios con mayor probabilidad de cierre. Demo interactivo.',
+    keywords: [
+      'CRM con IA',
+      'gestión de clientes',
+      'scoring de leads',
+      'pipeline de ventas',
+      'automatización comercial',
+      'software CRM',
+      'gestión de contactos',
+      'embudo de ventas',
+      'CRM inteligencia artificial',
+    ],
+    canonical: `${baseUrl}/demo/crm-ia`,
+  },
+
+  // Demo: App de Delivery
+  'demo-delivery': {
+    title: 'App de Delivery | Pedidos a Domicilio y Tracking en Tiempo Real',
+    description:
+      'Aplicación de delivery completa con pedidos a domicilio, tracking en tiempo real y gestión de repartidores. Optimización de rutas, seguimiento GPS y notificaciones de estado. Plataforma escalable para restaurantes y comercios. Demo interactivo.',
+    keywords: [
+      'app de delivery',
+      'pedidos a domicilio',
+      'tracking en tiempo real',
+      'gestión de repartidores',
+      'optimización de rutas',
+      'software delivery',
+      'plataforma domicilios',
+      'seguimiento GPS pedidos',
+      'app reparto comida',
+    ],
+    canonical: `${baseUrl}/demo/delivery`,
+  },
+
+  // Demo: ERP Modular
+  'demo-erp': {
+    title: 'ERP Modular | Finanzas, Inventario y Facturación DIAN',
+    description:
+      'Sistema ERP modular para empresas: finanzas, inventario, contabilidad y facturación electrónica DIAN. Integra todas las áreas de tu negocio en una sola plataforma. Reportes en tiempo real y módulos escalables. Demo interactivo.',
+    keywords: [
+      'ERP modular',
+      'software ERP empresas',
+      'gestión de inventario',
+      'facturación DIAN',
+      'contabilidad empresarial',
+      'sistema de gestión empresarial',
+      'ERP Colombia',
+      'integración empresarial',
+      'software finanzas empresas',
+    ],
+    canonical: `${baseUrl}/demo/erp`,
+  },
+
+  // Demo: Facturación Electrónica DIAN
+  'demo-facturacion-electronica': {
+    title: 'Facturación Electrónica DIAN | Nómina Electrónica Colombia',
+    description:
+      'Plataforma de facturación electrónica para Colombia, certificada DIAN. Emite facturas, notas crédito y nómina electrónica de forma sencilla. Validación automática, envío al adquirente y archivo seguro. Cumple la normativa vigente. Demo interactivo.',
+    keywords: [
+      'facturación electrónica DIAN',
+      'facturación electrónica Colombia',
+      'nómina electrónica',
+      'factura electrónica',
+      'software facturación DIAN',
+      'documentos electrónicos DIAN',
+      'notas crédito electrónicas',
+      'facturador electrónico',
+      'cumplimiento DIAN',
+    ],
+    canonical: `${baseUrl}/demo/facturacion-electronica`,
+  },
+
+  // Demo: Firma Electrónica
+  'demo-firma-electronica': {
+    title: 'Firma Electrónica | Firma Digital de Documentos con Validez Legal',
+    description:
+      'Firma electrónica de documentos con validez legal. Define flujos de firmantes, envía solicitudes y rastrea el estado en tiempo real. Firma digital segura, auditable y con trazabilidad completa. Agiliza tus contratos. Demo interactivo.',
+    keywords: [
+      'firma electrónica',
+      'firma digital documentos',
+      'validez legal firma',
+      'flujos de firmantes',
+      'firma de contratos online',
+      'software firma electrónica',
+      'firma digital segura',
+      'gestión de firmas',
+      'documentos firmados digitalmente',
+    ],
+    canonical: `${baseUrl}/demo/firma-electronica`,
+  },
+
+  // Demo: Helpdesk con IA
+  'demo-helpdesk-ia': {
+    title: 'Helpdesk con IA | Mesa de Ayuda y Tickets Omnicanal',
+    description:
+      'Mesa de ayuda con inteligencia artificial: gestión de tickets, clasificación automática con IA y base de conocimiento. Soporte omnicanal desde email, chat y WhatsApp. Resuelve más rápido y mejora la satisfacción del cliente. Demo interactivo.',
+    keywords: [
+      'helpdesk con IA',
+      'mesa de ayuda',
+      'gestión de tickets',
+      'clasificación tickets IA',
+      'base de conocimiento',
+      'soporte omnicanal',
+      'software helpdesk',
+      'atención al cliente IA',
+      'sistema de tickets',
+    ],
+    canonical: `${baseUrl}/demo/helpdesk-ia`,
+  },
+
+  // Demo: HRMS / Gestión de Talento
+  'demo-hrms': {
+    title: 'HRMS | Gestión de Talento, Nómina y Desempeño',
+    description:
+      'Sistema HRMS para la gestión integral de talento humano: empleados, nómina, vacaciones y evaluación de desempeño. Centraliza la información del personal y automatiza procesos de RRHH. Reportes y autoservicio para empleados. Demo interactivo.',
+    keywords: [
+      'HRMS',
+      'gestión de talento',
+      'software recursos humanos',
+      'gestión de empleados',
+      'nómina',
+      'gestión de vacaciones',
+      'evaluación de desempeño',
+      'software RRHH',
+      'gestión de personal',
+    ],
+    canonical: `${baseUrl}/demo/hrms`,
+  },
+
+  // Demo: LMS / Plataforma E-learning
+  'demo-lms': {
+    title: 'LMS | Plataforma E-learning con Cursos y Certificados',
+    description:
+      'Plataforma LMS de e-learning para crear y gestionar cursos online. Inscripciones, evaluaciones, seguimiento de progreso y emisión de certificados. Contenido multimedia y rutas de aprendizaje. Ideal para empresas y academias. Demo interactivo.',
+    keywords: [
+      'LMS',
+      'plataforma e-learning',
+      'cursos online',
+      'software educativo',
+      'gestión de cursos',
+      'evaluaciones online',
+      'certificados digitales',
+      'inscripciones cursos',
+      'plataforma formación online',
+    ],
+    canonical: `${baseUrl}/demo/lms`,
+  },
+
+  // Demo: Programa de Fidelización
+  'demo-loyalty': {
+    title: 'Programa de Fidelización | Puntos, Recompensas y Retención',
+    description:
+      'Programa de fidelización para premiar y retener clientes: acumulación de puntos, recompensas y segmentación inteligente. Aumenta la recompra y el valor de vida del cliente con incentivos personalizados. Métricas de retención. Demo interactivo.',
+    keywords: [
+      'programa de fidelización',
+      'puntos y recompensas',
+      'retención de clientes',
+      'segmentación de clientes',
+      'loyalty program',
+      'fidelización de clientes',
+      'recompensas clientes',
+      'sistema de puntos',
+      'marketing de fidelización',
+    ],
+    canonical: `${baseUrl}/demo/loyalty`,
+  },
+
+  // Demo: Moderación de Contenido con IA
+  'demo-moderacion-contenido': {
+    title: 'Moderación de Contenido con IA | Trust & Safety Automático',
+    description:
+      'Moderación de contenido con inteligencia artificial para texto e imágenes. Filtrado automático de contenido inapropiado, trust & safety y detección de riesgos a escala. Protege tu comunidad y tu marca en tiempo real. Demo interactivo.',
+    keywords: [
+      'moderación de contenido con IA',
+      'moderación de texto',
+      'moderación de imágenes',
+      'trust and safety',
+      'filtrado automático contenido',
+      'detección contenido inapropiado',
+      'moderación automática',
+      'IA moderación',
+      'seguridad de plataformas',
+    ],
+    canonical: `${baseUrl}/demo/moderacion-contenido`,
+  },
+
+  // Demo: POS para Retail
+  'demo-pos': {
+    title: 'POS para Retail | Punto de Venta Multi-sucursal con DIAN',
+    description:
+      'Sistema POS para retail con punto de venta ágil, gestión multi-sucursal e inventario en tiempo real. Facturación electrónica DIAN integrada y reportes de ventas centralizados. Ideal para tiendas y cadenas. Demo interactivo.',
+    keywords: [
+      'POS retail',
+      'punto de venta',
+      'software POS',
+      'multi-sucursal',
+      'gestión de inventario',
+      'facturación DIAN',
+      'sistema punto de venta',
+      'POS Colombia',
+      'caja registradora digital',
+    ],
+    canonical: `${baseUrl}/demo/pos`,
+  },
+
+  // Demo: SaaS Multi-tenant Boilerplate
+  'demo-saas-boilerplate': {
+    title: 'SaaS Multi-tenant Boilerplate | Auth y Billing con Stripe',
+    description:
+      'Base SaaS multi-tenant lista para producción: autenticación, gestión de organizaciones y billing con Stripe. Arquitectura escalable para lanzar tu producto más rápido. Roles, suscripciones y aislamiento de datos por tenant. Demo interactivo.',
+    keywords: [
+      'SaaS multi-tenant',
+      'SaaS boilerplate',
+      'base SaaS',
+      'autenticación SaaS',
+      'billing Stripe',
+      'arquitectura multi-tenant',
+      'plantilla SaaS',
+      'desarrollo SaaS',
+      'suscripciones SaaS',
+    ],
+    canonical: `${baseUrl}/demo/saas-boilerplate`,
+  },
+
+  // Demo: Scraping y Extracción de Datos
+  'demo-scraping': {
+    title: 'Scraping y Extracción de Datos | Web Scraping a Escala',
+    description:
+      'Plataforma de web scraping y extracción de datos a escala. Recolecta información estructurada de sitios web con rotación de proxies y procesamiento automático. Datos limpios y listos para usar en tus análisis. Demo interactivo.',
+    keywords: [
+      'web scraping',
+      'extracción de datos',
+      'scraping a escala',
+      'datos estructurados',
+      'rotación de proxies',
+      'recolección de datos web',
+      'extracción web automática',
+      'data scraping',
+      'minería de datos web',
+    ],
+    canonical: `${baseUrl}/demo/scraping`,
+  },
+
+  // Demo: Telemedicina
+  'demo-telemedicina': {
+    title: 'Telemedicina | Consultas por Video e Historia Clínica',
+    description:
+      'Plataforma de telemedicina con consultas médicas por video, historia clínica digital y agendamiento de citas. Atención remota segura, recetas y seguimiento de pacientes. Acerca la salud a tus pacientes desde cualquier lugar. Demo interactivo.',
+    keywords: [
+      'telemedicina',
+      'consultas médicas por video',
+      'historia clínica digital',
+      'agendamiento de citas médicas',
+      'atención médica remota',
+      'software telemedicina',
+      'salud digital',
+      'teleconsulta médica',
+      'plataforma médica online',
+    ],
+    canonical: `${baseUrl}/demo/telemedicina`,
+  },
+
+  // Demo: Voice AI / Call Center
+  'demo-voice-ai': {
+    title: 'Voice AI | Agentes de Voz con IA para Call Center',
+    description:
+      'Agentes de voz con inteligencia artificial para call center: IVR inteligente, transcripción automática y telefonía automatizada. Atiende llamadas 24/7, resuelve consultas y deriva casos complejos. Reduce costos de operación. Demo interactivo.',
+    keywords: [
+      'voice AI',
+      'agentes de voz IA',
+      'call center con IA',
+      'IVR inteligente',
+      'transcripción de llamadas',
+      'telefonía automatizada',
+      'asistente de voz',
+      'automatización call center',
+      'IA telefonía',
+    ],
+    canonical: `${baseUrl}/demo/voice-ai`,
+  },
+
+  // Demo: WMS / Logística de Bodegas
+  'demo-wms-logistica': {
+    title: 'WMS | Logística de Bodegas, Picking e Inventario',
+    description:
+      'Sistema WMS para la gestión de bodegas y logística: picking optimizado, control de inventario en tiempo real e integración con transportadoras. Mejora la precisión y la velocidad de tus operaciones de almacén. Demo interactivo.',
+    keywords: [
+      'WMS',
+      'logística de bodegas',
+      'gestión de almacenes',
+      'picking',
+      'control de inventario',
+      'integración transportadoras',
+      'software logística',
+      'gestión de bodegas',
+      'optimización de almacén',
+    ],
+    canonical: `${baseUrl}/demo/wms-logistica`,
+  },
 };
 
 /**

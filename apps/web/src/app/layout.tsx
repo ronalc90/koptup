@@ -30,33 +30,6 @@ export const metadata = {
   },
   description:
     'KopTup - Desarrollo de software a medida para empresas. Aplicaciones web y móviles, e-commerce, chatbots con IA, dashboards, automatización de procesos y transformación digital. Prueba nuestras demos interactivas.',
-  keywords: [
-    'desarrollo de software a medida',
-    'software empresarial Colombia',
-    'aplicaciones web a medida',
-    'desarrollo aplicaciones móviles',
-    'software personalizado',
-    'e-commerce desarrollo',
-    'chatbot inteligencia artificial',
-    'dashboard empresarial',
-    'automatización de procesos',
-    'transformación digital',
-    'desarrollo web Colombia',
-    'empresa de software Bogotá',
-    'soluciones tecnológicas empresas',
-    'sistema de reservas online',
-    'gestión documental',
-    'control de proyectos software',
-    'CMS a medida',
-    'integración de sistemas',
-    'consultoría tecnológica',
-    'desarrollo React Next.js',
-    'API desarrollo',
-    'software como servicio SaaS',
-    'aplicaciones empresariales',
-    'diseño UX UI',
-    'soporte técnico software',
-  ],
   authors: [{ name: 'KopTup' }],
   creator: 'KopTup',
   publisher: 'KopTup',
@@ -102,13 +75,12 @@ export const metadata = {
     },
   },
   verification: { google: ['3ec311666f8be2b7', 'M4CeqSjLCXpbpvE0trc5A-KAyWYoW-8lgDv1v4jNG9M'] },
+  // Canonical de la home. Cada página de contenido define el suyo propio
+  // (vía su layout + seo-config), evitando que hereden este valor.
+  // No declaramos hreflang porque el idioma es por cookie y no hay rutas /es /en
+  // distintas; un hreflang que apunta a la misma URL no aporta nada.
   alternates: {
     canonical: 'https://koptup.com',
-    languages: {
-      'es-CO': 'https://koptup.com',
-      'en-US': 'https://koptup.com',
-      'x-default': 'https://koptup.com',
-    },
   },
 };
 

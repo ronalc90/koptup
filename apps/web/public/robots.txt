@@ -50,6 +50,5 @@ Disallow: /
 User-agent: CCBot
 Disallow: /
 
-# Sitemaps
-Sitemap: https://www.koptup.com/sitemap.xml
+# Sitemap (host canónico, sin www)
 Sitemap: https://koptup.com/sitemap.xml
