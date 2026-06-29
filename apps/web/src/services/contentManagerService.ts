@@ -1,6 +1,6 @@
 // Service for Content Manager API calls
+import { BACKEND_URL as API_BASE_URL } from '@/lib/backend-url';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 const API_PREFIX = '/api';
 
 export type ContentTone = 'formal' | 'técnico' | 'persuasivo';

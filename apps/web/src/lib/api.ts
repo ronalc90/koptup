@@ -13,14 +13,7 @@ import type {
   CreateInvoiceData,
   PayInvoiceData,
 } from '@/types/api.types';
-
-const RAW_API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').trim();
-const NORMALIZED_API_URL = (() => {
-  let u = RAW_API_URL;
-  if (!/^https?:\/\//i.test(u)) u = `https://${u}`;
-  return u.replace(/\/+$/, '');
-})();
-const API_URL = NORMALIZED_API_URL;
+import { BACKEND_URL as API_URL } from './backend-url';
 
 /**
  * API Client singleton
@@ -209,6 +202,17 @@ class ApiClient {
 
   async register(data: RegisterData) {
     const response = await this.client.post('/api/auth/register', data);
+    return response.data;
+  }
+
+  // Password reset
+  async requestPasswordReset(email: string) {
+    const response = await this.client.post('/api/auth/forgot-password', { email });
+    return response.data;
+  }
+
+  async resetPassword(token: string, password: string) {
+    const response = await this.client.post('/api/auth/reset-password', { token, password });
     return response.data;
   }
 

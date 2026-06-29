@@ -12,8 +12,7 @@ import {
   CpuChipIcon,
   SparklesIcon,
 } from '@heroicons/react/24/outline';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+import { API_BASE as API_BASE_URL } from '@/lib/backend-url';
 
 interface EstadisticasExperto {
   totalCuentas: number;

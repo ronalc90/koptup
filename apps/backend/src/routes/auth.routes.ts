@@ -7,6 +7,8 @@ import {
   logout,
   getProfile,
   googleCallback,
+  forgotPassword,
+  resetPassword,
 } from '../controllers/auth.controller';
 import { authenticate } from '../middleware/auth';
 import { strictRateLimiter } from '../middleware/rateLimiter';
@@ -121,6 +123,69 @@ router.post(
  *         description: Invalid refresh token
  */
 router.post('/refresh', body('refreshToken').notEmpty(), refreshToken as RequestHandler);
+
+/**
+ * @swagger
+ * /api/auth/forgot-password:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Request a password reset link
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *     responses:
+ *       200:
+ *         description: Reset link sent if the account exists
+ */
+router.post(
+  '/forgot-password',
+  strictRateLimiter,
+  [body('email').isEmail().normalizeEmail()],
+  forgotPassword as RequestHandler
+);
+
+/**
+ * @swagger
+ * /api/auth/reset-password:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Reset the password using a valid token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - token
+ *               - password
+ *             properties:
+ *               token:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *                 minLength: 8
+ *     responses:
+ *       200:
+ *         description: Password updated
+ *       400:
+ *         description: Invalid or expired token
+ */
+router.post(
+  '/reset-password',
+  strictRateLimiter,
+  [body('token').trim().notEmpty(), body('password').isLength({ min: 8 })],
+  resetPassword as RequestHandler
+);
 
 /**
  * @swagger

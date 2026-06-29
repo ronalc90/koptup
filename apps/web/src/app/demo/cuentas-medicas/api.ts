@@ -1,7 +1,8 @@
 import { Factura, ResultadoAuditoria, Estadisticas, Tarifario } from './tipos-auditoria';
+import { BACKEND_URL as API_URL } from '@/lib/backend-url';
+import { downloadBlob } from '@/lib/utils';
 
 // Asegurarse de que siempre use /api
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 const API_BASE = API_URL.endsWith('/api') ? API_URL : `${API_URL}/api`;
 
 export const auditoriaAPI = {
@@ -63,14 +64,7 @@ export const auditoriaAPI = {
     if (!response.ok) throw new Error('Error al generar Excel');
 
     const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Auditoria_${facturaId}_${Date.now()}.xlsx`;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
+    downloadBlob(blob, `Auditoria_${facturaId}_${Date.now()}.xlsx`);
   },
 
   // Soportes
@@ -163,13 +157,6 @@ export const auditoriaAPI = {
     if (!response.ok) throw new Error('Error al generar Excel de auditoría médica');
 
     const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Auditoria_NuevaEPS_${facturaId}_${Date.now()}.xlsx`;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
+    downloadBlob(blob, `Auditoria_NuevaEPS_${facturaId}_${Date.now()}.xlsx`);
   },
 };

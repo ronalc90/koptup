@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'https://koptupbackend-production.up.railway.app';
+import { BACKEND_URL } from '@/lib/backend-url';
 
 export async function DELETE(
   request: NextRequest,

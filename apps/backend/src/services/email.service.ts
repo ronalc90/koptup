@@ -32,7 +32,7 @@ class EmailService {
         pass: process.env.SMTP_PASS || '',
       },
       from: process.env.EMAIL_FROM || 'KopTup <noreply@koptup.com>',
-      adminEmail: process.env.ADMIN_EMAIL || 'dirox7@gmail.com',
+      adminEmail: process.env.ADMIN_EMAIL || 'ronald@koptup.com',
     };
 
     // Solo inicializar si hay credenciales configuradas
@@ -185,6 +185,89 @@ ${contactData.message}
       logger.error('❌ Email notification error:');
       logger.error(`   Error: ${error.message}`);
       logger.error(`   Stack: ${error.stack}`);
+      return false;
+    }
+  }
+
+  /**
+   * Envía el email de recuperación de contraseña con el enlace de reseteo.
+   */
+  async sendPasswordResetEmail(params: {
+    to: string;
+    name: string;
+    resetUrl: string;
+  }): Promise<boolean> {
+    if (!this.isConfigured()) {
+      logger.warn('📧 Email not configured - skipping password reset email');
+      return false;
+    }
+
+    try {
+      logger.info(`📧 Sending password reset email to: ${params.to}`);
+
+      const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+    .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+    .button { display: inline-block; background: #4F46E5; color: white; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: bold; margin: 20px 0; }
+    .muted { color: #6b7280; font-size: 13px; word-break: break-all; }
+    .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔐 Recuperar contraseña</h1>
+      <p>KopTup</p>
+    </div>
+    <div class="content">
+      <p>Hola ${params.name},</p>
+      <p>Recibimos una solicitud para restablecer la contraseña de tu cuenta. Haz clic en el botón para crear una nueva contraseña. Este enlace expira en 1 hora.</p>
+      <p style="text-align:center;">
+        <a class="button" href="${params.resetUrl}">Restablecer contraseña</a>
+      </p>
+      <p class="muted">Si el botón no funciona, copia y pega este enlace en tu navegador:<br>${params.resetUrl}</p>
+      <p>Si no solicitaste este cambio, puedes ignorar este correo: tu contraseña seguirá siendo la misma.</p>
+      <div class="footer">
+        <p>⏰ ${new Date().toLocaleString('es-CO', { timeZone: 'America/Bogota' })}</p>
+        <p>Este email fue generado automáticamente por el sistema KopTup</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+`;
+
+      const textContent = `Recuperar contraseña - KopTup
+
+Hola ${params.name},
+
+Recibimos una solicitud para restablecer la contraseña de tu cuenta.
+Abre el siguiente enlace para crear una nueva contraseña (expira en 1 hora):
+
+${params.resetUrl}
+
+Si no solicitaste este cambio, ignora este correo.
+`;
+
+      const info = await this.transporter.sendMail({
+        from: this.config.from,
+        to: params.to,
+        subject: '🔐 Recupera tu contraseña - KopTup',
+        text: textContent,
+        html: htmlContent,
+      });
+
+      logger.info(`✅ Password reset email sent (Message ID: ${info.messageId})`);
+      return true;
+    } catch (error: any) {
+      logger.error(`❌ Password reset email error: ${error.message}`);
       return false;
     }
   }

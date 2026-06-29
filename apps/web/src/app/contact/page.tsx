@@ -112,8 +112,8 @@ function ContactPageInner() {
   const handleScheduleCall = () => {
     setIsScheduling(true);
 
-    // Crear el mailto con ambos destinatarios
-    const recipients = 'ronald@koptup.com,ronalddemiancipagauta@gmail.com';
+    // Destinatario corporativo (única fuente de verdad, sin correos personales).
+    const recipients = 'ronald@koptup.com';
     const subject = encodeURIComponent(t('schedule.emailSubject'));
     const body = encodeURIComponent(t('schedule.emailBody'));
 

@@ -8,7 +8,7 @@ import { connectDB } from '../config/mongodb';
  */
 const setAdmin = async () => {
   try {
-    const email = process.argv[2] || 'dirox7@gmail.com';
+    const email = process.argv[2] || process.env.ADMIN_EMAIL || 'ronald@koptup.com';
 
     console.log(`🔧 Setting admin role for: ${email}`);
 

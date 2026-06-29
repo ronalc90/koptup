@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { api } from '@/lib/api';
 import Button from '@/components/ui/Button';
 import Card, { CardContent } from '@/components/ui/Card';
 import { EnvelopeIcon, ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
@@ -18,8 +19,9 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      // Simulate API call - implement actual password reset logic later
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // El backend responde el mismo mensaje exista o no la cuenta (anti-enumeración),
+      // por eso mostramos éxito siempre que la petición se complete sin error de red.
+      await api.requestPasswordReset(email);
       setSuccess(true);
     } catch (err: any) {
       setError('Ocurrió un error al enviar el correo. Por favor intenta nuevamente.');

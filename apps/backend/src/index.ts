@@ -141,7 +141,7 @@ const startServer = async () => {
     }
 
     try {
-      const targetEmail = 'dirox7@gmail.com';
+      const targetEmail = process.env.ADMIN_EMAIL || 'ronald@koptup.com';
       const updated = await User.findOneAndUpdate(
         { email: targetEmail },
         { $set: { role: 'admin' } },

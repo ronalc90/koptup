@@ -4,6 +4,7 @@
  * Responsabilidad única: hablar con `${NEXT_PUBLIC_API_URL}/api/chatbot/bots/...`.
  * Centraliza URLs y serialización para mantener los componentes UI puros.
  */
+import { BACKEND_URL as RAW_BASE } from '@/lib/backend-url';
 
 export interface RemoteBotDoc {
   id: string;
@@ -105,7 +106,6 @@ export interface RemoteUrlIngestResult {
   errors: Array<{ url: string; reason: string }>;
 }
 
-const RAW_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
 const API_BASE = `${RAW_BASE}/api/chatbot`;
 
 async function jsonFetch<T>(input: string, init?: RequestInit): Promise<T> {

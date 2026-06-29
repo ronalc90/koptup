@@ -1,6 +1,6 @@
 import axios from 'axios';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+import { BACKEND_URL as API_URL } from '@/lib/backend-url';
+import { downloadBlob } from '@/lib/utils';
 
 export interface Radicado {
   id: string;
@@ -169,14 +169,7 @@ class LiquidacionService {
    * Helper para descargar el Excel
    */
   downloadExcel(blob: Blob, numeroRadicado: string): void {
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `liquidacion_${numeroRadicado}_${new Date().getTime()}.xlsx`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
+    downloadBlob(blob, `liquidacion_${numeroRadicado}_${new Date().getTime()}.xlsx`);
   }
 }
 

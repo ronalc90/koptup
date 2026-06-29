@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { downloadBlob } from '@/lib/utils';
 import {
   DocumentTextIcon,
   PresentationChartBarIcon,
@@ -398,14 +399,7 @@ export default function GestorContenido() {
   const downloadAsTxt = () => {
     const finalText = getFinalContent();
     const blob = new Blob([finalText], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${selectedTemplate?.name || 'documento'}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    downloadBlob(blob, `${selectedTemplate?.name || 'documento'}.txt`);
     setShowExportMenu(false);
   };
 

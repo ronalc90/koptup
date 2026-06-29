@@ -33,9 +33,9 @@ import toast from 'react-hot-toast';
 import ProcesoAuditoriaVisual from './ProcesoAuditoriaVisual';
 import { CUPS_COMPLETO } from './contenido-cups-completo';
 import { CIE10_COMPLETO } from './contenido-cie10-completo';
+import { BACKEND_URL as API_URL } from '@/lib/backend-url';
 
 // API URL Configuration
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 // Tipo para documentos de la base de conocimiento
 interface DocumentoConocimiento {

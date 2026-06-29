@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { validationResult } from 'express-validator';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -10,7 +11,13 @@ import { AuthRequest } from '../types';
 import { AppError, asyncHandler } from '../middleware/errorHandler';
 import { logger } from '../utils/logger';
 import { redis } from '../config/redis';
+import emailService from '../services/email.service';
 import User from '../models/User';
+
+/** Prefijo de las claves Redis para tokens de reseteo de contraseña. */
+const RESET_TOKEN_PREFIX = 'password_reset:';
+/** Vigencia del token de reseteo: 1 hora. */
+const RESET_TOKEN_TTL_SECONDS = 60 * 60;
 
 export const register = asyncHandler(async (req: AuthRequest, res: Response) => {
   const errors = validationResult(req);
@@ -195,6 +202,103 @@ export const getProfile = asyncHandler(
         created_at: user.created_at,
         last_login: user.last_login,
       },
+    });
+  }
+);
+
+/**
+ * Solicita el reseteo de contraseña. Por seguridad (evitar enumeración de
+ * usuarios) responde siempre el mismo mensaje, exista o no la cuenta. Si la
+ * cuenta existe y es de tipo `local`, genera un token de un solo uso (guardado
+ * en Redis con TTL) y envía el email con el enlace de reseteo.
+ */
+export const forgotPassword = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      throw new AppError('Validation error', 400);
+    }
+
+    const { email } = req.body;
+
+    const genericResponse = () =>
+      res.json({
+        success: true,
+        message:
+          'Si existe una cuenta con ese correo, te enviamos un enlace para restablecer tu contraseña.',
+      });
+
+    const user = await User.findOne({ email });
+
+    // Solo cuentas locales con contraseña pueden resetear (las de Google no).
+    if (!user || user.provider !== 'local') {
+      logger.info(`Password reset requested for non-resettable email: ${email}`);
+      return genericResponse();
+    }
+
+    // Token aleatorio de un solo uso. Guardamos el hash en Redis, no el token.
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+
+    await redis.setEx(
+      `${RESET_TOKEN_PREFIX}${tokenHash}`,
+      RESET_TOKEN_TTL_SECONDS,
+      user._id.toString()
+    );
+
+    const frontendURL = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const resetUrl = `${frontendURL}/reset-password?token=${rawToken}`;
+
+    await emailService.sendPasswordResetEmail({
+      to: user.email,
+      name: user.name,
+      resetUrl,
+    });
+
+    logger.info(`Password reset email dispatched for: ${email}`);
+    return genericResponse();
+  }
+);
+
+/**
+ * Restablece la contraseña a partir de un token válido. El token es de un solo
+ * uso: se elimina de Redis tras consumirlo y se invalida la sesión vigente.
+ */
+export const resetPassword = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      throw new AppError('Validation error', 400);
+    }
+
+    const { token, password } = req.body;
+
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    const redisKey = `${RESET_TOKEN_PREFIX}${tokenHash}`;
+
+    const userId = await redis.get(redisKey);
+    if (!userId) {
+      throw new AppError('El enlace de recuperación es inválido o expiró', 400);
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      await redis.del(redisKey);
+      throw new AppError('El enlace de recuperación es inválido o expiró', 400);
+    }
+
+    user.password = await bcrypt.hash(password, 12);
+    await user.save();
+
+    // Token de un solo uso + invalidar refresh token para forzar re-login.
+    await redis.del(redisKey);
+    await redis.del(`refresh_token:${user._id}`);
+
+    logger.info(`Password reset completed for: ${user.email}`);
+
+    res.json({
+      success: true,
+      message: 'Tu contraseña fue actualizada. Ya puedes iniciar sesión.',
     });
   }
 );

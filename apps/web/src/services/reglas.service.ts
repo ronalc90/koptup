@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+import { BACKEND_URL as API_URL } from '@/lib/backend-url';
 
 export interface Regla {
   id: string;

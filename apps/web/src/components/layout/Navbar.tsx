@@ -325,6 +325,9 @@ const toggleLanguage = () => {
             className="md:hidden p-2 rounded-lg transition-colors"
             style={{ color: textColor }}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-menu"
           >
             {mobileMenuOpen ? (
               <XMarkIcon className="h-6 w-6" />
@@ -337,7 +340,7 @@ const toggleLanguage = () => {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white dark:bg-secondary-900 border-t border-secondary-200 dark:border-secondary-700 backdrop-blur-lg shadow-lg">
+        <div id="mobile-menu" className="md:hidden bg-white dark:bg-secondary-900 border-t border-secondary-200 dark:border-secondary-700 backdrop-blur-lg shadow-lg">
           <div className="px-4 py-4 space-y-2">
             {navigation.map((item) => (
               <Link

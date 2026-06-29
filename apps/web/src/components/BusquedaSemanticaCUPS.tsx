@@ -5,8 +5,7 @@ import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import { MagnifyingGlassIcon, SparklesIcon, ClockIcon } from '@heroicons/react/24/outline';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+import { API_BASE as API_BASE_URL } from '@/lib/backend-url';
 
 interface ResultadoBusqueda {
   cups: {
