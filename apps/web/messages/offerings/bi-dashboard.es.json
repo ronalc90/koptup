@@ -2,7 +2,7 @@
   "offering_biDashboard": {
     "name": "Dashboard ejecutivo con IA",
     "tagline": "Tus KPIs en un solo tablero, con resúmenes generados por IA",
-    "description": "Visualizá ventas, finanzas y operaciones en tiempo real con explicaciones automáticas y forecasting. Lo entregamos como software o como SaaS mensual.",
+    "description": "Visualiza ventas, finanzas y operaciones en tiempo real con explicaciones automáticas y forecasting. Lo entregamos como software o como SaaS mensual.",
     "categoryLabel": "Plataforma IA",
     "tiers": {
       "basico": {

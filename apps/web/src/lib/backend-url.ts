@@ -2,7 +2,7 @@
  * Fuente única de verdad para la URL base del backend.
  *
  * Toda llamada al backend debe derivar de aquí. El fallback canónico es la URL
- * de producción en Railway; en local definí `NEXT_PUBLIC_API_URL` en `.env`.
+ * de producción en Railway; en local define `NEXT_PUBLIC_API_URL` en `.env`.
  */
 const RAW = (process.env.NEXT_PUBLIC_API_URL || 'https://koptupbackend-production.up.railway.app').trim();
 

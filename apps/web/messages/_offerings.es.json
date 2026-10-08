@@ -708,7 +708,7 @@
   "offering_appDelivery": {
     "name": "App de delivery",
     "tagline": "Pedidos, rutas dinámicas y app de repartidor con mapas en vivo",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"App de delivery\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"App de delivery\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Operaciones",
     "tiers": {
       "basico": {
@@ -773,8 +773,8 @@
   },
   "offering_automatizacionWorkflows": {
     "name": "Automatización de workflows",
-    "tagline": "Conectá tus apps y automatizá procesos con steps de IA",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Automatización de workflows\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Conecta tus apps y automatiza procesos con steps de IA",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Automatización de workflows\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Plataforma IA",
     "tiers": {
       "basico": {
@@ -840,7 +840,7 @@
   "offering_biDashboard": {
     "name": "Dashboard ejecutivo con IA",
     "tagline": "Tus KPIs en un solo tablero, con resúmenes generados por IA",
-    "description": "Visualizá ventas, finanzas y operaciones en tiempo real con explicaciones automáticas y forecasting. Lo entregamos como software o como SaaS mensual.",
+    "description": "Visualiza ventas, finanzas y operaciones en tiempo real con explicaciones automáticas y forecasting. Lo entregamos como software o como SaaS mensual.",
     "categoryLabel": "Plataforma IA",
     "tiers": {
       "basico": {
@@ -906,7 +906,7 @@
   "offering_chatbotRagIa": {
     "name": "Chatbot RAG con IA",
     "tagline": "Asistente virtual que entiende tu negocio",
-    "description": "Bot conversacional entrenado con tu base de conocimiento. Lo podés comprar como software a medida (te entregamos el código) o suscribirte al SaaS mensual hospedado por nosotros.",
+    "description": "Bot conversacional entrenado con tu base de conocimiento. Lo puedes comprar como software a medida (te entregamos el código) o suscribirte al SaaS mensual hospedado por nosotros.",
     "categoryLabel": "Plataforma IA",
     "tiers": {
       "basico": {
@@ -971,8 +971,8 @@
   },
   "offering_cmsHeadless": {
     "name": "CMS headless",
-    "tagline": "Gestioná tu contenido desde un panel y publicalo en cualquier frontend",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"CMS headless\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Gestiona tu contenido desde un panel y publícalo en cualquier frontend",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"CMS headless\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Engagement",
     "tiers": {
       "basico": {
@@ -1037,8 +1037,8 @@
   },
   "offering_codeReviewIa": {
     "name": "Code review con IA",
-    "tagline": "Recibí comentarios automáticos en cada PR con sugerencias y bugs",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Code review con IA\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Recibe comentarios automáticos en cada PR con sugerencias y bugs",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Code review con IA\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "DevTools",
     "tiers": {
       "basico": {
@@ -1103,8 +1103,8 @@
   },
   "offering_crmIa": {
     "name": "CRM con IA",
-    "tagline": "Cerrá más negocios con lead scoring y drafting automático",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"CRM con IA\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Cierra más negocios con lead scoring y drafting automático",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"CRM con IA\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Ventas",
     "tiers": {
       "basico": {
@@ -1169,8 +1169,8 @@
   },
   "offering_ecommerce": {
     "name": "Tienda en línea",
-    "tagline": "Vendé en línea con catálogo, carrito y pagos integrados",
-    "description": "Plataforma de ecommerce con catálogo, checkout y pasarela. Comprala como software (con código fuente) o usá la suscripción mensual hospedada por nosotros.",
+    "tagline": "Vende en línea con catálogo, carrito y pagos integrados",
+    "description": "Plataforma de ecommerce con catálogo, checkout y pasarela. Cómprala como software (con código fuente) o usa la suscripción mensual hospedada por nosotros.",
     "categoryLabel": "Comercio",
     "tiers": {
       "basico": {
@@ -1236,7 +1236,7 @@
   "offering_erpModular": {
     "name": "ERP modular",
     "tagline": "Contabilidad, inventarios, compras y facturación electrónica en un solo lugar",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"ERP modular\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"ERP modular\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Finanzas",
     "tiers": {
       "basico": {
@@ -1301,8 +1301,8 @@
   },
   "offering_facturacionElectronica": {
     "name": "Facturación electrónica",
-    "tagline": "Emití facturas DIAN con multi-resolución y nómina electrónica",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Facturación electrónica\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Emite facturas DIAN con multi-resolución y nómina electrónica",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Facturación electrónica\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Finanzas",
     "tiers": {
       "basico": {
@@ -1368,7 +1368,7 @@
   "offering_firmaElectronica": {
     "name": "Firma electrónica",
     "tagline": "Firmas válidas legalmente con KYC y estampa cronológica",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Firma electrónica\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Firma electrónica\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Seguridad",
     "tiers": {
       "basico": {
@@ -1433,8 +1433,8 @@
   },
   "offering_gestionProyectos": {
     "name": "Gestión de proyectos",
-    "tagline": "Controlá proyectos, tareas y tiempos con tableros e integraciones",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Gestión de proyectos\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Controla proyectos, tareas y tiempos con tableros e integraciones",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Gestión de proyectos\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Productividad",
     "tiers": {
       "basico": {
@@ -1499,8 +1499,8 @@
   },
   "offering_gestorDocumental": {
     "name": "Gestor documental con IA",
-    "tagline": "Ordená, buscá y firmá tus documentos con OCR e indexado por IA",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Gestor documental con IA\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Ordena, busca y firma tus documentos con OCR e indexado por IA",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Gestor documental con IA\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Datos",
     "tiers": {
       "basico": {
@@ -1565,8 +1565,8 @@
   },
   "offering_helpdeskIa": {
     "name": "Helpdesk con IA",
-    "tagline": "Atendé tickets con respuestas sugeridas y enrutamiento automático",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Helpdesk con IA\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Atiende tickets con respuestas sugeridas y enrutamiento automático",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Helpdesk con IA\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Soporte",
     "tiers": {
       "basico": {
@@ -1631,8 +1631,8 @@
   },
   "offering_hrms": {
     "name": "HRMS",
-    "tagline": "Gestioná empleados, nómina y compliance laboral",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"HRMS\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Gestiona empleados, nómina y compliance laboral",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"HRMS\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Ventas",
     "tiers": {
       "basico": {
@@ -1697,8 +1697,8 @@
   },
   "offering_lmsElearning": {
     "name": "LMS de e-learning",
-    "tagline": "Lanzá cursos online con pagos, certificados y proctoring",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"LMS de e-learning\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Lanza cursos online con pagos, certificados y proctoring",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"LMS de e-learning\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Educación",
     "tiers": {
       "basico": {
@@ -1763,8 +1763,8 @@
   },
   "offering_loyaltyFidelizacion": {
     "name": "Programa de fidelización",
-    "tagline": "Premiá a tus clientes con puntos, niveles y campañas segmentadas",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Programa de fidelización\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Premia a tus clientes con puntos, niveles y campañas segmentadas",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Programa de fidelización\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Engagement",
     "tiers": {
       "basico": {
@@ -1829,8 +1829,8 @@
   },
   "offering_moderacionContenido": {
     "name": "Moderación de contenido",
-    "tagline": "Filtrá texto, imágenes y video con clasificadores combinados",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Moderación de contenido\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Filtra texto, imágenes y video con clasificadores combinados",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Moderación de contenido\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Seguridad",
     "tiers": {
       "basico": {
@@ -1896,7 +1896,7 @@
   "offering_posRetail": {
     "name": "POS retail",
     "tagline": "Punto de venta multi-sucursal con DIAN y datafono integrados",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"POS retail\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"POS retail\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Comercio",
     "tiers": {
       "basico": {
@@ -1961,8 +1961,8 @@
   },
   "offering_qaAutomatizadoIa": {
     "name": "QA automatizado con IA",
-    "tagline": "Generá y mantené suites de tests E2E con IA",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"QA automatizado con IA\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Genera y mantén suites de tests E2E con IA",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"QA automatizado con IA\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "DevTools",
     "tiers": {
       "basico": {
@@ -2027,8 +2027,8 @@
   },
   "offering_saasMultiTenant": {
     "name": "Plataforma SaaS multi-tenant",
-    "tagline": "Lanzá tu propio SaaS con billing, auth y aislamiento por tenant",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Plataforma SaaS multi-tenant\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Lanza tu propio SaaS con billing, auth y aislamiento por tenant",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Plataforma SaaS multi-tenant\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Seguridad",
     "tiers": {
       "basico": {
@@ -2093,8 +2093,8 @@
   },
   "offering_scrapingExtraccion": {
     "name": "Scraping y extracción de datos",
-    "tagline": "Recolectá datos de la web con proxies y parsing inteligente",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Scraping y extracción de datos\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Recolecta datos de la web con proxies y parsing inteligente",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Scraping y extracción de datos\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Datos",
     "tiers": {
       "basico": {
@@ -2159,8 +2159,8 @@
   },
   "offering_sistemaReservas": {
     "name": "Sistema de reservas",
-    "tagline": "Agendá citas, clases o turnos con calendarios sincronizados",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Sistema de reservas\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Agenda citas, clases o turnos con calendarios sincronizados",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Sistema de reservas\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Productividad",
     "tiers": {
       "basico": {
@@ -2226,7 +2226,7 @@
   "offering_telemedicina": {
     "name": "Plataforma de telemedicina",
     "tagline": "Consultas remotas con historia clínica y recetas digitales",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Plataforma de telemedicina\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Plataforma de telemedicina\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "HealthTech",
     "tiers": {
       "basico": {
@@ -2292,7 +2292,7 @@
   "offering_voiceAiCallcenter": {
     "name": "Voice AI para call center",
     "tagline": "Bots por teléfono con STT, TTS y enrutamiento inteligente",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Voice AI para call center\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Voice AI para call center\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Voz IA",
     "tiers": {
       "basico": {
@@ -2358,7 +2358,7 @@
   "offering_vpnEmpresarial": {
     "name": "VPN empresarial",
     "tagline": "Acceso remoto seguro con WireGuard, MFA y SIEM",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"VPN empresarial\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"VPN empresarial\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Seguridad",
     "tiers": {
       "basico": {
@@ -2423,8 +2423,8 @@
   },
   "offering_wmsLogistica": {
     "name": "WMS logística",
-    "tagline": "Controlá tu bodega con scanner, picking y carriers integrados",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"WMS logística\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Controla tu bodega con scanner, picking y carriers integrados",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"WMS logística\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Operaciones",
     "tiers": {
       "basico": {

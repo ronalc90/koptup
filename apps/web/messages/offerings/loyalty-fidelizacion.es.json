@@ -1,8 +1,8 @@
 {
   "offering_loyaltyFidelizacion": {
     "name": "Programa de fidelización",
-    "tagline": "Premiá a tus clientes con puntos, niveles y campañas segmentadas",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Programa de fidelización\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Premia a tus clientes con puntos, niveles y campañas segmentadas",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Programa de fidelización\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Engagement",
     "tiers": {
       "basico": {

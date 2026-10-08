@@ -66,7 +66,7 @@ export default function Calendar({ diaSeleccionado, onSelectDia }: CalendarProps
             Calendario editorial · 30 días
           </h2>
           <p className="mt-1 text-sm text-secondary-600 dark:text-secondary-400">
-            Un demo distinto cada día, mezclando ángulos y formatos. Hacé click en cualquier día para generar el post.
+            Un demo distinto cada día, mezclando ángulos y formatos. Haz clic en cualquier día para generar el post.
           </p>
         </div>
         <Leyenda />

@@ -1,8 +1,8 @@
 {
   "offering_gestionProyectos": {
     "name": "Gestión de proyectos",
-    "tagline": "Controlá proyectos, tareas y tiempos con tableros e integraciones",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Gestión de proyectos\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Controla proyectos, tareas y tiempos con tableros e integraciones",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Gestión de proyectos\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Productividad",
     "tiers": {
       "basico": {

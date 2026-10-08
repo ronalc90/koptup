@@ -12,7 +12,7 @@ async function loadAggregate(locale: string, name: 'demos' | 'offerings'): Promi
     const mod = await import(`../../messages/_${name}.${locale}.json`);
     return (mod as any).default ?? mod;
   } catch (err) {
-    console.warn(`[i18n/request] no aggregate for ${name}.${locale} — corré "npm run merge-messages"`, err);
+    console.warn(`[i18n/request] no aggregate for ${name}.${locale} — corre "npm run merge-messages"`, err);
     return {};
   }
 }

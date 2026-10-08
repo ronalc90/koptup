@@ -1,8 +1,8 @@
 {
   "offering_saasMultiTenant": {
     "name": "Plataforma SaaS multi-tenant",
-    "tagline": "Lanzá tu propio SaaS con billing, auth y aislamiento por tenant",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Plataforma SaaS multi-tenant\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Lanza tu propio SaaS con billing, auth y aislamiento por tenant",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Plataforma SaaS multi-tenant\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Seguridad",
     "tiers": {
       "basico": {

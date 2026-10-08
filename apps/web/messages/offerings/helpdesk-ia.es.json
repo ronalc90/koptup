@@ -1,8 +1,8 @@
 {
   "offering_helpdeskIa": {
     "name": "Helpdesk con IA",
-    "tagline": "Atendé tickets con respuestas sugeridas y enrutamiento automático",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Helpdesk con IA\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Atiende tickets con respuestas sugeridas y enrutamiento automático",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Helpdesk con IA\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Soporte",
     "tiers": {
       "basico": {

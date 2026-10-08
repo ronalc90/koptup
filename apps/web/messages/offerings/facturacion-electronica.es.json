@@ -1,8 +1,8 @@
 {
   "offering_facturacionElectronica": {
     "name": "Facturación electrónica",
-    "tagline": "Emití facturas DIAN con multi-resolución y nómina electrónica",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Facturación electrónica\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Emite facturas DIAN con multi-resolución y nómina electrónica",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Facturación electrónica\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Finanzas",
     "tiers": {
       "basico": {

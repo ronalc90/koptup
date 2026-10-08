@@ -123,7 +123,7 @@ export default function NodeInspector({ nodeKind }: Props) {
                 <Field label={t('fields.temperature')} value="0.2" />
                 <CodeField
                   label={t('fields.prompt')}
-                  value={`Resumí al cliente {{input.email}} en 2 frases y recomendá siguiente acción.`}
+                  value={`Resume al cliente {{input.email}} en 2 frases y recomienda siguiente acción.`}
                   rows={4}
                 />
               </>

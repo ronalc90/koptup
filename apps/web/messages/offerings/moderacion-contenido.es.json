@@ -1,8 +1,8 @@
 {
   "offering_moderacionContenido": {
     "name": "Moderación de contenido",
-    "tagline": "Filtrá texto, imágenes y video con clasificadores combinados",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Moderación de contenido\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Filtra texto, imágenes y video con clasificadores combinados",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Moderación de contenido\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Seguridad",
     "tiers": {
       "basico": {

@@ -2,7 +2,7 @@
   "offering_firmaElectronica": {
     "name": "Firma electrónica",
     "tagline": "Firmas válidas legalmente con KYC y estampa cronológica",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Firma electrónica\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Firma electrónica\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Seguridad",
     "tiers": {
       "basico": {

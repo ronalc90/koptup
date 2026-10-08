@@ -2,7 +2,7 @@
   "offering_chatbotRagIa": {
     "name": "Chatbot RAG con IA",
     "tagline": "Asistente virtual que entiende tu negocio",
-    "description": "Bot conversacional entrenado con tu base de conocimiento. Lo podés comprar como software a medida (te entregamos el código) o suscribirte al SaaS mensual hospedado por nosotros.",
+    "description": "Bot conversacional entrenado con tu base de conocimiento. Lo puedes comprar como software a medida (te entregamos el código) o suscribirte al SaaS mensual hospedado por nosotros.",
     "categoryLabel": "Plataforma IA",
     "tiers": {
       "basico": {

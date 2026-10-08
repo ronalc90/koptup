@@ -1,8 +1,8 @@
 {
   "offering_automatizacionWorkflows": {
     "name": "Automatización de workflows",
-    "tagline": "Conectá tus apps y automatizá procesos con steps de IA",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Automatización de workflows\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Conecta tus apps y automatiza procesos con steps de IA",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Automatización de workflows\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Plataforma IA",
     "tiers": {
       "basico": {

@@ -148,7 +148,7 @@ export default function LoginPage() {
           <div className="p-4 bg-primary-50 dark:bg-primary-950 border border-primary-200 dark:border-primary-800 rounded-lg text-center">
             {/* TODO: extract to i18n */}
             <p className="text-sm text-primary-700 dark:text-primary-300">
-              Iniciá sesión para continuar a <span className="font-semibold">{redirectTarget}</span>
+              Inicia sesión para continuar a <span className="font-semibold">{redirectTarget}</span>
             </p>
           </div>
         )}

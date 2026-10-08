@@ -1,8 +1,8 @@
 {
   "offering_qaAutomatizadoIa": {
     "name": "QA automatizado con IA",
-    "tagline": "Generá y mantené suites de tests E2E con IA",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"QA automatizado con IA\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Genera y mantén suites de tests E2E con IA",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"QA automatizado con IA\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "DevTools",
     "tiers": {
       "basico": {

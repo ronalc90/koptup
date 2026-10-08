@@ -236,7 +236,7 @@ export default function PostGenerator({
             <p className="mt-2 flex items-start gap-1.5 rounded-md bg-red-50 px-2.5 py-1.5 text-[11px] leading-snug text-red-700 dark:bg-red-950/40 dark:text-red-300">
               <ExclamationTriangleIcon className="mt-0.5 h-3.5 w-3.5 shrink-0" />
               <span>
-                {aiError}. Mostrando versión local mientras tanto — podés regenerar cuando quieras.
+                {aiError}. Mostrando versión local mientras tanto — puedes regenerar cuando quieras.
               </span>
             </p>
           ) : null}
@@ -498,7 +498,7 @@ function AdCopyView({
         </div>
         <p className="mt-3 text-[11px] text-secondary-500 dark:text-secondary-400">
           Costo estimado LinkedIn LATAM: <strong>$3–8 USD por click</strong> para audiencia de
-          decisores. Pensá presupuesto mínimo $10/día y rotar 3 variantes para validar cuál convierte.
+          decisores. Piensa en un presupuesto mínimo de $10/día y en rotar 3 variantes para validar cuál convierte.
         </p>
       </div>
     </div>
@@ -532,7 +532,7 @@ function CarruselView({ slides, demo }: { slides: CarruselSlide[]; demo: KoptupD
           {slides.length} slides · 1080×1080 cada uno
         </p>
         <p className="text-[11px] text-secondary-500 dark:text-secondary-400">
-          Exportá las imágenes con Canva / Figma siguiendo estas notas
+          Exporta las imágenes con Canva / Figma siguiendo estas notas
         </p>
       </div>
 
@@ -569,7 +569,7 @@ function CarruselView({ slides, demo }: { slides: CarruselSlide[]; demo: KoptupD
 
       <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs leading-relaxed text-amber-900 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-200">
         💡 <strong>Tip:</strong> En LinkedIn, los carruseles tienen 3× más alcance orgánico que los
-        posts de texto. Subílos como documento PDF (1080×1080 por página). Combinalo con un texto
+        posts de texto. Súbelos como documento PDF (1080×1080 por página). Combínalo con un texto
         introductorio corto (2-3 líneas) sobre <strong>{demo.titulo}</strong>.
       </div>
     </div>

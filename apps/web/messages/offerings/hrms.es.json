@@ -1,8 +1,8 @@
 {
   "offering_hrms": {
     "name": "HRMS",
-    "tagline": "Gestioná empleados, nómina y compliance laboral",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"HRMS\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Gestiona empleados, nómina y compliance laboral",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"HRMS\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Ventas",
     "tiers": {
       "basico": {

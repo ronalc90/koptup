@@ -26,7 +26,7 @@
     },
     "views": {
       "title": "Vistas disponibles",
-      "subtitle": "Elegí la mejor vista según el contexto de tu equipo",
+      "subtitle": "Elige la mejor vista según el contexto de tu equipo",
       "kanban": "Kanban",
       "gantt": "Gantt",
       "timeline": "Timeline",
@@ -191,7 +191,7 @@
     },
     "integrations": {
       "title": "Integraciones",
-      "subtitle": "Conectá tu stack en segundos",
+      "subtitle": "Conecta tu stack en segundos",
       "github": "GitHub",
       "githubDesc": "Auto-link de commits y PRs",
       "gitlab": "GitLab",
@@ -235,7 +235,7 @@
     },
     "templates": {
       "title": "Marketplace de plantillas",
-      "subtitle": "Empezá tu próximo proyecto en minutos",
+      "subtitle": "Empieza tu próximo proyecto en minutos",
       "tpl1": "Lanzamiento de producto",
       "tpl1Desc": "Roadmap, marketing, GTM",
       "tpl2": "Sprint Scrum",
@@ -252,7 +252,7 @@
       "fromScratch": "Empezar en blanco",
       "fromScratchDesc": "Crear un proyecto vacío",
       "useTemplates": "Usar una plantilla",
-      "chooseTemplate": "Elegí una plantilla para arrancar"
+      "chooseTemplate": "Elige una plantilla para arrancar"
     },
     "shell": {
       "aiInsights": "AI Insights",

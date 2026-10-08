@@ -317,7 +317,7 @@ export default function BuilderMode() {
       }
     }
     router.replace('?');
-    toast.success('Nuevo bot listo. Configurá y guardá para persistir.');
+    toast.success('Nuevo bot listo. Configura y guarda para persistir.');
   }, [router]);
 
   /** El bot activo fue eliminado: volvemos al estado "sin guardar". */

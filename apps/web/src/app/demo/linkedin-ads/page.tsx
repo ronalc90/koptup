@@ -132,7 +132,7 @@ function Hero() {
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-base text-primary-50 sm:text-lg">
           Plan editorial de 30 días, posts orgánicos + ad copy + carruseles + capturas de pantalla
-          reales de cada demo. Pasá de 19 seguidores a una audiencia que entiende qué hace Koptup.
+          reales de cada demo. Pasa de 19 seguidores a una audiencia que entiende qué hace Koptup.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur">
@@ -201,7 +201,7 @@ function Overview({
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <AccionCard
           step="1"
-          titulo="Mirá el plan de 30 días"
+          titulo="Mira el plan de 30 días"
           descripcion="Un demo distinto cada día, con ángulo + tipo de contenido recomendado para maximizar variedad y alcance."
           cta="Abrir calendario"
           onClick={onGoCalendar}
@@ -209,16 +209,16 @@ function Overview({
         />
         <AccionCard
           step="2"
-          titulo="Generá el post"
-          descripcion="Elegí demo, ángulo y tono. Te entregamos hook, cuerpo, CTA, hashtags y vista previa real de LinkedIn."
+          titulo="Genera el post"
+          descripcion="Elige demo, ángulo y tono. Te entregamos hook, cuerpo, CTA, hashtags y vista previa real de LinkedIn."
           cta="Abrir generador"
           onClick={onGoGen}
           icon={<SparklesIcon className="h-6 w-6" />}
         />
         <AccionCard
           step="3"
-          titulo="Sumá el visual"
-          descripcion="Generá imagen 1200×627 con plantillas o capturá foto/video del demo real con un click."
+          titulo="Suma el visual"
+          descripcion="Genera imagen 1200×627 con plantillas o captura foto/video del demo real con un click."
           cta="Abrir capturas"
           onClick={onGoCapture}
           icon={<PhotoIcon className="h-6 w-6" />}
@@ -231,24 +231,24 @@ function Overview({
         </h3>
         <ol className="mt-3 space-y-2.5 text-sm leading-relaxed text-secondary-700 dark:text-secondary-300">
           <li>
-            <strong>1. Lunes 9:00 AM:</strong> abrís el calendario, ves el demo del día y su ángulo. Si
-            no te convence, lo regenerás con otro tono.
+            <strong>1. Lunes 9:00 AM:</strong> abres el calendario, ves el demo del día y su ángulo. Si
+            no te convence, lo regeneras con otro tono.
           </li>
           <li>
-            <strong>2. Generás 3 variantes del mismo post</strong> y elegís la que más te suena.
-            Editás los matices personales que solo vos podés aportar.
+            <strong>2. Generas 3 variantes del mismo post</strong> y eliges la que más te suena.
+            Editas los matices personales que solo tú puedes aportar.
           </li>
           <li>
-            <strong>3. Vas a Capturas:</strong> generás visual 1200×627 con la plantilla o capturás
+            <strong>3. Vas a Capturas:</strong> generas visual 1200×627 con la plantilla o capturas
             el demo real en pantalla (foto + video corto si el formato lo pide).
           </li>
           <li>
-            <strong>4. Pegás en LinkedIn:</strong> copiás el texto, subís la imagen/video, agregás
-            tags a 3 personas relevantes y publicás.
+            <strong>4. Pegas en LinkedIn:</strong> copias el texto, subes la imagen/video, agregas
+            tags a 3 personas relevantes y publicas.
           </li>
           <li>
-            <strong>5. Promocionás solo lo que probaste orgánicamente:</strong> si un post pasa de 100
-            impresiones orgánicas, abrís el tab Ad Copy y armás la versión sponsored.
+            <strong>5. Promocionas solo lo que probaste orgánicamente:</strong> si un post pasa de 100
+            impresiones orgánicas, abres el tab Ad Copy y armas la versión sponsored.
           </li>
         </ol>
       </div>

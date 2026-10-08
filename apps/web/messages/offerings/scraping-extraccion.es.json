@@ -1,8 +1,8 @@
 {
   "offering_scrapingExtraccion": {
     "name": "Scraping y extracción de datos",
-    "tagline": "Recolectá datos de la web con proxies y parsing inteligente",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Scraping y extracción de datos\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Recolecta datos de la web con proxies y parsing inteligente",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Scraping y extracción de datos\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Datos",
     "tiers": {
       "basico": {

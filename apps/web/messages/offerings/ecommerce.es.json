@@ -1,8 +1,8 @@
 {
   "offering_ecommerce": {
     "name": "Tienda en línea",
-    "tagline": "Vendé en línea con catálogo, carrito y pagos integrados",
-    "description": "Plataforma de ecommerce con catálogo, checkout y pasarela. Comprala como software (con código fuente) o usá la suscripción mensual hospedada por nosotros.",
+    "tagline": "Vende en línea con catálogo, carrito y pagos integrados",
+    "description": "Plataforma de ecommerce con catálogo, checkout y pasarela. Cómprala como software (con código fuente) o usa la suscripción mensual hospedada por nosotros.",
     "categoryLabel": "Comercio",
     "tiers": {
       "basico": {
