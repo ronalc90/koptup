@@ -119,8 +119,9 @@ export function createApp(): Express {
   app.use('/api/chatbot', chatbotRateLimiter);
   app.use('/api/', (req, res, next) => {
     if (req.path.startsWith('/chatbot')) return next();
-    // La verificación de sesión del middleware de la web tiene su propio cupo.
-    if (req.path === '/auth/me') return authMeRateLimiter(req, res, next);
+    // La verificación de sesión del middleware de la web tiene su propio cupo,
+    // igual que la verificación de acceso que hace al abrir /demo/<slug>.
+    if (req.path === '/auth/me' || req.path.startsWith('/demo-access/')) return authMeRateLimiter(req, res, next);
     return rateLimiter(req, res, next);
   });
 

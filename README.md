@@ -49,6 +49,16 @@ El resto (24 vistas: CRM, ERP, POS, HRMS, WMS, LMS, helpdesk, telemedicina, fact
 
 Catálogo filtrable por categoría: **<https://www.koptup.com/demo>**
 
+### Solicitud y acceso a demos
+
+Cada demo tiene un modo de acceso que el administrador cambia en **Admin › Catálogo de demos** (`/admin/catalogo-demos`): **Abierta** (cualquiera la abre), **Requiere acceso** (solo con un acceso aprobado) o **Solo por invitación**. El modo inicial de cada una está en [`apps/web/src/lib/demo-access-defaults.ts`](apps/web/src/lib/demo-access-defaults.ts) (igual a la semilla del backend).
+
+1. El visitante pide la demo en [`/solicitar-demo`](https://www.koptup.com/solicitar-demo) (también desde el cierre de cada demo, las tarjetas de `/demo` y la pantalla de acceso). La solicitud exige la autorización de datos (Ley 1581 de 2012) y tiene honeypot y cupos por IP y por email.
+2. El equipo la revisa en **Admin › Solicitudes de demo** (`/admin/solicitudes`): aprueba (elige demos, días y nota) o rechaza (motivo). Al aprobar se crea la cuenta del prospecto y un enlace de activación de un solo uso (72 h) que el panel muestra para **copiar** o **enviar por WhatsApp**; si el servidor tiene SMTP, también se envía por email.
+3. El prospecto crea su contraseña en `/activar/<token>` y entra a **Mis demos** (`/dashboard/demos`), con los días que le quedan.
+4. Al abrir `/demo/<slug>`, el middleware de Next ([`apps/web/src/middleware.ts`](apps/web/src/middleware.ts)) pregunta al backend (`GET /api/demo-access/<slug>`) con la sesión; sin acceso muestra la pantalla "Solicita acceso" (`/demo-acceso/<slug>`, sin indexar). Si el backend no responde, las demos abiertas siguen abiertas y las demás no se abren.
+5. En **Admin › Accesos a demos** (`/admin/accesos`) el equipo extiende, revoca (la demo deja de abrirse desde su siguiente carga; las APIs de las demos con backend real lo verifican en cada llamada) o concede acceso directo por email.
+
 ## Stack
 
 Tecnologías que realmente usamos en este repo:
@@ -101,7 +111,7 @@ Las tres son opcionales: si una no existe, su etiqueta no se carga. Aunque exist
 
   | Evento | Cuándo | Parámetros |
   |---|---|---|
-  | `generate_lead` | Formulario de [`/contact`](https://www.koptup.com/contact) enviado con éxito | `lead_source` (`contact_form`), `service`, `plan_id` (si viene de un plan RAG) |
+  | `generate_lead` | Formulario de [`/contact`](https://www.koptup.com/contact) o de [`/solicitar-demo`](https://www.koptup.com/solicitar-demo) enviado con éxito | `lead_source` (`contact_form` o `demo-request`); en contacto, `service` y `plan_id` (si viene de un plan RAG); en solicitud de demo, `demos_count` y `demo_slugs` |
   | `demo_start` | Primera pregunta en [`/demo/chatbot`](https://www.koptup.com/demo/chatbot) en cada carga de la página | `demo_mode` (`sample`: documento de ejemplo; `upload`: documento propio) |
   | `demo_upload` | Documento subido con éxito en "Prueba con tu documento" | `file_type` (`pdf`, `docx` o `txt`), `pages` |
   | `whatsapp_click` | Clic en el botón de WhatsApp de `/contact` | `link_location` |
@@ -138,7 +148,7 @@ Al arrancar, el backend valida sus variables con zod (`apps/backend/src/config/e
 | `CHATBOT_MONTHLY_BUDGET_USD` | por defecto `50` | Tope de gasto mensual en OpenAI del chatbot (Builder, Playground y chat por sesión). Al alcanzarlo, el chat responde en modo extractivo y lo dice. |
 | `LINKEDIN_ADS_MONTHLY_BUDGET_USD` | por defecto `20` | Tope mensual del generador de LinkedIn Ads (además, 5 generaciones cada 10 minutos y 30 al día por cuenta, o por IP si no hay sesión). |
 | `CONTENT_MONTHLY_BUDGET_USD` | por defecto `20` | Tope mensual del gestor de contenido con IA. |
-| `INTERNAL_API_KEY` | opcional, igual en Vercel y Railway | Permite que la web (middleware de `/admin` y `/dashboard`, proxy de LinkedIn Ads) informe la IP real del visitante para los límites por IP (sin ella, esas peticiones cuentan por la IP de salida de Vercel). |
+| `INTERNAL_API_KEY` | opcional, igual en Vercel y Railway | Permite que la web (middleware de `/admin`, `/dashboard` y `/demo/<slug>`, proxy de LinkedIn Ads) informe la IP real del visitante para los límites por IP (sin ella, esas peticiones cuentan por la IP de salida de Vercel). |
 | `ADMIN_EMAIL` | opcional | Si existe, el arranque asegura el rol admin de esa cuenta (solo si ya está registrada). Sin ella, el arranque no cambia roles; también se puede usar `src/scripts/set-admin.ts`. |
 | `API_DOCS_ENABLED` | `false` en producción | `/api-docs` solo existe fuera de producción o con este valor en `true`. |
 

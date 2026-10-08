@@ -8,6 +8,7 @@
  *  GET  /api/demo-catalog         Catálogo público: slug, nombre, accessMode, activo.
  *  GET  /api/demo-access/:slug    ¿Puede esta sesión abrir la demo? (sesión opcional)
  *                                 → { allowed, accessMode, reason, expiresAt, ... }
+ *                                 `?registrar=0` no cuenta la consulta como uso.
  *  GET  /api/me/demos             Accesos de la cuenta con días restantes (autenticado).
  */
 import { Router, Request, Response } from 'express';
@@ -168,7 +169,10 @@ demoAccessRouter.get(
       if (fresh && fresh !== 'db_unavailable') user = { id: fresh.id, role: fresh.role };
     }
 
-    const decision = await evaluateDemoAccess(slug, user, { registrar: true });
+    // `?registrar=0`: el middleware de la web lo usa en los prefetch de Next
+    // (no son una visita a la demo). Solo omite el registro de uso.
+    const sinRegistro = req.query.registrar === '0';
+    const decision = await evaluateDemoAccess(slug, user, { registrar: !sinRegistro, sinRegistro });
     if (decision.reason === 'no_existe') {
       res.status(404).json({ success: false, code: 'not_found', message: 'Esa demo no existe.' });
       return;

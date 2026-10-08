@@ -44,8 +44,12 @@ jest.mock('next/navigation', () => {
 });
 
 // ---------------------------------------------------------------------------
-// APIs del navegador que jsdom no trae.
+// APIs del navegador que jsdom no trae. Las pruebas con
+// `@jest-environment node` (p. ej. el middleware de Next) no tienen DOM:
+// ahí se omiten.
 // ---------------------------------------------------------------------------
+const IS_DOM = typeof window !== 'undefined';
+
 class MockObserver {
   observe() {}
   unobserve() {}
@@ -55,15 +59,15 @@ class MockObserver {
   }
 }
 
-Object.defineProperty(window, 'ResizeObserver', { writable: true, configurable: true, value: MockObserver });
-Object.defineProperty(window, 'IntersectionObserver', { writable: true, configurable: true, value: MockObserver });
-Object.defineProperty(window, 'MutationObserver', {
+if (IS_DOM) Object.defineProperty(window, 'ResizeObserver', { writable: true, configurable: true, value: MockObserver });
+if (IS_DOM) Object.defineProperty(window, 'IntersectionObserver', { writable: true, configurable: true, value: MockObserver });
+if (IS_DOM) Object.defineProperty(window, 'MutationObserver', {
   writable: true,
   configurable: true,
   value: window.MutationObserver ?? MockObserver,
 });
 
-Object.defineProperty(window, 'matchMedia', {
+if (IS_DOM) Object.defineProperty(window, 'matchMedia', {
   writable: true,
   configurable: true,
   value: (query: string) => ({
@@ -78,21 +82,21 @@ Object.defineProperty(window, 'matchMedia', {
   }),
 });
 
-Object.defineProperty(window, 'scrollTo', { writable: true, configurable: true, value: jest.fn() });
-Element.prototype.scrollIntoView = jest.fn();
-Element.prototype.scrollTo = jest.fn() as unknown as Element['scrollTo'];
+if (IS_DOM) Object.defineProperty(window, 'scrollTo', { writable: true, configurable: true, value: jest.fn() });
+if (IS_DOM) Element.prototype.scrollIntoView = jest.fn();
+if (IS_DOM) Element.prototype.scrollTo = jest.fn() as unknown as Element['scrollTo'];
 
 // Canvas: las gráficas dibujan en <canvas>; jsdom no tiene contexto 2D.
-HTMLCanvasElement.prototype.getContext = jest.fn(() => null) as unknown as HTMLCanvasElement['getContext'];
-HTMLCanvasElement.prototype.toDataURL = jest.fn(() => 'data:image/png;base64,');
+if (IS_DOM) HTMLCanvasElement.prototype.getContext = jest.fn(() => null) as unknown as HTMLCanvasElement['getContext'];
+if (IS_DOM) HTMLCanvasElement.prototype.toDataURL = jest.fn(() => 'data:image/png;base64,');
 
 // Audio y video: jsdom no reproduce medios.
-Object.defineProperty(HTMLMediaElement.prototype, 'play', {
+if (IS_DOM) Object.defineProperty(HTMLMediaElement.prototype, 'play', {
   configurable: true,
   value: jest.fn(() => Promise.resolve()),
 });
-Object.defineProperty(HTMLMediaElement.prototype, 'pause', { configurable: true, value: jest.fn() });
-Object.defineProperty(HTMLMediaElement.prototype, 'load', { configurable: true, value: jest.fn() });
+if (IS_DOM) Object.defineProperty(HTMLMediaElement.prototype, 'pause', { configurable: true, value: jest.fn() });
+if (IS_DOM) Object.defineProperty(HTMLMediaElement.prototype, 'load', { configurable: true, value: jest.fn() });
 
 // TextEncoder/TextDecoder existen en todos los navegadores, pero no en el
 // entorno jsdom de Jest (los usa, por ejemplo, jspdf).
@@ -202,7 +206,7 @@ class BlockedXMLHttpRequest extends BlockedEventTarget {
     }, 0);
   }
 }
-Object.defineProperty(window, 'XMLHttpRequest', { writable: true, configurable: true, value: BlockedXMLHttpRequest });
+if (IS_DOM) Object.defineProperty(window, 'XMLHttpRequest', { writable: true, configurable: true, value: BlockedXMLHttpRequest });
 
 /** WebSocket que nunca conecta: emite error y cierre. */
 class BlockedWebSocket extends BlockedEventTarget {
@@ -233,9 +237,9 @@ class BlockedWebSocket extends BlockedEventTarget {
     this.readyState = 3;
   }
 }
-Object.defineProperty(window, 'WebSocket', { writable: true, configurable: true, value: BlockedWebSocket });
+if (IS_DOM) Object.defineProperty(window, 'WebSocket', { writable: true, configurable: true, value: BlockedWebSocket });
 
-Object.defineProperty(navigator, 'sendBeacon', { writable: true, configurable: true, value: jest.fn(() => false) });
+if (IS_DOM) Object.defineProperty(navigator, 'sendBeacon', { writable: true, configurable: true, value: jest.fn(() => false) });
 
 // Antes del desmontaje automático de Testing Library: deja que terminen los
 // efectos asíncronos pendientes (por ejemplo, el manejo del fetch rechazado)

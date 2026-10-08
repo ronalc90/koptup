@@ -18,7 +18,8 @@
  *    POST   /:id/reject                { motivo, notificar?, mensaje? }
  *    POST   /:id/resend-activation
  *  /api/admin/demo-grants
- *    GET    /                          ?estado=activo|expirado|revocado&demo=&q=&user=&request=&page=&limit=
+ *    GET    /                          ?estado=activo|por_vencer|expirado|revocado&demo=&q=&user=&request=&page=&limit=
+ *                                      (devuelve también `conteos` por estado)
  *    POST   /                          invitación directa { email, nombre?, empresa?, telefono?, demos[], dias?, nota?, mensaje? }
  *    POST   /:id/extend                { dias }
  *    POST   /:id/revoke                { motivo? }
@@ -55,6 +56,7 @@ import {
 } from '../services/demo-requests.service';
 import {
   DirectGrantSchema,
+  GRANT_LIST_STATES,
   type StaffActor,
   createDirectGrants,
   extendGrant,
@@ -183,7 +185,7 @@ adminDemoRequestsRouter.post(
 export const adminDemoGrantsRouter = Router();
 
 const GrantListQuery = PageSchema.extend({
-  estado: z.enum(['activo', 'expirado', 'revocado']).optional(),
+  estado: z.enum(GRANT_LIST_STATES).optional(),
   demo: optionalQuery(60),
   q: optionalQuery(120),
   user: optionalQuery(40),

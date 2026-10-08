@@ -11,6 +11,8 @@ import {
   resetPassword,
   activateAccount,
   checkActivation,
+  updateProfile,
+  changePassword,
 } from '../controllers/auth.controller';
 import { authenticate } from '../middleware/auth';
 import { activationCheckRateLimiter, strictRateLimiter } from '../middleware/rateLimiter';
@@ -275,6 +277,19 @@ router.get('/profile', authenticate, getProfile as RequestHandler);
  * Lo usa el middleware de Next para proteger /admin y /dashboard en el servidor.
  */
 router.get('/me', authenticate, getProfile as RequestHandler);
+
+/**
+ * PATCH /api/auth/me { name?, phone?, company? } — el dueño actualiza sus
+ * datos básicos (Portal › Mi perfil). El email y el rol no se cambian aquí.
+ */
+router.patch('/me', authenticate, updateProfile as RequestHandler);
+
+/**
+ * POST /api/auth/change-password { currentPassword, newPassword } — cambia la
+ * contraseña verificando la actual y devuelve una sesión nueva (rate-limit
+ * estricto: 5/min por IP).
+ */
+router.post('/change-password', strictRateLimiter, authenticate, changePassword as RequestHandler);
 
 /**
  * @swagger

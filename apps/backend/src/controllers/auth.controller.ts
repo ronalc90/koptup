@@ -217,19 +217,105 @@ export const getProfile = asyncHandler(
       throw new AppError('User not found', 404);
     }
 
-    res.json({
-      success: true,
-      data: {
-        id: user._id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        created_at: user.created_at,
-        last_login: user.last_login,
-      },
-    });
+    res.json({ success: true, data: profileView(user) });
   }
 );
+
+/** Datos de la cuenta que ve su dueño (GET /me y /profile, PATCH /me). */
+function profileView(user: IUser) {
+  return {
+    id: user._id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+    phone: user.phone ?? null,
+    company: user.company ?? null,
+    provider: user.provider,
+    accountStatus: user.accountStatus,
+    created_at: user.created_at,
+    last_login: user.last_login,
+  };
+}
+
+const PROFILE_PHONE = /^[+0-9 ().-]{7,40}$/;
+const optionalProfileText = (max: number) =>
+  z
+    .string()
+    .trim()
+    .max(max)
+    .nullable()
+    .optional()
+    .transform((v) => (v ? v : null));
+
+const UpdateProfileSchema = z
+  .object({
+    name: z.string().trim().min(2, 'Escribe tu nombre (mínimo 2 caracteres).').max(120).optional(),
+    phone: optionalProfileText(40).refine((v) => v === null || PROFILE_PHONE.test(v), 'Escribe un teléfono válido (solo números, espacios y +).'),
+    company: optionalProfileText(160),
+  })
+  .strict();
+
+/**
+ * PATCH /api/auth/me { name?, phone?, company? } — el dueño de la cuenta
+ * actualiza sus datos básicos. El email y el rol no se cambian aquí.
+ */
+export const updateProfile = asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (!req.user) throw new AppError('Unauthorized', 401);
+  const parsed = UpdateProfileSchema.safeParse(req.body ?? {});
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0];
+    const field = String(issue?.path[0] ?? '');
+    throw new AppError(issue?.message ?? 'Datos inválidos', 400, 'invalid_profile', { fields: field ? [field] : [] });
+  }
+  const user = await User.findById(req.user.id);
+  if (!user) throw new AppError('User not found', 404);
+  const { name, phone, company } = parsed.data;
+  if (name !== undefined) user.name = name;
+  if ('phone' in (req.body ?? {})) user.phone = phone ?? undefined;
+  if ('company' in (req.body ?? {})) user.company = company ?? undefined;
+  await user.save();
+  res.json({ success: true, message: 'Datos actualizados.', data: profileView(user) });
+});
+
+const ChangePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Escribe tu contraseña actual.').max(128),
+  newPassword: z.string().min(8, 'La contraseña nueva debe tener al menos 8 caracteres.').max(128, 'La contraseña puede tener máximo 128 caracteres.'),
+});
+
+/**
+ * POST /api/auth/change-password { currentPassword, newPassword } — cambia la
+ * contraseña de una cuenta local verificando la actual. Emite una sesión
+ * nueva: el refresh token anterior (de cualquier otro navegador) deja de servir.
+ */
+export const changePassword = asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (!req.user) throw new AppError('Unauthorized', 401);
+  const parsed = ChangePasswordSchema.safeParse(req.body ?? {});
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0];
+    throw new AppError(issue?.message ?? 'Datos inválidos', 400, 'invalid_password', { fields: [String(issue?.path[0] ?? 'newPassword')] });
+  }
+  const user = await User.findById(req.user.id).select('+password');
+  if (!user) throw new AppError('User not found', 404);
+  if (!user.password) {
+    throw new AppError('Tu cuenta entra con Google: no tiene una contraseña de KopTup para cambiar.', 400, 'no_local_password');
+  }
+  const ok = await bcrypt.compare(parsed.data.currentPassword, user.password);
+  if (!ok) throw new AppError('La contraseña actual no es correcta.', 400, 'wrong_password', { fields: ['currentPassword'] });
+  if (parsed.data.currentPassword === parsed.data.newPassword) {
+    throw new AppError('La contraseña nueva debe ser distinta de la actual.', 400, 'invalid_password', { fields: ['newPassword'] });
+  }
+  user.password = await bcrypt.hash(parsed.data.newPassword, 12);
+  await user.save();
+  await recordAudit({
+    actor: { id: String(user._id), email: user.email, role: user.role },
+    accion: 'user.change_password',
+    entidad: { tipo: 'User', id: String(user._id) },
+    req,
+  });
+  const session = await issueSession(user);
+  logger.info('Password changed by the account owner');
+  res.json({ success: true, message: 'Tu contraseña quedó actualizada.', data: session });
+});
 
 /**
  * Solicita el reseteo de contraseña. Por seguridad (evitar enumeración de

@@ -173,6 +173,15 @@ class ApiClient {
 
       return { user };
     } catch (error: any) {
+      // Cuenta creada al aprobar una demo que aún no se activa: el mensaje del
+      // backend explica que debe usar el enlace de activación.
+      if (error.response?.status === 401 && error.response?.data?.code === 'account_not_activated') {
+        const notActivated: any = new Error(error.response.data.message || 'account_not_activated');
+        notActivated.code = 'account_not_activated';
+        notActivated.response = { status: 401, data: error.response.data };
+        throw notActivated;
+      }
+
       // Crear un error completamente nuevo con mensaje amigable
       if (error.response?.status === 401) {
         // No usar el error original, crear uno completamente nuevo

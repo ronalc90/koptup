@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import Button from '@/components/ui/Button';
+import DemoAccessBadge from '@/components/demo/DemoAccessBadge';
+import { demoSlugFromPath, gatedInfo, useDemoCatalog } from '@/lib/use-demo-catalog';
 import Badge from '@/components/ui/Badge';
 import Card, { CardContent } from '@/components/ui/Card';
 import {
@@ -51,6 +53,8 @@ export default function RagSectorLanding({ sectorId }: { sectorId: RagSectorId }
   const t = useTranslations('ragSectors');
   const locale = useLocale();
   const sector = getRagSector(sectorId);
+  // Modo de acceso real de la demo enlazada (p. ej. «Solo por invitación»).
+  const demoGate = gatedInfo(useDemoCatalog(), sector.demo ? demoSlugFromPath(sector.demo.path) : null);
   const Icon = RAG_SECTOR_ICONS[sectorId];
   const cases = asRagCases(t.raw(`${sectorId}.cases`));
   const values = getRagFaqValues(locale);
@@ -90,13 +94,16 @@ export default function RagSectorLanding({ sectorId }: { sectorId: RagSectorId }
                   <h3 className="text-xl font-bold text-secondary-900 dark:text-white mb-2">{c.title}</h3>
                   <p className="text-secondary-600 dark:text-secondary-400">{c.desc}</p>
                   {sector.demo && sector.demo.caseIndex === i ? (
-                    <Link
-                      href={sector.demo.path}
-                      className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
-                    >
-                      {t(`${sectorId}.demoLink`)}
-                      <ArrowRightIcon className="h-4 w-4" aria-hidden="true" />
-                    </Link>
+                    <div className="mt-4 flex flex-col items-start gap-2">
+                      <Link
+                        href={sector.demo.path}
+                        className="inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+                      >
+                        {t(`${sectorId}.demoLink`)}
+                        <ArrowRightIcon className="h-4 w-4" aria-hidden="true" />
+                      </Link>
+                      {demoGate && <DemoAccessBadge mode={demoGate.mode} activo={demoGate.activo} />}
+                    </div>
                   ) : null}
                 </CardContent>
               </Card>

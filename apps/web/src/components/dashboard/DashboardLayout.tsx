@@ -16,6 +16,7 @@ import {
   Bars3Icon,
   XMarkIcon,
   UserCircleIcon,
+  KeyIcon,
 } from '@heroicons/react/24/outline';
 import { api } from '@/lib/api';
 import { useTranslations } from 'next-intl';
@@ -39,7 +40,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       router.push('/login');
       return;
     }
-    setUser(JSON.parse(userData));
+    const parsed = JSON.parse(userData);
+    setUser(parsed);
+    // Un prospecto solo ve Mis demos y su perfil (sin notificaciones).
+    if (parsed?.role === 'prospect') return;
 
     // Cargar notificaciones reales
     const loadNotifications = async () => {
@@ -60,14 +64,20 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     router.push('/');
   };
 
-  const navigation = [
+  // Un prospecto (cuenta creada al aprobar una demo) solo tiene Mis demos y
+  // su perfil; el middleware también lo limita en el servidor.
+  const isProspect = user?.role === 'prospect';
+  const navigation = isProspect
+    ? [{ name: t('myDemos'), href: '/dashboard/demos', icon: KeyIcon }]
+    : [
     { name: t('dashboard'), href: '/dashboard', icon: HomeIcon },
+    { name: t('myDemos'), href: '/dashboard/demos', icon: KeyIcon },
     { name: t('myOrders'), href: '/dashboard/orders', icon: ShoppingBagIcon },
     { name: t('projects'), href: '/dashboard/projects', icon: FolderIcon },
     { name: t('deliverables'), href: '/dashboard/deliverables', icon: DocumentTextIcon },
     { name: t('billing'), href: '/dashboard/billing', icon: CreditCardIcon },
     { name: t('messages'), href: '/dashboard/messages', icon: ChatBubbleLeftRightIcon },
-  ];
+      ];
 
   const isActive = (href: string) => {
     if (href === '/dashboard') return pathname === href;
@@ -97,7 +107,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </button>
 
             {/* Logo */}
-            <Link href="/dashboard" className="flex items-center space-x-2">
+            <Link href={isProspect ? '/dashboard/demos' : '/dashboard'} className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-lg">K</span>
               </div>
@@ -109,17 +119,19 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             {/* Right side */}
             <div className="flex items-center gap-3">
               {/* Notifications */}
-              <Link
-                href="/dashboard/notifications"
-                className="relative p-2 rounded-lg text-secondary-600 dark:text-secondary-400 hover:bg-secondary-100 dark:hover:bg-secondary-800"
-              >
-                <BellIcon className="h-6 w-6" />
-                {notifications > 0 && (
-                  <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                    {notifications}
-                  </span>
-                )}
-              </Link>
+              {!isProspect && (
+                <Link
+                  href="/dashboard/notifications"
+                  className="relative p-2 rounded-lg text-secondary-600 dark:text-secondary-400 hover:bg-secondary-100 dark:hover:bg-secondary-800"
+                >
+                  <BellIcon className="h-6 w-6" />
+                  {notifications > 0 && (
+                    <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                      {notifications}
+                    </span>
+                  )}
+                </Link>
+              )}
 
               {/* User menu */}
               <div className="flex items-center gap-2">
@@ -195,15 +207,31 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <UserCircleIcon className="h-5 w-5 flex-shrink-0" />
                 <span>{t('myProfile')}</span>
               </Link>
+              {!isProspect && (
+                <Link
+                  href="/dashboard/settings"
+                  onClick={() => setSidebarOpen(false)}
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800"
+                >
+                  <Cog6ToothIcon className="h-5 w-5 flex-shrink-0" />
+                  <span>{t('settings')}</span>
+                </Link>
+              )}
               <Link
-                href="/dashboard/settings"
+                href="/"
                 onClick={() => setSidebarOpen(false)}
                 className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800"
               >
-                <Cog6ToothIcon className="h-5 w-5 flex-shrink-0" />
-                <span>{t('settings')}</span>
+                <HomeIcon className="h-5 w-5 flex-shrink-0" />
+                <span>{t('backToSite')}</span>
               </Link>
             </div>
+            {isProspect && (
+              <div className="mt-6 p-4 rounded-lg bg-secondary-50 dark:bg-secondary-900 border border-secondary-200 dark:border-secondary-800">
+                <p className="text-xs font-semibold text-secondary-800 dark:text-secondary-200">{t('prospectTitle')}</p>
+                <p className="text-xs text-secondary-600 dark:text-secondary-400 mt-1">{t('prospectBody')}</p>
+              </div>
+            )}
           </nav>
         </aside>
 

@@ -3,6 +3,15 @@
 import { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
+import { homePathForRole } from '@/lib/auth-roles';
+
+/** Ruta interna guardada por el login (?redirect=…), o null. */
+function takeRedirect(): string | null {
+  if (typeof window === 'undefined') return null;
+  const value = sessionStorage.getItem('redirectAfterLogin');
+  sessionStorage.removeItem('redirectAfterLogin');
+  return value && value.startsWith('/') && !value.startsWith('//') && !value.startsWith('/\\') ? value : null;
+}
 
 function CallbackContent() {
   const router = useRouter();
@@ -30,8 +39,11 @@ function CallbackContent() {
           if (typeof window !== 'undefined') {
             localStorage.setItem('user', JSON.stringify(user));
           }
-          // Redirect to dashboard
-          router.push('/dashboard');
+          // Vuelve a la ruta pedida (navegación completa: el servidor decide
+          // con la sesión nueva) o a la página de inicio de su rol.
+          const target = takeRedirect();
+          if (target) window.location.assign(target);
+          else router.push(homePathForRole(user?.role));
         })
         .catch((err) => {
           if (!(err as any)?.suppressLogging) {

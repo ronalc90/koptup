@@ -55,12 +55,11 @@ const HYDRATION_TO_LOCALE: KnownIssue = {
   intermitente: true,
 };
 
-// Demos cuyas APIs exigen sesión o acceso desde P3 (autorización en el
-// servidor). Un visitante anónimo recibe 401 del backend hasta que la demo
-// muestre su pantalla de acceso (P4: «Solicita acceso» con DemoGrant) o, en
-// gestor-documentos, pida iniciar sesión (pista demos). cuentas-medicas
-// además debe enviar la sesión con `authFetch` de src/lib/auth-token.ts
-// (pista demos) para funcionar con una cuenta con acceso.
+// Demos públicas cuyas APIs exigen sesión desde P3 (autorización en el
+// servidor): un visitante anónimo recibe 401 del backend hasta que la demo
+// pida iniciar sesión (pista demos). Las demos que requieren acceso o
+// invitación (erp, cuentas-medicas, sistema-experto…) ya no llegan a cargar
+// sin acceso: el middleware muestra /demo-acceso (ver demo-access.spec.ts).
 const ACCESS_REQUIRED: KnownIssue = {
   motivo:
     'la API de la demo exige sesión o acceso (P3); falta la pantalla de acceso (P4) / pedir inicio de sesión (pista demos), así que el anónimo ve 401 en consola',
@@ -71,13 +70,9 @@ const ACCESS_REQUIRED: KnownIssue = {
 };
 
 const KNOWN_CONSOLE_ISSUES: Record<string, KnownIssue> = {
-  // pendiente P4 + pista demos: pantalla de acceso y authFetch (ver ACCESS_REQUIRED).
-  'cuentas-medicas': ACCESS_REQUIRED,
   // pendiente pista demos: con 401 mostrar «inicia sesión» (useDocuments expone
   // `requiresLogin`) o un corpus de muestra, en lugar del error genérico.
   'gestor-documentos': ACCESS_REQUIRED,
-  // pendiente P4: pantalla de acceso (demo privada).
-  'sistema-experto': ACCESS_REQUIRED,
   // pendiente pista demos: hidratación por toLocaleString() sin locale.
   automatizacion: HYDRATION_TO_LOCALE,
   // pendiente pista demos: hidratación por toLocaleString() sin locale.
@@ -105,8 +100,6 @@ const KNOWN_CONSOLE_ISSUES: Record<string, KnownIssue> = {
  * cada entrada es un pendiente real y la lista solo se achica).
  */
 const KNOWN_VISIBLE_ISSUES: Record<string, { motivo: string; textos: string[] }> = {
-  // pendiente P4 + pista demos: sin acceso, la demo muestra su error en lugar de «Solicita acceso».
-  'cuentas-medicas': { motivo: ACCESS_REQUIRED.motivo, textos: ['Error al cargar', 'No se pudieron cargar', 'Verifique que el servidor'] },
   // pendiente pista demos: pedir inicio de sesión antes de cargar documentos.
   'gestor-documentos': { motivo: ACCESS_REQUIRED.motivo, textos: ['Error al cargar'] },
 };

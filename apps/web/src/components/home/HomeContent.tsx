@@ -8,6 +8,8 @@ import Badge from '@/components/ui/Badge';
 import HomeHighlights from '@/components/home/HomeHighlights';
 import { DEMO_COUNT } from '@/lib/demos';
 import { MEDICAL_ACCOUNTS_DEMO_PATH } from '@/lib/rag-page';
+import DemoAccessBadge from '@/components/demo/DemoAccessBadge';
+import { demoSlugFromPath, gatedInfo, useDemoCatalog } from '@/lib/use-demo-catalog';
 import {
   ShoppingCartIcon,
   ChatBubbleBottomCenterTextIcon,
@@ -28,6 +30,8 @@ import {
  */
 export default function HomeContent() {
   const t = useTranslations();
+  // Modo de acceso real de cada demo (las que no son abiertas llevan su etiqueta).
+  const demoCatalog = useDemoCatalog();
   const th = useTranslations('homePage');
 
   const services = [
@@ -201,6 +205,7 @@ export default function HomeContent() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
             {featuredDemos.map((demo, index) => {
               const Icon = demo.icon;
+              const gated = gatedInfo(demoCatalog, demoSlugFromPath(demo.href));
               return (
                 <Link key={index} href={demo.href}>
                   <Card
@@ -211,10 +216,11 @@ export default function HomeContent() {
                       <div className={`w-14 h-14 bg-gradient-to-br ${demo.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-md`}>
                         <Icon className="h-7 w-7 text-white" />
                       </div>
-                      <div className="mb-2">
+                      <div className="mb-2 flex flex-wrap items-center gap-2">
                         <span className="text-xs font-medium text-primary-600 dark:text-primary-400">
                           {demo.category}
                         </span>
+                        {gated && <DemoAccessBadge mode={gated.mode} activo={gated.activo} />}
                       </div>
                       <CardTitle className="text-lg font-bold">{demo.title}</CardTitle>
                     </CardHeader>

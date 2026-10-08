@@ -21,7 +21,8 @@ demuestran (401/403/200 por política) están en `src/__tests__/integration/`.
 | `/api-docs` | Swagger | Solo fuera de producción o con `API_DOCS_ENABLED=true` |
 | `/api/auth` | `register`, `login`, `forgot-password`, `reset-password` | Pública con rate-limit estricto (5/min por IP) |
 | | `refresh`, `google`, `google/callback` | Pública (refresh exige un refresh token válido) |
-| | `me`, `profile`, `logout` | Autenticado |
+| | `me`, `profile`, `logout`, `PATCH me` (nombre, teléfono y empresa propios) | Autenticado |
+| | `change-password` | Autenticado + contraseña actual, rate-limit estricto (5/min por IP) |
 | `/api/contact` | `POST /` | Pública con rate-limit estricto |
 | | `test-whatsapp`, `test-email` | Solo desarrollo |
 | `/api/quotes` | `POST /` | Pública con rate-limit estricto |

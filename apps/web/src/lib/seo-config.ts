@@ -65,6 +65,14 @@ export const seoConfig: Record<string, PageSEO> = {
     canonical: `${baseUrl}/contact`,
   },
 
+  // Formulario "Solicitar demo" (sistema de demos, wiki 04)
+  'solicitar-demo': {
+    title: 'Solicitar una demo guiada',
+    description:
+      'Elige las demos de KopTup que te interesan y cuéntanos tu caso. Revisamos tu solicitud y, si la aprobamos, te enviamos un enlace para entrar a tus demos.',
+    canonical: `${baseUrl}/solicitar-demo`,
+  },
+
   // About page
   about: {
     title: 'Sobre Nosotros: Empresa de Software en Bogotá',
@@ -77,7 +85,7 @@ export const seoConfig: Record<string, PageSEO> = {
   demo: {
     title: 'Prototipos Interactivos: Prueba Antes de Contratar',
     description:
-      `Explora ${DEMO_COUNT} prototipos navegables que muestran el rango de soluciones que construimos. Dos usan OpenAI real (chatbot RAG y LinkedIn Ads); el resto son mockups interactivos con datos simulados. Sin registro ni tarjeta de crédito.`,
+      `Explora ${DEMO_COUNT} prototipos navegables que muestran el rango de soluciones que construimos. Dos usan OpenAI real (chatbot RAG y LinkedIn Ads); el resto son mockups interactivos con datos simulados. Las demos abiertas no piden registro; las demás se solicitan.`,
     canonical: `${baseUrl}/demo`,
   },
 

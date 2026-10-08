@@ -804,6 +804,47 @@ describeDb('sistema de demos (integración)', () => {
     expect((await request(app).post(`/api/admin/demo-grants/${gid}/revoke`).set(bearer(admin)).send({})).status).toBe(200);
   });
 
+  it('listado de accesos: filtro por_vencer (≤ 3 días) y conteos por estado con la misma búsqueda', async () => {
+    const DemoGrant = (await import('../../models/DemoGrant')).default;
+    const email = uniqueEmail('conteos');
+    const inv = await request(app).post('/api/admin/demo-grants').set(bearer(admin)).send({ email, nombre: 'Conteos', demos: ['erp', 'lms', 'hrms', 'delivery'] });
+    expect(inv.status).toBe(201);
+    const [erp, lms, hrms, delivery] = inv.body.data.grants.map((g: { id: string }) => g.id);
+    await DemoGrant.updateOne({ _id: lms }, { $set: { expiresAt: new Date(Date.now() + 2 * DAY) } });
+    await DemoGrant.updateOne({ _id: hrms }, { $set: { expiresAt: new Date(Date.now() - DAY) } });
+    expect((await request(app).post(`/api/admin/demo-grants/${delivery}/revoke`).set(bearer(admin)).send({ motivo: 'prueba' })).status).toBe(200);
+
+    const all = await request(app).get('/api/admin/demo-grants').query({ q: email }).set(bearer(sales));
+    expect(all.status).toBe(200);
+    expect(all.body.data.conteos).toEqual({ todos: 4, activo: 2, por_vencer: 1, expirado: 1, revocado: 1 });
+    const soon = await request(app).get('/api/admin/demo-grants').query({ q: email, estado: 'por_vencer' }).set(bearer(manager));
+    expect(soon.status).toBe(200);
+    expect(soon.body.data.items.map((g: { id: string }) => g.id)).toEqual([lms]);
+    expect(soon.body.data.conteos.todos).toBe(4);
+    const active = await request(app).get('/api/admin/demo-grants').query({ q: email, estado: 'activo' }).set(bearer(admin));
+    expect(active.body.data.items.map((g: { id: string }) => g.id).sort()).toEqual([erp, lms].sort());
+    expect((await request(app).get('/api/admin/demo-grants').query({ estado: 'otro' }).set(bearer(admin))).status).toBe(400);
+  });
+
+  it('demo-access con ?registrar=0 (prefetch de la web) decide igual pero no cuenta el uso', async () => {
+    const DemoGrant = (await import('../../models/DemoGrant')).default;
+    const inv = await request(app).post('/api/admin/demo-grants').set(bearer(admin)).send({ email: uniqueEmail('prefetch'), nombre: 'Prefetch', demos: ['telemedicina'] });
+    const session = (await activate(tokenFromUrl(inv.body.data.activationUrl))).body.data.accessToken as string;
+    const auth = { Authorization: `Bearer ${session}` };
+    const gid = inv.body.data.grants[0].id;
+
+    const pre = await request(app).get('/api/demo-access/telemedicina?registrar=0').set(auth);
+    expect(pre.body.data).toMatchObject({ allowed: true, reason: 'grant' });
+    let g = await DemoGrant.findById(gid).lean();
+    expect(g?.accesos ?? 0).toBe(0);
+    expect(g?.ultimoAcceso ?? null).toBeNull();
+
+    expect((await request(app).get('/api/demo-access/telemedicina').set(auth)).body.data.allowed).toBe(true);
+    g = await DemoGrant.findById(gid).lean();
+    expect(g?.accesos).toBe(1);
+    expect(g?.ultimoAcceso).toBeTruthy();
+  });
+
   it('ids inválidos o inexistentes → 404 (no 500)', async () => {
     const missing = new mongoose.Types.ObjectId().toString();
     for (const url of [`/api/admin/demo-requests/${missing}`, '/api/admin/demo-requests/no-es-id']) {

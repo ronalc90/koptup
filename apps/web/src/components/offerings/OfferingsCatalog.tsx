@@ -61,6 +61,8 @@ import {
 } from '@/lib/services-catalog';
 import { formatRagCOP } from '@/lib/rag-plans';
 import { trackPlanClick, type PlanClickParams } from '@/lib/analytics';
+import DemoAccessBadge from '@/components/demo/DemoAccessBadge';
+import { gatedInfo, useDemoCatalog } from '@/lib/use-demo-catalog';
 
 type Modality = 'compra' | 'saas';
 
@@ -174,6 +176,8 @@ interface OfferingCardProps {
 }
 
 function OfferingCard({ offering, globalModality, currency, onOpen }: OfferingCardProps) {
+  // Las demos que requieren acceso o invitación lo indican junto a "Ver demo".
+  const demoGate = gatedInfo(useDemoCatalog(), offering.demoSlug);
   const ns = slugToOfferingNamespace(offering.slug);
   const tp = useTranslations('offeringsCatalog');
   const t = useTranslations(ns);
@@ -265,6 +269,7 @@ function OfferingCard({ offering, globalModality, currency, onOpen }: OfferingCa
             >
               <Button variant="outline" size="sm" className="w-full">
                 {tp('card.viewDemo')}
+                {demoGate && <DemoAccessBadge mode={demoGate.mode} activo={demoGate.activo} className="ml-2" />}
               </Button>
             </Link>
           ) : null}
@@ -286,6 +291,7 @@ interface OfferingModalProps {
 }
 
 function OfferingModal({ offering, initialModality, currency, onClose }: OfferingModalProps) {
+  const demoGate = gatedInfo(useDemoCatalog(), offering.demoSlug);
   const ns = slugToOfferingNamespace(offering.slug);
   const tp = useTranslations('offeringsCatalog');
   const t = useTranslations(ns);
@@ -541,6 +547,7 @@ function OfferingModal({ offering, initialModality, currency, onClose }: Offerin
                 >
                   <Button variant="outline" size="md" className="w-full">
                     {tp('card.viewDemo')}
+                    {demoGate && <DemoAccessBadge mode={demoGate.mode} activo={demoGate.activo} className="ml-2" />}
                   </Button>
                 </Link>
               ) : null}

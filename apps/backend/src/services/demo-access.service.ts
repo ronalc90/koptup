@@ -121,10 +121,12 @@ async function recordUse(grant: IDemoGrant, registrar: boolean, now: Date): Prom
 export async function evaluateDemoAccess(
   slug: string,
   user: AccessUser | null,
-  opts: { registrar?: boolean; now?: Date } = {},
+  opts: { registrar?: boolean; sinRegistro?: boolean; now?: Date } = {},
 ): Promise<DemoAccessResult> {
   const now = opts.now ?? new Date();
   const registrar = opts.registrar === true;
+  // `sinRegistro`: solo decide, no cuenta uso (prefetch de la web).
+  const record = (grant: IDemoGrant) => (opts.sinRegistro ? Promise.resolve() : recordUse(grant, registrar, now));
 
   let entry: CatalogEntry | null;
   let dbDown = !isDbReady();
@@ -150,7 +152,7 @@ export async function evaluateDemoAccess(
     if (!user || dbDown || !mongoose.Types.ObjectId.isValid(user.id)) return result(entry, true, 'publico', null, now);
     try {
       const grant = await DemoGrant.findOne({ user: user.id, demoSlug: slug, estado: 'activo', expiresAt: { $gt: now } });
-      if (grant) await recordUse(grant, registrar, now);
+      if (grant) await record(grant);
       return result(entry, true, 'publico', grant, now);
     } catch {
       return result(entry, true, 'publico', null, now);
@@ -170,7 +172,7 @@ export async function evaluateDemoAccess(
 
   const vigente = grants.find((g) => effectiveGrantState(g, now) === 'activo');
   if (vigente) {
-    await recordUse(vigente, registrar, now);
+    await record(vigente);
     return result(entry, true, 'grant', vigente, now);
   }
   const ultimo = grants[0];

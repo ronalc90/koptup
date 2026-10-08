@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next';
 import { OFFERINGS } from '@/lib/services-catalog';
 import { RAG_PATH, RAG_SECTORS } from '@/lib/rag-page';
 import { SITE_URL } from '@/lib/site';
+import { defaultAccessMode } from '@/lib/demo-access-defaults';
 
 // Dominio canónico (con www).
 const baseUrl = SITE_URL;
@@ -37,6 +38,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/soluciones-ia', changeFrequency: 'monthly', priority: 0.9 },
     { path: '/services', changeFrequency: 'monthly', priority: 0.9 },
     { path: '/demo', changeFrequency: 'weekly', priority: 0.9 },
+    { path: '/solicitar-demo', changeFrequency: 'monthly', priority: 0.8 },
     { path: '/contact', changeFrequency: 'monthly', priority: 0.8 },
     { path: '/about', changeFrequency: 'monthly', priority: 0.7 },
     { path: '/privacy', changeFrequency: 'yearly', priority: 0.3 },
@@ -45,12 +47,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
 
   // Demos derivadas del catálogo (deduplicadas: algunos offerings comparten demo).
+  // Solo las abiertas según la semilla del sistema de demos: las que requieren
+  // acceso o invitación muestran una pantalla de acceso (noindex) a quien no
+  // lo tiene, así que no se listan (wiki 04, §10.2).
   const demoSlugs = Array.from(
     new Set([
       ...OFFERINGS.map((o) => o.demoSlug).filter(Boolean),
       ...AUX_DEMO_SLUGS,
     ]),
-  );
+  ).filter((slug) => defaultAccessMode(slug) === 'publico');
 
   const staticEntries: MetadataRoute.Sitemap = staticPages.map((p) => ({
     url: `${baseUrl}${p.path}`,

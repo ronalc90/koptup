@@ -19,6 +19,7 @@ import DemoGrant, { type IDemoGrant } from '../models/DemoGrant';
 import { AppError } from '../middleware/errorHandler';
 import {
   DEFAULT_GRANT_DAYS,
+  GRANT_REMINDER_DAYS_BEFORE,
   MAX_GRANT_DAYS,
   MIN_GRANT_DAYS,
   TEAM_ROLES,
@@ -478,12 +479,26 @@ function escapeRegex(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+/** Filtros de estado del listado de accesos (`por_vencer`: vigentes que vencen en 3 días o menos). */
+export const GRANT_LIST_STATES = ['activo', 'por_vencer', 'expirado', 'revocado'] as const;
+export type GrantListState = (typeof GRANT_LIST_STATES)[number];
+
+function grantStateFilter(estado: GrantListState, now: Date): Record<string, unknown> {
+  switch (estado) {
+    case 'activo':
+      return { estado: 'activo', expiresAt: { $gt: now } };
+    case 'por_vencer':
+      return { estado: 'activo', expiresAt: { $gt: now, $lte: new Date(now.getTime() + GRANT_REMINDER_DAYS_BEFORE * DAY_MS) } };
+    case 'expirado':
+      return { $or: [{ estado: 'expirado' }, { estado: 'activo', expiresAt: { $lte: now } }] };
+    case 'revocado':
+      return { estado: 'revocado' };
+  }
+}
+
 export async function listGrants(params: { estado?: string; demo?: string; q?: string; user?: string; request?: string; page: number; limit: number }) {
   const now = new Date();
   const filter: Record<string, unknown> = {};
-  if (params.estado === 'activo') Object.assign(filter, { estado: 'activo', expiresAt: { $gt: now } });
-  else if (params.estado === 'expirado') Object.assign(filter, { $or: [{ estado: 'expirado' }, { estado: 'activo', expiresAt: { $lte: now } }] });
-  else if (params.estado === 'revocado') filter.estado = 'revocado';
   if (params.demo) filter.demoSlug = params.demo;
   if (params.user && mongoose.Types.ObjectId.isValid(params.user)) filter.user = params.user;
   if (params.request && mongoose.Types.ObjectId.isValid(params.request)) filter.request = params.request;
@@ -492,20 +507,31 @@ export async function listGrants(params: { estado?: string; demo?: string; q?: s
     const users = await User.find({ $or: [{ email: rx }, { name: rx }, { company: rx }] }).select('_id').limit(500).lean();
     filter.user = { $in: users.map((u) => u._id) };
   }
-  const [total, docs] = await Promise.all([
+  // Conteos por estado con los mismos filtros de demo, persona o búsqueda.
+  const base = { ...filter };
+  const estado = (GRANT_LIST_STATES as readonly string[]).includes(params.estado ?? '') ? (params.estado as GrantListState) : null;
+  if (estado) Object.assign(filter, grantStateFilter(estado, now));
+  const [total, docs, ...counts] = await Promise.all([
     DemoGrant.countDocuments(filter),
     DemoGrant.find(filter)
       .sort({ createdAt: -1 })
       .skip((params.page - 1) * params.limit)
       .limit(params.limit)
       .populate('user', 'email name company role accountStatus'),
+    DemoGrant.countDocuments(base),
+    ...GRANT_LIST_STATES.map((st) => DemoGrant.countDocuments({ ...base, ...grantStateFilter(st, now) })),
   ]);
+  const conteos: Record<string, number> = { todos: counts[0] ?? 0 };
+  GRANT_LIST_STATES.forEach((st, i) => {
+    conteos[st] = counts[i + 1] ?? 0;
+  });
   const catalog = await getCatalogMap(docs.map((d) => d.demoSlug));
   return {
     items: docs.map((d) => grantView(d, catalog.get(d.demoSlug) ?? null, now)),
     total,
     page: params.page,
     pages: Math.max(1, Math.ceil(total / params.limit)),
+    conteos,
   };
 }
 
