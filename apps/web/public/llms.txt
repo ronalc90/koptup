@@ -44,7 +44,7 @@ Chatbots que responden con los documentos de la empresa y citan la fuente: widge
 Más info: https://www.koptup.com/chatbots-ia
 
 ### 3. Soluciones de IA para Empresas
-Automatización de procesos, análisis predictivo, procesamiento de documentos, sistemas expertos.
+Primero, sistemas RAG con los documentos de la empresa (ver arriba, https://www.koptup.com/rag); además chatbots para WhatsApp y web, automatización de procesos, análisis predictivo, procesamiento de documentos, sistemas expertos y generación de contenido.
 Más info: https://www.koptup.com/soluciones-ia
 
 ### 4. E-commerce

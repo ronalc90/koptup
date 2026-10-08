@@ -120,10 +120,11 @@ export const seoConfig: Record<string, PageSEO> = {
     canonical: `${baseUrl}/chatbots-ia`,
   },
 
+  // Usada por src/app/soluciones-ia/layout.tsx (sistemas RAG primero).
   'soluciones-ia': {
     title: 'Soluciones de Inteligencia Artificial para Empresas',
     description:
-      'Implementamos soluciones de inteligencia artificial para empresas en Colombia: chatbots, automatización, análisis predictivo y sistemas expertos con GPT-4 y Claude AI. Consultoría gratuita.',
+      'Soluciones de IA para empresas en Colombia: sistemas RAG que responden con tus documentos y citan la fuente, chatbots, automatización y análisis predictivo.',
     canonical: `${baseUrl}/soluciones-ia`,
   },
 

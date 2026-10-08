@@ -2539,42 +2539,6 @@
     "justNow": "Just now",
     "copy": "(copy)"
   },
-  "aiSolutionsPage": {
-    "badge": "Artificial Intelligence Solutions",
-    "hero": {
-      "title": "AI Solutions to Transform Your Business",
-      "subtitle": "We implement artificial intelligence in your business: chatbots, process automation, predictive analytics and expert systems. Accessible AI for companies in Colombia and Latin America.",
-      "cta1": "See AI Demos",
-      "cta2": "Talk to an Expert",
-      "ragLink": "Need an AI that answers from your company documents? Discover RAG systems"
-    },
-    "solutionsTitle": "Our AI Solutions",
-    "solutionsSubtitle": "From conversational chatbots to expert decision-making systems",
-    "s1t": "Conversational Chatbots",
-    "s1d": "AI virtual assistants that serve customers 24/7 via WhatsApp, web and mobile apps.",
-    "s2t": "AI Process Automation",
-    "s2d": "AI that automates repetitive tasks, reduces errors and frees your team for strategic work.",
-    "s3t": "Predictive Analytics",
-    "s3d": "Algorithms that analyze your data and predict trends, demand and customer behavior.",
-    "s4t": "Intelligent Document Processing",
-    "s4d": "AI that reads, extracts and processes information from invoices, contracts and documents automatically.",
-    "s5t": "Expert Systems",
-    "s5d": "AI that makes complex decisions based on business rules and historical data.",
-    "s6t": "AI Content Generation",
-    "s6d": "AI that creates emails, reports, product descriptions and personalized marketing content.",
-    "whyTitle": "Why Adopt AI in Your Business?",
-    "w1t": "Reduce Operating Costs up to 60%",
-    "w1d": "AI automates processes that previously required entire teams, significantly reducing costs.",
-    "w2t": "Scale Without Hiring More Staff",
-    "w2d": "Your AI handles thousands of simultaneous requests without increasing your payroll.",
-    "w3t": "Smarter Business Decisions",
-    "w3d": "Real-time data analysis for better business decisions.",
-    "w4t": "Real Competitive Advantage",
-    "w4d": "Companies that adopt AI today will lead their industry in the coming years.",
-    "ctaTitle": "Implement AI in Your Business Today",
-    "ctaSubtitle": "Schedule a free consultation. We'll show you which AI solutions apply to your specific business.",
-    "ctaButton": "Schedule Free Consultation"
-  },
   "devWebPage": {
     "badge": "Custom Software Development Colombia",
     "hero": {

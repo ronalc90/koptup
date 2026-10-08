@@ -1,4 +1,105 @@
 {
+  "aiSolutionsPage": {
+    "badge": "Artificial Intelligence Solutions",
+    "hero": {
+      "title": "AI Solutions to Transform Your Business",
+      "subtitle": "We implement artificial intelligence in your business: RAG systems that answer from your company documents, chatbots, process automation, predictive analytics and expert systems. Accessible AI for companies in Colombia and Latin America.",
+      "cta1": "See AI Demos",
+      "cta2": "Talk to an Expert",
+      "ragLink": "Need an AI that answers from your company documents? Discover RAG systems"
+    },
+    "solutions": {
+      "title": "Our AI Solutions",
+      "subtitle": "From RAG systems that answer from your documents to expert decision-making systems",
+      "items": {
+        "rag": {
+          "badge": "Main product",
+          "title": "RAG Systems: AI Grounded in Your Company Documents",
+          "desc": "Assistants that answer from your manuals, contracts and policies, cite the source of every answer and say “I couldn't find that information” when the answer isn't in your documents. Pilot with your documents in {pilotWeeks} weeks.",
+          "link": "Discover RAG systems"
+        },
+        "chatbots": {
+          "title": "Chatbots for WhatsApp and Web",
+          "desc": "AI virtual assistants that answer your customers at any hour on your website and on WhatsApp, using your company's information.",
+          "link": "See RAG chatbots"
+        },
+        "automation": {
+          "title": "AI Process Automation",
+          "desc": "AI that automates repetitive tasks, reduces errors and frees your team for strategic work."
+        },
+        "predictive": {
+          "title": "Predictive Analytics",
+          "desc": "Algorithms that analyze your data and predict trends, demand and customer behavior."
+        },
+        "documents": {
+          "title": "Intelligent Document Processing",
+          "desc": "AI that reads, extracts and processes information from invoices, contracts and documents automatically."
+        },
+        "expert": {
+          "title": "Expert Systems",
+          "desc": "AI that makes complex decisions based on business rules and historical data."
+        },
+        "content": {
+          "title": "AI Content Generation",
+          "desc": "AI that creates emails, reports, product descriptions and personalized marketing content."
+        }
+      }
+    },
+    "why": {
+      "title": "Why Adopt AI in Your Business?",
+      "items": {
+        "time": {
+          "title": "Less Time on Repetitive Tasks",
+          "desc": "AI looks up information, classifies documents and answers frequently asked questions, so your team can spend that time on higher-value work."
+        },
+        "scale": {
+          "title": "Handle More Without Overloading Your Team",
+          "desc": "AI resolves repetitive inquiries and your team focuses on the cases that need a person."
+        },
+        "decisions": {
+          "title": "Smarter Business Decisions",
+          "desc": "Real-time data analysis for better business decisions."
+        },
+        "advantage": {
+          "title": "Real Competitive Advantage",
+          "desc": "Companies that adopt AI today will lead their industry in the coming years."
+        }
+      }
+    },
+    "tech": {
+      "title": "AI Technologies We Implement",
+      "subtitle": "We work with the most advanced AI platforms on the market",
+      "orchestration": "AI orchestration",
+      "automation": "Automation"
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "items": {
+        "solutions": {
+          "q": "What artificial intelligence solutions does KopTup offer?",
+          "a": "Our main product is RAG systems: AI that answers from your company documents and cites the source. We also implement chatbots for WhatsApp and web, process automation, predictive analytics, intelligent document processing, expert systems and AI content generation."
+        },
+        "cost": {
+          "q": "How much does it cost to implement artificial intelligence in my company?",
+          "a": "It depends on the solution and the scope. RAG systems have published prices: a {pilotWeeks}-week pilot for {pilotPrice} and the Essential plan with a {essentialSetup} implementation plus {essentialMonthly} per month, plus VAT where applicable. Other solutions are quoted for your case; you'll find reference prices on the services page."
+        },
+        "howTo": {
+          "q": "How do I implement artificial intelligence in my business in Colombia?",
+          "a": "This is how we do it at KopTup: 1) we review your processes and documents to find where AI adds value; 2) we choose the right technology for your case; 3) we run a pilot with your data (for a RAG system, with your documents in {pilotWeeks} weeks); 4) we integrate it with your systems and train your team; 5) we provide support and continuous improvement."
+        },
+        "whoBenefits": {
+          "q": "Which companies in Colombia can benefit from artificial intelligence?",
+          "a": "Those that handle a lot of information in documents or repeat the same tasks and inquiries every day. For example: healthcare (clinical protocols, industry regulations and medical claims auditing), legal (contracts, internal legal opinions and regulations) and support or customer service (manuals, policies and knowledge base), as well as retail, logistics, education and finance."
+        }
+      }
+    },
+    "cta": {
+      "title": "Implement AI in Your Business Today",
+      "subtitle": "Schedule a free consultation. We'll show you which AI solutions apply to your specific business.",
+      "button": "Schedule Free Consultation",
+      "demos": "See AI Demos"
+    }
+  },
   "chatbotsPage": {
     "hero": {
       "badge": "RAG chatbots",

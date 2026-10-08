@@ -2539,42 +2539,6 @@
     "justNow": "Justo ahora",
     "copy": "(copia)"
   },
-  "aiSolutionsPage": {
-    "badge": "Soluciones de Inteligencia Artificial",
-    "hero": {
-      "title": "Soluciones de IA para Transformar tu Empresa",
-      "subtitle": "Implementamos inteligencia artificial en tu negocio: chatbots, automatización de procesos, análisis predictivo y sistemas expertos. IA accesible para empresas en Colombia y Latinoamérica.",
-      "cta1": "Ver Demos de IA",
-      "cta2": "Hablar con un Experto",
-      "ragLink": "¿Necesitas una IA que responda con los documentos de tu empresa? Conoce los sistemas RAG"
-    },
-    "solutionsTitle": "Nuestras Soluciones de IA",
-    "solutionsSubtitle": "Desde chatbots conversacionales hasta sistemas expertos de toma de decisiones",
-    "s1t": "Chatbots Conversacionales",
-    "s1d": "Asistentes virtuales con IA que atienden clientes 24/7 por WhatsApp, web y apps móviles.",
-    "s2t": "Automatización de Procesos con IA",
-    "s2d": "IA que automatiza tareas repetitivas, reduce errores y libera a tu equipo para trabajo estratégico.",
-    "s3t": "Análisis Predictivo",
-    "s3d": "Algoritmos que analizan tus datos y predicen tendencias, demanda y comportamiento de clientes.",
-    "s4t": "Procesamiento Inteligente de Documentos",
-    "s4d": "IA que lee, extrae y procesa información de facturas, contratos y documentos automáticamente.",
-    "s5t": "Sistemas Expertos",
-    "s5d": "IA que toma decisiones complejas basándose en reglas de negocio y datos históricos.",
-    "s6t": "Generación de Contenido con IA",
-    "s6d": "IA que crea emails, reportes, descripciones de productos y contenido de marketing personalizado.",
-    "whyTitle": "¿Por qué Adoptar IA en tu Empresa?",
-    "w1t": "Reduce Costos Operativos hasta 60%",
-    "w1d": "La IA automatiza procesos que antes requerían equipos completos, reduciendo costos significativamente.",
-    "w2t": "Escala sin Contratar Más Personal",
-    "w2d": "Tu IA atiende miles de solicitudes simultáneas sin aumentar tu nómina.",
-    "w3t": "Decisiones más Inteligentes",
-    "w3d": "Datos analizados en tiempo real para tomar mejores decisiones de negocio.",
-    "w4t": "Ventaja Competitiva Real",
-    "w4d": "Las empresas que adoptan IA hoy liderarán su industria en los próximos años.",
-    "ctaTitle": "Implementa IA en tu Empresa Hoy",
-    "ctaSubtitle": "Agenda una consultoría gratuita. Te mostramos qué soluciones de IA aplican a tu negocio específico.",
-    "ctaButton": "Agendar Consultoría Gratis"
-  },
   "devWebPage": {
     "badge": "Desarrollo Web Colombia",
     "hero": {
