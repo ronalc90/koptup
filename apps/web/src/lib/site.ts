@@ -29,6 +29,15 @@ export const MAX_TITLE_LENGTH = 60;
  */
 export const HOME_TITLE = 'KopTup | IA que responde con los documentos de tu empresa';
 
+/**
+ * Imagen og/twitter con el mensaje RAG: la genera `src/app/opengraph-image.tsx`
+ * (la de la home) y se sirve en esta ruta. La usan también las páginas de
+ * sistemas RAG (/rag, landings por sector, /services, /chatbots-ia,
+ * /soluciones-ia y /demo/chatbot), que son el destino de los anuncios; el
+ * resto del sitio sigue con `/og-image.png`.
+ */
+export const RAG_OG_IMAGE = '/opengraph-image';
+
 /** Meta description de la home; también es la descripción por defecto del sitio. */
 export const HOME_DESCRIPTION =
   'Sistemas RAG para empresas en Colombia: IA que responde con tus manuales, contratos y políticas, cita la fuente y protege tus datos. Prueba la demo gratis.';

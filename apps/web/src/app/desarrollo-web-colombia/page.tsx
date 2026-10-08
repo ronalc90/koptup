@@ -24,7 +24,7 @@ import {
 export default function DesarrolloWebColombiaPage() {
   const t = useTranslations('devWebPage');
   const locale = useLocale();
-  // Precio de los chatbots (sv2d, q3a): el mismo de /chatbots-ia, desde rag-plans.ts.
+  // Precios (sv2d, q3a y el piloto de q1a): los mismos de /chatbots-ia, desde rag-plans.ts.
   const chatbotPrice = getChatbotsPageValues(locale);
 
   const services = [
@@ -51,7 +51,7 @@ export default function DesarrolloWebColombiaPage() {
   ];
 
   const faqs = [
-    { q: t('q1q'), a: t('q1a') },
+    { q: t('q1q'), a: t('q1a', chatbotPrice) },
     { q: t('q2q'), a: t('q2a') },
     { q: t('q3q'), a: t('q3a', chatbotPrice) },
     { q: t('q4q'), a: t('q4a') },

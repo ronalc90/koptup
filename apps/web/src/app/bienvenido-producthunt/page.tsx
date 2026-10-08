@@ -5,6 +5,7 @@ import Button from '@/components/ui/Button';
 import Card, { CardContent } from '@/components/ui/Card';
 import HomeHighlights from '@/components/home/HomeHighlights';
 import { DEMO_COUNT } from '@/lib/demos';
+import { formatRagCOP, formatRagUSD, getRagPlan } from '@/lib/rag-plans';
 import {
   ChatBubbleBottomCenterTextIcon,
   ShoppingCartIcon,
@@ -19,7 +20,7 @@ const demos = [
   {
     icon: ChatBubbleBottomCenterTextIcon,
     title: 'Chatbot con IA',
-    desc: 'Configura y prueba tu propio chatbot con GPT-4 o Claude AI. Sube documentos, personaliza colores y genera el código embed.',
+    desc: 'Configura y prueba tu propio chatbot RAG con IA real (OpenAI). Sube documentos, personaliza colores y genera el código embed.',
     href: '/demo/chatbot',
     color: 'bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400',
   },
@@ -46,6 +47,9 @@ const demos = [
   },
 ];
 
+// Precio publicado del piloto RAG (mismo valor que /services#planes-rag).
+const pilot = getRagPlan('piloto').setup;
+
 const features = [
   'Software 100% a medida — nada genérico',
   'Demos interactivos antes de pagar',
@@ -53,7 +57,7 @@ const features = [
   'E-commerce con pagos colombianos e internacionales',
   'Stack moderno: React, Next.js, Node.js, Python',
   'Equipo en Colombia, clientes en todo el mundo',
-  'Precios desde $499 USD',
+  `Precios publicados: piloto RAG de ${formatRagCOP(pilot.cop)} / ${formatRagUSD(pilot.usd)}`,
   'Entrega en 4–8 semanas para MVPs',
 ];
 

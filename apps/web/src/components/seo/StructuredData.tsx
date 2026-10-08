@@ -127,7 +127,9 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
   const getSoftwareApplicationSchema = () => ({
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'KopTup - Software a Medida',
+    // Es el producto de la home (sistemas RAG): nombre, descripción y
+    // funciones coinciden con los planes cuyo precio se publica en `offers`.
+    name: 'KopTup - Sistemas RAG para empresas',
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
     // Planes RAG de /services#planes-rag (sin highPrice: Empresarial es "desde").
@@ -138,17 +140,15 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
       offerCount: String(RAG_PLANS.length),
       url: absoluteUrl('/services#planes-rag'),
     },
-    description:
-      'Plataforma de desarrollo de software empresarial a medida. E-commerce, chatbots con IA, dashboards, gestión documental, sistemas de reservas y más.',
+    description: HOME_DESCRIPTION,
     featureList: [
-      'E-commerce completo con pasarela de pagos',
-      'Chatbots inteligentes con IA',
-      'Dashboards ejecutivos con KPIs en tiempo real',
-      'Gestión documental con búsqueda avanzada',
-      'Sistemas de reservas online',
-      'CMS y gestión de contenido',
-      'Control de proyectos y tareas',
-      'Integraciones con APIs externas',
+      'Respuestas basadas en los documentos de tu empresa',
+      'Cita la fuente de cada respuesta',
+      'Dice "no encontré esa información" cuando la respuesta no está en tus documentos',
+      'Fuentes: Google Drive, SharePoint o carga manual',
+      'Widget web y WhatsApp',
+      'Permisos por rol y panel de métricas',
+      'Despliegue en la nube del cliente u on-premise',
     ],
   });
 

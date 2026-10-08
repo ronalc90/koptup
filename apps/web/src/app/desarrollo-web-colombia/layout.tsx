@@ -3,7 +3,7 @@ import { getBreadcrumbSchema } from '@/lib/seo-config';
 import { SITE_URL, absoluteUrl } from '@/lib/site';
 import { getChatbotsPageValues } from '@/lib/chatbots-page';
 
-// Precio de los chatbots en el FAQ: el mismo de /chatbots-ia, desde rag-plans.ts.
+// Precios del FAQ (chatbots y piloto RAG): los mismos de /chatbots-ia, desde rag-plans.ts.
 const chatbotPrice = getChatbotsPageValues('es');
 
 export const metadata: Metadata = {
@@ -62,7 +62,8 @@ const serviceSchema = {
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Automatización con IA' } },
     ],
   },
-  priceRange: '$499 - $50,000 USD',
+  // Mismo criterio que StructuredData: los precios publicados están en /services.
+  priceRange: '$$ - $$$$',
 };
 
 const faqSchema = {
@@ -74,7 +75,7 @@ const faqSchema = {
       name: '¿Cuánto cuesta contratar una empresa de desarrollo de software en Colombia?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En KopTup los proyectos parten desde $499 USD para soluciones básicas. Un proyecto web completo generalmente está entre $2,000 y $8,000 USD dependiendo de la complejidad. Ofrecemos cotización gratuita y sin compromiso.',
+        text: `Publicamos nuestros precios en www.koptup.com/services, en COP y con su referencia en USD (más IVA si aplica). Los sistemas RAG empiezan con un piloto de ${chatbotPrice.pilotFrom} y las demás soluciones a medida tienen precios por plan según su alcance. Ofrecemos cotización gratuita y sin compromiso.`,
       },
     },
     {
@@ -90,7 +91,7 @@ const faqSchema = {
       name: '¿KopTup puede desarrollar chatbots para WhatsApp?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Sí. Integramos chatbots con la API oficial de WhatsApp Business usando GPT-4 o Claude AI. El chatbot puede atender clientes 24/7, capturar leads y transferir a agentes humanos. Desde ${chatbotPrice.essentialFrom}, o piloto de ${chatbotPrice.pilotFrom} (más IVA si aplica).`,
+        text: `Sí. Integramos chatbots con la API oficial de WhatsApp Business usando GPT-4 o Claude AI. El chatbot puede atender clientes a cualquier hora, capturar leads y transferir a agentes humanos. Desde ${chatbotPrice.essentialFrom}, o piloto de ${chatbotPrice.pilotFrom} (más IVA si aplica).`,
       },
     },
     {

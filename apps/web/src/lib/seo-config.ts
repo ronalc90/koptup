@@ -14,7 +14,7 @@
 import { Metadata } from 'next';
 import { DEMO_COUNT } from './demos';
 import { formatRagCOP, getRagPlan } from './rag-plans';
-import { HOME_DESCRIPTION, SITE_NAME, SITE_URL, TITLE_TEMPLATE } from './site';
+import { HOME_DESCRIPTION, RAG_OG_IMAGE, SITE_NAME, SITE_URL, TITLE_TEMPLATE } from './site';
 
 const baseUrl = SITE_URL;
 
@@ -45,6 +45,7 @@ export const seoConfig: Record<string, PageSEO> = {
     description:
       `Sistemas RAG: piloto de ${RAG_PILOT.weeks.max} semanas por ${formatRagCOP(RAG_PILOT.setup.cop)} y planes desde ${formatRagCOP(RAG_ESSENTIAL.setup.cop)} (precios en COP y USD, más IVA si aplica). Y otras soluciones a medida.`,
     canonical: `${baseUrl}/services`,
+    ogImage: RAG_OG_IMAGE,
   },
 
   // Pricing page
@@ -118,6 +119,7 @@ export const seoConfig: Record<string, PageSEO> = {
     description:
       `Chatbots RAG para WhatsApp y tu sitio web: responden con los documentos de tu empresa y citan la fuente. Desde ${formatRagCOP(RAG_ESSENTIAL.setup.cop)}, o piloto de ${formatRagCOP(RAG_PILOT.setup.cop)}.`,
     canonical: `${baseUrl}/chatbots-ia`,
+    ogImage: RAG_OG_IMAGE,
   },
 
   // Usada por src/app/soluciones-ia/layout.tsx (sistemas RAG primero).
@@ -126,6 +128,7 @@ export const seoConfig: Record<string, PageSEO> = {
     description:
       'Soluciones de IA para empresas en Colombia: sistemas RAG que responden con tus documentos y citan la fuente, chatbots, automatización y análisis predictivo.',
     canonical: `${baseUrl}/soluciones-ia`,
+    ogImage: RAG_OG_IMAGE,
   },
 
   // Sistemas RAG: página principal y landings por sector (src/app/rag/*).
@@ -136,6 +139,7 @@ export const seoConfig: Record<string, PageSEO> = {
     description:
       `Sistemas RAG (retrieval augmented generation) para empresas en Colombia: un chatbot con los documentos de tu empresa que cita la fuente. Piloto en ${RAG_PILOT.weeks.max} semanas.`,
     canonical: `${baseUrl}/rag`,
+    ogImage: RAG_OG_IMAGE,
   },
 
   'rag-salud': {
@@ -143,6 +147,7 @@ export const seoConfig: Record<string, PageSEO> = {
     description:
       'RAG para salud: IA que responde con tus protocolos clínicos y la normativa del sector, cita la fuente y apoya la auditoría de cuentas médicas.',
     canonical: `${baseUrl}/rag/salud`,
+    ogImage: RAG_OG_IMAGE,
   },
 
   'rag-legal': {
@@ -150,6 +155,7 @@ export const seoConfig: Record<string, PageSEO> = {
     description:
       'Busca en contratos con IA: un sistema RAG que responde con tus contratos, conceptos jurídicos internos y normativa, y cita la cláusula de donde sale.',
     canonical: `${baseUrl}/rag/legal`,
+    ogImage: RAG_OG_IMAGE,
   },
 
   'rag-soporte': {
@@ -157,6 +163,7 @@ export const seoConfig: Record<string, PageSEO> = {
     description:
       'Asistente IA para manuales internos: tus agentes consultan manuales, políticas y la base de conocimiento con IA y responden con la fuente citada.',
     canonical: `${baseUrl}/rag/soporte`,
+    ogImage: RAG_OG_IMAGE,
   },
 
   // DEMOS MÉDICOS
@@ -179,6 +186,7 @@ export const seoConfig: Record<string, PageSEO> = {
     description:
       'Sube un PDF, DOCX o TXT y hazle preguntas a un chatbot RAG que cita la página o el fragmento de donde sale cada respuesta. También puedes probar la demo con un documento de ejemplo, sin registro.',
     canonical: `${baseUrl}/demo/chatbot`,
+    ogImage: RAG_OG_IMAGE,
   },
 
   // Demo: Generador LinkedIn (marketing engine)

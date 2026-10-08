@@ -54,6 +54,14 @@ import {
 
 type TenantId = (typeof TENANTS)[number]['id'];
 
+/**
+ * El paso "llm" del pipeline muestra el modelo elegido en el TopBar (el
+ * backend solo usa modelos de OpenAI), no un valor fijo del escenario.
+ */
+function withSelectedModel(steps: PipelineStepData[], modelId: string): PipelineStepData[] {
+  return steps.map((step) => (step.key === 'llm' ? { ...step, detail: modelId } : step));
+}
+
 const STREAM_CHAR_INTERVAL_MS = 18;
 const ONBOARDING_LS_KEY = 'koptup.demo.chatbot.onboarded';
 const PLAYGROUND_BOT_LS_KEY = 'koptup.chatbot.demoBotId';
@@ -284,7 +292,7 @@ export default function ChatbotDemoPage() {
 
       setMessages((prev) => [...prev, userMsg, asstMsg]);
       setInput('');
-      setPipelineSteps(payload.pipeline);
+      setPipelineSteps(withSelectedModel(payload.pipeline, modelId));
       setPipelineTotals({
         latencyMs: payload.totalLatencyMs,
         tokens: payload.totalTokens,
@@ -297,7 +305,7 @@ export default function ChatbotDemoPage() {
       setIsStreaming(true);
       setThinkingId(asstId);
     },
-    [isStreaming, markDemoStart, t],
+    [isStreaming, markDemoStart, modelId, t],
   );
 
   const handleSend = useCallback(() => {
@@ -330,7 +338,7 @@ export default function ChatbotDemoPage() {
     setMessages((prev) => [...prev, userMsg, asstMsg]);
     const sentInput = input;
     setInput('');
-    setPipelineSteps(payload.pipeline);
+    setPipelineSteps(withSelectedModel(payload.pipeline, modelId));
     setPipelineTotals({
       latencyMs: payload.totalLatencyMs,
       tokens: payload.totalTokens,
