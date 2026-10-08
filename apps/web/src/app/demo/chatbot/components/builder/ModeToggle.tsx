@@ -17,11 +17,10 @@ interface ModeToggleProps {
 }
 
 /**
- * Toggle de modos: Playground RAG (showcase con el documento de ejemplo, sin
- * registro), Prueba con tu documento (subida propia con email) y Builder &
- * Embed (personalización).
- * Se renderiza inmediatamente debajo del TopBar. A la derecha, fuera del
- * tablist, enlaza a /rag (página de sistemas RAG para empresas).
+ * Modos de la demo: "Prueba el asistente" (empresas de ejemplo, sin
+ * registro), "Prueba con tu documento" (subida propia con email) y
+ * "Configura el tuyo" (bot propio + código para insertar). A la derecha,
+ * fuera del tablist, enlaza a /rag.
  */
 export default function ModeToggle({ mode, onChange }: ModeToggleProps) {
   const t = useTranslations('demoChatbot.modes');
@@ -35,11 +34,7 @@ export default function ModeToggle({ mode, onChange }: ModeToggleProps) {
 
   return (
     <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-secondary-200 bg-white px-3 py-1.5 dark:border-secondary-800 dark:bg-secondary-900">
-      <div
-        className="flex w-full items-stretch gap-1 md:w-auto md:flex-1"
-        role="tablist"
-        aria-label="Chatbot demo modes"
-      >
+      <div className="flex w-full items-stretch gap-1 md:w-auto md:flex-1" role="tablist" aria-label={t('ariaLabel')}>
         {tabs.map(({ key, label, hint, Icon }) => {
           const active = mode === key;
           return (
@@ -49,17 +44,17 @@ export default function ModeToggle({ mode, onChange }: ModeToggleProps) {
               role="tab"
               aria-selected={active}
               onClick={() => onChange(key)}
-              className={`group flex flex-1 items-center gap-2 rounded-md px-3 py-2 text-left text-xs transition md:flex-none ${
+              className={`group flex min-w-0 flex-1 items-center gap-2 rounded-md px-2.5 py-2 text-left text-xs transition md:flex-none ${
                 active
                   ? 'bg-primary-600 text-white shadow-sm'
                   : 'text-secondary-600 hover:bg-secondary-100 dark:text-secondary-300 dark:hover:bg-secondary-800'
               }`}
             >
-              <Icon className="hidden h-4 w-4 shrink-0 sm:block" />
+              <Icon className="hidden h-4 w-4 shrink-0 sm:block" aria-hidden="true" />
               <div className="min-w-0">
                 <div className="font-semibold leading-tight">{label}</div>
                 <div
-                  className={`hidden text-[10px] leading-tight md:block ${
+                  className={`hidden text-[10px] leading-tight lg:block ${
                     active ? 'text-white/80' : 'text-secondary-500 dark:text-secondary-400'
                   }`}
                 >

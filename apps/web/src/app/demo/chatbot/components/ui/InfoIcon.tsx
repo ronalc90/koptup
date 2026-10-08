@@ -42,7 +42,7 @@ export default function InfoIcon({
       <span
         tabIndex={0}
         role="img"
-        aria-label={ariaLabel ?? 'info'}
+        aria-label={ariaLabel ?? (typeof content === 'string' ? content : undefined)}
         className={`inline-flex cursor-help items-center justify-center rounded-full text-secondary-400 outline-none transition hover:text-primary-600 focus-visible:text-primary-600 focus-visible:ring-2 focus-visible:ring-primary-500 dark:text-secondary-500 dark:hover:text-primary-300 ${className ?? ''}`}
       >
         <InformationCircleIcon className={SIZE[size]} />

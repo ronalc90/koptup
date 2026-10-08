@@ -1,73 +1,75 @@
 /**
- * Tipos y constantes locales del modo Builder.
- * Separan la "fuente de verdad" de la config del widget para que cada
- * sub-componente reciba sólo props serializables.
+ * Tipos y utilidades del modo "Configura el tuyo" (Builder).
+ *
+ * La configuración se guarda en el backend (`/api/chatbot/bots`); aquí solo
+ * hay campos que el backend persiste y que el widget real usa: nombre,
+ * bienvenida, color, posición, ícono, instrucciones y tono.
  */
+import type { BotPosition, RemoteBotConfig } from './api';
 
-export type WidgetCornerPosition = 'br' | 'bl' | 'tr' | 'tl';
+export type WidgetCornerPosition = BotPosition;
 export type BuilderToneKey = 'professional' | 'friendly' | 'technical' | 'casual';
-export type BuilderLangCode = 'es' | 'en' | 'pt' | 'fr';
-export type EmbedTabKey = 'script' | 'iframe' | 'react' | 'webhook';
-
-export interface MockKnowledgeDoc {
-  id: string;
-  name: string;
-  sizeKb: number;
-  chunks: number;
-}
 
 export interface BuilderWidgetConfig {
   botName: string;
   primaryColor: string;
   position: WidgetCornerPosition;
   avatar: string;
-  /**
-   * Imagen de logo opcional (data URL `data:image/...;base64,...`). Cuando
-   * está set, el widget la prioriza por sobre el emoji `avatar`. Mantener
-   * ambas posibilidades es coherente con OCP: agregamos comportamiento sin
-   * modificar el código que ya consume `avatar`.
-   */
-  avatarImage?: string;
   welcome: string;
-  systemPrompt: string;
+  /** Instrucciones de rol y estilo (sin la línea de tono, que se agrega al guardar). */
+  instructions: string;
   tone: BuilderToneKey;
-  languages: BuilderLangCode[];
-  docs: MockKnowledgeDoc[];
-  botId: string;
 }
 
-/** Tamaño máximo aceptado para el logo subido por el usuario (500 KB). */
-export const AVATAR_IMAGE_MAX_BYTES = 500 * 1024;
-export const AVATAR_IMAGE_MIME_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
+export const AVATAR_CHOICES: readonly string[] = ['💬', '🤖', '✨', '🎯', '🚀', '🦊'];
 
-/** Emoji set acotado para el selector de avatar. */
-export const AVATAR_CHOICES: readonly string[] = ['🤖', '💬', '✨', '🎯', '🚀', '🦊'];
+export const TONE_CHOICES: readonly BuilderToneKey[] = ['professional', 'friendly', 'technical', 'casual'];
 
-export const TONE_CHOICES: readonly BuilderToneKey[] = [
-  'professional',
-  'friendly',
-  'technical',
-  'casual',
-];
+export const POSITIONS: readonly WidgetCornerPosition[] = ['br', 'bl', 'tr', 'tl'];
 
-export const LANG_CHOICES: readonly { code: BuilderLangCode; label: string }[] = [
-  { code: 'es', label: 'ES' },
-  { code: 'en', label: 'EN' },
-  { code: 'pt', label: 'PT' },
-  { code: 'fr', label: 'FR' },
-];
+/** Formatos que la ruta de bots del backend sabe leer (texto plano). */
+export const TEXT_EXTENSIONS: readonly string[] = ['.txt', '.md', '.csv'];
+export const MAX_TEXT_FILE_BYTES = 2 * 1024 * 1024;
+export const MAX_FILES_PER_UPLOAD = 5;
 
-export const MOCK_DOCS: MockKnowledgeDoc[] = [
-  { id: 'd-pricing', name: 'pricing.pdf', sizeKb: 412, chunks: 28 },
-  { id: 'd-policy', name: 'data-retention-policy.docx', sizeKb: 188, chunks: 14 },
-  { id: 'd-onboard', name: 'onboarding-guide.md', sizeKb: 76, chunks: 9 },
-  { id: 'd-faq', name: 'faq.txt', sizeKb: 32, chunks: 6 },
-  { id: 'd-sla', name: 'enterprise-sla.pdf', sizeKb: 540, chunks: 41 },
-];
+const HEX = /^#[0-9a-f]{6}$/i;
+export const isHexColor = (v: string) => HEX.test(v);
 
-export const DEFAULT_BOT_ID = 'kbot_demo_acme';
+/** Prefijos de la línea de tono en ES y EN (para separarla al cargar un bot). */
+const TONE_LINE_PATTERN = /\n*\s*(Tono de las respuestas|Tone of the answers):[^\n]*\s*$/i;
 
-/** Mapea el código de esquina a clases utilitarias para posicionar absolutamente. */
+/** Instrucciones + línea de tono: así el tono llega de verdad al modelo. */
+export function composeSystemPrompt(instructions: string, toneLine: string): string {
+  const base = instructions.replace(TONE_LINE_PATTERN, '').trim();
+  return base ? `${base}\n\n${toneLine}` : toneLine;
+}
+
+export function stripToneLine(systemPrompt: string): string {
+  return systemPrompt.replace(TONE_LINE_PATTERN, '').trim();
+}
+
+export function toneFrom(value: string | undefined): BuilderToneKey {
+  return (TONE_CHOICES as readonly string[]).includes(value ?? '') ? (value as BuilderToneKey) : 'friendly';
+}
+
+export function fromRemote(remote: RemoteBotConfig): BuilderWidgetConfig {
+  return {
+    botName: remote.name,
+    primaryColor: isHexColor(remote.color) ? remote.color : '#4F46E5',
+    position: (POSITIONS as readonly string[]).includes(remote.position) ? remote.position : 'br',
+    avatar: remote.avatar || '💬',
+    welcome: remote.welcome,
+    instructions: stripToneLine(remote.systemPrompt || ''),
+    tone: toneFrom(remote.tone),
+  };
+}
+
+export function sameConfig(a: BuilderWidgetConfig, b: BuilderWidgetConfig | null): boolean {
+  if (!b) return false;
+  return (Object.keys(a) as Array<keyof BuilderWidgetConfig>).every((k) => a[k] === b[k]);
+}
+
+/** Clases para la vista previa local (antes de guardar). */
 export const POSITION_CLASS: Record<WidgetCornerPosition, string> = {
   br: 'bottom-4 right-4 items-end',
   bl: 'bottom-4 left-4 items-start',
@@ -75,10 +77,19 @@ export const POSITION_CLASS: Record<WidgetCornerPosition, string> = {
   tl: 'top-4 left-4 items-start',
 };
 
-/** Origen del panel desplegado (para que abra "hacia el centro"). */
 export const PANEL_ORIGIN: Record<WidgetCornerPosition, string> = {
   br: 'bottom-16 right-0',
   bl: 'bottom-16 left-0',
   tr: 'top-16 right-0',
   tl: 'top-16 left-0',
 };
+
+/** Escapa un valor para usarlo dentro de un atributo HTML entre comillas dobles. */
+export function escapeAttr(value: string): string {
+  return value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+export function formatBytes(bytes: number): string {
+  if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+}

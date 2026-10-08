@@ -78,40 +78,52 @@ const nextConfig = {
 
   // Security & SEO headers
   async headers() {
+    const securityHeaders = [
+      {
+        key: 'X-DNS-Prefetch-Control',
+        value: 'on'
+      },
+      {
+        key: 'Strict-Transport-Security',
+        value: 'max-age=63072000; includeSubDomains; preload'
+      },
+      {
+        key: 'X-Content-Type-Options',
+        value: 'nosniff'
+      },
+      {
+        key: 'Referrer-Policy',
+        value: 'strict-origin-when-cross-origin'
+      },
+      {
+        key: 'Permissions-Policy',
+        value: 'camera=(), microphone=(), geolocation=(self)'
+      }
+    ];
+    const contentSecurityPolicy = (frameAncestors) => ({
+      key: 'Content-Security-Policy',
+      value:
+        `default-src 'self' https://www.google.com; img-src 'self' data: blob: https://koptup-uploads.s3.amazonaws.com https://images.unsplash.com https://media.licdn.com${analyticsSources('img')}; script-src 'self' 'unsafe-inline' 'unsafe-eval'${analyticsSources('script')}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' blob: ${API_ORIGIN} http://localhost:3001 https://*.railway.app https://koptup-uploads.s3.amazonaws.com${analyticsSources('connect')}; frame-src 'self' https://www.google.com${analyticsSources('frame')}; frame-ancestors ${frameAncestors}; base-uri 'self'; form-action 'self'; media-src 'self' blob:; worker-src 'self' blob:`
+    });
     return [
       {
-        source: '/:path*',
+        // Todo el sitio menos /embed/*: solo se puede incrustar en el propio dominio.
+        source: '/:path((?!embed(?:/|$)).*)',
         headers: [
-          {
-            key: 'X-DNS-Prefetch-Control',
-            value: 'on'
-          },
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=63072000; includeSubDomains; preload'
-          },
+          ...securityHeaders,
           {
             key: 'X-Frame-Options',
             value: 'SAMEORIGIN'
           },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff'
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin'
-          },
-          {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=(self)'
-          },
-          {
-            key: 'Content-Security-Policy',
-            value:
-              `default-src 'self' https://www.google.com; img-src 'self' data: blob: https://koptup-uploads.s3.amazonaws.com https://images.unsplash.com https://media.licdn.com${analyticsSources('img')}; script-src 'self' 'unsafe-inline' 'unsafe-eval'${analyticsSources('script')}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' blob: ${API_ORIGIN} http://localhost:3001 https://*.railway.app https://koptup-uploads.s3.amazonaws.com${analyticsSources('connect')}; frame-src 'self' https://www.google.com${analyticsSources('frame')}; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; media-src 'self' blob:; worker-src 'self' blob:`
-          }
+          contentSecurityPolicy("'self'")
         ]
+      },
+      {
+        // /embed/* (chat del widget, apps/web/public/widget.js): se incrusta en el
+        // sitio de cada cliente, así que no lleva X-Frame-Options y permite
+        // cualquier frame-ancestor.
+        source: '/embed/:path*',
+        headers: [...securityHeaders, contentSecurityPolicy('*')]
       },
       // Cache static assets aggressively
       {
