@@ -72,3 +72,9 @@ test-pdfs/
 
 # Chatbot file-based store (no commitear conversaciones)
 apps/backend/data/
+
+# Playwright (reportes y resultados locales/CI)
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/

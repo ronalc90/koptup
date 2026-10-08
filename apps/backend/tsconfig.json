@@ -38,7 +38,8 @@
     "dist",
     "src/**/*.test.ts",
     "src/**/*.spec.ts",
-    "src/**/__tests__/**"
+    "src/**/__tests__/**",
+    "src/test/**"
   ],
   "ts-node": {
     "transpileOnly": true,

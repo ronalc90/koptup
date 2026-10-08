@@ -59,7 +59,7 @@ Tecnologías que realmente usamos en este repo:
 
 **Storage & infra:** AWS S3 (uploads) · Docker · Vercel (web) · Railway (API)
 
-**Testing & calidad:** Jest · Playwright · React Testing Library · ESLint · TypeScript strict
+**Testing & calidad:** Jest (ts-jest en el backend, next/jest en la web) · React Testing Library · Playwright · ESLint · TypeScript (modo `strict` en la web) · GitHub Actions
 
 Eso es ~25 tecnologías que dominamos. Conocemos y trabajamos cuando el proyecto lo pide con: Python (FastAPI/Django), Java (Spring Boot), .NET, Postgres + pgvector, Redis, Pinecone, Anthropic, Kubernetes, Terraform, GraphQL, gRPC, WebSockets, React Native, Flutter. Si necesitas algo fuera de esta lista, lo evaluamos antes de comprometernos.
 
@@ -132,14 +132,46 @@ La subida de documentos en `/demo/chatbot` (`/api/demo-rag`) queda **apagada** h
 
 ```
 apps/
-  web/                    # Next.js — sitio + 26 demos en /demo
+  web/                    # Next.js — sitio + demos en /demo
+    e2e/                  # pruebas end-to-end (Playwright)
   backend/                # Express — APIs reales (chatbot) + mocks (resto)
 packages/
-  design-system/          # tokens compartidos
-  database/               # init.sql, helpers Mongo
-infra/
-  k8s/ · terraform/       # stubs de IaC
+  database/               # init.sql heredado (la app usa MongoDB)
+docs/
+  wiki/                   # fuente de la wiki del proyecto
+.github/workflows/        # CI (ci.yml) y publicación de la wiki (wiki-sync.yml)
 ```
+
+## Pruebas y CI
+
+```bash
+npm test               # Jest de backend y web (turbo)
+npm run lint           # ESLint de backend y web
+npm run typecheck      # TypeScript (tsc --noEmit) de backend y web, incluidas las pruebas
+npm run test:e2e       # Playwright contra un sitio ya levantado (ver abajo)
+```
+
+- **Backend:** Jest con `ts-jest` ([`apps/backend/jest.config.js`](apps/backend/jest.config.js)). Las pruebas viven en carpetas `__tests__` dentro de `apps/backend/src`.
+- **Web:** Jest con `next/jest` y jsdom ([`apps/web/jest.config.js`](apps/web/jest.config.js)). Las pruebas de humo de las demos renderizan cada página con los mensajes reales en español ([`apps/web/src/test-utils`](apps/web/src/test-utils)) y fallan si la página lanza un error, no pinta nada o usa una clave de traducción inexistente. Ninguna prueba unitaria sale a la red.
+- **E2E:** Playwright ([`apps/web/playwright.config.ts`](apps/web/playwright.config.ts), pruebas en [`apps/web/e2e`](apps/web/e2e)), en escritorio y móvil con el navegador en `es-CO`. Revisa la home, `/rag`, el catálogo `/demo` y cada demo: responden 200, no muestran textos de error y no registran errores en la consola (incluidos los de hidratación de React). Las demos con un error de consola ya conocido están listadas, con su motivo, en [`apps/web/e2e/demos.spec.ts`](apps/web/e2e/demos.spec.ts): la prueba sigue revisándolas, falla si aparece cualquier otro error y también si el error conocido ya no ocurre (para que se borre de la lista). No arranca servidores: corre contra `E2E_BASE_URL` (por defecto `http://localhost:3300`; con `npm run dev` la web queda en el puerto 3000, así que usa `E2E_BASE_URL=http://localhost:3000 npm run test:e2e`) y, si se define `E2E_API_URL`, también revisa el `/health` del backend. Para probar sin clave de OpenAI hay un mock local: `node apps/web/e2e/support/openai-mock.js` y luego `OPENAI_BASE_URL=http://127.0.0.1:3999/v1 OPENAI_API_KEY=sk-test-mock` en el backend.
+
+El workflow [`ci.yml`](.github/workflows/ci.yml) corre en cada pull request y en cada push a `main`, con Node 20:
+
+| Job | Qué hace |
+|---|---|
+| Lint y tipos | Verifica que los mensajes i18n agregados estén al día, ESLint, `tsc` y el formato de los títulos de página |
+| Pruebas unitarias | Jest del backend y de la web |
+| Build | `tsc` del backend y `next build` de la web (apuntando a un backend local, nunca al de producción) |
+| E2E | Levanta MongoDB 7, Redis 7, el mock de OpenAI, el backend y la web compilados (`next start`) y corre Playwright |
+
+## Despliegue
+
+GitHub Actions **no despliega**: el workflow de CI solo verifica. El despliegue lo hacen las integraciones de cada plataforma con el repositorio de GitHub:
+
+- **Web:** Vercel (proyecto conectado al repositorio).
+- **API:** Railway, que construye con Nixpacks según [`apps/backend/railway.json`](apps/backend/railway.json) (`npm install && npm run build` y arranca con `npm run start`).
+
+Las variables de cada entorno se configuran en esas plataformas (ver [Variables de entorno](#variables-de-entorno)). Los secretos nunca van en el repositorio: el único archivo de entorno versionado, `apps/web/.env.production`, solo tiene las URL públicas del sitio y de la API.
 
 ## Documentación y plan de producto
 
