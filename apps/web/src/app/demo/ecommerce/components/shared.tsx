@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useMemo, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useMemo, useCallback, useEffect, ReactNode } from 'react';
 import { Product } from './products';
 
 // ---------------------------------------------------------------------------
@@ -27,7 +27,8 @@ interface CartContextValue {
   setView: (v: ViewId) => void;
 }
 
-export type ViewId = 'storefront' | 'checkout' | 'vendor' | 'operations' | 'admin';
+export const VIEW_IDS = ['storefront', 'checkout', 'vendor', 'operations', 'admin'] as const;
+export type ViewId = (typeof VIEW_IDS)[number];
 
 const CartContext = createContext<CartContextValue | null>(null);
 
@@ -35,6 +36,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
   const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);
   const [view, setView] = useState<ViewId>('storefront');
+
+  // Permite enlazar una vista concreta: /demo/ecommerce?view=admin
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get('view');
+    if (requested && (VIEW_IDS as readonly string[]).includes(requested)) {
+      setView(requested as ViewId);
+    }
+  }, []);
 
   const add = useCallback((product: Product, qty = 1) => {
     setLines((prev) => {
@@ -113,20 +122,36 @@ export function useCart() {
 // Pricing helpers
 // ---------------------------------------------------------------------------
 
+// Tienda de ejemplo para Colombia: pesos colombianos sin decimales, formato
+// es-CO ("$ 6.499.000") en ambos idiomas, para que servidor y navegador
+// rendericen lo mismo.
+const COP_FORMAT = new Intl.NumberFormat('es-CO', {
+  style: 'currency',
+  currency: 'COP',
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
+const NUMBER_FORMAT = new Intl.NumberFormat('es-CO');
+
 export function formatPrice(amount: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(amount);
+  return COP_FORMAT.format(Math.round(amount));
 }
 
-export function calcTotals(subtotal: number) {
-  const shipping = subtotal === 0 ? 0 : subtotal >= 100 ? 0 : 12;
-  const tax = +(subtotal * 0.08).toFixed(2);
-  const total = +(subtotal + shipping + tax).toFixed(2);
-  return { shipping, tax, total };
+export function formatNumber(value: number): string {
+  return NUMBER_FORMAT.format(value);
+}
+
+// Reglas de ejemplo: los precios ya incluyen IVA (19 %, tarifa general), el
+// envío cuesta $ 9.900 y es gratis desde $ 150.000.
+export const IVA_RATE = 0.19;
+export const SHIPPING_FEE = 9900;
+export const FREE_SHIPPING_FROM = 150000;
+
+export function calcTotals(net: number) {
+  const shipping = net === 0 ? 0 : net >= FREE_SHIPPING_FROM ? 0 : SHIPPING_FEE;
+  const ivaIncluded = Math.round(net - net / (1 + IVA_RATE));
+  const total = net + shipping;
+  return { shipping, ivaIncluded, total };
 }
 
 // ---------------------------------------------------------------------------
