@@ -4,8 +4,9 @@
  * Es la lógica que antes vivía en `contact.controller.submitContact`: guarda el
  * `Contact` en MongoDB y dispara (sin bloquear) las notificaciones por WhatsApp
  * y email al equipo. La usan:
- *   - el formulario de /contact (`source: 'contact-form'`, por defecto), y
- *   - la demo "Prueba con tu documento" (`source: 'demo-rag'`).
+ *   - el formulario de /contact (`source: 'contact-form'`, por defecto),
+ *   - la demo "Prueba con tu documento" (`source: 'demo-rag'`), y
+ *   - el formulario "Solicitar demo" (`source: 'demo-request'`).
  *
  * El guardado se espera (si Mongo falla, el error sube al caller, igual que
  * antes en el formulario); las notificaciones nunca hacen fallar la petición.
@@ -27,16 +28,25 @@ export interface LeadInput {
   source?: ContactSource;
 }
 
-export async function registerLead(input: LeadInput): Promise<IContact> {
+export interface LeadNotificationResult {
+  /** true si el aviso por WhatsApp al equipo se envió (false si no está configurado o falló). */
+  whatsapp: boolean;
+  /** true si el aviso por email al equipo se envió (false si no está configurado o falló). */
+  email: boolean;
+}
+
+/**
+ * Guarda el lead y dispara los avisos al equipo sin esperarlos. `notified`
+ * se resuelve (nunca se rechaza) cuando terminan, con lo que de verdad se
+ * envió; la solicitud de demo lo guarda para que el panel lo muestre.
+ */
+export async function registerLeadWithNotifications(
+  input: LeadInput,
+): Promise<{ contact: IContact; notified: Promise<LeadNotificationResult> }> {
   const { name, email, phone, company, service, budget, message } = input;
   const source = input.source ?? DEFAULT_CONTACT_SOURCE;
 
-  logger.info('📝 Processing contact form submission:');
-  logger.info(`   Name: ${name}`);
-  logger.info(`   Email: ${email}`);
-  logger.info(`   Phone: ${phone || 'Not provided'}`);
-  logger.info(`   Service: ${service}`);
-  logger.info(`   Source: ${source}`);
+  logger.info(`📝 Registrando lead (origen: ${source})`);
 
   // Guardar en base de datos
   const contact = await Contact.create({
@@ -55,23 +65,21 @@ export async function registerLead(input: LeadInput): Promise<IContact> {
 
   const notification = { name, email, phone, company, service, budget, message, source };
 
-  // Enviar notificación por WhatsApp (async, no bloqueante)
-  logger.info('🔔 Triggering WhatsApp notification...');
-  whatsappService.sendContactNotification(notification).catch((err) => {
-    logger.error('❌ Failed to send WhatsApp notification:');
-    logger.error(`   Error: ${err.message}`);
-    logger.error(`   Stack: ${err.stack}`);
-    // No fallar la petición si WhatsApp falla
+  // Avisos al equipo (no bloqueantes: nunca hacen fallar la petición).
+  const whatsapp = whatsappService.sendContactNotification(notification).catch((err) => {
+    logger.error(`❌ Failed to send WhatsApp notification: ${err?.message ?? err}`);
+    return false;
   });
-
-  // Enviar notificación por Email (async, no bloqueante)
-  logger.info('📧 Triggering Email notification...');
-  emailService.sendContactNotification(notification).catch((err) => {
-    logger.error('❌ Failed to send Email notification:');
-    logger.error(`   Error: ${err.message}`);
-    logger.error(`   Stack: ${err.stack}`);
-    // No fallar la petición si Email falla
+  const emailSent = emailService.sendContactNotification(notification).catch((err) => {
+    logger.error(`❌ Failed to send Email notification: ${err?.message ?? err}`);
+    return false;
   });
+  const notified = Promise.all([whatsapp, emailSent]).then(([w, e]) => ({ whatsapp: w === true, email: e === true }));
 
+  return { contact, notified };
+}
+
+export async function registerLead(input: LeadInput): Promise<IContact> {
+  const { contact } = await registerLeadWithNotifications(input);
   return contact;
 }

@@ -75,6 +75,15 @@ const startServer = async () => {
 
     await ensureAdminFromEnv();
 
+    // 3b. Catálogo de demos: inserta las que falten (idempotente; nunca pisa
+    // los cambios hechos desde el panel).
+    try {
+      const { ensureCatalogSeeded } = await import('./services/demo-catalog.service');
+      await ensureCatalogSeeded();
+    } catch (err: any) {
+      logger.warn(`Fallo sembrando el catálogo de demos: ${err?.message ?? err}`);
+    }
+
     // 4. Estrategias de Passport (Google OAuth si está configurado).
     try {
       const passportMod = await import('./config/passport');
@@ -92,6 +101,10 @@ const startServer = async () => {
       console.log('Servidor iniciado correctamente', `http://localhost:${PORT}`);
     });
 
+    // Job de vencimiento de accesos a demos y recordatorios (candado en Redis).
+    const { startDemoGrantsJob, stopDemoGrantsJob } = await import('./jobs/demo-grants.job');
+    startDemoGrantsJob();
+
     // Análisis IA de cuentas médicas con PDFs grandes puede tardar minutos.
     server.timeout = 900000;
     server.keepAliveTimeout = 910000;
@@ -99,6 +112,7 @@ const startServer = async () => {
 
     const shutdown = (signal: string) => {
       logger.info(`Recibido ${signal}, cerrando...`);
+      stopDemoGrantsJob();
       server.close(() => {
         logger.info('Server closed');
         process.exit(0);

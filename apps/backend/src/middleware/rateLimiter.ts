@@ -47,6 +47,15 @@ export const strictRateLimiter = rateLimit({
   },
 });
 
+/** Validación del enlace de activación al cargar /activar/<token> (por IP). */
+export const activationCheckRateLimiter = rateLimit({
+  windowMs: 60000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many requests, please try again later.' },
+});
+
 export const uploadRateLimiter = rateLimit({
   windowMs: 60000, // 1 minute
   max: 10,

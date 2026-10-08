@@ -43,6 +43,15 @@ import liquidacionRoutes from './routes/liquidacion.routes';
 import testRoutes from './routes/test.routes';
 import adminRoutes from './routes/admin.routes';
 import linkedinAdsRoutes from './routes/linkedin-ads.routes';
+import { demoAccessRouter, demoCatalogRouter, demoRequestsRouter, meRouter } from './routes/demo-public.routes';
+import {
+  adminAuditLogRouter,
+  adminDemoCatalogRouter,
+  adminDemoGrantsRouter,
+  adminDemoRequestsRouter,
+} from './routes/admin-demos.routes';
+import { setDemoAccessResolver } from './middleware/access';
+import { demoGrantResolver } from './services/demo-access.service';
 
 /** Orígenes de producción siempre permitidos. */
 const PRODUCTION_ORIGINS = ['https://koptup.com', 'https://www.koptup.com'];
@@ -64,6 +73,10 @@ const CHATBOT_DOCS_PATH = /^\/api\/chatbot\/bots\/[^/]+\/docs\/?$/;
 
 export function createApp(): Express {
   const app = express();
+
+  // Acceso a demos (P4): requireStaffOrDemoAccess consulta el catálogo
+  // editable y el DemoGrant vigente del usuario.
+  setDemoAccessResolver(demoGrantResolver);
 
   // Detrás del proxy de Railway: confiar en N saltos (TRUST_PROXY_HOPS, por
   // defecto 1) para que req.ip sea la IP real del visitante (X-Forwarded-For).
@@ -168,6 +181,17 @@ export function createApp(): Express {
   app.use('/api/reglas-facturacion', reglasFacturacionRoutes);
   app.use('/api/liquidacion', liquidacionRoutes);
   app.use('/api/test', testRoutes);
+  // Sistema de demos (wiki 04). Las rutas del equipo van ANTES de /api/admin:
+  // admin.routes exige admin o manager en todo su router y `sales` también
+  // gestiona solicitudes y accesos (permisos por ruta en admin-demos.routes).
+  app.use('/api/demo-requests', demoRequestsRouter);
+  app.use('/api/demo-catalog', demoCatalogRouter);
+  app.use('/api/demo-access', demoAccessRouter);
+  app.use('/api/me', meRouter);
+  app.use('/api/admin/demo-requests', adminDemoRequestsRouter);
+  app.use('/api/admin/demo-grants', adminDemoGrantsRouter);
+  app.use('/api/admin/demo-catalog', adminDemoCatalogRouter);
+  app.use('/api/admin/audit-log', adminAuditLogRouter);
   app.use('/api/admin', adminRoutes);
   app.use('/api/linkedin-ads', linkedinAdsRoutes);
 

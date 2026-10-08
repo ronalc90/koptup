@@ -6,11 +6,13 @@ import {
   resetearConfiguraciones,
 } from '../controllers/documentoConocimientoConfig.controller';
 
-import { requireAdmin, requireStaffOrDemoAccess } from '../middleware/access';
+import { requireAdmin, requireStaff, requireStaffOrDemoAccess } from '../middleware/access';
 
 const router = Router();
 
-// Política: staff o acceso a la demo /demo/cuentas-medicas; resetear todo, solo admin.
+// Política: leer e inicializar, staff o acceso a la demo /demo/cuentas-medicas;
+// activar o desactivar un documento (configuración global del motor), staff;
+// resetear todo, solo admin.
 router.use(requireStaffOrDemoAccess('cuentas-medicas'));
 
 /**
@@ -56,7 +58,7 @@ router.get('/config', getConfiguracion as RequestHandler);
  *       500:
  *         description: Error del servidor
  */
-router.patch('/config/:documento_id', toggleDocumento as RequestHandler);
+router.patch('/config/:documento_id', ...requireStaff, toggleDocumento as RequestHandler);
 
 /**
  * @swagger

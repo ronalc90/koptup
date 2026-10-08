@@ -14,14 +14,15 @@ import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { handleUploadError } from '../middleware/upload';
 
-import { requireStaffOrDemoAccess } from '../middleware/access';
+import { requireStaff } from '../middleware/access';
 import { AppError } from '../middleware/errorHandler';
 
 const router = Router();
 
-// Política: staff o acceso a la demo /demo/cuentas-medicas. Va antes de
-// multer: una petición sin acceso no escribe nada en disco.
-router.use(requireStaffOrDemoAccess('cuentas-medicas'));
+// Política: staff (herramienta interna /liquidacion; sus radicados son
+// datos del equipo, no de la demo). Va antes de multer: una petición sin
+// acceso no escribe nada en disco.
+router.use(...requireStaff);
 
 // Configurar multer para documentos de liquidación
 const storage = multer.diskStorage({

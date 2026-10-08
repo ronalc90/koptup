@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { validationResult } from 'express-validator';
 import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
+import { z } from 'zod';
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -12,12 +12,48 @@ import { AppError, asyncHandler } from '../middleware/errorHandler';
 import { logger } from '../utils/logger';
 import { redis } from '../config/redis';
 import emailService from '../services/email.service';
-import User from '../models/User';
+import User, { type IUser } from '../models/User';
+import {
+  MAGIC_LINK_ERRORS,
+  consumeMagicLink,
+  inspectMagicLink,
+  invalidatePendingMagicLinks,
+  issueMagicLink,
+  releaseMagicLink,
+} from '../services/magic-link.service';
+import { recordAudit } from '../services/audit.service';
+import { maskEmail } from '../utils/email-address';
 
-/** Prefijo de las claves Redis para tokens de reseteo de contraseña. */
-const RESET_TOKEN_PREFIX = 'password_reset:';
-/** Vigencia del token de reseteo: 1 hora. */
-const RESET_TOKEN_TTL_SECONDS = 60 * 60;
+/** Vigencia del refresh token en Redis: 7 días. */
+const REFRESH_TTL_SECONDS = 7 * 24 * 60 * 60;
+
+/**
+ * Emite la sesión (access + refresh) de un usuario: la misma respuesta que
+ * POST /api/auth/login. La usan el login y la activación de cuenta.
+ */
+async function issueSession(user: IUser) {
+  const accessToken = generateAccessToken({
+    id: user._id.toString(),
+    email: user.email,
+    role: user.role,
+    name: user.name,
+  });
+  const refreshToken = generateRefreshToken({
+    id: user._id.toString(),
+    email: user.email,
+  });
+  await redis.setEx(`refresh_token:${user._id}`, REFRESH_TTL_SECONDS, refreshToken);
+  return {
+    accessToken,
+    refreshToken,
+    user: {
+      id: user._id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    },
+  };
+}
 
 export const register = asyncHandler(async (req: AuthRequest, res: Response) => {
   const errors = validationResult(req);
@@ -71,6 +107,15 @@ export const login = asyncHandler(async (req: AuthRequest, res: Response) => {
   // Get user
   const user = await User.findOne({ email }).select('+password');
 
+  // Cuenta creada al aprobar una demo que aún no se activa: no tiene contraseña.
+  if (user && user.accountStatus === 'invitado') {
+    throw new AppError(
+      'Tu cuenta aún no está activada. Usa el enlace de activación que te enviamos o pide uno nuevo al equipo de KopTup.',
+      401,
+      'account_not_activated',
+    );
+  }
+
   if (!user || !user.password) {
     throw new AppError('Invalid credentials', 401);
   }
@@ -81,21 +126,7 @@ export const login = asyncHandler(async (req: AuthRequest, res: Response) => {
     throw new AppError('Invalid credentials', 401);
   }
 
-  // Generate tokens
-  const accessToken = generateAccessToken({
-    id: user._id.toString(),
-    email: user.email,
-    role: user.role,
-    name: user.name,
-  });
-
-  const refreshToken = generateRefreshToken({
-    id: user._id.toString(),
-    email: user.email,
-  });
-
-  // Store refresh token in Redis with 7 days expiration
-  await redis.setEx(`refresh_token:${user._id}`, 7 * 24 * 60 * 60, refreshToken);
+  const session = await issueSession(user);
 
   // Update last login
   user.last_login = new Date();
@@ -106,16 +137,7 @@ export const login = asyncHandler(async (req: AuthRequest, res: Response) => {
   res.json({
     success: true,
     message: 'Login successful',
-    data: {
-      accessToken,
-      refreshToken,
-      user: {
-        id: user._id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-      },
-    },
+    data: session,
   });
 });
 
@@ -212,8 +234,9 @@ export const getProfile = asyncHandler(
 /**
  * Solicita el reseteo de contraseña. Por seguridad (evitar enumeración de
  * usuarios) responde siempre el mismo mensaje, exista o no la cuenta. Si la
- * cuenta existe y es de tipo `local`, genera un token de un solo uso (guardado
- * en Redis con TTL) y envía el email con el enlace de reseteo.
+ * cuenta existe y es de tipo `local`, emite un enlace mágico de un solo uso
+ * (MagicLinkToken, propósito `reset`, 1 hora; solo se guarda su hash) y envía
+ * el email con el enlace.
  */
 export const forgotPassword = asyncHandler(
   async (req: AuthRequest, res: Response) => {
@@ -233,39 +256,29 @@ export const forgotPassword = asyncHandler(
 
     const user = await User.findOne({ email });
 
-    // Solo cuentas locales con contraseña pueden resetear (las de Google no).
+    // Solo cuentas locales pueden resetear (las de Google no).
     if (!user || user.provider !== 'local') {
-      logger.info(`Password reset requested for non-resettable email: ${email}`);
+      logger.info('Password reset requested for a non-resettable email');
       return genericResponse();
     }
 
-    // Token aleatorio de un solo uso. Guardamos el hash en Redis, no el token.
-    const rawToken = crypto.randomBytes(32).toString('hex');
-    const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
-
-    await redis.setEx(
-      `${RESET_TOKEN_PREFIX}${tokenHash}`,
-      RESET_TOKEN_TTL_SECONDS,
-      user._id.toString()
-    );
-
-    const frontendURL = process.env.FRONTEND_URL || 'http://localhost:3000';
-    const resetUrl = `${frontendURL}/reset-password?token=${rawToken}`;
+    const link = await issueMagicLink({ userId: user._id as any, proposito: 'reset' });
 
     await emailService.sendPasswordResetEmail({
       to: user.email,
       name: user.name,
-      resetUrl,
+      resetUrl: link.url,
     });
 
-    logger.info(`Password reset email dispatched for: ${email}`);
+    logger.info('Password reset email dispatched');
     return genericResponse();
   }
 );
 
 /**
- * Restablece la contraseña a partir de un token válido. El token es de un solo
- * uso: se elimina de Redis tras consumirlo y se invalida la sesión vigente.
+ * Restablece la contraseña a partir de un enlace válido. El enlace es de un
+ * solo uso (se consume de forma atómica) y se invalida la sesión vigente.
+ * Si la cuenta estaba `invitado`, queda activa (probó que controla el email).
  */
 export const resetPassword = asyncHandler(
   async (req: AuthRequest, res: Response) => {
@@ -276,28 +289,35 @@ export const resetPassword = asyncHandler(
 
     const { token, password } = req.body;
 
-    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
-    const redisKey = `${RESET_TOKEN_PREFIX}${tokenHash}`;
-
-    const userId = await redis.get(redisKey);
-    if (!userId) {
-      throw new AppError('El enlace de recuperación es inválido o expiró', 400);
+    const consumed = await consumeMagicLink(token, 'reset');
+    if (!consumed.ok) {
+      throw new AppError('El enlace de recuperación es inválido o expiró', 400, consumed.reason);
     }
 
-    const user = await User.findById(userId);
+    const user = await User.findById(consumed.doc.user);
     if (!user) {
-      await redis.del(redisKey);
-      throw new AppError('El enlace de recuperación es inválido o expiró', 400);
+      throw new AppError('El enlace de recuperación es inválido o expiró', 400, 'token_invalid');
     }
 
-    user.password = await bcrypt.hash(password, 12);
-    await user.save();
+    const wasInvited = user.accountStatus === 'invitado';
+    try {
+      user.password = await bcrypt.hash(password, 12);
+      if (wasInvited) {
+        user.accountStatus = 'activo';
+        user.emailVerifiedAt = new Date();
+      }
+      await user.save();
+    } catch (err) {
+      await releaseMagicLink(consumed.doc._id as any);
+      throw err;
+    }
+    // Ya tiene contraseña: el enlace de activación pendiente deja de servir.
+    if (wasInvited) await invalidatePendingMagicLinks(user._id as any, 'activacion');
 
-    // Token de un solo uso + invalidar refresh token para forzar re-login.
-    await redis.del(redisKey);
+    // Invalida el refresh token para forzar un login nuevo.
     await redis.del(`refresh_token:${user._id}`);
 
-    logger.info(`Password reset completed for: ${user.email}`);
+    logger.info('Password reset completed');
 
     res.json({
       success: true,
@@ -305,6 +325,78 @@ export const resetPassword = asyncHandler(
     });
   }
 );
+
+const ActivateSchema = z.object({
+  token: z.string().trim().min(20).max(200),
+  password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres.').max(128),
+});
+
+const TokenOnlySchema = z.object({ token: z.string().trim().min(1).max(200) });
+
+/**
+ * POST /api/auth/activate/check { token } — valida el enlace de activación
+ * SIN consumirlo (la página /activar/<token> lo llama al cargar, y los
+ * filtros de correo que abren enlaces no lo gastan). Devuelve el nombre y el
+ * email enmascarado.
+ */
+export const checkActivation = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const parsed = TokenOnlySchema.safeParse(req.body ?? {});
+  if (!parsed.success) throw new AppError(MAGIC_LINK_ERRORS.token_invalid, 400, 'token_invalid');
+  const found = await inspectMagicLink(parsed.data.token, 'activacion');
+  if (!found.ok) throw new AppError(MAGIC_LINK_ERRORS[found.reason], 400, found.reason);
+  const user = await User.findById(found.doc.user).select('email name').lean();
+  if (!user) throw new AppError(MAGIC_LINK_ERRORS.token_invalid, 400, 'token_invalid');
+  res.json({
+    success: true,
+    data: { nombre: user.name, emailEnmascarado: maskEmail(user.email), expiresAt: found.doc.expiresAt },
+  });
+});
+
+/**
+ * POST /api/auth/activate { token, password } — consume el enlace de
+ * activación (un solo uso, 72 h), fija la contraseña, deja la cuenta activa y
+ * devuelve la sesión igual que el login.
+ */
+export const activateAccount = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const parsed = ActivateSchema.safeParse(req.body ?? {});
+  if (!parsed.success) {
+    const passwordIssue = parsed.error.issues.find((i) => i.path[0] === 'password');
+    if (passwordIssue) throw new AppError(passwordIssue.message, 400, 'invalid_password', { fields: ['password'] });
+    throw new AppError(MAGIC_LINK_ERRORS.token_invalid, 400, 'token_invalid');
+  }
+
+  const consumed = await consumeMagicLink(parsed.data.token, 'activacion');
+  if (!consumed.ok) throw new AppError(MAGIC_LINK_ERRORS[consumed.reason], 400, consumed.reason);
+
+  const user = await User.findById(consumed.doc.user);
+  if (!user) throw new AppError(MAGIC_LINK_ERRORS.token_invalid, 400, 'token_invalid');
+
+  const now = new Date();
+  try {
+    user.password = await bcrypt.hash(parsed.data.password, 12);
+    user.accountStatus = 'activo';
+    user.emailVerifiedAt = user.emailVerifiedAt ?? now;
+    user.last_login = now;
+    await user.save();
+  } catch (err) {
+    await releaseMagicLink(consumed.doc._id as any);
+    throw err;
+  }
+  // Cualquier otro enlace de activación pendiente deja de servir.
+  await invalidatePendingMagicLinks(user._id as any, 'activacion', now);
+
+  await recordAudit({
+    actor: { id: String(user._id), email: user.email, role: user.role },
+    accion: 'user.activate',
+    entidad: { tipo: 'User', id: String(user._id) },
+    detalle: { via: 'enlace_activacion' },
+    req,
+  });
+
+  const session = await issueSession(user);
+  logger.info('Account activated with magic link');
+  res.json({ success: true, message: 'Tu cuenta quedó activa.', data: session });
+});
 
 // Google OAuth callback handler
 export const googleCallback = asyncHandler(
@@ -329,7 +421,7 @@ export const googleCallback = asyncHandler(
     });
 
     // Store refresh token in Redis with 7 days expiration
-    await redis.setEx(`refresh_token:${user.id}`, 7 * 24 * 60 * 60, refreshToken);
+    await redis.setEx(`refresh_token:${user.id}`, REFRESH_TTL_SECONDS, refreshToken);
 
     // Redirect to frontend with tokens
     const frontendURL = process.env.FRONTEND_URL || 'http://localhost:3000';

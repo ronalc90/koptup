@@ -27,7 +27,7 @@ export const OPTIONAL_WITH_EFFECT: Record<string, string> = {
   CORS_ORIGIN: 'orígenes extra permitidos por CORS (solo se aceptan koptup.com y www.koptup.com)',
   FRONTEND_URL: 'enlaces de los correos (se usa http://localhost:3000)',
   ADMIN_EMAIL: 'asegurar el rol admin al arrancar (no se modifica ningún rol)',
-  SMTP_HOST: 'envío de correos',
+  SMTP_HOST: 'envío de correos (acuse y aprobación de demos, recordatorios); el panel muestra igual el enlace de activación',
 };
 
 const optionalNumber = (opts: { min?: number; int?: boolean } = {}) =>
@@ -81,6 +81,11 @@ export const EnvSchema = z.object({
   LINKEDIN_ADS_MONTHLY_BUDGET_USD: optionalNumber({ min: 0 }),
   CONTENT_MONTHLY_BUDGET_USD: optionalNumber({ min: 0 }),
   SMTP_HOST: z.string().optional(),
+  PRIVACY_POLICY_VERSION: z.string().max(40).optional(),
+  DEMO_REQUEST_LIMIT_PER_HOUR: optionalNumber({ min: 1, int: true }),
+  DEMO_REQUEST_LIMIT_PER_EMAIL_DAY: optionalNumber({ min: 1, int: true }),
+  DEMO_GRANTS_JOB_ENABLED: z.enum(['true', 'false']).optional(),
+  DEMO_GRANTS_JOB_INTERVAL_MS: optionalNumber({ min: 60000, int: true }),
 });
 
 export type Env = z.infer<typeof EnvSchema>;

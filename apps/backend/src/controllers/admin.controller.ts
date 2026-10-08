@@ -9,6 +9,7 @@ import Contact from '../models/Contact';
 import mongoose from 'mongoose';
 import User from '../models/User';
 import { sendOrderStatusMessage } from '../utils/conversationHelper';
+import { recordAudit } from '../services/audit.service';
 
 export const adminGetOrders = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
@@ -456,12 +457,21 @@ export const adminUpdateUserRole = async (req: AuthRequest, res: Response): Prom
       return;
     }
 
+    const previous = await User.findById(id).select('role').lean();
     const user = await User.findByIdAndUpdate(id, { role }, { new: true }).select('-password');
 
     if (!user) {
       res.status(404).json({ success: false, message: 'Usuario no encontrado' });
       return;
     }
+
+    await recordAudit({
+      actor: req.user ? { id: req.user.id, email: req.user.email, role: req.user.role } : null,
+      accion: 'user.role_change',
+      entidad: { tipo: 'User', id: String(user._id) },
+      detalle: { email: user.email, antes: previous?.role ?? null, despues: user.role },
+      req,
+    });
 
     res.json({
       success: true,

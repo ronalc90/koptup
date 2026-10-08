@@ -202,18 +202,26 @@ export interface DemoAccessDecision {
   reason: 'staff' | 'public' | 'grant' | 'login_required' | 'no_access';
   /** Identificador del acceso concedido (lo llena el resolvedor de P4). */
   grantId?: string;
+  /**
+   * Motivo detallado del resolvedor de P4 (services/demo-access.service.ts):
+   * `publico`, `grant`, `sin_sesion`, `sin_acceso`, `expirado`, `revocado`,
+   * `desactivada`, `no_existe`… Se devuelve en la respuesta de error para que
+   * la web muestre la pantalla adecuada.
+   */
+  motivo?: string;
 }
 
 export type DemoAccessResolver = (ctx: DemoAccessContext) => Promise<DemoAccessDecision>;
 
 /**
  * Resolvedor por defecto (P3): abre las demos `publico` y niega el resto a
- * quien no sea staff.
+ * quien no sea staff. Solo se usa si no hay otro registrado.
  *
- * GANCHO P4: el sistema de demos registra su propio resolvedor con
- * `setDemoAccessResolver`, que lee el `accessMode` editable de la demo y el
- * `DemoGrant` vigente del usuario (y registra el uso). El staff nunca llega
- * al resolvedor: `requireStaffOrDemoAccess` lo deja pasar antes.
+ * P4: createApp() registra `demoGrantResolver`
+ * (services/demo-access.service.ts) con `setDemoAccessResolver`: lee el
+ * `accessMode` editable de la demo y el `DemoGrant` vigente del usuario (y
+ * registra el uso). El staff nunca llega al resolvedor:
+ * `requireStaffOrDemoAccess` lo deja pasar antes.
  */
 export const defaultDemoAccessResolver: DemoAccessResolver = async ({ slug, user }) => {
   const mode = DEFAULT_DEMO_ACCESS_MODES[slug] ?? 'privado';
@@ -278,12 +286,24 @@ export function requireStaffOrDemoAccess(slug: string): RequestHandler {
       sendDbUnavailable(res);
       return;
     }
+    if (decision.motivo === 'desactivada' || decision.motivo === 'no_existe') {
+      // Iniciar sesión no ayuda: la demo está apagada (o no existe).
+      res.status(403).json({
+        success: false,
+        code: 'demo_disabled',
+        demo: slug,
+        motivo: decision.motivo,
+        message: 'Esta demo no está disponible en este momento.',
+      });
+      return;
+    }
     if (!user) {
       const expired = bearer.error === 'expired';
       res.status(401).json({
         success: false,
         code: expired ? 'TOKEN_EXPIRED' : 'login_required',
         demo: slug,
+        motivo: decision.motivo ?? 'sin_sesion',
         message: expired
           ? 'Tu sesión expiró. Inicia sesión de nuevo.'
           : 'Inicia sesión con una cuenta que tenga acceso a esta demo.',
@@ -294,7 +314,13 @@ export function requireStaffOrDemoAccess(slug: string): RequestHandler {
       success: false,
       code: 'demo_access_required',
       demo: slug,
-      message: 'Tu cuenta no tiene acceso a esta demo. Solicítalo desde la página de la demo.',
+      motivo: decision.motivo ?? 'sin_acceso',
+      message:
+        decision.motivo === 'expirado'
+          ? 'Tu acceso a esta demo venció. Pide una extensión al equipo de KopTup.'
+          : decision.motivo === 'revocado'
+            ? 'Tu acceso a esta demo fue cerrado. Escríbenos si crees que es un error.'
+            : 'Tu cuenta no tiene acceso a esta demo. Solicítalo desde la página de la demo.',
     });
   };
 }

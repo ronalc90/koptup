@@ -5,6 +5,7 @@
 
 import nodemailer from 'nodemailer';
 import { logger } from '../utils/logger';
+import { escapeHtml } from '../utils/email-address';
 
 interface EmailConfig {
   host: string;
@@ -56,6 +57,36 @@ class EmailService {
     return !!(this.transporter && this.config.auth.user && this.config.auth.pass);
   }
 
+  /** Destinatario de los avisos internos (ADMIN_EMAIL). */
+  getAdminEmail(): string {
+    return this.config.adminEmail;
+  }
+
+  /**
+   * Envía un correo ya armado (plantillas del sistema de demos). Devuelve
+   * false, sin lanzar, si SMTP no está configurado o el envío falla.
+   */
+  async sendMail(params: { to: string; subject: string; html: string; text: string }): Promise<boolean> {
+    if (!this.isConfigured()) {
+      logger.warn(`📧 Email not configured - skipping "${params.subject}"`);
+      return false;
+    }
+    try {
+      const info = await this.transporter.sendMail({
+        from: this.config.from,
+        to: params.to,
+        subject: params.subject,
+        text: params.text,
+        html: params.html,
+      });
+      logger.info(`✅ Email "${params.subject}" sent (Message ID: ${info.messageId})`);
+      return true;
+    } catch (error: any) {
+      logger.error(`❌ Email "${params.subject}" error: ${error?.message ?? error}`);
+      return false;
+    }
+  }
+
   /**
    * Envía notificación de nuevo contacto al admin
    */
@@ -104,50 +135,50 @@ class EmailService {
     <div class="content">
       <div class="field">
         <span class="label">👤 Nombre:</span>
-        <div class="value">${contactData.name}</div>
+        <div class="value">${escapeHtml(contactData.name)}</div>
       </div>
 
       <div class="field">
         <span class="label">📧 Email:</span>
-        <div class="value"><a href="mailto:${contactData.email}">${contactData.email}</a></div>
+        <div class="value"><a href="mailto:${escapeHtml(contactData.email)}">${escapeHtml(contactData.email)}</a></div>
       </div>
 
       ${contactData.phone ? `
       <div class="field">
         <span class="label">📱 Teléfono:</span>
-        <div class="value">${contactData.phone}</div>
+        <div class="value">${escapeHtml(contactData.phone)}</div>
       </div>
       ` : ''}
 
       ${contactData.company ? `
       <div class="field">
         <span class="label">🏢 Empresa:</span>
-        <div class="value">${contactData.company}</div>
+        <div class="value">${escapeHtml(contactData.company)}</div>
       </div>
       ` : ''}
 
       <div class="field">
         <span class="label">💼 Servicio:</span>
-        <div class="value">${contactData.service}</div>
+        <div class="value">${escapeHtml(contactData.service)}</div>
       </div>
 
       ${contactData.source && contactData.source !== 'contact-form' ? `
       <div class="field">
         <span class="label">🧭 Origen:</span>
-        <div class="value">${contactData.source}</div>
+        <div class="value">${escapeHtml(contactData.source)}</div>
       </div>
       ` : ''}
 
       ${contactData.budget ? `
       <div class="field">
         <span class="label">💰 Presupuesto:</span>
-        <div class="value">${contactData.budget}</div>
+        <div class="value">${escapeHtml(contactData.budget)}</div>
       </div>
       ` : ''}
 
       <div class="field">
         <span class="label">💬 Mensaje:</span>
-        <div class="value">${contactData.message.replace(/\n/g, '<br>')}</div>
+        <div class="value">${escapeHtml(contactData.message).replace(/\n/g, '<br>')}</div>
       </div>
 
       <div class="footer">
@@ -236,12 +267,12 @@ ${contactData.message}
       <p>KopTup</p>
     </div>
     <div class="content">
-      <p>Hola ${params.name},</p>
+      <p>Hola ${escapeHtml(params.name)},</p>
       <p>Recibimos una solicitud para restablecer la contraseña de tu cuenta. Haz clic en el botón para crear una nueva contraseña. Este enlace expira en 1 hora.</p>
       <p style="text-align:center;">
-        <a class="button" href="${params.resetUrl}">Restablecer contraseña</a>
+        <a class="button" href="${escapeHtml(params.resetUrl)}">Restablecer contraseña</a>
       </p>
-      <p class="muted">Si el botón no funciona, copia y pega este enlace en tu navegador:<br>${params.resetUrl}</p>
+      <p class="muted">Si el botón no funciona, copia y pega este enlace en tu navegador:<br>${escapeHtml(params.resetUrl)}</p>
       <p>Si no solicitaste este cambio, puedes ignorar este correo: tu contraseña seguirá siendo la misma.</p>
       <div class="footer">
         <p>⏰ ${new Date().toLocaleString('es-CO', { timeZone: 'America/Bogota' })}</p>

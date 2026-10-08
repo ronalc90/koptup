@@ -5,11 +5,17 @@ import { logger } from '../utils/logger';
 export class AppError extends Error {
   statusCode: number;
   isOperational: boolean;
+  /** Código estable para el cliente (p. ej. `token_expired`); opcional. */
+  code?: string;
+  /** Datos extra que se agregan a la respuesta de error (sin datos internos). */
+  details?: Record<string, unknown>;
 
-  constructor(message: string, statusCode: number = 500) {
+  constructor(message: string, statusCode: number = 500, code?: string, details?: Record<string, unknown>) {
     super(message);
     this.statusCode = statusCode;
     this.isOperational = true;
+    this.code = code;
+    this.details = details;
 
     Error.captureStackTrace(this, this.constructor);
   }
@@ -32,13 +38,20 @@ interface BodyParserError extends Error {
  * Traduce un error a { status, message, code } sin filtrar detalles internos.
  * Exportado para probarlo de forma aislada.
  */
-export function classifyError(err: unknown): { status: number; message: string; code: string; operational: boolean } {
+export function classifyError(err: unknown): {
+  status: number;
+  message: string;
+  code: string;
+  operational: boolean;
+  details?: Record<string, unknown>;
+} {
   if (err instanceof AppError) {
     return {
       status: err.statusCode,
       message: err.message,
-      code: err instanceof CorsError ? 'cors_forbidden' : err.statusCode < 500 ? 'bad_request' : 'internal_error',
+      code: err instanceof CorsError ? 'cors_forbidden' : err.code ?? (err.statusCode < 500 ? 'bad_request' : 'internal_error'),
       operational: err.isOperational,
+      details: err.details,
     };
   }
 
@@ -91,7 +104,7 @@ export const errorHandler = (
   // Express identifica el manejador de errores por sus 4 argumentos.
   _next: NextFunction
 ): void => {
-  const { status, message, code, operational } = classifyError(err);
+  const { status, message, code, operational, details } = classifyError(err);
 
   if (!operational || status >= 500) {
     logger.error('Error:', {
@@ -107,6 +120,7 @@ export const errorHandler = (
   if (res.headersSent) return;
 
   res.status(status).json({
+    ...(details ?? {}),
     success: false,
     code,
     message,
