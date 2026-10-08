@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Landing de producto — CRM con IA · Mockup KopTup</title>
+<!-- Mockup de diseño (wiki de KopTup). Datos ficticios. Generado como HTML autocontenido; ver render.js -->
+<style>
+@font-face{font-family:'Poppins';font-weight:500;src:url(fonts/poppins-500.woff2) format('woff2')}
+@font-face{font-family:'Poppins';font-weight:600;src:url(fonts/poppins-600.woff2) format('woff2')}
+@font-face{font-family:'Poppins';font-weight:700;src:url(fonts/poppins-700.woff2) format('woff2')}
+@font-face{font-family:'Poppins';font-weight:800;src:url(fonts/poppins-800.woff2) format('woff2')}
+:root{
+  --p50:#eff6ff;--p100:#dbeafe;--p200:#bfdbfe;--p300:#93c5fd;--p400:#60a5fa;--p500:#3b82f6;--p600:#2563eb;--p700:#1d4ed8;--p800:#1e40af;--p900:#1e3a8a;
+  --s50:#f8fafc;--s100:#f1f5f9;--s200:#e2e8f0;--s300:#cbd5e1;--s400:#94a3b8;--s500:#64748b;--s600:#475569;--s700:#334155;--s800:#1e293b;--s900:#0f172a;
+  --g50:#f0fdf4;--g100:#dcfce7;--g200:#bbf7d0;--g500:#22c55e;--g600:#16a34a;--g700:#15803d;
+  --a50:#fffbeb;--a100:#fef3c7;--a200:#fde68a;--a400:#fbbf24;--a500:#f59e0b;--a600:#d97706;--a700:#b45309;
+  --r50:#fef2f2;--r100:#fee2e2;--r200:#fecaca;--r500:#ef4444;--r600:#dc2626;--r700:#b91c1c;
+  --v50:#f5f3ff;--v100:#ede9fe;--v200:#ddd6fe;--v600:#7c3aed;--v700:#6d28d9;
+  --i600:#4f46e5;--i700:#4338ca;
+  --acc:#c026d3;
+  --display:'Poppins','Inter Display',Inter,system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#fff}
+body{font-family:Inter,system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--s900);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;font-feature-settings:"cv11"}
+h1,h2,h3,h4,.display{font-family:var(--display);letter-spacing:-.01em;line-height:1.2}
+a{color:inherit;text-decoration:none}
+.ico{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}
+.wrap{max-width:1216px;margin:0 auto}
+.row{display:flex;align-items:center}
+.gap4{gap:4px}.gap6{gap:6px}.gap8{gap:8px}.gap10{gap:10px}.gap12{gap:12px}.gap16{gap:16px}.gap24{gap:24px}
+.grow{flex:1}
+.muted{color:var(--s500)}.soft{color:var(--s600)}.faint{color:var(--s400)}
+.small{font-size:12px}.xs{font-size:11px}.fw5{font-weight:500}.fw6{font-weight:600}.fw7{font-weight:700}
+.mono{font-family:'JetBrains Mono','DejaVu Sans Mono',ui-monospace,monospace;font-size:12px;letter-spacing:-.01em}
+.tnum{font-variant-numeric:tabular-nums}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:8px;font-weight:600;font-size:14px;border:1px solid transparent;white-space:nowrap;line-height:1}
+.btn-primary{background:var(--p600);color:#fff;box-shadow:0 1px 2px rgba(37,99,235,.25)}
+.btn-outline{border:1.5px solid var(--p600);color:var(--p600);background:#fff}
+.btn-secondary{background:#fff;border-color:var(--s300);color:var(--s700);box-shadow:0 1px 2px rgba(15,23,42,.05)}
+.btn-ghost{color:var(--s600);background:transparent}
+.btn-danger{background:var(--r600);color:#fff}
+.btn-danger-soft{background:#fff;border-color:var(--r200);color:var(--r600)}
+.btn-white{background:#fff;color:var(--p700)}
+.btn-lg{height:48px;padding:0 22px;font-size:16px;border-radius:10px}
+.btn-sm{height:32px;padding:0 12px;font-size:13px;border-radius:7px;gap:6px}
+.btn-xs{height:26px;padding:0 9px;font-size:12px;border-radius:6px;gap:5px}
+.btn-block{width:100%}
+.badge{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap;line-height:1}
+.badge .ico{width:12px;height:12px}
+.b-green{background:var(--g100);color:var(--g700)}
+.b-amber{background:var(--a100);color:var(--a700)}
+.b-red{background:var(--r100);color:var(--r700)}
+.b-blue{background:var(--p100);color:var(--p700)}
+.b-gray{background:var(--s100);color:var(--s600)}
+.b-purple{background:var(--v100);color:var(--v700)}
+.b-outline{background:#fff;border:1px solid var(--s200);color:var(--s600)}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+.card{background:#fff;border:1px solid var(--s200);border-radius:14px}
+.shadow{box-shadow:0 1px 3px rgba(15,23,42,.06),0 1px 2px rgba(15,23,42,.04)}
+.shadow-lg{box-shadow:0 12px 32px -8px rgba(15,23,42,.18),0 4px 8px -4px rgba(15,23,42,.08)}
+.shadow-xl{box-shadow:0 24px 48px -12px rgba(15,23,42,.28),0 8px 16px -8px rgba(15,23,42,.12)}
+.label{font-size:13px;font-weight:600;color:var(--s700);margin-bottom:6px;display:block}
+.req{color:var(--r600)}
+.help{font-size:12px;color:var(--s500);margin-top:6px}
+.input{height:40px;border:1px solid var(--s300);border-radius:8px;padding:0 12px;display:flex;align-items:center;gap:8px;background:#fff;color:var(--s900);font-size:14px}
+.input.ph{color:var(--s400)}
+.input .ico{color:var(--s400)}
+.select{justify-content:space-between}
+.textarea{border:1px solid var(--s300);border-radius:8px;padding:10px 12px;background:#fff;font-size:14px;line-height:1.5}
+.cb{width:18px;height:18px;border:1.5px solid var(--s300);border-radius:5px;background:#fff;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.cb.on{background:var(--p600);border-color:var(--p600);color:#fff}
+.cb.on .ico{width:13px;height:13px;stroke-width:3}
+.cb.dis{background:var(--s100);border-color:var(--s200)}
+.radio{width:18px;height:18px;border:1.5px solid var(--s300);border-radius:50%;background:#fff;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.radio.on{border-color:var(--p600)}
+.radio.on::after{content:'';width:9px;height:9px;border-radius:50%;background:var(--p600)}
+.toggle{width:36px;height:20px;border-radius:999px;background:var(--s300);position:relative;flex:none;display:inline-block}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.toggle.on{background:var(--p600)}
+.toggle.on::after{left:18px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--s200);background:#fff;font-size:13px;font-weight:500;color:var(--s700);white-space:nowrap}
+.chip.on{background:var(--p50);border-color:var(--p300);color:var(--p700)}
+.chip .ico{width:14px;height:14px}
+.seg{display:inline-flex;background:var(--s100);border-radius:10px;padding:4px;gap:2px}
+.seg>span{height:34px;padding:0 14px;border-radius:7px;display:inline-flex;align-items:center;font-size:13px;font-weight:600;color:var(--s600);gap:6px}
+.seg>span.on{background:#fff;color:var(--s900);box-shadow:0 1px 3px rgba(15,23,42,.12)}
+.avatar{border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;color:#fff;flex:none;background:var(--p600);font-size:13px;width:32px;height:32px}
+.divider{height:1px;background:var(--s200)}
+.kbd{font-size:11px;border:1px solid var(--s200);border-radius:4px;padding:1px 5px;color:var(--s500);background:var(--s50)}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:21px;color:var(--s900);letter-spacing:-.01em}
+.logo-k{width:32px;height:32px;border-radius:8px;background:var(--p600);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;font-family:var(--display)}
+.shot{position:relative;overflow:hidden;background:var(--s100)}
+.shot>img{display:block;width:100%}
+/* tabla */
+table.t{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+table.t th{font-size:11.5px;font-weight:600;color:var(--s500);text-align:left;padding:10px 10px;background:var(--s50);border-bottom:1px solid var(--s200);white-space:nowrap;text-transform:none}
+table.t td{padding:11px 10px;border-bottom:1px solid var(--s100);vertical-align:middle}
+table.t tr:last-child td{border-bottom:0}
+/* navbar del sitio */
+.site-nav{height:80px;background:rgba(255,255,255,.96);border-bottom:1px solid var(--s100);position:relative;z-index:5}
+.site-nav .wrap{height:80px;display:flex;align-items:center}
+.site-nav nav{display:flex;gap:4px;margin-left:40px}
+.site-nav nav a{height:36px;padding:0 14px;border-radius:8px;display:inline-flex;align-items:center;font-weight:500;color:var(--s700);font-size:14.5px}
+.site-nav nav a.on{background:var(--p50);color:var(--p600)}
+.site-nav .nav-r{margin-left:auto;display:flex;align-items:center;gap:14px}
+.site-nav .lang{display:flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;color:var(--s700)}
+/* admin */
+.adm{display:grid;grid-template-columns:232px minmax(0,1fr);grid-template-rows:64px 1fr;min-height:900px;background:var(--s50)}
+.adm-top{grid-column:1/3;display:flex;align-items:center;background:#fff;border-bottom:1px solid var(--s200);padding:0 24px 0 20px;gap:16px;position:relative;z-index:3}
+.adm-top .logo{font-size:19px;width:192px}
+.adm-top .logo-k{width:30px;height:30px;font-size:16px}
+.adm-search{width:360px;height:38px;border-radius:9px;background:var(--s50);border:1px solid var(--s200);display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--s400);font-size:13.5px}
+.adm-search .kbd{margin-left:auto}
+.adm-top .tr{margin-left:auto;display:flex;align-items:center;gap:16px}
+.icon-btn{width:36px;height:36px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;color:var(--s600);position:relative}
+.icon-btn .ico{width:19px;height:19px}
+.icon-btn .pip{position:absolute;top:7px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--r500);border:2px solid #fff}
+.who{display:flex;align-items:center;gap:10px}
+.who .n{font-size:13.5px;font-weight:600;line-height:1.2}
+.who .r{font-size:12px;color:var(--s500);line-height:1.2}
+.adm-side{background:#fff;border-right:1px solid var(--s200);padding:18px 12px;display:flex;flex-direction:column}
+.side-group{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--s400);padding:14px 12px 6px}
+.side-group:first-child{padding-top:2px}
+.nav-item{display:flex;align-items:center;gap:10px;height:38px;padding:0 10px 0 12px;border-radius:9px;color:var(--s700);font-weight:500;font-size:13.5px;margin-bottom:1px;white-space:nowrap}
+.nav-item .ico{width:18px;height:18px;color:var(--s500)}
+.nav-item.on{background:var(--p50);color:var(--p700);font-weight:600}
+.nav-item.on .ico{color:var(--p600)}
+.nav-item .cnt{margin-left:auto;min-width:22px;height:20px;padding:0 7px;border-radius:999px;background:var(--p600);color:#fff;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.nav-item .cnt.amber{background:var(--a100);color:var(--a700)}
+.nav-item .cnt.gray{background:var(--s100);color:var(--s600)}
+.side-foot{margin-top:auto;padding:12px;border-radius:10px;background:var(--s50);border:1px solid var(--s200);font-size:12px;color:var(--s600)}
+.adm-main{padding:26px 32px 40px;min-width:0}
+.page-h{display:flex;align-items:flex-end;gap:16px;margin-bottom:20px}
+.page-h h1{font-size:28px;font-weight:700}
+.page-h .sub{color:var(--s500);margin-top:4px;font-size:14.5px}
+.crumbs{font-size:13px;color:var(--s500);display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.crumbs .ico{width:14px;height:14px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--s200)}
+.tabs>span{padding:10px 14px;font-size:14px;font-weight:500;color:var(--s500);display:inline-flex;align-items:center;gap:8px;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs>span.on{color:var(--p700);border-color:var(--p600);font-weight:600}
+.tabs .n{font-size:12px;background:var(--s100);color:var(--s600);border-radius:999px;padding:1px 8px;font-weight:600}
+.tabs .on .n{background:var(--p100);color:var(--p700)}
+.example-tag{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;background:var(--a50);border:1px dashed var(--a500);color:var(--a700);font-size:12px;font-weight:600}
+
+
+.hero{background:linear-gradient(135deg,#eff6ff 0%,#f8fafc 45%,#fff 100%);padding:28px 0 72px;border-bottom:1px solid var(--s100)}
+.hero .crumbs{margin-bottom:34px}
+.hero-grid{display:grid;grid-template-columns:1fr 1.08fr;gap:56px;align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 14px;border-radius:999px;background:var(--p100);color:var(--p800);font-weight:600;font-size:13.5px}
+.hero h1{font-size:54px;font-weight:700;line-height:1.08;margin:20px 0 18px;letter-spacing:-.02em}
+.hero p.lead{font-size:18.5px;color:var(--s600);line-height:1.6;max-width:520px}
+.hero .ctas{display:flex;gap:12px;margin-top:30px}
+.hero .tert{margin-top:20px;display:flex;align-items:center;gap:10px;font-weight:600;color:var(--p700);font-size:14.5px}
+.facts{display:flex;gap:22px;white-space:nowrap;margin-top:34px;padding-top:24px;border-top:1px solid var(--s200);color:var(--s600);font-size:13.5px}
+.facts span{display:flex;align-items:center;gap:7px}
+.facts .ico{color:var(--g600)}
+/* marco navegador */
+.browser{background:#fff;border-radius:16px;border:1px solid var(--s200);overflow:hidden;position:relative}
+.browser .bar{height:40px;background:var(--s50);border-bottom:1px solid var(--s200);display:flex;align-items:center;padding:0 14px;gap:7px}
+.browser .bar i{width:11px;height:11px;border-radius:50%;background:var(--s300);display:block}
+.browser .url{margin-left:14px;flex:1;height:26px;border-radius:7px;background:#fff;border:1px solid var(--s200);display:flex;align-items:center;gap:6px;padding:0 10px;font-size:12px;color:var(--s500)}
+.crm{padding:16px 18px 18px;background:linear-gradient(180deg,#fff, #f8fafc)}
+.crm-h{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.crm-h .ic{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--i600),var(--i700));color:#fff;display:flex;align-items:center;justify-content:center}
+.crm-tabs{display:flex;gap:16px;font-size:12px;color:var(--s500);border-bottom:1px solid var(--s200);margin-bottom:12px}
+.crm-tabs span{padding:6px 0 8px;display:flex;gap:5px;align-items:center}
+.crm-tabs .on{color:var(--p700);border-bottom:2px solid var(--p600);font-weight:600}
+.crm-kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.crm-kpi div{border:1px solid var(--s200);border-radius:9px;padding:7px 10px;background:#fff}
+.crm-kpi small{font-size:10.5px;color:var(--s500);display:block}
+.crm-kpi b{font-size:15px}
+.kb{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.kb .col{background:var(--s100);border-radius:10px;padding:8px}
+.kb .ch{display:flex;justify-content:space-between;font-size:11px;font-weight:600;color:var(--s700);margin-bottom:2px}
+.kb .cv{font-size:10.5px;color:var(--s500);margin-bottom:7px}
+.deal{background:#fff;border:1px solid var(--s200);border-radius:8px;padding:7px 8px;margin-bottom:6px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.deal b{font-size:11px;display:block;line-height:1.3}
+.deal .m{display:flex;justify-content:space-between;align-items:center;margin-top:4px;font-size:10.5px;color:var(--s600)}
+.ia{font-size:9.5px;font-weight:700;padding:1px 5px;border-radius:5px}
+.ia.h{background:var(--g100);color:var(--g700)}.ia.m{background:var(--a100);color:var(--a700)}.ia.l{background:var(--s100);color:var(--s600)}
+.deal.hot{border-color:var(--p300);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.suggest{position:absolute;left:-34px;bottom:30px;width:300px;background:#fff;border-radius:12px;border:1px solid var(--s200);padding:12px 14px;display:flex;gap:10px}
+.suggest .s-ic{width:32px;height:32px;border-radius:9px;background:var(--v100);color:var(--v700);display:flex;align-items:center;justify-content:center;flex:none}
+section.blk{padding:80px 0}
+.sec-h{text-align:center;max-width:880px;margin:0 auto 44px}
+.sec-h .k{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--p600)}
+.sec-h h2{font-size:36px;font-weight:700;margin:10px 0 12px}
+.sec-h p{font-size:17px;color:var(--s600)}
+.who3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.who3 .card{padding:28px}
+.ibox{width:48px;height:48px;border-radius:12px;background:var(--p50);color:var(--p600);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.ibox .ico{width:24px;height:24px}
+.who3 h3{font-size:19px;font-weight:600;margin-bottom:8px}
+.who3 p{color:var(--s600);font-size:15px}
+.inc{display:grid;grid-template-columns:repeat(3,1fr);gap:20px 28px}
+.inc .it{display:flex;gap:16px;padding:22px;border-radius:14px;background:#fff;border:1px solid var(--s200)}
+.inc .ibox{margin:0;width:44px;height:44px;flex:none}
+.inc h4{font-family:Inter,system-ui,sans-serif;font-size:16px;font-weight:600;margin-bottom:4px;letter-spacing:0}
+.inc p{color:var(--s600);font-size:14px}
+.gal-h{display:flex;align-items:flex-end;margin-bottom:26px}
+.gal-h h2{font-size:32px;font-weight:700}
+.gal{display:grid;grid-template-columns:minmax(0,1.25fr) repeat(3,minmax(0,1fr));gap:20px}.gal img{max-width:none}
+.tile .shot,.tile .mini{height:200px;border-radius:12px;border:1px solid var(--s200);overflow:hidden}
+.tile figcaption{font-size:13.5px;color:var(--s600);margin-top:10px;line-height:1.45}
+.tile figcaption b{color:var(--s900);display:block;font-weight:600;margin-bottom:2px}
+.vid{position:relative}
+.vid::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,23,42,.15),rgba(15,23,42,.6))}
+.vid .pl{position:absolute;z-index:2;left:50%;top:50%;transform:translate(-50%,-50%);width:62px;height:62px;border-radius:50%;background:rgba(255,255,255,.95);color:var(--p600);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.vid .pl .ico{width:26px;height:26px;fill:var(--p600);margin-left:4px}
+.vid .dur{position:absolute;z-index:2;left:12px;bottom:12px;color:#fff;font-weight:600;font-size:13px;display:flex;gap:8px;align-items:center}
+.vid .dur span{background:rgba(15,23,42,.75);padding:3px 8px;border-radius:6px}
+.mini{background:#fff;padding:14px;font-size:11px}
+.mini .mh{font-weight:700;font-size:12.5px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.lsr{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--s100)}
+.lsr .av{width:22px;height:22px;border-radius:50%;background:var(--p100);color:var(--p700);font-weight:700;font-size:9.5px;display:flex;align-items:center;justify-content:center}
+.lsr .bar{height:6px;border-radius:3px;background:var(--s100);width:70px;overflow:hidden}
+.lsr .bar i{display:block;height:100%;background:var(--p600);border-radius:3px}
+.fc{display:flex;align-items:flex-end;gap:12px;height:118px;padding:0 6px;border-bottom:1px solid var(--s200);position:relative}
+.fc .c{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px}
+.fc .c i{display:block;width:20px;border-radius:4px 4px 0 0;background:var(--p600)}
+.fc .c i.p{background:var(--p200)}
+.fc .goal{position:absolute;left:0;right:0;border-top:1px dashed var(--a600)}
+.dots{display:flex;gap:8px;justify-content:center;margin-top:26px}
+.dots i{width:8px;height:8px;border-radius:50%;background:var(--s300)}
+.dots i.on{width:24px;border-radius:4px;background:var(--p600)}
+.arrows{margin-left:auto;display:flex;gap:10px}
+.arrows span{width:42px;height:42px;border-radius:50%;border:1px solid var(--s300);display:flex;align-items:center;justify-content:center;color:var(--s700);background:#fff}
+.plans{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;align-items:stretch}
+.plan{padding:28px 24px;display:flex;flex-direction:column;position:relative}
+.plan h3{font-size:20px;font-weight:600}
+.plan .pd{font-size:13.5px;color:var(--s500);margin-top:4px;min-height:40px}
+.plan .price{margin-top:18px;font-family:var(--display);font-weight:700;font-size:25px;letter-spacing:-.02em;white-space:nowrap}
+.plan .price small{font-size:14px;font-weight:600;color:var(--s500);margin-right:4px;font-family:Inter,system-ui}
+.plan .once{font-size:13px;color:var(--s500);margin-top:2px}
+.plan .mant{margin-top:10px;font-size:13px;font-weight:600;color:var(--s700);background:var(--s50);border:1px solid var(--s200);border-radius:8px;padding:7px 10px;display:flex;gap:6px;align-items:center}
+.plan ul{list-style:none;margin:20px 0 22px;display:flex;flex-direction:column;gap:11px;flex:1}
+.plan li{display:flex;gap:10px;font-size:14px;color:var(--s700);line-height:1.4}
+.plan li .ico{color:var(--g600);margin-top:2px;width:16px;height:16px}
+.plan .impl{font-size:12.5px;color:var(--s500);display:flex;gap:6px;align-items:center;margin-bottom:14px}
+.plan.feat{border:2px solid var(--p600);box-shadow:0 20px 40px -16px rgba(37,99,235,.35)}
+.plan.feat .rib{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--p600);color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;white-space:nowrap}
+.saas{margin-top:26px;display:flex;align-items:center;gap:18px;padding:18px 22px;border-radius:14px;background:var(--s50);border:1px dashed var(--s300)}
+.saas .si{width:42px;height:42px;border-radius:11px;background:#fff;border:1px solid var(--s200);display:flex;align-items:center;justify-content:center;color:var(--a600)}
+.faq{display:grid;grid-template-columns:.8fr 1.4fr;gap:64px}
+.faq h2{font-size:34px;font-weight:700;margin-bottom:14px}
+.qa{border:1px solid var(--s200);border-radius:12px;background:#fff;padding:0 22px;height:64px;display:flex;align-items:center;justify-content:space-between;font-weight:600;font-size:16px;margin-bottom:12px}
+.qa .pm{width:30px;height:30px;border-radius:50%;background:var(--s100);color:var(--s600);display:flex;align-items:center;justify-content:center}
+.band{background:linear-gradient(120deg,var(--p600),var(--p800));border-radius:24px;padding:56px 64px;display:flex;align-items:center;gap:40px;color:#fff;position:relative;overflow:hidden}
+.band::before{content:'';position:absolute;right:-80px;top:-120px;width:360px;height:360px;border-radius:50%;background:rgba(255,255,255,.07)}
+.band h2{font-size:34px;font-weight:700}
+.band p{color:var(--p100);font-size:17px;margin-top:10px}
+.btn-ow{border:1.5px solid rgba(255,255,255,.7);color:#fff;background:transparent}
+footer.ft{border-top:1px solid var(--s200);padding:28px 0;margin-top:80px;color:var(--s500);font-size:13.5px}
+</style>
+</head>
+<body>
+<header class="site-nav"><div class="wrap">
+  <div class="logo"><span class="logo-k">K</span>KopTup</div>
+  <nav><a class="">Inicio</a><a class="">RAG</a><a class="on">Servicios</a><a class="">Demos</a><a class="">Nosotros</a><a class="">Contacto</a></nav>
+  <div class="nav-r">
+    <span class="lang"><svg class="ico" viewBox="0 0 24 24" style="width:18px;height:18px"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg> ES</span>
+    <span class="icon-btn" style="width:32px"><svg class="ico" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span>
+    <a class="btn btn-outline" style="height:38px">Iniciar sesión</a>
+    <a class="btn btn-primary" style="height:38px">Solicitar demo</a>
+  </div></div></header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="crumbs">Inicio <svg class="ico" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg> Servicios <svg class="ico" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg> <span style="color:var(--s800);font-weight:500">CRM con IA</span></div>
+    <div class="hero-grid">
+      <div>
+        <span class="eyebrow"><svg class="ico" viewBox="0 0 24 24" style="width:15px;height:15px"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> Ventas · CRM con IA</span>
+        <h1>Un CRM que te dice a quién llamar hoy</h1>
+        <p class="lead">Prioriza oportunidades con IA, registra cada interacción y pronostica tus ventas. Implementación desde 2 semanas según el plan.</p>
+        <div class="ctas">
+          <a class="btn btn-primary btn-lg">Solicitar demo <svg class="ico" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+          <a class="btn btn-outline btn-lg"><svg class="ico" viewBox="0 0 24 24" style="width:18px;height:18px"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg> Agendar llamada</a>
+        </div>
+        <div class="tert"><svg class="ico" viewBox="0 0 24 24" style="width:18px;height:18px"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg> Probar la demo abierta <span class="badge b-green"><span class="dot" style="background:var(--g600);width:6px;height:6px"></span>Demo abierta</span> <span class="muted fw5 small">sin registro</span></div>
+        <div class="facts">
+          <span><svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px"><polyline points="20 6 9 17 4 12"/></svg> El código es tuyo (compra)</span>
+          <span><svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px"><polyline points="20 6 9 17 4 12"/></svg> Precios en COP</span>
+          <span><svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px"><polyline points="20 6 9 17 4 12"/></svg> Equipo en Colombia</span>
+        </div>
+      </div>
+      <div style="position:relative">
+        <div class="browser shadow-xl">
+          <div class="bar"><i></i><i></i><i></i><div class="url"><svg class="ico" viewBox="0 0 24 24" style="width:12px;height:12px"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> koptup.com/demo/crm-ia <span class="badge b-amber" style="margin-left:auto;height:18px;font-size:10.5px">Datos de ejemplo</span></div></div>
+          <div class="crm">
+            <div class="crm-h"><span class="ic"><svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span><div><div class="fw7" style="font-size:14px;line-height:1.1">CRM con IA</div><div class="muted" style="font-size:11px">Comercializadora Demo S.A.S. · Octubre</div></div><span class="badge b-blue" style="margin-left:auto;height:20px;font-size:10.5px"><svg class="ico" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> IA activa</span></div>
+            <div class="crm-tabs"><span class="on"><svg class="ico" viewBox="0 0 24 24" style="width:13px;height:13px"><path d="M6 5v11"/><path d="M12 5v6"/><path d="M18 5v14"/></svg> Pipeline</span><span><svg class="ico" viewBox="0 0 24 24" style="width:13px;height:13px"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Contactos</span><span><svg class="ico" viewBox="0 0 24 24" style="width:13px;height:13px"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg> Pronóstico</span><span><svg class="ico" viewBox="0 0 24 24" style="width:13px;height:13px"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> Asistente IA</span><span><svg class="ico" viewBox="0 0 24 24" style="width:13px;height:13px"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg> Conversaciones</span></div>
+            <div class="crm-kpi">
+              <div><small>Pipeline del mes</small><b>$ 1.159 M</b></div>
+              <div><small>Avance de la meta</small><b>62 %</b></div>
+              <div><small>Negocios calientes</small><b>4</b></div>
+            </div>
+            <div class="kb">
+              <div class="col"><div class="ch">Prospecto <span class="muted">3</span></div><div class="cv">$ 126 M</div>
+                <div class="deal"><b>Ferretería Los Andes</b><div class="m">$ 38 M <span class="ia l">IA 41 %</span></div></div>
+                <div class="deal"><b>Agroinsumos del Valle</b><div class="m">$ 52 M <span class="ia l">IA 35 %</span></div></div>
+                <div class="deal"><b>Textiles Rionegro</b><div class="m">$ 36 M <span class="ia m">IA 49 %</span></div></div>
+              </div>
+              <div class="col"><div class="ch">Calificado <span class="muted">2</span></div><div class="cv">$ 170 M</div>
+                <div class="deal hot"><b>Distribuidora Andina SAS</b><div class="m">$ 96 M <span class="ia h">IA 82 %</span></div></div>
+                <div class="deal"><b>Clínica Santa Lucía</b><div class="m">$ 74 M <span class="ia m">IA 58 %</span></div></div>
+              </div>
+              <div class="col"><div class="ch">Propuesta <span class="muted">2</span></div><div class="cv">$ 310 M</div>
+                <div class="deal"><b>Inmobiliaria Altos del Río</b><div class="m">$ 120 M <span class="ia m">IA 64 %</span></div></div>
+                <div class="deal"><b>Grupo Llanos</b><div class="m">$ 190 M <span class="ia m">IA 47 %</span></div></div>
+              </div>
+              <div class="col"><div class="ch">Negociación <span class="muted">2</span></div><div class="cv">$ 420 M</div>
+                <div class="deal"><b>Concesionario Norte</b><div class="m">$ 260 M <span class="ia h">IA 71 %</span></div></div>
+                <div class="deal"><b>Café Origen</b><div class="m">$ 160 M <span class="ia h">IA 76 %</span></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="suggest shadow-lg">
+          <span class="s-ic"><svg class="ico" viewBox="0 0 24 24" style="width:17px;height:17px"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg></span>
+          <div style="font-size:12.5px;line-height:1.45"><div class="fw7" style="font-size:13px">Sugerencia de hoy</div>Llama a <b>Distribuidora Andina SAS</b>: abrió la propuesta 3 veces esta semana.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="blk">
+  <div class="wrap">
+    <div class="sec-h"><div class="k">Para quién es</div><h2>Hecho para equipos que venden todos los días</h2><p>Si hoy tu pipeline vive en Excel o en el WhatsApp de cada vendedor, este CRM es para ti.</p></div>
+    <div class="who3">
+      <div class="card shadow"><div class="ibox"><svg class="ico" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h3>Equipos comerciales de 5 a 50 vendedores</h3><p>Un solo lugar para el pipeline, las tareas y el seguimiento de cada vendedor.</p></div>
+      <div class="card shadow"><div class="ibox"><svg class="ico" viewBox="0 0 24 24"><path d="M5 18H3c-.6 0-1-.4-1-1V7c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v11"/><path d="M14 9h4l4 4v4c0 .6-.4 1-1 1h-2"/><circle cx="7" cy="18" r="2"/><path d="M15 18H9"/><circle cx="17" cy="18" r="2"/></svg></div><h3>Distribuidoras B2B</h3><p>Clientes recurrentes, visitas de campo y pedidos repetidos bajo control.</p></div>
+      <div class="card shadow"><div class="ibox"><svg class="ico" viewBox="0 0 24 24"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg></div><h3>Inmobiliarias y concesionarios</h3><p>Muchos prospectos entrantes: la IA ordena a quién llamar primero.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="blk" style="background:var(--s50);border-top:1px solid var(--s100);border-bottom:1px solid var(--s100)">
+  <div class="wrap">
+    <div class="sec-h"><div class="k">Qué incluye</div><h2>Todo lo que tu equipo necesita para vender</h2><p>Los módulos se activan según el plan. En la demo puedes probarlos todos.</p></div>
+    <div class="inc">
+      <div class="it"><div class="ibox"><svg class="ico" viewBox="0 0 24 24"><path d="M6 5v11"/><path d="M12 5v6"/><path d="M18 5v14"/></svg></div><div><h4>Pipeline visual</h4><p>Arrastra negocios entre etapas y ve el valor de cada una.</p></div></div>
+      <div class="it"><div class="ibox"><svg class="ico" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg></div><div><h4>Puntaje de leads con IA</h4><p>Cada oportunidad recibe un puntaje según su actividad y perfil.</p></div></div>
+      <div class="it"><div class="ibox"><svg class="ico" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div><div><h4>Recordatorios y tareas</h4><p>Ningún cliente se queda sin seguimiento: tareas con fecha y aviso.</p></div></div>
+      <div class="it"><div class="ibox"><svg class="ico" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div><div><h4>Pronóstico de ventas</h4><p>Proyección del mes y del trimestre, por vendedor y por etapa.</p></div></div>
+      <div class="it"><div class="ibox"><svg class="ico" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg></div><div><h4>Integración con WhatsApp y email</h4><p>Cada conversación queda en la ficha del cliente.</p></div></div>
+      <div class="it"><div class="ibox"><svg class="ico" viewBox="0 0 24 24"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg></div><div><h4>Reportes por vendedor</h4><p>Actividad, conversión y tiempos de respuesta de cada persona.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="blk">
+  <div class="wrap">
+    <div class="gal-h"><div><div class="sec-h" style="text-align:left;margin:0"><div class="k">Así se ve</div></div><h2 style="margin-top:8px">Capturas de la demo</h2><p class="muted" style="font-size:16px;margin-top:6px">Con datos de ejemplo. Puedes abrirla sin registro.</p></div>
+      <div class="arrows"><span><svg class="ico" viewBox="0 0 24 24" style="width:20px;height:20px"><path d="m15 18-6-6 6-6"/></svg></span><span><svg class="ico" viewBox="0 0 24 24" style="width:20px;height:20px"><path d="m9 18 6-6-6-6"/></svg></span></div></div>
+    <div class="gal">
+      <figure class="tile">
+        <div class="shot vid"><img src="../../actual/demo-crm-ia.jpg" style="margin-top:-5.6%" alt=""><span class="pl"><svg class="ico" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></svg></span><span class="dur"><span>1:30</span> Recorrido del CRM</span></div>
+        <figcaption><b>Video: recorrido del CRM</b>De un lead nuevo a un negocio ganado en 90 segundos.</figcaption>
+      </figure>
+      <figure class="tile">
+        <div class="shot"><img src="../../actual/demo-crm-ia.jpg" style="width:480px;margin-left:-33px;margin-top:-100px" alt=""></div>
+        <figcaption><b>Resumen del mes</b>Negocios activos, valor del pipeline y ciclo de venta.</figcaption>
+      </figure>
+      <figure class="tile">
+        <div class="mini">
+          <div class="mh">Prioridad de leads <svg class="ico" viewBox="0 0 24 24" style="width:13px;height:13px;color:var(--v600)"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg></div>
+          <div class="lsr"><span class="av">DA</span><span class="grow">Distribuidora Andina</span><span class="bar"><i style="width:82%"></i></span><b>82</b></div>
+          <div class="lsr"><span class="av">CO</span><span class="grow">Café Origen</span><span class="bar"><i style="width:76%"></i></span><b>76</b></div>
+          <div class="lsr"><span class="av">CN</span><span class="grow">Concesionario Norte</span><span class="bar"><i style="width:71%"></i></span><b>71</b></div>
+          <div class="lsr" style="border:0"><span class="av">IA</span><span class="grow">Inmobiliaria Altos</span><span class="bar"><i style="width:64%"></i></span><b>64</b></div>
+          
+        </div>
+        <figcaption><b>Puntaje de leads con IA</b>La lista de llamadas del día, ordenada por probabilidad.</figcaption>
+      </figure>
+      <figure class="tile">
+        <div class="mini">
+          <div class="mh">Pronóstico del trimestre <span class="muted fw5" style="font-size:10px">millones COP</span></div>
+          <div class="fc">
+            <div class="goal" style="bottom:84px"></div>
+            <div class="c"><span class="muted" style="font-size:9.5px">410</span><i style="height:62px"></i><span style="font-size:10px">Ago</span></div>
+            <div class="c"><span class="muted" style="font-size:9.5px">455</span><i style="height:69px"></i><span style="font-size:10px">Sep</span></div>
+            <div class="c"><span class="muted" style="font-size:9.5px">480</span><i class="p" style="height:72px"></i><span style="font-size:10px">Oct</span></div>
+            <div class="c"><span class="muted" style="font-size:9.5px">520</span><i class="p" style="height:78px"></i><span style="font-size:10px">Nov</span></div>
+          </div>
+          <div class="row gap12" style="margin-top:8px;font-size:10px;color:var(--s600)"><span class="row gap4"><i style="width:10px;height:10px;border-radius:2px;background:var(--p600)"></i>Real</span><span class="row gap4"><i style="width:10px;height:10px;border-radius:2px;background:var(--p200)"></i>Pronóstico</span><span class="row gap4"><i style="width:12px;border-top:1px dashed var(--a600)"></i>Meta</span></div>
+        </div>
+        <figcaption><b>Pronóstico de ventas</b>Real contra meta, con la proyección de los próximos meses.</figcaption>
+      </figure>
+    </div>
+    <div class="dots"><i class="on"></i><i></i><i></i></div>
+  </div>
+</section>
+
+<section class="blk" style="background:linear-gradient(180deg,var(--s50),#fff);border-top:1px solid var(--s100)">
+  <div class="wrap">
+    <div class="sec-h" style="margin-bottom:28px"><div class="k">Planes y precios</div><h2>Precios claros, en pesos colombianos</h2><p>Valores en COP más IVA si aplica. El mantenimiento mensual depende del plan y se detalla en la propuesta.</p></div>
+    <div style="display:flex;justify-content:center;margin-bottom:40px"><div class="seg"><span class="on"><svg class="ico" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg> Compra (pago único)</span><span><svg class="ico" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg> SaaS (mensual)</span></div></div>
+    <div class="plans">
+      <div class="card plan shadow">
+        <h3>Básico</h3><div class="pd">Para empezar a ordenar el proceso comercial.</div>
+        <div class="price"><small>COP</small>56.000.000</div><div class="once">pago único</div>
+        <div class="mant"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M5 12h14"/><path d="M12 5v14"/></svg> mantenimiento según plan</div>
+        <ul><li><svg class="ico" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Hasta 5 usuarios y 2.000 contactos</li><li><svg class="ico" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Pipeline, tareas e importación desde Excel</li><li><svg class="ico" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Prioridad de leads con IA</li><li><svg class="ico" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>1 buzón de Gmail u Outlook</li></ul>
+        <div class="impl"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Implementación de 2 a 5 semanas</div>
+        <a class="btn btn-outline btn-block">Solicitar demo</a>
+      </div>
+      <div class="card plan feat">
+        <span class="rib">Recomendado</span>
+        <h3>Profesional</h3><div class="pd">Para equipos que venden por WhatsApp y correo.</div>
+        <div class="price"><small>COP</small>144.000.000</div><div class="once">pago único</div>
+        <div class="mant"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M5 12h14"/><path d="M12 5v14"/></svg> mantenimiento según plan</div>
+        <ul><li><svg class="ico" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Hasta 30 usuarios y 15.000 contactos</li><li><svg class="ico" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>WhatsApp Business integrado</li><li><svg class="ico" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Varios buzones y campañas por correo</li><li><svg class="ico" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Soporte por WhatsApp</li></ul>
+        <div class="impl"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Implementación de 5 a 9 semanas</div>
+        <a class="btn btn-primary btn-block">Solicitar demo</a>
+      </div>
+      <div class="card plan shadow">
+        <h3>Avanzado</h3><div class="pd">Para equipos grandes con procesos definidos.</div>
+        <div class="price"><small>COP</small>336.000.000</div><div class="once">pago único</div>
+        <div class="mant"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M5 12h14"/><path d="M12 5v14"/></svg> mantenimiento según plan</div>
+        <ul><li><svg class="ico" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Hasta 80 usuarios y 75.000 contactos</li><li><svg class="ico" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Asistente que redacta correos y WhatsApp</li><li><svg class="ico" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Pronóstico de ventas y secuencias</li><li><svg class="ico" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Cotizador integrado</li></ul>
+        <div class="impl"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Implementación de 9 a 14 semanas</div>
+        <a class="btn btn-outline btn-block">Solicitar demo</a>
+      </div>
+      <div class="card plan shadow">
+        <h3>Enterprise</h3><div class="pd">Para corporativos con integraciones propias.</div>
+        <div class="price"><small>COP</small>720.000.000</div><div class="once">pago único</div>
+        <div class="mant"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M5 12h14"/><path d="M12 5v14"/></svg> mantenimiento según plan</div>
+        <ul><li><svg class="ico" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Usuarios ilimitados y 250.000+ contactos</li><li><svg class="ico" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Inicio de sesión único (SSO)</li><li><svg class="ico" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Bodega de datos e integraciones corporativas</li><li><svg class="ico" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Gerente de proyecto dedicado</li></ul>
+        <div class="impl"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Implementación de 12 a 20 semanas</div>
+        <a class="btn btn-outline btn-block">Solicitar demo</a>
+      </div>
+    </div>
+    <div class="saas">
+      <span class="si"><svg class="ico" viewBox="0 0 24 24" style="width:20px;height:20px"><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg></span>
+      <div class="grow"><div class="fw7" style="font-size:15px">SaaS (mensual): lista de espera — déjanos tu email</div><div class="soft" style="font-size:14px">Estamos preparando la versión hospedada por KopTup. Te avisamos cuando abra, sin compromiso.</div></div>
+      <div class="input ph" style="width:260px"><svg class="ico" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg> tu@empresa.com</div>
+      <a class="btn btn-secondary">Unirme a la lista</a>
+    </div>
+  </div>
+</section>
+
+<section class="blk" style="padding-top:40px">
+  <div class="wrap faq">
+    <div>
+      <h2>Preguntas frecuentes</h2>
+      <p class="soft" style="font-size:16px;margin-bottom:22px">¿No encuentras tu respuesta? Escríbenos y te respondemos en horario hábil (lunes a viernes, 8:00 a. m. a 5:00 p. m.).</p>
+      <a class="btn btn-secondary"><svg class="ico" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg> Escribir por WhatsApp</a>
+    </div>
+    <div>
+      <div class="qa">¿Cuánto tarda la implementación? <span class="pm"><svg class="ico" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></div>
+      <div class="qa">¿Puedo migrar mis datos de Excel? <span class="pm"><svg class="ico" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></div>
+      <div class="qa">¿Funciona con WhatsApp? <span class="pm"><svg class="ico" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></div>
+      <div class="qa">¿El código es mío en la modalidad compra? <span class="pm"><svg class="ico" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></div>
+      <div class="qa" style="margin:0">¿Qué incluye el mantenimiento? <span class="pm"><svg class="ico" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></div>
+    </div>
+  </div>
+</section>
+
+<section style="padding:20px 0 0">
+  <div class="wrap">
+    <div class="band">
+      <div class="grow" style="position:relative"><h2>Mira el CRM con tus propios procesos</h2><p>Te mostramos el CRM con un ejemplo de tu sector en una sesión de 30 minutos.</p></div>
+      <div class="row gap12" style="position:relative"><a class="btn btn-white btn-lg">Solicitar demo <svg class="ico" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a><a class="btn btn-ow btn-lg"><svg class="ico" viewBox="0 0 24 24" style="width:18px;height:18px"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg> Agendar llamada</a></div>
+    </div>
+  </div>
+</section>
+
+<footer class="ft"><div class="wrap row">
+  <div class="logo" style="font-size:17px"><span class="logo-k" style="width:26px;height:26px;font-size:14px">K</span>KopTup</div>
+  <span style="margin-left:18px">© 2026 KopTup · Bogotá, Colombia</span>
+  <span style="margin-left:auto" class="row gap24"><a>Política de tratamiento de datos</a><a>Términos</a><a>Cookies</a></span>
+</div></footer>
+</body>
+</html>

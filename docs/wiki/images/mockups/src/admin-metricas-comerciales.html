@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin — Métricas comerciales · Mockup KopTup</title>
+<!-- Mockup de diseño (wiki de KopTup). Datos ficticios. Generado como HTML autocontenido; ver render.js -->
+<style>
+@font-face{font-family:'Poppins';font-weight:500;src:url(fonts/poppins-500.woff2) format('woff2')}
+@font-face{font-family:'Poppins';font-weight:600;src:url(fonts/poppins-600.woff2) format('woff2')}
+@font-face{font-family:'Poppins';font-weight:700;src:url(fonts/poppins-700.woff2) format('woff2')}
+@font-face{font-family:'Poppins';font-weight:800;src:url(fonts/poppins-800.woff2) format('woff2')}
+:root{
+  --p50:#eff6ff;--p100:#dbeafe;--p200:#bfdbfe;--p300:#93c5fd;--p400:#60a5fa;--p500:#3b82f6;--p600:#2563eb;--p700:#1d4ed8;--p800:#1e40af;--p900:#1e3a8a;
+  --s50:#f8fafc;--s100:#f1f5f9;--s200:#e2e8f0;--s300:#cbd5e1;--s400:#94a3b8;--s500:#64748b;--s600:#475569;--s700:#334155;--s800:#1e293b;--s900:#0f172a;
+  --g50:#f0fdf4;--g100:#dcfce7;--g200:#bbf7d0;--g500:#22c55e;--g600:#16a34a;--g700:#15803d;
+  --a50:#fffbeb;--a100:#fef3c7;--a200:#fde68a;--a400:#fbbf24;--a500:#f59e0b;--a600:#d97706;--a700:#b45309;
+  --r50:#fef2f2;--r100:#fee2e2;--r200:#fecaca;--r500:#ef4444;--r600:#dc2626;--r700:#b91c1c;
+  --v50:#f5f3ff;--v100:#ede9fe;--v200:#ddd6fe;--v600:#7c3aed;--v700:#6d28d9;
+  --i600:#4f46e5;--i700:#4338ca;
+  --acc:#c026d3;
+  --display:'Poppins','Inter Display',Inter,system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#fff}
+body{font-family:Inter,system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--s900);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;font-feature-settings:"cv11"}
+h1,h2,h3,h4,.display{font-family:var(--display);letter-spacing:-.01em;line-height:1.2}
+a{color:inherit;text-decoration:none}
+.ico{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}
+.wrap{max-width:1216px;margin:0 auto}
+.row{display:flex;align-items:center}
+.gap4{gap:4px}.gap6{gap:6px}.gap8{gap:8px}.gap10{gap:10px}.gap12{gap:12px}.gap16{gap:16px}.gap24{gap:24px}
+.grow{flex:1}
+.muted{color:var(--s500)}.soft{color:var(--s600)}.faint{color:var(--s400)}
+.small{font-size:12px}.xs{font-size:11px}.fw5{font-weight:500}.fw6{font-weight:600}.fw7{font-weight:700}
+.mono{font-family:'JetBrains Mono','DejaVu Sans Mono',ui-monospace,monospace;font-size:12px;letter-spacing:-.01em}
+.tnum{font-variant-numeric:tabular-nums}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:8px;font-weight:600;font-size:14px;border:1px solid transparent;white-space:nowrap;line-height:1}
+.btn-primary{background:var(--p600);color:#fff;box-shadow:0 1px 2px rgba(37,99,235,.25)}
+.btn-outline{border:1.5px solid var(--p600);color:var(--p600);background:#fff}
+.btn-secondary{background:#fff;border-color:var(--s300);color:var(--s700);box-shadow:0 1px 2px rgba(15,23,42,.05)}
+.btn-ghost{color:var(--s600);background:transparent}
+.btn-danger{background:var(--r600);color:#fff}
+.btn-danger-soft{background:#fff;border-color:var(--r200);color:var(--r600)}
+.btn-white{background:#fff;color:var(--p700)}
+.btn-lg{height:48px;padding:0 22px;font-size:16px;border-radius:10px}
+.btn-sm{height:32px;padding:0 12px;font-size:13px;border-radius:7px;gap:6px}
+.btn-xs{height:26px;padding:0 9px;font-size:12px;border-radius:6px;gap:5px}
+.btn-block{width:100%}
+.badge{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap;line-height:1}
+.badge .ico{width:12px;height:12px}
+.b-green{background:var(--g100);color:var(--g700)}
+.b-amber{background:var(--a100);color:var(--a700)}
+.b-red{background:var(--r100);color:var(--r700)}
+.b-blue{background:var(--p100);color:var(--p700)}
+.b-gray{background:var(--s100);color:var(--s600)}
+.b-purple{background:var(--v100);color:var(--v700)}
+.b-outline{background:#fff;border:1px solid var(--s200);color:var(--s600)}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+.card{background:#fff;border:1px solid var(--s200);border-radius:14px}
+.shadow{box-shadow:0 1px 3px rgba(15,23,42,.06),0 1px 2px rgba(15,23,42,.04)}
+.shadow-lg{box-shadow:0 12px 32px -8px rgba(15,23,42,.18),0 4px 8px -4px rgba(15,23,42,.08)}
+.shadow-xl{box-shadow:0 24px 48px -12px rgba(15,23,42,.28),0 8px 16px -8px rgba(15,23,42,.12)}
+.label{font-size:13px;font-weight:600;color:var(--s700);margin-bottom:6px;display:block}
+.req{color:var(--r600)}
+.help{font-size:12px;color:var(--s500);margin-top:6px}
+.input{height:40px;border:1px solid var(--s300);border-radius:8px;padding:0 12px;display:flex;align-items:center;gap:8px;background:#fff;color:var(--s900);font-size:14px}
+.input.ph{color:var(--s400)}
+.input .ico{color:var(--s400)}
+.select{justify-content:space-between}
+.textarea{border:1px solid var(--s300);border-radius:8px;padding:10px 12px;background:#fff;font-size:14px;line-height:1.5}
+.cb{width:18px;height:18px;border:1.5px solid var(--s300);border-radius:5px;background:#fff;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.cb.on{background:var(--p600);border-color:var(--p600);color:#fff}
+.cb.on .ico{width:13px;height:13px;stroke-width:3}
+.cb.dis{background:var(--s100);border-color:var(--s200)}
+.radio{width:18px;height:18px;border:1.5px solid var(--s300);border-radius:50%;background:#fff;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.radio.on{border-color:var(--p600)}
+.radio.on::after{content:'';width:9px;height:9px;border-radius:50%;background:var(--p600)}
+.toggle{width:36px;height:20px;border-radius:999px;background:var(--s300);position:relative;flex:none;display:inline-block}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.toggle.on{background:var(--p600)}
+.toggle.on::after{left:18px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--s200);background:#fff;font-size:13px;font-weight:500;color:var(--s700);white-space:nowrap}
+.chip.on{background:var(--p50);border-color:var(--p300);color:var(--p700)}
+.chip .ico{width:14px;height:14px}
+.seg{display:inline-flex;background:var(--s100);border-radius:10px;padding:4px;gap:2px}
+.seg>span{height:34px;padding:0 14px;border-radius:7px;display:inline-flex;align-items:center;font-size:13px;font-weight:600;color:var(--s600);gap:6px}
+.seg>span.on{background:#fff;color:var(--s900);box-shadow:0 1px 3px rgba(15,23,42,.12)}
+.avatar{border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;color:#fff;flex:none;background:var(--p600);font-size:13px;width:32px;height:32px}
+.divider{height:1px;background:var(--s200)}
+.kbd{font-size:11px;border:1px solid var(--s200);border-radius:4px;padding:1px 5px;color:var(--s500);background:var(--s50)}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:21px;color:var(--s900);letter-spacing:-.01em}
+.logo-k{width:32px;height:32px;border-radius:8px;background:var(--p600);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;font-family:var(--display)}
+.shot{position:relative;overflow:hidden;background:var(--s100)}
+.shot>img{display:block;width:100%}
+/* tabla */
+table.t{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+table.t th{font-size:11.5px;font-weight:600;color:var(--s500);text-align:left;padding:10px 10px;background:var(--s50);border-bottom:1px solid var(--s200);white-space:nowrap;text-transform:none}
+table.t td{padding:11px 10px;border-bottom:1px solid var(--s100);vertical-align:middle}
+table.t tr:last-child td{border-bottom:0}
+/* navbar del sitio */
+.site-nav{height:80px;background:rgba(255,255,255,.96);border-bottom:1px solid var(--s100);position:relative;z-index:5}
+.site-nav .wrap{height:80px;display:flex;align-items:center}
+.site-nav nav{display:flex;gap:4px;margin-left:40px}
+.site-nav nav a{height:36px;padding:0 14px;border-radius:8px;display:inline-flex;align-items:center;font-weight:500;color:var(--s700);font-size:14.5px}
+.site-nav nav a.on{background:var(--p50);color:var(--p600)}
+.site-nav .nav-r{margin-left:auto;display:flex;align-items:center;gap:14px}
+.site-nav .lang{display:flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;color:var(--s700)}
+/* admin */
+.adm{display:grid;grid-template-columns:232px minmax(0,1fr);grid-template-rows:64px 1fr;min-height:900px;background:var(--s50)}
+.adm-top{grid-column:1/3;display:flex;align-items:center;background:#fff;border-bottom:1px solid var(--s200);padding:0 24px 0 20px;gap:16px;position:relative;z-index:3}
+.adm-top .logo{font-size:19px;width:192px}
+.adm-top .logo-k{width:30px;height:30px;font-size:16px}
+.adm-search{width:360px;height:38px;border-radius:9px;background:var(--s50);border:1px solid var(--s200);display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--s400);font-size:13.5px}
+.adm-search .kbd{margin-left:auto}
+.adm-top .tr{margin-left:auto;display:flex;align-items:center;gap:16px}
+.icon-btn{width:36px;height:36px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;color:var(--s600);position:relative}
+.icon-btn .ico{width:19px;height:19px}
+.icon-btn .pip{position:absolute;top:7px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--r500);border:2px solid #fff}
+.who{display:flex;align-items:center;gap:10px}
+.who .n{font-size:13.5px;font-weight:600;line-height:1.2}
+.who .r{font-size:12px;color:var(--s500);line-height:1.2}
+.adm-side{background:#fff;border-right:1px solid var(--s200);padding:18px 12px;display:flex;flex-direction:column}
+.side-group{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--s400);padding:14px 12px 6px}
+.side-group:first-child{padding-top:2px}
+.nav-item{display:flex;align-items:center;gap:10px;height:38px;padding:0 10px 0 12px;border-radius:9px;color:var(--s700);font-weight:500;font-size:13.5px;margin-bottom:1px;white-space:nowrap}
+.nav-item .ico{width:18px;height:18px;color:var(--s500)}
+.nav-item.on{background:var(--p50);color:var(--p700);font-weight:600}
+.nav-item.on .ico{color:var(--p600)}
+.nav-item .cnt{margin-left:auto;min-width:22px;height:20px;padding:0 7px;border-radius:999px;background:var(--p600);color:#fff;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.nav-item .cnt.amber{background:var(--a100);color:var(--a700)}
+.nav-item .cnt.gray{background:var(--s100);color:var(--s600)}
+.side-foot{margin-top:auto;padding:12px;border-radius:10px;background:var(--s50);border:1px solid var(--s200);font-size:12px;color:var(--s600)}
+.adm-main{padding:26px 32px 40px;min-width:0}
+.page-h{display:flex;align-items:flex-end;gap:16px;margin-bottom:20px}
+.page-h h1{font-size:28px;font-weight:700}
+.page-h .sub{color:var(--s500);margin-top:4px;font-size:14.5px}
+.crumbs{font-size:13px;color:var(--s500);display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.crumbs .ico{width:14px;height:14px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--s200)}
+.tabs>span{padding:10px 14px;font-size:14px;font-weight:500;color:var(--s500);display:inline-flex;align-items:center;gap:8px;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs>span.on{color:var(--p700);border-color:var(--p600);font-weight:600}
+.tabs .n{font-size:12px;background:var(--s100);color:var(--s600);border-radius:999px;padding:1px 8px;font-weight:600}
+.tabs .on .n{background:var(--p100);color:var(--p700)}
+.example-tag{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;background:var(--a50);border:1px dashed var(--a500);color:var(--a700);font-size:12px;font-weight:600}
+
+
+.adm-main{padding:24px 24px 40px}
+.ctrl{display:flex;align-items:center;gap:8px;margin-left:auto}
+.fsel{height:36px;border:1px solid var(--s300);border-radius:8px;background:#fff;padding:0 12px;display:inline-flex;align-items:center;gap:8px;font-size:13.5px;color:var(--s800);white-space:nowrap;font-weight:500}
+.fsel .ico{width:15px;height:15px;color:var(--s400)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.kpi{padding:16px 18px}
+.kpi .l{font-size:13px;color:var(--s500);font-weight:500}
+.kpi .v{font-size:28px;font-weight:700;line-height:1.15;margin-top:4px;letter-spacing:-.01em}
+.kpi .v small{font-size:14px;font-weight:600;color:var(--s500);margin-left:2px}
+.kpi .d{display:flex;align-items:center;gap:4px;font-size:12px;margin-top:6px;color:var(--s500)}
+.kpi .d b{display:inline-flex;align-items:center;gap:2px;font-weight:700}
+.kpi .d .ico{width:13px;height:13px;stroke-width:2.5}
+.up{color:var(--g700)}.down{color:var(--r700)}
+.meter{height:6px;border-radius:3px;background:var(--p100);margin-top:10px;position:relative}
+.meter i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--p600)}
+.meter .tick{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--s800);border-radius:1px}
+.cardc{padding:20px 22px}
+.cardc h3{font-family:Inter,system-ui;font-size:15.5px;font-weight:600;letter-spacing:0}
+.cardc .cs{font-size:12.5px;color:var(--s500);margin-top:2px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;margin-top:18px}
+.grid75{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:18px;margin-top:18px}
+.fgroup{margin-top:16px}
+.fgroup .gh{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--s400);margin-bottom:6px}
+.fgroup .gh span{font-weight:500;text-transform:none;letter-spacing:0}
+.frow{display:grid;grid-template-columns:200px minmax(0,1fr) 64px 150px;align-items:center;gap:12px;height:36px}
+.frow .lb{font-size:13.5px;color:var(--s700)}
+.frow .tr{height:22px;border-radius:0 4px 4px 0;background:var(--s100);position:relative;overflow:hidden}
+.frow .tr i{position:absolute;left:0;top:0;bottom:0;background:var(--p600);border-radius:0 4px 4px 0}
+.frow .val{font-weight:700;font-size:14px;text-align:right;font-variant-numeric:tabular-nums}
+.frow .cv{font-size:12.5px;color:var(--s500);display:flex;align-items:center;gap:4px;white-space:nowrap}
+.frow .cv .ico{width:13px;height:13px;color:var(--s400)}
+.frow .cv b{color:var(--s800);font-variant-numeric:tabular-nums}
+.sep{height:1px;background:var(--s200);margin:10px 0}
+.pb{display:grid;grid-template-columns:170px minmax(0,1fr);align-items:center;gap:12px;height:38px}
+.pb .lb{font-size:13.5px;color:var(--s700)}
+.pb .b{display:flex;align-items:center;gap:8px}
+.pb .b i{display:block;height:20px;border-radius:0 4px 4px 0;background:var(--p600)}
+.pb .b b{font-size:13.5px;font-variant-numeric:tabular-nums}
+table.t{font-size:13px}
+table.t td,table.t th{padding:10px 12px}
+table.t .n{text-align:right;font-variant-numeric:tabular-nums}
+table.t tfoot td{background:var(--s50);font-weight:700;border-top:1px solid var(--s200)}
+.ax{font-size:11px;fill:var(--s500);font-family:Inter,system-ui}
+</style>
+</head>
+<body>
+<div class="adm">
+<header class="adm-top">
+  <div class="logo"><span class="logo-k">K</span>Admin</div>
+  <div class="adm-search"><svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><span>Buscar lead, empresa o código…</span><span class="kbd">Ctrl K</span></div>
+  <div class="tr">
+    <a class="row gap6 small soft fw5"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg> Ver sitio</a>
+    <span class="icon-btn"><svg class="ico" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="pip"></span></span>
+    <div class="who"><span class="avatar" style="background:#7c3aed">DT</span><div><div class="n">Daniela Torres</div><div class="r">Administradora</div></div><svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px;color:var(--s400)"><path d="m6 9 6 6 6-6"/></svg></div>
+  </div></header>
+<aside class="adm-side"><div class="side-group">Comercial</div><div class="nav-item "><svg class="ico" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Inicio</span></div><div class="nav-item "><svg class="ico" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg><span>Solicitudes de demo</span><span class="cnt ">7</span></div><div class="nav-item "><svg class="ico" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg><span>Accesos a demos</span><span class="cnt amber">4</span></div><div class="nav-item "><svg class="ico" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Leads</span></div><div class="nav-item "><svg class="ico" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg><span>Catálogo de demos</span></div><div class="nav-item on"><svg class="ico" viewBox="0 0 24 24"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg><span>Métricas</span></div><div class="side-group">Operación</div><div class="nav-item "><svg class="ico" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><span>Contactos</span></div><div class="nav-item "><svg class="ico" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg><span>Usuarios</span></div><div class="nav-item "><svg class="ico" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span>Pedidos</span></div><div class="nav-item "><svg class="ico" viewBox="0 0 24 24"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></svg><span>Facturas</span></div><div class="nav-item "><svg class="ico" viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg><span>Entregables</span></div><div class="nav-item "><svg class="ico" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg><span>Conversaciones</span></div><div class="side-group">Sistema</div><div class="nav-item "><svg class="ico" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg><span>Bitácora</span></div><div class="nav-item "><svg class="ico" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg><span>Privacidad</span></div><div class="nav-item "><svg class="ico" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg><span>Configuración</span></div><div class="side-foot row gap8"><svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px;color:var(--p600)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg><span>Rol <b>Administrador</b>: ves todas las secciones.</span></div></aside>
+<main class="adm-main">
+  <div class="page-h" style="margin-bottom:14px">
+    <div><h1>Métricas comerciales</h1><div class="sub">Embudo de demos, tiempos de respuesta y productos más pedidos.</div></div>
+    <span class="example-tag" style="margin-left:auto;white-space:nowrap"><svg class="ico" viewBox="0 0 24 24" style="width:13px;height:13px"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg> Datos de ejemplo</span>
+  </div>
+  <div class="row gap8" style="margin-bottom:18px">
+    <span class="fsel"><svg class="ico" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg> Últimos 30 días <span class="muted fw5" style="font-size:12.5px">8 sep – 7 oct</span> <svg class="ico" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
+    <span class="fsel" style="gap:10px"><span class="toggle on" style="transform:scale(.85)"></span>Comparar con el periodo anterior <span class="muted fw5" style="font-size:12.5px">9 ago – 7 sep</span></span>
+    <span class="fsel"><svg class="ico" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Comercial: todos <svg class="ico" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
+    <span class="fsel"><svg class="ico" viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg> Producto: todos <svg class="ico" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
+    <a class="btn btn-secondary btn-sm" style="height:36px;margin-left:auto"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg> Exportar CSV</a>
+  </div>
+
+  <div class="kpis">
+    <div class="card kpi shadow"><div class="l">Solicitudes</div><div class="v">42</div><div class="d"><b class="up"><svg class="ico" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg> 8</b> vs 34 del periodo anterior</div></div>
+    <div class="card kpi shadow"><div class="l">Aprobadas</div><div class="v">71 %</div><div class="d"><b class="up"><svg class="ico" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg> 3 pp</b> · 30 de 42</div></div>
+    <div class="card kpi shadow"><div class="l">Mediana de primera respuesta</div><div class="v">3,2 <small>h hábiles</small></div><div class="d"><b class="up"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg> 0,6 h</b> más rápido que antes</div></div>
+    <div class="card kpi shadow"><div class="l">Dentro del SLA</div><div class="v">88 % <small>meta 90 %</small></div><div class="meter"><i style="width:88%"></i><span class="tick" style="left:90%"></span></div><div class="d"><b class="up"><svg class="ico" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg> 4 pp</b> · faltan 2 pp para la meta</div></div>
+    <div class="card kpi shadow"><div class="l">Activación</div><div class="v">77 %</div><div class="d">23 de 30 aprobadas entraron a la demo</div></div>
+    <div class="card kpi shadow"><div class="l">Uso efectivo</div><div class="v">53 %</div><div class="d">16 de 30 aprobadas la usaron a fondo</div></div>
+    <div class="card kpi shadow"><div class="l">Propuestas enviadas</div><div class="v">9</div><div class="d"><b class="up"><svg class="ico" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg> 2</b> vs 7 del periodo anterior</div></div>
+    <div class="card kpi shadow"><div class="l">Clientes nuevos</div><div class="v">3</div><div class="d"><b style="color:var(--s600)">= 0</b> igual que el periodo anterior</div></div>
+  </div>
+
+  <div class="card cardc shadow">
+    <div class="row"><div><h3>Embudo: de la visita al cliente</h3><div class="cs">Conversión entre etapas consecutivas. De solicitud a cliente: 7 %. Cada grupo usa su propia escala.</div></div><span class="seg" style="margin-left:auto"><span class="on">Todas las fuentes</span><span>Google Ads</span><span>LinkedIn</span><span>Orgánico</span></span></div>
+    <div class="fgroup">
+      <div class="gh">Tráfico <span>· escala: visitas</span></div>
+      <div class="frow"><span class="lb">Visitas a landings</span><span class="tr"><i style="width:100%"></i></span><span class="val">3.200</span><span class="cv">—</span></div>
+      <div class="frow"><span class="lb">Clic en “Solicitar demo”</span><span class="tr"><i style="width:8.1%"></i></span><span class="val">260</span><span class="cv"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg><b>8,1 %</b> de las visitas</span></div>
+    </div>
+    <div class="sep"></div>
+    <div class="fgroup" style="margin-top:6px">
+      <div class="gh">Embudo de demos <span>· escala: solicitudes</span></div>
+      <div class="frow"><span class="lb">Solicitudes</span><span class="tr"><i style="width:100%"></i></span><span class="val">42</span><span class="cv"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg><b>16,2 %</b> de los clics</span></div>
+      <div class="frow"><span class="lb">Aprobadas</span><span class="tr"><i style="width:71.4%"></i></span><span class="val">30</span><span class="cv"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg><b>71 %</b></span></div>
+      <div class="frow"><span class="lb">Activadas</span><span class="tr"><i style="width:54.8%"></i></span><span class="val">23</span><span class="cv"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg><b>77 %</b></span></div>
+      <div class="frow"><span class="lb">Uso efectivo</span><span class="tr"><i style="width:38.1%"></i></span><span class="val">16</span><span class="cv"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg><b>70 %</b></span></div>
+      <div class="frow"><span class="lb">Propuesta</span><span class="tr"><i style="width:21.4%"></i></span><span class="val">9</span><span class="cv"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg><b>56 %</b></span></div>
+      <div class="frow"><span class="lb">Cliente</span><span class="tr"><i style="width:7.1%"></i></span><span class="val">3</span><span class="cv"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg><b>33 %</b></span></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card cardc shadow">
+      <h3>Tiempo de primera respuesta por semana</h3><div class="cs">Mediana en horas hábiles (L–V 8:00–17:00)</div>
+      <svg viewBox="0 0 540 214" width="100%" style="margin-top:12px;display:block">
+        <g stroke="#e2e8f0" stroke-width="1">
+          <line x1="36" x2="496" y1="174" y2="174"/><line x1="36" x2="496" y1="120.7" y2="120.7"/><line x1="36" x2="496" y1="14" y2="14"/>
+        </g>
+        <line x1="36" x2="496" y1="67.3" y2="67.3" stroke="#d97706" stroke-width="1.5"/>
+        <text x="250" y="60" class="ax" style="fill:#b45309;font-weight:600">Meta de la mediana: 4 h</text>
+        <g class="ax" text-anchor="end"><text x="28" y="178">0 h</text><text x="28" y="124.7">2 h</text><text x="28" y="71.3">4 h</text><text x="28" y="18">6 h</text></g>
+        <path d="M36 51.3 L98.9 64.7 L161.7 59.3 L224.6 72.7 L287.4 78 L350.3 83.3 L413.1 96.7 L476 88.7" fill="none" stroke="#2563eb" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+        <path d="M36 51.3 L98.9 64.7 L161.7 59.3 L224.6 72.7 L287.4 78 L350.3 83.3 L413.1 96.7 L476 88.7 L476 174 L36 174 Z" fill="#2563eb" opacity=".08"/>
+        <circle cx="476" cy="88.7" r="5" fill="#2563eb" stroke="#fff" stroke-width="2"/>
+        <text x="486" y="92.7" style="font-size:12px;font-weight:700;fill:#0f172a;font-family:Inter,system-ui">3,2 h</text>
+        <g class="ax" text-anchor="middle"><text x="36" y="196">17 ago</text><text x="98.9" y="196">24 ago</text><text x="161.7" y="196">31 ago</text><text x="224.6" y="196">7 sep</text><text x="287.4" y="196">14 sep</text><text x="350.3" y="196">21 sep</text><text x="413.1" y="196">28 sep</text><text x="476" y="196">5 oct</text></g>
+      </svg>
+    </div>
+    <div class="card cardc shadow">
+      <h3>Productos más solicitados</h3><div class="cs">Solicitudes que incluyen el producto (una solicitud puede tener varios)</div>
+      <div style="margin-top:14px">
+        <div class="pb"><span class="lb">Asistente RAG</span><span class="b"><i style="width:100%;max-width:300px"></i><b>14</b></span></div>
+        <div class="pb"><span class="lb">ERP modular</span><span class="b"><i style="width:193px"></i><b>9</b></span></div>
+        <div class="pb"><span class="lb">WMS logística</span><span class="b"><i style="width:150px"></i><b>7</b></span></div>
+        <div class="pb"><span class="lb">CRM con IA</span><span class="b"><i style="width:129px"></i><b>6</b></span></div>
+        <div class="pb"><span class="lb">Facturación electrónica</span><span class="b"><i style="width:86px"></i><b>4</b></span></div>
+      </div>
+      <div class="small muted" style="margin-top:10px">Asistente RAG cuenta las solicitudes de demo guiada; “Prueba con tu documento” se mide aparte.</div>
+    </div>
+  </div>
+
+  <div class="grid75">
+    <div class="card shadow" style="overflow:hidden">
+      <div class="cardc" style="padding-bottom:12px"><h3>Por fuente</h3><div class="cs">Según la UTM o el origen registrado en el lead</div></div>
+      <table class="t">
+        <thead><tr><th>Fuente</th><th class="n">Solicitudes</th><th class="n">% aprobadas</th><th class="n">Activadas</th><th class="n">Propuestas</th><th class="n">Clientes</th></tr></thead>
+        <tbody>
+          <tr><td>Google Ads</td><td class="n">16</td><td class="n">69 %</td><td class="n">8</td><td class="n">3</td><td class="n">1</td></tr>
+          <tr><td>LinkedIn</td><td class="n">9</td><td class="n">78 %</td><td class="n">6</td><td class="n">2</td><td class="n">1</td></tr>
+          <tr><td>Orgánico</td><td class="n">8</td><td class="n">63 %</td><td class="n">4</td><td class="n">1</td><td class="n">0</td></tr>
+          <tr><td>Referido</td><td class="n">5</td><td class="n">100 %</td><td class="n">4</td><td class="n">3</td><td class="n">1</td></tr>
+          <tr><td>WhatsApp</td><td class="n">4</td><td class="n">50 %</td><td class="n">1</td><td class="n">0</td><td class="n">0</td></tr>
+        </tbody>
+        <tfoot><tr><td>Total</td><td class="n">42</td><td class="n">71 %</td><td class="n">23</td><td class="n">9</td><td class="n">3</td></tr></tfoot>
+      </table>
+    </div>
+    <div class="card shadow" style="overflow:hidden">
+      <div class="cardc" style="padding-bottom:12px"><h3>Por comercial</h3><div class="cs">Respuesta en horas hábiles</div></div>
+      <table class="t">
+        <thead><tr><th>Comercial</th><th class="n">Solicitudes</th><th class="n">Mediana 1.ª respuesta</th><th class="n">En SLA</th></tr></thead>
+        <tbody>
+          <tr><td><div class="row gap8"><span class="avatar" style="width:24px;height:24px;font-size:10px;background:#0f766e">CP</span>Carlos Pérez</div></td><td class="n">24</td><td class="n">2,9 h</td><td class="n"><span class="row gap6" style="justify-content:flex-end"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px;color:var(--g600)"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>92 %</span></td></tr>
+          <tr><td><div class="row gap8"><span class="avatar" style="width:24px;height:24px;font-size:10px;background:#9333ea">VR</span>Valentina Ríos</div></td><td class="n">18</td><td class="n">3,6 h</td><td class="n"><span class="row gap6" style="justify-content:flex-end"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px;color:var(--a600)"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>83 %</span></td></tr>
+        </tbody>
+        <tfoot><tr><td>Equipo</td><td class="n">42</td><td class="n">3,2 h</td><td class="n">88 %</td></tr></tfoot>
+      </table>
+      <div class="small muted" style="padding:12px 16px">Meta del equipo: 90 % dentro del SLA (A 2 h · B 4 h · C y D 1 día hábil).</div>
+    </div>
+  </div>
+</main>
+</div>
+</body>
+</html>

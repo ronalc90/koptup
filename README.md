@@ -141,6 +141,10 @@ infra/
   k8s/ · terraform/       # stubs de IaC
 ```
 
+## Documentación y plan de producto
+
+El plan para convertir Koptup en un producto vendible (flujo del cliente, sistema de solicitud y acceso a demos, panel de administración, plan por producto y por sección, roadmap) vive en la **[wiki del proyecto](https://github.com/ronalc90/koptup/wiki)**. La fuente versionada está en [`docs/wiki/`](docs/wiki/Home.md) y se publica en la wiki con el workflow [`wiki-sync.yml`](.github/workflows/wiki-sync.yml).
+
 ## Estado del proyecto
 
 - **Producción:** [www.koptup.com](https://www.koptup.com) (Vercel) + API en Railway.
