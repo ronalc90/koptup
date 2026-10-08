@@ -1,0 +1,588 @@
+{
+  "demoLinkedinAds": {
+    "hero": {
+      "badge": "Uso interno · Marketing",
+      "title": "Así usamos IA para nuestro contenido en LinkedIn",
+      "subtitle": "Es la herramienta interna con la que KopTup prepara publicaciones sobre sus demos: plan editorial de 30 días, posts, textos de anuncio, carruseles y capturas. No publica en LinkedIn: copias el texto y lo publicas tú.",
+      "chips": {
+        "demos": "{count} demos en el catálogo",
+        "days": "{count} días planificados",
+        "combos": "{angles} ángulos × {tones} tonos",
+        "capture": "Foto y video de cada demo"
+      },
+      "cta": "¿Quieres un motor de contenido así para tu empresa? Hablemos"
+    },
+    "badges": {
+      "sampleData": "Datos de ejemplo",
+      "notPublishing": "No publica en LinkedIn"
+    },
+    "tabs": {
+      "overview": "Resumen",
+      "calendar": "Calendario 30 días",
+      "generator": "Generador de posts",
+      "capture": "Capturas y video"
+    },
+    "overview": {
+      "stats": {
+        "demos": "Demos para promocionar",
+        "days": "Días planificados",
+        "angles": "Ángulos de post",
+        "tones": "Tonos de voz"
+      },
+      "stepLabel": "Paso {n}",
+      "steps": {
+        "calendar": {
+          "title": "Mira el plan de 30 días",
+          "desc": "Una demo distinta cada día, con el ángulo y el formato sugeridos. Haz clic en un día y el generador se carga con esa configuración.",
+          "cta": "Abrir calendario"
+        },
+        "generator": {
+          "title": "Genera y edita el post",
+          "desc": "Elige demo, ángulo y tono. Obtienes gancho, cuerpo, llamado a la acción, hashtags, texto de anuncio y carrusel, con vista previa simulada.",
+          "cta": "Abrir generador"
+        },
+        "capture": {
+          "title": "Suma el visual",
+          "desc": "Crea una imagen de 1200×627 con plantillas o toma una foto o un video de la demo tal como la ves.",
+          "cta": "Abrir capturas"
+        }
+      },
+      "howTitle": "Cómo se usa (flujo sugerido)",
+      "how": {
+        "0": {
+          "label": "Elige el día:",
+          "text": "abre el calendario y haz clic en el día; la demo y el ángulo pasan al generador."
+        },
+        "1": {
+          "label": "Genera y ajusta:",
+          "text": "genera con IA o con plantillas, prueba otra versión o cambia el tono y edita lo que solo tú puedes aportar."
+        },
+        "2": {
+          "label": "Revisa la veracidad:",
+          "text": "atiende las alertas (cifras sin fuente, testimonios, enlace sin UTM) y guarda el borrador."
+        },
+        "3": {
+          "label": "Crea el visual:",
+          "text": "descarga una plantilla 1200×627 o captura la demo y úsala en la vista previa."
+        },
+        "4": {
+          "label": "Publica tú:",
+          "text": "copia el texto, sube la imagen o el video a LinkedIn y publica desde tu cuenta. Si quieres pauta, usa la pestaña de texto de anuncio."
+        }
+      },
+      "scopeTitle": "Qué hace y qué no hace esta demo",
+      "doesTitle": "Hace",
+      "doesNotTitle": "No hace",
+      "does": {
+        "0": "Genera post, texto de anuncio y carrusel con IA (un modelo de OpenAI llamado desde el servidor de KopTup) o, si la IA no está disponible, con plantillas locales, y te dice cuál de las dos usó.",
+        "1": "Te deja editar el texto, revisa alertas de veracidad, guarda borradores en este navegador y los exporta en CSV.",
+        "2": "Crea imágenes de 1200×627 con plantillas, descarga el carrusel en PDF y captura foto o video de cualquier demo de KopTup.",
+        "3": "Agrega parámetros UTM a los enlaces para que puedas medir las visitas en tu analítica."
+      },
+      "doesNot": {
+        "0": "No se conecta a tu cuenta de LinkedIn ni publica por ti (simulado en la demo; en un proyecto a medida se puede conectar a la API de LinkedIn si tu empresa tiene acceso aprobado).",
+        "1": "No mide alcance, clics ni seguidores: la vista previa no muestra reacciones reales.",
+        "2": "No inventa resultados: los textos no traen cifras ni testimonios de clientes; si agregas una cifra, debe tener fuente."
+      }
+    },
+    "catalog": {
+      "chatbot": {
+        "industria": "Atención al cliente",
+        "publico": ["Clínicas", "Comercio electrónico", "Firmas de abogados", "Instituciones educativas", "Soporte interno"],
+        "problema": "Los equipos pierden horas respondiendo las mismas preguntas y muchos chatbots responden sin una fuente que lo respalde"
+      },
+      "ecommerce": {
+        "industria": "Comercio minorista",
+        "publico": ["Comercios minoristas", "Fabricantes", "Marcas que venden directo"],
+        "problema": "Muchas tiendas en línea muestran el mismo catálogo a todos y no guían la compra"
+      },
+      "dashboard-ejecutivo": {
+        "industria": "Gerencia",
+        "publico": ["Gerentes generales", "Directores financieros", "Directores de área"],
+        "problema": "Los reportes llegan tarde, en hojas de cálculo, y no explican qué cambió"
+      },
+      "gestor-documentos": {
+        "industria": "Gestión documental",
+        "publico": ["Áreas legales", "Áreas de cumplimiento", "Notarías", "Gestión humana"],
+        "problema": "Los documentos se quedan en carpetas que nadie revisa hasta que llega una auditoría"
+      },
+      "sistema-reservas": {
+        "industria": "Servicios",
+        "publico": ["Clínicas", "Restaurantes", "Salones de belleza", "Consultorios"],
+        "problema": "Las citas se pierden porque la agenda está en un cuaderno o en chats sueltos"
+      },
+      "gestor-contenido": {
+        "industria": "Comunicaciones",
+        "publico": ["Equipos de mercadeo", "Equipos de ventas", "Comunicación interna"],
+        "problema": "Redactar correos, comunicados y propuestas toma más tiempo del que debería"
+      },
+      "control-proyectos": {
+        "industria": "Gestión de proyectos",
+        "publico": ["Oficinas de proyectos", "Constructoras", "Empresas de software"],
+        "problema": "Los proyectos se atrasan sin que nadie vea las señales a tiempo"
+      },
+      "crm-ia": {
+        "industria": "Ventas",
+        "publico": ["Equipos comerciales", "Ejecutivos de cuenta", "Gerentes de ventas"],
+        "problema": "Los vendedores olvidan seguimientos y dedican tiempo a oportunidades que no avanzan"
+      },
+      "erp": {
+        "industria": "Operaciones",
+        "publico": ["Empresas de manufactura", "Distribuidoras", "Pymes en crecimiento"],
+        "problema": "La empresa usa varios sistemas que no se hablan entre sí"
+      },
+      "helpdesk-ia": {
+        "industria": "Soporte",
+        "publico": ["Mesas de ayuda", "Servicio al cliente", "Soporte de TI"],
+        "problema": "El equipo de soporte resuelve las mismas solicitudes todos los días"
+      },
+      "lms": {
+        "industria": "Capacitación",
+        "publico": ["Gestión humana", "Universidades corporativas", "Centros de formación"],
+        "problema": "Los cursos internos se abandonan porque son largos y genéricos"
+      },
+      "telemedicina": {
+        "industria": "Salud",
+        "publico": ["Clínicas", "IPS", "Consultorios especializados"],
+        "problema": "Los pacientes de zonas apartadas tardan en conseguir una cita con un especialista"
+      },
+      "facturacion-electronica": {
+        "industria": "Contabilidad",
+        "publico": ["Contadores", "Pymes", "Empresas medianas"],
+        "problema": "Una factura electrónica mal emitida genera rechazos y reprocesos"
+      },
+      "wms-logistica": {
+        "industria": "Logística",
+        "publico": ["Operadores logísticos", "Fabricantes con bodega propia"],
+        "problema": "En la bodega se pierde tiempo buscando productos sin una ubicación clara"
+      },
+      "pos": {
+        "industria": "Comercio físico",
+        "publico": ["Tiendas", "Restaurantes", "Cadenas de comercio"],
+        "problema": "La caja no está conectada con el inventario y los cierres se hacen a mano"
+      },
+      "hrms": {
+        "industria": "Gestión humana",
+        "publico": ["Gerentes de gestión humana", "Pymes", "Empresas con más de 50 personas"],
+        "problema": "El área de gestión humana vive entre hojas de cálculo y formularios"
+      },
+      "automatizacion": {
+        "industria": "Operaciones",
+        "publico": ["Equipos de operaciones", "Equipos de mercadeo", "Áreas administrativas"],
+        "problema": "Hay tareas repetitivas que se podrían automatizar, pero parecen requerir programación"
+      },
+      "saas-boilerplate": {
+        "industria": "Startups",
+        "publico": ["Fundadores", "Startups", "Equipos que lanzan un producto mínimo"],
+        "problema": "Cada producto nuevo vuelve a construir lo mismo: acceso, cobros y panel de administración"
+      },
+      "voice-ai": {
+        "industria": "Atención telefónica",
+        "publico": ["Equipos de cobranza", "Servicio al cliente", "Agendamiento de citas"],
+        "problema": "La atención telefónica solo crece contratando más personas"
+      },
+      "firma-electronica": {
+        "industria": "Contratos",
+        "publico": ["Firmas de abogados", "Gestión humana", "Inmobiliarias"],
+        "problema": "Reunir las firmas de un contrato toma días de correos y reenvíos"
+      },
+      "scraping": {
+        "industria": "Inteligencia de mercado",
+        "publico": ["Equipos de precios", "Investigación de mercados", "Inmobiliarias"],
+        "problema": "Las empresas se enteran tarde de los cambios de precios y de catálogo de su mercado"
+      },
+      "code-review-ia": {
+        "industria": "Desarrollo de software",
+        "publico": ["Líderes técnicos", "Equipos de desarrollo", "Directores de tecnología"],
+        "problema": "Los cambios de código esperan días por una revisión"
+      },
+      "moderacion-contenido": {
+        "industria": "Plataformas digitales",
+        "publico": ["Mercados en línea", "Comunidades en línea", "Plataformas educativas"],
+        "problema": "El contenido ofensivo y el spam en una comunidad dañan la marca"
+      },
+      "delivery": {
+        "industria": "Última milla",
+        "publico": ["Empresas de domicilios", "Comercios con flota propia", "Restaurantes"],
+        "problema": "Los repartidores hacen rutas ineficientes y el cliente no sabe dónde está su pedido"
+      },
+      "loyalty": {
+        "industria": "Fidelización",
+        "publico": ["Comercios minoristas", "Restaurantes", "Hoteles"],
+        "problema": "Los programas de puntos aburren y casi nadie redime sus premios"
+      }
+    },
+    "angles": {
+      "lanzamiento": { "label": "Lanzamiento", "desc": "Anuncio de una demo o de una función nueva" },
+      "caso-uso": { "label": "Caso de uso", "desc": "Un ejemplo concreto, planteado como hipótesis (nunca como cliente real)" },
+      "educativo": { "label": "Educativo", "desc": "Explica un concepto usando la demo como ejemplo" },
+      "detras-camaras": { "label": "Detrás de cámaras", "desc": "Cómo se pensó y se construyó la demo" },
+      "comparativa": { "label": "Comparativa", "desc": "Antes y después: el proceso manual frente a la solución" },
+      "tip-rapido": { "label": "Tip rápido", "desc": "Un consejo accionable que el lector puede aplicar hoy" },
+      "pregunta-engagement": { "label": "Pregunta abierta", "desc": "Una pregunta que invita a comentar" }
+    },
+    "tones": {
+      "profesional": { "label": "Profesional", "desc": "Formal y claro, sin exagerar" },
+      "cercano": { "label": "Cercano", "desc": "Conversacional, con emojis y en primera persona" },
+      "tecnico": { "label": "Técnico", "desc": "Arquitectura y decisiones técnicas" },
+      "storytelling": { "label": "Storytelling", "desc": "Una historia con inicio, nudo y cierre" },
+      "controversial": { "label": "Polémico", "desc": "Una opinión fuerte que invita al debate" }
+    },
+    "templates": {
+      "hooks": {
+        "lanzamiento": [
+          "{emoji} Nueva demo en KopTup: {titulo}.",
+          "🚀 Ya puedes probar {titulo} en nuestra web.",
+          "{emoji} {titulo}: así funciona, en una demo que puedes navegar.",
+          "Te presentamos {titulo}. {emoji}"
+        ],
+        "caso-uso": [
+          "Imagina esto: una empresa de {industriaLower} donde {problemaLower}.",
+          "{emoji} Cómo podría usar {titulo} un equipo de {industriaLower}.",
+          "Caso hipotético: {problemaLower}. ¿Qué harías?",
+          "{emoji} Una historia corta sobre por qué construimos {titulo}."
+        ],
+        "educativo": [
+          "{emoji} ¿Sabes qué hay detrás de «{funcion0}»? Te lo explico sin tecnicismos.",
+          "Hilo corto: qué es «{funcion0}» y por qué importa en {industriaLower}.",
+          "{emoji} Lo que tu equipo debería entender sobre {titulo}.",
+          "Muchas personas preguntan cómo funciona «{funcion0}». Aquí va la versión corta."
+        ],
+        "detras-camaras": [
+          "🛠️ Cómo construimos {titulo}: las decisiones detrás de la demo.",
+          "{emoji} Detrás de cámaras: qué hay dentro de {titulo}.",
+          "Lo que aprendimos construyendo {titulo}.",
+          "🛠️ Qué tuvimos en cuenta al diseñar {titulo}."
+        ],
+        "comparativa": [
+          "{emoji} Antes: {problemaLower}. Ahora: {funcion0Lower}.",
+          "⚖️ Lo que cambia cuando reemplazas un proceso manual por {titulo}.",
+          "{emoji} Hacerlo a mano vs. hacerlo con {titulo}. Mira la diferencia.",
+          "La diferencia entre improvisar y tener {titulo}."
+        ],
+        "tip-rapido": [
+          "💡 Tip de hoy para equipos de {industriaLower}: {funcion0Lower}.",
+          "{emoji} Si tu equipo de {industriaLower} todavía hace esto a mano, este consejo es para ti.",
+          "💡 Una idea rápida para sacarle más provecho a {titulo}.",
+          "{emoji} Pequeño truco para {industriaLower}: pruébalo esta semana."
+        ],
+        "pregunta-engagement": [
+          "{emoji} Pregunta para {publico0Lower}: ¿cómo manejan hoy este problema? {problema}.",
+          "¿Cuánto tiempo dedica tu equipo a tareas de {industriaLower}? Curiosidad genuina {emoji}",
+          "{emoji} Si tuvieras que automatizar UNA tarea de {industriaLower}, ¿cuál sería?",
+          "Pregunta abierta: ¿qué es lo que más le frustra a tu equipo de {industriaLower}? {emoji}"
+        ]
+      },
+      "closings": {
+        "profesional": [
+          "Mira la demo y cuéntanos qué te parece.",
+          "Si quieres profundizar, agendemos una conversación.",
+          "Si tu empresa evalúa algo similar, hablemos."
+        ],
+        "cercano": [
+          "¿Te suena familiar? Cuéntame en los comentarios 👇",
+          "Pruébala y me cuentas qué tal 😉",
+          "¿Tienes un caso parecido en tu empresa? Te leo 👇"
+        ],
+        "tecnico": [
+          "¿Quieres que escriba sobre la arquitectura? Déjalo en los comentarios.",
+          "Si te interesa el detalle técnico, escríbeme.",
+          "¿Qué stack usarías tú? Te leo."
+        ],
+        "storytelling": [
+          "¿Tu empresa tiene una historia parecida? Compártela 👇",
+          "Si esto te resonó, compártelo con alguien a quien le sirva.",
+          "¿Qué habrías hecho distinto? Curiosidad genuina."
+        ],
+        "controversial": [
+          "¿Estás de acuerdo o crees que exagero? Te leo 👇",
+          "¿Piensas distinto? Convénceme en los comentarios.",
+          "Opinión fuerte, lo sé. ¿Tú qué piensas?"
+        ]
+      },
+      "ctaIntros": ["👉 Mira la demo:", "🔗 Demo navegable:", "➡️ Pruébala aquí:", "🎬 Así funciona:"],
+      "context": {
+        "caso-uso": "📌 Imagina una empresa de {industriaLower} donde {problemaLower}.",
+        "educativo": "📚 Por qué importa en {industriaLower}: {problemaLower}.",
+        "comparativa": "⚖️ Antes: {problemaLower}. Con {titulo}: {funcion0Lower}."
+      },
+      "bodyIntro": "¿Qué incluye {titulo}?",
+      "audience": "👥 Pensado para: {publico}.",
+      "ad": {
+        "headlines": ["{titulo} para {publico0Lower}", "{tagline}", "{titulo}: mira la demo", "{funcion0}"],
+        "intros": [
+          "{emoji} {tagline}. Mira la demo navegable.",
+          "Si lideras {publico0Lower}, esto te interesa: {funcion0Lower}.",
+          "{emoji} {funcion0}. {funcion1}. Mira cómo funciona."
+        ],
+        "descriptions": ["Mira cómo funciona", "Demo navegable con datos de ejemplo", "Agenda una conversación", "Conoce la demo de KopTup"]
+      },
+      "carousel": {
+        "coverNote": "Portada: logo de KopTup y título de la demo",
+        "problemTitle": "El problema",
+        "problemNote": "Ilustra el proceso manual de hoy",
+        "solutionTitle": "Cómo lo resolvemos",
+        "solutionNote": "Captura de la demo mostrando la pantalla principal",
+        "moreTitle": "Qué más incluye",
+        "moreNote": "Un ícono simple por cada función",
+        "tryTitle": "Pruébalo tú",
+        "tryBullets": ["Abre la demo navegable", "Recorre las pantallas con datos de ejemplo", "No necesitas instalar nada"],
+        "tryNote": "Captura de la demo con una flecha sobre el paso clave",
+        "audienceTitle": "¿Para quién?",
+        "audienceNote": "Íconos de sectores (sin logos de terceros)",
+        "ctaTitle": "Mira la demo",
+        "ctaContact": "Cuéntanos tu caso en koptup.com/contact",
+        "ctaNote": "Llamado a la acción grande y código QR opcional"
+      }
+    },
+    "calendar": {
+      "title": "Calendario editorial · 30 días",
+      "subtitle": "Una demo distinta cada día, con ángulo y formato sugeridos. Los fines de semana van preguntas y consejos cortos. Haz clic en un día para generar el post.",
+      "range": "Del {start} al {end}",
+      "startsMonday": "El plan empieza un lunes.",
+      "prevWeek": "Semana anterior",
+      "nextWeek": "Semana siguiente",
+      "exportCsv": "Exportar CSV",
+      "dayLabel": "Día {n}",
+      "selected": "Seleccionado",
+      "types": {
+        "texto": "Texto",
+        "imagen": "Imagen",
+        "carrusel": "Carrusel",
+        "video": "Video"
+      },
+      "csv": {
+        "day": "Día",
+        "date": "Fecha",
+        "demo": "Demo",
+        "angle": "Ángulo",
+        "type": "Formato",
+        "note": "Nota",
+        "url": "Enlace"
+      },
+      "notes": {
+        "1": "Abre el mes con la demo principal: un video corto haciéndole una pregunta al chatbot sobre un documento de ejemplo.",
+        "2": "Carrusel: el problema, cómo se ve la solución en la demo y la invitación a probarla.",
+        "3": "Antes y después: un reporte en hoja de cálculo frente al tablero de la demo.",
+        "4": "Explica en palabras simples cómo se organiza un archivo de documentos y por qué importa.",
+        "5": "Un solo consejo de seguimiento comercial que cualquiera puede aplicar hoy.",
+        "6": "Fin de semana: pregunta ligera sobre las citas que no se cumplen.",
+        "7": "Fin de semana: pregunta sobre cómo responde tu equipo las solicitudes repetidas.",
+        "8": "Inicio de semana: video corto de la demo de voz.",
+        "9": "Cómo pensamos un ERP por módulos: qué va primero y por qué.",
+        "10": "Infografía: errores comunes al emitir una factura electrónica y cómo evitarlos.",
+        "11": "Caso hipotético: una obra que se atrasa y cómo se vería en el tablero de la demo.",
+        "12": "Por qué una ruta de aprendizaje por etapas ayuda a terminar los cursos.",
+        "13": "Fin de semana: ¿cuánto tardas en reunir todas las firmas de un contrato?",
+        "14": "Fin de semana: un consejo práctico para preparar una consulta virtual.",
+        "15": "Mitad de mes: video de un flujo automatizado de principio a fin en la demo.",
+        "16": "Antes y después: buscar productos en la bodega a ojo frente a ubicaciones registradas.",
+        "17": "Un consejo para escribir correos más claros con ayuda de una plantilla.",
+        "18": "Qué tuvimos en cuenta al diseñar la caja del punto de venta.",
+        "19": "Caso hipotético: un área de gestión humana que cierra la nómina con menos reprocesos.",
+        "20": "Fin de semana: ¿qué construirías primero en tu producto SaaS?",
+        "21": "Fin de semana: un consejo para monitorear precios públicos de forma responsable.",
+        "22": "Caso hipotético: una tienda que premia a sus clientes frecuentes.",
+        "23": "Tono polémico: si la revisión de un cambio de código tarda días, el proceso se puede mejorar.",
+        "24": "Qué revisar al moderar comentarios en una comunidad o un mercado en línea.",
+        "25": "Video: cómo se ve una ruta de entregas en la demo.",
+        "26": "Cómo hacemos que el chatbot muestre la fuente de cada respuesta.",
+        "27": "Fin de semana: una pregunta que todo gerente debería hacerle a sus datos.",
+        "28": "Fin de semana: ¿cuál es tu mayor freno para vender en línea?",
+        "29": "Cómo decidimos qué información mostrar en la ficha de cada cliente.",
+        "30": "Cierre de mes: invita a probar el chatbot con un documento propio."
+      }
+    },
+    "generator": {
+      "plan": "Plan del día {n} · {type}: {note}",
+      "ai": {
+        "title": "Generar con IA",
+        "desc": "Un clic: un modelo de OpenAI, llamado desde el servidor de KopTup, redacta el post, el texto de anuncio y los slides del carrusel para la demo, el ángulo y el tono que elijas. Revisa siempre el resultado antes de publicarlo.",
+        "langNote": "La IA escribe en español neutro, con trato de tú.",
+        "button": "Generar con IA",
+        "regenerate": "Regenerar con IA",
+        "loading": "Generando con IA…",
+        "success": "Generado con IA ({model}).",
+        "strategy": "Por qué este enfoque:",
+        "unavailable": "La IA no está disponible ahora mismo: {reason}.",
+        "fallbackLocal": "Te mostramos la versión de plantillas locales.",
+        "fallbackEdited": "Se mantiene tu texto editado.",
+        "reasons": {
+          "notConfigured": "el servidor no tiene configurada la clave de OpenAI",
+          "limit": "se alcanzó el límite de generaciones, intenta más tarde",
+          "access": "necesitas acceso aprobado a esta demo",
+          "invalid": "la respuesta de la IA llegó incompleta",
+          "network": "no hubo conexión con el servidor",
+          "generic": "el servidor no pudo completar la solicitud"
+        }
+      },
+      "source": {
+        "ai": "Fuente: IA ({model})",
+        "local": "Fuente: plantillas locales (sin IA)",
+        "edited": "Editado por ti"
+      },
+      "demoLabel": "Demo a promocionar",
+      "angleLabel": "Ángulo del post",
+      "toneLabel": "Tono",
+      "variantLabel": "Variante",
+      "variantButton": "Generar otra versión",
+      "variantN": "v{n}",
+      "variantHelp": "Cada versión cambia el gancho y el cierre con la misma información.",
+      "utmLabel": "Agregar UTM a los enlaces",
+      "utmHelp": "Agrega utm_source=linkedin, el medio y la campaña al enlace de la demo para medir las visitas en tu analítica.",
+      "views": {
+        "organic": "Post orgánico",
+        "ad": "Texto de anuncio",
+        "carousel": "Carrusel {count} slides"
+      },
+      "post": {
+        "textLabel": "Texto para LinkedIn (editable)",
+        "chars": "{count} caracteres · máximo de LinkedIn: 3.000",
+        "copy": "Copiar texto",
+        "copied": "¡Copiado!",
+        "copyError": "No se pudo copiar automáticamente; selecciona el texto y cópialo.",
+        "reset": "Restablecer",
+        "saveDraft": "Guardar borrador",
+        "saved": "Borrador guardado",
+        "previewLabel": "Vista previa estilo LinkedIn (simulada)",
+        "removeImage": "Quitar imagen",
+        "imageHint": "Agrega una imagen desde la pestaña Capturas y video."
+      },
+      "ad": {
+        "headline": "Título",
+        "intro": "Texto introductorio",
+        "description": "Descripción",
+        "cta": "Botón",
+        "url": "URL de destino",
+        "copyAll": "Copiar todos los campos",
+        "copyTemplate": "Título: {headline}\n\nTexto introductorio: {intro}\n\nDescripción: {description}\n\nBotón: {cta}\n\nURL de destino: {url}",
+        "mockTitle": "Así se vería el anuncio (simulado)",
+        "sponsored": "Promocionado",
+        "note": "Esta demo no crea ni paga campañas: copia los campos en el administrador de campañas de LinkedIn.",
+        "over": "Supera el límite",
+        "ctaLabels": {
+          "learnMore": "Más información",
+          "visitSite": "Visitar sitio web",
+          "register": "Registrarse",
+          "tryDemo": "Probar demo"
+        }
+      },
+      "carousel": {
+        "count": "{count} slides · 1080×1080 cada uno",
+        "hint": "Descarga el PDF (una página por slide) o copia los textos para tu herramienta de diseño.",
+        "slideN": "Slide {n}/{total}",
+        "downloadPdf": "Descargar PDF",
+        "generating": "Generando PDF…",
+        "downloaded": "PDF descargado",
+        "pdfError": "No se pudo generar el PDF: {msg}",
+        "copyTexts": "Copiar textos",
+        "visualNote": "Nota para el diseño",
+        "tip": "LinkedIn permite publicar un carrusel subiéndolo como documento PDF. Acompáñalo con un texto corto sobre {titulo}."
+      },
+      "checks": {
+        "title": "Revisión de veracidad",
+        "desc": "Alertas automáticas sobre el texto actual. No reemplazan tu revisión.",
+        "numbers": "Contiene cifras ({list}): verifica que cada una tenga fuente antes de publicar.",
+        "noNumbers": "Sin cifras de resultados",
+        "testimonial": "Parece un testimonio o una cita de cliente: publícalo solo con autorización escrita.",
+        "noTestimonial": "Sin testimonios ni citas de clientes",
+        "link": "Incluye el enlace a la demo",
+        "noLink": "No incluye el enlace a la demo",
+        "utm": "El enlace lleva UTM",
+        "noUtm": "El enlace no lleva UTM",
+        "length": "Dentro del máximo de 3.000 caracteres",
+        "tooLong": "Supera los 3.000 caracteres de LinkedIn"
+      },
+      "drafts": {
+        "title": "Borradores guardados ({count})",
+        "empty": "Aún no tienes borradores. Guarda uno desde el post orgánico.",
+        "stored": "Se guardan solo en este navegador.",
+        "open": "Abrir",
+        "copy": "Copiar",
+        "delete": "Eliminar",
+        "exportCsv": "Exportar CSV",
+        "loaded": "Borrador abierto en el editor",
+        "deleted": "Borrador eliminado",
+        "chars": "{count} caracteres",
+        "sources": {
+          "ai": "IA",
+          "local": "Plantillas",
+          "edited": "Editado"
+        },
+        "csv": {
+          "date": "Fecha",
+          "demo": "Demo",
+          "angle": "Ángulo",
+          "tone": "Tono",
+          "source": "Fuente",
+          "chars": "Caracteres",
+          "text": "Texto"
+        }
+      }
+    },
+    "preview": {
+      "author": "KopTup",
+      "headline": "Software a medida con IA para empresas",
+      "time": "Ahora",
+      "simulated": "Vista previa simulada · sin reacciones reales",
+      "seeMore": "… ver más",
+      "seeLess": "ver menos",
+      "imageAlt": "Imagen que acompaña el post",
+      "actions": {
+        "like": "Recomendar",
+        "comment": "Comentar",
+        "repost": "Compartir",
+        "send": "Enviar"
+      }
+    },
+    "capture": {
+      "title": "Capturas para el post",
+      "subtitle": "Crea una imagen con plantilla o captura la demo tal como la ves. Descarga PNG o WebM.",
+      "demoLabel": "Demo",
+      "modes": {
+        "auto": "Captura automática",
+        "visual": "Plantilla diseñada"
+      },
+      "useInPost": "Usar en la vista previa del post",
+      "usedInPost": "Imagen agregada a la vista previa del post.",
+      "goToGenerator": "Ir al generador",
+      "downloadPng": "Descargar PNG",
+      "downloadWebm": "Descargar WebM",
+      "openTab": "Abrir en otra pestaña",
+      "iframeTitle": "Vista de la demo {titulo}",
+      "stop": "Detener ({s} s)",
+      "webmNote": "LinkedIn no acepta videos WebM. Conviértelo a MP4, por ejemplo con ffmpeg:",
+      "auto": {
+        "info": "La demo real carga en el recuadro. La foto toma exactamente lo que se ve en él; el video graba mientras navegas por la demo, a pocos cuadros por segundo (depende de tu equipo). No pide permisos porque la demo está en el mismo sitio.",
+        "photo": "Tomar foto",
+        "capturing": "Capturando…",
+        "record": "Grabar video",
+        "photoTitle": "Foto de la demo",
+        "videoTitle": "Video de la demo (WebM)",
+        "videoStats": "{seconds} s · {frames} cuadros capturados (≈ {fps} por segundo; depende de tu equipo)",
+        "errors": {
+          "notReady": "La demo todavía está cargando; espera unos segundos e intenta de nuevo.",
+          "capture": "No se pudo capturar la demo: {msg}",
+          "record": "No se pudo iniciar la grabación: {msg}",
+          "noRecorder": "Tu navegador no permite grabar video desde esta página."
+        }
+      },
+      "visual": {
+        "styles": {
+          "browser": "Ventana de navegador",
+          "headline": "Titular destacado",
+          "features": "Lista de funciones"
+        },
+        "download": "Descargar PNG 1200×627",
+        "generating": "Generando…",
+        "sizeNote": "1200×627 px es el tamaño recomendado por LinkedIn para imágenes con enlace.",
+        "error": "No se pudo generar la imagen: {msg}",
+        "svg": {
+          "includes": "QUÉ INCLUYE",
+          "for": "PARA",
+          "seeDemo": "Mira la demo"
+        }
+      }
+    }
+  }
+}

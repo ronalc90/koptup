@@ -1,112 +1,142 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
+import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import {
   CalendarDaysIcon,
   SparklesIcon,
   PhotoIcon,
-  ChartBarIcon,
   ArrowRightIcon,
   RocketLaunchIcon,
   Squares2X2Icon,
+  ChatBubbleLeftRightIcon,
+  CheckCircleIcon,
+  NoSymbolIcon,
+  BeakerIcon,
+  InformationCircleIcon,
 } from '@heroicons/react/24/outline';
 import Calendar from './components/Calendar';
 import PostGenerator from './components/PostGenerator';
 import DemoCapture from './components/DemoCapture';
-import {
-  ANGULOS_LABELS,
-  CALENDARIO_30_DIAS,
-  KOPTUP_DEMOS,
-  type AnguloPost,
-} from './components/data';
+import { ANGULOS, CALENDARIO_30_DIAS, TONOS, type AnguloPost } from './components/data';
+import { useCatalogo } from './components/useLinkedinData';
 
 type Tab = 'overview' | 'calendar' | 'generator' | 'capture';
 
-export default function LinkedInAdsDemoPage() {
-  const [tab, setTab] = useState<Tab>('overview');
-  const [diaSeleccionado, setDiaSeleccionado] = useState<number | null>(null);
-  const [demoId, setDemoId] = useState<string>(KOPTUP_DEMOS[0].id);
-  const [angulo, setAngulo] = useState<AnguloPost>('lanzamiento');
-  const [imagenCapturada, setImagenCapturada] = useState<string | null>(null);
+const TABS: { key: Tab; Icon: typeof CalendarDaysIcon }[] = [
+  { key: 'overview', Icon: Squares2X2Icon },
+  { key: 'calendar', Icon: CalendarDaysIcon },
+  { key: 'generator', Icon: SparklesIcon },
+  { key: 'capture', Icon: PhotoIcon },
+];
 
-  const handleSelectDia = (dia: number) => {
-    const planDia = CALENDARIO_30_DIAS.find((d) => d.dia === dia);
-    if (!planDia) return;
-    setDiaSeleccionado(dia);
-    setDemoId(planDia.demoId);
-    setAngulo(planDia.angulo);
-    setTab('generator');
+export default function LinkedInAdsDemoPage() {
+  const t = useTranslations('demoLinkedinAds');
+  const demos = useCatalogo();
+  const [tab, setTab] = useState<Tab>('overview');
+  // Las pestañas visitadas quedan montadas (ocultas) para no perder lo que hiciste en ellas.
+  const [visitadas, setVisitadas] = useState<Tab[]>(['overview']);
+  const [diaSeleccionado, setDiaSeleccionado] = useState<number | null>(null);
+  const [demoId, setDemoId] = useState<string>(demos[0].id);
+  const [angulo, setAngulo] = useState<AnguloPost>('lanzamiento');
+  const [imagen, setImagen] = useState<string | null>(null);
+
+  const irA = (destino: Tab) => {
+    setTab(destino);
+    setVisitadas((v) => (v.includes(destino) ? v : [...v, destino]));
   };
 
-  const stats = useMemo(() => {
-    const tipos = new Map<string, number>();
-    for (const d of CALENDARIO_30_DIAS) {
-      tipos.set(d.tipoContenido, (tipos.get(d.tipoContenido) ?? 0) + 1);
-    }
-    return {
-      demos: KOPTUP_DEMOS.length,
-      dias: CALENDARIO_30_DIAS.length,
-      angulos: Object.keys(ANGULOS_LABELS).length,
-      tipos,
-    };
-  }, []);
+  const handleSelectDia = (dia: number) => {
+    const plan = CALENDARIO_30_DIAS.find((d) => d.dia === dia);
+    if (!plan) return;
+    setDiaSeleccionado(dia);
+    setDemoId(plan.demoId);
+    setAngulo(plan.angulo);
+    irA('generator');
+  };
+
+  const planDia = diaSeleccionado ? CALENDARIO_30_DIAS.find((d) => d.dia === diaSeleccionado) ?? null : null;
+
+  const counts = { demos: demos.length, days: CALENDARIO_30_DIAS.length, angles: ANGULOS.length, tones: TONOS.length };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-secondary-50 via-white to-primary-50 pb-20 dark:from-secondary-950 dark:via-black dark:to-primary-950">
-      <Hero />
+      <Hero counts={counts} />
 
-      <div className="mx-auto -mt-12 max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 mx-auto -mt-12 max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="rounded-2xl border border-secondary-200 bg-white shadow-xl dark:border-secondary-800 dark:bg-secondary-900">
-          <nav className="flex items-center gap-1 overflow-x-auto border-b border-secondary-200 px-3 py-2 dark:border-secondary-800">
-            {(
-              [
-                { key: 'overview', label: 'Resumen', Icon: Squares2X2Icon },
-                { key: 'calendar', label: 'Calendario 30 días', Icon: CalendarDaysIcon },
-                { key: 'generator', label: 'Generador de posts', Icon: SparklesIcon },
-                { key: 'capture', label: 'Capturas & video', Icon: PhotoIcon },
-              ] as { key: Tab; label: string; Icon: typeof CalendarDaysIcon }[]
-            ).map(({ key, label, Icon }) => {
-              const activo = tab === key;
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => setTab(key)}
-                  className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition ${
-                    activo
-                      ? 'bg-primary-600 text-white shadow-sm'
-                      : 'text-secondary-600 hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-300 dark:hover:bg-secondary-800 dark:hover:text-white'
-                  }`}
-                >
-                  <Icon className="h-4 w-4" />
-                  {label}
-                </button>
-              );
-            })}
-          </nav>
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-secondary-200 px-3 py-2 dark:border-secondary-800">
+            <nav className="flex min-w-0 flex-wrap items-center gap-1" role="tablist" aria-label="LinkedIn">
+              {TABS.map(({ key, Icon }) => {
+                const activo = tab === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    role="tab"
+                    aria-selected={activo}
+                    aria-controls={`linkedin-panel-${key}`}
+                    onClick={() => irA(key)}
+                    className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                      activo
+                        ? 'bg-primary-600 text-white shadow-sm'
+                        : 'text-secondary-600 hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-300 dark:hover:bg-secondary-800 dark:hover:text-white'
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {t(`tabs.${key}`)}
+                  </button>
+                );
+              })}
+            </nav>
+            <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-semibold">
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200">
+                <BeakerIcon className="h-3.5 w-3.5" />
+                {t('badges.sampleData')}
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-secondary-100 px-2 py-0.5 text-secondary-700 dark:bg-secondary-800 dark:text-secondary-200">
+                <InformationCircleIcon className="h-3.5 w-3.5" />
+                {t('badges.notPublishing')}
+              </span>
+            </div>
+          </div>
 
           <div className="p-4 sm:p-6">
-            {tab === 'overview' ? (
-              <Overview stats={stats} onGoCalendar={() => setTab('calendar')} onGoGen={() => setTab('generator')} onGoCapture={() => setTab('capture')} />
+            {visitadas.includes('overview') ? (
+              <div id="linkedin-panel-overview" role="tabpanel" hidden={tab !== 'overview'}>
+                <Overview counts={counts} onIr={irA} />
+              </div>
             ) : null}
-            {tab === 'calendar' ? (
-              <Calendar diaSeleccionado={diaSeleccionado} onSelectDia={handleSelectDia} />
+            {visitadas.includes('calendar') ? (
+              <div id="linkedin-panel-calendar" role="tabpanel" hidden={tab !== 'calendar'}>
+                <Calendar demos={demos} diaSeleccionado={diaSeleccionado} onSelectDia={handleSelectDia} />
+              </div>
             ) : null}
-            {tab === 'generator' ? (
-              <PostGenerator
-                demoIdInicial={demoId}
-                anguloInicial={angulo}
-                imagenCapturada={imagenCapturada}
-              />
+            {visitadas.includes('generator') ? (
+              <div id="linkedin-panel-generator" role="tabpanel" hidden={tab !== 'generator'}>
+                <PostGenerator
+                  demos={demos}
+                  demoId={demoId}
+                  onDemoChange={setDemoId}
+                  angulo={angulo}
+                  onAnguloChange={setAngulo}
+                  planDia={planDia}
+                  imagen={imagen}
+                  onQuitarImagen={() => setImagen(null)}
+                />
+              </div>
             ) : null}
-            {tab === 'capture' ? (
-              <DemoCapture
-                demoId={demoId}
-                onDemoChange={setDemoId}
-                onImageCaptured={(url) => {
-                  setImagenCapturada(url);
-                }}
-              />
+            {visitadas.includes('capture') ? (
+              <div id="linkedin-panel-capture" role="tabpanel" hidden={tab !== 'capture'}>
+                <DemoCapture
+                  demos={demos}
+                  demoId={demoId}
+                  onDemoChange={setDemoId}
+                  onImageCaptured={setImagen}
+                  onIrAlGenerador={() => irA('generator')}
+                />
+              </div>
             ) : null}
           </div>
         </div>
@@ -115,152 +145,133 @@ export default function LinkedInAdsDemoPage() {
   );
 }
 
-function Hero() {
+interface Counts {
+  demos: number;
+  days: number;
+  angles: number;
+  tones: number;
+}
+
+function Hero({ counts }: { counts: Counts }) {
+  const t = useTranslations('demoLinkedinAds.hero');
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-primary-700 via-primary-600 to-violet-700 px-4 pb-24 pt-16 text-white sm:px-6 lg:px-8">
-      <div className="absolute inset-0 opacity-20">
+      <div className="pointer-events-none absolute inset-0 opacity-20" aria-hidden="true">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.3),transparent_60%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(124,58,237,0.4),transparent_50%)]" />
       </div>
       <div className="relative mx-auto max-w-5xl text-center">
         <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider backdrop-blur">
           <RocketLaunchIcon className="h-3.5 w-3.5" />
-          Marketing engine · Koptup
+          {t('badge')}
         </div>
-        <h1 className="mt-4 text-3xl font-extrabold leading-tight sm:text-5xl">
-          Generador de contenido LinkedIn para mostrar el <span className="text-violet-200">100%</span> de Koptup
-        </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-base text-primary-50 sm:text-lg">
-          Plan editorial de 30 días, posts orgánicos + ad copy + carruseles + capturas de pantalla
-          reales de cada demo. Pasa de 19 seguidores a una audiencia que entiende qué hace Koptup.
-        </p>
+        <h1 className="mt-4 text-3xl font-extrabold leading-tight sm:text-5xl">{t('title')}</h1>
+        <p className="mx-auto mt-4 max-w-2xl text-base text-primary-50 sm:text-lg">{t('subtitle')}</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur">
-            🎯 {KOPTUP_DEMOS.length} demos catalogadas
-          </span>
-          <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur">
-            📅 30 días planificados
-          </span>
-          <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur">
-            ✨ 8 ángulos × 5 tonos por post
-          </span>
-          <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur">
-            📸 Foto + video del demo real
-          </span>
+          {[
+            t('chips.demos', { count: counts.demos }),
+            t('chips.days', { count: counts.days }),
+            t('chips.combos', { angles: counts.angles, tones: counts.tones }),
+            t('chips.capture'),
+          ].map((chip) => (
+            <span key={chip} className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur">
+              {chip}
+            </span>
+          ))}
         </div>
+        <Link
+          href="/contact"
+          className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-primary-700 shadow-md transition hover:bg-primary-50"
+        >
+          <ChatBubbleLeftRightIcon className="h-4 w-4" />
+          {t('cta')}
+        </Link>
       </div>
     </section>
   );
 }
 
-function Overview({
-  stats,
-  onGoCalendar,
-  onGoGen,
-  onGoCapture,
-}: {
-  stats: {
-    demos: number;
-    dias: number;
-    angulos: number;
-    tipos: Map<string, number>;
-  };
-  onGoCalendar: () => void;
-  onGoGen: () => void;
-  onGoCapture: () => void;
-}) {
+function Overview({ counts, onIr }: { counts: Counts; onIr: (tab: Tab) => void }) {
+  const t = useTranslations('demoLinkedinAds.overview');
+  const pasos: { key: 'calendar' | 'generator' | 'capture'; Icon: typeof CalendarDaysIcon }[] = [
+    { key: 'calendar', Icon: CalendarDaysIcon },
+    { key: 'generator', Icon: SparklesIcon },
+    { key: 'capture', Icon: PhotoIcon },
+  ];
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <StatCard
-          Icon={Squares2X2Icon}
-          label="Demos para promocionar"
-          value={stats.demos}
-          color="from-primary-500 to-primary-700"
-        />
-        <StatCard
-          Icon={CalendarDaysIcon}
-          label="Días planificados"
-          value={stats.dias}
-          color="from-violet-500 to-violet-700"
-        />
-        <StatCard
-          Icon={SparklesIcon}
-          label="Ángulos disponibles"
-          value={stats.angulos}
-          color="from-emerald-500 to-emerald-700"
-        />
-        <StatCard
-          Icon={ChartBarIcon}
-          label="Variantes por post"
-          value="∞"
-          color="from-rose-500 to-rose-700"
-        />
+        <StatCard Icon={Squares2X2Icon} label={t('stats.demos')} value={counts.demos} color="from-primary-500 to-primary-700" />
+        <StatCard Icon={CalendarDaysIcon} label={t('stats.days')} value={counts.days} color="from-violet-500 to-violet-700" />
+        <StatCard Icon={SparklesIcon} label={t('stats.angles')} value={counts.angles} color="from-emerald-500 to-emerald-700" />
+        <StatCard Icon={ChatBubbleLeftRightIcon} label={t('stats.tones')} value={counts.tones} color="from-rose-500 to-rose-700" />
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <AccionCard
-          step="1"
-          titulo="Mira el plan de 30 días"
-          descripcion="Un demo distinto cada día, con ángulo + tipo de contenido recomendado para maximizar variedad y alcance."
-          cta="Abrir calendario"
-          onClick={onGoCalendar}
-          icon={<CalendarDaysIcon className="h-6 w-6" />}
-        />
-        <AccionCard
-          step="2"
-          titulo="Genera el post"
-          descripcion="Elige demo, ángulo y tono. Te entregamos hook, cuerpo, CTA, hashtags y vista previa real de LinkedIn."
-          cta="Abrir generador"
-          onClick={onGoGen}
-          icon={<SparklesIcon className="h-6 w-6" />}
-        />
-        <AccionCard
-          step="3"
-          titulo="Suma el visual"
-          descripcion="Genera imagen 1200×627 con plantillas o captura foto/video del demo real con un click."
-          cta="Abrir capturas"
-          onClick={onGoCapture}
-          icon={<PhotoIcon className="h-6 w-6" />}
-        />
+        {pasos.map(({ key, Icon }, i) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => onIr(key)}
+            className="group flex h-full flex-col items-start gap-3 rounded-xl border border-secondary-200 bg-white p-5 text-left transition hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-lg dark:border-secondary-700 dark:bg-secondary-900 dark:hover:border-primary-700"
+          >
+            <div className="flex w-full items-center justify-between">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-primary-100 text-primary-700 dark:bg-primary-950/60 dark:text-primary-200">
+                <Icon className="h-6 w-6" />
+              </span>
+              <span className="text-xs font-bold uppercase tracking-widest text-secondary-400 dark:text-secondary-500">
+                {t('stepLabel', { n: i + 1 })}
+              </span>
+            </div>
+            <h3 className="text-base font-bold text-secondary-900 dark:text-white">{t(`steps.${key}.title`)}</h3>
+            <p className="text-sm leading-relaxed text-secondary-600 dark:text-secondary-400">{t(`steps.${key}.desc`)}</p>
+            <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-primary-600 group-hover:gap-2 dark:text-primary-300">
+              {t(`steps.${key}.cta`)}
+              <ArrowRightIcon className="h-4 w-4 transition-all" />
+            </span>
+          </button>
+        ))}
       </div>
 
       <div className="rounded-xl border border-secondary-200 bg-white p-5 dark:border-secondary-700 dark:bg-secondary-900">
-        <h3 className="text-base font-bold text-secondary-900 dark:text-white">
-          🧠 Cómo lo usamos para crecer Koptup en LinkedIn
-        </h3>
+        <h3 className="text-base font-bold text-secondary-900 dark:text-white">{t('howTitle')}</h3>
         <ol className="mt-3 space-y-2.5 text-sm leading-relaxed text-secondary-700 dark:text-secondary-300">
-          <li>
-            <strong>1. Lunes 9:00 AM:</strong> abres el calendario, ves el demo del día y su ángulo. Si
-            no te convence, lo regeneras con otro tono.
-          </li>
-          <li>
-            <strong>2. Generas 3 variantes del mismo post</strong> y eliges la que más te suena.
-            Editas los matices personales que solo tú puedes aportar.
-          </li>
-          <li>
-            <strong>3. Vas a Capturas:</strong> generas visual 1200×627 con la plantilla o capturas
-            el demo real en pantalla (foto + video corto si el formato lo pide).
-          </li>
-          <li>
-            <strong>4. Pegas en LinkedIn:</strong> copias el texto, subes la imagen/video, agregas
-            tags a 3 personas relevantes y publicas.
-          </li>
-          <li>
-            <strong>5. Promocionas solo lo que probaste orgánicamente:</strong> si un post pasa de 100
-            impresiones orgánicas, abres el tab Ad Copy y armas la versión sponsored.
-          </li>
+          {[0, 1, 2, 3, 4].map((i) => (
+            <li key={i}>
+              <strong>
+                {i + 1}. {t(`how.${i}.label`)}
+              </strong>{' '}
+              {t(`how.${i}.text`)}
+            </li>
+          ))}
         </ol>
       </div>
 
       <div className="rounded-xl border border-violet-200 bg-gradient-to-br from-violet-50 to-primary-50 p-5 dark:border-violet-800/40 dark:from-violet-950/40 dark:to-primary-950/40">
-        <h3 className="text-base font-bold text-secondary-900 dark:text-white">
-          💡 Objetivos de los 30 días
-        </h3>
-        <div className="mt-3 grid grid-cols-1 gap-3 text-sm md:grid-cols-3">
-          <ObjetivoCard meta="500 seguidores" tactica="3 posts/semana + interacción diaria 15 min" />
-          <ObjetivoCard meta="10 leads calificados" tactica="Ads pagados sobre los 3 mejores posts orgánicos del mes" />
-          <ObjetivoCard meta="2 reuniones cerradas" tactica="DMs personalizados a interesados que comentaron" />
+        <h3 className="text-base font-bold text-secondary-900 dark:text-white">{t('scopeTitle')}</h3>
+        <div className="mt-3 grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
+          <div className="rounded-lg bg-white/70 p-4 dark:bg-secondary-900/70">
+            <p className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">{t('doesTitle')}</p>
+            <ul className="mt-2 space-y-2">
+              {[0, 1, 2, 3].map((i) => (
+                <li key={i} className="flex items-start gap-2 text-secondary-700 dark:text-secondary-300">
+                  <CheckCircleIcon className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                  <span>{t(`does.${i}`)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="rounded-lg bg-white/70 p-4 dark:bg-secondary-900/70">
+            <p className="text-xs font-bold uppercase tracking-wider text-rose-700 dark:text-rose-300">{t('doesNotTitle')}</p>
+            <ul className="mt-2 space-y-2">
+              {[0, 1, 2].map((i) => (
+                <li key={i} className="flex items-start gap-2 text-secondary-700 dark:text-secondary-300">
+                  <NoSymbolIcon className="mt-0.5 h-4 w-4 shrink-0 text-rose-600 dark:text-rose-400" />
+                  <span>{t(`doesNot.${i}`)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -280,64 +291,12 @@ function StatCard({
 }) {
   return (
     <div className={`relative overflow-hidden rounded-xl bg-gradient-to-br ${color} p-4 text-white shadow-md`}>
-      <div className="absolute -right-4 -top-4 opacity-10">
+      <div className="absolute -right-4 -top-4 opacity-10" aria-hidden="true">
         <Icon className="h-24 w-24" />
       </div>
       <Icon className="h-5 w-5 opacity-80" />
       <p className="mt-2 text-3xl font-extrabold leading-tight">{value}</p>
       <p className="text-xs font-medium opacity-90">{label}</p>
-    </div>
-  );
-}
-
-function AccionCard({
-  step,
-  titulo,
-  descripcion,
-  cta,
-  onClick,
-  icon,
-}: {
-  step: string;
-  titulo: string;
-  descripcion: string;
-  cta: string;
-  onClick: () => void;
-  icon: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="group flex h-full flex-col items-start gap-3 rounded-xl border border-secondary-200 bg-white p-5 text-left transition hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-lg dark:border-secondary-700 dark:bg-secondary-900 dark:hover:border-primary-700"
-    >
-      <div className="flex w-full items-center justify-between">
-        <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-primary-100 text-primary-700 dark:bg-primary-950/60 dark:text-primary-200">
-          {icon}
-        </span>
-        <span className="text-xs font-bold uppercase tracking-widest text-secondary-400 dark:text-secondary-500">
-          Paso {step}
-        </span>
-      </div>
-      <h4 className="text-base font-bold text-secondary-900 dark:text-white">{titulo}</h4>
-      <p className="text-sm leading-relaxed text-secondary-600 dark:text-secondary-400">
-        {descripcion}
-      </p>
-      <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-primary-600 group-hover:gap-2 dark:text-primary-300">
-        {cta}
-        <ArrowRightIcon className="h-4 w-4 transition-all" />
-      </span>
-    </button>
-  );
-}
-
-function ObjetivoCard({ meta, tactica }: { meta: string; tactica: string }) {
-  return (
-    <div className="rounded-lg bg-white/70 p-3 backdrop-blur dark:bg-secondary-900/70">
-      <p className="text-lg font-bold text-secondary-900 dark:text-white">{meta}</p>
-      <p className="mt-1 text-xs leading-relaxed text-secondary-600 dark:text-secondary-300">
-        {tactica}
-      </p>
     </div>
   );
 }
