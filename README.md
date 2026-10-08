@@ -21,8 +21,8 @@
 
 Koptup es el portafolio comercial de un estudio de desarrollo a medida. Construimos software para empresas en LATAM — web, mobile, integraciones, IA aplicada. Este repo contiene:
 
-- **2 aplicaciones reales** que podés usar hoy: un chatbot RAG con OpenAI y un generador de copy para LinkedIn Ads.
-- **25 prototipos navegables** que muestran cómo se ve y se siente cada solución antes de que la construyamos para vos.
+- **2 aplicaciones reales** que puedes usar hoy: un chatbot RAG con OpenAI y un generador de copy para LinkedIn Ads.
+- **24 prototipos navegables** que muestran cómo se ve y se siente cada solución antes de que la construyamos para ti.
 - **Sitio comercial** (catálogo de servicios, precios en COP/USD con TRM en vivo, sobre nosotros, contacto).
 
 No es un SaaS ni un producto. Es la vitrina de un equipo que cobra por construir cosas a medida.
@@ -45,7 +45,7 @@ Generador de copies para campañas de LinkedIn con OpenAI server-side. Calendari
 
 ## Prototipos navegables
 
-El resto (25 vistas: CRM, ERP, POS, HRMS, WMS, LMS, helpdesk, telemedicina, facturación electrónica, voice AI, e-commerce, automatización de workflows, scraping, etc.) son **mockups interactivos con datos simulados realistas**. Cubren el flujo de UI completo — tabs, formularios validados, gráficas, drag-and-drop, modales — pero los datos son fixtures, no provienen de un backend de producción. Sirven para que un cliente potencial vea cómo se vería un ERP o un CRM moderno antes de contratarnos para construirlo.
+El resto (24 vistas: CRM, ERP, POS, HRMS, WMS, LMS, helpdesk, telemedicina, facturación electrónica, voice AI, e-commerce, automatización de workflows, scraping, etc.) son **mockups interactivos con datos simulados realistas**. Cubren el flujo de UI completo — tabs, formularios validados, gráficas, drag-and-drop, modales — pero los datos son fixtures, no provienen de un backend de producción. Sirven para que un cliente potencial vea cómo se vería un ERP o un CRM moderno antes de contratarnos para construirlo.
 
 Catálogo filtrable por categoría: **<https://www.koptup.com/demo>**
 
@@ -61,7 +61,7 @@ Tecnologías que realmente usamos en este repo:
 
 **Testing & calidad:** Jest · Playwright · React Testing Library · ESLint · TypeScript strict
 
-Eso es ~25 tecnologías que dominamos. Conocemos y trabajamos cuando el proyecto lo pide con: Python (FastAPI/Django), Java (Spring Boot), .NET, Postgres + pgvector, Redis, Pinecone, Anthropic, Kubernetes, Terraform, GraphQL, gRPC, WebSockets, React Native, Flutter. Si necesitás algo fuera de esta lista, lo evaluamos antes de comprometernos.
+Eso es ~25 tecnologías que dominamos. Conocemos y trabajamos cuando el proyecto lo pide con: Python (FastAPI/Django), Java (Spring Boot), .NET, Postgres + pgvector, Redis, Pinecone, Anthropic, Kubernetes, Terraform, GraphQL, gRPC, WebSockets, React Native, Flutter. Si necesitas algo fuera de esta lista, lo evaluamos antes de comprometernos.
 
 ## Quick start
 
@@ -85,7 +85,7 @@ El chatbot RAG funciona sin `OPENAI_API_KEY` (fallback extractivo BM25). Con la 
 
 ```
 apps/
-  web/                    # Next.js — sitio + 27 vistas en /demo
+  web/                    # Next.js — sitio + 26 demos en /demo
   backend/                # Express — APIs reales (chatbot) + mocks (resto)
 packages/
   design-system/          # tokens compartidos
@@ -98,12 +98,12 @@ infra/
 
 - **Producción:** [www.koptup.com](https://www.koptup.com) (Vercel) + API en Railway.
 - **Chatbot RAG:** integración real con OpenAI, persistencia en disco, multi-tenant.
-- **25 prototipos restantes:** UI completa, datos simulados, no production-ready sin trabajo adicional.
+- **24 prototipos restantes:** UI completa, datos simulados, no production-ready sin trabajo adicional.
 - **Roadmap inmediato:** S3 real para uploads del RAG, autenticación de tenants, métricas de uso.
 
-## ¿Querés contratarnos?
+## ¿Quieres contratarnos?
 
-Construimos a medida lo que viste en los prototipos — o lo que necesités que no esté acá. Tarifas en COP y USD, propuesta en 48h hábiles.
+Construimos a medida lo que viste en los prototipos — o lo que necesites que no esté acá. Tarifas en COP y USD, propuesta en 48h hábiles.
 
 - **Email:** [dirox7@gmail.com](mailto:dirox7@gmail.com)
 - **Sitio:** [www.koptup.com/contact](https://www.koptup.com/contact)

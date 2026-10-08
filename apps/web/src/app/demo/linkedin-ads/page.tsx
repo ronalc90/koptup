@@ -174,7 +174,7 @@ function Overview({
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <StatCard
           Icon={Squares2X2Icon}
-          label="Demos en catálogo"
+          label="Demos para promocionar"
           value={stats.demos}
           color="from-primary-500 to-primary-700"
         />

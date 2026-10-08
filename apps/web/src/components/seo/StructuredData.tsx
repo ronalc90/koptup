@@ -6,7 +6,8 @@
  * número de clientes). Por eso no hay `aggregateRating`.
  */
 
-import { SITE_URL, absoluteUrl } from '@/lib/site';
+import { DEMO_COUNT } from '@/lib/demos';
+import { HOME_DESCRIPTION, SITE_URL, absoluteUrl } from '@/lib/site';
 
 interface StructuredDataProps {
   type: 'organization' | 'website' | 'service' | 'article' | 'softwareApplication' | 'localBusiness';
@@ -105,8 +106,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
     '@type': 'WebSite',
     name: 'KopTup',
     url: SITE_URL,
-    description:
-      'Desarrollo de software a medida para empresas. Prueba nuestras demos interactivas: e-commerce, chatbots IA, dashboards, gestión documental y más.',
+    description: HOME_DESCRIPTION,
     inLanguage: 'es-CO',
   });
 
@@ -295,7 +295,7 @@ export function FAQStructuredData() {
         name: '¿Puedo probar el software antes de contratar?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Sí. Ofrecemos 27 prototipos navegables del tipo de soluciones que construimos. Dos de ellos (chatbot RAG y generador de LinkedIn Ads) usan OpenAI real; el resto son mockups interactivos con datos simulados para que veas el flujo y la UX antes de contratarnos.',
+          text: `Sí. Ofrecemos ${DEMO_COUNT} prototipos navegables del tipo de soluciones que construimos. Dos de ellos (chatbot RAG y generador de LinkedIn Ads) usan OpenAI real; el resto son mockups interactivos con datos simulados para que veas el flujo y la UX antes de contratarnos.`,
         },
       },
       {

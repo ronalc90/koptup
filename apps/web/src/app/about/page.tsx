@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import Card, { CardContent } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
+import { DEMO_COUNT, LIVE_AI_DEMO_COUNT, MOCKUP_DEMO_COUNT } from '@/lib/demos';
 import {
   RocketLaunchIcon,
   ShieldCheckIcon,
@@ -271,20 +272,20 @@ const caseStudies = [
 
 const heroStats = [
   { value: '8+', label: 'Años construyendo software' },
-  { value: '2', label: 'Apps reales con OpenAI' },
-  { value: '25', label: 'Prototipos navegables' },
+  { value: String(LIVE_AI_DEMO_COUNT), label: 'Apps reales con OpenAI' },
+  { value: String(MOCKUP_DEMO_COUNT), label: 'Prototipos navegables' },
   { value: '~25', label: 'Tecnologías core que usamos' },
 ];
 
 const bigMetrics: { value: string; label: string; sub: string; gradient: string }[] = [
   {
-    value: '2',
+    value: String(LIVE_AI_DEMO_COUNT),
     label: 'Apps reales con IA',
     sub: 'Chatbot RAG con OpenAI + Generador LinkedIn Ads',
     gradient: 'from-primary-500 to-primary-700',
   },
   {
-    value: '25',
+    value: String(MOCKUP_DEMO_COUNT),
     label: 'Prototipos navegables',
     sub: 'Mockups interactivos con datos simulados realistas',
     gradient: 'from-secondary-500 to-secondary-800',
@@ -361,7 +362,7 @@ const timeline: TimelineItem[] = [
     year: '2026',
     title: 'Vitrina y dos apps reales',
     description:
-      '27 vistas interactivas en línea (2 con integración real a OpenAI: chatbot RAG y generador de LinkedIn Ads, el resto mockups), planes en COP/USD con TRM en vivo, sitio comercial completo.',
+      `${DEMO_COUNT} vistas interactivas en línea (${LIVE_AI_DEMO_COUNT} con integración real a OpenAI: chatbot RAG y generador de LinkedIn Ads, el resto mockups), planes en COP/USD con TRM en vivo, sitio comercial completo.`,
     highlight: true,
   },
   {
@@ -405,11 +406,11 @@ export default function AboutPage() {
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">Koptup</h1>
             <p className="text-2xl md:text-3xl mb-8 max-w-3xl text-primary-50">
               Estudio de desarrollo a medida en Bogotá. Construimos software para empresas de LATAM con stack moderno —
-              dos apps reales con IA online + 25 prototipos navegables para que veas lo que podemos construirte.
+              dos apps reales con IA online + {MOCKUP_DEMO_COUNT} prototipos navegables para que veas lo que podemos construirte.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" variant="outline" className="bg-white text-primary-700 hover:bg-primary-50" asChild>
-                <Link href="/demo">Ver los 27 prototipos</Link>
+                <Link href="/demo">Ver las {DEMO_COUNT} demos</Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
                 <Link href="/contact">Hablar con nosotros</Link>
@@ -480,8 +481,8 @@ export default function AboutPage() {
               <p className="text-lg text-secondary-700 dark:text-secondary-300 mb-6">
                 Trabajamos en dos modalidades: <strong>software a medida</strong> con código fuente entregado al
                 cliente, o <strong>SaaS hospedado</strong> por nosotros cuando el cliente prefiere no operar la
-                infraestructura. Lo que ves online son <strong>2 apps reales</strong> (chatbot RAG con OpenAI y
-                generador de LinkedIn Ads) y <strong>25 prototipos navegables</strong> con datos simulados que
+                infraestructura. Lo que ves online son <strong>{LIVE_AI_DEMO_COUNT} apps reales</strong> (chatbot RAG con OpenAI y
+                generador de LinkedIn Ads) y <strong>{MOCKUP_DEMO_COUNT} prototipos navegables</strong> con datos simulados que
                 muestran el rango de soluciones que podemos construirte.
               </p>
               <div className="space-y-3">
@@ -879,14 +880,14 @@ export default function AboutPage() {
           <GlobeAltIcon className="h-16 w-16 mx-auto mb-6 opacity-90" />
           <h2 className="text-4xl md:text-6xl font-bold mb-6">¿Empezamos?</h2>
           <p className="text-xl mb-10 text-white/90">
-            Probá los prototipos sin registrarte o agendá una llamada de 30 minutos para evaluar tu proyecto.
+            Prueba las demos sin registrarte o agenda una llamada de 30 minutos para evaluar tu proyecto.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/demo"
               className="bg-white text-primary-700 px-8 py-4 rounded-xl font-bold text-lg hover:scale-105 transition shadow-xl"
             >
-              Ver los 27 prototipos
+              Ver las {DEMO_COUNT} demos
             </Link>
             <Link
               href="/contact"

@@ -12,7 +12,8 @@
  */
 
 import { Metadata } from 'next';
-import { SITE_NAME, SITE_URL, TITLE_TEMPLATE } from './site';
+import { DEMO_COUNT } from './demos';
+import { HOME_DESCRIPTION, SITE_NAME, SITE_URL, TITLE_TEMPLATE } from './site';
 
 const baseUrl = SITE_URL;
 
@@ -24,11 +25,12 @@ export interface PageSEO {
 }
 
 export const seoConfig: Record<string, PageSEO> = {
-  // Homepage
+  // Homepage. Referencia: la home NO usa esta entrada; su metadata real está
+  // en src/app/layout.tsx + src/app/page.tsx (título absoluto HOME_TITLE,
+  // "KopTup | …", que no sigue la plantilla).
   home: {
-    title: 'Desarrollo de Software a Medida',
-    description:
-      'KopTup: empresa de desarrollo de software a medida en Colombia. Creamos e-commerce, chatbots con IA, dashboards ejecutivos, apps móviles y soluciones tecnológicas personalizadas. Prueba nuestras demos gratuitas.',
+    title: 'IA que responde con los documentos de tu empresa',
+    description: HOME_DESCRIPTION,
     canonical: baseUrl,
   },
 
@@ -69,7 +71,7 @@ export const seoConfig: Record<string, PageSEO> = {
   demo: {
     title: 'Prototipos Interactivos: Prueba Antes de Contratar',
     description:
-      'Explora 27 prototipos navegables que muestran el rango de soluciones que construimos. Dos usan OpenAI real (chatbot RAG y LinkedIn Ads); el resto son mockups interactivos con datos simulados. Sin registro ni tarjeta de crédito.',
+      `Explora ${DEMO_COUNT} prototipos navegables que muestran el rango de soluciones que construimos. Dos usan OpenAI real (chatbot RAG y LinkedIn Ads); el resto son mockups interactivos con datos simulados. Sin registro ni tarjeta de crédito.`,
     canonical: `${baseUrl}/demo`,
   },
 

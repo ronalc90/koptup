@@ -5,6 +5,8 @@ import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import Card, { CardContent } from '@/components/ui/Card';
+import HomeHighlights from '@/components/home/HomeHighlights';
+import { DEMO_COUNT } from '@/lib/demos';
 import {
   CodeBracketIcon,
   ChatBubbleBottomCenterTextIcon,
@@ -50,7 +52,7 @@ export default function DesarrolloWebColombiaPage() {
     { q: t('q3q'), a: t('q3a') },
     { q: t('q4q'), a: t('q4a') },
     { q: t('q5q'), a: t('q5a') },
-    { q: t('q6q'), a: t('q6a') },
+    { q: t('q6q'), a: t('q6a', { count: DEMO_COUNT }) },
   ];
 
   const techStack = [
@@ -94,22 +96,10 @@ export default function DesarrolloWebColombiaPage() {
         </div>
       </section>
 
-      {/* Stats */}
+      {/* Datos verificables (sin cifras de proyectos, clientes ni satisfacción) */}
       <section className="bg-white dark:bg-secondary-950 border-b border-secondary-200 dark:border-secondary-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {[
-              { v: t('s1v'), l: t('s1l') },
-              { v: t('s2v'), l: t('s2l') },
-              { v: t('s3v'), l: t('s3l') },
-              { v: t('s4v'), l: t('s4l') },
-            ].map((s, i) => (
-              <div key={i}>
-                <div className="text-4xl md:text-5xl font-bold text-primary-600 dark:text-primary-400 mb-2">{s.v}</div>
-                <div className="text-sm md:text-base text-secondary-600 dark:text-secondary-400">{s.l}</div>
-              </div>
-            ))}
-          </div>
+          <HomeHighlights />
         </div>
       </section>
 

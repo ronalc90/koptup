@@ -23,6 +23,16 @@ export const TITLE_TEMPLATE = '%s | KopTup';
 /** Longitud máxima del `<title>` final, sufijo incluido. */
 export const MAX_TITLE_LENGTH = 60;
 
+/**
+ * `<title>` de la home. Es absoluto (no pasa por la plantilla): la marca va
+ * primero solo aquí. También es el og:title / twitter:title por defecto.
+ */
+export const HOME_TITLE = 'KopTup | IA que responde con los documentos de tu empresa';
+
+/** Meta description de la home; también es la descripción por defecto del sitio. */
+export const HOME_DESCRIPTION =
+  'Sistemas RAG para empresas en Colombia: IA que responde con tus manuales, contratos y políticas, cita la fuente y protege tus datos. Prueba la demo gratis.';
+
 /** Convierte una ruta del sitio (`/services`) en URL absoluta canónica. */
 export function absoluteUrl(path = ''): string {
   if (!path || path === '/') return SITE_URL;

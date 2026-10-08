@@ -98,8 +98,9 @@ for (const p of seoObj.properties) {
 
 // --- metadata de cada layout/page -------------------------------------------
 /**
- * Valor string de un nodo: literal, `TITLE_TEMPLATE` (importado de site.ts) o
- * una constante del mismo archivo inicializada con un literal.
+ * Valor string de un nodo: literal, una constante del mismo archivo
+ * inicializada con un literal, o una constante exportada por site.ts
+ * (`TITLE_TEMPLATE`, `HOME_TITLE`…).
  */
 function resolveString(sf, node) {
   const lit = literal(node);
@@ -107,7 +108,7 @@ function resolveString(sf, node) {
   const n = unwrap(node);
   if (n && ts.isIdentifier(n)) {
     if (n.text === 'TITLE_TEMPLATE') return TITLE_TEMPLATE;
-    return literal(exportedConst(sf, n.text));
+    return literal(exportedConst(sf, n.text)) ?? literal(exportedConst(siteSf, n.text));
   }
   return undefined;
 }

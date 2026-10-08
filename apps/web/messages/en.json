@@ -16,27 +16,28 @@
     "success": "Success"
   },
   "hero": {
-    "title": "We turn your ideas into technology solutions",
-    "subtitle": "Custom software, e-commerce, AI chatbots and more to power your business",
-    "cta1": "View Plans",
-    "cta2": "Talk to us"
+    "badge": "RAG systems for businesses",
+    "title": "AI that answers with your company's documents",
+    "subtitle": "RAG systems with cited answers from your manuals, contracts and policies. Pilot with your documents in 2 weeks.",
+    "cta1": "Try the demo",
+    "cta2": "View plans"
   },
   "homePage": {
     "stats": {
-      "projects": "Projects completed",
-      "clients": "Satisfied clients",
-      "support": "Support",
-      "rating": "Average rating"
+      "liveDemo": "Real AI demo, no sign-up",
+      "citedAnswers": "Answers with cited sources",
+      "pilot": "Pilot in 2 weeks",
+      "team": "Team in Colombia"
     },
     "cta": {
       "title": "Ready to start your project?",
       "subtitle": "Tell us your goals and we'll design the best plan",
-      "button": "View Plans"
+      "button": "View plans"
     },
     "demos": {
       "sectionBadge": "Interactive Demos",
       "sectionTitle": "Solutions for Every Industry",
-      "sectionSubtitle": "Explore 27 navigable prototypes that showcase the range of solutions we build. Two of them (RAG chatbot and LinkedIn Ads generator) use live OpenAI; the rest are interactive mockups with simulated data so you can feel how each solution would look before hiring us to build it.",
+      "sectionSubtitle": "Explore {count} navigable prototypes that showcase the range of solutions we build. Two of them (RAG chatbot and LinkedIn Ads generator) use live OpenAI; the rest are interactive mockups with simulated data so you can feel how each solution would look before hiring us to build it.",
       "exploreDemo": "Explore demo →",
       "ecommerce": {
         "title": "Full E-Commerce",
@@ -44,9 +45,9 @@
         "category": "Retail & Sales"
       },
       "chatbot": {
-        "title": "Intelligent Chatbot",
-        "description": "AI-powered virtual assistant that answers questions, processes documents and learns from every interaction.",
-        "category": "Customer Support"
+        "title": "RAG Chatbot",
+        "description": "Ask the AI questions about documents and get answers that cite the source. Real AI, no sign-up.",
+        "category": "AI with your documents"
       },
       "dashboard": {
         "title": "Executive Dashboard",
@@ -2642,19 +2643,10 @@
     "badge": "Custom Software Development Colombia",
     "hero": {
       "title": "Custom Web Development & Software Company in Colombia",
-      "subtitle": "Hire KopTup to develop your web application, chatbot, e-commerce or enterprise system. Over 100 projects delivered in Colombia and Latin America. Free quote.",
+      "subtitle": "Hire KopTup to develop your web application, chatbot, e-commerce or enterprise system. Free quote.",
       "cta1": "Request Free Quote",
       "cta2": "View Demos"
     },
-    "statsTitle": "Numbers that back our experience",
-    "s1v": "+100",
-    "s1l": "Projects delivered",
-    "s2v": "+50",
-    "s2l": "Client companies",
-    "s3v": "6+",
-    "s3l": "Years of experience",
-    "s4v": "98%",
-    "s4l": "Client satisfaction",
     "servicesTitle": "What can we develop for your business?",
     "servicesSubtitle": "Complete technology solutions, from design to deployment",
     "sv1t": "Custom Web Applications",
@@ -2701,7 +2693,7 @@
     "q5q": "Do you offer maintenance after delivering the project?",
     "q5a": "Yes. We offer monthly maintenance and support plans. We also evolve the product according to your business needs. We don't leave you alone after launch.",
     "q6q": "Can I see examples of KopTup's work?",
-    "q6a": "Yes. We have 27 navigable prototypes at koptup.com/demo — two of them (RAG chatbot and LinkedIn Ads generator) use live OpenAI; the rest are interactive mockups with simulated data so you can see how each solution would look before hiring us. No registration or credit card needed.",
+    "q6a": "Yes. We have {count} navigable prototypes at www.koptup.com/demo — two of them (RAG chatbot and LinkedIn Ads generator) use live OpenAI; the rest are interactive mockups with simulated data so you can see how each solution would look before hiring us. No registration or credit card needed.",
     "ctaTitle": "Ready to develop your project?",
     "ctaSubtitle": "Tell us what you need. We respond within 24 hours with a personalized proposal.",
     "ctaButton": "Request Free Quote"

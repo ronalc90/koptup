@@ -1,11 +1,11 @@
-# KopTup — Empresa de Desarrollo de Software a Medida | Colombia
+# KopTup — Sistemas RAG para empresas | Colombia
 
-> KopTup es una empresa colombiana especializada en desarrollo de software a medida, chatbots con inteligencia artificial, e-commerce y automatización de procesos. Sede en Bogotá, Colombia. Atiende empresas en toda Latinoamérica.
+> KopTup es una empresa colombiana. Su producto principal son los sistemas RAG: IA que responde con los documentos de cada empresa (manuales, contratos, políticas) y cita la fuente. Piloto con los documentos del cliente en 2 semanas. También desarrolla software a medida, chatbots con inteligencia artificial, e-commerce y automatización de procesos. Sede en Bogotá, Colombia. Atiende empresas en toda Latinoamérica.
 
 ## Identidad
 
 - **Nombre:** KopTup
-- **Tipo:** Empresa de desarrollo de software a medida
+- **Tipo:** Sistemas RAG (IA con los documentos de la empresa) y desarrollo de software a medida
 - **País:** Colombia
 - **Ciudad:** Bogotá
 - **Sitio web:** https://www.koptup.com
@@ -71,7 +71,7 @@ Análisis, arquitectura y hoja de ruta para transformación digital de empresas.
 
 KopTup ofrece demos interactivos sin registro para evaluar sus soluciones:
 
-- Demo Chatbot IA: https://www.koptup.com/demo/chatbot
+- Demo Chatbot RAG (IA real, sin registro): https://www.koptup.com/demo/chatbot
 - Demo E-commerce: https://www.koptup.com/demo/ecommerce
 - Demo Dashboard Ejecutivo: https://www.koptup.com/demo/dashboard-ejecutivo
 - Demo Gestor de Documentos: https://www.koptup.com/demo/gestor-documentos
@@ -106,5 +106,3 @@ KopTup ofrece demos interactivos sin registro para evaluar sus soluciones:
 **¿KopTup hace chatbots?** Sí. Es uno de sus servicios principales. Integran chatbots con WhatsApp Business, GPT-4 y Claude AI.
 
 **¿KopTup puede hacer mi tienda online?** Sí. Desarrollan e-commerce completo con pasarelas de pago colombianas e internacionales.
-
-**¿Qué empresas han contratado a KopTup?** Más de 50 empresas en Colombia y Latinoamérica. +100 proyectos entregados.

@@ -6,7 +6,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import ThemeProvider from '@/components/providers/ThemeProvider';
 import ConditionalLayout from '@/components/layout/ConditionalLayout';
 import ClientToaster from '../components/ClientToaster';
-import { SITE_NAME, SITE_URL, TITLE_TEMPLATE } from '@/lib/site';
+import { HOME_DESCRIPTION, HOME_TITLE, SITE_NAME, SITE_URL, TITLE_TEMPLATE } from '@/lib/site';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
@@ -17,9 +17,10 @@ const poppins = Poppins({
   display: 'swap',
 });
 
-// Título por defecto (home y páginas sin metadata propia). Ya trae el sufijo
-// porque el `default` del layout raíz no pasa por la plantilla.
-const DEFAULT_TITLE = 'Desarrollo de Software a Medida | KopTup';
+// Título por defecto de las páginas sin metadata propia (login, dashboard…).
+// Ya trae el sufijo porque el `default` del layout raíz no pasa por la
+// plantilla. La home lo reemplaza por HOME_TITLE (title.absolute en app/page.tsx).
+const DEFAULT_TITLE = 'IA que responde con los documentos de tu empresa | KopTup';
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
@@ -35,8 +36,9 @@ export const metadata = {
     statusBarStyle: 'default',
     title: 'KopTup',
   },
-  description:
-    'KopTup - Desarrollo de software a medida para empresas. Aplicaciones web y móviles, e-commerce, chatbots con IA, dashboards, automatización de procesos y transformación digital. Prueba nuestras demos interactivas.',
+  // Description, canonical y og/twitter de la home (y valores por defecto del
+  // sitio para las páginas que no definen los suyos).
+  description: HOME_DESCRIPTION,
   authors: [{ name: 'KopTup' }],
   creator: 'KopTup',
   publisher: 'KopTup',
@@ -45,29 +47,21 @@ export const metadata = {
     address: false,
     telephone: false,
   },
+  // Sin `images`: la imagen og la genera src/app/opengraph-image.tsx (archivo
+  // de metadata de Next) y twitter:image la hereda de og:image. Las páginas de
+  // contenido declaran sus propias imágenes vía seo-config.
   openGraph: {
     type: 'website',
     locale: 'es_CO',
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: DEFAULT_TITLE,
-    description:
-      'Desarrollo de software personalizado para empresas. E-commerce, chatbots con IA, dashboards, gestión documental y más. Prueba 27 prototipos interactivos sin registro.',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'KopTup - Desarrollo de Software a Medida',
-      },
-    ],
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
   },
   twitter: {
     card: 'summary_large_image',
-    title: DEFAULT_TITLE,
-    description:
-      'Desarrollo de software personalizado para empresas. E-commerce, chatbots con IA, dashboards y más. Prueba 27 prototipos interactivos sin registro.',
-    images: ['/og-image.png'],
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
     creator: '@koptup',
   },
   robots: {

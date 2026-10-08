@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import Card, { CardContent } from '@/components/ui/Card';
+import HomeHighlights from '@/components/home/HomeHighlights';
+import { DEMO_COUNT } from '@/lib/demos';
 import {
   ChatBubbleBottomCenterTextIcon,
   ShoppingCartIcon,
@@ -165,28 +167,16 @@ export default function BienvenidoProductHuntPage() {
           </div>
           <div className="text-center mt-8">
             <Button variant="outline" asChild>
-              <Link href="/demo">Ver todas las demos (9 en total)</Link>
+              <Link href="/demo">Ver todas las demos ({DEMO_COUNT} en total)</Link>
             </Button>
           </div>
         </div>
       </section>
 
-      {/* Stats */}
+      {/* Datos verificables (sin cifras de proyectos, clientes ni calificaciones) */}
       <section className="section-padding bg-white dark:bg-secondary-950">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {[
-              { v: '+100', l: 'Proyectos entregados' },
-              { v: '+50', l: 'Empresas clientes' },
-              { v: '6+', l: 'Años de experiencia' },
-              { v: '4.9★', l: 'Satisfacción promedio' },
-            ].map((s, i) => (
-              <div key={i}>
-                <div className="text-4xl font-bold text-[#DA552F] mb-2">{s.v}</div>
-                <div className="text-sm text-secondary-600 dark:text-secondary-400">{s.l}</div>
-              </div>
-            ))}
-          </div>
+          <HomeHighlights />
         </div>
       </section>
 
