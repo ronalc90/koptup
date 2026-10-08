@@ -48,7 +48,7 @@ function ViewShell() {
         aria-label={t('viewSelector')}
       >
         <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-          <div className="flex gap-1 sm:gap-2 overflow-x-auto py-3 -mx-2 px-2">
+          <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto py-3 -mx-2 px-2">
             {VIEWS.map((v) => {
               const Icon = v.icon;
               const active = view === v.id;
@@ -78,6 +78,12 @@ function ViewShell() {
                 </button>
               );
             })}
+            <span
+              className="ml-auto shrink-0 whitespace-nowrap rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200"
+              title={t('sampleDataHint')}
+            >
+              {t('sampleData')}
+            </span>
           </div>
         </div>
       </nav>

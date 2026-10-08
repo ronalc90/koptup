@@ -6,8 +6,8 @@ import {
 } from '@heroicons/react/24/outline';
 import Card, { CardContent } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
-import Button from '@/components/ui/Button';
 import { PRODUCTS } from './products';
+import { formatPrice } from './shared';
 
 const WAREHOUSES = [
   { id: 'bog', city: 'Bogotá',  capacity: 87, pending: 142 },
@@ -15,27 +15,27 @@ const WAREHOUSES = [
   { id: 'cli', city: 'Cali',     capacity: 52, pending: 71  },
 ];
 
+// Transportadoras nacionales con tarifas ilustrativas en COP por paquete
+// estándar (datos de ejemplo, no son cotizaciones reales).
 const CARRIERS = [
-  { id: 'fedex',           sla: '24h', cost: 18.5, rating: 4.7 },
-  { id: 'dhl',             sla: '24h', cost: 22.0, rating: 4.8 },
-  { id: 'servientrega',    sla: '48h', cost: 9.5,  rating: 4.4 },
-  { id: 'coordinadora',    sla: '48h', cost: 8.0,  rating: 4.3 },
-  { id: 'interrapidisimo', sla: '72h', cost: 6.5,  rating: 4.2 },
-  { id: 'tcc',             sla: '72h', cost: 7.0,  rating: 4.1 },
+  { id: 'coordinadora',    sla: '24–48 h', cost: 11500, rating: 4.4 },
+  { id: 'servientrega',    sla: '24–48 h', cost: 12900, rating: 4.3 },
+  { id: 'interrapidisimo', sla: '48–72 h', cost: 9800,  rating: 4.2 },
+  { id: 'tcc',             sla: '48–72 h', cost: 13900, rating: 4.1 },
 ];
 
 const SHIPMENTS = [
-  { id: 'SH-9001', carrier: 'fedex',        from: 'Bogotá',   to: 'Cartagena',    status: 'in_transit',      eta: '2026-05-15' },
-  { id: 'SH-9002', carrier: 'dhl',          from: 'Medellín', to: 'Cali',         status: 'out_for_delivery',eta: '2026-05-14' },
+  { id: 'SH-9001', carrier: 'coordinadora',    from: 'Bogotá',   to: 'Cartagena',    status: 'in_transit',      eta: '2026-05-15' },
+  { id: 'SH-9002', carrier: 'interrapidisimo', from: 'Medellín', to: 'Cali',         status: 'out_for_delivery',eta: '2026-05-14' },
   { id: 'SH-9003', carrier: 'servientrega', from: 'Bogotá',   to: 'Barranquilla', status: 'in_transit',      eta: '2026-05-16' },
   { id: 'SH-9004', carrier: 'coordinadora', from: 'Cali',     to: 'Pereira',      status: 'delivered',       eta: '2026-05-13' },
 ];
 
 const RETURNS = [
-  { id: 'RMA-401', sku: 'TEC-HDP-WL',  reasonKey: 'returns.reasons.defective',       status: 'approved'   },
-  { id: 'RMA-402', sku: 'MOD-JCK-CUE', reasonKey: 'returns.reasons.size',            status: 'pending'    },
-  { id: 'RMA-403', sku: 'TEC-IPH-15P', reasonKey: 'returns.reasons.notAsDescribed',  status: 'reviewing'  },
-  { id: 'RMA-404', sku: 'MOD-SNK-RED', reasonKey: 'returns.reasons.changeMind',      status: 'approved'   },
+  { id: 'RMA-401', sku: 'TEC-AUD-DIA', reasonKey: 'returns.reasons.defective',       status: 'approved'   },
+  { id: 'RMA-402', sku: 'MOD-CHA-CUE', reasonKey: 'returns.reasons.size',            status: 'pending'    },
+  { id: 'RMA-403', sku: 'TEC-SMP-61',  reasonKey: 'returns.reasons.notAsDescribed',  status: 'reviewing'  },
+  { id: 'RMA-404', sku: 'MOD-TEN-LON', reasonKey: 'returns.reasons.changeMind',      status: 'approved'   },
 ];
 
 export default function OperationsView() {
@@ -137,7 +137,7 @@ export default function OperationsView() {
                   <tr key={c.id} className="border-b border-secondary-100 dark:border-secondary-800">
                     <td className="py-3 pr-3 font-medium text-secondary-900 dark:text-white">{t(`ops.carriers.names.${c.id}`)}</td>
                     <td className="py-3 pr-3">{c.sla}</td>
-                    <td className="py-3 pr-3 font-semibold">${c.cost.toFixed(2)}</td>
+                    <td className="py-3 pr-3 font-semibold">{formatPrice(c.cost)}</td>
                     <td className="py-3 pr-3">★ {c.rating}</td>
                     <td className="py-3 pr-3"><Badge variant="success" size="sm">{t('ops.carriers.active')}</Badge></td>
                   </tr>
@@ -185,7 +185,6 @@ export default function OperationsView() {
               <ArrowPathIcon className="h-5 w-5 text-primary-600" />
               {t('ops.returns.title')}
             </h2>
-            <Button variant="outline" size="sm">{t('ops.returns.openPortal')}</Button>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">

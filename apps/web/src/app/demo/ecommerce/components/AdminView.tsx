@@ -7,7 +7,7 @@ import {
 } from '@heroicons/react/24/outline';
 import Card, { CardContent } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
-import { formatPrice } from './shared';
+import { formatPrice, formatNumber } from './shared';
 
 const SALES_30D = [
   35, 42, 38, 50, 46, 55, 60, 58, 62, 70, 68, 72, 80, 76, 84, 88, 92, 90, 95, 100, 98, 105, 110, 108, 115, 120, 118, 125, 130, 134,
@@ -36,12 +36,15 @@ const MARKETING_CAMPAIGNS = [
   { id: 'replenishment', icon: '🔁' },
 ];
 
-const COMPLIANCE = ['PCI DSS', 'GDPR', 'DIAN', 'Habeas Data CO', 'ISO 27001'];
+// Requisitos que se cubren al implementar la tienda real (no certificaciones
+// de KopTup ni de esta demo).
+const COMPLIANCE = ['dian', 'habeasData', 'retracto', 'pci'] as const;
 
 export default function AdminView() {
   const t = useTranslations('demoEcommerce2');
-  const revenue = 384720, gmv = 512430, customers = 12480;
-  const aov = revenue / 1240, ltv = 489, cac = 38;
+  // Cifras de ejemplo del mes en COP (coherentes entre sí: ventas / pedidos = ticket promedio).
+  const revenue = 186000000, gmv = 214500000, customers = 12480, orders = 2140;
+  const aov = revenue / orders, ltv = 412000, cac = 38500;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
@@ -53,7 +56,7 @@ export default function AdminView() {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         <BigKpi label={t('admin.kpis.revenue')}   value={formatPrice(revenue)} icon={<CurrencyDollarIcon className="h-5 w-5" />} />
         <BigKpi label={t('admin.kpis.gmv')}       value={formatPrice(gmv)}     icon={<ShoppingBagIcon className="h-5 w-5" />} />
-        <BigKpi label={t('admin.kpis.customers')} value={customers.toLocaleString()} icon={<UsersIcon className="h-5 w-5" />} />
+        <BigKpi label={t('admin.kpis.customers')} value={formatNumber(customers)} icon={<UsersIcon className="h-5 w-5" />} />
         <BigKpi label={t('admin.kpis.aov')}       value={formatPrice(aov)}     icon={<ArrowTrendingUpIcon className="h-5 w-5" />} />
         <BigKpi label={t('admin.kpis.ltv')}       value={formatPrice(ltv)}     icon={<ChartBarIcon className="h-5 w-5" />} />
         <BigKpi label={t('admin.kpis.cac')}       value={formatPrice(cac)}     icon={<UsersIcon className="h-5 w-5" />} />
@@ -125,10 +128,10 @@ export default function AdminView() {
               <FraudRow label={t('admin.fraud.score')}    value="12 / 100" tone="success" />
               <FraudRow label={t('admin.fraud.blocked')}  value="34"       tone="danger"  />
               <FraudRow label={t('admin.fraud.review')}   value="78"       tone="warning" />
-              <FraudRow label={t('admin.fraud.approved')} value="1,432"    tone="success" />
+              <FraudRow label={t('admin.fraud.approved')} value={formatNumber(1432)} tone="success" />
             </div>
-            <div className="mt-4 p-3 bg-green-50 dark:bg-green-950/30 rounded-lg text-sm text-green-700 dark:text-green-300">
-              ✓ {t('admin.fraud.summary')}
+            <div className="mt-4 p-3 bg-secondary-50 dark:bg-secondary-800 rounded-lg text-sm text-secondary-600 dark:text-secondary-300">
+              {t('admin.fraud.summary')}
             </div>
           </CardContent>
         </Card>
@@ -138,7 +141,7 @@ export default function AdminView() {
             <p className="text-sm text-secondary-500 mb-4">{t('admin.compliance.subtitle')}</p>
             <div className="flex flex-wrap gap-2">
               {COMPLIANCE.map((c) => (
-                <Badge key={c} variant="primary" className="font-mono">✓ {c}</Badge>
+                <Badge key={c} variant="default">{t(`admin.compliance.items.${c}`)}</Badge>
               ))}
             </div>
           </CardContent>
