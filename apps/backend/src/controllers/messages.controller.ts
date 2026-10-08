@@ -222,6 +222,15 @@ export const markAsRead = async (req: AuthRequest, res: Response) => {
       return;
     }
 
+    // Solo un participante puede marcar la conversación como leída.
+    const isParticipant = conversation.participants.some(
+      (p: any) => String(p.userId?._id ?? p.userId) === userId.toString()
+    );
+    if (!isParticipant) {
+      res.status(403).json({ success: false, message: 'No tienes acceso a esta conversación' });
+      return;
+    }
+
     // Resetear contador de no leídos
     conversation.unreadCount.set(userId.toString(), 0);
     await conversation.save();

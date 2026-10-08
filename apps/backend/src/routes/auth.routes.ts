@@ -9,9 +9,13 @@ import {
   googleCallback,
   forgotPassword,
   resetPassword,
+  activateAccount,
+  checkActivation,
+  updateProfile,
+  changePassword,
 } from '../controllers/auth.controller';
 import { authenticate } from '../middleware/auth';
-import { strictRateLimiter } from '../middleware/rateLimiter';
+import { activationCheckRateLimiter, strictRateLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
 
@@ -189,6 +193,57 @@ router.post(
 
 /**
  * @swagger
+ * /api/auth/activate/check:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Valida un enlace de activación sin consumirlo
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [token]
+ *             properties:
+ *               token:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Enlace válido (nombre y email enmascarado)
+ *       400:
+ *         description: token_invalid, token_used o token_expired
+ */
+router.post('/activate/check', activationCheckRateLimiter, checkActivation as RequestHandler);
+
+/**
+ * @swagger
+ * /api/auth/activate:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Activa la cuenta con el enlace mágico y fija la contraseña (devuelve la sesión)
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [token, password]
+ *             properties:
+ *               token:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *                 minLength: 8
+ *     responses:
+ *       200:
+ *         description: Cuenta activa; misma respuesta que el login
+ *       400:
+ *         description: token_invalid, token_used, token_expired o invalid_password
+ */
+router.post('/activate', strictRateLimiter, activateAccount as RequestHandler);
+
+/**
+ * @swagger
  * /api/auth/logout:
  *   post:
  *     tags: [Auth]
@@ -216,6 +271,25 @@ router.post('/logout', authenticate, logout as RequestHandler);
  *         description: Unauthorized
  */
 router.get('/profile', authenticate, getProfile as RequestHandler);
+
+/**
+ * GET /api/auth/me — usuario vigente según la BD (id, email, nombre y rol).
+ * Lo usa el middleware de Next para proteger /admin y /dashboard en el servidor.
+ */
+router.get('/me', authenticate, getProfile as RequestHandler);
+
+/**
+ * PATCH /api/auth/me { name?, phone?, company? } — el dueño actualiza sus
+ * datos básicos (Portal › Mi perfil). El email y el rol no se cambian aquí.
+ */
+router.patch('/me', authenticate, updateProfile as RequestHandler);
+
+/**
+ * POST /api/auth/change-password { currentPassword, newPassword } — cambia la
+ * contraseña verificando la actual y devuelve una sesión nueva (rate-limit
+ * estricto: 5/min por IP).
+ */
+router.post('/change-password', strictRateLimiter, authenticate, changePassword as RequestHandler);
 
 /**
  * @swagger

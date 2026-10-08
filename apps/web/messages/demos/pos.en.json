@@ -1,249 +1,537 @@
 {
   "demoPos": {
     "meta": {
-      "title": "POS · point of sale",
-      "subtitle": "Omnichannel suite for restaurant, retail, self-checkout, and kiosk, with e-invoicing, loyalty, and integrated hardware.",
-      "demo": "Interactive demo"
+      "title": "POS for retail and restaurants: interactive demo",
+      "description": "Point-of-sale demo with sample data from Colombia: sell with a barcode scanner, a scale or by table with kitchen tickets, take split payments, issue a sample electronic POS document, keep selling offline and close the till with X and Z reports. Includes a multi-store console with inventory and transfers.",
+      "breadcrumbHome": "Home",
+      "breadcrumbDemos": "Demos",
+      "breadcrumbName": "POS for retail and restaurants"
     },
-    "topbar": {
-      "store": "Store",
-      "stores": {
-        "main": "Downtown",
-        "north": "North branch",
-        "airport": "Airport T1"
-      },
-      "currency": "Currency",
-      "language": "Language",
+    "pageTitle": "POS for retail and restaurants",
+    "pageSubtitle": "Sell with a barcode scanner and a scale, or by table with kitchen tickets. Take split payments, issue the electronic POS document, keep selling offline and close the till with a Z report. Everything works on this page.",
+    "sampleBadge": "Sample data",
+    "sampleHint": "The businesses (Mercado La Ceiba and Fogón Andino), their tax IDs, stores, addresses, employees, customers, ID numbers, phone numbers, barcodes, stock and figures are made up.",
+    "howItWorks": {
+      "title": "What is real in this demo",
+      "real": "Everything is calculated in your browser: stock per store, taxes included in prices (19% VAT, 5% VAT, exempt or 8% consumption tax), points, change, tips, kitchen tickets, X and Z reports, cash count, commissions and the store console. Your sales and changes are saved only in this browser.",
+      "scanner": "The “Scan” field accepts a real barcode scanner connected as a keyboard (USB or Bluetooth); if you don't have one, use the sample codes.",
+      "simulated": "Simulated: sending the document to the DIAN (the CUDE is computed here with SHA-384, in test mode, and never leaves your browser), the card terminal, QR payments, the scale, printer and cash drawer, and sending the receipt by WhatsApp or email. The “Offline” button is a demo switch: it does not cut your connection.",
+      "project": "In your project, the till installs as an app on a tablet or PC, stores sales on the device when the internet goes down and syncs them when it comes back, issues the electronic document through your authorized technology provider and connects to your card terminal, thermal printer, scanner, cash drawer and scale."
+    },
+    "tour": {
+      "title": "Suggested walkthrough (3 minutes)",
+      "steps": {
+        "1": "Retail: press “Scan”, use a sample code and weigh a per-kilo product with “Read scale”.",
+        "2": "In the ticket, look up customer 300 123 4567, redeem 500 points and take a split payment: part cash, the rest by card or QR.",
+        "3": "Turn on “Offline”, make another sale (it is queued) and reconnect to see it sync.",
+        "4": "Restaurant: open a table in “Tables”, take the order with modifiers, send it to the kitchen and move the ticket forward in “Kitchen (KDS)”.",
+        "5": "In “X/Z reports” review sales by payment method and close the shift with a cash count; in “Stores” move stock between stores."
+      }
+    },
+    "reset": {
+      "button": "Reset data",
+      "confirm": "Delete your sales and changes in this demo?",
+      "yes": "Yes, reset",
+      "done": "Sample data restored"
+    },
+    "presets": {
+      "label": "Business type",
+      "retail": "Retail · grocery",
+      "restaurant": "Restaurant"
+    },
+    "toolbar": {
+      "sede": "Store",
+      "sedeToast": "You are now selling at {name}",
       "online": "Online",
-      "offline": "Offline mode",
-      "offlineHint": "Sync pending · {n} tickets",
-      "searchPlaceholder": "Search by product, SKU, or barcode",
-      "scan": "Scan",
-      "shift": "Shift open",
-      "shiftBy": "Cashier · {name}"
+      "offline": "Offline",
+      "queued": "{n, plural, =0 {no queued sales} one {# queued sale} other {# queued sales}}",
+      "syncing": "Syncing {n, plural, one {# sale} other {# sales}}…",
+      "offlineTitle": "Simulate an internet outage: the till keeps selling and queues the documents",
+      "onlineTitle": "Reconnect and sync the queue (simulated)",
+      "offlineToast": "Offline (simulated): you keep selling and documents are queued",
+      "onlineToast": "Back online",
+      "onlineSyncToast": "Back online: syncing {n, plural, one {# sale} other {# sales}} (simulated)",
+      "shiftOpen": "Till open · Shift {n} · {name}",
+      "shiftClosed": "Till closed"
     },
-    "modes": {
-      "restaurant": "Restaurant",
-      "retail": "Retail",
-      "selfcheckout": "Self-checkout",
-      "kiosk": "Kiosk"
+    "tabs": {
+      "label": "POS sections",
+      "sale": "Sale",
+      "tables": "Tables",
+      "kds": "Kitchen (KDS)",
+      "reports": "X/Z reports",
+      "console": "Stores",
+      "staff": "Staff"
     },
     "categories": {
       "all": "All",
+      "pantry": "Pantry",
+      "dairy": "Dairy and eggs",
+      "produce": "Fruit and vegetables",
       "drinks": "Drinks",
-      "food": "Food",
-      "snacks": "Snacks",
+      "cleaning": "Cleaning",
+      "mains": "Main dishes",
+      "starters": "Starters",
       "desserts": "Desserts"
     },
-    "products": {
-      "title": "Catalog",
-      "happyHour": "Happy hour",
-      "combo": "Combo",
-      "lowStock": "Low stock",
-      "stock": "Stock · {n}",
-      "addedToast": "{name} added"
+    "tax": {
+      "iva19": "VAT 19%",
+      "iva5": "VAT 5%",
+      "exento": "Exempt or excluded",
+      "inc8": "Consumption tax 8%"
     },
-    "ticket": {
-      "title": "Current ticket",
-      "empty": "No items yet. Add products from the catalog.",
-      "table": "Table {n}",
-      "waiter": "Server · {name}",
-      "customer": "Customer",
-      "noCustomer": "No customer assigned",
-      "addCustomer": "Assign customer",
-      "removeCustomer": "Remove",
-      "modifiers": "Modifiers",
-      "note": "Note",
-      "discount": "Discount",
-      "applyDiscount": "Apply discount",
-      "subtotal": "Subtotal",
-      "tax": "Tax · 19%",
-      "tip": "Tip",
-      "total": "Total",
-      "pay": "Charge",
-      "send": "Send to kitchen",
-      "void": "Void item",
-      "clear": "Clear ticket"
+    "catalog": {
+      "searchRetail": "Search by name or barcode",
+      "searchRestaurant": "Search the menu",
+      "categoriesLabel": "Categories",
+      "added": "{name} added",
+      "combo": "Combo",
+      "happyHour": "Happy hour",
+      "happyHourActive": "Happy hour on",
+      "happyHourOn": "Happy hour on: −20% on domestic beer",
+      "happyHourOff": "Happy hour off",
+      "left": "{n} left",
+      "outOfStock": "Out of stock",
+      "noResults": "No matching products.",
+      "pricesNote": "Retail prices include taxes. Tax rates are examples: in your project your accountant sets them per product."
+    },
+    "scan": {
+      "button": "Scan",
+      "label": "Scan the barcode or type it and press Enter",
+      "add": "Add",
+      "hint": "Works with a scanner connected as a keyboard. Sample codes:",
+      "notFound": "Code {code} is not in the catalog."
+    },
+    "weigh": {
+      "title": "Weigh · {name}",
+      "subtitle": "Price per kilo: {price}",
+      "read": "Read scale (simulated)",
+      "manual": "Weight in kg",
+      "available": "Available at this store: {kg}",
+      "invalid": "Enter a weight between 0.01 and 20 kg."
     },
     "modifiers": {
       "title": "Modifiers · {name}",
-      "size": "Size",
-      "sizes": {
-        "small": "Small",
-        "medium": "Medium",
-        "large": "Large"
+      "subtitle": "Your choices are printed on the kitchen or bar ticket.",
+      "items": {
+        "half": "Half portion",
+        "avocado": "Avocado",
+        "egg": "Fried egg",
+        "chicharron": "Extra pork crackling",
+        "noOnion": "No onion",
+        "milk": "Made with milk",
+        "noSugar": "No sugar",
+        "noIce": "No ice"
       },
-      "extras": "Extras",
-      "extrasItems": {
-        "cheese": "Extra cheese",
-        "bacon": "Bacon",
-        "sauce": "BBQ sauce",
-        "ice": "No ice",
-        "sugar": "No sugar"
-      },
-      "notes": "Kitchen notes",
-      "notesPlaceholder": "e.g. no onions, cook it medium rare...",
-      "cancel": "Cancel",
+      "notes": "Note for the kitchen",
+      "notesPlaceholder": "E.g.: medium, no salt…",
       "add": "Add to ticket"
     },
+    "ticket": {
+      "title": "Ticket",
+      "clear": "Empty ticket",
+      "counter": "Counter / takeaway",
+      "tableInfo": "Table {n} · {guests} guests",
+      "waiter": "Server: {name}",
+      "changeTable": "Change table",
+      "seller": "Sales associate",
+      "noSeller": "No associate",
+      "emptyRetail": "Scan or tap a product to add it.",
+      "emptyRestaurant": "Tap a dish or drink to add it.",
+      "each": "{price} each",
+      "weighed": "Weighed on the scale",
+      "removeLine": "Remove {name}",
+      "less": "One less {name}",
+      "more": "One more {name}",
+      "sentBadge": "Sent: {n}",
+      "gross": "Items total",
+      "pointsDiscount": "{points} points redeemed",
+      "base": "Pre-tax amount",
+      "onBase": "base {base}",
+      "total": "Total",
+      "send": "Send to kitchen ({n})",
+      "sentToast": "Ticket sent: {kitchen, plural, one {# item} other {# items}} to the kitchen and {bar, plural, one {# item} other {# items}} to the bar",
+      "bill": "Pre-bill",
+      "billToast": "Table {n}: bill requested",
+      "pay": "Charge {amount}",
+      "goToTicket": "View ticket ({n}) · {amount}"
+    },
     "loyalty": {
-      "title": "Loyalty program",
-      "lookupPlaceholder": "ID or phone number",
+      "lookupPlaceholder": "Customer ID or mobile",
       "search": "Search",
-      "found": "{name} · {points} points",
-      "tier": "Tier · {tier}",
+      "hint": "Try {phone} or ID {doc}.",
+      "notFound": "Not registered.",
+      "summary": "{points} points · {tier} tier",
       "tiers": {
         "bronze": "Bronze",
         "silver": "Silver",
         "gold": "Gold"
       },
-      "redeem": "Redeem {points} pts (-{amount})",
-      "notFound": "Customer not found",
-      "ptsEarned": "Earns {points} pts on this sale"
+      "remove": "Remove customer",
+      "redeem": "Redeem {points} pts (−{amount})",
+      "undoRedeem": "Undo redemption",
+      "cannotRedeem": "Points are redeemed in blocks of {points} for {amount}.",
+      "ptsEarned": "Will earn {points} points with this purchase",
+      "register": {
+        "open": "Register them",
+        "title": "Register a frequent customer",
+        "name": "Full name",
+        "doc": "ID number",
+        "phone": "Mobile",
+        "consent": "The customer authorizes the processing of their data for the points program (Colombian Law 1581 of 2012).",
+        "save": "Register",
+        "done": "Customer registered and added to the ticket",
+        "errors": {
+          "name": "Enter the full name.",
+          "doc": "The ID must have 5 to 10 digits.",
+          "phone": "The mobile number must have 10 digits and start with 3.",
+          "consent": "The customer's data authorization is missing.",
+          "exists": "There is already a customer with that ID or mobile."
+        }
+      }
     },
     "checkout": {
-      "title": "Take payment",
-      "total": "Total due",
-      "pending": "Pending",
+      "title": "Charge",
+      "total": "Amount due",
       "received": "Received",
+      "pending": "Remaining",
       "change": "Change",
+      "tip": {
+        "title": "Voluntary tip: ask the customer",
+        "hint": "Calculated on the pre-tax amount ({base}); the customer may decline it.",
+        "none": "No tip",
+        "suggested": "10% suggested",
+        "amount": "Tip: {amount}"
+      },
+      "methodsTitle": "Payment method",
+      "splitHint": "you can combine several until the total is covered",
       "methods": {
         "cash": "Cash",
-        "card": "Card",
-        "qr": "QR / Bank",
-        "wallet": "Digital wallet",
-        "bnpl": "BNPL · 3 installments"
+        "card": "Card (terminal)",
+        "qr": "QR (Bre-B or wallet)",
+        "gift": "Gift card"
       },
-      "cardModes": {
-        "chip": "Chip",
-        "tap": "Contactless",
-        "swipe": "Swipe"
+      "methodHints": {
+        "cash": "If the customer overpays, the demo calculates the change.",
+        "card": "Simulated: in your project it integrates with your acquirer's card terminal.",
+        "qr": "Simulated: in your project the QR is generated by your payment gateway or bank.",
+        "gift": "Sample gift cards: BONO50 ($50,000) and BONO20 ($20,000)."
       },
-      "split": "Split payment",
-      "splitHint": "Combine methods to cover the full total",
-      "addPayment": "Add payment",
-      "remove": "Remove",
-      "cancel": "Cancel",
+      "amount": "Amount",
+      "add": {
+        "cash": "Receive cash",
+        "card": "Charge on terminal",
+        "qr": "Generate QR",
+        "gift": "Apply gift card"
+      },
+      "exact": "Exact {amount}",
+      "giftPlaceholder": "Gift card code",
+      "device": {
+        "card": "Waiting for the card terminal… (simulated)",
+        "qr": "Waiting for the QR payment confirmation… (simulated)"
+      },
+      "auth": "Auth. {code}",
+      "remove": "Remove payment",
+      "errors": {
+        "amount": "Enter a valid amount.",
+        "covered": "The total is already covered.",
+        "giftUnknown": "That gift card doesn't exist. Try BONO50 or BONO20.",
+        "giftEmpty": "That gift card has no balance left."
+      },
+      "buyer": {
+        "title": "Document for the customer",
+        "final": "End consumer",
+        "finalHint": "Electronic POS equivalent document",
+        "invoice": "Requests an e-invoice",
+        "invoiceHint": "With their tax ID or national ID and email",
+        "docType": "Document type",
+        "docTypes": {
+          "CC": "National ID (CC)",
+          "NIT": "Tax ID (NIT)",
+          "CE": "Foreigner ID (CE)"
+        },
+        "doc": "Document number",
+        "name": "Name or company name",
+        "email": "Email to send the invoice"
+      },
+      "missing": {
+        "tip": "Ask about the tip (it can be “No tip”).",
+        "pending": "{amount} still to be charged.",
+        "buyer": "Complete the invoice details (document, name and email)."
+      },
       "confirm": "Confirm payment",
-      "processing": "Processing...",
-      "approved": "Approved",
-      "tip": "Suggested tip"
+      "processing": "Recording…"
     },
     "receipt": {
-      "title": "Electronic receipt",
-      "thermal": "Thermal 80mm preview",
-      "store": "KopTup · Downtown",
-      "address": "11th Ave # 93-46 · Bogotá",
-      "nit": "Tax ID 900.123.456-7",
-      "ticket": "Ticket #{n}",
-      "cashier": "Cashier · {name}",
-      "thanks": "Thanks for your purchase!",
-      "dian": "DIAN · e-invoice accepted",
-      "cufe": "CUFE · {code}",
-      "send": "Send receipt",
-      "email": "Email",
-      "whatsapp": "WhatsApp",
-      "sms": "SMS",
+      "titlePos": "POS equivalent document",
+      "titleInvoice": "Electronic sales invoice",
+      "thermal": "80 mm thermal print preview · sample document",
+      "docPos": "ELECTRONIC POS EQUIVALENT DOCUMENT",
+      "docInvoice": "ELECTRONIC SALES INVOICE",
+      "number": "No. {n}",
+      "resolution": "Sample DIAN resolution {n} · prefix {prefix}",
+      "date": "Date: {date}",
+      "cashier": "Cashier: {name}",
+      "table": "Table {n}",
+      "waiter": "Server: {name}",
+      "seller": "Sales associate: {name}",
+      "buyer": "Buyer",
+      "finalConsumer": "End consumer",
+      "perKg": "{price}/kg",
+      "tip": "Voluntary tip",
+      "points": "Points earned: {earned} · redeemed: {redeemed}",
+      "cudeNote": "Sample code computed in your browser (SHA-384, test mode). It was not sent to the DIAN.",
+      "refunded": "VOIDED with credit note {nc}",
+      "thanks": "Thank you for your purchase!",
+      "sampleFooter": "Demo document with no tax validity.",
+      "send": "Send to the customer (simulated)",
+      "channels": {
+        "whatsapp": "WhatsApp",
+        "email": "Email"
+      },
+      "emailPlaceholder": "email@example.com",
+      "phonePlaceholder": "Mobile, e.g. 300 123 4567",
+      "sendBtn": "Send",
+      "sentMsg": "Done: it would be sent to {dest} via {channel}. Simulated: no message leaves the demo.",
+      "errors": {
+        "email": "Enter a valid email.",
+        "phone": "Enter a 10-digit mobile number."
+      },
       "print": "Print",
-      "newSale": "New sale",
-      "sent": "Sent via {channel}"
+      "printing": "Opening the browser print dialog…",
+      "done": "Done"
+    },
+    "status": {
+      "sent": "Transmitted (simulated)",
+      "sending": "Transmitting…",
+      "queued": "Queued offline",
+      "hint": {
+        "sent": "In the demo the transmission is simulated.",
+        "sending": "Simulated sending to the technology provider.",
+        "queued": "It will be transmitted when you reconnect."
+      }
+    },
+    "tables": {
+      "title": "Tables",
+      "subtitle": "Tap a free table to open it with its server, or a busy one to continue its order.",
+      "table": "Table {n}",
+      "seats": "{n} seats",
+      "guestsOf": "{n} of {seats} seats",
+      "states": {
+        "free": "Free",
+        "busy": "Occupied",
+        "bill": "Bill requested"
+      },
+      "items": "{n, plural, one {# item} other {# items}} · {amount}",
+      "inKitchen": "{n, plural, one {# ticket in the kitchen} other {# tickets in the kitchen}}",
+      "tapToOpen": "Tap to open",
+      "counterHint": "Sales without a table",
+      "openTitle": "Open table {n}",
+      "waiter": "Server",
+      "guests": "Guests",
+      "noWaiters": "No servers are on shift at this store. Clock one in under “Staff”.",
+      "openConfirm": "Open table",
+      "release": "Release table with no order"
     },
     "kds": {
-      "title": "Kitchen display · KDS",
-      "subtitle": "Live kitchen orders",
-      "order": "Order #{n}",
-      "table": "Table {n}",
+      "title": "Kitchen (KDS)",
+      "subtitle": "This store's tickets by station, with how long they have been waiting.",
+      "stations": {
+        "all": "All",
+        "kitchen": "Kitchen",
+        "bar": "Bar"
+      },
+      "counts": "{n} new · {p} in progress · {r} ready",
+      "order": "Ticket #{n}",
       "elapsed": "{min} min",
       "states": {
         "new": "New",
-        "cooking": "Cooking",
+        "preparing": "In progress",
         "ready": "Ready"
       },
+      "start": "Start preparing",
       "markReady": "Mark ready",
-      "deliver": "Deliver",
-      "empty": "No pending orders"
-    },
-    "tables": {
-      "title": "Table management",
-      "subtitle": "Assign a server and a ticket to each table",
-      "table": "Table {n}",
-      "seats": "{n} seats",
-      "states": {
-        "free": "Free",
-        "busy": "Busy",
-        "bill": "Bill requested"
-      },
-      "openTicket": "Open ticket",
-      "assignWaiter": "Assign server",
-      "waiters": {
-        "ana": "Ana M.",
-        "luis": "Luis G.",
-        "sofia": "Sofía P.",
-        "diego": "Diego R."
-      }
-    },
-    "employees": {
-      "title": "Employees",
-      "clockIn": "Clock in",
-      "clockOut": "Clock out",
-      "active": "On shift",
-      "off": "Off",
-      "hours": "{h}h worked",
-      "commission": "Commission · {amount}",
-      "punch": "Punch"
+      "deliver": "Deliver to table",
+      "empty": "No pending tickets.",
+      "note": "Green: under 8 minutes; yellow: up to 15; red: over 15. In your project this view runs on a kitchen screen connected to the till."
     },
     "reports": {
-      "title": "X / Z report",
-      "subtitle": "Summary of the current shift",
-      "sales": "Sales",
-      "tickets": "Tickets issued",
-      "avgTicket": "Avg ticket",
-      "cash": "Cash",
-      "card": "Card",
-      "digital": "Digital",
-      "voids": "Voids",
+      "title": "X report · Shift {n}",
+      "openSince": "open since {time}",
+      "printX": "Print X",
+      "closeShift": "Close shift (Z)",
+      "empty": "No sales in this shift yet. Make a sale under “Sale” and come back: the report is calculated from what you sell.",
+      "sales": "Sales charged",
+      "salesSubTips": "Includes tips",
+      "docs": "Documents",
+      "avgTicket": "Average ticket",
+      "expectedSub": "Float {base} + net cash",
+      "tips": "Tips",
+      "discounts": "Points discounts",
+      "voids": "Voided items",
+      "voidsSub": "Removed after being sent to the kitchen",
       "refunds": "Refunds",
-      "topProduct": "Top product",
-      "closeShift": "Close shift · Z",
-      "printX": "Print X"
+      "byMethod": "By payment method",
+      "cashNet": "Cash already deducts the change given.",
+      "taxes": "Shift taxes",
+      "rate": "Rate",
+      "tax": "Tax",
+      "top": "Best-selling products",
+      "salesList": "Shift sales ({n})",
+      "salesListHint": "You can view each document or void it with a credit note: it restores stock, points and gift card balance.",
+      "noSales": "No sales yet.",
+      "docPosShort": "POS",
+      "docInvoiceShort": "Invoice",
+      "refundedBadge": "Voided · {nc}",
+      "view": "View",
+      "refund": "Void",
+      "refundConfirm": "Void with a credit note?",
+      "refundDone": "Sale {n} voided with a credit note",
+      "closures": "Z closings in this session"
+    },
+    "shift": {
+      "openTitle": "Open till",
+      "openSubtitle": "Record the cash float the shift starts with.",
+      "base": "Cash float",
+      "baseInvalid": "Enter a valid amount.",
+      "cashier": "Shift cashier",
+      "openConfirm": "Open shift",
+      "openedToast": "Till open: you can sell now",
+      "closeTitle": "Close shift (Z)",
+      "closeSubtitle": "{n, plural, =0 {No sales in the shift} one {# sale in the shift} other {# sales in the shift}}. Count the cash in the drawer.",
+      "cashSales": "Net cash from sales",
+      "expected": "Expected cash",
+      "counted": "Counted cash",
+      "diff": "Difference",
+      "diffZero": "It balances exactly.",
+      "diffOver": "{amount} over.",
+      "diffShort": "{amount} short.",
+      "useExpected": "Use the expected amount",
+      "closeConfirm": "Close and generate Z",
+      "closedBanner": "The till at this store is closed. Open it to keep selling.",
+      "closedShort": "Till closed"
+    },
+    "z": {
+      "title": "Z report · Shift {n}"
     },
     "cash": {
-      "title": "Cash management",
-      "open": "Open drawer",
-      "close": "Close drawer",
-      "opening": "Opening float",
-      "expected": "Expected in drawer",
-      "counted": "Counted",
-      "diff": "Variance",
-      "confirm": "Confirm",
-      "withdraw": "Withdraw",
-      "deposit": "Deposit"
+      "title": "Till",
+      "openSince": "Shift {n} since {time} · {name}"
     },
     "hardware": {
-      "title": "Hardware",
-      "subtitle": "Connected peripherals",
-      "printer": "Thermal printer",
-      "scanner": "Bluetooth scanner",
+      "title": "Peripherals",
+      "subtitle": "Simulated in the demo; in your project they connect to the till.",
+      "printer": "80 mm thermal printer",
+      "scanner": "Barcode scanner",
+      "terminal": "Card terminal",
       "scale": "Scale",
-      "reader": "Chip / NFC reader",
       "drawer": "Cash drawer",
-      "connected": "Connected",
-      "disconnected": "Disconnected",
-      "reconnect": "Reconnect"
+      "testBtn": {
+        "printer": "Test",
+        "scanner": "Open field",
+        "terminal": "Test",
+        "scale": "Test",
+        "drawer": "Open"
+      },
+      "test": {
+        "printer": "Test page sent to the printer (simulated)",
+        "scanner": "Scan field ready: scan or type a code",
+        "terminal": "Card terminal responded correctly (simulated)",
+        "scale": "Scale zeroed and ready (simulated)",
+        "drawer": "Cash drawer opened (simulated)"
+      }
     },
-    "tabs": {
-      "sale": "Sale",
-      "tables": "Tables",
-      "kds": "Kitchen · KDS",
-      "reports": "Reports",
-      "employees": "Employees"
+    "console": {
+      "title": "Store console · {business}",
+      "subtitle": "Today's sales by store, stock across all stores, transfers and central pricing.",
+      "current": "Store where you are selling",
+      "open": "Till open",
+      "closed": "Till closed",
+      "myTill": "Your till (this demo)",
+      "otherTills": "Other tills (sample)",
+      "salesValue": "{n} · {amount}",
+      "dayTotal": "Day total",
+      "lowStock": "{n, plural, one {# product low on stock} other {# products low on stock}}",
+      "switch": "Sell at this store",
+      "chainTotal": "Chain total today: {amount}.",
+      "otherTillsNote": "Other tills are fixed sample data; your till adds up what you sell here.",
+      "stockTitle": "Stock by store",
+      "stockHint": "Deducted when you sell and restored when you void. In red, items at or below the minimum.",
+      "onlyLow": "Low stock only",
+      "product": "Product",
+      "price": "Central price",
+      "minLabel": "Minimum: {n}",
+      "low": "Low stock",
+      "prices": {
+        "label": "New price for {name}",
+        "edit": "Change the price of {name}",
+        "changed": "Changed",
+        "invalid": "Enter a price between $100 and $10,000,000.",
+        "saved": "Price updated in all stores",
+        "note": "The central price applies to all stores from the next product you add to a ticket."
+      },
+      "transfer": {
+        "title": "Transfer stock between stores",
+        "hint": "Moves stock from one store to another; you cannot transfer what is in an open ticket. Requires a connection.",
+        "from": "Origin store",
+        "to": "Destination store",
+        "fromOpt": "From {name}",
+        "toOpt": "To {name}",
+        "qty": "Quantity",
+        "units": "Units",
+        "button": "Transfer",
+        "done": "Transfer recorded: {qty} of {name}",
+        "errors": {
+          "offline": "Transfers can't be recorded offline (in the demo, switch back to “Online”).",
+          "same": "Choose different stores.",
+          "qty": "Enter a valid quantity (whole units or kg).",
+          "stock": "The origin store only has {n} available."
+        }
+      }
+    },
+    "staff": {
+      "title": "Store staff",
+      "subtitle": "Clock people in and out; figures come from shift {n} sales.",
+      "roles": {
+        "cashier": "Cashier",
+        "seller": "Sales associate",
+        "supervisor": "Supervisor",
+        "waiter": "Server",
+        "cook": "Kitchen",
+        "bartender": "Bar"
+      },
+      "since": "in at {time}",
+      "out": "out at {time}",
+      "notToday": "not clocked in today",
+      "active": "On shift",
+      "off": "Off shift",
+      "clockIn": "Clock in",
+      "clockOut": "Clock out",
+      "inToast": "Clock-in recorded: {name}",
+      "outToast": "Clock-out recorded: {name}",
+      "metrics": {
+        "cashier": "Charged {n, plural, one {# sale} other {# sales}} · {amount}",
+        "seller": "Assigned sales (pre-tax): {amount} · {pct} commission: {commission}",
+        "waiter": "{open, plural, one {# open table} other {# open tables}} · {n, plural, one {# bill charged} other {# bills charged}} · tips {tips}",
+        "station": "{n, plural, one {# ticket at their station} other {# tickets at their station}}"
+      },
+      "note": "Only servers on shift can open tables and only associates on shift appear in the ticket."
+    },
+    "errors": {
+      "closed": "The till is closed: open it to sell.",
+      "stock": "Not enough stock at this store.",
+      "tableNotOpen": "Open the table under “Tables” first.",
+      "checkout": "The payment could not be recorded. Check the ticket."
     },
     "common": {
       "close": "Close",
+      "cancel": "Cancel",
       "save": "Save",
-      "back": "Back",
+      "show": "Show",
+      "hide": "Hide",
       "yes": "Yes",
-      "no": "No"
+      "no": "No",
+      "simulated": "simulated"
     }
   }
 }

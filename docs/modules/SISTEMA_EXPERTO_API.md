@@ -440,8 +440,8 @@ VALIDAR_COHERENCIA_CLINICA=true
 ```json
 {
   "openai": "^4.0.0",
-  "xlsx": "^0.18.5",
-  "date-fns": "^3.0.0",
+  "exceljs": "^4.4.0",
+  "date-fns": "^4.1.0",
   "mongoose": "^8.0.0",
   "express": "^4.18.0",
   "csv-parser": "^3.0.0"

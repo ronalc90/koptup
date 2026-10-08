@@ -182,13 +182,11 @@ function RegisterPageInner() {
           </p>
         </div>
 
-        {/* Banner contexto: viene de contact form */}
-        {/* TODO: extract to i18n */}
+        {/* Banner contexto: viene del formulario de contacto (el portal no
+            muestra los mensajes de contacto: la respuesta llega por correo). */}
         {sourceParam === 'contact' && (
           <div className="p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg text-center">
-            <p className="text-sm text-blue-700 dark:text-blue-300">
-              Tu solicitud de contacto fue enviada. Crea tu cuenta para hacer seguimiento desde tu dashboard.
-            </p>
+            <p className="text-sm text-blue-700 dark:text-blue-300">{t('fromContact')}</p>
           </div>
         )}
 

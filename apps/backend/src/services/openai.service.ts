@@ -4,6 +4,17 @@ import { logger } from '../utils/logger';
 
 // Lazy initialization - only create when needed
 let openai: OpenAI | null = null;
+/**
+ * Cliente perezoso: se crea en el primer uso, no al importar el módulo. Así el
+ * servidor arranca aunque falte OPENAI_API_KEY (las funciones de IA responden
+ * con su error controlado en lugar de tumbar el proceso).
+ */
+export function lazyOpenAI(): OpenAI {
+  return new Proxy({} as OpenAI, {
+    get: (_target, prop) => Reflect.get(getOpenAI() as object, prop),
+  });
+}
+
 export function getOpenAI(): OpenAI {
   if (!openai) {
     if (!process.env.OPENAI_API_KEY) {

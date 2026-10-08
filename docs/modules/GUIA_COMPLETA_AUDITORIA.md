@@ -103,7 +103,7 @@ Un sistema completo de **auditoría médica automatizada** con inteligencia arti
 ### 1. Prerrequisitos
 
 ```bash
-- Node.js 18+
+- Node.js 20.9+
 - MongoDB 6.0+
 - npm o yarn
 - OpenAI API Key (opcional para extracción de PDFs)

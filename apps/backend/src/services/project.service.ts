@@ -1,4 +1,5 @@
 import Project from '../models/Project';
+import { AppError } from '../middleware/errorHandler';
 import Task from '../models/Task';
 import ProjectMember from '../models/ProjectMember';
 import ActivityLog from '../models/ActivityLog';
@@ -357,7 +358,7 @@ export const deleteProject = async (projectId: string, userId: string) => {
   });
 
   if (!project) {
-    throw new Error('Project not found or access denied');
+    throw new AppError('Project not found or access denied', 404);
   }
 
   await Project.deleteOne({ _id: projectObjectId });
@@ -387,7 +388,7 @@ export const createTask = async (projectId: string, userId: string, taskData: an
   });
 
   if (!hasAccess && !isMember) {
-    throw new Error('Project not found or access denied');
+    throw new AppError('Project not found or access denied', 404);
   }
 
   const {

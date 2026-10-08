@@ -4,7 +4,7 @@ Este documento explica cómo configurar y ejecutar el sistema completo de KopTup
 
 ## 📋 Requisitos Previos
 
-- **Node.js** v18 o superior
+- **Node.js** v20.9 o superior
 - **MongoDB** v6 o superior (local o MongoDB Atlas)
 - **npm** o **yarn**
 

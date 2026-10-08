@@ -1,0 +1,755 @@
+{
+  "demoCms": {
+    "meta": {
+      "seoTitle": "Demo de CMS headless: modelos, editor visual y API",
+      "seoDescription": "Prueba un CMS headless con datos de ejemplo: modelos de contenido, editor visual por bloques, vista previa web y app, chequeos SEO, roles, aprobación, publicación programada, webhooks y API JSON. Asistente de redacción con IA.",
+      "breadcrumbHome": "Inicio",
+      "breadcrumbDemos": "Demos",
+      "breadcrumb": "CMS headless"
+    },
+    "bar": {
+      "title": "CMS headless",
+      "sample": "Datos de ejemplo",
+      "sampleHint": "Empresa, personas, direcciones, teléfonos y dominios ficticios. Tus cambios se guardan solo en este navegador.",
+      "subtitle": "Modela tu contenido, edítalo en un editor visual, apruébalo y publícalo en tu web, tu app y tu asistente desde un solo panel.",
+      "company": "{name} (empresa ficticia) · sitio web, app y asistente",
+      "viewAs": "Ver como",
+      "switched": "Ahora ves la demo como {name} ({role}).",
+      "reset": "Restablecer datos",
+      "storageOff": "Tu navegador no permite guardar datos: los cambios se perderán al recargar la página.",
+      "resetTitle": "¿Restablecer los datos de ejemplo?",
+      "resetBody": "Se borran las entradas, imágenes, campos y publicaciones que creaste o cambiaste en este navegador y se cargan de nuevo los datos de ejemplo.",
+      "resetConfirm": "Restablecer",
+      "resetDone": "Listo: cargamos de nuevo los datos de ejemplo.",
+      "cancel": "Cancelar",
+      "loading": "Cargando los datos de ejemplo…"
+    },
+    "common": {
+      "close": "Cerrar"
+    },
+    "nav": {
+      "label": "Secciones del CMS",
+      "home": "Inicio",
+      "entries": "Entradas",
+      "models": "Modelos",
+      "media": "Medios",
+      "publishing": "Publicación",
+      "api": "API de entrega",
+      "roles": "Roles y permisos"
+    },
+    "roles": {
+      "writer": {
+        "name": "Redacción",
+        "desc": "Crea entradas, edita borradores y publicadas (como borrador) y las envía a revisión."
+      },
+      "editor": {
+        "name": "Edición",
+        "desc": "Revisa, aprueba, programa y publica; puede editar cualquier entrada."
+      },
+      "admin": {
+        "name": "Administración",
+        "desc": "Todo lo anterior, más modelos de contenido y webhooks."
+      }
+    },
+    "status": {
+      "draft": "Borrador",
+      "review": "En revisión",
+      "approved": "Aprobada",
+      "scheduled": "Programada",
+      "published": "Publicada",
+      "live": "Hay una versión publicada",
+      "liveHint": "El sitio sigue mostrando la versión publicada hasta que publiques estos cambios."
+    },
+    "types": {
+      "page": {
+        "name": "Página",
+        "desc": "Páginas del sitio (inicio, quiénes somos) armadas con bloques.",
+        "example": "Trabaja con nosotros"
+      },
+      "article": {
+        "name": "Artículo del blog",
+        "desc": "Noticias, guías y avisos con fecha, categoría e imagen de portada.",
+        "example": "Cómo prepararte para tu examen de laboratorio"
+      },
+      "location": {
+        "name": "Sede",
+        "desc": "Cada sede con dirección, horario, WhatsApp, foto y servicios que ofrece.",
+        "example": "Sede Laureles"
+      },
+      "service": {
+        "name": "Servicio",
+        "desc": "Servicios con resumen, tarifa particular desde, preparación e imagen.",
+        "example": "Cardiología"
+      },
+      "faq": {
+        "name": "Pregunta frecuente",
+        "desc": "Preguntas y respuestas que se muestran en el sitio y que el asistente puede citar.",
+        "example": "¿Puedo cambiar la hora de mi cita?"
+      }
+    },
+    "fields": {
+      "page": {
+        "title": "Título",
+        "summary": "Resumen",
+        "heroImage": "Imagen principal",
+        "body": "Contenido por bloques"
+      },
+      "article": {
+        "title": "Título",
+        "excerpt": "Extracto",
+        "category": "Categoría",
+        "cover": "Imagen de portada",
+        "body": "Contenido por bloques"
+      },
+      "location": {
+        "name": "Nombre de la sede",
+        "city": "Ciudad",
+        "address": "Dirección",
+        "hours": "Horario",
+        "whatsapp": "WhatsApp de la sede",
+        "photo": "Foto",
+        "services": "Servicios que ofrece",
+        "description": "Descripción"
+      },
+      "service": {
+        "name": "Nombre del servicio",
+        "summary": "Resumen",
+        "priceFrom": "Tarifa particular desde (COP)",
+        "preparation": "Preparación",
+        "image": "Imagen"
+      },
+      "faq": {
+        "question": "Pregunta",
+        "answer": "Respuesta",
+        "service": "Servicio relacionado",
+        "assistant": "Disponible para el asistente del sitio"
+      }
+    },
+    "kinds": {
+      "text": "Texto corto",
+      "longText": "Texto largo",
+      "number": "Número",
+      "boolean": "Sí / no",
+      "date": "Fecha",
+      "phone": "Teléfono",
+      "image": "Imagen",
+      "reference": "Referencia",
+      "references": "Referencias (varias)",
+      "blocks": "Bloques (editor visual)"
+    },
+    "home": {
+      "hello": "Hola, {name}",
+      "roleLine": "Estás viendo la demo con el rol {role}. {desc} Cambia de persona con «Ver como» para probar los permisos.",
+      "entriesCount": "{n, plural, one {# entrada} other {# entradas}}",
+      "tourTitle": "Recorrido en 5 pasos",
+      "tourProgress": "{done} de {total} hechos",
+      "tourIntro": "Cada paso se marca solo cuando lo haces de verdad en la demo.",
+      "stepDone": "Paso completado",
+      "go": "Ir",
+      "tour": {
+        "model": {
+          "title": "1. Mira cómo se modela el contenido",
+          "desc": "Abre «Modelos de contenido» y revisa el tipo «Sede»: campos, obligatorios y traducibles. Como administración puedes agregar un campo."
+        },
+        "edit": {
+          "title": "2. Edita la sede Chapinero y mira la vista previa",
+          "desc": "Cambia el horario o la foto: la vista previa web y app se actualiza mientras escribes."
+        },
+        "assistant": {
+          "title": "3. Pide al asistente de redacción una versión más corta",
+          "desc": "En la pestaña «Asistente IA» usa «Versión corta para la app» y aplícala al campo."
+        },
+        "publish": {
+          "title": "4. Envía a revisión, aprueba y publica",
+          "desc": "Envía como Redacción, cambia a Edición con «Ver como», aprueba y publica. Mira el webhook en «Publicación» y el JSON en la pestaña «API»."
+        },
+        "rag": {
+          "title": "5. Publica la pregunta frecuente y pregúntale al asistente del sitio",
+          "desc": "Publica «¿Qué preparación necesito para una ecografía abdominal?» y en la vista previa pregunta por la ecografía: el asistente cita la respuesta publicada."
+        }
+      },
+      "truthTitle": "Qué es real en esta demo",
+      "truth": {
+        "browser": {
+          "title": "Funciona en tu navegador:",
+          "desc": "modelos, entradas, editor visual, vista previa, chequeos SEO, roles, aprobación, programación, versiones y el JSON de la API. Se guarda en este navegador."
+        },
+        "ai": {
+          "title": "IA real:",
+          "desc": "el asistente de redacción envía el texto al backend de KopTup, que llama a un modelo de lenguaje."
+        },
+        "simulated": {
+          "title": "Simulado:",
+          "desc": "los webhooks (no se envía nada), los dominios .example, el CDN de imágenes y el asistente del sitio (búsqueda por palabras clave en las preguntas frecuentes publicadas)."
+        },
+        "project": {
+          "title": "En tu proyecto:",
+          "desc": "lo implementamos con tu modelo de contenido, tu sitio y tu app, permisos validados en el servidor y las integraciones que necesites."
+        }
+      },
+      "scheduledTitle": "Próximas publicaciones programadas",
+      "scheduledEmpty": "No hay publicaciones programadas.",
+      "inMinutes": "{n, plural, =0 {en menos de un minuto} one {en # minuto} other {en # minutos}}",
+      "inHours": "{n, plural, one {en # hora} other {en # horas}}",
+      "inDays": "{n, plural, one {en # día} other {en # días}}",
+      "activityTitle": "Actividad reciente",
+      "activityEmpty": "Aún no hay actividad en esta sesión. Lo que hagas aparecerá aquí."
+    },
+    "activity": {
+      "created": "creó «{title}»",
+      "edited": "editó «{title}» (volvió a borrador)",
+      "saved": "guardó una versión de «{title}»",
+      "submitted": "envió a revisión «{title}»",
+      "approved": "aprobó «{title}»",
+      "changesRequested": "pidió cambios en «{title}»",
+      "published": "publicó «{title}»",
+      "autoPublished": "publicó «{title}» (publicación programada)",
+      "scheduled": "programó «{title}»",
+      "unscheduled": "canceló la programación de «{title}»",
+      "unpublished": "despublicó «{title}»",
+      "discarded": "descartó los cambios sin publicar de «{title}»",
+      "restored": "restauró una versión de «{title}»",
+      "duplicated": "duplicó «{detail}»",
+      "deleted": "eliminó «{title}»",
+      "fieldAdded": "agregó el campo {detail}",
+      "fieldRemoved": "quitó el campo {detail}",
+      "mediaAdded": "subió la imagen {detail}",
+      "mediaRemoved": "eliminó la imagen {detail}",
+      "webhookToggled": "cambió el webhook «{detail}»",
+      "webhookResent": "reenvió una entrega al webhook «{detail}»"
+    },
+    "entries": {
+      "title": "Entradas",
+      "subtitle": "{shown} de {total} entradas",
+      "new": "Nueva entrada",
+      "newTitle": "Nueva entrada",
+      "typeLabel": "Tipo de contenido",
+      "titleLabel": "Título",
+      "slugPreview": "Se publicará en {path}",
+      "create": "Crear y editar",
+      "created": "Entrada creada como borrador.",
+      "cancel": "Cancelar",
+      "exportCsv": "Exportar CSV",
+      "csvDone": "Descargaste {n, plural, one {# entrada} other {# entradas}} en CSV.",
+      "csv": {
+        "title": "Título",
+        "type": "Tipo",
+        "status": "Estado",
+        "path": "Ruta",
+        "enMissing": "Campos sin traducir (EN)",
+        "author": "Autor",
+        "updated": "Última edición",
+        "published": "Publicada"
+      },
+      "search": "Buscar por título o slug",
+      "filterType": "Filtrar por tipo",
+      "allTypes": "Todos los tipos",
+      "filterStatus": "Filtrar por estado",
+      "allStatuses": "Todos los estados",
+      "filterLang": "Filtrar por idioma",
+      "allLangs": "Todos los idiomas",
+      "langComplete": "Traducción al inglés completa",
+      "langMissing": "Falta traducir al inglés",
+      "filterAuthor": "Filtrar por autor",
+      "allAuthors": "Todos los autores",
+      "sortBy": "Ordenar por",
+      "sort": {
+        "updated": "Última edición",
+        "title": "Título (A–Z)",
+        "type": "Tipo"
+      },
+      "clear": "Limpiar filtros",
+      "empty": "No hay entradas con esos filtros.",
+      "col": {
+        "title": "Título",
+        "type": "Tipo",
+        "status": "Estado",
+        "langs": "Idiomas",
+        "author": "Autor",
+        "updated": "Última edición",
+        "actions": "Acciones"
+      },
+      "untitled": "(sin título)",
+      "enMissing": "{n, plural, one {# campo sin traducir} other {# campos sin traducir}}",
+      "enComplete": "Traducción completa",
+      "edit": "Editar",
+      "duplicate": "Duplicar",
+      "duplicated": "Entrada duplicada como borrador.",
+      "delete": "Eliminar",
+      "deleteNotAllowed": "Tu rol no puede eliminar esta entrada",
+      "deleteTitle": "¿Eliminar la entrada?",
+      "deleteBody": "Se elimina «{title}» y sus versiones. Las referencias desde otras entradas se quitan.",
+      "deleteLive": "La entrada está publicada: se avisará al sitio para quitarla (webhook simulado).",
+      "deleteConfirm": "Eliminar",
+      "deleted": "Entrada eliminada."
+    },
+    "editor": {
+      "back": "Volver a entradas",
+      "gone": "Esta entrada ya no existe (quizá la eliminaste).",
+      "untitled": "(sin título)",
+      "meta": "Creada por {author} · última edición de {editor}, {date}",
+      "publishedOn": "publicada el {date}",
+      "scheduledFor": "se publicará el {date} (hora de Colombia)",
+      "contentLanguage": "Idioma del contenido",
+      "saveVersion": "Guardar versión",
+      "saved": "Versión guardada en el historial.",
+      "submit": "Enviar a revisión",
+      "submitted": "Enviada a revisión.",
+      "discard": "Descartar cambios",
+      "discarded": "Volviste a la versión publicada.",
+      "approve": "Aprobar",
+      "approved": "Entrada aprobada: ya se puede publicar o programar.",
+      "requestChanges": "Pedir cambios",
+      "publishNow": "Publicar ahora",
+      "published": "Publicada: se avisó al sitio, a la app y al asistente (webhooks simulados).",
+      "scheduleBtn": "Programar…",
+      "unschedule": "Cancelar programación",
+      "unscheduled": "Programación cancelada: la entrada sigue aprobada.",
+      "unpublish": "Despublicar",
+      "unpublished": "Entrada despublicada: la API ya no la entrega.",
+      "delete": "Eliminar entrada",
+      "backToDraft": "Editaste una entrada aprobada o publicada: volvió a borrador. El sitio sigue mostrando la versión publicada.",
+      "waitingApproval": "Con el rol {role} no puedes aprobar. Cambia a Edición con «Ver como» para aprobar o pedir cambios.",
+      "waitingPublish": "Con el rol {role} no puedes publicar. Cambia a Edición con «Ver como» para publicar o programar.",
+      "readOnly": "Solo lectura: con el rol {role} no puedes editar entradas en estado «{status}».",
+      "reviewNote": "Edición pidió cambios: «{note}»",
+      "changesNote": "Hay cambios sin publicar: el sitio y la API muestran la versión publicada hasta que la vuelvas a publicar.",
+      "issuesTitle": "Antes de enviar o publicar, corrige:",
+      "issues": {
+        "required": "Falta el campo obligatorio «{field}» (en español).",
+        "slugInvalid": "El slug solo puede tener minúsculas, números y guiones.",
+        "slugTaken": "Ya existe otra entrada de este tipo con ese slug."
+      },
+      "translationPending": "{n, plural, one {Falta traducir # campo} other {Faltan traducir # campos}}: mientras tanto, el sitio en inglés muestra el texto en español.",
+      "formLabel": "Campos de la entrada",
+      "panelLabel": "Vista previa y herramientas",
+      "slug": "Slug (dirección en el sitio)",
+      "slugFromTitle": "Desde el título",
+      "slugPath": "Ruta pública: {path}",
+      "sharedAllLangs": "igual en todos los idiomas",
+      "fallbackNote": "Sin traducir: se mostrará el texto en español.",
+      "copyFromEs": "Copiar el texto en español",
+      "chars": "{n}/{max} caracteres",
+      "assistantHint": "Si está activo y la pregunta está publicada, el asistente del sitio puede citarla.",
+      "noReference": "Sin servicio relacionado",
+      "notPublished": "(sin publicar)",
+      "tabs": {
+        "preview": "Vista previa",
+        "seo": "SEO",
+        "api": "API",
+        "history": "Historial",
+        "ai": "Asistente IA"
+      },
+      "previewVersion": "Versión de la vista previa",
+      "previewModes": {
+        "draft": "Borrador",
+        "live": "Publicada"
+      },
+      "requestTitle": "Pedir cambios",
+      "requestNote": "¿Qué debe cambiar?",
+      "requestPlaceholder": "Ej.: falta la foto con texto alternativo y el horario de los sábados.",
+      "send": "Enviar",
+      "changesRequested": "La entrada volvió a borrador con tus comentarios.",
+      "cancel": "Cancelar",
+      "deleteTitle": "¿Eliminar la entrada?",
+      "deleteBody": "Se elimina «{title}» y sus versiones. Esta acción no se puede deshacer (salvo con «Restablecer datos»).",
+      "deleteConfirm": "Eliminar",
+      "deleted": "Entrada eliminada.",
+      "schedule": {
+        "title": "Programar publicación",
+        "when": "Fecha y hora (hora de Colombia)",
+        "future": "Elige una fecha y hora en el futuro.",
+        "inOneMinute": "En ~1 minuto",
+        "tomorrow7": "Mañana, 7:00 a. m.",
+        "nextWeek": "En una semana, 7:00 a. m.",
+        "note": "Mientras la demo está abierta, el programador revisa cada 5 segundos. Si cierras la pestaña, la entrada se publica la próxima vez que abras la demo, con la fecha que programaste.",
+        "confirm": "Programar",
+        "cancel": "Cancelar",
+        "done": "Programada para el {date}."
+      },
+      "noChangesSinceVersion": "No hay cambios desde la última versión"
+    },
+    "blocks": {
+      "empty": "Todavía no hay bloques. Agrega el primero.",
+      "add": "Agregar bloque:",
+      "kinds": {
+        "heading": "Título",
+        "paragraph": "Párrafo",
+        "image": "Imagen",
+        "button": "Botón",
+        "faq": "Pregunta y respuesta"
+      },
+      "moveUp": "Subir bloque",
+      "moveDown": "Bajar bloque",
+      "remove": "Quitar bloque",
+      "level": "Nivel del título",
+      "paragraphPlaceholder": "Escribe aquí. Usa la barra para negrita, listas y enlaces.",
+      "translatePlaceholder": "Escribe la traducción de este párrafo.",
+      "caption": "Pie de foto",
+      "chooseImage": "Elegir imagen",
+      "changeImage": "Cambiar imagen",
+      "buttonLabel": "Texto del botón",
+      "buttonHref": "Enlace (ej.: /sedes)",
+      "badHref": "Usa una ruta interna (/sedes) o una dirección que empiece por https://.",
+      "question": "Pregunta",
+      "answer": "Respuesta"
+    },
+    "rich": {
+      "toolbar": "Formato del párrafo",
+      "bold": "Negrita",
+      "italic": "Cursiva",
+      "bullets": "Lista con viñetas",
+      "numbers": "Lista numerada",
+      "link": "Insertar enlace",
+      "clear": "Quitar formato",
+      "linkUrl": "Dirección del enlace",
+      "linkApply": "Aplicar",
+      "linkCancel": "Cancelar",
+      "linkHint": "Ruta interna (/servicios/fisioterapia) o dirección https://, mailto: o tel:.",
+      "linkInvalid": "Ese enlace no es válido: usa /ruta, https://, mailto: o tel:."
+    },
+    "media": {
+      "title": "Biblioteca de medios",
+      "subtitle": "{n} imágenes · {missing, plural, =0 {todas con texto alternativo} one {# sin texto alternativo} other {# sin texto alternativo}}",
+      "upload": "Subir imagen",
+      "uploading": "Procesando…",
+      "uploaded": "Imagen agregada a la biblioteca (se guarda solo en este navegador).",
+      "errors": {
+        "notImage": "Ese archivo no es una imagen.",
+        "tooBig": "La imagen pesa más de {mb} MB.",
+        "unreadable": "No pudimos leer esa imagen."
+      },
+      "search": "Buscar por nombre",
+      "onlyNoAlt": "Solo sin texto alternativo",
+      "empty": "No hay imágenes con esos filtros.",
+      "usedCount": "{n, plural, =0 {sin usar} one {usada en # entrada} other {usada en # entradas}}",
+      "uploadedTag": "subida por ti",
+      "sampleTag": "ilustración de ejemplo",
+      "noAlt": "Sin texto alternativo",
+      "pickTitle": "Elegir imagen",
+      "none": "Sin imagen",
+      "choose": "Elegir",
+      "change": "Cambiar",
+      "remove": "Quitar",
+      "close": "Cerrar",
+      "meta": "{w} × {h} px · {kb} KB",
+      "focalHint": "Haz clic en la imagen para fijar el punto de interés ({x} %, {y} %): así se recorta en cada formato.",
+      "crops": {
+        "web": "Web 16:9",
+        "app": "App 4:5",
+        "social": "Redes 1:1"
+      },
+      "alt": "Texto alternativo",
+      "altPlaceholder": "Describe la imagen para quien no puede verla.",
+      "altNote": "El texto alternativo ayuda a la accesibilidad y al SEO. El panel SEO de cada entrada avisa cuando falta.",
+      "usedIn": "Se usa en",
+      "unused": "Esta imagen no se usa en ninguna entrada.",
+      "delete": "Eliminar imagen",
+      "inUse": "No se puede eliminar mientras se use en una entrada",
+      "noDeletePerm": "Tu rol no puede eliminar imágenes",
+      "removed": "Imagen eliminada.",
+      "note": "Las ilustraciones son de ejemplo. Las imágenes que subes se reducen y se guardan solo en este navegador; en tu proyecto van a tu almacenamiento o CDN de imágenes."
+    },
+    "preview": {
+      "channel": "Canal",
+      "channels": {
+        "web": "Sitio web",
+        "app": "App"
+      },
+      "device": "Dispositivo",
+      "devices": {
+        "desktop": "Escritorio",
+        "mobile": "Celular"
+      },
+      "draftMode": "Mostrando el borrador (se actualiza mientras escribes).",
+      "liveMode": "Mostrando la versión publicada.",
+      "draftRibbon": "Vista previa del borrador · no publicada",
+      "nav": {
+        "home": "Inicio",
+        "locations": "Sedes",
+        "locationsPath": "sedes",
+        "services": "Servicios",
+        "servicesPath": "servicios",
+        "blog": "Blog",
+        "blogPath": "blog",
+        "faq": "Preguntas frecuentes",
+        "faqPath": "preguntas-frecuentes"
+      },
+      "notYetPublished": "Sin publicar",
+      "address": "Dirección",
+      "hours": "Horario",
+      "whatsapp": "Escríbenos por WhatsApp · {phone}",
+      "whatsappShort": "Escribir por WhatsApp",
+      "whatsappSimulated": "En tu sitio, este botón abre WhatsApp con el número {phone}. En la demo es simulado.",
+      "linkSimulated": "En el sitio de ejemplo, este enlace lleva a {href}.",
+      "servicesHere": "Servicios en esta sede",
+      "from": "Desde {price}",
+      "preparation": "Preparación",
+      "availableAt": "Disponible en:",
+      "faqSection": "Preguntas frecuentes",
+      "relatedService": "Ver servicio: {name}",
+      "assistantOn": "Disponible para el asistente del sitio cuando esté publicada.",
+      "assistantOff": "No disponible para el asistente del sitio.",
+      "yes": "Sí",
+      "no": "No",
+      "footer": "Sitio de ejemplo · Red de Clínicas Montaña Azul (empresa ficticia)",
+      "askAssistant": "Pregúntale al asistente",
+      "appNote": "La app recibe el mismo contenido por la API y lo muestra en su propio diseño.",
+      "simulatedNote": "Vista previa simulada en tu navegador: en tu proyecto es tu sitio y tu app reales, leyendo el contenido por la API."
+    },
+    "assistant": {
+      "title": "Asistente del sitio",
+      "close": "Cerrar asistente",
+      "disclaimer": "Simulación: busca por palabras clave en {n, plural, =0 {las preguntas frecuentes publicadas (ninguna disponible aún)} one {# pregunta frecuente publicada} other {# preguntas frecuentes publicadas}}. En tu proyecto responde tu asistente con IA sobre el mismo contenido.",
+      "suggest1": "¿Cómo me preparo para una ecografía?",
+      "suggest2": "¿Puedo agendar por WhatsApp?",
+      "placeholder": "Escribe tu pregunta",
+      "send": "Enviar",
+      "source": "Fuente: pregunta frecuente «{title}»",
+      "publishedOn": "publicada el {date}",
+      "noAnswer": "No encontré esa información en el contenido publicado. Si publicas una pregunta frecuente sobre el tema, podré citarla."
+    },
+    "seo": {
+      "metaTitle": "Título para buscadores",
+      "metaDescription": "Meta descripción",
+      "titleCount": "{n} caracteres (recomendado: {min}–{max}). Si lo dejas vacío, se usa el título de la entrada.",
+      "descCount": "{n} caracteres (recomendado: {min}–{max}).",
+      "serp": "Así se vería en un buscador",
+      "noDescription": "Sin meta descripción: el buscador elegirá un fragmento del texto.",
+      "checksTitle": "Chequeos: {passed} de {total} en orden",
+      "checks": {
+        "titleLength": {
+          "ok": "Título de {value} caracteres (entre {min} y {max}).",
+          "ko": "Título de {value} caracteres: lo ideal es entre {min} y {max}."
+        },
+        "descriptionLength": {
+          "ok": "Meta descripción de {value} caracteres (entre {min} y {max}).",
+          "ko": "Meta descripción de {value} caracteres: lo ideal es entre {min} y {max}."
+        },
+        "slug": {
+          "ok": "Slug válido y único: {value}.",
+          "ko": "Slug inválido o repetido: «{value}»."
+        },
+        "singleH1": {
+          "ok": "Un solo H1 (el título de la entrada).",
+          "ko": "Hay {value} H1: el título ya es el H1; usa H2 o H3 en los bloques."
+        },
+        "imageAlt": {
+          "ok": "Todas las imágenes tienen texto alternativo.",
+          "ko": "Imágenes sin texto alternativo: {value}."
+        },
+        "internalLink": {
+          "ok": "Tiene {value, plural, one {# enlace interno} other {# enlaces internos}}.",
+          "ko": "Sin enlaces internos: enlaza otra página del sitio (por ejemplo, /sedes)."
+        },
+        "bodyLength": {
+          "ok": "El artículo tiene {value} palabras.",
+          "ko": "El artículo tiene {value} palabras: apunta a 80 o más."
+        }
+      },
+      "note": "Los chequeos se calculan con el contenido real de esta entrada en el idioma seleccionado. No reemplazan una auditoría SEO completa del sitio."
+    },
+    "api": {
+      "title": "API de entrega",
+      "subtitle": "Así lee el contenido tu sitio, tu app o tu asistente. Cambia los filtros y mira el JSON: sale de los datos de esta demo.",
+      "type": "Tipo de contenido",
+      "allTypes": "Todos",
+      "locale": "Idioma",
+      "preview": "Incluir borradores (vista previa)",
+      "previewToken": "token de vista previa",
+      "response": "Respuesta",
+      "results": "{n, plural, one {# resultado} other {# resultados}}",
+      "copy": "Copiar JSON",
+      "copied": "Copiado al portapapeles.",
+      "copyFailed": "No pudimos copiar: selecciona el texto y cópialo a mano.",
+      "download": "Descargar .json",
+      "downloaded": "JSON descargado.",
+      "snippets": "Cómo consumirla",
+      "snippet": {
+        "next": "Next.js",
+        "curl": "cURL"
+      },
+      "snippetComment": "el webhook de publicación revalida esta etiqueta",
+      "copyCode": "Copiar código",
+      "point1": "Sin vista previa, la API solo entrega lo publicado; los borradores no salen.",
+      "point2": "Si falta una traducción, entrega el texto en español y lo indica en «localeFallback».",
+      "point3": "Las imágenes salen con texto alternativo, tamaño y punto de interés para recortarlas en cada canal.",
+      "simulated": "API simulada en tu navegador con los datos de esta demo (dominios .example). En tu proyecto la sirve el servidor del CMS, con REST o GraphQL según lo que necesites.",
+      "version": "Versión",
+      "publishedVersion": "Publicada",
+      "previewVersion": "Vista previa (borrador)",
+      "notPublished": "Esta entrada no tiene versión publicada: la API responde 404. Con vista previa (y su token) verías el borrador."
+    },
+    "history": {
+      "reasons": {
+        "created": "Creada",
+        "saved": "Versión guardada",
+        "submitted": "Enviada a revisión",
+        "approved": "Aprobada",
+        "published": "Publicada",
+        "restored": "Versión restaurada",
+        "discarded": "Cambios descartados"
+      },
+      "latest": "más reciente",
+      "sameAsCurrent": "igual a la actual",
+      "differs": "{n, plural, one {# parte distinta de la actual} other {# partes distintas de la actual}}",
+      "restore": "Restaurar",
+      "restored": "Versión restaurada: revísala y vuelve a enviarla.",
+      "activity": "Actividad de esta entrada en la sesión",
+      "note": "Los cambios se guardan solos en este navegador; «Guardar versión», enviar, aprobar y publicar crean un punto en el historial."
+    },
+    "ai": {
+      "realNote": "IA real: el texto elegido se envía al backend de KopTup, que lo procesa con un modelo de lenguaje. No incluyas datos personales.",
+      "target": "Texto a trabajar",
+      "emptySource": "Este campo está vacío en el idioma seleccionado.",
+      "words": "{n, plural, one {# palabra} other {# palabras}}",
+      "improve": "Mejorar redacción",
+      "shorter": "Versión corta para la app",
+      "tooShort": "El texto ya es corto (menos de 12 palabras).",
+      "tones": {
+        "formal": "Tono formal",
+        "tecnico": "Tono técnico",
+        "persuasivo": "Tono persuasivo"
+      },
+      "versions": "3 versiones",
+      "working": "Generando…",
+      "result": "Propuesta de la IA",
+      "apply": "Aplicar al campo",
+      "applyThis": "Aplicar esta",
+      "applied": "Texto aplicado en «{field}».",
+      "copy": "Copiar",
+      "copied": "Copiado al portapapeles.",
+      "copyFailed": "No pudimos copiar el texto.",
+      "discard": "Descartar",
+      "option": "Opción {n} · {tone}",
+      "uses": "{n, plural, =0 {Aún no usas la IA en esta visita.} one {Usaste la IA # vez en esta visita.} other {Usaste la IA # veces en esta visita.}}",
+      "readOnly": "Tu rol no puede editar esta entrada en su estado actual, así que no puedes aplicar textos.",
+      "noTargets": "Esta entrada no tiene campos de texto para trabajar con la IA.",
+      "errors": {
+        "network": "No pudimos conectar con el servidor de IA. Revisa tu conexión o inténtalo más tarde; el resto de la demo sigue funcionando.",
+        "timeout": "La IA tardó demasiado en responder. Inténtalo de nuevo con un texto más corto.",
+        "notConfigured": "El asistente de IA no está configurado en este servidor (falta la clave del modelo). El resto de la demo funciona igual.",
+        "rateLimited": "Llegaste al límite de solicitudes por ahora. Espera unos minutos y vuelve a intentarlo.",
+        "invalid": "El servidor no aceptó ese texto. Prueba con un texto más largo o diferente.",
+        "server": "El servicio de IA respondió con un error. Inténtalo de nuevo en un momento."
+      }
+    },
+    "models": {
+      "title": "Modelos de contenido",
+      "subtitle": "En un CMS headless el contenido es estructurado: cada tipo define sus campos y el diseño lo pone cada canal (web, app, asistente).",
+      "typesLabel": "Tipos de contenido",
+      "entriesCount": "{n, plural, one {# entrada} other {# entradas}}",
+      "apiId": "ID de API",
+      "route": "Ruta en el sitio",
+      "addField": "Agregar campo",
+      "adminOnly": "Solo Administración puede cambiar los modelos. Usa «Ver como» para probarlo.",
+      "col": {
+        "field": "Campo",
+        "apiId": "ID de API",
+        "kind": "Tipo",
+        "required": "Obligatorio",
+        "localized": "Traducible",
+        "actions": "Acciones"
+      },
+      "custom": "propio",
+      "yes": "Sí",
+      "no": "No",
+      "removeField": "Quitar campo",
+      "fieldRemoved": "Campo quitado del modelo y de sus entradas.",
+      "headlessNote": "Los campos base de la demo no se pueden borrar; los que agregues aparecen en el editor, en la vista previa (información adicional) y en el JSON de la API.",
+      "addTitle": "Agregar campo a «{type}»",
+      "labelEs": "Nombre del campo (español)",
+      "labelEn": "Nombre del campo (inglés, opcional)",
+      "labelPlaceholder": "Ej.: Parqueadero",
+      "idPreview": "ID de API: {id}",
+      "idTaken": "Ya existe un campo con el ID {id}.",
+      "kind": "Tipo de campo",
+      "required": "Obligatorio para publicar",
+      "localized": "Traducible (un valor por idioma)",
+      "requiredWarn": "Las entradas existentes de este tipo no se podrán enviar ni publicar hasta que completen este campo.",
+      "save": "Agregar",
+      "cancel": "Cancelar",
+      "fieldAdded": "Campo «{name}» agregado: ya aparece en el editor y en la API."
+    },
+    "publishing": {
+      "title": "Publicación",
+      "subtitle": "Cola editorial, publicaciones programadas y avisos (webhooks) a tus canales.",
+      "emptyColumn": "Nada por aquí.",
+      "approve": "Aprobar",
+      "approvedToast": "Entrada aprobada.",
+      "publishNow": "Publicar ahora",
+      "publishedToast": "Entrada publicada.",
+      "scheduledAt": "{date} · {rel}",
+      "by": "{name} · {date}",
+      "blocked": "Tiene campos pendientes: ábrela para corregirlos.",
+      "writerNote": "Con el rol Redacción ves la cola, pero aprobar y publicar es de Edición. Usa «Ver como» para cambiar de persona.",
+      "webhooksTitle": "Webhooks al publicar",
+      "targets": {
+        "site": {
+          "name": "Sitio web",
+          "desc": "Regenera las páginas afectadas (revalidación)."
+        },
+        "app": {
+          "name": "App",
+          "desc": "Avisa a la app para que actualice su contenido."
+        },
+        "assistant": {
+          "name": "Asistente",
+          "desc": "Reindexa las preguntas frecuentes que el asistente puede citar."
+        }
+      },
+      "hookOn": "Webhook activado.",
+      "hookOff": "Webhook desactivado: ya no se avisará a ese canal.",
+      "adminOnly": "Solo Administración puede activar, desactivar o reenviar webhooks.",
+      "deliveriesTitle": "Entregas recientes",
+      "deliveriesEmpty": "Aún no hay entregas. Publica o despublica una entrada para verlas aquí.",
+      "col": {
+        "time": "Hora",
+        "event": "Evento",
+        "target": "Destino",
+        "entry": "Entrada",
+        "paths": "Rutas",
+        "result": "Resultado",
+        "actions": "Acciones"
+      },
+      "events": {
+        "entry": {
+          "published": "Publicación",
+          "unpublished": "Despublicación",
+          "deleted": "Eliminación"
+        }
+      },
+      "auto": "por programación",
+      "resent": "reenviado",
+      "simulatedOk": "200 · simulado",
+      "resend": "Reenviar",
+      "resentToast": "Entrega reenviada (simulada).",
+      "simulatedNote": "Simulado: en la demo no se envía nada a internet y los dominios son .example. En tu proyecto, al publicar se llama a la revalidación de tu sitio, a tu app y al reindexado de tu asistente."
+    },
+    "rolesView": {
+      "title": "Roles y permisos",
+      "subtitle": "Tres personas de ejemplo con roles distintos. Cambia de persona y prueba: los botones y las acciones respetan estos permisos.",
+      "viewAs": "Ver como esta persona",
+      "current": "Estás viendo como esta persona",
+      "switched": "Ahora ves la demo como {name}.",
+      "permission": "Permiso",
+      "yes": "Permitido",
+      "no": "No permitido",
+      "note": "En la demo, la lógica de cada acción vuelve a verificar el permiso (no basta con ocultar botones). En tu proyecto, los permisos se validan en el servidor del CMS y se integran con el inicio de sesión de tu empresa si lo necesitas."
+    },
+    "perms": {
+      "entry_create": "Crear entradas",
+      "entry_editDraft": "Editar borradores y entradas publicadas (crea un borrador)",
+      "entry_editAny": "Editar entradas en cualquier estado",
+      "entry_submit": "Enviar a revisión",
+      "entry_approve": "Aprobar o pedir cambios",
+      "entry_publish": "Publicar y programar",
+      "entry_unpublish": "Despublicar",
+      "entry_delete": "Eliminar entradas",
+      "models_manage": "Cambiar modelos de contenido",
+      "media_upload": "Subir imágenes y editar su texto alternativo",
+      "media_delete": "Eliminar imágenes",
+      "webhooks_manage": "Gestionar webhooks"
+    }
+  }
+}

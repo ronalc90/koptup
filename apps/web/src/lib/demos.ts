@@ -7,11 +7,14 @@
  * Si agregas o quitas una tarjeta en /demo, actualiza esta lista (en desarrollo,
  * /demo avisa en consola si no coinciden).
  *
- * No se cuentan:
- *  - /demo/cuentas-medicas ("Sistema experto para salud"): no tiene tarjeta en
- *    el catálogo de /demo (allí se entra con código de acceso); se enlaza
- *    directamente desde las demos destacadas de la home y desde /rag/salud.
- *  - /demo/sistema-experto: no está enlazada desde el catálogo.
+ * No se cuentan (aparecen en /demo en «Más demos», por invitación según la
+ * semilla de src/lib/demo-access-defaults.ts):
+ *  - /demo/cuentas-medicas ("Sistema experto para salud"): se enlaza también
+ *    desde las demos destacadas de la home y desde /rag/salud.
+ *  - /demo/sistema-experto.
+ *
+ * El modo de acceso de cada demo (abierta, requiere acceso o solo por
+ * invitación) lo decide el catálogo del backend (Admin › Catálogo de demos).
  */
 export const DEMO_CATALOG_SLUGS = [
   'chatbot',

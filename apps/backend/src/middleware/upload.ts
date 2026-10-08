@@ -25,7 +25,13 @@ const ALLOWED_ORDER_EXTENSIONS = [
   'rar',
 ];
 
-const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE || '10485760'); // 10MB default
+// 10MB por defecto. Multer 2.4+ rechaza al arrancar un límite que no sea un
+// entero positivo (antes un NaN desactivaba el límite sin avisar), así que un
+// valor inválido en MAX_FILE_SIZE vuelve al valor por defecto.
+const DEFAULT_MAX_FILE_SIZE = 10 * 1024 * 1024;
+const parsedMaxFileSize = Number.parseInt(process.env.MAX_FILE_SIZE || '', 10);
+const MAX_FILE_SIZE =
+  Number.isInteger(parsedMaxFileSize) && parsedMaxFileSize > 0 ? parsedMaxFileSize : DEFAULT_MAX_FILE_SIZE;
 
 // File filter
 const fileFilter = (

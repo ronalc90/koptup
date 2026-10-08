@@ -10,7 +10,14 @@ import {
   previsualizarRegla,
 } from '../controllers/reglas-facturacion.controller';
 
+import { requireStaff } from '../middleware/access';
+
 const router = Router();
+
+// Política: staff. Las reglas son globales (las usa la herramienta interna
+// /liquidacion, solo staff); un prospecto con acceso a la demo de cuentas
+// médicas no las usa y no debe poder cambiarlas para todos.
+router.use(...requireStaff);
 
 /**
  * @swagger

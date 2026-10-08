@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import { AuthRequest } from '../types';
+import { isStaffRole } from '../middleware/access';
 import Notification from '../models/Notification';
 import { createNotification } from '../utils/notifications';
 
@@ -227,7 +228,14 @@ export const createNewNotification = async (req: AuthRequest, res: Response) => 
     const userId = req.user?.id;
     const { type, title, message, actionUrl, metadata, targetUserId } = req.body;
 
-    // Si se especifica un targetUserId (para admin), usar ese; sino usar el userId del usuario autenticado
+    // Solo el staff puede crear notificaciones para otra cuenta (targetUserId);
+    // el resto solo para sí mismo.
+    if (targetUserId && String(targetUserId) !== String(userId) && !isStaffRole(req.user?.role)) {
+      return res.status(403).json({
+        success: false,
+        message: 'No tienes permiso para notificar a otro usuario',
+      });
+    }
     const notificationUserId = targetUserId || userId;
 
     if (!notificationUserId) {

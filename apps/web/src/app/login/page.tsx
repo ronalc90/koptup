@@ -15,6 +15,12 @@ import {
   ArrowRightIcon,
 } from '@heroicons/react/24/outline';
 import { FaGoogle, FaGithub } from 'react-icons/fa';
+import { homePathForRole } from '@/lib/auth-roles';
+
+/** true si `path` es una ruta interna del sitio (evita redirecciones abiertas). */
+function isSafeInternalPath(path: string): boolean {
+  return path.startsWith('/') && !path.startsWith('//') && !path.startsWith('/\\');
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -48,7 +54,8 @@ export default function LoginPage() {
       setError(t('errorGeneric'));
     }
 
-    if (redirect && redirect.startsWith('/')) {
+    // Solo rutas internas: '/algo' sí; '//dominio' o '/\\dominio' no (redirección abierta).
+    if (redirect && isSafeInternalPath(redirect)) {
       setRedirectTarget(redirect);
       sessionStorage.setItem('redirectAfterLogin', redirect);
     }
@@ -70,26 +77,26 @@ export default function LoginPage() {
         localStorage.setItem('user', JSON.stringify(user));
       }
 
-      // Detección de admin para enrutar al panel correspondiente
-      const isAdmin =
-        user?.role === 'admin' ||
-        (user?.email || '').toLowerCase() === 'admin@koptup.com';
-
+      // Vuelve a la ruta pedida (p. ej. una demo con acceso) o a la página de
+      // inicio de su rol: panel para el equipo, Mis demos para un prospecto.
       const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
-      if (redirectUrl) {
-        sessionStorage.removeItem('redirectAfterLogin');
-        router.push(redirectUrl);
-      } else if (isAdmin) {
-        router.push('/admin');
+      sessionStorage.removeItem('redirectAfterLogin');
+      if (redirectUrl && isSafeInternalPath(redirectUrl)) {
+        // Navegación completa: el servidor vuelve a decidir con la sesión
+        // nueva (p. ej. una demo que antes mostró "Solicita acceso" y que el
+        // enrutador del cliente podría tener en caché).
+        window.location.assign(redirectUrl);
       } else {
-        router.push('/dashboard');
+        router.push(homePathForRole(user?.role));
       }
     } catch (err: any) {
       // Manejo amigable de errores
       let friendlyMessage = t('errorFields');
 
       // Primero intentar obtener el mensaje amigable que ya viene del api.ts
-      if (err.message && !err.message.includes('Request failed with status code')) {
+      if (err.code === 'account_not_activated') {
+        friendlyMessage = t('errorNotActivated');
+      } else if (err.message && !err.message.includes('Request failed with status code')) {
         // Si el mensaje no es el mensaje técnico de axios, usarlo
         friendlyMessage = err.message;
       } else if (err.response?.data?.message) {

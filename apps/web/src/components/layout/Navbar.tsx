@@ -17,12 +17,14 @@ import {
   ArrowRightOnRectangleIcon,
   Squares2X2Icon,
   ChevronDownIcon,
-  PlayCircleIcon,
+  PaperAirplaneIcon,
+  KeyIcon,
 } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 import { useAutoContrast } from '@/hooks/useAutoContrast';
 import { api } from '@/lib/api';
+import { homePathForRole } from '@/lib/auth-roles';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -116,6 +118,28 @@ export default function Navbar() {
     if (href === '/') return pathname === href;
     return pathname?.startsWith(href);
   };
+
+  // Menú de la cuenta según el rol (el backend y el middleware deciden el acceso real).
+  const role: string | undefined = user?.role;
+  const userMenuItems =
+    role === 'prospect'
+      ? [
+          { href: '/dashboard/demos', label: t('nav.myDemos'), icon: KeyIcon },
+          { href: '/dashboard/profile', label: t('nav.myAccount'), icon: UserCircleIcon },
+          { href: '/contact', label: t('nav.support'), icon: LifebuoyIcon },
+        ]
+      : ['admin', 'manager', 'sales'].includes(role ?? '')
+        ? [
+            { href: homePathForRole(role), label: t('nav.adminPanel'), icon: Squares2X2Icon },
+            { href: '/dashboard/profile', label: t('nav.myAccount'), icon: UserCircleIcon },
+          ]
+        : [
+            { href: '/dashboard', label: t('nav.dashboard'), icon: Squares2X2Icon },
+            { href: '/dashboard/demos', label: t('nav.myDemos'), icon: KeyIcon },
+            { href: '/dashboard/profile', label: t('nav.myAccount'), icon: UserCircleIcon },
+            { href: '/dashboard/billing', label: t('nav.invoices'), icon: CreditCardIcon },
+            { href: '/contact', label: t('nav.support'), icon: LifebuoyIcon },
+          ];
 
 const toggleLanguage = () => {
   const current = document.cookie.split('; ').find(r => r.startsWith('locale='))?.split('=')[1] || 'es';
@@ -235,7 +259,7 @@ const toggleLanguage = () => {
                     )}
                   </div>
                   <span className="text-sm font-medium hidden lg:inline">
-                    {user?.name?.split(' ')[0] || 'Mi cuenta'}
+                    {user?.name?.split(' ')[0] || t('nav.myAccount')}
                   </span>
                   <ChevronDownIcon className="h-4 w-4" />
                 </button>
@@ -247,46 +271,27 @@ const toggleLanguage = () => {
                   >
                     <div className="p-4 border-b border-secondary-200 dark:border-secondary-800">
                       <p className="text-sm font-semibold text-secondary-900 dark:text-white truncate">
-                        {user?.name || 'Cliente'}
+                        {user?.name || t('nav.customer')}
                       </p>
                       <p className="text-xs text-secondary-500 dark:text-secondary-400 truncate">
                         {user?.email}
                       </p>
                     </div>
                     <div className="py-1">
-                      {/* TODO: extract to i18n */}
-                      <Link
-                        href="/dashboard"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2 text-sm text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800"
-                      >
-                        <Squares2X2Icon className="h-4 w-4" />
-                        Dashboard
-                      </Link>
-                      <Link
-                        href="/dashboard/profile"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2 text-sm text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800"
-                      >
-                        <UserCircleIcon className="h-4 w-4" />
-                        Mi cuenta
-                      </Link>
-                      <Link
-                        href="/dashboard/billing"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2 text-sm text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800"
-                      >
-                        <CreditCardIcon className="h-4 w-4" />
-                        Facturas
-                      </Link>
-                      <Link
-                        href="/contact"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2 text-sm text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800"
-                      >
-                        <LifebuoyIcon className="h-4 w-4" />
-                        Soporte
-                      </Link>
+                      {userMenuItems.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => setUserMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-2 text-sm text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800"
+                          >
+                            <Icon className="h-4 w-4" />
+                            {item.label}
+                          </Link>
+                        );
+                      })}
                     </div>
                     <div className="border-t border-secondary-200 dark:border-secondary-800 py-1">
                       <button
@@ -295,7 +300,7 @@ const toggleLanguage = () => {
                         className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 text-left"
                       >
                         <ArrowRightOnRectangleIcon className="h-4 w-4" />
-                        Cerrar sesión
+                        {t('nav.logout')}
                       </button>
                     </div>
                   </div>
@@ -303,18 +308,17 @@ const toggleLanguage = () => {
               </div>
             ) : (
               <>
-                {/* TODO: extract to i18n */}
                 <Button size="sm" variant="ghost" asChild>
-                  <Link href="/demo" className="flex items-center gap-1">
-                    <PlayCircleIcon className="h-4 w-4" />
-                    Probar demos
+                  <Link href="/solicitar-demo" className="flex items-center gap-1">
+                    <PaperAirplaneIcon className="h-4 w-4" />
+                    {t('nav.requestDemo')}
                   </Link>
                 </Button>
                 <Button size="sm" variant="outline" asChild>
                   <Link href="/login">{t('nav.login')}</Link>
                 </Button>
                 <Button size="sm" asChild>
-                  <Link href="/services#planes-rag">Quiero esto</Link>
+                  <Link href="/services#planes-rag">{t('nav.wantThis')}</Link>
                 </Button>
               </>
             )}
@@ -326,7 +330,7 @@ const toggleLanguage = () => {
             className="md:hidden p-2 rounded-lg transition-colors"
             style={{ color: textColor }}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label={mobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+            aria-label={mobileMenuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-menu"
           >
@@ -367,38 +371,40 @@ const toggleLanguage = () => {
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-secondary-900 dark:text-white truncate">
-                        {user?.name || 'Cliente'}
+                        {user?.name || t('nav.customer')}
                       </p>
                       <p className="text-xs text-secondary-500 dark:text-secondary-400 truncate">
                         {user?.email}
                       </p>
                     </div>
                   </div>
-                  <Button size="sm" fullWidth asChild>
-                    <Link href="/dashboard">{t('nav.dashboard')}</Link>
-                  </Button>
-                  <Button size="sm" fullWidth variant="outline" asChild>
-                    <Link href="/dashboard/billing">Facturas</Link>
-                  </Button>
+                  {userMenuItems.slice(0, 2).map((item, i) => (
+                    <Button key={item.href} size="sm" fullWidth variant={i === 0 ? 'primary' : 'outline'} asChild>
+                      <Link href={item.href} onClick={() => setMobileMenuOpen(false)}>
+                        {item.label}
+                      </Link>
+                    </Button>
+                  ))}
                   <button
                     onClick={handleLogout}
                     className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950"
                   >
                     <ArrowRightOnRectangleIcon className="h-4 w-4" />
-                    Cerrar sesión
+                    {t('nav.logout')}
                   </button>
                 </>
               ) : (
                 <>
-                  {/* TODO: extract to i18n */}
                   <Button size="sm" fullWidth variant="ghost" asChild>
-                    <Link href="/demo">Probar demos</Link>
+                    <Link href="/solicitar-demo" onClick={() => setMobileMenuOpen(false)}>
+                      {t('nav.requestDemo')}
+                    </Link>
                   </Button>
                   <Button size="sm" fullWidth variant="outline" asChild>
                     <Link href="/login">{t('nav.login')}</Link>
                   </Button>
                   <Button size="sm" fullWidth asChild>
-                    <Link href="/services#planes-rag">Quiero esto</Link>
+                    <Link href="/services#planes-rag">{t('nav.wantThis')}</Link>
                   </Button>
                 </>
               )}

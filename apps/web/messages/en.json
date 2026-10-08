@@ -37,7 +37,7 @@
     "demos": {
       "sectionBadge": "Interactive Demos",
       "sectionTitle": "Solutions for Every Industry",
-      "sectionSubtitle": "Explore {count} navigable prototypes that showcase the range of solutions we build. Two of them (RAG chatbot and LinkedIn Ads generator) use live OpenAI; the rest are interactive mockups with simulated data so you can feel how each solution would look before hiring us to build it.",
+      "sectionSubtitle": "Explore {count} navigable prototypes that showcase the range of solutions we build. Two of them (RAG chatbot and LinkedIn Ads generator) use live OpenAI; the rest are interactive mockups with simulated data so you can feel how each solution would look before hiring us to build it. Open demos need no sign-up; the ones that require access can be requested.",
       "exploreDemo": "Explore demo →",
       "ecommerce": {
         "title": "Full E-Commerce",
@@ -795,7 +795,18 @@
     "about": "About",
     "contact": "Contact",
     "login": "Sign in",
-    "dashboard": "Dashboard"
+    "dashboard": "Dashboard",
+    "requestDemo": "Request a demo",
+    "wantThis": "I want this",
+    "myAccount": "My account",
+    "customer": "Customer",
+    "myDemos": "My demos",
+    "adminPanel": "Admin panel",
+    "invoices": "Invoices",
+    "support": "Support",
+    "logout": "Sign out",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "execDashboard": {
     "menu": {
@@ -1168,7 +1179,7 @@
     "badge": "Interactive Prototypes",
     "title": "Try Our Solutions",
     "subtitle": "Explore navigable prototypes with simulated data — two of them (RAG chatbot and LinkedIn Ads) use live OpenAI",
-    "interactive": "100% Interactive - No registration",
+    "interactive": "Open demos need no sign-up; the others open with approved access",
     "includes": "Includes:",
     "tryDemo": "Try Demo",
     "chatbot": {
@@ -1253,16 +1264,16 @@
       "description": "We craft a demo tailored to your use case",
       "button": "Request Demo"
     },
-    "accessModal": {
-      "openButton": "Access with code",
-      "title": "Private Demo Access",
-      "description": "Enter the code to access the private demo",
-      "label": "Access code",
-      "placeholder": "Eg. 2020",
-      "cancel": "Cancel",
-      "access": "Access",
-      "noCodeHint": "Don't have a code? Contact our sales team.",
-      "error": "Invalid code, please try again."
+    "linkedin": {
+      "badge": "AI Marketing",
+      "title": "AI LinkedIn Generator",
+      "description": "30-day editorial plan + generation with OpenAI: posts, ad copy, carousels and screenshots ready to promote your business.",
+      "features": {
+        "0": "30-day editorial calendar planned demo by demo",
+        "1": "1-click generation with OpenAI: post + ad + carousel",
+        "2": "Real LinkedIn preview + 8 angles × 5 tones",
+        "3": "Designed PNG screenshot + photo and video of the real demo"
+      }
     }
   },
   "dashboardLayout": {
@@ -1274,7 +1285,11 @@
     "messages": "Messages",
     "myProfile": "My Profile",
     "settings": "Settings",
-    "logout": "Logout"
+    "logout": "Logout",
+    "myDemos": "My demos",
+    "backToSite": "Back to site",
+    "prospectTitle": "Prospect account",
+    "prospectBody": "Here you see the demos we approved for you. If you hire a project, you will also see orders, deliverables and invoices."
   },
   "dashboardPage": {
     "loading": "Loading dashboard...",
@@ -1443,7 +1458,8 @@
     "errorCredentials": "Email or password is incorrect. If you don't have an account, register first.",
     "errorNotFound": "We couldn't find an account with this email. Would you like to create a new account?",
     "errorNetwork": "Could not connect to the server. Please check your internet connection.",
-    "createAccount": "Create account"
+    "createAccount": "Create account",
+    "errorNotActivated": "Your account is not activated yet. Use the activation link we sent you or ask the KopTup team for a new one."
   },
   "registerPage": {
     "title": "Create Account",
@@ -1478,7 +1494,8 @@
     "backHome": "Back to home",
     "errorPasswordMismatch": "Passwords do not match.",
     "errorPasswordLength": "Password must be at least 8 characters.",
-    "errorTerms": "You must accept the terms and privacy."
+    "errorTerms": "You must accept the terms and privacy.",
+    "fromContact": "We got your message and will reply to the email you gave us. Creating an account is optional."
   },
   "aboutPage": {
     "badge": "About Us",
@@ -1627,7 +1644,9 @@
       "errorSubmit": "Error sending message. Please try again or contact us directly via WhatsApp.",
       "success": {
         "title": "Message sent!",
-        "subtitle": "Thanks for contacting us. We'll respond soon."
+        "subtitle": "Thanks for contacting us. We'll respond soon.",
+        "nextStep": "While we get back to you, you can try our RAG assistant in the demo.",
+        "nextStepCta": "Try the demo"
       }
     },
     "services": {
@@ -1814,7 +1833,8 @@
     "titleWithName": "Need a {demoName} like this?",
     "description": "We develop custom software tailored to your company's needs. Request a no-obligation quote.",
     "requestQuote": "Request Quote",
-    "viewPricing": "View Plans & Pricing"
+    "viewPricing": "View Plans & Pricing",
+    "requestGuidedDemo": "Request a guided demo"
   },
   "demoEcommerce": {
     "title": "Demo Store",
@@ -1925,23 +1945,15 @@
   },
   "profilePage": {
     "title": "My Profile",
-    "subtitle": "Manage your personal information and preferences",
+    "subtitle": "Your contact details and account security.",
     "personalInfo": "Personal Information",
     "edit": "Edit",
     "cancel": "Cancel",
     "save": "Save",
-    "changePhoto": "Change photo",
     "fullName": "Full name",
     "email": "Email",
     "phone": "Phone",
-    "companyRole": "Company role",
-    "companyInfo": "Company Information",
-    "companyName": "Company name",
-    "taxId": "Tax ID",
-    "country": "Country",
-    "address": "Address",
-    "city": "City",
-    "postalCode": "Postal code",
+    "companyName": "Company",
     "changePassword": "Change Password",
     "changePasswordDesc": "Update your password to keep your account secure",
     "currentPassword": "Current password",
@@ -1950,28 +1962,42 @@
     "newPasswordPlaceholder": "Minimum 8 characters",
     "confirmNewPassword": "Confirm new password",
     "confirmNewPasswordPlaceholder": "Confirm your new password",
-    "permissions": "Permissions",
-    "viewProjects": "View projects",
-    "createOrders": "Create orders",
-    "manageBilling": "Manage billing",
-    "inviteUsers": "Invite users",
-    "companySettings": "Company settings",
-    "notificationPrefs": "Notification Preferences",
-    "emailOrders": "Orders by email",
-    "emailProjects": "Projects by email",
-    "emailBilling": "Billing by email",
-    "emailMessages": "Messages by email",
-    "pushNotifications": "Push notifications",
-    "weeklyReport": "Weekly report",
-    "savePreferences": "Save Preferences",
-    "passwordMismatch": "Passwords do not match",
-    "passwordUpdated": "Password updated successfully",
-    "preferencesSaved": "Preferences saved",
-    "roles": {
-      "owner": "Owner",
+    "passwordMismatch": "The passwords do not match.",
+    "passwordUpdated": "Your password was updated. Use it the next time you sign in.",
+    "emailHelp": "It is your sign-in username; to change it, write to us.",
+    "phonePlaceholder": "+57 300 000 0000",
+    "notProvided": "Not provided",
+    "profileSaved": "Your details were saved.",
+    "googleAccount": "Your account signs in with Google, so it has no KopTup password to change.",
+    "account": "Your account",
+    "accountType": "Account type",
+    "signInMethod": "Sign-in",
+    "signInPassword": "Email and password",
+    "signInGoogle": "Google",
+    "memberSince": "Created on",
+    "lastLogin": "Last sign-in",
+    "accountHelp": "The KopTup team sets your account type: it defines which portal sections you see.",
+    "loading": "Loading your profile",
+    "loadError": "We couldn't load your profile. Check your connection and try again.",
+    "retry": "Retry",
+    "accountRoles": {
       "admin": "Administrator",
-      "member": "Member",
-      "viewer": "Viewer"
+      "manager": "Manager",
+      "sales": "Sales",
+      "developer": "Development",
+      "prospect": "Prospect (demos)",
+      "client": "Client",
+      "user": "User"
+    },
+    "errors": {
+      "name": "Enter your name (at least 2 characters).",
+      "phone": "Enter a valid phone number (digits, spaces and + only).",
+      "save": "We couldn't save your details. Please try again.",
+      "currentRequired": "Enter your current password.",
+      "passwordShort": "The new password must be at least {min} characters long.",
+      "wrongPassword": "The current password is not correct.",
+      "tooMany": "Too many attempts. Wait a minute and try again.",
+      "passwordSave": "We couldn't change the password. Please try again."
     }
   },
   "ordersPage": {
@@ -2628,7 +2654,7 @@
     "q5q": "Do you offer maintenance after delivering the project?",
     "q5a": "Yes. We offer monthly maintenance and support plans. We also evolve the product according to your business needs. We don't leave you alone after launch.",
     "q6q": "Can I see examples of KopTup's work?",
-    "q6a": "Yes. We have {count} navigable prototypes at www.koptup.com/demo — two of them (RAG chatbot and LinkedIn Ads generator) use live OpenAI; the rest are interactive mockups with simulated data so you can see how each solution would look before hiring us. No registration or credit card needed.",
+    "q6a": "Yes. We have {count} navigable prototypes at www.koptup.com/demo — two of them (RAG chatbot and LinkedIn Ads generator) use live OpenAI; the rest are interactive mockups with simulated data so you can see how each solution would look before hiring us. Open demos need no registration or credit card; the ones that require access can be requested at www.koptup.com/solicitar-demo.",
     "ctaTitle": "Ready to develop your project?",
     "ctaSubtitle": "Tell us what you need. We respond within 24 hours with a personalized proposal.",
     "ctaButton": "Request Free Quote"
@@ -2947,5 +2973,533 @@
       "title": "Swimlanes",
       "subtitle": "Tasks grouped by owner"
     }
+  },
+  "demoAccessBadge": {
+    "publico": "Open",
+    "solicitud": "Access required",
+    "privado": "Invitation only",
+    "inactiva": "Under maintenance"
+  },
+  "demoHub": {
+    "legend": "How each demo opens",
+    "requestDemo": "Request a demo",
+    "open": "Open demo",
+    "requestAccess": "Request access",
+    "requestCustom": "Request a custom demo",
+    "requestGuided": "Request a guided demo",
+    "login": "I have access: sign in",
+    "preview": "See details",
+    "maintenance": "Under maintenance",
+    "daysLeft": "{days, plural, =0 {Expires today} one {# day left} other {# days left}}",
+    "moreTitle": "More demos",
+    "moreSubtitle": "Demos for specific cases that are not in the main catalog. Each one shows how it opens.",
+    "myDemos": "I have access: My demos"
+  },
+  "demoAccess": {
+    "metaTitle": "{name}: access",
+    "checking": "Checking your access…",
+    "allowed": "You have access to this demo.",
+    "allowedDays": "You have access to this demo. {days, plural, =0 {It expires today.} one {# day left.} other {# days left.}}",
+    "status": {
+      "sin_sesion": "Not signed in",
+      "sin_acceso": "No access",
+      "expirado": "Access expired",
+      "revocado": "Access removed",
+      "desactivada": "Under maintenance",
+      "no_disponible": "Could not verify"
+    },
+    "message": {
+      "sin_sesion": {
+        "solicitud": "You need approved access to use this demo. Request it and, if we approve it, we will send you a link to get in. If you already have access, sign in.",
+        "privado": "This demo only opens with an invitation from the KopTup team. Request a custom demo; if we already invited you, sign in."
+      },
+      "sin_acceso": {
+        "solicitud": "Your account doesn't have access to this demo yet. Request it and we'll review it.",
+        "privado": "Your account doesn't have an invitation for this demo. Request a custom demo and we'll review it."
+      },
+      "expirado": "Your access to this demo has expired. Ask for more time and we will review it.",
+      "expiradoFecha": "Your access to this demo expired on {date}. Ask for more time and we will review it.",
+      "revocado": "Your access to this demo was removed. If you think it's a mistake, write to us or request it again.",
+      "desactivada": "This demo is under maintenance right now. Come back later or explore the other demos.",
+      "no_disponible": "We couldn't verify your access right now because the service didn't respond. Please try again in a few minutes."
+    },
+    "cta": {
+      "open": "Open the demo",
+      "requestAccess": "Request access",
+      "requestCustom": "Request a custom demo",
+      "login": "I have access: sign in",
+      "myDemos": "See my demos",
+      "moreTime": "Ask for more time",
+      "requestAgain": "Request it again",
+      "contact": "Write to us",
+      "otherDemos": "See other demos",
+      "requestGuided": "Request a guided demo",
+      "retry": "Try again",
+      "allDemos": "See all demos"
+    },
+    "previewTitle": "Preview",
+    "previewNote": "This is how we describe this demo in the KopTup catalog.",
+    "preview": {
+      "cuentasMedicas": {
+        "title": "Healthcare expert system",
+        "description": "Audits medical claims with rules, CUPS and ICD-10 codes and fee schedules, and flags potential denials. AI extracts the invoice data.",
+        "features": {
+          "0": "Audit rules with CUPS and ICD-10 codes",
+          "1": "Fee schedules and potential-denial flags",
+          "2": "AI extraction of invoice data"
+        }
+      },
+      "sistemaExperto": {
+        "title": "Medical audit expert system",
+        "description": "Medical audit dashboard with CUPS code search and rules-engine configuration.",
+        "features": {
+          "0": "Dashboard with audit statistics",
+          "1": "CUPS code search",
+          "2": "Rules-engine configuration"
+        }
+      }
+    }
+  },
+  "requestDemo": {
+    "title": "Request a demo",
+    "subtitle": "Choose the demos you are interested in and tell us about your case. We review your request and, if we approve it, send you a link to get in.",
+    "breadcrumbHome": "Home",
+    "form": {
+      "sectionDemos": "Demos you are interested in",
+      "demosHelp": "Choose one or more (up to {max}). Those marked “Access required” or “Invitation only” open only if we approve your request.",
+      "sectionYou": "About you and your case",
+      "name": "Name",
+      "namePlaceholder": "Your full name",
+      "company": "Company",
+      "companyPlaceholder": "Your company name",
+      "jobTitle": "Job title",
+      "jobTitlePlaceholder": "e.g. Operations manager",
+      "optional": "(optional)",
+      "email": "Email",
+      "emailPlaceholder": "you@company.com",
+      "phone": "Phone or WhatsApp",
+      "phonePlaceholder": "+57 300 000 0000",
+      "phoneHelp": "If you add it, we can send your access link via WhatsApp.",
+      "country": "Country",
+      "countryPlaceholder": "Choose your country",
+      "size": "Company size",
+      "sizeOption": "{size} people",
+      "useCase": "Use case",
+      "useCasePlaceholder": "e.g. we have 2 warehouses and track inventory in Excel today…",
+      "useCaseHint": "Don't include patient data or confidential information.",
+      "honeypot": "Website (leave this field empty)",
+      "consent": "I authorize KopTup to process my personal data to handle this request and contact me about it, under the <link>Data processing policy</link> (Colombian Law 1581 of 2012).",
+      "required": "Required",
+      "submit": "Send request",
+      "submitting": "Sending…"
+    },
+    "errors": {
+      "demos": "Choose at least one demo.",
+      "nombre": "Enter your name.",
+      "empresa": "Enter your company name.",
+      "email": "Enter a valid email.",
+      "telefono": "Enter a valid phone number (digits, spaces and + only).",
+      "pais": "Choose your country.",
+      "tamanoEmpresa": "Choose your company size.",
+      "casoDeUso": "Tell us briefly what you want to solve (at least {min} characters).",
+      "consentimiento": "You must authorize the processing of your data to send the request.",
+      "checkFields": "Please review the highlighted fields.",
+      "rateLimited": "We received several requests from your connection or with this email. Please try again later or message us on WhatsApp.",
+      "invalidField": "Please review this field.",
+      "unknownDemo": "One of the chosen demos no longer exists. Remove it and try again.",
+      "generic": "We couldn't send your request. Please try again in a few minutes.",
+      "network": "We couldn't reach the server. Check your connection and try again."
+    },
+    "aside": {
+      "title": "What happens next",
+      "step1Title": "We review your request",
+      "step1Body": "Someone from the KopTup team reviews it during business hours (Monday to Friday, Colombia time).",
+      "step2Title": "We send you your access link",
+      "step2Body": "If we approve it, you get a single-use link to create your password: by email or, if you leave your phone, via WhatsApp.",
+      "step3Title": "You open My demos",
+      "step3Body": "There you see the approved demos and how many days of access you have left.",
+      "talkTitle": "Rather talk now?",
+      "talkBody": "Message us on WhatsApp and we will reply during business hours.",
+      "whatsappCta": "Message us on WhatsApp",
+      "whatsappText": "Hi, I'd like a KopTup demo.",
+      "privacy": "We only use your data to handle this request. You can ask us to update or delete it at any time."
+    },
+    "success": {
+      "title": "We received your request",
+      "code": "Your code is <mono>{code}</mono>. Keep it in case you write to us.",
+      "merged": "We already had a request from you under review: we added the demos you chose.",
+      "emailNote": "We will write to {email}.",
+      "nextTitle": "What happens now",
+      "step1Title": "Request received",
+      "step1Body": "It was recorded together with your data authorization.",
+      "step2Title": "Team review",
+      "step2Body": "We review it during business hours (Monday to Friday, Colombia time).",
+      "step3Title": "Access to your demos",
+      "step3Body": "If we approve it, we send you a single-use link to create your password and open My demos.",
+      "ragTitle": "Meanwhile, try the RAG assistant demo",
+      "ragBody": "AI that answers from documents and cites the source. No sign-up needed.",
+      "ragCta": "Try the demo",
+      "home": "Back to home"
+    }
+  },
+  "activate": {
+    "metaTitle": "Activate your access",
+    "checking": "Checking your link…",
+    "title": "Hi, {name}",
+    "subtitle": "Create your password to activate your account ({email}) and open your demos.",
+    "expires": "This link is single-use (expires on {date}).",
+    "password": "Password",
+    "passwordHelp": "Use at least {min} characters.",
+    "confirm": "Confirm password",
+    "show": "Show password",
+    "hide": "Hide password",
+    "submit": "Activate my access",
+    "done": "Your account is active. Taking you to My demos…",
+    "errors": {
+      "short": "The password must have at least {min} characters.",
+      "long": "The password can have at most {max} characters.",
+      "mismatch": "The passwords don't match."
+    },
+    "errorTitles": {
+      "token_invalid": "This link is not valid",
+      "token_used": "This link was already used",
+      "token_replaced": "This link was replaced",
+      "token_expired": "This link has expired",
+      "rate_limited": "Too many attempts",
+      "network": "No connection to the server",
+      "generic": "We couldn't activate your account"
+    },
+    "errorBodies": {
+      "token_invalid": "Make sure you copied it completely. If the problem persists, ask the KopTup team for a new link.",
+      "token_used": "If you already created your password, sign in to see your demos.",
+      "token_replaced": "A newer link was generated for your account: use the latest one you received or ask for a new one.",
+      "token_expired": "Activation links expire after 72 hours. Ask the KopTup team for a new one.",
+      "rate_limited": "Wait a minute and try again.",
+      "network": "Check your connection and try again.",
+      "generic": "Please try again in a few minutes."
+    },
+    "login": "Sign in",
+    "retry": "Try again",
+    "askNewLink": "Ask for a new link on WhatsApp",
+    "whatsappText": "Hi, I need a new link to activate my access to the KopTup demos.",
+    "home": "Back to home"
+  },
+  "myDemos": {
+    "title": "My demos",
+    "titleWithName": "Hi, {name}. These are your demos",
+    "subtitle": "The demos we approved for you, with the days of access you have left.",
+    "welcome": "Your account is active. You can now open your demos.",
+    "loadError": "We couldn't load your demos.",
+    "retry": "Retry",
+    "loading": "Loading your demos",
+    "emptyTitle": "You don't have demos yet",
+    "emptyBody": "Request a demo and, if we approve it, it will show up here with its access time.",
+    "requestDemo": "Request a demo",
+    "status": {
+      "activa": "Active",
+      "pronto": "Expires soon",
+      "vencida": "Expired",
+      "revocada": "Removed",
+      "mantenimiento": "Under maintenance"
+    },
+    "daysLeft": "{days, plural, =0 {Expires today} one {# day left} other {# days left}}",
+    "revoked": "This access was removed.",
+    "ended": "Ended on {date}",
+    "expiresOn": "Expires on {date}",
+    "lastAccess": "Last opened: {date}",
+    "neverOpened": "You haven't opened it yet",
+    "maintenance": "The demo is under maintenance; your access is still valid.",
+    "open": "Open demo",
+    "moreTime": "Ask for more time",
+    "requestAgain": "Request it again",
+    "otherTitle": "Interested in another solution?",
+    "otherBody": "Request access to another demo and we will review it.",
+    "otherCta": "Request another demo",
+    "dataNote": "Demos use sample data unless the demo says otherwise. Don't upload confidential information.",
+    "allDemos": "The open demos in the <link>catalog</link> remain available without a request."
+  },
+  "adminLayout": {
+    "brand": "Admin",
+    "groupCommercial": "Sales",
+    "groupOperations": "Operations",
+    "home": "Home",
+    "demoRequests": "Demo requests",
+    "demoGrants": "Demo access",
+    "demoCatalog": "Demo catalog",
+    "orders": "Orders",
+    "deliverables": "Deliverables",
+    "invoices": "Invoices",
+    "conversations": "Conversations",
+    "users": "Users",
+    "contacts": "Contacts",
+    "settings": "Settings",
+    "viewSite": "View site",
+    "logout": "Sign out",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "roles": {
+      "admin": "Administrator",
+      "manager": "Manager",
+      "sales": "Sales",
+      "other": "Team"
+    }
+  },
+  "adminDemos": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "save": "Save",
+    "add": "Add",
+    "refresh": "Refresh",
+    "search": "Search",
+    "loading": "Loading…",
+    "loadError": "Couldn't load the information. Check your session and try again.",
+    "actionError": "Couldn't complete the action. Please try again.",
+    "all": "All",
+    "allDemos": "All demos",
+    "filterDemo": "Filter by demo",
+    "actions": "Actions",
+    "view": "View",
+    "prev": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {pages} · {total} total",
+    "readOnly": "Your role can only view this section.",
+    "days": "days",
+    "daysShort": "{days} days",
+    "customDays": "Another number of days",
+    "daysLeftShort": "{days, plural, =0 {expires today} one {# day left} other {# days left}}",
+    "people": "{size} people",
+    "requestStatus": {
+      "pendiente": "Pending",
+      "en_revision": "In review",
+      "aprobada": "Approved",
+      "rechazada": "Rejected"
+    },
+    "grantStatus": {
+      "activo": "Active",
+      "por_vencer": "Expiring",
+      "expirado": "Expired",
+      "revocado": "Revoked"
+    },
+    "accountStatus": {
+      "invitado": "Not activated",
+      "activo": "Active"
+    },
+    "notice": {
+      "sent": "Sent",
+      "notSent": "Not sent"
+    },
+    "rejectReasons": {
+      "spam": "Spam",
+      "fuera_de_perfil": "Out of profile",
+      "datos_invalidos": "Invalid data",
+      "duplicada": "Duplicate",
+      "otro": "Other"
+    },
+    "audit": {
+      "demo_request": {
+        "update": "Request updated",
+        "approve": "Request approved",
+        "reject": "Request rejected"
+      },
+      "demo_grant": {
+        "create": "Access granted",
+        "extend": "Access extended",
+        "revoke": "Access revoked",
+        "resend_activation": "New activation link"
+      },
+      "demo_catalog": {
+        "update": "Catalog updated"
+      },
+      "user": {
+        "activate": "Account activated",
+        "role_change": "Role changed"
+      }
+    },
+    "requests": {
+      "title": "Demo requests",
+      "subtitle": "What comes in from the “Request a demo” form. Approve them to create the access and the activation link.",
+      "searchPlaceholder": "Search by name, company, email, code or use case",
+      "colCode": "Code · Received",
+      "colPerson": "Person",
+      "colCountry": "Country · Size",
+      "colDemos": "Demos",
+      "colStatus": "Status",
+      "review": "Review",
+      "empty": "No requests match these filters.",
+      "footer": "Requests come from the <link>public form</link>; the team gets an email or WhatsApp notice if those are configured."
+    },
+    "detail": {
+      "received": "Received on {date}",
+      "resubmitted": "{count, plural, one {the person resubmitted the form # time} other {the person resubmitted the form # times}}",
+      "markReview": "Mark as in review",
+      "email": "Email",
+      "phone": "Phone",
+      "whatsapp": "WhatsApp",
+      "whatsappGreeting": "Hi {name}, this is KopTup about your demo request {code}.",
+      "country": "Country",
+      "size": "Size",
+      "origin": "Source page",
+      "useCase": "Use case and requested demos",
+      "consent": "Data authorization",
+      "consentGiven": "Authorized the processing of their data (Colombian Law 1581 of 2012) on {date} · policy {version}.",
+      "consentMissing": "No authorization recorded.",
+      "notices": "Notices",
+      "noticeTeamEmail": "Team notice by email",
+      "noticeTeamWhatsapp": "Team notice by WhatsApp",
+      "noticeAck": "Acknowledgment to requester",
+      "noticeDecision": "Decision email",
+      "notes": "Internal notes",
+      "noNotes": "No notes yet.",
+      "byRequester": "The requester",
+      "addNote": "Add note",
+      "addNotePlaceholder": "Internal note (only the team sees it)…",
+      "history": "History",
+      "noHistory": "No team actions yet.",
+      "approveTab": "Approve",
+      "rejectTab": "Reject",
+      "demosToGrant": "Demos to grant",
+      "privateAdminOnly": "“Invitation only” demos are approved by an administrator.",
+      "addDemo": "Add another demo…",
+      "validity": "Access validity",
+      "expiresOn": "Expires on {date}",
+      "internalNote": "Internal note",
+      "internalNoteHint": "(only the team sees it)",
+      "messageToProspect": "Message to the person",
+      "messageHint": "(goes in the email, if SMTP is set up)",
+      "approveSummaryNew": "The person's account will be created (not activated) with {count, plural, one {# access} other {# accesses}} of {days} days, plus a single-use activation link that expires in 72 hours.",
+      "approveSummaryExisting": "The person already has an account: {count, plural, one {# access} other {# accesses}} of {days} days will be added.",
+      "approveButton": "Approve and generate the link",
+      "approved": "Request approved.",
+      "rejectReason": "Reason",
+      "rejectDetail": "Reason details (internal)",
+      "notify": "Notify the person by email",
+      "notifyHint": "Only if SMTP is set up. The reason is internal: the email carries the message below or a generic text. Spam is never notified.",
+      "rejectMessage": "Message to the person (optional)",
+      "rejectButton": "Reject request",
+      "rejected": "Request rejected.",
+      "rejectedTitle": "Rejection reason",
+      "grantsTitle": "This person's access",
+      "account": "Account: {email} · {status}",
+      "newLink": "Generate a new activation link",
+      "newLinkHint": "The account is not activated yet. A new link invalidates the previous ones.",
+      "linkIssued": "New link generated.",
+      "manageGrants": "Manage access"
+    },
+    "link": {
+      "activationTitle": "Activation link",
+      "activationHelp": "It's single-use (expires on {date}). Copy it or send it via WhatsApp: it won't be shown again (you can generate a new one).",
+      "loginTitle": "The person already has an account",
+      "loginHelp": "Nothing to activate: share this link so they sign in and see their demos.",
+      "linkLabel": "Link to share",
+      "copy": "Copy",
+      "copiedShort": "Copied",
+      "copied": "Link copied to the clipboard.",
+      "copyFailed": "Couldn't copy: select the link and copy it manually.",
+      "whatsapp": "Send via WhatsApp",
+      "noPhone": "No phone on file: copy the link and send it however you prefer.",
+      "emailSent": "It was also sent by email.",
+      "emailPending": "The email is still being sent.",
+      "emailFailed": "The email couldn't be sent: share the link.",
+      "emailNotConfigured": "Email is not configured on the server: share the link yourself.",
+      "whatsappActivation": "Hi {name}, we approved your access to {demos} at KopTup. Create your password and get in with this link (single-use, expires on {date}): {url}",
+      "whatsappLogin": "Hi {name}, we approved your access to {demos} at KopTup. Sign in with your account and open them from My demos: {url}"
+    },
+    "grants": {
+      "title": "Demo access",
+      "subtitle": "Each access is one demo granted to one person, with its validity and real usage.",
+      "invite": "Grant access",
+      "kpi": {
+        "activo": "Active",
+        "por_vencer": "Expiring (3 days or less)",
+        "expirado": "Expired",
+        "revocado": "Revoked"
+      },
+      "tabs": {
+        "activo": "Active",
+        "por_vencer": "Expiring",
+        "expirado": "Expired",
+        "revocado": "Revoked"
+      },
+      "searchPlaceholder": "Search by name, email or company",
+      "colPerson": "Person",
+      "colDemo": "Demo",
+      "colStatus": "Status",
+      "colExpires": "Expires",
+      "colLastAccess": "Last opened",
+      "colVisits": "Visits",
+      "empty": "No access matches these filters.",
+      "never": "Never",
+      "deletedAccount": "Deleted account",
+      "extend": "Extend",
+      "revoke": "Revoke",
+      "newLink": "Activation link",
+      "viewRequest": "View request",
+      "extendTitle": "Extend {demo} · {name}",
+      "currentExpiry": "Currently expires on {date}.",
+      "newExpiry": "New date: {date}",
+      "extended": "Access extended.",
+      "revokeTitle": "Revoke {demo} · {name}",
+      "revokeHelp": "The person can no longer open the demo right away (the server checks on every visit). It is recorded in the audit log.",
+      "revokeReason": "Reason (optional, internal)",
+      "revoked": "Access revoked.",
+      "inviteTitle": "Grant direct access",
+      "inviteHelp": "To grant access without a prior request. If the email has no account, a non-activated one is created and its activation link is generated.",
+      "inviteEmail": "Email",
+      "inviteName": "Name",
+      "inviteNameHint": "Required if the person doesn't have an account.",
+      "inviteCompany": "Company",
+      "invitePhone": "Phone or WhatsApp",
+      "inviteDemos": "Demos",
+      "inviteSubmit": "Grant access",
+      "invited": "Access granted.",
+      "inviteEmailError": "Enter a valid email.",
+      "inviteDemosError": "Choose at least one demo."
+    },
+    "catalog": {
+      "title": "Demo catalog",
+      "subtitle": "Access mode, status and default validity of the {count} demos.",
+      "info": "Changes take effect on the site within a minute and are recorded in the audit log with your user.",
+      "modesHelp": "“Open”: anyone can open it. “Access required”: only with approved access. “Invitation only”: only with an administrator invitation, and it is not listed as open in /demo. Deactivated: shows “Under maintenance” (the team can still open it).",
+      "filter": {
+        "todas": "All",
+        "publico": "Open",
+        "solicitud": "Access required",
+        "privado": "Invitation only",
+        "inactivas": "Deactivated"
+      },
+      "mode": {
+        "publico": "Open",
+        "solicitud": "Access required",
+        "privado": "Invitation only"
+      },
+      "colDemo": "Demo",
+      "colMode": "Access mode",
+      "colActive": "Active",
+      "colDuration": "Default validity",
+      "colUpdated": "Last change",
+      "fixedPublic": "Always open (ad landing destination)",
+      "saved": "Saved “{name}”.",
+      "openDemo": "Open {name} in a new tab",
+      "readOnly": "Only an administrator can edit the catalog."
+    }
+  },
+  "adminDashboard": {
+    "title": "Panel home",
+    "subtitle": "Demo requests, access and contacts with the real data from the system.",
+    "kpi": {
+      "pending": "Requests to review",
+      "activeGrants": "Active access",
+      "expiring": "Access expiring (3 days)",
+      "newContacts": "Unread contacts"
+    },
+    "quickLinks": "Shortcuts",
+    "latestRequests": "Latest demo requests",
+    "latestContacts": "Latest contacts received",
+    "viewAll": "View all",
+    "loading": "Loading…",
+    "loadError": "Couldn't load this information.",
+    "noRequests": "No demo requests yet.",
+    "noContacts": "No contacts yet.",
+    "note": "Figures come from the backend right now; “—” means the data could not be loaded."
   }
 }

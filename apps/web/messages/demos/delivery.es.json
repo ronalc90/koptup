@@ -1,261 +1,841 @@
 {
   "demoDelivery": {
     "meta": {
-      "title": "App de Delivery",
-      "subtitle": "Plataforma multi-rol: Customer, Driver, Merchant y Operaciones con tracking en vivo, pagos in-app y routing ML.",
-      "demo": "Demo interactivo"
+      "title": "App de domicilios",
+      "badge": "Demo interactiva",
+      "subtitle": "Tu propio canal de domicilios en 4 apps conectadas: el pedido que haces como cliente llega a la sede, a operaciones y al repartidor, y la entrega con código lo cierra en todas.",
+      "sampleData": "Datos de ejemplo",
+      "sampleDataHint": "Marca, sedes, clientes, repartidores, pedidos y cifras son ficticios. Pagos, mensajes de WhatsApp, llamadas, GPS y mapa son simulados.",
+      "footer": "Demo con datos de ejemplo de una marca ficticia (Fogón Demo) con 3 sedes en Bogotá. Los pagos con Nequi, Daviplata, PSE o tarjeta, el mensaje de WhatsApp, la llamada enmascarada, la posición del repartidor y el mapa son simulados: en tu proyecto se conectan con la pasarela de pagos, WhatsApp Business, un proveedor de telefonía, el GPS del celular del repartidor y un servicio de mapas (p. ej. Google Maps o Mapbox). Lo que haces se guarda solo en este navegador.",
+      "seoTitle": "App de domicilios: cliente, sede, operaciones y repartidor",
+      "seoDescription": "Demo interactiva de un canal propio de domicilios con datos de ejemplo: pedido con pago simulado, aceptación en la sede, asignación del repartidor más cercano, entrega con código y reportes de tiempos calculados. Mapa y seguimiento simulados.",
+      "breadcrumbHome": "Inicio",
+      "breadcrumbDemos": "Demos"
     },
     "tabs": {
+      "label": "Apps de la demo",
       "customer": "Cliente",
-      "driver": "Repartidor",
       "merchant": "Comercio",
-      "ops": "Operaciones"
+      "ops": "Operaciones",
+      "driver": "Repartidor",
+      "count": {
+        "customer": "{n, plural, one {# producto en el carrito} other {# productos en el carrito}}",
+        "merchant": "{n, plural, one {# pedido por aceptar} other {# pedidos por aceptar}}",
+        "ops": "{n, plural, one {# alerta} other {# alertas}}",
+        "driver": "{n, plural, one {# oferta de pedido} other {# ofertas de pedido}}"
+      }
+    },
+    "controls": {
+      "autoOn": "Avance automático: activo",
+      "autoOff": "Avance automático",
+      "autoHint": "Simula a la sede, a operaciones y al repartidor: tu pedido avanza solo un paso cada 4 segundos.",
+      "autoOnToast": "Avance automático activado: tu pedido avanzará solo",
+      "autoOffToast": "Avance automático desactivado",
+      "reset": "Reiniciar demo",
+      "resetHint": "Vuelve a los datos de ejemplo iniciales",
+      "resetTitle": "¿Reiniciar la demo?",
+      "resetBody": "Se borran {n, plural, =0 {los cambios que hiciste} one {tu pedido y los cambios que hiciste} other {tus # pedidos y los cambios que hiciste}}, y vuelve la jornada de ejemplo de las 7:05 p. m.",
+      "resetConfirm": "Reiniciar",
+      "resetToast": "Demo reiniciada"
+    },
+    "tour": {
+      "title": "Recorrido sugerido: un pedido de punta a punta",
+      "show": "Ver recorrido sugerido ({done}/{total})",
+      "hide": "Ocultar",
+      "steps": {
+        "order": "Pide y paga (simulado)",
+        "accept": "Acepta el pedido antes de 45 s",
+        "assign": "Asigna al repartidor más cercano",
+        "deliver": "Recoge y entrega con el código",
+        "rate": "Califica la entrega"
+      },
+      "next": {
+        "order": "Empieza en Cliente: agrega platos al carrito y haz el pedido.",
+        "accept": "Siguiente: en Comercio acepta el pedido {id} antes de que se acaben los 45 s.",
+        "assign": "Siguiente: en Operaciones asigna un repartidor al pedido {id} (Despacho o Alertas).",
+        "deliver": "Siguiente: en Comercio marca el pedido {id} «Listo para recoger»; luego, en Repartidor, acepta la oferta, recógelo y confirma la entrega con el código que ve el cliente.",
+        "rate": "Siguiente: en Cliente califica la entrega del pedido {id}."
+      },
+      "done": "¡Listo! Recorriste el pedido en las 4 apps. En Operaciones mira los tiempos por etapa y la comisión que no pagaste.",
+      "failed": "El pedido {id} fue rechazado o cancelado. Haz otro pedido en Cliente para seguir el recorrido.",
+      "here": "Este paso se hace en la app que estás viendo: {step}.",
+      "doneHere": "Este paso ya está hecho."
+    },
+    "activity": {
+      "title": "Actividad entre apps",
+      "hint": "Cada acción en una app se refleja en las demás. El reloj de la demo empezó a las 7:05 p. m. y avanza en tiempo real.",
+      "clockHint": "Reloj de la demo",
+      "empty": "Aquí verás cómo tu pedido pasa de una app a otra.",
+      "app": {
+        "customer": "Cliente",
+        "merchant": "Comercio",
+        "ops": "Operaciones",
+        "driver": "Repartidor",
+        "system": "Demo"
+      }
+    },
+    "log": {
+      "orderPlaced": "Pedido {id} enviado a la {sede} · {method}",
+      "accepted": "La {sede} aceptó {id} · listo en {min} min",
+      "acceptedByOps": "Operaciones aceptó {id} en nombre de la sede ({min} min)",
+      "rejected": "La {sede} rechazó {id}: {reason}",
+      "ready": "{id} listo para recoger en la {sede}",
+      "assigned": "Oferta de {id} enviada a {driver}",
+      "reassigned": "{id} reasignado a {driver}",
+      "driverAccepted": "{driver} aceptó {id}",
+      "driverRejected": "{driver} rechazó {id}: {reason}",
+      "pickedUp": "{id} recogido: va en camino",
+      "delivered": "{id} entregado ({method})",
+      "cancelled": "{id} cancelado: {reason}",
+      "rated": "El cliente calificó {id} con {stars} estrellas",
+      "lateNotified": "Operaciones avisó al cliente del retraso de {id}",
+      "soldOut": "La {sede} agotó «{item}»",
+      "available": "La {sede} reactivó «{item}»",
+      "sedeClosed": "La {sede} cerró: no recibe pedidos",
+      "sedeOpened": "La {sede} abrió",
+      "surchargeOn": "Recargo por lluvia activado para pedidos nuevos",
+      "surchargeOff": "Recargo por lluvia desactivado",
+      "bonusOn": "Bono por lluvia para repartidores activado",
+      "bonusOff": "Bono por lluvia desactivado",
+      "alertBlocked": "Revisión «{alert}»: bloqueo aplicado",
+      "alertDismissed": "Revisión «{alert}»: descartada",
+      "unblocked": "Cuenta desbloqueada",
+      "driverOnline": "{driver} se conectó",
+      "driverOffline": "{driver} se desconectó",
+      "docUpdated": "Documento actualizado: {doc}",
+      "autoOn": "Avance automático activado",
+      "autoOff": "Avance automático desactivado"
     },
     "common": {
       "back": "Volver",
-      "next": "Continuar",
-      "confirm": "Confirmar",
       "cancel": "Cancelar",
-      "accept": "Aceptar",
-      "reject": "Rechazar",
-      "online": "En línea",
-      "offline": "Desconectado",
-      "min": "min",
-      "km": "km",
-      "from": "Desde",
       "save": "Guardar",
-      "search": "Buscar",
-      "viewAll": "Ver todo"
+      "close": "Cerrar",
+      "min": "min",
+      "less": "Quitar uno",
+      "more": "Agregar uno",
+      "copy": "Copiar",
+      "copied": "Copiado al portapapeles",
+      "copyFailed": "No se pudo copiar: selecciona el texto y cópialo a mano",
+      "understood": "Entendido",
+      "yours": "Tuyo",
+      "yes": "sí",
+      "no": "no",
+      "mapHint": "Mapa ilustrativo, no a escala · posición simulada",
+      "mapHintOps": "Mapa ilustrativo de Bogotá, no a escala · posiciones simuladas"
+    },
+    "stage": {
+      "pending": "Por confirmar",
+      "preparing": "En preparación",
+      "ready": "Listo para recoger",
+      "pickedUp": "En camino",
+      "delivered": "Entregado",
+      "rejected": "Rechazado",
+      "cancelled": "Cancelado"
+    },
+    "months": [
+      "ene.",
+      "feb.",
+      "mar.",
+      "abr.",
+      "may.",
+      "jun.",
+      "jul.",
+      "ago.",
+      "sept.",
+      "oct.",
+      "nov.",
+      "dic."
+    ],
+    "vehicle": {
+      "moto": "Moto",
+      "bici": "Bicicleta"
+    },
+    "sedes": {
+      "chapinero": "Sede Chapinero",
+      "usaquen": "Sede Usaquén",
+      "cedritos": "Sede Cedritos"
+    },
+    "zones": {
+      "chapinero": "Chapinero",
+      "usaquen": "Usaquén",
+      "cedritos": "Cedritos",
+      "suba": "Suba",
+      "teusaquillo": "Teusaquillo",
+      "kennedy": "Kennedy",
+      "fontibon": "Fontibón"
+    },
+    "menu": {
+      "categories": {
+        "all": "Todo",
+        "platos": "Platos fuertes",
+        "sopas": "Sopas",
+        "antojos": "Antojos",
+        "bebidas": "Bebidas",
+        "postres": "Postres"
+      },
+      "choices": {
+        "termino": "Término de la carne",
+        "base": "Preparación"
+      },
+      "options": {
+        "sinChicharron": "Sin chicharrón",
+        "sinHuevo": "Sin huevo",
+        "aguacateExtra": "Aguacate extra",
+        "terminoMedio": "Término medio",
+        "terminoTresCuartos": "Tres cuartos",
+        "terminoBienAsado": "Bien asado",
+        "papaCriolla": "Papa criolla en vez de papa a la francesa",
+        "sinCrema": "Sin crema de leche",
+        "sinAlcaparras": "Sin alcaparras",
+        "conArroz": "Con arroz blanco",
+        "ajiAparte": "Ají aparte",
+        "enAgua": "En agua",
+        "enLeche": "En leche"
+      },
+      "items": {
+        "bandeja": {
+          "name": "Bandeja paisa",
+          "desc": "Fríjoles, arroz, chicharrón, carne molida, huevo, maduro, arepa y aguacate"
+        },
+        "churrasco": {
+          "name": "Churrasco 300 g",
+          "desc": "Con papa a la francesa, ensalada y chimichurri"
+        },
+        "pollo": {
+          "name": "Medio pollo asado",
+          "desc": "Con arepa, papa salada y ensalada"
+        },
+        "ajiaco": {
+          "name": "Ajiaco santafereño",
+          "desc": "Pollo, tres papas y mazorca; crema y alcaparras aparte"
+        },
+        "sancocho": {
+          "name": "Sancocho de gallina",
+          "desc": "Con yuca, plátano, mazorca y arroz aparte"
+        },
+        "arepa": {
+          "name": "Arepa de choclo con queso",
+          "desc": "Arepa dulce de maíz tierno con queso campesino"
+        },
+        "empanadas": {
+          "name": "Empanadas de pipián (3)",
+          "desc": "Rellenas de papa y maní, con ají"
+        },
+        "patacon": {
+          "name": "Patacón con hogao",
+          "desc": "Patacón grande con hogao y guacamole"
+        },
+        "limonada": {
+          "name": "Limonada de coco",
+          "desc": "Limonada frappé con crema de coco"
+        },
+        "jugoLulo": {
+          "name": "Jugo de lulo",
+          "desc": "Jugo natural, en agua o en leche"
+        },
+        "aguaGas": {
+          "name": "Agua con gas 600 ml",
+          "desc": "Botella individual"
+        },
+        "natas": {
+          "name": "Postre de natas",
+          "desc": "Receta tradicional con uvas pasas"
+        },
+        "arrozLeche": {
+          "name": "Arroz con leche",
+          "desc": "Con canela y uvas pasas"
+        }
+      }
+    },
+    "payments": {
+      "nequi": {
+        "name": "Nequi",
+        "desc": "Pago con el celular (simulado)"
+      },
+      "daviplata": {
+        "name": "Daviplata",
+        "desc": "Pago con el celular (simulado)"
+      },
+      "pse": {
+        "name": "PSE",
+        "desc": "Débito desde tu cuenta bancaria (simulado)"
+      },
+      "card": {
+        "name": "Tarjeta •••• 0457",
+        "desc": "Crédito o débito guardada (simulado)"
+      },
+      "cash": {
+        "name": "Efectivo contraentrega",
+        "desc": "Pagas al recibir; el repartidor lleva cambio"
+      },
+      "dataphone": {
+        "name": "Datáfono contraentrega",
+        "desc": "Pagas con tarjeta al recibir"
+      }
+    },
+    "reasons": {
+      "reject": {
+        "soldOut": "se agotó un producto",
+        "busy": "la cocina está llena",
+        "outOfArea": "dirección fuera de cobertura",
+        "closing": "la sede está por cerrar"
+      },
+      "driver": {
+        "tooFar": "me queda muy lejos",
+        "noSpace": "no tengo espacio en el maletín",
+        "finishing": "estoy terminando otro pedido"
+      },
+      "cancel": {
+        "customer": "lo canceló el cliente",
+        "noResponse": "la sede no respondió"
+      }
+    },
+    "ratingComments": {
+      "c0": "Llegó caliente y a tiempo",
+      "c1": "Muy amable el repartidor",
+      "c2": "Todo completo y bien empacado",
+      "c3": "Rápido, como siempre",
+      "c4": "La bandeja, espectacular",
+      "c5": "Llegó un poco tarde"
+    },
+    "chat": {
+      "title": "Chat con {name}",
+      "driver": "el repartidor",
+      "empty": "Todavía no hay mensajes.",
+      "placeholder": "Escribe un mensaje…",
+      "send": "Enviar",
+      "fromOps": "Operaciones",
+      "closed": "El chat se habilita cuando un repartidor acepta tu pedido y se cierra al entregarlo.",
+      "customerNote": "En la demo tus mensajes llegan a la app del Repartidor (pestaña Repartidor, tarea actual).",
+      "quick": {
+        "comingDown": "Ya bajo",
+        "ringBell": "Toca el timbre, por favor",
+        "leaveReception": "Déjalo en la portería",
+        "onMyWay": "Voy en camino con tu pedido",
+        "atDoor": "Estoy afuera",
+        "cantFind": "No encuentro la dirección, ¿me ayudas?",
+        "lateNotice": "tu pedido va un poco demorado. Ya estamos encima y te avisamos cualquier novedad."
+      }
+    },
+    "call": {
+      "title": "Llamada enmascarada (simulada)",
+      "connecting": "Te comunicamos con {name}",
+      "body": "Con un número puente, ni el cliente ni el repartidor ven el número del otro. En la demo no se hace ninguna llamada; en tu proyecto se conecta con un proveedor de telefonía."
+    },
+    "nav": {
+      "follow": "Sigue por la {street} hacia el {heading} {km}",
+      "followUntil": "Sigue por la {street} hacia el {heading} {km} hasta la {until}",
+      "turn": "Gira a la {dir} en la {street} y sigue hacia el {heading} {km}",
+      "arrive": "Llegaste: {address}",
+      "heading": {
+        "north": "norte",
+        "south": "sur",
+        "east": "oriente",
+        "west": "occidente"
+      },
+      "dir": {
+        "left": "izquierda",
+        "right": "derecha"
+      }
+    },
+    "pod": {
+      "title": "Confirmar entrega de {id}",
+      "mode": {
+        "code": "Código del cliente",
+        "photoSignature": "Foto y firma"
+      },
+      "codeLabel": "Código de 4 dígitos que te dio el cliente",
+      "codeFormat": "Escribe los 4 dígitos.",
+      "codeWrong": "El código no coincide. Pídeselo de nuevo al cliente.",
+      "hintOwn": "En la demo: el código está en la app del Cliente (seguimiento del pedido y vista previa del WhatsApp).",
+      "hintSample": "En la demo: el código de este pedido de ejemplo es {code}.",
+      "photo": "Foto de la entrega",
+      "photoPick": "Tomar o elegir una foto",
+      "photoType": "El archivo debe ser una imagen.",
+      "photoAlt": "Foto de la entrega",
+      "signature": "Firma de quien recibe",
+      "clear": "Borrar",
+      "signatureArea": "Área para firmar",
+      "signHere": "Firma con el dedo o el mouse.",
+      "signed": "Firma capturada.",
+      "needBoth": "Para entregar sin código necesitas la foto y la firma.",
+      "privacy": "En la demo la foto y la firma no salen de tu navegador; en tu proyecto se guardan como evidencia de la entrega.",
+      "confirm": "Confirmar entrega",
+      "done": "Pedido {id} entregado"
+    },
+    "docs": {
+      "title": "Documentos del repartidor",
+      "issues": "{n, plural, one {# por revisar} other {# por revisar}}",
+      "allValid": "Al día",
+      "items": {
+        "cedula": "Cédula de ciudadanía",
+        "licencia": "Licencia de conducción",
+        "soat": "SOAT",
+        "tecnomecanica": "Revisión técnico-mecánica",
+        "tarjetaPropiedad": "Tarjeta de propiedad",
+        "seguridadSocial": "Planilla de seguridad social (PILA)"
+      },
+      "expired": "Vencido desde el {date}",
+      "expiresIn": "Vence en {n, plural, one {# día} other {# días}} ({date})",
+      "validUntil": "Vigente hasta el {date}",
+      "noExpiry": "Sin vencimiento · verificado",
+      "uploaded": "archivo: {file}",
+      "update": "Actualizar",
+      "updateTitle": "Actualizar: {doc}",
+      "file": "Archivo (foto o PDF)",
+      "newDate": "Nueva fecha de vencimiento",
+      "needFile": "Elige el archivo del documento.",
+      "needDate": "Escribe una fecha de vencimiento posterior a la fecha de la demo.",
+      "savedToast": "{doc}: actualizado",
+      "privacy": "En la demo el archivo no sale de tu navegador (solo se guarda su nombre); en tu proyecto se sube cifrado y lo revisa tu equipo.",
+      "note": "Vencimientos calculados frente a la fecha de la demo ({date}). Se avisa cuando faltan 15 días o menos."
     },
     "customer": {
-      "greeting": "Hola, Sofía",
-      "address": "Av. Reforma 245, Polanco",
-      "searchPlaceholder": "¿Qué se te antoja hoy?",
-      "categoriesTitle": "Categorías",
-      "categories": {
-        "food": "Comida",
-        "groceries": "Mercado",
-        "pharmacy": "Farmacia",
-        "tech": "Tech"
+      "addressLabels": {
+        "casa": "Casa",
+        "oficina": "Oficina"
       },
-      "near": "Cerca de ti",
-      "promoBanner": "Membership Prime · 30 días gratis · envíos sin costo",
-      "loyalty": "{points} puntos KopUp",
-      "restaurant": {
-        "fee": "Envío {fee}",
-        "eta": "{eta} min",
-        "rating": "{rating}",
-        "free": "Gratis",
-        "categoriesTitle": "Menú",
+      "home": {
+        "deliverTo": "Entregar en · {label}",
+        "points": "{points} puntos",
+        "greeting": "Hola, {name}. ¿Qué pides hoy en {brand}?",
+        "blocked": "Operaciones bloqueó tu cuenta en la demo (revisión por reglas). Desbloquéala en Operaciones › Revisión por reglas o reinicia la demo.",
+        "activeOrder": "Pedido en curso {id}",
+        "track": "Ver",
+        "servedBy": "Te atiende la {sede}",
+        "fee": "domicilio {fee}",
+        "eta": "{from}–{to} min",
+        "changeSede": "Cambiar",
+        "noCoverage": "Ninguna sede abierta cubre esta dirección (cobertura de 8 km).",
+        "seeSedes": "Ver sedes",
+        "search": "Busca en el menú: ajiaco, limonada…",
+        "categories": "Categorías del menú",
+        "noResults": "No encontramos «{q}» en esta categoría.",
+        "viewAll": "Ver todo el menú",
         "popular": "Popular",
-        "addToCart": "Añadir · {price}",
-        "modifiers": "Personaliza",
-        "noteLabel": "Nota para el restaurante",
-        "notePlaceholder": "Sin cebolla, picante aparte..."
+        "soldOut": "Agotado en esta sede",
+        "add": "Agregar {item}",
+        "added": "{item} agregado al carrito",
+        "myOrders": "Mis pedidos ({n})",
+        "viewCart": "Ver carrito · {n} · {total}",
+        "pickSede": "Elige la sede",
+        "pickSedeHint": "Distancia y domicilio desde {address}.",
+        "closed": "Cerrada",
+        "outOfCoverage": "Fuera de cobertura",
+        "selected": "Seleccionada",
+        "available": "Disponible",
+        "useNearest": "Usar la más cercana"
+      },
+      "club": {
+        "offer": "Club {brand}: domicilio gratis en pedidos desde {min}. Prueba de 30 días (simulada).",
+        "active": "Club activo: domicilio gratis en pedidos desde {min}.",
+        "cta": "Activar",
+        "cancel": "Cancelar",
+        "activated": "Club activado (simulado)",
+        "cancelled": "Club cancelado"
+      },
+      "item": {
+        "add": "Agregar · {total}",
+        "required": "obligatorio",
+        "extras": "Personaliza",
+        "noteHint": "¿Algo más? Escríbelo en la nota para la sede, en el carrito."
       },
       "cart": {
         "title": "Tu carrito",
-        "empty": "Aún no agregas productos",
+        "empty": "Tu carrito está vacío.",
+        "goMenu": "Ir al menú",
+        "from": "Pedido a la {sede}",
+        "lineSoldOut": "Agotado en esta sede: quítalo para continuar",
+        "remove": "Quitar del carrito",
+        "noteLabel": "Nota para la sede",
+        "notePlaceholder": "Ej.: sin cebolla, salsas aparte…",
+        "tipLabel": "Propina para el repartidor (opcional)",
+        "tipHint": "El 100 % es para quien te lleva el pedido.",
+        "noTip": "Sin propina",
+        "paymentMethod": "Medio de pago",
+        "cashWith": "¿Con cuánto vas a pagar? (opcional)",
+        "cashPlaceholder": "Ej.: 100000",
+        "change": "El repartidor lleva {change} de cambio.",
+        "paymentNote": "Pagos simulados: no se cobra nada. En tu proyecto se conectan con la pasarela que elijas (p. ej. Wompi o PayU) y con el pago contraentrega.",
+        "usePoints": "Usar {points} puntos (−{value}) · tienes {balance}",
+        "pointsMissing": "Te faltan {n} puntos para canjear un descuento.",
+        "split": "Dividir la cuenta",
+        "people": "{n, plural, one {Solo yo} other {# personas}}",
         "subtotal": "Subtotal",
-        "deliveryFee": "Envío",
-        "service": "Servicio",
+        "deliveryFee": "Domicilio",
+        "freeClub": "Gratis (Club)",
+        "clubMissing": "Te faltan {n} para el domicilio gratis del Club.",
+        "rainFee": "Recargo por lluvia",
+        "pointsDiscount": "Descuento con puntos",
         "tip": "Propina",
         "total": "Total",
-        "checkout": "Pagar {total}",
-        "tipLabel": "Elige propina",
-        "splitPayment": "Dividir pago",
-        "splitWith": "Dividir con {n} amigos",
-        "paymentMethod": "Método de pago",
-        "cards": {
-          "visa": "Visa ••4521",
-          "mc": "Mastercard ••8800",
-          "wallet": "Wallet KopUp"
+        "perPerson": "Entre {n}: {amount} por persona",
+        "pay": "Pagar {total} (simulado)",
+        "placeCod": "Hacer pedido · pagas {total} al recibir",
+        "items": "{n, plural, one {# producto} other {# productos}}: {lines}",
+        "sentCod": "Pedido {id} enviado a la sede",
+        "paidOnline": "Pago aprobado con {method} (simulado) · pedido {id} enviado a la sede",
+        "errors": {
+          "empty": "Agrega al menos un producto.",
+          "noSede": "Ninguna sede abierta cubre tu dirección.",
+          "soldOut": "Hay productos agotados en la sede: quítalos del carrito.",
+          "cash": "El efectivo con el que vas a pagar no alcanza para el total.",
+          "blocked": "Tu cuenta está bloqueada en la demo: desbloquéala en Operaciones."
         }
       },
       "tracking": {
-        "title": "Tu pedido va en camino",
-        "etaLabel": "Llega en",
-        "driverName": "Diego R.",
-        "driverRating": "4.9",
-        "driverPlate": "Moto · ABC-123",
-        "chat": "Chatear",
-        "call": "Llamar",
-        "status": {
-          "confirmed": "Confirmado",
-          "preparing": "Preparando",
-          "onTheWay": "En camino",
-          "delivered": "Entregado"
+        "title": "Pedido {id}",
+        "noOrderTitle": "Seguimiento",
+        "noOrder": "Todavía no has hecho pedidos.",
+        "headline": {
+          "pending": "Esperando que la sede confirme",
+          "preparing": "La sede está preparando tu pedido",
+          "ready": "Tu pedido está listo",
+          "pickedUp": "Tu pedido va en camino",
+          "delivered": "¡Pedido entregado!",
+          "rejected": "La sede no pudo tomar tu pedido",
+          "cancelled": "Pedido cancelado"
         },
-        "mapHint": "Mapa en vivo",
+        "sub": {
+          "pending": "La sede tiene {s} s para responder.",
+          "pendingLate": "La sede no respondió a tiempo: Operaciones ya recibió una alerta.",
+          "preparing": "La {sede} lo prepara en unos {min} min.",
+          "readyDriver": "Esperando que {driver} lo recoja.",
+          "readyNoDriver": "Operaciones está asignando un repartidor.",
+          "pickedUp": "{driver} va hacia tu dirección.",
+          "delivered": "Entregado a las {time} · {min} min desde que lo pediste.",
+          "rejected": "Motivo: {reason}. No se hizo ningún cobro (simulado).",
+          "cancelled": "No se hizo ningún cobro (simulado)."
+        },
+        "eta": "Llegada estimada",
+        "promised": "Prometido: antes de las {time}",
+        "code": "Código de entrega",
+        "demoHint": "En la demo: ve a la pestaña Comercio para aceptar el pedido, o activa el «Avance automático».",
+        "goMerchant": "Ir a Comercio",
+        "cancel": "Cancelar pedido",
+        "cancelledToast": "Pedido {id} cancelado",
+        "offered": "Oferta enviada a {driver}; esperando que la acepte.",
         "you": "Tú",
-        "driver": "Driver",
-        "store": "Comercio"
-      },
-      "chat": {
-        "title": "Chat con {name}",
-        "placeholder": "Escribe un mensaje...",
-        "quick": {
-          "outside": "Estoy afuera",
-          "ring": "Toca el timbre",
-          "leave": "Déjalo en la puerta"
+        "chat": "Chatear con el repartidor",
+        "call": "Llamar al repartidor",
+        "whatsapp": {
+          "title": "Vista previa del WhatsApp que recibes",
+          "message": "{brand}: tu pedido {id} fue confirmado y llega aprox. a las {time}\nSíguelo aquí: {link}\nCódigo de entrega: {code} (dáselo al repartidor)",
+          "note": "Simulado: no se envía nada. En tu proyecto se envía con WhatsApp Business; el enlace es de ejemplo."
         },
-        "driverHi": "Hola, voy en camino. ETA 8 min.",
-        "driverArrived": "Estoy en la entrada del edificio."
+        "rated": "Gracias por calificar",
+        "pointsEarned": "Ganaste {n} puntos con este pedido · ahora tienes {balance}.",
+        "rateTitle": "¿Cómo estuvo tu pedido?",
+        "ratePlaceholder": "Cuéntanos (opcional)",
+        "sendRating": "Enviar calificación",
+        "thanks": "¡Gracias! Tu calificación llegó a la sede y al repartidor",
+        "summary": "Detalle del pedido · {total}",
+        "note": "Nota: {note}",
+        "keepShopping": "Seguir pidiendo",
+        "myOrders": "Mis pedidos"
       },
-      "membership": {
-        "title": "KopUp Prime",
-        "perks": [
-          "Envíos $0 en pedidos +$150",
-          "10% cashback en farmacia",
-          "Soporte prioritario 24/7"
-        ],
-        "cta": "Activar 30 días gratis",
-        "active": "Membresía activa"
-      }
-    },
-    "driver": {
-      "header": "Hola, Diego",
-      "statusOnline": "Online · aceptando pedidos",
-      "statusOffline": "Offline",
-      "earnings": {
-        "today": "Hoy",
-        "week": "Semana",
-        "trips": "{n} viajes",
-        "hours": "{h} h conectado"
+      "orders": {
+        "title": "Mis pedidos",
+        "empty": "Aún no has hecho pedidos en esta demo."
       },
-      "nextPickup": {
-        "title": "Próxima recogida",
-        "store": "Sushi Lab · Polanco",
-        "items": "{n} artículos",
-        "distance": "{km} km · {min} min",
-        "accept": "Aceptar",
-        "skip": "Pasar"
-      },
-      "batch": {
-        "title": "Pickup múltiple",
-        "badge": "Routing ML · 2 stops",
-        "stop1": "1. Recoger en Sushi Lab",
-        "stop2": "2. Recoger en Bao Bar",
-        "stop3": "3. Entregar a Sofía M.",
-        "stop4": "4. Entregar a Luis G."
-      },
-      "navigation": {
-        "title": "Navegación",
-        "steps": [
-          "Sigue derecho 200 m por Av. Reforma",
-          "Gira a la derecha en C. Schiller",
-          "Continúa 600 m hasta el destino",
-          "Has llegado a Polanco 102"
-        ]
-      },
-      "pod": {
-        "title": "Prueba de entrega",
-        "photo": "Tomar foto",
-        "signature": "Firma del cliente",
-        "submit": "Confirmar entrega",
-        "captured": "Foto capturada",
-        "signed": "Firma capturada"
-      },
-      "ratings": {
-        "title": "Calificaciones recientes",
-        "items": [
-          "5★ · entrega impecable",
-          "5★ · súper amable",
-          "4★ · llegó a tiempo"
-        ]
-      },
-      "kyc": {
-        "title": "Onboarding driver",
-        "step1": "Subir INE / DNI",
-        "step2": "Subir licencia",
-        "step3": "Selfie verificación",
-        "step4": "Aprobado",
-        "uploadedBadge": "Verificado"
+      "address": {
+        "title": "Direcciones",
+        "savedList": "Direcciones guardadas",
+        "saved": "Dirección guardada",
+        "newTitle": "Agregar una dirección",
+        "streetType": "Tipo de vía",
+        "main": "Número",
+        "cross": "Cruce",
+        "placa": "Placa",
+        "extra": "Complemento",
+        "extraPlaceholder": "Apto, torre, conjunto…",
+        "label": "Nombre",
+        "labelPlaceholder": "Ej.: Casa de mi mamá",
+        "defaultLabel": "Nueva dirección",
+        "covered": "Te atiende la {sede} a {km} · domicilio {fee}",
+        "notCovered": "Ninguna sede abierta cubre esta dirección (8 km). Puedes guardarla igual.",
+        "invalid": "Revisa la dirección: usa números como 85, 127C o 38 Sur, y una placa como 32.",
+        "note": "La distancia se calcula por cuadras con la nomenclatura (aproximada). En tu proyecto la dirección se geocodifica con un servicio de mapas y se confirma el pin.",
+        "save": "Guardar y usar"
       }
     },
     "merchant": {
-      "header": "Sushi Lab · Polanco",
-      "openLabel": "Tienda abierta",
+      "subtitle": "App de la sede · pedidos, menú y ventas del día",
+      "open": "Abierta",
+      "closed": "Cerrada",
+      "sedePicker": "Sede",
+      "closedNote": "La sede está cerrada: el Cliente no puede pedirle y se le ofrece otra sede.",
+      "openedToast": "{sede} abierta",
+      "closedToast": "{sede} cerrada: no recibe pedidos nuevos",
       "kpis": {
-        "salesToday": "Ventas hoy",
-        "aov": "Ticket promedio",
-        "orders": "Pedidos",
-        "peakHour": "Hora pico"
+        "sales": "Ventas del día",
+        "orders": "Pedidos del día",
+        "rejected": "{n} rechazados o cancelados",
+        "avgTicket": "Ticket promedio",
+        "peak": "Hora pico",
+        "note": "Calculado con los pedidos de ejemplo de hoy y los que hagas en la demo (sin domicilio ni propina)."
       },
-      "incoming": {
-        "title": "Pedidos entrantes",
-        "newOrder": "Nuevo pedido",
-        "timer": "{s}s para responder",
-        "items": "{n} artículos · {total}",
-        "prepTime": "Tiempo prep: {min} min"
-      },
-      "menu": {
-        "title": "Menú",
-        "categories": ["Entradas", "Rolls", "Bebidas", "Postres"],
-        "stock": "Stock: {n}",
-        "outOfStock": "Agotado (86)",
-        "markOut": "Marcar 86",
-        "markIn": "Reactivar",
-        "edit": "Editar"
-      },
-      "analytics": {
-        "title": "Analytics",
-        "topSellers": "Top sellers",
-        "salesTrend": "Tendencia semanal",
-        "ratingsAvg": "Rating promedio"
-      },
-      "items": {
-        "philly": "Philly Roll",
-        "spicy": "Spicy Tuna",
-        "tempura": "Tempura Roll",
-        "edamame": "Edamame",
-        "miso": "Sopa Miso",
-        "matcha": "Matcha Latte"
-      }
+      "incoming": "Pedidos por aceptar",
+      "noIncoming": "No hay pedidos por aceptar. Haz uno en la app del Cliente.",
+      "respondIn": "Responde en {s} s",
+      "escalated": "Sin respuesta · escalado a Operaciones",
+      "note": "Nota: {note}",
+      "prepTime": "Tiempo de preparación",
+      "prepOption": "{min} min",
+      "reject": "Rechazar",
+      "accept": "Aceptar",
+      "acceptedToast": "Pedido {id} aceptado · listo en {min} min",
+      "rejectTitle": "Rechazar {id}",
+      "rejectHint": "El cliente verá el motivo y no se le cobra nada.",
+      "rejectedToast": "Pedido {id} rechazado",
+      "preparing": "En preparación",
+      "none": "Ninguno por ahora.",
+      "prepProgress": "{elapsed} de {min} min",
+      "driverComing": "{driver} viene a recogerlo",
+      "driverOffered": "Oferta enviada a {driver}",
+      "noDriver": "Sin repartidor: lo asigna Operaciones",
+      "markReady": "Listo para recoger",
+      "readyToast": "{id} listo para recoger",
+      "ready": "Listos para recoger",
+      "waitingDriver": "Espera a {driver}",
+      "menuTitle": "Menú de la sede",
+      "menuHint": "Lo que agotes aquí aparece como agotado en la app del Cliente para esta sede.",
+      "soldOut": "Agotado",
+      "markSoldOut": "Agotar",
+      "makeAvailable": "Reactivar",
+      "soldOutToast": "Agotaste «{item}» en esta sede",
+      "availableToast": "Reactivaste «{item}»",
+      "analytics": "Ventas de hoy",
+      "topItems": "Más vendidos (unidades)",
+      "salesByHour": "Ventas por hora",
+      "rating": "Calificación promedio ({n} opiniones)"
+    },
+    "driver": {
+      "hello": "Hola, {name}",
+      "online": "Conectado",
+      "offline": "Desconectado",
+      "onlineSwitch": "Conectarme o desconectarme",
+      "viewAs": "Ver la app como",
+      "offersN": "{n, plural, one {# oferta} other {# ofertas}}",
+      "earningsToday": "Ganancias de hoy",
+      "trips": "{n, plural, one {# domicilio} other {# domicilios}}",
+      "tips": "propinas {tips}",
+      "ratingTitle": "Calificación",
+      "ratingsN": "{n, plural, =0 {sin calificaciones} one {# calificación} other {# calificaciones}}",
+      "payRule": "Pago de ejemplo por domicilio: {base} + {perKm} por km, más propina y bono. En tu proyecto lo defines tú.",
+      "offlineNote": "Estás desconectado: no recibes ofertas de pedidos.",
+      "cantGoOffline": "Termina tus pedidos y responde tus ofertas antes de desconectarte.",
+      "onlineToast": "Conectado: ya puedes recibir pedidos",
+      "offlineToast": "Desconectado",
+      "offers": "Ofertas de pedido",
+      "noOffers": "Sin ofertas por ahora. Operaciones te las envía desde Despacho.",
+      "offlineNoOffers": "Conéctate para recibir ofertas.",
+      "pickupAt": "Recoge en la {sede} ({address})",
+      "deliverTo": "Entrega en {zone}",
+      "rainBonus": "Incluye bono por lluvia de {bonus}",
+      "payBreakdown": "Incluye propina de {tip}",
+      "reject": "Rechazar",
+      "accept": "Aceptar",
+      "acceptedToast": "Aceptaste {id}: ve a la sede",
+      "rejectedToast": "Rechazaste {id}: vuelve a Operaciones",
+      "rejectTitle": "Rechazar {id}",
+      "rejectHint": "Operaciones verá el motivo y asignará a otra persona.",
+      "currentTask": "Tarea actual",
+      "goToSede": "Ve a la {sede}: {address}",
+      "pickup": "Recogí el pedido",
+      "pickedToast": "{id} recogido: el cliente ya lo ve en camino",
+      "waitingSede": "La sede aún lo prepara (faltan ~{min} min). Cuando lo marque listo podrás recogerlo.",
+      "deliverAt": "Entrega a {name}: {address}",
+      "collectCash": "Cobra {total} en efectivo.",
+      "collectCashChange": "Cobra {total} en efectivo: paga con {with}, lleva {change} de cambio.",
+      "collectDataphone": "Cobra {total} con el datáfono.",
+      "prepaid": "Ya pagado con {method}: no cobres nada.",
+      "chat": "Chat",
+      "call": "Llamar",
+      "confirmDelivery": "Confirmar entrega",
+      "navigation": "Indicaciones",
+      "navNote": "Por cuadras, aproximadas. En tu proyecto se abre Google Maps o Waze.",
+      "nextStep": "Siguiente indicación",
+      "route": "Ruta con varias paradas",
+      "routeHint": "{n, plural, one {# parada} other {# paradas}} · {km} en total. Orden por cercanía (regla simple en la demo; en tu proyecto, un motor de rutas).",
+      "stopPickup": "Recoger {id} · {place}",
+      "stopDropoff": "Entregar {id} · {place}",
+      "recentRatings": "Calificaciones recientes",
+      "noRatings": "Todavía sin calificaciones.",
+      "footer": "Ganancias, calificaciones y documentos se calculan con los datos de ejemplo de esta demo."
     },
     "ops": {
-      "header": "Centro de Operaciones",
-      "activeDeliveries": "Entregas activas",
-      "driversOnline": "Drivers online",
-      "avgEta": "ETA promedio",
-      "surgeNow": "Surge actual",
-      "heatmap": {
-        "title": "Demanda por zona · próxima hora",
-        "zones": ["Polanco", "Roma", "Condesa", "Centro", "Reforma", "Coyoacán"],
-        "legendLow": "Baja",
-        "legendHigh": "Alta"
+      "title": "Centro de operaciones · {brand}",
+      "subtitle": "Jornada de ejemplo del {date} · reloj de la demo {time}",
+      "exportCsv": "Exportar pedidos (CSV)",
+      "csvToast": "CSV descargado con {n} pedidos",
+      "kpis": {
+        "orders": "Pedidos hoy",
+        "ordersHint": "{n} rechazados o cancelados",
+        "active": "En curso",
+        "drivers": "Repartidores conectados",
+        "avgDelivery": "Tiempo promedio de entrega",
+        "onTime": "Entregados a tiempo",
+        "avgTicket": "Ticket promedio",
+        "note": "Todo se calcula con los pedidos de ejemplo de hoy y los que hagas en la demo; nada está escrito a mano."
       },
-      "surge": {
-        "title": "Pricing dinámico",
-        "multiplier": "Multiplicador",
-        "reason": "Razón",
-        "reasons": {
-          "rain": "Lluvia detectada",
-          "peak": "Hora pico",
-          "event": "Evento masivo"
+      "mapTitle": "Mapa de la operación",
+      "legend": {
+        "sede": "Sedes",
+        "driver": "Repartidores conectados",
+        "order": "Destino de pedidos en curso"
+      },
+      "alertsTitle": "Alertas",
+      "noAlerts": "Sin alertas en este momento.",
+      "alerts": {
+        "noResponse": "La sede no respondió el pedido {id} en 45 s",
+        "unassigned": "El pedido {id} no tiene repartidor",
+        "late": "El pedido {id} va {min} min tarde frente a lo prometido",
+        "driverRejected": "Un repartidor rechazó el pedido {id}: falta reasignarlo",
+        "gpsFar": "Entrega de {id} confirmada a {m} m de la dirección",
+        "sharedPhone": "El celular {phone} aparece en {n} cuentas distintas",
+        "bigCash": "Pedido {id} de cliente nuevo en efectivo por {total}"
+      },
+      "acceptForSede": "Aceptar por la sede",
+      "acceptedByOps": "Aceptaste {id} en nombre de la sede",
+      "cancelOrder": "Cancelar pedido",
+      "cancelledToast": "Pedido {id} cancelado",
+      "assign": "Asignar",
+      "reassign": "Reasignar",
+      "customerNotified": "Cliente avisado",
+      "notifyCustomer": "Avisar al cliente",
+      "notifiedToast": "Aviso enviado al chat del pedido {id}",
+      "detail": "Detalle",
+      "detailOf": "Detalle de {id}",
+      "dispatchTitle": "Despacho",
+      "dispatchHint": "Asigna o reasigna repartidores. El sistema sugiere al más cercano a la sede que esté libre (regla simple, no IA).",
+      "table": {
+        "order": "Pedido",
+        "sede": "Sede",
+        "status": "Estado",
+        "driver": "Repartidor",
+        "promised": "Entrega prometida",
+        "actions": "Acciones"
+      },
+      "offerSent": "Oferta enviada",
+      "driverAccepted": "Aceptó",
+      "waitingSede": "Espera a la sede",
+      "noDriver": "Sin repartidor",
+      "lateBy": "{min} min tarde",
+      "noActive": "No hay pedidos en curso.",
+      "rain": {
+        "title": "Lluvia en la ciudad",
+        "hint": "Actívalo cuando llueva: se aplica a los pedidos nuevos.",
+        "surcharge": "Recargo al cliente de {amount}",
+        "surchargeDesc": "Se suma al domicilio en el carrito del Cliente.",
+        "bonus": "Bono al repartidor de {amount}",
+        "bonusDesc": "Se suma al pago de las ofertas nuevas del Repartidor.",
+        "surchargeOn": "Recargo por lluvia activado",
+        "surchargeOff": "Recargo por lluvia desactivado",
+        "bonusOn": "Bono por lluvia activado",
+        "bonusOff": "Bono por lluvia desactivado"
+      },
+      "reports": {
+        "title": "Tiempos y zonas",
+        "hint": "Promedio de {n} pedidos entregados hoy.",
+        "stages": "Minutos promedio por etapa",
+        "stage": {
+          "accept": "Aceptación de la sede",
+          "prep": "Preparación",
+          "waitPickup": "Espera del repartidor",
+          "ride": "Trayecto al cliente"
         },
-        "apply": "Aplicar surge"
+        "byZone": "Pedidos por zona"
       },
-      "dispatch": {
-        "title": "Dispatch · override manual",
-        "order": "Orden #{id}",
-        "assignedTo": "Asignado a {driver}",
-        "reassign": "Reasignar",
-        "candidates": "Drivers cercanos"
+      "savings": {
+        "title": "Comisión que no pagaste hoy",
+        "hint": "Si estos pedidos hubieran entrado por un agregador. Ajusta los supuestos.",
+        "pct": "Comisión del agregador (%)",
+        "cost": "Costo por domicilio propio",
+        "base": "Ventas de {n} pedidos entregados",
+        "gross": "Comisión evitada ({pct} %)",
+        "ownCost": "Costo de tus domicilios",
+        "fees": "Domicilios cobrados a clientes",
+        "net": "Ahorro neto estimado",
+        "note": "Estimación con datos de ejemplo. No incluye mantenimiento del software, comisión de la pasarela ni mapas."
       },
-      "fraud": {
-        "title": "Anti-fraude",
-        "alerts": {
-          "gps": "GPS spoofing detectado · driver #{id}",
-          "multi": "Multi-account sospechoso · cliente #{id}",
-          "chargeback": "Riesgo chargeback · pedido #{id}"
+      "review": {
+        "title": "Revisión por reglas",
+        "hint": "Reglas configurables, no IA: entrega confirmada a más de {m} m de la dirección, un mismo celular en 3 cuentas o más, y primeros pedidos contraentrega por más de {total}.",
+        "rule": {
+          "gpsFar": "Entrega lejos de la dirección",
+          "sharedPhone": "Celular repetido",
+          "bigCash": "Contraentrega alto de cliente nuevo"
         },
-        "review": "Revisar"
+        "review": "Revisar",
+        "resolved": {
+          "dismissed": "Descartada",
+          "blocked": "Bloqueada"
+        },
+        "modalTitle": "Revisar alerta",
+        "explain": {
+          "gpsFar": "El GPS del celular del repartidor marcó la confirmación lejos de la dirección. Puede ser un error del GPS o una entrega mal hecha: revísalo con el repartidor.",
+          "sharedPhone": "Varias cuentas con el mismo celular pueden ser alguien que abusa de los descuentos de bienvenida.",
+          "bigCash": "Un primer pedido grande para pagar al recibir puede ser una broma o un riesgo para el repartidor: confírmalo por teléfono antes de despacharlo."
+        },
+        "podInfo": "Confirmada a {m} m · {driver}",
+        "dismiss": "Descartar (falsa alarma)",
+        "block": "Bloquear cuenta",
+        "suspendDriver": "Suspender al repartidor",
+        "note": "En la demo el bloqueo solo afecta esta simulación; en tu proyecto queda en la auditoría.",
+        "dismissedToast": "Alerta descartada",
+        "blockedToast": "Bloqueo aplicado en la demo",
+        "blocked": "Cuentas bloqueadas",
+        "unblock": "Desbloquear",
+        "unblockedToast": "Cuenta desbloqueada"
       },
-      "forecast": {
-        "title": "Forecast demanda",
-        "nextHour": "Próxima hora: +{pct}%",
-        "model": "Modelo: GBM v3.1"
+      "drivers": {
+        "title": "Repartidores",
+        "offline": "Desconectado",
+        "busy": "{n, plural, one {# pedido en curso} other {# pedidos en curso}}",
+        "free": "Libre",
+        "done": "{n} entregados hoy",
+        "open": "Ver su app",
+        "suspended": "Suspendido"
+      },
+      "assignTitle": "Asignar {id} · {sede}",
+      "assignHint": "Repartidores conectados, ordenados por carga y distancia a la sede. Quien reciba la oferta debe aceptarla en su app.",
+      "noDrivers": "No hay repartidores conectados.",
+      "suggested": "Sugerido",
+      "current": "Asignado",
+      "assignedToast": "Oferta de {id} enviada a {driver}. Mírala en la pestaña Repartidor.",
+      "offlineCount": "Desconectados o suspendidos (no aparecen): {n}",
+      "detailTitle": "Pedido {id}",
+      "timeline": "Línea de tiempo",
+      "events": {
+        "created": "Creado",
+        "accepted": "Aceptado por la sede",
+        "ready": "Listo para recoger",
+        "assigned": "Repartidor asignado",
+        "pickedUp": "Recogido",
+        "delivered": "Entregado"
+      },
+      "detailDriver": "Repartidor: {driver}",
+      "detailCode": "código {code}",
+      "detailRating": "Calificación: {stars} de 5",
+      "rejectReason": "Motivo del rechazo: {reason}",
+      "csv": {
+        "order": "pedido",
+        "sede": "sede",
+        "zone": "zona",
+        "status": "estado",
+        "created": "hora_pedido",
+        "delivered": "hora_entrega",
+        "minutes": "minutos",
+        "onTime": "a_tiempo",
+        "subtotal": "subtotal",
+        "fee": "domicilio",
+        "tip": "propina",
+        "total": "total",
+        "payment": "medio_pago",
+        "driver": "repartidor",
+        "rating": "calificacion"
       }
     }
   }

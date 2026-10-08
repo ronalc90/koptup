@@ -1,0 +1,8 @@
+// Solo para Jest: transpila sin chequear tipos (más rápido). Los tipos de las
+// pruebas los revisa `npm run typecheck` con tsconfig.test.json.
+{
+  "extends": "./tsconfig.test.json",
+  "compilerOptions": {
+    "isolatedModules": true
+  }
+}

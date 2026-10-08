@@ -1,4 +1,4 @@
-**[Inicio](Home.md)**
+**[Inicio](Home.md)** · **[Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md)**
 
 **Estrategia**
 - [01 · Diagnóstico](01-Diagnostico.md)

@@ -1,8 +1,12 @@
 import { Router } from 'express';
 import { whatsappService } from '../services/whatsapp.service';
 import { logger } from '../utils/logger';
+import { devOnlyAdmin } from '../middleware/access';
 
 const router = Router();
+
+// Rutas de diagnóstico: 404 en producción; en desarrollo, solo admin.
+router.use(...devOnlyAdmin);
 
 /**
  * GET /api/test/whatsapp

@@ -3,6 +3,8 @@ import Task from '../../models/Task';
 import ProjectMember from '../../models/ProjectMember';
 import User from '../../models/User';
 import mongoose from 'mongoose';
+import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
 
 export async function seedProjects() {
   try {
@@ -24,7 +26,9 @@ export async function seedProjects() {
       adminUser = await User.create({
         name: 'Administrador KopTup',
         email: 'admin@koptup.com',
-        password: 'temporal123',
+        // Nunca una contraseña fija: SEED_ADMIN_PASSWORD o una aleatoria (con
+        // hash, como el registro; el modelo no la cifra por sí solo).
+        password: await bcrypt.hash(process.env.SEED_ADMIN_PASSWORD || crypto.randomBytes(12).toString('base64url'), 12),
         role: 'admin',
       });
       console.log('👤 Usuario administrador creado para seed');

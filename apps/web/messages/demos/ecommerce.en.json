@@ -1,18 +1,127 @@
 {
   "demoEcommerce2": {
-    "viewSelector": "View selector",
+    "meta": {
+      "title": "Online store",
+      "seoTitle": "Online store demo: catalog, cart, simulated checkout and reports",
+      "seoDescription": "Try a sample online store for Colombia: catalog with search and favorites, cart with pricing rules and coupons, simulated payment by card, PSE, Nequi, Daviplata, cash on delivery and Addi, order and inventory panel, simulated shipping labels, returns and sales reports in COP exportable to CSV. Runs on sample data.",
+      "breadcrumbHome": "Home",
+      "breadcrumbDemos": "Demos"
+    },
+    "viewSelector": "Demo views",
     "views": {
-      "storefront": "Storefront",
-      "checkout": "Checkout",
-      "vendor": "Vendor",
-      "operations": "Operations",
-      "admin": "Admin"
+      "storefront": "Store",
+      "checkout": "Cart & checkout",
+      "vendor": "Store admin",
+      "operations": "Logistics",
+      "admin": "Reports"
+    },
+    "sampleData": "Sample data",
+    "sampleDataHint": "Sample store: products, customers, orders and figures are fictitious; payments, the invoice and shipping labels are simulated. What you do is saved only in this browser.",
+    "footerNote": "Demo with sample data. Orders, inventory and reports are calculated in your browser and saved only there (you can reset them). In your project we connect the payment gateway, the e-invoicing provider, carriers and your ERP.",
+    "reset": {
+      "button": "Reset",
+      "hint": "Go back to the initial sample data",
+      "title": "Reset the demo",
+      "body": "This clears the changes saved in this browser: {n, plural, =0 {you have not placed orders} one {# order of yours} other {# orders of yours}}, created products, stock, rules and favorites. The demo goes back to the initial sample data.",
+      "confirm": "Reset"
+    },
+    "tour": {
+      "title": "Suggested walkthrough",
+      "show": "Show suggested walkthrough ({done}/{total})",
+      "hide": "Hide",
+      "steps": {
+        "cart": "Add products to the cart in the store",
+        "pay": "Pay for a sample order (simulated payment)",
+        "prepare": "In the admin, move your order to preparing",
+        "ship": "In logistics, create the shipping label",
+        "reports": "See your order added up in the reports"
+      },
+      "here": "This step happens in this view: {step}.",
+      "doneHere": "You already completed this step."
+    },
+    "common": {
+      "close": "Close",
+      "cancel": "Cancel",
+      "unitsShort": "u.",
+      "showMore": "Show {n} more"
+    },
+    "time": {
+      "now": "now",
+      "min": "{n} min ago",
+      "h": "{n} h ago",
+      "d": "{n, plural, one {# day} other {# days}} ago"
+    },
+    "orderStatus": {
+      "new": "New",
+      "preparing": "Preparing",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    },
+    "paymentMethods": {
+      "card": "Card",
+      "pse": "PSE",
+      "nequi": "Nequi",
+      "daviplata": "Daviplata",
+      "cod": "Cash on delivery",
+      "addi": "Addi (installments)"
+    },
+    "carriers": {
+      "coordinadora": "Coordinadora",
+      "servientrega": "Servientrega",
+      "interrapidisimo": "Interrapidísimo",
+      "tcc": "TCC"
+    },
+    "warehouses": {
+      "bog": "Bogotá warehouse",
+      "mde": "Medellín warehouse",
+      "cli": "Cali warehouse",
+      "short": {
+        "bog": "BOG",
+        "mde": "MDE",
+        "cli": "CLO"
+      }
+    },
+    "tracking": {
+      "labelCreated": "Label created",
+      "pickedUp": "Picked up at warehouse",
+      "inTransit": "In transit",
+      "outForDelivery": "Out for delivery",
+      "delivered": "Delivered"
+    },
+    "toasts": {
+      "noStock": "No more units of “{name}” available (stock: {n}).",
+      "added": "“{name}” is in your cart.",
+      "addedLimited": "Only {n} units of “{name}” are available: your cart now has {n}.",
+      "goToCart": "Checkout",
+      "toPreparing": "{order} moved to preparing.",
+      "guideCreated": "Simulated {carrier} label created for {order}.",
+      "seeTracking": "See tracking",
+      "delivered": "{order} was delivered.",
+      "trackingStep": "{order}: {step} (simulated tracking).",
+      "invoiceDownloaded": "You downloaded the sample invoice for {order} (PDF).",
+      "copied": "Message copied to the clipboard.",
+      "copyFailed": "Your browser did not allow copying; select the text and copy it.",
+      "csvDownloaded": "You downloaded a CSV with {n, plural, one {# row} other {# rows}}.",
+      "published": "“{name}” is back in the store.",
+      "hidden": "“{name}” is no longer shown in the store.",
+      "productCreated": "“{name}” was published in the store.",
+      "seeInStore": "See in store",
+      "productUpdated": "You saved the changes to “{name}”.",
+      "productDeleted": "You deleted “{name}”.",
+      "restocked": "You added {n} units of “{name}” to the {warehouse}.",
+      "returnApproved": "Return {id} approved.",
+      "returnRejected": "Return {id} rejected.",
+      "returnCreated": "You registered a return for order {order}.",
+      "riskApproved": "You approved order {order}.",
+      "riskRejected": "You cancelled order {order} and its units went back to stock."
     },
     "hero": {
       "badge": "Sample store",
       "title": "Your online store, end to end",
-      "subtitle": "Catalog, cart, simulated checkout, vendor panel, logistics and analytics with sample data.",
+      "subtitle": "Shop in the store, pay with a simulated payment and follow the order in the admin, in logistics and in the reports.",
       "freeShipping": "Free shipping from {amount}",
+      "shippingFlat": "Flat-rate shipping",
       "pricesNote": "Prices in COP, VAT included",
       "imageAlt": "Colorful paper shopping bags"
     },
@@ -28,37 +137,56 @@
       "home": "Home",
       "sports": "Sports",
       "beauty": "Beauty",
-      "wines": "Wines"
+      "wines": "Wines",
+      "favorites": "Favorites ({n})"
+    },
+    "sort": {
+      "label": "Sort",
+      "relevance": "Featured",
+      "priceAsc": "Price: low to high",
+      "priceDesc": "Price: high to low",
+      "rating": "Top rated"
     },
     "sections": {
       "recommended": "Best sellers",
-      "recommendedHint": "Products flagged as best sellers (sample data)",
+      "recommendedHint": "Calculated from the sample orders of the last 30 days",
       "allProducts": "All products",
-      "recentlyViewed": "Recently viewed",
-      "empty": "No products found matching your criteria."
+      "favorites": "Your favorites",
+      "favoritesEmpty": "You have no favorites yet. Tap a product’s heart to save it here.",
+      "empty": "No products match those criteria.",
+      "recentlyViewed": "Recently viewed"
     },
     "product": {
       "addToCart": "Add",
+      "addToCartNamed": "Add {name} to the cart",
+      "soldOut": "Sold out",
       "buyNow": "Buy now",
       "quickView": "Quick view",
-      "wishlist": "Wishlist",
-      "reviewsCount": "reviews",
+      "wishlistAdd": "Save to favorites",
+      "wishlistRemove": "Remove from favorites",
+      "noReviews": "No reviews yet",
+      "ratingLabel": "Rated {rating} out of 5 with {n} reviews",
+      "sku": "SKU",
       "category": "Category",
-      "stock": "Stock",
-      "description": "Sample product. In your store, this is where each item's description, specs and warranty go.",
+      "availability": "Availability",
+      "unitsAvailable": "{n, plural, one {# unit} other {# units}}",
+      "quantity": "Quantity",
+      "inCart": "You already have {n} in the cart",
+      "description": "Sample product. In your store, this is where each item’s description, specs and warranty go.",
+      "taxIncluded": "Price in Colombian pesos (COP), VAT included",
+      "galleryFull": "See full photo",
+      "galleryDetail": "See detail {n}",
       "badges": {
         "new": "New",
         "bestseller": "Best seller",
-        "eco": "Eco"
-      },
-      "galleryFull": "Show full photo",
-      "galleryDetail": "Show detail {n}",
-      "taxIncluded": "Price in Colombian pesos (COP), VAT included"
+        "eco": "Eco",
+        "soldOut": "Sold out"
+      }
     },
     "productNames": {
-      "laptop15": "Pro Laptop 15\"",
-      "smartphone61": "Pro Smartphone 6.1\"",
-      "tablet11": "11\" Tablet with stylus",
+      "laptop15": "Pro laptop 15\"",
+      "smartphone61": "Pro smartphone 6.1\"",
+      "tablet11": "11\" tablet with stylus",
       "headphones": "Wireless over-ear headphones",
       "smartwatch": "Smartwatch",
       "filmCamera": "35 mm film camera",
@@ -82,264 +210,516 @@
       "chardonnay": "Chardonnay white wine 750 ml"
     },
     "cart": {
-      "goToCheckout": "Go to checkout",
-      "items": "items"
+      "goToCheckout": "Checkout"
     },
     "checkout": {
-      "backToStore": "Back to store",
+      "backToStore": "Back to the store",
+      "stepsLabel": "Checkout steps",
       "steps": {
         "cart": "Cart",
-        "address": "Address",
+        "address": "Details & shipping",
         "payment": "Payment",
         "confirmation": "Confirmation"
       },
       "back": "Back",
       "continue": "Continue",
-      "placeOrder": "Place order",
+      "placeOrder": "Pay {amount}",
       "cart": {
         "title": "Your cart",
         "empty": "Your cart is empty. Go back to the store and add products.",
-        "remove": "Remove",
-        "couponPlaceholder": "Coupon code (KOP10 / KOP20)",
+        "removeNamed": "Remove {name} from the cart",
+        "decrease": "Remove one unit",
+        "increase": "Add one unit",
+        "couponApplied": "Coupon {code} applied",
+        "removeCoupon": "Remove",
+        "couponPlaceholder": "Discount code",
         "applyCoupon": "Apply",
-        "couponApplied": "Coupon applied: {value}% off"
+        "couponInvalid": "That coupon does not exist in the sample store.",
+        "couponHint": "Try the coupon BIENVENIDA10 (10% off). Pricing rules enabled in the store admin apply automatically."
       },
       "address": {
-        "title": "Shipping address",
+        "title": "Details and shipping address",
+        "fillSample": "Use sample details",
         "fullName": "Full name",
+        "document": "ID document",
+        "docType": "Document type",
+        "docTypes": {
+          "CC": "CC",
+          "CE": "CE",
+          "PP": "Passport"
+        },
         "email": "Email",
-        "phone": "Phone",
-        "address": "Address",
+        "phone": "Mobile",
         "city": "City",
-        "zip": "ZIP code",
-        "mapHint": "Delivery map (mock)"
+        "address": "Address",
+        "deliveryEstimate": "Shipping to {city}: {min} to {max} business days. Ships from the {warehouse}.",
+        "wantsCompany": "I need the e-invoice issued to a company",
+        "companyName": "Company name",
+        "companyNit": "NIT (without check digit)",
+        "nitDv": "Calculated check digit: {dv}",
+        "consent": "I authorize the processing of my personal data to handle this order (Colombian Law 1581 of 2012).",
+        "privacyNote": "Demo: use fictitious data. What you type stays in this browser and is not sent to any server."
       },
       "payment": {
         "title": "Payment method",
-        "subtitle": "Common payment methods in Colombia. In this demo the payment is simulated; in your project we connect the gateway you choose.",
-        "methods": {
-          "card": "Card",
-          "pse": "PSE",
-          "nequi": "Nequi",
-          "daviplata": "Daviplata",
-          "mercadoPago": "Mercado Pago",
-          "wompi": "Wompi",
-          "applePay": "Apple Pay",
-          "googlePay": "Google Pay",
-          "addi": "Addi BNPL"
-        },
+        "subtitle": "Payment methods commonly used in Colombia. In this demo the payment is simulated: nothing is charged and no gateway is contacted. In your project we connect the gateway you choose (for example Wompi, PayU, Mercado Pago or ePayco).",
         "cardNumber": "Card number",
-        "cardName": "Cardholder name",
-        "addiHint": "Example of paying in installments with Addi: approval and terms are set by Addi in the real integration.",
-        "redirectHint": "In the real store you are redirected to the provider's portal to complete the payment. Here the payment is simulated.",
-        "walletHint": "In the real store you confirm the payment from your digital wallet. Here the payment is simulated.",
-        "cardExpiry": "MM/YY",
-        "cardHint": "Demo: do not enter real card data; nothing is sent or stored."
+        "brands": {
+          "visa": "Visa",
+          "mastercard": "Mastercard",
+          "amex": "American Express"
+        },
+        "cardName": "Name on card",
+        "cardExpiry": "Expires (MM/YY)",
+        "cardCvv": "CVV",
+        "cardHint": "Do not enter real card details: nothing is sent or stored here.",
+        "useTestCard": "Use approved test card",
+        "useDeclinedCard": "Use declined test card",
+        "pseHint": "In your real store, PSE shows the list of banks and takes you to your bank’s online banking. Here the approval is simulated.",
+        "walletPhone": "Mobile number registered in {wallet}",
+        "walletHint": "In your real store you get a {wallet} notification to approve the payment. Here the approval is simulated.",
+        "codHint": "You pay in cash when you receive the order. The order stays pending payment until delivery.",
+        "addiHint": "Installments: in your real store Addi reviews and approves the credit. Here it is simulated and applies to purchases from {min}.",
+        "declined": "Payment declined by the simulated gateway (declined test card). Try another card or payment method.",
+        "processing": "Processing simulated payment…",
+        "stockChanged": "Stock changed: review your cart before paying."
       },
-      "confirmation": {
-        "title": "Sample order confirmed!",
-        "subtitle": "Simulated payment: nothing was charged and no real invoice was issued.",
-        "orderNumber": "Order number",
-        "cufe": "CUFE (simulated)",
-        "email": "Confirmation email",
-        "total": "Total paid",
-        "delivery": "Estimated delivery in 3 to 5 business days",
-        "continueShopping": "Continue shopping"
+      "errors": {
+        "fullName": "Enter your full name.",
+        "docNumber": "Enter a valid document number (5 to 12 characters).",
+        "email": "Enter a valid email.",
+        "phone": "Enter a 10-digit Colombian mobile number starting with 3.",
+        "cityId": "Choose a city.",
+        "address": "Enter the delivery address.",
+        "companyName": "Enter the company name.",
+        "companyNit": "The NIT must have 9 digits.",
+        "consent": "You must authorize data processing to continue.",
+        "summary": "Check the fields marked in red.",
+        "cardNumber": "Invalid card number.",
+        "cardName": "Enter the name as it appears on the card.",
+        "cardExpiry": "Invalid or expired date (MM/YY).",
+        "cardCvv": "The CVV has 3 or 4 digits."
       },
       "summary": {
         "title": "Summary",
-        "subtotal": "Subtotal (VAT included)",
-        "discount": "Discount",
+        "paidTitle": "Order summary",
+        "subtotal": "Subtotal ({n, plural, one {# product} other {# products}})",
+        "adjustments": {
+          "volume10": "Rule: 10% for large orders",
+          "freeShipping": "Rule: free shipping",
+          "coffee3x2": "Rule: coffee 3 for 2",
+          "wine15": "Rule: 15% off wines",
+          "coupon": "Coupon {code}"
+        },
+        "discount": "Discounts",
         "shipping": "Shipping",
-        "total": "Total",
         "free": "Free",
-        "freeShippingApplied": "Free shipping applied",
+        "total": "Total",
         "taxIncluded": "VAT included ({rate}%)",
-        "freeShippingFrom": "Free shipping from {amount}."
+        "shippingFlat": "The free-shipping rule is off in the admin: shipping has a flat rate.",
+        "freeShippingApplied": "Free shipping applied",
+        "freeShippingMissing": "Add {amount} more for free shipping.",
+        "rulesNote": "Discounts come from the pricing rules enabled in the store admin."
+      },
+      "confirmation": {
+        "title": "Sample order confirmed!",
+        "titleCod": "Sample order received! You pay on delivery",
+        "subtitle": "Simulated payment: nothing was charged, no email was sent and the invoice was not transmitted to the DIAN.",
+        "orderNumber": "Order number",
+        "method": "Payment method",
+        "pendingPayment": "pending until delivery",
+        "approved": "approved (simulated)",
+        "email": "Buyer email",
+        "total": "Total",
+        "cufe": "Sample CUFE",
+        "cufeHint": "Calculated in your browser with SHA-384 over the order data and a fictitious technical key, as defined by the DIAN. It is not valid and is not reported.",
+        "delivery": "Estimated delivery in {city}: {min} to {max} business days.",
+        "whatsappTitle": "Preview of the WhatsApp confirmation message",
+        "whatsappText": "Hi {name}. We received your order {order} for {total} ({method}).\nWe will ship it to {city}; it arrives in {min} to {max} business days.\nWe will let you know when it leaves the warehouse.",
+        "whatsappHint": "Nothing is sent: in your project this message goes out through the WhatsApp Business API.",
+        "copy": "Copy message",
+        "downloadInvoice": "Download sample invoice (PDF)",
+        "seeInPanel": "See the order in the admin",
+        "continueShopping": "Keep shopping"
       }
     },
+    "invoice": {
+      "title": "Sales invoice (sample)",
+      "notValid": "Sample document generated by a demo: it is not a valid electronic invoice and was not transmitted to the DIAN.",
+      "seller": "Seller",
+      "buyer": "Buyer",
+      "document": "Document",
+      "address": "Address",
+      "order": "Order",
+      "date": "Date",
+      "payment": "Payment method",
+      "product": "Product",
+      "qty": "Qty",
+      "unit": "Unit price",
+      "amount": "Amount",
+      "subtotal": "Subtotal",
+      "discount": "Discounts",
+      "shipping": "Shipping",
+      "total": "Total",
+      "ivaIncluded": "VAT included ({rate}%)",
+      "cufe": "Sample CUFE (SHA-384)",
+      "cufePending": "Calculating…",
+      "footer": "Sample store from the KopTup demo. In your project, the electronic invoice is issued by a DIAN-authorized technology provider or by your ERP."
+    },
+    "orderActions": {
+      "prepare": "Move to preparing",
+      "ship": "Create label",
+      "track": "Simulate next event"
+    },
+    "guide": {
+      "title": "Create label for {order}",
+      "confirm": "Create label (simulated)",
+      "destination": "Destination: {city} ({department}). Ships from the {warehouse}.",
+      "carrier": "Carrier",
+      "days": "{min} to {max} days",
+      "simulatedNote": "Simulated label and rate with illustrative values. In your project they are created through the carrier’s or a shipping aggregator’s API."
+    },
+    "orderDetail": {
+      "title": "Order {order}",
+      "customer": "Customer",
+      "city": "City",
+      "address": "Address",
+      "email": "Email",
+      "document": "Document",
+      "payment": "Payment",
+      "paid": "paid",
+      "unpaid": "pending payment",
+      "warehouse": "Warehouse",
+      "guide": "Label",
+      "product": "Product",
+      "qty": "Qty",
+      "amount": "Amount"
+    },
     "vendor": {
-      "title": "Vendor dashboard",
-      "subtitle": "Manage your catalog, orders and pricing rules (sample data).",
-      "createProduct": "Create product",
-      "live": "Simulated",
-      "liveOrders": "Today's orders",
-      "topProducts": "Top products (30 days)",
-      "lowStock": "Low stock",
-      "unitsSold": "sold",
-      "units": "u.",
+      "title": "Store admin",
+      "subtitle": "Orders, catalog, inventory and pricing rules of the sample store. Changes show up instantly in the store.",
       "kpis": {
-        "todaySales": "Today's sales",
-        "aov": "Average order value",
-        "conversion": "Conversion",
-        "activeProducts": "Active products"
+        "title": "Last 24 hours",
+        "hint": "Calculated from the sample orders and yours. The change compares with the daily average of the previous 7 days.",
+        "sales": "Sales (excl. shipping)",
+        "orders": "Orders",
+        "ticket": "Average order value",
+        "units": "Units sold",
+        "deltaHint": "Versus the daily average of the previous 7 days"
       },
-      "order": {
+      "orders": {
+        "title": "Orders",
+        "period": "Period",
+        "periods": {
+          "1": "Last 24 h",
+          "7": "Last 7 days",
+          "30": "Last 30 days"
+        },
+        "search": "Search order or customer",
+        "export": "Export CSV",
+        "statusFilter": "Filter by status",
+        "all": "All",
+        "number": "Order",
         "customer": "Customer",
-        "items": "Items",
+        "city": "City",
         "total": "Total",
+        "payment": "Payment",
         "status": "Status",
-        "action": "Action",
-        "advance": "Advance →",
-        "status_new": "New",
-        "status_preparing": "Preparing",
-        "status_shipped": "Shipped",
-        "status_delivered": "Delivered"
+        "when": "When",
+        "action": "Next step",
+        "yours": "Yours",
+        "unpaid": "to collect",
+        "empty": "No orders match those filters.",
+        "more": "Show {n} more"
       },
       "pricing": {
         "title": "Pricing rules",
-        "subtitle": "Sample rules: switch them on or off",
-        "rule1": "10% off when the cart exceeds $ 300.000 COP",
-        "rule2": "Free shipping for VIP customers",
-        "rule3": "Dynamic pricing by demand (Tech category)",
-        "rule4": "Bundle: 3x2 on coffee and wines"
-      },
-      "createForm": {
-        "title": "New product",
-        "name": "Name",
-        "sku": "SKU",
-        "price": "Price",
-        "stock": "Stock",
-        "description": "Description",
-        "dropImages": "Drag images here or click to select them",
-        "cancel": "Cancel",
-        "save": "Save product",
-        "namePlaceholder": "Blue canvas sneakers",
-        "filesSelected": "{count, plural, one {# image selected} other {# images selected}} (not uploaded in the demo)",
-        "simulatedHint": "Demo: the product is saved as a simulated draft and is not published in the sample store.",
-        "savedNotice": "“{name}” was saved as a draft (simulated: it is not published in the sample store).",
-        "dismiss": "Dismiss notice"
+        "subtitle": "Turn them on or off: they apply instantly in the cart.",
+        "on": "On",
+        "off": "Off",
+        "rules": {
+          "volume10": "10% off when the cart is over {from}",
+          "freeShipping": "Free shipping from {from} (otherwise {fee})",
+          "coffee3x2": "Single-origin coffee 3 for 2 (every 3 bags, 1 free)",
+          "wine15": "15% off wines"
+        }
       }
     },
+    "csv": {
+      "order": "Order",
+      "date": "Date",
+      "customer": "Customer",
+      "city": "City",
+      "department": "Department",
+      "products": "Products",
+      "units": "Units",
+      "subtotal": "Subtotal",
+      "discount": "Discount",
+      "shipping": "Shipping",
+      "total": "Total",
+      "iva": "VAT included",
+      "method": "Payment method",
+      "paid": "Paid",
+      "status": "Status",
+      "carrier": "Carrier",
+      "guide": "Label",
+      "yes": "Yes",
+      "no": "No",
+      "sku": "SKU",
+      "product": "Product",
+      "category": "Category",
+      "netSales": "Net sales (COP)",
+      "stock": "Stock",
+      "coverageDays": "Days of inventory",
+      "orders": "Orders"
+    },
+    "catalog": {
+      "title": "Catalog and inventory",
+      "subtitle": "Stock per warehouse, units sold in 30 days and days of inventory at the current pace.",
+      "search": "Search by name or SKU",
+      "onlyLow": "Low stock only ({n})",
+      "create": "Create product",
+      "product": "Product",
+      "price": "Price",
+      "stock": "Stock",
+      "sold30": "Sold 30 d",
+      "coverage": "Inventory for",
+      "status": "Status",
+      "actions": "Actions",
+      "created": "created by you",
+      "days": "{n, plural, one {# day} other {# days}}",
+      "hidden": "Hidden",
+      "published": "Published",
+      "edit": "Edit",
+      "restock": "Restock",
+      "publish": "Publish in the store",
+      "hide": "Hide from the store",
+      "delete": "Delete",
+      "empty": "No products match those filters.",
+      "more": "Show {n} more",
+      "form": {
+        "editTitle": "Edit product",
+        "createTitle": "New product",
+        "saveChanges": "Save changes",
+        "publish": "Publish in the store",
+        "name": "Name",
+        "namePlaceholder": "Blue canvas sneakers",
+        "baseNameNote": "Sample products keep their name; you can edit their price and description.",
+        "sku": "SKU",
+        "category": "Category",
+        "price": "Price incl. VAT (COP)",
+        "ivaIncluded": "VAT included",
+        "stock": "Initial stock (Bogotá warehouse)",
+        "description": "Description",
+        "imagePreview": "Photo preview",
+        "imageChange": "Change photo",
+        "imagePick": "Choose a product photo (optional)",
+        "imageNote": "The photo is downsized and saved only in this browser; it is not uploaded to any server.",
+        "errors": {
+          "name": "Enter a name with at least 3 characters.",
+          "sku": "Use 4 to 20 letters, numbers or hyphens.",
+          "skuTaken": "A product with that SKU already exists.",
+          "price": "The price must be between COP 1,000 and COP 50,000,000.",
+          "stock": "Enter a whole number between 0 and 5,000.",
+          "image": "We could not read that image (8 MB max)."
+        }
+      },
+      "restockTitle": "Restock “{name}”",
+      "restockConfirm": "Add to inventory",
+      "restockQty": "Units",
+      "restockWarehouse": "Warehouse",
+      "restockNote": "Simulates incoming goods. In your project, receipts are recorded from the purchase order or your ERP.",
+      "deleteTitle": "Delete product",
+      "deleteConfirm": "Delete “{name}”? It is removed from the store, the cart and favorites."
+    },
     "ops": {
-      "title": "Operations & Logistics",
-      "subtitle": "Warehouses, picking, carriers and returns in a single view (sample data).",
+      "title": "Logistics",
+      "subtitle": "Warehouses, dispatch, shipment tracking, carriers and returns for the sample store.",
       "warehouses": {
         "title": "Warehouses",
-        "capacity": "Capacity",
-        "pendingOrders": "Pending orders"
+        "capacityOf": "Capacity: {n} units",
+        "occupancy": "Occupancy ({n} units)",
+        "pendingOrders": "Orders to dispatch",
+        "inTransit": "Shipments on the way"
       },
-      "picking": {
-        "title": "Picking in progress",
-        "items": "items",
-        "wave1": "Wave 1 (express)",
-        "wave2": "Wave 2 (24 h)",
-        "wave3": "Wave 3 (48 h)",
-        "complete": "Complete",
-        "inProgress": "In progress",
-        "queued": "Queued"
-      },
-      "carriers": {
-        "title": "Colombian carriers (sample rates)",
-        "carrier": "Carrier",
-        "sla": "Delivery time",
-        "cost": "Rate per parcel",
-        "rating": "Rating",
-        "status": "Status",
-        "active": "Active",
-        "names": {
-          "servientrega": "Servientrega",
-          "coordinadora": "Coordinadora",
-          "interrapidisimo": "Interrapidísimo",
-          "tcc": "TCC"
-        }
+      "dispatch": {
+        "title": "To dispatch ({n})",
+        "hint": "Orders already picked. {n, plural, =0 {No new orders waiting for confirmation.} one {# new order is waiting for confirmation in the admin.} other {# new orders are waiting for confirmation in the admin.}}",
+        "empty": "No picked orders. Move an order to preparing in the store admin.",
+        "units": "{n, plural, one {# unit} other {# units}}",
+        "from": "Ships from the {warehouse}"
       },
       "tracking": {
-        "title": "Shipment tracking",
-        "status": {
-          "in_transit": "In transit",
-          "out_for_delivery": "Out for delivery",
-          "delivered": "Delivered"
-        }
+        "title": "Shipments on the way ({n})",
+        "hint": "Simulated tracking: advance the events by hand.",
+        "empty": "No shipments on the way."
+      },
+      "carriers": {
+        "title": "National carriers",
+        "hint": "Sample rates for a standard parcel to Bogotá; they are not real quotes. Disabled carriers do not appear when creating labels.",
+        "carrier": "Carrier",
+        "sla": "Delivery time",
+        "cost": "Sample rate",
+        "rating": "Rating",
+        "enabled": "Available",
+        "toggle": "Use {carrier} to create labels"
       },
       "returns": {
         "title": "Returns",
+        "hint": "Approving a return puts the unit back in stock, except for warranty claims (sent to technical review).",
+        "create": "Register return",
+        "id": "Return",
+        "order": "Order",
+        "product": "Product",
         "reason": "Reason",
+        "amount": "Refund amount",
         "statusLabel": "Status",
+        "actions": "Actions",
         "reasons": {
-          "defective": "Defective product",
-          "size": "Wrong size",
-          "notAsDescribed": "Not as described",
-          "changeMind": "Change of mind"
+          "retracto": "Right of withdrawal",
+          "warranty": "Warranty",
+          "size": "Size exchange",
+          "notAsDescribed": "Not as described"
+        },
+        "reasonHelp": {
+          "retracto": "In distance sales the buyer can withdraw within 5 business days after delivery (Colombian Law 1480 of 2011, art. 47).",
+          "warranty": "The product has a defect: it is reviewed and repaired, replaced or refunded under the warranty.",
+          "size": "The customer asks for another size or item.",
+          "notAsDescribed": "The product received does not match the store listing."
         },
         "status": {
-          "approved": "Approved",
           "pending": "Pending",
-          "reviewing": "Reviewing"
-        }
+          "approved": "Approved",
+          "rejected": "Rejected"
+        },
+        "restocked": "Back in stock",
+        "toWarranty": "Sent to technical review",
+        "approve": "Approve",
+        "reject": "Reject",
+        "createTitle": "Register return",
+        "createConfirm": "Register",
+        "already": "There is already a return for that product in this order."
       }
     },
     "admin": {
-      "title": "Admin & analytics",
-      "subtitle": "Executive view with sample figures for the month.",
+      "title": "Sales reports",
+      "subtitle": "Figures calculated in your browser from the sample orders and the ones you place in the demo.",
+      "period": "Report period",
+      "periods": "Last {n} days",
+      "exportProducts": "Sales by product (CSV)",
+      "exportDaily": "Sales by day (CSV)",
+      "includesYours": "Includes {n, plural, one {# order of yours} other {# orders of yours}} totaling {total} in sales.",
       "kpis": {
-        "revenue": "Monthly sales",
-        "gmv": "Gross merchandise value (GMV)",
-        "customers": "Customers",
-        "aov": "Average order value",
-        "ltv": "Lifetime value (LTV)",
-        "cac": "Acquisition cost (CAC)"
+        "sales": "Net sales",
+        "orders": "Orders",
+        "ticket": "Average order value",
+        "customers": "Unique customers",
+        "repeat": "Repeat rate",
+        "units": "Units",
+        "hint": "Net sales = product value after discounts, excluding shipping. Repeat rate = customers with 2 or more orders in the period. Cancelled orders excluded."
       },
       "charts": {
-        "sales30d": "Sales last 30 days",
-        "topCategories": "Top categories"
+        "daily": "Sales by day (last {n} days)",
+        "dailyAria": "Bar chart of sales by day",
+        "categories": "Sales by category",
+        "cities": "Sales by city",
+        "methods": "Orders by payment method",
+        "topProducts": "Best-selling products",
+        "today": "today",
+        "daysAgo": "{n} d ago",
+        "ordersCount": "{n, plural, one {# order} other {# orders}}",
+        "maxDay": "Best day in the period: {amount}. Hover over a bar to see the details."
       },
-      "ai": {
-        "title": "Sample insights",
-        "tone": {
-          "up": "Trend",
-          "down": "Alert",
-          "warn": "Attention",
-          "insight": "Insight"
+      "unitsShort": "{n} u.",
+      "insights": {
+        "title": "Recommendations",
+        "hint": "Calculated with simple rules over the data (not AI): inventory coverage, products bought together, weekly change by category and payment methods.",
+        "kinds": {
+          "restock": "Inventory",
+          "pair": "Bought together",
+          "trend": "Weekly trend",
+          "wallets": "Payment methods"
         },
-        "i1": "Beauty sales dropped 12% due to lower ad spend. Review campaign.",
-        "i2": "Forecast: Wine demand will rise 28% in the next 14 days.",
-        "i3": "Customers who buy coffee also buy the French press 41% of the time.",
-        "i4": "3 Tech SKUs will run out of stock in 5 days at current pace."
+        "restock": "Restock “{name}”: {stock} units left, about {days} days at the pace of the last 30 days.",
+        "restockAction": "Restock 30 units",
+        "pair": "{pct}% of the orders with “{a}” also include “{b}” ({n} orders). Useful for a bundle or a cart suggestion.",
+        "trendUp": "{category} sales went up {pct}% versus the previous week.",
+        "trendDown": "{category} sales went down {pct}% versus the previous week.",
+        "wallets": "{pct}% of the orders in the last 30 days were paid with Nequi or Daviplata."
       },
       "marketing": {
-        "title": "Marketing automations (sample)",
+        "title": "Marketing automations",
+        "hint": "Audiences calculated from the orders. Emails are not sent in the demo: you can see the message each customer would get.",
+        "toggle": "Turn on {name}",
+        "audience": "Audience today",
+        "customers": "{n, plural, one {# customer} other {# customers}}",
         "active": "Active",
-        "openRate": "Open rate",
-        "campaigns": {
-          "abandonment": {
-            "title": "Cart abandonment",
-            "desc": "Recover sales with automated emails at 1h, 24h and 72h."
-          },
+        "paused": "Paused",
+        "preview": "See message",
+        "previewTitle": "Message: {name}",
+        "subjectLabel": "Subject",
+        "bodyLabel": "Message",
+        "previewNote": "Preview with the first customer in the audience ({n} in total). Nothing is sent.",
+        "sampleName": "customer",
+        "automations": {
           "postPurchase": {
-            "title": "Post-purchase",
-            "desc": "Thank-you, tracking and review request."
+            "title": "After purchase",
+            "desc": "Customers with an order delivered in the last 7 days: thank-you and review request.",
+            "subject": "{name}, how did you like your purchase?",
+            "body": "Hi {name}.\nYour order {order} has arrived. Can you tell us how “{product}” worked for you?\nYour review helps other customers decide."
           },
           "winBack": {
-            "title": "Win-back",
-            "desc": "Re-engage inactive customers with personalized offers."
+            "title": "Win back",
+            "desc": "Customers with no purchases in the last 21 days or more.",
+            "subject": "{name}, we miss you",
+            "body": "Hi {name}.\nWe have not seen you in the store for a while. Your last purchase was “{product}”.\nHere is the coupon BIENVENIDA10 for your next order."
           },
           "replenishment": {
-            "title": "Replenishment",
-            "desc": "Reminders for consumable products."
+            "title": "Coffee replenishment",
+            "desc": "Customers who bought coffee 20 to 30 days ago and have not bought it again.",
+            "subject": "{name}, running low on coffee?",
+            "body": "Hi {name}.\nYour bag of “{product}” from order {order} must be running out.\nOrder another one before you run out of coffee."
           }
         }
       },
-      "fraud": {
-        "title": "Fraud control",
-        "score": "Average risk score",
-        "blocked": "Blocked today",
-        "review": "Under review",
-        "approved": "Approved",
-        "summary": "Sample indicators. In your project we connect the payment gateway's anti-fraud rules."
+      "risk": {
+        "title": "Risk review",
+        "hint": "Sample rules on orders not yet dispatched: cash on delivery from {cod}, first order from {first} and 3 or more units of the same tech product. In your project the gateway’s anti-fraud rules are added.",
+        "empty": "No orders match the rules.",
+        "rules": {
+          "codHigh": "High-value cash on delivery",
+          "firstOrderHigh": "High-value first order from the customer",
+          "bulkTech": "3 or more units of a tech product"
+        },
+        "decided": {
+          "approved": "Reviewed: approved",
+          "rejected": "Reviewed: cancelled"
+        },
+        "approve": "Approve",
+        "reject": "Cancel order"
       },
       "compliance": {
         "title": "Regulatory requirements",
-        "subtitle": "Configured when your store is implemented; this demo does not process payments or real data.",
+        "subtitle": "They are configured when your store is implemented; this demo does not process real payments or data.",
         "items": {
-          "dian": "DIAN e-invoicing",
-          "habeasData": "Personal data processing (Law 1581)",
-          "retracto": "Right of withdrawal (Law 1480)",
-          "pci": "Card data handled by the gateway (PCI DSS)"
+          "dian": {
+            "title": "DIAN electronic invoice",
+            "desc": "Issued by an authorized technology provider or your ERP. In the demo, the invoice and the CUFE are samples."
+          },
+          "habeasData": {
+            "title": "Data processing (Law 1581)",
+            "desc": "Consent at sign-up and checkout, a data policy and handling of inquiries and claims."
+          },
+          "retracto": {
+            "title": "Right of withdrawal (Law 1480)",
+            "desc": "Returns within 5 business days after delivery and payment reversal when applicable."
+          },
+          "pci": {
+            "title": "Card data at the gateway (PCI DSS)",
+            "desc": "The store does not keep card data: a certified payment gateway captures it."
+          }
         }
       }
-    },
-    "sampleData": "Sample data",
-    "sampleDataHint": "Sample store: products, prices, orders and figures are fictitious; payments are simulated."
+    }
   }
 }

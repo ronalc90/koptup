@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { BACKEND_URL } from '@/lib/backend-url';
+import { authFetch } from '@/lib/auth-token';
 
 interface EndpointTest {
   name: string;
@@ -20,7 +22,8 @@ interface TestResult {
   timestamp?: Date;
 }
 
-const DEFAULT_BACKEND_URL = 'https://koptupbackend-production.up.railway.app';
+// El backend configurado para esta web (NEXT_PUBLIC_API_URL).
+const DEFAULT_BACKEND_URL = BACKEND_URL;
 
 const endpoints: EndpointTest[] = [
   // Health & System
@@ -212,7 +215,10 @@ export default function TestPage() {
         options.body = JSON.stringify(endpoint.body);
       }
 
-      const response = await fetch(url, options);
+      // La sesión (Authorization) solo se envía al backend configurado, nunca
+      // a una URL escrita a mano en el campo.
+      const sameBackend = backendUrl.trim().replace(/\/+$/, '') === BACKEND_URL;
+      const response = sameBackend ? await authFetch(url, options) : await fetch(url, options);
       const responseText = await response.text();
 
       let data: any;

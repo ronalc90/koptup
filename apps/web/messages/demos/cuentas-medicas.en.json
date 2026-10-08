@@ -1,10 +1,349 @@
 {
   "demoMedicalAccounts": {
-    "backToDemos": "Back to Demos",
-    "title": "🏥 Healthcare expert system",
-    "subtitle": "Medical claims auditing: a rules engine checks CUPS and ICD-10 codes and fee schedules, and AI extracts the invoice data to flag potential denials.",
-    "adminButton": "Administration",
-    "viewProcess": "View Process",
-    "ragLink": "Want an AI that answers from your protocols, regulations and fee schedules, citing the source? Discover RAG systems"
+    "backToDemos": "Back to demos",
+    "title": "Healthcare expert system",
+    "subtitle": "Medical claims auditing: AI reads the PDF invoice, the engine compares each CUPS code against a sample fee schedule and proposes denials. You, as the auditor, confirm, adjust or discard each one.",
+    "ragLink": "Want an AI that answers from your protocols, regulations and fee schedules, citing the source? Discover RAG systems",
+    "badges": {
+      "sampleData": "Sample data",
+      "private": "Private demo"
+    },
+    "tabs": {
+      "label": "Demo sections",
+      "dashboard": "Dashboard",
+      "invoices": "Invoices",
+      "howItWorks": "How it audits"
+    },
+    "auditButton": "Audit invoice",
+    "sharedSpaceNote": "This demo space is shared: everyone with access sees the same invoices. Do not upload real patient data.",
+    "common": {
+      "retry": "Retry",
+      "refresh": "Refresh",
+      "loading": "Loading…",
+      "cancel": "Cancel",
+      "close": "Close",
+      "confirmDelete": "Yes, delete",
+      "keep": "No",
+      "delete": "Delete"
+    },
+    "access": {
+      "title": "Your access to this demo is not active",
+      "body": "This is a private demo: only people the KopTup team has given access can use it. If you had access, it may have expired or your session may have ended.",
+      "login": "Log in",
+      "request": "Request access"
+    },
+    "errors": {
+      "network": "We could not reach the demo server. Please try again in a few minutes.",
+      "server": "The demo server returned an error. Please try again.",
+      "notFound": "This invoice no longer exists: someone may have deleted it.",
+      "saveDecision": "The decision could not be saved. Please try again.",
+      "delete": "The invoice could not be deleted. Please try again.",
+      "report": "The file could not be generated. Please try again."
+    },
+    "entities": {
+      "provider": "Sample provider",
+      "payer": "Sample payer"
+    },
+    "states": {
+      "radicada": "Filed",
+      "enAuditoria": "Under review",
+      "auditada": "Audited",
+      "glosada": "With denials",
+      "aceptada": "Accepted",
+      "pagada": "Paid",
+      "rechazada": "Rejected"
+    },
+    "denialTypes": {
+      "tarifa": "Tariff difference",
+      "soporte": "Supporting documents",
+      "pertinencia": "Medical necessity",
+      "duplicidad": "Duplicate",
+      "autorizacion": "Authorization",
+      "facturacion": "Billing",
+      "otro": "Other"
+    },
+    "dashboard": {
+      "kpis": {
+        "invoices": "Invoices",
+        "billed": "Billed amount",
+        "denied": "Denied amount",
+        "toPay": "Amount to pay"
+      },
+      "kpiHint": "The denied amount changes when you confirm, adjust or discard denials in each invoice's detail.",
+      "byState": "Invoices by status",
+      "byType": "Denials by type",
+      "invoicesCount": "{count, plural, one {# invoice} other {# invoices}}",
+      "denialsCount": "{count, plural, one {# denial} other {# denials}}",
+      "noDenials": "No denials yet.",
+      "emptyTitle": "There are no invoices in this space yet",
+      "emptyBody": "Audit the sample invoice (fictitious data) in one click, or upload a test PDF.",
+      "emptyCta": "Audit the sample invoice",
+      "emptyUpload": "Upload a PDF",
+      "stepsTitle": "How this demo works",
+      "steps": {
+        "s1": {
+          "title": "You upload the invoice",
+          "desc": "A PDF with selectable text (not scanned)."
+        },
+        "s2": {
+          "title": "AI reads the data",
+          "desc": "Number, patient, ICD-10 diagnosis, authorization and the procedures table."
+        },
+        "s3": {
+          "title": "The engine applies the fee schedule",
+          "desc": "It compares each CUPS code against the sample fee schedule and computes the difference."
+        },
+        "s4": {
+          "title": "AI drafts a proposal",
+          "desc": "Amount to pay and rationale. It is a proposal: it does not decide for you."
+        },
+        "s5": {
+          "title": "You decide and download",
+          "desc": "You confirm, adjust or discard each denial and download the report as CSV or PDF."
+        }
+      }
+    },
+    "upload": {
+      "title": "Audit invoice",
+      "intro": "Upload the invoice as a PDF. The demo reads the text, extracts the data with AI, compares each CUPS code against the sample fee schedule and proposes denials.",
+      "sampleTitle": "Don't have a test invoice?",
+      "sampleBody": "Use the sample invoice: fictitious data from “Clínica Demo Los Andes” with two procedures above the fee schedule.",
+      "useSample": "Use sample invoice",
+      "downloadSample": "Download sample invoice (PDF)",
+      "dropzone": "Drag the PDFs here or",
+      "choose": "choose files",
+      "limits": "PDF with selectable text only (not scanned) · Max. 10 MB per file · Up to 10 files",
+      "multiNote": "If you upload several invoices, the demo merges their procedures into a single claim.",
+      "selected": "Selected files ({count})",
+      "remove": "Remove {name}",
+      "consent": "I confirm the files do not contain real patient data.",
+      "sharedNote": "What you upload stays visible to everyone with access to this demo until you delete it from Invoices.",
+      "submit": "{count, plural, one {Audit # file} other {Audit # files}}",
+      "processing": "Reading the PDF and querying the AI model… this can take up to a minute.",
+      "errors": {
+        "notPdf": "{name} is not a PDF.",
+        "tooBig": "{name} is larger than 10 MB.",
+        "tooMany": "You can upload up to 10 files.",
+        "sample": "The sample invoice could not be generated.",
+        "noInvoice": "The demo did not find a readable invoice in the files. Check that the PDF has selectable text (not scanned). The AI service may also be unavailable right now.",
+        "server": "The server could not process the files. Please try again in a few minutes."
+      },
+      "resultTitle": "Invoice {number} audited",
+      "resultProcedures": "Procedures read",
+      "resultMethod": "How it was read",
+      "methods": {
+        "HIBRIDO": "Pattern-based table + AI",
+        "IA": "AI only",
+        "REGEX": "Patterns only"
+      },
+      "resultDenials": "Proposed denials",
+      "resultToPay": "Proposed amount to pay",
+      "resultReview": "The model flagged this invoice for auditor review.",
+      "viewDetail": "View detail and decide denials",
+      "another": "Audit another invoice",
+      "failedTitle": "The audit could not be completed"
+    },
+    "invoices": {
+      "title": "Invoices",
+      "search": "Search by invoice number",
+      "state": "Status",
+      "allStates": "All",
+      "from": "Registered from",
+      "to": "Registered to",
+      "clear": "Clear filters",
+      "exportCsv": "Export CSV",
+      "showing": "Showing {shown} of {total}",
+      "loadMore": "Load more",
+      "updatedAt": "Updated at {time}",
+      "empty": "There are no invoices yet. Audit the sample invoice or upload a PDF.",
+      "noResults": "No invoices match the filters.",
+      "columns": {
+        "number": "Invoice",
+        "state": "Status",
+        "provider": "Provider",
+        "payer": "Payer",
+        "registered": "Registered",
+        "billed": "Billed",
+        "denied": "Denied",
+        "toPay": "To pay"
+      },
+      "view": "View detail",
+      "deleteQuestion": "Delete invoice {number} and its denials?",
+      "deleted": "Invoice {number} deleted"
+    },
+    "detail": {
+      "back": "Back to invoices",
+      "title": "Invoice {number}",
+      "registered": "Registered on {date}",
+      "downloadCsv": "Download CSV",
+      "downloadPdf": "PDF report",
+      "values": {
+        "billed": "Billed amount",
+        "vat": "VAT",
+        "denied": "Denied amount",
+        "toPay": "Amount to pay"
+      },
+      "review": {
+        "title": "Auditor decision",
+        "progress": "{done} of {total} denials decided",
+        "complete": "Review complete: you decided every denial.",
+        "none": "No proposed denials: every amount is within the sample fee schedule.",
+        "flagged": "The model flagged this invoice for human review."
+      },
+      "proposal": {
+        "title": "AI model proposal",
+        "note": "Text generated by the model (in Spanish). It is a proposal: the auditor decides.",
+        "empty": "The model did not leave a rationale for this invoice."
+      },
+      "patient": {
+        "title": "Patient and visit",
+        "name": "Patient",
+        "document": "ID document",
+        "diagnosis": "Diagnosis (ICD-10)",
+        "authorization": "Authorization",
+        "noAuthorization": "No authorization number",
+        "copay": "Copay",
+        "moderatorFee": "Moderating fee",
+        "notRead": "Not read"
+      },
+      "procedures": {
+        "title": "Procedures ({count})",
+        "code": "CUPS",
+        "description": "Description",
+        "qty": "Qty",
+        "billed": "Billed",
+        "tariff": "Sample tariff",
+        "difference": "Difference",
+        "proposed": "Proposed denial",
+        "notInTariff": "Not in the fee schedule",
+        "empty": "The demo did not find procedures in this invoice."
+      },
+      "trace": {
+        "title": "How this proposal was reached",
+        "read": "PDF reading",
+        "readValue": "{method} · {count, plural, one {# procedure} other {# procedures}}",
+        "readUnknown": "{count, plural, one {# procedure read} other {# procedures read}}",
+        "tariff": "Sample fee schedule",
+        "tariffValue": "{over} of {total} above the tariff",
+        "model": "Model proposal",
+        "modelFlagged": "Asked for human review",
+        "modelOk": "No alerts",
+        "auditor": "Auditor decision",
+        "auditorNone": "No denials to decide"
+      }
+    },
+    "denials": {
+      "title": "Proposed denials ({count})",
+      "rule": "Rule {code}",
+      "proposedValue": "Proposed amount",
+      "currentValue": "Denied amount",
+      "tariffText": "{procedure}: billed {billed} per unit and the sample fee schedule allows {tariff}.",
+      "noTariffText": "{procedure}: the code is not in the sample fee schedule; the demo engine proposes denying {percent}% (provisional rule).",
+      "engineText": "See the engine's original text",
+      "confirm": "Confirm",
+      "adjust": "Adjust",
+      "discard": "Discard",
+      "reopen": "Reopen",
+      "newValue": "New denied amount (COP)",
+      "note": "Auditor note",
+      "notePlaceholder": "E.g.: tariff agreed in amendment 2 of the contract",
+      "noteRequired": "Write a note to discard the denial.",
+      "save": "Save decision",
+      "invalidValue": "Enter an amount between 0 and {max}.",
+      "saved": "Decision saved",
+      "decision": {
+        "pendiente": "Pending",
+        "confirmada": "Confirmed by the auditor",
+        "ajustada": "Adjusted by the auditor",
+        "descartada": "Discarded by the auditor"
+      }
+    },
+    "howItWorks": {
+      "title": "How this demo audits",
+      "intro": "This is exactly what the demo engine does with each invoice. Everything else is configured in your project.",
+      "pipeline": {
+        "s1": {
+          "title": "PDF reading",
+          "desc": "The server extracts the PDF text. Scanned PDFs (images) are not read in this demo."
+        },
+        "s2": {
+          "title": "AI extraction",
+          "desc": "The procedures table is read with patterns (code, description, quantity and amounts). An OpenAI language model (GPT-4o mini) extracts the invoice number, patient, ICD-10 diagnosis and authorization."
+        },
+        "s3": {
+          "title": "Fee schedule and rules",
+          "desc": "Each CUPS code is compared against the sample fee schedule. If the billed amount exceeds the tariff, a denial for the difference is proposed."
+        },
+        "s4": {
+          "title": "Model proposal",
+          "desc": "A second OpenAI model (GPT-4o) reviews the data and drafts a proposal: amount to pay, rationale and whether human review is needed."
+        },
+        "s5": {
+          "title": "Auditor decision",
+          "desc": "You confirm, adjust or discard each denial with a note. The server recalculates the totals and you can download the report as CSV or PDF."
+        }
+      },
+      "tariffTitle": "Sample fee schedule",
+      "tariffNote": "Sample codes and amounts used by the demo engine. They do not correspond to any real contract or fee schedule manual.",
+      "tariffSearch": "Search code or procedure",
+      "tariffCols": {
+        "code": "CUPS",
+        "description": "Procedure",
+        "value": "Sample amount"
+      },
+      "tariffEmpty": "No code matches the search.",
+      "rulesTitle": "Rules it applies",
+      "rules": {
+        "r1": "Billed amount above the sample tariff: denial for the difference times the quantity (rule 202, tariff difference).",
+        "r2": "Code not in the sample fee schedule: the engine proposes denying 30% of the amount. It is a provisional demo rule; in your project it is replaced by your contract's tariffs.",
+        "r3": "Rule codes (such as 202) are internal to the demo; in your project they are mapped to Colombia's current Single Manual of Returns, Denials and Responses."
+      },
+      "notIncludedTitle": "What this demo does not do (built in your project)",
+      "notIncluded": {
+        "n1": "Read RIPS files (JSON or Excel) and cross-check them with the PDF.",
+        "n2": "Validate authorizations with the payer (validity and quantities).",
+        "n3": "Review clinical consistency between diagnosis and procedure, and medications.",
+        "n4": "Detect duplicates across invoices.",
+        "n5": "Take the provider and payer from the PDF: the demo uses a sample provider and payer.",
+        "n6": "Apply per-payer contracts and official catalogs (CUPS, ICD-10) with their version.",
+        "n7": "Read scanned PDFs (OCR).",
+        "n8": "Keep data separate per client: this demo space is shared."
+      },
+      "projectNote": "In your project we connect your contracts and fee schedules, the official catalogs and your rules, and process RIPS and supporting documents."
+    },
+    "report": {
+      "listFileName": "demo-audit-invoices",
+      "detailFileName": "demo-audit",
+      "noDenial": "No denial",
+      "notInTariff": "Not in the fee schedule",
+      "total": "TOTAL",
+      "sampleNote": "Sample data",
+      "columns": {
+        "invoice": "Invoice",
+        "code": "CUPS",
+        "description": "Description",
+        "qty": "Quantity",
+        "billed": "Billed amount",
+        "tariff": "Sample tariff",
+        "difference": "Difference",
+        "proposed": "Proposed denial",
+        "final": "Final denial",
+        "decision": "Auditor decision",
+        "note": "Auditor note"
+      },
+      "pdf": {
+        "sampleBanner": "SAMPLE DATA - KOPTUP DEMO - NOT AN OFFICIAL DOCUMENT",
+        "title": "Audit report - invoice {number}",
+        "registered": "Registered",
+        "state": "Status",
+        "values": "Amounts",
+        "procedures": "Procedures",
+        "denials": "Denials and auditor decision",
+        "proposed": "proposed",
+        "final": "final",
+        "aiProposal": "AI model proposal",
+        "footer": "Generated in KopTup's \"Healthcare expert system\" demo with the sample fee schedule. Providers and payers are samples."
+      }
+    }
   }
 }

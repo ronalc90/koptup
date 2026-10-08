@@ -14,8 +14,14 @@ import {
 } from '../controllers/document.controller';
 import { upload, handleUploadError } from '../middleware/upload';
 import { uploadRateLimiter } from '../middleware/rateLimiter';
+import { authenticate } from '../middleware/auth';
 
 const router = Router();
+
+// Política: autenticado + aislamiento por usuario (cada consulta del
+// controlador filtra por el id de la sesión). La sesión se verifica ANTES de
+// aceptar archivos (multer) para no escribir en disco peticiones anónimas.
+router.use(authenticate as RequestHandler);
 
 /**
  * @swagger

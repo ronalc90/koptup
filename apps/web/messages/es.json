@@ -37,7 +37,7 @@
     "demos": {
       "sectionBadge": "Demos Interactivas",
       "sectionTitle": "Soluciones para Cada Industria",
-      "sectionSubtitle": "Explora {count} prototipos navegables que muestran el rango de soluciones que construimos. Dos de ellos (chatbot RAG y generador de LinkedIn Ads) usan OpenAI real; el resto son mockups interactivos con datos simulados para que sientas cómo se vería cada solución antes de contratarnos.",
+      "sectionSubtitle": "Explora {count} prototipos navegables que muestran el rango de soluciones que construimos. Dos de ellos (chatbot RAG y generador de LinkedIn Ads) usan OpenAI real; el resto son mockups interactivos con datos simulados para que sientas cómo se vería cada solución antes de contratarnos. Las demos abiertas no piden registro; las que requieren acceso se solicitan.",
       "exploreDemo": "Explorar demo →",
       "ecommerce": {
         "title": "E-Commerce Completo",
@@ -795,7 +795,18 @@
     "about": "Nosotros",
     "contact": "Contacto",
     "login": "Iniciar sesión",
-    "dashboard": "Panel"
+    "dashboard": "Panel",
+    "requestDemo": "Solicitar demo",
+    "wantThis": "Quiero esto",
+    "myAccount": "Mi cuenta",
+    "customer": "Cliente",
+    "myDemos": "Mis demos",
+    "adminPanel": "Panel de administración",
+    "invoices": "Facturas",
+    "support": "Soporte",
+    "logout": "Cerrar sesión",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú"
   },
   "execDashboard": {
     "menu": {
@@ -1168,7 +1179,7 @@
     "badge": "Prototipos Interactivos",
     "title": "Prueba Nuestras Soluciones",
     "subtitle": "Explora prototipos navegables con datos simulados — dos de ellos (chatbot RAG y LinkedIn Ads) usan OpenAI real",
-    "interactive": "100% Interactivo - Sin registro",
+    "interactive": "Las demos abiertas no piden registro; las demás se abren con un acceso aprobado",
     "includes": "Incluye:",
     "tryDemo": "Probar Demo",
     "chatbot": {
@@ -1253,16 +1264,16 @@
       "description": "Creamos una demo ajustada a tu caso de uso",
       "button": "Solicitar Demo"
     },
-    "accessModal": {
-      "openButton": "Acceder con código",
-      "title": "Acceso a Demo Privada",
-      "description": "Ingresa el código para acceder a la demo privada",
-      "label": "Código de acceso",
-      "placeholder": "Ej. 2020",
-      "cancel": "Cancelar",
-      "access": "Acceder",
-      "noCodeHint": "¿No tienes código? Contacta nuestro equipo comercial.",
-      "error": "Código inválido, intenta nuevamente."
+    "linkedin": {
+      "badge": "Marketing IA",
+      "title": "Generador LinkedIn con IA",
+      "description": "Plan editorial de 30 días + generación con OpenAI: posts, ad copy, carruseles y capturas listas para promocionar tu negocio.",
+      "features": {
+        "0": "Calendario editorial de 30 días con plan demo a demo",
+        "1": "Generación 1-click con OpenAI: post + ad + carrusel",
+        "2": "Vista previa real de LinkedIn + 8 ángulos × 5 tonos",
+        "3": "Captura PNG diseñada + foto y video del demo real"
+      }
     }
   },
   "dashboardLayout": {
@@ -1274,7 +1285,11 @@
     "messages": "Mensajes",
     "myProfile": "Mi Perfil",
     "settings": "Configuración",
-    "logout": "Cerrar Sesión"
+    "logout": "Cerrar Sesión",
+    "myDemos": "Mis demos",
+    "backToSite": "Volver al sitio",
+    "prospectTitle": "Cuenta de prospecto",
+    "prospectBody": "Aquí ves las demos que te aprobamos. Si contratas un proyecto, verás también pedidos, entregables y facturas."
   },
   "dashboardPage": {
     "loading": "Cargando dashboard...",
@@ -1443,7 +1458,8 @@
     "errorCredentials": "El correo electrónico o la contraseña son incorrectos. Si no tienes cuenta, regístrate primero.",
     "errorNotFound": "No encontramos una cuenta con este correo. ¿Quieres crear una cuenta nueva?",
     "errorNetwork": "No se pudo conectar con el servidor. Por favor verifica tu conexión a internet.",
-    "createAccount": "Crear cuenta"
+    "createAccount": "Crear cuenta",
+    "errorNotActivated": "Tu cuenta aún no está activada. Usa el enlace de activación que te enviamos o pide uno nuevo al equipo de KopTup."
   },
   "registerPage": {
     "title": "Crear Cuenta",
@@ -1478,7 +1494,8 @@
     "backHome": "Volver al inicio",
     "errorPasswordMismatch": "Las contraseñas no coinciden.",
     "errorPasswordLength": "La contraseña debe tener al menos 8 caracteres.",
-    "errorTerms": "Debes aceptar los términos y la privacidad."
+    "errorTerms": "Debes aceptar los términos y la privacidad.",
+    "fromContact": "Tu mensaje ya nos llegó: te responderemos al correo que indicaste. Crear una cuenta es opcional."
   },
   "aboutPage": {
     "badge": "Sobre Nosotros",
@@ -1627,7 +1644,9 @@
       "errorSubmit": "Error al enviar el mensaje. Por favor intenta de nuevo o contáctanos directamente por WhatsApp.",
       "success": {
         "title": "¡Mensaje enviado!",
-        "subtitle": "Gracias por contactarnos. Te responderemos pronto."
+        "subtitle": "Gracias por contactarnos. Te responderemos pronto.",
+        "nextStep": "Mientras te respondemos, puedes probar nuestro asistente RAG en la demo.",
+        "nextStepCta": "Probar la demo"
       }
     },
     "services": {
@@ -1814,7 +1833,8 @@
     "titleWithName": "¿Necesitas un {demoName} como este?",
     "description": "Desarrollamos software a medida adaptado a las necesidades de tu empresa. Solicita una cotización sin compromiso.",
     "requestQuote": "Solicitar Cotización",
-    "viewPricing": "Ver Planes y Precios"
+    "viewPricing": "Ver Planes y Precios",
+    "requestGuidedDemo": "Solicitar demo guiada"
   },
   "demoEcommerce": {
     "title": "Tienda Demo",
@@ -1925,23 +1945,15 @@
   },
   "profilePage": {
     "title": "Mi Perfil",
-    "subtitle": "Gestiona tu información personal y preferencias",
+    "subtitle": "Tus datos de contacto y la seguridad de tu cuenta.",
     "personalInfo": "Información Personal",
     "edit": "Editar",
     "cancel": "Cancelar",
     "save": "Guardar",
-    "changePhoto": "Cambiar foto",
     "fullName": "Nombre completo",
     "email": "Correo electrónico",
     "phone": "Teléfono",
-    "companyRole": "Rol en la empresa",
-    "companyInfo": "Información de la Empresa",
-    "companyName": "Nombre de la empresa",
-    "taxId": "NIT / RUT",
-    "country": "País",
-    "address": "Dirección",
-    "city": "Ciudad",
-    "postalCode": "Código postal",
+    "companyName": "Empresa",
     "changePassword": "Cambiar Contraseña",
     "changePasswordDesc": "Actualiza tu contraseña para mantener tu cuenta segura",
     "currentPassword": "Contraseña actual",
@@ -1950,28 +1962,42 @@
     "newPasswordPlaceholder": "Mínimo 8 caracteres",
     "confirmNewPassword": "Confirmar nueva contraseña",
     "confirmNewPasswordPlaceholder": "Confirma tu nueva contraseña",
-    "permissions": "Permisos",
-    "viewProjects": "Ver proyectos",
-    "createOrders": "Crear pedidos",
-    "manageBilling": "Gestionar facturación",
-    "inviteUsers": "Invitar usuarios",
-    "companySettings": "Configuración de empresa",
-    "notificationPrefs": "Preferencias de Notificaciones",
-    "emailOrders": "Pedidos por email",
-    "emailProjects": "Proyectos por email",
-    "emailBilling": "Facturación por email",
-    "emailMessages": "Mensajes por email",
-    "pushNotifications": "Notificaciones push",
-    "weeklyReport": "Reporte semanal",
-    "savePreferences": "Guardar Preferencias",
-    "passwordMismatch": "Las contraseñas no coinciden",
-    "passwordUpdated": "Contraseña actualizada exitosamente",
-    "preferencesSaved": "Preferencias guardadas",
-    "roles": {
-      "owner": "Propietario",
+    "passwordMismatch": "Las contraseñas no coinciden.",
+    "passwordUpdated": "Tu contraseña quedó actualizada. Úsala la próxima vez que inicies sesión.",
+    "emailHelp": "Es tu usuario para iniciar sesión; para cambiarlo, escríbenos.",
+    "phonePlaceholder": "+57 300 000 0000",
+    "notProvided": "Sin registrar",
+    "profileSaved": "Tus datos quedaron guardados.",
+    "googleAccount": "Tu cuenta entra con Google, así que no tiene una contraseña de KopTup para cambiar.",
+    "account": "Tu cuenta",
+    "accountType": "Tipo de cuenta",
+    "signInMethod": "Inicio de sesión",
+    "signInPassword": "Email y contraseña",
+    "signInGoogle": "Google",
+    "memberSince": "Creada el",
+    "lastLogin": "Último ingreso",
+    "accountHelp": "El tipo de cuenta lo asigna el equipo de KopTup: define qué secciones del portal ves.",
+    "loading": "Cargando tu perfil",
+    "loadError": "No pudimos cargar tu perfil. Revisa tu conexión e intenta de nuevo.",
+    "retry": "Reintentar",
+    "accountRoles": {
       "admin": "Administrador",
-      "member": "Miembro",
-      "viewer": "Observador"
+      "manager": "Gerente",
+      "sales": "Comercial",
+      "developer": "Desarrollo",
+      "prospect": "Prospecto (demos)",
+      "client": "Cliente",
+      "user": "Usuario"
+    },
+    "errors": {
+      "name": "Escribe tu nombre (mínimo 2 caracteres).",
+      "phone": "Escribe un teléfono válido (solo números, espacios y +).",
+      "save": "No pudimos guardar tus datos. Intenta de nuevo.",
+      "currentRequired": "Escribe tu contraseña actual.",
+      "passwordShort": "La contraseña nueva debe tener al menos {min} caracteres.",
+      "wrongPassword": "La contraseña actual no es correcta.",
+      "tooMany": "Demasiados intentos. Espera un minuto e intenta de nuevo.",
+      "passwordSave": "No pudimos cambiar la contraseña. Intenta de nuevo."
     }
   },
   "ordersPage": {
@@ -2628,7 +2654,7 @@
     "q5q": "¿Ofrecen mantenimiento después de entregar el proyecto?",
     "q5a": "Sí. Ofrecemos planes de mantenimiento y soporte mensual. También evolucionamos el producto según las necesidades de tu negocio. No te dejamos solo después del lanzamiento.",
     "q6q": "¿Puedo ver ejemplos del trabajo de KopTup?",
-    "q6a": "Sí. Tenemos {count} prototipos navegables en www.koptup.com/demo — dos de ellos (chatbot RAG y generador de LinkedIn Ads) usan OpenAI real; el resto son mockups interactivos con datos simulados para que veas cómo se vería cada solución antes de contratarnos. Sin registro ni tarjeta de crédito.",
+    "q6a": "Sí. Tenemos {count} prototipos navegables en www.koptup.com/demo — dos de ellos (chatbot RAG y generador de LinkedIn Ads) usan OpenAI real; el resto son mockups interactivos con datos simulados para que veas cómo se vería cada solución antes de contratarnos. Las demos abiertas no piden registro ni tarjeta de crédito; las que requieren acceso se solicitan en www.koptup.com/solicitar-demo.",
     "ctaTitle": "¿Listo para desarrollar tu proyecto?",
     "ctaSubtitle": "Cuéntanos qué necesitas. Respondemos en menos de 24 horas con una propuesta personalizada.",
     "ctaButton": "Solicitar Cotización Gratis"
@@ -2947,5 +2973,533 @@
       "title": "Carriles",
       "subtitle": "Tareas agrupadas por responsable"
     }
+  },
+  "demoAccessBadge": {
+    "publico": "Abierta",
+    "solicitud": "Requiere acceso",
+    "privado": "Solo por invitación",
+    "inactiva": "En mantenimiento"
+  },
+  "demoHub": {
+    "legend": "Cómo se abre cada demo",
+    "requestDemo": "Solicitar demo",
+    "open": "Abrir demo",
+    "requestAccess": "Solicitar acceso",
+    "requestCustom": "Solicitar demo personalizada",
+    "requestGuided": "Solicitar demo guiada",
+    "login": "Ya tengo acceso: iniciar sesión",
+    "preview": "Ver detalles",
+    "maintenance": "En mantenimiento",
+    "daysLeft": "{days, plural, =0 {Vence hoy} one {Te queda # día} other {Te quedan # días}}",
+    "moreTitle": "Más demos",
+    "moreSubtitle": "Demos de casos específicos que no están en el catálogo principal. Cada una indica cómo se abre.",
+    "myDemos": "Ya tengo acceso: Mis demos"
+  },
+  "demoAccess": {
+    "metaTitle": "{name}: acceso",
+    "checking": "Verificando tu acceso…",
+    "allowed": "Tienes acceso a esta demo.",
+    "allowedDays": "Tienes acceso a esta demo. {days, plural, =0 {Vence hoy.} one {Te queda # día.} other {Te quedan # días.}}",
+    "status": {
+      "sin_sesion": "Sin sesión",
+      "sin_acceso": "Sin acceso",
+      "expirado": "Acceso vencido",
+      "revocado": "Acceso retirado",
+      "desactivada": "En mantenimiento",
+      "no_disponible": "No se pudo verificar"
+    },
+    "message": {
+      "sin_sesion": {
+        "solicitud": "Para usar esta demo necesitas un acceso aprobado. Solicítalo y, si lo aprobamos, te enviamos un enlace para entrar. Si ya lo tienes, inicia sesión.",
+        "privado": "Esta demo se abre solo con una invitación del equipo de KopTup. Pide una demo personalizada; si ya te invitamos, inicia sesión."
+      },
+      "sin_acceso": {
+        "solicitud": "Tu cuenta todavía no tiene acceso a esta demo. Solicítalo y lo revisamos.",
+        "privado": "Tu cuenta no tiene una invitación para esta demo. Pide una demo personalizada y la revisamos."
+      },
+      "expirado": "Tu acceso a esta demo venció. Pide más tiempo y lo revisamos.",
+      "expiradoFecha": "Tu acceso a esta demo venció el {date}. Pide más tiempo y lo revisamos.",
+      "revocado": "Tu acceso a esta demo fue retirado. Si crees que es un error, escríbenos o solicítalo de nuevo.",
+      "desactivada": "Esta demo está en mantenimiento en este momento. Vuelve más tarde o explora las demás demos.",
+      "no_disponible": "No pudimos verificar tu acceso en este momento porque el servicio no respondió. Intenta de nuevo en unos minutos."
+    },
+    "cta": {
+      "open": "Abrir la demo",
+      "requestAccess": "Solicitar acceso",
+      "requestCustom": "Solicitar demo personalizada",
+      "login": "Ya tengo acceso: iniciar sesión",
+      "myDemos": "Ver mis demos",
+      "moreTime": "Pedir más tiempo",
+      "requestAgain": "Solicitar de nuevo",
+      "contact": "Escribirnos",
+      "otherDemos": "Ver otras demos",
+      "requestGuided": "Solicitar demo guiada",
+      "retry": "Intentar de nuevo",
+      "allDemos": "Ver todas las demos"
+    },
+    "previewTitle": "Vista previa",
+    "previewNote": "Así describimos esta demo en el catálogo de KopTup.",
+    "preview": {
+      "cuentasMedicas": {
+        "title": "Sistema experto para salud",
+        "description": "Audita cuentas médicas con reglas, códigos CUPS y CIE-10 y tarifarios, y señala posibles glosas. La IA extrae los datos de las facturas.",
+        "features": {
+          "0": "Reglas de auditoría con códigos CUPS y CIE-10",
+          "1": "Tarifarios y señales de posibles glosas",
+          "2": "Extracción de datos de facturas con IA"
+        }
+      },
+      "sistemaExperto": {
+        "title": "Sistema experto de auditoría médica",
+        "description": "Panel de auditoría médica con búsqueda de códigos CUPS y configuración del motor de reglas.",
+        "features": {
+          "0": "Panel con estadísticas de auditoría",
+          "1": "Búsqueda de códigos CUPS",
+          "2": "Configuración del motor de reglas"
+        }
+      }
+    }
+  },
+  "requestDemo": {
+    "title": "Solicitar demo",
+    "subtitle": "Elige las demos que te interesan y cuéntanos tu caso. Revisamos tu solicitud y, si la aprobamos, te enviamos un enlace para entrar.",
+    "breadcrumbHome": "Inicio",
+    "form": {
+      "sectionDemos": "Demos que te interesan",
+      "demosHelp": "Elige una o varias (máximo {max}). Las que dicen «Requiere acceso» o «Solo por invitación» se abren solo si aprobamos tu solicitud.",
+      "sectionYou": "Tus datos y tu caso",
+      "name": "Nombre",
+      "namePlaceholder": "Tu nombre completo",
+      "company": "Empresa",
+      "companyPlaceholder": "Nombre de tu empresa",
+      "jobTitle": "Cargo",
+      "jobTitlePlaceholder": "Ej.: Gerente de operaciones",
+      "optional": "(opcional)",
+      "email": "Email",
+      "emailPlaceholder": "tu@empresa.com",
+      "phone": "Teléfono o WhatsApp",
+      "phonePlaceholder": "+57 300 000 0000",
+      "phoneHelp": "Si lo dejas, podemos enviarte el enlace de acceso por WhatsApp.",
+      "country": "País",
+      "countryPlaceholder": "Elige tu país",
+      "size": "Tamaño de la empresa",
+      "sizeOption": "{size} personas",
+      "useCase": "Caso de uso",
+      "useCasePlaceholder": "Ej.: tenemos 2 bodegas y hoy controlamos el inventario en Excel…",
+      "useCaseHint": "No incluyas datos de pacientes ni información confidencial.",
+      "honeypot": "Sitio web (deja este campo vacío)",
+      "consent": "Autorizo a KopTup a tratar mis datos personales para gestionar esta solicitud y contactarme sobre ella, según la <link>Política de tratamiento de datos</link> (Ley 1581 de 2012).",
+      "required": "Obligatorio",
+      "submit": "Enviar solicitud",
+      "submitting": "Enviando…"
+    },
+    "errors": {
+      "demos": "Elige al menos una demo.",
+      "nombre": "Escribe tu nombre.",
+      "empresa": "Escribe el nombre de tu empresa.",
+      "email": "Escribe un email válido.",
+      "telefono": "Escribe un teléfono válido (solo números, espacios y +).",
+      "pais": "Elige tu país.",
+      "tamanoEmpresa": "Elige el tamaño de tu empresa.",
+      "casoDeUso": "Cuéntanos en pocas palabras qué quieres resolver (mínimo {min} caracteres).",
+      "consentimiento": "Debes autorizar el tratamiento de tus datos para enviar la solicitud.",
+      "checkFields": "Revisa los campos marcados.",
+      "rateLimited": "Recibimos varias solicitudes desde tu conexión o con este email. Intenta de nuevo más tarde o escríbenos por WhatsApp.",
+      "invalidField": "Revisa este campo.",
+      "unknownDemo": "Alguna de las demos elegidas ya no existe. Quítala e intenta de nuevo.",
+      "generic": "No pudimos enviar tu solicitud. Intenta de nuevo en unos minutos.",
+      "network": "No pudimos conectarnos con el servidor. Revisa tu conexión e intenta de nuevo."
+    },
+    "aside": {
+      "title": "Qué pasa después",
+      "step1Title": "Revisamos tu solicitud",
+      "step1Body": "Una persona del equipo de KopTup la revisa en horario hábil (lunes a viernes, hora de Colombia).",
+      "step2Title": "Te enviamos tu enlace de acceso",
+      "step2Body": "Si la aprobamos, recibes un enlace de un solo uso para crear tu contraseña: por email o, si nos dejas tu teléfono, por WhatsApp.",
+      "step3Title": "Entras a Mis demos",
+      "step3Body": "Ahí ves las demos aprobadas y los días que te quedan de acceso.",
+      "talkTitle": "¿Prefieres hablar ya?",
+      "talkBody": "Escríbenos por WhatsApp y te respondemos en horario hábil.",
+      "whatsappCta": "Escribir por WhatsApp",
+      "whatsappText": "Hola, quiero una demo de KopTup.",
+      "privacy": "Usamos tus datos solo para gestionar esta solicitud. Puedes pedir que los actualicemos o los borremos cuando quieras."
+    },
+    "success": {
+      "title": "Recibimos tu solicitud",
+      "code": "Tu código es <mono>{code}</mono>. Guárdalo por si nos escribes.",
+      "merged": "Ya teníamos una solicitud tuya en revisión: le sumamos las demos que elegiste.",
+      "emailNote": "Te escribiremos a {email}.",
+      "nextTitle": "Qué pasa ahora",
+      "step1Title": "Solicitud recibida",
+      "step1Body": "Quedó registrada con tu autorización de datos.",
+      "step2Title": "Revisión del equipo",
+      "step2Body": "La revisamos en horario hábil (lunes a viernes, hora de Colombia).",
+      "step3Title": "Acceso a tus demos",
+      "step3Body": "Si la aprobamos, te enviamos un enlace de un solo uso para crear tu contraseña y entrar a Mis demos.",
+      "ragTitle": "Mientras tanto, prueba la demo del asistente RAG",
+      "ragBody": "IA que responde con documentos y cita la fuente. Se abre sin registro.",
+      "ragCta": "Probar la demo",
+      "home": "Volver al inicio"
+    }
+  },
+  "activate": {
+    "metaTitle": "Activa tu acceso",
+    "checking": "Verificando tu enlace…",
+    "title": "Hola, {name}",
+    "subtitle": "Crea tu contraseña para activar tu cuenta ({email}) y entrar a tus demos.",
+    "expires": "Este enlace es de un solo uso (vence el {date}).",
+    "password": "Contraseña",
+    "passwordHelp": "Usa al menos {min} caracteres.",
+    "confirm": "Confirma la contraseña",
+    "show": "Mostrar contraseña",
+    "hide": "Ocultar contraseña",
+    "submit": "Activar mi acceso",
+    "done": "Tu cuenta quedó activa. Te llevamos a Mis demos…",
+    "errors": {
+      "short": "La contraseña debe tener al menos {min} caracteres.",
+      "long": "La contraseña puede tener máximo {max} caracteres.",
+      "mismatch": "Las contraseñas no coinciden."
+    },
+    "errorTitles": {
+      "token_invalid": "Este enlace no es válido",
+      "token_used": "Este enlace ya se usó",
+      "token_replaced": "Este enlace fue reemplazado",
+      "token_expired": "Este enlace venció",
+      "rate_limited": "Demasiados intentos",
+      "network": "Sin conexión con el servidor",
+      "generic": "No pudimos activar tu cuenta"
+    },
+    "errorBodies": {
+      "token_invalid": "Revisa que lo hayas copiado completo. Si el problema sigue, pide un enlace nuevo al equipo de KopTup.",
+      "token_used": "Si ya creaste tu contraseña, inicia sesión para ver tus demos.",
+      "token_replaced": "Se generó un enlace más reciente para tu cuenta: usa el último que recibiste o pide uno nuevo.",
+      "token_expired": "Los enlaces de activación vencen a las 72 horas. Pide uno nuevo al equipo de KopTup.",
+      "rate_limited": "Espera un minuto e intenta de nuevo.",
+      "network": "Revisa tu conexión e intenta de nuevo.",
+      "generic": "Intenta de nuevo en unos minutos."
+    },
+    "login": "Iniciar sesión",
+    "retry": "Intentar de nuevo",
+    "askNewLink": "Pedir un enlace nuevo por WhatsApp",
+    "whatsappText": "Hola, necesito un enlace nuevo para activar mi acceso a las demos de KopTup.",
+    "home": "Volver al inicio"
+  },
+  "myDemos": {
+    "title": "Mis demos",
+    "titleWithName": "Hola, {name}. Estas son tus demos",
+    "subtitle": "Las demos que te aprobamos, con los días de acceso que te quedan.",
+    "welcome": "Tu cuenta quedó activa. Ya puedes abrir tus demos.",
+    "loadError": "No pudimos cargar tus demos.",
+    "retry": "Reintentar",
+    "loading": "Cargando tus demos",
+    "emptyTitle": "Aún no tienes demos",
+    "emptyBody": "Solicita una demo y, si la aprobamos, aparecerá aquí con su tiempo de acceso.",
+    "requestDemo": "Solicitar una demo",
+    "status": {
+      "activa": "Activa",
+      "pronto": "Vence pronto",
+      "vencida": "Vencida",
+      "revocada": "Retirada",
+      "mantenimiento": "En mantenimiento"
+    },
+    "daysLeft": "{days, plural, =0 {Vence hoy} one {Te queda # día} other {Te quedan # días}}",
+    "revoked": "Este acceso fue retirado.",
+    "ended": "Terminó el {date}",
+    "expiresOn": "Vence el {date}",
+    "lastAccess": "Último ingreso: {date}",
+    "neverOpened": "Aún no la abres",
+    "maintenance": "La demo está en mantenimiento; tu acceso sigue vigente.",
+    "open": "Abrir demo",
+    "moreTime": "Pedir más tiempo",
+    "requestAgain": "Solicitar de nuevo",
+    "otherTitle": "¿Te interesa otra solución?",
+    "otherBody": "Pide acceso a otra demo y la revisamos.",
+    "otherCta": "Solicitar otra demo",
+    "dataNote": "Las demos usan datos de ejemplo, salvo que la demo indique otra cosa. No cargues información confidencial.",
+    "allDemos": "Las demos abiertas del <link>catálogo</link> siguen disponibles sin solicitud."
+  },
+  "adminLayout": {
+    "brand": "Admin",
+    "groupCommercial": "Comercial",
+    "groupOperations": "Operación",
+    "home": "Inicio",
+    "demoRequests": "Solicitudes de demo",
+    "demoGrants": "Accesos a demos",
+    "demoCatalog": "Catálogo de demos",
+    "orders": "Pedidos",
+    "deliverables": "Entregables",
+    "invoices": "Facturas",
+    "conversations": "Conversaciones",
+    "users": "Usuarios",
+    "contacts": "Contactos",
+    "settings": "Configuración",
+    "viewSite": "Ver sitio",
+    "logout": "Salir",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
+    "roles": {
+      "admin": "Administrador",
+      "manager": "Gerente",
+      "sales": "Comercial",
+      "other": "Equipo"
+    }
+  },
+  "adminDemos": {
+    "close": "Cerrar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "add": "Agregar",
+    "refresh": "Actualizar",
+    "search": "Buscar",
+    "loading": "Cargando…",
+    "loadError": "No se pudo cargar la información. Revisa tu sesión e intenta de nuevo.",
+    "actionError": "No se pudo completar la acción. Intenta de nuevo.",
+    "all": "Todas",
+    "allDemos": "Todas las demos",
+    "filterDemo": "Filtrar por demo",
+    "actions": "Acciones",
+    "view": "Ver",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "pageOf": "Página {page} de {pages} · {total} en total",
+    "readOnly": "Tu rol solo puede consultar esta sección.",
+    "days": "días",
+    "daysShort": "{days} días",
+    "customDays": "Otra cantidad de días",
+    "daysLeftShort": "{days, plural, =0 {vence hoy} one {queda # día} other {quedan # días}}",
+    "people": "{size} personas",
+    "requestStatus": {
+      "pendiente": "Pendiente",
+      "en_revision": "En revisión",
+      "aprobada": "Aprobada",
+      "rechazada": "Rechazada"
+    },
+    "grantStatus": {
+      "activo": "Activo",
+      "por_vencer": "Por vencer",
+      "expirado": "Vencido",
+      "revocado": "Revocado"
+    },
+    "accountStatus": {
+      "invitado": "Sin activar",
+      "activo": "Activa"
+    },
+    "notice": {
+      "sent": "Enviado",
+      "notSent": "No enviado"
+    },
+    "rejectReasons": {
+      "spam": "Spam",
+      "fuera_de_perfil": "Fuera de perfil",
+      "datos_invalidos": "Datos inválidos",
+      "duplicada": "Duplicada",
+      "otro": "Otro"
+    },
+    "audit": {
+      "demo_request": {
+        "update": "Solicitud actualizada",
+        "approve": "Solicitud aprobada",
+        "reject": "Solicitud rechazada"
+      },
+      "demo_grant": {
+        "create": "Acceso concedido",
+        "extend": "Acceso extendido",
+        "revoke": "Acceso revocado",
+        "resend_activation": "Enlace de activación nuevo"
+      },
+      "demo_catalog": {
+        "update": "Catálogo actualizado"
+      },
+      "user": {
+        "activate": "Cuenta activada",
+        "role_change": "Rol cambiado"
+      }
+    },
+    "requests": {
+      "title": "Solicitudes de demo",
+      "subtitle": "Lo que llega desde el formulario «Solicitar demo». Apruébalas para crear el acceso y el enlace de activación.",
+      "searchPlaceholder": "Buscar por nombre, empresa, email, código o caso de uso",
+      "colCode": "Código · Recibida",
+      "colPerson": "Persona",
+      "colCountry": "País · Tamaño",
+      "colDemos": "Demos",
+      "colStatus": "Estado",
+      "review": "Revisar",
+      "empty": "No hay solicitudes con estos filtros.",
+      "footer": "Las solicitudes llegan desde el <link>formulario público</link>; el equipo recibe un aviso por email o WhatsApp si están configurados."
+    },
+    "detail": {
+      "received": "Recibida el {date}",
+      "resubmitted": "{count, plural, one {la persona volvió a enviar el formulario # vez} other {la persona volvió a enviar el formulario # veces}}",
+      "markReview": "Marcar en revisión",
+      "email": "Email",
+      "phone": "Teléfono",
+      "whatsapp": "WhatsApp",
+      "whatsappGreeting": "Hola {name}, te escribimos de KopTup por tu solicitud de demo {code}.",
+      "country": "País",
+      "size": "Tamaño",
+      "origin": "Página de origen",
+      "useCase": "Caso de uso y demos pedidas",
+      "consent": "Autorización de datos",
+      "consentGiven": "Autorizó el tratamiento de sus datos (Ley 1581 de 2012) el {date} · política {version}.",
+      "consentMissing": "Sin autorización registrada.",
+      "notices": "Avisos",
+      "noticeTeamEmail": "Aviso al equipo por email",
+      "noticeTeamWhatsapp": "Aviso al equipo por WhatsApp",
+      "noticeAck": "Acuse al solicitante",
+      "noticeDecision": "Correo de la decisión",
+      "notes": "Notas internas",
+      "noNotes": "Sin notas todavía.",
+      "byRequester": "El solicitante",
+      "addNote": "Agregar nota",
+      "addNotePlaceholder": "Nota interna (solo la ve el equipo)…",
+      "history": "Historial",
+      "noHistory": "Sin acciones del equipo todavía.",
+      "approveTab": "Aprobar",
+      "rejectTab": "Rechazar",
+      "demosToGrant": "Demos a conceder",
+      "privateAdminOnly": "Las demos «Solo por invitación» las aprueba un administrador.",
+      "addDemo": "Agregar otra demo…",
+      "validity": "Vigencia del acceso",
+      "expiresOn": "Vence el {date}",
+      "internalNote": "Nota interna",
+      "internalNoteHint": "(solo la ve el equipo)",
+      "messageToProspect": "Mensaje para la persona",
+      "messageHint": "(va en el correo, si hay SMTP)",
+      "approveSummaryNew": "Se creará la cuenta de la persona (sin activar) con {count, plural, one {# acceso} other {# accesos}} de {days} días, y un enlace de activación de un solo uso que vence en 72 horas.",
+      "approveSummaryExisting": "La persona ya tiene cuenta: se le {count, plural, one {agrega # acceso} other {agregan # accesos}} de {days} días.",
+      "approveButton": "Aprobar y generar el enlace",
+      "approved": "Solicitud aprobada.",
+      "rejectReason": "Motivo",
+      "rejectDetail": "Detalle del motivo (interno)",
+      "notify": "Avisar a la persona por email",
+      "notifyHint": "Solo si hay SMTP. El motivo es interno: el correo lleva el mensaje de abajo o un texto genérico. Un spam nunca se avisa.",
+      "rejectMessage": "Mensaje para la persona (opcional)",
+      "rejectButton": "Rechazar solicitud",
+      "rejected": "Solicitud rechazada.",
+      "rejectedTitle": "Motivo del rechazo",
+      "grantsTitle": "Accesos de esta persona",
+      "account": "Cuenta: {email} · {status}",
+      "newLink": "Generar enlace de activación nuevo",
+      "newLinkHint": "La cuenta aún no se activa. Un enlace nuevo invalida los anteriores.",
+      "linkIssued": "Enlace nuevo generado.",
+      "manageGrants": "Gestionar accesos"
+    },
+    "link": {
+      "activationTitle": "Enlace de activación",
+      "activationHelp": "Es de un solo uso (vence el {date}). Cópialo o envíalo por WhatsApp: no se vuelve a mostrar (puedes generar uno nuevo).",
+      "loginTitle": "La persona ya tiene cuenta",
+      "loginHelp": "No necesita activar nada: comparte este enlace para que inicie sesión y vea sus demos.",
+      "linkLabel": "Enlace para compartir",
+      "copy": "Copiar",
+      "copiedShort": "Copiado",
+      "copied": "Enlace copiado al portapapeles.",
+      "copyFailed": "No se pudo copiar: selecciona el enlace y cópialo a mano.",
+      "whatsapp": "Enviar por WhatsApp",
+      "noPhone": "Sin teléfono registrado: copia el enlace y envíalo por el medio que prefieras.",
+      "emailSent": "También se envió por email.",
+      "emailPending": "El correo se sigue enviando.",
+      "emailFailed": "El correo no se pudo enviar: comparte el enlace.",
+      "emailNotConfigured": "El email no está configurado en el servidor: comparte el enlace tú mismo.",
+      "whatsappActivation": "Hola {name}, aprobamos tu acceso a {demos} en KopTup. Crea tu contraseña y entra con este enlace (es de un solo uso y vence el {date}): {url}",
+      "whatsappLogin": "Hola {name}, aprobamos tu acceso a {demos} en KopTup. Inicia sesión con tu cuenta y ábrelas desde Mis demos: {url}"
+    },
+    "grants": {
+      "title": "Accesos a demos",
+      "subtitle": "Cada acceso es una demo concedida a una persona, con su vigencia y su uso real.",
+      "invite": "Conceder acceso",
+      "kpi": {
+        "activo": "Activos",
+        "por_vencer": "Por vencer (3 días o menos)",
+        "expirado": "Vencidos",
+        "revocado": "Revocados"
+      },
+      "tabs": {
+        "activo": "Activos",
+        "por_vencer": "Por vencer",
+        "expirado": "Vencidos",
+        "revocado": "Revocados"
+      },
+      "searchPlaceholder": "Buscar por nombre, email o empresa",
+      "colPerson": "Persona",
+      "colDemo": "Demo",
+      "colStatus": "Estado",
+      "colExpires": "Vence",
+      "colLastAccess": "Último ingreso",
+      "colVisits": "Visitas",
+      "empty": "No hay accesos con estos filtros.",
+      "never": "Nunca",
+      "deletedAccount": "Cuenta eliminada",
+      "extend": "Extender",
+      "revoke": "Revocar",
+      "newLink": "Enlace de activación",
+      "viewRequest": "Ver solicitud",
+      "extendTitle": "Extender {demo} · {name}",
+      "currentExpiry": "Vence actualmente el {date}.",
+      "newExpiry": "Nueva fecha: {date}",
+      "extended": "Acceso extendido.",
+      "revokeTitle": "Revocar {demo} · {name}",
+      "revokeHelp": "La persona deja de poder abrir la demo de inmediato (el servidor lo verifica en cada ingreso). Queda en la bitácora.",
+      "revokeReason": "Motivo (opcional, interno)",
+      "revoked": "Acceso revocado.",
+      "inviteTitle": "Conceder acceso directo",
+      "inviteHelp": "Para dar acceso sin solicitud previa. Si el email no tiene cuenta, se crea una sin activar y se genera su enlace de activación.",
+      "inviteEmail": "Email",
+      "inviteName": "Nombre",
+      "inviteNameHint": "Obligatorio si la persona no tiene cuenta.",
+      "inviteCompany": "Empresa",
+      "invitePhone": "Teléfono o WhatsApp",
+      "inviteDemos": "Demos",
+      "inviteSubmit": "Conceder acceso",
+      "invited": "Acceso concedido.",
+      "inviteEmailError": "Escribe un email válido.",
+      "inviteDemosError": "Elige al menos una demo."
+    },
+    "catalog": {
+      "title": "Catálogo de demos",
+      "subtitle": "Modo de acceso, estado y vigencia por defecto de las {count} demos.",
+      "info": "Los cambios se aplican en el sitio en máximo un minuto y quedan en la bitácora con tu usuario.",
+      "modesHelp": "«Abierta»: cualquiera la abre. «Requiere acceso»: solo con un acceso aprobado. «Solo por invitación»: solo con invitación de un administrador y no aparece como abierta en /demo. Desactivada: se muestra «En mantenimiento» (el equipo la sigue abriendo).",
+      "filter": {
+        "todas": "Todas",
+        "publico": "Abiertas",
+        "solicitud": "Requieren acceso",
+        "privado": "Por invitación",
+        "inactivas": "Desactivadas"
+      },
+      "mode": {
+        "publico": "Abierta",
+        "solicitud": "Requiere acceso",
+        "privado": "Solo por invitación"
+      },
+      "colDemo": "Demo",
+      "colMode": "Modo de acceso",
+      "colActive": "Activa",
+      "colDuration": "Vigencia por defecto",
+      "colUpdated": "Último cambio",
+      "fixedPublic": "Siempre abierta (destino de la pauta)",
+      "saved": "Se guardó «{name}».",
+      "openDemo": "Abrir {name} en otra pestaña",
+      "readOnly": "Solo un administrador puede editar el catálogo."
+    }
+  },
+  "adminDashboard": {
+    "title": "Inicio del panel",
+    "subtitle": "Solicitudes de demo, accesos y contactos con los datos reales del sistema.",
+    "kpi": {
+      "pending": "Solicitudes por revisar",
+      "activeGrants": "Accesos activos",
+      "expiring": "Accesos por vencer (3 días)",
+      "newContacts": "Contactos sin leer"
+    },
+    "quickLinks": "Accesos rápidos",
+    "latestRequests": "Últimas solicitudes de demo",
+    "latestContacts": "Últimos contactos recibidos",
+    "viewAll": "Ver todos",
+    "loading": "Cargando…",
+    "loadError": "No se pudo cargar esta información.",
+    "noRequests": "Todavía no hay solicitudes de demo.",
+    "noContacts": "Todavía no hay contactos.",
+    "note": "Las cifras salen del backend en este momento; «—» significa que el dato no se pudo cargar."
   }
 }

@@ -1,378 +1,200 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { useTranslations } from 'next-intl';
-import { api } from '@/lib/api';
+import { useCallback, useEffect, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
+import Cookies from 'js-cookie';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import Card, { CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import {
-  UserCircleIcon,
-  BuildingOfficeIcon,
-  KeyIcon,
-  BellIcon,
-  ShieldCheckIcon,
-  PencilIcon,
-  CheckIcon,
-  XMarkIcon,
-  CameraIcon,
-} from '@heroicons/react/24/outline';
+import { UserCircleIcon, KeyIcon, ShieldCheckIcon, PencilIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { ApiError, apiRequest, formatDate } from '@/lib/demo-system';
 
-interface UserProfile {
-  name: string;
+/**
+ * Portal › Mi perfil. Todo sale del backend y se guarda de verdad:
+ *  - GET /api/auth/me: datos de la cuenta (nombre, email, teléfono, empresa, rol, fechas).
+ *  - PATCH /api/auth/me: nombre, teléfono y empresa (el email y el rol no se cambian aquí).
+ *  - POST /api/auth/change-password: verifica la contraseña actual y devuelve una sesión nueva.
+ */
+
+interface Profile {
+  id: string;
   email: string;
-  phone: string;
-  avatar?: string;
-  role: 'owner' | 'admin' | 'member' | 'viewer';
-}
-
-interface CompanyInfo {
   name: string;
-  taxId: string;
-  address: string;
-  city: string;
-  country: string;
-  postalCode: string;
+  role: string;
+  phone: string | null;
+  company: string | null;
+  provider: 'local' | 'google';
+  accountStatus: 'invitado' | 'activo';
+  created_at: string | null;
+  last_login: string | null;
 }
 
-interface NotificationPreferences {
-  emailOrders: boolean;
-  emailProjects: boolean;
-  emailBilling: boolean;
-  emailMessages: boolean;
-  pushNotifications: boolean;
-  weeklyReport: boolean;
+interface Session {
+  accessToken: string;
+  refreshToken: string;
+  user: { id: string; email: string; name: string; role: string };
 }
+
+const ROLE_KEYS = ['admin', 'manager', 'sales', 'developer', 'prospect', 'client', 'user'] as const;
+const MIN_PASSWORD = 8;
+
+type Draft = { name: string; phone: string; company: string };
+type PasswordField = 'currentPassword' | 'newPassword' | 'confirmPassword';
 
 export default function ProfilePage() {
   const t = useTranslations('profilePage');
-  const [loading, setLoading] = useState(true);
-  const [editingProfile, setEditingProfile] = useState(false);
-  const [editingCompany, setEditingCompany] = useState(false);
-  const [savingProfile, setSavingProfile] = useState(false);
-  const [savingCompany, setSavingCompany] = useState(false);
+  const locale = useLocale();
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState<Draft>({ name: '', phone: '', company: '' });
+  const [saving, setSaving] = useState(false);
+  const [profileError, setProfileError] = useState<{ field?: keyof Draft; message: string } | null>(null);
+  const [profileSaved, setProfileSaved] = useState(false);
 
-  const [userProfile, setUserProfile] = useState<UserProfile>({
-    name: '',
-    email: '',
-    phone: '',
-    role: 'owner',
-  });
+  const [passwords, setPasswords] = useState<Record<PasswordField, string>>({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [passwordError, setPasswordError] = useState<{ field?: PasswordField; message: string } | null>(null);
+  const [passwordSaved, setPasswordSaved] = useState(false);
+  const [changing, setChanging] = useState(false);
 
-  const [companyInfo, setCompanyInfo] = useState<CompanyInfo>({
-    name: '',
-    taxId: '',
-    address: '',
-    city: '',
-    country: '',
-    postalCode: '',
-  });
-
-  const [notificationPrefs, setNotificationPrefs] = useState<NotificationPreferences>({
-    emailOrders: true,
-    emailProjects: true,
-    emailBilling: true,
-    emailMessages: true,
-    pushNotifications: true,
-    weeklyReport: false,
-  });
-
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-  });
-
-  useEffect(() => {
-    loadProfileData();
+  const load = useCallback(async () => {
+    setLoadError(false);
+    try {
+      const data = await apiRequest<Profile>('/auth/me');
+      setProfile(data);
+      setDraft({ name: data.name ?? '', phone: data.phone ?? '', company: data.company ?? '' });
+    } catch {
+      setLoadError(true);
+    }
   }, []);
 
-  const loadProfileData = async () => {
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const serverMessage = (err: unknown, fallback: string) =>
+    err instanceof ApiError && err.status >= 400 && err.status < 500 && locale === 'es' && !/^HTTP \d+/.test(err.message) ? err.message : fallback;
+
+  const startEdit = () => {
+    if (!profile) return;
+    setDraft({ name: profile.name ?? '', phone: profile.phone ?? '', company: profile.company ?? '' });
+    setProfileError(null);
+    setProfileSaved(false);
+    setEditing(true);
+  };
+
+  const saveProfile = async () => {
+    setProfileError(null);
+    setProfileSaved(false);
+    if (draft.name.trim().length < 2) return setProfileError({ field: 'name', message: t('errors.name') });
+    if (draft.phone.trim() && !/^[+0-9 ().-]{7,40}$/.test(draft.phone.trim())) return setProfileError({ field: 'phone', message: t('errors.phone') });
+    setSaving(true);
     try {
-      // Try to fetch from API
-      const user = await api.getCurrentUser();
-      setUserProfile({
-        name: user.name || 'Juan Pérez',
-        email: user.email || 'juan.perez@empresa.com',
-        phone: user.phone || '+57 300 123 4567',
-        avatar: user.avatar,
-        role: user.role || 'owner',
+      const data = await apiRequest<Profile>('/auth/me', {
+        method: 'PATCH',
+        body: { name: draft.name.trim(), phone: draft.phone.trim(), company: draft.company.trim() },
       });
-
-      // Set company info if available from API
-      if (user.company) {
-        setCompanyInfo({
-          name: user.company.name || 'Empresa Demo S.A.S',
-          taxId: user.company.taxId || '900.123.456-7',
-          address: user.company.address || 'Calle 123 #45-67',
-          city: user.company.city || 'Bogotá',
-          country: user.company.country || 'Colombia',
-          postalCode: user.company.postalCode || '110111',
-        });
+      setProfile(data);
+      setEditing(false);
+      setProfileSaved(true);
+      // El nombre también se muestra en el encabezado (guardado al iniciar sesión).
+      try {
+        const stored = JSON.parse(localStorage.getItem('user') ?? 'null');
+        if (stored) localStorage.setItem('user', JSON.stringify({ ...stored, name: data.name }));
+      } catch {
+        // sin almacenamiento local: solo cambia el encabezado al volver a entrar
       }
-    } catch (error: any) {
-      if (!error?.suppressLogging) {
-        console.error('Failed to load profile from API, using fallback data:', error);
-      }
+    } catch (err) {
+      const field = err instanceof ApiError && Array.isArray(err.data.fields) ? (String(err.data.fields[0]) as keyof Draft) : undefined;
+      setProfileError({ field, message: serverMessage(err, t('errors.save')) });
+    } finally {
+      setSaving(false);
+    }
+  };
 
-      // Fallback to localStorage or default values
-      const userData = localStorage.getItem('user');
-      if (userData) {
-        const user = JSON.parse(userData);
-        setUserProfile({
-          name: user.name || 'Juan Pérez',
-          email: user.email || 'juan.perez@empresa.com',
-          phone: '+57 300 123 4567',
-          avatar: user.avatar,
-          role: 'owner',
-        });
-      }
-
-      setCompanyInfo({
-        name: 'Empresa Demo S.A.S',
-        taxId: '900.123.456-7',
-        address: 'Calle 123 #45-67',
-        city: 'Bogotá',
-        country: 'Colombia',
-        postalCode: '110111',
+  const changePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError(null);
+    setPasswordSaved(false);
+    if (!passwords.currentPassword) return setPasswordError({ field: 'currentPassword', message: t('errors.currentRequired') });
+    if (passwords.newPassword.length < MIN_PASSWORD) return setPasswordError({ field: 'newPassword', message: t('errors.passwordShort', { min: MIN_PASSWORD }) });
+    if (passwords.newPassword !== passwords.confirmPassword) return setPasswordError({ field: 'confirmPassword', message: t('passwordMismatch') });
+    setChanging(true);
+    try {
+      const session = await apiRequest<Session>('/auth/change-password', {
+        method: 'POST',
+        body: { currentPassword: passwords.currentPassword, newPassword: passwords.newPassword },
       });
+      // Sesión nueva (la anterior deja de servir en otros navegadores).
+      Cookies.set('accessToken', session.accessToken, { expires: 1 / 96 });
+      Cookies.set('refreshToken', session.refreshToken, { expires: 7 });
+      setPasswords({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      setPasswordSaved(true);
+    } catch (err) {
+      const code = err instanceof ApiError ? err.code : undefined;
+      const field: PasswordField | undefined = code === 'wrong_password' ? 'currentPassword' : code === 'invalid_password' ? 'newPassword' : undefined;
+      const fallback = err instanceof ApiError && err.status === 429 ? t('errors.tooMany') : code === 'wrong_password' ? t('errors.wrongPassword') : t('errors.passwordSave');
+      setPasswordError({ field, message: serverMessage(err, fallback) });
     } finally {
-      setLoading(false);
+      setChanging(false);
     }
   };
 
-  const handleSaveProfile = async () => {
-    setSavingProfile(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      // Save to API
-      const userData = localStorage.getItem('user');
-      if (userData) {
-        const user = JSON.parse(userData);
-        localStorage.setItem('user', JSON.stringify({ ...user, ...userProfile }));
-      }
-      setEditingProfile(false);
-    } catch (error) {
-      console.error('Failed to save profile:', error);
-    } finally {
-      setSavingProfile(false);
-    }
-  };
+  const roleLabel = (role: string) => t(`accountRoles.${(ROLE_KEYS as readonly string[]).includes(role) ? role : 'user'}`);
 
-  const handleSaveCompany = async () => {
-    setSavingCompany(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      // Save to API
-      setEditingCompany(false);
-    } catch (error) {
-      console.error('Failed to save company info:', error);
-    } finally {
-      setSavingCompany(false);
-    }
-  };
-
-  const handleChangePassword = async () => {
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert(t('passwordMismatch'));
-      return;
-    }
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      // Call API to change password
-      alert(t('passwordUpdated'));
-      setPasswordData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
-      });
-    } catch (error) {
-      console.error('Failed to change password:', error);
-    }
-  };
-
-  const handleSaveNotificationPrefs = async () => {
-    try {
-      await new Promise(resolve => setTimeout(resolve, 800));
-      // Save to API
-      alert(t('preferencesSaved'));
-    } catch (error) {
-      console.error('Failed to save preferences:', error);
-    }
-  };
-
-  const getRoleBadge = (role: UserProfile['role']) => {
-    const badges: Record<UserProfile['role'], { variant: any; text: string }> = {
-      owner: { variant: 'primary', text: t('roles.owner') },
-      admin: { variant: 'info', text: t('roles.admin') },
-      member: { variant: 'success', text: t('roles.member') },
-      viewer: { variant: 'default', text: t('roles.viewer') },
-    };
-    const badge = badges[role] || badges.viewer;
-    return <Badge variant={badge.variant} size="sm">{badge.text}</Badge>;
-  };
-
-  if (loading) {
+  if (!profile) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center h-96">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-        </div>
+        {loadError ? (
+          <div className="p-6 rounded-lg bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 flex flex-wrap items-center justify-between gap-3" role="alert">
+            <p className="text-sm text-red-700 dark:text-red-300">{t('loadError')}</p>
+            <Button size="sm" variant="outline" onClick={load}>
+              {t('retry')}
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-96" role="status" aria-label={t('loading')}>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+          </div>
+        )}
       </DashboardLayout>
     );
   }
 
+  const localAccount = profile.provider !== 'google';
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">
-            {t('title')}
-          </h1>
-          <p className="text-secondary-600 dark:text-secondary-400">
-            {t('subtitle')}
-          </p>
+          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">{t('title')}</h1>
+          <p className="text-secondary-600 dark:text-secondary-400">{t('subtitle')}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column */}
           <div className="lg:col-span-2 space-y-6">
-            {/* User Profile */}
+            {/* Datos personales */}
             <Card variant="bordered">
               <CardHeader>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <UserCircleIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
                     <CardTitle>{t('personalInfo')}</CardTitle>
                   </div>
-                  {!editingProfile ? (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setEditingProfile(true)}
-                    >
+                  {!editing ? (
+                    <Button variant="outline" size="sm" onClick={startEdit} data-testid="profile-edit">
                       <PencilIcon className="h-4 w-4 mr-2" />
                       {t('edit')}
                     </Button>
                   ) : (
                     <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setEditingProfile(false)}
-                      >
+                      <Button variant="ghost" size="sm" onClick={() => setEditing(false)} disabled={saving}>
                         <XMarkIcon className="h-4 w-4 mr-2" />
                         {t('cancel')}
                       </Button>
-                      <Button
-                        size="sm"
-                        onClick={handleSaveProfile}
-                        isLoading={savingProfile}
-                      >
-                        <CheckIcon className="h-4 w-4 mr-2" />
-                        {t('save')}
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {/* Avatar */}
-                  <div className="flex items-center gap-4">
-                    <div className="w-20 h-20 rounded-full overflow-hidden bg-primary-100 dark:bg-primary-950 flex items-center justify-center">
-                      {userProfile.avatar ? (
-                        <Image
-                          src={userProfile.avatar}
-                          alt={userProfile.name}
-                          width={80}
-                          height={80}
-                          className="object-cover"
-                          unoptimized
-                        />
-                      ) : (
-                        <UserCircleIcon className="h-12 w-12 text-primary-600 dark:text-primary-400" />
-                      )}
-                    </div>
-                    {editingProfile && (
-                      <Button variant="outline" size="sm">
-                        <CameraIcon className="h-4 w-4 mr-2" />
-                        {t('changePhoto')}
-                      </Button>
-                    )}
-                  </div>
-
-                  {/* Form Fields */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Input
-                      label={t('fullName')}
-                      value={userProfile.name}
-                      onChange={(e) => setUserProfile({ ...userProfile, name: e.target.value })}
-                      disabled={!editingProfile}
-                    />
-                    <Input
-                      label={t('email')}
-                      type="email"
-                      value={userProfile.email}
-                      onChange={(e) => setUserProfile({ ...userProfile, email: e.target.value })}
-                      disabled={!editingProfile}
-                    />
-                    <Input
-                      label={t('phone')}
-                      type="tel"
-                      value={userProfile.phone}
-                      onChange={(e) => setUserProfile({ ...userProfile, phone: e.target.value })}
-                      disabled={!editingProfile}
-                    />
-                    <div>
-                      <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                        {t('companyRole')}
-                      </label>
-                      <div className="mt-2">
-                        {getRoleBadge(userProfile.role)}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Company Information */}
-            <Card variant="bordered">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <BuildingOfficeIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-                    <CardTitle>{t('companyInfo')}</CardTitle>
-                  </div>
-                  {!editingCompany ? (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setEditingCompany(true)}
-                    >
-                      <PencilIcon className="h-4 w-4 mr-2" />
-                      {t('edit')}
-                    </Button>
-                  ) : (
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setEditingCompany(false)}
-                      >
-                        <XMarkIcon className="h-4 w-4 mr-2" />
-                        {t('cancel')}
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={handleSaveCompany}
-                        isLoading={savingCompany}
-                      >
+                      <Button size="sm" onClick={saveProfile} isLoading={saving} data-testid="profile-save">
                         <CheckIcon className="h-4 w-4 mr-2" />
                         {t('save')}
                       </Button>
@@ -382,226 +204,149 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="md:col-span-2">
-                    <Input
-                      label={t('companyName')}
-                      value={companyInfo.name}
-                      onChange={(e) => setCompanyInfo({ ...companyInfo, name: e.target.value })}
-                      disabled={!editingCompany}
-                    />
-                  </div>
                   <Input
-                    label={t('taxId')}
-                    value={companyInfo.taxId}
-                    onChange={(e) => setCompanyInfo({ ...companyInfo, taxId: e.target.value })}
-                    disabled={!editingCompany}
+                    id="profile-name"
+                    label={t('fullName')}
+                    value={editing ? draft.name : profile.name}
+                    onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+                    disabled={!editing}
+                    maxLength={120}
+                    autoComplete="name"
+                    error={profileError?.field === 'name' ? profileError.message : undefined}
+                  />
+                  <Input id="profile-email" label={t('email')} type="email" value={profile.email} disabled helperText={t('emailHelp')} />
+                  <Input
+                    id="profile-phone"
+                    label={t('phone')}
+                    type="tel"
+                    value={editing ? draft.phone : profile.phone ?? ''}
+                    placeholder={editing ? t('phonePlaceholder') : t('notProvided')}
+                    onChange={(e) => setDraft({ ...draft, phone: e.target.value })}
+                    disabled={!editing}
+                    maxLength={40}
+                    autoComplete="tel"
+                    error={profileError?.field === 'phone' ? profileError.message : undefined}
                   />
                   <Input
-                    label={t('country')}
-                    value={companyInfo.country}
-                    onChange={(e) => setCompanyInfo({ ...companyInfo, country: e.target.value })}
-                    disabled={!editingCompany}
-                  />
-                  <div className="md:col-span-2">
-                    <Input
-                      label={t('address')}
-                      value={companyInfo.address}
-                      onChange={(e) => setCompanyInfo({ ...companyInfo, address: e.target.value })}
-                      disabled={!editingCompany}
-                    />
-                  </div>
-                  <Input
-                    label={t('city')}
-                    value={companyInfo.city}
-                    onChange={(e) => setCompanyInfo({ ...companyInfo, city: e.target.value })}
-                    disabled={!editingCompany}
-                  />
-                  <Input
-                    label={t('postalCode')}
-                    value={companyInfo.postalCode}
-                    onChange={(e) => setCompanyInfo({ ...companyInfo, postalCode: e.target.value })}
-                    disabled={!editingCompany}
+                    id="profile-company"
+                    label={t('companyName')}
+                    value={editing ? draft.company : profile.company ?? ''}
+                    placeholder={editing ? '' : t('notProvided')}
+                    onChange={(e) => setDraft({ ...draft, company: e.target.value })}
+                    disabled={!editing}
+                    maxLength={160}
+                    autoComplete="organization"
                   />
                 </div>
+                {profileError && !profileError.field && (
+                  <p role="alert" className="mt-4 text-sm text-red-600 dark:text-red-400">
+                    {profileError.message}
+                  </p>
+                )}
+                {profileSaved && (
+                  <p role="status" className="mt-4 text-sm text-green-700 dark:text-green-400" data-testid="profile-saved">
+                    {t('profileSaved')}
+                  </p>
+                )}
               </CardContent>
             </Card>
 
-            {/* Change Password */}
+            {/* Contraseña */}
             <Card variant="bordered">
               <CardHeader>
                 <div className="flex items-center gap-3">
                   <KeyIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
                   <div>
                     <CardTitle>{t('changePassword')}</CardTitle>
-                    <CardDescription>
-                      {t('changePasswordDesc')}
-                    </CardDescription>
+                    <CardDescription>{localAccount ? t('changePasswordDesc') : t('googleAccount')}</CardDescription>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <Input
-                    label={t('currentPassword')}
-                    type="password"
-                    value={passwordData.currentPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                    placeholder={t('currentPasswordPlaceholder')}
-                  />
-                  <Input
-                    label={t('newPassword')}
-                    type="password"
-                    value={passwordData.newPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                    placeholder={t('newPasswordPlaceholder')}
-                  />
-                  <Input
-                    label={t('confirmNewPassword')}
-                    type="password"
-                    value={passwordData.confirmPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                    placeholder={t('confirmNewPasswordPlaceholder')}
-                  />
-                  <Button onClick={handleChangePassword}>
-                    {t('changePassword')}
-                  </Button>
-                </div>
-              </CardContent>
+              {localAccount && (
+                <CardContent>
+                  <form className="space-y-4" onSubmit={changePassword} noValidate data-testid="password-form">
+                    <Input
+                      id="current-password"
+                      label={t('currentPassword')}
+                      type="password"
+                      autoComplete="current-password"
+                      value={passwords.currentPassword}
+                      onChange={(e) => setPasswords({ ...passwords, currentPassword: e.target.value })}
+                      placeholder={t('currentPasswordPlaceholder')}
+                      error={passwordError?.field === 'currentPassword' ? passwordError.message : undefined}
+                    />
+                    <Input
+                      id="new-password"
+                      label={t('newPassword')}
+                      type="password"
+                      autoComplete="new-password"
+                      value={passwords.newPassword}
+                      onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
+                      placeholder={t('newPasswordPlaceholder')}
+                      error={passwordError?.field === 'newPassword' ? passwordError.message : undefined}
+                    />
+                    <Input
+                      id="confirm-password"
+                      label={t('confirmNewPassword')}
+                      type="password"
+                      autoComplete="new-password"
+                      value={passwords.confirmPassword}
+                      onChange={(e) => setPasswords({ ...passwords, confirmPassword: e.target.value })}
+                      placeholder={t('confirmNewPasswordPlaceholder')}
+                      error={passwordError?.field === 'confirmPassword' ? passwordError.message : undefined}
+                    />
+                    {passwordError && !passwordError.field && (
+                      <p role="alert" className="text-sm text-red-600 dark:text-red-400">
+                        {passwordError.message}
+                      </p>
+                    )}
+                    {passwordSaved && (
+                      <p role="status" className="text-sm text-green-700 dark:text-green-400" data-testid="password-saved">
+                        {t('passwordUpdated')}
+                      </p>
+                    )}
+                    <Button type="submit" isLoading={changing} disabled={changing}>
+                      {t('changePassword')}
+                    </Button>
+                  </form>
+                </CardContent>
+              )}
             </Card>
           </div>
 
-          {/* Right Column */}
+          {/* Cuenta */}
           <div className="space-y-6">
-            {/* Role Permissions */}
             <Card variant="bordered">
               <CardHeader>
                 <div className="flex items-center gap-3">
                   <ShieldCheckIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-                  <CardTitle>{t('permissions')}</CardTitle>
+                  <CardTitle>{t('account')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                      {t('viewProjects')}
-                    </span>
-                    <CheckIcon className="h-5 w-5 text-green-600" />
+                <dl className="space-y-3 text-sm">
+                  <div className="flex items-center justify-between gap-3">
+                    <dt className="text-secondary-600 dark:text-secondary-400">{t('accountType')}</dt>
+                    <dd>
+                      <Badge variant="primary" size="sm">
+                        {roleLabel(profile.role)}
+                      </Badge>
+                    </dd>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                      {t('createOrders')}
-                    </span>
-                    <CheckIcon className="h-5 w-5 text-green-600" />
+                  <div className="flex items-center justify-between gap-3">
+                    <dt className="text-secondary-600 dark:text-secondary-400">{t('signInMethod')}</dt>
+                    <dd className="text-secondary-900 dark:text-white">{localAccount ? t('signInPassword') : t('signInGoogle')}</dd>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                      {t('manageBilling')}
-                    </span>
-                    <CheckIcon className="h-5 w-5 text-green-600" />
+                  <div className="flex items-center justify-between gap-3">
+                    <dt className="text-secondary-600 dark:text-secondary-400">{t('memberSince')}</dt>
+                    <dd className="text-secondary-900 dark:text-white">{formatDate(profile.created_at, locale)}</dd>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                      {t('inviteUsers')}
-                    </span>
-                    <CheckIcon className="h-5 w-5 text-green-600" />
+                  <div className="flex items-center justify-between gap-3">
+                    <dt className="text-secondary-600 dark:text-secondary-400">{t('lastLogin')}</dt>
+                    <dd className="text-secondary-900 dark:text-white">{formatDate(profile.last_login, locale, true)}</dd>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                      {t('companySettings')}
-                    </span>
-                    <CheckIcon className="h-5 w-5 text-green-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Notification Preferences */}
-            <Card variant="bordered">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <BellIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-                  <CardTitle>{t('notificationPrefs')}</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="space-y-3">
-                    <label className="flex items-center justify-between cursor-pointer">
-                      <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                        {t('emailOrders')}
-                      </span>
-                      <input
-                        type="checkbox"
-                        checked={notificationPrefs.emailOrders}
-                        onChange={(e) => setNotificationPrefs({ ...notificationPrefs, emailOrders: e.target.checked })}
-                        className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
-                      />
-                    </label>
-                    <label className="flex items-center justify-between cursor-pointer">
-                      <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                        {t('emailProjects')}
-                      </span>
-                      <input
-                        type="checkbox"
-                        checked={notificationPrefs.emailProjects}
-                        onChange={(e) => setNotificationPrefs({ ...notificationPrefs, emailProjects: e.target.checked })}
-                        className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
-                      />
-                    </label>
-                    <label className="flex items-center justify-between cursor-pointer">
-                      <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                        {t('emailBilling')}
-                      </span>
-                      <input
-                        type="checkbox"
-                        checked={notificationPrefs.emailBilling}
-                        onChange={(e) => setNotificationPrefs({ ...notificationPrefs, emailBilling: e.target.checked })}
-                        className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
-                      />
-                    </label>
-                    <label className="flex items-center justify-between cursor-pointer">
-                      <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                        {t('emailMessages')}
-                      </span>
-                      <input
-                        type="checkbox"
-                        checked={notificationPrefs.emailMessages}
-                        onChange={(e) => setNotificationPrefs({ ...notificationPrefs, emailMessages: e.target.checked })}
-                        className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
-                      />
-                    </label>
-                    <label className="flex items-center justify-between cursor-pointer">
-                      <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                        {t('pushNotifications')}
-                      </span>
-                      <input
-                        type="checkbox"
-                        checked={notificationPrefs.pushNotifications}
-                        onChange={(e) => setNotificationPrefs({ ...notificationPrefs, pushNotifications: e.target.checked })}
-                        className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
-                      />
-                    </label>
-                    <label className="flex items-center justify-between cursor-pointer">
-                      <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                        {t('weeklyReport')}
-                      </span>
-                      <input
-                        type="checkbox"
-                        checked={notificationPrefs.weeklyReport}
-                        onChange={(e) => setNotificationPrefs({ ...notificationPrefs, weeklyReport: e.target.checked })}
-                        className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
-                      />
-                    </label>
-                  </div>
-                  <Button
-                    variant="outline"
-                    fullWidth
-                    onClick={handleSaveNotificationPrefs}
-                  >
-                    {t('savePreferences')}
-                  </Button>
-                </div>
+                </dl>
+                <p className="mt-4 text-xs text-secondary-500 dark:text-secondary-400">{t('accountHelp')}</p>
               </CardContent>
             </Card>
           </div>

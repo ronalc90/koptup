@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs/promises';
 import path from 'path';
-import pdfParse from 'pdf-parse';
+import { parsePdf } from '../utils/pdf-parse';
 import mammoth from 'mammoth';
 import { AuthRequest } from '../types';
 import { AppError, asyncHandler } from '../middleware/errorHandler';
@@ -17,8 +17,16 @@ import {
   explainSimilarity,
 } from '../services/document-ai.service';
 
-// Usuario demo público para la demostración
-const DEMO_USER_ID = 'demo-public-user';
+/**
+ * Dueño de los documentos: el usuario autenticado. Las rutas exigen sesión
+ * (`authenticate` en document.routes.ts) y cada consulta filtra por user_id,
+ * así que nadie ve ni modifica documentos de otra cuenta.
+ */
+function requireUserId(req: AuthRequest): string {
+  const id = req.user?.id;
+  if (!id) throw new AppError('Unauthorized', 401);
+  return id;
+}
 const DELETE_PIN = '1010'; // PIN requerido para eliminar documentos
 
 /**
@@ -33,7 +41,7 @@ export const uploadDocument = asyncHandler(
     const file = req.file;
     const documentId = uuidv4();
     const { folder } = req.body;
-    const userId = req.user?.id || DEMO_USER_ID; // Usar usuario demo si no hay autenticación
+    const userId = requireUserId(req);
 
     try {
       // Extraer texto del documento
@@ -42,7 +50,7 @@ export const uploadDocument = asyncHandler(
 
       if (ext === '.pdf') {
         const dataBuffer = await fs.readFile(file.path);
-        const pdfData = await pdfParse(dataBuffer);
+        const pdfData = await parsePdf(dataBuffer);
         extractedText = pdfData.text;
       } else if (ext === '.docx') {
         const result = await mammoth.extractRawText({ path: file.path });
@@ -133,7 +141,7 @@ export const uploadDocument = asyncHandler(
  */
 export const getDocuments = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const userId = req.user?.id || DEMO_USER_ID;
+    const userId = requireUserId(req);
 
     const {
       folder,
@@ -152,7 +160,8 @@ export const getDocuments = asyncHandler(
       filter.is_deleted = false;
     }
 
-    if (folder) {
+    // Solo cadenas: un objeto en la query (?folder[$ne]=x) no llega a la consulta.
+    if (typeof folder === 'string' && folder) {
       filter.folder = folder;
     }
 
@@ -162,10 +171,12 @@ export const getDocuments = asyncHandler(
 
     // Búsqueda por texto
     if (search && typeof search === 'string') {
+      // Texto literal (escapado) y acotado: la búsqueda no acepta expresiones regulares.
+      const literal = search.slice(0, 100).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       filter.$or = [
-        { original_filename: { $regex: search, $options: 'i' } },
-        { tags: { $in: [new RegExp(search, 'i')] } },
-        { ai_keywords: { $in: [new RegExp(search, 'i')] } },
+        { original_filename: { $regex: literal, $options: 'i' } },
+        { tags: { $in: [new RegExp(literal, 'i')] } },
+        { ai_keywords: { $in: [new RegExp(literal, 'i')] } },
       ];
     }
 
@@ -211,7 +222,7 @@ export const getDocuments = asyncHandler(
  */
 export const searchDocumentsBySemantic = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const userId = req.user?.id || DEMO_USER_ID;
+    const userId = requireUserId(req);
 
     const { query } = req.body;
 
@@ -281,7 +292,7 @@ export const searchDocumentsBySemantic = asyncHandler(
  */
 export const explainDocumentSimilarity = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const userId = req.user?.id || DEMO_USER_ID;
+    const userId = requireUserId(req);
     const { id } = req.params;
     const { query, similarity } = req.body;
 
@@ -336,7 +347,7 @@ export const explainDocumentSimilarity = asyncHandler(
  */
 export const explainDocumentById = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const userId = req.user?.id || DEMO_USER_ID;
+    const userId = requireUserId(req);
     const { id } = req.params;
 
     const document = await Document.findOne({
@@ -377,7 +388,7 @@ export const explainDocumentById = asyncHandler(
  */
 export const updateDocument = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const userId = req.user?.id || DEMO_USER_ID;
+    const userId = requireUserId(req);
     const { id } = req.params;
     const { filename, folder, is_favorite } = req.body;
 
@@ -425,7 +436,7 @@ export const updateDocument = asyncHandler(
  */
 export const deleteDocument = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const userId = req.user?.id || DEMO_USER_ID;
+    const userId = requireUserId(req);
     const { id } = req.params;
     const { permanent, pin } = req.query;
 
@@ -486,7 +497,7 @@ export const deleteDocument = asyncHandler(
  */
 export const restoreDocument = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const userId = req.user?.id || DEMO_USER_ID;
+    const userId = requireUserId(req);
     const { id } = req.params;
 
     const document = await Document.findOne({
@@ -521,7 +532,7 @@ export const restoreDocument = asyncHandler(
  */
 export const getFolders = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const userId = req.user?.id || DEMO_USER_ID;
+    const userId = requireUserId(req);
 
     const folders = await Document.aggregate([
       {
@@ -556,7 +567,7 @@ export const getFolders = asyncHandler(
  */
 export const createFolder = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const userId = req.user?.id || DEMO_USER_ID;
+    const userId = requireUserId(req);
     const { name } = req.body;
 
     if (!name || typeof name !== 'string') {
@@ -588,7 +599,7 @@ export const createFolder = asyncHandler(
  */
 export const getDocumentStats = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const userId = req.user?.id || DEMO_USER_ID;
+    const userId = requireUserId(req);
 
     const [totalDocs, favorites, recentCount, trashedCount, totalSize] = await Promise.all([
       Document.countDocuments({ user_id: userId, is_deleted: false }),

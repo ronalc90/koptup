@@ -46,6 +46,8 @@ yarn-error.log*
 # Asistentes / herramientas locales (no subir)
 .claude/
 **/.claude/
+.claude/settings.local.json
+**/.claude/settings.local.json
 CLAUDE.md
 MEMORY.md
 memory/
@@ -72,3 +74,9 @@ test-pdfs/
 
 # Chatbot file-based store (no commitear conversaciones)
 apps/backend/data/
+
+# Playwright (reportes y resultados locales/CI)
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/

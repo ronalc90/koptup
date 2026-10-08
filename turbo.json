@@ -5,21 +5,29 @@
       "dependsOn": ["^build"],
       "outputs": [
         "dist/**",
-        ".next/**"
+        ".next/**",
+        "!.next/cache/**"
       ]
     },
     "lint": {
       "outputs": []
     },
-    "test": {
-      "dependsOn": ["^build"],
+    "typecheck": {
       "outputs": []
     },
-    "dev": {
+    "test": {
+      "outputs": ["coverage/**"]
+    },
+    "test:e2e": {
       "cache": false
     },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
     "start": {
-      "outputs": []
+      "cache": false,
+      "persistent": true
     },
     "clean": {
       "cache": false

@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth';
+import { requireRole } from '../middleware/access';
 import {
   getDeliverables,
   getDeliverableById,
@@ -16,7 +17,8 @@ router.use(authenticate);
 
 // Deliverable routes
 router.get('/', getDeliverables);
-router.post('/', uploadDeliverable);
+// Subir entregables: equipo de KopTup (el cliente los revisa y aprueba).
+router.post('/', ...requireRole('admin', 'manager', 'developer'), uploadDeliverable);
 router.get('/:id', getDeliverableById);
 router.put('/:id', updateDeliverable);
 router.post('/:id/approve', approveDeliverable);

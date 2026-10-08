@@ -7,11 +7,18 @@ import ProjectMember from '../models/ProjectMember';
 import { connectDB } from '../config/mongodb';
 import { logger } from '../utils/logger';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 
 dotenv.config();
 
 const seedDatabase = async () => {
   try {
+    // Este seed BORRA usuarios y proyectos: nunca en producción.
+    if (process.env.NODE_ENV === 'production') {
+      logger.error('seedMongoDB está deshabilitado en producción (borra datos).');
+      process.exit(1);
+    }
+
     await connectDB();
 
     logger.info('Clearing existing data...');
@@ -22,8 +29,10 @@ const seedDatabase = async () => {
 
     logger.info('Creating users...');
 
-    // Create sample users
-    const hashedPassword = await bcrypt.hash('password123', 10);
+    // Contraseña de las cuentas de ejemplo: SEED_ADMIN_PASSWORD o una aleatoria
+    // que se muestra una sola vez en la consola (nunca una fija en el código).
+    const seedPassword = process.env.SEED_ADMIN_PASSWORD || crypto.randomBytes(12).toString('base64url');
+    const hashedPassword = await bcrypt.hash(seedPassword, 10);
 
     const users = await User.insertMany([
       {
@@ -270,10 +279,11 @@ const seedDatabase = async () => {
     ]);
 
     logger.info('✅ Database seeded successfully!');
-    logger.info('\nSample credentials:');
-    logger.info('Email: admin@koptup.com | Password: password123');
-    logger.info('Email: carlos@koptup.com | Password: password123');
-    logger.info('Email: ana@koptup.com | Password: password123');
+    logger.info('Cuentas de ejemplo: admin@koptup.com, carlos@koptup.com, ana@koptup.com');
+    if (!process.env.SEED_ADMIN_PASSWORD) {
+      // Solo en consola local: no se guarda en ningún archivo.
+      console.log(`Contraseña generada para las cuentas de ejemplo: ${seedPassword}`);
+    }
 
     process.exit(0);
   } catch (error) {

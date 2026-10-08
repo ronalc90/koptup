@@ -63,8 +63,10 @@ class ApiClient {
 
         // Handle 401 errors (Unauthorized)
         if (error.response?.status === 401 && !isAuthEndpoint) {
-          // Si hay un token y no hemos intentado refrescarlo, intentamos refresh
-          if (!originalRequest._retry && Cookies.get('accessToken')) {
+          const hadSession = Boolean(Cookies.get('accessToken') || Cookies.get('refreshToken'));
+          // Con refresh token (aunque el access token ya venció y su cookie no
+          // existe), se intenta renovar una vez y reintentar la petición.
+          if (!originalRequest._retry && Cookies.get('refreshToken')) {
             originalRequest._retry = true;
 
             try {
@@ -74,14 +76,16 @@ class ApiClient {
                 return this.client(originalRequest);
               }
             } catch (refreshError) {
-              // Refresh falló, limpiar y redirigir a login
+              // Refresh falló: la sesión venció de verdad.
               this.redirectToLogin();
               return Promise.reject(refreshError);
             }
-          } else {
-            // No hay token o ya intentamos refresh, redirigir a login
+          } else if (hadSession) {
+            // Había sesión y no se pudo renovar: redirigir a login.
             this.redirectToLogin();
           }
+          // Sin sesión (visitante anónimo, p. ej. en una demo pública) no se
+          // redirige: quien llamó maneja el 401 (p. ej. pidiendo iniciar sesión).
         }
 
         // Suppress console errors for expected failures (404, 401 when backend is down)
@@ -97,6 +101,10 @@ class ApiClient {
         if (isSuppressibleError) {
           const silentError = new Error(error.message);
           Object.defineProperty(silentError, 'suppressLogging', { value: true });
+          // Conserva el estado HTTP para que quien llamó distinga un 401
+          // (iniciar sesión) de un 404 o de un backend caído.
+          Object.defineProperty(silentError, 'response', { value: error.response });
+          Object.defineProperty(silentError, 'code', { value: error.code });
           return Promise.reject(silentError);
         }
 
@@ -165,6 +173,15 @@ class ApiClient {
 
       return { user };
     } catch (error: any) {
+      // Cuenta creada al aprobar una demo que aún no se activa: el mensaje del
+      // backend explica que debe usar el enlace de activación.
+      if (error.response?.status === 401 && error.response?.data?.code === 'account_not_activated') {
+        const notActivated: any = new Error(error.response.data.message || 'account_not_activated');
+        notActivated.code = 'account_not_activated';
+        notActivated.response = { status: 401, data: error.response.data };
+        throw notActivated;
+      }
+
       // Crear un error completamente nuevo con mensaje amigable
       if (error.response?.status === 401) {
         // No usar el error original, crear uno completamente nuevo

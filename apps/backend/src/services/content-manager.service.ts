@@ -2,6 +2,16 @@
 import OpenAI from 'openai';
 import { logger } from '../utils/logger';
 import { getOpenAI } from './openai.service';
+import { recordSpend } from './ai-budget.service';
+import { estimateCostUSD } from './rag-pipeline';
+
+/** Suma el costo de la llamada al tope mensual de la demo (CONTENT_MONTHLY_BUDGET_USD). */
+async function recordContentUsage(response: { model?: string; usage?: { prompt_tokens?: number; completion_tokens?: number } | null }): Promise<void> {
+  await recordSpend(
+    'content',
+    estimateCostUSD(response.model || 'gpt-4o-mini', response.usage?.prompt_tokens ?? 0, response.usage?.completion_tokens ?? 0),
+  );
+}
 
 export type ContentTone = 'formal' | 'técnico' | 'persuasivo';
 export type ContentTemplate = 'email' | 'presentation' | 'product' | 'social' | 'proposal';
@@ -77,6 +87,7 @@ Instrucciones:
       temperature: 0.7,
       max_tokens: 2000,
     });
+    await recordContentUsage(response);
 
     const improvedContent = response.choices[0]?.message?.content;
     if (!improvedContent) {
@@ -125,6 +136,7 @@ Instrucciones:
       temperature: 0.7,
       max_tokens: 2000,
     });
+    await recordContentUsage(response);
 
     const adaptedContent = response.choices[0]?.message?.content;
     if (!adaptedContent) {
@@ -168,6 +180,7 @@ Instrucciones:
       temperature: 0.7,
       max_tokens: 2500,
     });
+    await recordContentUsage(response);
 
     const adjustedContent = response.choices[0]?.message?.content;
     if (!adjustedContent) {
@@ -250,6 +263,7 @@ Instrucciones:
       temperature: 0.8,
       max_tokens: 2000,
     });
+    await recordContentUsage(response);
 
     const generatedContent = response.choices[0]?.message?.content;
     if (!generatedContent) {

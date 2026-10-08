@@ -11,7 +11,8 @@
  *
  * Eventos (GA4; las conversiones de Google Ads se importan desde GA4, no hay
  * etiquetas de conversión propias en el código):
- *  - `generate_lead`: formulario de /contact enviado con éxito.
+ *  - `generate_lead`: formulario enviado con éxito; `lead_source` indica cuál
+ *    (`contact_form` en /contact, `demo-request` en /solicitar-demo).
  *  - `demo_start`: primera pregunta en /demo/chatbot (por carga de página).
  *  - `demo_upload`: documento subido con éxito en "Prueba con tu documento".
  *  - `whatsapp_click`: clic en un enlace de WhatsApp.

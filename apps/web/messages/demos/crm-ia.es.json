@@ -1,172 +1,329 @@
 {
   "demoCrm": {
+    "meta": {
+      "title": "CRM con IA: demo de embudo de ventas y pronóstico",
+      "description": "Demo interactiva de un CRM para equipos comerciales en Colombia, con datos de ejemplo: embudo con arrastrar y soltar, puntaje de leads explicado, pronóstico en pesos, secuencias de seguimiento y borradores de correo y WhatsApp.",
+      "breadcrumbHome": "Inicio",
+      "breadcrumbDemos": "Demos",
+      "breadcrumbName": "CRM con IA"
+    },
     "pageTitle": "CRM con IA",
-    "pageSubtitle": "Plataforma comercial inteligente: pipeline visual, lead scoring ML, forecast predictivo y asistente IA para tu equipo de ventas.",
-    "tabs": {
-      "pipeline": "Pipeline",
-      "contacts": "Contactos",
-      "forecast": "Forecast",
-      "assistant": "Asistente IA",
-      "conversations": "Conversaciones",
-      "sequences": "Secuencias"
+    "pageSubtitle": "Embudo de ventas, puntaje de leads, pronóstico en pesos y borradores de correo y WhatsApp para tu equipo comercial. Pruébalo: crea, mueve y cierra negocios.",
+    "sampleBadge": "Datos de ejemplo",
+    "sampleBadgeHint": "Es el CRM de una empresa de logística ficticia (Logística Quindara S.A.S.). Empresas, personas, NIT, correos, teléfonos y cifras son inventados. Fecha de corte de los datos: {date}.",
+    "howItWorks": {
+      "title": "Qué es real en esta demo",
+      "show": "Ver",
+      "hide": "Ocultar",
+      "real": "Todo se calcula en tu navegador con los datos de ejemplo: puntaje de cada lead, probabilidad de cierre, métricas, pronóstico y alertas. Puedes crear, mover, editar y eliminar negocios, y los cambios se guardan solo en este navegador.",
+      "simulated": "Los envíos de WhatsApp y correo, los pasos de las secuencias y el análisis de llamadas son simulados: no sale ningún mensaje ni se graba nada. Los borradores salen de plantillas y el puntaje de reglas; aquí no se llama a un modelo de IA.",
+      "project": "En tu proyecto, el puntaje y los borradores los genera un modelo de IA con tu histórico de ventas, y el CRM se conecta a tu WhatsApp Business, tu correo y tu telefonía."
+    },
+    "reset": {
+      "button": "Restablecer datos",
+      "confirm": "¿Volver a los datos de ejemplo? Se borran los cambios que hiciste en este navegador.",
+      "yes": "Sí, restablecer",
+      "done": "Datos de ejemplo restablecidos."
     },
     "metrics": {
-      "title": "Resumen ejecutivo",
-      "dealsActive": "Deals activos",
-      "dealsActiveSub": "en pipeline",
-      "pipelineValue": "Valor pipeline",
-      "pipelineValueSub": "ponderado IA",
-      "winRate": "Win rate",
-      "winRateSub": "últimos 90 días",
-      "avgCycle": "Ciclo promedio",
-      "avgCycleSub": "días para cerrar",
-      "trendUp": "vs mes anterior",
-      "trendDown": "vs mes anterior"
+      "openDeals": "Negocios abiertos",
+      "openDealsSub": "{value} en el embudo",
+      "weighted": "Valor ponderado",
+      "weightedSub": "valor × probabilidad de cada negocio abierto",
+      "winRate": "Tasa de cierre",
+      "winRateSub": "{won} ganados de {total} cerrados en los últimos 90 días",
+      "winRateEmpty": "sin negocios cerrados en los últimos 90 días",
+      "cycle": "Ciclo de venta promedio",
+      "cycleValue": "{days} días",
+      "cycleSub": "de la creación al cierre de los ganados en 90 días"
+    },
+    "tabs": {
+      "label": "Secciones del CRM",
+      "pipeline": "Embudo",
+      "contacts": "Contactos",
+      "forecast": "Pronóstico",
+      "assistant": "Asistente de redacción",
+      "calls": "Llamadas",
+      "sequences": "Secuencias"
+    },
+    "plans": {
+      "advanced": "Plan Avanzado",
+      "advancedForecastHint": "El pronóstico de ventas está incluido desde el plan Avanzado del CRM con IA.",
+      "advancedAssistantHint": "La redacción de correos con IA está incluida desde el plan Avanzado del CRM con IA.",
+      "extra": "Fuera de los planes estándar",
+      "extraHint": "La grabación y el análisis de llamadas no están en los planes estándar: se cotizan como desarrollo adicional."
+    },
+    "stages": {
+      "prospect": "Prospecto",
+      "qualified": "Calificado",
+      "proposal": "Propuesta enviada",
+      "negotiation": "Negociación",
+      "won": "Ganado",
+      "lost": "Perdido"
+    },
+    "channels": {
+      "whatsapp": "WhatsApp",
+      "email": "Correo",
+      "call": "Llamada",
+      "task": "Tarea"
+    },
+    "sources": {
+      "web": "formulario web",
+      "referral": "referido",
+      "fair": "feria comercial",
+      "inbound": "llamada entrante",
+      "import": "importado de Excel"
+    },
+    "sizes": {
+      "small": "menos de 50 empleados",
+      "medium": "50 a 199 empleados",
+      "large": "200 o más empleados"
+    },
+    "temperature": {
+      "hot": "Caliente",
+      "warm": "Tibio",
+      "cold": "Frío"
+    },
+    "lostReasons": {
+      "price": "Precio",
+      "competitor": "Eligió a la competencia",
+      "timing": "No es el momento",
+      "noResponse": "Sin respuesta"
+    },
+    "dates": {
+      "months": ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
+      "ago": "{days, plural, =0 {hoy} =1 {ayer} other {hace # días}}",
+      "overdue": "{days, plural, =1 {vencida hace 1 día} other {vencida hace # días}}"
     },
     "pipeline": {
-      "title": "Pipeline visual",
-      "subtitle": "Arrastra deals entre etapas. La IA recalcula la probabilidad de cierre en tiempo real.",
-      "stages": {
-        "prospect": "Prospecto",
-        "qualified": "Calificado",
-        "proposal": "Propuesta",
-        "negotiation": "Negociación",
-        "closed": "Cerrado ganado"
-      },
-      "deals": "deals",
-      "probability": "Prob.",
-      "owner": "Owner",
-      "closeDate": "Cierra",
-      "viewDetails": "Ver detalle",
-      "emptyStage": "Sin deals en esta etapa",
-      "addDeal": "Nuevo deal"
+      "title": "Embudo de ventas",
+      "subtitle": "Arrastra un negocio a otra etapa o usa «Mover a…». La probabilidad, los totales, las métricas y el pronóstico se recalculan al instante.",
+      "ownerFilter": "Filtrar por vendedor",
+      "allOwners": "Todos los vendedores",
+      "newDeal": "Nuevo negocio",
+      "weightedShort": "pond. {value}",
+      "empty": "Sin negocios en esta etapa",
+      "dropHere": "Suelta el negocio aquí",
+      "moveTo": "Mover a…",
+      "moveToLabel": "Mover {company} a otra etapa",
+      "openCard": "Abrir la ficha de {company}",
+      "scoreTitle": "Puntaje {score}: {temp}",
+      "probabilityHint": "Probabilidad de cierre = base de la etapa ajustada por el puntaje del lead (reglas de ejemplo).",
+      "moved": "{company} pasó a «{stage}».",
+      "wonToast": "¡Negocio ganado! {company} · {value}.",
+      "lostToast": "{company} quedó como perdido. Motivo: {reason}.",
+      "lostTitle": "¿Por qué se perdió {company}?",
+      "lostText": "Registrar el motivo te permite analizar en qué estás perdiendo negocios.",
+      "lostReason": "Motivo",
+      "lostConfirm": "Marcar como perdido"
     },
     "contacts": {
-      "title": "Contactos y leads",
-      "subtitle": "Base unificada con scoring IA, próxima mejor acción y enriquecimiento automático.",
-      "searchPlaceholder": "Buscar por nombre, empresa o email...",
+      "title": "Contactos",
+      "subtitle": "Todos tus contactos con su puntaje, canal preferido y próxima acción. Busca, filtra, ordena y exporta.",
+      "searchLabel": "Buscar contactos",
+      "searchPlaceholder": "Buscar por nombre, empresa, NIT, ciudad o correo…",
+      "tempFilter": "Filtrar por temperatura del lead",
       "filters": {
         "all": "Todos",
-        "hot": "Hot",
-        "warm": "Warm",
-        "cold": "Cold",
-        "untouched": "Sin contactar"
+        "hot": "Calientes",
+        "warm": "Tibios",
+        "cold": "Fríos"
+      },
+      "sortLabel": "Ordenar contactos",
+      "sortBy": "Ordenar por: {field}",
+      "sort": {
+        "score": "puntaje",
+        "value": "valor",
+        "lastContact": "último contacto",
+        "name": "nombre"
       },
       "columns": {
-        "name": "Nombre",
+        "name": "Contacto",
         "company": "Empresa",
-        "score": "Score IA",
-        "dealValue": "Valor deal",
+        "score": "Puntaje",
+        "value": "Negocio",
         "nextAction": "Próxima acción",
         "lastContact": "Último contacto",
-        "actions": ""
+        "actions": "Acciones"
       },
-      "scoreLabels": {
-        "hot": "Hot",
-        "warm": "Warm",
-        "cold": "Cold"
-      },
-      "viewProfile": "Ver perfil",
-      "openCustomer360": "Abrir Customer 360",
-      "noResults": "No se encontraron contactos con esos criterios.",
-      "results": "{count} contactos"
+      "viewProfile": "Ver ficha",
+      "noResults": "No hay contactos con esos filtros.",
+      "results": "{count, plural, =1 {1 contacto} other {# contactos}}",
+      "exportCsv": "Exportar CSV",
+      "exported": "Descargaste {count, plural, =1 {1 contacto} other {# contactos}} en CSV.",
+      "csvFile": "contactos-crm-ejemplo.csv",
+      "csv": {
+        "name": "Contacto",
+        "role": "Cargo",
+        "company": "Empresa",
+        "nit": "NIT",
+        "city": "Ciudad",
+        "email": "Correo",
+        "phone": "Teléfono",
+        "channel": "Canal preferido",
+        "owner": "Vendedor",
+        "stage": "Etapa",
+        "value": "Valor (COP)",
+        "probability": "Probabilidad (%)",
+        "score": "Puntaje",
+        "lastContact": "Último contacto",
+        "nextAction": "Próxima acción"
+      }
     },
     "customer360": {
-      "title": "Customer 360",
-      "subtitle": "Vista unificada del cliente",
+      "score": "Puntaje",
+      "value": "Valor del negocio",
+      "probability": "Probabilidad",
+      "lastContact": "Último contacto",
+      "whyScore": "Por qué tiene este puntaje",
+      "whyScoreHint": "Reglas de ejemplo que suman hasta 100 puntos. En tu proyecto, el modelo se ajusta con tu histórico de ventas.",
+      "factors": {
+        "fit": "Perfil de la empresa ({size})",
+        "engagement": "{count, plural, =0 {Sin interacciones recientes} =1 {1 interacción reciente} other {# interacciones recientes}}",
+        "recency": "Último contacto: {ago}",
+        "budget": "Presupuesto confirmado",
+        "budgetNo": "Presupuesto sin confirmar",
+        "decision": "Habla con quien decide",
+        "decisionNo": "Aún no habla con quien decide"
+      },
+      "recommendations": "Recomendaciones",
+      "recommendationsHint": "Calculadas con reglas sobre los datos de este negocio.",
       "tabs": {
-        "timeline": "Timeline",
-        "deals": "Deals",
-        "tickets": "Tickets",
+        "history": "Historial",
+        "deal": "Negocio",
         "files": "Archivos"
       },
-      "score": "Score IA",
-      "lifetimeValue": "Valor de vida",
-      "totalDeals": "Deals totales",
-      "openTickets": "Tickets abiertos",
-      "lastInteraction": "Última interacción",
-      "aiInsights": "Insights de IA",
-      "insight1": "Alta probabilidad de upsell en próximos 30 días.",
-      "insight2": "Sentimiento positivo creciente en últimas 3 interacciones.",
-      "insight3": "Cliente activo, mejor canal para contactar: email matutino.",
-      "timeline": {
-        "title": "Línea de tiempo",
-        "emailSent": "Email enviado",
-        "callMade": "Llamada realizada",
-        "meetingHeld": "Reunión",
-        "dealCreated": "Deal creado",
-        "ticketOpened": "Ticket abierto",
-        "transactionCompleted": "Transacción completada"
+      "logTitle": "Registrar actividad",
+      "logType": "Tipo de actividad",
+      "logText": "Detalle de la actividad",
+      "logPlaceholder": "Ej.: llamé para confirmar la visita del jueves",
+      "logSubmit": "Registrar",
+      "logHint": "Se guarda con la fecha de corte de la demo ({date}). Una llamada, un WhatsApp, un correo o una reunión cuentan como contacto y suben el puntaje.",
+      "logged": "Actividad registrada en el historial.",
+      "logTypes": {
+        "note": "Nota",
+        "call": "Llamada",
+        "whatsapp": "WhatsApp",
+        "email": "Correo",
+        "meeting": "Reunión"
       },
-      "summaries": {
-        "discovery": "Discovery call · 45min",
-        "proposalSent": "Propuesta v2 enviada",
-        "followUp": "Llamada follow-up",
-        "renewal": "Renovación plan Pro · $4.8k",
-        "supportApi": "Soporte: integración API",
-        "newDeal": "Nuevo deal · {value}",
-        "firstOutbound": "Primer contacto outbound"
+      "dealFields": {
+        "title": "Negocio",
+        "owner": "Vendedor",
+        "value": "Valor",
+        "closeDate": "Cierre estimado",
+        "created": "Creado",
+        "source": "Origen",
+        "channel": "Canal preferido",
+        "size": "Tamaño de la empresa",
+        "stage": "Etapa",
+        "nextAction": "Próxima acción",
+        "lostReason": "Motivo de pérdida"
       },
-      "deals": {
-        "q2": "Deal {company} · Q2",
-        "annualRenewal": "Renovación anual",
-        "expansion": "Expansion · Add-on"
-      },
-      "tickets": {
-        "t1": "Integración API REST falla con código 429",
-        "t2": "Solicitud nuevo usuario admin"
-      },
-      "ticketStatus": {
-        "open": "Abierto",
-        "resolved": "Resuelto"
-      },
-      "priorities": {
-        "high": "Alta",
-        "medium": "Media",
-        "low": "Baja"
-      },
-      "noFiles": "Aún no hay archivos compartidos.",
-      "close": "Cerrar"
+      "nextActionSaved": "Próxima acción actualizada.",
+      "delete": "Eliminar negocio",
+      "deleteConfirm": "¿Eliminar este negocio y su historial de este navegador?",
+      "deleteYes": "Sí, eliminar",
+      "deleted": "{company} se eliminó.",
+      "draftMessage": "Redactar mensaje",
+      "files": {
+        "quote": "Cotización {id} (PDF de ejemplo)",
+        "quoteHint": "Se genera en tu navegador con los datos actuales de este negocio.",
+        "download": "Descargar PDF",
+        "downloaded": "Descargaste la cotización de ejemplo.",
+        "noQuote": "Todavía no hay cotización: se genera cuando el negocio llega a «Propuesta enviada».",
+        "lost": "El negocio se perdió: su cotización ya no está vigente."
+      }
+    },
+    "recs": {
+      "won": "Negocio ganado: agenda el inicio de la operación y una revisión del servicio al mes.",
+      "lost": "Se perdió por «{reason}»: programa un nuevo contacto en unos meses.",
+      "overdue": "{days, plural, =1 {La fecha estimada de cierre venció ayer} other {La fecha estimada de cierre venció hace # días}}: actualízala o mueve el negocio.",
+      "stale": "Lleva {days} días sin contacto: haz seguimiento hoy.",
+      "hot": "Lead caliente con contacto reciente: prioriza este negocio.",
+      "budget": "Confirma el presupuesto aprobado antes de avanzar.",
+      "decision": "Pide una reunión con quien toma la decisión.",
+      "channel": "Escríbele por {channel}: es su canal preferido.",
+      "stageNext": {
+        "prospect": "Haz la llamada de calificación: necesidad, presupuesto y fecha.",
+        "qualified": "Prepara y envía la propuesta con el alcance acordado.",
+        "proposal": "Agenda una revisión de la propuesta para resolver dudas.",
+        "negotiation": "Cierra condiciones de pago y envía el contrato.",
+        "won": "Agenda el inicio de la operación.",
+        "lost": "Programa un nuevo contacto en unos meses."
+      }
+    },
+    "events": {
+      "created": "Negocio creado. Origen: {source}.",
+      "createdManual": "Negocio creado en la demo.",
+      "meeting": "Reunión de diagnóstico.",
+      "proposal": "Propuesta enviada por {channel}.",
+      "followUp": "Seguimiento por {channel}.",
+      "postSale": "Seguimiento postventa por {channel}.",
+      "callLogged": "Llamada de {duration} min (ver la pestaña Llamadas).",
+      "won": "Negocio ganado.",
+      "lost": "Negocio perdido. Motivo: {reason}.",
+      "stage": "Movido a «{stage}».",
+      "sent": "Mensaje por {channel} registrado como enviado (simulado): «{preview}»",
+      "sequenceSeed": "Secuencia: {step}.",
+      "sequence": "Secuencia: {step} (simulado).",
+      "enrolled": "Inscrito en la secuencia de seguimiento a cotizaciones.",
+      "replied": "Respondió a la secuencia de seguimiento."
     },
     "forecast": {
-      "title": "Forecast comercial",
-      "subtitle": "Predicción de cierres por trimestre, calibrada por el modelo IA con históricos.",
-      "thisQuarter": "Este trimestre",
-      "quotaAttainment": "Cumplimiento de cuota",
-      "quota": "Cuota",
-      "categories": {
-        "commit": "Commit",
-        "commitSub": "Compromisos firmes del equipo",
-        "best": "Best case",
-        "bestSub": "Mejor escenario realista",
-        "weighted": "Pipeline ponderado",
-        "weightedSub": "Valor x probabilidad IA"
+      "title": "Pronóstico de ventas",
+      "subtitle": "Se calcula con los negocios del embudo: si cambias una etapa o creas un negocio, el pronóstico cambia.",
+      "periodLabel": "Periodo del pronóstico",
+      "period": {
+        "month": "Octubre 2026",
+        "quarter": "4.º trimestre 2026"
       },
-      "byOwner": "Forecast por owner",
-      "byStage": "Distribución por etapa",
-      "trend": "Tendencia 6 meses",
-      "monthLabels": {
-        "jan": "Ene",
-        "feb": "Feb",
-        "mar": "Mar",
-        "apr": "Abr",
-        "may": "May",
-        "jun": "Jun"
+      "attainment": "Cumplimiento proyectado de la meta",
+      "attainmentSub": "Proyección {projection} de una meta de {quota}",
+      "includesOverdue": "Cuentan los negocios abiertos con cierre estimado hasta el final del periodo; los que tienen la fecha vencida se suman al periodo actual.",
+      "won": "Ganado",
+      "wonSub": "negocios ganados en el periodo",
+      "commit": "Comprometido",
+      "commitSub": "ganado + negocios en Negociación",
+      "projection": "Proyección",
+      "projectionSub": "ganado + valor ponderado de los abiertos",
+      "best": "Mejor escenario",
+      "bestSub": "ganado + todo lo que está en Propuesta y Negociación",
+      "ofQuota": "{value} % de la meta",
+      "byOwner": "Por vendedor",
+      "byOwnerSub": "Ganado, proyección y mejor escenario de cada vendedor en el periodo.",
+      "ownerLine": "Proyección {projection} · {count, plural, =1 {1 abierto} other {# abiertos}}",
+      "ownerDetail": "Ganado {won} · comprometido {commit} · mejor escenario {best}",
+      "byStage": "Negocios abiertos por etapa",
+      "byStageSub": "Participación de cada etapa en el valor abierto.",
+      "stageLine": "{count} · {value} · {share} %",
+      "trend": "Ganado por mes y ponderado abierto",
+      "trendAria": "Gráfico de barras: valor ganado por mes de julio a octubre y valor ponderado abierto por mes de cierre de octubre a diciembre de 2026",
+      "trendUnit": "Millones de COP",
+      "legendWon": "Ganado",
+      "legendWeighted": "Ponderado abierto (por mes de cierre estimado)",
+      "alerts": "Alertas",
+      "alertsHint": "Calculadas con reglas sobre los datos del embudo.",
+      "alert": {
+        "stale": "{company} lleva {days} días sin contacto ({stage}, {value}).",
+        "overdue": "{company}: la fecha estimada de cierre venció hace {days} días.",
+        "gap": "Con la proyección actual te faltan {value} para la meta de {period}.",
+        "over": "La proyección supera la meta de {period} en {value}."
       },
-      "aiCommentary": "Comentario del modelo",
-      "aiCommentaryText": "Riesgo medio en cuenta Acme Corp ($85k) por silencio del decisor. Sugerido: reactivar con caso de éxito relevante. Pipeline ponderado supera meta en 12%."
+      "openDeal": "Ver ficha"
     },
     "assistant": {
-      "title": "Asistente IA de ventas",
-      "subtitle": "Redacta emails, genera scripts y obtén sugerencias contextuales.",
-      "emailComposer": "Compositor de email IA",
-      "selectContact": "Seleccionar contacto",
-      "objective": "Objetivo del email",
+      "title": "Asistente de redacción",
+      "subtitle": "Arma un borrador de correo o WhatsApp con los datos del contacto, edítalo, cópialo y regístralo en el historial.",
+      "simulatedNote": "En esta demo los borradores salen de plantillas (objetivo × tono × canal) con los datos del contacto y tu contexto; no se llama a un modelo de IA y no se envía nada. En tu proyecto los redacta un modelo de IA con el historial del cliente.",
+      "contact": "Contacto",
+      "channel": "Canal",
+      "objective": "Objetivo",
       "objectives": {
         "intro": "Primer contacto",
         "followUp": "Seguimiento",
         "proposal": "Enviar propuesta",
-        "reEngage": "Reactivar lead",
+        "reEngage": "Reactivar",
         "closing": "Cierre"
       },
       "tone": "Tono",
@@ -176,73 +333,302 @@
         "direct": "Directo",
         "consultative": "Consultivo"
       },
-      "context": "Contexto adicional (opcional)",
-      "contextPlaceholder": "Ej: el cliente mencionó que evalúa también a un competidor...",
+      "context": "Contexto (opcional)",
+      "contextPlaceholder": "Ej.: pidió pagar en dos cuotas",
       "generate": "Generar borrador",
-      "generating": "Generando...",
-      "generated": "Borrador generado",
+      "generateAgain": "Generar de nuevo con estas opciones",
+      "empty": "Elige el contacto, el canal, el objetivo y el tono, y genera el borrador.",
+      "draftLabel": "Borrador de {channel} · puedes editarlo",
       "subject": "Asunto",
-      "body": "Cuerpo",
+      "body": "Mensaje",
       "copy": "Copiar",
       "copied": "Copiado",
-      "regenerate": "Regenerar",
-      "send": "Enviar",
-      "subjectDraft": "Próximos pasos para {company} — alineación rápida",
-      "bodyDraft": "Hola {name},\n\nGracias por tu tiempo la semana pasada. Resumiendo lo conversado, creemos que podemos ayudar a {company} a:\n\n- Reducir el ciclo de ventas en ~25% con automatización de pipeline.\n- Subir el win rate gracias a lead scoring basado en datos.\n- Centralizar la operación comercial en una sola vista.\n\n¿Tendrías 20 minutos esta semana para revisar una propuesta personalizada? Te dejo un par de horarios en mi calendario.\n\nQuedo atento,\nRonald",
+      "copyError": "No se pudo copiar automáticamente: selecciona el texto y cópialo.",
+      "regenerate": "Otra versión",
+      "chars": "{count} caracteres",
+      "send": "Registrar como enviado (simulado)",
+      "sendHint": "No se envía ningún mensaje: se registra en el historial del contacto con fecha {date} y cuenta como contacto reciente.",
+      "sentToast": "Registrado en el historial de {name} (simulado: no se envió ningún mensaje).",
       "quickActions": "Acciones rápidas",
-      "quickActionItems": {
-        "summarize": "Resumir última llamada",
+      "quickHint": "Calculadas con reglas sobre los datos de {name}.",
+      "quick": {
+        "summary": "Resumir historial",
         "nextStep": "Sugerir próximo paso",
-        "competitor": "Análisis de competencia",
-        "objection": "Manejar objeción común"
+        "objection": "Responder la objeción de precio",
+        "callPrep": "Preparar la próxima llamada"
+      },
+      "quickOut": {
+        "summaryHead": "{name}: {stage} · {value} · {prob} % de probabilidad",
+        "nextStepHead": "Próximos pasos con {name}",
+        "objectionHead": "Si {name} dice que {value} es mucho:",
+        "objection1": "Propón arrancar por fases: una primera etapa de unos {phase} y el resto cuando vea resultados.",
+        "objection2": "Ofrece un anticipo del 30 % ({advance}) y el saldo a 30 días.",
+        "objection3": "Muestra lo que hoy le cuesta no resolverlo: retrasos, devoluciones y horas de su equipo.",
+        "objection4": "No bajes el precio sin quitar alcance: pregunta qué parte del alcance puede esperar.",
+        "prepHead": "Antes de llamar a {name}:",
+        "prepScore": "Puntaje {score} ({temp}). Lo que más suma: {factor}.",
+        "prepLast": "Último contacto {ago}; prefiere {channel}.",
+        "prepPending": "Pendiente: {action}.",
+        "askBudget": "Pregunta: ¿ya tienen el presupuesto aprobado?",
+        "askDecision": "Pregunta: ¿quién más participa en la decisión?"
+      },
+      "tpl": {
+        "greeting": {
+          "professional": "Buenos días, {name}:",
+          "friendly": "¡Hola, {name}!",
+          "direct": "{name}, buen día.",
+          "consultative": "Hola, {name}. Espero que estés muy bien."
+        },
+        "body": {
+          "intro": {
+            "a": "Soy {owner}, de {seller}. Trabajamos con empresas de {city} en {title} y creo que podemos ayudarle a {company} a tener sus despachos más organizados.",
+            "b": "Te escribe {owner}, de {seller}. Creo que a {company} le puede servir lo que hacemos en {title} y me gustaría contarte cómo funciona."
+          },
+          "followUp": {
+            "a": "Te escribo para dar seguimiento a «{title}». Quedamos en que el siguiente paso era {nextAction}.",
+            "b": "¿Cómo vas con «{title}»? Quiero asegurarme de que tengas lo necesario para avanzar; el siguiente paso es {nextAction}."
+          },
+          "proposal": {
+            "a": "Te comparto la propuesta de «{title}» por {value}. Incluye el alcance que conversamos y la forma de pago.",
+            "b": "Ya está lista la propuesta de «{title}»: valor total {value}, con el alcance y los tiempos que acordamos."
+          },
+          "reEngage": {
+            "a": "No hablamos de «{title}» desde el {since}. ¿Sigue siendo una prioridad para {company}?",
+            "b": "Retomo nuestra conversación del {since} sobre «{title}». Si algo cambió en {company}, me cuentas y ajustamos la propuesta."
+          },
+          "closing": {
+            "a": "Ya tenemos todo listo para arrancar con «{title}» ({value}). Solo falta tu confirmación para enviarte el contrato.",
+            "b": "Para iniciar «{title}» en la fecha acordada necesitamos tu aprobación esta semana. El valor final es {value}."
+          }
+        },
+        "context": "Tuve en cuenta lo que me comentaste: {context}.",
+        "toneLine": {
+          "friendly": "Cualquier cosa me escribes por aquí, con gusto te ayudo.",
+          "consultative": "Antes de seguir, me gustaría entender qué resultado esperan lograr antes de fin de año."
+        },
+        "cta": {
+          "intro": "¿Te queda bien una llamada de 15 minutos esta semana?",
+          "followUp": "¿Te sirve que lo revisemos el jueves en la mañana?",
+          "proposal": "¿Qué día podemos revisarla juntos para resolver tus dudas?",
+          "reEngage": "Si ya no es el momento, me avisas y lo retomamos más adelante.",
+          "closing": "¿Te envío hoy el contrato para firma?"
+        },
+        "subject": {
+          "intro": "{seller} para {company}",
+          "followUp": "Seguimiento: {title}",
+          "proposal": "Propuesta: {title}",
+          "reEngage": "¿Retomamos «{title}»?",
+          "closing": "Siguiente paso para arrancar: {title}"
+        },
+        "signoff": {
+          "professional": "Cordial saludo,",
+          "friendly": "¡Un abrazo!",
+          "direct": "Quedo pendiente.",
+          "consultative": "Quedo pendiente de tus comentarios."
+        },
+        "signature": "{owner}\nEquipo comercial · {seller}",
+        "whatsappSign": "{owner} · {seller}"
       }
     },
-    "conversations": {
-      "title": "Inteligencia conversacional",
-      "subtitle": "Llamadas grabadas analizadas por IA: sentimiento, temas y action items detectados automáticamente.",
+    "calls": {
+      "title": "Análisis de llamadas",
+      "subtitle": "Tres llamadas de ejemplo con su transcripción, temas, compromisos y tiempo de habla de cada parte.",
+      "simulatedNote": "En esta demo no se graban ni se transcriben llamadas: las transcripciones, los temas y el tono son de ejemplo. El tiempo de habla sí se calcula con las palabras de cada parte en la transcripción, y los compromisos se pueden marcar como hechos. En tu proyecto se conecta a tu telefonía y a un servicio de voz a texto.",
+      "empty": "No hay llamadas de ejemplo para los negocios actuales.",
+      "openProfile": "Ver ficha",
+      "sentimentHint": "Tono general de la llamada (dato de ejemplo).",
       "sentiment": {
-        "positive": "Positivo",
-        "neutral": "Neutro",
-        "negative": "Negativo"
+        "positive": "Tono positivo",
+        "neutral": "Tono neutro",
+        "negative": "Tono negativo"
       },
-      "duration": "Duración",
-      "topics": "Temas detectados",
-      "actionItems": "Action items",
-      "talkRatio": "Talk ratio",
-      "rep": "Comercial",
-      "client": "Cliente",
-      "playRecording": "Reproducir",
-      "viewTranscript": "Ver transcript",
-      "noConversations": "No hay conversaciones esta semana."
+      "duration": "{value} min",
+      "topics": "Temas",
+      "actionItems": "Compromisos",
+      "actionDone": "{done} de {total} hechos",
+      "talkTime": "Tiempo de habla",
+      "talkHint": "Calculado con las palabras de cada parte en la transcripción.",
+      "rep": "vendedor {value} %",
+      "client": "cliente {value} %",
+      "viewTranscript": "Ver transcripción",
+      "hideTranscript": "Ocultar transcripción",
+      "transcriptLabel": "Transcripción de ejemplo"
     },
     "sequences": {
-      "title": "Secuencias multi-canal",
-      "subtitle": "Cadencias automatizadas que combinan email, WhatsApp y tareas de llamada.",
-      "activeSequence": "Secuencia activa",
-      "stepsCompleted": "{done} de {total} pasos",
-      "enrolled": "Leads inscritos",
-      "openRate": "Tasa de apertura",
-      "replyRate": "Tasa de respuesta",
-      "channels": {
-        "email": "Email",
-        "whatsapp": "WhatsApp",
-        "call": "Llamada",
-        "linkedin": "LinkedIn",
-        "task": "Tarea"
+      "title": "Secuencias de seguimiento",
+      "subtitle": "Una cadencia de WhatsApp, correo y llamada para las cotizaciones enviadas. Inscribe negocios, ejecuta pasos y mide las respuestas.",
+      "simulatedNote": "Los pasos se ejecutan de forma simulada: quedan en el historial del contacto, pero no se envía ningún mensaje. En tu proyecto salen por WhatsApp Business y tu correo, y las llamadas quedan como tareas del vendedor.",
+      "name": "Seguimiento a cotizaciones B2B",
+      "stepsTitle": "Pasos de la secuencia",
+      "stepDay": "Día {day}",
+      "steps": {
+        "s1": "Confirmar que recibió la cotización",
+        "s2": "Enviar el resumen de la propuesta y las preguntas frecuentes",
+        "s3": "Llamada de 10 minutos para resolver dudas",
+        "s4": "Recordar la vigencia de la cotización",
+        "s5": "Si no responde, pasar el negocio a reactivación"
       },
-      "stepStatus": {
-        "done": "Completado",
-        "current": "En curso",
-        "pending": "Pendiente"
+      "metrics": {
+        "enrolled": "Inscritos",
+        "active": "Activos",
+        "replied": "Respondieron",
+        "replyRate": "Tasa de respuesta",
+        "sent": "Pasos ejecutados"
       },
-      "stepDay": "Día {day}"
+      "enrollLabel": "Negocio para inscribir",
+      "enrollPlaceholder": "Elige un negocio abierto para inscribir…",
+      "noneToEnroll": "Todos los negocios abiertos ya están inscritos",
+      "enroll": "Inscribir",
+      "enrolledToast": "{company} quedó inscrito en la secuencia.",
+      "empty": "No hay negocios inscritos.",
+      "startedOn": "inició el {date}",
+      "progress": "{done} de {total} pasos",
+      "nextStep": "Siguiente: día {day} · {channel} · {step}.",
+      "dueIn": "{days, plural, =0 {Vence hoy.} =1 {Vence mañana.} other {Vence en # días.}}",
+      "dueOverdue": "{days, plural, =1 {Atrasado 1 día.} other {Atrasado # días.}}",
+      "status": {
+        "active": "Activa",
+        "paused": "Pausada",
+        "replied": "Respondió",
+        "finished": "Terminada"
+      },
+      "runStep": "Ejecutar paso (simulado)",
+      "pause": "Pausar",
+      "resume": "Reanudar",
+      "markReplied": "Marcar respuesta",
+      "remove": "Quitar",
+      "ranToast": "{step} · {company} (simulado).",
+      "finishedToast": "{company} completó la secuencia (simulado).",
+      "repliedToast": "{company} respondió: la secuencia se detiene.",
+      "removedToast": "{company} salió de la secuencia."
+    },
+    "newDeal": {
+      "title": "Nuevo negocio",
+      "subtitle": "Se agrega al embudo y se guarda solo en este navegador.",
+      "fields": {
+        "company": "Empresa",
+        "contactName": "Contacto",
+        "role": "Cargo",
+        "nit": "NIT (opcional)",
+        "city": "Ciudad",
+        "email": "Correo",
+        "phone": "Teléfono o WhatsApp",
+        "title": "Nombre del negocio",
+        "value": "Valor (COP)",
+        "closeDate": "Cierre estimado",
+        "stage": "Etapa",
+        "owner": "Vendedor",
+        "channel": "Canal preferido",
+        "source": "Origen",
+        "size": "Tamaño de la empresa",
+        "budget": "Presupuesto confirmado",
+        "decision": "Habla con quien decide",
+        "nextAction": "Próxima acción"
+      },
+      "titlePlaceholder": "Ej.: Distribución regional 2027",
+      "defaultNextAction": "Hacer el primer contacto",
+      "scoreHint": "El puntaje y la probabilidad se calculan con estos datos y el contacto de hoy.",
+      "errors": {
+        "required": "Este campo es obligatorio.",
+        "value": "Escribe un valor mayor que cero.",
+        "email": "Revisa el correo.",
+        "nit": "NIT no válido. Ej.: 900.123.456-7",
+        "closeDate": "La fecha debe ser igual o posterior al {date}."
+      },
+      "submit": "Crear negocio",
+      "created": "{company} se agregó a «{stage}»."
+    },
+    "pdf": {
+      "sample": "DOCUMENTO DE EJEMPLO - DATOS FICTICIOS - GENERADO EN LA DEMO DEL CRM",
+      "sellerLine": "Empresa ficticia de la demo · Bogotá, Colombia",
+      "title": "COTIZACIÓN {number}",
+      "date": "Fecha: {date} · Vigente hasta: {valid}",
+      "client": "Cliente",
+      "scope": "Alcance",
+      "total": "Valor total: {value} (antes de impuestos)",
+      "payment": "Forma de pago: anticipo del 30 % ({advance}) y saldo del 70 % ({balance}) a 30 días.",
+      "taxes": "Los impuestos se liquidan según la normativa vigente para el servicio contratado.",
+      "owner": "Asesor comercial: {owner}",
+      "fileName": "cotizacion-ejemplo-{id}"
     },
     "common": {
-      "loading": "Cargando...",
-      "viewAll": "Ver todo",
       "close": "Cerrar",
-      "deal": "deal",
-      "deals": "deals"
+      "cancel": "Cancelar",
+      "save": "Guardar"
+    },
+    "data": {
+      "seller": "Logística Quindara S.A.S.",
+      "deals": {
+        "d1": { "role": "Gerente de compras", "title": "Distribución nacional 2027", "nextAction": "Enviar el contrato con anticipo del 30 %" },
+        "d2": { "role": "Director de logística", "title": "Transporte de materiales a obra", "nextAction": "Confirmar quién aprueba la propuesta" },
+        "d3": { "role": "Gerente general", "title": "Bodegaje refrigerado en Funza", "nextAction": "Confirmar el presupuesto aprobado" },
+        "d4": { "role": "Jefe de compras", "title": "Despachos semanales a la Costa", "nextAction": "Enviar la propuesta de rutas" },
+        "d5": { "role": "Directora administrativa", "title": "Distribución de material académico 2027", "nextAction": "Hacer la llamada de calificación" },
+        "d6": { "role": "Gerente de operaciones", "title": "Última milla para tiendas propias", "nextAction": "Revisar la propuesta con su comité" },
+        "d7": { "role": "Coordinadora de compras", "title": "Transporte con cadena de frío", "nextAction": "Enviar el reporte de temperatura y la propuesta del piloto" },
+        "d8": { "role": "Gerente comercial", "title": "Rutas a fincas de Santander", "nextAction": "Agendar la visita a su bodega" },
+        "d9": { "role": "Jefa de abastecimiento", "title": "Mensajería de muestras de laboratorio", "nextAction": "Reactivar con un caso de uso del sector salud" },
+        "d10": { "role": "Gerente general", "title": "Consolidación de carga para exportación", "nextAction": "Ajustar la propuesta a dos contenedores por mes" },
+        "d11": { "role": "Directora de compras", "title": "Distribución a droguerías y tiendas", "nextAction": "Negociar el plazo de pago" },
+        "d12": { "role": "Jefe de bodega", "title": "Bodegaje para la temporada navideña", "nextAction": "Confirmar el interés por llamada" },
+        "d13": { "role": "Gerente financiera", "title": "Logística inversa de garantías", "nextAction": "Enviar la propuesta económica" },
+        "w1": { "role": "Gerente de logística", "title": "Rutas Villavicencio–Bogotá", "nextAction": "Revisión trimestral del servicio" },
+        "w2": { "role": "Directora de operaciones", "title": "Transporte refrigerado en Boyacá", "nextAction": "Encuesta de satisfacción del primer mes" },
+        "w3": { "role": "Jefe de compras", "title": "Distribución de repuestos a talleres", "nextAction": "Ofrecer la ampliación a Medellín" },
+        "w4": { "role": "Gerente general", "title": "Entregas diarias a puntos de venta", "nextAction": "Programar el inicio de la operación" },
+        "l1": { "role": "Jefe de compras", "title": "Transporte de materia prima", "nextAction": "Volver a contactar en febrero de 2027" },
+        "l2": { "role": "Gerente de operaciones", "title": "Distribución regional de bebidas", "nextAction": "Volver a contactar en enero de 2027" },
+        "l3": { "role": "Director administrativo", "title": "Mensajería nacional de pedidos", "nextAction": "Volver a contactar en diciembre" }
+      },
+      "calls": {
+        "c1": {
+          "topics": ["Fecha de inicio", "Forma de pago", "Visita a la bodega"],
+          "actions": [
+            "Enviar el contrato con anticipo del 30 % y saldo a 30 días",
+            "Confirmar la fecha de la primera ruta",
+            "Agendar la visita a la bodega de Barranquilla"
+          ],
+          "transcript": [
+            "Hola, Laura. Gracias por el espacio. ¿Pudiste revisar la propuesta de distribución nacional?",
+            "Sí, la revisé con mi equipo. El alcance nos sirve; lo que más nos preocupa es arrancar antes de la temporada de diciembre.",
+            "Entiendo. Si firmamos este mes, podemos tener la primera ruta operando en tres semanas.",
+            "Eso nos sirve. ¿Y la forma de pago? Para nosotros es más fácil un anticipo y el resto a 30 días.",
+            "Lo podemos hacer: 30 % de anticipo y el saldo a 30 días.",
+            "Perfecto. Mándame el contrato con esas condiciones y lo paso a jurídica. Y quiero conocer la bodega de Barranquilla.",
+            "Hecho. Te envío el contrato y agendamos la visita a la bodega."
+          ]
+        },
+        "c2": {
+          "topics": ["Registro de temperatura", "Precio", "Piloto de 30 días"],
+          "actions": [
+            "Enviar un reporte de temperatura de una ruta de ejemplo",
+            "Proponer por escrito un piloto de 30 días"
+          ],
+          "transcript": [
+            "Natalia, ¿qué te pareció la propuesta de transporte con cadena de frío?",
+            "Está bien, pero necesitamos ver cómo registran la temperatura durante todo el recorrido.",
+            "Cada vehículo guarda la temperatura cada cinco minutos y te enviamos el reporte de cada entrega.",
+            "Me gustaría ver un reporte de una ruta antes de decidir. Y el precio está por encima de lo que pagamos hoy.",
+            "Te comparto un reporte de ejemplo. Sobre el precio, ¿qué tal un piloto de 30 días para que comparen?",
+            "Un piloto puede funcionar. Lo tengo que consultar con la gerencia."
+          ]
+        },
+        "c3": {
+          "topics": ["Presupuesto", "Competencia", "Volumen de carga"],
+          "actions": [
+            "Ajustar la propuesta a dos contenedores por mes",
+            "Llamar de nuevo después del 13 de octubre"
+          ],
+          "transcript": [
+            "Felipe, te llamo para saber cómo vas con la propuesta de consolidación de carga.",
+            "La verdad, este trimestre no tenemos presupuesto para todo el volumen que cotizamos.",
+            "Entiendo. ¿Qué volumen sí podrían mover desde ahora?",
+            "Unos dos contenedores al mes. Además, otra empresa nos ofreció un precio más bajo.",
+            "Ajusto la propuesta a dos contenedores y te muestro qué incluye cada opción.",
+            "Listo, pero llámame después del 13 de octubre, cuando cerremos la cosecha."
+          ]
+        }
+      }
     }
   }
 }

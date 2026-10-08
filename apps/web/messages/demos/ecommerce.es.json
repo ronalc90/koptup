@@ -1,18 +1,127 @@
 {
   "demoEcommerce2": {
-    "viewSelector": "Selector de vista",
+    "meta": {
+      "title": "Tienda en línea",
+      "seoTitle": "Demo de tienda en línea: catálogo, carrito, pago simulado y reportes",
+      "seoDescription": "Prueba una tienda en línea de ejemplo para Colombia: catálogo con búsqueda y favoritos, carrito con reglas de precio y cupones, pago simulado con tarjeta, PSE, Nequi, Daviplata, contraentrega y Addi, panel de pedidos e inventario, guías de envío simuladas, devoluciones y reportes de ventas en COP exportables a CSV. Funciona con datos de ejemplo.",
+      "breadcrumbHome": "Inicio",
+      "breadcrumbDemos": "Demos"
+    },
+    "viewSelector": "Vistas de la demo",
     "views": {
       "storefront": "Tienda",
-      "checkout": "Checkout",
-      "vendor": "Vendedor",
-      "operations": "Operaciones",
-      "admin": "Admin"
+      "checkout": "Carrito y pago",
+      "vendor": "Panel de la tienda",
+      "operations": "Logística",
+      "admin": "Reportes"
+    },
+    "sampleData": "Datos de ejemplo",
+    "sampleDataHint": "Tienda de ejemplo: productos, clientes, pedidos y cifras son ficticios; los pagos, la factura y las guías son simulados. Lo que haces se guarda solo en este navegador.",
+    "footerNote": "Demo con datos de ejemplo. Los pedidos, el inventario y los reportes se calculan en tu navegador y se guardan solo en él (puedes restablecerlos). En tu proyecto se conectan la pasarela de pagos, el proveedor de factura electrónica, las transportadoras y tu ERP.",
+    "reset": {
+      "button": "Restablecer",
+      "hint": "Vuelve a los datos de ejemplo iniciales",
+      "title": "Restablecer la demo",
+      "body": "Se borran los cambios guardados en este navegador: {n, plural, =0 {no has hecho pedidos} one {# pedido tuyo} other {# pedidos tuyos}}, productos creados, existencias, reglas y favoritos. La demo vuelve a los datos de ejemplo iniciales.",
+      "confirm": "Restablecer"
+    },
+    "tour": {
+      "title": "Recorrido sugerido",
+      "show": "Ver recorrido sugerido ({done}/{total})",
+      "hide": "Ocultar",
+      "steps": {
+        "cart": "Agrega productos al carrito en la tienda",
+        "pay": "Paga un pedido de ejemplo (pago simulado)",
+        "prepare": "En el panel, pasa tu pedido a preparación",
+        "ship": "En logística, genera la guía de envío",
+        "reports": "Mira tu pedido sumado en los reportes"
+      },
+      "here": "Este paso se hace en esta vista: {step}.",
+      "doneHere": "Ya completaste este paso."
+    },
+    "common": {
+      "close": "Cerrar",
+      "cancel": "Cancelar",
+      "unitsShort": "u.",
+      "showMore": "Ver {n} más"
+    },
+    "time": {
+      "now": "ahora",
+      "min": "hace {n} min",
+      "h": "hace {n} h",
+      "d": "hace {n, plural, one {# día} other {# días}}"
+    },
+    "orderStatus": {
+      "new": "Nuevo",
+      "preparing": "Preparando",
+      "shipped": "Enviado",
+      "delivered": "Entregado",
+      "cancelled": "Cancelado"
+    },
+    "paymentMethods": {
+      "card": "Tarjeta",
+      "pse": "PSE",
+      "nequi": "Nequi",
+      "daviplata": "Daviplata",
+      "cod": "Contraentrega",
+      "addi": "Addi (a cuotas)"
+    },
+    "carriers": {
+      "coordinadora": "Coordinadora",
+      "servientrega": "Servientrega",
+      "interrapidisimo": "Interrapidísimo",
+      "tcc": "TCC"
+    },
+    "warehouses": {
+      "bog": "Bodega Bogotá",
+      "mde": "Bodega Medellín",
+      "cli": "Bodega Cali",
+      "short": {
+        "bog": "BOG",
+        "mde": "MDE",
+        "cli": "CLO"
+      }
+    },
+    "tracking": {
+      "labelCreated": "Guía generada",
+      "pickedUp": "Recogido en bodega",
+      "inTransit": "En tránsito",
+      "outForDelivery": "En reparto",
+      "delivered": "Entregado"
+    },
+    "toasts": {
+      "noStock": "No hay más unidades disponibles de «{name}» (existencias: {n}).",
+      "added": "«{name}» quedó en tu carrito.",
+      "addedLimited": "Solo hay {n} unidades de «{name}»: tu carrito quedó con {n}.",
+      "goToCart": "Ir a pagar",
+      "toPreparing": "{order} pasó a preparación.",
+      "guideCreated": "Guía simulada de {carrier} generada para {order}.",
+      "seeTracking": "Ver seguimiento",
+      "delivered": "{order} quedó entregado.",
+      "trackingStep": "{order}: {step} (seguimiento simulado).",
+      "invoiceDownloaded": "Descargaste la factura de ejemplo de {order} (PDF).",
+      "copied": "Mensaje copiado al portapapeles.",
+      "copyFailed": "Tu navegador no permitió copiar; selecciona el texto y cópialo.",
+      "csvDownloaded": "Descargaste un CSV con {n, plural, one {# fila} other {# filas}}.",
+      "published": "«{name}» volvió a la tienda.",
+      "hidden": "«{name}» ya no se muestra en la tienda.",
+      "productCreated": "«{name}» se publicó en la tienda.",
+      "seeInStore": "Ver en la tienda",
+      "productUpdated": "Guardaste los cambios de «{name}».",
+      "productDeleted": "Eliminaste «{name}».",
+      "restocked": "Sumaste {n} unidades de «{name}» en {warehouse}.",
+      "returnApproved": "Devolución {id} aprobada.",
+      "returnRejected": "Devolución {id} rechazada.",
+      "returnCreated": "Registraste una devolución del pedido {order}.",
+      "riskApproved": "Aprobaste el pedido {order}.",
+      "riskRejected": "Cancelaste el pedido {order} y sus unidades volvieron al inventario."
     },
     "hero": {
       "badge": "Tienda de ejemplo",
       "title": "Tu tienda en línea, de punta a punta",
-      "subtitle": "Catálogo, carrito, pago simulado, panel del vendedor, logística y analítica con datos de ejemplo.",
+      "subtitle": "Compra en la tienda, paga con un pago simulado y sigue el pedido en el panel, en logística y en los reportes.",
       "freeShipping": "Envío gratis desde {amount}",
+      "shippingFlat": "Envío con tarifa fija",
       "pricesNote": "Precios en COP con IVA incluido",
       "imageAlt": "Bolsas de compra de papel de colores"
     },
@@ -28,41 +137,60 @@
       "home": "Hogar",
       "sports": "Deportes",
       "beauty": "Belleza",
-      "wines": "Vinos"
+      "wines": "Vinos",
+      "favorites": "Favoritos ({n})"
+    },
+    "sort": {
+      "label": "Ordenar",
+      "relevance": "Destacados",
+      "priceAsc": "Precio: menor a mayor",
+      "priceDesc": "Precio: mayor a menor",
+      "rating": "Mejor calificados"
     },
     "sections": {
       "recommended": "Más vendidos",
-      "recommendedHint": "Productos marcados como más vendidos (datos de ejemplo)",
+      "recommendedHint": "Calculado con los pedidos de ejemplo de los últimos 30 días",
       "allProducts": "Todos los productos",
-      "recentlyViewed": "Visto recientemente",
-      "empty": "No encontramos productos con esos criterios."
+      "favorites": "Tus favoritos",
+      "favoritesEmpty": "Todavía no tienes favoritos. Toca el corazón de un producto para guardarlo aquí.",
+      "empty": "No encontramos productos con esos criterios.",
+      "recentlyViewed": "Vistos recientemente"
     },
     "product": {
       "addToCart": "Agregar",
+      "addToCartNamed": "Agregar {name} al carrito",
+      "soldOut": "Agotado",
       "buyNow": "Comprar ahora",
       "quickView": "Vista rápida",
-      "wishlist": "Lista de deseos",
-      "reviewsCount": "reseñas",
+      "wishlistAdd": "Guardar en favoritos",
+      "wishlistRemove": "Quitar de favoritos",
+      "noReviews": "Sin reseñas todavía",
+      "ratingLabel": "Calificación {rating} de 5 con {n} reseñas",
+      "sku": "SKU",
       "category": "Categoría",
-      "stock": "Stock",
+      "availability": "Disponibilidad",
+      "unitsAvailable": "{n, plural, one {# unidad} other {# unidades}}",
+      "quantity": "Cantidad",
+      "inCart": "Ya tienes {n} en el carrito",
       "description": "Producto de ejemplo. En tu tienda, aquí van la descripción, la ficha técnica y la garantía de cada referencia.",
-      "badges": {
-        "new": "Nuevo",
-        "bestseller": "Top ventas",
-        "eco": "Eco"
-      },
+      "taxIncluded": "Precio en pesos colombianos (COP), IVA incluido",
       "galleryFull": "Ver foto completa",
       "galleryDetail": "Ver detalle {n}",
-      "taxIncluded": "Precio en pesos colombianos (COP), IVA incluido"
+      "badges": {
+        "new": "Nuevo",
+        "bestseller": "Más vendido",
+        "eco": "Eco",
+        "soldOut": "Agotado"
+      }
     },
     "productNames": {
       "laptop15": "Portátil Pro 15\"",
-      "smartphone61": "Smartphone Pro 6,1\"",
+      "smartphone61": "Celular Pro 6,1\"",
       "tablet11": "Tableta 11\" con lápiz",
       "headphones": "Audífonos inalámbricos de diadema",
       "smartwatch": "Reloj inteligente",
       "filmCamera": "Cámara análoga de 35 mm",
-      "earbuds": "Audífonos in-ear inalámbricos",
+      "earbuds": "Audífonos de botón inalámbricos",
       "canvasSneakers": "Tenis de lona rojos",
       "leatherBoots": "Botas de cuero café",
       "leatherJacket": "Chaqueta de cuero negra",
@@ -72,274 +200,526 @@
       "deskLamp": "Lámpara de escritorio",
       "frenchPress": "Prensa francesa para café",
       "cookwareSet": "Batería de cocina de 5 piezas",
-      "runningShoes": "Tenis de running",
+      "runningShoes": "Tenis para correr",
       "dumbbells": "Set de mancuernas hexagonales",
       "yogaMat": "Tapete de yoga",
       "gymBag": "Maletín deportivo de lona",
-      "fragrance": "Perfume eau de parfum 100 ml",
+      "fragrance": "Perfume de 100 ml",
       "faceCream": "Crema hidratante facial",
       "reserveMalbec": "Vino tinto Malbec reserva 750 ml",
       "chardonnay": "Vino blanco Chardonnay 750 ml"
     },
     "cart": {
-      "goToCheckout": "Ir al checkout",
-      "items": "ítems"
+      "goToCheckout": "Ir a pagar"
     },
     "checkout": {
       "backToStore": "Volver a la tienda",
+      "stepsLabel": "Pasos de la compra",
       "steps": {
         "cart": "Carrito",
-        "address": "Dirección",
+        "address": "Datos y envío",
         "payment": "Pago",
         "confirmation": "Confirmación"
       },
       "back": "Atrás",
       "continue": "Continuar",
-      "placeOrder": "Confirmar pago",
+      "placeOrder": "Pagar {amount}",
       "cart": {
         "title": "Tu carrito",
         "empty": "Tu carrito está vacío. Vuelve a la tienda y agrega productos.",
-        "remove": "Quitar",
-        "couponPlaceholder": "Código de descuento (KOP10 / KOP20)",
+        "removeNamed": "Quitar {name} del carrito",
+        "decrease": "Restar una unidad",
+        "increase": "Sumar una unidad",
+        "couponApplied": "Cupón {code} aplicado",
+        "removeCoupon": "Quitar",
+        "couponPlaceholder": "Código de descuento",
         "applyCoupon": "Aplicar",
-        "couponApplied": "Cupón aplicado: {value}% de descuento"
+        "couponInvalid": "Ese cupón no existe en la tienda de ejemplo.",
+        "couponHint": "Prueba el cupón BIENVENIDA10 (10 % de descuento). Las reglas de precio activas en el panel de la tienda se aplican solas."
       },
       "address": {
-        "title": "Dirección de envío",
+        "title": "Datos y dirección de envío",
+        "fillSample": "Usar datos de ejemplo",
         "fullName": "Nombre completo",
-        "email": "Email",
-        "phone": "Teléfono",
-        "address": "Dirección",
+        "document": "Documento",
+        "docType": "Tipo de documento",
+        "docTypes": {
+          "CC": "CC",
+          "CE": "CE",
+          "PP": "Pasaporte"
+        },
+        "email": "Correo electrónico",
+        "phone": "Celular",
         "city": "Ciudad",
-        "zip": "Código postal",
-        "mapHint": "Mapa de entrega (mock)"
+        "address": "Dirección",
+        "deliveryEstimate": "Envío a {city}: {min} a {max} días hábiles. Despacha {warehouse}.",
+        "wantsCompany": "Necesito la factura electrónica a nombre de una empresa",
+        "companyName": "Razón social",
+        "companyNit": "NIT (sin dígito de verificación)",
+        "nitDv": "Dígito de verificación calculado: {dv}",
+        "consent": "Autorizo el tratamiento de mis datos personales para gestionar este pedido (Ley 1581 de 2012).",
+        "privacyNote": "Demo: usa datos ficticios. Lo que escribas se queda en este navegador y no se envía a ningún servidor."
       },
       "payment": {
-        "title": "Método de pago",
-        "subtitle": "Métodos de pago habituales en Colombia. En esta demo el pago es simulado; en tu proyecto se conecta la pasarela que elijas.",
-        "methods": {
-          "card": "Tarjeta",
-          "pse": "PSE",
-          "nequi": "Nequi",
-          "daviplata": "Daviplata",
-          "mercadoPago": "Mercado Pago",
-          "wompi": "Wompi",
-          "applePay": "Apple Pay",
-          "googlePay": "Google Pay",
-          "addi": "Addi BNPL"
-        },
+        "title": "Medio de pago",
+        "subtitle": "Medios de pago habituales en Colombia. En esta demo el pago es simulado: no se cobra nada ni se contacta a ninguna pasarela. En tu proyecto se conecta la pasarela que elijas (por ejemplo Wompi, PayU, Mercado Pago o ePayco).",
         "cardNumber": "Número de tarjeta",
+        "brands": {
+          "visa": "Visa",
+          "mastercard": "Mastercard",
+          "amex": "American Express"
+        },
         "cardName": "Nombre en la tarjeta",
-        "addiHint": "Ejemplo de pago a cuotas con Addi: la aprobación y las condiciones las define Addi en la integración real.",
-        "redirectHint": "En la tienda real te redirige al portal del proveedor para completar el pago. Aquí el pago es simulado.",
-        "walletHint": "En la tienda real confirmas el pago desde tu billetera digital. Aquí el pago es simulado.",
-        "cardExpiry": "MM/AA",
-        "cardHint": "Demo: no ingreses datos reales de tarjeta; no se envían ni se guardan."
+        "cardExpiry": "Vence (MM/AA)",
+        "cardCvv": "CVV",
+        "cardHint": "No escribas datos reales de tarjeta: aquí no se envían ni se guardan.",
+        "useTestCard": "Usar tarjeta de prueba aprobada",
+        "useDeclinedCard": "Usar tarjeta de prueba rechazada",
+        "pseHint": "En tu tienda real, PSE te muestra la lista de bancos y te lleva a la banca en línea del tuyo. Aquí la aprobación es simulada.",
+        "walletPhone": "Celular registrado en {wallet}",
+        "walletHint": "En tu tienda real te llega una notificación de {wallet} para aprobar el pago. Aquí la aprobación es simulada.",
+        "codHint": "Pagas en efectivo cuando recibes el pedido. El pedido queda pendiente de pago hasta la entrega.",
+        "addiHint": "Pago a cuotas: en tu tienda real Addi estudia y aprueba el crédito. Aquí es simulado y aplica para compras desde {min}.",
+        "declined": "Pago rechazado por la pasarela simulada (tarjeta de prueba rechazada). Prueba con otra tarjeta u otro medio de pago.",
+        "processing": "Procesando pago simulado…",
+        "stockChanged": "Las existencias cambiaron: revisa tu carrito antes de pagar."
       },
-      "confirmation": {
-        "title": "¡Pedido de ejemplo confirmado!",
-        "subtitle": "Pago simulado: no se cobró nada ni se emitió una factura real.",
-        "orderNumber": "Número de pedido",
-        "cufe": "CUFE (simulado)",
-        "email": "Email confirmación",
-        "total": "Total pagado",
-        "delivery": "Entrega estimada en 3 a 5 días hábiles",
-        "continueShopping": "Seguir comprando"
+      "errors": {
+        "fullName": "Escribe tu nombre completo.",
+        "docNumber": "Escribe un número de documento válido (5 a 12 caracteres).",
+        "email": "Escribe un correo válido.",
+        "phone": "Escribe un celular colombiano de 10 dígitos que empiece por 3.",
+        "cityId": "Elige una ciudad.",
+        "address": "Escribe la dirección de entrega.",
+        "companyName": "Escribe la razón social.",
+        "companyNit": "El NIT debe tener 9 dígitos.",
+        "consent": "Debes autorizar el tratamiento de datos para continuar.",
+        "summary": "Revisa los campos marcados en rojo.",
+        "cardNumber": "Número de tarjeta no válido.",
+        "cardName": "Escribe el nombre como aparece en la tarjeta.",
+        "cardExpiry": "Fecha no válida o vencida (MM/AA).",
+        "cardCvv": "El CVV tiene 3 o 4 dígitos."
       },
       "summary": {
         "title": "Resumen",
-        "subtotal": "Subtotal (IVA incluido)",
-        "discount": "Descuento",
+        "paidTitle": "Resumen del pedido",
+        "subtotal": "Subtotal ({n, plural, one {# producto} other {# productos}})",
+        "adjustments": {
+          "volume10": "Regla: 10 % por compra grande",
+          "freeShipping": "Regla: envío gratis",
+          "coffee3x2": "Regla: café 3x2",
+          "wine15": "Regla: 15 % en vinos",
+          "coupon": "Cupón {code}"
+        },
+        "discount": "Descuentos",
         "shipping": "Envío",
-        "total": "Total",
         "free": "Gratis",
-        "freeShippingApplied": "Envío gratis aplicado",
+        "total": "Total",
         "taxIncluded": "IVA incluido ({rate} %)",
-        "freeShippingFrom": "Envío gratis desde {amount}."
+        "shippingFlat": "La regla de envío gratis está desactivada en el panel: el envío tiene tarifa fija.",
+        "freeShippingApplied": "Envío gratis aplicado",
+        "freeShippingMissing": "Te faltan {amount} para el envío gratis.",
+        "rulesNote": "Los descuentos salen de las reglas de precio activas en el panel de la tienda."
+      },
+      "confirmation": {
+        "title": "¡Pedido de ejemplo confirmado!",
+        "titleCod": "¡Pedido de ejemplo recibido! Pagas al recibir",
+        "subtitle": "Pago simulado: no se cobró nada, no se envió ningún correo y la factura no se transmitió a la DIAN.",
+        "orderNumber": "Número de pedido",
+        "method": "Medio de pago",
+        "pendingPayment": "pendiente hasta la entrega",
+        "approved": "aprobado (simulado)",
+        "email": "Correo del comprador",
+        "total": "Total",
+        "cufe": "CUFE de ejemplo",
+        "cufeHint": "Calculado en tu navegador con SHA-384 sobre los datos del pedido y una clave técnica ficticia, como lo define la DIAN. No es válido ni se reporta.",
+        "delivery": "Entrega estimada en {city}: {min} a {max} días hábiles.",
+        "whatsappTitle": "Vista previa del mensaje de confirmación por WhatsApp",
+        "whatsappText": "Hola, {name}. Recibimos tu pedido {order} por {total} ({method}).\nLo enviaremos a {city}; llega en {min} a {max} días hábiles.\nTe avisaremos cuando salga de bodega.",
+        "whatsappHint": "No se envía nada: en tu proyecto este mensaje sale por la API de WhatsApp Business.",
+        "copy": "Copiar mensaje",
+        "downloadInvoice": "Descargar factura de ejemplo (PDF)",
+        "seeInPanel": "Ver el pedido en el panel",
+        "continueShopping": "Seguir comprando"
       }
     },
+    "invoice": {
+      "title": "Factura de venta (ejemplo)",
+      "notValid": "Documento de ejemplo generado por una demo: no es una factura electrónica válida ni fue transmitida a la DIAN.",
+      "seller": "Vendedor",
+      "buyer": "Comprador",
+      "document": "Documento",
+      "address": "Dirección",
+      "order": "Pedido",
+      "date": "Fecha",
+      "payment": "Medio de pago",
+      "product": "Producto",
+      "qty": "Cant.",
+      "unit": "Valor unitario",
+      "amount": "Valor",
+      "subtotal": "Subtotal",
+      "discount": "Descuentos",
+      "shipping": "Envío",
+      "total": "Total",
+      "ivaIncluded": "IVA incluido ({rate} %)",
+      "cufe": "CUFE de ejemplo (SHA-384)",
+      "cufePending": "Calculando…",
+      "footer": "Tienda de ejemplo de la demo de KopTup. En tu proyecto, la factura electrónica la emite un proveedor tecnológico autorizado por la DIAN o tu ERP."
+    },
+    "orderActions": {
+      "prepare": "Pasar a preparación",
+      "ship": "Generar guía",
+      "track": "Simular siguiente evento"
+    },
+    "guide": {
+      "title": "Generar guía para {order}",
+      "confirm": "Generar guía (simulada)",
+      "destination": "Destino: {city} ({department}). Sale de {warehouse}.",
+      "carrier": "Transportadora",
+      "days": "{min} a {max} días",
+      "simulatedNote": "Guía y tarifa simuladas con valores ilustrativos. En tu proyecto se generan con la API de la transportadora o de un agregador de envíos."
+    },
+    "orderDetail": {
+      "title": "Pedido {order}",
+      "customer": "Cliente",
+      "city": "Ciudad",
+      "address": "Dirección",
+      "email": "Correo",
+      "document": "Documento",
+      "payment": "Pago",
+      "paid": "pagado",
+      "unpaid": "pendiente de pago",
+      "warehouse": "Bodega",
+      "guide": "Guía",
+      "product": "Producto",
+      "qty": "Cant.",
+      "amount": "Valor"
+    },
     "vendor": {
-      "title": "Panel del vendedor",
-      "subtitle": "Gestiona tu catálogo, pedidos y reglas de precio (datos de ejemplo).",
-      "createProduct": "Crear producto",
-      "live": "Simulado",
-      "liveOrders": "Pedidos de hoy",
-      "topProducts": "Productos top (30 días)",
-      "lowStock": "Stock bajo",
-      "unitsSold": "vendidos",
-      "units": "u.",
+      "title": "Panel de la tienda",
+      "subtitle": "Pedidos, catálogo, inventario y reglas de precio de la tienda de ejemplo. Los cambios se ven al instante en la tienda.",
       "kpis": {
-        "todaySales": "Ventas hoy",
-        "aov": "Ticket promedio",
-        "conversion": "Conversión",
-        "activeProducts": "Productos activos"
+        "title": "Últimas 24 horas",
+        "hint": "Calculado con los pedidos de ejemplo y los tuyos. La variación compara con el promedio diario de los 7 días anteriores.",
+        "sales": "Ventas (sin envío)",
+        "orders": "Pedidos",
+        "ticket": "Ticket promedio",
+        "units": "Unidades vendidas",
+        "deltaHint": "Frente al promedio diario de los 7 días anteriores"
       },
-      "order": {
+      "orders": {
+        "title": "Pedidos",
+        "period": "Periodo",
+        "periods": {
+          "1": "Últimas 24 h",
+          "7": "Últimos 7 días",
+          "30": "Últimos 30 días"
+        },
+        "search": "Buscar pedido o cliente",
+        "export": "Exportar CSV",
+        "statusFilter": "Filtrar por estado",
+        "all": "Todos",
+        "number": "Pedido",
         "customer": "Cliente",
-        "items": "Ítems",
+        "city": "Ciudad",
         "total": "Total",
+        "payment": "Pago",
         "status": "Estado",
-        "action": "Acción",
-        "advance": "Avanzar →",
-        "status_new": "Nuevo",
-        "status_preparing": "Preparando",
-        "status_shipped": "Enviado",
-        "status_delivered": "Entregado"
+        "when": "Cuándo",
+        "action": "Siguiente paso",
+        "yours": "Tuyo",
+        "unpaid": "por cobrar",
+        "empty": "No hay pedidos con esos filtros.",
+        "more": "Ver {n} más"
       },
       "pricing": {
         "title": "Reglas de precio",
-        "subtitle": "Reglas de ejemplo: actívalas o desactívalas",
-        "rule1": "Descuento del 10 % si el carrito supera $ 300.000",
-        "rule2": "Envío gratis a clientes VIP",
-        "rule3": "Precio dinámico por demanda (categoría Tecnología)",
-        "rule4": "Bundle: 3x2 en café y vinos"
-      },
-      "createForm": {
-        "title": "Nuevo producto",
-        "name": "Nombre",
-        "sku": "SKU",
-        "price": "Precio",
-        "stock": "Stock",
-        "description": "Descripción",
-        "dropImages": "Arrastra imágenes aquí o haz clic para seleccionarlas",
-        "cancel": "Cancelar",
-        "save": "Guardar producto",
-        "namePlaceholder": "Tenis de lona azules",
-        "filesSelected": "{count, plural, one {# imagen seleccionada} other {# imágenes seleccionadas}} (no se suben en la demo)",
-        "simulatedHint": "Demo: el producto se guarda como borrador simulado y no se publica en la tienda de ejemplo.",
-        "savedNotice": "«{name}» quedó guardado como borrador (simulado: no se publica en la tienda de ejemplo).",
-        "dismiss": "Cerrar aviso"
+        "subtitle": "Actívalas o desactívalas: se aplican al instante en el carrito.",
+        "on": "Activa",
+        "off": "Inactiva",
+        "rules": {
+          "volume10": "10 % de descuento si el carrito supera {from}",
+          "freeShipping": "Envío gratis desde {from} (si no, {fee})",
+          "coffee3x2": "Café de origen 3x2 (cada 3 bolsas, 1 gratis)",
+          "wine15": "15 % de descuento en vinos"
+        }
       }
     },
+    "csv": {
+      "order": "Pedido",
+      "date": "Fecha",
+      "customer": "Cliente",
+      "city": "Ciudad",
+      "department": "Departamento",
+      "products": "Productos",
+      "units": "Unidades",
+      "subtotal": "Subtotal",
+      "discount": "Descuento",
+      "shipping": "Envío",
+      "total": "Total",
+      "iva": "IVA incluido",
+      "method": "Medio de pago",
+      "paid": "Pagado",
+      "status": "Estado",
+      "carrier": "Transportadora",
+      "guide": "Guía",
+      "yes": "Sí",
+      "no": "No",
+      "sku": "SKU",
+      "product": "Producto",
+      "category": "Categoría",
+      "netSales": "Ventas netas (COP)",
+      "stock": "Existencias",
+      "coverageDays": "Días de inventario",
+      "orders": "Pedidos"
+    },
+    "catalog": {
+      "title": "Catálogo e inventario",
+      "subtitle": "Existencias por bodega, unidades vendidas en 30 días y días de inventario al ritmo actual.",
+      "search": "Buscar por nombre o SKU",
+      "onlyLow": "Solo existencias bajas ({n})",
+      "create": "Crear producto",
+      "product": "Producto",
+      "price": "Precio",
+      "stock": "Existencias",
+      "sold30": "Vendidas 30 d",
+      "coverage": "Inventario para",
+      "status": "Estado",
+      "actions": "Acciones",
+      "created": "creado por ti",
+      "days": "{n, plural, one {# día} other {# días}}",
+      "hidden": "Oculto",
+      "published": "Publicado",
+      "edit": "Editar",
+      "restock": "Reponer existencias",
+      "publish": "Publicar en la tienda",
+      "hide": "Ocultar de la tienda",
+      "delete": "Eliminar",
+      "empty": "No hay productos con esos filtros.",
+      "more": "Ver {n} más",
+      "form": {
+        "editTitle": "Editar producto",
+        "createTitle": "Nuevo producto",
+        "saveChanges": "Guardar cambios",
+        "publish": "Publicar en la tienda",
+        "name": "Nombre",
+        "namePlaceholder": "Tenis de lona azules",
+        "baseNameNote": "El nombre de los productos de ejemplo no se edita; sí su precio y su descripción.",
+        "sku": "SKU",
+        "category": "Categoría",
+        "price": "Precio con IVA (COP)",
+        "ivaIncluded": "IVA incluido",
+        "stock": "Existencias iniciales (Bodega Bogotá)",
+        "description": "Descripción",
+        "imagePreview": "Vista previa de la foto",
+        "imageChange": "Cambiar foto",
+        "imagePick": "Elige una foto del producto (opcional)",
+        "imageNote": "La foto se reduce y se guarda solo en este navegador; no se sube a ningún servidor.",
+        "errors": {
+          "name": "Escribe un nombre de al menos 3 caracteres.",
+          "sku": "Usa de 4 a 20 letras, números o guiones.",
+          "skuTaken": "Ya existe un producto con ese SKU.",
+          "price": "El precio debe estar entre $ 1.000 y $ 50.000.000.",
+          "stock": "Escribe un número entero entre 0 y 5.000.",
+          "image": "No pudimos leer esa imagen (máximo 8 MB)."
+        }
+      },
+      "restockTitle": "Reponer «{name}»",
+      "restockConfirm": "Sumar al inventario",
+      "restockQty": "Unidades",
+      "restockWarehouse": "Bodega",
+      "restockNote": "Simula la llegada de mercancía. En tu proyecto, la entrada se registra desde la orden de compra o tu ERP.",
+      "deleteTitle": "Eliminar producto",
+      "deleteConfirm": "¿Eliminar «{name}»? Se quita de la tienda, del carrito y de los favoritos."
+    },
     "ops": {
-      "title": "Operaciones y logística",
-      "subtitle": "Bodegas, alistamiento, transportadoras y devoluciones en una sola vista (datos de ejemplo).",
+      "title": "Logística",
+      "subtitle": "Bodegas, despachos, seguimiento de envíos, transportadoras y devoluciones de la tienda de ejemplo.",
       "warehouses": {
         "title": "Bodegas",
-        "capacity": "Capacidad",
-        "pendingOrders": "Pedidos pendientes"
+        "capacityOf": "Capacidad: {n} unidades",
+        "occupancy": "Ocupación ({n} unidades)",
+        "pendingOrders": "Pedidos por despachar",
+        "inTransit": "Envíos en camino"
       },
-      "picking": {
-        "title": "Alistamiento en curso",
-        "items": "ítems",
-        "wave1": "Ola 1 (exprés)",
-        "wave2": "Ola 2 (24 h)",
-        "wave3": "Ola 3 (48 h)",
-        "complete": "Completo",
-        "inProgress": "En curso",
-        "queued": "En cola"
-      },
-      "carriers": {
-        "title": "Transportadoras nacionales (tarifas de ejemplo)",
-        "carrier": "Transportadora",
-        "sla": "Tiempo de entrega",
-        "cost": "Tarifa por paquete",
-        "rating": "Calificación",
-        "status": "Estado",
-        "active": "Activa",
-        "names": {
-          "servientrega": "Servientrega",
-          "coordinadora": "Coordinadora",
-          "interrapidisimo": "Interrapidísimo",
-          "tcc": "TCC"
-        }
+      "dispatch": {
+        "title": "Por despachar ({n})",
+        "hint": "Pedidos ya alistados. {n, plural, =0 {No hay pedidos nuevos por confirmar.} one {# pedido nuevo espera confirmación en el panel.} other {# pedidos nuevos esperan confirmación en el panel.}}",
+        "empty": "No hay pedidos alistados. Pasa un pedido a preparación en el panel de la tienda.",
+        "units": "{n, plural, one {# unidad} other {# unidades}}",
+        "from": "Sale de {warehouse}"
       },
       "tracking": {
-        "title": "Seguimiento de envíos",
-        "status": {
-          "in_transit": "En tránsito",
-          "out_for_delivery": "Salió a entrega",
-          "delivered": "Entregado"
-        }
+        "title": "Envíos en camino ({n})",
+        "hint": "Seguimiento simulado: avanza los eventos a mano.",
+        "empty": "No hay envíos en camino."
+      },
+      "carriers": {
+        "title": "Transportadoras nacionales",
+        "hint": "Tarifas de ejemplo para un paquete estándar a Bogotá; no son cotizaciones reales. Las desactivadas no aparecen al generar guías.",
+        "carrier": "Transportadora",
+        "sla": "Tiempo de entrega",
+        "cost": "Tarifa de ejemplo",
+        "rating": "Calificación",
+        "enabled": "Disponible",
+        "toggle": "Usar {carrier} para generar guías"
       },
       "returns": {
         "title": "Devoluciones",
+        "hint": "Aprobar una devolución devuelve la unidad al inventario, salvo en garantía (va a revisión técnica).",
+        "create": "Registrar devolución",
+        "id": "Devolución",
+        "order": "Pedido",
+        "product": "Producto",
         "reason": "Motivo",
+        "amount": "Valor a reembolsar",
         "statusLabel": "Estado",
+        "actions": "Acciones",
         "reasons": {
-          "defective": "Producto defectuoso",
-          "size": "Talla incorrecta",
-          "notAsDescribed": "No es como se describe",
-          "changeMind": "Cambio de opinión"
+          "retracto": "Derecho de retracto",
+          "warranty": "Garantía",
+          "size": "Cambio de talla",
+          "notAsDescribed": "No corresponde a lo descrito"
+        },
+        "reasonHelp": {
+          "retracto": "En ventas a distancia el comprador puede retractarse dentro de los 5 días hábiles siguientes a la entrega (Ley 1480 de 2011, art. 47).",
+          "warranty": "El producto presenta una falla: se revisa y se repara, cambia o reembolsa según la garantía.",
+          "size": "El cliente pide otra talla o referencia.",
+          "notAsDescribed": "El producto recibido no coincide con la ficha de la tienda."
         },
         "status": {
-          "approved": "Aprobada",
           "pending": "Pendiente",
-          "reviewing": "En revisión"
-        }
+          "approved": "Aprobada",
+          "rejected": "Rechazada"
+        },
+        "restocked": "Volvió al inventario",
+        "toWarranty": "Enviado a revisión técnica",
+        "approve": "Aprobar",
+        "reject": "Rechazar",
+        "createTitle": "Registrar devolución",
+        "createConfirm": "Registrar",
+        "already": "Ya hay una devolución registrada para ese producto del pedido."
       }
     },
     "admin": {
-      "title": "Administración y analítica",
-      "subtitle": "Visión ejecutiva con cifras de ejemplo del mes.",
+      "title": "Reportes de ventas",
+      "subtitle": "Cifras calculadas en tu navegador con los pedidos de ejemplo y los que hagas en la demo.",
+      "period": "Periodo del reporte",
+      "periods": "Últimos {n} días",
+      "exportProducts": "Ventas por producto (CSV)",
+      "exportDaily": "Ventas por día (CSV)",
+      "includesYours": "Incluye {n, plural, one {# pedido tuyo} other {# pedidos tuyos}} por {total} en ventas.",
       "kpis": {
-        "revenue": "Ventas del mes",
-        "gmv": "Valor bruto (GMV)",
-        "customers": "Clientes",
-        "aov": "Ticket promedio",
-        "ltv": "Valor de vida (LTV)",
-        "cac": "Costo de adquisición (CAC)"
+        "sales": "Ventas netas",
+        "orders": "Pedidos",
+        "ticket": "Ticket promedio",
+        "customers": "Clientes únicos",
+        "repeat": "Recompra",
+        "units": "Unidades",
+        "hint": "Ventas netas = valor de los productos después de descuentos, sin envío. Recompra = clientes con 2 o más pedidos en el periodo. Pedidos cancelados excluidos."
       },
       "charts": {
-        "sales30d": "Ventas últimos 30 días",
-        "topCategories": "Categorías top"
+        "daily": "Ventas por día (últimos {n} días)",
+        "dailyAria": "Gráfico de barras de ventas por día",
+        "categories": "Ventas por categoría",
+        "cities": "Ventas por ciudad",
+        "methods": "Pedidos por medio de pago",
+        "topProducts": "Productos más vendidos",
+        "today": "hoy",
+        "daysAgo": "hace {n} d",
+        "ordersCount": "{n, plural, one {# pedido} other {# pedidos}}",
+        "maxDay": "Mejor día del periodo: {amount}. Pasa el cursor por una barra para ver el detalle."
       },
-      "ai": {
-        "title": "Hallazgos de ejemplo",
-        "tone": {
-          "up": "Tendencia",
-          "down": "Alerta",
-          "warn": "Atención",
-          "insight": "Insight"
+      "unitsShort": "{n} u.",
+      "insights": {
+        "title": "Recomendaciones",
+        "hint": "Calculadas con reglas simples sobre los datos (no es IA): cobertura de inventario, productos que se compran juntos, variación semanal por categoría y medios de pago.",
+        "kinds": {
+          "restock": "Inventario",
+          "pair": "Compra conjunta",
+          "trend": "Tendencia semanal",
+          "wallets": "Medios de pago"
         },
-        "i1": "Las ventas de Belleza bajaron 12% por menor inversión en ads. Revisar campaña.",
-        "i2": "Predicción: la demanda de Vinos subirá 28% en los próximos 14 días.",
-        "i3": "Los clientes que compran café también compran la prensa francesa en el 41 % de los casos.",
-        "i4": "3 SKUs de Tecnología quedarán sin stock en 5 días al ritmo actual."
+        "restock": "Reponer «{name}»: quedan {stock} unidades, unos {days} días al ritmo de los últimos 30 días.",
+        "restockAction": "Reponer 30 unidades",
+        "pair": "El {pct} % de los pedidos con «{a}» también incluye «{b}» ({n} pedidos). Sirve para un combo o una sugerencia en el carrito.",
+        "trendUp": "Las ventas de {category} subieron {pct} % frente a la semana anterior.",
+        "trendDown": "Las ventas de {category} bajaron {pct} % frente a la semana anterior.",
+        "wallets": "El {pct} % de los pedidos de los últimos 30 días se pagó con Nequi o Daviplata."
       },
       "marketing": {
-        "title": "Automatizaciones de marketing (ejemplo)",
+        "title": "Automatizaciones de marketing",
+        "hint": "Audiencias calculadas con los pedidos. Los correos no se envían en la demo: puedes ver el mensaje que recibiría cada cliente.",
+        "toggle": "Activar {name}",
+        "audience": "Audiencia hoy",
+        "customers": "{n, plural, one {# cliente} other {# clientes}}",
         "active": "Activa",
-        "openRate": "Tasa de apertura",
-        "campaigns": {
-          "abandonment": {
-            "title": "Abandono de carrito",
-            "desc": "Recupera ventas con emails automáticos a 1h, 24h y 72h."
-          },
+        "paused": "Pausada",
+        "preview": "Ver mensaje",
+        "previewTitle": "Mensaje: {name}",
+        "subjectLabel": "Asunto",
+        "bodyLabel": "Mensaje",
+        "previewNote": "Vista previa con el primer cliente de la audiencia ({n} en total). No se envía nada.",
+        "sampleName": "cliente",
+        "automations": {
           "postPurchase": {
-            "title": "Post-compra",
-            "desc": "Agradecimiento, tracking y solicitud de reseña."
+            "title": "Después de la compra",
+            "desc": "Clientes con un pedido entregado en los últimos 7 días: agradecimiento y solicitud de reseña.",
+            "subject": "{name}, ¿qué tal te pareció tu compra?",
+            "body": "Hola, {name}.\nTu pedido {order} ya llegó. ¿Nos cuentas cómo te fue con «{product}»?\nTu reseña ayuda a otros clientes a decidir."
           },
           "winBack": {
-            "title": "Win-back",
-            "desc": "Reactiva clientes inactivos con ofertas personalizadas."
+            "title": "Reactivación",
+            "desc": "Clientes sin compras en los últimos 21 días o más.",
+            "subject": "{name}, te extrañamos",
+            "body": "Hola, {name}.\nHace un tiempo no te vemos por la tienda. Tu última compra fue «{product}».\nTe dejamos el cupón BIENVENIDA10 para tu próximo pedido."
           },
           "replenishment": {
-            "title": "Reposición",
-            "desc": "Recordatorios para productos consumibles."
+            "title": "Reposición de café",
+            "desc": "Clientes que compraron café hace 20 a 30 días y no lo han vuelto a comprar.",
+            "subject": "{name}, ¿ya se te está acabando el café?",
+            "body": "Hola, {name}.\nTu bolsa de «{product}» del pedido {order} debe estar por terminarse.\nPide otra antes de quedarte sin café."
           }
         }
       },
-      "fraud": {
-        "title": "Control de fraude",
-        "score": "Puntaje de riesgo promedio",
-        "blocked": "Bloqueadas hoy",
-        "review": "En revisión",
-        "approved": "Aprobadas",
-        "summary": "Indicadores de ejemplo. En tu proyecto se conectan las reglas antifraude de la pasarela de pagos."
+      "risk": {
+        "title": "Revisión de riesgo",
+        "hint": "Reglas de ejemplo sobre pedidos sin despachar: contraentrega desde {cod}, primer pedido desde {first} y 3 o más unidades de un mismo producto de tecnología. En tu proyecto se suman las reglas antifraude de la pasarela.",
+        "empty": "Ningún pedido cumple las reglas.",
+        "rules": {
+          "codHigh": "Contraentrega por un valor alto",
+          "firstOrderHigh": "Primer pedido del cliente por un valor alto",
+          "bulkTech": "3 o más unidades de un producto de tecnología"
+        },
+        "decided": {
+          "approved": "Revisado: aprobado",
+          "rejected": "Revisado: cancelado"
+        },
+        "approve": "Aprobar",
+        "reject": "Cancelar pedido"
       },
       "compliance": {
         "title": "Requisitos normativos",
-        "subtitle": "Se configuran en la implementación de tu tienda; esta demo no procesa pagos ni datos reales.",
+        "subtitle": "Se configuran al implementar tu tienda; esta demo no procesa pagos ni datos reales.",
         "items": {
-          "dian": "Factura electrónica DIAN",
-          "habeasData": "Tratamiento de datos (Ley 1581)",
-          "retracto": "Derecho de retracto (Ley 1480)",
-          "pci": "Datos de tarjeta en la pasarela (PCI DSS)"
+          "dian": {
+            "title": "Factura electrónica DIAN",
+            "desc": "Emitida por un proveedor tecnológico autorizado o tu ERP. En la demo, la factura y el CUFE son de ejemplo."
+          },
+          "habeasData": {
+            "title": "Tratamiento de datos (Ley 1581)",
+            "desc": "Autorización en el registro y en el pago, política de datos y atención de consultas y reclamos."
+          },
+          "retracto": {
+            "title": "Derecho de retracto (Ley 1480)",
+            "desc": "Devoluciones dentro de los 5 días hábiles siguientes a la entrega y reversión del pago cuando aplique."
+          },
+          "pci": {
+            "title": "Datos de tarjeta en la pasarela (PCI DSS)",
+            "desc": "La tienda no guarda datos de tarjeta: los captura la pasarela de pagos certificada."
+          }
         }
       }
-    },
-    "sampleData": "Datos de ejemplo",
-    "sampleDataHint": "Tienda de ejemplo: productos, precios, pedidos y cifras son ficticios; los pagos son simulados."
+    }
   }
 }

@@ -12,7 +12,7 @@
 
 import * as fs from 'fs';
 import OpenAI from 'openai';
-import pdfParse from 'pdf-parse';
+import { parsePdf } from '../utils/pdf-parse';
 import { DatosFacturaPDF } from './pdf-extractor.service';
 
 /**
@@ -667,7 +667,7 @@ RECUERDA: Extrae TODAS las filas de la tabla, no solo algunas. Si hay 50 procedi
 
     try {
       dataBuffer = fs.readFileSync(pdfPath);
-      pdfData = await pdfParse(dataBuffer);
+      pdfData = await parsePdf(dataBuffer);
       textoPDF = pdfData.text;
     } catch (error: any) {
       throw new Error(`Error al leer PDF: ${error.message}. El archivo podría estar corrupto o protegido.`);

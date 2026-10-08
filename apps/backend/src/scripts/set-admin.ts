@@ -4,11 +4,15 @@ import { connectDB } from '../config/mongodb';
 
 /**
  * Script to set a user as admin by email
- * Usage: npx tsx src/scripts/set-admin.ts <email>
+ * Usage: npx ts-node --transpile-only src/scripts/set-admin.ts <email>
  */
 const setAdmin = async () => {
   try {
-    const email = process.argv[2] || process.env.ADMIN_EMAIL || 'ronald@koptup.com';
+    const email = process.argv[2] || process.env.ADMIN_EMAIL;
+    if (!email) {
+      console.error('Uso: npx ts-node --transpile-only src/scripts/set-admin.ts <email> (o define ADMIN_EMAIL)');
+      process.exit(1);
+    }
 
     console.log(`🔧 Setting admin role for: ${email}`);
 

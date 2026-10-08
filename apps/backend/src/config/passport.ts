@@ -45,6 +45,18 @@ export const initializePassport = async () => {
                 user.google_id = profile.id;
               }
 
+              // Cuenta invitada (aprobación de una demo): Google confirma que
+              // controla el email, así que queda activa y el enlace de
+              // activación pendiente deja de servir.
+              if (user.accountStatus === 'invitado') {
+                user.accountStatus = 'activo';
+                user.emailVerifiedAt = new Date();
+                // Sin contraseña, la cuenta entra con Google (como las creadas con Google).
+                if (!user.password) user.provider = 'google';
+                const { invalidatePendingMagicLinks } = await import('../services/magic-link.service');
+                await invalidatePendingMagicLinks(user._id as any, 'activacion');
+              }
+
               // Update last login
               user.last_login = new Date();
               await user.save();

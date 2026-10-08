@@ -7,11 +7,11 @@ import Footer from './Footer';
 export default function ConditionalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  // Rutas que no deben mostrar Navbar y Footer
-  const isDashboard = pathname?.startsWith('/dashboard');
+  // Rutas que no deben mostrar Navbar y Footer: el portal y el panel tienen
+  // su propio encabezado (DashboardLayout y AdminLayout).
+  const hasOwnLayout = pathname?.startsWith('/dashboard') || pathname === '/admin' || pathname?.startsWith('/admin/');
 
-  if (isDashboard) {
-    // Dashboard tiene su propio layout integrado
+  if (hasOwnLayout) {
     return <>{children}</>;
   }
 

@@ -13,7 +13,7 @@
 
 import * as fs from 'fs';
 import OpenAI from 'openai';
-import pdfParse from 'pdf-parse';
+import { parsePdf } from '../utils/pdf-parse';
 
 /**
  * Tipos de documentos soportados
@@ -380,7 +380,7 @@ REGLAS:
 
     // 2. Leer PDF
     const dataBuffer = fs.readFileSync(pdfPath);
-    const pdfData = await pdfParse(dataBuffer);
+    const pdfData = await parsePdf(dataBuffer);
     const textoCompleto = pdfData.text;
 
     // 3. Filtrar líneas relevantes según tipo

@@ -1,5 +1,5 @@
 import fs from 'fs';
-import pdfParse from 'pdf-parse';
+import { parsePdf } from '../utils/pdf-parse';
 
 export interface DatosFacturaPDF {
   // SECCIÓN 1: DATOS DE RADICACIÓN/FACTURA
@@ -114,7 +114,7 @@ class PDFExtractorService {
   async extraerDatosFactura(filePath: string): Promise<DatosFacturaPDF> {
     try {
       const dataBuffer = fs.readFileSync(filePath);
-      const data = await pdfParse(dataBuffer);
+      const data = await parsePdf(dataBuffer);
       const texto = data.text;
 
       console.log('📄 PDF Texto extraído (primeros 500 caracteres):');
@@ -451,7 +451,7 @@ class PDFExtractorService {
   async extraerDatosHistoriaClinica(filePath: string): Promise<Partial<DatosFacturaPDF>> {
     try {
       const dataBuffer = fs.readFileSync(filePath);
-      const data = await pdfParse(dataBuffer);
+      const data = await parsePdf(dataBuffer);
       const texto = data.text;
 
       console.log('📋 Historia Clínica - Texto extraído (primeros 500 caracteres):');

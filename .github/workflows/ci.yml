@@ -1,179 +1,294 @@
-name: CI/CD Pipeline
+# Integración continua de KopTup.
+#
+# Corre en cada pull request y en cada push a main:
+#   1. calidad  -> mensajes i18n al día, lint, tipos y títulos de página
+#   2. pruebas  -> Jest del backend (con MongoDB y Redis para las pruebas de
+#                  integración) y de la web (matriz)
+#   3. build    -> compila el backend (tsc) y la web (next build)
+#   4. e2e      -> levanta MongoDB, Redis, el mock de OpenAI versionado
+#                  (apps/web/e2e/support/openai-mock.js), el backend y la web
+#                  compilados, y corre Playwright: humo de páginas y demos, y
+#                  la plataforma de punta a punta (solicitud → aprobación →
+#                  activación → acceso → revocación, permisos, modo de acceso
+#                  desde el panel, contacto y la demo RAG con un PDF)
+#
+# Despliegue: este workflow NO despliega. La web la despliega la integración
+# de Vercel con GitHub y la API la despliega Railway desde main (ver README).
+#
+# Los valores de entorno de este archivo son ficticios y solo sirven para CI
+# (no son secretos): nunca pongas aquí credenciales reales.
+name: CI
 
 on:
-  push:
-    branches: [main, develop]
   pull_request:
-    branches: [main, develop]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
-  NODE_VERSION: '18.x'
+  NODE_VERSION: '20'
+  NEXT_TELEMETRY_DISABLED: '1'
+  TURBO_TELEMETRY_DISABLED: '1'
 
 jobs:
-  lint:
-    name: Lint
+  calidad:
+    name: Lint y tipos
     runs-on: ubuntu-latest
-
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: npm
 
-      - name: Install dependencies
+      - name: Instalar dependencias
         run: npm ci
 
-      - name: Run linter
+      - name: Mensajes i18n agregados al día
+        run: |
+          npm run merge-messages --workspace=apps/web
+          if ! git diff --exit-code -- apps/web/messages; then
+            echo "::error::Los archivos apps/web/messages/_*.json no están al día. Corre 'node apps/web/scripts/merge-messages.mjs' y súbelos."
+            exit 1
+          fi
+
+      - name: Lint (web y backend)
         run: npm run lint
 
-  test:
-    name: Test
-    runs-on: ubuntu-latest
+      - name: Tipos (web y backend, incluidas las pruebas)
+        run: npm run typecheck
 
+      - name: Títulos de página
+        run: npm run check-titles --workspace=apps/web
+
+  pruebas:
+    name: Pruebas unitarias (${{ matrix.app }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [backend, web]
+    # Las pruebas de integración del backend (src/__tests__/integration:
+    # autorización por rol, propiedad de bots, topes de gasto) usan MongoDB y
+    # Redis reales; sin MONGODB_URI_TEST / REDIS_URL_TEST se omiten.
     services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_PASSWORD: test_password
-          POSTGRES_USER: test_user
-          POSTGRES_DB: test_db
+      mongo:
+        image: mongo:7
         ports:
-          - 5432:5432
+          - 27017:27017
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok'"
           --health-interval 10s
           --health-timeout 5s
-          --health-retries 5
-
+          --health-retries 10
       redis:
-        image: redis:7-alpine
+        image: redis:7
         ports:
           - 6379:6379
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 10s
           --health-timeout 5s
-          --health-retries 5
-
+          --health-retries 10
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: npm
 
-      - name: Install dependencies
+      - name: Instalar dependencias
         run: npm ci
 
-      - name: Run tests
-        run: npm run test
+      - name: Jest
+        run: npm test --workspace=apps/${{ matrix.app }} -- --ci
         env:
-          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
-          REDIS_URL: redis://localhost:6379
-          JWT_SECRET: test_jwt_secret
-          JWT_REFRESH_SECRET: test_refresh_secret
+          MONGODB_URI_TEST: mongodb://localhost:27017/koptup_ci
+          REDIS_URL_TEST: redis://localhost:6379/15
 
-  build-frontend:
-    name: Build Frontend
+  build:
+    name: Build
     runs-on: ubuntu-latest
-    needs: [lint]
-
+    timeout-minutes: 20
+    env:
+      # El build de CI apunta al backend local del job e2e. Sin esta variable,
+      # apps/web/.env.production apuntaría a la API de producción.
+      NEXT_PUBLIC_API_URL: http://localhost:3001
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: npm
 
-      - name: Install dependencies
+      - name: Instalar dependencias
         run: npm ci
 
-      - name: Build frontend
-        run: npm run build --workspace=apps/web
-        env:
-          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
-          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
-
-  build-backend:
-    name: Build Backend
-    runs-on: ubuntu-latest
-    needs: [lint]
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Caché de Next.js
+        uses: actions/cache@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          path: apps/web/.next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('apps/web/src/**', 'apps/web/messages/**') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build backend
+      - name: Build del backend
         run: npm run build --workspace=apps/backend
 
-  docker-build:
-    name: Docker Build
+      - name: Build de la web
+        run: npm run build --workspace=apps/web
+
+      - name: Guardar builds para e2e
+        uses: actions/upload-artifact@v4
+        with:
+          name: builds
+          include-hidden-files: true
+          retention-days: 3
+          path: |
+            apps/backend/dist
+            apps/web/.next
+            !apps/web/.next/cache
+
+  e2e:
+    name: E2E (Playwright)
+    needs: build
     runs-on: ubuntu-latest
-    needs: [build-frontend, build-backend, test]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.DOCKER_USERNAME != '' && secrets.DOCKER_PASSWORD != ''
-
+    timeout-minutes: 20
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      E2E_BASE_URL: http://localhost:3000
+      E2E_API_URL: http://localhost:3001
+      # Base del backend de este job: e2e/global-setup.ts crea ahí la cuenta
+      # admin de pruebas (contraseña al azar de cada corrida) con el script
+      # set-admin del backend. No es un secreto: la base vive solo en el job.
+      E2E_MONGODB_URI: mongodb://localhost:27017/koptup_e2e
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
+      - uses: actions/setup-node@v4
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
 
-      - name: Build and push frontend
-        uses: docker/build-push-action@v4
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Descargar builds
+        uses: actions/download-artifact@v4
         with:
-          context: .
-          file: ./apps/web/Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/koptup-frontend:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/koptup-frontend:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/koptup-frontend:buildcache,mode=max
+          name: builds
+          path: apps
 
-      - name: Build and push backend
-        uses: docker/build-push-action@v4
+      - name: Caché de navegadores de Playwright
+        uses: actions/cache@v4
         with:
-          context: .
-          file: ./apps/backend/Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/koptup-backend:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/koptup-backend:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/koptup-backend:buildcache,mode=max
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
-  deploy-vercel:
-    name: Deploy to Vercel
-    runs-on: ubuntu-latest
-    needs: [build-frontend]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.VERCEL_TOKEN != '' && secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_PROJECT_ID != ''
+      - name: Instalar Chromium para Playwright
+        run: npx playwright install --with-deps chromium
 
-    steps:
-      - uses: actions/checkout@v3
+      - name: Arrancar mock de OpenAI
+        run: nohup node apps/web/e2e/support/openai-mock.js > openai-mock.log 2>&1 &
+        env:
+          OPENAI_MOCK_PORT: '3999'
 
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
+      - name: Arrancar backend
+        working-directory: apps/backend
+        run: nohup node dist/index.js > ../../backend.log 2>&1 &
+        env:
+          PORT: '3001'
+          NODE_ENV: production
+          MONGODB_URI: mongodb://localhost:27017/koptup_e2e
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: solo-ci-e2e-no-es-secreto
+          JWT_REFRESH_SECRET: solo-ci-e2e-refresh-no-es-secreto
+          CORS_ORIGIN: http://localhost:3000
+          # Enlaces de activación que muestra el panel (/activar/<token>).
+          FRONTEND_URL: http://localhost:3000
+          OPENAI_BASE_URL: http://127.0.0.1:3999/v1
+          OPENAI_API_KEY: sk-test-mock
+          # "Prueba con tu documento" (/demo/chatbot): rag-upload.spec.ts sube
+          # un PDF y pregunta contra el mock de OpenAI.
+          DEMO_UPLOAD_ENABLED: 'true'
+          # Todo sale de la misma máquina: con el límite general por defecto
+          # (100 cada 15 min) las demos y el catálogo reciben 429 a mitad de
+          # la corrida.
+          RATE_LIMIT_MAX_REQUESTS: '10000'
+          # Los cupos por IP (login, contacto, solicitudes de demo, documentos
+          # de la demo RAG) se respetan tal cual: las pruebas de la plataforma
+          # presentan a cada visitante con su propia IP en X-Forwarded-For,
+          # que el backend lee porque confía en un salto de proxy (igual que
+          # detrás de Railway). Ver apps/web/e2e/support/backend.ts.
+          TRUST_PROXY_HOPS: '1'
+
+      - name: Arrancar web (next start)
+        working-directory: apps/web
+        run: nohup npx next start -p 3000 > ../../web.log 2>&1 &
+
+      - name: Esperar a que respondan
+        run: |
+          for url in http://127.0.0.1:3999/health "$E2E_API_URL/health" "$E2E_BASE_URL/"; do
+            ok=""
+            for _ in $(seq 1 60); do
+              if curl -fs -o /dev/null "$url"; then ok=1; break; fi
+              sleep 2
+            done
+            if [ -z "$ok" ]; then
+              echo "::error::$url no respondió a tiempo"
+              exit 1
+            fi
+            echo "$url responde"
+          done
+
+      - name: Playwright
+        run: npm run test:e2e --workspace=apps/web
+
+      - name: Logs de los servidores
+        if: always()
+        run: |
+          for f in openai-mock.log backend.log web.log; do
+            echo "::group::$f"
+            tail -n 200 "$f" || true
+            echo "::endgroup::"
+          done
+
+      - name: Reporte de Playwright
+        if: failure()
+        uses: actions/upload-artifact@v4
         with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod --confirm'
-          working-directory: ./apps/web
+          name: playwright-report
+          retention-days: 7
+          path: |
+            apps/web/playwright-report
+            apps/web/test-results

@@ -295,17 +295,15 @@ function ContactPageInner() {
                       <p className="text-secondary-600 dark:text-secondary-400 mb-6">
                         {t('form.success.subtitle')}
                       </p>
-                      {/* CTA crear cuenta para seguir conversación — TODO: extract to i18n */}
+                      {/* Siguiente paso mientras el equipo responde. (Antes invitaba a
+                          "hacer seguimiento desde tu dashboard", pero el portal no
+                          muestra los mensajes de contacto.) */}
                       <div className="max-w-md mx-auto p-4 rounded-lg bg-primary-50 dark:bg-primary-950 border border-primary-200 dark:border-primary-800">
                         <p className="text-sm text-secondary-700 dark:text-secondary-300 mb-3">
-                          Crea tu cuenta para hacer seguimiento de esta solicitud desde tu dashboard.
+                          {t('form.success.nextStep')}
                         </p>
                         <Button size="sm" fullWidth asChild>
-                          <Link
-                            href={`/register?source=contact${queryService ? `&service=${queryService}` : ''}${queryPlan ? `&plan=${queryService || ''}&tier=${queryPlan}` : ''}`}
-                          >
-                            Crear mi cuenta para seguir hablando
-                          </Link>
+                          <Link href="/demo/chatbot">{t('form.success.nextStepCta')}</Link>
                         </Button>
                       </div>
                     </div>

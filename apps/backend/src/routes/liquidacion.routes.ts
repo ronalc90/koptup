@@ -14,7 +14,15 @@ import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { handleUploadError } from '../middleware/upload';
 
+import { requireStaff } from '../middleware/access';
+import { AppError } from '../middleware/errorHandler';
+
 const router = Router();
+
+// Política: staff (herramienta interna /liquidacion; sus radicados son
+// datos del equipo, no de la demo). Va antes de multer: una petición sin
+// acceso no escribe nada en disco.
+router.use(...requireStaff);
 
 // Configurar multer para documentos de liquidación
 const storage = multer.diskStorage({
@@ -39,7 +47,7 @@ const upload = multer({
     if (ext === '.pdf') {
       cb(null, true);
     } else {
-      cb(new Error('Solo se permiten archivos PDF'));
+      cb(new AppError('Solo se permiten archivos PDF', 400));
     }
   },
 });

@@ -86,10 +86,10 @@ Otras soluciones a medida (e-commerce, CRM, ERP, dashboards, etc.): precios de r
 
 ## Demos interactivos gratuitos
 
-KopTup ofrece demos interactivos sin registro para evaluar sus soluciones:
+KopTup ofrece demos interactivos para evaluar sus soluciones. Las demos abiertas no piden registro; las que requieren acceso o invitación se solicitan en https://www.koptup.com/solicitar-demo:
 
 - Demo Chatbot RAG (IA real, sin registro): https://www.koptup.com/demo/chatbot
-- Demo Sistema experto para salud (auditoría de cuentas médicas con reglas e IA): https://www.koptup.com/demo/cuentas-medicas
+- Demo Sistema experto para salud (auditoría de cuentas médicas con reglas e IA; por invitación): https://www.koptup.com/demo/cuentas-medicas
 - Demo E-commerce: https://www.koptup.com/demo/ecommerce
 - Demo Dashboard Ejecutivo: https://www.koptup.com/demo/dashboard-ejecutivo
 - Demo Gestor de Documentos: https://www.koptup.com/demo/gestor-documentos
@@ -100,6 +100,7 @@ KopTup ofrece demos interactivos sin registro para evaluar sus soluciones:
 ## Contacto y cotización
 
 - Formulario: https://www.koptup.com/contact
+- Solicitar demo: https://www.koptup.com/solicitar-demo
 - LinkedIn: https://www.linkedin.com/company/koptup
 - GitHub: https://github.com/koptup
 - Instagram: https://www.instagram.com/koptup

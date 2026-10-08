@@ -2,228 +2,936 @@
   "demoErp": {
     "meta": {
       "title": "ERP Modular",
-      "subtitle": "Suite empresarial integral con módulos de Contabilidad, Finanzas, Inventario, Ventas, Compras, RRHH y Manufactura.",
-      "poweredByAI": "Potenciado por IA"
+      "subtitle": "Ventas, inventario en tres bodegas, compras con aprobaciones, producción, contabilidad, cartera y nómina de una empresa ficticia. Lo que haces en un módulo se refleja en los demás.",
+      "sampleBadge": "Datos de ejemplo",
+      "sampleHint": "Empresa y cifras ficticias generadas para la demo (enero–septiembre de 2026). La DIAN, los bancos y WhatsApp están simulados.",
+      "seoTitle": "Demo ERP: ventas, inventario, compras y contabilidad",
+      "seoDescription": "Prueba un ERP modular con datos de ejemplo: cotización, pedido y factura que descuentan inventario y generan el asiento contable, compras con aprobación, conciliación bancaria, cartera por edades, nómina y producción. La validación DIAN está simulada.",
+      "breadcrumbHome": "Inicio",
+      "breadcrumbDemos": "Demos"
     },
     "topbar": {
       "company": "Empresa",
+      "companyAll": "Grupo Montevera (consolidado)",
       "currency": "Moneda",
-      "country": "País",
+      "cop": "COP (pesos)",
+      "usd": "USD (TRM fija)",
       "period": "Período",
-      "searchPlaceholder": "Buscar transacciones, SKUs, empleados...",
-      "newTransaction": "Nueva transacción"
-    },
-    "companies": {
-      "holding": "KopTup Holding S.A.",
-      "co": "KopTup Colombia SAS",
-      "mx": "KopTup México S. de R.L.",
-      "ar": "KopTup Argentina S.A.",
-      "cl": "KopTup Chile SpA",
-      "pe": "KopTup Perú S.A.C."
-    },
-    "currencies": {
-      "usd": "USD - Dólar",
-      "cop": "COP - Peso Colombiano",
-      "mxn": "MXN - Peso Mexicano",
-      "ars": "ARS - Peso Argentino",
-      "clp": "CLP - Peso Chileno",
-      "pen": "PEN - Sol Peruano"
+      "search": "Buscar",
+      "searchPlaceholder": "Factura, cliente, SKU…",
+      "clearSearch": "Borrar búsqueda",
+      "resultsIn": "Coincidencias en:",
+      "workDate": "Período abierto: septiembre de 2026 · las operaciones nuevas quedan con fecha {date}",
+      "trmNote": "USD convertido con una TRM fija de ejemplo de {trm}",
+      "savedLocally": "Tus cambios se guardan solo en este navegador",
+      "reset": "Restablecer datos de ejemplo",
+      "resetTitle": "¿Restablecer los datos de ejemplo?",
+      "resetBody": "Se borran las cotizaciones, facturas, órdenes, pagos y demás cambios que hiciste en esta demo, y vuelves a los datos originales.",
+      "resetConfirm": "Sí, restablecer",
+      "resetDone": "Listo: volviste a los datos de ejemplo."
     },
     "periods": {
-      "q1": "Q1 2026",
-      "q2": "Q2 2026",
-      "month": "Mayo 2026",
-      "ytd": "Año en curso"
-    },
-    "kpis": {
-      "revenue": "Ingresos",
-      "grossMargin": "Margen bruto",
-      "ebitda": "EBITDA",
-      "cash": "Posición de caja",
-      "ar": "Cuentas por cobrar",
-      "ap": "Cuentas por pagar",
-      "vsLastMonth": "vs mes anterior"
+      "2026-09": "Septiembre 2026",
+      "2026-08": "Agosto 2026",
+      "2026-07": "Julio 2026",
+      "q3": "3.er trimestre 2026",
+      "ytd": "Año 2026 (ene–sep)",
+      "prev_2026-09": "agosto 2026",
+      "prev_2026-08": "julio 2026",
+      "prev_2026-07": "junio 2026",
+      "prev_q3": "2.º trimestre 2026",
+      "prev_ytd": "—"
     },
     "modules": {
-      "accounting": "Contabilidad",
-      "finance": "Finanzas",
-      "inventory": "Inventario",
+      "aria": "Módulos del ERP",
       "sales": "Ventas",
+      "inventory": "Inventario",
       "purchases": "Compras",
-      "hr": "RRHH",
-      "manufacturing": "Manufactura"
+      "accounting": "Contabilidad",
+      "finance": "Tesorería y cartera",
+      "hr": "Talento humano",
+      "manufacturing": "Producción"
     },
-    "accounting": {
-      "title": "Libro Diario - Partida doble",
-      "subtitle": "Registro contable con débitos y créditos balanceados",
-      "tableDate": "Fecha",
-      "tableEntry": "Asiento",
-      "tableAccount": "Cuenta",
-      "tableDescription": "Descripción",
-      "tableDebit": "Debe",
-      "tableCredit": "Haber",
-      "totals": "Totales",
-      "plTitle": "Estado de Resultados",
-      "plRevenue": "Ingresos operacionales",
-      "plCogs": "Costo de ventas",
-      "plGross": "Utilidad bruta",
-      "plOpex": "Gastos operacionales",
-      "plEbitda": "EBITDA",
-      "plTax": "Impuestos",
-      "plNet": "Utilidad neta",
-      "balanceTitle": "Balance General",
-      "assets": "Activos",
-      "liabilities": "Pasivos",
-      "equity": "Patrimonio",
-      "viewDetail": "Ver detalle"
+    "common": {
+      "close": "Cerrar",
+      "cancel": "Cancelar",
+      "showMore": "Ver más ({shown} de {total})",
+      "exportCsv": "Exportar CSV",
+      "csvDone": "Descargaste un CSV con {n} filas.",
+      "noResults": "No hay resultados para tu búsqueda en este período.",
+      "currency": "Moneda",
+      "moduleNames": {
+        "sales": "Ventas",
+        "inventory": "Inventario",
+        "purchases": "Compras",
+        "accounting": "Contabilidad",
+        "finance": "Tesorería y cartera",
+        "hr": "Talento humano",
+        "manufacturing": "Producción"
+      }
     },
-    "finance": {
-      "cashFlowTitle": "Flujo de caja",
-      "cashFlowSubtitle": "Entradas y salidas de los últimos 6 meses",
-      "inflows": "Ingresos",
-      "outflows": "Egresos",
-      "net": "Neto",
-      "arAging": "AR Aging",
-      "apAging": "AP Aging",
-      "bucketCurrent": "Al día",
-      "bucket30": "1-30 días",
-      "bucket60": "31-60 días",
-      "bucket90": "61-90 días",
-      "bucket90plus": "+90 días",
-      "reconciliation": "Conciliación bancaria",
-      "reconciliationSubtitle": "Coincidencias sugeridas por IA",
-      "matched": "Coincidente",
-      "review": "Revisar",
-      "aiSuggested": "Sugerido por IA",
-      "confidence": "Confianza",
-      "bankMovement": "Mov. bancario",
-      "ledgerEntry": "Asiento contable"
+    "kpis": {
+      "aria": "Indicadores del período",
+      "revenue": "Ventas netas",
+      "grossMargin": "Margen bruto",
+      "ebitda": "EBITDA",
+      "cash": "Caja y bancos",
+      "ar": "Cartera (CxC)",
+      "ap": "Cuentas por pagar",
+      "arOverdue": "Vencida > 60 días: {value}",
+      "vs": "vs. {period}",
+      "ytdNote": "Acumulado del año",
+      "deltaUp": "Subió frente al período anterior",
+      "deltaDown": "Bajó frente al período anterior"
     },
-    "inventory": {
-      "title": "Maestro de SKUs",
-      "subtitle": "Stock multi-bodega con valoración FIFO/LIFO",
-      "sku": "SKU",
-      "product": "Producto",
-      "warehouse": "Bodega",
-      "stock": "Stock",
-      "min": "Mín.",
-      "valuation": "Valoración",
-      "method": "Método",
-      "unitCost": "Costo unit.",
-      "totalValue": "Valor total",
-      "status": "Estado",
-      "lowStock": "Bajo stock",
-      "ok": "OK",
-      "out": "Agotado",
-      "wh1": "Bogotá Centro",
-      "wh2": "Medellín Norte",
-      "wh3": "CDMX Logística",
-      "alerts": "Alertas activas",
-      "alertLow": "Bajo el punto de reorden",
-      "alertOut": "Sin existencias"
+    "flow": {
+      "title": "Recorrido de punta a punta",
+      "progress": "{done} de {total} pasos hechos",
+      "intro": "Cada paso se marca cuando lo haces de verdad en la demo. Haz clic en un paso para ir al módulo.",
+      "done": "¡Completaste el recorrido! Revisa cómo cambiaron los indicadores de arriba.",
+      "steps": {
+        "invoice": {
+          "module": "Ventas",
+          "text": "Convierte una cotización en pedido y factúrala: se descuenta el inventario y nace el asiento."
+        },
+        "reorder": {
+          "module": "Inventario",
+          "text": "Crea una orden de compra desde una alerta de punto de reorden (o desde el MRP)."
+        },
+        "approve": {
+          "module": "Compras",
+          "text": "Aprueba tu OC (Jefe de compras y, si pasa de $ 20 M, Gerencia) y recibe la mercancía."
+        },
+        "reconcile": {
+          "module": "Tesorería",
+          "text": "Concilia un movimiento del extracto: un pago PSE de un cliente o el 4x1000."
+        },
+        "ledger": {
+          "module": "Contabilidad",
+          "text": "Mira los asientos automáticos de tu factura y los estados financieros actualizados."
+        }
+      }
+    },
+    "warehouses": {
+      "bog": "Bogotá (Fontibón)",
+      "med": "Medellín (Itagüí)",
+      "baq": "Barranquilla"
+    },
+    "entryDesc": {
+      "opening": "Saldos iniciales al 31 de diciembre de 2025",
+      "sale": "Factura de venta {doc} · {third}",
+      "creditNote": "Nota crédito {doc} (devolución de {ref}) · {third}",
+      "receipt_pse": "Recaudo PSE de {doc} · {third}",
+      "receipt_transfer": "Recaudo por transferencia de {doc} · {third}",
+      "receipt_deposit": "Recaudo por consignación de {doc} · {third}",
+      "purchase": "Compra {doc}, factura del proveedor {ref} · {third}",
+      "payment": "Pago de {doc} · {third}",
+      "prodStart": "Consumo de materiales de {doc} ({item})",
+      "prodFinish": "Ingreso de producto terminado de {doc} ({item})",
+      "exp_rent": "Arriendo de bodegas · {month}",
+      "exp_utilities": "Servicios públicos · {month}",
+      "exp_maintenance": "Mantenimiento · {month}",
+      "exp_depreciation": "Depreciación · {month}",
+      "exp_bankFee": "Comisiones bancarias · {month}",
+      "exp_gmf": "Gravamen a los movimientos financieros (4x1000) · {month}",
+      "exp_opCost": "Costo de operación logística · {month}",
+      "exp_unidentified": "Consignación por identificar · {month}",
+      "payroll": "Nómina y aportes · {month}",
+      "taxVat": "Pago de IVA del bimestre que termina en {month}",
+      "taxWithholding": "Pago de retención en la fuente de {month}"
+    },
+    "accounts": {
+      "1105": "Caja",
+      "1110": "Bancos",
+      "1305": "Clientes",
+      "1405": "Materias primas",
+      "1410": "Productos en proceso",
+      "1430": "Productos terminados",
+      "1435": "Mercancías no fabricadas por la empresa",
+      "1520": "Maquinaria y equipo",
+      "1524": "Equipo de oficina",
+      "1540": "Flota y equipo de transporte",
+      "1592": "Depreciación acumulada",
+      "2205": "Proveedores nacionales",
+      "2365": "Retención en la fuente",
+      "2408": "Impuesto sobre las ventas por pagar",
+      "2610": "Provisiones para obligaciones laborales",
+      "2805": "Anticipos y avances recibidos",
+      "3105": "Capital suscrito y pagado",
+      "3705": "Utilidades acumuladas",
+      "4120": "Ingresos · industrias manufactureras",
+      "4135": "Ingresos · comercio al por mayor y al por menor",
+      "4145": "Ingresos · transporte y almacenamiento",
+      "4175": "Devoluciones en ventas (DB)",
+      "5105": "Gastos de personal",
+      "5115": "Impuestos",
+      "5120": "Arrendamientos",
+      "5135": "Servicios",
+      "5145": "Mantenimiento y reparaciones",
+      "5160": "Depreciaciones",
+      "5195": "Diversos",
+      "5305": "Gastos financieros",
+      "6120": "Costo de ventas · industrias manufactureras",
+      "6135": "Costo de ventas · comercio",
+      "6145": "Costo de ventas · transporte y almacenamiento"
     },
     "sales": {
-      "title": "Facturación Electrónica",
-      "subtitle": "Integración DIAN / SAT en tiempo real",
-      "invoice": "Factura",
-      "customer": "Cliente",
-      "date": "Fecha",
-      "amount": "Monto",
-      "tax": "Impuesto",
-      "status": "Estado DIAN/SAT",
-      "type": "Tipo",
-      "typeInv": "Factura",
-      "typeCN": "Nota Crédito",
-      "typeDN": "Nota Débito",
-      "accepted": "Aceptada",
-      "pending": "Pendiente",
-      "rejected": "Rechazada",
-      "resend": "Re-enviar",
-      "view": "Ver"
+      "title": "Ventas: cotización → pedido → factura",
+      "subtitle": "Al facturar se valida el stock de la bodega, se descuenta el inventario, se genera el asiento contable y la factura pasa a cartera.",
+      "newQuote": "Nueva cotización",
+      "summary": {
+        "quotes": "Cotizaciones abiertas (con IVA)",
+        "orders": "Pedidos por facturar (con IVA)",
+        "invoiced": "Facturado en el período (con IVA)"
+      },
+      "views": {
+        "all": "Todos",
+        "quote": "Cotizaciones",
+        "order": "Pedidos",
+        "invoiced": "Facturas"
+      },
+      "empty": "No hay documentos de venta en este período.",
+      "cols": {
+        "doc": "Documento",
+        "status": "Estado",
+        "customer": "Cliente",
+        "date": "Fecha",
+        "total": "Total",
+        "open": "Saldo",
+        "actions": "Acciones"
+      },
+      "csv": {
+        "doc": "Documento",
+        "status": "Estado",
+        "company": "Empresa",
+        "customer": "Cliente",
+        "nit": "NIT",
+        "date": "Fecha",
+        "subtotal": "Subtotal",
+        "vat": "IVA",
+        "total": "Total",
+        "open": "Saldo al 30/09/2026",
+        "dian": "DIAN",
+        "currency": "Moneda"
+      },
+      "dianSimulated": "Aceptada (simulado)",
+      "status": {
+        "quote": "Cotización",
+        "order": "Pedido",
+        "invoiced": "Factura",
+        "credited": "Anulada con {doc}",
+        "paid": "Pagada",
+        "overdue": "Vencida {days} d",
+        "receivable": "Por cobrar"
+      },
+      "yours": "TUYA",
+      "periodSwitched": "Cambiamos el período a septiembre de 2026 para que veas la operación.",
+      "toasts": {
+        "ordered": "{doc} ahora es un pedido.",
+        "invoiced": "Factura {doc} emitida. Validación DIAN simulada en curso…",
+        "credited": "Nota crédito {doc} registrada: la mercancía volvió a la bodega.",
+        "quoted": "Cotización {doc} creada.",
+        "paid": "Recaudo {doc} registrado para {inv}."
+      },
+      "actions": {
+        "toOrder": "Convertir en pedido",
+        "invoice": "Facturar",
+        "pay": "Registrar pago",
+        "view": "Ver {doc}",
+        "creditNote": "Nota crédito (devolución total)"
+      },
+      "docType": {
+        "quote": "Cotización",
+        "order": "Pedido",
+        "invoiced": "Factura electrónica"
+      },
+      "info": {
+        "nit": "NIT",
+        "city": "Ciudad",
+        "warehouse": "Bodega",
+        "term": "Plazo",
+        "termDays": "{days} días",
+        "quote": "Cotización",
+        "order": "Pedido",
+        "invoice": "Factura",
+        "due": "Vence"
+      },
+      "lines": {
+        "item": "Producto",
+        "qty": "Cant.",
+        "price": "Precio",
+        "vat": "IVA",
+        "subtotal": "Subtotal",
+        "excluded": "Excluido",
+        "vatTotal": "IVA",
+        "total": "Total",
+        "open": "Saldo por cobrar"
+      },
+      "shortage": {
+        "title": "No hay stock suficiente en {wh} para facturar:",
+        "line": "{item}: necesitas {need} y hay {have}.",
+        "go": "Ir a Inventario para trasladar o comprar"
+      },
+      "dian": {
+        "sending": "Enviando a la DIAN… (simulado)",
+        "accepted": "Aceptada por la DIAN (simulado)",
+        "note": "En la demo la respuesta de la DIAN es simulada. En tu proyecto la factura se transmite a la DIAN a través de un proveedor tecnológico autorizado y se envía al cliente.",
+        "link": "Ver la demo de Facturación electrónica"
+      },
+      "trace": {
+        "title": "Qué generó este documento",
+        "sale": "Asiento contable {doc} (ingreso, IVA, costo de ventas e inventario)",
+        "creditNote": "Asiento de la nota crédito {doc}",
+        "seeEntry": "Ver en Contabilidad",
+        "receipt": "Recaudo {doc} del {date} por {amount}",
+        "stock": "Salida de inventario de la bodega {wh} (ver kardex en Inventario)"
+      },
+      "creditNote": {
+        "title": "Nota crédito para {doc}",
+        "confirm": "Registrar nota crédito",
+        "body": "Se anula la factura completa: la mercancía vuelve a {wh}, se reversan el ingreso, el IVA y el costo, y el saldo del cliente queda en cero."
+      },
+      "form": {
+        "title": "Nueva cotización",
+        "subtitle": "Se crea con fecha {date} y precios de lista (antes de IVA).",
+        "company": "Empresa que vende",
+        "customer": "Cliente",
+        "warehouse": "Bodega de despacho",
+        "item": "Producto o servicio",
+        "qty": "Cantidad",
+        "available": "Disponible: {qty}",
+        "removeLine": "Quitar línea",
+        "addLine": "Agregar línea",
+        "totals": "Subtotal {subtotal} · IVA {vat} · Total {total}",
+        "errorLines": "Agrega al menos una línea con cantidad.",
+        "errorDup": "Hay productos repetidos: une las cantidades en una sola línea.",
+        "save": "Crear cotización",
+        "note": "La cotización no mueve inventario ni contabilidad. El stock se valida al facturar."
+      },
+      "payment": {
+        "title": "Registrar pago de {doc}",
+        "save": "Registrar recaudo",
+        "open": "Saldo pendiente: {amount}",
+        "amount": "Valor recibido (COP)",
+        "method": "Medio de pago",
+        "methods": {
+          "pse": "PSE",
+          "transfer": "Transferencia",
+          "deposit": "Consignación"
+        },
+        "error": "Escribe un valor entre 1 y {max}.",
+        "note": "Se registra con fecha {date}: debita Bancos y acredita Clientes."
+      }
+    },
+    "inventory": {
+      "title": "Inventario por bodega",
+      "subtitle": "Existencias y valor al {date}. Haz clic en un SKU para ver su kardex.",
+      "noInventoryLog": "Montevera Logística presta servicios de almacenamiento y no maneja inventario propio. Elige «Surtidora Montevera» o el consolidado.",
+      "periodSwitched": "Cambiamos el período a septiembre de 2026 para que veas la operación.",
+      "toasts": {
+        "poCreated": "Orden de compra {doc} creada para {supplier}: apruébala en Compras.",
+        "transferred": "Traslado {doc}: {qty} de {item} de {from} a {to}."
+      },
+      "cols": {
+        "sku": "SKU",
+        "item": "Producto",
+        "warehouse": "Bodega",
+        "stock": "Existencias",
+        "reorder": "Punto de reorden",
+        "unitCost": "Costo unit.",
+        "value": "Valor",
+        "status": "Estado"
+      },
+      "status": {
+        "ok": "OK",
+        "low": "Bajo reorden",
+        "out": "Agotado"
+      },
+      "transfer": {
+        "open": "Trasladar entre bodegas",
+        "title": "Traslado entre bodegas",
+        "subtitle": "Mueve unidades de una bodega a otra al costo promedio.",
+        "from": "Desde",
+        "to": "Hacia",
+        "qty": "Cantidad",
+        "available": "Disponible en {wh}: {qty}",
+        "errorSame": "Elige bodegas distintas.",
+        "errorQty": "Escribe una cantidad mayor que cero.",
+        "errorStock": "Solo hay {have} disponibles en la bodega de origen.",
+        "save": "Registrar traslado",
+        "note": "Un traslado no cambia el valor total del inventario ni genera asiento contable; sí aparece en el kardex de cada bodega."
+      },
+      "filters": {
+        "warehouse": "Bodega",
+        "allWarehouses": "Todas las bodegas",
+        "kind": "Tipo",
+        "allKinds": "Todos los tipos"
+      },
+      "kinds": {
+        "merch": "Mercancía",
+        "finished": "Producto terminado",
+        "raw": "Materia prima y empaque"
+      },
+      "method": {
+        "label": "Valoración",
+        "avg": "Promedio ponderado",
+        "fifo": "PEPS",
+        "totals": "Valor total: {avg} con promedio ponderado · {fifo} con PEPS (diferencia {diff}).",
+        "policy": "La contabilidad usa promedio ponderado; PEPS se muestra para comparar."
+      },
+      "shownTotal": "Valor de las filas mostradas: {value}",
+      "alerts": {
+        "title": "Alertas de reorden",
+        "subtitle": "Productos por debajo de su punto de reorden en la fecha de corte.",
+        "none": "No hay productos por debajo del punto de reorden.",
+        "out": "Agotado · reorden en {reorder}",
+        "low": "{qty} en stock · reorden en {reorder}",
+        "inProgress": "Ya hay una OC en curso: {doc}",
+        "createPo": "Crear OC por {qty}",
+        "produce": "Programar producción",
+        "transfer": "Trasladar desde Bogotá",
+        "pastPeriod": "Estás viendo un período cerrado: las acciones se habilitan en septiembre de 2026."
+      },
+      "kardex": {
+        "open": "Ver kardex de {sku}",
+        "hint": "El valor y el costo unitario cambian con el método de valoración elegido.",
+        "title": "Kardex de {sku}",
+        "subtitle": "movimientos del período, del más reciente al más antiguo",
+        "allWarehouses": "Todas las bodegas",
+        "empty": "Este producto no tuvo movimientos en el período.",
+        "date": "Fecha",
+        "doc": "Documento",
+        "type": "Tipo",
+        "in": "Entrada",
+        "out": "Salida",
+        "unit": "Costo unit.",
+        "balance": "Saldo",
+        "note": "Con «Todas las bodegas» no se muestran los traslados porque no cambian el saldo total.",
+        "kinds": {
+          "opening": "Saldo inicial",
+          "purchase": "Compra",
+          "sale": "Venta",
+          "return": "Devolución",
+          "transferIn": "Traslado (entrada)",
+          "transferOut": "Traslado (salida)",
+          "prodOut": "Consumo de producción",
+          "prodIn": "Producto terminado"
+        }
+      }
     },
     "purchases": {
-      "title": "Órdenes de Compra",
-      "subtitle": "Gestión de proveedores con OCR + workflow",
-      "poNumber": "PO",
-      "supplier": "Proveedor",
-      "date": "Fecha",
-      "amount": "Monto",
-      "status": "Estado",
-      "approvalFlow": "Flujo aprobación",
-      "level1": "Supervisor",
-      "level2": "Gerencia",
-      "level3": "Dirección",
-      "approved": "Aprobada",
-      "inReview": "En revisión",
-      "rejected": "Rechazada",
-      "ocrTitle": "OCR de facturas proveedor",
-      "ocrSubtitle": "Procesado por IA: 12 campos extraídos",
-      "fieldNit": "NIT proveedor",
-      "fieldDate": "Fecha emisión",
-      "fieldDue": "Fecha vencimiento",
-      "fieldSubtotal": "Subtotal",
-      "fieldTax": "IVA 19%",
-      "fieldTotal": "Total",
-      "fieldItems": "Items detectados",
-      "uploadInvoice": "Cargar factura",
-      "extractedAt": "Extraído hace 2 min"
+      "title": "Órdenes de compra",
+      "subtitle": "Aprobación por niveles, recepción con la factura del proveedor y pago.",
+      "noPurchasesLog": "Montevera Logística no tiene compras de inventario en esta demo. Elige «Surtidora Montevera» o el consolidado.",
+      "newPo": "Nueva orden de compra",
+      "views": {
+        "pending": "Por aprobar ({n})",
+        "approved": "Por recibir ({n})",
+        "received": "Recibidas",
+        "all": "Todas"
+      },
+      "empty": "No hay órdenes de compra en esta vista para el período.",
+      "csv": {
+        "doc": "OC",
+        "status": "Estado",
+        "supplier": "Proveedor",
+        "nit": "NIT",
+        "date": "Fecha",
+        "warehouse": "Bodega",
+        "subtotal": "Subtotal",
+        "vat": "IVA",
+        "total": "Total",
+        "withholding": "Retención",
+        "payable": "Por pagar",
+        "open": "Saldo al 30/09/2026"
+      },
+      "status": {
+        "pending": "Por aprobar",
+        "approved": "Aprobada",
+        "rejected": "Rechazada",
+        "received": "Recibida · por pagar",
+        "paid": "Pagada"
+      },
+      "rules": {
+        "title": "Cómo funciona",
+        "level1": "Toda OC la aprueba el Jefe de compras.",
+        "level2": "Si el total con IVA es de {amount} o más, también la aprueba Gerencia.",
+        "receive": "Al recibir, la mercancía entra a la bodega y se causa la factura del proveedor (puedes cargar su XML para compararla con la OC).",
+        "withholding": "Se practica retención en la fuente del {pct} % sobre el subtotal (tarifa de ejemplo).",
+        "demoNote": "En la demo tú puedes aprobar en todos los niveles. En tu proyecto cada nivel lo aprueba el rol asignado, con los montos que definas."
+      },
+      "origin": {
+        "manual": "CREADA POR TI",
+        "reorder": "DESDE ALERTA DE REORDEN",
+        "mrp": "DESDE MRP"
+      },
+      "itemsCount": "{n, plural, one {1 producto} other {# productos}}: {first}…",
+      "openAmount": "Por pagar {amount} · vence {due}",
+      "flow": {
+        "aria": "Flujo de la orden de compra",
+        "level1": "Jefe de compras",
+        "level2": "Gerencia",
+        "receive": "Recepción",
+        "pay": "Pago"
+      },
+      "rejectedReason": "Motivo del rechazo: {reason}",
+      "actions": {
+        "approveAs": "Aprobar como {role}",
+        "reject": "Rechazar",
+        "receive": "Recibir mercancía",
+        "pay": "Pagar {amount}",
+        "detail": "Ver detalle"
+      },
+      "toasts": {
+        "approvedFinal": "{doc} aprobada por {role}. Ya puedes recibir la mercancía.",
+        "approvedLevel": "{doc} aprobada por {role}. Falta la aprobación de Gerencia.",
+        "paid": "Pago {doc} de {amount} registrado para {po}.",
+        "received": "{doc} recibida en {wh}: el inventario y la cuenta por pagar se actualizaron.",
+        "rejected": "{doc} rechazada.",
+        "created": "Orden de compra {doc} creada. Ahora apruébala."
+      },
+      "periodSwitched": "Cambiamos el período a septiembre de 2026 para que veas la operación.",
+      "detail": {
+        "title": "Orden de compra",
+        "item": "Producto",
+        "qty": "Cant.",
+        "cost": "Costo",
+        "vat": "IVA",
+        "subtotal": "Subtotal",
+        "excluded": "Excluido",
+        "vatTotal": "IVA",
+        "total": "Total",
+        "withholding": "Retención en la fuente",
+        "payable": "Neto por pagar",
+        "history": "Historial",
+        "created": "Creada el {date}",
+        "approved": "Aprobada por {role} el {date}",
+        "received": "Recibida el {date} con la factura {invoice} ({source})",
+        "source": {
+          "xml": "XML",
+          "manual": "digitada"
+        },
+        "paid": "Pago {doc} del {date} por {amount}",
+        "seeEntry": "Ver asiento {doc}"
+      },
+      "receive": {
+        "title": "Recibir {doc}",
+        "save": "Recibir y causar factura",
+        "invoiceNo": "Número de la factura del proveedor",
+        "xml": "XML de la factura (opcional)",
+        "upload": "Cargar XML",
+        "sample": "Descargar XML de ejemplo",
+        "xmlHint": "Se lee en tu navegador y no se envía a ningún servidor. Acepta la estructura UBL 2.1 de la factura electrónica (simplificada).",
+        "vatCredit": "IVA descontable",
+        "match": "Comparación del XML con la OC ({lines} líneas en el XML)",
+        "field": "Campo",
+        "inXml": "En el XML",
+        "inPo": "En la OC",
+        "fields": {
+          "supplier": "NIT del proveedor",
+          "order": "Orden de compra",
+          "subtotal": "Subtotal",
+          "vat": "IVA",
+          "total": "Total"
+        },
+        "ok": "Coincide",
+        "diff": "Diferente",
+        "mismatch": "La factura no coincide con la OC. Revisa con el proveedor o recibe sin XML digitando el número de factura.",
+        "effect": "Al confirmar: entra la mercancía a {wh} (costo promedio actualizado) y se genera el asiento de compra con IVA descontable, retención y cuenta por pagar.",
+        "errors": {
+          "tooBig": "El archivo pesa más de 2 MB.",
+          "notXml": "El archivo no es un XML válido.",
+          "notInvoice": "El XML no es una factura UBL (no tiene el elemento Invoice).",
+          "missing": "Al XML le falta el número de factura o el total."
+        }
+      },
+      "reject": {
+        "title": "Rechazar {doc}",
+        "save": "Rechazar orden",
+        "reason": "Motivo",
+        "placeholder": "Ej.: precio por encima de la última compra"
+      },
+      "form": {
+        "title": "Nueva orden de compra",
+        "subtitle": "El costo propuesto es el costo promedio actual de cada producto.",
+        "supplier": "Proveedor",
+        "warehouse": "Bodega de destino",
+        "item": "Producto",
+        "qty": "Cantidad",
+        "cost": "Costo unit.: {cost}",
+        "removeLine": "Quitar línea",
+        "addLine": "Agregar línea",
+        "totals": "Total con IVA {total} · {levels, plural, one {1 nivel de aprobación} other {# niveles de aprobación}}",
+        "errorLines": "Agrega al menos una línea con cantidad.",
+        "errorDup": "Hay productos repetidos: une las cantidades en una sola línea.",
+        "errorRaw": "Las materias primas y empaques solo se reciben en la bodega de Bogotá (planta).",
+        "save": "Crear orden de compra"
+      }
+    },
+    "accounting": {
+      "tabs": {
+        "journal": "Libro diario",
+        "trial": "Balance de prueba",
+        "statements": "Estados financieros"
+      },
+      "journal": {
+        "title": "Libro diario (PUC)",
+        "subtitle": "Asientos por partida doble generados por cada operación. Haz clic en un comprobante para ver su origen.",
+        "empty": "No hay asientos en este período.",
+        "totals": "Totales ({n} comprobantes)"
+      },
+      "cols": {
+        "date": "Fecha",
+        "entry": "Comprobante",
+        "company": "Empresa",
+        "account": "Cuenta",
+        "description": "Descripción / tercero",
+        "third": "Tercero",
+        "debit": "Débito",
+        "credit": "Crédito"
+      },
+      "yours": "TUYO",
+      "manual": {
+        "open": "Asiento manual",
+        "title": "Nuevo asiento manual",
+        "subtitle": "Comprobante de ajuste: los débitos deben ser iguales a los créditos.",
+        "company": "Empresa",
+        "desc": "Descripción",
+        "descPlaceholder": "Ej.: reclasificación de gastos de septiembre",
+        "removeLine": "Quitar línea",
+        "addLine": "Agregar línea",
+        "sums": "Débitos {debit} · Créditos {credit} · Diferencia {diff}",
+        "note": "Se registra con fecha 30 sep 2026 y afecta de inmediato el balance de prueba y los estados financieros.",
+        "save": "Registrar asiento",
+        "done": "Asiento {doc} registrado.",
+        "errorDesc": "Escribe una descripción.",
+        "errorLines": "Necesitas al menos dos líneas con valor.",
+        "errorBoth": "Cada línea debe tener débito o crédito, no ambos.",
+        "errorBalance": "Los débitos y los créditos deben ser iguales y mayores que cero."
+      },
+      "periodSwitched": "Cambiamos el período a septiembre de 2026 para que veas la operación.",
+      "entry": {
+        "title": "Comprobante",
+        "goSource": "Ver el documento en {module}",
+        "totals": "Totales",
+        "balanced": "Débitos = créditos",
+        "unbalanced": "Descuadrado",
+        "manual": "Asiento manual registrado por ti.",
+        "source": {
+          "opening": "Saldos iniciales de la demo.",
+          "sale": "Generado automáticamente al facturar.",
+          "creditNote": "Generado automáticamente por la nota crédito.",
+          "receipt": "Generado automáticamente al registrar el recaudo.",
+          "purchase": "Generado automáticamente al recibir la compra.",
+          "payment": "Generado automáticamente al pagar al proveedor.",
+          "expense": "Generado automáticamente por la causación del gasto o el movimiento bancario.",
+          "payroll": "Generado automáticamente al liquidar la nómina.",
+          "tax": "Generado automáticamente al pagar el impuesto (saldo de la cuenta al corte).",
+          "prodStart": "Generado automáticamente al iniciar la orden de producción.",
+          "prodFinish": "Generado automáticamente al terminar la orden de producción."
+        }
+      },
+      "trial": {
+        "title": "Balance de prueba",
+        "subtitle": "Del {from} al {to}",
+        "ok": "Cuadra",
+        "notOk": "No cuadra",
+        "opening": "Saldo inicial",
+        "closing": "Saldo final",
+        "totals": "Totales",
+        "note": "Saldos con naturaleza débito positivos y crédito negativos. La suma de saldos finales siempre es cero."
+      },
+      "pl": {
+        "title": "Estado de resultados",
+        "subtitle": "Del {from} al {to}",
+        "revenue": "Ingresos operacionales netos",
+        "cogs": "Costo de ventas",
+        "gross": "Utilidad bruta",
+        "opex": "Gastos operacionales",
+        "operating": "Utilidad operacional",
+        "nonOperating": "Gastos no operacionales (financieros)",
+        "preTax": "Utilidad antes de impuestos",
+        "tax": "Provisión estimada de renta ({pct} %)",
+        "net": "Utilidad neta estimada",
+        "ebitda": "EBITDA",
+        "ebitdaNote": "Utilidad operacional + depreciaciones del período ({dep}).",
+        "taxNote": "La provisión de renta es una estimación de la demo y no se registra como asiento."
+      },
+      "bs": {
+        "title": "Estado de situación financiera",
+        "subtitle": "Al {date}",
+        "ok": "Activo = Pasivo + Patrimonio",
+        "notOk": "No cuadra",
+        "currentAssets": "Activo corriente (caja, bancos, cartera, inventarios)",
+        "fixedAssets": "Propiedades, planta y equipo (neto)",
+        "assets": "Total activo",
+        "liabilities": "Total pasivo",
+        "capital": "Capital y utilidades acumuladas",
+        "result": "Resultado del ejercicio (antes de impuestos)",
+        "equity": "Total patrimonio",
+        "note": "Las cifras salen de los mismos asientos del libro diario. En tu proyecto puedes llevar la contabilidad aquí o enviar los movimientos a tu software contable."
+      }
+    },
+    "finance": {
+      "periodSwitched": "Cambiamos el período a septiembre de 2026 para que veas la operación.",
+      "cash": {
+        "title": "Flujo de caja",
+        "subtitle": "Entradas y salidas de caja y bancos por mes, calculadas con los asientos.",
+        "aria": "Gráfico de entradas y salidas por mes",
+        "tooltip": "{month}: entradas {inflow} · salidas {outflow}",
+        "inflows": "Entradas",
+        "outflows": "Salidas",
+        "net": "Neto del período: {value}"
+      },
+      "aging": {
+        "ar": "Cartera por edades",
+        "ap": "Cuentas por pagar por edades",
+        "cutoff": "Corte {date} · {n} documentos",
+        "buckets": {
+          "current": "Sin vencer",
+          "d30": "Vencida 1–30 días",
+          "d60": "Vencida 31–60 días",
+          "d90": "Vencida 61–90 días",
+          "d90plus": "Vencida más de 90 días"
+        }
+      },
+      "ar": {
+        "title": "Cartera por cliente",
+        "subtitle": "Facturas con saldo al {date}, de mayor a menor saldo vencido.",
+        "empty": "No hay cartera pendiente.",
+        "customer": "Cliente",
+        "company": "Empresa",
+        "doc": "Factura",
+        "date": "Fecha",
+        "due": "Vence",
+        "days": "Días vencida",
+        "open": "Saldo",
+        "invoices": "Facturas",
+        "overdue": "Vencido",
+        "over60": "Vencido > 60 d",
+        "actions": "Acciones",
+        "hide": "Ocultar",
+        "show": "Ver facturas",
+        "remind": "Recordatorio",
+        "line": "del {date}, vence {due}",
+        "daysOverdue": "{days} días vencida",
+        "notDue": "sin vencer"
+      },
+      "reminder": {
+        "title": "Recordatorio de cobro",
+        "text": "Hola, equipo de {customer}: te escribimos de {company} porque tienes {n, plural, one {1 factura vencida} other {# facturas vencidas}} por {amount}: {list}. ¿Nos confirmas la fecha de pago? Gracias.",
+        "copied": "Mensaje copiado.",
+        "copyError": "No pudimos copiar el texto; selecciónalo y cópialo a mano.",
+        "copy": "Copiar mensaje",
+        "note": "Simulado: la demo no envía nada. En tu proyecto el recordatorio se envía por WhatsApp Business o por correo, de forma manual o programada."
+      },
+      "recon": {
+        "title": "Conciliación bancaria",
+        "subtitle": "Movimientos del extracto del período. Las sugerencias salen de reglas (referencia, valor y nombre del cliente), no de IA.",
+        "import": "Importar extracto (CSV)",
+        "views": {
+          "pending": "Pendientes ({n})",
+          "matched": "Conciliados",
+          "all": "Todos"
+        },
+        "nonePending": "No hay movimientos pendientes por conciliar en este período.",
+        "note": "Los movimientos de la demo son de ejemplo. En tu proyecto se importan los extractos en Excel o CSV de tu banco; la conexión directa depende de cada banco.",
+        "imported": "importado",
+        "matchedByYou": "Conciliado por ti con {doc}",
+        "matchedWith": "Conciliado con {doc}",
+        "suggestion": "Sugerencia",
+        "suggest": {
+          "receipt": "registrar el recaudo de {doc} ({customer})",
+          "bankFee": "registrar como gasto bancario",
+          "gmf": "registrar el gravamen a los movimientos financieros (4x1000)",
+          "unidentified": "registrar como consignación por identificar"
+        },
+        "why": "Por qué",
+        "reasons": {
+          "reference": "la descripción trae el número de la factura",
+          "amount": "el valor es igual al saldo de la factura",
+          "customer": "la descripción trae el nombre del cliente",
+          "gmf": "la descripción dice GMF / 4x1000",
+          "fee": "la descripción dice comisión",
+          "outflow": "es un débito sin referencia",
+          "noMatch": "no hay una factura con esa referencia o ese valor"
+        },
+        "matched": "Conciliado",
+        "confidence": {
+          "high": "Coincidencia alta",
+          "medium": "Revisar"
+        },
+        "applyTo": "Aplicar a una factura…",
+        "useSuggested": "Usar la sugerida",
+        "acceptReceipt": "Registrar recaudo",
+        "accept": {
+          "bankFee": "Registrar gasto",
+          "gmf": "Registrar 4x1000",
+          "unidentified": "Registrar por identificar"
+        },
+        "toasts": {
+          "receipt": "Recaudo registrado y conciliado: {doc} bajó de la cartera.",
+          "bankFee": "Gasto bancario registrado y conciliado.",
+          "gmf": "4x1000 registrado y conciliado.",
+          "unidentified": "Consignación registrada en «Anticipos y avances recibidos» hasta identificar al cliente."
+        }
+      },
+      "import": {
+        "title": "Importar extracto bancario",
+        "subtitle": "Archivo CSV con columnas: fecha, descripción, valor.",
+        "save": "Importar {n} movimientos",
+        "company": "Cuenta de la empresa",
+        "choose": "Elegir archivo CSV",
+        "sample": "Descargar CSV de ejemplo",
+        "format": "Fechas AAAA-MM-DD o DD/MM/AAAA entre el 1 de enero de 2026 y el {max}. Valores positivos para entradas y negativos para salidas. Separador ; o ,.",
+        "preview": "{n} movimientos listos para importar ({skipped} filas omitidas por formato).",
+        "date": "Fecha",
+        "desc": "Descripción",
+        "amount": "Valor",
+        "note": "El archivo se lee en tu navegador y no se envía a ningún servidor.",
+        "done": "Importaste {n} movimientos. Revísalos en «Pendientes».",
+        "errors": {
+          "tooBig": "El archivo pesa más de 1 MB.",
+          "empty": "El archivo está vacío.",
+          "noRows": "No encontramos filas válidas. Revisa el formato."
+        }
+      }
     },
     "hr": {
-      "title": "Capital Humano",
-      "subtitle": "Empleados, vacaciones y nómina",
-      "employees": "Empleados activos",
-      "onVacation": "En vacaciones",
-      "payrollMonth": "Nómina del mes",
-      "headcount": "Plantilla",
-      "name": "Nombre",
-      "position": "Cargo",
-      "department": "Departamento",
-      "salary": "Salario base",
-      "statusActive": "Activo",
-      "statusVacation": "Vacaciones",
-      "vacationsTitle": "Solicitudes de vacaciones",
-      "from": "Desde",
-      "to": "Hasta",
-      "days": "Días",
-      "approve": "Aprobar",
-      "reject": "Rechazar",
-      "payrollTitle": "Resumen de nómina"
+      "kpi": {
+        "employees": "Personas en nómina",
+        "employeesNote": "Según la empresa elegida",
+        "onVacation": "En vacaciones",
+        "onVacationNote": "Al {date}",
+        "payrollCost": "Costo de nómina del período",
+        "payrollCostNote": "{n, plural, one {1 liquidación} other {# liquidaciones}} (salario + aportes + prestaciones)"
+      },
+      "staff": {
+        "title": "Personas",
+        "subtitle": "Cargos, áreas y salario básico mensual.",
+        "empty": "No hay personas que coincidan con la búsqueda.",
+        "name": "Nombre",
+        "position": "Cargo",
+        "dept": "Área",
+        "city": "Ciudad",
+        "salary": "Salario básico",
+        "status": "Estado",
+        "vacation": "Vacaciones",
+        "active": "Activo"
+      },
+      "depts": {
+        "management": "Gerencia",
+        "finance": "Administración y finanzas",
+        "purchasing": "Compras",
+        "sales": "Comercial",
+        "warehouse": "Bodegas",
+        "production": "Producción",
+        "people": "Talento humano",
+        "operations": "Operación logística"
+      },
+      "vacations": {
+        "title": "Solicitudes de vacaciones",
+        "empty": "No hay solicitudes.",
+        "status": {
+          "pending": "Pendiente",
+          "approved": "Aprobada",
+          "rejected": "Rechazada"
+        },
+        "range": "{from} → {to} · {days} días hábiles",
+        "approve": "Aprobar",
+        "reject": "Rechazar"
+      },
+      "payroll": {
+        "title": "Nómina del período",
+        "subtitle": "Cada liquidación genera su asiento contable y su envío de nómina electrónica.",
+        "empty": "No hay liquidaciones de nómina en este período.",
+        "month": "Mes",
+        "company": "Empresa",
+        "headcount": "Personas",
+        "gross": "Salarios",
+        "cost": "Costo empresa",
+        "eStatus": "Nómina electrónica",
+        "actions": "Acciones",
+        "e": {
+          "pending": "Pendiente de enviar",
+          "sending": "Enviando… (simulado)",
+          "accepted": "Aceptada (simulado)"
+        },
+        "transmit": "Transmitir a la DIAN (simulado)",
+        "seeEntry": "Ver asiento",
+        "factorNote": "El costo empresa usa factores de ejemplo (salario × {factor}: aportes y prestaciones sociales). En tu proyecto se liquida persona por persona según la ley vigente.",
+        "hrmsNote": "La transmisión de la nómina electrónica está simulada en la demo; en tu proyecto se hace con un proveedor tecnológico autorizado. La liquidación detallada (novedades, horas extra, incapacidades) vive en el módulo de talento humano.",
+        "hrmsLink": "Ver la demo de HRMS"
+      },
+      "toasts": {
+        "approved": "Vacaciones de {name} aprobadas.",
+        "rejected": "Vacaciones de {name} rechazadas.",
+        "transmitting": "Enviando la nómina electrónica de {month} de {company} (simulado)…"
+      }
     },
     "manufacturing": {
-      "title": "Manufactura y MRP",
-      "subtitle": "BOM, órdenes de trabajo y sugerencias de planeación",
-      "bomTitle": "Estructura de producto (BOM)",
-      "qty": "Cant.",
-      "workOrders": "Órdenes de trabajo",
-      "wo": "OT",
-      "product": "Producto",
-      "qtyOrdered": "Cant. ordenada",
-      "progress": "Avance",
-      "dueDate": "Entrega",
-      "mrpTitle": "Sugerencias MRP",
-      "mrpSubtitle": "Recomendaciones generadas por IA",
-      "buy": "Comprar",
-      "produce": "Producir",
-      "transfer": "Transferir",
-      "reason": "Motivo",
-      "reasonLow": "Stock bajo mínimo",
-      "reasonForecast": "Demanda proyectada Q3",
-      "reasonLead": "Tiempo de aprovisionamiento alto"
-    },
-    "modal": {
-      "transactionDetail": "Detalle de transacción",
-      "reference": "Referencia",
-      "createdBy": "Creado por",
-      "createdAt": "Creado",
-      "approvedBy": "Aprobado por",
-      "notes": "Notas",
-      "audit": "Auditoría",
-      "close": "Cerrar",
-      "noteText": "Transacción registrada correctamente. Conciliación automática completada por IA con 98% de confianza."
+      "title": "Producción",
+      "noManufacturingLog": "Montevera Logística no produce. Elige «Surtidora Montevera» o el consolidado.",
+      "periodSwitched": "Cambiamos el período a septiembre de 2026 para que veas la operación.",
+      "yours": "TUYA",
+      "toasts": {
+        "started": "{doc} iniciada: los materiales salieron del inventario.",
+        "finished": "{doc} terminada: entraron {qty} de {item} a la bodega de Bogotá.",
+        "created": "Orden de producción {doc} creada."
+      },
+      "bom": {
+        "title": "Lista de materiales (BOM)",
+        "subtitle": "Componentes por unidad con su costo promedio actual.",
+        "product": "Producto",
+        "perUnit": "por unidad",
+        "unitCost": "Costo estándar por unidad",
+        "price": "Precio de venta (antes de IVA)",
+        "margin": "Margen bruto",
+        "note": "Si cambia el costo de un componente (por una compra nueva), el costo estándar se recalcula.",
+        "phantom": "subensamble"
+      },
+      "orders": {
+        "title": "Órdenes de producción",
+        "subtitle": "Planta de Bogotá. Iniciar consume materiales; terminar ingresa el producto terminado al costo real.",
+        "new": "Nueva orden",
+        "empty": "No hay órdenes de producción en este período.",
+        "status": {
+          "planned": "Planeada",
+          "inProgress": "En proceso",
+          "done": "Terminada"
+        },
+        "dates": "Creada {created} · inicio {start} · fin {finish}",
+        "start": "Iniciar (consumir materiales)",
+        "finish": "Terminar (ingresar a bodega)",
+        "consumes": "Consume:",
+        "units": "und",
+        "shortage": "Faltan materiales: {list}. Usa el MRP de abajo para comprarlos."
+      },
+      "mrp": {
+        "title": "Planeación de materiales (MRP)",
+        "subtitle": "Calculado con las órdenes planeadas, la lista de materiales, el stock y los puntos de reorden.",
+        "buyTitle": "Materias primas y empaques",
+        "buyLine": "Stock {have} · requiere {required} · queda {after} · reorden {reorder}",
+        "covered": "Cubierto",
+        "poOpen": "OC en curso: {doc}",
+        "createPo": "Crear OC por {qty}",
+        "produceTitle": "Producto terminado (Bogotá)",
+        "produceLine": "Stock {have} · en producción o planeado {planned} · reorden {reorder}",
+        "createOp": "Planear {qty}",
+        "note": "Son reglas de cálculo, no IA. En tu proyecto se puede sumar el pronóstico de ventas y los tiempos de entrega de cada proveedor."
+      },
+      "form": {
+        "title": "Nueva orden de producción",
+        "subtitle": "Se crea como planeada; el MRP la tiene en cuenta de inmediato.",
+        "qty": "Cantidad a producir",
+        "errorQty": "Escribe una cantidad entre 1 y 50.000.",
+        "save": "Crear orden"
+      }
     },
     "footer": {
-      "demo": "Demo interactivo",
-      "note": "Datos simulados para fines demostrativos"
+      "sample": "Datos de ejemplo: Surtidora Montevera S.A.S. y Montevera Logística S.A.S. son empresas ficticias; clientes, proveedores, personas, NIT y cifras son inventados.",
+      "integrations": "La validación de la DIAN (factura y nómina electrónica), los extractos bancarios y los recordatorios por WhatsApp están simulados en la demo. En tu proyecto se conectan a un proveedor tecnológico autorizado, a los extractos de tu banco y a WhatsApp Business o correo.",
+      "storage": "Lo que haces aquí se guarda solo en este navegador y puedes restablecerlo cuando quieras."
     }
   }
 }

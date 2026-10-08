@@ -18,6 +18,8 @@ Disallow: /reset-password
 Disallow: /auth/
 Disallow: /test
 Disallow: /liquidacion
+Disallow: /activar/
+Disallow: /demo-acceso/
 Disallow: /*?*sessionId=*
 Disallow: /*?*token=*
 
@@ -33,6 +35,8 @@ Disallow: /reset-password
 Disallow: /auth/
 Disallow: /test
 Disallow: /liquidacion
+Disallow: /activar/
+Disallow: /demo-acceso/
 Disallow: /*?*sessionId=*
 Disallow: /*?*token=*
 Crawl-delay: 5

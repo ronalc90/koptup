@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticate, authorize } from '../middleware/auth';
+import { requireAdmin, requireRole } from '../middleware/access';
 import {
   adminGetOrders,
   adminUpdateOrderStatus,
@@ -18,7 +18,8 @@ import {
 
 const router = Router();
 
-router.use(authenticate, authorize('admin', 'manager'));
+// Panel de administración: admin o manager (rol leído de la BD en cada petición).
+router.use(...requireRole('admin', 'manager'));
 
 // Orders
 router.get('/orders', adminGetOrders);
@@ -39,7 +40,8 @@ router.get('/conversations/:id', adminGetConversationDetails);
 
 // Users
 router.get('/users', adminGetUsers);
-router.patch('/users/:id/role', adminUpdateUserRole);
+// Cambiar roles: solo admin (un manager no puede darse ni dar el rol admin).
+router.patch('/users/:id/role', ...requireAdmin, adminUpdateUserRole);
 
 // Contacts
 router.get('/contacts', adminGetContacts);

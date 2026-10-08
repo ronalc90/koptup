@@ -6,7 +6,29 @@ import { Request, Response } from 'express';
 import { cupsSisproService } from '../services/cups-sispro.service';
 import { embeddingsService } from '../services/embeddings.service';
 import { logger } from '../utils/logger';
+import fs from 'fs';
 import path from 'path';
+
+/**
+ * Resuelve el archivo a importar SOLO dentro de la carpeta de importación
+ * (CUPS_IMPORT_DIR, por defecto `data/imports`). Acepta únicamente un nombre
+ * de archivo con la extensión esperada: nada de rutas absolutas, `..` ni
+ * subcarpetas. Devuelve null si no es válido o no existe.
+ */
+export function resolveImportFile(name: unknown, allowedExts: string[]): string | null {
+  if (typeof name !== 'string' || name.length === 0 || name.length > 200) return null;
+  if (path.basename(name) !== name || name.startsWith('.')) return null;
+  if (!allowedExts.includes(path.extname(name).toLowerCase())) return null;
+  const dir = path.resolve(process.env.CUPS_IMPORT_DIR || './data/imports');
+  const full = path.resolve(dir, name);
+  if (!full.startsWith(dir + path.sep)) return null;
+  try {
+    if (!fs.statSync(full).isFile()) return null;
+  } catch {
+    return null;
+  }
+  return full;
+}
 
 /**
  * POST /api/cups/importar-csv
@@ -14,20 +36,21 @@ import path from 'path';
  */
 export async function importarCSV(req: Request, res: Response) {
   try {
-    const { rutaArchivo, truncate, batchSize } = req.body;
+    const { archivo, truncate, batchSize } = req.body;
+    const rutaArchivo = resolveImportFile(archivo, ['.csv']);
 
     if (!rutaArchivo) {
       return res.status(400).json({
         success: false,
-        error: 'Se requiere la ruta del archivo CSV',
+        error: 'Indica en "archivo" el nombre de un .csv que exista en la carpeta de importación del servidor',
       });
     }
 
-    logger.info(`Importando CUPS desde CSV: ${rutaArchivo}`);
+    logger.info(`Importando CUPS desde CSV: ${path.basename(rutaArchivo)}`);
 
     const resultado = await cupsSisproService.importarDesdeCSV(rutaArchivo, {
-      truncate: truncate || false,
-      batchSize: batchSize || 1000,
+      truncate: truncate === true,
+      batchSize: Math.min(Math.max(Number(batchSize) || 1000, 1), 5000),
     });
 
     return res.json({
@@ -38,7 +61,7 @@ export async function importarCSV(req: Request, res: Response) {
     logger.error('Error importando CSV:', error);
     return res.status(500).json({
       success: false,
-      error: error.message || 'Error importando archivo CSV',
+      error: 'Error importando archivo CSV',
     });
   }
 }
@@ -49,21 +72,22 @@ export async function importarCSV(req: Request, res: Response) {
  */
 export async function importarExcel(req: Request, res: Response) {
   try {
-    const { rutaArchivo, truncate, batchSize, nombreHoja } = req.body;
+    const { archivo, truncate, batchSize, nombreHoja } = req.body;
+    const rutaArchivo = resolveImportFile(archivo, ['.xlsx', '.xls']);
 
     if (!rutaArchivo) {
       return res.status(400).json({
         success: false,
-        error: 'Se requiere la ruta del archivo Excel',
+        error: 'Indica en "archivo" el nombre de un .xlsx que exista en la carpeta de importación del servidor',
       });
     }
 
-    logger.info(`Importando CUPS desde Excel: ${rutaArchivo}`);
+    logger.info(`Importando CUPS desde Excel: ${path.basename(rutaArchivo)}`);
 
     const resultado = await cupsSisproService.importarDesdeExcel(rutaArchivo, {
-      truncate: truncate || false,
-      batchSize: batchSize || 1000,
-      nombreHoja: nombreHoja,
+      truncate: truncate === true,
+      batchSize: Math.min(Math.max(Number(batchSize) || 1000, 1), 5000),
+      nombreHoja: typeof nombreHoja === 'string' ? nombreHoja.slice(0, 100) : undefined,
     });
 
     return res.json({
@@ -74,7 +98,7 @@ export async function importarExcel(req: Request, res: Response) {
     logger.error('Error importando Excel:', error);
     return res.status(500).json({
       success: false,
-      error: error.message || 'Error importando archivo Excel',
+      error: 'Error importando archivo Excel',
     });
   }
 }

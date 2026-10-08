@@ -3,9 +3,10 @@ import mongoose, { Schema, Document } from 'mongoose';
 /**
  * Origen del lead. `contact-form` es el formulario de /contact (valor por
  * defecto, también para los contactos guardados antes de existir el campo);
- * `demo-rag` es la demo "Prueba con tu documento" de /demo/chatbot.
+ * `demo-rag` es la demo "Prueba con tu documento" de /demo/chatbot;
+ * `demo-request` es el formulario "Solicitar demo" (POST /api/demo-requests).
  */
-export const CONTACT_SOURCES = ['contact-form', 'demo-rag'] as const;
+export const CONTACT_SOURCES = ['contact-form', 'demo-rag', 'demo-request'] as const;
 export type ContactSource = (typeof CONTACT_SOURCES)[number];
 export const DEFAULT_CONTACT_SOURCE: ContactSource = 'contact-form';
 

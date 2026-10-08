@@ -1,5 +1,7 @@
 # KopTup: plan de producto
 
+> **Estado al 8 de octubre de 2026:** ver [Estado del trabajo y próximos pasos](15-Estado-y-Proximos-Pasos.md).
+
 Esta wiki es el **plan de producto de KopTup**: dónde está hoy el negocio y el software, qué se quiere vender, cómo se mueve un cliente interesado desde que descubre KopTup hasta que es cliente, y qué hay que construir en cada módulo, sección y producto para lograrlo. Está escrita para que el dueño pueda decidir y un equipo de desarrollo pueda ejecutar: cada página trae diagnóstico, plan, tareas con fase, prioridad y esfuerzo, y métricas de éxito.
 
 El pedido que la originó: que KopTup sea **un producto adecuado, vendible y claro para cada cliente**; que los clientes puedan **solicitar demos** y que desde el **panel de administración** se les **dé acceso**; con un plan, un diagrama del flujo del cliente y todo documentado con diagramas y capturas.

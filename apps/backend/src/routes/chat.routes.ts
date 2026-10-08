@@ -5,9 +5,13 @@ import {
   sendMessage,
   getHistory,
 } from '../controllers/chat.controller';
-import { authenticate } from '../middleware/auth';
+import { devOnlyAdmin } from '../middleware/access';
 
 const router = Router();
+
+// Chat heredado (responde con eco, sin consumidor en la web): no existe en
+// producción y en desarrollo solo lo usa un admin.
+router.use(...devOnlyAdmin);
 
 /**
  * @swagger

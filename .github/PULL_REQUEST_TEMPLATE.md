@@ -17,6 +17,7 @@
 - [ ] Build local pasa (`npm run build`)
 - [ ] Tests pasan (`npm test`)
 - [ ] Lint limpio (`npm run lint`)
+- [ ] Tipos sin errores (`npm run typecheck`)
 - [ ] i18n ES + EN agregado/actualizado si aplica
 - [ ] Screenshots si es UI
 - [ ] Vercel preview revisado

@@ -332,9 +332,8 @@ const seedDashboard = async () => {
     console.log('✅ Conversaciones y mensajes creados');
 
     console.log('\n✅ Seed completado exitosamente!');
-    console.log('\n📧 Credenciales de prueba:');
-    console.log('   Admin: admin@koptup.com / admin123');
-    console.log('   Cliente: cliente@example.com / cliente123');
+    console.log('\n📧 Cuentas de prueba: admin@koptup.com y cliente@example.com');
+    console.log('   (contraseñas: SEED_ADMIN_PASSWORD / SEED_CLIENT_PASSWORD o las generadas arriba)');
 
     process.exit(0);
   } catch (error) {

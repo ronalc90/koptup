@@ -16,7 +16,10 @@
 import fs from 'fs';
 import path from 'path';
 
-const DATA_DIR = path.join(process.cwd(), 'data', 'chatbots');
+// CHATBOT_STATE_DIR permite aislar el estado (p. ej. en pruebas).
+const DATA_DIR = process.env.CHATBOT_STATE_DIR
+  ? path.resolve(process.env.CHATBOT_STATE_DIR)
+  : path.join(process.cwd(), 'data', 'chatbots');
 const STATE_FILE = path.join(DATA_DIR, 'state.json');
 
 export interface PersistShape {

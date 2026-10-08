@@ -1,344 +1,340 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useMemo, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
+import {
+  MagnifyingGlassIcon, MapPinIcon, PlusIcon, MinusIcon, SparklesIcon, FireIcon, ShoppingBagIcon, ClipboardDocumentListIcon,
+  BuildingStorefrontIcon, ChevronRightIcon, ExclamationTriangleIcon, NoSymbolIcon,
+} from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
-import Badge from '@/components/ui/Badge';
-import Input from '@/components/ui/Input';
-import { MagnifyingGlassIcon, ArrowLeftIcon, PlusIcon, MinusIcon, ChatBubbleLeftEllipsisIcon, PhoneIcon, PaperAirplaneIcon, BoltIcon, CreditCardIcon, UserGroupIcon, FireIcon, SparklesIcon, CakeIcon, ShoppingCartIcon, BeakerIcon, CpuChipIcon } from '@heroicons/react/24/outline';
-import { StarIcon as StarSolid, CheckCircleIcon as CheckSolid } from '@heroicons/react/24/solid';
-import { PhoneFrame, MapPlaceholder, Row, fmt } from './shared';
+import { BRAND, CUSTOMER, MENU } from './data';
+import { CLUB_FREE_FROM, fmtKm, fmtNum, isActive, travelMin, unitPrice } from './engine';
+import type { CategoryId, MenuItem } from './types';
+import { PhoneFrame, Modal, StageBadge, useMoney } from './ui';
+import { useDelivery, selectedSede, cartPricing } from './store';
+import CustomerCart from './CustomerCart';
+import { CustomerTracking, CustomerChat } from './CustomerTracking';
+import { CustomerOrders, CustomerAddress } from './CustomerExtras';
 
-type View = 'home' | 'restaurant' | 'cart' | 'tracking' | 'chat';
-
-interface MenuItem { id: string; name: string; desc: string; price: number; popular?: boolean }
-interface CartItem { id: string; name: string; price: number; qty: number }
+const CATS: (CategoryId | 'all')[] = ['all', 'platos', 'sopas', 'antojos', 'bebidas', 'postres'];
 
 export default function CustomerApp() {
   const t = useTranslations('demoDelivery');
-  const [view, setView] = useState<View>('home');
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [tip, setTip] = useState(10);
-  const [orderStatus, setOrderStatus] = useState(0);
-  const [payment, setPayment] = useState<'visa' | 'mc' | 'wallet'>('visa');
-  const [split, setSplit] = useState(0);
-  const [chat, setChat] = useState<{ from: 'driver' | 'you'; text: string }[]>([
-    { from: 'driver', text: t('customer.chat.driverHi') },
-  ]);
-  const [chatInput, setChatInput] = useState('');
-  const [membership, setMembership] = useState(false);
+  const { state } = useDelivery();
+  const [sheet, setSheet] = useState<MenuItem | null>(null);
+  const view = state.customer.view;
 
-  const restaurants = [
-    { id: 'r1', name: 'Sushi Lab', cuisine: 'Japanese', rating: 4.8, eta: 25, fee: 2.5, img: '🍣' },
-    { id: 'r2', name: 'Bao Bar', cuisine: 'Asian fusion', rating: 4.7, eta: 30, fee: 0, img: '🥟' },
-    { id: 'r3', name: 'Pizza Forno', cuisine: 'Italian', rating: 4.6, eta: 35, fee: 3.0, img: '🍕' },
-    { id: 'r4', name: 'Healthy Bowl', cuisine: 'Healthy', rating: 4.9, eta: 20, fee: 1.5, img: '🥗' },
-  ];
-
-  const menu: MenuItem[] = [
-    { id: 'm1', name: t('merchant.items.philly'), desc: 'Salmón, queso crema, pepino', price: 12.5, popular: true },
-    { id: 'm2', name: t('merchant.items.spicy'), desc: 'Atún picante, aguacate', price: 13, popular: true },
-    { id: 'm3', name: t('merchant.items.tempura'), desc: 'Camarón tempura, mango', price: 14 },
-    { id: 'm4', name: t('merchant.items.edamame'), desc: 'Edamame al sal', price: 5 },
-    { id: 'm5', name: t('merchant.items.miso'), desc: 'Tofu, alga wakame', price: 4.5 },
-    { id: 'm6', name: t('merchant.items.matcha'), desc: 'Matcha ceremonial', price: 6 },
-  ];
-
-  const subtotal = cart.reduce((a, c) => a + c.price * c.qty, 0);
-  const fee = membership ? 0 : 2.5;
-  const service = +(subtotal * 0.05).toFixed(2);
-  const tipAmt = +((subtotal * tip) / 100).toFixed(2);
-  const total = +(subtotal + fee + service + tipAmt).toFixed(2);
-
-  const add = (m: MenuItem) =>
-    setCart((p) => {
-      const e = p.find((x) => x.id === m.id);
-      return e ? p.map((x) => (x.id === m.id ? { ...x, qty: x.qty + 1 } : x)) : [...p, { id: m.id, name: m.name, price: m.price, qty: 1 }];
-    });
-  const dec = (id: string) => setCart((p) => p.flatMap((x) => (x.id === id ? (x.qty > 1 ? [{ ...x, qty: x.qty - 1 }] : []) : [x])));
-
-  useEffect(() => {
-    if (view !== 'tracking') return;
-    const id = setInterval(() => setOrderStatus((s) => (s < 3 ? s + 1 : s)), 3500);
-    return () => clearInterval(id);
-  }, [view]);
-
-  const send = () => {
-    if (!chatInput.trim()) return;
-    setChat((m) => [...m, { from: 'you', text: chatInput.trim() }]);
-    setChatInput('');
-    setTimeout(() => setChat((m) => [...m, { from: 'driver', text: t('customer.chat.driverArrived') }]), 1200);
-  };
-
-  const cats = [
-    { key: 'food', icon: CakeIcon, color: 'bg-orange-500' },
-    { key: 'groceries', icon: ShoppingCartIcon, color: 'bg-emerald-500' },
-    { key: 'pharmacy', icon: BeakerIcon, color: 'bg-rose-500' },
-    { key: 'tech', icon: CpuChipIcon, color: 'bg-indigo-500' },
-  ] as const;
-
-  if (view === 'home')
-    return (
-      <PhoneFrame label="Customer">
-        <div className="p-4 space-y-4">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs text-secondary-500 dark:text-secondary-400">{t('customer.address')}</p>
-              <h2 className="text-lg font-bold">{t('customer.greeting')}</h2>
-            </div>
-            <Badge variant="primary" size="sm">
-              <SparklesIcon className="h-3 w-3 mr-1" />
-              {t('customer.loyalty', { points: 1240 })}
-            </Badge>
-          </div>
-          <div className="relative">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-secondary-400 z-10" />
-            <Input className="pl-9" placeholder={t('customer.searchPlaceholder')} />
-          </div>
-          <div className={`rounded-xl p-3 text-sm font-medium flex items-center justify-between ${membership ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-200' : 'bg-gradient-to-r from-primary-600 to-purple-600 text-white'}`}>
-            <span className="flex items-center gap-2">
-              <BoltIcon className="h-4 w-4" />
-              {membership ? t('customer.membership.active') : t('customer.promoBanner')}
-            </span>
-            {!membership && (
-              <button onClick={() => setMembership(true)} className="text-xs font-semibold underline">
-                {t('customer.membership.cta')}
-              </button>
-            )}
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold mb-2">{t('customer.categoriesTitle')}</h3>
-            <div className="grid grid-cols-4 gap-2">
-              {cats.map((c) => (
-                <div key={c.key} className="flex flex-col items-center gap-1.5">
-                  <div className={`h-12 w-12 rounded-2xl ${c.color} text-white flex items-center justify-center shadow`}>
-                    <c.icon className="h-6 w-6" />
-                  </div>
-                  <span className="text-[11px] font-medium">{t(`customer.categories.${c.key}` as any)}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-semibold">{t('customer.near')}</h3>
-              <span className="text-xs text-primary-600 dark:text-primary-400">{t('common.viewAll')}</span>
-            </div>
-            <div className="space-y-2">
-              {restaurants.map((r) => (
-                <button key={r.id} onClick={() => setView('restaurant')} className="w-full text-left rounded-xl bg-white dark:bg-secondary-800 p-3 flex items-center gap-3 border border-secondary-200 dark:border-secondary-700 hover:border-primary-500 transition">
-                  <div className="h-14 w-14 rounded-xl bg-secondary-100 dark:bg-secondary-700 flex items-center justify-center text-3xl">{r.img}</div>
-                  <div className="flex-1">
-                    <div className="font-semibold text-sm">{r.name}</div>
-                    <div className="text-xs text-secondary-500 dark:text-secondary-400">{r.cuisine}</div>
-                    <div className="flex items-center gap-2 mt-1 text-xs">
-                      <span className="inline-flex items-center gap-0.5 text-amber-500"><StarSolid className="h-3 w-3" />{r.rating}</span>
-                      <span className="text-secondary-500 dark:text-secondary-400">{t('customer.restaurant.eta', { eta: r.eta })}</span>
-                      <span className="text-secondary-500 dark:text-secondary-400">{r.fee === 0 || membership ? t('customer.restaurant.free') : t('customer.restaurant.fee', { fee: fmt(r.fee) })}</span>
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </PhoneFrame>
-    );
-
-  if (view === 'restaurant')
-    return (
-      <PhoneFrame label="Customer">
-        <div className="relative pb-24">
-          <div className="h-32 bg-gradient-to-r from-orange-400 to-rose-500 relative flex items-end">
-            <button onClick={() => setView('home')} className="absolute top-3 left-3 h-9 w-9 rounded-full bg-white/90 flex items-center justify-center">
-              <ArrowLeftIcon className="h-4 w-4 text-secondary-900" />
-            </button>
-            <div className="p-4 text-white">
-              <h2 className="text-xl font-bold">Sushi Lab</h2>
-              <div className="flex items-center gap-2 text-xs">
-                <span className="inline-flex items-center gap-0.5"><StarSolid className="h-3 w-3" />4.8</span>
-                <span>·</span><span>25 min</span><span>·</span><span>{fmt(2.5)}</span>
-              </div>
-            </div>
-          </div>
-          <div className="p-4 space-y-2">
-            <h3 className="font-semibold text-sm mb-1">{t('customer.restaurant.categoriesTitle')}</h3>
-            {menu.map((m) => (
-              <div key={m.id} className="rounded-xl bg-white dark:bg-secondary-800 p-3 border border-secondary-200 dark:border-secondary-700 flex items-start justify-between gap-2">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-sm">{m.name}</span>
-                    {m.popular && <Badge variant="warning" size="sm"><FireIcon className="h-3 w-3 mr-0.5" />{t('customer.restaurant.popular')}</Badge>}
-                  </div>
-                  <p className="text-xs text-secondary-500 dark:text-secondary-400 mt-0.5">{m.desc}</p>
-                  <p className="text-sm font-bold mt-1">{fmt(m.price)}</p>
-                </div>
-                <Button size="sm" onClick={() => add(m)}><PlusIcon className="h-4 w-4" /></Button>
-              </div>
-            ))}
-          </div>
-          {cart.length > 0 && (
-            <div className="sticky bottom-0 p-3 bg-white/95 dark:bg-secondary-900/95 backdrop-blur border-t border-secondary-200 dark:border-secondary-700">
-              <Button fullWidth onClick={() => setView('cart')}>
-                {t('customer.cart.checkout', { total: fmt(total) })} · {cart.reduce((a, c) => a + c.qty, 0)}
-              </Button>
-            </div>
-          )}
-        </div>
-      </PhoneFrame>
-    );
-
-  if (view === 'cart')
-    return (
-      <PhoneFrame label="Customer">
-        <div className="p-4 space-y-4">
-          <div className="flex items-center gap-2">
-            <button onClick={() => setView('restaurant')} className="h-9 w-9 rounded-full bg-secondary-200 dark:bg-secondary-800 flex items-center justify-center">
-              <ArrowLeftIcon className="h-4 w-4" />
-            </button>
-            <h2 className="text-lg font-bold">{t('customer.cart.title')}</h2>
-          </div>
-          {cart.length === 0 ? (
-            <p className="text-sm text-secondary-500 dark:text-secondary-400 text-center py-12">{t('customer.cart.empty')}</p>
-          ) : (
-            <>
-              <div className="space-y-2">
-                {cart.map((c) => (
-                  <div key={c.id} className="flex items-center gap-3 rounded-xl bg-white dark:bg-secondary-800 p-3 border border-secondary-200 dark:border-secondary-700">
-                    <div className="flex-1">
-                      <div className="text-sm font-semibold">{c.name}</div>
-                      <div className="text-xs text-secondary-500 dark:text-secondary-400">{fmt(c.price)}</div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => dec(c.id)} className="h-7 w-7 rounded-full bg-secondary-100 dark:bg-secondary-700 flex items-center justify-center"><MinusIcon className="h-3 w-3" /></button>
-                      <span className="text-sm font-bold w-5 text-center">{c.qty}</span>
-                      <button onClick={() => add({ id: c.id, name: c.name, desc: '', price: c.price })} className="h-7 w-7 rounded-full bg-primary-600 text-white flex items-center justify-center"><PlusIcon className="h-3 w-3" /></button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="rounded-xl bg-white dark:bg-secondary-800 p-3 border border-secondary-200 dark:border-secondary-700">
-                <p className="text-xs font-semibold mb-2">{t('customer.cart.tipLabel')}</p>
-                <div className="flex gap-2">
-                  {[0, 5, 10, 15, 20].map((v) => (
-                    <button key={v} onClick={() => setTip(v)} className={`flex-1 rounded-lg py-1.5 text-xs font-semibold ${tip === v ? 'bg-primary-600 text-white' : 'bg-secondary-100 dark:bg-secondary-700 text-secondary-700 dark:text-secondary-200'}`}>
-                      {v}%
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="rounded-xl bg-white dark:bg-secondary-800 p-3 border border-secondary-200 dark:border-secondary-700">
-                <p className="text-xs font-semibold mb-2">{t('customer.cart.paymentMethod')}</p>
-                <div className="space-y-1.5">
-                  {(['visa', 'mc', 'wallet'] as const).map((k) => (
-                    <button key={k} onClick={() => setPayment(k)} className={`w-full flex items-center justify-between rounded-lg px-3 py-2 text-sm ${payment === k ? 'bg-primary-50 dark:bg-primary-900/30 border border-primary-500' : 'bg-secondary-50 dark:bg-secondary-900 border border-transparent'}`}>
-                      <span className="flex items-center gap-2"><CreditCardIcon className="h-4 w-4" />{t(`customer.cart.cards.${k}` as any)}</span>
-                      {payment === k && <CheckSolid className="h-4 w-4 text-primary-600" />}
-                    </button>
-                  ))}
-                </div>
-                <button onClick={() => setSplit((s) => (s + 1) % 4)} className="mt-2 w-full text-xs text-primary-600 dark:text-primary-400 flex items-center justify-center gap-1">
-                  <UserGroupIcon className="h-3.5 w-3.5" />
-                  {split > 0 ? t('customer.cart.splitWith', { n: split }) : t('customer.cart.splitPayment')}
-                </button>
-              </div>
-              <div className="rounded-xl bg-white dark:bg-secondary-800 p-3 border border-secondary-200 dark:border-secondary-700 text-sm space-y-1">
-                <Row k={t('customer.cart.subtotal')} v={fmt(subtotal)} />
-                <Row k={t('customer.cart.deliveryFee')} v={fee === 0 ? t('customer.restaurant.free') : fmt(fee)} />
-                <Row k={t('customer.cart.service')} v={fmt(service)} />
-                <Row k={t('customer.cart.tip')} v={fmt(tipAmt)} />
-                <div className="border-t border-secondary-200 dark:border-secondary-700 pt-1 mt-1">
-                  <Row k={t('customer.cart.total')} v={fmt(total)} bold />
-                </div>
-              </div>
-              <Button fullWidth onClick={() => { setView('tracking'); setOrderStatus(0); }}>
-                {t('customer.cart.checkout', { total: fmt(total) })}
-              </Button>
-            </>
-          )}
-        </div>
-      </PhoneFrame>
-    );
-
-  if (view === 'tracking') {
-    const keys = ['confirmed', 'preparing', 'onTheWay', 'delivered'] as const;
-    const dx = 25 + orderStatus * 18;
-    const dy = 60 - orderStatus * 6;
-    return (
-      <PhoneFrame label="Customer">
-        <div className="p-4 space-y-4">
-          <h2 className="text-lg font-bold">{t('customer.tracking.title')}</h2>
-          <MapPlaceholder
-            storePos={{ x: 18, y: 78 }}
-            driverPos={{ x: dx, y: dy }}
-            customerPos={{ x: 82, y: 22 }}
-            labels={{ you: t('customer.tracking.you'), driver: t('customer.tracking.driver'), store: t('customer.tracking.store'), hint: t('customer.tracking.mapHint') }}
-          />
-          <div className="rounded-xl bg-white dark:bg-secondary-800 p-3 border border-secondary-200 dark:border-secondary-700">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-secondary-500 dark:text-secondary-400">{t('customer.tracking.etaLabel')}</p>
-                <p className="text-2xl font-bold">{Math.max(2, 25 - orderStatus * 7)} {t('common.min')}</p>
-              </div>
-              <Badge variant={orderStatus === 3 ? 'success' : 'info'}>
-                {t(`customer.tracking.status.${keys[orderStatus]}` as any)}
-              </Badge>
-            </div>
-            <div className="mt-3 flex items-center gap-1">
-              {keys.map((_, i) => (
-                <div key={i} className={`h-1.5 flex-1 rounded-full transition-colors ${i <= orderStatus ? 'bg-primary-600' : 'bg-secondary-200 dark:bg-secondary-700'}`} />
-              ))}
-            </div>
-          </div>
-          <div className="rounded-xl bg-white dark:bg-secondary-800 p-3 border border-secondary-200 dark:border-secondary-700 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-emerald-400 to-sky-500 flex items-center justify-center text-white font-bold">D</div>
-            <div className="flex-1">
-              <div className="text-sm font-semibold">{t('customer.tracking.driverName')}</div>
-              <div className="text-xs text-secondary-500 dark:text-secondary-400 flex items-center gap-1">
-                <StarSolid className="h-3 w-3 text-amber-500" /> {t('customer.tracking.driverRating')} · {t('customer.tracking.driverPlate')}
-              </div>
-            </div>
-            <button onClick={() => setView('chat')} className="h-9 w-9 rounded-full bg-primary-600 text-white flex items-center justify-center"><ChatBubbleLeftEllipsisIcon className="h-4 w-4" /></button>
-            <button className="h-9 w-9 rounded-full bg-emerald-600 text-white flex items-center justify-center"><PhoneIcon className="h-4 w-4" /></button>
-          </div>
-          <Button variant="outline" fullWidth onClick={() => { setView('home'); setCart([]); setOrderStatus(0); }}>
-            <ArrowLeftIcon className="h-4 w-4 mr-2" />{t('common.back')}
-          </Button>
-        </div>
-      </PhoneFrame>
-    );
-  }
+  const overlay = sheet ? <ItemSheet item={sheet} onClose={() => setSheet(null)} /> : null;
 
   return (
-    <PhoneFrame label="Customer">
-      <div className="flex flex-col h-full">
-        <div className="p-3 border-b border-secondary-200 dark:border-secondary-700 flex items-center gap-2">
-          <button onClick={() => setView('tracking')} className="h-8 w-8 rounded-full bg-secondary-100 dark:bg-secondary-800 flex items-center justify-center">
-            <ArrowLeftIcon className="h-4 w-4" />
+    <PhoneFrame label={t('tabs.customer')} overlay={overlay}>
+      {view === 'home' && <CustomerHome onOpenItem={setSheet} />}
+      {view === 'cart' && <CustomerCart />}
+      {view === 'tracking' && <CustomerTracking />}
+      {view === 'chat' && <CustomerChat />}
+      {view === 'orders' && <CustomerOrders />}
+      {view === 'address' && <CustomerAddress />}
+    </PhoneFrame>
+  );
+}
+
+function CustomerHome({ onOpenItem }: { onOpenItem: (m: MenuItem) => void }) {
+  const t = useTranslations('demoDelivery');
+  const locale = useLocale();
+  const money = useMoney();
+  const { state, dispatch, notify } = useDelivery();
+  const [q, setQ] = useState('');
+  const [cat, setCat] = useState<CategoryId | 'all'>('all');
+  const [pickSede, setPickSede] = useState(false);
+  const { address, option, options } = selectedSede(state);
+  const c = state.customer;
+  const soldOut = option ? state.soldOut[option.sede.id] : [];
+  const pricing = cartPricing(state);
+  const cartCount = c.cart.reduce((a, l) => a + l.qty, 0);
+  const active = [...state.orders].reverse().find((o) => o.own && isActive(o));
+  const blocked = state.blocked.includes(CUSTOMER.id);
+
+  const items = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    return MENU.filter((m) => (cat === 'all' || m.cat === cat) && (!needle || `${t(`menu.items.${m.id}.name`)} ${t(`menu.items.${m.id}.desc`)}`.toLowerCase().includes(needle)));
+  }, [q, cat, t]);
+
+  const quickAdd = (m: MenuItem) => {
+    if (m.choice || m.extras) return onOpenItem(m);
+    dispatch({ type: 'addToCart', itemId: m.id, options: [], qty: 1 });
+    notify(t('customer.home.added', { item: t(`menu.items.${m.id}.name`) }));
+  };
+
+  const ride = option ? travelMin(option.km) : 0;
+  const addressLabel = ['casa', 'oficina'].includes(address.label) ? t(`customer.addressLabels.${address.label}`) : address.label;
+
+  return (
+    <div className="min-h-full pb-2">
+      <div className="space-y-3 p-4">
+        <div className="flex items-start justify-between gap-2">
+          <button type="button" onClick={() => dispatch({ type: 'customer', patch: { view: 'address' } })} className="min-w-0 text-left">
+            <span className="flex items-center gap-1 text-[11px] text-secondary-500 dark:text-secondary-400">
+              <MapPinIcon className="h-3.5 w-3.5" />
+              {t('customer.home.deliverTo', { label: addressLabel })}
+            </span>
+            <span className="block truncate text-xs font-semibold text-primary-700 underline-offset-2 hover:underline dark:text-primary-300">{address.address}</span>
           </button>
-          <div className="font-semibold text-sm">{t('customer.chat.title', { name: t('customer.tracking.driverName') })}</div>
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-primary-50 px-2 py-0.5 text-[11px] font-semibold text-primary-700 dark:bg-primary-900/40 dark:text-primary-200">
+            <SparklesIcon className="h-3 w-3" />
+            {t('customer.home.points', { points: fmtNum(c.points, locale) })}
+          </span>
         </div>
-        <div className="flex-1 overflow-y-auto p-3 space-y-2 min-h-[420px]">
-          {chat.map((m, i) => (
-            <div key={i} className={`flex ${m.from === 'you' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[75%] rounded-2xl px-3 py-1.5 text-sm ${m.from === 'you' ? 'bg-primary-600 text-white rounded-br-sm' : 'bg-secondary-200 dark:bg-secondary-700 text-secondary-900 dark:text-white rounded-bl-sm'}`}>
-                {m.text}
-              </div>
+        <h2 className="text-lg font-bold">{t('customer.home.greeting', { name: CUSTOMER.name, brand: BRAND })}</h2>
+
+        {blocked && (
+          <div className="flex items-start gap-2 rounded-xl bg-red-50 p-3 text-xs text-red-800 dark:bg-red-900/30 dark:text-red-200">
+            <NoSymbolIcon className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>{t('customer.home.blocked')}</span>
+          </div>
+        )}
+
+        {active && (
+          <button
+            type="button"
+            onClick={() => dispatch({ type: 'customer', patch: { view: 'tracking', activeOrderId: active.id } })}
+            className="flex w-full items-center justify-between gap-2 rounded-xl bg-secondary-900 px-3 py-2 text-left text-xs text-white dark:bg-secondary-700"
+          >
+            <span className="min-w-0 space-y-1">
+              <span className="block font-semibold">{t('customer.home.activeOrder', { id: active.id })}</span>
+              <StageBadge stage={active.stage} />
+            </span>
+            <span className="flex items-center gap-1 whitespace-nowrap font-semibold">{t('customer.home.track')}<ChevronRightIcon className="h-4 w-4" /></span>
+          </button>
+        )}
+
+        {option ? (
+          <div className="rounded-xl border border-secondary-200 bg-white p-3 text-xs dark:border-secondary-700 dark:bg-secondary-800">
+            <div className="flex items-center justify-between gap-2">
+              <span className="flex min-w-0 items-center gap-2">
+                <BuildingStorefrontIcon className="h-5 w-5 shrink-0 text-orange-500" />
+                <span className="min-w-0">
+                  <span className="block truncate font-semibold">{t('customer.home.servedBy', { sede: t(`sedes.${option.sede.id}`) })}</span>
+                  <span className="text-secondary-500 dark:text-secondary-400">
+                    {fmtKm(option.km, locale)} · {t('customer.home.fee', { fee: money(option.fee) })} · {t('customer.home.eta', { from: 15 + ride, to: 25 + ride })}
+                  </span>
+                </span>
+              </span>
+              <button type="button" onClick={() => setPickSede(true)} className="shrink-0 font-semibold text-primary-600 hover:underline dark:text-primary-400">
+                {t('customer.home.changeSede')}
+              </button>
             </div>
-          ))}
+          </div>
+        ) : (
+          <div className="flex items-start gap-2 rounded-xl bg-amber-50 p-3 text-xs text-amber-900 dark:bg-amber-900/30 dark:text-amber-100">
+            <ExclamationTriangleIcon className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>
+              {t('customer.home.noCoverage')}{' '}
+              <button type="button" onClick={() => setPickSede(true)} className="font-semibold underline">{t('customer.home.seeSedes')}</button>
+            </span>
+          </div>
+        )}
+
+        <div className={`flex items-center justify-between gap-2 rounded-xl p-3 text-xs font-medium ${c.club ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200' : 'bg-gradient-to-r from-orange-500 to-red-500 text-white'}`}>
+          <span>{c.club ? t('customer.club.active', { min: money(CLUB_FREE_FROM) }) : t('customer.club.offer', { brand: BRAND, min: money(CLUB_FREE_FROM) })}</span>
+          <button
+            type="button"
+            onClick={() => {
+              dispatch({ type: 'customer', patch: { club: !c.club } });
+              notify(c.club ? t('customer.club.cancelled') : t('customer.club.activated'), 'info');
+            }}
+            className="shrink-0 rounded-lg bg-white/90 px-2 py-1 text-[11px] font-semibold text-secondary-900"
+          >
+            {c.club ? t('customer.club.cancel') : t('customer.club.cta')}
+          </button>
         </div>
-        <div className="p-2 flex flex-wrap gap-1 border-t border-secondary-200 dark:border-secondary-700">
-          {(['outside', 'ring', 'leave'] as const).map((k) => (
-            <button key={k} onClick={() => setChat((m) => [...m, { from: 'you', text: t(`customer.chat.quick.${k}` as any) }])} className="text-xs rounded-full px-2.5 py-1 bg-secondary-100 dark:bg-secondary-800 text-secondary-700 dark:text-secondary-200">
-              {t(`customer.chat.quick.${k}` as any)}
+
+        <div className="relative">
+          <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-secondary-400" />
+          <input
+            type="search"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder={t('customer.home.search')}
+            aria-label={t('customer.home.search')}
+            className="block w-full rounded-lg border border-secondary-300 bg-white py-2 pl-9 pr-3 text-sm placeholder:text-secondary-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-secondary-600 dark:bg-secondary-800"
+          />
+        </div>
+
+        <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-1" role="tablist" aria-label={t('customer.home.categories')}>
+          {CATS.map((k) => (
+            <button
+              key={k}
+              type="button"
+              role="tab"
+              aria-selected={cat === k}
+              onClick={() => setCat(k)}
+              className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold ${cat === k ? 'bg-orange-500 text-white' : 'bg-white text-secondary-700 ring-1 ring-secondary-200 dark:bg-secondary-800 dark:text-secondary-200 dark:ring-secondary-700'}`}
+            >
+              {t(`menu.categories.${k}`)}
             </button>
           ))}
         </div>
-        <div className="p-2 flex items-center gap-2 border-t border-secondary-200 dark:border-secondary-700">
-          <Input value={chatInput} onChange={(e) => setChatInput(e.target.value)} placeholder={t('customer.chat.placeholder')} onKeyDown={(e) => e.key === 'Enter' && send()} />
-          <Button size="sm" onClick={send}><PaperAirplaneIcon className="h-4 w-4" /></Button>
+
+        <div className="space-y-2">
+          {items.length === 0 && (
+            <div className="py-6 text-center text-xs text-secondary-500 dark:text-secondary-400">
+              <p>{t('customer.home.noResults', { q })}</p>
+              <button type="button" onClick={() => { setQ(''); setCat('all'); }} className="mt-1 font-semibold text-primary-600 hover:underline dark:text-primary-400">
+                {t('customer.home.viewAll')}
+              </button>
+            </div>
+          )}
+          {items.map((m) => {
+            const out = soldOut.includes(m.id);
+            const name = t(`menu.items.${m.id}.name`);
+            return (
+              <div key={m.id} className={`flex items-start justify-between gap-2 rounded-xl border border-secondary-200 bg-white p-3 dark:border-secondary-700 dark:bg-secondary-800 ${out ? 'opacity-60' : ''}`}>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="text-sm font-semibold">{name}</span>
+                    {m.popular && !out && (
+                      <span className="inline-flex items-center rounded-full bg-amber-100 px-1.5 text-[10px] font-semibold text-amber-800 dark:bg-amber-900/40 dark:text-amber-200">
+                        <FireIcon className="mr-0.5 h-3 w-3" />
+                        {t('customer.home.popular')}
+                      </span>
+                    )}
+                    {out && <span className="rounded-full bg-secondary-200 px-1.5 text-[10px] font-semibold text-secondary-700 dark:bg-secondary-700 dark:text-secondary-200">{t('customer.home.soldOut')}</span>}
+                  </div>
+                  <p className="mt-0.5 text-xs text-secondary-500 dark:text-secondary-400">{t(`menu.items.${m.id}.desc`)}</p>
+                  <p className="mt-1 text-sm font-bold">{money(m.price)}</p>
+                </div>
+                <Button size="sm" onClick={() => quickAdd(m)} disabled={out || !option} aria-label={t('customer.home.add', { item: name })} title={t('customer.home.add', { item: name })}>
+                  <PlusIcon className="h-4 w-4" />
+                </Button>
+              </div>
+            );
+          })}
         </div>
+
+        <button type="button" onClick={() => dispatch({ type: 'customer', patch: { view: 'orders' } })} className="flex w-full items-center justify-center gap-1 py-2 text-xs font-semibold text-primary-600 hover:underline dark:text-primary-400">
+          <ClipboardDocumentListIcon className="h-4 w-4" />
+          {t('customer.home.myOrders', { n: state.orders.filter((o) => o.own).length })}
+        </button>
       </div>
-    </PhoneFrame>
+
+      {cartCount > 0 && (
+        <div className="sticky bottom-0 border-t border-secondary-200 bg-white/95 p-3 backdrop-blur dark:border-secondary-700 dark:bg-secondary-900/95">
+          <Button fullWidth onClick={() => dispatch({ type: 'customer', patch: { view: 'cart' } })}>
+            <ShoppingBagIcon className="mr-2 h-4 w-4" />
+            {t('customer.home.viewCart', { n: cartCount, total: money(pricing.subtotal) })}
+          </Button>
+        </div>
+      )}
+
+      {pickSede && (
+        <Modal scope="phone" title={t('customer.home.pickSede')} onClose={() => setPickSede(false)}>
+          <p className="mb-2 text-xs text-secondary-500 dark:text-secondary-400">{t('customer.home.pickSedeHint', { address: address.address })}</p>
+          <div className="space-y-2">
+            {options.map((o) => {
+              const disabled = !o.open || !o.inCoverage;
+              const selected = option?.sede.id === o.sede.id;
+              return (
+                <button
+                  key={o.sede.id}
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => {
+                    dispatch({ type: 'customer', patch: { sedeId: o.sede.id } });
+                    setPickSede(false);
+                  }}
+                  className={`w-full rounded-lg border px-3 py-2 text-left text-xs disabled:cursor-not-allowed disabled:opacity-50 ${selected ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/30' : 'border-secondary-200 dark:border-secondary-700'}`}
+                >
+                  <span className="block font-semibold">{t(`sedes.${o.sede.id}`)} · {o.sede.address}</span>
+                  <span className="text-secondary-500 dark:text-secondary-400">
+                    {fmtKm(o.km, locale)} · {money(o.fee)} · {!o.open ? t('customer.home.closed') : !o.inCoverage ? t('customer.home.outOfCoverage') : selected ? t('customer.home.selected') : t('customer.home.available')}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          {state.customer.sedeId && (
+            <button type="button" onClick={() => { dispatch({ type: 'customer', patch: { sedeId: null } }); setPickSede(false); }} className="mt-3 text-xs font-semibold text-primary-600 hover:underline dark:text-primary-400">
+              {t('customer.home.useNearest')}
+            </button>
+          )}
+        </Modal>
+      )}
+    </div>
+  );
+}
+
+function ItemSheet({ item, onClose }: { item: MenuItem; onClose: () => void }) {
+  const t = useTranslations('demoDelivery');
+  const money = useMoney();
+  const { dispatch, notify } = useDelivery();
+  const [choice, setChoice] = useState<string | null>(item.choice?.options[0].id ?? null);
+  const [extras, setExtras] = useState<string[]>([]);
+  const [qty, setQty] = useState(1);
+  const options = [...(choice ? [choice] : []), ...extras];
+  const unit = unitPrice(item, options);
+  const name = t(`menu.items.${item.id}.name`);
+
+  return (
+    <Modal
+      scope="phone"
+      title={name}
+      onClose={onClose}
+      footer={
+        <div className="flex w-full items-center gap-2">
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={() => setQty((x) => Math.max(1, x - 1))} aria-label={t('common.less')} className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary-100 dark:bg-secondary-700"><MinusIcon className="h-4 w-4" /></button>
+            <span className="w-5 text-center text-sm font-bold">{qty}</span>
+            <button type="button" onClick={() => setQty((x) => Math.min(20, x + 1))} aria-label={t('common.more')} className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary-100 dark:bg-secondary-700"><PlusIcon className="h-4 w-4" /></button>
+          </div>
+          <Button
+            className="flex-1"
+            size="sm"
+            onClick={() => {
+              dispatch({ type: 'addToCart', itemId: item.id, options, qty });
+              notify(t('customer.home.added', { item: name }));
+              onClose();
+            }}
+          >
+            {t('customer.item.add', { total: money(unit * qty) })}
+          </Button>
+        </div>
+      }
+    >
+      <p className="text-xs text-secondary-500 dark:text-secondary-400">{t(`menu.items.${item.id}.desc`)}</p>
+      <p className="mt-1 font-bold">{money(item.price)}</p>
+      {item.choice && (
+        <fieldset className="mt-3">
+          <legend className="mb-1 text-xs font-semibold">{t(`menu.choices.${item.choice.id}`)} <span className="font-normal text-secondary-500">· {t('customer.item.required')}</span></legend>
+          <div className="space-y-1">
+            {item.choice.options.map((o) => (
+              <label key={o.id} className="flex cursor-pointer items-center justify-between rounded-lg bg-secondary-50 px-3 py-2 text-xs dark:bg-secondary-800">
+                <span className="flex items-center gap-2">
+                  <input type="radio" name={`choice-${item.id}`} checked={choice === o.id} onChange={() => setChoice(o.id)} />
+                  {t(`menu.options.${o.id}`)}
+                </span>
+                {o.delta > 0 && <span>+{money(o.delta)}</span>}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      )}
+      {item.extras && (
+        <fieldset className="mt-3">
+          <legend className="mb-1 text-xs font-semibold">{t('customer.item.extras')}</legend>
+          <div className="space-y-1">
+            {item.extras.map((o) => (
+              <label key={o.id} className="flex cursor-pointer items-center justify-between rounded-lg bg-secondary-50 px-3 py-2 text-xs dark:bg-secondary-800">
+                <span className="flex items-center gap-2">
+                  <input type="checkbox" checked={extras.includes(o.id)} onChange={() => setExtras((x) => (x.includes(o.id) ? x.filter((y) => y !== o.id) : [...x, o.id]))} />
+                  {t(`menu.options.${o.id}`)}
+                </span>
+                {o.delta > 0 && <span>+{money(o.delta)}</span>}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      )}
+      <p className="mt-3 text-[11px] text-secondary-500 dark:text-secondary-400">{t('customer.item.noteHint')}</p>
+    </Modal>
   );
 }

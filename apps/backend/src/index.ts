@@ -1,21 +1,9 @@
-// src/index.ts — arranque robusto
+// src/index.ts — arranque del servidor
 import 'dotenv/config';
-import express, { Express, Request, Response } from 'express';
-import helmet from 'helmet';
-import cors from 'cors';
-import compression from 'compression';
-import morgan from 'morgan';
-import swaggerUi from 'swagger-ui-express';
-import swaggerJsdoc from 'swagger-jsdoc';
 import fs from 'fs';
 import path from 'path';
 import { logger } from './utils/logger';
-import { errorHandler } from './middleware/errorHandler';
-import { rateLimiter, chatbotRateLimiter } from './middleware/rateLimiter';
-import User from './models/User';
-
-const app: Express = express();
-const PORT = Number(process.env.PORT ?? 3001);
+import { assertValidEnv } from './config/env';
 
 // Global safety nets
 process.on('uncaughtException', (err) => {
@@ -29,92 +17,35 @@ process.on('unhandledRejection', (reason) => {
   process.exit(1);
 });
 
-console.log('index.ts arrancando', new Date().toISOString());
 logger.info('index.ts arrancando');
 
-// Detrás del proxy de Railway: confiar en 1 salto para que req.ip sea la IP
-// real del visitante (X-Forwarded-For) y no la del proxy. Lo usan los rate
-// limiters y el cupo diario por IP de la demo "Prueba con tu documento".
-// Ajustable con TRUST_PROXY_HOPS si cambia la cantidad de proxies delante.
-const trustProxyHops = Number(process.env.TRUST_PROXY_HOPS ?? 1);
-app.set('trust proxy', Number.isInteger(trustProxyHops) && trustProxyHops >= 0 ? trustProxyHops : 1);
-
-// Basic middleware that never fails
-app.use(helmet());
-
-// CORS configuration - siempre incluir dominios de producción
-const allowedOrigins = process.env.NODE_ENV === 'production'
-  ? [
-      'https://koptup.com',
-      'https://www.koptup.com',
-      ...(process.env.CORS_ORIGIN?.split(',').filter(Boolean) || [])
-    ]
-  : [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'https://koptup.com',
-      'https://www.koptup.com'
-    ];
-
-logger.info('CORS origins configurados:', allowedOrigins);
-
-app.use(cors({
-  origin: (origin, callback) => {
-    // Permitir requests sin origin (como Postman, curl, etc.)
-    if (!origin) return callback(null, true);
-
-    // Verificar si el origin está en la lista permitida
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      logger.warn(`CORS blocked origin: ${origin}`);
-      callback(new Error(`Origin ${origin} not allowed by CORS`));
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
-app.use(compression());
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(morgan('combined', { stream: { write: (message) => logger.info(message.trim()) } }));
-
-// Rate limiters: chatbot tiene su propio rate limiter más permisivo
-app.use('/api/chatbot', chatbotRateLimiter);
-app.use('/api/', (req, res, next) => {
-  // Excluir /api/chatbot del rate limiter general
-  if (req.path.startsWith('/chatbot')) {
-    return next();
+/**
+ * Asegura el rol admin de ADMIN_EMAIL al arrancar. Sin ADMIN_EMAIL no se
+ * modifica ningún rol (no hay correo por defecto en el código).
+ */
+async function ensureAdminFromEnv(): Promise<void> {
+  const targetEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  if (!targetEmail) {
+    logger.info('ADMIN_EMAIL no definido: el arranque no modifica roles.');
+    return;
   }
-  return rateLimiter(req, res, next);
-});
+  try {
+    const User = (await import('./models/User')).default;
+    const updated = await User.findOneAndUpdate({ email: targetEmail }, { $set: { role: 'admin' } }, { new: true }).lean();
+    if (updated) logger.info('Rol admin asegurado para ADMIN_EMAIL');
+    else logger.warn('ADMIN_EMAIL no corresponde a ningún usuario registrado (no se cambió ningún rol)');
+  } catch (err: any) {
+    logger.warn(`Fallo asegurando el rol admin de ADMIN_EMAIL: ${err?.message ?? err}`);
+  }
+}
 
-// Health and docs (swagger spec can be built later)
-app.get('/health', (_req: Request, res: Response) => {
-  res.status(200).json({ status: 'healthy', timestamp: new Date().toISOString(), uptime: process.uptime() });
-});
-
-const swaggerOptions = {
-  definition: {
-    openapi: '3.0.0',
-    info: { title: 'KopTup API', version: '1.0.0' },
-    servers: [{ url: process.env.API_URL || `http://localhost:${PORT}` }],
-  },
-  apis: ['./src/routes/*.ts'],
-};
-const swaggerSpec = swaggerJsdoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
-// Robust startup
 const startServer = async () => {
   try {
-    console.log('Comprobando MONGODB_URI:', Boolean(process.env.MONGODB_URI));
-    if (!process.env.MONGODB_URI) {
-      logger.warn('MONGODB_URI no definido. Algunas funcionalidades pueden fallar.');
-    }
+    // 1. Variables de entorno: en producción falla si falta una imprescindible.
+    assertValidEnv({ warn: (m) => logger.warn(m), error: (m) => logger.error(m) });
+    const PORT = Number(process.env.PORT ?? 3001);
 
-    // Crear directorios necesarios para uploads
+    // 2. Carpetas de archivos subidos (disco efímero en Railway).
     const uploadDirs = [
       './uploads',
       './uploads/orders',
@@ -124,162 +55,64 @@ const startServer = async () => {
       './uploads/temp-images',
       './uploads/temp-processing',
       './uploads/chatbot',
+      './data/imports',
     ];
-
-    uploadDirs.forEach((dir) => {
+    for (const dir of uploadDirs) {
       const dirPath = path.resolve(dir);
       if (!fs.existsSync(dirPath)) {
         fs.mkdirSync(dirPath, { recursive: true });
         logger.info(`Directorio creado: ${dir}`);
       }
-    });
+    }
 
-    // Conectar a la DB y cargar passport antes de registrar rutas que dependan de modelos
+    // 3. MongoDB (si no conecta, el servidor arranca y /health responde 503).
     try {
       const mongodb = await import('./config/mongodb');
-      if (mongodb?.connectDB) {
-        await mongodb.connectDB();
-        logger.info('MongoDB conectada');
-      } else {
-        logger.warn('connectDB no exportado desde ./config/mongodb');
-      }
+      await mongodb.connectDB();
     } catch (err: any) {
-      logger.warn('Fallo al cargar/conectar MongoDB. Continuando sin DB:', err?.message ?? err);
+      logger.warn('Fallo al conectar MongoDB. Continuando sin DB:', err?.message ?? err);
     }
 
+    await ensureAdminFromEnv();
+
+    // 3b. Catálogo de demos: inserta las que falten (idempotente; nunca pisa
+    // los cambios hechos desde el panel).
     try {
-      const targetEmail = process.env.ADMIN_EMAIL || 'ronald@koptup.com';
-      const updated = await User.findOneAndUpdate(
-        { email: targetEmail },
-        { $set: { role: 'admin' } },
-        { new: true }
-      ).lean();
-      if (updated) {
-        logger.info(`Rol asegurado: ${targetEmail} -> admin`);
-      } else {
-        logger.warn(`Usuario no encontrado para asegurar rol admin: ${targetEmail}`);
-      }
+      const { ensureCatalogSeeded } = await import('./services/demo-catalog.service');
+      await ensureCatalogSeeded();
     } catch (err: any) {
-      logger.warn(`Fallo asegurando rol admin para usuario objetivo: ${err?.message ?? err}`);
+      logger.warn(`Fallo sembrando el catálogo de demos: ${err?.message ?? err}`);
     }
 
+    // 4. Estrategias de Passport (Google OAuth si está configurado).
     try {
       const passportMod = await import('./config/passport');
-      if (passportMod?.initializePassport && passportMod?.passport) {
-        await passportMod.initializePassport();
-        app.use(passportMod.passport.initialize());
-        logger.info('Passport inicializado');
-      } else {
-        logger.info('Passport no exportado completamente. OAuth deshabilitado.');
-      }
+      await passportMod.initializePassport();
     } catch (err: any) {
       logger.warn('Fallo inicializando passport:', err?.message ?? err);
     }
 
-    // Registrar rutas de forma dinámica para capturar errores de importación aquí
-    try {
-      const [
-        authRoutes,
-        documentRoutes,
-        chatRoutes,
-        contactRoutes,
-        quoteRoutes,
-        projectRoutes,
-        ordersRoutes,
-        deliverablesRoutes,
-        invoicesRoutes,
-        messagesRoutes,
-        cuentasRoutes,
-        expertSystemRoutes,
-        cupsRoutes,
-        chatbotRoutes,
-        demoRagRoutes,
-        auditoriaRoutes,
-        contentManagerRoutes,
-        notificationsRoutes,
-        documentoConocimientoConfigRoutes,
-        reglasFacturacionRoutes,
-        liquidacionRoutes,
-        testRoutes,
-        adminRoutes,
-      ] = await Promise.all([
-        import('./routes/auth.routes'),
-        import('./routes/document.routes'),
-        import('./routes/chat.routes'),
-        import('./routes/contact.routes'),
-        import('./routes/quote.routes'),
-        import('./routes/project.routes'),
-        import('./routes/orders.routes'),
-        import('./routes/deliverables.routes'),
-        import('./routes/invoices.routes'),
-        import('./routes/messages.routes'),
-        import('./routes/cuentas.routes'),
-        import('./routes/expert-system.routes'),
-        import('./routes/cups.routes'),
-        import('./routes/chatbot.routes'),
-        import('./routes/demo-rag.routes'),
-        import('./routes/auditoria.routes'),
-        import('./routes/content-manager.routes'),
-        import('./routes/notifications.routes'),
-        import('./routes/documentoConocimientoConfig.routes'),
-        import('./routes/reglas-facturacion.routes'),
-        import('./routes/liquidacion.routes'),
-        import('./routes/test.routes'),
-        import('./routes/admin.routes'),
-      ]);
-
-      if (authRoutes.default) app.use('/api/auth', authRoutes.default);
-      if (documentRoutes.default) app.use('/api/documents', documentRoutes.default);
-      if (chatRoutes.default) app.use('/api/chat', chatRoutes.default);
-      if (contactRoutes.default) app.use('/api/contact', contactRoutes.default);
-      if (quoteRoutes.default) app.use('/api/quotes', quoteRoutes.default);
-      if (projectRoutes.default) app.use('/api/projects', projectRoutes.default);
-      if (ordersRoutes.default) app.use('/api/orders', ordersRoutes.default);
-      if (deliverablesRoutes.default) app.use('/api/deliverables', deliverablesRoutes.default);
-      if (invoicesRoutes.default) app.use('/api/invoices', invoicesRoutes.default);
-      if (messagesRoutes.default) app.use('/api/messages', messagesRoutes.default);
-      if (cuentasRoutes.default) app.use('/api', cuentasRoutes.default);
-      if (expertSystemRoutes.default) app.use('/api/expert', expertSystemRoutes.default);
-      if (cupsRoutes.default) app.use('/api/cups', cupsRoutes.default);
-      if (chatbotRoutes.default) app.use('/api/chatbot', chatbotRoutes.default);
-      if (demoRagRoutes.default) app.use('/api/demo-rag', demoRagRoutes.default);
-      if (auditoriaRoutes.default) app.use('/api/auditoria', auditoriaRoutes.default);
-      if (contentManagerRoutes.default) app.use('/api/content', contentManagerRoutes.default);
-      if (notificationsRoutes.default) app.use('/api/notifications', notificationsRoutes.default);
-      if (documentoConocimientoConfigRoutes.default) app.use('/api/documentos-conocimiento', documentoConocimientoConfigRoutes.default);
-      if (reglasFacturacionRoutes.default) app.use('/api/reglas-facturacion', reglasFacturacionRoutes.default);
-      if (liquidacionRoutes.default) app.use('/api/liquidacion', liquidacionRoutes.default);
-      if (testRoutes.default) app.use('/api/test', testRoutes.default);
-      if (adminRoutes.default) app.use('/api/admin', adminRoutes.default);
-
-      logger.info('Rutas registradas');
-    } catch (err: any) {
-      logger.error('Error registrando rutas:', err);
-      throw err;
-    }
-
-    // 404 handler (must be after all routes)
-    app.use((_req: Request, res: Response) => res.status(404).json({ success: false, message: 'Endpoint not found' }));
-
-    // Error handler (must be last)
-    app.use(errorHandler);
+    // 5. App con todas las rutas y sus políticas.
+    const { createApp } = await import('./app');
+    const app = createApp();
 
     const server = app.listen(PORT, () => {
       logger.info(`Servidor escuchando en http://localhost:${PORT}`);
-      logger.info(`Docs: http://localhost:${PORT}/api-docs`);
-      logger.info(`Health: http://localhost:${PORT}/health`);
       console.log('Servidor iniciado correctamente', `http://localhost:${PORT}`);
     });
 
-    // Aumentar timeout del servidor para permitir análisis IA exhaustivo
-    // Con chunking, PDFs grandes pueden tardar 10+ minutos
-    server.timeout = 900000; // 15 minutos (para procesar múltiples PDFs con chunking)
-    server.keepAliveTimeout = 910000; // Ligeramente mayor que timeout
-    server.headersTimeout = 920000; // Ligeramente mayor que keepAliveTimeout
-    logger.info('Timeouts del servidor configurados para análisis IA extenso (15 min)');
+    // Job de vencimiento de accesos a demos y recordatorios (candado en Redis).
+    const { startDemoGrantsJob, stopDemoGrantsJob } = await import('./jobs/demo-grants.job');
+    startDemoGrantsJob();
+
+    // Análisis IA de cuentas médicas con PDFs grandes puede tardar minutos.
+    server.timeout = 900000;
+    server.keepAliveTimeout = 910000;
+    server.headersTimeout = 920000;
 
     const shutdown = (signal: string) => {
       logger.info(`Recibido ${signal}, cerrando...`);
+      stopDemoGrantsJob();
       server.close(() => {
         logger.info('Server closed');
         process.exit(0);
@@ -289,10 +122,9 @@ const startServer = async () => {
     process.on('SIGTERM', () => shutdown('SIGTERM'));
   } catch (err) {
     logger.error('Error en startServer:', err);
-    console.error('Error en startServer:', err);
+    console.error('Error en startServer:', err instanceof Error ? err.message : err);
     process.exit(1);
   }
 };
 
 startServer();
-export default app;

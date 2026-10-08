@@ -1,44 +1,38 @@
 # Admin Setup Guide
 
-## Setting a User as Admin
+> Nunca escribas cadenas de conexión, contraseñas ni tokens en este archivo ni en
+> ningún otro archivo versionado: el repositorio es público. Usa variables de
+> entorno o la CLI de Railway.
 
-### Development (Local)
+## Dar el rol admin a un usuario
 
-To set a user as admin in development:
+El usuario debe existir (haberse registrado o haber entrado al menos una vez).
+
+### Local (desarrollo)
 
 ```bash
 cd apps/backend
-MONGODB_URI="your-mongodb-uri" npx tsx src/scripts/set-admin.ts <email>
+MONGODB_URI="<tu-cadena-de-conexion>" npx ts-node --transpile-only src/scripts/set-admin.ts <email>
 ```
 
-Example:
+### Producción (Railway)
+
 ```bash
-MONGODB_URI="mongodb://mongo:QTaKycIfxXPWhlXWuRkzTzHxtCFBreSM@trolley.proxy.rlwy.net:11709/koptup?authSource=admin" npx tsx src/scripts/set-admin.ts dirox7@gmail.com
+railway run npx ts-node --transpile-only src/scripts/set-admin.ts <email>
 ```
 
-### Production (Railway)
+`railway run` inyecta las variables del servicio (incluida `MONGODB_URI`), así
+que la cadena de conexión nunca pasa por la terminal ni por el historial.
 
-Option 1: Run via Railway CLI
-```bash
-railway run npx tsx src/scripts/set-admin.ts <email>
-```
+### Arranque del servidor (opcional)
 
-Option 2: Set via MongoDB directly
-```bash
-# Connect to MongoDB and run:
-db.users.updateOne(
-  { email: "dirox7@gmail.com" },
-  { $set: { role: "admin" } }
-)
-```
+Si defines `ADMIN_EMAIL` en las variables del entorno, el backend asegura el
+rol `admin` de esa cuenta al arrancar (solo si la cuenta ya existe). Si
+`ADMIN_EMAIL` no está definida, el arranque no modifica ningún rol.
 
-## Notes
+## Notas
 
-- The user must have logged in at least once before setting them as admin
-- The script will fail if the user doesn't exist in the database
-- Admin users will automatically be redirected to `/admin` instead of `/dashboard`
-- Admin users will only see the admin module, not the regular dashboard
-
-## Current Admin Users
-
-- dirox7@gmail.com (set on 2025-12-13)
+- El script falla si el usuario no existe en la base de datos.
+- Los usuarios admin entran a `/admin` en lugar de `/dashboard`.
+- El panel `/admin` y el portal `/dashboard` se verifican en el servidor: la
+  web consulta `GET /api/auth/me` con la sesión antes de mostrar la página.
