@@ -3,7 +3,11 @@
  *
  * Reglas:
  *  - En producción el servidor NO arranca si falta una variable
- *    imprescindible: MONGODB_URI, JWT_SECRET o JWT_REFRESH_SECRET.
+ *    imprescindible: MONGODB_URI o JWT_SECRET.
+ *  - JWT_REFRESH_SECRET es obligatoria para iniciar sesión, pero si falta en
+ *    producción solo se registra un error en el log (no se bloquea el arranque):
+ *    así un despliegue sin ella no tumba el resto de la API (contacto, chatbot,
+ *    demos), que es lo que pasaba antes de esta validación.
  *  - Las opcionales que faltan o tienen un formato inválido solo generan una
  *    advertencia (la función que las usa queda deshabilitada o usa su valor
  *    por defecto).
@@ -15,7 +19,10 @@
 import { z } from 'zod';
 
 /** Variables sin las cuales el backend no puede operar en producción. */
-export const REQUIRED_IN_PRODUCTION = ['MONGODB_URI', 'JWT_SECRET', 'JWT_REFRESH_SECRET'] as const;
+export const REQUIRED_IN_PRODUCTION = ['MONGODB_URI', 'JWT_SECRET'] as const;
+
+/** Necesarias para iniciar sesión; si faltan en producción se avisa en el log sin bloquear el arranque. */
+export const RECOMMENDED_IN_PRODUCTION = ['JWT_REFRESH_SECRET'] as const;
 
 /**
  * Variables opcionales: si faltan se avisa qué función queda apagada.
@@ -131,6 +138,16 @@ export function validateEnv(source: NodeJS.ProcessEnv = process.env): EnvValidat
     if (isBlank(source[name])) {
       if (isProduction) errors.push(`${name}: falta (obligatoria en producción)`);
       else warnings.push(`${name}: no está definida`);
+    }
+  }
+
+  for (const name of RECOMMENDED_IN_PRODUCTION) {
+    if (isBlank(source[name])) {
+      warnings.push(
+        isProduction
+          ? `${name}: falta en producción → el inicio de sesión fallará hasta configurarla`
+          : `${name}: no está definida`,
+      );
     }
   }
 

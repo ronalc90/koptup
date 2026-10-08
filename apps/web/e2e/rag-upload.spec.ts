@@ -32,7 +32,7 @@ test.describe('/demo/chatbot › Prueba con tu documento', () => {
     // reintenta hasta que la pestaña quede elegida.
     const statusResponse = page.waitForResponse((r) => r.url().endsWith('/api/demo-rag/status'));
     const uploadTab = page.getByRole('tab', { name: /Prueba con tu documento/ });
-    const skipTour = page.getByRole('dialog').getByRole('button', { name: 'Saltar tour' });
+    const skipTour = page.getByRole('dialog').getByRole('button', { name: /Saltar (tour|recorrido)/ });
     await expect(async () => {
       if (await skipTour.isVisible()) await skipTour.click();
       await uploadTab.click({ timeout: 2_000 });

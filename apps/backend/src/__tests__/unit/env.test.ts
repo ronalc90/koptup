@@ -12,7 +12,16 @@ describe('validación de variables de entorno (zod)', () => {
     expect(r.ok).toBe(false);
     expect(r.errors.join(' ')).toMatch(/MONGODB_URI/);
     expect(r.errors.join(' ')).toMatch(/JWT_SECRET/);
-    expect(r.errors.join(' ')).toMatch(/JWT_REFRESH_SECRET/);
+    // JWT_REFRESH_SECRET no bloquea el arranque: solo se avisa.
+    expect(r.errors.join(' ')).not.toMatch(/JWT_REFRESH_SECRET/);
+    expect(r.warnings.some((w) => w.startsWith('JWT_REFRESH_SECRET'))).toBe(true);
+  });
+
+  it('producción sin JWT_REFRESH_SECRET: arranca y avisa que el login fallará', () => {
+    const { JWT_REFRESH_SECRET: _omit, ...sinRefresh } = base;
+    const r = validateEnv({ NODE_ENV: 'production', ...sinRefresh });
+    expect(r.ok).toBe(true);
+    expect(r.warnings.some((w) => w.startsWith('JWT_REFRESH_SECRET') && /inicio de sesión/.test(w))).toBe(true);
   });
 
   it('producción completa: arranca y solo avisa de las opcionales', () => {
