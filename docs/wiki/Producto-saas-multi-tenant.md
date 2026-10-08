@@ -4,7 +4,7 @@
 
 ![Demo actual](images/actual/demo-saas-boilerplate.jpg)
 
-*Captura actual de `/demo/saas-boilerplate` (pestaña Arquitectura). Lo primero que ve el prospecto es la insignia "Production-ready" y una barra de 12 pestañas en la que la última ("Observability") queda cortada. Ver [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md) y [Roadmap](12-Roadmap.md). Relacionados: [Chatbot RAG con IA](Producto-chatbot-rag-ia.md), que es el primer producto que estrena el core SaaS, y [VPN empresarial](Producto-vpn-empresarial.md), que hoy apunta por error a este mismo demo.*
+*Captura actual de `/demo/saas-boilerplate` (pestaña Arquitectura). Lo primero que ve el prospecto es la insignia "Production-ready" y una barra de 12 pestañas en la que la última ("Observability") queda cortada. Ver [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md) y [Roadmap](12-Roadmap.md). Relacionados: [Sistemas RAG](Producto-chatbot-rag-ia.md), el producto principal y el primero que estrena el core SaaS, y [VPN empresarial](Producto-vpn-empresarial.md), que hoy apunta por error a este mismo demo.*
 
 ---
 
@@ -116,6 +116,7 @@ flowchart LR
     D --> E["5. Soporte con bitacora"]
     E --> F["CTA: Agendar sesion de arquitectura"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-saas-multi-tenant-1.png)
 
 1. Ver el panel del dueño: ingresos del mes en COP, cuatro clientes, uno de ellos en mora.
 2. Dar de alta "Torres de Cañaveral" con su logo y su plan.
@@ -166,7 +167,7 @@ Todo se hace con formularios del admin, sin escribir código. Los conjuntos de d
 
 Avanzado y Enterprise agregan aislamiento por schema o con base de datos dedicada, SSO SAML/OIDC y SCIM, residencia de datos, API gateway con límites por plan y soporte con acuerdo de nivel de servicio.
 
-**Coherencia con el core de Koptup:** el core multi-tenant y de cobro recurrente que se construye en la **Fase 4** para el [Chatbot RAG](Producto-chatbot-rag-ia.md) debe diseñarse como base reutilizable de este producto. Mientras no exista, cada proyecto de compra se construye a medida y la landing no promete una "base probada en producción".
+**Coherencia con el core de Koptup:** el core multi-tenant y de cobro recurrente que se construye en la **Fase 4** para los [Sistemas RAG](Producto-chatbot-rag-ia.md) debe diseñarse como base reutilizable de este producto. Mientras no exista, cada proyecto de compra se construye a medida y la landing no promete una "base probada en producción".
 
 **SaaS:** según la DECISIÓN 7, este producto **no** se ofrece como SaaS. La columna SaaS se reemplaza por **"Operación gestionada"**: Koptup hospeda, monitorea, actualiza y da soporte al SaaS del cliente a cambio de una cuota mensual. Para ofrecerla hacen falta:
 - un acuerdo de nivel de servicio explícito (horario hábil o 24/7) con su herramienta de monitoreo y alertas;
@@ -243,4 +244,4 @@ Precios actuales del catálogo (`services-catalog.ts`, entrada `saas-multi-tenan
 | Clientes de compra que contratan operación gestionada | ≥ 50 % |
 | Tiempo hasta que un cliente cobra a sus primeros tenants (con el core de la Fase 4) | ≤ 5 semanas |
 
-Páginas relacionadas: [Chatbot RAG con IA](Producto-chatbot-rag-ia.md), [Facturación electrónica](Producto-facturacion-electronica.md), [VPN empresarial](Producto-vpn-empresarial.md), [Landing de producto](Seccion-Landing-de-Producto.md), [Panel de administración](05-Panel-de-Administracion.md) y [Roadmap](12-Roadmap.md).
+Páginas relacionadas: [Sistemas RAG](Producto-chatbot-rag-ia.md), [Facturación electrónica](Producto-facturacion-electronica.md), [VPN empresarial](Producto-vpn-empresarial.md), [Landing de producto](Seccion-Landing-de-Producto.md), [Panel de administración](05-Panel-de-Administracion.md) y [Roadmap](12-Roadmap.md).

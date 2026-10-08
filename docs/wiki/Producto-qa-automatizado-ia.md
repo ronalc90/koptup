@@ -97,6 +97,7 @@ flowchart LR
     D --> E["5. Reporte semanal y aviso en Slack"]
     E --> F["CTA: Solicitar diagnostico de QA"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-qa-automatizado-ia-1.png)
 
 1. Ver los 8 flujos críticos y cuáles están cubiertos.
 2. Escribir o elegir una historia de usuario y ver la prueba generada.
@@ -206,4 +207,4 @@ Precios actuales del catálogo (`services-catalog.ts`, entrada `qa-automatizado-
 | Clientes de compra que contratan la suite gestionada | ≥ 70 % |
 | Tiempo para tener 5 flujos automatizados en un cliente nuevo | ≤ 3 días hábiles |
 
-Páginas relacionadas: [Code review con IA](Producto-code-review-ia.md), [Chatbot RAG con IA](Producto-chatbot-rag-ia.md), [Landing de producto](Seccion-Landing-de-Producto.md), [Panel de administración](05-Panel-de-Administracion.md).
+Páginas relacionadas: [Code review con IA](Producto-code-review-ia.md), [Sistemas RAG](Producto-chatbot-rag-ia.md), [Landing de producto](Seccion-Landing-de-Producto.md), [Panel de administración](05-Panel-de-Administracion.md).

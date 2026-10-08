@@ -189,7 +189,7 @@ El rol lo entrega el servidor en `GET /api/auth/profile` y se lee con `useSessio
 ## Mapa de navegación
 
 ```mermaid
-flowchart LR
+flowchart TD
   IN["/login, /auth/callback o /acceso/activar"] --> RS{"Rol según el servidor"}
   RS -->|"prospect"| MD["/dashboard/demos: Mis demos"]
   RS -->|"client"| CI["/dashboard: Inicio del cliente"]
@@ -221,6 +221,7 @@ flowchart LR
   C3 -->|"Aprobar o rechazar"| EQ["Aviso al equipo"]
   C6 --> EQ
 ```
+> [Ver diagrama como imagen](images/diagramas/06-Portal-del-Cliente-1.png)
 
 ---
 
@@ -247,6 +248,7 @@ stateDiagram-v2
   suspendido --> prospecto: el admin reactiva
   suspendido --> cliente: el admin reactiva
 ```
+> [Ver diagrama como imagen](images/diagramas/06-Portal-del-Cliente-2.png)
 
 **Qué cambia en el portal al convertir**
 
@@ -431,6 +433,7 @@ flowchart TD
   K2 --> PL{"¿Es un Piloto RAG?"}
   PL -->|"Sí"| PL1["Plazo para aplicar el 100 por ciento del piloto a un plan"]
 ```
+> [Ver diagrama como imagen](images/diagramas/06-Portal-del-Cliente-3.png)
 
 **Bloques del prospecto** (`ProspectHome`), con copy propuesto:
 
@@ -597,6 +600,7 @@ sequenceDiagram
   O-->>C: Email, aviso en el panel y WhatsApp si es grado A
   Note over P,C: En la Fase 3 la propuesta llega a Propuestas y a /propuesta/token
 ```
+> [Ver diagrama como imagen](images/diagramas/06-Portal-del-Cliente-4.png)
 
 #### Integración con el sistema de demos
 
@@ -1030,6 +1034,7 @@ stateDiagram-v2
   terminado --> [*]
   cancelado --> [*]
 ```
+> [Ver diagrama como imagen](images/diagramas/06-Portal-del-Cliente-5.png)
 
 **Migración de los estados viejos:**
 

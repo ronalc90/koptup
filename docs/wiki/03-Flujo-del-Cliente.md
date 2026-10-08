@@ -2,9 +2,67 @@
 
 > Este es el recorrido completo de un prospecto, desde que descubre KopTup hasta que es cliente con un proyecto activo. Cubre los dos caminos de venta: los **sistemas RAG** (producto principal) y las **otras soluciones a medida**.
 >
-> Páginas relacionadas: la especificación técnica está en [Sistema de demos](04-Sistema-de-Demos.md), las pantallas internas en [Panel de administración](05-Panel-de-Administracion.md) y las pantallas del prospecto y del cliente en [Portal del cliente](06-Portal-del-Cliente.md).
+> La página empieza por el **embudo principal (Sistemas RAG)**, que no pasa por el formulario "Solicitar demo". Después describe el **flujo de solicitud y acceso a demos**, que es el camino de las otras soluciones a medida y de las demos privadas de salud.
+>
+> Páginas relacionadas: el producto está en [Sistemas RAG](Producto-chatbot-rag-ia.md) y los cambios del sitio en [Reposicionamiento RAG](13-Reposicionamiento-RAG.md). La especificación técnica del flujo de demos está en [Sistema de demos](04-Sistema-de-Demos.md), las pantallas internas en [Panel de administración](05-Panel-de-Administracion.md) y las pantallas del prospecto y del cliente en [Portal del cliente](06-Portal-del-Cliente.md).
 
 ---
+
+## Embudo principal: Sistemas RAG
+
+El producto principal de KopTup son los **sistemas RAG**: una IA que responde con los documentos de cada empresa y cita la fuente ([Sistemas RAG](Producto-chatbot-rag-ia.md)). Su embudo es corto: la demo es **pública**, la prueba con un documento propio pide solo el email y el siguiente paso es un **Piloto pagado de 2 semanas**. Lo que cambia en el sitio para soportarlo (landings, planes, demo y medición) está en [Reposicionamiento RAG](13-Reposicionamiento-RAG.md).
+
+```mermaid
+flowchart TD
+  AD["Anuncio en Google Ads o LinkedIn"] --> LP{"Landing de destino"}
+  ORG["Búsqueda orgánica, referido o WhatsApp"] --> LP
+  LP -->|"Intención general"| R["/rag"]
+  LP -->|"Intención por sector"| S["/rag/salud, /rag/legal o /rag/soporte"]
+  S --> R
+  R --> DP["Demo pública /demo/chatbot, sin registro"]
+  S --> DP
+  DP -->|"demo_start"| UP["Prueba con tu documento: email y autorización Ley 1581"]
+  UP -->|"demo_upload y generate_lead"| LEAD["Lead con origen demo-rag"]
+  LEAD --> AG["Agenda un piloto: llamada de 30 min"]
+  R -->|"plan_click"| AG
+  DP --> AG
+  AG --> PI["Piloto RAG de 2 semanas"]
+  PI --> INF["Informe de precisión con 50 preguntas"]
+  INF --> PL{"¿Contrata en 30 días?"}
+  PL -->|"Si, con 100 % del piloto descontado"| PLAN["Plan Esencial, Profesional o Empresarial"]
+  PL -->|"No"| NUT["Nutrición y seguimiento comercial"]
+  NUT -->|"Vuelve a mostrar interés"| AG
+```
+> [Ver diagrama como imagen](images/diagramas/03-Flujo-del-Cliente-1.png)
+
+| Paso | Qué hace el prospecto | Qué hace KopTup | Medición |
+|---|---|---|---|
+| 1. Anuncio o búsqueda | Hace clic en un anuncio de Google o LinkedIn, o llega por búsqueda o referido | Pauta con UTM hacia `/rag` o la landing de su sector | Visitas por fuente (GA4, con consentimiento) |
+| 2. Landing | Lee `/rag` o la landing de su sector y revisa los planes | Mensaje: "IA que responde con los documentos de tu empresa" | `plan_click` |
+| 3. Demo pública | Pregunta en `/demo/chatbot` sobre el documento de ejemplo, sin registro | Cupo por visitante y tope mensual de gasto | `demo_start` |
+| 4. "Prueba con tu documento" | Sube un PDF, DOCX o TXT (hasta 5 MB y 30 páginas) dando solo su email y la autorización Ley 1581; hace hasta 10 preguntas | El email entra como lead con origen `demo-rag` por el canal del formulario de contacto. El documento se borra a la hora. El comercial contacta al lead en 1 día hábil | `demo_upload`, `generate_lead` |
+| 5. Agenda un piloto | Pide una llamada desde "Agenda un piloto" o desde el botón de un plan (formulario de contacto con el plan prellenado) | Llamada de 30 min, alcance y orden del Piloto | `generate_lead` |
+| 6. Piloto RAG | Entrega una fuente con hasta 100 documentos y valida las 50 preguntas | Arma su asistente con citas en 2 semanas y entrega el informe de precisión | Pilotos vendidos |
+| 7. Plan | Contrata Esencial, Profesional o Empresarial en los 30 días siguientes, con el 100 % del Piloto descontado del setup | Propuesta, implementación y operación mensual | Pilotos que pasan a un plan |
+
+**Precios** (COP más IVA si aplica; USD fijos):
+
+| Plan | Pago inicial | Mensualidad |
+|---|---|---|
+| Piloto RAG (2 semanas) | COP 3.900.000 / USD 1.200 | — |
+| Esencial (3–4 semanas) | Setup COP 9.900.000 / USD 2.990 | COP 1.490.000 / USD 450 |
+| Profesional (6–8 semanas) | Setup COP 24.900.000 / USD 7.490 | COP 2.990.000 / USD 890 |
+| Empresarial (10–14 semanas) | Desde COP 59.900.000 / USD 17.900 | Según SLA |
+
+Pregunta adicional sobre el tope del plan: COP 250 / USD 0,08. Las tarifas de Meta por mensajes de WhatsApp se cobran aparte, al costo.
+
+**El flujo de solicitud de demos en el camino RAG** solo acompaña la venta: la demo guiada con un comercial, la preparación del Piloto y, en la Fase 2, un acceso ampliado con más cupo, la marca del prospecto y datos de su sector.
+
+---
+
+## Flujo de solicitud de demos: otras soluciones a medida y demos privadas
+
+El resto de esta página describe el **flujo de solicitud y acceso a demos**. Es el camino de venta de las **"Otras soluciones a medida"** (ERP, CRM, POS, LMS y los demás productos del catálogo) y de las **demos privadas de salud** (auditoría de cuentas médicas y sistema experto). Las tablas y el diagrama principal incluyen el camino RAG para mostrar dónde se cruzan los dos.
 
 ## En una mirada
 
@@ -101,6 +159,7 @@ flowchart TD
   UP --> PR
   RP -->|"No"| REN["Soporte, renovación y nuevos productos"]
 ```
+> [Ver diagrama como imagen](images/diagramas/03-Flujo-del-Cliente-2.png)
 
 ---
 
@@ -109,7 +168,7 @@ flowchart TD
 Muestra quién hace qué en el camino feliz: solicitud, aprobación, uso y cierre.
 
 ```mermaid
-flowchart LR
+flowchart TD
   subgraph N["Notificaciones"]
     N1["Acuse al solicitante"]
     N2["Aviso al equipo"]
@@ -153,6 +212,7 @@ flowchart LR
   B5 --> N4 --> A3
   B5 --> N5 --> V5 --> A4 --> V6 --> B6
 ```
+> [Ver diagrama como imagen](images/diagramas/03-Flujo-del-Cliente-3.png)
 
 ---
 
@@ -208,8 +268,11 @@ Detalle de la plantilla en [Landing de producto](Seccion-Landing-de-Producto.md)
   - Pide solo el email y la autorización de tratamiento de datos.
   - Admite un PDF, DOCX o TXT de hasta 5 MB y 30 páginas.
   - Permite 10 preguntas por documento.
+  - Permite 3 documentos por IP al día y tiene un tope de gasto mensual (`DEMO_MONTHLY_BUDGET_USD`). Al alcanzarlo, la subida se apaga y aparece "Agenda una demo con nosotros".
   - Borra el documento a la hora.
-  - El email entra como **Lead con origen `demo-rag`** y el comercial lo ve en **Admin › Leads**.
+  - Muestra el aviso "No subas información confidencial en la demo".
+  - El email entra como lead con origen **`demo-rag`** por el mismo canal del formulario de contacto (hoy llega como un contacto más). Con el sistema de demos se unifica como **Lead** (canal `demo_rag`) y el comercial lo ve en **Admin › Leads**.
+  - Detalle de límites, variables y Ley 1581 en [Reposicionamiento RAG](13-Reposicionamiento-RAG.md).
 - **Desde aquí el prospecto puede:**
   - pedir una demo guiada o un piloto (formulario de solicitud);
   - agendar una llamada (agenda real, que reemplaza el `mailto:` actual).
@@ -374,6 +437,7 @@ journey
     Firma y paga el anticipo: 3: Prospecto
     Sigue su proyecto en el portal: 5: Cliente
 ```
+> [Ver diagrama como imagen](images/diagramas/03-Flujo-del-Cliente-4.png)
 
 **Momentos de verdad** (donde más se pierde a un prospecto, y qué se hace):
 

@@ -45,7 +45,7 @@ Evidencia tomada de la rama `main`. La rama `rag-reposicionamiento` ya cambia pa
 | JSON-LD | 5 bloques: Organization, WebSite, SoftwareApplication, LocalBusiness y FAQPage. Incluyen `aggregateRating` sin reseñas, `foundingDate: 2019`, `numberOfEmployees: 5`, un `SearchAction` a `/search` (no existe), un `AggregateOffer` de 500 a 50.000 USD y un FAQ que no se ve en la página ("desde $499 USD", "27 prototipos") | `StructuredData.tsx` líneas 61–62, 96–102, 113–120, 129–135, 148–153, 257–263 y 303–357. La rama ya quitó `aggregateRating` y `SearchAction` |
 | Imagen OG | Texto "Desarrollo de Software a Medida" | `opengraph-image.tsx` líneas 4 y 85 |
 | Mensajes i18n | El layout envía a cada página todos los mensajes: base, demos y ofertas (≈ 440 KB entre `es.json`, `_demos.es.json` y `_offerings.es.json`) | `layout.tsx` líneas 97–116 y 156 |
-| Medición | No hay analítica. La rama agrega GA4, Google Ads y LinkedIn con banner de consentimiento (Fase 7 de su especificación) | — |
+| Medición | No hay analítica. La rama agrega GA4, Google Ads y LinkedIn con banner de consentimiento (etapa E7 de su especificación) | — |
 
 **Capturas del estado actual**
 
@@ -114,6 +114,7 @@ flowchart TD
   F --> DR["DemoRequest pendiente + Lead + acuse con código"]
   H -->|"Agendar llamada"| C["Agenda en línea"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Seccion-Home-1.png)
 
 ### 1. Hero
 
@@ -134,7 +135,7 @@ El texto lo fija la especificación del reposicionamiento RAG (rama `rag-reposic
 
 Reglas del hero:
 - **Una sola acción dominante** (Probar la demo). "Ver planes" va como botón secundario y la demo guiada como enlace de texto, para no tener tres botones iguales.
-- La captura del visual sale de la demo real **después** de las mejoras de la Fase 2 del [Chatbot RAG](Producto-chatbot-rag-ia.md). Hasta entonces el hero queda sin imagen, que es mejor que mostrar una respuesta en inglés o con métricas simuladas.
+- La captura del visual sale de la demo real **después** de las mejoras de la Fase 2 de los [Sistemas RAG](Producto-chatbot-rag-ia.md). Hasta entonces el hero queda sin imagen, que es mejor que mostrar una respuesta en inglés o con métricas simuladas.
 
 ### 2. Cómo funciona en 3 pasos
 
@@ -334,7 +335,7 @@ No son de la home, pero la home es donde más se ven. El detalle está en [Plan 
 
 | # | Tarea | Fase | Prioridad | Esfuerzo | Criterio de aceptación |
 |---|---|---|---|---|---|
-| 1 | Fusionar en `main` la Fase 2 de la rama `rag-reposicionamiento` (title y description, H1, subtítulo, botones "Probar la demo" y "Ver planes", 4 frases verificables, chatbot primero, `page.tsx` server + `HomeContent.tsx`, `DEMO_COUNT`) | Fase 1 — Funnel y solicitud de demos | P0 | S | En producción el H1 es "IA que responde con los documentos de tu empresa"; no aparecen "100+", "50+", "5★" ni "24/7"; `npm run check-titles` pasa |
+| 1 | Fusionar en `main` la etapa E2 de la rama `rag-reposicionamiento` (title y description, H1, subtítulo, botones "Probar la demo" y "Ver planes", 4 frases verificables, chatbot primero, `page.tsx` server + `HomeContent.tsx`, `DEMO_COUNT`) | Fase 1 — Funnel y solicitud de demos | P0 | S | En producción el H1 es "IA que responde con los documentos de tu empresa"; no aparecen "100+", "50+", "5★" ni "24/7"; `npm run check-titles` pasa |
 | 2 | Quitar de la home los enlaces a demos que fallan o están desactualizadas (gestor documental, dashboard ejecutivo, control de proyectos) hasta que pasen el QA de la Fase 2 | Fase 1 — Funnel y solicitud de demos | P0 | S | Una prueba E2E recorre todos los enlaces de la home y ninguno termina en una pantalla con error o con datos de 2024 |
 | 3 | Reescribir el JSON-LD de la home: quitar `FAQStructuredData` actual, `SoftwareApplication` y `LocalBusiness` (si no hay oficina con atención al público); `Organization` con datos de `lib/company.ts`, buzón de rol y `sameAs` verificados | Fase 1 — Funnel y solicitud de demos | P0 | S | La prueba de resultados enriquecidos de Google no muestra errores; ningún dato del JSON-LD contradice `/about` (año, cifras, precios) |
 | 4 | Reemplazar "Soluciones para cada industria" y "Servicios tecnológicos" por `OtherSolutionsGrid` (6 productos → `/productos/<slug>`, botón según `accessMode`, rejilla sin huecos) | Fase 1 — Funnel y solicitud de demos | P1 | M | No quedan enlaces a `/services#ecommerce` ni a otras anclas inexistentes; con 6 tarjetas no hay huecos en escritorio ni en móvil; una demo con `active = false` desaparece de la home sin desplegar |

@@ -197,6 +197,7 @@ flowchart LR
   PL --> EX["Expansión: más fuentes, WhatsApp, plan superior, otros productos"]
   PR --> EX
 ```
+> [Ver diagrama como imagen](images/diagramas/11-Comercial-Marketing-y-Legal-1.png)
 
 | Oferta | Para quién | Precio | Duración | Qué recibe el cliente | Siguiente paso |
 |---|---|---|---|---|---|
@@ -228,6 +229,7 @@ flowchart TD
   PL -->|"Sí"| UP["Pasa a un plan en 30 días: 50 %"]
   PL -->|"No"| PJ["Proyecto a medida en el portal"]
 ```
+> [Ver diagrama como imagen](images/diagramas/11-Comercial-Marketing-y-Legal-2.png)
 
 | Etapa | Definición | Fuente del dato | Meta del mes 3 |
 |---|---|---|---|
@@ -496,6 +498,7 @@ flowchart LR
   AD --> OPT["Optimización de campañas"]
   API -.->|"Fase 5, solo con consentimiento"| OFF["Conversiones offline a Google Ads"]
 ```
+> [Ver diagrama como imagen](images/diagramas/11-Comercial-Marketing-y-Legal-3.png)
 
 **Diccionario de eventos.** Es la lista maestra: reúne los eventos de la rama RAG y de las demás páginas. Los nombres van en `snake_case` y **ningún parámetro lleva datos personales**.
 
@@ -745,6 +748,7 @@ sequenceDiagram
   A->>A: Marca la factura como pagada y crea el proyecto
   Note over FE,A: En la Fase 1 los pasos 2 y 7 son manuales y en la Fase 3 van por API
 ```
+> [Ver diagrama como imagen](images/diagramas/11-Comercial-Marketing-y-Legal-4.png)
 
 ### 15. Facturación electrónica DIAN de KopTup
 
@@ -828,6 +832,7 @@ flowchart TD
   OSP --> T["Términos publicados en /terms"]
   MSA --> T
 ```
+> [Ver diagrama como imagen](images/diagramas/11-Comercial-Marketing-y-Legal-5.png)
 
 | Cláusula | Compra a medida | Planes RAG (suscripción) | Piloto RAG |
 |---|---|---|---|
@@ -956,6 +961,7 @@ gantt
   Solicitud de demos en producción, estimado :milestone, r3, 2027-01-08, 0d
   Retro de 90 días y plan del trimestre :r4, 2027-01-12, 4d
 ```
+> [Ver diagrama como imagen](images/diagramas/11-Comercial-Marketing-y-Legal-6.png)
 
 | Semana | Fechas | Acciones | Resultado esperado |
 |---|---|---|---|
@@ -1031,7 +1037,7 @@ El plan de SEO está en la sección 12. Aquí van las reglas que afectan a todos
 | 10 | Lista negra de afirmaciones en `src/config/claims-blacklist.json` y `scripts/check-claims.mjs` en el CI, compartida con la prueba E2E de [Landings SEO](Seccion-Landings-SEO.md) | Fase 1 — Funnel y solicitud de demos | P0 | S | El script falla si encuentra cualquier frase de la lista en `src/`, `messages/` o `public/` (excepto los datos simulados de las demos); en `main` devuelve 0 resultados |
 | 11 | JSON-LD honesto desde `lib/company.ts`: quitar `aggregateRating`, `SoftwareApplication`, `LocalBusiness` sin dirección confirmada, `foundingDate: 2019`, `numberOfEmployees` y `priceRange` de $499; `sameAs` solo con perfiles activos; reescribir `llms.txt` (comparte trabajo con la tarea 3 de [Home](Seccion-Home.md) y la tarea 2 de [Nosotros](Seccion-Nosotros.md)) | Fase 1 — Funnel y solicitud de demos | P0 | S | La prueba de resultados enriquecidos no muestra errores; una búsqueda de `aggregateRating` en `apps/web/src` da 0; el año de fundación es el mismo en `/about`, JSON-LD y `llms.txt` |
 | 12 | SEO técnico: fusionar `SITE_URL` con `www`, sitemap según el modo de cada demo y con `lastModified` real, `robots.txt` según D10 (con `/acceso` y `/baja`), Search Console y Bing con sitemap enviado | Fase 1 — Funnel y solicitud de demos | P0 | S | Todos los canónicos usan `www`; el sitemap no lista demos `solicitud` ni `privado`; Search Console no reporta errores del sitemap |
-| 13 | Plan de medición: GA4 con Consent Mode v2 en modo básico, Google Ads y LinkedIn Insight (Fase 7 de la rama RAG con el banner de [Legal](Seccion-Legal.md)), diccionario de eventos, dimensiones, eventos clave, filtro de tráfico interno, retención de 14 meses, sin etiquetas en `/acceso`, `/baja`, `/dashboard` ni `/admin`, y CSP ampliada solo con lo necesario | Fase 1 — Funnel y solicitud de demos | P0 | M | Con el banner rechazado no sale ninguna petición a terceros; con todo aceptado, los eventos de la tabla llegan a DebugView con sus parámetros; `generate_lead` y `schedule_call_booked` figuran como conversiones en Ads |
+| 13 | Plan de medición: GA4 con Consent Mode v2 en modo básico, Google Ads y LinkedIn Insight (etapa E7 de la rama RAG, con el banner de [Legal](Seccion-Legal.md)), diccionario de eventos, dimensiones, eventos clave, filtro de tráfico interno, retención de 14 meses, sin etiquetas en `/acceso`, `/baja`, `/dashboard` ni `/admin`, y CSP ampliada solo con lo necesario | Fase 1 — Funnel y solicitud de demos | P0 | M | Con el banner rechazado no sale ninguna petición a terceros; con todo aceptado, los eventos de la tabla llegan a DebugView con sus parámetros; `generate_lead` y `schedule_call_booked` figuran como conversiones en Ads |
 | 14 | Atribución con UTM: convención, generador, persistencia del primer y del último contacto en `sessionStorage` y envío a `Lead.source.utm` y `DemoRequest.source.utm` | Fase 1 — Funnel y solicitud de demos | P1 | S | Un lead que llega por un anuncio y vuelve después por búsqueda orgánica guarda los dos contactos; ≥ 90 % de los leads del mes tienen fuente identificada |
 | 15 | Pipeline: definiciones de etapa, probabilidades y motivos de pérdida en **Admin › Leads**; hoja puente con acceso restringido mientras sale la pantalla; script `import-leads-csv.ts` idempotente con `--dry-run` | Fase 1 — Funnel y solicitud de demos | P0 | S | Cada lead abierto tiene responsable y próxima acción; la importación de la hoja no crea duplicados al correr dos veces; la hoja se borra después de importarla |
 | 16 | Kit de ventas: guion de "Conocer tu caso" con las 4 preguntas de calificación, tabla de objeciones, plantilla de propuesta de la Fase 1 y plantilla de resumen de llamada | Fase 1 — Funnel y solicitud de demos | P1 | S (dueño) | Toda llamada registrada tiene las 4 respuestas; el 100 % de las propuestas sale en ≤ 2 días hábiles con la plantilla |

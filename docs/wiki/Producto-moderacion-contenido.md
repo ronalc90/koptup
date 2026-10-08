@@ -79,7 +79,7 @@
 5. **IA + humanos:** umbrales, cola con prioridad, apelaciones, bitácora y cuidado del equipo (pausas, desenfoque por defecto, rotación de categorías).
 6. **Datos y cumplimiento:** dónde se procesa el contenido, retención, Ley 1581 (datos personales), protocolo de protección de menores con escalamiento a las autoridades y a la línea de reporte Te Protejo, apoyo para documentar las políticas de la plataforma. Redactado como "te ayudamos a cumplir", nunca como certificación.
 7. **Planes y precios** (compra; SaaS "lista de espera") y **FAQ:** ¿qué tan precisa es? (se mide con tus datos antes de comprometer cifras) · ¿puedo usar mis propias políticas? · ¿qué pasa con las imágenes? · ¿dónde quedan los datos? · ¿reemplaza a mi equipo? (no; reduce el volumen que revisa) · ¿cuánto cuesta la IA por ítem?
-8. **Bloque cruzado:** [Chatbot RAG con IA](Producto-chatbot-rag-ia.md) ("controles de seguridad para tu asistente"), [Helpdesk con IA](Producto-helpdesk-ia.md) y [E-commerce](Producto-ecommerce.md) (reseñas y vendedores).
+8. **Bloque cruzado:** [Sistemas RAG](Producto-chatbot-rag-ia.md) ("controles de seguridad para tu asistente"), [Helpdesk con IA](Producto-helpdesk-ia.md) y [E-commerce](Producto-ecommerce.md) (reseñas y vendedores).
 
 ### Demo interactiva (mejoras por pantalla/módulo)
 
@@ -123,6 +123,7 @@ flowchart LR
     D --> E["5. Prueba con tu texto"]
     E --> F["CTA: Evalua con tus datos"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-moderacion-contenido-1.png)
 
 1. Elegir "Marketplace y clasificados" (preseleccionado).
 2. Abrir el caso "pago por fuera": ver el fragmento resaltado, la política y la confianza.
@@ -243,4 +244,4 @@ USD de referencia (TRM 3.300, "Otras soluciones a medida"): setup de compra ≈ 
 | Evaluaciones que pasan a propuesta o piloto | ≥ 25 % |
 | Costo mensual de "Prueba con tu texto" | Dentro del tope de gasto de demos |
 
-Páginas relacionadas: [Chatbot RAG con IA](Producto-chatbot-rag-ia.md), [Helpdesk con IA](Producto-helpdesk-ia.md), [E-commerce](Producto-ecommerce.md), [Seguridad y calidad](10-Seguridad-y-Calidad.md), [Landing de producto](Seccion-Landing-de-Producto.md), [Panel de administración](05-Panel-de-Administracion.md).
+Páginas relacionadas: [Sistemas RAG](Producto-chatbot-rag-ia.md), [Helpdesk con IA](Producto-helpdesk-ia.md), [E-commerce](Producto-ecommerce.md), [Seguridad y calidad](10-Seguridad-y-Calidad.md), [Landing de producto](Seccion-Landing-de-Producto.md), [Panel de administración](05-Panel-de-Administracion.md).

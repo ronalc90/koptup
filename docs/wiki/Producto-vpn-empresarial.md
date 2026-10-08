@@ -109,6 +109,7 @@ flowchart LR
     SA["Sede principal"] ---|"tunel entre sedes"| SB["Sede secundaria"]
     GW --- SA
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-vpn-empresarial-1.png)
 
 ### Demo interactiva
 
@@ -134,6 +135,7 @@ flowchart LR
     D --> E["5. Sedes conectadas entre si"]
     E --> F["CTA: Solicitar diagnostico"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-vpn-empresarial-2.png)
 
 **Medios (Fase 2):** un video de 60–90 s grabado sobre el laboratorio y 4 capturas anonimizadas de la consola. Es preferible a construir una maqueta.
 

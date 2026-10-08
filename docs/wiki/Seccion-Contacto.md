@@ -126,6 +126,7 @@ flowchart TD
   DR --> AD2["Admin: Solicitudes de demo"]
   RE --> AD
 ```
+> [Ver diagrama como imagen](images/diagramas/Seccion-Contacto-1.png)
 
 ### 1. Hero
 
@@ -216,7 +217,7 @@ Son tarjetas tipo radio, en un `fieldset` con `legend`. La opción que se elige 
 {
   "reason": "cotizacion",
   "name": "Ana Gómez",
-  "email": "ana@logisticaandina.co",
+  "email": "ana@logisticaandina.example",
   "company": "Logística Andina S.A.S. (ejemplo)",
   "phone": "+573000000000",
   "offeringSlug": "wms-logistica",
@@ -284,6 +285,7 @@ sequenceDiagram
   O-->>V: Email contact_received
   O-->>E: Email contact_internal y aviso en el panel
 ```
+> [Ver diagrama como imagen](images/diagramas/Seccion-Contacto-2.png)
 
 **Plantillas nuevas.** Se suman a las de la sección 11 de [Sistema de demos](04-Sistema-de-Demos.md) y viven en `apps/backend/src/templates/contact/`. Todo texto que venga del usuario se escapa.
 
@@ -439,7 +441,7 @@ Coherente con la sección 8.6 de [Sistema de demos](04-Sistema-de-Demos.md) (`GE
 | Un solo Lead por persona | Un mismo email que llega por contacto, por "Prueba con tu documento" y por "Solicitar demo" queda en un solo Lead, con una actividad por canal | [Sistema de demos](04-Sistema-de-Demos.md), DECISIÓN 1 y tarea 4 |
 | "Prueba con tu documento" | La demo RAG envía el email por `POST /api/contact` con `source = demo_rag`, sin servicio ni mensaje obligatorios, con su propio texto de autorización | Rama `rag-reposicionamiento`; [Legal](Seccion-Legal.md) |
 | Pedir una demo desde contacto | El selector lleva a `/solicitar-demo` con el producto. Si la persona ya escribió por contacto, el comercial la invita directamente | Sección 8.4, `POST /api/demo-grants` |
-| Cupo de la demo RAG agotado | "Agenda una demo con nosotros" lleva a `/solicitar-demo?producto=chatbot-rag-ia` cuando el formulario exista. Mientras tanto, a `/contact?motivo=demo&producto=chatbot-rag-ia` | Rama RAG, Fase 6 |
+| Cupo de la demo RAG agotado | "Agenda una demo con nosotros" lleva a `/solicitar-demo?producto=chatbot-rag-ia` cuando el formulario exista. Mientras tanto, a `/contact?motivo=demo&producto=chatbot-rag-ia` | Rama RAG, etapa E6 |
 | "Agenda un piloto" (home y `/rag`) | `/solicitar-demo?producto=chatbot-rag-ia&plan=piloto`. Mientras no exista, `/contact` con los mismos parámetros, que ahora sí se conservan | [Home](Seccion-Home.md) |
 | Prospectos y clientes con sesión | El formulario sale prellenado y sin captcha. "Quiero ver una demo" usa `POST /api/me/demo-requests` | Sección 8.3 |
 | Plazos | La tarea "Responder contacto" usa el mismo `sla.service.ts` (horas hábiles en Bogotá) que las solicitudes de demo, así que el comercial ve un solo tipo de plazo | Sección 5.4 |

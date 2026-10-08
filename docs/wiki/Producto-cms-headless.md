@@ -4,7 +4,7 @@
 
 ![Demo actual](images/actual/demo-gestor-contenido.jpg)
 
-*Captura actual de `/demo/gestor-contenido` (vista Plantillas). Ver también [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md) y [Roadmap](12-Roadmap.md). Productos relacionados: [Chatbot RAG](Producto-chatbot-rag-ia.md), [Ecommerce](Producto-ecommerce.md) y [Demo LinkedIn Ads](Demo-linkedin-ads.md).*
+*Captura actual de `/demo/gestor-contenido` (vista Plantillas). Ver también [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md) y [Roadmap](12-Roadmap.md). Productos relacionados: [Sistemas RAG](Producto-chatbot-rag-ia.md), [Ecommerce](Producto-ecommerce.md) y [Demo LinkedIn Ads](Demo-linkedin-ads.md).*
 
 > **Contexto de posicionamiento:** con el reposicionamiento de Koptup en sistemas RAG (ver [Visión de producto](02-Vision-de-Producto.md)), este producto queda dentro de **"Otras soluciones a medida"**. Es un mercado con mucha oferta: CMS headless de código abierto sin licencia (Strapi, Payload, Directus), servicios en la nube (Contentful, Sanity) y WordPress. Por eso tiene prioridad **P3**.
 >
@@ -188,6 +188,7 @@ flowchart LR
   D --> E["5. El asistente RAG cita la nueva FAQ"]
   E --> F["CTA: Solicitar demo o Agendar llamada"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-cms-headless-1.png)
 
 1. **Modelo:** ver el tipo "Sede" y sus campos. Así se entiende qué significa "headless": el contenido es estructurado y no depende del diseño.
 2. **Editar:** cambiar el horario y la foto de "Sede Chapinero"; la vista previa web y móvil se actualiza al instante.
@@ -342,6 +343,8 @@ Detalle de la política comercial común en [Catálogo de productos](08-Catalogo
 ---
 
 ## Métricas de éxito
+
+Son **metas** iniciales a validar con datos reales; no son resultados actuales.
 
 - 0 menciones de "médico" o "emails" en el SEO de la demo, y un único nombre en todos los puntos de contacto (tarea 2).
 - ≥ 40 % de los visitantes de la demo rehecha completan los 5 pasos del tour.

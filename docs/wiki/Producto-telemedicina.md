@@ -4,7 +4,7 @@
 
 ![Demo actual](images/actual/demo-telemedicina.jpg)
 
-*Captura actual de `/demo/telemedicina` (Consultorio virtual sin consulta activa). Ver también [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md) y [Roadmap](12-Roadmap.md). Relacionados: [Chatbot RAG](Producto-chatbot-rag-ia.md) (guías clínicas con IA y landing `/rag/salud`), [Demo de cuentas médicas](Demo-cuentas-medicas.md) (auditoría de lo facturado), [Facturación electrónica](Producto-facturacion-electronica.md) (factura en salud y RIPS), [Sistema de reservas](Producto-sistema-reservas.md) (agenda) y [Firma electrónica](Producto-firma-electronica.md).*
+*Captura actual de `/demo/telemedicina` (Consultorio virtual sin consulta activa). Ver también [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md) y [Roadmap](12-Roadmap.md). Relacionados: [Sistemas RAG](Producto-chatbot-rag-ia.md) (guías clínicas con IA y landing `/rag/salud`), [Demo de cuentas médicas](Demo-cuentas-medicas.md) (auditoría de lo facturado), [Facturación electrónica](Producto-facturacion-electronica.md) (factura en salud y RIPS), [Sistema de reservas](Producto-sistema-reservas.md) (agenda) y [Firma electrónica](Producto-firma-electronica.md).*
 
 ---
 
@@ -120,6 +120,7 @@ flowchart LR
   D --> E["5. Coordinacion: RIPS, ocupacion y auditoria"]
   E --> F["CTA: Solicitar propuesta o piloto"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-telemedicina-1.png)
 
 1. **Paciente:** Carlos recibe el enlace por WhatsApp (simulado), prueba la cámara y acepta el consentimiento de telemedicina.
 2. **Orientación de síntomas:** "tos seca y fiebre de 38 °C" → urgente → cita de medicina general hoy. Contraste: "dolor en el pecho" muestra la derivación a urgencias y la línea 123.
@@ -165,7 +166,7 @@ Sin código, desde **Admin › Solicitudes de demo › Aprobar** (o Admin › De
 - **Pagos y facturación:** particulares con Wompi o PayU (PSE, tarjeta, Nequi); cuotas moderadoras y copagos; factura electrónica de venta en salud con RIPS vía proveedor autorizado o [Facturación electrónica](Producto-facturacion-electronica.md); envío a [cuentas médicas](Demo-cuentas-medicas.md) para auditoría.
 - **Coordinación:** ocupación, inasistencias, tiempos de espera, productividad y satisfacción.
 - **Auditoría** de cada acceso y cambio en la información clínica.
-- **Guías clínicas con IA (complemento RAG):** reutiliza el núcleo del [Chatbot RAG](Producto-chatbot-rag-ia.md) sobre los protocolos de la IPS, con fuente citada y aviso de apoyo documental.
+- **Guías clínicas con IA (complemento RAG):** reutiliza el núcleo de los [Sistemas RAG](Producto-chatbot-rag-ia.md) sobre los protocolos de la IPS, con fuente citada y aviso de apoyo documental.
 - **Integraciones típicas en Colombia:** WhatsApp Business, Wompi/PayU, proveedor de facturación electrónica en salud, laboratorios (HL7 v2 o FHIR cuando el laboratorio lo soporte), historia clínica existente, Google Calendar / Microsoft 365, MIPRES.
 - **Matriz normativa a validar con un asesor de salud antes de la primera propuesta:** Ley 1419 de 2010 y Resolución 2654 de 2019 (telesalud y telemedicina), Resolución 3100 de 2019 (habilitación; la habilitación del servicio es responsabilidad de la IPS), Resolución 1995 de 1999 y sus modificaciones (historia clínica y su conservación), Ley 2015 de 2020 (historia clínica electrónica interoperable), Ley 1581 de 2012 (datos sensibles) y la normativa vigente de RIPS como soporte de la factura electrónica en salud.
 - **Base técnica:** partir de `apps/backend/src/modules/telemedicine/` (Consultation, Prescription, `startSession`) migrado a Mongoose con autenticación, autorización por rol (paciente, profesional, coordinación, administrador) y `tenantId`; cifrado en tránsito y en reposo, copias de seguridad y registro de accesos.
@@ -192,7 +193,7 @@ Horas de evolutivos incluidas por mes: 5 / 12 / 25 / 50. Soporte: correo 24 h h�
 4. **Tiempos realistas:** con consentimientos, plantillas clínicas, facturación y RIPS, proponer 6–10 / 10–16 / 16–24 / 24–36 semanas (override por offering de `IMPL_SEMANAS_BY_TIER`).
 5. **SaaS → "Lista de espera"** hasta la Fase 4.
 6. **Bullets en lenguaje de IPS y alineados con la demo.** Propuesta: **Básico** "Hasta 300 teleconsultas al mes · Agenda con recordatorios por WhatsApp · Videoconsulta sin app · Consentimiento informado y registro de la atención · Receta y órdenes en PDF firmadas · Pagos en línea con PSE y tarjeta". **Profesional** "+ Hasta 5.000 consultas y 5 sedes · Factura electrónica en salud y RIPS · Integración con laboratorio · Tablero de coordinación · Guías clínicas con IA (complemento)". **Avanzado** "+ Integración con tu historia clínica (HL7/FHIR) · Convenios con EPS y prepagadas · MIPRES · Auditoría avanzada". **Enterprise** "+ Multi-sede nacional o multi-país · SSO · Integración con tu sistema hospitalario · SLA de 1 h · Gerente de proyecto dedicado".
-7. Quitar "eRX", "Lab HL7 básico" y "Wearables" de Profesional (dejar wearables como opción del preset de crónicos), tuteo o usted en lugar de voseo, quitar "Reportes mensuales del tier" repetido, descripción propia y `costoNote` igual al catálogo (USD 150–30.000).
+7. Quitar "eRX", "Lab HL7 básico" y "Wearables" de Profesional (dejar wearables como opción del preset de crónicos), tuteo ("tú") en lugar de voseo, quitar "Reportes mensuales del tier" repetido, descripción propia y `costoNote` igual al catálogo (USD 150–30.000).
 8. Ofrecer una entrada de bajo riesgo: **"Piloto de telemedicina"** (1 especialidad, 1 sede, 4–6 semanas, precio cerrado) que se descuenta si contratan, con la misma lógica del Piloto RAG.
 
 Política comercial común en [Catálogo de productos](08-Catalogo-de-Productos.md) y [Comercial, marketing y legal](11-Comercial-Marketing-y-Legal.md).
@@ -222,6 +223,8 @@ Política comercial común en [Catálogo de productos](08-Catalogo-de-Productos.
 ---
 
 ## Métricas de éxito
+
+Son **metas** iniciales a validar con datos reales; no son resultados actuales.
 
 - **Interés:** ≥ 3 solicitudes de demo calificadas por trimestre de prestadores con NIT (IPS, consultorios, programas de crónicos).
 - **Activación:** ≥ 80 % de los aprobados asiste a la sesión guiada; ≥ 50 % abre la vista Paciente en un celular; ≥ 40 % invita a un segundo usuario de su IPS.

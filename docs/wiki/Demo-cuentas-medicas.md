@@ -4,7 +4,7 @@
 
 ![Demo actual](images/actual/demo-cuentas-medicas.jpg)
 
-*Captura actual de `/demo/cuentas-medicas` en producción: el tablero abre con el aviso "No se pudieron cargar las estadísticas. Verifique que el servidor esté corriendo." y sin datos. Ver también [Sistema de demos](04-Sistema-de-Demos.md), [Flujo del cliente](03-Flujo-del-Cliente.md), [Catálogo de productos](08-Catalogo-de-Productos.md), [Seguridad y calidad](10-Seguridad-y-Calidad.md) y [Roadmap](12-Roadmap.md). Relacionados: [Motor de reglas del auditor (sistema experto)](Demo-sistema-experto.md), que se integra en este producto; [Chatbot RAG](Producto-chatbot-rag-ia.md) y la landing `/rag/salud`; [Facturación electrónica](Producto-facturacion-electronica.md) (factura en salud y RIPS); [Telemedicina](Producto-telemedicina.md).*
+*Captura actual de `/demo/cuentas-medicas` en producción: el tablero abre con el aviso "No se pudieron cargar las estadísticas. Verifique que el servidor esté corriendo." y sin datos. Ver también [Sistema de demos](04-Sistema-de-Demos.md), [Flujo del cliente](03-Flujo-del-Cliente.md), [Catálogo de productos](08-Catalogo-de-Productos.md), [Seguridad y calidad](10-Seguridad-y-Calidad.md) y [Roadmap](12-Roadmap.md). Relacionados: [Motor de reglas del auditor (sistema experto)](Demo-sistema-experto.md), que se integra en este producto; [Sistemas RAG](Producto-chatbot-rag-ia.md) y la landing `/rag/salud`; [Facturación electrónica](Producto-facturacion-electronica.md) (factura en salud y RIPS); [Telemedicina](Producto-telemedicina.md).*
 
 ---
 
@@ -19,7 +19,7 @@
 
 **Propuesta de valor:** "Revisa el 100 % de las cuentas, no una muestra. La IA lee la factura, los RIPS y los soportes; el motor aplica las reglas de tu convenio y propone cada glosa con su evidencia y su norma; **el auditor decide**. Entrega en Excel con tu plantilla y tablero de valor glosado por causa."
 
-**Qué es según su código (para el reposicionamiento RAG):** no es un RAG. Es un **sistema experto híbrido**: extracción con IA (texto y visión) + motor de reglas + catálogos (CUPS, CIE-10, tarifarios) + una decisión asistida por un modelo de lenguaje. El flujo de auditoría que usa la demo no usa embeddings ni búsqueda vectorial (solo la búsqueda de CUPS de la consola del [Motor de reglas](Demo-sistema-experto.md) los usa), y la "Base de conocimiento" de la pantalla Administración es texto fijo dentro del bundle que no alimenta respuestas con cita. Por la regla de la especificación RAG (con búsqueda vectorial: "Caso RAG"; sin ella: "Sistema experto para salud"), la etiqueta correcta hoy es **"Sistema experto para salud"**: en `/rag/salud` la tarjeta dice "Auditoría de cuentas médicas · Sistema experto para salud", con el botón "Solicitar demo personalizada". El puente con el producto principal es un módulo nuevo **"Consulta normativa y contractual con citas"** (RAG sobre contratos, manuales tarifarios y normas, con el núcleo del [Chatbot RAG](Producto-chatbot-rag-ia.md), tarea 11); cuando exista, la tarjeta pasa a "IA + reglas + consulta con citas".
+**Qué es según su código (para el reposicionamiento RAG):** no es un RAG. Es un **sistema experto híbrido**: extracción con IA (texto y visión) + motor de reglas + catálogos (CUPS, CIE-10, tarifarios) + una decisión asistida por un modelo de lenguaje. El flujo de auditoría que usa la demo no usa embeddings ni búsqueda vectorial (solo la búsqueda de CUPS de la consola del [Motor de reglas](Demo-sistema-experto.md) los usa), y la "Base de conocimiento" de la pantalla Administración es texto fijo dentro del bundle que no alimenta respuestas con cita. Por la regla de la especificación RAG (con búsqueda vectorial: "Caso RAG"; sin ella: "Sistema experto para salud"), la etiqueta correcta hoy es **"Sistema experto para salud"**: en `/rag/salud` la tarjeta dice "Auditoría de cuentas médicas · Sistema experto para salud", con el botón "Solicitar demo personalizada". El puente con el producto principal es un módulo nuevo **"Consulta normativa y contractual con citas"** (RAG sobre contratos, manuales tarifarios y normas, con el núcleo de los [Sistemas RAG](Producto-chatbot-rag-ia.md), tarea 11); cuando exista, la tarjeta pasa a "IA + reglas + consulta con citas".
 
 ---
 
@@ -141,6 +141,7 @@ flowchart LR
   D --> E["5. Reporte Excel y tablero por causa"]
   E --> F["CTA: Solicitar piloto de auditoria"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Demo-cuentas-medicas-1.png)
 
 1. **Carga:** el prospecto elige "Usar paquete de ejemplo" (lote de "Clínica Demo Los Andes" a "EPS Andina Demo").
 2. **Extracción:** abre una factura y ve los campos resaltados en el PDF, la confianza y el cruce con los RIPS.
@@ -179,6 +180,7 @@ flowchart TD
   J -->|"No por ahora"| L["Recordatorio y seguimiento comercial"]
   K --> M["Informe del piloto y propuesta"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Demo-cuentas-medicas-2.png)
 
 ### Datos de ejemplo anonimizados (para la demo)
 
@@ -245,6 +247,7 @@ flowchart LR
   H --> J["Retroalimentacion: precision por regla"]
   J --> F
 ```
+> [Ver diagrama como imagen](images/diagramas/Demo-cuentas-medicas-3.png)
 
 **Alcance MVP — modalidad compra (plan Profesional, 10–14 semanas reales):**
 - **Ingesta** de PDF, RIPS (estructura vigente) y Excel; clasificación automática de documentos; procesamiento en cola (no dentro de la petición) con reintentos; almacenamiento de objetos cifrado, nunca en el disco del servidor.
@@ -306,6 +309,8 @@ Factura adicional sobre el tope: COP 500 · USD 0,15. La mensualidad incluye la 
 ---
 
 ## Métricas de éxito
+
+Son **metas** iniciales a validar con datos reales; no son resultados actuales.
 
 - **Interés:** ≥ 4 solicitudes calificadas por trimestre (IPS, firmas auditoras o pagadores con NIT) desde `/rag/salud` y la landing.
 - **Activación:** ≥ 80 % de los aprobados asiste a la sesión guiada; ≥ 60 % procesa el paquete completo; ≥ 40 % descarga el reporte.

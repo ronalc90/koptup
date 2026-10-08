@@ -327,6 +327,7 @@ flowchart LR
   P --> N["Humo nocturno y monitores"]
   N -->|"Falla"| I["Issue automático y alerta"]
 ```
+> [Ver diagrama como imagen](images/diagramas/10-Seguridad-y-Calidad-1.png)
 
 #### 2.2 Workflows
 
@@ -678,6 +679,7 @@ flowchart LR
   JH --> C2
   U --> C3
 ```
+> [Ver diagrama como imagen](images/diagramas/10-Seguridad-y-Calidad-2.png)
 
 #### 5.2 Errores (Sentry) (tarea 15)
 
@@ -780,6 +782,7 @@ flowchart LR
   STG --> PRD["Producción: rama production y datos reales"]
   PRD --> RB["Reversión en menos de 15 min"]
 ```
+> [Ver diagrama como imagen](images/diagramas/10-Seguridad-y-Calidad-3.png)
 
 | Aspecto | Local | Vista previa (por PR) | Staging | Producción |
 |---|---|---|---|---|
@@ -1021,7 +1024,7 @@ Para el [Roadmap](12-Roadmap.md). Agrupa las tareas de Fase 0 repartidas en la w
 | Abuso | Rate-limit compartido | Backend y API, 6 = [Autenticación](Seccion-Autenticacion.md), 6 | P0 | S |
 | Credenciales, dependencias del backend y rutas de prueba | Rotación, actualización y retiro (incluye [Contacto](Seccion-Contacto.md), 9) | Backend y API, 7 | P0 | S |
 | Archivos | Almacenamiento de objetos (incluye Gestor documental 3 y Cuentas médicas 2) | Backend y API, 9 | P0 | M |
-| Chatbot | Persistencia en MongoDB (= [Chatbot RAG](Producto-chatbot-rag-ia.md), 1) | Backend y API, 10 | P0 | M |
+| Chatbot | Persistencia en MongoDB (= [Sistemas RAG](Producto-chatbot-rag-ia.md), 1) | Backend y API, 10 | P0 | M |
 | Base de datos | Réplica, copias y staging | Backend y API, 12 | P0 | S |
 | Herramienta interna | `/liquidacion` fuera del sitio comercial | [Landings SEO](Seccion-Landings-SEO.md), 4 | P0 | M |
 | Demo rota | Error de carga en producción | [Gestor documental](Producto-gestor-documental.md), 4 | P0 | S |
@@ -1083,6 +1086,7 @@ gantt
   section Puerta
   Salida de la Fase 0 :milestone, m1, after a7 b8, 0d
 ```
+> [Ver diagrama como imagen](images/diagramas/10-Seguridad-y-Calidad-4.png)
 
 ---
 

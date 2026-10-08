@@ -117,6 +117,7 @@ flowchart LR
   D --> E["5. Gerencia: ventas del mes en COP"]
   E --> F["CTA: Solicitar demo guiada o propuesta"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-ecommerce-1.png)
 
 1. **Tienda:** buscar "café", abrir la vista rápida y agregar "Café de origen Huila 500 g" y una prensa francesa. Aplicar el cupón `BIENVENIDA10`.
 2. **Pago:** ver el IVA incluido y el envío gratis por pasar de $150.000, pagar con Nequi (simulado) y recibir el pedido `#TDA-1042`, la factura electrónica simulada y el WhatsApp de confirmación.
@@ -218,6 +219,8 @@ Detalle de la política comercial común en [Catálogo de productos](08-Catalogo
 ---
 
 ## Métricas de éxito
+
+Son **metas** iniciales a validar con datos reales; no son resultados actuales.
 
 - Conversión landing → solicitud de demo ≥ 2 % (búsquedas de alto volumen y menor intención que otros productos).
 - ≥ 50 % de los visitantes de la demo pública completan un pedido simulado (medido con `DemoEvent`).

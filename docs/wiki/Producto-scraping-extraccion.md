@@ -80,7 +80,7 @@
 5. **Cómo se entrega:** archivo diario (Excel/CSV), Google Sheets, base de datos para Power BI, API o webhook, alertas por correo, Teams o WhatsApp.
 6. **Qué pasa cuando la página cambia:** monitoreo de calidad, la IA sugiere el ajuste y un ingeniero lo aprueba; tiempo de reparación por plan.
 7. **Planes y precios** (compra; SaaS "lista de espera") y **FAQ:** ¿es legal extraer datos de la web? · ¿qué fuentes no hacen? · ¿con qué frecuencia se actualiza? · ¿qué pasa si la fuente cambia? · ¿puedo recibir los datos en Power BI? · ¿quién paga los proxies?
-8. **Bloque cruzado:** [Chatbot RAG con IA](Producto-chatbot-rag-ia.md) ("conecta fuentes web a tu asistente") y [Dashboard ejecutivo](Producto-bi-dashboard.md) ("visualiza los datos extraídos").
+8. **Bloque cruzado:** [Sistemas RAG](Producto-chatbot-rag-ia.md) ("conecta fuentes web a tu asistente") y [Dashboard ejecutivo](Producto-bi-dashboard.md) ("visualiza los datos extraídos").
 
 ### Demo interactiva (mejoras por pantalla/módulo)
 
@@ -115,6 +115,7 @@ flowchart LR
     C --> D["4. Descarga el Excel y ve la ficha legal"]
     D --> E["5. CTA: Pide una extraccion de prueba"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-scraping-extraccion-1.png)
 
 1. Abrir "Radar de contratación pública" (preseleccionado) y ver los procesos de hoy con su resumen.
 2. Ir a "Precios de competencia", entrar al constructor y hacer clic en el precio de la tienda de ejemplo: aparece el campo con su valor.
@@ -233,4 +234,4 @@ USD de referencia (TRM 3.300, "Otras soluciones a medida"): setup de compra ≈ 
 | Extracciones de prueba entregadas en 5 días hábiles o menos | ≥ 90 % |
 | Extracciones de prueba que pasan a propuesta o piloto | ≥ 25 % |
 
-Páginas relacionadas: [Chatbot RAG con IA](Producto-chatbot-rag-ia.md), [Dashboard ejecutivo](Producto-bi-dashboard.md), [Gestor documental](Producto-gestor-documental.md), [Automatización de procesos con IA](Producto-automatizacion-workflows.md), [Landing de producto](Seccion-Landing-de-Producto.md), [Panel de administración](05-Panel-de-Administracion.md).
+Páginas relacionadas: [Sistemas RAG](Producto-chatbot-rag-ia.md), [Dashboard ejecutivo](Producto-bi-dashboard.md), [Gestor documental](Producto-gestor-documental.md), [Automatización de procesos con IA](Producto-automatizacion-workflows.md), [Landing de producto](Seccion-Landing-de-Producto.md), [Panel de administración](05-Panel-de-Administracion.md).

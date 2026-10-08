@@ -4,7 +4,7 @@
 
 ![Demo actual](images/actual/demo-helpdesk-ia.jpg)
 
-*Captura actual de `/demo/helpdesk-ia` (bandeja de tickets y detalle). Ver también [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md) y [Roadmap](12-Roadmap.md). Productos relacionados: [CRM con IA](Producto-crm-ia.md), [Voice AI para call center](Producto-voice-ai-callcenter.md) y [Chatbot RAG con IA](Producto-chatbot-rag-ia.md).*
+*Captura actual de `/demo/helpdesk-ia` (bandeja de tickets y detalle). Ver también [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md) y [Roadmap](12-Roadmap.md). Productos relacionados: [CRM con IA](Producto-crm-ia.md), [Voice AI para call center](Producto-voice-ai-callcenter.md) y [Sistemas RAG](Producto-chatbot-rag-ia.md).*
 
 ---
 
@@ -19,7 +19,7 @@
 - Colegios y universidades (certificados, pagos de matrícula).
 - Cooperativas, fintech y empresas de servicios con 5–80 agentes.
 
-**Propuesta de valor:** "Todos tus canales en una sola bandeja; la IA clasifica, asigna y sugiere la respuesta con tu base de conocimiento, y tú controlas SLA y PQRS con términos en días hábiles." El código es del cliente y puede compartir la base de conocimiento con el [Chatbot RAG](Producto-chatbot-rag-ia.md).
+**Propuesta de valor:** "Todos tus canales en una sola bandeja; la IA clasifica, asigna y sugiere la respuesta con tu base de conocimiento, y tú controlas SLA y PQRS con términos en días hábiles." El código es del cliente y puede compartir la base de conocimiento con los [Sistemas RAG](Producto-chatbot-rag-ia.md).
 
 ---
 
@@ -31,7 +31,7 @@
 | Pantallas | Cabecera con selector de marca y departamento · 5 métricas SLA · columna izquierda (canales, prioridad, base de conocimiento) · bandeja de tickets · detalle (conversación, respuestas sugeridas, respuesta, notas internas) · fila inferior (Auto-respuesta IA, Macros, CSAT) · modal de encuesta CSAT · animación de enrutamiento · avisos (toast) | Todo en `page.tsx` |
 | Datos | Constantes en el mismo archivo: 8 tickets (`INITIAL_TICKETS`), 6 artículos (`KB_ARTICLES`), registro de auto-respuesta, CSAT por agente; marcas "Alpha Retail / Beta Telecom / Gamma Banking" | `page.tsx`, `apps/web/messages/demos/helpdesk-ia.es.json` |
 | Backend | Módulo en memoria `apps/backend/src/modules/helpdesk/` (tickets, agentes, asignación; 191 líneas con test) **no montado** en `apps/backend/src/index.ts` | `helpdesk.service.ts`, `helpdesk.types.ts` |
-| Base reutilizable | El backend real del chatbot RAG (`apps/backend/src/routes/chatbot.routes.ts`) sirve para base de conocimiento y respuestas sugeridas reales | Ver [Chatbot RAG](Producto-chatbot-rag-ia.md) |
+| Base reutilizable | El backend real del chatbot RAG (`apps/backend/src/routes/chatbot.routes.ts`) sirve para base de conocimiento y respuestas sugeridas reales | Ver [Sistemas RAG](Producto-chatbot-rag-ia.md) |
 | i18n ES/EN | UI en `helpdesk-ia.{es,en}.json` (240 líneas c/u). Fijos en código: notas internas en español ("Cliente VIP, dos reembolsos previos OK.") e intenciones del registro de auto-respuesta en inglés ("FAQ: password reset", "Shipping status", "Refund request", "Greeting") | `page.tsx` |
 | Tests | 1 smoke test (`__tests__/page.test.tsx`) que hoy no se ejecuta | |
 | Tamaño | 815 líneas: `page.tsx` monolítico de **782 líneas**, sin componentes separados | `wc -l` |
@@ -114,6 +114,7 @@ flowchart LR
   D --> E["5. Tablero SLA y PQRS por vencer"]
   E --> F["CTA: Solicitar demo guiada"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-helpdesk-ia-1.png)
 
 1. **Mensaje entrante:** "Simular ticket" crea "Me cobraron dos veces por PSE" por WhatsApp.
 2. **Clasificación y asignación:** la IA marca Facturación, sentimiento negativo, prioridad Alta y lo asigna a la agente con esa habilidad.
@@ -210,6 +211,8 @@ Política comercial común en [Catálogo de productos](08-Catalogo-de-Productos.
 ---
 
 ## Métricas de éxito
+
+Son **metas** iniciales a validar con datos reales; no son resultados actuales.
 
 - Conversión landing → solicitud de demo ≥ 3 %.
 - ≥ 60 % de los visitantes de la demo pública envían al menos una respuesta y resuelven un ticket (medido con `DemoEvent`).

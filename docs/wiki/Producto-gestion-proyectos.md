@@ -4,7 +4,7 @@
 
 ![Demo actual](images/actual/demo-control-proyectos.jpg)
 
-*Captura actual de `/demo/control-proyectos` (vista Kanban). Ver también [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md) y [Roadmap](12-Roadmap.md). Productos relacionados: [Helpdesk IA](Producto-helpdesk-ia.md), [CRM con IA](Producto-crm-ia.md), [Automatización de workflows](Producto-automatizacion-workflows.md), [Gestor documental](Producto-gestor-documental.md), [Chatbot RAG](Producto-chatbot-rag-ia.md) y [Facturación electrónica](Producto-facturacion-electronica.md).*
+*Captura actual de `/demo/control-proyectos` (vista Kanban). Ver también [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md) y [Roadmap](12-Roadmap.md). Productos relacionados: [Helpdesk IA](Producto-helpdesk-ia.md), [CRM con IA](Producto-crm-ia.md), [Automatización de workflows](Producto-automatizacion-workflows.md), [Gestor documental](Producto-gestor-documental.md), [Sistemas RAG](Producto-chatbot-rag-ia.md) y [Facturación electrónica](Producto-facturacion-electronica.md).*
 
 > **Contexto de posicionamiento:** con el reposicionamiento de Koptup en sistemas RAG (ver [Visión de producto](02-Vision-de-Producto.md)), este producto queda dentro de **"Otras soluciones a medida"**. Como herramienta genérica de tareas compite con Trello, Asana, Monday o ClickUp, que cuestan entre USD 10 y 25 por usuario al mes. Solo es vendible si se presenta por lo que esas herramientas no traen: **un portal donde el cliente final ve el avance y aprueba**, flujos por sector (obra, agencia, consultoría) y conexión con horas, presupuesto y facturación. Koptup ya tiene esa base funcionando en su propio portal de clientes, lo que lo convierte en un buen candidato a SaaS después del chatbot RAG.
 
@@ -85,7 +85,7 @@ Sigue la estructura común de [Landing de producto](Seccion-Landing-de-Producto.
 1. **Hero:** "Tus proyectos al día y tu cliente informado, sin perseguirlo por WhatsApp". Subtítulo: "Tareas, cronograma, horas y entregables en un solo lugar, con un portal con tu marca donde tu cliente ve el avance y aprueba." CTA principal **"Solicitar demo personalizada"**; secundario "Agendar llamada"; enlace de texto "Probar la demo ahora" (modo `publico`).
 2. **Problemas que resuelve** (3 tarjetas): "El avance vive en Excel y en cinco grupos de WhatsApp"; "Tu cliente pregunta '¿cómo vamos?' todos los días"; "No sabes si el proyecto da plata hasta que termina".
 3. **Cómo funciona** (4 pasos): diagnóstico de 2 horas sobre cómo trabaja tu equipo → configuración de estados, plantillas por tipo de proyecto y portal con tu marca → migración de proyectos activos desde Excel, Trello o Asana → capacitación y acompañamiento mensual.
-4. **Módulos con "Incluido desde":** Tablero, lista y calendario (Básico) · Tareas con checklist, comentarios y adjuntos (Básico) · Registro de horas (Básico) · Portal del cliente (Básico, hasta 10 invitados) · Cronograma con dependencias (Profesional) · Aprobación de entregables y actas (Profesional) · Facturación de hitos y horas (Profesional) · Portafolio con semáforos y presupuesto contra real (Avanzado) · Asistente IA sobre los documentos del proyecto (Avanzado, complemento basado en el [Chatbot RAG](Producto-chatbot-rag-ia.md)) · Inicio de sesión corporativo y conectores empresariales (Enterprise).
+4. **Módulos con "Incluido desde":** Tablero, lista y calendario (Básico) · Tareas con checklist, comentarios y adjuntos (Básico) · Registro de horas (Básico) · Portal del cliente (Básico, hasta 10 invitados) · Cronograma con dependencias (Profesional) · Aprobación de entregables y actas (Profesional) · Facturación de hitos y horas (Profesional) · Portafolio con semáforos y presupuesto contra real (Avanzado) · Asistente IA sobre los documentos del proyecto (Avanzado, complemento basado en los [Sistemas RAG](Producto-chatbot-rag-ia.md)) · Inicio de sesión corporativo y conectores empresariales (Enterprise).
 5. **Capturas** (galería de 6: Portafolio, Kanban, Cronograma, Portal del cliente, Horas y presupuesto, Informe semanal) y **video de 60–90 s**.
 6. **Integraciones:** Google Workspace y Microsoft 365 (calendario, Drive/OneDrive, inicio de sesión), Slack y Teams, WhatsApp Business (avisos y aprobaciones), Siigo o Alegra (facturar hitos y horas; ver [Facturación electrónica](Producto-facturacion-electronica.md)), Wompi o PayU (enlace de pago del anticipo o del hito), GitHub/GitLab (solo equipos de software) y exportación a Power BI.
 7. **Planes y precios:** "Compra / a medida" en COP con "desde"; SaaS como **"Lista de espera"** (DECISIÓN 7).
@@ -119,6 +119,7 @@ flowchart LR
   D --> E["5. Informe semanal automatico"]
   E --> F["CTA: demo personalizada o propuesta"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-gestion-proyectos-1.png)
 
 1. **Portafolio:** "Tienes 3 proyectos; Torre 2 va en riesgo: el pedido de acero lleva 3 días de atraso".
 2. **Kanban:** mover "Acta de avance #7" a "Revisión del cliente"; aparece la notificación que recibirá el cliente.
@@ -220,6 +221,8 @@ Detalle de la política comercial común en [Catálogo de productos](08-Catalogo
 ---
 
 ## Métricas de éxito
+
+Son **metas** iniciales a validar con datos reales; no son resultados actuales.
 
 - ≥ 40 % de los visitantes de la demo pública pasan más de 90 s en ella y ≥ 30 % completan el recorrido.
 - Clic en el banner "Solicita tu demo guiada" ≥ 3 % de las sesiones de la demo; conversión a solicitud enviada ≥ 1,5 %.

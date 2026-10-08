@@ -4,7 +4,7 @@
 
 ![Demo actual](images/actual/demo-hrms.jpg)
 
-*Captura actual de `/demo/hrms` (pestaña Dashboard). Ver también [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md) y [Roadmap](12-Roadmap.md). Productos relacionados: [ERP modular](Producto-erp-modular.md) (su pestaña RRHH debe apuntar a este producto), [LMS de e-learning](Producto-lms-elearning.md) (formación), [Firma electrónica](Producto-firma-electronica.md) (contratos) y [Chatbot RAG](Producto-chatbot-rag-ia.md) (asistente de políticas internas).*
+*Captura actual de `/demo/hrms` (pestaña Dashboard). Ver también [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md) y [Roadmap](12-Roadmap.md). Productos relacionados: [ERP modular](Producto-erp-modular.md) (su pestaña RRHH debe apuntar a este producto), [LMS de e-learning](Producto-lms-elearning.md) (formación), [Firma electrónica](Producto-firma-electronica.md) (contratos) y [Sistemas RAG](Producto-chatbot-rag-ia.md) (asistente de políticas internas).*
 
 ---
 
@@ -112,6 +112,7 @@ flowchart LR
   D --> E["5. Nomina: liquidar y transmitir (simulado)"]
   E --> F["CTA: Solicitar propuesta"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-hrms-1.png)
 
 1. **Inicio:** "Alimentos Cordillera tiene 186 colaboradores; 6 contratos a término fijo vencen este mes y 3 personas acumulan más de 2 periodos de vacaciones."
 2. **App del colaborador:** Camila pide 5 días de vacaciones desde el celular; la solicitud aparece en Inicio y el jefe la aprueba; el saldo baja de 12 a 7.
@@ -157,7 +158,7 @@ Sin código, desde **Admin › Solicitudes de demo › Aprobar** (o Admin › De
 - **Selección y onboarding:** vacantes, postulados, entrevistas, oferta, contratación con firma electrónica y checklist de afiliaciones y exámenes.
 - **Desempeño:** ciclos de evaluación configurables y objetivos.
 - **Nómina:** dos rutas a decidir por cliente: **(a) integrada** (Básico/Profesional): novedades (horas extra, recargos, ausencias, comisiones) se envían al software de nómina actual por archivo o API; **(b) propia** (Avanzado+): liquidación, provisiones, PILA, nómina electrónica (documento soporte de pago de nómina y notas de ajuste) transmitida a la DIAN directamente o vía proveedor tecnológico, contabilización y dispersión bancaria.
-- **Asistente de políticas internas (RAG):** responde sobre reglamento interno, beneficios y procedimientos citando el documento; reutiliza el núcleo del [Chatbot RAG](Producto-chatbot-rag-ia.md).
+- **Asistente de políticas internas (RAG):** responde sobre reglamento interno, beneficios y procedimientos citando el documento; reutiliza el núcleo de los [Sistemas RAG](Producto-chatbot-rag-ia.md).
 - **Integraciones típicas en Colombia:** DIAN (nómina electrónica), operadores PILA, bancos (dispersión), Siigo / Alegra / World Office, WhatsApp Business, firma electrónica, Google/Microsoft (inicio de sesión), relojes biométricos.
 - **Transversal:** roles (colaborador, jefe, gestión humana, nómina, administrador) con autorización en servidor; auditoría de cambios en salarios y datos sensibles; autorización de tratamiento de datos (Ley 1581 de 2012) en el primer ingreso; parámetros normativos editables (salario mínimo, auxilio de transporte, jornada, recargos) para absorber cambios como la reducción de jornada de la Ley 2101 de 2021 y la reforma laboral de 2025 sin desarrollo nuevo.
 - **Base técnica:** partir de los tipos de `apps/backend/src/modules/hrms/` (Employee, Candidate, etapas) migrados a Mongoose con autenticación, autorización y `tenantId`. Multi-país solo en Enterprise y con socio local por país.
@@ -184,7 +185,7 @@ Horas de evolutivos incluidas por mes: 5 / 12 / 25 / 50. Soporte: correo 24 h h�
 4. **Tiempos realistas:** con migración del expediente y nómina, proponer 4–8 / 8–12 / 12–20 / 20–32 semanas (override por offering de `IMPL_SEMANAS_BY_TIER`).
 5. **SaaS → "Lista de espera"** hasta la Fase 4.
 6. **Bullets en lenguaje de cliente y alineados con la demo.** Propuesta: **Básico** "Hasta 50 colaboradores · Expediente digital y organigrama · Vacaciones y permisos desde el celular · Desprendibles y certificados laborales automáticos · Integración con tu software de nómina". **Profesional** "+ Hasta 300 colaboradores y 5 empresas · Selección y onboarding con firma electrónica · Evaluación de desempeño · Asistente IA de políticas internas · Nómina electrónica vía proveedor". **Avanzado** "+ Nómina propia con PILA y nómina electrónica · Turnos y recargos · Tableros de gestión humana · Integración contable y bancaria". **Enterprise** "+ Multi-país con socio local · Conector SAP SuccessFactors / Workday · SSO · Gerente de proyecto dedicado".
-7. Cambiar `category: 'sales'` por `'operations'` (o crear una categoría "Gestión humana"), usar tuteo o usted en lugar de voseo, quitar "Reportes mensuales del tier" repetido, escribir una descripción propia e igualar el `costoNote` al rango del catálogo (USD 50–18.000).
+7. Cambiar `category: 'sales'` por `'operations'` (o crear una categoría "Gestión humana"), usar tuteo ("tú") en lugar de voseo, quitar "Reportes mensuales del tier" repetido, escribir una descripción propia e igualar el `costoNote` al rango del catálogo (USD 50–18.000).
 8. Mostrar "desde $53 M + IVA" en la landing junto al costo total a 12 meses y ofrecer el **diagnóstico de procesos** como primer paso.
 
 Política comercial común en [Catálogo de productos](08-Catalogo-de-Productos.md) y [Comercial, marketing y legal](11-Comercial-Marketing-y-Legal.md).
@@ -213,6 +214,8 @@ Política comercial común en [Catálogo de productos](08-Catalogo-de-Productos.
 ---
 
 ## Métricas de éxito
+
+Son **metas** iniciales a validar con datos reales; no son resultados actuales.
 
 - **Interés:** ≥ 3 solicitudes de demo calificadas por trimestre (empresas de 50+ colaboradores) desde la landing.
 - **Activación:** ≥ 60 % de los prospectos aprobados abre la demo en las primeras 72 h; ≥ 40 % completa el recorrido guiado; ≥ 30 % abre la app del colaborador.

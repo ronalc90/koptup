@@ -60,7 +60,7 @@ Evidencia tomada de la rama `main`.
 | `/terms` | Pensado para desarrollo a medida: anticipo del 50 %, mora del 1,5 % mensual, garantía de 30–90 días, propiedad intelectual, confidencialidad por 3 años y jurisdicción en Bogotá. No cubre demos, IA, planes con mensualidad, Piloto RAG ni el tratamiento de documentos de clientes. "Su uso continuado constituye su aceptación de los términos modificados" | `es.json` → `termsPage` (`s1.c3`, `s3`, `s7`) |
 | `/cookies`: inventario | Lista cookies que el sitio no usa (`session_id`, `auth_token`, `csrf_token`, `cookie_consent`, `language`, `theme`, `user_preferences`, `_ga`, `_gid`, `_gat`). Las reales son `accessToken`, `refreshToken` y `locale`, más datos en `localStorage` (`user`, `cookie_preferences`, `koptup.clientType`, `chatbot_session_id`, entre otros) | `cookies/page.tsx` líneas 33–63; `lib/api.ts` líneas 144 y 163–164; `Navbar.tsx` línea 124 |
 | `/cookies`: preferencias | Botones que guardan `cookie_preferences` en `localStorage` y muestran un `alert()`. Ningún código lee esa preferencia. No hay banner ni categoría de publicidad | `cookies/page.tsx` líneas 65–94 |
-| Analítica | `main` no tiene. La rama RAG agrega GA4, Google Ads y LinkedIn "después de aceptar cookies", con un banner simple de aceptar o rechazar | Especificación de la rama, Fase 7 |
+| Analítica | `main` no tiene. La rama RAG agrega GA4, Google Ads y LinkedIn "después de aceptar cookies", con un banner simple de aceptar o rechazar | Especificación de la rama, etapa E7 |
 | Autorización en formularios | Contacto: ninguna. Registro: una sola casilla "Acepto los Términos y Privacidad". Cuentas con Google: se crean sin aceptar nada | `contact/page.tsx`; `register/page.tsx` (`agreeTerms`); `config/passport.ts` (creación del usuario) |
 | Peso | Los textos legales viven en `es.json` (≈ 23,6 KB entre `privacyPage`, `termsPage` y `cookiesPage`) y viajan a todas las páginas con el resto de mensajes | `app/layout.tsx` (carga de mensajes) |
 | Pie de página | Enlaces a las 3 páginas legales | `Footer.tsx` líneas 34–36 |
@@ -134,6 +134,7 @@ flowchart TD
   DER --> PRQ["PrivacyRequest con fecha límite legal"]
   USO --> RET["Retención: job privacy-retention anonimiza al vencer"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Seccion-Legal-1.png)
 
 ### 3. Política de tratamiento de datos personales (`/privacy`)
 
@@ -282,6 +283,7 @@ flowchart TD
   NO --> FIN
   FIN --> SIC["Si no queda conforme, puede acudir a la SIC"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Seccion-Legal-2.png)
 
 **Supresión:**
 - La hace la acción **Anonimizar Lead**, solo para admin. Revoca los accesos con motivo `supresion` y conserva solo la prueba de la autorización y de la atención (sección 14 de [Sistema de demos](04-Sistema-de-Demos.md)).
@@ -410,6 +412,7 @@ flowchart TD
   S -->|"No"| N["No carga scripts de terceros"]
   F["Enlace Preferencias de cookies"] --> CF
 ```
+> [Ver diagrama como imagen](images/diagramas/Seccion-Legal-3.png)
 
 ### 8. Datos sensibles y documentos de los clientes
 
@@ -519,7 +522,7 @@ flowchart TD
 | 11 | Condiciones de uso de las demos con casilla en `/acceso/activar` y `User.termsAcceptance` | Fase 1 — Funnel y solicitud de demos | P0 | S | Sin la casilla no se puede activar el acceso; el usuario queda con la versión y la fecha aceptadas |
 | 12 | Términos del Piloto RAG y de los planes con mensualidad, leyendo los precios de la misma constante que `/services#planes-rag` | Fase 1 — Funnel y solicitud de demos | P1 | S | Cambiar un precio en la constante lo cambia en `/services` y en `/terms`; los topes, el precio por pregunta adicional y el crédito de 30 días coinciden con la especificación RAG |
 | 13 | Inventario real de cookies en `lib/cookies-inventory.ts` y escaneo automático con Playwright (`scripts/scan-cookies.mjs`) | Fase 1 — Funnel y solicitud de demos | P0 | S | El escaneo de producción no encuentra cookies ni claves de almacenamiento fuera del inventario; la página `/cookies` lista solo cookies reales |
-| 14 | Banner de consentimiento con panel por categoría, Consent Mode v2 en modo básico, `kp_consent` versionado y enlace "Preferencias de cookies" en el pie. Reemplaza `localStorage` y `alert()` de `/cookies` y se coordina con la Fase 7 de la rama RAG | Fase 1 — Funnel y solicitud de demos | P0 | M | Con el banner sin responder o rechazado no sale ninguna petición a Google ni a LinkedIn (verificado con la tarea 13); aceptar solo analítica carga GA4 y no las etiquetas de publicidad; el banner se puede usar solo con teclado |
+| 14 | Banner de consentimiento con panel por categoría, Consent Mode v2 en modo básico, `kp_consent` versionado y enlace "Preferencias de cookies" en el pie. Reemplaza `localStorage` y `alert()` de `/cookies` y se coordina con la etapa E7 de la rama RAG | Fase 1 — Funnel y solicitud de demos | P0 | M | Con el banner sin responder o rechazado no sale ninguna petición a Google ni a LinkedIn (verificado con la tarea 13); aceptar solo analítica carga GA4 y no las etiquetas de publicidad; el banner se puede usar solo con teclado |
 | 15 | Contenido de terceros que carga al pulsar: mapa, videos (dominio sin cookies) y agenda | Fase 1 — Funnel y solicitud de demos | P1 | S | Al abrir `/contact`, `/rag` y las landings no hay peticiones a esos terceros hasta que la persona pulsa |
 | 16 | Advertencia de datos sensibles en los campos de texto libre, en la carga de documentos y en las demos de salud | Fase 1 — Funnel y solicitud de demos | P0 | S | La advertencia aparece en los 4 formularios y antes de subir un documento en `/demo/chatbot` |
 | 17 | Anexo de tratamiento de datos (encargo) para clientes de RAG y SaaS, adjunto a la propuesta | Fase 3 — Propuestas y conversión | P1 | M (externo) | Cada propuesta de un plan RAG lleva el anexo; el texto está aprobado por el asesor e incluye subencargados, incidentes y borrado al terminar |

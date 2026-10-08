@@ -41,7 +41,7 @@ Evidencia de la rama `main`.
 | Herramientas | 18 herramientas de terceros (Zoom, Slack, Jira, Toggl…) | `tooling`, líneas 233–240 |
 | Casos | 3 casos: SoSalud (real, con monto de COP 3.500.000), "Chatbot WhatsApp para empresa de productos" (+3x leads) y "Dashboard ejecutivo mid-market" (−60 %). Los dos últimos no tienen cliente identificable ni fuente de la cifra | `caseStudies`, líneas 242–270; título "Proyectos que ya entregamos" en la 830 |
 | CTA final | "¿Empezamos?" con voseo ("Probá… agendá una llamada de 30 minutos"), pero el botón lleva a `/contact`; otra foto de banco de fondo | Líneas 873–895 |
-| Voseo | "Si lo ves acá", "Probá", "agendá" | Líneas 56 y 882 |
+| Voseo | "Probá" y "agendá" (y el regionalismo "Si lo ves acá") | Líneas 56 y 882 |
 | Metadata | "Más de 100 proyectos entregados con éxito" (la rama `rag-reposicionamiento` ya lo quitó) | `seo-config.ts`, entrada `about` |
 | i18n | El namespace `aboutPage` de `es.json` y `en.json` tiene otro texto ("Transformamos Ideas en Realidad Digital") y no lo usa ningún componente. Con la cookie en inglés, `/about` sale en español | `grep aboutPage apps/web/src` no devuelve resultados |
 
@@ -95,6 +95,7 @@ flowchart LR
   P["Constante de planes RAG"] --> A
   P --> H
 ```
+> [Ver diagrama como imagen](images/diagramas/Seccion-Nosotros-1.png)
 
 Campos mínimos de `lib/company.ts`:
 
@@ -229,6 +230,7 @@ flowchart LR
   B --> C["2026: estudio comercial, asistente RAG en línea y catálogo de demos"]
   C --> D["Próximo: asistente RAG como servicio SaaS"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Seccion-Nosotros-2.png)
 
 - **2024:** primeros prototipos navegables de chatbot, e-commerce y tableros, con datos simulados.
 - **2025:** primer cliente: VPN empresarial para SoSalud (nombre según `authorized`).
@@ -276,7 +278,7 @@ Se quita "2027+: alianzas con integradores en México y Argentina" mientras no e
 
 **i18n**
 - Mover los textos a `messages/{es,en}.json`, reescribiendo el namespace `aboutPage`, hoy muerto. Se borran sus claves viejas.
-- Español colombiano con "tú": sin "acá", "Probá" ni "agendá". La rama `rag-reposicionamiento` corrige el voseo de todo el sitio; esta página se revisa al fusionarla.
+- Español colombiano con "tú": sin "Probá" ni "agendá" (la rama `rag-reposicionamiento` ya los cambió por "Prueba" y "agenda"). "Acá" no es voseo, pero se cambia por "aquí" al mover los textos a i18n.
 - Marca escrita siempre **KopTup**.
 
 **Accesibilidad**
@@ -309,7 +311,7 @@ Se quita "2027+: alianzas con integradores en México y Argentina" mientras no e
 | 11 | Bloque "Tus datos y la empresa" con datos legales desde `lib/company.ts` y enlaces a `/privacy` y `/rag` | Fase 1 — Funnel y solicitud de demos | P1 | S | Razón social y NIT (si existen) coinciden con los de `/privacy`; el texto de datos coincide con la home |
 | 12 | Historia con fechas reales y "Próximo" tomado del roadmap; quitar "alianzas en México y Argentina" | Fase 1 — Funnel y solicitud de demos | P1 | S | Cada hito tiene fecha confirmada por el dueño; la lista es un `<ol>` accesible |
 | 13 | CTA final con "Probar la demo", "Solicitar demo guiada" (modal con `source.page = "/about"`) y "Agendar llamada" real | Fase 1 — Funnel y solicitud de demos | P1 | S | Una solicitud enviada desde `/about` llega al panel con origen `/about`; no hay `mailto:` ni promesas de llamada que lleven a un formulario |
-| 14 | Corregir el voseo de la página ("acá", "Probá", "agendá") al fusionar la rama `rag-reposicionamiento` | Fase 1 — Funnel y solicitud de demos | P1 | S | La búsqueda de las formas de voseo de la especificación RAG no encuentra nada en `about/` |
+| 14 | Verificar el "tú" de la página al fusionar la rama `rag-reposicionamiento` (que ya cambió "Probá" y "agendá") y cambiar "acá" por "aquí" | Fase 1 — Funnel y solicitud de demos | P1 | S | La búsqueda de las formas de voseo de la especificación RAG no encuentra nada en `about/` |
 | 15 | Convertir `/about` en server component y servir imágenes con `next/image` | Fase 1 — Funnel y solicitud de demos | P2 | S | `about/page.tsx` no tiene `'use client'`; Lighthouse móvil ≥ 90 en rendimiento; LCP p75 < 2,5 s |
 | 16 | JSON-LD `AboutPage` + `Person` (fundador) enlazados al `Organization` por `@id` | Fase 1 — Funnel y solicitud de demos | P2 | S | La prueba de resultados enriquecidos no muestra errores; el `@id` del `Organization` es el mismo que en la home |
 | 17 | Tecnología compacta (2 listas + desplegable `<details>`) y eliminación de "Herramientas de trabajo" | Fase 2 — Demos vendibles | P2 | S | La página tiene como máximo 16 tecnologías visibles sin abrir el desplegable; no queda la sección de herramientas |

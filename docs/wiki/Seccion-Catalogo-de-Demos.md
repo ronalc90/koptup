@@ -184,6 +184,7 @@ flowchart TD
   E -->|"solicitud"| G["Solicitar acceso y Ver vista previa"]
   C -->|"Expirado hace 30 días o menos"| H["Pedir extensión"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Seccion-Catalogo-de-Demos-1.png)
 
 El estado del visitante (acceso vigente o expirado) se resuelve en la isla cliente con `GET /api/me/demos` solo si hay sesión. Mientras carga, la tarjeta muestra la acción por modo, sin saltos de diseño.
 
@@ -233,6 +234,7 @@ flowchart LR
   T["messages demos catalog: títulos y resúmenes"] --> H
   SC["services-catalog.ts: área del producto"] --> H
 ```
+> [Ver diagrama como imagen](images/diagramas/Seccion-Catalogo-de-Demos-2.png)
 
 | Dato | De dónde sale | Notas |
 |---|---|---|

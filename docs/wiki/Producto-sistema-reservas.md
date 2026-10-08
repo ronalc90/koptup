@@ -4,7 +4,7 @@
 
 ![Demo actual](images/actual/demo-sistema-reservas.jpg)
 
-*Captura actual de `/demo/sistema-reservas` (vista pública). Ver también [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md) y [Roadmap](12-Roadmap.md). Productos relacionados: [Telemedicina](Producto-telemedicina.md), [Chatbot RAG](Producto-chatbot-rag-ia.md), [Programa de fidelización](Producto-loyalty-fidelizacion.md), [POS retail](Producto-pos-retail.md), [CRM con IA](Producto-crm-ia.md) y [Facturación electrónica](Producto-facturacion-electronica.md).*
+*Captura actual de `/demo/sistema-reservas` (vista pública). Ver también [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md) y [Roadmap](12-Roadmap.md). Productos relacionados: [Telemedicina](Producto-telemedicina.md), [Sistemas RAG](Producto-chatbot-rag-ia.md), [Programa de fidelización](Producto-loyalty-fidelizacion.md), [POS retail](Producto-pos-retail.md), [CRM con IA](Producto-crm-ia.md) y [Facturación electrónica](Producto-facturacion-electronica.md).*
 
 > **Contexto de posicionamiento:** con el reposicionamiento de Koptup en sistemas RAG (ver [Visión de producto](02-Vision-de-Producto.md)), este producto queda dentro de **"Otras soluciones a medida"**. Tiene una conexión natural con el producto principal: el **agendamiento por WhatsApp con un asistente** que responde las preguntas del negocio con sus propios documentos (precios, preparación para un procedimiento, políticas) y agenda la cita. Ese complemento es el argumento para no competir solo como "otra agenda en línea".
 
@@ -85,7 +85,7 @@ Sigue la estructura común de [Landing de producto](Seccion-Landing-de-Producto.
 1. **Hero:** "Tu agenda llena y sin ausencias". Subtítulo: "Reservas en línea con tu marca, abono anticipado con PSE o Nequi y recordatorios por WhatsApp, para todas tus sedes y profesionales." CTA principal **"Solicitar demo personalizada"** (propuesta: "Quiero ver mi página de reservas de prueba"); secundario "Agendar llamada"; enlace de texto "Probar la demo ahora" (modo `publico`).
 2. **Problemas que resuelve** (3 tarjetas): "Se te va el día agendando por WhatsApp"; "Clientes que reservan y no llegan"; "Agendas por profesional y por sede que se cruzan".
 3. **Cómo funciona** (4 pasos): diagnóstico de servicios, profesionales, sedes y reglas → configuración de tu página con tu marca y de los recordatorios → piloto de 2 semanas en una sede → todas las sedes y acompañamiento mensual.
-4. **Módulos con "Incluido desde":** Página de reservas con tu marca y enlace para Instagram y WhatsApp (Básico) · Agenda por profesional y recurso (Básico) · Abonos en línea (Básico) · Confirmación por correo y sincronización con Google Calendar (Básico) · Recordatorios por WhatsApp con confirmar/reprogramar (Profesional) · Videollamada automática para citas virtuales (Profesional) · Lista de espera y políticas de cancelación (Profesional) · Multisede, franquicias y recursos compartidos (Avanzado) · Paquetes y membresías (Avanzado) · Agendamiento por WhatsApp con asistente IA (Avanzado, complemento basado en el [Chatbot RAG](Producto-chatbot-rag-ia.md)) · Integración con historia clínica (Enterprise).
+4. **Módulos con "Incluido desde":** Página de reservas con tu marca y enlace para Instagram y WhatsApp (Básico) · Agenda por profesional y recurso (Básico) · Abonos en línea (Básico) · Confirmación por correo y sincronización con Google Calendar (Básico) · Recordatorios por WhatsApp con confirmar/reprogramar (Profesional) · Videollamada automática para citas virtuales (Profesional) · Lista de espera y políticas de cancelación (Profesional) · Multisede, franquicias y recursos compartidos (Avanzado) · Paquetes y membresías (Avanzado) · Agendamiento por WhatsApp con asistente IA (Avanzado, complemento basado en los [Sistemas RAG](Producto-chatbot-rag-ia.md)) · Integración con historia clínica (Enterprise).
 5. **Capturas** (galería de 6: página de reservas, elección de profesional y hora, pago del abono, mensaje de WhatsApp, agenda semanal del negocio, indicadores) y **video de 60 s** del recorrido.
 6. **Integraciones:** Google Calendar, Outlook/Microsoft 365 y Apple Calendar; WhatsApp Business Platform; Wompi, PayU o Mercado Pago (PSE, Nequi, Daviplata, tarjetas); Zoom o Google Meet; Siigo, Alegra o [Facturación electrónica](Producto-facturacion-electronica.md) para facturar el servicio; [CRM con IA](Producto-crm-ia.md) o HubSpot; [POS retail](Producto-pos-retail.md) y [Programa de fidelización](Producto-loyalty-fidelizacion.md); sistemas de historia clínica (Enterprise).
 7. **Planes y precios:** "Compra / a medida" en COP con "desde"; SaaS como **"Lista de espera"** (DECISIÓN 7).
@@ -119,6 +119,7 @@ flowchart LR
   D --> E["5. La cita aparece en la agenda del negocio"]
   E --> F["CTA: pagina de reservas de prueba o propuesta"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-sistema-reservas-1.png)
 
 1. **Página pública:** elegir "Limpieza dental" en la sede Cedritos con la higienista Paola Gómez.
 2. **Fecha y hora:** el calendario muestra el festivo como cerrado; elegir el jueves a las 10:00 a. m. entre las franjas que quedan.
@@ -225,6 +226,8 @@ Detalle de la política comercial común en [Catálogo de productos](08-Catalogo
 ---
 
 ## Métricas de éxito
+
+Son **metas** iniciales a validar con datos reales; no son resultados actuales.
 
 - ≥ 35 % de las sesiones que empiezan una reserva en la demo pública la terminan, y ≥ 50 % de ellas pasan a "Vista negocio".
 - Clic en el banner "Pide tu página de reservas de prueba" ≥ 3 % de las sesiones; conversión a solicitud enviada ≥ 2 %.

@@ -55,7 +55,7 @@ Evidencia tomada de la rama `main`. La rama `rag-reposicionamiento` ya cambia pa
 | SEO | Título "Servicios de Desarrollo de Software \| E-commerce, IA, Apps Móviles". El JSON-LD `ProfessionalService` lista 6 servicios (apps móviles, diseño UX/UI, integración de sistemas…) que no son los productos del catálogo | `seo-config.ts` líneas 40–58; `services/layout.tsx` líneas 6–31 |
 | CTA final | "¿No sabés cuál elegir?" → "Hablar con un experto" → `/contact` sin producto | `OfferingsCatalog.tsx` línea 740 |
 | Peso de mensajes | Los textos de los 27 productos (`_offerings.es.json`, 79 KB) viajan a **todas** las páginas del sitio dentro del proveedor global de i18n | `app/layout.tsx` (`getMessages`), `i18n/request.ts` |
-| Rama `rag-reposicionamiento` | Ya hecho: `/pricing` → `/services#planes-rag`, canónico con `www`, botones a `/pricing` corregidos. Pendiente (su Fase 4): sección `#planes-rag`, quitar la tarjeta del chatbot, `TRM_REFERENCIA = 3300` y quitar el botón de demo de QA y VPN | `git diff main...rag-reposicionamiento` |
+| Rama `rag-reposicionamiento` (sin fusionar) | Ya hecho en commits: `/pricing` → `/services#planes-rag`, canónico con `www` y botones a `/pricing` corregidos (E1, `2df589a`); sección `#planes-rag` con `RagPlans` y `lib/rag-plans.ts`, JSON-LD `Service` con un `Offer` por plan, tarjeta "Chatbot RAG con IA" oculta del catálogo, título "Otras soluciones a medida", `TRM_REFERENCIA = 3300` y retiro de la TRM en vivo (E4, `5828060`); QA automatizado y VPN sin botón de demo (E5, `a72235f`). Producción todavía no tiene nada de esto | `git log --oneline main..rag-reposicionamiento` |
 
 **Capturas del estado actual**
 
@@ -121,6 +121,7 @@ flowchart TD
   E --> L["Solicitud pendiente + Lead + acuse"]
   G --> L2["Llamada con comercial"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Seccion-Servicios-y-Precios-1.png)
 
 ### 1. Hero compacto
 
@@ -133,7 +134,7 @@ La rama RAG pide la sección de planes "arriba de todo". El hero queda en una so
 
 ### 2. Planes RAG (`#planes-rag`)
 
-Se implementa en la rama `rag-reposicionamiento` (su Fase 4). Los datos viven en **una sola constante**, `RAG_PLANS` en `apps/web/src/lib/rag-plans.ts`, que también usan `RagPlansTeaser` en la home y la tabla de `/rag`.
+Ya está implementada en la rama `rag-reposicionamiento` (etapa E4, commit `5828060`), pendiente de fusionar en `main`. Los datos viven en **una sola constante**, `RAG_PLANS` en `apps/web/src/lib/rag-plans.ts`, que también usan `RagPlansTeaser` en la home y la tabla de `/rag`.
 
 | Plan | Precio | Implementación | Qué incluye | CTA principal | CTA secundario |
 |---|---|---|---|---|---|
@@ -141,6 +142,10 @@ Se implementa en la rama `rag-reposicionamiento` (su Fase 4). Los datos viven en
 | **Esencial** | Setup COP 9.900.000 / USD 2.990 + COP 1.490.000 / USD 450 al mes | 3–4 semanas | Una fuente (Drive, SharePoint o carga manual), hasta 1.000 documentos, widget web, respuestas con cita. La mensualidad incluye hosting, IA hasta 3.000 preguntas al mes, actualización de documentos y soporte Lun–Vie | **Solicitar demo guiada** (`plan=esencial`) | Probar la demo |
 | **Profesional** | Setup COP 24.900.000 / USD 7.490 + COP 2.990.000 / USD 890 al mes | 6–8 semanas | Hasta 3 fuentes, 10.000 documentos, web y WhatsApp, permisos por rol, panel de métricas, hasta 15.000 preguntas al mes, soporte prioritario y revisión mensual de calidad | **Solicitar demo guiada** (`plan=profesional`) | Probar la demo |
 | **Empresarial** | Desde COP 59.900.000 / USD 17.900; mensualidad según SLA | 10–14 semanas | Fuentes ilimitadas, nube del cliente u on-premise, SSO, auditoría, código fuente incluido | **Agendar llamada** | Solicitar propuesta |
+
+![Vista previa de /services#planes-rag en la rama rag-reposicionamiento: tarjetas Piloto RAG, Esencial, Profesional y Empresarial con precios en COP y USD fijos, "Más IVA si aplica" y el bloque "Ten en cuenta" con la pregunta adicional y las tarifas de Meta](images/mockups/rag-vista-previa-planes.jpg)
+
+*Vista previa de la sección `#planes-rag` (build local de la rama `rag-reposicionamiento`; aún no está en producción). Los botones de la vista previa ("Agenda tu piloto", "Elegir Esencial", "Elegir Profesional", "Cotizar Empresarial") van hoy a `/contact` con el plan preseleccionado; la tabla de arriba describe el destino final con el formulario "Solicitar demo".*
 
 Notas visibles debajo de la tabla:
 
@@ -164,6 +169,7 @@ flowchart LR
   P2 --> P3["3. Recibe tu propuesta"]
   P3 --> P4["4. Firma, paga el anticipo y arrancamos"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Seccion-Servicios-y-Precios-2.png)
 
 | Paso | Texto propuesto |
 |---|---|
@@ -257,7 +263,7 @@ La fila de soporte dice "hábiles" en todos los planes: hoy el plan Enterprise d
 - **Planes RAG:** USD fijos de la especificación.
 - **Otras soluciones:** USD **de referencia** = COP ÷ `TRM_REFERENCIA` (3.300), redondeado a la centena (≥ USD 1.000) o a la decena (< USD 1.000). Ejemplo: COP 56.000.000 → USD 17.000.
 - **Etiqueta visible:** "USD de referencia (1 USD = COP 3.300). Para empresas fuera de Colombia, la propuesta fija el precio en USD."
-- Se quitan del catálogo público `useLiveTRM`, `TRM_FALLBACK` y la etiqueta "TRM en vivo". La ruta `/api/trm` se conserva para el armador de propuestas (Fase 3, campo `fxRate` del `Quote`), y debe devolver y mostrar el proveedor real que respondió.
+- Se quitan del catálogo público `useLiveTRM`, `TRM_FALLBACK` y la etiqueta "TRM en vivo". La ruta `/api/trm` también se elimina (ya retirada en la rama `rag-reposicionamiento`). El armador de propuestas (Fase 3) convierte con `TRM_REFERENCIA` y guarda la tasa usada en el campo `fxRate` del `Quote`.
 
 #### 7.2 IVA
 
@@ -313,6 +319,7 @@ flowchart LR
   RP -.-> PK
   SC -.-> PK
 ```
+> [Ver diagrama como imagen](images/diagramas/Seccion-Servicios-y-Precios-3.png)
 
 - Se eliminan los precios escritos a mano en `register/page.tsx` (`PLAN_PREVIEW`), `dashboard/page.tsx` (`EmptyView`) y `admin/page.tsx`. El registro y el portal leen el plan desde `RAG_PLANS` u `OFFERINGS`; el panel admin usa datos reales (ver [Panel de administración](05-Panel-de-Administracion.md)).
 - **Fase 3:** las dos fuentes se mueven a un paquete compartido del monorepo, `packages/catalog` (ya existe la carpeta `packages/`), para que el `Quote` ampliado del backend use exactamente los mismos montos que la web.
@@ -432,7 +439,7 @@ Componente `FaqSection`; el JSON-LD `FAQPage` se genera del mismo arreglo visibl
 
 | # | Tarea | Fase | Prioridad | Esfuerzo | Criterio de aceptación |
 |---|---|---|---|---|---|
-| 1 | Fusionar la Fase 4 de la rama `rag-reposicionamiento`: sección `#planes-rag` (`RagPlans` + `lib/rag-plans.ts`), quitar la tarjeta del chatbot, `TRM_REFERENCIA = 3300` y quitar el botón de demo de QA y VPN | Fase 1 — Funnel y solicitud de demos | P0 | M | En producción `/services#planes-rag` muestra los 4 planes con los montos exactos de la especificación y USD fijos; no aparece la tarjeta "Chatbot RAG con IA"; QA y VPN no tienen botón de demo |
+| 1 | Fusionar la etapa E4 de la rama `rag-reposicionamiento`: sección `#planes-rag` (`RagPlans` + `lib/rag-plans.ts`), quitar la tarjeta del chatbot, `TRM_REFERENCIA = 3300` y quitar el botón de demo de QA y VPN | Fase 1 — Funnel y solicitud de demos | P0 | M | En producción `/services#planes-rag` muestra los 4 planes con los montos exactos de la especificación y USD fijos; no aparece la tarjeta "Chatbot RAG con IA"; QA y VPN no tienen botón de demo |
 | 2 | Fuente única de precios: borrar `PLAN_PREVIEW` de `register/page.tsx`, las recomendaciones con precio de `dashboard/page.tsx` y los montos simulados de `admin/page.tsx`; leer de `RAG_PLANS` u `OFFERINGS` | Fase 1 — Funnel y solicitud de demos | P0 | S | Una búsqueda de "489000", "249000", "Starter" y "agente-ia-ventas" en `apps/web/src` no da resultados; el registro con `?plan=` muestra un plan que existe en `/services` |
 | 3 | Regla SaaS (DECISIÓN 7): campo `saasStatus`, ocultar las cuotas SaaS de las 26 soluciones, insignia "Suscripción: lista de espera" y formulario de lista de espera hacia `POST /api/contact` con `modality = saas` | Fase 1 — Funnel y solicitud de demos | P0 | M | Ninguna tarjeta ni landing de "Otras soluciones" muestra una cuota mensual; unirse a la lista crea o actualiza un Lead con la etiqueta `saas_lista_espera:<slug>` visible en **Admin › Leads** |
 | 4 | `SolutionsCatalog` y `SolutionCard` como server component: "Desde" con el setup mínimo de compra, USD de referencia, insignias por modo, botón "Ver producto" a la landing, sin modal; ancla `#otras-soluciones` | Fase 1 — Funnel y solicitud de demos | P0 | M | Las 26 tarjetas enlazan a `/productos/<slug>` (respuesta 200); ninguna dice "Desde $6.900.000"; el precio de cada tarjeta coincide con el plan Básico de compra de `services-catalog.ts` |
@@ -441,7 +448,7 @@ Componente `FaqSection`; el JSON-LD `FAQPage` se genera del mismo arreglo visibl
 | 7 | Reescribir el hero, la caja "Cómo escalamos" (sin HIPAA/SOC 2/ISO) y el CTA final en tuteo; CTA final con "Solicitar demo guiada" y "Agendar llamada" | Fase 1 — Funnel y solicitud de demos | P1 | S | `_page.es.json` no tiene voseo ni menciones de certificaciones; no queda enlace a `/contact` sin producto en la página |
 | 8 | Secciones "Cómo comprar" (`BuyingSteps`) y "Compra o suscripción" (`ModalityExplainer`) | Fase 1 — Funnel y solicitud de demos | P1 | S | Las dos secciones se ven en móvil sin desplazamiento horizontal; el texto dice qué modalidad está disponible para cada tipo de producto |
 | 9 | Campo `area` con las 6 áreas de negocio y chips de filtro; reclasificar HRMS, BI y SaaS multi-tenant; el mismo campo lo usa el catálogo de demos | Fase 1 — Funnel y solicitud de demos | P1 | S | Hay 7 chips (6 áreas + Todas); ningún área tiene menos de 2 productos; `?area=finanzas` filtra al cargar la página |
-| 10 | Formatos: "A convenir" en lugar de "Personalizado" y "Custom"; `formatUsdReference` con redondeo; quitar `useLiveTRM` y la etiqueta "TRM en vivo" del catálogo; `/api/trm` devuelve el proveedor real | Fase 1 — Funnel y solicitud de demos | P1 | S | La página no hace peticiones a `/api/trm`; COP 56.000.000 se muestra como "≈ USD 17.000 de referencia"; la palabra "Custom" no aparece en español |
+| 10 | Formatos: "A convenir" en lugar de "Personalizado" y "Custom"; `formatUsdReference` con redondeo; quitar `useLiveTRM`, la etiqueta "TRM en vivo" y la ruta `/api/trm` (ya retirados en la rama) | Fase 1 — Funnel y solicitud de demos | P1 | S | La página no hace peticiones a `/api/trm`; COP 56.000.000 se muestra como "≈ USD 17.000 de referencia"; la palabra "Custom" no aparece en español |
 | 11 | Política de mantenimiento de la compra (decisión del dueño, sección 7.3) y su visualización; mientras tanto, "+ mantenimiento según plan" | Fase 1 — Funnel y solicitud de demos | P1 | S | La decisión queda escrita en [Comercial, marketing y legal](11-Comercial-Marketing-y-Legal.md); ningún precio público de mantenimiento contradice esa decisión |
 | 12 | Limpiar los textos de las 26 ofertas: descripción propia, viñetas sin duplicados ni "tier", tuteo, `searchKeywords`; eliminar `incluyeCount` y recorrer el arreglo real | Fase 1 — Funnel y solicitud de demos | P1 | M | Un script sobre `messages/offerings/*.es.json` no encuentra la frase de plantilla, viñetas repetidas dentro de un plan ni formas de voseo de la lista de la especificación RAG |
 | 13 | Preguntas sobre precios (`FaqSection`, 8 preguntas) con `FAQPage` generado del mismo arreglo | Fase 1 — Funnel y solicitud de demos | P1 | S | El texto del JSON-LD es idéntico al visible; la prueba de resultados enriquecidos no muestra errores |

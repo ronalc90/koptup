@@ -4,7 +4,7 @@
 
 ![Demo actual](images/actual/demo-lms.jpg)
 
-*Captura actual de `/demo/lms` (vista Alumno, Catálogo). Ver también [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md) y [Roadmap](12-Roadmap.md). Productos relacionados: [Chatbot RAG](Producto-chatbot-rag-ia.md) (tutor IA sobre el material del curso), [Gestión Humana y Nómina](Producto-hrms.md) (formación corporativa), [Facturación electrónica](Producto-facturacion-electronica.md) (venta de cursos) y [E-commerce](Producto-ecommerce.md).*
+*Captura actual de `/demo/lms` (vista Alumno, Catálogo). Ver también [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md) y [Roadmap](12-Roadmap.md). Productos relacionados: [Sistemas RAG](Producto-chatbot-rag-ia.md) (tutor IA sobre el material del curso), [Gestión Humana y Nómina](Producto-hrms.md) (formación corporativa), [Facturación electrónica](Producto-facturacion-electronica.md) (venta de cursos) y [E-commerce](Producto-ecommerce.md).*
 
 ---
 
@@ -115,6 +115,7 @@ flowchart LR
   D --> E["5. Panel del administrador: ventas y abandono"]
   E --> F["CTA: Solicitar propuesta"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-lms-elearning-1.png)
 
 1. **Catálogo:** "Academia Andina vende 12 cursos; el diplomado de finanzas cuesta $890.000."
 2. **Pago:** comprar con el cupón `BIENVENIDA10` y PSE (simulado); llega la confirmación, la factura electrónica (simulada) y el curso aparece en "Mis cursos".
@@ -163,7 +164,7 @@ Sin código, desde **Admin › Solicitudes de demo › Aprobar** (o Admin › De
 - **Analítica:** avance por curso y estudiante, riesgo de abandono por inactividad, recordatorios por correo y WhatsApp Business.
 - **Roles:** estudiante, instructor, administrador (y jefe de área en el caso corporativo), con autorización en servidor.
 - **Corporativo:** asignación por cargo y área, cursos obligatorios con vencimiento, reportes de cumplimiento exportables, inicio de sesión con Google o Microsoft, integración con [Gestión Humana](Producto-hrms.md).
-- **Tutor IA (complemento RAG):** responde con el material del curso y cita la lección; reutiliza el núcleo del [Chatbot RAG](Producto-chatbot-rag-ia.md) y se cobra como plan RAG.
+- **Tutor IA (complemento RAG):** responde con el material del curso y cita la lección; reutiliza el núcleo de los [Sistemas RAG](Producto-chatbot-rag-ia.md) y se cobra como plan RAG.
 - **Profesional en adelante:** SCORM 1.2/2004 y xAPI; **Avanzado:** LTI 1.3, multi-sede, proctoring con proveedor externo.
 - **Transversal:** autorización de datos personales (Ley 1581 de 2012) en el registro, términos de venta y retracto para cursos vendidos en línea, auditoría de calificaciones y certificados.
 - **Base técnica:** partir de los tipos de `apps/backend/src/modules/lms/` (Course, Enrollment, `enroll`) migrados a Mongoose con autenticación, autorización y `tenantId`.
@@ -190,7 +191,7 @@ Horas de evolutivos incluidas por mes: 5 / 12 / 25 / 50. Soporte: correo 24 h h�
 4. **Pagos locales primero:** Wompi/PayU con PSE y Nequi en todos los planes; Stripe solo para cobros en USD.
 5. **SaaS → "Lista de espera"** hasta la Fase 4; ofrecer el **tutor RAG** como complemento con los planes RAG.
 6. **Bullets en lenguaje de cliente y alineados con la demo.** Propuesta: **Básico** "Hasta 500 estudiantes activos · Tu marca y dominio · Venta de cursos con PSE, tarjeta y Nequi · Certificados verificables con QR · Recordatorios por correo". **Profesional** "+ Hasta 5.000 estudiantes · Clases en vivo con Zoom, Meet o Teams · Analítica y alertas de abandono · SCORM/xAPI · Asignaciones corporativas · Tutor IA con tus materiales (complemento)". **Avanzado** "+ Multi-sede · LTI 1.3 · Proctoring con proveedor externo · Integración con Gestión Humana o sistema académico". **Enterprise** "+ SSO y aprovisionamiento automático · Video corporativo · Integración con SAP SuccessFactors / Workday Learning · Gerente de proyecto dedicado".
-7. Tuteo o usted en lugar de voseo; quitar "Zoom manual", "HRMS para certificaciones", "Talent Management adapter" y "Reportes mensuales del tier" repetido; descripción propia; `costoNote` igual al catálogo (USD 80–25.000) explicando el costo del video.
+7. Tuteo ("tú") en lugar de voseo; quitar "Zoom manual", "HRMS para certificaciones", "Talent Management adapter" y "Reportes mensuales del tier" repetido; descripción propia; `costoNote` igual al catálogo (USD 80–25.000) explicando el costo del video.
 8. Ofrecer una entrada de bajo riesgo: **"Lanza tu academia"** (plataforma configurada + 3 cursos migrados + primera cohorte acompañada) con precio cerrado.
 
 Política comercial común en [Catálogo de productos](08-Catalogo-de-Productos.md) y [Comercial, marketing y legal](11-Comercial-Marketing-y-Legal.md).
@@ -220,6 +221,8 @@ Política comercial común en [Catálogo de productos](08-Catalogo-de-Productos.
 ---
 
 ## Métricas de éxito
+
+Son **metas** iniciales a validar con datos reales; no son resultados actuales.
 
 - **Interés:** ≥ 4 solicitudes de demo calificadas por trimestre (academias con 300+ estudiantes al año o empresas con 100+ colaboradores).
 - **Activación:** ≥ 60 % de los prospectos aprobados abre la demo en 72 h; ≥ 40 % completa el checkout simulado; ≥ 30 % prueba las 3 vistas (alumno, instructor, administrador); ≥ 50 % hace al menos una pregunta al tutor.

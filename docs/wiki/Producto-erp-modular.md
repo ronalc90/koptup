@@ -109,6 +109,7 @@ flowchart LR
   D --> E["5. Finanzas: asiento, cartera y conciliacion"]
   E --> F["CTA: Solicitar propuesta o diagnostico"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-erp-modular-1.png)
 
 1. **Tablero:** "Comercial Nevado vendió $1.240 M este mes; tiene $86 M de cartera vencida a más de 60 días".
 2. **Ventas:** convertir la cotización de "Supermercados La Sabana" en pedido y factura; la factura queda "Aceptada por la DIAN (simulado)".
@@ -174,7 +175,7 @@ Almacenamiento: 50 GB / 400 GB / 1,5 TB / ilimitado. Horas de evolutivos incluid
 2. **Tiempos irreales:** un ERP con facturación DIAN no sale en 2–5 semanas. Permitir que cada offering sobrescriba `IMPL_SEMANAS_BY_TIER`; propuesta para ERP: 8–12 / 12–18 / 18–26 / 24–40 semanas, por fases de módulos.
 3. **SaaS → "Lista de espera"** hasta la Fase 4.
 4. **Bullets en lenguaje de cliente y alineados con la demo.** Propuesta: **Básico** "1 empresa, hasta 10 usuarios · Ventas y facturación electrónica · Inventario en 1 bodega · Cartera y links de pago Wompi/PSE · Integración con tu software contable". **Profesional** "+ Hasta 5 empresas y 5 bodegas · Compras con aprobaciones · Conciliación bancaria · POS/WMS conectados · Nómina electrónica (vía HRMS)". **Avanzado** "+ Contabilidad NIIF propia y consolidación · Producción y MRP · Tableros gerenciales · Intercambio electrónico con proveedores". **Enterprise** "+ Multi-país (CO/MX/PE/CL) · Integración SAP/Oracle · Auditoría continua · Gerente de proyecto dedicado".
-5. Quitar "Reportes mensuales del tier" repetido, usar tuteo o usted en lugar de voseo y escribir una descripción propia (no "Implementación a medida o suscripción SaaS mensual del producto…").
+5. Quitar "Reportes mensuales del tier" repetido, usar tuteo ("tú") en lugar de voseo y escribir una descripción propia (no "Implementación a medida o suscripción SaaS mensual del producto…").
 6. Igualar el `costoNote` al rango del catálogo (USD 150–35.000) y explicar qué es cada costo.
 7. Mostrar "desde $60 M + IVA" en la landing junto con el costo total a 12 meses, y ofrecer el **diagnóstico de procesos** como primer paso de bajo riesgo.
 
@@ -205,6 +206,8 @@ Detalle de la política comercial común en [Catálogo de productos](08-Catalogo
 ---
 
 ## Métricas de éxito
+
+Son **metas** iniciales a validar con datos reales; no son resultados actuales.
 
 - Conversión landing → solicitud de demo ≥ 2 % (ticket alto, menor volumen).
 - ≥ 80 % de las solicitudes calificadas (empresa con NIT y más de 10 empleados) y aprobadas en < 24 h hábiles.

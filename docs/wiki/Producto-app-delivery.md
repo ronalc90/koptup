@@ -115,6 +115,7 @@ flowchart LR
   D --> E["5. Cliente califica y operaciones ve tiempos y ahorro"]
   E --> F["CTA: Solicitar propuesta o agendar llamada"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-app-delivery-1.png)
 
 1. **Cliente** (Chapinero, Bogotá): pide una bandeja paisa y dos limonadas en la sede Chapinero, agrega "sin cebolla" y paga con Nequi (simulado). Recibe el WhatsApp con el enlace de seguimiento.
 2. **Comercio:** el pedido entra con 45 s para aceptar; la sede lo acepta y lo marca "Listo para recoger" a los 14 min (tiempo acelerado en la demo).
@@ -221,6 +222,8 @@ Detalle de la política comercial común en [Catálogo de productos](08-Catalogo
 ---
 
 ## Métricas de éxito
+
+Son **metas** iniciales a validar con datos reales; no son resultados actuales.
 
 - Conversión landing → solicitud de demo ≥ 2 %.
 - ≥ 50 % de los visitantes de la landing usan la calculadora de ahorro.

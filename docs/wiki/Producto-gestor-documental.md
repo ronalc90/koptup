@@ -4,7 +4,7 @@
 
 ![Demo actual](images/actual/demo-gestor-documentos.jpg)
 
-*Captura actual de `/demo/gestor-documentos` en producción: muestra "Error al cargar documentos" con todos los contadores en 0. Ver también [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md) y [Roadmap](12-Roadmap.md). Productos relacionados: [Chatbot RAG](Producto-chatbot-rag-ia.md), [Firma electrónica](Producto-firma-electronica.md), [Facturación electrónica](Producto-facturacion-electronica.md) y [Gestión de proyectos](Producto-gestion-proyectos.md).*
+*Captura actual de `/demo/gestor-documentos` en producción: muestra "Error al cargar documentos" con todos los contadores en 0. Ver también [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md) y [Roadmap](12-Roadmap.md). Productos relacionados: [Sistemas RAG](Producto-chatbot-rag-ia.md), [Firma electrónica](Producto-firma-electronica.md), [Facturación electrónica](Producto-facturacion-electronica.md) y [Gestión de proyectos](Producto-gestion-proyectos.md).*
 
 > **Contexto de posicionamiento:** con el reposicionamiento de Koptup en sistemas RAG (ver [Visión de producto](02-Vision-de-Producto.md)), este producto queda formalmente en **"Otras soluciones a medida"**, pero es **el más cercano al producto principal**. La demo ya hace la mitad de un RAG:
 > - sube PDF, DOCX y TXT;
@@ -179,6 +179,7 @@ flowchart LR
   D --> E["5. Preguntar a estos documentos (RAG)"]
   E --> F["CTA: Prueba con tu documento o Solicitar demo"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-gestor-documental-1.png)
 
 1. **Archivo clasificado:** 24 documentos de "Constructora Altos del Río" ya ordenados por carpeta, con etiquetas y tiempo de retención.
 2. **Buscar por significado:** "contratos con renovación automática que vencen en 2026" devuelve 3 resultados con el fragmento resaltado y el porqué.
@@ -194,7 +195,7 @@ flowchart LR
   - El único costo en vivo es el embedding de cada consulta, con límite de uso por visitante.
   - Así la demo sirve de imán SEO ("gestor documental", "gestión documental con IA") sin exponer costos.
   - Banner "Solicita tu demo guiada" (DECISIÓN 1).
-- **Subir documentos propios sin registro:** se redirige a "Prueba con tu documento" del RAG: email + autorización Ley 1581, 3 documentos por IP al día y borrado a la hora. Es el mismo flujo que ya define [Chatbot RAG](Producto-chatbot-rag-ia.md).
+- **Subir documentos propios sin registro:** se redirige a "Prueba con tu documento" del RAG: email + autorización Ley 1581, 3 documentos por IP al día y borrado a la hora. Es el mismo flujo que ya define la página [Sistemas RAG](Producto-chatbot-rag-ia.md).
 - **Qué obtiene al solicitar** (flujo de [Sistema de demos](04-Sistema-de-Demos.md)):
   - Sesión guiada de 45 min.
   - **Espacio propio y aislado** (`DemoGrant`) con su marca y su preset de sector.
@@ -322,6 +323,8 @@ Detalle de la política comercial común en [Catálogo de productos](08-Catalogo
 ---
 
 ## Métricas de éxito
+
+Son **metas** iniciales a validar con datos reales; no son resultados actuales.
 
 - 0 errores de carga visibles en la demo de producción (monitoreo diario) y búsqueda p95 < 2 s sobre el corpus de ejemplo.
 - ≥ 50 % de los visitantes de la demo hacen al menos una búsqueda por significado, y ≥ 40 % completan 3 pasos del tour.

@@ -120,6 +120,7 @@ flowchart LR
   G -->|"Si"| H["Version patrocinada con el ad copy"]
   G -->|"No"| A
 ```
+> [Ver diagrama como imagen](images/diagramas/Demo-linkedin-ads-1.png)
 
 **Reglas de contenido** (se aplican en el prompt, en el generador local y en la lista de verificación):
 1. Sin testimonios ni clientes salvo los autorizados por escrito (hoy: ninguno publicable sin permiso; ver [Comercial, marketing y legal](11-Comercial-Marketing-y-Legal.md)).
@@ -128,7 +129,7 @@ flowchart LR
 4. Español neutro con "tú"; sin anglicismos innecesarios.
 5. CTA a `/rag`, a la landing sectorial o a la demo del chatbot, con `utm_source=linkedin&utm_medium=organic|paid&utm_campaign=<mes>&utm_content=<postId>`.
 
-### Vitrina pública `/demo/linkedin-ads` (modo `solicitud`)
+### Demo interactiva: vitrina pública `/demo/linkedin-ads` (modo `solicitud`)
 
 | Elemento | Agregar | Quitar / corregir |
 |---|---|---|

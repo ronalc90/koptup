@@ -151,6 +151,7 @@ flowchart TD
   PR -.->|"Suscripción"| WL["Lista de espera"]
   X -.-> D
 ```
+> [Ver diagrama como imagen](images/diagramas/Seccion-Landing-de-Producto-1.png)
 
 **Hero: ejemplo con CRM con IA** (textos de [CRM con IA](Producto-crm-ia.md)):
 
@@ -187,6 +188,7 @@ flowchart TD
   E -->|"solicitud"| S["Solicitar demo y Agendar llamada"]
   E -->|"privado"| V["Solicitar demo personalizada"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Seccion-Landing-de-Producto-2.png)
 
 Reglas de implementación:
 
@@ -420,6 +422,7 @@ flowchart LR
   C --> D["Ola 2, Fase 2: 18 productos restantes"]
   D --> E["Fase 5: casos de estudio y versión en inglés"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Seccion-Landing-de-Producto-3.png)
 
 El contenido de cada landing se toma de su página `Producto-<slug>.md` (hero, problemas, cómo funciona, módulos, integraciones y FAQ ya propuestos) y lo revisa el dueño antes de pasar a `publicada`.
 
@@ -455,6 +458,7 @@ sequenceDiagram
   F->>G: Redirige a solicitar-demo gracias
   G-->>V: Código, qué pasa ahora y Agendar llamada
 ```
+> [Ver diagrama como imagen](images/diagramas/Seccion-Landing-de-Producto-4.png)
 
 ![Mockup del formulario Solicitar demo con el producto precargado, consentimiento Ley 1581 y captcha](images/mockups/solicitar-demo.png)
 

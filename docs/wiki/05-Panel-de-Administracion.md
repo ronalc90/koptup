@@ -24,10 +24,10 @@ El panel de administración es donde KopTup **convierte el interés en clientes*
 
 ## Índice
 
-1. [Objetivo](#1-objetivo)
+1. [Objetivo](#1-objetivo), con el [resumen de cómo se da acceso a una demo](#en-resumen-cómo-se-da-acceso-a-una-demo-desde-el-panel)
 2. [Estado actual](#2-estado-actual)
 3. [Problemas detectados](#3-problemas-detectados)
-4. [Diseño del panel](#4-diseño-del-panel): principios, navegación, permisos, flujo de trabajo, base común y cambios de API
+4. [Diseño del panel](#4-diseño-del-panel) (inicio del **plan detallado**): principios, navegación, permisos, flujo de trabajo, base común y cambios de API. Las secciones 5 a 21 son el plan detallado de cada módulo, con su objetivo, estado actual, plan, permisos, tareas y métricas
 5. [Inicio](#5-inicio)
 6. [Solicitudes de demo](#6-solicitudes-de-demo)
 7. [Accesos a demos](#7-accesos-a-demos)
@@ -71,6 +71,22 @@ Pasar de un **panel de operación con datos simulados** a un **centro de operaci
 | % de accesos activados en 72 h | Un acceso sin activar es un lead que se enfría |
 | % de accesos en rojo con acción en 48 h | Mide si el comercial rescata a tiempo |
 | Leads con próxima acción definida | Ningún lead queda sin dueño ni siguiente paso |
+
+### En resumen: cómo se da acceso a una demo desde el panel
+
+Lo que pidió el dueño ("que los clientes soliciten demos y desde el panel se les dé acceso"), acción por acción:
+
+| Acción del equipo | Dónde | Qué pasa | Detalle | Mockup |
+|---|---|---|---|---|
+| **Ver las solicitudes** | Admin › Solicitudes de demo | Bandeja con pestañas, filtros, puntaje y SLA; las vencidas arriba | [Sección 6](#6-solicitudes-de-demo) | `admin-solicitudes.png` |
+| **Aprobar** eligiendo **demos y vigencia** | Detalle de la solicitud, pestaña Aprobar | Se eligen las demos (las `privado` solo las aprueba un admin), la vigencia (14 días por defecto, de 1 a 90), el modo (guiada o autoservicio), la sesión guiada y un mensaje. Crea la cuenta `prospect`, un `DemoGrant` por demo y la invitación con enlace mágico de 72 h | [Sección 6](#6-solicitudes-de-demo) | `admin-aprobar-solicitud.png`, `email-invitacion.png` |
+| **Rechazar** | Detalle de la solicitud, pestaña Rechazar | Motivo obligatorio y aviso opcional al prospecto (nunca con spam ni competidor) | [Sección 6](#6-solicitudes-de-demo) | `admin-aprobar-solicitud.png` |
+| **Extender** | Admin › Accesos a demos | 7, 14 o 30 días u otra fecha, con motivo y aviso al prospecto | [Sección 7](#7-accesos-a-demos) | `admin-accesos.png` |
+| **Revocar** | Admin › Accesos a demos | Con motivo; la demo se bloquea en máximo 5 minutos | [Sección 7](#7-accesos-a-demos) | `admin-accesos.png` |
+| **Convertir a cliente** | Admin › Accesos a demos (y Propuestas en la Fase 3) | El prospecto pasa a `client`, se crea el proyecto, la demo queda 90 días como referencia y el Lead pasa a `ganado` | [Secciones 7](#7-accesos-a-demos) y [9](#9-propuestas) | `admin-accesos.png` |
+| **Invitar directo** (sin solicitud previa) | Accesos, ficha del Lead o Contactos | Mismo resultado que aprobar, para demos privadas o prospectos que llegan por otra vía | [Sección 7](#7-accesos-a-demos) | — |
+| **Configurar el modo de cada demo** (`accessMode`: `publico`, `solicitud` o `privado`), activarla o apagarla, y su vigencia por defecto | Admin › Catálogo de demos | Se aplica en máximo 60 s, sin desplegar | [Sección 11](#11-catálogo-de-demos) | `admin-catalogo-demos.png` |
+| **Medir el embudo** | Admin › Métricas | De la visita al cliente, con tiempos de respuesta | [Sección 10](#10-métricas-comerciales) | `admin-metricas-comerciales.png` |
 
 ---
 
@@ -163,7 +179,7 @@ El menú se agrupa en tres bloques, como en los mockups, y **cada rol ve solo su
 **Mapa de navegación**
 
 ```mermaid
-flowchart LR
+flowchart TD
   LG["/login"] -->|"admin, sales o manager"| HOME["Inicio: Mi día"]
   LG -->|"prospect o client"| PORTAL["Portal /dashboard"]
   subgraph COM["Comercial"]
@@ -205,6 +221,7 @@ flowchart LR
   PRJ --> ENT
   PRJ --> FAC
 ```
+> [Ver diagrama como imagen](images/diagramas/05-Panel-de-Administracion-1.png)
 
 ### 4.3 Permisos por módulo
 
@@ -268,13 +285,14 @@ flowchart TD
   PX -->|"Nada y el acceso vence"| NU["Lead a nutrición o perdido, con motivo"]
   L --> CV["Convertir: rol client, proyecto y Lead ganado"]
 ```
+> [Ver diagrama como imagen](images/diagramas/05-Panel-de-Administracion-2.png)
 
 ### 4.5 Rutina diaria del comercial
 
 El orden de trabajo que el **Inicio** propone cada mañana. Al terminar el día no debe quedar ninguna solicitud con SLA vencido ni ninguna tarea vencida.
 
 ```mermaid
-flowchart LR
+flowchart TD
   D["7:45 Resumen diario por email"] --> I["Inicio: Mi día"]
   I --> R1["1. SLA vencido o en riesgo"]
   R1 --> R2["2. Pendientes sin asignar, grado A y B primero"]
@@ -284,6 +302,7 @@ flowchart LR
   R5 --> R6["6. Tareas vencidas y leads sin próxima acción"]
   R6 --> F["Cierre: cero SLA vencidos y cero tareas vencidas"]
 ```
+> [Ver diagrama como imagen](images/diagramas/05-Panel-de-Administracion-3.png)
 
 ### 4.6 Base común: estructura y componentes
 
@@ -843,7 +862,7 @@ No existe. Los modos no existen: las demos están abiertas, salvo la de cuentas 
 |---|---|
 | Demo | Nombre y ruta (`/demo/erp`); chip **En mantenimiento** si está inactiva |
 | Producto | `offeringSlug` o "—" (cuentas médicas, sistema experto, LinkedIn Ads) |
-| Modo de acceso | Selector Pública · Con solicitud · Privada |
+| Modo de acceso | Selector Pública · Con solicitud · Privada, que guarda el campo `accessMode` del `DemoCatalogItem` (`publico`, `solicitud` o `privado`; reglas de cada modo en [Sistema de demos](04-Sistema-de-Demos.md), sección 4). En `chatbot` (Sistemas RAG) el selector está bloqueado en Pública con el texto "Demo principal de la pauta: siempre pública" |
 | Activa | Interruptor |
 | Duración por defecto · Modo por defecto · Autoservicio permitido | |
 | Video · Capturas · Recorrido | ✓ o **Falta**, número de capturas, número de pasos |
@@ -854,7 +873,7 @@ No existe. Los modos no existen: las demos están abiertas, salvo la de cuentas 
 
 | Bloque | Campos y reglas |
 |---|---|
-| Acceso | Modo; Activa; duración por defecto (1 a 90 días); modo por defecto; autoservicio permitido (si se apaga, el modo por defecto pasa a Guiada); cupo diario de IA (`quotas.aiActionsPerDay`, solo demos con IA) |
+| Acceso | Modo de acceso (`accessMode`); Activa (`active`); duración por defecto (`defaultDurationDays`, 1 a 90 días); modo por defecto (guiada o autoservicio); autoservicio permitido (si se apaga, el modo por defecto pasa a Guiada); cupo diario de IA (`quotas.aiActionsPerDay`, solo demos con IA) |
 | Medios | URL del video (ruta propia `/media/demos/<demoSlug>/…` o un dominio de video permitido); capturas con texto alternativo obligatorio. Aviso si falta video: "Hoy falta el video. Al guardar, la landing y la pantalla sin acceso mostrarán el video de 1:30." |
 | Recorrido guiado | Hasta 5 pasos con título, descripción y ruta (debe empezar por `/demo/<demoSlug>`), ordenables; acciones clave (`keyActions`) que cuentan como uso efectivo |
 

@@ -82,7 +82,7 @@
 6. **Cómo trabajamos:** diagnóstico de 1 proceso (gratis, 1 hora) → piloto de 1 a 3 flujos en 2 a 4 semanas → operación con monitoreo y ajustes mensuales.
 7. **Seguridad:** credenciales cifradas, bitácora de cada ejecución, aprobación humana en los pasos sensibles, instalación en la nube del cliente (compra) y tratamiento de datos conforme a la Ley 1581.
 8. **Planes y precios** (compra; SaaS "lista de espera") y **FAQ:** ¿es como Zapier o Make? · ¿qué pasa si mi software contable cambia su API? · ¿necesito un programador en mi empresa? · ¿la IA puede equivocarse al leer una factura? (sí; por eso las diferencias van a revisión humana) · ¿cuánto cuesta la IA por ejecución?
-9. **Bloque cruzado:** "¿Ya tienes o evalúas un asistente RAG? Conéctalo a tus procesos" → [Chatbot RAG con IA](Producto-chatbot-rag-ia.md).
+9. **Bloque cruzado:** "¿Ya tienes o evalúas un asistente RAG? Conéctalo a tus procesos" → [Sistemas RAG](Producto-chatbot-rag-ia.md).
 
 ### Demo interactiva (mejoras por pantalla/módulo)
 
@@ -117,6 +117,7 @@ flowchart LR
     C --> D["4. Revisa el ahorro del mes"]
     D --> E["5. CTA: Cuentanos tu proceso"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-automatizacion-workflows-1.png)
 
 1. Elegir "Facturas de proveedores" (preseleccionado). Una nota explica en una línea qué hace el flujo.
 2. Pulsar "Ejecutar con un ejemplo": cada paso se ilumina y el inspector muestra los datos que la IA leyó del XML.
@@ -233,4 +234,4 @@ USD de referencia (TRM 3.300, "Otras soluciones a medida"): setup de compra ≈ 
 | Demos personalizadas que pasan a propuesta o piloto | ≥ 25 % |
 | Pilotos que pasan a contrato en 30 días | ≥ 50 % |
 
-Páginas relacionadas: [Chatbot RAG con IA](Producto-chatbot-rag-ia.md), [CRM con IA](Producto-crm-ia.md), [Facturación electrónica](Producto-facturacion-electronica.md), [Helpdesk con IA](Producto-helpdesk-ia.md), [Landing de producto](Seccion-Landing-de-Producto.md), [Panel de administración](05-Panel-de-Administracion.md).
+Páginas relacionadas: [Sistemas RAG](Producto-chatbot-rag-ia.md), [CRM con IA](Producto-crm-ia.md), [Facturación electrónica](Producto-facturacion-electronica.md), [Helpdesk con IA](Producto-helpdesk-ia.md), [Landing de producto](Seccion-Landing-de-Producto.md), [Panel de administración](05-Panel-de-Administracion.md).

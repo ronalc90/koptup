@@ -86,7 +86,7 @@ Estos términos deben revisarse con un abogado antes de publicarse y usarse igua
 
 - **Retirar las afirmaciones legales** y adoptar el glosario único, validado por un abogado.
 - **Cerrar la historia del asistente:** que el documento subido se vea, que el sobre enviado aparezca en la lista, que el firmante reciba y firme, y que se pueda descargar el certificado de evidencia.
-- **"Firma un documento de prueba" de verdad** (cuando exista el módulo de la Fase 3): el visitante recibe un código en su correo, firma un documento de ejemplo y descarga el PDF firmado con su certificado. Es el "momento ajá" equivalente a "Prueba con tu documento" del [Chatbot RAG](Producto-chatbot-rag-ia.md).
+- **"Firma un documento de prueba" de verdad** (cuando exista el módulo de la Fase 3): el visitante recibe un código en su correo, firma un documento de ejemplo y descarga el PDF firmado con su certificado. Es el "momento ajá" equivalente a "Prueba con tu documento" de los [Sistemas RAG](Producto-chatbot-rag-ia.md).
 - **Casos de uso colombianos:** contrato de trabajo, otrosí, consentimiento informado, contrato de arrendamiento, acta de entrega de dotación y autorización de tratamiento de datos (Ley 1581).
 - **Integraciones locales:** envío del enlace por WhatsApp Business, archivo en Microsoft 365/SharePoint o Google Drive, conexión con el HRMS y el gestor documental, y API con webhooks.
 - **Un diferencial claro:** en Colombia hay proveedores SaaS de firma con planes de entrada baratos. Koptup no debe competir por precio por firma. Su diferencial es integrar la firma en los procesos del cliente e instalarla en su propia infraestructura cuando los documentos no pueden salir de ella.
@@ -144,6 +144,7 @@ flowchart LR
     D --> E["5. Contrato archivado en el expediente"]
     E --> F["CTA: Firma un documento de prueba"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-firma-electronica-1.png)
 
 1. Elegir la plantilla "Contrato de trabajo a término fijo" y completar los datos del trabajador.
 2. Agregar firmantes en orden (trabajador y luego jefe de RRHH), con envío por WhatsApp.

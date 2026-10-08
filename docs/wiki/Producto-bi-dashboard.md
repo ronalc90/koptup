@@ -4,7 +4,7 @@
 
 ![Demo actual](images/actual/demo-dashboard-ejecutivo.jpg)
 
-*Captura actual de `/demo/dashboard-ejecutivo` (vista Dashboard). Ver también [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md) y [Roadmap](12-Roadmap.md). Productos relacionados: [ERP modular](Producto-erp-modular.md), [Facturación electrónica](Producto-facturacion-electronica.md), [CRM con IA](Producto-crm-ia.md) y [Chatbot RAG](Producto-chatbot-rag-ia.md).*
+*Captura actual de `/demo/dashboard-ejecutivo` (vista Dashboard). Ver también [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md) y [Roadmap](12-Roadmap.md). Productos relacionados: [ERP modular](Producto-erp-modular.md), [Facturación electrónica](Producto-facturacion-electronica.md), [CRM con IA](Producto-crm-ia.md) y [Sistemas RAG](Producto-chatbot-rag-ia.md).*
 
 > **Contexto de posicionamiento:** con el reposicionamiento de Koptup en sistemas RAG (ver [Visión de producto](02-Vision-de-Producto.md)), este producto queda dentro de **"Otras soluciones a medida"**. Aun así, es una de las demos más visibles del sitio: la enlazan el home (`apps/web/src/app/page.tsx`), el footer (`components/layout/Footer.tsx`), `/bienvenido-producthunt` y el calendario de la demo de LinkedIn Ads. Una demo floja aquí perjudica la marca entera, así que sus arreglos de credibilidad son P1 aunque el producto sea P2.
 
@@ -169,6 +169,7 @@ flowchart LR
   D --> E["5. Alertas y resumen del lunes"]
   E --> F["CTA: Prueba con tu Excel o Solicitar demo"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-bi-dashboard-1.png)
 
 1. **Resumen:** "Septiembre: ventas $1.840 M COP, 6 % bajo el presupuesto". La IA explica que la caída viene de Cali y de la línea Lácteos.
 2. **Pronóstico:** la banda a 3 meses muestra que, al ritmo actual, el trimestre cierra al 91 % de la meta.
@@ -320,6 +321,8 @@ Detalle de la política comercial común en [Catálogo de productos](08-Catalogo
 ---
 
 ## Métricas de éxito
+
+Son **metas** iniciales a validar con datos reales; no son resultados actuales.
 
 - ≥ 50 % de los visitantes de la demo pública completan al menos 3 pasos del tour (medido con `DemoEvent`).
 - ≥ 8 % de los visitantes de la demo usan "Prueba con tu Excel", y ≥ 30 % de ellos dejan su email para el PDF.

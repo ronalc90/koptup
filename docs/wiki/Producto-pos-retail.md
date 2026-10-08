@@ -115,6 +115,7 @@ flowchart LR
   D --> E["5. Sin internet y consola de sedes"]
   E --> F["CTA: Solicitar demo o piloto"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-pos-retail-1.png)
 
 1. **Abrir caja:** elegir "Bogotá Chapinero" y abrir el turno con base de $200.000.
 2. **Vender:** en Retail, escanear 3 productos y elegir talla; en Restaurante, tomar el pedido de la mesa 4 con modificadores y enviarlo a cocina (KDS).
@@ -212,6 +213,8 @@ Detalle de la política comercial común en [Catálogo de productos](08-Catalogo
 ---
 
 ## Métricas de éxito
+
+Son **metas** iniciales a validar con datos reales; no son resultados actuales.
 
 - Conversión landing → solicitud de demo ≥ 3 %.
 - ≥ 60 % de los visitantes de la demo completan al menos 1 venta y ≥ 30 % prueban el modo sin internet (medido con `DemoEvent`).

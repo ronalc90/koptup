@@ -110,6 +110,7 @@ flowchart LR
   D --> E["5. Forecast: cumplimiento de meta"]
   E --> F["CTA: Solicitar demo guiada o propuesta"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-crm-ia-1.png)
 
 1. **Resumen:** "Tu equipo tiene $1.120 M COP en juego este mes; 4 negocios calientes llevan 3 días sin seguimiento".
 2. **Pipeline:** arrastrar un negocio de $86 M de "Propuesta enviada" a "Negociación"; la probabilidad sube a 70 % y cambia el valor ponderado de la columna.
@@ -174,7 +175,7 @@ Horas de evolutivos incluidas por mes: 5 / 12 / 25 / 50. Soporte: correo 24 h h�
 2. **SaaS → "Lista de espera"** hasta la Fase 4: no mostrar la cuota SaaS como contratable hoy.
 3. Enterprise SaaS setup: mostrar "Incluido" o "A convenir" en lugar de "Personalizado" (hoy sale de `formatCOP(0)`).
 4. Bullets en lenguaje de cliente y sin duplicados. Propuesta: **Básico** "Hasta 5 usuarios y 2.000 contactos · Pipeline y tareas · Importación desde Excel · Prioridad de leads con IA · 1 buzón de Gmail/Outlook". **Profesional** "+ WhatsApp Business integrado · Varios buzones · Llamadas (Twilio) · Campañas por correo · Soporte por WhatsApp". **Avanzado** "+ Asistente que redacta correos y WhatsApp · Pronóstico de ventas · Secuencias automáticas · Cotizador". **Enterprise** "+ Inicio de sesión único (SSO) · Bodega de datos · Integración con marketing corporativo · Gerente de proyecto dedicado".
-5. Tuteo (o usted) en vez de voseo, y una descripción específica en lugar de "Implementación a medida o suscripción SaaS mensual del producto…".
+5. Tuteo ("tú") en vez de voseo, y una descripción específica en lugar de "Implementación a medida o suscripción SaaS mensual del producto…".
 6. Mostrar en la landing el costo total a 12 meses (setup + mantenimiento + costos estimados del proveedor) para Básico y Profesional.
 7. Evaluar un paquete "Suite de ventas y atención" (CRM + [Helpdesk con IA](Producto-helpdesk-ia.md) + [Voice AI](Producto-voice-ai-callcenter.md)): los planes ya se cruzan (el Profesional de Voice AI incluye "CRM con call logging").
 
@@ -205,6 +206,8 @@ Detalle de la política comercial común en [Catálogo de productos](08-Catalogo
 ---
 
 ## Métricas de éxito
+
+Son **metas** iniciales a validar con datos reales; no son resultados actuales.
 
 - Conversión landing → solicitud de demo ≥ 3 %.
 - ≥ 60 % de los visitantes de la demo pública completan al menos 3 pasos del tour (medido con `DemoEvent`).

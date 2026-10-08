@@ -124,6 +124,7 @@ flowchart LR
   D --> E["5. Despacho, guia y prueba de entrega"]
   E --> F["CTA: diagnostico de bodega o propuesta"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-wms-logistica-1.png)
 
 1. **Tablero:** "CEDI Funza tiene 182 pedidos por alistar antes del corte de las 3:00 p. m. y 99,4 % de exactitud de inventario".
 2. **Recibo:** escanear la orden de compra del laboratorio; el sistema detecta 4 unidades faltantes y deja el recibo con novedad.
@@ -222,6 +223,8 @@ Detalle de la política comercial común en [Catálogo de productos](08-Catalogo
 ---
 
 ## Métricas de éxito
+
+Son **metas** iniciales a validar con datos reales; no son resultados actuales.
 
 - Conversión landing → solicitud de demo ≥ 1,5 % (ticket alto, nicho).
 - ≥ 70 % de las solicitudes calificadas (bodega propia o 3PL, más de 1.000 pedidos al mes o más de 2.000 SKUs) y respondidas en < 24 h hábiles.

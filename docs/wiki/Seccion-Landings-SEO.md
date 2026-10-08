@@ -4,7 +4,7 @@
 
 ![Captura actual de /chatbots-ia: hero morado "Chatbots con IA para Empresas en Colombia", botones Ver Demo Gratis y Solicitar Cotización, y cifras 80 %, 3x y 60 %](images/actual/chatbots-ia.jpg)
 
-*Páginas relacionadas: [Home](Seccion-Home.md), [Landing de producto](Seccion-Landing-de-Producto.md), [Servicios y precios](Seccion-Servicios-y-Precios.md), [Chatbot RAG](Producto-chatbot-rag-ia.md), [Flujo del cliente](03-Flujo-del-Cliente.md), [Sistema de demos](04-Sistema-de-Demos.md), [Comercial, marketing y legal](11-Comercial-Marketing-y-Legal.md), [Seguridad y calidad](10-Seguridad-y-Calidad.md).*
+*Páginas relacionadas: [Home](Seccion-Home.md), [Landing de producto](Seccion-Landing-de-Producto.md), [Servicios y precios](Seccion-Servicios-y-Precios.md), [Sistemas RAG](Producto-chatbot-rag-ia.md), [Flujo del cliente](03-Flujo-del-Cliente.md), [Sistema de demos](04-Sistema-de-Demos.md), [Comercial, marketing y legal](11-Comercial-Marketing-y-Legal.md), [Seguridad y calidad](10-Seguridad-y-Calidad.md).*
 
 ---
 
@@ -69,6 +69,7 @@ flowchart TD
   PROD --> FORM
   PRIV --> FORM
 ```
+> [Ver diagrama como imagen](images/diagramas/Seccion-Landings-SEO-1.png)
 
 ### Mapa de palabras clave
 
@@ -92,7 +93,7 @@ Una intención principal por URL. Las de la rama RAG combinan palabras **técnic
 
 ---
 
-## Estado actual
+## Estado actual y problemas detectados
 
 Evidencia de la rama `main`. La rama `rag-reposicionamiento` (commit `2df589a`) ya corrigió parte del SEO técnico: dominio canónico con www, títulos de 60 caracteres como máximo, sin meta keywords, sin `aggregateRating`, `robots.txt` y enlaces a `/pricing`.
 
@@ -204,7 +205,11 @@ Evidencia de la rama `main`. La rama `rag-reposicionamiento` (commit `2df589a`) 
 
 ### `/chatbots-ia`: Chatbots RAG para WhatsApp y web
 
-La reescritura la define la especificación RAG (Fase 5 de la rama). Este plan agrega la conexión con el sistema de demos y el detalle de copy.
+La reescritura la define la especificación RAG (etapa E5 de la rama). Este plan agrega la conexión con el sistema de demos y el detalle de copy.
+
+![Vista previa de /chatbots-ia reescrita en la rama rag-reposicionamiento: H1 "Chatbots RAG para WhatsApp y web", botones "Probar la demo" y "Agenda un piloto", "Desde COP 9.900.000, o piloto de COP 3.900.000. Más IVA si aplica" y los 4 datos verificables](images/mockups/rag-vista-previa-chatbots-ia.jpg)
+
+*Así quedó el hero en la rama (commit `576d6df`, sin fusionar). La tabla de abajo describe el destino completo, que además conecta la landing con el formulario "Solicitar demo".*
 
 | Elemento | Copy o cambio |
 |---|---|
@@ -313,6 +318,7 @@ flowchart LR
   REQ --> PANEL["Admin: Solicitudes y Métricas por landing y campaña"]
   LEAD --> PANEL
 ```
+> [Ver diagrama como imagen](images/diagramas/Seccion-Landings-SEO-2.png)
 
 ---
 
@@ -373,7 +379,7 @@ flowchart LR
 
 | # | Tarea | Fase | Prioridad | Esfuerzo | Criterio de aceptación |
 |---|---|---|---|---|---|
-| 1 | Fusionar en `main` las Fases 1, 3 y 5 de la rama `rag-reposicionamiento` (SEO técnico, `/rag` y sectores, coherencia de `/chatbots-ia` y `/soluciones-ia`, voseo) | Fase 1 — Funnel y solicitud de demos | P0 | M | `npm run check-titles` pasa; `/rag`, `/rag/salud`, `/rag/legal` y `/rag/soporte` responden 200 y están en el sitemap; ninguna página tiene meta keywords |
+| 1 | Fusionar en `main` las etapas E1, E3 y E5 de la rama `rag-reposicionamiento` (SEO técnico, `/rag` y sectores, coherencia de `/chatbots-ia` y `/soluciones-ia`, voseo) | Fase 1 — Funnel y solicitud de demos | P0 | M | `npm run check-titles` pasa; `/rag`, `/rag/salud`, `/rag/legal` y `/rag/soporte` responden 200 y están en el sitemap; ninguna página tiene meta keywords |
 | 2 | Retirar de todas las landings las cifras sin fuente y las garantías absolutas (lista negra de "Reglas comunes") | Fase 1 — Funnel y solicitud de demos | P0 | S | Una prueba E2E recorre las landings y no encuentra ninguna expresión de la lista negra |
 | 3 | Unificar precios: quitar "desde $499 USD", "$2,000–$8,000 USD", los `AggregateOffer` y el `priceRange` inventados; leer de la constante de planes RAG y de `services-catalog.ts` | Fase 1 — Funnel y solicitud de demos | P0 | S | Una búsqueda de "499" en `apps/web/src`, `messages/` y `public/` (fuera de las demos) no devuelve resultados; cambiar un precio en la constante cambia todas las landings |
 | 4 | `/liquidacion`: sacarla del sitio comercial e integrarla como módulo de la demo privada de cuentas médicas (acceso con `DemoGrant` verificado en servidor) o del panel interno; incluir sus endpoints en la auditoría de autenticación y autorización de la Fase 0 | Fase 0 — Endurecimiento | P0 | M | La ruta pública `/liquidacion` responde 404 o redirige a `/demo/acceso`; las pruebas de integración confirman que sus endpoints exigen una sesión con permiso |

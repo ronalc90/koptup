@@ -109,6 +109,7 @@ flowchart LR
     C --> D["4. Mira como llega el comentario a GitHub o Azure DevOps"]
     D --> E["CTA: Pega tu diff / Solicitar demo"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-code-review-ia-1.png)
 
 1. Abrir el PR "integrar pago PSE" (preseleccionado).
 2. Leer el resumen: qué cambia, riesgo alto y por qué.
@@ -219,4 +220,4 @@ Precios actuales del catálogo (`services-catalog.ts`, entrada `code-review-ia`)
 | Tiempo de la primera revisión en la instalación de prueba | < 2 minutos por PR |
 | Comentarios de IA marcados como útiles por el prospecto | ≥ 70 % |
 
-Páginas relacionadas: [QA automatizado con IA](Producto-qa-automatizado-ia.md), [Chatbot RAG con IA](Producto-chatbot-rag-ia.md), [Landing de producto](Seccion-Landing-de-Producto.md), [Panel de administración](05-Panel-de-Administracion.md).
+Páginas relacionadas: [QA automatizado con IA](Producto-qa-automatizado-ia.md), [Sistemas RAG](Producto-chatbot-rag-ia.md), [Landing de producto](Seccion-Landing-de-Producto.md), [Panel de administración](05-Panel-de-Administracion.md).

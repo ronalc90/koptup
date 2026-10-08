@@ -4,7 +4,7 @@
 
 ![Demo actual](images/actual/demo-voice-ai.jpg)
 
-*Captura actual de `/demo/voice-ai` (cockpit de llamada). Ver también [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md) y [Roadmap](12-Roadmap.md). Productos relacionados: [Helpdesk con IA](Producto-helpdesk-ia.md), [CRM con IA](Producto-crm-ia.md) y [Chatbot RAG con IA](Producto-chatbot-rag-ia.md).*
+*Captura actual de `/demo/voice-ai` (cockpit de llamada). Ver también [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md) y [Roadmap](12-Roadmap.md). Productos relacionados: [Helpdesk con IA](Producto-helpdesk-ia.md), [CRM con IA](Producto-crm-ia.md) y [Sistemas RAG](Producto-chatbot-rag-ia.md).*
 
 ---
 
@@ -119,6 +119,7 @@ flowchart LR
   D --> E["5. Resumen y métricas"]
   E --> F["CTA: Solicitar demo con tu guion"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-voice-ai-callcenter-1.png)
 
 1. **Escenario:** elegir "Confirmación de cita médica" (IPS ficticia).
 2. **Escuchar:** 90 s de llamada con transcripción sincronizada, intención y sentimiento cambiando en vivo.
@@ -214,6 +215,8 @@ Política comercial común en [Catálogo de productos](08-Catalogo-de-Productos.
 ---
 
 ## Métricas de éxito
+
+Son **metas** iniciales a validar con datos reales; no son resultados actuales.
 
 - ≥ 40 % de los visitantes de la landing reproducen al menos una muestra de audio.
 - Conversión landing → solicitud de demo ≥ 2 % (ticket alto, menor volumen).

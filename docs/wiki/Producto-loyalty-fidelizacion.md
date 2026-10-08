@@ -121,6 +121,7 @@ flowchart LR
   D --> E["5. Resultados: ticket de miembros y costo"]
   E --> F["CTA: Solicitar demo guiada o propuesta"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-loyalty-fidelizacion-1.png)
 
 1. **Caja:** la cajera busca el celular de una clienta nueva, la inscribe con su autorización y registra una compra de $185.000 en Cuidado personal: +370 puntos (doble puntos de martes).
 2. **App del miembro:** llega el WhatsApp "Ganaste 370 puntos en Club <Marca>"; el saldo sube y la barra de progreso hacia Oro avanza.
@@ -222,6 +223,8 @@ Detalle de la política comercial común en [Catálogo de productos](08-Catalogo
 ---
 
 ## Métricas de éxito
+
+Son **metas** iniciales a validar con datos reales; no son resultados actuales.
 
 - Conversión landing → solicitud de demo ≥ 3 %.
 - ≥ 40 % de los visitantes de la landing usan el simulador de costo (evento propio).

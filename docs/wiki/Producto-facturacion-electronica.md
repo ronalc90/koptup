@@ -118,6 +118,7 @@ flowchart LR
   D --> E["5. Recepcion RADIAN y reportes"]
   E --> F["CTA: Solicitar demo guiada"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Producto-facturacion-electronica-1.png)
 
 1. **Factura:** escribir el NIT de un cliente frecuente; el dígito de verificación se valida y se autocompletan razón social, correo y ciudad.
 2. **Totales:** cambiar una línea a IVA 5 % y ver el resumen (subtotal, IVA por tarifa, retenciones informativas, total a pagar).
@@ -211,6 +212,8 @@ Detalle de la política comercial común en [Catálogo de productos](08-Catalogo
 ---
 
 ## Métricas de éxito
+
+Son **metas** iniciales a validar con datos reales; no son resultados actuales.
 
 - Conversión landing → solicitud de demo ≥ 3 %.
 - ≥ 50 % de los visitantes del simulador emiten al menos 1 documento y ≥ 30 % descargan el PDF de ejemplo.

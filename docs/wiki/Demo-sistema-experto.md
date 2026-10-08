@@ -58,7 +58,7 @@
 
 ### Problemas detectados (con ruta)
 
-1. **"Guardar cambios" no guarda:** la pestaña Configuración muestra "✓ Guardado" sin llamar al backend (`page.tsx`, `ConfiguracionMotorReglas`); y el backend guarda la configuración en memoria, global para todos los usuarios.
+1. **"Guardar cambios" no guarda:** la pestaña Configuración muestra "✓ Guardado" sin llamar al backend (`page.tsx`, `ConfiguracionMotorReglas`); y el backend guarda la configuración solo en la memoria del proceso, sin persistencia ni separación por cliente.
 2. **Reglas inconsistentes entre capas:** la pantalla lista 8 reglas con severidades distintas a las del backend (por ejemplo, la 101 aparece "alta" en la pantalla y "CRÍTICA" en el servicio); la demo de cuentas médicas dice "9 reglas"; la documentación de `docs/modules/SISTEMA_EXPERTO_README.md` describe 15 códigos. Nadie puede responder "¿cuántas reglas tiene el sistema?".
 3. **Códigos propios** (101, 201, 301, 401) en lugar de los códigos del Manual Único de Devoluciones, Glosas y Respuestas vigente.
 4. **Indicadores en cero y formato roto** en producción; insignia "Sistema Activo" fija, sin verificación real.
@@ -112,6 +112,7 @@ flowchart LR
   D --> E["Revisar condiciones que propone la IA"]
   E --> F["Activar y ver la glosa explicada en la factura"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Demo-sistema-experto-1.png)
 
 ### Catálogo único de reglas
 
@@ -126,6 +127,7 @@ flowchart TD
   D --> F["Alcance: todos o un convenio"]
   D --> G["Motor de evaluacion unico con pruebas por regla"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Demo-sistema-experto-2.png)
 
 **Campos propuestos:** `codigoInterno`, `codigoOficial`, `concepto` (facturación, tarifas, soportes, autorización, cobertura, pertinencia u otro del manual vigente), `nombre`, `descripcion`, `fundamento` (norma o cláusula), `severidad`, `alcance` (`global` o `convenioId`), `condiciones` (estructura que evalúa el motor), `textoOriginal` (si nació en lenguaje natural), `estado`, `version`, `creadaPor`, `aprobadaPor`, `espacioId` (cliente o acceso de demo).
 
@@ -142,6 +144,7 @@ stateDiagram-v2
   activa --> retirada: desactivar
   retirada --> [*]
 ```
+> [Ver diagrama como imagen](images/diagramas/Demo-sistema-experto-3.png)
 
 En Esencial basta con `borrador → activa`; la aprobación por un segundo usuario es del plan Empresarial.
 
@@ -225,6 +228,8 @@ No tiene precio propio. **Propuesta de inclusión** en los planes de [Auditoría
 ---
 
 ## Métricas de éxito
+
+Son **metas** iniciales a validar con datos reales; no son resultados actuales.
 
 - **Uso en la demo:** ≥ 50 % de los prospectos de perfil coordinación o pagador ejecuta al menos una simulación; ≥ 30 % escribe una regla propia.
 - **Conversión de plan:** ≥ 1 de cada 2 propuestas de Auditoría de cuentas médicas a firmas auditoras o pagadores sale en Profesional o Empresarial gracias a reglas propias y simulador.

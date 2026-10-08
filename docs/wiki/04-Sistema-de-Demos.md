@@ -13,7 +13,9 @@
 
 ## Índice
 
-1. [Objetivo y alcance](#1-objetivo-y-alcance)
+Cómo leer esta página: **objetivo, estado actual y problemas** en la sección 1; **plan detallado** en las secciones 2 a 16; **tareas** en la 17; **pruebas y riesgos** en la 18 y la 19; **métricas de éxito** en la 20.
+
+1. [Objetivo y alcance](#1-objetivo-y-alcance): incluye [estado actual](#11-estado-actual) y [problemas que resuelve](#12-problemas-que-resuelve)
 2. [Decisiones de diseño](#2-decisiones-de-diseño)
 3. [Actores, roles y permisos](#3-actores-roles-y-permisos)
 4. [Modos de acceso](#4-modos-de-acceso)
@@ -29,9 +31,10 @@
 14. [Datos personales (Ley 1581 de 2012)](#14-datos-personales-ley-1581-de-2012)
 15. [Controles anti-abuso](#15-controles-anti-abuso)
 16. [Casos borde](#16-casos-borde)
-17. [Plan de implementación](#17-plan-de-implementación)
+17. [Plan de implementación y tareas](#17-plan-de-implementación-y-tareas)
 18. [Plan de pruebas](#18-plan-de-pruebas)
 19. [Riesgos y mitigaciones](#19-riesgos-y-mitigaciones)
+20. [Métricas de éxito](#20-métricas-de-éxito)
 
 ---
 
@@ -45,7 +48,11 @@
 - KopTup sabe qué demo usó, cuánto tiempo y qué le interesó.
 - El acceso **se decide siempre en el servidor**.
 
-**Relación con el reposicionamiento RAG.** El producto principal son los sistemas RAG (ver [Visión de producto](02-Vision-de-Producto.md)), y en ese camino la demo del asistente es **pública**: no pide registro y tiene la opción "Prueba con tu documento". El sistema de demos:
+**Relación con el reposicionamiento RAG.** El producto principal son los sistemas RAG (ver [Visión de producto](02-Vision-de-Producto.md) y [Sistemas RAG](Producto-chatbot-rag-ia.md)), y en ese camino la demo del asistente es **pública**: no pide registro y tiene la opción "Prueba con tu documento".
+
+> **`/demo/chatbot` es `publico` y no pasa por este flujo.** La demo con el documento de ejemplo se abre sin cuenta. Para subir un documento propio, el visitante da solo su **email** y la **autorización de tratamiento de datos (Ley 1581 de 2012)**; ese email entra como lead con origen `demo-rag`, y el documento se borra a la hora. Límites, tope de gasto, variables y cumplimiento en [Reposicionamiento RAG](13-Reposicionamiento-RAG.md). El catálogo de demos con `accessMode` (`publico`, `solicitud`, `privado`) que define esta página aplica al **resto de las demos**: las "Otras soluciones a medida" y las demos privadas de salud.
+
+El sistema de demos:
 
 - **Controla el acceso** a las "Otras soluciones a medida" que estén en modo `solicitud` y a las demos **privadas** de salud (cuentas médicas, sistema experto).
 - **Acompaña la venta RAG:** demo guiada, preparación del Piloto y, en la Fase 2, un acceso ampliado con más cupo y datos del sector del cliente.
@@ -60,6 +67,35 @@
 | Verificación de acceso en servidor (middleware Next + backend) | CRM completo con automatizaciones (Fase 5) |
 | Eventos de uso, avisos al comercial y tablero de métricas | |
 | Consentimiento Ley 1581, bitácora de auditoría y jobs | |
+
+### 1.1 Estado actual
+
+Lo que existe hoy en `main` (producción) para pedir, dar y medir el acceso a las demos. Estado al 8 de octubre de 2026.
+
+| Pieza | Hoy | Evidencia |
+|---|---|---|
+| Pedir una demo | **No existe** un formulario "Solicitar demo". Los CTA al pie de las demos llevan a `/contact` ("Solicitar cotización") y a `/pricing`, que solo redirige a `/services` | `apps/web/src/components/demo/DemoCTA.tsx` |
+| Leads | Dos buzones separados: `Contact` (mensajes del formulario, estados `new`, `read` y `responded`) y `Quote` (`name`, `email`, `service`, `description`; estados `pending`, `contacted` y `completed`). No hay etapa, responsable, puntaje, SLA ni registro del consentimiento | `apps/backend/src/models/{Contact,Quote}.ts` |
+| Catálogo de demos | 28 carpetas de demo en `apps/web/src/app/demo/` (25 de ofertas del catálogo, más cuentas médicas, sistema experto y LinkedIn Ads). El hub `/demo` es una lista fija en el código; no hay modelo de catálogo ni modo de acceso configurable | `apps/web/src/app/demo/page.tsx` |
+| Acceso | Todas las demos se abren sin cuenta. La de cuentas médicas pide un **código de acceso fijo, igual para todos**, en un modal del hub: no permite saber quién entra, dar vigencia ni revocar | `apps/web/src/app/demo/page.tsx`, claves `demos.accessModal.*` |
+| Roles | `User.role` acepta `user`, `admin`, `manager` y `developer`. No existen `sales`, `prospect` ni `client` | `apps/backend/src/models/User.ts` |
+| Panel de administración | Usuarios, contactos, conversaciones, entregables, facturas, pedidos y configuración. Nada de solicitudes, accesos, leads ni catálogo de demos | [Panel de administración](05-Panel-de-Administracion.md), sección 2 |
+| Portal | `/dashboard` pensado para clientes con proyecto. No tiene "Mis demos" | [Portal del cliente](06-Portal-del-Cliente.md) |
+| Avisos internos | El formulario de contacto ya avisa al equipo por email y por WhatsApp (Twilio). Es la base que reutiliza el outbox de la sección 11 | `apps/backend/src/controllers/contact.controller.ts` |
+| Medición | Sin analítica en producción. GA4, Google Ads, LinkedIn Insight y sus 5 eventos están especificados para la rama `rag-reposicionamiento` (todavía sin código) | [Reposicionamiento RAG](13-Reposicionamiento-RAG.md) |
+| Demo RAG | `/demo/chatbot` es pública. En la rama, "Prueba con tu documento" envía el email como lead `demo-rag` por el canal del formulario de contacto (en curso, sin fusionar) | [Sistemas RAG](Producto-chatbot-rag-ia.md) |
+
+### 1.2 Problemas que resuelve
+
+1. **El interés no se captura.** Un visitante que quiere ver una demo a fondo solo encuentra un formulario de contacto genérico que, además, pierde el producto y el plan que traía preseleccionados ([Contacto](Seccion-Contacto.md)).
+2. **Nadie sabe quién usa qué demo.** No hay eventos de uso: el comercial no sabe si el prospecto abrió la demo, cuánto tiempo la usó ni qué módulos vio, y llama a ciegas.
+3. **El acceso no se puede gobernar.** Un código común no tiene dueño, vigencia ni revocación, así que no sirve para administrar demos con backend real (salud) o con costo de IA. El acceso debe decidirse en el servidor y por persona.
+4. **Leads duplicados y sin dueño.** El mismo email puede llegar por contacto, por la demo RAG y por una cotización sin unirse, sin etapa, responsable ni plazo de respuesta.
+5. **Sin prueba del consentimiento** (Ley 1581 de 2012) para contactar y hacer seguimiento.
+6. **Sin roles para el equipo comercial ni para el prospecto**, y el paso de prospecto a cliente con proyecto es manual.
+7. **Promesas sin respaldo:** "Agendar llamada" abre el correo (`mailto:`) en lugar de una agenda real.
+
+El diseño detallado que resuelve estos problemas ocupa las secciones 2 a 16; las tareas están en la sección 17 y las métricas de éxito en la sección 20.
 
 ---
 
@@ -128,6 +164,8 @@ Se compararon tres diseños: uno mínimo, uno centrado en seguridad y uno centra
 
 El modo de cada demo (`accessMode`) vive en la base de datos y se cambia desde **Admin › Catálogo de demos** sin desplegar.
 
+> **Excepción fija: `chatbot` (Sistemas RAG).** Su modo es `publico` y no se cambia a `solicitud` ni a `privado`: es el destino de la pauta y de todos los CTA "Probar la demo". "Prueba con tu documento" no usa grants, cuentas ni el formulario de solicitud: pide email y autorización Ley 1581 y tiene sus propios límites (5 MB, 30 páginas, 10 preguntas por documento, 3 documentos por IP al día, borrado a la hora y tope `DEMO_MONTHLY_BUDGET_USD`). Ver [Reposicionamiento RAG](13-Reposicionamiento-RAG.md). La tabla de abajo y el resto de esta sección aplican a las demás demos.
+
 | Modo | Visitante sin sesión | Con sesión, sin acceso | Con acceso vigente | Staff | SEO |
 |---|---|---|---|---|---|
 | `publico` | Entra. Banner "Solicita tu demo guiada" y "Agendar llamada" | Igual que sin sesión | Entra con **barra de acceso** (días restantes, CTA) y su uso se registra con el `grantId` | Entra | Indexable y en el sitemap |
@@ -174,7 +212,8 @@ En total: 20 demos `publico`, 6 `solicitud` y 2 `privado`, es decir, las 28 ruta
 
 **Notas sobre la semilla:**
 - Las ofertas `qa-automatizado-ia` y `vpn-empresarial` hoy no tienen demo propia y no se les asigna ninguna. Si se construye la demo propuesta en su página (ver [QA automatizado con IA](Producto-qa-automatizado-ia.md)), se agrega a la semilla.
-- La página del chatbot RAG proponía `solicitud`. Con el reposicionamiento RAG, la demo del asistente pasa a ser **pública** (sin registro) y el acceso por solicitud queda para el cupo ampliado.
+- Una versión anterior de la página del chatbot proponía `solicitud`. Con el reposicionamiento RAG, la demo del asistente es **pública** (sin registro) y la página [Sistemas RAG](Producto-chatbot-rag-ia.md) ya lo refleja. Un grant del chatbot solo sirve para el acceso ampliado de la Fase 2 (más cupo y un bot con la marca del prospecto en el Builder).
+- `cuentas-medicas` se presenta como **"Sistema experto para salud"** (su código no usa búsqueda vectorial). La rama `rag-reposicionamiento` la enlaza desde `/rag/salud` y desde el inicio con un enlace directo a la demo; cuando se active este control de acceso, esos enlaces llevan a la vista previa con "Solicitar demo personalizada", porque la demo es `privado`.
 
 ---
 
@@ -316,6 +355,7 @@ erDiagram
     string status
   }
 ```
+> [Ver diagrama como imagen](images/diagramas/04-Sistema-de-Demos-1.png)
 
 ### 5.1 Modelos nuevos
 
@@ -518,6 +558,7 @@ stateDiagram-v2
   aprobada --> [*]
   rechazada --> [*]
 ```
+> [Ver diagrama como imagen](images/diagramas/04-Sistema-de-Demos-2.png)
 
 - **Aprobar o rechazar desde `pendiente`** también está permitido: el servicio registra un paso implícito por `en_revision` en `history`, así el flujo de la DECISIÓN 4 se mantiene.
 - **Spam y duplicadas** son motivos de rechazo, no estados aparte.
@@ -541,6 +582,7 @@ stateDiagram-v2
   revocado --> [*]
   convertido --> [*]
 ```
+> [Ver diagrama como imagen](images/diagramas/04-Sistema-de-Demos-3.png)
 
 Reglas:
 
@@ -570,6 +612,7 @@ stateDiagram-v2
   ganado --> [*]
   perdido --> [*]
 ```
+> [Ver diagrama como imagen](images/diagramas/04-Sistema-de-Demos-4.png)
 
 - Cada cambio de etapa crea un `LeadActivity` de tipo `cambio_estado`.
 - Un Lead `perdido` puede volver a `nuevo` si envía una solicitud nueva.
@@ -613,6 +656,7 @@ sequenceDiagram
   O-->>V: Email de acuse
   O-->>E: Email, aviso en el panel y WhatsApp si es grado A o B
 ```
+> [Ver diagrama como imagen](images/diagramas/04-Sistema-de-Demos-5.png)
 
 ### 7.2 Aprobación y enlace mágico
 
@@ -657,6 +701,7 @@ sequenceDiagram
   W-->>P: Redirige a /dashboard/demos
   A->>O: Aviso al comercial de que el prospecto activó su acceso
 ```
+> [Ver diagrama como imagen](images/diagramas/04-Sistema-de-Demos-6.png)
 
 ### 7.3 Apertura de una demo con verificación en servidor
 
@@ -702,6 +747,7 @@ sequenceDiagram
     P-->>N: Pase renovado o bloqueo de la pantalla
   end
 ```
+> [Ver diagrama como imagen](images/diagramas/04-Sistema-de-Demos-7.png)
 
 ### 7.4 Recordatorio y expiración
 
@@ -735,6 +781,7 @@ sequenceDiagram
   end
   Note over J,D: La vigencia se evalúa en tiempo real en demo-access. El job solo cambia etiquetas y avisa
 ```
+> [Ver diagrama como imagen](images/diagramas/04-Sistema-de-Demos-8.png)
 
 ---
 
@@ -845,7 +892,8 @@ sequenceDiagram
 | Ruta | Estado | Rol | Descripción |
 |---|---|---|---|
 | `/productos/[slug]` | Nueva | público | Landing de cada producto con el CTA según el modo. Detalle en [Landing de producto](Seccion-Landing-de-Producto.md) |
-| `/rag`, `/rag/salud`, `/rag/legal`, `/rag/soporte` | Nuevas (rama `rag-reposicionamiento`) | público | Landings del producto principal. Su CTA secundario es "Solicitar demo guiada" |
+| `/rag`, `/rag/salud`, `/rag/legal`, `/rag/soporte` | Nuevas (rama `rag-reposicionamiento`) | público | Landings del producto principal. Sus CTA son "Prueba con tu documento" (→ `/demo/chatbot`) y "Agenda un piloto"; cuando exista el formulario se agrega "Solicitar demo guiada" como opción secundaria |
+| `/demo/chatbot` | Modificada (rama `rag-reposicionamiento`) | público | Demo RAG con documento de ejemplo y "Prueba con tu documento" (email + autorización Ley 1581). No usa `/demo/acceso` ni pase de demo |
 | `/solicitar-demo` | Nueva | público | Formulario en 2 pasos (también en modal desde las landings y las demos) |
 | `/solicitar-demo/gracias` | Nueva | público | Confirmación con código, qué pasa ahora y "Agendar llamada" |
 | `/demo` | Modificada | público | Etiquetas por modo ("Abierta", "Requiere solicitud"). Las privadas no se listan. Se elimina el modal del código de acceso |
@@ -943,6 +991,7 @@ flowchart TD
   D1 -->|"denegado"| X2["/demo/acceso con motivo: sin_acceso, expirado, revocado, privado, desactivada"]
   D1 -->|"error o timeout"| X3["Falla cerrada: /demo/acceso con motivo no_disponible"]
 ```
+> [Ver diagrama como imagen](images/diagramas/04-Sistema-de-Demos-9.png)
 
 **Reglas de `evaluateAccess`** (`services/demo-access.service.ts`), en este orden:
 
@@ -1293,6 +1342,13 @@ Este diseño cumple las exigencias de la ley así. Debe validarlo un asesor lega
 **Registro Nacional de Bases de Datos**
 - Evaluar con el asesor si KopTup está obligada a inscribirse ante la SIC.
 
+**"Prueba con tu documento" (demo pública del chatbot RAG)**
+- No usa el formulario de solicitud: pide solo el email y la casilla de autorización (sin marcar) con enlace a `/privacy`.
+- Su `ConsentRecord` se guarda con canal `demo_rag` y el Lead queda con la finalidad "responder sobre el documento y contacto comercial".
+- La política debe informar la transmisión internacional al proveedor de IA y que el documento se borra a la hora.
+- El documento nunca se guarda en almacenamiento permanente y el Lead solo registra datos de uso (páginas, preguntas usadas), no el contenido.
+- Detalle en [Reposicionamiento RAG](13-Reposicionamiento-RAG.md).
+
 ---
 
 ## 15. Controles anti-abuso
@@ -1341,7 +1397,7 @@ Son controles genéricos que se configuran por variables de entorno.
 
 ---
 
-## 17. Plan de implementación
+## 17. Plan de implementación y tareas
 
 Tallas para 1 dev senior: **S** ≤ 2 días · **M** 3–5 días · **L** 1–2 semanas · **XL** más de 2 semanas. Prioridad: **P0** bloquea la salida · **P1** alta · **P2** media.
 
@@ -1421,6 +1477,8 @@ Pasar la sesión a cookies httpOnly es P1 y no bloquea este sistema.
 | `SALES_NOTIFY_EMAILS`, `SALES_WHATSAPP_TO` | backend | Destinatarios de los avisos internos |
 | `SLACK_WEBHOOK_URL` (opcional) | backend | Avisos al canal de ventas |
 | `PRIVACY_POLICY_VERSION` | web y backend | Versión vigente de la política |
+
+Las variables de la demo pública del chatbot y de la medición para anuncios (`DEMO_UPLOAD_ENABLED`, `DEMO_MONTHLY_BUDGET_USD`, `NEXT_PUBLIC_GA_ID`, `NEXT_PUBLIC_GOOGLE_ADS_ID`, `NEXT_PUBLIC_LINKEDIN_PARTNER_ID`) vienen de la rama `rag-reposicionamiento` y están en [Reposicionamiento RAG](13-Reposicionamiento-RAG.md).
 
 ---
 
@@ -1504,6 +1562,26 @@ Para estas pruebas, Turnstile usa sus claves de prueba y el email se captura con
 | Puntaje sesgado | Pesos configurables con desglose visible y revisión mensual contra los cierres reales |
 | Incumplir la Ley 1581 | Prueba del consentimiento, política versionada, plazos con alertas, retención automática, validación con asesor legal |
 | Acceso que vence en plena negociación | Extensión con un clic. `convertido` conserva la demo 90 días |
+
+---
+
+## 20. Métricas de éxito
+
+Son **metas iniciales a validar** con 8 semanas de operación real (igual que en [Flujo del cliente](03-Flujo-del-Cliente.md)). No son resultados actuales. Las definiciones exactas de cada métrica están en la sección 13 y se ven en **Admin › Métricas** ([Panel de administración](05-Panel-de-Administracion.md), sección 10).
+
+| Métrica | Fuente | Meta inicial |
+|---|---|---|
+| Solicitudes con primera respuesta dentro del SLA de su grado | `DemoRequest.slaBreached` | ≥ 90 % |
+| Mediana de primera respuesta | `firstResponseAt − createdAt`, en horas hábiles | ≤ 4 h hábiles |
+| Abandono del formulario entre el paso 1 y el paso 2 | Eventos `demo_request_step1` y `demo_request_submit` | ≤ 40 % |
+| Solicitudes descartadas como spam | Rechazos con motivo `spam` sobre el total | ≤ 10 %, con 0 bots que lleguen a aprobarse |
+| Accesos activados en 72 h (enlace mágico usado) | `DemoGrant.usage.firstAccessAt` | ≥ 70 % |
+| Accesos con uso efectivo (≥ 20 min o ≥ la mitad de las acciones clave) | `DemoEvent` (`heartbeat`, `key_action`) | ≥ 50 % de los activados |
+| Accesos que terminan en llamada o propuesta | `LeadActivity` y etapa `propuesta` del Lead | ≥ 25 % |
+| Leads sin duplicar (un Lead por email) | Consulta de control sobre `Lead.email` | 100 % |
+| Solicitudes con consentimiento Ley 1581 registrado (versión y hash del texto) | `ConsentRecord` | 100 % |
+| Aperturas de demos `solicitud` o `privado` sin un acceso vigente | `DemoEvent` `open` sin `grantId` válido (excluye al equipo) | 0 |
+| Tiempo hasta que una revocación bloquea la demo abierta | Prueba e2e de la sección 18 | ≤ 5 min |
 
 ---
 

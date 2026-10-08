@@ -119,6 +119,7 @@ stateDiagram-v2
   activo --> suspendido: el admin suspende
   suspendido --> activo: el admin reactiva
 ```
+> [Ver diagrama como imagen](images/diagramas/Seccion-Autenticacion-1.png)
 
 Una cuenta `invitado` no tiene contraseña y no puede iniciar sesión. Para eso necesita el enlace. Una cuenta `suspendido` no puede iniciar sesión ni refrescar. La supresión por la Ley 1581 se hace anonimizando el Lead y la cuenta (ver [Legal](Seccion-Legal.md)); no es un estado.
 
@@ -145,6 +146,7 @@ flowchart TD
   RO -->|"client"| D2["Portal del cliente"]
   RO -->|"Equipo"| D3["Panel de administración"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Seccion-Autenticacion-2.png)
 
 ### 3. Destino después de entrar
 
@@ -210,6 +212,7 @@ sequenceDiagram
     N->>W: Va a /login con el aviso de sesión terminada
   end
 ```
+> [Ver diagrama como imagen](images/diagramas/Seccion-Autenticacion-3.png)
 
 **Cerrar sesión**
 - `POST /api/auth/logout` revoca la sesión actual y borra las cookies; después la web lleva a la página de inicio con el aviso "Cerraste sesión".
@@ -241,6 +244,7 @@ flowchart TD
   GG -->|"Sí"| M
   GG -->|"No"| GE["Aviso: usa la cuenta invitada o crea una contraseña"]
 ```
+> [Ver diagrama como imagen](images/diagramas/Seccion-Autenticacion-4.png)
 
 | Estado | Qué ve el prospecto (texto propuesto) | Acciones |
 |---|---|---|

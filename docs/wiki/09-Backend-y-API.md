@@ -60,7 +60,7 @@ Esta página es el plan técnico del backend. Para cada módulo dice qué hace h
 | Sistema experto | `/api/expert` | 6 | 2.060 | `/demo/sistema-experto` | **Mover** al módulo de salud como "Motor de reglas" | 1–2 |
 | Gestor de contenido con IA | `/api/content` | 5 | 630 | `/demo/gestor-contenido` | **Mantener** detrás de la pasarela de IA; módulo `content-ai` en la Fase 2 | 0–2 |
 | Módulos en memoria (`src/modules/`) | no montados | 126 | 3.440 | Ninguno | **Eliminar** | 0 |
-| Rutas de prueba | `/api/test/*`, `/api/contact/test-*` | 4 | 160 | Ninguno | **Eliminar** de producción | 0 |
+| Rutas de prueba | `routes/test.routes.ts` y las rutas de prueba de `contact.routes.ts` | 4 | 160 | Ninguno | **Eliminar** de producción | 0 |
 
 ---
 
@@ -120,6 +120,7 @@ flowchart LR
   SV --> AI
   SV --> MSG
 ```
+> [Ver diagrama como imagen](images/diagramas/09-Backend-y-API-1.png)
 
 - La web llama al backend **directamente desde el navegador**, a la URL pública de Railway (`apps/web/src/lib/backend-url.ts`). Solo el chatbot heredado pasa por un proxy de Next.
 - La generación de LinkedIn Ads llama a OpenAI **desde Vercel** (`apps/web/src/app/api/linkedin-ads/generate/route.ts`), por fuera del backend.
@@ -131,7 +132,7 @@ flowchart LR
 | 21–30 | `uncaughtException` y `unhandledRejection` terminan el proceso | Correcto como red de seguridad, pero no hay reporte de errores (Sentry) |
 | 36–70 | `helmet` y CORS con lista de orígenes (producción + `CORS_ORIGIN`) | Falta `trust proxy`: detrás del proxy de Railway, el rate-limit y los logs no ven la IP real del visitante |
 | 76–84 | Rate-limit general (100 por 15 min) y del chatbot (60 por minuto) | En memoria: cada instancia cuenta por separado |
-| 91–100 | Swagger con `swagger-jsdoc` sobre `./src/routes/*.ts`, servido en `/api-docs` | Solo 9 de 22 archivos de rutas tienen anotaciones |
+| 91–100 | Swagger con `swagger-jsdoc` sobre `./src/routes/*.ts`, servido por el mismo backend | Solo 9 de 22 archivos de rutas tienen anotaciones |
 | 110–128 | Crea 8 carpetas bajo `./uploads` | Todo lo que se guarda ahí se pierde al redesplegar |
 | 143–157 | Al arrancar, asegura el rol `admin` de una cuenta configurada | Un arranque no debería modificar datos. Se reemplaza por el script `scripts/set-admin.ts`, que ya existe |
 | 172–243 | Importa y monta los 22 routers. `cuentas.routes` se monta en la raíz `/api` (línea 232) | Rutas genéricas como `/api/process` o `/api/export` ocupan nombres que la plataforma necesitará |
@@ -264,12 +265,14 @@ flowchart LR
     WK["Servicio worker: colas BullMQ y jobs, Fase 2"]
   end
   subgraph PL["Plataforma, en capas"]
+    direction LR
     P1["Autenticación, usuarios y permisos"]
     P2["Leads, sistema de demos, privacidad, bitácora y métricas"]
     P3["Portal: proyectos, pedidos, facturas, entregables y mensajes"]
     P4["Propuestas y pagos, Fase 3"]
   end
   subgraph MD["Módulos de producto, Fase 2"]
+    direction LR
     M1["rag-core: ingesta, búsqueda híbrida y citas"]
     M2["chatbot y Prueba con tu documento"]
     M3["documentos"]
@@ -295,6 +298,7 @@ flowchart LR
   WK --> S3
   API --> OBS["Logs JSON, Sentry, health y ready"]
 ```
+> [Ver diagrama como imagen](images/diagramas/09-Backend-y-API-2.png)
 
 **Principios:**
 
@@ -395,11 +399,11 @@ Cada subsección dice qué hace el módulo, su estado, la decisión y los cambio
   - Hay dos rutas de prueba en el mismo router.
 - **Decisión: refactorizar.** `POST /api/contact` pasa a ser **el canal único de Leads** fuera del formulario de demo.
 - **Cambios:**
-  1. Upsert del `Lead` por email, `ConsentRecord` y `Contact` con `leadId`, `source` (`contacto` o `demo_rag`), `offeringSlug` y `plan`. Es la tarea 4 de Sistema de demos.
+  1. Upsert del `Lead` por email, `ConsentRecord` y `Contact` con `leadId`, `source` (`contacto` o `demo_rag`), `offeringSlug` y `plan`. Es la tarea 4 de Sistema de demos. La rama `rag-reposicionamiento` está agregando (sin commit todavía) `Contact.source` con los valores `contact-form` y `demo-rag`; la migración del Lead los normaliza a `contacto` y `demo_rag`.
   2. Turnstile, honeypot y tiempo mínimo de llenado (sección 15 de Sistema de demos).
   3. Con `source = demo_rag`, la respuesta incluye un **ticket de carga** firmado de 60 minutos para "Prueba con tu documento" (sección 3.7).
   4. Los avisos al equipo salen por el outbox, con plantillas y sin datos de contacto del prospecto en WhatsApp.
-  5. Se eliminan `test-whatsapp` y `test-email` (sección 15).
+  5. Se eliminan las rutas de prueba de email y WhatsApp de este router (sección 15).
   6. Los logs registran solo el id del Lead, nunca el email.
 
 #### 3.4 Sistema de demos (nuevo)
@@ -446,7 +450,7 @@ No existen hoy. Se crean con el sistema de demos (sección 12 de Sistema de demo
   - PDF y DOCX no se interpretan en la API de bots: se tratan como texto.
   - Los límites de uso y de costo de la IA se rediseñan con la pasarela de IA de la Fase 0.
   - Los modelos están en una constante del archivo.
-  - Es el producto principal del reposicionamiento ([Chatbot RAG](Producto-chatbot-rag-ia.md)).
+  - Es el producto principal del reposicionamiento ([Sistemas RAG](Producto-chatbot-rag-ia.md), [Reposicionamiento RAG](13-Reposicionamiento-RAG.md)).
 - **Decisión: refactorizar** la API de bots y **eliminar** la heredada.
 - **Cambios:**
   1. **Persistencia (Fase 0, tarea 10).** Modelos `Bot`, `BotDocument`, `BotChunk` y `BotMessage` en MongoDB, y archivos en el almacenamiento de objetos.
@@ -462,7 +466,7 @@ No existen hoy. Se crean con el sistema de demos (sección 12 de Sistema de demo
      - Citas con página y fragmento.
      - Ingesta de URLs con límites de tamaño, tiempo y tipo de contenido, y lista de dominios permitidos.
   5. **Grants (Fase 2).** Un `DemoGrant` del chatbot amplía el cupo y crea un bot personalizado con el logo y el sector del prospecto (`DemoGrant.customization`).
-  6. **Retiro de la API heredada (Fase 2).** Se eliminan las 7 rutas, `chatbot.controller.ts`, `chatbot.service.ts`, `models/Chatbot.ts`, los proxies de Next y la página `/preview`. Es la tarea 13 de Chatbot RAG.
+  6. **Retiro de la API heredada (Fase 2).** Se eliminan las 7 rutas, `chatbot.controller.ts`, `chatbot.service.ts`, `models/Chatbot.ts`, los proxies de Next y la página `/preview`. Es la tarea 18 de [Sistemas RAG](Producto-chatbot-rag-ia.md).
   7. **SaaS real (Fase 4, tarea 25).** `Organization` y `tenantId` en todas las consultas, medición de conversaciones y cobro recurrente.
 
 **Modelo de datos del chatbot (Fase 0, ampliado en la Fase 2):**
@@ -516,12 +520,13 @@ erDiagram
     date at
   }
 ```
+> [Ver diagrama como imagen](images/diagramas/09-Backend-y-API-3.png)
 
 **Contrato de "Prueba con tu documento".**
 
 El comportamiento lo define el dueño: PDF, DOCX o TXT de hasta 5 MB y 30 páginas; solo email y autorización Ley 1581; 10 preguntas por documento; 3 documentos por IP al día; borrado a la hora; tope mensual; respuestas con cita.
 
-La rama `rag-reposicionamiento` todavía no trae cambios en el backend. Si al fusionarla define otro contrato, prevalece el de la rama y se actualiza esta sección.
+La rama `rag-reposicionamiento` ya cambió `chatbot.routes.ts` (reglas para responder solo con los documentos y citar) y está implementando esta demo, todavía sin commit, como una API propia montada en `/api/demo-rag` (`routes/demo-rag.routes.ts` y `services/demo-rag.service.ts`): el documento, sus fragmentos y su índice viven solo en memoria con un TTL de 1 hora; el cupo por IP y el gasto del mes se cuentan en Redis, y la función queda apagada si falta `DEMO_UPLOAD_ENABLED=true`, Redis o la clave del proveedor de IA. Al fusionarla prevalece el contrato de la rama y se actualiza esta sección; el diagrama de abajo es el diseño objetivo con persistencia y pasarela de IA.
 
 ```mermaid
 sequenceDiagram
@@ -553,6 +558,7 @@ sequenceDiagram
   A-->>W: Respuesta con citas y preguntas restantes
   Note over A,D: El job demo-docs-cleanup corre cada 10 min y borra documento, fragmentos y archivo al cumplirse la hora
 ```
+> [Ver diagrama como imagen](images/diagramas/09-Backend-y-API-4.png)
 
 | Endpoint | Rol | Reglas |
 |---|---|---|
@@ -698,8 +704,8 @@ Además:
 
 | Elemento | Qué es | Decisión |
 |---|---|---|
-| `routes/test.routes.ts` (`/api/test/whatsapp`, `/status`) | Envío y estado de mensajes de prueba | **Eliminar** de producción. Se reemplaza por el script `scripts/notify-smoke.ts`, que se corre desde la consola de Railway |
-| `POST /api/contact/test-whatsapp`, `/test-email` | Pruebas de proveedor | **Eliminar** |
+| `routes/test.routes.ts` | Pruebas de mensajería | **Eliminar** de producción. Se reemplaza por el script `scripts/notify-smoke.ts`, que se corre desde la consola de Railway |
+| Rutas de prueba de `contact.routes.ts` | Pruebas de proveedor | **Eliminar** |
 | `/api/chat` (`chat.routes.ts`, `chat.controller.ts`, `ChatSession`, `ChatMessage`) | Chat anónimo que responde un eco | **Eliminar**, junto con `sendChatMessage` y `createChatSession` de `apps/web/src/lib/api.ts` |
 | Página web `/test` | Página interna que llama a APIs | **Eliminar** de la web de producción (ver [Seguridad y calidad](10-Seguridad-y-Calidad.md)) |
 
@@ -748,7 +754,7 @@ Dónde vive cada pieza. Los nombres y archivos son los de [Sistema de demos](04-
 ### 5. Mensajería unificada (email, WhatsApp, Slack y avisos en la app)
 
 ```mermaid
-flowchart LR
+flowchart TD
   E1["Controladores y servicios"] -->|"enqueue con idempotencyKey"| OB[("OutboundMessage")]
   J1["Jobs: secuencias, recordatorios, resumen diario"] --> OB
   OB --> D["outbox-dispatcher cada minuto"]
@@ -765,6 +771,7 @@ flowchart LR
   C4 --> ST
   WH["Webhooks de rebote y entrega, Fase 2"] --> ST
 ```
+> [Ver diagrama como imagen](images/diagramas/09-Backend-y-API-5.png)
 
 - **Una sola entrada.** `notify.enqueue({channel, templateKey, to, vars, leadId?, userId?, grantId?, scheduledAt?, idempotencyKey})`.
   - Ningún controlador vuelve a llamar a `emailService` o `whatsappService` directamente.
@@ -821,6 +828,7 @@ flowchart TD
   C3 --> DB
   C3 --> P["Proveedores de email y WhatsApp"]
 ```
+> [Ver diagrama como imagen](images/diagramas/09-Backend-y-API-6.png)
 
 - **Arranque.** `src/worker.ts` comparte modelos y servicios con la API. En Railway es un segundo servicio desde la misma imagen (`node dist/worker.js`), con `JOBS_ENABLED=true`. La API pasa a `JOBS_ENABLED=false`.
 - **Colas:**
@@ -1016,7 +1024,7 @@ apps/backend/
 ### 11. Convenciones de la API
 
 ```mermaid
-flowchart LR
+flowchart TD
   A["Petición"] --> B["requestId y logger"]
   B --> C["helmet y CORS con lista de orígenes"]
   C --> D["Parser JSON con límite de 1 MB"]
@@ -1032,6 +1040,7 @@ flowchart LR
   H -->|"400"| X
   J -->|"409 o 422"| X
 ```
+> [Ver diagrama como imagen](images/diagramas/09-Backend-y-API-7.png)
 
 | Tema | Convención |
 |---|---|
@@ -1047,7 +1056,7 @@ flowchart LR
 
 ### 12. Swagger / OpenAPI
 
-- **Hoy:** `swagger-jsdoc` lee comentarios de `src/routes/*.ts` y `swagger-ui-express` los sirve en `/api-docs`. Solo 9 de 22 archivos tienen anotaciones, sin los esquemas de respuesta. El cliente de la web se escribe a mano.
+- **Hoy:** `swagger-jsdoc` lee comentarios de `src/routes/*.ts` y `swagger-ui-express` los sirve desde el mismo backend. Solo 9 de 22 archivos tienen anotaciones, sin los esquemas de respuesta. El cliente de la web se escribe a mano.
 - **Objetivo:**
   1. **Esquemas zod en `src/schemas/`.** Cada ruta nueva declara `body`, `query`, `params` y la respuesta. El middleware `validate(schema)` los usa para validar.
   2. **Registro OpenAPI** (`config/openapi.ts`, con `@asteasolutions/zod-to-openapi`).
@@ -1132,7 +1141,7 @@ Estado: **Nuevo**, **Modificado**, **Se mantiene** o **Se elimina**. El detalle 
 | `GET /api/quotes/public/:token`, `POST .../accept`, `POST .../reject` | público (token) | Nuevo: propuesta en línea | 3 · Sistema de demos |
 | `POST /api/quotes` (público heredado) | público | **Se elimina** (sin consumidor) | 0 |
 | `/api/chat/*` (3 rutas) | público | **Se elimina** (eco sin consumidor) | 0 |
-| `/api/test/*`, `/api/contact/test-*` | — | **Se eliminan** de producción | 0 |
+| Rutas de prueba (`routes/test.routes.ts` y las de prueba de `contact.routes.ts`) | — | **Se eliminan** de producción | 0 |
 
 **Autenticación y cuenta**
 
@@ -1224,7 +1233,7 @@ Antes de borrar, se crea la etiqueta `archivo/antes-de-limpieza`. Después se co
 | `src/models/CUPSEquivalencia.ts` | Modelo | 0 importaciones | Eliminar | 0 |
 | `/api/chat` (`chat.routes.ts`, `chat.controller.ts`, `ChatSession`, `ChatMessage`) y sus métodos en `apps/web/src/lib/api.ts` | Chat que responde un eco | Ninguna página llama a `sendChatMessage` | Eliminar | 0 |
 | `POST /api/quotes` (`quote.routes.ts`, `submitQuote`) y `requestQuote` en `lib/api.ts` | Formulario de cotización | Ninguna página llama a `requestQuote` | Desmontar (se conserva el modelo para migrar en la Fase 3) | 0 |
-| `routes/test.routes.ts` y las rutas `test-*` de contacto | Rutas de prueba | Sin consumidor | Eliminar; usar `scripts/notify-smoke.ts` | 0 |
+| `routes/test.routes.ts` y las rutas de prueba de contacto | Rutas de prueba | Sin consumidor | Eliminar; usar `scripts/notify-smoke.ts` | 0 |
 | Promoción de rol en el arranque (`index.ts` líneas 143–157) | Efecto lateral del arranque | — | Eliminar; usar `scripts/set-admin.ts` con bitácora | 0 |
 | `ADMIN_SETUP.md` | Guía de operación | — | Reemplazar por la página de operación de la wiki (procedimiento con `set-admin.ts`) | 0 |
 | `data/chatbots/`, `data/decisiones-ia/` (30 archivos versionados) y `src/data/chatbot-store.ts` | Estado en disco | Sección 7 | Migrar a MongoDB, quitar del repositorio y agregar `data/` al `.gitignore` | 0 |
@@ -1412,5 +1421,5 @@ Tallas para 1 dev senior: **S** ≤ 2 días · **M** 3–5 días · **L** 1–2 
 
 - [Sistema de demos](04-Sistema-de-Demos.md) · [Flujo del cliente](03-Flujo-del-Cliente.md) · [Panel de administración](05-Panel-de-Administracion.md) · [Portal del cliente](06-Portal-del-Cliente.md)
 - [Autenticación](Seccion-Autenticacion.md) · [Contacto](Seccion-Contacto.md) · [Legal](Seccion-Legal.md)
-- [Chatbot RAG](Producto-chatbot-rag-ia.md) · [Gestor documental](Producto-gestor-documental.md) · [CMS headless](Producto-cms-headless.md) · [Demo cuentas médicas](Demo-cuentas-medicas.md) · [Demo sistema experto](Demo-sistema-experto.md) · [Demo LinkedIn Ads](Demo-linkedin-ads.md)
+- [Sistemas RAG](Producto-chatbot-rag-ia.md) · [Gestor documental](Producto-gestor-documental.md) · [CMS headless](Producto-cms-headless.md) · [Demo cuentas médicas](Demo-cuentas-medicas.md) · [Demo sistema experto](Demo-sistema-experto.md) · [Demo LinkedIn Ads](Demo-linkedin-ads.md)
 - [Diagnóstico](01-Diagnostico.md) · [Visión de producto](02-Vision-de-Producto.md) · [Catálogo de productos](08-Catalogo-de-Productos.md) · [Seguridad y calidad](10-Seguridad-y-Calidad.md) · [Comercial, marketing y legal](11-Comercial-Marketing-y-Legal.md) · [Roadmap](12-Roadmap.md)
