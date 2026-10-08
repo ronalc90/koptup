@@ -11,19 +11,21 @@ import Card, { CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import { PRODUCTS, imageUrl } from './products';
-import { formatPrice } from './shared';
+import { formatPrice, formatNumber } from './shared';
 
 type OrderStatus = 'new' | 'preparing' | 'shipped' | 'delivered';
 
 interface VendorOrder { id: string; customer: string; items: number; total: number; status: OrderStatus; date: string; }
 
+// Pedidos de ejemplo del día, armados con productos del catálogo (COP, IVA
+// incluido; los pedidos de menos de $ 150.000 suman el envío de $ 9.900).
 const MOCK_ORDERS: VendorOrder[] = [
-  { id: 'KOP-001', customer: 'María González',  items: 3, total: 348,  status: 'new',       date: '2026-05-14 10:42' },
-  { id: 'KOP-002', customer: 'Carlos Ramírez',  items: 1, total: 1199, status: 'preparing', date: '2026-05-14 10:21' },
-  { id: 'KOP-003', customer: 'Andrea Suárez',   items: 5, total: 612,  status: 'preparing', date: '2026-05-14 09:55' },
-  { id: 'KOP-004', customer: 'Felipe López',    items: 2, total: 198,  status: 'shipped',   date: '2026-05-14 09:18' },
-  { id: 'KOP-005', customer: 'Laura Henao',     items: 1, total: 79,   status: 'shipped',   date: '2026-05-14 08:46' },
-  { id: 'KOP-006', customer: 'Daniel Cárdenas', items: 4, total: 437,  status: 'delivered', date: '2026-05-13 17:33' },
+  { id: 'KOP-001', customer: 'María González',  items: 3, total: 167700,  status: 'new',       date: '2026-05-14 10:42' }, // 2 café + prensa francesa
+  { id: 'KOP-002', customer: 'Carlos Ramírez',  items: 1, total: 4299000, status: 'preparing', date: '2026-05-14 10:21' }, // smartphone
+  { id: 'KOP-003', customer: 'Andrea Suárez',   items: 5, total: 787500,  status: 'preparing', date: '2026-05-14 09:55' }, // tapete + maletín + tenis + 2 café
+  { id: 'KOP-004', customer: 'Felipe López',    items: 2, total: 568900,  status: 'shipped',   date: '2026-05-14 09:18' }, // audífonos in-ear + morral
+  { id: 'KOP-005', customer: 'Laura Henao',     items: 1, total: 99800,   status: 'shipped',   date: '2026-05-14 08:46' }, // malbec + envío
+  { id: 'KOP-006', customer: 'Daniel Cárdenas', items: 4, total: 539600,  status: 'delivered', date: '2026-05-14 07:58' }, // perfume + crema + 2 chardonnay
 ];
 
 const PRICING_RULES = [
@@ -37,6 +39,7 @@ export default function VendorView() {
   const t = useTranslations('demoEcommerce2');
   const [orders, setOrders] = useState(MOCK_ORDERS);
   const [showCreate, setShowCreate] = useState(false);
+  const [savedDraft, setSavedDraft] = useState<string | null>(null);
   const [rules, setRules] = useState(PRICING_RULES);
 
   const kpis = useMemo(() => {
@@ -73,10 +76,19 @@ export default function VendorView() {
         </Button>
       </header>
 
+      {savedDraft && (
+        <div role="status" className="flex items-start justify-between gap-3 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-800 dark:border-green-800 dark:bg-green-950/30 dark:text-green-200">
+          <span>{t('vendor.createForm.savedNotice', { name: savedDraft })}</span>
+          <button type="button" onClick={() => setSavedDraft(null)} aria-label={t('vendor.createForm.dismiss')} className="shrink-0">
+            <XMarkIcon className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard icon={<CurrencyDollarIcon className="h-6 w-6" />} label={t('vendor.kpis.todaySales')} value={formatPrice(kpis.revenue)} delta="+12.4%" tone="green" />
-        <KpiCard icon={<ShoppingBagIcon className="h-6 w-6" />} label={t('vendor.kpis.aov')} value={formatPrice(kpis.aov)} delta="+3.1%" tone="green" />
-        <KpiCard icon={<ArrowTrendingUpIcon className="h-6 w-6" />} label={t('vendor.kpis.conversion')} value={`${kpis.conversion}%`} delta="+0.4 pts" tone="green" />
+        <KpiCard icon={<CurrencyDollarIcon className="h-6 w-6" />} label={t('vendor.kpis.todaySales')} value={formatPrice(kpis.revenue)} delta="+12,4 %" tone="green" />
+        <KpiCard icon={<ShoppingBagIcon className="h-6 w-6" />} label={t('vendor.kpis.aov')} value={formatPrice(kpis.aov)} delta="+3,1 %" tone="green" />
+        <KpiCard icon={<ArrowTrendingUpIcon className="h-6 w-6" />} label={t('vendor.kpis.conversion')} value={`${formatNumber(kpis.conversion)} %`} delta="+0,4 pts" tone="green" />
         <KpiCard icon={<CubeIcon className="h-6 w-6" />} label={t('vendor.kpis.activeProducts')} value={kpis.activeProducts.toString()} delta="+2" tone="neutral" />
       </div>
 
@@ -84,10 +96,7 @@ export default function VendorView() {
         <CardContent>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-secondary-900 dark:text-white">{t('vendor.liveOrders')}</h2>
-            <Badge variant="success" className="flex items-center gap-1">
-              <span className="inline-block w-2 h-2 rounded-full bg-green-600 animate-pulse" />
-              {t('vendor.live')}
-            </Badge>
+            <Badge variant="warning">{t('vendor.live')}</Badge>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -132,7 +141,7 @@ export default function VendorView() {
               {topProducts.map((p) => (
                 <div key={p.id} className="text-center">
                   <div className="relative aspect-square rounded-lg overflow-hidden bg-secondary-100 dark:bg-secondary-800 mb-2">
-                    <Image src={imageUrl(p.photoId, 240, 240)} alt={p.sku} fill sizes="120px" className="object-cover" />
+                    <Image src={imageUrl(p.photoId, 240, 240)} alt={t(`productNames.${p.nameKey}`)} fill sizes="120px" className="object-cover" />
                   </div>
                   <p className="text-xs font-semibold text-secondary-900 dark:text-white truncate">{t(`productNames.${p.nameKey}`)}</p>
                   <p className="text-xs text-secondary-500">{p.sales30d} {t('vendor.unitsSold')}</p>
@@ -185,7 +194,13 @@ export default function VendorView() {
         </CardContent>
       </Card>
 
-      {showCreate && <CreateProductModal onClose={() => setShowCreate(false)} t={t} />}
+      {showCreate && (
+        <CreateProductModal
+          onClose={() => setShowCreate(false)}
+          onSaved={(name) => { setSavedDraft(name); setShowCreate(false); }}
+          t={t}
+        />
+      )}
     </div>
   );
 }
@@ -217,34 +232,51 @@ function StatusBadge({ status, t }: { status: OrderStatus; t: ReturnType<typeof 
   return <Badge variant={variant} size="sm">{t(key)}</Badge>;
 }
 
-function CreateProductModal({ onClose, t }: { onClose: () => void; t: ReturnType<typeof useTranslations> }) {
+function CreateProductModal({ onClose, onSaved, t }: { onClose: () => void; onSaved: (name: string) => void; t: ReturnType<typeof useTranslations> }) {
+  const [name, setName] = useState('');
+  const [price, setPrice] = useState('');
+  const [files, setFiles] = useState<string[]>([]);
+  const canSave = name.trim() !== '' && Number(price) > 0;
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-white dark:bg-secondary-900 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-secondary-900 dark:text-white">{t('vendor.createForm.title')}</h2>
-            <button onClick={onClose} className="p-2 hover:bg-secondary-100 dark:hover:bg-secondary-800 rounded-lg">
+            <button onClick={onClose} className="p-2 hover:bg-secondary-100 dark:hover:bg-secondary-800 rounded-lg" aria-label={t('vendor.createForm.cancel')}>
               <XMarkIcon className="h-5 w-5" />
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-            <Field label={t('vendor.createForm.name')} placeholder="Sneakers Pro" />
-            <Field label={t('vendor.createForm.sku')} placeholder="TEC-XYZ-001" />
-            <Field label={t('vendor.createForm.price')} placeholder="129.99" type="number" />
+            <Field label={t('vendor.createForm.name')} placeholder={t('vendor.createForm.namePlaceholder')} value={name} onChange={setName} />
+            <Field label={t('vendor.createForm.sku')} placeholder="MOD-TEN-002" />
+            <Field label={t('vendor.createForm.price')} placeholder="189900" type="number" value={price} onChange={setPrice} />
             <Field label={t('vendor.createForm.stock')} placeholder="100" type="number" />
             <div className="md:col-span-2">
               <label className="block text-xs font-medium text-secondary-700 dark:text-secondary-300 mb-1">{t('vendor.createForm.description')}</label>
               <textarea rows={3} className="w-full px-3 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white text-sm" placeholder="" />
             </div>
           </div>
-          <div className="border-2 border-dashed border-secondary-300 dark:border-secondary-700 rounded-lg p-8 text-center text-secondary-500 mb-4">
+          <label className="block cursor-pointer border-2 border-dashed border-secondary-300 dark:border-secondary-700 rounded-lg p-8 text-center text-secondary-500 mb-4 hover:border-primary-400">
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              className="sr-only"
+              onChange={(e) => setFiles(Array.from(e.target.files ?? []).map((f) => f.name))}
+            />
             <PhotoIcon className="h-10 w-10 mx-auto mb-2" />
             <p className="text-sm">{t('vendor.createForm.dropImages')}</p>
-          </div>
+            {files.length > 0 && (
+              <p className="mt-2 text-xs text-secondary-700 dark:text-secondary-300">
+                {t('vendor.createForm.filesSelected', { count: files.length })}
+              </p>
+            )}
+          </label>
+          <p className="text-xs text-secondary-500 mb-4">{t('vendor.createForm.simulatedHint')}</p>
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={onClose}>{t('vendor.createForm.cancel')}</Button>
-            <Button onClick={onClose}>{t('vendor.createForm.save')}</Button>
+            <Button onClick={() => onSaved(name.trim())} disabled={!canSave}>{t('vendor.createForm.save')}</Button>
           </div>
         </div>
       </div>
@@ -252,11 +284,16 @@ function CreateProductModal({ onClose, t }: { onClose: () => void; t: ReturnType
   );
 }
 
-function Field({ label, placeholder, type = 'text' }: { label: string; placeholder?: string; type?: string }) {
+function Field({ label, placeholder, type = 'text', value, onChange }: { label: string; placeholder?: string; type?: string; value?: string; onChange?: (v: string) => void }) {
   return (
     <div>
       <label className="block text-xs font-medium text-secondary-700 dark:text-secondary-300 mb-1">{label}</label>
-      <input type={type} placeholder={placeholder} className="w-full px-3 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white text-sm" />
+      <input
+        type={type}
+        placeholder={placeholder}
+        {...(onChange ? { value: value ?? '', onChange: (e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value) } : {})}
+        className="w-full px-3 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white text-sm"
+      />
     </div>
   );
 }

@@ -10,7 +10,7 @@ import {
 import Card, { CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
-import { useCart, formatPrice, calcTotals, generateCufe, generateOrderNumber } from './shared';
+import { useCart, formatPrice, calcTotals, generateCufe, generateOrderNumber, IVA_RATE, FREE_SHIPPING_FROM } from './shared';
 import { imageUrl } from './products';
 
 type Step = 0 | 1 | 2 | 3;
@@ -37,10 +37,11 @@ export default function CheckoutView() {
     fullName: '', email: '', phone: '', address: '', city: 'Bogotá', zip: '110111', country: 'CO',
   });
   const [method, setMethod] = useState<(typeof PAYMENT_METHODS)[number]['id']>('card');
+  const [card, setCard] = useState({ number: '', name: '', expiry: '', cvv: '' });
   const [orderNumber] = useState(generateOrderNumber());
   const [cufe] = useState(generateCufe());
 
-  const discount = +(subtotal * appliedCoupon).toFixed(2);
+  const discount = Math.round(subtotal * appliedCoupon);
   const totals = useMemo(() => calcTotals(Math.max(0, subtotal - discount)), [subtotal, discount]);
 
   function applyCoupon() {
@@ -101,7 +102,7 @@ export default function CheckoutView() {
                   {lines.map((l) => (
                     <div key={l.product.id} className="flex gap-4 p-3 bg-secondary-50 dark:bg-secondary-800 rounded-lg">
                       <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0">
-                        <Image src={imageUrl(l.product.photoId, 160, 160)} alt={l.product.sku} fill sizes="80px" className="object-cover" />
+                        <Image src={imageUrl(l.product.photoId, 160, 160)} alt={t(`productNames.${l.product.nameKey}`)} fill sizes="80px" className="object-cover" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-secondary-900 dark:text-white truncate">{t(`productNames.${l.product.nameKey}`)}</p>
@@ -183,12 +184,13 @@ export default function CheckoutView() {
 
               {method === 'card' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <FormField label={t('checkout.payment.cardNumber')} value="" onChange={() => {}} placeholder="4242 4242 4242 4242" className="md:col-span-2" />
-                  <FormField label={t('checkout.payment.cardName')} value="" onChange={() => {}} placeholder="RONALD PEREZ" />
+                  <FormField label={t('checkout.payment.cardNumber')} value={card.number} onChange={(v) => setCard({ ...card, number: v })} placeholder="4242 4242 4242 4242" className="md:col-span-2" />
+                  <FormField label={t('checkout.payment.cardName')} value={card.name} onChange={(v) => setCard({ ...card, name: v })} placeholder="RONALD PEREZ" />
                   <div className="grid grid-cols-2 gap-3">
-                    <FormField label="MM/YY" value="" onChange={() => {}} placeholder="12/28" />
-                    <FormField label="CVV" value="" onChange={() => {}} placeholder="123" />
+                    <FormField label={t('checkout.payment.cardExpiry')} value={card.expiry} onChange={(v) => setCard({ ...card, expiry: v })} placeholder="12/28" />
+                    <FormField label="CVV" value={card.cvv} onChange={(v) => setCard({ ...card, cvv: v })} placeholder="123" />
                   </div>
+                  <p className="md:col-span-2 text-xs text-secondary-500">{t('checkout.payment.cardHint')}</p>
                 </div>
               )}
               {method === 'addi' && (
@@ -253,13 +255,18 @@ export default function CheckoutView() {
                 <Row label={t('checkout.summary.subtotal')} value={formatPrice(subtotal)} />
                 {discount > 0 && <Row label={t('checkout.summary.discount')} value={`-${formatPrice(discount)}`} />}
                 <Row label={t('checkout.summary.shipping')} value={totals.shipping === 0 ? t('checkout.summary.free') : formatPrice(totals.shipping)} />
-                <Row label={t('checkout.summary.tax')} value={formatPrice(totals.tax)} />
                 <div className="border-t border-secondary-200 dark:border-secondary-700 pt-2 mt-2">
                   <Row label={t('checkout.summary.total')} value={formatPrice(totals.total)} bold />
                 </div>
+                <Row label={t('checkout.summary.taxIncluded', { rate: Math.round(IVA_RATE * 100) })} value={formatPrice(totals.ivaIncluded)} muted />
               </div>
               {totals.shipping === 0 && subtotal > 0 && (
                 <Badge variant="success" className="mt-3 w-full justify-center">✓ {t('checkout.summary.freeShippingApplied')}</Badge>
+              )}
+              {totals.shipping > 0 && (
+                <p className="mt-3 text-xs text-secondary-500">
+                  {t('checkout.summary.freeShippingFrom', { amount: formatPrice(FREE_SHIPPING_FROM) })}
+                </p>
               )}
             </CardContent>
           </Card>
@@ -283,11 +290,16 @@ function FormField({ label, value, onChange, type = 'text', placeholder, classNa
   );
 }
 
-function Row({ label, value, mono = false, bold = false }: { label: string; value: string; mono?: boolean; bold?: boolean }) {
+function Row({ label, value, mono = false, bold = false, muted = false }: { label: string; value: string; mono?: boolean; bold?: boolean; muted?: boolean }) {
+  const valueClass = bold
+    ? 'text-lg font-bold text-primary-600'
+    : muted
+      ? 'text-xs text-secondary-500'
+      : 'font-medium text-secondary-900 dark:text-white';
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className="text-secondary-500">{label}</span>
-      <span className={`${bold ? 'text-lg font-bold text-primary-600' : 'font-medium text-secondary-900 dark:text-white'} ${mono ? 'font-mono text-xs' : ''}`}>{value}</span>
+      <span className={`text-secondary-500 ${muted ? 'text-xs' : ''}`}>{label}</span>
+      <span className={`${valueClass} ${mono ? 'font-mono text-xs' : ''}`}>{value}</span>
     </div>
   );
 }
