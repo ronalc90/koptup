@@ -11,7 +11,8 @@
     "lint": "next lint",
     "test": "jest --passWithNoTests",
     "test:e2e": "playwright test",
-    "merge-messages": "node scripts/merge-messages.mjs"
+    "merge-messages": "node scripts/merge-messages.mjs",
+    "check-titles": "node scripts/check-titles.mjs"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",

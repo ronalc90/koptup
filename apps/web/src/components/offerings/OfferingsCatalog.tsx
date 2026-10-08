@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
@@ -45,7 +45,7 @@ import {
 import {
   OFFERINGS,
   TIER_ORDER,
-  TRM_FALLBACK,
+  TRM_REFERENCIA,
   copToUsd,
   formatCOP,
   formatMoney,
@@ -59,6 +59,8 @@ import {
   type TierLimits,
   type UnlimitedOrNumber,
 } from '@/lib/services-catalog';
+import { formatRagCOP } from '@/lib/rag-plans';
+import { trackPlanClick, type PlanClickParams } from '@/lib/analytics';
 
 type Modality = 'compra' | 'saas';
 
@@ -110,36 +112,23 @@ const CATEGORY_FILTERS: (OfferingCategory | 'all')[] = [
 ];
 
 /* -------------------------------------------------------------------------- */
-/* Hook: TRM en vivo                                                           */
+/* Ofertas visibles                                                            */
 /* -------------------------------------------------------------------------- */
 
-interface TrmState {
-  rate: number;
-  source: 'live' | 'fallback';
-}
+/**
+ * Ofertas que /services no muestra en "Otras soluciones a medida".
+ * `chatbot-rag-ia` lo reemplazan los planes RAG (`RagPlans`, arriba de la
+ * página). Se filtra solo en esta vista: el sitemap y /demo/chatbot siguen
+ * usando `OFFERINGS` completo.
+ */
+const HIDDEN_IN_CATALOG = new Set<string>(['chatbot-rag-ia']);
 
-function useLiveTRM(): TrmState {
-  const [state, setState] = useState<TrmState>({ rate: TRM_FALLBACK, source: 'fallback' });
-  useEffect(() => {
-    let alive = true;
-    fetch('/api/trm')
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data: { rate?: number; source?: string } | null) => {
-        if (!alive || !data || typeof data.rate !== 'number') return;
-        setState({
-          rate: data.rate,
-          source: data.source === 'fallback' ? 'fallback' : 'live',
-        });
-      })
-      .catch(() => {
-        /* keep fallback */
-      });
-    return () => {
-      alive = false;
-    };
-  }, []);
-  return state;
-}
+const CATALOG_OFFERINGS: Offering[] = OFFERINGS.filter((o) => !HIDDEN_IN_CATALOG.has(o.slug));
+
+/** Chips de categoría con al menos una oferta visible. */
+const VISIBLE_CATEGORY_FILTERS = CATEGORY_FILTERS.filter(
+  (cat) => cat === 'all' || CATALOG_OFFERINGS.some((o) => o.category === cat),
+);
 
 /* -------------------------------------------------------------------------- */
 /* Helpers                                                                     */
@@ -149,6 +138,22 @@ function formatLimit(value: UnlimitedOrNumber, unlimitedLabel: string, naLabel: 
   if (value === 'unlimited') return unlimitedLabel;
   if (value === 0) return naLabel;
   return new Intl.NumberFormat('es-CO').format(value);
+}
+
+/** Evento `plan_click` de una solución del catálogo "Otras soluciones a medida". */
+function trackOfferingClick(
+  offering: Offering,
+  planName: string,
+  cta: PlanClickParams['cta'],
+  extra: { plan_tier?: TierKey; modality?: Modality } = {},
+): void {
+  trackPlanClick({
+    plan_name: planName,
+    plan_id: offering.slug,
+    plan_group: 'otras_soluciones',
+    cta,
+    ...extra,
+  });
 }
 
 function getTierAccent(idx: number): string {
@@ -165,11 +170,10 @@ interface OfferingCardProps {
   offering: Offering;
   globalModality: Modality;
   currency: DisplayCurrency;
-  trmRate: number;
   onOpen: (slug: string) => void;
 }
 
-function OfferingCard({ offering, globalModality, currency, trmRate, onOpen }: OfferingCardProps) {
+function OfferingCard({ offering, globalModality, currency, onOpen }: OfferingCardProps) {
   const ns = slugToOfferingNamespace(offering.slug);
   const tp = useTranslations('offeringsCatalog');
   const t = useTranslations(ns);
@@ -224,7 +228,7 @@ function OfferingCard({ offering, globalModality, currency, trmRate, onOpen }: O
                 {tp('card.fromPrice')}
               </p>
               <p className="text-xl font-bold text-secondary-900 dark:text-white">
-                {formatMoney(setupCOP, currency, trmRate)}
+                {formatMoney(setupCOP, currency)}
               </p>
               <p className="text-[11px] text-secondary-500 dark:text-secondary-400">
                 {tp('card.setupOnce')}
@@ -232,7 +236,7 @@ function OfferingCard({ offering, globalModality, currency, trmRate, onOpen }: O
             </div>
             <div className="text-right">
               <p className="text-xl font-bold text-secondary-900 dark:text-white">
-                {recurringCOP > 0 ? formatMoney(recurringCOP, currency, trmRate) : '—'}
+                {recurringCOP > 0 ? formatMoney(recurringCOP, currency) : '—'}
               </p>
               <p className="text-[11px] text-secondary-500 dark:text-secondary-400">
                 {tp('card.perMonth')}
@@ -242,11 +246,23 @@ function OfferingCard({ offering, globalModality, currency, trmRate, onOpen }: O
         </div>
 
         <div className="flex gap-2 mt-auto pt-2">
-          <Button variant="primary" size="sm" className="flex-1" onClick={() => onOpen(offering.slug)}>
+          <Button
+            variant="primary"
+            size="sm"
+            className="flex-1"
+            onClick={() => {
+              trackOfferingClick(offering, t('name'), 'details');
+              onOpen(offering.slug);
+            }}
+          >
             {tp('card.viewMore')}
           </Button>
           {offering.demoSlug ? (
-            <Link href={`/demo/${offering.demoSlug}`} className="flex-1">
+            <Link
+              href={`/demo/${offering.demoSlug}`}
+              className="flex-1"
+              onClick={() => trackOfferingClick(offering, t('name'), 'demo')}
+            >
               <Button variant="outline" size="sm" className="w-full">
                 {tp('card.viewDemo')}
               </Button>
@@ -266,17 +282,10 @@ interface OfferingModalProps {
   offering: Offering;
   initialModality: Modality;
   currency: DisplayCurrency;
-  trmRate: number;
   onClose: () => void;
 }
 
-function OfferingModal({
-  offering,
-  initialModality,
-  currency,
-  trmRate,
-  onClose,
-}: OfferingModalProps) {
+function OfferingModal({ offering, initialModality, currency, onClose }: OfferingModalProps) {
   const ns = slugToOfferingNamespace(offering.slug);
   const tp = useTranslations('offeringsCatalog');
   const t = useTranslations(ns);
@@ -401,15 +410,15 @@ function OfferingModal({
                     {tp('card.setupOnce')}
                   </p>
                   <p className="text-2xl font-bold text-secondary-900 dark:text-white">
-                    {formatMoney(setupCOP, currency, trmRate)}
+                    {formatMoney(setupCOP, currency)}
                   </p>
                   {currency === 'COP' ? (
                     <p className="text-xs text-secondary-500 dark:text-secondary-400">
-                      ≈ {formatUSD(copToUsd(setupCOP, trmRate))}
+                      ≈ {formatUSD(copToUsd(setupCOP))}
                     </p>
                   ) : (
                     <p className="text-xs text-secondary-500 dark:text-secondary-400">
-                      ≈ {formatCOP(setupCOP)}
+                      {formatCOP(setupCOP)}
                     </p>
                   )}
                 </div>
@@ -420,7 +429,7 @@ function OfferingModal({
                       : tp('modal.monthlyLabel')}
                   </p>
                   <p className="text-2xl font-bold text-secondary-900 dark:text-white">
-                    {recurringCOP > 0 ? formatMoney(recurringCOP, currency, trmRate) : '—'}
+                    {recurringCOP > 0 ? formatMoney(recurringCOP, currency) : '—'}
                   </p>
                   <p className="text-xs text-secondary-500 dark:text-secondary-400">
                     {modality === 'compra'
@@ -511,13 +520,25 @@ function OfferingModal({
 
             {/* CTA */}
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <Link href={`/contact?service=${offering.slug}&tier=${tier.key}&modality=${modality}`} className="flex-1">
+              <Link
+                href={`/contact?service=${offering.slug}&tier=${tier.key}&modality=${modality}`}
+                className="flex-1"
+                onClick={() =>
+                  trackOfferingClick(offering, t('name'), 'quote', { plan_tier: tier.key, modality })
+                }
+              >
                 <Button variant="primary" size="md" className="w-full">
                   {tp('modal.quote')}
                 </Button>
               </Link>
               {offering.demoSlug ? (
-                <Link href={`/demo/${offering.demoSlug}`} className="flex-1">
+                <Link
+                  href={`/demo/${offering.demoSlug}`}
+                  className="flex-1"
+                  onClick={() =>
+                    trackOfferingClick(offering, t('name'), 'demo', { plan_tier: tier.key, modality })
+                  }
+                >
                   <Button variant="outline" size="md" className="w-full">
                     {tp('card.viewDemo')}
                   </Button>
@@ -569,50 +590,43 @@ function LimitsTable({ limits }: { limits: TierLimits }) {
 
 export default function OfferingsCatalog() {
   const tp = useTranslations('offeringsCatalog');
+  const locale = useLocale();
 
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<OfferingCategory | 'all'>('all');
   const [modality, setModality] = useState<Modality>('saas');
   const [currency, setCurrency] = useState<DisplayCurrency>('COP');
   const [openSlug, setOpenSlug] = useState<string | null>(null);
-  const { rate, source } = useLiveTRM();
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return OFFERINGS.filter((o) => {
+    return CATALOG_OFFERINGS.filter((o) => {
       if (category !== 'all' && o.category !== category) return false;
       if (!q) return true;
       return o.slug.replace(/-/g, ' ').includes(q) || o.category.toLowerCase().includes(q);
     });
   }, [query, category]);
 
-  const openOffering = openSlug ? OFFERINGS.find((o) => o.slug === openSlug) : null;
-
-  const trmLabel =
-    source === 'live'
-      ? tp('currency.trmLive', { value: formatCOP(rate) })
-      : tp('currency.trmCached', { value: formatCOP(rate) });
+  const openOffering = openSlug ? CATALOG_OFFERINGS.find((o) => o.slug === openSlug) : null;
 
   return (
-    <div className="min-h-screen bg-secondary-50 dark:bg-secondary-950">
-      {/* Hero */}
-      <section className="bg-gradient-to-br from-primary-600 to-primary-800 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20">
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-            {tp('hero.title')}
-          </h1>
-          <p className="mt-4 text-base sm:text-lg text-white/90 max-w-3xl">
-            {tp('hero.subtitle')}
-          </p>
-        </div>
+    <div id="otras-soluciones" className="scroll-mt-16 md:scroll-mt-20">
+      {/* Encabezado */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
+        <h2 className="text-3xl md:text-4xl font-bold text-secondary-900 dark:text-white">
+          {tp('section.title')}
+        </h2>
+        <p className="mt-3 text-base sm:text-lg text-secondary-600 dark:text-secondary-400 max-w-3xl">
+          {tp('section.subtitle')}
+        </p>
       </section>
 
       {/* Banner cómo escalamos */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
         <div className="rounded-2xl border border-secondary-200 dark:border-secondary-800 bg-white dark:bg-secondary-900 p-5 shadow-medium">
-          <h2 className="text-sm font-bold text-secondary-900 dark:text-white">
+          <h3 className="text-sm font-bold text-secondary-900 dark:text-white">
             {tp('banner.title')}
-          </h2>
+          </h3>
           <p className="text-sm text-secondary-600 dark:text-secondary-400 mt-1">
             {tp('banner.body')}
           </p>
@@ -685,11 +699,13 @@ export default function OfferingsCatalog() {
           </div>
         </div>
 
-        <p className="text-xs text-secondary-500 dark:text-secondary-400 mt-2">{trmLabel}</p>
+        <p className="text-xs text-secondary-500 dark:text-secondary-400 mt-2">
+          {tp('currency.trmReference', { value: formatRagCOP(TRM_REFERENCIA, locale) })}
+        </p>
 
         {/* Category chips */}
         <div className="flex flex-wrap gap-2 mt-5">
-          {CATEGORY_FILTERS.map((cat) => {
+          {VISIBLE_CATEGORY_FILTERS.map((cat) => {
             const isActive = category === cat;
             return (
               <button
@@ -723,7 +739,6 @@ export default function OfferingsCatalog() {
                 offering={offering}
                 globalModality={modality}
                 currency={currency}
-                trmRate={rate}
                 onOpen={setOpenSlug}
               />
             ))}
@@ -751,7 +766,6 @@ export default function OfferingsCatalog() {
           offering={openOffering}
           initialModality={modality}
           currency={currency}
-          trmRate={rate}
           onClose={() => setOpenSlug(null)}
         />
       ) : null}

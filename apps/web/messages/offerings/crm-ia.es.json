@@ -1,8 +1,8 @@
 {
   "offering_crmIa": {
     "name": "CRM con IA",
-    "tagline": "Cerrá más negocios con lead scoring y drafting automático",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"CRM con IA\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Cierra más negocios con lead scoring y drafting automático",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"CRM con IA\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Ventas",
     "tiers": {
       "basico": {

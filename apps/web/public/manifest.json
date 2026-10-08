@@ -1,7 +1,7 @@
 {
-  "name": "KopTup - Desarrollo de Software a Medida",
+  "name": "KopTup | IA que responde con los documentos de tu empresa",
   "short_name": "KopTup",
-  "description": "Desarrollo de software personalizado para empresas. E-commerce, chatbots con IA, dashboards y más.",
+  "description": "Sistemas RAG para empresas en Colombia: IA que responde con tus manuales, contratos y políticas, cita la fuente y protege tus datos. Prueba la demo gratis.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

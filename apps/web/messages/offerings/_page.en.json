@@ -1,7 +1,7 @@
 {
   "offeringsCatalog": {
-    "hero": {
-      "title": "Plans and services",
+    "section": {
+      "title": "Other custom solutions",
       "subtitle": "Choose how to work with us: buy the software (we hand over the source code) or subscribe to the monthly SaaS (we host it for you)."
     },
     "search": "Search...",
@@ -22,8 +22,7 @@
       "label": "Currency",
       "cop": "COP",
       "usd": "USD",
-      "trmLive": "Live FX rate {value} (datos.gov.co)",
-      "trmCached": "FX ~{value}"
+      "trmReference": "Prices are set in COP. The USD value is a reference calculated at an exchange rate of {value} per dollar."
     },
     "card": {
       "viewMore": "View more details",

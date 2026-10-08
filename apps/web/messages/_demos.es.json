@@ -461,7 +461,7 @@
     },
     "sidebar": {
       "title": "Capas de plataforma",
-      "subtitle": "Hacé click en cualquier capa para ver el detalle",
+      "subtitle": "Haz clic en cualquier capa para ver el detalle",
       "search": "Buscar capacidad...",
       "noResults": "Sin resultados para tu búsqueda."
     },
@@ -716,9 +716,9 @@
     "chat": {
       "title": "Conversación",
       "subtitle": "Streaming token-by-token con citas inline clickeables",
-      "placeholder": "Hacé una pregunta sobre tus documentos...",
+      "placeholder": "Haz una pregunta sobre tus documentos...",
       "send": "Enviar",
-      "you": "Vos",
+      "you": "Tú",
       "assistant": "Koptup RAG",
       "thinking": "Pensando...",
       "confidence": "Confianza",
@@ -729,8 +729,8 @@
       "feedbackUp": "Buena respuesta",
       "feedbackDown": "Respuesta a mejorar",
       "scenarios": "Escenarios mock",
-      "suggestions": "Probá una de estas preguntas",
-      "emptyHint": "Tu chatbot está listo. Subí documentos o lanzá una pregunta de muestra.",
+      "suggestions": "Prueba una de estas preguntas",
+      "emptyHint": "Tu chatbot está listo. Sube documentos o lanza una pregunta de muestra.",
       "relativeTime": {
         "now": "ahora",
         "secondsAgo": "hace {seconds}s",
@@ -739,9 +739,9 @@
         "daysAgo": "hace {days} d"
       },
       "suggestionPrompts": {
-        "summary": "Resumime lo principal de mis documentos",
+        "summary": "Resúmeme lo principal de mis documentos",
         "search": "¿Qué dicen los docs sobre {topic}?",
-        "compare": "Compará los dos documentos más relevantes",
+        "compare": "Compara los dos documentos más relevantes",
         "lookup": "¿Qué hay cargado actualmente en el bot?"
       },
       "scenarioLabels": {
@@ -762,7 +762,7 @@
         "answer": "Encontré **4 tickets** correlacionados con el incidente #INC-2049 del lunes en payments-svc [1]: dos reportan timeouts en `/charge` [2], uno reporta refunds duplicados [3] y el cuarto reporta latencias en el dashboard de finanzas [1]. La causa raíz común es el retry loop sin idempotency-key descrito en el RCA [3]."
       },
       "code": {
-        "question": "Mostrame cómo implementamos rotación de refresh tokens.",
+        "question": "Muéstrame cómo implementamos rotación de refresh tokens.",
         "answer": "La rotación vive en `RefreshService.rotate()` [1]. Verifica la firma JWT, consulta una denylist en Redis, agrega el `jti` consumido y emite un nuevo par access/refresh [2]. El controller usa `validate(RefreshDto)` y maneja `RevokedTokenError` con un 401 [1]."
       },
       "sql": {
@@ -813,7 +813,7 @@
       "deleteConfirm": "¿Eliminar el bot \"{name}\"? Se borran documentos, fragmentos y conversaciones.",
       "deleted": "Bot \"{name}\" eliminado",
       "deleteFailed": "No pude eliminar el bot",
-      "empty": "Todavía no creaste ningún bot. Configurá uno arriba y tocá Guardar.",
+      "empty": "Todavía no creaste ningún bot. Configura uno arriba y toca Guardar.",
       "docsCount": "{count, plural, =0 {sin docs} one {1 doc} other {# docs}}",
       "conversationsCount": "{count, plural, =0 {sin conversaciones} one {1 conversación} other {# conversaciones}}"
     },
@@ -848,11 +848,13 @@
       "playground": "Playground RAG",
       "playgroundHint": "Showcase enterprise: 19 capas, pipeline en vivo, citas",
       "builder": "Builder & Embed",
-      "builderHint": "Personalizá el widget, generá el snippet y embebé en tu sitio"
+      "builderHint": "Personaliza el widget, genera el snippet y embébelo en tu sitio",
+      "upload": "Prueba con tu documento",
+      "uploadHint": "Sube tu PDF, DOCX o TXT y pregúntale: cada respuesta cita la fuente"
     },
     "builder": {
       "title": "Builder de chatbot embebible",
-      "subtitle": "Personalizá el look, el comportamiento y exportá el snippet de embed",
+      "subtitle": "Personaliza el look, el comportamiento y exporta el snippet de embed",
       "configTitle": "Configuración del widget",
       "sections": {
         "identity": "Identidad",
@@ -866,9 +868,9 @@
         "welcome": "Mensaje de bienvenida",
         "welcomePh": "Ej: ¡Hola! ¿En qué te puedo ayudar?",
         "placeholder": "Placeholder del input",
-        "placeholderPh": "Ej: Escribí tu pregunta...",
+        "placeholderPh": "Ej: Escribe tu pregunta...",
         "systemPrompt": "System prompt / instrucciones",
-        "systemPromptPh": "Sos un asistente experto en... Respondé siempre en español, con tono profesional...",
+        "systemPromptPh": "Eres un asistente experto en... Responde siempre en español, con tono profesional...",
         "primaryColor": "Color primario",
         "accentColor": "Color de acento",
         "position": "Posición del widget",
@@ -881,8 +883,8 @@
         "avatarImageBtn": "Subir logo",
         "avatarImageRemove": "Quitar",
         "avatarImageHint": "PNG, JPG o WebP · máx. 500 KB",
-        "avatarImageBadType": "Formato no soportado. Usá PNG, JPG o WebP.",
-        "avatarImageTooBig": "El archivo supera 500 KB. Reducí el tamaño.",
+        "avatarImageBadType": "Formato no soportado. Usa PNG, JPG o WebP.",
+        "avatarImageTooBig": "El archivo supera 500 KB. Reduce el tamaño.",
         "tone": "Tono de voz",
         "tones": {
           "professional": "Profesional",
@@ -899,10 +901,10 @@
       },
       "knowledge": {
         "title": "Documentos cargados",
-        "drop": "Arrastrá archivos o hacé click para seleccionar",
+        "drop": "Arrastra archivos o haz clic para seleccionar",
         "hint": "PDF, DOCX, TXT, MD, CSV · máx. 10MB por archivo",
         "addMock": "Agregar documento de ejemplo",
-        "empty": "Aún no cargaste documentos. Subí PDFs, docs o notas para que el bot los use como contexto.",
+        "empty": "Aún no cargaste documentos. Sube PDFs, docs o notas para que el bot los use como contexto.",
         "remove": "Quitar",
         "indexed": "Indexado",
         "chunks": "chunks",
@@ -910,14 +912,14 @@
       },
       "preview": {
         "title": "Preview en vivo",
-        "subtitle": "Así se va a ver el widget en tu sitio. Hacé click en el botón para abrirlo.",
+        "subtitle": "Así se va a ver el widget en tu sitio. Haz clic en el botón para abrirlo.",
         "subtitleReal": "Iframe real apuntando a /embed/chatbot/{botId}",
-        "saveHint": "Guardá el bot para ver el preview real con iframe.",
+        "saveHint": "Guarda el bot para ver el preview real con iframe.",
         "notSaved": "Sin guardar · simulación",
         "bubbleHint": "Click para abrir",
         "send": "Enviar",
         "sampleUser": "¿Tienen plan empresa?",
-        "sampleBot": "Sí, contamos con planes Pro, Business y Enterprise con SLA, SSO y soporte prioritario. ¿Querés que te muestre los precios?",
+        "sampleBot": "Sí, contamos con planes Pro, Business y Enterprise con SLA, SSO y soporte prioritario. ¿Quieres que te muestre los precios?",
         "poweredBy": "Powered by Koptup",
         "modeLabel": "Modo de previsualización",
         "modes": {
@@ -926,14 +928,14 @@
           "bubble": "Burbuja"
         },
         "bubble": {
-          "intro": "Así se ve el widget cuando un usuario aterriza en tu sitio. Hacé click en la burbuja para ver el panel del chat.",
+          "intro": "Así se ve el widget cuando un usuario aterriza en tu sitio. Haz clic en la burbuja para ver el panel del chat.",
           "openButton": "Abrir chat",
           "closeButton": "Cerrar chat",
-          "snippetComment": "Integralo así en tu sitio:"
+          "snippetComment": "Intégralo así en tu sitio:"
         },
         "defaultName": "Asistente",
         "defaultWelcome": "¡Hola! ¿En qué te puedo ayudar?",
-        "inputPlaceholder": "Escribí tu mensaje...",
+        "inputPlaceholder": "Escribe tu mensaje...",
         "mobileFrame": {
           "time": "9:41",
           "status": "5G ●●● 100%"
@@ -941,7 +943,7 @@
       },
       "embed": {
         "title": "Snippet de embed",
-        "subtitle": "Pegá este snippet antes del cierre de </body> en tu sitio",
+        "subtitle": "Pega este snippet antes del cierre de </body> en tu sitio",
         "tabs": {
           "script": "Script tag",
           "iframe": "iframe",
@@ -953,8 +955,8 @@
         "botId": "Bot ID",
         "regenerate": "Regenerar ID",
         "webhookTitle": "URL del webhook",
-        "webhookHint": "Configurá esta URL en tu backend para recibir cada conversación",
-        "saveFirst": "Guardá el bot para activar el embed"
+        "webhookHint": "Configura esta URL en tu backend para recibir cada conversación",
+        "saveFirst": "Guarda el bot para activar el embed"
       },
       "actions": {
         "save": "Guardar bot",
@@ -983,7 +985,7 @@
         "toggleStats": "Abrir/cerrar la telemetría agregada.",
         "newSession": "Reinicia la conversación sin perder configuración.",
         "settings": "Configuración avanzada del playground.",
-        "settingsHint": "Para personalizar nombre, colores, prompt y embed, cambiá a Builder Mode.",
+        "settingsHint": "Para personalizar nombre, colores, prompt y embed, cambia a Builder Mode.",
         "citation": "Fragmento citado por el modelo. Click para ver el chunk original con score.",
         "confidence": "Confianza calibrada del modelo en la respuesta basada en groundedness y citations.",
         "scenarioPicker": "Queries pre-armadas que cubren RAG sobre docs, multi-hop, código, SQL y graph.",
@@ -1041,9 +1043,9 @@
         "openFull": "Ver pipeline completo"
       },
       "empty": {
-        "title": "Probá una query",
-        "subtitle": "Elegí un escenario mock o escribí tu propia pregunta abajo.",
-        "tryThis": "Probá esto"
+        "title": "Prueba una query",
+        "subtitle": "Elige un escenario mock o escribe tu propia pregunta abajo.",
+        "tryThis": "Prueba esto"
       },
       "onboarding": {
         "title": "Bienvenido al Playground RAG",
@@ -1051,19 +1053,104 @@
         "next": "Siguiente",
         "done": "Listo",
         "step1Title": "Esto es el chat",
-        "step1Body": "Hacé una pregunta o corré un escenario. Las respuestas vienen con citas clickeables.",
+        "step1Body": "Haz una pregunta o corre un escenario. Las respuestas vienen con citas clickeables.",
         "step2Title": "19 capas enterprise",
         "step2Body": "Cada ítem representa una capa de la plataforma. Click para explorar capacidades.",
         "step3Title": "Pipeline en vivo",
-        "step3Body": "Mirá cada paso (rewrite, retrieve, rerank, LLM...) con tiempos y tokens reales.",
+        "step3Body": "Mira cada paso (rewrite, retrieve, rerank, LLM...) con tiempos y tokens reales.",
         "step4Title": "Builder Mode",
-        "step4Body": "Personalizá colores, prompt y exportá el snippet para embeber en tu sitio."
+        "step4Body": "Personaliza colores, prompt y exporta el snippet para embeber en tu sitio."
       },
       "advancedConfig": {
         "title": "Configuración avanzada",
-        "body": "Para personalizar nombre, colores, prompt del sistema y generar un snippet de embed listo para producción, cambiá al modo Builder.",
+        "body": "Para personalizar nombre, colores, prompt del sistema y generar un snippet de embed listo para producción, cambia al modo Builder.",
         "cta": "Ir a Builder Mode",
         "close": "Cerrar"
+      }
+    },
+    "ragLink": "Sistemas RAG para empresas",
+    "ragLinkShort": "¿Qué es RAG?",
+    "uploadDemo": {
+      "title": "Prueba con tu documento",
+      "subtitle": "Sube un PDF, DOCX o TXT y hazle preguntas. Cada respuesta cita la página o el fragmento de tu documento, y si algo no está, te lo dice.",
+      "loading": "Verificando disponibilidad…",
+      "warning": {
+        "title": "No subas información confidencial en la demo",
+        "body": "Usa un documento público o de prueba. Lo procesamos solo en memoria y se borra automáticamente en 1 hora."
+      },
+      "limits": "PDF, DOCX o TXT · máximo {maxMb} MB y {maxPages} páginas · {maxQuestions} preguntas por documento · {maxDocs} documentos al día",
+      "form": {
+        "fileLabel": "Tu documento",
+        "fileCta": "Elige un archivo",
+        "fileDrop": "o arrástralo aquí",
+        "fileHint": "PDF, DOCX o TXT, hasta {maxMb} MB y {maxPages} páginas",
+        "fileChange": "Cambiar archivo",
+        "emailLabel": "Tu email",
+        "emailPlaceholder": "tu@empresa.com",
+        "emailHint": "Es lo único que te pedimos. Lo usamos para registrar tu prueba y poder contactarte.",
+        "consent": "Autorizo el tratamiento de mis datos personales según la Ley 1581 de 2012 y la <link>política de privacidad</link>.",
+        "submit": "Subir y empezar",
+        "submitting": "Procesando tu documento…",
+        "noSignup": "¿Prefieres no dejar tu email? La demo con el documento de ejemplo sigue sin registro."
+      },
+      "unavailable": {
+        "title": "La prueba con tu documento no está disponible en este momento",
+        "body": "Puedes seguir usando la demo con el documento de ejemplo, sin registro, o agendar una demo con nosotros para verla con tu caso.",
+        "budgetTitle": "Alcanzamos el cupo de pruebas de este mes",
+        "budgetBody": "La subida de documentos está desactivada por ahora. Agenda una demo con nosotros o usa la demo con el documento de ejemplo, sin registro."
+      },
+      "cta": {
+        "schedule": "Agenda una demo con nosotros",
+        "sample": "Usar la demo con el documento de ejemplo"
+      },
+      "chat": {
+        "pages": "{count, plural, one {# página} other {# páginas}}",
+        "pagesEstimated": "{count, plural, one {~# página} other {~# páginas}}",
+        "counter": "Preguntas: {used}/{max}",
+        "expiry": "Tu documento se borra automáticamente en 1 hora (a las {time}).",
+        "welcome": "Listo, ya leí «{name}». Pregúntame lo que quieras sobre su contenido: te respondo solo con lo que dice el documento y cito la página o el fragmento.",
+        "placeholder": "Pregunta algo sobre tu documento…",
+        "send": "Enviar",
+        "thinking": "Buscando en tu documento…",
+        "you": "Tú",
+        "assistant": "KopTup RAG",
+        "sources": "Fuentes",
+        "page": "p. {n}",
+        "fragment": "fragmento {n}",
+        "notFoundHint": "No está en el documento, así que no inventamos una respuesta.",
+        "suggestionsTitle": "Prueba con",
+        "suggestions": {
+          "summary": "¿De qué trata el documento?",
+          "dates": "¿Qué fechas o plazos menciona?",
+          "requirements": "¿Qué requisitos u obligaciones establece?"
+        },
+        "newDocument": "Subir otro documento",
+        "limitReached": "Usaste las {max} preguntas de este documento.",
+        "limitReachedBody": "¿Quieres verlo funcionando con los documentos de tu empresa?",
+        "expired": "Tu documento se borró porque pasó 1 hora. Súbelo de nuevo para seguir probando.",
+        "showMore": "Ver más",
+        "showLess": "Ver menos"
+      },
+      "errors": {
+        "invalid_format": "Formato no permitido. Sube un archivo PDF, DOCX o TXT.",
+        "file_too_large": "El archivo pesa más de {maxMb} MB. Sube uno más liviano.",
+        "too_many_pages": "El documento tiene más de {maxPages} páginas. Sube uno más corto.",
+        "empty_document": "No pudimos extraer texto del documento. Si es un PDF escaneado, prueba con uno que tenga texto seleccionable.",
+        "unreadable_document": "No pudimos leer el documento. Revisa que no esté dañado ni protegido con contraseña.",
+        "missing_file": "Elige un documento para subir.",
+        "invalid_email": "Escribe un email válido.",
+        "consent_required": "Para subir el documento debes autorizar el tratamiento de tus datos personales.",
+        "daily_limit": "Llegaste al límite de {maxDocs} documentos por día. Vuelve mañana o agenda una demo con nosotros.",
+        "question_limit": "Llegaste al límite de {maxQuestions} preguntas para este documento.",
+        "invalid_question": "Escribe una pregunta de máximo {maxChars} caracteres.",
+        "rate_limited": "Estás enviando muchas solicitudes. Espera unos minutos y vuelve a intentarlo.",
+        "document_not_found": "Tu documento ya no está disponible: se borra 1 hora después de subirlo. Súbelo de nuevo para seguir probando.",
+        "budget_exhausted": "Alcanzamos el cupo de pruebas de este mes. Agenda una demo con nosotros.",
+        "demo_disabled": "La prueba con tu documento no está disponible en este momento.",
+        "capacity": "La demo tiene mucha demanda en este momento. Intenta de nuevo en unos minutos.",
+        "llm_error": "No pudimos generar la respuesta. Intenta de nuevo; esta pregunta no se descontó.",
+        "network": "No pudimos conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.",
+        "generic": "Algo salió mal. Inténtalo de nuevo."
       }
     }
   },
@@ -1343,7 +1430,7 @@
     },
     "views": {
       "title": "Vistas disponibles",
-      "subtitle": "Elegí la mejor vista según el contexto de tu equipo",
+      "subtitle": "Elige la mejor vista según el contexto de tu equipo",
       "kanban": "Kanban",
       "gantt": "Gantt",
       "timeline": "Timeline",
@@ -1508,7 +1595,7 @@
     },
     "integrations": {
       "title": "Integraciones",
-      "subtitle": "Conectá tu stack en segundos",
+      "subtitle": "Conecta tu stack en segundos",
       "github": "GitHub",
       "githubDesc": "Auto-link de commits y PRs",
       "gitlab": "GitLab",
@@ -1552,7 +1639,7 @@
     },
     "templates": {
       "title": "Marketplace de plantillas",
-      "subtitle": "Empezá tu próximo proyecto en minutos",
+      "subtitle": "Empieza tu próximo proyecto en minutos",
       "tpl1": "Lanzamiento de producto",
       "tpl1Desc": "Roadmap, marketing, GTM",
       "tpl2": "Sprint Scrum",
@@ -1569,7 +1656,7 @@
       "fromScratch": "Empezar en blanco",
       "fromScratchDesc": "Crear un proyecto vacío",
       "useTemplates": "Usar una plantilla",
-      "chooseTemplate": "Elegí una plantilla para arrancar"
+      "chooseTemplate": "Elige una plantilla para arrancar"
     },
     "shell": {
       "aiInsights": "AI Insights",
@@ -1879,10 +1966,11 @@
   },
   "demoMedicalAccounts": {
     "backToDemos": "Volver a Demos",
-    "title": "🏥 Auditoría de Cuentas Médicas",
-    "subtitle": "Sistema experto con IA para auditoría automática de facturas de salud",
+    "title": "🏥 Sistema experto para salud",
+    "subtitle": "Auditoría de cuentas médicas: un motor de reglas revisa códigos CUPS y CIE-10 y tarifarios, y la IA extrae los datos de las facturas para señalar posibles glosas.",
     "adminButton": "Administración",
-    "viewProcess": "Ver Proceso"
+    "viewProcess": "Ver Proceso",
+    "ragLink": "¿Quieres una IA que responda con tus protocolos, normativa y tarifarios citando la fuente? Conoce los sistemas RAG"
   },
   "demoDelivery": {
     "meta": {
@@ -2176,7 +2264,7 @@
       "description": "Autocompletado typeahead, búsqueda visual, búsqueda por voz y ranking personalizado por usuario.",
       "placeholder": "Buscar producto (ej: laptop, audífonos, reloj)",
       "suggestionsLabel": "Sugerencias",
-      "noResults": "Empezá a tipear para ver sugerencias",
+      "noResults": "Empieza a tipear para ver sugerencias",
       "badges": {
         "visual": "Visual Search",
         "voice": "Voice Search",
@@ -2203,7 +2291,7 @@
       "description": "Motor de recomendaciones que aumenta el ticket promedio y la conversión.",
       "boughtTogether": "Frecuentemente comprados juntos",
       "alsoViewed": "Clientes también vieron",
-      "completeLook": "Completá el look",
+      "completeLook": "Completa el look",
       "addBundle": "Agregar combo",
       "viewAll": "Ver todos",
       "boost": "+%{value}% conversión"
@@ -2287,7 +2375,7 @@
       "description": "Campañas de email lifecycle automatizadas con segmentación IA.",
       "abandonment": {
         "title": "Abandono de carrito",
-        "desc": "Recuperá ventas con emails automáticos a las 1h, 24h y 72h.",
+        "desc": "Recupera ventas con emails automáticos a las 1h, 24h y 72h.",
         "metric": "Recuperación"
       },
       "postPurchase": {
@@ -2297,7 +2385,7 @@
       },
       "winBack": {
         "title": "Win-back",
-        "desc": "Reactivá clientes inactivos con ofertas personalizadas.",
+        "desc": "Reactiva clientes inactivos con ofertas personalizadas.",
         "metric": "Reactivación"
       },
       "replenishment": {
@@ -2341,7 +2429,7 @@
       "wines": "Vinos"
     },
     "sections": {
-      "recommended": "Recomendado para vos",
+      "recommended": "Recomendado para ti",
       "recommendedHint": "Sugerencias generadas con IA",
       "allProducts": "Todos los productos",
       "recentlyViewed": "Visto recientemente",
@@ -2401,7 +2489,7 @@
       "placeOrder": "Confirmar pago",
       "cart": {
         "title": "Tu carrito",
-        "empty": "Tu carrito está vacío. Volvé a la tienda y agregá productos.",
+        "empty": "Tu carrito está vacío. Vuelve a la tienda y agrega productos.",
         "remove": "Quitar",
         "couponPlaceholder": "Código de descuento (KOP10 / KOP20)",
         "applyCoupon": "Aplicar",
@@ -2419,7 +2507,7 @@
       },
       "payment": {
         "title": "Método de pago",
-        "subtitle": "Elegí cómo querés pagar — soportamos los principales métodos de Latinoamérica.",
+        "subtitle": "Elige cómo quieres pagar — soportamos los principales métodos de Latinoamérica.",
         "methods": {
           "card": "Tarjeta",
           "pse": "PSE",
@@ -2433,9 +2521,9 @@
         },
         "cardNumber": "Número de tarjeta",
         "cardName": "Nombre en la tarjeta",
-        "addiHint": "Pagá en 4 cuotas sin interés con Addi. Aprobación inmediata.",
+        "addiHint": "Paga en 4 cuotas sin interés con Addi. Aprobación inmediata.",
         "redirectHint": "Serás redirigido al portal del proveedor para completar el pago.",
-        "walletHint": "Confirmá el pago desde tu billetera digital."
+        "walletHint": "Confirma el pago desde tu billetera digital."
       },
       "confirmation": {
         "title": "¡Pago confirmado!",
@@ -2460,7 +2548,7 @@
     },
     "vendor": {
       "title": "Dashboard del vendedor",
-      "subtitle": "Gestioná tu catálogo, pedidos y reglas de pricing en tiempo real.",
+      "subtitle": "Gestiona tu catálogo, pedidos y reglas de pricing en tiempo real.",
       "createProduct": "Crear producto",
       "live": "En vivo",
       "liveOrders": "Pedidos en vivo",
@@ -2501,7 +2589,7 @@
         "price": "Precio",
         "stock": "Stock",
         "description": "Descripción",
-        "dropImages": "Arrastrá imágenes acá o hacé click para seleccionar",
+        "dropImages": "Arrastra imágenes acá o haz clic para seleccionar",
         "cancel": "Cancelar",
         "save": "Guardar producto"
       }
@@ -2602,7 +2690,7 @@
         "campaigns": {
           "abandonment": {
             "title": "Abandono de carrito",
-            "desc": "Recuperá ventas con emails automáticos a 1h, 24h y 72h."
+            "desc": "Recupera ventas con emails automáticos a 1h, 24h y 72h."
           },
           "postPurchase": {
             "title": "Post-compra",
@@ -2610,7 +2698,7 @@
           },
           "winBack": {
             "title": "Win-back",
-            "desc": "Reactivá clientes inactivos con ofertas personalizadas."
+            "desc": "Reactiva clientes inactivos con ofertas personalizadas."
           },
           "replenishment": {
             "title": "Reposición",

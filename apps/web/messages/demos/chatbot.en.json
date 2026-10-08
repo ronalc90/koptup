@@ -399,7 +399,9 @@
       "playground": "RAG Playground",
       "playgroundHint": "Enterprise showcase: 19 layers, live pipeline, citations",
       "builder": "Builder & Embed",
-      "builderHint": "Customize the widget, generate the snippet, embed it on your site"
+      "builderHint": "Customize the widget, generate the snippet, embed it on your site",
+      "upload": "Try your own document",
+      "uploadHint": "Upload your PDF, DOCX or TXT and ask it: every answer cites the source"
     },
     "builder": {
       "title": "Embeddable chatbot builder",
@@ -615,6 +617,91 @@
         "body": "To customize name, colors, system prompt and generate a production-ready embed snippet, switch to Builder mode.",
         "cta": "Go to Builder Mode",
         "close": "Close"
+      }
+    },
+    "ragLink": "RAG systems for companies",
+    "ragLinkShort": "What is RAG?",
+    "uploadDemo": {
+      "title": "Try your own document",
+      "subtitle": "Upload a PDF, DOCX or TXT and ask it questions. Every answer cites the page or fragment of your document, and if something isn't there, it tells you.",
+      "loading": "Checking availability…",
+      "warning": {
+        "title": "Don't upload confidential information to the demo",
+        "body": "Use a public or test document. We process it in memory only and it is deleted automatically after 1 hour."
+      },
+      "limits": "PDF, DOCX or TXT · up to {maxMb} MB and {maxPages} pages · {maxQuestions} questions per document · {maxDocs} documents per day",
+      "form": {
+        "fileLabel": "Your document",
+        "fileCta": "Choose a file",
+        "fileDrop": "or drag it here",
+        "fileHint": "PDF, DOCX or TXT, up to {maxMb} MB and {maxPages} pages",
+        "fileChange": "Change file",
+        "emailLabel": "Your email",
+        "emailPlaceholder": "you@company.com",
+        "emailHint": "It's the only thing we ask for. We use it to register your trial and to be able to contact you.",
+        "consent": "I authorize the processing of my personal data under Colombian Law 1581 of 2012 and the <link>privacy policy</link>.",
+        "submit": "Upload and start",
+        "submitting": "Processing your document…",
+        "noSignup": "Rather not leave your email? The demo with the sample document still requires no sign-up."
+      },
+      "unavailable": {
+        "title": "Trying your own document isn't available right now",
+        "body": "You can keep using the demo with the sample document, no sign-up required, or book a demo with us to see it with your use case.",
+        "budgetTitle": "We've reached this month's trial quota",
+        "budgetBody": "Document upload is turned off for now. Book a demo with us or use the demo with the sample document, no sign-up required."
+      },
+      "cta": {
+        "schedule": "Book a demo with us",
+        "sample": "Use the demo with the sample document"
+      },
+      "chat": {
+        "pages": "{count, plural, one {# page} other {# pages}}",
+        "pagesEstimated": "{count, plural, one {~# page} other {~# pages}}",
+        "counter": "Questions: {used}/{max}",
+        "expiry": "Your document is deleted automatically after 1 hour (at {time}).",
+        "welcome": "Done, I've read “{name}”. Ask me anything about its content: I'll answer only with what the document says and cite the page or fragment.",
+        "placeholder": "Ask something about your document…",
+        "send": "Send",
+        "thinking": "Searching your document…",
+        "you": "You",
+        "assistant": "KopTup RAG",
+        "sources": "Sources",
+        "page": "p. {n}",
+        "fragment": "fragment {n}",
+        "notFoundHint": "It isn't in the document, so we don't make up an answer.",
+        "suggestionsTitle": "Try",
+        "suggestions": {
+          "summary": "What is the document about?",
+          "dates": "What dates or deadlines does it mention?",
+          "requirements": "What requirements or obligations does it set?"
+        },
+        "newDocument": "Upload another document",
+        "limitReached": "You've used the {max} questions for this document.",
+        "limitReachedBody": "Want to see it working with your company's documents?",
+        "expired": "Your document was deleted because 1 hour has passed. Upload it again to keep trying.",
+        "showMore": "Show more",
+        "showLess": "Show less"
+      },
+      "errors": {
+        "invalid_format": "File type not allowed. Upload a PDF, DOCX or TXT file.",
+        "file_too_large": "The file is larger than {maxMb} MB. Upload a smaller one.",
+        "too_many_pages": "The document has more than {maxPages} pages. Upload a shorter one.",
+        "empty_document": "We couldn't extract text from the document. If it's a scanned PDF, try one with selectable text.",
+        "unreadable_document": "We couldn't read the document. Check that it isn't damaged or password-protected.",
+        "missing_file": "Choose a document to upload.",
+        "invalid_email": "Enter a valid email.",
+        "consent_required": "To upload the document you must authorize the processing of your personal data.",
+        "daily_limit": "You've reached the limit of {maxDocs} documents per day. Come back tomorrow or book a demo with us.",
+        "question_limit": "You've reached the limit of {maxQuestions} questions for this document.",
+        "invalid_question": "Write a question of up to {maxChars} characters.",
+        "rate_limited": "You're sending too many requests. Wait a few minutes and try again.",
+        "document_not_found": "Your document is no longer available: it is deleted 1 hour after upload. Upload it again to keep trying.",
+        "budget_exhausted": "We've reached this month's trial quota. Book a demo with us.",
+        "demo_disabled": "Trying your own document isn't available right now.",
+        "capacity": "The demo is in high demand right now. Try again in a few minutes.",
+        "llm_error": "We couldn't generate the answer. Try again; this question wasn't counted.",
+        "network": "We couldn't reach the server. Check your connection and try again.",
+        "generic": "Something went wrong. Try again."
       }
     }
   }

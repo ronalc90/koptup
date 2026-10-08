@@ -1,8 +1,8 @@
 {
   "offering_wmsLogistica": {
     "name": "WMS logística",
-    "tagline": "Controlá tu bodega con scanner, picking y carriers integrados",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"WMS logística\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Controla tu bodega con scanner, picking y carriers integrados",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"WMS logística\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Operaciones",
     "tiers": {
       "basico": {

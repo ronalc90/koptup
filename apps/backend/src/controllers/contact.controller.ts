@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
-import Contact from '../models/Contact';
 import { logger } from '../utils/logger';
 import { whatsappService } from '../services/whatsapp.service';
 import { emailService } from '../services/email.service';
+import { registerLead } from '../services/lead.service';
 
 export const submitContact = asyncHandler(async (req: Request, res: Response) => {
   const errors = validationResult(req);
@@ -14,14 +14,9 @@ export const submitContact = asyncHandler(async (req: Request, res: Response) =>
 
   const { name, email, phone, company, service, budget, message } = req.body;
 
-  logger.info('📝 Processing contact form submission:');
-  logger.info(`   Name: ${name}`);
-  logger.info(`   Email: ${email}`);
-  logger.info(`   Phone: ${phone || 'Not provided'}`);
-  logger.info(`   Service: ${service}`);
-
-  // Guardar en base de datos
-  const contact = await Contact.create({
+  // Guarda el Contact y notifica por WhatsApp/email (mismo canal que usa la
+  // demo "Prueba con tu documento" con origen "demo-rag").
+  await registerLead({
     name,
     email,
     phone,
@@ -29,43 +24,7 @@ export const submitContact = asyncHandler(async (req: Request, res: Response) =>
     service,
     budget,
     message,
-    status: 'new',
-  });
-
-  logger.info(`✅ Contact saved to database with ID: ${contact._id}`);
-
-  // Enviar notificación por WhatsApp (async, no bloqueante)
-  logger.info('🔔 Triggering WhatsApp notification...');
-  whatsappService.sendContactNotification({
-    name,
-    email,
-    phone,
-    company,
-    service,
-    budget,
-    message,
-  }).catch((err) => {
-    logger.error('❌ Failed to send WhatsApp notification:');
-    logger.error(`   Error: ${err.message}`);
-    logger.error(`   Stack: ${err.stack}`);
-    // No fallar la petición si WhatsApp falla
-  });
-
-  // Enviar notificación por Email (async, no bloqueante)
-  logger.info('📧 Triggering Email notification...');
-  emailService.sendContactNotification({
-    name,
-    email,
-    phone,
-    company,
-    service,
-    budget,
-    message,
-  }).catch((err) => {
-    logger.error('❌ Failed to send Email notification:');
-    logger.error(`   Error: ${err.message}`);
-    logger.error(`   Stack: ${err.stack}`);
-    // No fallar la petición si Email falla
+    source: 'contact-form',
   });
 
   res.json({

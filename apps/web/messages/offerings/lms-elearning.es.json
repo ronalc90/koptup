@@ -1,8 +1,8 @@
 {
   "offering_lmsElearning": {
     "name": "LMS de e-learning",
-    "tagline": "Lanzá cursos online con pagos, certificados y proctoring",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"LMS de e-learning\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Lanza cursos online con pagos, certificados y proctoring",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"LMS de e-learning\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Educación",
     "tiers": {
       "basico": {

@@ -96,7 +96,7 @@ export default function FileDropZone({
         />
         <CloudArrowUpIcon className="mb-3 h-10 w-10 text-primary-600 dark:text-primary-400" />
         <div className="text-sm font-medium text-secondary-900 dark:text-white">
-          {label ?? 'Arrastrá archivos aquí o hacé clic para seleccionarlos'}
+          {label ?? 'Arrastra archivos aquí o haz clic para seleccionarlos'}
         </div>
         {hint && (
           <div className="mt-1 text-xs text-secondary-500 dark:text-secondary-400">{hint}</div>

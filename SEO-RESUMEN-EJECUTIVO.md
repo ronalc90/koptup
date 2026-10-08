@@ -62,7 +62,7 @@ Archivo creado: `apps/web/src/app/sitemap.ts`
 - /demo/cuentas-medicas (prioridad 0.9)
 - /services, /pricing, /about, /contact, /blog
 
-**URL:** https://koptup.com/sitemap.xml
+**URL:** https://www.koptup.com/sitemap.xml
 
 ### 🤖 5. Robots.txt Optimizado
 
@@ -89,7 +89,6 @@ Archivo modificado: `apps/web/src/app/page.tsx`
 
 2. **Gestión de Glosas**
    - "Identifica y previene glosas administrativas y técnicas"
-   - "Reduce rechazos en facturación médica hasta un 80%"
    - Keywords: glosas médicas, reducción glosas, facturación salud
 
 3. **Liquidación Automatizada**
@@ -101,7 +100,6 @@ Archivo modificado: `apps/web/src/app/page.tsx`
    - Keywords: chatbot médico, asistente IA salud, normatividad
 
 **Sección de Beneficios:**
-- ✅ "Reduce glosas hasta 80%" - Cifra específica que atrae clics
 - ✅ "Optimiza facturación médica" - Valida tarifas SOAT, ISS
 - ✅ "Cumple normatividad vigente" - Ley 100, Resolución 3047
 
@@ -297,8 +295,8 @@ Archivo creado: `apps/web/src/app/manifest.ts`
 
 ### Esta Semana
 - [ ] Verificar que el sitio carga correctamente
-- [ ] Probar sitemap: https://koptup.com/sitemap.xml
-- [ ] Probar robots.txt: https://koptup.com/robots.txt
+- [ ] Probar sitemap: https://www.koptup.com/sitemap.xml
+- [ ] Probar robots.txt: https://www.koptup.com/robots.txt
 - [ ] Verificar SSL para www.koptup.com
 - [ ] Crear imágenes SEO (og-image, logo, favicon)
 - [ ] Instalar Google Analytics 4

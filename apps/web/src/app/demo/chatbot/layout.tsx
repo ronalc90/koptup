@@ -7,7 +7,7 @@ export default function ChatbotLayout({ children }: { children: React.ReactNode 
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: 'Inicio', url: '/' },
     { name: 'Demos', url: '/demo' },
-    { name: 'Chatbot Médico con IA', url: '/demo/chatbot' },
+    { name: 'Demo de chatbot RAG', url: '/demo/chatbot' },
   ]);
 
   return (

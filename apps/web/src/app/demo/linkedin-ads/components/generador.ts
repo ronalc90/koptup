@@ -9,6 +9,7 @@
  * edita en LinkedIn antes de publicar.
  */
 
+import { SITE_URL } from '@/lib/site';
 import {
   ANGULOS_LABELS,
   HASHTAGS_GLOBALES,
@@ -37,17 +38,17 @@ const HOOK_PLANTILLAS: Record<AnguloPost, (d: KoptupDemo) => string[]> = {
   lanzamiento: (d) => [
     `${d.emoji} Acabamos de lanzar: ${d.titulo}.`,
     `🚀 Nuevo demo en Koptup: ${d.titulo}.`,
-    `${d.emoji} ${d.titulo} ya está vivo. Mirá lo que hace.`,
+    `${d.emoji} ${d.titulo} ya está vivo. Mira lo que hace.`,
     `Recién salido del horno: ${d.titulo}. ${d.emoji}`,
   ],
   'caso-uso': (d) => [
-    `Imaginá esto: una empresa de ${d.industria.split(' / ')[0].toLowerCase()} ${d.problemaResuelve.toLowerCase().split(' ').slice(0, 8).join(' ')}…`,
+    `Imagina esto: una empresa de ${d.industria.split(' / ')[0].toLowerCase()} ${d.problemaResuelve.toLowerCase().split(' ').slice(0, 8).join(' ')}…`,
     `${d.emoji} Cómo ${d.publicoObjetivo[0]} usa ${d.titulo} en la vida real.`,
     `Caso real: ${d.problemaResuelve}.`,
     `${d.emoji} Una historia rápida sobre por qué construimos ${d.titulo}.`,
   ],
   educativo: (d) => [
-    `${d.emoji} ¿Sabés cómo funciona ${d.caracteristicasIA[0]}? Spoiler: es más simple de lo que parece.`,
+    `${d.emoji} ¿Sabes cómo funciona ${d.caracteristicasIA[0]}? Spoiler: es más simple de lo que parece.`,
     `Hilo corto: qué es ${d.caracteristicasIA[0]} y por qué importa en ${d.industria.split(' / ')[0]}.`,
     `${d.emoji} 3 cosas que tu equipo debería entender sobre ${d.titulo}.`,
     `Mucha gente me pregunta cómo hace ${d.caracteristicasIA[0]}. Acá va la versión sin tecnicismos.`,
@@ -66,18 +67,18 @@ const HOOK_PLANTILLAS: Record<AnguloPost, (d: KoptupDemo) => string[]> = {
   ],
   comparativa: (d) => [
     `${d.emoji} Antes: ${d.problemaResuelve}. Ahora: ${d.metricaImpactante}.`,
-    `⚖️ Lo que cambia cuando reemplazás procesos manuales por ${d.titulo}.`,
-    `${d.emoji} Solución tradicional vs ${d.titulo}. Mirá la diferencia.`,
+    `⚖️ Lo que cambia cuando reemplazas procesos manuales por ${d.titulo}.`,
+    `${d.emoji} Solución tradicional vs ${d.titulo}. Mira la diferencia.`,
     `La diferencia entre hacerlo a mano y hacerlo con ${d.titulo}: ${d.metricaImpactante}.`,
   ],
   'tip-rapido': (d) => [
     `💡 Tip de hoy: ${d.beneficiosClave[0].toLowerCase()}.`,
     `${d.emoji} Si tu equipo de ${d.publicoObjetivo[0].toLowerCase()} no está haciendo esto, lo está haciendo mal.`,
-    `💡 30 segundos: una cosa que cambia cómo usás ${d.titulo}.`,
-    `${d.emoji} Pequeño truco para ${d.industria.split(' / ')[0].toLowerCase()}: probá esto.`,
+    `💡 30 segundos: una cosa que cambia cómo usas ${d.titulo}.`,
+    `${d.emoji} Pequeño truco para ${d.industria.split(' / ')[0].toLowerCase()}: prueba esto.`,
   ],
   'pregunta-engagement': (d) => [
-    `${d.emoji} Pregunta para ${d.publicoObjetivo[0]}: ¿cómo manejás hoy ${d.problemaResuelve.toLowerCase().split(' ').slice(-4).join(' ')}?`,
+    `${d.emoji} Pregunta para ${d.publicoObjetivo[0]}: ¿cómo manejas hoy ${d.problemaResuelve.toLowerCase().split(' ').slice(-4).join(' ')}?`,
     `¿Cuánto tiempo invierte tu equipo en ${d.industria.split(' / ')[0].toLowerCase()}? Curiosidad genuina ${d.emoji}`,
     `${d.emoji} Si tuvieras que automatizar UNA tarea de ${d.industria.split(' / ')[0].toLowerCase()}, ¿cuál sería?`,
     `Pregunta abierta: ¿qué es lo que más frustra a tu equipo en ${d.publicoObjetivo[0].toLowerCase()}? ${d.emoji}`,
@@ -94,22 +95,22 @@ const ESTILOS_BULLETS: Record<TonoPost, (items: string[]) => string> = {
 
 const FRASES_CIERRE: Record<TonoPost, string[]> = {
   profesional: [
-    'Probá la demo y nos cuentás qué te parece.',
-    'Disponible para una reunión esta semana si querés profundizar.',
+    'Prueba la demo y nos cuentas qué te parece.',
+    'Disponible para una reunión esta semana si quieres profundizar.',
     'Si tu empresa está evaluando algo similar, hablemos.',
   ],
   cercano: [
-    '¿Te suena familiar? Contame en los comentarios 👇',
-    'Probalo y me cuentás qué tal 😉',
+    '¿Te suena familiar? Cuéntame en los comentarios 👇',
+    'Pruébalo y me cuentas qué tal 😉',
     '¿Algún caso parecido en tu empresa? Te leo 👇',
   ],
   tecnico: [
-    '¿Querés que abramos parte del código? Pinguéame.',
+    '¿Quieres que abramos parte del código? Pinguéame.',
     'Detalles de arquitectura en los comentarios si interesa.',
-    'Si querés que escriba un deep-dive del stack, dejá un comentario.',
+    'Si quieres que escriba un deep-dive del stack, deja un comentario.',
   ],
   storytelling: [
-    '¿Tu empresa tiene una historia parecida? Compartila 👇',
+    '¿Tu empresa tiene una historia parecida? Compártela 👇',
     'Si esto te resonó, dale share que ayuda a más founders.',
     '¿Qué hubieras hecho distinto? Curiosidad genuina.',
   ],
@@ -121,9 +122,9 @@ const FRASES_CIERRE: Record<TonoPost, string[]> = {
 };
 
 const CTAS_LINK: string[] = [
-  '👉 Probalo gratis:',
+  '👉 Pruébalo gratis:',
   '🔗 Demo interactiva:',
-  '➡️ Mirá la demo:',
+  '➡️ Mira la demo:',
   '🎬 Pruébalo en 30 segundos:',
 ];
 
@@ -142,7 +143,7 @@ export function generarPost(
   angulo: AnguloPost,
   tono: TonoPost,
   variante: number = 0,
-  baseUrl: string = 'https://koptup.com',
+  baseUrl: string = SITE_URL,
 ): PostGenerado {
   const seedBase = hashSeed(`${demo.id}-${angulo}-${tono}-${variante}`);
   const hooks = HOOK_PLANTILLAS[angulo](demo);
@@ -217,16 +218,16 @@ export function generarAdCopy(demo: KoptupDemo, variante: number = 0): AdCopyGen
   ];
 
   const introsBase = [
-    `${demo.emoji} ${demo.tagline}. ${demo.metricaImpactante}. Probá la demo gratis.`,
-    `Si liderás ${demo.publicoObjetivo[0].toLowerCase()}, esto te interesa: ${demo.beneficiosClave[0]}.`,
-    `${demo.emoji} Reemplazá procesos manuales por IA. ${demo.metricaImpactante}.`,
+    `${demo.emoji} ${demo.tagline}. ${demo.metricaImpactante}. Prueba la demo gratis.`,
+    `Si lideras ${demo.publicoObjetivo[0].toLowerCase()}, esto te interesa: ${demo.beneficiosClave[0]}.`,
+    `${demo.emoji} Reemplaza procesos manuales por IA. ${demo.metricaImpactante}.`,
   ];
 
   const descriptions = [
-    'Probá la demo en 30 segundos',
+    'Prueba la demo en 30 segundos',
     'Demo interactiva sin registro',
-    'Solicitá una llamada',
-    'Mirá cómo funciona',
+    'Solicita una llamada',
+    'Mira cómo funciona',
   ];
 
   return {
@@ -293,7 +294,7 @@ export function generarCarrusel(demo: KoptupDemo): CarruselSlide[] {
     },
     {
       numero: 7,
-      titulo: 'Probalo gratis',
+      titulo: 'Pruébalo gratis',
       bullets: [`koptup.com${demo.path}`, 'Sin registro, sin tarjeta'],
       notaVisual: 'CTA grande + QR opcional',
     },

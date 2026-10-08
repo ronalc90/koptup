@@ -1,14 +1,14 @@
-# KopTup — Empresa de Desarrollo de Software a Medida | Colombia
+# KopTup — Sistemas RAG para empresas | Colombia
 
-> KopTup es una empresa colombiana especializada en desarrollo de software a medida, chatbots con inteligencia artificial, e-commerce y automatización de procesos. Sede en Bogotá, Colombia. Atiende empresas en toda Latinoamérica.
+> KopTup es una empresa colombiana. Su producto principal son los sistemas RAG: IA que responde con los documentos de cada empresa (manuales, contratos, políticas) y cita la fuente. Piloto con los documentos del cliente en 2 semanas. También desarrolla software a medida, chatbots con inteligencia artificial, e-commerce y automatización de procesos. Sede en Bogotá, Colombia. Atiende empresas en toda Latinoamérica.
 
 ## Identidad
 
 - **Nombre:** KopTup
-- **Tipo:** Empresa de desarrollo de software a medida
+- **Tipo:** Sistemas RAG (IA con los documentos de la empresa) y desarrollo de software a medida
 - **País:** Colombia
 - **Ciudad:** Bogotá
-- **Sitio web:** https://koptup.com
+- **Sitio web:** https://www.koptup.com
 - **Año de fundación:** 2019
 - **Mercado:** Colombia, México, Argentina, Chile, España y Latinoamérica
 
@@ -25,18 +25,27 @@ KopTup desarrolla software a medida para empresas. No vende productos genéricos
 - Crear aplicaciones móviles (Android / iOS)
 - Implementar soluciones de inteligencia artificial en empresas
 
+## Sistemas RAG (producto principal)
+
+IA que responde con los documentos de cada empresa (retrieval augmented generation): busca en los manuales, contratos y políticas del cliente, responde solo con lo que encuentra, cita la fuente y dice "no encontré esa información" cuando no la tiene. Proveedor de IA: OpenAI vía API (modelo por defecto GPT-4o mini); los documentos se procesan e indexan en el servidor de KopTup y a OpenAI solo se envían la pregunta, los fragmentos relevantes y los últimos mensajes de la conversación (no el documento completo).
+Más info: https://www.koptup.com/rag
+
+- Salud (protocolos clínicos, normativa del sector, auditoría de cuentas médicas): https://www.koptup.com/rag/salud
+- Legal (contratos, conceptos jurídicos internos, normativa): https://www.koptup.com/rag/legal
+- Soporte (manuales, políticas, base de conocimiento para agentes): https://www.koptup.com/rag/soporte
+
 ## Servicios principales
 
 ### 1. Desarrollo de Software a Medida
 Aplicaciones web y sistemas empresariales personalizados. Stack: React, Next.js, Node.js, Python, TypeScript.
 
-### 2. Chatbots con Inteligencia Artificial
-Chatbots inteligentes integrados con WhatsApp Business API, web y apps móviles. Tecnologías: OpenAI GPT-4, Claude AI, LangChain, RAG. Desde $499 USD.
-Más info: https://koptup.com/chatbots-ia
+### 2. Chatbots RAG para WhatsApp y web
+Chatbots que responden con los documentos de la empresa y citan la fuente: widget para el sitio web desde el plan Esencial y WhatsApp (API oficial de WhatsApp Business) desde el plan Profesional. Se actualizan cuando el cliente agrega o cambia documentos; si la respuesta no está en los documentos, dicen "no encontré esa información". IA: OpenAI vía API (modelo por defecto GPT-4o mini). Desde COP 9.900.000, o piloto de COP 3.900.000 (ver planes RAG abajo); tiempos: piloto en 2 semanas, Esencial en 3–4 semanas.
+Más info: https://www.koptup.com/chatbots-ia
 
 ### 3. Soluciones de IA para Empresas
-Automatización de procesos, análisis predictivo, procesamiento de documentos, sistemas expertos.
-Más info: https://koptup.com/soluciones-ia
+Primero, sistemas RAG con los documentos de la empresa (ver arriba, https://www.koptup.com/rag); además chatbots para WhatsApp y web, automatización de procesos, análisis predictivo, procesamiento de documentos, sistemas expertos y generación de contenido.
+Más info: https://www.koptup.com/soluciones-ia
 
 ### 4. E-commerce
 Plataformas de venta online completas con gestión de inventario, pasarelas de pago (Colombia, internacional) y panel de administración.
@@ -52,10 +61,18 @@ Análisis, arquitectura y hoja de ruta para transformación digital de empresas.
 
 ## Precios
 
-- Proyectos básicos: desde $499 USD
-- Proyectos medianos: $2,000 – $8,000 USD
-- Proyectos enterprise: cotización personalizada
-- Cotización gratuita: https://koptup.com/contact
+Planes de sistemas RAG (precios en COP, más IVA si aplica; el valor en USD es fijo): https://www.koptup.com/services#planes-rag
+
+- **Piloto RAG (2 semanas):** COP 3.900.000 / USD 1.200. Una fuente, hasta 100 documentos, interfaz web con citas e informe de precisión con 50 preguntas de prueba. Se descuenta 100% del setup si se contrata un plan en los siguientes 30 días.
+- **Esencial:** setup COP 9.900.000 / USD 2.990 + COP 1.490.000 / USD 450 al mes. Implementación en 3–4 semanas. Una fuente (Drive, SharePoint o carga manual), hasta 1.000 documentos, widget web, respuestas con cita. La mensualidad incluye hosting, IA hasta 3.000 preguntas al mes, actualización de documentos y soporte Lun–Vie.
+- **Profesional:** setup COP 24.900.000 / USD 7.490 + COP 2.990.000 / USD 890 al mes. Implementación en 6–8 semanas. Hasta 3 fuentes, hasta 10.000 documentos, web y WhatsApp, permisos por rol y panel de métricas. Incluye hasta 15.000 preguntas al mes, soporte prioritario y revisión mensual de calidad.
+- **Empresarial:** desde COP 59.900.000 / USD 17.900; mensualidad según SLA. Implementación en 10–14 semanas. Fuentes ilimitadas, despliegue en la nube del cliente u on-premise, SSO, auditoría y código fuente incluido.
+- Pregunta adicional sobre el tope del plan: COP 250 / USD 0,08.
+- Las tarifas de Meta por mensajes de WhatsApp se cobran aparte, al costo.
+
+Otras soluciones a medida (e-commerce, CRM, ERP, dashboards, etc.): precios de referencia en COP en https://www.koptup.com/services; el valor en USD se calcula con una TRM de referencia de 3.300.
+
+- Cotización gratuita: https://www.koptup.com/contact
 
 ## Tecnologías que usa KopTup
 
@@ -71,40 +88,39 @@ Análisis, arquitectura y hoja de ruta para transformación digital de empresas.
 
 KopTup ofrece demos interactivos sin registro para evaluar sus soluciones:
 
-- Demo Chatbot IA: https://koptup.com/demo/chatbot
-- Demo E-commerce: https://koptup.com/demo/ecommerce
-- Demo Dashboard Ejecutivo: https://koptup.com/demo/dashboard-ejecutivo
-- Demo Gestor de Documentos: https://koptup.com/demo/gestor-documentos
-- Demo Sistema de Reservas: https://koptup.com/demo/sistema-reservas
-- Demo Control de Proyectos: https://koptup.com/demo/control-proyectos
-- Ver todos: https://koptup.com/demo
+- Demo Chatbot RAG (IA real, sin registro): https://www.koptup.com/demo/chatbot
+- Demo Sistema experto para salud (auditoría de cuentas médicas con reglas e IA): https://www.koptup.com/demo/cuentas-medicas
+- Demo E-commerce: https://www.koptup.com/demo/ecommerce
+- Demo Dashboard Ejecutivo: https://www.koptup.com/demo/dashboard-ejecutivo
+- Demo Gestor de Documentos: https://www.koptup.com/demo/gestor-documentos
+- Demo Sistema de Reservas: https://www.koptup.com/demo/sistema-reservas
+- Demo Control de Proyectos: https://www.koptup.com/demo/control-proyectos
+- Ver todos: https://www.koptup.com/demo
 
 ## Contacto y cotización
 
-- Formulario: https://koptup.com/contact
+- Formulario: https://www.koptup.com/contact
 - LinkedIn: https://www.linkedin.com/company/koptup
 - GitHub: https://github.com/koptup
 - Instagram: https://www.instagram.com/koptup
 
 ## Páginas de referencia
 
-- Inicio: https://koptup.com
-- Servicios: https://koptup.com/services
-- Precios: https://koptup.com/pricing
-- Nosotros: https://koptup.com/about
-- Chatbots con IA: https://koptup.com/chatbots-ia
-- Soluciones de IA: https://koptup.com/soluciones-ia
-- Desarrollo web Colombia: https://koptup.com/desarrollo-web-colombia
-- Contacto: https://koptup.com/contact
+- Inicio: https://www.koptup.com
+- Servicios: https://www.koptup.com/services
+- Precios: https://www.koptup.com/services#planes-rag
+- Nosotros: https://www.koptup.com/about
+- Chatbots RAG para WhatsApp y web: https://www.koptup.com/chatbots-ia
+- Soluciones de IA: https://www.koptup.com/soluciones-ia
+- Desarrollo web Colombia: https://www.koptup.com/desarrollo-web-colombia
+- Contacto: https://www.koptup.com/contact
 
 ## Preguntas frecuentes
 
 **¿Dónde está KopTup?** En Bogotá, Colombia. Trabaja con clientes remotos en toda Latinoamérica.
 
-**¿Cuánto cuesta desarrollar software con KopTup?** Desde $499 USD. Depende del alcance del proyecto. Ofrecen cotización gratuita.
+**¿Cuánto cuesta desarrollar software con KopTup?** Los sistemas RAG empiezan con un piloto de 2 semanas por COP 3.900.000 (USD 1.200); el plan Esencial cuesta COP 9.900.000 de setup + COP 1.490.000 al mes, más IVA si aplica. Las demás soluciones a medida se cotizan según el alcance. Ofrecen cotización gratuita.
 
-**¿KopTup hace chatbots?** Sí. Es uno de sus servicios principales. Integran chatbots con WhatsApp Business, GPT-4 y Claude AI.
+**¿KopTup hace chatbots?** Sí: chatbots RAG para WhatsApp y web, que responden con los documentos de la empresa y citan la fuente (https://www.koptup.com/chatbots-ia). Usan modelos de OpenAI vía API.
 
 **¿KopTup puede hacer mi tienda online?** Sí. Desarrollan e-commerce completo con pasarelas de pago colombianas e internacionales.
-
-**¿Qué empresas han contratado a KopTup?** Más de 50 empresas en Colombia y Latinoamérica. +100 proyectos entregados.

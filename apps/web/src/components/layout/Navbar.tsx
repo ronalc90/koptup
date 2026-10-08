@@ -105,6 +105,7 @@ export default function Navbar() {
 
   const navigation = [
     { name: t('nav.home'), href: '/' },
+    { name: t('nav.rag'), href: '/rag' },
     { name: t('nav.services'), href: '/services' },
     { name: t('nav.demos'), href: '/demo' },
     { name: t('nav.about'), href: '/about' },
@@ -171,7 +172,7 @@ const toggleLanguage = () => {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+                  'px-3 xl:px-4 py-2 rounded-lg text-sm font-medium transition-colors',
                   isActive(item.href)
                     ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950'
                     : 'hover:text-primary-600 dark:hover:text-primary-400 hover:bg-secondary-100 dark:hover:bg-secondary-800'
@@ -186,7 +187,7 @@ const toggleLanguage = () => {
           </div>
 
           {/* Right side actions */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-2 xl:space-x-4">
             {/* Language Toggle */}
             <button
               onClick={toggleLanguage}
@@ -313,7 +314,7 @@ const toggleLanguage = () => {
                   <Link href="/login">{t('nav.login')}</Link>
                 </Button>
                 <Button size="sm" asChild>
-                  <Link href="/pricing">Quiero esto</Link>
+                  <Link href="/services#planes-rag">Quiero esto</Link>
                 </Button>
               </>
             )}
@@ -397,7 +398,7 @@ const toggleLanguage = () => {
                     <Link href="/login">{t('nav.login')}</Link>
                   </Button>
                   <Button size="sm" fullWidth asChild>
-                    <Link href="/pricing">Quiero esto</Link>
+                    <Link href="/services#planes-rag">Quiero esto</Link>
                   </Button>
                 </>
               )}

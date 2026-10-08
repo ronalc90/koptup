@@ -11,7 +11,7 @@
 [![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o-412991?logo=openai)](https://openai.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-[**koptup.com**](https://koptup.com) · [Catálogo de prototipos](https://koptup.com/demo) · [Planes y servicios](https://koptup.com/services) · [Contacto](https://koptup.com/contact)
+[**www.koptup.com**](https://www.koptup.com) · [Catálogo de prototipos](https://www.koptup.com/demo) · [Planes y servicios](https://www.koptup.com/services) · [Contacto](https://www.koptup.com/contact)
 
 </div>
 
@@ -21,22 +21,22 @@
 
 Koptup es el portafolio comercial de un estudio de desarrollo a medida. Construimos software para empresas en LATAM — web, mobile, integraciones, IA aplicada. Este repo contiene:
 
-- **2 aplicaciones reales** que podés usar hoy: un chatbot RAG con OpenAI y un generador de copy para LinkedIn Ads.
-- **25 prototipos navegables** que muestran cómo se ve y se siente cada solución antes de que la construyamos para vos.
-- **Sitio comercial** (catálogo de servicios, precios en COP/USD con TRM en vivo, sobre nosotros, contacto).
+- **2 aplicaciones reales** que puedes usar hoy: un chatbot RAG con OpenAI y un generador de copy para LinkedIn Ads.
+- **24 prototipos navegables** que muestran cómo se ve y se siente cada solución antes de que la construyamos para ti.
+- **Sitio comercial** (planes RAG con precios fijos en COP y USD, catálogo de otras soluciones a medida en COP con referencia en USD a una TRM fija de 3.300, sobre nosotros, contacto).
 
 No es un SaaS ni un producto. Es la vitrina de un equipo que cobra por construir cosas a medida.
 
 ## Aplicaciones reales
 
-### [Chatbot RAG con IA](https://koptup.com/demo/chatbot)
+### [Chatbot RAG con IA](https://www.koptup.com/demo/chatbot)
 
 Plataforma RAG end-to-end. Ingesta PDF/Word/Excel/CSV/HTML/URLs, chunking, retrieval BM25 con TF·IDF, llamadas a OpenAI Chat Completions (GPT-4o-mini por defecto, configurable) con citas inline `[1] [2]` clickeables. Builder visual para personalizar avatar/color/posición, 3 modos de preview (desktop/móvil/bubble) y generación de embed code (iframe / script / componente React).
 
 **Stack real:** Next.js · TypeScript · Express · OpenAI SDK · BM25 implementado a mano · persistencia en archivos JSON.
 **Código:** [`apps/backend/src/routes/chatbot.routes.ts`](apps/backend/src/routes/chatbot.routes.ts) — 11 endpoints REST, 940+ líneas.
 
-### [Generador de LinkedIn Ads](https://koptup.com/demo/linkedin-ads)
+### [Generador de LinkedIn Ads](https://www.koptup.com/demo/linkedin-ads)
 
 Generador de copies para campañas de LinkedIn con OpenAI server-side. Calendario editorial, plantillas por industria, variantes A/B, preview en formato nativo de LinkedIn.
 
@@ -45,9 +45,9 @@ Generador de copies para campañas de LinkedIn con OpenAI server-side. Calendari
 
 ## Prototipos navegables
 
-El resto (25 vistas: CRM, ERP, POS, HRMS, WMS, LMS, helpdesk, telemedicina, facturación electrónica, voice AI, e-commerce, automatización de workflows, scraping, etc.) son **mockups interactivos con datos simulados realistas**. Cubren el flujo de UI completo — tabs, formularios validados, gráficas, drag-and-drop, modales — pero los datos son fixtures, no provienen de un backend de producción. Sirven para que un cliente potencial vea cómo se vería un ERP o un CRM moderno antes de contratarnos para construirlo.
+El resto (24 vistas: CRM, ERP, POS, HRMS, WMS, LMS, helpdesk, telemedicina, facturación electrónica, voice AI, e-commerce, automatización de workflows, scraping, etc.) son **mockups interactivos con datos simulados realistas**. Cubren el flujo de UI completo — tabs, formularios validados, gráficas, drag-and-drop, modales — pero los datos son fixtures, no provienen de un backend de producción. Sirven para que un cliente potencial vea cómo se vería un ERP o un CRM moderno antes de contratarnos para construirlo.
 
-Catálogo filtrable por categoría: **<https://koptup.com/demo>**
+Catálogo filtrable por categoría: **<https://www.koptup.com/demo>**
 
 ## Stack
 
@@ -61,7 +61,7 @@ Tecnologías que realmente usamos en este repo:
 
 **Testing & calidad:** Jest · Playwright · React Testing Library · ESLint · TypeScript strict
 
-Eso es ~25 tecnologías que dominamos. Conocemos y trabajamos cuando el proyecto lo pide con: Python (FastAPI/Django), Java (Spring Boot), .NET, Postgres + pgvector, Redis, Pinecone, Anthropic, Kubernetes, Terraform, GraphQL, gRPC, WebSockets, React Native, Flutter. Si necesitás algo fuera de esta lista, lo evaluamos antes de comprometernos.
+Eso es ~25 tecnologías que dominamos. Conocemos y trabajamos cuando el proyecto lo pide con: Python (FastAPI/Django), Java (Spring Boot), .NET, Postgres + pgvector, Redis, Pinecone, Anthropic, Kubernetes, Terraform, GraphQL, gRPC, WebSockets, React Native, Flutter. Si necesitas algo fuera de esta lista, lo evaluamos antes de comprometernos.
 
 ## Quick start
 
@@ -81,11 +81,58 @@ cd apps/web && npm run dev                        # http://localhost:3000
 
 El chatbot RAG funciona sin `OPENAI_API_KEY` (fallback extractivo BM25). Con la key activa el modo LLM completo.
 
+## Variables de entorno
+
+Plantillas: [`apps/web/.env.example`](apps/web/.env.example) y [`apps/backend/.env.example`](apps/backend/.env.example). En producción la web se configura en **Vercel** (proyecto → *Settings* → *Environment Variables*) y el backend en **Railway** (servicio del backend → *Variables*).
+
+### Web (Vercel): medición para anuncios
+
+Las tres son opcionales: si una no existe, su etiqueta no se carga. Aunque exista, la etiqueta solo se carga después de que el visitante acepte cookies en el banner o en [`/cookies`](https://www.koptup.com/cookies) ("Rechazar" deja solo las esenciales). El banner de cookies aparece solo si hay al menos una de las tres configurada (sin ninguna no hay cookies opcionales que aceptar).
+
+| Variable | Formato | Qué hace |
+|---|---|---|
+| `NEXT_PUBLIC_GA_ID` | `G-XXXXXXXXXX` | ID de medición de GA4 (GA4 → *Administrar* → *Flujos de datos* → flujo web). Carga Google Analytics 4 si el visitante acepta las cookies de **analítica**. |
+| `NEXT_PUBLIC_GOOGLE_ADS_ID` | `AW-XXXXXXXXX` | ID de la etiqueta de Google de la cuenta de Google Ads. Carga la etiqueta de Google Ads (vinculador de conversiones y remarketing) si el visitante acepta las cookies de **marketing**. |
+| `NEXT_PUBLIC_LINKEDIN_PARTNER_ID` | número | *Partner ID* del Insight Tag en LinkedIn Campaign Manager. Carga LinkedIn Insight Tag si el visitante acepta las cookies de **marketing**. |
+
+- Son variables `NEXT_PUBLIC_*`: Next las fija al compilar. Después de crearlas o cambiarlas en Vercel hay que **redesplegar**. La CSP de [`apps/web/next.config.js`](apps/web/next.config.js) abre los dominios de Google o de LinkedIn solo si su variable existe en ese build.
+- Un valor con un formato distinto al de la tabla se ignora (la etiqueta no se carga). En Google Ads también se acepta solo el número, sin `AW-`.
+- Eventos que se envían a GA4 (y a Google Ads si su etiqueta está cargada):
+
+  | Evento | Cuándo | Parámetros |
+  |---|---|---|
+  | `generate_lead` | Formulario de [`/contact`](https://www.koptup.com/contact) enviado con éxito | `lead_source` (`contact_form`), `service`, `plan_id` (si viene de un plan RAG) |
+  | `demo_start` | Primera pregunta en [`/demo/chatbot`](https://www.koptup.com/demo/chatbot) en cada carga de la página | `demo_mode` (`sample`: documento de ejemplo; `upload`: documento propio) |
+  | `demo_upload` | Documento subido con éxito en "Prueba con tu documento" | `file_type` (`pdf`, `docx` o `txt`), `pages` |
+  | `whatsapp_click` | Clic en el botón de WhatsApp de `/contact` | `link_location` |
+  | `plan_click` | Clic en el botón de un plan RAG (`/services#planes-rag`, `/rag` y "Agenda un piloto" de `/chatbots-ia`) o en los botones de las tarjetas de "Otras soluciones a medida" | `plan_name` (en el idioma del visitante; para agrupar usa `plan_id`), `plan_id`, `plan_group` (`planes_rag` u `otras_soluciones`), `cta` (`quote`, `details` o `demo`) y, en el detalle de una solución, `plan_tier` y `modality` |
+
+- **Conversiones de Google Ads:** el código no tiene etiquetas de conversión propias de Ads. Vincula GA4 con Google Ads, marca en GA4 como *eventos clave* los que quieras optimizar (por ejemplo `generate_lead` y `demo_upload`) e impórtalos en Google Ads como conversiones de Google Analytics 4.
+- **Conversiones de LinkedIn:** el Insight Tag mide visitas y audiencias. Las conversiones se crean en Campaign Manager (por ejemplo, por URL); el código no tiene IDs de conversión de LinkedIn.
+- Para ver `plan_name` y los demás parámetros en los informes de GA4, regístralos como dimensiones personalizadas (*Administrar* → *Definiciones personalizadas*).
+
+La web también usa `NEXT_PUBLIC_API_URL` (URL del backend en Railway; la demo "Prueba con tu documento" llama al backend con ella).
+
+### Backend (Railway): demo "Prueba con tu documento"
+
+La subida de documentos en `/demo/chatbot` (`/api/demo-rag`) queda **apagada** hasta que `DEMO_UPLOAD_ENABLED=true`, Redis esté conectado y exista `OPENAI_API_KEY`. Si falta algo, el sitio muestra "Agenda una demo con nosotros" y la demo con el documento de ejemplo sigue funcionando.
+
+| Variable | Valor | Qué hace |
+|---|---|---|
+| `DEMO_UPLOAD_ENABLED` | `true` para encender (por defecto `false`) | Encendido explícito de la subida de documentos. |
+| `DEMO_MONTHLY_BUDGET_USD` | por defecto `50` | Tope de gasto mensual (USD, mes UTC) en OpenAI de esta demo, calculado con los tokens de cada respuesta. Al alcanzarlo se desactivan la subida y las preguntas. Un valor inválido o negativo la deja desactivada. |
+| `OPENAI_API_KEY` | obligatoria | Clave de OpenAI (la demo usa `gpt-4o-mini`). La usan también el chatbot y otros módulos del backend. |
+| `REDIS_URL` | obligatoria para la demo | Redis de Railway (plugin Redis). Guarda el límite de 3 documentos por IP al día y el contador de gasto. |
+| `MONGODB_URI` | recomendada | Base de datos donde se guardan los leads: los del formulario de contacto y el email de la demo (origen `demo-rag`). Si falla, la demo sigue funcionando y el error queda en el log. |
+| `TRUST_PROXY_HOPS` | `1` en Railway | Cantidad de proxies delante del backend; define la IP real del visitante para los límites por IP. |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM`, `ADMIN_EMAIL`, `WHATSAPP_PROVIDER` y las de su proveedor | las que ya usa el formulario de contacto | Avisos por email y WhatsApp de cada lead (mismo canal que el formulario de contacto). |
+| `DEMO_RAG_TTL_SECONDS` | **no la definas en Railway** | Solo para pruebas locales: baja el tiempo de vida de 1 hora de los documentos. Se ignora con `NODE_ENV=production`. |
+
 ## Estructura del repo
 
 ```
 apps/
-  web/                    # Next.js — sitio + 27 vistas en /demo
+  web/                    # Next.js — sitio + 26 demos en /demo
   backend/                # Express — APIs reales (chatbot) + mocks (resto)
 packages/
   design-system/          # tokens compartidos
@@ -96,17 +143,17 @@ infra/
 
 ## Estado del proyecto
 
-- **Producción:** [koptup.com](https://koptup.com) (Vercel) + API en Railway.
+- **Producción:** [www.koptup.com](https://www.koptup.com) (Vercel) + API en Railway.
 - **Chatbot RAG:** integración real con OpenAI, persistencia en disco, multi-tenant.
-- **25 prototipos restantes:** UI completa, datos simulados, no production-ready sin trabajo adicional.
+- **24 prototipos restantes:** UI completa, datos simulados, no production-ready sin trabajo adicional.
 - **Roadmap inmediato:** S3 real para uploads del RAG, autenticación de tenants, métricas de uso.
 
-## ¿Querés contratarnos?
+## ¿Quieres contratarnos?
 
-Construimos a medida lo que viste en los prototipos — o lo que necesités que no esté acá. Tarifas en COP y USD, propuesta en 48h hábiles.
+Construimos a medida lo que viste en los prototipos — o lo que necesites que no esté acá. Tarifas en COP y USD, propuesta en 48h hábiles.
 
 - **Email:** [dirox7@gmail.com](mailto:dirox7@gmail.com)
-- **Sitio:** [koptup.com/contact](https://koptup.com/contact)
+- **Sitio:** [www.koptup.com/contact](https://www.koptup.com/contact)
 - **LinkedIn:** [/in/ronalc90](https://www.linkedin.com/in/ronalc90)
 
 ## Licencia

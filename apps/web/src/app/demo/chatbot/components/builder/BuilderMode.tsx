@@ -19,6 +19,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
+import { SITE_URL } from '@/lib/site';
 
 import ConfigPanel from './ConfigPanel';
 import LivePreview from './LivePreview';
@@ -316,7 +317,7 @@ export default function BuilderMode() {
       }
     }
     router.replace('?');
-    toast.success('Nuevo bot listo. Configurá y guardá para persistir.');
+    toast.success('Nuevo bot listo. Configura y guarda para persistir.');
   }, [router]);
 
   /** El bot activo fue eliminado: volvemos al estado "sin guardar". */
@@ -329,7 +330,7 @@ export default function BuilderMode() {
   const handleShareMicrosite = useCallback(async () => {
     try {
       const id = persistedBotId ?? (await ensureSaved());
-      const url = `https://koptup.com/chatbot/${id}`;
+      const url = `${SITE_URL}/chatbot/${id}`;
       if (typeof navigator !== 'undefined' && navigator.clipboard) {
         await navigator.clipboard.writeText(url);
       }

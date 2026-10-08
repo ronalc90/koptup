@@ -32,6 +32,13 @@ process.on('unhandledRejection', (reason) => {
 console.log('index.ts arrancando', new Date().toISOString());
 logger.info('index.ts arrancando');
 
+// Detrás del proxy de Railway: confiar en 1 salto para que req.ip sea la IP
+// real del visitante (X-Forwarded-For) y no la del proxy. Lo usan los rate
+// limiters y el cupo diario por IP de la demo "Prueba con tu documento".
+// Ajustable con TRUST_PROXY_HOPS si cambia la cantidad de proxies delante.
+const trustProxyHops = Number(process.env.TRUST_PROXY_HOPS ?? 1);
+app.set('trust proxy', Number.isInteger(trustProxyHops) && trustProxyHops >= 0 ? trustProxyHops : 1);
+
 // Basic middleware that never fails
 app.use(helmet());
 
@@ -186,6 +193,7 @@ const startServer = async () => {
         expertSystemRoutes,
         cupsRoutes,
         chatbotRoutes,
+        demoRagRoutes,
         auditoriaRoutes,
         contentManagerRoutes,
         notificationsRoutes,
@@ -209,6 +217,7 @@ const startServer = async () => {
         import('./routes/expert-system.routes'),
         import('./routes/cups.routes'),
         import('./routes/chatbot.routes'),
+        import('./routes/demo-rag.routes'),
         import('./routes/auditoria.routes'),
         import('./routes/content-manager.routes'),
         import('./routes/notifications.routes'),
@@ -233,6 +242,7 @@ const startServer = async () => {
       if (expertSystemRoutes.default) app.use('/api/expert', expertSystemRoutes.default);
       if (cupsRoutes.default) app.use('/api/cups', cupsRoutes.default);
       if (chatbotRoutes.default) app.use('/api/chatbot', chatbotRoutes.default);
+      if (demoRagRoutes.default) app.use('/api/demo-rag', demoRagRoutes.default);
       if (auditoriaRoutes.default) app.use('/api/auditoria', auditoriaRoutes.default);
       if (contentManagerRoutes.default) app.use('/api/content', contentManagerRoutes.default);
       if (notificationsRoutes.default) app.use('/api/notifications', notificationsRoutes.default);

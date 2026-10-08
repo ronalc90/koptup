@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
+import { track, trackWhatsappClick } from '@/lib/analytics';
+import { RAG_SERVICE_SLUG, isRagPlanId } from '@/lib/rag-plans';
 import Button from '@/components/ui/Button';
 import Card, { CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -33,12 +35,22 @@ const SERVICE_NAME_BY_SLUG: Record<string, string> = {
 
 function ContactPageInner() {
   const t = useTranslations('contactPage');
+  const tRag = useTranslations('ragPlans');
   const searchParams = useSearchParams();
   const queryService = searchParams.get('service');
   const queryPlan = searchParams.get('plan');
+  const isRagQuote = queryService === RAG_SERVICE_SLUG;
 
+  // Los planes RAG de /services#planes-rag llegan como ?service=sistema-rag&plan=<id>.
   const cotizandoLabel = queryService
-    ? (SERVICE_NAME_BY_SLUG[queryService] || queryService.replace(/-/g, ' '))
+    ? isRagQuote
+      ? t('services.rag')
+      : (SERVICE_NAME_BY_SLUG[queryService] || queryService.replace(/-/g, ' '))
+    : null;
+  const planLabel = queryPlan
+    ? isRagQuote && isRagPlanId(queryPlan)
+      ? tRag(`plans.${queryPlan}.name`)
+      : queryPlan
     : null;
 
   const [formData, setFormData] = useState({
@@ -64,11 +76,13 @@ function ContactPageInner() {
         service: cotizandoLabel,
         message: prev.message
           ? prev.message
-          : `Hola, estoy interesado en cotizar ${cotizandoLabel}${queryPlan ? ` (plan ${queryPlan})` : ''}.`,
+          : planLabel
+            ? t('quote.messageWithPlan', { service: cotizandoLabel, plan: planLabel })
+            : t('quote.message', { service: cotizandoLabel }),
       }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cotizandoLabel, queryPlan]);
+  }, [cotizandoLabel, planLabel]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,7 +90,21 @@ function ContactPageInner() {
     setError('');
 
     try {
-      await api.submitContactForm(formData);
+      // Si sigue elegido el servicio que se estaba cotizando, el plan viaja con
+      // el lead aunque la persona edite el mensaje.
+      const payload =
+        cotizandoLabel && planLabel && formData.service === cotizandoLabel
+          ? { ...formData, service: `${cotizandoLabel} — ${t('quote.plan', { plan: planLabel })}` }
+          : formData;
+      await api.submitContactForm(payload);
+
+      // Conversión `generate_lead` (solo envío exitoso). Sin datos personales:
+      // el servicio solo si es una opción del formulario y el plan RAG por id.
+      track('generate_lead', {
+        lead_source: 'contact_form',
+        service: baseServices.includes(formData.service) ? formData.service : undefined,
+        plan_id: isRagQuote && isRagPlanId(queryPlan) ? queryPlan : undefined,
+      });
 
       setIsSubmitted(true);
 
@@ -153,7 +181,8 @@ function ContactPageInner() {
     },
   ];
 
-  const services = [
+  const baseServices = [
+    t('services.rag'),
     t('services.ecommerce'),
     t('services.chatbot'),
     t('services.webDev'),
@@ -163,6 +192,12 @@ function ContactPageInner() {
     t('services.consulting'),
     t('services.other'),
   ];
+  // El servicio que llega por ?service= debe ser una opción del select; si no,
+  // el navegador deja el select vacío y el campo obligatorio bloquea el envío.
+  const services =
+    cotizandoLabel && !baseServices.includes(cotizandoLabel)
+      ? [cotizandoLabel, ...baseServices]
+      : baseServices;
 
   const budgetRanges = [
     t('budgetRanges.1'),
@@ -213,8 +248,7 @@ function ContactPageInner() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Contact Form */}
             <div className="lg:col-span-2">
-              {/* Banner cotizando — pre-fill desde /services o /pricing */}
-              {/* TODO: extract to i18n */}
+              {/* Banner cotizando — pre-fill desde /services (planes RAG y catálogo) */}
               {cotizandoLabel && (
                 <Card
                   variant="bordered"
@@ -226,14 +260,18 @@ function ContactPageInner() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs uppercase tracking-wide font-semibold text-primary-700 dark:text-primary-300">
-                        Estás cotizando
+                        {t('quote.label')}
                       </p>
                       <p className="text-base font-bold text-secondary-900 dark:text-white">
                         {cotizandoLabel}
-                        {queryPlan && <span className="text-secondary-600 dark:text-secondary-400"> — Plan {queryPlan}</span>}
+                        {planLabel && (
+                          <span className="text-secondary-600 dark:text-secondary-400">
+                            {' '}— {t('quote.plan', { plan: planLabel })}
+                          </span>
+                        )}
                       </p>
                     </div>
-                    <Badge variant="primary" size="sm">Solicitud pre-llenada</Badge>
+                    <Badge variant="primary" size="sm">{t('quote.prefilled')}</Badge>
                   </CardContent>
                 </Card>
               )}
@@ -260,7 +298,7 @@ function ContactPageInner() {
                       {/* CTA crear cuenta para seguir conversación — TODO: extract to i18n */}
                       <div className="max-w-md mx-auto p-4 rounded-lg bg-primary-50 dark:bg-primary-950 border border-primary-200 dark:border-primary-800">
                         <p className="text-sm text-secondary-700 dark:text-secondary-300 mb-3">
-                          Creá tu cuenta para hacer seguimiento de esta solicitud desde tu dashboard.
+                          Crea tu cuenta para hacer seguimiento de esta solicitud desde tu dashboard.
                         </p>
                         <Button size="sm" fullWidth asChild>
                           <Link
@@ -388,7 +426,7 @@ function ContactPageInner() {
                       {/* Timeline — TODO: extract to i18n */}
                       <div>
                         <label htmlFor="timeline" className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                          ¿Cuándo querés empezar?
+                          ¿Cuándo quieres empezar?
                         </label>
                         <select
                           id="timeline"
@@ -397,7 +435,7 @@ function ContactPageInner() {
                           onChange={handleChange}
                           className="w-full px-4 py-3 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                         >
-                          <option value="">Seleccioná una opción</option>
+                          <option value="">Selecciona una opción</option>
                           <option value="now">Ya, lo antes posible</option>
                           <option value="1m">En el próximo mes</option>
                           <option value="3m">En 2-3 meses</option>
@@ -488,6 +526,7 @@ function ContactPageInner() {
                       href="https://wa.me/573024794842"
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={() => trackWhatsappClick('contact_page')}
                       className="w-12 h-12 bg-green-100 dark:bg-green-950 rounded-lg flex items-center justify-center hover:bg-green-200 dark:hover:bg-green-900 transition-colors"
                       title="WhatsApp"
                     >

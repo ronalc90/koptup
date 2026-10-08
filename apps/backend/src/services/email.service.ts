@@ -67,6 +67,8 @@ class EmailService {
     service: string;
     budget?: string;
     message: string;
+    /** Origen del lead (p. ej. `demo-rag`); se muestra si no es el formulario. */
+    source?: string;
   }): Promise<boolean> {
     if (!this.isConfigured()) {
       logger.warn('📧 Email not configured - skipping notification');
@@ -129,6 +131,13 @@ class EmailService {
         <div class="value">${contactData.service}</div>
       </div>
 
+      ${contactData.source && contactData.source !== 'contact-form' ? `
+      <div class="field">
+        <span class="label">🧭 Origen:</span>
+        <div class="value">${contactData.source}</div>
+      </div>
+      ` : ''}
+
       ${contactData.budget ? `
       <div class="field">
         <span class="label">💰 Presupuesto:</span>
@@ -159,7 +168,7 @@ class EmailService {
 ${contactData.phone ? `📱 Teléfono: ${contactData.phone}\n` : ''}
 ${contactData.company ? `🏢 Empresa: ${contactData.company}\n` : ''}
 💼 Servicio: ${contactData.service}
-${contactData.budget ? `💰 Presupuesto: ${contactData.budget}\n` : ''}
+${contactData.source && contactData.source !== 'contact-form' ? `🧭 Origen: ${contactData.source}\n` : ''}${contactData.budget ? `💰 Presupuesto: ${contactData.budget}\n` : ''}
 
 💬 Mensaje:
 ${contactData.message}

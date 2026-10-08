@@ -48,7 +48,7 @@ export default function DemoCapture({
             Capturas para el post
           </h2>
           <p className="mt-1 text-sm text-secondary-600 dark:text-secondary-400">
-            Generá un visual diseñado o capturá el demo en vivo. Descargá PNG / WebM listo para subir.
+            Genera un visual diseñado o captura el demo en vivo. Descarga PNG / WebM listo para subir.
           </p>
         </div>
 
@@ -291,7 +291,7 @@ function AutoCapture({
         <CameraIcon className="mr-1 inline h-4 w-4" />
         <strong>Modo automático:</strong> capturamos el demo real renderizado en el iframe.
         Sin permisos, sin compartir pantalla, 100% del DOM real. La foto sale en 1-3 segundos;
-        para video grabamos a 10 fps mientras interactuás con el demo.
+        para video grabamos a 10 fps mientras interactúas con el demo.
       </div>
 
       <div className="overflow-hidden rounded-xl border border-secondary-200 bg-white shadow-sm dark:border-secondary-700 dark:bg-secondary-900">
@@ -398,7 +398,7 @@ function AutoCapture({
             Descargar WebM
           </a>
           <p className="text-[11px] text-secondary-500 dark:text-secondary-400">
-            LinkedIn no acepta WebM directo. Convertí a MP4 con{' '}
+            LinkedIn no acepta WebM directo. Convierte a MP4 con{' '}
             <a className="underline" href="https://cloudconvert.com/webm-to-mp4" target="_blank" rel="noreferrer">
               CloudConvert
             </a>{' '}
@@ -515,8 +515,8 @@ function VisualGenerator({
         ) : null}
       </div>
       <p className="text-[11px] text-secondary-500 dark:text-secondary-400">
-        Tamaño optimizado para link share. Para post nativo LinkedIn usá 1200×627 (paisaje) o 1080×1080
-        (cuadrado para carrusel) — podés cambiar el viewBox del SVG.
+        Tamaño optimizado para link share. Para post nativo LinkedIn usa 1200×627 (paisaje) o 1080×1080
+        (cuadrado para carrusel) — puedes cambiar el viewBox del SVG.
       </p>
     </div>
   );
@@ -601,7 +601,7 @@ function PlantillaMockupBrowser({ demo }: { demo: KoptupDemo }) {
       {/* Footer CTA */}
       <g transform="translate(80,595)">
         <text fontFamily="Inter, sans-serif" fontSize="14" fontWeight="600" fill="white">
-          Probá la demo gratis · koptup.com{demo.path}
+          Prueba la demo gratis · koptup.com{demo.path}
         </text>
       </g>
     </>
@@ -653,7 +653,7 @@ function PlantillaMetricaHero({ demo }: { demo: KoptupDemo }) {
           PARA: {demo.publicoObjetivo.slice(0, 4).join(' · ').toUpperCase()}
         </text>
         <text y="80" fontFamily="Inter, sans-serif" fontSize="18" fontWeight="700" fill="white">
-          → Probalo en koptup.com{demo.path}
+          → Pruébalo en koptup.com{demo.path}
         </text>
       </g>
     </>
@@ -792,7 +792,7 @@ function ScreenCapture({
   const iniciarStream = async () => {
     setError(null);
     if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getDisplayMedia) {
-      setError('Tu navegador no soporta captura de pantalla. Probá Chrome/Edge en HTTPS o localhost.');
+      setError('Tu navegador no soporta captura de pantalla. Prueba Chrome/Edge en HTTPS o localhost.');
       return null;
     }
     try {
@@ -886,7 +886,7 @@ function ScreenCapture({
       <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-relaxed text-amber-900 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-200">
         <ExclamationTriangleIcon className="mr-1 inline h-4 w-4" />
         <strong>Cómo funciona:</strong> el navegador te va a pedir permiso para compartir pantalla.
-        Elegí la pestaña donde está el demo (o solo la ventana). Luego tomamos foto o grabamos
+        Elige la pestaña donde está el demo (o solo la ventana). Luego tomamos foto o grabamos
         video desde el contenido real. Funciona en Chrome/Edge sobre HTTPS o localhost.
       </div>
 
@@ -992,7 +992,7 @@ function ScreenCapture({
             Descargar WebM
           </a>
           <p className="text-[11px] text-secondary-500 dark:text-secondary-400">
-            LinkedIn no acepta WebM directo. Convertilo a MP4 con{' '}
+            LinkedIn no acepta WebM directo. Conviértelo a MP4 con{' '}
             <a className="underline" href="https://cloudconvert.com/webm-to-mp4" target="_blank" rel="noreferrer">
               CloudConvert
             </a>{' '}

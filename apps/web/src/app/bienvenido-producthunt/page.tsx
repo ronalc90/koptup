@@ -3,6 +3,9 @@
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import Card, { CardContent } from '@/components/ui/Card';
+import HomeHighlights from '@/components/home/HomeHighlights';
+import { DEMO_COUNT } from '@/lib/demos';
+import { formatRagCOP, formatRagUSD, getRagPlan } from '@/lib/rag-plans';
 import {
   ChatBubbleBottomCenterTextIcon,
   ShoppingCartIcon,
@@ -17,7 +20,7 @@ const demos = [
   {
     icon: ChatBubbleBottomCenterTextIcon,
     title: 'Chatbot con IA',
-    desc: 'Configura y prueba tu propio chatbot con GPT-4 o Claude AI. Sube documentos, personaliza colores y genera el código embed.',
+    desc: 'Configura y prueba tu propio chatbot RAG con IA real (OpenAI). Sube documentos, personaliza colores y genera el código embed.',
     href: '/demo/chatbot',
     color: 'bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400',
   },
@@ -44,6 +47,9 @@ const demos = [
   },
 ];
 
+// Precio publicado del piloto RAG (mismo valor que /services#planes-rag).
+const pilot = getRagPlan('piloto').setup;
+
 const features = [
   'Software 100% a medida — nada genérico',
   'Demos interactivos antes de pagar',
@@ -51,7 +57,7 @@ const features = [
   'E-commerce con pagos colombianos e internacionales',
   'Stack moderno: React, Next.js, Node.js, Python',
   'Equipo en Colombia, clientes en todo el mundo',
-  'Precios desde $499 USD',
+  `Precios publicados: piloto RAG de ${formatRagCOP(pilot.cop)} / ${formatRagUSD(pilot.usd)}`,
   'Entrega en 4–8 semanas para MVPs',
 ];
 
@@ -165,28 +171,16 @@ export default function BienvenidoProductHuntPage() {
           </div>
           <div className="text-center mt-8">
             <Button variant="outline" asChild>
-              <Link href="/demo">Ver todas las demos (9 en total)</Link>
+              <Link href="/demo">Ver todas las demos ({DEMO_COUNT} en total)</Link>
             </Button>
           </div>
         </div>
       </section>
 
-      {/* Stats */}
+      {/* Datos verificables (sin cifras de proyectos, clientes ni calificaciones) */}
       <section className="section-padding bg-white dark:bg-secondary-950">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {[
-              { v: '+100', l: 'Proyectos entregados' },
-              { v: '+50', l: 'Empresas clientes' },
-              { v: '6+', l: 'Años de experiencia' },
-              { v: '4.9★', l: 'Satisfacción promedio' },
-            ].map((s, i) => (
-              <div key={i}>
-                <div className="text-4xl font-bold text-[#DA552F] mb-2">{s.v}</div>
-                <div className="text-sm text-secondary-600 dark:text-secondary-400">{s.l}</div>
-              </div>
-            ))}
-          </div>
+          <HomeHighlights />
         </div>
       </section>
 
@@ -206,7 +200,7 @@ export default function BienvenidoProductHuntPage() {
               <Link href="/contact">Hablar con el equipo</Link>
             </Button>
             <Button size="lg" className="border-2 border-white/60 text-white hover:bg-white/10" asChild>
-              <Link href="/pricing">Ver precios</Link>
+              <Link href="/services#planes-rag">Ver precios</Link>
             </Button>
           </div>
         </div>

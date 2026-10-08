@@ -2,7 +2,7 @@
   "offering_vpnEmpresarial": {
     "name": "VPN empresarial",
     "tagline": "Acceso remoto seguro con WireGuard, MFA y SIEM",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"VPN empresarial\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"VPN empresarial\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Seguridad",
     "tiers": {
       "basico": {

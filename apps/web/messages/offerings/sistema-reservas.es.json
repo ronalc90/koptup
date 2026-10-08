@@ -1,8 +1,8 @@
 {
   "offering_sistemaReservas": {
     "name": "Sistema de reservas",
-    "tagline": "Agendá citas, clases o turnos con calendarios sincronizados",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Sistema de reservas\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Agenda citas, clases o turnos con calendarios sincronizados",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Sistema de reservas\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Productividad",
     "tiers": {
       "basico": {

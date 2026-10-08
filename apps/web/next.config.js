@@ -11,6 +11,39 @@ try {
   API_ORIGIN = new URL(NORMALIZED_API).origin;
 } catch {}
 
+// Medición para anuncios (src/components/analytics/Analytics.tsx): la CSP solo
+// abre los dominios de una etiqueta si su variable existe en el build (las
+// NEXT_PUBLIC_* se fijan al compilar; cambiarlas exige redesplegar). Mismos
+// formatos que valida src/lib/analytics.ts.
+const hasEnv = (name, pattern) => pattern.test((process.env[name] || '').trim());
+const USE_GOOGLE_TAG =
+  hasEnv('NEXT_PUBLIC_GA_ID', /^G-[A-Z0-9]+$/i) ||
+  hasEnv('NEXT_PUBLIC_GOOGLE_ADS_ID', /^(AW-)?\d+$/i);
+const USE_LINKEDIN = hasEnv('NEXT_PUBLIC_LINKEDIN_PARTNER_ID', /^\d+$/);
+
+// Dominios de Google tag (gtag.js) para GA4 y Google Ads, según
+// https://developers.google.com/tag-platform/security/guides/csp
+// (GA4 con funciones publicitarias + conversiones/remarketing de Google Ads).
+// `*.google.com.co`: dominio de país de Google para Colombia (la CSP no admite
+// comodines de TLD).
+const GOOGLE_TAG_CSP = {
+  script: ['https://www.googletagmanager.com', 'https://www.googleadservices.com', 'https://www.google.com', 'https://googleads.g.doubleclick.net'],
+  img: ['https://www.googletagmanager.com', 'https://*.google-analytics.com', 'https://*.analytics.google.com', 'https://*.g.doubleclick.net', 'https://*.google.com', 'https://*.google.com.co', 'https://www.googleadservices.com', 'https://pagead2.googlesyndication.com'],
+  connect: ['https://www.googletagmanager.com', 'https://*.google-analytics.com', 'https://*.analytics.google.com', 'https://*.doubleclick.net', 'https://*.google.com', 'https://*.google.com.co', 'https://www.googleadservices.com', 'https://pagead2.googlesyndication.com'],
+  frame: ['https://www.googletagmanager.com', 'https://td.doubleclick.net'],
+};
+// LinkedIn Insight Tag: script en snap.licdn.com; envía los eventos (fetch,
+// sendBeacon o píxel) a px.ads.linkedin.com.
+const LINKEDIN_CSP = {
+  script: ['https://snap.licdn.com'],
+  img: ['https://px.ads.linkedin.com'],
+  connect: ['https://px.ads.linkedin.com'],
+  frame: [],
+};
+const ANALYTICS_CSP = [USE_GOOGLE_TAG && GOOGLE_TAG_CSP, USE_LINKEDIN && LINKEDIN_CSP].filter(Boolean);
+const analyticsSources = (directive) =>
+  [...new Set(ANALYTICS_CSP.flatMap((group) => group[directive]))].map((src) => ` ${src}`).join('');
+
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
@@ -76,7 +109,7 @@ const nextConfig = {
           {
             key: 'Content-Security-Policy',
             value:
-              `default-src 'self' https://www.google.com; img-src 'self' data: blob: https://koptup-uploads.s3.amazonaws.com https://images.unsplash.com https://media.licdn.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' blob: ${API_ORIGIN} http://localhost:3001 https://*.railway.app https://koptup-uploads.s3.amazonaws.com; frame-src 'self' https://www.google.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; media-src 'self' blob:; worker-src 'self' blob:`
+              `default-src 'self' https://www.google.com; img-src 'self' data: blob: https://koptup-uploads.s3.amazonaws.com https://images.unsplash.com https://media.licdn.com${analyticsSources('img')}; script-src 'self' 'unsafe-inline' 'unsafe-eval'${analyticsSources('script')}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' blob: ${API_ORIGIN} http://localhost:3001 https://*.railway.app https://koptup-uploads.s3.amazonaws.com${analyticsSources('connect')}; frame-src 'self' https://www.google.com${analyticsSources('frame')}; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; media-src 'self' blob:; worker-src 'self' blob:`
           }
         ]
       },

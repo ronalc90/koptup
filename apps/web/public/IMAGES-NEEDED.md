@@ -100,7 +100,7 @@ Para completar la optimización SEO, necesitas crear las siguientes imágenes:
 - [ ] Crear icon-512.png (512x512)
 - [ ] Optimizar todas las imágenes con TinyPNG
 - [ ] Subir imágenes a /apps/web/public/
-- [ ] Verificar que carguen en https://koptup.com/og-image.png
+- [ ] Verificar que carguen en https://www.koptup.com/og-image.png
 - [ ] Probar vista previa en Facebook Debugger
 - [ ] Probar vista previa en Twitter Card Validator
 
@@ -110,18 +110,18 @@ Para completar la optimización SEO, necesitas crear las siguientes imágenes:
 
 ### Facebook Debugger
 URL: https://developers.facebook.com/tools/debug/
-- Ingresa: https://koptup.com
+- Ingresa: https://www.koptup.com
 - Verifica que aparezca og-image.png
 - Click "Scrape Again" si es necesario
 
 ### Twitter Card Validator
 URL: https://cards-dev.twitter.com/validator
-- Ingresa: https://koptup.com
+- Ingresa: https://www.koptup.com
 - Verifica que aparezca la imagen
 
 ### LinkedIn Post Inspector
 URL: https://www.linkedin.com/post-inspector/
-- Ingresa: https://koptup.com
+- Ingresa: https://www.koptup.com
 - Verifica vista previa
 
 ---

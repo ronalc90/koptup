@@ -14,6 +14,7 @@ import {
   CheckIcon,
 } from '@heroicons/react/24/outline';
 
+import { SITE_URL } from '@/lib/site';
 import type { BuilderWidgetConfig, EmbedTabKey } from './widgetConfig';
 
 interface EmbedCodeProps {
@@ -40,8 +41,8 @@ function buildSnippet(
     languages: c.languages,
   };
 
-  const iframeSrc = `https://koptup.com/embed/chatbot/${effectiveBotId}`;
-  const webhookUrl = `https://koptup.com/api/chatbot/bots/${effectiveBotId}/webhook`;
+  const iframeSrc = `${SITE_URL}/embed/chatbot/${effectiveBotId}`;
+  const webhookUrl = `${SITE_URL}/api/chatbot/bots/${effectiveBotId}/webhook`;
 
   switch (tab) {
     case 'script':

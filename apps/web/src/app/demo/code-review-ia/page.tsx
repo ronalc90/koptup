@@ -108,7 +108,7 @@ const AI_COMMENTS: AIComment[] = [
     fix: 'router.post("/refresh", validate(RefreshDto), handler(refreshService.rotate));' },
   { id: 'c4', file: 'src/auth/refresh.service.ts', line: 2, severity: 'info', category: 'design',
     message: 'Inyectar Clock facilita testeo determinístico.',
-    explanation: 'Evita new Date() embebido — recibí un Clock por constructor para tests.',
+    explanation: 'Evita new Date() embebido — recibe un Clock por constructor para tests.',
     snippet: 'constructor() {}',
     fix: 'constructor(private denylist: TokenDenylist, private clock: Clock) {}' },
 ];

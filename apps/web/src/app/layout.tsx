@@ -6,6 +6,9 @@ import { NextIntlClientProvider } from 'next-intl';
 import ThemeProvider from '@/components/providers/ThemeProvider';
 import ConditionalLayout from '@/components/layout/ConditionalLayout';
 import ClientToaster from '../components/ClientToaster';
+import Analytics from '@/components/analytics/Analytics';
+import CookieBanner from '@/components/consent/CookieBanner';
+import { HOME_DESCRIPTION, HOME_TITLE, SITE_NAME, SITE_URL, TITLE_TEMPLATE } from '@/lib/site';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
@@ -16,11 +19,18 @@ const poppins = Poppins({
   display: 'swap',
 });
 
+// Título por defecto de las páginas sin metadata propia (login, dashboard…).
+// Ya trae el sufijo porque el `default` del layout raíz no pasa por la
+// plantilla. La home lo reemplaza por HOME_TITLE (title.absolute en app/page.tsx).
+const DEFAULT_TITLE = 'IA que responde con los documentos de tu empresa | KopTup';
+
 export const metadata = {
-  metadataBase: new URL('https://koptup.com'),
+  metadataBase: new URL(SITE_URL),
+  // Formato final: "<título> | KopTup", ≤ 60 caracteres
+  // (verificar con `node scripts/check-titles.mjs`).
   title: {
-    default: 'KopTup - Desarrollo de Software a Medida | Demos Interactivas',
-    template: '%s | KopTup - Software a Medida',
+    default: DEFAULT_TITLE,
+    template: TITLE_TEMPLATE,
   },
   manifest: '/manifest.json',
   appleWebApp: {
@@ -28,8 +38,9 @@ export const metadata = {
     statusBarStyle: 'default',
     title: 'KopTup',
   },
-  description:
-    'KopTup - Desarrollo de software a medida para empresas. Aplicaciones web y móviles, e-commerce, chatbots con IA, dashboards, automatización de procesos y transformación digital. Prueba nuestras demos interactivas.',
+  // Description, canonical y og/twitter de la home (y valores por defecto del
+  // sitio para las páginas que no definen los suyos).
+  description: HOME_DESCRIPTION,
   authors: [{ name: 'KopTup' }],
   creator: 'KopTup',
   publisher: 'KopTup',
@@ -38,29 +49,21 @@ export const metadata = {
     address: false,
     telephone: false,
   },
+  // Sin `images`: la imagen og la genera src/app/opengraph-image.tsx (archivo
+  // de metadata de Next) y twitter:image la hereda de og:image. Las páginas de
+  // contenido declaran sus propias imágenes vía seo-config.
   openGraph: {
     type: 'website',
     locale: 'es_CO',
-    url: 'https://koptup.com',
-    siteName: 'KopTup',
-    title: 'KopTup - Desarrollo de Software a Medida | Demos Interactivas',
-    description:
-      'Desarrollo de software personalizado para empresas. E-commerce, chatbots con IA, dashboards, gestión documental y más. Prueba 27 prototipos interactivos sin registro.',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'KopTup - Desarrollo de Software a Medida',
-      },
-    ],
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'KopTup - Desarrollo de Software a Medida | Demos Interactivas',
-    description:
-      'Desarrollo de software personalizado para empresas. E-commerce, chatbots con IA, dashboards y más. Prueba 27 prototipos interactivos sin registro.',
-    images: ['/og-image.png'],
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
     creator: '@koptup',
   },
   robots: {
@@ -80,7 +83,7 @@ export const metadata = {
   // No declaramos hreflang porque el idioma es por cookie y no hay rutas /es /en
   // distintas; un hreflang que apunta a la misma URL no aporta nada.
   alternates: {
-    canonical: 'https://koptup.com',
+    canonical: SITE_URL,
   },
 };
 
@@ -89,7 +92,7 @@ async function loadAggregate(locale: string, name: 'demos' | 'offerings'): Promi
     const mod = await import(`../../messages/_${name}.${locale}.json`);
     return (mod as any).default ?? mod;
   } catch (err) {
-    console.warn(`[layout] no aggregate for ${name}.${locale} — corré "npm run merge-messages"`, err);
+    console.warn(`[layout] no aggregate for ${name}.${locale} — ejecuta "npm run merge-messages"`, err);
     return {};
   }
 }
@@ -158,6 +161,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
             {/* Client-only toaster */}
             <ClientToaster />
+
+            {/* Consentimiento de cookies y etiquetas de medición (GA4, Google
+                Ads, LinkedIn): solo con variable de entorno y consentimiento. */}
+            <CookieBanner />
+            <Analytics />
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>

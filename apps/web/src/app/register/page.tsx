@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
+import { RagPlanCard } from '@/components/rag/RagPlans';
+import { RAG_PLANS_PATH, RAG_SERVICE_SLUG, getRagPlan, isRagPlanId } from '@/lib/rag-plans';
 import Button from '@/components/ui/Button';
 import Card, { CardContent } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -25,15 +27,9 @@ import { FaGoogle, FaGithub } from 'react-icons/fa';
 const COP_FMT = (n: number) =>
   '$ ' + new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 }).format(n) + ' COP';
 
+// Los planes RAG no van aquí: llegan como ?plan=sistema-rag&tier=<id> y se
+// muestran con la misma tarjeta de /services#planes-rag (src/lib/rag-plans.ts).
 const PLAN_PREVIEW: Record<string, { name: string; tiers: Record<string, { label: string; price: number; bullets: string[] }> }> = {
-  'chatbot-rag-ia': {
-    name: 'Chatbot RAG con IA',
-    tiers: {
-      starter: { label: 'Starter', price: 249000, bullets: ['Hasta 3.000 conversaciones/mes', '20 documentos RAG', 'Soporte por email'] },
-      profesional: { label: 'Profesional', price: 489000, bullets: ['Hasta 15.000 conversaciones/mes', '100 documentos RAG', 'WhatsApp + Web'] },
-      enterprise: { label: 'Enterprise', price: 1290000, bullets: ['Conversaciones ilimitadas', 'Documentos ilimitados', 'SLA y soporte 24/7'] },
-    },
-  },
   'agente-ia-ventas': {
     name: 'Agente IA de Ventas',
     tiers: {
@@ -63,6 +59,10 @@ function RegisterPageInner() {
           slug: planSlug,
         }
       : null;
+
+  const ragPlan =
+    planSlug === RAG_SERVICE_SLUG && isRagPlanId(tierSlug) ? getRagPlan(tierSlug) : null;
+  const hasPlanAside = Boolean(planContext || ragPlan);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -163,7 +163,7 @@ function RegisterPageInner() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:from-secondary-950 dark:via-black dark:to-primary-950 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className={planContext ? 'max-w-6xl w-full space-y-8' : 'max-w-2xl w-full space-y-8'}>
+      <div className={hasPlanAside ? 'max-w-6xl w-full space-y-8' : 'max-w-2xl w-full space-y-8'}>
         {/* Logo */}
         <div className="text-center">
           <Link href="/" className="inline-flex items-center space-x-2">
@@ -187,13 +187,13 @@ function RegisterPageInner() {
         {sourceParam === 'contact' && (
           <div className="p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg text-center">
             <p className="text-sm text-blue-700 dark:text-blue-300">
-              Tu solicitud de contacto fue enviada. Creá tu cuenta para hacer seguimiento desde tu dashboard.
+              Tu solicitud de contacto fue enviada. Crea tu cuenta para hacer seguimiento desde tu dashboard.
             </p>
           </div>
         )}
 
-        <div className={planContext ? 'grid grid-cols-1 lg:grid-cols-3 gap-6' : ''}>
-        <Card variant="elevated" className={planContext ? 'shadow-xl lg:col-span-2' : 'shadow-xl'}>
+        <div className={hasPlanAside ? 'grid grid-cols-1 lg:grid-cols-3 gap-6' : ''}>
+        <Card variant="elevated" className={hasPlanAside ? 'shadow-xl lg:col-span-2' : 'shadow-xl'}>
           <CardContent className="p-8">
             {/* Error Message */}
             {error && (
@@ -443,7 +443,7 @@ function RegisterPageInner() {
                 disabled={isLoading}
               >
                 {/* TODO: extract to i18n */}
-                {isLoading ? t('creating') : (planContext ? 'Crear cuenta y empezar' : t('createButton'))}
+                {isLoading ? t('creating') : (hasPlanAside ? 'Crear cuenta y empezar' : t('createButton'))}
               </Button>
             </form>
           </CardContent>
@@ -451,7 +451,27 @@ function RegisterPageInner() {
 
         {/* Plan summary aside */}
         {/* TODO: extract to i18n */}
-        {planContext && (
+        {ragPlan && (
+          <aside className="lg:col-span-1 space-y-3">
+            <div className="flex items-center gap-2">
+              <SparklesIcon className="h-5 w-5 text-primary-600 dark:text-primary-400" />
+              <span className="text-xs uppercase tracking-wide font-semibold text-primary-700 dark:text-primary-300">
+                Tu plan elegido
+              </span>
+            </div>
+            <RagPlanCard plan={ragPlan} showCta={false} />
+            <p className="p-3 rounded-lg bg-secondary-50 dark:bg-secondary-900 text-xs text-secondary-600 dark:text-secondary-400">
+              Al crear tu cuenta podrás hacer seguimiento de tu solicitud desde tu panel.
+            </p>
+            <Link
+              href={RAG_PLANS_PATH}
+              className="block text-xs text-center text-primary-600 dark:text-primary-400 hover:underline"
+            >
+              Cambiar de plan
+            </Link>
+          </aside>
+        )}
+        {!ragPlan && planContext && (
           <aside className="lg:col-span-1">
             <Card variant="bordered" className="sticky top-6 border-primary-200 dark:border-primary-800 bg-gradient-to-br from-primary-50 to-white dark:from-primary-950 dark:to-secondary-950">
               <CardContent className="p-6">
@@ -491,7 +511,7 @@ function RegisterPageInner() {
                   Al crear tu cuenta podrás configurar este plan, integrar tus APIs y empezar a usarlo en minutos.
                 </div>
                 <Link
-                  href="/pricing"
+                  href="/services#planes-rag"
                   className="block mt-3 text-xs text-center text-primary-600 dark:text-primary-400 hover:underline"
                 >
                   Cambiar de plan

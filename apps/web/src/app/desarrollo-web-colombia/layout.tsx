@@ -1,33 +1,20 @@
 import { Metadata } from 'next';
 import { getBreadcrumbSchema } from '@/lib/seo-config';
+import { SITE_URL, absoluteUrl } from '@/lib/site';
+import { getChatbotsPageValues } from '@/lib/chatbots-page';
+
+// Precios del FAQ (chatbots y piloto RAG): los mismos de /chatbots-ia, desde rag-plans.ts.
+const chatbotPrice = getChatbotsPageValues('es');
 
 export const metadata: Metadata = {
-  title: 'Empresa de Desarrollo Web y Software a Medida | KopTup Colombia',
+  title: 'Desarrollo Web y Software a Medida en Colombia',
   description:
-    'Contrata a KopTup para desarrollar tu aplicación web, chatbot con IA, e-commerce o sistema empresarial. Empresa de desarrollo de software a medida con sede en Colombia, trabajamos con clientes en todo el mundo. +100 proyectos. Cotización gratis.',
-  keywords: [
-    'empresa de desarrollo de software colombia',
-    'desarrollo web colombia',
-    'contratar empresa desarrollo software',
-    'desarrollo web a medida colombia',
-    'empresa software bogotá',
-    'contratar desarrolladores web colombia',
-    'agencia desarrollo software colombia',
-    'desarrollo aplicaciones web colombia',
-    'software a medida colombia',
-    'empresa tecnología colombia',
-    'desarrollo software empresa',
-    'contratar desarrollo web',
-    'desarrollo de software a medida',
-    'empresa software latinoamerica',
-    'desarrollo web latinoamerica',
-    'offshore software development colombia',
-  ],
-  alternates: { canonical: 'https://koptup.com/desarrollo-web-colombia' },
+    'Contrata a KopTup para desarrollar tu aplicación web, chatbot con IA, e-commerce o sistema empresarial. Empresa de desarrollo de software a medida con sede en Colombia, trabajamos con clientes en todo el mundo. Cotización gratis.',
+  alternates: { canonical: absoluteUrl('/desarrollo-web-colombia') },
   openGraph: {
-    title: 'Empresa de Desarrollo Web a Medida | KopTup Colombia',
-    description: '+100 proyectos entregados. Aplicaciones web, chatbots IA, e-commerce y apps móviles. Trabajamos con clientes en todo el mundo. Cotización gratis.',
-    url: 'https://koptup.com/desarrollo-web-colombia',
+    title: 'Empresa de Desarrollo Web a Medida | KopTup',
+    description: 'Aplicaciones web, chatbots IA, e-commerce y apps móviles a medida. Trabajamos con clientes en todo el mundo. Cotización gratis.',
+    url: absoluteUrl('/desarrollo-web-colombia'),
     siteName: 'KopTup',
     images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Desarrollo Web Colombia - KopTup' }],
     locale: 'es_CO',
@@ -47,7 +34,7 @@ const serviceSchema = {
   name: 'KopTup - Desarrollo de Software a Medida',
   description:
     'Empresa de desarrollo de software a medida con sede en Bogotá, Colombia. Desarrollamos aplicaciones web, chatbots con IA, e-commerce, apps móviles, dashboards y sistemas empresariales para clientes en Colombia y todo el mundo.',
-  url: 'https://koptup.com',
+  url: SITE_URL,
   telephone: '+57-302-479-4842',
   address: {
     '@type': 'PostalAddress',
@@ -75,14 +62,8 @@ const serviceSchema = {
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Automatización con IA' } },
     ],
   },
-  priceRange: '$499 - $50,000 USD',
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '4.9',
-    reviewCount: '67',
-    bestRating: '5',
-    worstRating: '1',
-  },
+  // Mismo criterio que StructuredData: los precios publicados están en /services.
+  priceRange: '$$ - $$$$',
 };
 
 const faqSchema = {
@@ -94,7 +75,7 @@ const faqSchema = {
       name: '¿Cuánto cuesta contratar una empresa de desarrollo de software en Colombia?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En KopTup los proyectos parten desde $499 USD para soluciones básicas. Un proyecto web completo generalmente está entre $2,000 y $8,000 USD dependiendo de la complejidad. Ofrecemos cotización gratuita y sin compromiso.',
+        text: `Publicamos nuestros precios en www.koptup.com/services, en COP y con su referencia en USD (más IVA si aplica). Los sistemas RAG empiezan con un piloto de ${chatbotPrice.pilotFrom} y las demás soluciones a medida tienen precios por plan según su alcance. Ofrecemos cotización gratuita y sin compromiso.`,
       },
     },
     {
@@ -110,7 +91,7 @@ const faqSchema = {
       name: '¿KopTup puede desarrollar chatbots para WhatsApp?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. Integramos chatbots con la API oficial de WhatsApp Business usando GPT-4 o Claude AI. El chatbot puede atender clientes 24/7, capturar leads y transferir a agentes humanos. Desde $499 USD.',
+        text: `Sí. Integramos chatbots con la API oficial de WhatsApp Business usando GPT-4 o Claude AI. El chatbot puede atender clientes a cualquier hora, capturar leads y transferir a agentes humanos. Desde ${chatbotPrice.essentialFrom}, o piloto de ${chatbotPrice.pilotFrom} (más IVA si aplica).`,
       },
     },
     {

@@ -1,8 +1,8 @@
 {
   "offering_codeReviewIa": {
     "name": "Code review con IA",
-    "tagline": "Recibí comentarios automáticos en cada PR con sugerencias y bugs",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Code review con IA\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Recibe comentarios automáticos en cada PR con sugerencias y bugs",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Code review con IA\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "DevTools",
     "tiers": {
       "basico": {

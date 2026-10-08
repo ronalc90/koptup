@@ -487,8 +487,8 @@ El sistema incluye:
 
 ### 1. Dashboard
 ```
-🏥 Auditoría de Cuentas Médicas
-Sistema experto con IA para auditoría automática de facturas de salud
+🏥 Sistema experto para salud
+Auditoría de cuentas médicas: un motor de reglas revisa códigos CUPS y CIE-10 y tarifarios, y la IA extrae los datos de las facturas para señalar posibles glosas.
 
 📊 Estadísticas:
 ┌─────────────┬─────────────┬─────────────┬─────────────┐

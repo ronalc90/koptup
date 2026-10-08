@@ -14,24 +14,24 @@ import Card, { CardContent } from '@/components/ui/Card';
 const STEPS = [
   {
     id: 'choose',
-    title: 'Elegí',
-    description: 'Explorá nuestro catálogo de soluciones IA y servicios a medida.',
+    title: 'Elige',
+    description: 'Explora nuestro catálogo de soluciones IA y servicios a medida.',
     icon: Squares2X2Icon,
     href: '/services',
     cta: 'Ver catálogo',
   },
   {
     id: 'try',
-    title: 'Probá',
-    description: 'Probá las demos interactivas sin costo y sin tarjeta.',
+    title: 'Prueba',
+    description: 'Prueba las demos interactivas sin costo y sin tarjeta.',
     icon: PlayCircleIcon,
     href: '/demo',
     cta: 'Ir a las demos',
   },
   {
     id: 'quote',
-    title: 'Cotizá',
-    description: 'Pedí cotización personalizada o registrate para empezar ya.',
+    title: 'Cotiza',
+    description: 'Pide cotización personalizada o regístrate para empezar ya.',
     icon: ChatBubbleLeftRightIcon,
     href: '/contact',
     cta: 'Cotizar',
@@ -46,8 +46,8 @@ const STEPS = [
   },
   {
     id: 'use',
-    title: 'Usá',
-    description: 'Accedé a tu dashboard, métricas y soporte cuando quieras.',
+    title: 'Usa',
+    description: 'Accede a tu dashboard, métricas y soporte cuando quieras.',
     icon: ChartBarIcon,
     href: '/dashboard',
     cta: 'Mi dashboard',
@@ -63,7 +63,7 @@ export default function HowItWorks() {
             ¿Cómo funciona Koptup?
           </h2>
           <p className="text-sm text-secondary-600 dark:text-secondary-400">
-            En 5 pasos pasás de explorar a tener tu solución funcionando.
+            En 5 pasos pasas de explorar a tener tu solución funcionando.
           </p>
         </div>
 

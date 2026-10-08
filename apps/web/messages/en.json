@@ -16,27 +16,28 @@
     "success": "Success"
   },
   "hero": {
-    "title": "We turn your ideas into technology solutions",
-    "subtitle": "Custom software, e-commerce, AI chatbots and more to power your business",
-    "cta1": "View Plans",
-    "cta2": "Talk to us"
+    "badge": "RAG systems for businesses",
+    "title": "AI that answers with your company's documents",
+    "subtitle": "RAG systems with cited answers from your manuals, contracts and policies. Pilot with your documents in 2 weeks.",
+    "cta1": "Try the demo",
+    "cta2": "View plans"
   },
   "homePage": {
     "stats": {
-      "projects": "Projects completed",
-      "clients": "Satisfied clients",
-      "support": "Support",
-      "rating": "Average rating"
+      "liveDemo": "Real AI demo, no sign-up",
+      "citedAnswers": "Answers with cited sources",
+      "pilot": "Pilot in 2 weeks",
+      "team": "Team in Colombia"
     },
     "cta": {
       "title": "Ready to start your project?",
       "subtitle": "Tell us your goals and we'll design the best plan",
-      "button": "View Plans"
+      "button": "View plans"
     },
     "demos": {
       "sectionBadge": "Interactive Demos",
       "sectionTitle": "Solutions for Every Industry",
-      "sectionSubtitle": "Explore 27 navigable prototypes that showcase the range of solutions we build. Two of them (RAG chatbot and LinkedIn Ads generator) use live OpenAI; the rest are interactive mockups with simulated data so you can feel how each solution would look before hiring us to build it.",
+      "sectionSubtitle": "Explore {count} navigable prototypes that showcase the range of solutions we build. Two of them (RAG chatbot and LinkedIn Ads generator) use live OpenAI; the rest are interactive mockups with simulated data so you can feel how each solution would look before hiring us to build it.",
       "exploreDemo": "Explore demo →",
       "ecommerce": {
         "title": "Full E-Commerce",
@@ -44,9 +45,14 @@
         "category": "Retail & Sales"
       },
       "chatbot": {
-        "title": "Intelligent Chatbot",
-        "description": "AI-powered virtual assistant that answers questions, processes documents and learns from every interaction.",
-        "category": "Customer Support"
+        "title": "RAG Chatbot",
+        "description": "Ask the AI questions about documents and get answers that cite the source. Real AI, no sign-up.",
+        "category": "AI with your documents"
+      },
+      "medicalAudit": {
+        "title": "Healthcare expert system",
+        "description": "Audits medical claims with rules, CUPS and ICD-10 codes and fee schedules, and flags potential denials. AI extracts the invoice data.",
+        "category": "Medical claims auditing"
       },
       "dashboard": {
         "title": "Executive Dashboard",
@@ -293,7 +299,7 @@
       "title": "Privacy Policy",
       "subtitle": "How we collect, use and protect your personal information"
     },
-    "updatedBadge": "Updated: November 2025",
+    "updatedBadge": "Updated: October 2026",
     "heroClaim": "Your trust is our priority",
     "intro": {
       "title": "Introduction",
@@ -416,7 +422,7 @@
     },
     "s6": {
       "title": "6. Cookies and Similar Technologies",
-      "p1": "We use cookies and similar technologies to improve your experience, analyze the use of our services and personalize content. Cookies are small text files stored on your device.",
+      "p1": "We use cookies and similar technologies to improve your experience, analyze the use of our services, measure the results of our ads and personalize content. Analytics and marketing cookies (Google Analytics, Google Ads and LinkedIn) are only activated with consent. Cookies are small text files stored on your device.",
       "p2": "You can control the use of cookies through your browser settings. However, please note that disabling cookies may affect the functionality of our services.",
       "p3": "For more information, see our",
       "link": "Cookie Policy"
@@ -443,7 +449,7 @@
       "labelAddress": "Address:"
     },
     "footer": {
-      "updated": "Last updated: November 2025",
+      "updated": "Last updated: October 2026",
       "copyright": "© 2025 KopTup - Tech Solutions. All rights reserved."
     }
   },
@@ -610,12 +616,12 @@
       "title": "Cookie Policy",
       "subtitle": "Information about cookies and how we use them"
     },
-    "updatedBadge": "Updated: November 2025",
+    "updatedBadge": "Updated: October 2026",
     "heroClaim": "Transparent preferences controlled by you",
     "intro": {
       "title": "What are Cookies?",
       "p1": "Cookies are small text files stored on your device (computer, tablet or mobile) when you visit a website. Cookies allow the website to remember your actions and preferences over a period of time, so you don't have to re-enter them every time you return to the site or navigate from one page to another.",
-      "p2": "At KopTup we use cookies to improve your browsing experience, analyze the use of our site and personalize content. This policy explains what cookies we use and why."
+      "p2": "At KopTup we use cookies to improve your browsing experience, analyze the use of our site, measure the results of our ads and personalize content. This policy explains what cookies we use and why."
     },
     "types": {
       "title": "Types of Cookies We Use",
@@ -645,8 +651,8 @@
         },
         "ck4": {
           "purpose": "Store cookie preferences",
-          "duration": "1 year",
-          "type": "First party"
+          "duration": "Until deleted",
+          "type": "First party (local storage)"
         }
       },
       "ct2": {
@@ -677,14 +683,33 @@
           "type": "Third party (Google)"
         },
         "ck2": {
-          "purpose": "Google Analytics - Distinguish users",
-          "duration": "24 hours",
+          "purpose": "Google Analytics - Persist session state",
+          "duration": "2 years",
+          "type": "Third party (Google)"
+        }
+      },
+      "ct4": {
+        "title": "Marketing Cookies",
+        "description": "Cookies that measure the results of our ads on Google Ads and LinkedIn",
+        "ck1": {
+          "purpose": "Google Ads - Attribute conversions to ads",
+          "duration": "90 days",
+          "type": "Third party (Google)"
+        },
+        "ck2": {
+          "purpose": "Google Ads - Store the ad click that brought the visitor to the site",
+          "duration": "90 days",
           "type": "Third party (Google)"
         },
         "ck3": {
-          "purpose": "Google Analytics - Throttle request rate",
-          "duration": "1 minute",
-          "type": "Third party (Google)"
+          "purpose": "LinkedIn - Ad conversion tracking and retargeting",
+          "duration": "30 days",
+          "type": "Third party (LinkedIn)"
+        },
+        "ck4": {
+          "purpose": "LinkedIn - Identify the browser",
+          "duration": "1 year",
+          "type": "Third party (LinkedIn)"
         }
       }
     },
@@ -708,10 +733,13 @@
     },
     "thirdParty": {
       "title": "Third-Party Cookies",
-      "p1": "Some of our business partners use cookies on our site (e.g., Google Analytics). We have no access to or control over these cookies. This cookie policy covers the use of cookies by KopTup and not the use of cookies by third parties.",
-      "googleTitle": "Google Analytics",
-      "googleP1": "We use Google Analytics to analyze the use of our website. For more information on how Google uses data, visit",
-      "googleLink": "Google's policies"
+      "p1": "Some of our business partners use cookies on our site (e.g., Google Analytics, Google Ads and LinkedIn), which are only activated with consent. We have no access to or control over these cookies. This cookie policy covers the use of cookies by KopTup and not the use of cookies by third parties.",
+      "googleTitle": "Google Analytics and Google Ads",
+      "googleP1": "We use Google Analytics to analyze the use of our website and Google Ads to measure the results of our ads. For more information on how Google uses data, visit",
+      "googleLink": "Google's policies",
+      "linkedinTitle": "LinkedIn Insight Tag",
+      "linkedinP1": "We use the LinkedIn Insight Tag to measure the results of our LinkedIn campaigns. More information in the",
+      "linkedinLink": "LinkedIn cookie policy"
     },
     "updates": {
       "title": "Updates to this Policy",
@@ -725,11 +753,19 @@
       "labelPhone": "Phone:"
     },
     "footer": {
-      "updated": "Last updated: November 2025",
+      "updated": "Last updated: October 2026",
       "copyright": "© 2025 KopTup - Tech Solutions. All rights reserved.",
       "linkPrivacy": "Privacy Policy",
       "linkTerms": "Terms & Conditions"
     }
+  },
+  "cookieBanner": {
+    "ariaLabel": "Cookie notice",
+    "title": "We use cookies",
+    "text": "We use essential cookies to make the site work. If you accept, we also use analytics and marketing cookies to understand how the site is used and to measure our ads.",
+    "settings": "Cookie settings",
+    "reject": "Reject",
+    "accept": "Accept"
   },
   "notFoundPage": {
     "badge": "Page not found",
@@ -741,6 +777,7 @@
   "footer": {
     "description": "We build innovative technology solutions that transform businesses.",
     "services": "Services",
+    "rag": "RAG systems",
     "company": "Company",
     "legal": "Legal",
     "privacy": "Privacy",
@@ -750,6 +787,7 @@
   },
   "nav": {
     "home": "Home",
+    "rag": "RAG",
     "services": "Plans & services",
     "demos": "Demos",
     "solutions": "Solutions",
@@ -1138,7 +1176,7 @@
       "title": "Intelligent Chatbot",
       "description": "Create and customize your AI virtual assistant",
       "features": {
-        "0": "Document training",
+        "0": "Try your own document",
         "1": "Contextual answers",
         "2": "Conversation analytics",
         "3": "Web/app integration"
@@ -1593,6 +1631,7 @@
       }
     },
     "services": {
+      "rag": "RAG system",
       "ecommerce": "E-Commerce",
       "chatbot": "AI Chatbot",
       "webDev": "Web Development",
@@ -1601,6 +1640,13 @@
       "uxui": "UX/UI Design",
       "consulting": "Consulting",
       "other": "Other"
+    },
+    "quote": {
+      "label": "You are requesting a quote for",
+      "prefilled": "Pre-filled request",
+      "plan": "{plan} plan",
+      "message": "Hi, I would like a quote for {service}.",
+      "messageWithPlan": "Hi, I would like a quote for {service} ({plan} plan)."
     },
     "budgetRanges": {
       "1": "Less than $1,000",
@@ -2528,139 +2574,20 @@
     "justNow": "Just now",
     "copy": "(copy)"
   },
-  "chatbotsPage": {
-    "badge": "AI-Powered Chatbots for Business",
-    "hero": {
-      "title": "AI Chatbots for Businesses in Latin America",
-      "subtitle": "Automate customer service, sales and technical support with intelligent chatbots available 24/7. Integration with WhatsApp Business, websites and mobile apps.",
-      "cta1": "Try Free Demo",
-      "cta2": "Request Quote"
-    },
-    "stats": {
-      "s1v": "80%",
-      "s1l": "Faster response times",
-      "s2v": "24/7",
-      "s2l": "Non-stop service",
-      "s3v": "3x",
-      "s3l": "More qualified leads",
-      "s4v": "60%",
-      "s4l": "Less support workload"
-    },
-    "why": {
-      "title": "Why Implement an AI Chatbot?",
-      "subtitle": "Intelligent chatbots transform how your business interacts with customers, generates sales and manages support."
-    },
-    "b1t": "24/7 Service at No Extra Cost",
-    "b1d": "Your chatbot attends customers at any hour without extra salaries or holidays. Never miss a sale.",
-    "b2t": "WhatsApp Business Integration",
-    "b2d": "Connect your chatbot directly to the official WhatsApp Business API — the most used channel in Latin America.",
-    "b3t": "Instant and Accurate Responses",
-    "b3d": "Eliminate wait times. Your chatbot responds in milliseconds with up-to-date business information.",
-    "b4t": "Learns and Improves Automatically",
-    "b4d": "The AI learns from every conversation and continuously improves its responses.",
-    "b5t": "Captures and Qualifies Leads",
-    "b5d": "Automatically captures prospect data and qualifies them before passing to your sales team.",
-    "b6t": "Integrates with Your Systems",
-    "b6d": "We connect the chatbot to your CRM, inventory system or any API you already use.",
-    "useCasesTitle": "Chatbots by Industry",
-    "useCasesSubtitle": "Chatbot solutions tailored to each business sector",
-    "u1t": "E-commerce and Retail",
-    "u1d": "Product queries, order tracking, personalized recommendations and automated after-sales support.",
-    "u2t": "Healthcare and Clinics",
-    "u2d": "Appointment scheduling, schedule queries, doctor info and 24/7 patient follow-up.",
-    "u3t": "Financial Services",
-    "u3d": "Balance queries, loan simulators, complaint handling and financial product guidance.",
-    "u4t": "Education",
-    "u4d": "Program info, enrollment process, academic support and continuous student assistance.",
-    "u5t": "Real Estate",
-    "u5d": "Property presentation, visit scheduling and qualification of potential buyers.",
-    "u6t": "Restaurants and Hospitality",
-    "u6d": "Table reservations, delivery orders, interactive menus and loyalty programs.",
-    "processTitle": "How Do We Implement Your Chatbot?",
-    "processSubtitle": "Simple and fast process. Your chatbot running in 2-4 weeks.",
-    "p1t": "1. Analysis",
-    "p1d": "We understand your business, customers and use cases the chatbot must solve.",
-    "p2t": "2. Design",
-    "p2d": "We design conversation flows, bot personality and knowledge base.",
-    "p3t": "3. Development",
-    "p3d": "We build the AI chatbot and integrate your existing channels and systems.",
-    "p4t": "4. Launch",
-    "p4d": "We deploy, run live tests and train you to manage the chatbot.",
-    "faqTitle": "Frequently Asked Questions about AI Chatbots",
-    "q1q": "How much does it cost to implement an AI chatbot?",
-    "q1a": "Our chatbots start at $499 USD for basic solutions up to custom enterprise projects. Price includes design, development, integration and support. Request a free no-commitment quote.",
-    "q2q": "How quickly can I have my chatbot running?",
-    "q2a": "A basic chatbot can be running in 1-2 weeks. More complex projects with multiple integrations take 3-4 weeks.",
-    "q3q": "Can the chatbot integrate with WhatsApp?",
-    "q3a": "Yes. We integrate with the official WhatsApp Business API. Your chatbot can handle thousands of simultaneous WhatsApp conversations.",
-    "q4q": "What AI technology do you use?",
-    "q4a": "We use the most advanced models: GPT-4 from OpenAI and Claude from Anthropic — guaranteeing natural, precise responses in Spanish and English.",
-    "q5q": "Can the chatbot sell products?",
-    "q5a": "Yes. We build sales chatbots that show catalogs, make recommendations, process orders and connect with payment gateways.",
-    "q6q": "What happens when the chatbot can't answer?",
-    "q6a": "We configure intelligent escalation: when the chatbot can't resolve a query, it transfers the conversation to a human agent with the full context.",
-    "ctaTitle": "Ready to Implement Your AI Chatbot?",
-    "ctaSubtitle": "Try our free demo with no registration or credit card required.",
-    "ctaButton": "Try Free Demo"
-  },
-  "aiSolutionsPage": {
-    "badge": "Artificial Intelligence Solutions",
-    "hero": {
-      "title": "AI Solutions to Transform Your Business",
-      "subtitle": "We implement artificial intelligence in your business: chatbots, process automation, predictive analytics and expert systems. Accessible AI for companies in Colombia and Latin America.",
-      "cta1": "See AI Demos",
-      "cta2": "Talk to an Expert"
-    },
-    "solutionsTitle": "Our AI Solutions",
-    "solutionsSubtitle": "From conversational chatbots to expert decision-making systems",
-    "s1t": "Conversational Chatbots",
-    "s1d": "AI virtual assistants that serve customers 24/7 via WhatsApp, web and mobile apps.",
-    "s2t": "AI Process Automation",
-    "s2d": "AI that automates repetitive tasks, reduces errors and frees your team for strategic work.",
-    "s3t": "Predictive Analytics",
-    "s3d": "Algorithms that analyze your data and predict trends, demand and customer behavior.",
-    "s4t": "Intelligent Document Processing",
-    "s4d": "AI that reads, extracts and processes information from invoices, contracts and documents automatically.",
-    "s5t": "Expert Systems",
-    "s5d": "AI that makes complex decisions based on business rules and historical data.",
-    "s6t": "AI Content Generation",
-    "s6d": "AI that creates emails, reports, product descriptions and personalized marketing content.",
-    "whyTitle": "Why Adopt AI in Your Business?",
-    "w1t": "Reduce Operating Costs up to 60%",
-    "w1d": "AI automates processes that previously required entire teams, significantly reducing costs.",
-    "w2t": "Scale Without Hiring More Staff",
-    "w2d": "Your AI handles thousands of simultaneous requests without increasing your payroll.",
-    "w3t": "Smarter Business Decisions",
-    "w3d": "Real-time data analysis for better business decisions.",
-    "w4t": "Real Competitive Advantage",
-    "w4d": "Companies that adopt AI today will lead their industry in the coming years.",
-    "ctaTitle": "Implement AI in Your Business Today",
-    "ctaSubtitle": "Schedule a free consultation. We'll show you which AI solutions apply to your specific business.",
-    "ctaButton": "Schedule Free Consultation"
-  },
   "devWebPage": {
     "badge": "Custom Software Development Colombia",
     "hero": {
       "title": "Custom Web Development & Software Company in Colombia",
-      "subtitle": "Hire KopTup to develop your web application, chatbot, e-commerce or enterprise system. Over 100 projects delivered in Colombia and Latin America. Free quote.",
+      "subtitle": "Hire KopTup to develop your web application, chatbot, e-commerce or enterprise system. Free quote.",
       "cta1": "Request Free Quote",
       "cta2": "View Demos"
     },
-    "statsTitle": "Numbers that back our experience",
-    "s1v": "+100",
-    "s1l": "Projects delivered",
-    "s2v": "+50",
-    "s2l": "Client companies",
-    "s3v": "6+",
-    "s3l": "Years of experience",
-    "s4v": "98%",
-    "s4l": "Client satisfaction",
     "servicesTitle": "What can we develop for your business?",
     "servicesSubtitle": "Complete technology solutions, from design to deployment",
     "sv1t": "Custom Web Applications",
     "sv1d": "Enterprise systems, management portals, CRMs, ERPs and any web application your business needs. Modern stack with React and Node.js.",
     "sv2t": "AI-Powered Chatbots",
-    "sv2d": "Intelligent chatbots with WhatsApp Business, GPT-4 and Claude AI. 24/7 support, lead capture, automated sales. From $499 USD.",
+    "sv2d": "Intelligent chatbots with WhatsApp Business, GPT-4 and Claude AI that answer at any hour, with lead capture and automated sales. From {essentialFrom}, or a {pilotFrom} pilot (plus VAT where applicable).",
     "sv3t": "E-commerce Stores",
     "sv3d": "Professional online sales platforms with shopping cart, inventory management and payment gateways.",
     "sv4t": "Mobile Applications",
@@ -2691,17 +2618,17 @@
     "techSubtitle": "Modern, proven and scalable stack",
     "faqTitle": "Frequently Asked Questions",
     "q1q": "How much does it cost to hire a software development company in Colombia?",
-    "q1a": "At KopTup projects start from $499 USD for basic solutions. A full web project is generally between $2,000 and $8,000 USD depending on complexity. We offer a free, no-commitment quote to evaluate your specific case.",
+    "q1a": "We publish our prices at www.koptup.com/services, in COP with a USD reference (plus VAT where applicable). RAG systems start with a {pilotFrom} pilot, and our other custom solutions are priced per plan according to scope. We offer a free, no-commitment quote to evaluate your specific case.",
     "q2q": "How long does it take to develop a web application?",
     "q2a": "It depends on the scope. An MVP (initial functional version) can be ready in 4-8 weeks. A complex system with multiple modules can take 3-6 months. In the initial analysis we define exact timelines.",
     "q3q": "Can KopTup develop chatbots for WhatsApp?",
-    "q3a": "Yes. It's one of our flagship services. We integrate chatbots with the official WhatsApp Business API using GPT-4 or Claude AI. The chatbot can serve customers 24/7, capture leads, process orders and transfer to human agents. From $499 USD.",
+    "q3a": "Yes. It's one of our flagship services. We integrate chatbots with the official WhatsApp Business API using GPT-4 or Claude AI. The chatbot can serve customers at any hour, capture leads, process orders and transfer to human agents. From {essentialFrom}, or a {pilotFrom} pilot (plus VAT where applicable).",
     "q4q": "Do you work with companies throughout Colombia or only in Bogotá?",
     "q4a": "We work with companies throughout Colombia and Latin America 100% remotely. We have clients in Bogotá, Medellín, Cali, Barranquilla, Bucaramanga and in countries like Mexico, Argentina and Chile.",
     "q5q": "Do you offer maintenance after delivering the project?",
     "q5a": "Yes. We offer monthly maintenance and support plans. We also evolve the product according to your business needs. We don't leave you alone after launch.",
     "q6q": "Can I see examples of KopTup's work?",
-    "q6a": "Yes. We have 27 navigable prototypes at koptup.com/demo — two of them (RAG chatbot and LinkedIn Ads generator) use live OpenAI; the rest are interactive mockups with simulated data so you can see how each solution would look before hiring us. No registration or credit card needed.",
+    "q6a": "Yes. We have {count} navigable prototypes at www.koptup.com/demo — two of them (RAG chatbot and LinkedIn Ads generator) use live OpenAI; the rest are interactive mockups with simulated data so you can see how each solution would look before hiring us. No registration or credit card needed.",
     "ctaTitle": "Ready to develop your project?",
     "ctaSubtitle": "Tell us what you need. We respond within 24 hours with a personalized proposal.",
     "ctaButton": "Request Free Quote"

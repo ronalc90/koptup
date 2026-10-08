@@ -1,34 +1,40 @@
-# robots.txt para KopTup - Desarrollo de Software a Medida
-# https://koptup.com/robots.txt
+# robots.txt para KopTup
+# https://www.koptup.com/robots.txt
+#
+# Ojo: cada rastreador obedece SOLO el grupo de User-agent más específico que
+# lo nombra. Por eso Bingbot repite las reglas Disallow del grupo general (si
+# no, podría rastrear /dashboard, /admin, etc.). Googlebot usa el grupo
+# general: no necesita grupo propio (además ignora Crawl-delay).
 
 User-agent: *
 Allow: /
-Allow: /demo/*
-Allow: /services
-Allow: /pricing
-Allow: /contact
-Allow: /about
-Allow: /privacy
-Allow: /terms
-Allow: /cookies
-Disallow: /dashboard/*
-Disallow: /admin/*
-Disallow: /api/*
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
 Disallow: /login
 Disallow: /register
-Disallow: /auth/*
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /auth/
 Disallow: /test
-Disallow: /liquidacion/*
+Disallow: /liquidacion
 Disallow: /*?*sessionId=*
 Disallow: /*?*token=*
 
-# Permitir rastreadores principales
-User-agent: Googlebot
-Allow: /
-Crawl-delay: 2
-
 User-agent: Bingbot
 Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /auth/
+Disallow: /test
+Disallow: /liquidacion
+Disallow: /*?*sessionId=*
+Disallow: /*?*token=*
 Crawl-delay: 5
 
 # Bloquear bots no deseados
@@ -50,5 +56,5 @@ Disallow: /
 User-agent: CCBot
 Disallow: /
 
-# Sitemap (host canónico, sin www)
-Sitemap: https://koptup.com/sitemap.xml
+# Sitemap (dominio canónico, con www)
+Sitemap: https://www.koptup.com/sitemap.xml

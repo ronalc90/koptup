@@ -1,7 +1,27 @@
 /**
  * Structured Data Component for SEO
  * Implements Schema.org JSON-LD markup for better search engine understanding
+ *
+ * Regla: no publicar cifras que no podamos respaldar (ratings, reseñas,
+ * número de clientes). Por eso no hay `aggregateRating`.
  */
+
+import { DEMO_COUNT } from '@/lib/demos';
+import { RAG_PLANS, formatRagCOP, formatRagUSD, getRagPlan } from '@/lib/rag-plans';
+import { HOME_DESCRIPTION, SITE_URL, absoluteUrl } from '@/lib/site';
+
+// Precios de los planes RAG (src/lib/rag-plans.ts) que citan el JSON-LD.
+const RAG_PILOT = getRagPlan('piloto');
+const RAG_ESSENTIAL = getRagPlan('esencial');
+const RAG_LOWEST_COP = Math.min(...RAG_PLANS.map((p) => p.setup.cop));
+const RAG_PRICE_ANSWER = [
+  `Los sistemas RAG empiezan con un piloto de ${RAG_PILOT.weeks.max} semanas por ${formatRagCOP(RAG_PILOT.setup.cop)} (${formatRagUSD(RAG_PILOT.setup.usd)}).`,
+  `El plan Esencial cuesta ${formatRagCOP(RAG_ESSENTIAL.setup.cop)} de setup${
+    RAG_ESSENTIAL.monthly ? ` más ${formatRagCOP(RAG_ESSENTIAL.monthly.cop)} al mes` : ''
+  }; todos los precios son más IVA si aplica.`,
+  `Las demás soluciones a medida tienen precios de referencia en COP en ${absoluteUrl('/services')} y el valor final depende del alcance.`,
+  'Contáctanos para recibir una cotización sin compromiso.',
+].join(' ');
 
 interface StructuredDataProps {
   type: 'organization' | 'website' | 'service' | 'article' | 'softwareApplication' | 'localBusiness';
@@ -14,10 +34,10 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
     '@type': 'Organization',
     name: 'KopTup',
     alternateName: 'KopTup Soluciones Tecnológicas',
-    url: 'https://koptup.com',
+    url: SITE_URL,
     logo: {
       '@type': 'ImageObject',
-      url: 'https://koptup.com/og-image.png',
+      url: absoluteUrl('/og-image.png'),
       width: 1200,
       height: 630,
     },
@@ -43,7 +63,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
       {
         '@type': 'ContactPoint',
         contactType: 'customer support',
-        url: 'https://koptup.com/contact',
+        url: absoluteUrl('/contact'),
         availableLanguage: ['Spanish', 'English'],
       },
     ],
@@ -85,20 +105,13 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
       '@type': 'OfferCatalog',
       name: 'Servicios de Desarrollo de Software',
       itemListElement: [
-        { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Chatbots con IA para empresas', url: 'https://koptup.com/chatbots-ia' } },
-        { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Soluciones de Inteligencia Artificial', url: 'https://koptup.com/soluciones-ia' } },
-        { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Desarrollo web a medida', url: 'https://koptup.com/desarrollo-web-colombia' } },
+        { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Chatbots RAG para WhatsApp y web', url: absoluteUrl('/chatbots-ia') } },
+        { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Soluciones de Inteligencia Artificial', url: absoluteUrl('/soluciones-ia') } },
+        { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Desarrollo web a medida', url: absoluteUrl('/desarrollo-web-colombia') } },
         { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'E-commerce profesional' } },
         { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Aplicaciones móviles iOS y Android' } },
         { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Consultoría tecnológica' } },
       ],
-    },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.9',
-      reviewCount: '67',
-      bestRating: '5',
-      worstRating: '1',
     },
   });
 
@@ -106,51 +119,37 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'KopTup',
-    url: 'https://koptup.com',
-    description:
-      'Desarrollo de software a medida para empresas. Prueba nuestras demos interactivas: e-commerce, chatbots IA, dashboards, gestión documental y más.',
+    url: SITE_URL,
+    description: HOME_DESCRIPTION,
     inLanguage: 'es-CO',
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: {
-        '@type': 'EntryPoint',
-        urlTemplate: 'https://koptup.com/search?q={search_term_string}',
-      },
-      'query-input': 'required name=search_term_string',
-    },
   });
 
   const getSoftwareApplicationSchema = () => ({
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'KopTup - Software a Medida',
+    // Es el producto de la home (sistemas RAG): nombre, descripción y
+    // funciones coinciden con los planes cuyo precio se publica en `offers`.
+    name: 'KopTup - Sistemas RAG para empresas',
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
+    // Planes RAG de /services#planes-rag (sin highPrice: Empresarial es "desde").
     offers: {
       '@type': 'AggregateOffer',
-      lowPrice: '500',
-      highPrice: '50000',
-      priceCurrency: 'USD',
-      offerCount: '3',
+      lowPrice: String(RAG_LOWEST_COP),
+      priceCurrency: 'COP',
+      offerCount: String(RAG_PLANS.length),
+      url: absoluteUrl('/services#planes-rag'),
     },
-    description:
-      'Plataforma de desarrollo de software empresarial a medida. E-commerce, chatbots con IA, dashboards, gestión documental, sistemas de reservas y más.',
+    description: HOME_DESCRIPTION,
     featureList: [
-      'E-commerce completo con pasarela de pagos',
-      'Chatbots inteligentes con IA',
-      'Dashboards ejecutivos con KPIs en tiempo real',
-      'Gestión documental con búsqueda avanzada',
-      'Sistemas de reservas online',
-      'CMS y gestión de contenido',
-      'Control de proyectos y tareas',
-      'Integraciones con APIs externas',
+      'Respuestas basadas en los documentos de tu empresa',
+      'Cita la fuente de cada respuesta',
+      'Dice "no encontré esa información" cuando la respuesta no está en tus documentos',
+      'Fuentes: Google Drive, SharePoint o carga manual',
+      'Widget web y WhatsApp',
+      'Permisos por rol y panel de métricas',
+      'Despliegue en la nube del cliente u on-premise',
     ],
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      ratingCount: '50',
-      bestRating: '5',
-    },
   });
 
   const getServiceSchema = () => ({
@@ -220,15 +219,15 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
   const getLocalBusinessSchema = () => ({
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
-    '@id': 'https://koptup.com/#localbusiness',
+    '@id': `${SITE_URL}/#localbusiness`,
     name: 'KopTup - Soluciones Tecnológicas',
     description:
       'Empresa de desarrollo de software a medida en Bogotá, Colombia. E-commerce, chatbots con IA, dashboards, aplicaciones móviles y soluciones tecnológicas personalizadas.',
-    url: 'https://koptup.com',
+    url: SITE_URL,
     telephone: '+57-302-479-4842',
     email: 'ronald@koptup.com',
-    image: 'https://koptup.com/og-image.png',
-    logo: 'https://koptup.com/logo.svg',
+    image: absoluteUrl('/og-image.png'),
+    logo: absoluteUrl('/logo.svg'),
     priceRange: '$$ - $$$$',
     currenciesAccepted: 'COP, USD',
     paymentAccepted: 'Transferencia bancaria, tarjeta de crédito',
@@ -254,13 +253,6 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
       },
     ],
     sameAs: ['https://www.linkedin.com/company/koptup'],
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      ratingCount: '50',
-      bestRating: '5',
-      worstRating: '1',
-    },
     hasMap: 'https://maps.google.com/?q=Av.+68+%231-63,+Bogotá,+Colombia',
     areaServed: [
       { '@type': 'Country', name: 'Colombia' },
@@ -318,7 +310,7 @@ export function FAQStructuredData() {
         name: '¿Puedo probar el software antes de contratar?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Sí. Ofrecemos 27 prototipos navegables del tipo de soluciones que construimos. Dos de ellos (chatbot RAG y generador de LinkedIn Ads) usan OpenAI real; el resto son mockups interactivos con datos simulados para que veas el flujo y la UX antes de contratarnos.',
+          text: `Sí. Ofrecemos ${DEMO_COUNT} prototipos navegables del tipo de soluciones que construimos. Dos de ellos (chatbot RAG y generador de LinkedIn Ads) usan OpenAI real; el resto son mockups interactivos con datos simulados para que veas el flujo y la UX antes de contratarnos.`,
         },
       },
       {
@@ -326,7 +318,7 @@ export function FAQStructuredData() {
         name: '¿Cuánto cuesta desarrollar software a medida con KopTup?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Ofrecemos planes desde $499 USD para proyectos básicos hasta soluciones enterprise personalizadas. El costo final depende de la complejidad, funcionalidades y alcance del proyecto. Contacta con nosotros para recibir una cotización personalizada sin compromiso.',
+          text: RAG_PRICE_ANSWER,
         },
       },
       {

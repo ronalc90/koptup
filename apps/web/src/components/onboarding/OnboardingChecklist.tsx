@@ -29,7 +29,7 @@ interface OnboardingChecklistProps {
 export default function OnboardingChecklist({
   steps,
   title = 'Tus primeros pasos en Koptup',
-  subtitle = 'Completá estos 3 pasos para sacarle el máximo provecho a tu cuenta.',
+  subtitle = 'Completa estos 3 pasos para sacarle el máximo provecho a tu cuenta.',
   storageKey = 'koptup.onboarding.dismissed',
   onDismiss,
 }: OnboardingChecklistProps) {
@@ -174,7 +174,7 @@ export default function OnboardingChecklist({
           <div className="mt-4 p-3 rounded-lg bg-green-100 dark:bg-green-950 border border-green-200 dark:border-green-900 text-center">
             <CheckCircleIcon className="h-6 w-6 text-green-600 dark:text-green-400 mx-auto mb-1" />
             <p className="text-sm font-semibold text-green-800 dark:text-green-300">
-              ¡Listo! Ya tenés todo configurado.
+              ¡Listo! Ya tienes todo configurado.
             </p>
           </div>
         )}

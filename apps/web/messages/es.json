@@ -16,27 +16,28 @@
     "success": "Éxito"
   },
   "hero": {
-    "title": "Transformamos tus ideas en soluciones tecnológicas",
-    "subtitle": "Software a medida, e-commerce, chatbots con IA y más para impulsar tu negocio",
-    "cta1": "Ver Planes",
-    "cta2": "Hablar con nosotros"
+    "badge": "Sistemas RAG para empresas",
+    "title": "IA que responde con los documentos de tu empresa",
+    "subtitle": "Sistemas RAG con respuestas citadas sobre tus manuales, contratos y políticas. Piloto con tus documentos en 2 semanas.",
+    "cta1": "Probar la demo",
+    "cta2": "Ver planes"
   },
   "homePage": {
     "stats": {
-      "projects": "Proyectos completados",
-      "clients": "Clientes satisfechos",
-      "support": "Soporte",
-      "rating": "Calificación promedio"
+      "liveDemo": "Demo con IA real, sin registro",
+      "citedAnswers": "Respuestas con fuente citada",
+      "pilot": "Piloto en 2 semanas",
+      "team": "Equipo en Colombia"
     },
     "cta": {
       "title": "¿Listo para iniciar tu proyecto?",
       "subtitle": "Cuéntanos tus objetivos y diseñamos el mejor plan",
-      "button": "Ver Planes"
+      "button": "Ver planes"
     },
     "demos": {
       "sectionBadge": "Demos Interactivas",
       "sectionTitle": "Soluciones para Cada Industria",
-      "sectionSubtitle": "Explora 27 prototipos navegables que muestran el rango de soluciones que construimos. Dos de ellos (chatbot RAG y generador de LinkedIn Ads) usan OpenAI real; el resto son mockups interactivos con datos simulados para que sientas cómo se vería cada solución antes de contratarnos.",
+      "sectionSubtitle": "Explora {count} prototipos navegables que muestran el rango de soluciones que construimos. Dos de ellos (chatbot RAG y generador de LinkedIn Ads) usan OpenAI real; el resto son mockups interactivos con datos simulados para que sientas cómo se vería cada solución antes de contratarnos.",
       "exploreDemo": "Explorar demo →",
       "ecommerce": {
         "title": "E-Commerce Completo",
@@ -44,9 +45,14 @@
         "category": "Retail & Ventas"
       },
       "chatbot": {
-        "title": "Chatbot Inteligente",
-        "description": "Asistente virtual con IA que responde preguntas, procesa documentos y aprende de cada interacción.",
-        "category": "Atención al Cliente"
+        "title": "Chatbot RAG",
+        "description": "Hazle preguntas a la IA sobre documentos y recibe respuestas con la fuente citada. IA real, sin registro.",
+        "category": "IA con tus documentos"
+      },
+      "medicalAudit": {
+        "title": "Sistema experto para salud",
+        "description": "Audita cuentas médicas con reglas, códigos CUPS y CIE-10 y tarifarios, y señala posibles glosas. La IA extrae los datos de las facturas.",
+        "category": "Auditoría de cuentas médicas"
       },
       "dashboard": {
         "title": "Dashboard Ejecutivo",
@@ -293,7 +299,7 @@
       "title": "Política de Privacidad",
       "subtitle": "Cómo recopilamos, usamos y protegemos tu información personal"
     },
-    "updatedBadge": "Actualizado: Noviembre 2025",
+    "updatedBadge": "Actualizado: Octubre 2026",
     "heroClaim": "Su confianza es nuestra prioridad",
     "intro": {
       "title": "Introducción",
@@ -416,7 +422,7 @@
     },
     "s6": {
       "title": "6. Cookies y Tecnologías Similares",
-      "p1": "Utilizamos cookies y tecnologías similares para mejorar su experiencia, analizar el uso de nuestros servicios y personalizar el contenido. Las cookies son pequeños archivos de texto que se almacenan en su dispositivo.",
+      "p1": "Utilizamos cookies y tecnologías similares para mejorar su experiencia, analizar el uso de nuestros servicios, medir los resultados de nuestros anuncios y personalizar el contenido. Las cookies de analítica y de marketing (Google Analytics, Google Ads y LinkedIn) solo se activan con consentimiento. Las cookies son pequeños archivos de texto que se almacenan en su dispositivo.",
       "p2": "Puede controlar el uso de cookies a través de la configuración de su navegador. Sin embargo, tenga en cuenta que deshabilitar las cookies puede afectar la funcionalidad de nuestros servicios.",
       "p3": "Para más información, consulte nuestra",
       "link": "Política de Cookies"
@@ -443,7 +449,7 @@
       "labelAddress": "Dirección:"
     },
     "footer": {
-      "updated": "Última actualización: Noviembre 2025",
+      "updated": "Última actualización: Octubre 2026",
       "copyright": "© 2025 KopTup - Soluciones Tecnológicas. Todos los derechos reservados."
     }
   },
@@ -610,12 +616,12 @@
       "title": "Política de Cookies",
       "subtitle": "Información sobre las cookies y cómo las usamos"
     },
-    "updatedBadge": "Actualizado: Noviembre 2025",
+    "updatedBadge": "Actualizado: Octubre 2026",
     "heroClaim": "Preferencias transparentes y controladas por ti",
     "intro": {
       "title": "¿Qué son las Cookies?",
       "p1": "Las cookies son pequeños archivos de texto que se almacenan en su dispositivo (computadora, tablet o móvil) cuando visita un sitio web. Las cookies permiten que el sitio web recuerde sus acciones y preferencias durante un período de tiempo, para que no tenga que volver a configurarlas cada vez que regrese al sitio o navegue de una página a otra.",
-      "p2": "En KopTup utilizamos cookies para mejorar su experiencia de navegación, analizar el uso de nuestro sitio y personalizar el contenido. Esta política explica qué cookies utilizamos y por qué."
+      "p2": "En KopTup utilizamos cookies para mejorar su experiencia de navegación, analizar el uso de nuestro sitio, medir los resultados de nuestros anuncios y personalizar el contenido. Esta política explica qué cookies utilizamos y por qué."
     },
     "types": {
       "title": "Tipos de Cookies que Utilizamos",
@@ -645,8 +651,8 @@
         },
         "ck4": {
           "purpose": "Almacenar preferencias de cookies",
-          "duration": "1 año",
-          "type": "Primera parte"
+          "duration": "Hasta que se borre",
+          "type": "Primera parte (almacenamiento local)"
         }
       },
       "ct2": {
@@ -677,14 +683,33 @@
           "type": "Terceros (Google)"
         },
         "ck2": {
-          "purpose": "Google Analytics - Distinguir usuarios",
-          "duration": "24 horas",
+          "purpose": "Google Analytics - Mantener el estado de la sesión",
+          "duration": "2 años",
+          "type": "Terceros (Google)"
+        }
+      },
+      "ct4": {
+        "title": "Cookies de Marketing",
+        "description": "Cookies que miden los resultados de nuestros anuncios en Google Ads y LinkedIn",
+        "ck1": {
+          "purpose": "Google Ads - Atribuir conversiones a los anuncios",
+          "duration": "90 días",
+          "type": "Terceros (Google)"
+        },
+        "ck2": {
+          "purpose": "Google Ads - Guardar el clic en el anuncio con el que se llegó al sitio",
+          "duration": "90 días",
           "type": "Terceros (Google)"
         },
         "ck3": {
-          "purpose": "Google Analytics - Limitar tasa de solicitudes",
-          "duration": "1 minuto",
-          "type": "Terceros (Google)"
+          "purpose": "LinkedIn - Atribuir conversiones y remarketing de anuncios",
+          "duration": "30 días",
+          "type": "Terceros (LinkedIn)"
+        },
+        "ck4": {
+          "purpose": "LinkedIn - Identificar el navegador",
+          "duration": "1 año",
+          "type": "Terceros (LinkedIn)"
         }
       }
     },
@@ -708,10 +733,13 @@
     },
     "thirdParty": {
       "title": "Cookies de Terceros",
-      "p1": "Algunos de nuestros socios comerciales utilizan cookies en nuestro sitio (por ejemplo, Google Analytics). No tenemos acceso ni control sobre estas cookies. Esta política de cookies cubre el uso de cookies por parte de KopTup y no el uso de cookies por parte de terceros.",
-      "googleTitle": "Google Analytics",
-      "googleP1": "Utilizamos Google Analytics para analizar el uso de nuestro sitio web. Para más información sobre cómo Google utiliza los datos, visite",
-      "googleLink": "políticas de Google"
+      "p1": "Algunos de nuestros socios comerciales utilizan cookies en nuestro sitio (por ejemplo, Google Analytics, Google Ads y LinkedIn), que solo se activan con consentimiento. No tenemos acceso ni control sobre estas cookies. Esta política de cookies cubre el uso de cookies por parte de KopTup y no el uso de cookies por parte de terceros.",
+      "googleTitle": "Google Analytics y Google Ads",
+      "googleP1": "Utilizamos Google Analytics para analizar el uso de nuestro sitio web y Google Ads para medir los resultados de nuestros anuncios. Para más información sobre cómo Google utiliza los datos, visite",
+      "googleLink": "políticas de Google",
+      "linkedinTitle": "LinkedIn Insight Tag",
+      "linkedinP1": "Utilizamos LinkedIn Insight Tag para medir los resultados de nuestras campañas en LinkedIn. Más información en la",
+      "linkedinLink": "política de cookies de LinkedIn"
     },
     "updates": {
       "title": "Actualizaciones de esta Política",
@@ -725,11 +753,19 @@
       "labelPhone": "Teléfono:"
     },
     "footer": {
-      "updated": "Última actualización: Noviembre 2025",
+      "updated": "Última actualización: Octubre 2026",
       "copyright": "© 2025 KopTup - Soluciones Tecnológicas. Todos los derechos reservados.",
       "linkPrivacy": "Política de Privacidad",
       "linkTerms": "Términos y Condiciones"
     }
+  },
+  "cookieBanner": {
+    "ariaLabel": "Aviso de cookies",
+    "title": "Usamos cookies",
+    "text": "Usamos cookies esenciales para que el sitio funcione. Si aceptas, también usamos cookies de analítica y de marketing para entender cómo se usa el sitio y medir nuestros anuncios.",
+    "settings": "Configurar cookies",
+    "reject": "Rechazar",
+    "accept": "Aceptar"
   },
   "notFoundPage": {
     "badge": "Página no encontrada",
@@ -741,6 +777,7 @@
   "footer": {
     "description": "Desarrollamos soluciones tecnológicas innovadoras que transforman negocios.",
     "services": "Servicios",
+    "rag": "Sistemas RAG",
     "company": "Empresa",
     "legal": "Legal",
     "privacy": "Privacidad",
@@ -750,6 +787,7 @@
   },
   "nav": {
     "home": "Inicio",
+    "rag": "RAG",
     "services": "Planes y servicios",
     "demos": "Demos",
     "solutions": "Soluciones",
@@ -1138,7 +1176,7 @@
       "title": "Chatbot Inteligente",
       "description": "Crea y personaliza tu asistente virtual con IA",
       "features": {
-        "0": "Entrenamiento con documentos",
+        "0": "Prueba con tu documento",
         "1": "Respuestas contextuales",
         "2": "Analítica de conversaciones",
         "3": "Integración con web/app"
@@ -1593,6 +1631,7 @@
       }
     },
     "services": {
+      "rag": "Sistema RAG",
       "ecommerce": "E-Commerce",
       "chatbot": "Chatbot con IA",
       "webDev": "Desarrollo Web",
@@ -1601,6 +1640,13 @@
       "uxui": "Diseño UX/UI",
       "consulting": "Consultoría",
       "other": "Otro"
+    },
+    "quote": {
+      "label": "Estás cotizando",
+      "prefilled": "Solicitud pre-llenada",
+      "plan": "Plan {plan}",
+      "message": "Hola, me interesa cotizar {service}.",
+      "messageWithPlan": "Hola, me interesa cotizar {service} (plan {plan})."
     },
     "budgetRanges": {
       "1": "Menos de $1,000",
@@ -2528,139 +2574,20 @@
     "justNow": "Justo ahora",
     "copy": "(copia)"
   },
-  "chatbotsPage": {
-    "badge": "Chatbots con Inteligencia Artificial",
-    "hero": {
-      "title": "Chatbots con IA para Empresas en Colombia",
-      "subtitle": "Automatiza la atención al cliente, ventas y soporte técnico con chatbots inteligentes disponibles 24/7. Integración con WhatsApp Business, sitio web y apps móviles.",
-      "cta1": "Ver Demo Gratis",
-      "cta2": "Solicitar Cotización"
-    },
-    "stats": {
-      "s1v": "80%",
-      "s1l": "Reducción en tiempos de respuesta",
-      "s2v": "24/7",
-      "s2l": "Atención sin interrupciones",
-      "s3v": "3x",
-      "s3l": "Más leads calificados",
-      "s4v": "60%",
-      "s4l": "Menos carga en soporte"
-    },
-    "why": {
-      "title": "¿Por qué implementar un Chatbot con IA?",
-      "subtitle": "Los chatbots inteligentes transforman la manera en que tu empresa interactúa con clientes, genera ventas y gestiona el soporte."
-    },
-    "b1t": "Atención 24/7 Sin Costo Adicional",
-    "b1d": "Tu chatbot atiende clientes a cualquier hora sin salarios adicionales ni días festivos. Nunca pierdas una venta.",
-    "b2t": "Integración con WhatsApp Business",
-    "b2d": "Conecta tu chatbot directamente a WhatsApp Business API, el canal más usado en Colombia y Latinoamérica.",
-    "b3t": "Respuestas Instantáneas y Precisas",
-    "b3d": "Elimina los tiempos de espera. Tu chatbot responde en milisegundos con información actualizada de tu negocio.",
-    "b4t": "Aprende y Mejora Solo",
-    "b4d": "La IA aprende de cada conversación y mejora sus respuestas continuamente.",
-    "b5t": "Captura y Cualifica Leads",
-    "b5d": "Captura datos de prospectos automáticamente y los cualifica antes de pasarlos a tu equipo de ventas.",
-    "b6t": "Integración con tus Sistemas",
-    "b6d": "Conectamos el chatbot con tu CRM, sistema de inventario o cualquier API que ya uses.",
-    "useCasesTitle": "Chatbots por Industria",
-    "useCasesSubtitle": "Soluciones de chatbot adaptadas a cada sector empresarial",
-    "u1t": "E-commerce y Retail",
-    "u1d": "Consulta de productos, seguimiento de pedidos, recomendaciones personalizadas y soporte postventa automatizado.",
-    "u2t": "Salud y Clínicas",
-    "u2d": "Agendamiento de citas, consulta de horarios, información de médicos y seguimiento de pacientes 24/7.",
-    "u3t": "Servicios Financieros",
-    "u3d": "Consulta de saldos, simuladores de crédito, atención de PQR y orientación de productos financieros.",
-    "u4t": "Educación",
-    "u4d": "Información de programas, proceso de matrícula, respuesta a dudas académicas y soporte continuo.",
-    "u5t": "Inmobiliario",
-    "u5d": "Presentación de propiedades, agendamiento de visitas y cualificación de compradores potenciales.",
-    "u6t": "Restaurantes y Hostelería",
-    "u6d": "Reservas de mesas, pedidos a domicilio, menú interactivo y programas de fidelización.",
-    "processTitle": "¿Cómo Implementamos tu Chatbot?",
-    "processSubtitle": "Proceso simple y rápido. Tu chatbot funcionando en 2-4 semanas.",
-    "p1t": "1. Análisis",
-    "p1d": "Entendemos tu negocio, clientes y casos de uso que el chatbot debe resolver.",
-    "p2t": "2. Diseño",
-    "p2d": "Diseñamos los flujos de conversación, personalidad del bot y base de conocimiento.",
-    "p3t": "3. Desarrollo",
-    "p3d": "Implementamos el chatbot con IA e integramos tus canales y sistemas existentes.",
-    "p4t": "4. Lanzamiento",
-    "p4d": "Desplegamos, hacemos pruebas en vivo y te capacitamos para gestionar el chatbot.",
-    "faqTitle": "Preguntas Frecuentes sobre Chatbots con IA",
-    "q1q": "¿Cuánto cuesta implementar un chatbot con IA?",
-    "q1a": "Nuestros chatbots van desde $499 USD para soluciones básicas hasta proyectos enterprise personalizados. El precio incluye diseño, desarrollo, integración y soporte. Solicita una cotización gratuita sin compromiso.",
-    "q2q": "¿En cuánto tiempo tengo mi chatbot funcionando?",
-    "q2a": "Un chatbot básico puede estar funcionando en 1-2 semanas. Proyectos más complejos con múltiples integraciones toman 3-4 semanas.",
-    "q3q": "¿El chatbot puede integrarse con WhatsApp?",
-    "q3a": "Sí. Integramos con WhatsApp Business API oficial. Tu chatbot puede atender miles de conversaciones simultáneas por WhatsApp sin límites.",
-    "q4q": "¿Qué tecnología de IA usan para los chatbots?",
-    "q4a": "Utilizamos GPT-4 de OpenAI y Claude de Anthropic — los modelos más avanzados del mercado. Garantizamos respuestas naturales y precisas en español e inglés.",
-    "q5q": "¿El chatbot puede vender productos?",
-    "q5a": "Sí. Desarrollamos chatbots de ventas que muestran catálogos, hacen recomendaciones, procesan pedidos y conectan con pasarelas de pago.",
-    "q6q": "¿Qué pasa si el chatbot no sabe responder?",
-    "q6a": "Configuramos escalamiento inteligente: cuando el chatbot no puede resolver la consulta, transfiere la conversación a un agente humano con todo el contexto.",
-    "ctaTitle": "¿Listo para Implementar tu Chatbot con IA?",
-    "ctaSubtitle": "Prueba nuestra demo gratuita sin registro ni tarjeta de crédito.",
-    "ctaButton": "Probar Demo Gratis"
-  },
-  "aiSolutionsPage": {
-    "badge": "Soluciones de Inteligencia Artificial",
-    "hero": {
-      "title": "Soluciones de IA para Transformar tu Empresa",
-      "subtitle": "Implementamos inteligencia artificial en tu negocio: chatbots, automatización de procesos, análisis predictivo y sistemas expertos. IA accesible para empresas en Colombia y Latinoamérica.",
-      "cta1": "Ver Demos de IA",
-      "cta2": "Hablar con un Experto"
-    },
-    "solutionsTitle": "Nuestras Soluciones de IA",
-    "solutionsSubtitle": "Desde chatbots conversacionales hasta sistemas expertos de toma de decisiones",
-    "s1t": "Chatbots Conversacionales",
-    "s1d": "Asistentes virtuales con IA que atienden clientes 24/7 por WhatsApp, web y apps móviles.",
-    "s2t": "Automatización de Procesos con IA",
-    "s2d": "IA que automatiza tareas repetitivas, reduce errores y libera a tu equipo para trabajo estratégico.",
-    "s3t": "Análisis Predictivo",
-    "s3d": "Algoritmos que analizan tus datos y predicen tendencias, demanda y comportamiento de clientes.",
-    "s4t": "Procesamiento Inteligente de Documentos",
-    "s4d": "IA que lee, extrae y procesa información de facturas, contratos y documentos automáticamente.",
-    "s5t": "Sistemas Expertos",
-    "s5d": "IA que toma decisiones complejas basándose en reglas de negocio y datos históricos.",
-    "s6t": "Generación de Contenido con IA",
-    "s6d": "IA que crea emails, reportes, descripciones de productos y contenido de marketing personalizado.",
-    "whyTitle": "¿Por qué Adoptar IA en tu Empresa?",
-    "w1t": "Reduce Costos Operativos hasta 60%",
-    "w1d": "La IA automatiza procesos que antes requerían equipos completos, reduciendo costos significativamente.",
-    "w2t": "Escala sin Contratar Más Personal",
-    "w2d": "Tu IA atiende miles de solicitudes simultáneas sin aumentar tu nómina.",
-    "w3t": "Decisiones más Inteligentes",
-    "w3d": "Datos analizados en tiempo real para tomar mejores decisiones de negocio.",
-    "w4t": "Ventaja Competitiva Real",
-    "w4d": "Las empresas que adoptan IA hoy liderarán su industria en los próximos años.",
-    "ctaTitle": "Implementa IA en tu Empresa Hoy",
-    "ctaSubtitle": "Agenda una consultoría gratuita. Te mostramos qué soluciones de IA aplican a tu negocio específico.",
-    "ctaButton": "Agendar Consultoría Gratis"
-  },
   "devWebPage": {
     "badge": "Desarrollo Web Colombia",
     "hero": {
       "title": "Empresa de Desarrollo Web y Software a Medida en Colombia",
-      "subtitle": "Contrata a KopTup para desarrollar tu aplicación web, chatbot, e-commerce o sistema empresarial. Más de 100 proyectos entregados en Colombia y Latinoamérica. Cotización gratis.",
+      "subtitle": "Contrata a KopTup para desarrollar tu aplicación web, chatbot, e-commerce o sistema empresarial. Cotización gratis.",
       "cta1": "Solicitar Cotización Gratis",
       "cta2": "Ver Demos"
     },
-    "statsTitle": "Números que respaldan nuestra experiencia",
-    "s1v": "+100",
-    "s1l": "Proyectos entregados",
-    "s2v": "+50",
-    "s2l": "Empresas clientes",
-    "s3v": "6+",
-    "s3l": "Años de experiencia",
-    "s4v": "98%",
-    "s4l": "Satisfacción de clientes",
     "servicesTitle": "¿Qué podemos desarrollar para tu empresa?",
     "servicesSubtitle": "Soluciones tecnológicas completas, desde el diseño hasta el despliegue",
     "sv1t": "Aplicaciones Web a Medida",
     "sv1d": "Sistemas empresariales, portales de gestión, CRMs, ERPs y cualquier aplicación web que necesite tu negocio. Stack moderno con React y Node.js.",
     "sv2t": "Chatbots con Inteligencia Artificial",
-    "sv2d": "Chatbots inteligentes con WhatsApp Business, GPT-4 y Claude AI. Atención 24/7, captura de leads, ventas automatizadas. Desde $499 USD.",
+    "sv2d": "Chatbots inteligentes con WhatsApp Business, GPT-4 y Claude AI que responden a cualquier hora, con captura de leads y ventas automatizadas. Desde {essentialFrom}, o piloto de {pilotFrom} (más IVA si aplica).",
     "sv3t": "Tiendas Online (E-commerce)",
     "sv3d": "Plataformas de venta online profesionales con carrito de compras, gestión de inventario y pasarelas de pago colombianas (PSE, Nequi, Bancolombia).",
     "sv4t": "Aplicaciones Móviles",
@@ -2691,17 +2618,17 @@
     "techSubtitle": "Stack moderno, probado y escalable",
     "faqTitle": "Preguntas frecuentes",
     "q1q": "¿Cuánto cuesta contratar una empresa de desarrollo de software en Colombia?",
-    "q1a": "En KopTup los proyectos parten desde $499 USD para soluciones básicas. Un proyecto web completo generalmente está entre $2,000 y $8,000 USD dependiendo de la complejidad. Ofrecemos cotización gratuita y sin compromiso para evaluar tu caso específico.",
+    "q1a": "Publicamos nuestros precios en www.koptup.com/services, en COP y con su referencia en USD (más IVA si aplica). Los sistemas RAG empiezan con un piloto de {pilotFrom} y las demás soluciones a medida tienen precios por plan según su alcance. Ofrecemos cotización gratuita y sin compromiso para evaluar tu caso específico.",
     "q2q": "¿Cuánto tiempo toma desarrollar una aplicación web?",
     "q2a": "Depende del alcance. Un MVP (versión inicial funcional) puede estar listo en 4-8 semanas. Un sistema complejo con múltiples módulos puede tomar 3-6 meses. En el análisis inicial definimos tiempos exactos.",
     "q3q": "¿KopTup puede desarrollar chatbots para WhatsApp?",
-    "q3a": "Sí. Es uno de nuestros servicios estrella. Integramos chatbots con la API oficial de WhatsApp Business usando GPT-4 o Claude AI. El chatbot puede atender clientes 24/7, capturar leads, procesar pedidos y transferir a agentes humanos. Desde $499 USD.",
+    "q3a": "Sí. Es uno de nuestros servicios estrella. Integramos chatbots con la API oficial de WhatsApp Business usando GPT-4 o Claude AI. El chatbot puede atender clientes a cualquier hora, capturar leads, procesar pedidos y transferir a agentes humanos. Desde {essentialFrom}, o piloto de {pilotFrom} (más IVA si aplica).",
     "q4q": "¿Trabajan con empresas de toda Colombia o solo de Bogotá?",
     "q4a": "Trabajamos con empresas de toda Colombia y Latinoamérica de forma 100% remota. Tenemos clientes en Bogotá, Medellín, Cali, Barranquilla, Bucaramanga y en países como México, Argentina y Chile.",
     "q5q": "¿Ofrecen mantenimiento después de entregar el proyecto?",
     "q5a": "Sí. Ofrecemos planes de mantenimiento y soporte mensual. También evolucionamos el producto según las necesidades de tu negocio. No te dejamos solo después del lanzamiento.",
     "q6q": "¿Puedo ver ejemplos del trabajo de KopTup?",
-    "q6a": "Sí. Tenemos 27 prototipos navegables en koptup.com/demo — dos de ellos (chatbot RAG y generador de LinkedIn Ads) usan OpenAI real; el resto son mockups interactivos con datos simulados para que veas cómo se vería cada solución antes de contratarnos. Sin registro ni tarjeta de crédito.",
+    "q6a": "Sí. Tenemos {count} prototipos navegables en www.koptup.com/demo — dos de ellos (chatbot RAG y generador de LinkedIn Ads) usan OpenAI real; el resto son mockups interactivos con datos simulados para que veas cómo se vería cada solución antes de contratarnos. Sin registro ni tarjeta de crédito.",
     "ctaTitle": "¿Listo para desarrollar tu proyecto?",
     "ctaSubtitle": "Cuéntanos qué necesitas. Respondemos en menos de 24 horas con una propuesta personalizada.",
     "ctaButton": "Solicitar Cotización Gratis"
@@ -2733,7 +2660,7 @@
     },
     "views": {
       "title": "Vistas disponibles",
-      "subtitle": "Elegí la mejor vista según el contexto de tu equipo",
+      "subtitle": "Elige la mejor vista según el contexto de tu equipo",
       "kanban": "Kanban",
       "gantt": "Gantt",
       "timeline": "Timeline",
@@ -2898,7 +2825,7 @@
     },
     "integrations": {
       "title": "Integraciones",
-      "subtitle": "Conectá tu stack en segundos",
+      "subtitle": "Conecta tu stack en segundos",
       "github": "GitHub",
       "githubDesc": "Auto-link de commits y PRs",
       "gitlab": "GitLab",
@@ -2942,7 +2869,7 @@
     },
     "templates": {
       "title": "Marketplace de plantillas",
-      "subtitle": "Empezá tu próximo proyecto en minutos",
+      "subtitle": "Empieza tu próximo proyecto en minutos",
       "tpl1": "Lanzamiento de producto",
       "tpl1Desc": "Roadmap, marketing, GTM",
       "tpl2": "Sprint Scrum",
@@ -2959,7 +2886,7 @@
       "fromScratch": "Empezar en blanco",
       "fromScratchDesc": "Crear un proyecto vacío",
       "useTemplates": "Usar una plantilla",
-      "chooseTemplate": "Elegí una plantilla para arrancar"
+      "chooseTemplate": "Elige una plantilla para arrancar"
     },
     "shell": {
       "aiInsights": "AI Insights",

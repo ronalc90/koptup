@@ -1,10 +1,13 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import Card, { CardContent } from '@/components/ui/Card';
+import HomeHighlights from '@/components/home/HomeHighlights';
+import { DEMO_COUNT } from '@/lib/demos';
+import { getChatbotsPageValues } from '@/lib/chatbots-page';
 import {
   CodeBracketIcon,
   ChatBubbleBottomCenterTextIcon,
@@ -20,10 +23,13 @@ import {
 
 export default function DesarrolloWebColombiaPage() {
   const t = useTranslations('devWebPage');
+  const locale = useLocale();
+  // Precios (sv2d, q3a y el piloto de q1a): los mismos de /chatbots-ia, desde rag-plans.ts.
+  const chatbotPrice = getChatbotsPageValues(locale);
 
   const services = [
     { icon: CodeBracketIcon, title: t('sv1t'), desc: t('sv1d') },
-    { icon: ChatBubbleBottomCenterTextIcon, title: t('sv2t'), desc: t('sv2d') },
+    { icon: ChatBubbleBottomCenterTextIcon, title: t('sv2t'), desc: t('sv2d', chatbotPrice) },
     { icon: ShoppingCartIcon, title: t('sv3t'), desc: t('sv3d') },
     { icon: DevicePhoneMobileIcon, title: t('sv4t'), desc: t('sv4d') },
     { icon: ChartBarIcon, title: t('sv5t'), desc: t('sv5d') },
@@ -45,12 +51,12 @@ export default function DesarrolloWebColombiaPage() {
   ];
 
   const faqs = [
-    { q: t('q1q'), a: t('q1a') },
+    { q: t('q1q'), a: t('q1a', chatbotPrice) },
     { q: t('q2q'), a: t('q2a') },
-    { q: t('q3q'), a: t('q3a') },
+    { q: t('q3q'), a: t('q3a', chatbotPrice) },
     { q: t('q4q'), a: t('q4a') },
     { q: t('q5q'), a: t('q5a') },
-    { q: t('q6q'), a: t('q6a') },
+    { q: t('q6q'), a: t('q6a', { count: DEMO_COUNT }) },
   ];
 
   const techStack = [
@@ -94,22 +100,10 @@ export default function DesarrolloWebColombiaPage() {
         </div>
       </section>
 
-      {/* Stats */}
+      {/* Datos verificables (sin cifras de proyectos, clientes ni satisfacción) */}
       <section className="bg-white dark:bg-secondary-950 border-b border-secondary-200 dark:border-secondary-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {[
-              { v: t('s1v'), l: t('s1l') },
-              { v: t('s2v'), l: t('s2l') },
-              { v: t('s3v'), l: t('s3l') },
-              { v: t('s4v'), l: t('s4l') },
-            ].map((s, i) => (
-              <div key={i}>
-                <div className="text-4xl md:text-5xl font-bold text-primary-600 dark:text-primary-400 mb-2">{s.v}</div>
-                <div className="text-sm md:text-base text-secondary-600 dark:text-secondary-400">{s.l}</div>
-              </div>
-            ))}
-          </div>
+          <HomeHighlights />
         </div>
       </section>
 
@@ -249,7 +243,7 @@ export default function DesarrolloWebColombiaPage() {
               <Link href="/contact">{t('ctaButton')}</Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/50 text-white hover:bg-white/10" asChild>
-              <Link href="/pricing">{useTranslations('common')('requestQuote')}</Link>
+              <Link href="/services#planes-rag">{useTranslations('common')('requestQuote')}</Link>
             </Button>
           </div>
         </div>

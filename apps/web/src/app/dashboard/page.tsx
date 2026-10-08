@@ -126,7 +126,7 @@ function DashboardPageInner() {
                     ¡Bienvenido a Koptup, {firstName}!
                   </h2>
                   <p className="text-secondary-700 dark:text-secondary-300">
-                    Tu cuenta está lista. Empezá completando los 3 pasos de abajo para sacarle el máximo provecho.
+                    Tu cuenta está lista. Empieza completando los 3 pasos de abajo para sacarle el máximo provecho.
                     {planFromQuery && (
                       <>
                         {' '}Tu plan elegido fue{' '}
@@ -151,9 +151,9 @@ function DashboardPageInner() {
               Hola, {firstName}
             </h1>
             <p className="text-secondary-600 dark:text-secondary-400">
-              {clientType === 'plan' && 'Tu suscripción SaaS está activa. Acá tenés el resumen.'}
-              {clientType === 'service' && 'Estamos construyendo tu solución a medida. Mirá el progreso.'}
-              {clientType === 'empty' && 'Todavía no contrataste nada. Explorá lo que podemos hacer por vos.'}
+              {clientType === 'plan' && 'Tu suscripción SaaS está activa. Acá tienes el resumen.'}
+              {clientType === 'service' && 'Estamos construyendo tu solución a medida. Mira el progreso.'}
+              {clientType === 'empty' && 'Todavía no contrataste nada. Explora lo que podemos hacer por ti.'}
             </p>
           </div>
           {/* Vista demo switcher (solo informativo, no afecta DB) */}
@@ -219,7 +219,7 @@ function PlanView({ welcome, planSlug }: { welcome: boolean; planSlug: string | 
   const steps: OnboardingStep[] = [
     {
       id: 'profile',
-      title: 'Completá tu perfil empresarial',
+      title: 'Completa tu perfil empresarial',
       description: 'NIT, razón social, datos de contacto y facturación.',
       done: false,
       href: '/dashboard/profile',
@@ -227,7 +227,7 @@ function PlanView({ welcome, planSlug }: { welcome: boolean; planSlug: string | 
     },
     {
       id: 'integrations',
-      title: 'Conectá tus integraciones',
+      title: 'Conecta tus integraciones',
       description: 'API keys de los servicios externos que paga tu empresa (OpenAI, Twilio, etc.).',
       done: false,
       href: '/dashboard/settings',
@@ -235,7 +235,7 @@ function PlanView({ welcome, planSlug }: { welcome: boolean; planSlug: string | 
     },
     {
       id: 'first-flow',
-      title: 'Subí tu primer documento al chatbot',
+      title: 'Sube tu primer documento al chatbot',
       description: 'PDFs, manuales o FAQs para alimentar el RAG.',
       done: false,
       href: '/dashboard/deliverables',
@@ -439,7 +439,7 @@ function ServiceView({ welcome }: { welcome: boolean }) {
   const steps: OnboardingStep[] = [
     {
       id: 'profile',
-      title: 'Completá los datos de tu empresa',
+      title: 'Completa los datos de tu empresa',
       description: 'Necesitamos NIT y datos de facturación para los próximos pagos.',
       done: false,
       href: '/dashboard/profile',
@@ -447,8 +447,8 @@ function ServiceView({ welcome }: { welcome: boolean }) {
     },
     {
       id: 'integrations',
-      title: 'Compartí accesos a sistemas externos',
-      description: 'CRM, base de datos, APIs que paga tu empresa. Las cifrá en /settings.',
+      title: 'Comparte accesos a sistemas externos',
+      description: 'CRM, base de datos, APIs que paga tu empresa. Cífralas en /settings.',
       done: false,
       href: '/dashboard/settings',
       ctaLabel: 'Cargar',
@@ -609,7 +609,7 @@ function ServiceView({ welcome }: { welcome: boolean }) {
                 </>
               ) : (
                 <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-3">
-                  No tenés mensajes pendientes.
+                  No tienes mensajes pendientes.
                 </p>
               )}
               <Button size="sm" variant="outline" fullWidth asChild>
@@ -670,7 +670,7 @@ function EmptyView({ welcome }: { welcome: boolean }) {
       name: 'Chatbot RAG con IA',
       tier: 'profesional',
       price: 489000,
-      desc: 'Atendé a tus clientes 24/7 con un chatbot que entiende tus documentos.',
+      desc: 'Atiende a tus clientes 24/7 con un chatbot que entiende tus documentos.',
       cta: '/contact?service=chatbot-rag-ia&plan=profesional',
     },
     {
@@ -678,7 +678,7 @@ function EmptyView({ welcome }: { welcome: boolean }) {
       name: 'Agente IA de Ventas',
       tier: 'growth',
       price: 1290000,
-      desc: 'Calificá leads automáticamente y agendá reuniones en tu calendario.',
+      desc: 'Califica leads automáticamente y agenda reuniones en tu calendario.',
       cta: '/contact?service=agente-ia-ventas&plan=growth',
     },
     {
@@ -694,15 +694,15 @@ function EmptyView({ welcome }: { welcome: boolean }) {
   const steps: OnboardingStep[] = [
     {
       id: 'explore',
-      title: 'Explorá las demos',
-      description: 'Probá nuestras soluciones IA sin compromiso ni tarjeta.',
+      title: 'Explora las demos',
+      description: 'Prueba nuestras soluciones IA sin compromiso ni tarjeta.',
       done: welcome ? false : false,
       href: '/demo',
       ctaLabel: 'Ir a demos',
     },
     {
       id: 'choose',
-      title: 'Elegí un plan o servicio',
+      title: 'Elige un plan o servicio',
       description: 'Catálogo completo con precios en COP claros.',
       done: false,
       href: '/services',
@@ -710,7 +710,7 @@ function EmptyView({ welcome }: { welcome: boolean }) {
     },
     {
       id: 'contact',
-      title: 'Hablá con un asesor',
+      title: 'Habla con un asesor',
       description: '15 minutos gratis para resolver tus dudas técnicas.',
       done: false,
       href: '/contact',
@@ -720,17 +720,17 @@ function EmptyView({ welcome }: { welcome: boolean }) {
 
   return (
     <div className="space-y-6">
-      <OnboardingChecklist steps={steps} title="Empezá a explorar Koptup" />
+      <OnboardingChecklist steps={steps} title="Empieza a explorar Koptup" />
 
       {/* CTA principal */}
       <Card variant="bordered" className="bg-gradient-to-r from-primary-600 to-primary-700 border-primary-700 text-white">
         <CardContent className="p-8 text-center">
           <PlayCircleIcon className="h-14 w-14 mx-auto mb-4 text-white/90" />
           <h2 className="text-2xl md:text-3xl font-bold mb-2">
-            Aún no tenés ningún plan activo
+            Aún no tienes ningún plan activo
           </h2>
           <p className="text-primary-100 mb-6 max-w-2xl mx-auto">
-            Probá nuestras demos en vivo o conversá con nuestro equipo para diseñar la solución perfecta para tu negocio.
+            Prueba nuestras demos en vivo o conversa con nuestro equipo para diseñar la solución perfecta para tu negocio.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
             <Button size="lg" variant="outline" asChild className="bg-white text-primary-700 border-white hover:bg-primary-50">
@@ -746,7 +746,7 @@ function EmptyView({ welcome }: { welcome: boolean }) {
       {/* Recomendaciones */}
       <Card variant="bordered">
         <CardHeader>
-          <CardTitle>Recomendado para vos</CardTitle>
+          <CardTitle>Recomendado para ti</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -846,7 +846,7 @@ function CommonCards() {
       <CommonCard
         icon={ChatBubbleLeftRightIcon}
         title="Mensajes"
-        description="Conversá con el equipo"
+        description="Conversa con el equipo"
         href="/dashboard/messages"
         color="purple"
       />

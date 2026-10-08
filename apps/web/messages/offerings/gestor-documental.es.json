@@ -1,8 +1,8 @@
 {
   "offering_gestorDocumental": {
     "name": "Gestor documental con IA",
-    "tagline": "Ordená, buscá y firmá tus documentos con OCR e indexado por IA",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Gestor documental con IA\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Ordena, busca y firma tus documentos con OCR e indexado por IA",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"Gestor documental con IA\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Datos",
     "tiers": {
       "basico": {

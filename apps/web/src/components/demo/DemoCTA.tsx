@@ -25,7 +25,7 @@ export default function DemoCTA({ demoName }: DemoCTAProps) {
             <Link href="/contact">{t('requestQuote')}</Link>
           </Button>
           <Button size="lg" variant="outline" className="text-white border-white/50 hover:bg-white/10" asChild>
-            <Link href="/pricing">{t('viewPricing')}</Link>
+            <Link href="/services#planes-rag">{t('viewPricing')}</Link>
           </Button>
         </div>
       </div>

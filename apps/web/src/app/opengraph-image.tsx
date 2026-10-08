@@ -1,7 +1,12 @@
 import { ImageResponse } from 'next/og';
+import { HOME_TITLE } from '@/lib/site';
 
+/**
+ * Imagen og/twitter de la home (archivo de metadata de Next para "/"). El
+ * layout raíz no declara openGraph/twitter images para que se use esta.
+ */
 export const runtime = 'edge';
-export const alt = 'KopTup - Desarrollo de Software a Medida';
+export const alt = HOME_TITLE;
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -26,8 +31,10 @@ export default async function Image() {
           style={{
             position: 'absolute',
             inset: 0,
+            // Satori (next/og) exige la dirección explícita en cada gradiente;
+            // sin ella la ruta /opengraph-image fallaba al renderizar.
             backgroundImage:
-              'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+              'linear-gradient(180deg, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
             backgroundSize: '40px 40px',
           }}
         />
@@ -82,7 +89,7 @@ export default async function Image() {
             maxWidth: '900px',
           }}
         >
-          Desarrollo de Software a Medida
+          IA que responde con los documentos de tu empresa
         </div>
 
         {/* Subtitle */}
@@ -92,10 +99,10 @@ export default async function Image() {
             color: '#93c5fd',
             textAlign: 'center',
             marginBottom: '40px',
-            maxWidth: '800px',
+            maxWidth: '1000px',
           }}
         >
-          E-commerce · Chatbots IA · Dashboards · Apps Móviles
+          Sistemas RAG · Respuestas con fuente citada · Piloto en 2 semanas
         </div>
 
         {/* CTA pill */}
@@ -112,7 +119,7 @@ export default async function Image() {
             gap: '8px',
           }}
         >
-          🚀 Prueba nuestras demos interactivas gratuitas
+          Prueba la demo gratis
         </div>
 
         {/* URL */}

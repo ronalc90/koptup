@@ -1,8 +1,8 @@
 {
   "offering_cmsHeadless": {
     "name": "CMS headless",
-    "tagline": "Gestioná tu contenido desde un panel y publicalo en cualquier frontend",
-    "description": "Implementación a medida o suscripción SaaS mensual del producto \"CMS headless\". Comprala como software (te entregamos el código) o pagá mensualmente mientras lo hospedamos por vos.",
+    "tagline": "Gestiona tu contenido desde un panel y publícalo en cualquier frontend",
+    "description": "Implementación a medida o suscripción SaaS mensual del producto \"CMS headless\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Engagement",
     "tiers": {
       "basico": {

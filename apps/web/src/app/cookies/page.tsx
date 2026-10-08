@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Badge from '@/components/ui/Badge';
 import Card, { CardContent } from '@/components/ui/Card';
@@ -13,13 +13,32 @@ import {
   ClockIcon,
   CheckCircleIcon,
   XCircleIcon,
+  MegaphoneIcon,
 } from '@heroicons/react/24/outline';
+import {
+  ACCEPT_ALL_CHOICE,
+  ESSENTIAL_ONLY_CHOICE,
+  readCookiePreferences,
+  saveCookiePreferences,
+  type CookieConsentChoice,
+} from '@/lib/cookie-consent';
+import { areTrackingTagsLoaded } from '@/lib/analytics';
 
 export default function CookiesPage() {
   const t = useTranslations('cookiesPage');
   const [essentialEnabled, setEssentialEnabled] = useState(true);
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
   const [functionalEnabled, setFunctionalEnabled] = useState(false);
+  const [marketingEnabled, setMarketingEnabled] = useState(false);
+
+  // Los interruptores muestran la elección ya guardada (banner o esta página).
+  useEffect(() => {
+    const saved = readCookiePreferences();
+    if (!saved) return;
+    setFunctionalEnabled(saved.functional);
+    setAnalyticsEnabled(saved.analytics);
+    setMarketingEnabled(saved.marketing);
+  }, []);
 
   const cookieTypes = [
     {
@@ -33,7 +52,7 @@ export default function CookiesPage() {
         { name: 'session_id', purpose: t('types.ct1.ck1.purpose'), duration: t('types.ct1.ck1.duration'), type: t('types.ct1.ck1.type') },
         { name: 'auth_token', purpose: t('types.ct1.ck2.purpose'), duration: t('types.ct1.ck2.duration'), type: t('types.ct1.ck2.type') },
         { name: 'csrf_token', purpose: t('types.ct1.ck3.purpose'), duration: t('types.ct1.ck3.duration'), type: t('types.ct1.ck3.type') },
-        { name: 'cookie_consent', purpose: t('types.ct1.ck4.purpose'), duration: t('types.ct1.ck4.duration'), type: t('types.ct1.ck4.type') },
+        { name: 'cookie_preferences', purpose: t('types.ct1.ck4.purpose'), duration: t('types.ct1.ck4.duration'), type: t('types.ct1.ck4.type') },
       ],
     },
     {
@@ -58,39 +77,58 @@ export default function CookiesPage() {
       setEnabled: setAnalyticsEnabled,
       cookies: [
         { name: '_ga', purpose: t('types.ct3.ck1.purpose'), duration: t('types.ct3.ck1.duration'), type: t('types.ct3.ck1.type') },
-        { name: '_gid', purpose: t('types.ct3.ck2.purpose'), duration: t('types.ct3.ck2.duration'), type: t('types.ct3.ck2.type') },
-        { name: '_gat', purpose: t('types.ct3.ck3.purpose'), duration: t('types.ct3.ck3.duration'), type: t('types.ct3.ck3.type') },
+        { name: '_ga_<ID>', purpose: t('types.ct3.ck2.purpose'), duration: t('types.ct3.ck2.duration'), type: t('types.ct3.ck2.type') },
+      ],
+    },
+    {
+      icon: MegaphoneIcon,
+      title: t('types.ct4.title'),
+      description: t('types.ct4.description'),
+      required: false,
+      enabled: marketingEnabled,
+      setEnabled: setMarketingEnabled,
+      cookies: [
+        { name: '_gcl_au', purpose: t('types.ct4.ck1.purpose'), duration: t('types.ct4.ck1.duration'), type: t('types.ct4.ck1.type') },
+        { name: '_gcl_aw', purpose: t('types.ct4.ck2.purpose'), duration: t('types.ct4.ck2.duration'), type: t('types.ct4.ck2.type') },
+        { name: 'li_fat_id', purpose: t('types.ct4.ck3.purpose'), duration: t('types.ct4.ck3.duration'), type: t('types.ct4.ck3.type') },
+        { name: 'bcookie', purpose: t('types.ct4.ck4.purpose'), duration: t('types.ct4.ck4.duration'), type: t('types.ct4.ck4.type') },
       ],
     },
   ];
 
+  /**
+   * Guarda la elección (emite `cookie-consent-changed`: las etiquetas aceptadas
+   * se cargan sin recargar) y confirma con el aviso de siempre. Si se retira
+   * un consentimiento y ya hay etiquetas cargadas, recarga la página para que
+   * ninguna siga activa.
+   */
+  const persist = (choice: CookieConsentChoice, message: string) => {
+    const before = readCookiePreferences();
+    setEssentialEnabled(true);
+    setFunctionalEnabled(choice.functional);
+    setAnalyticsEnabled(choice.analytics);
+    setMarketingEnabled(choice.marketing);
+    saveCookiePreferences(choice);
+    alert(message);
+    const revoked =
+      (before?.analytics === true && !choice.analytics) ||
+      (before?.marketing === true && !choice.marketing);
+    if (revoked && areTrackingTagsLoaded()) window.location.reload();
+  };
+
   const handleSavePreferences = () => {
-    const preferences = {
-      essential: essentialEnabled,
-      functional: functionalEnabled,
-      analytics: analyticsEnabled,
-      timestamp: new Date().toISOString(),
-    };
-    localStorage.setItem('cookie_preferences', JSON.stringify(preferences));
-    alert(t('preferences.alertSaved'));
+    persist(
+      { functional: functionalEnabled, analytics: analyticsEnabled, marketing: marketingEnabled },
+      t('preferences.alertSaved'),
+    );
   };
 
   const handleAcceptAll = () => {
-    setEssentialEnabled(true);
-    setFunctionalEnabled(true);
-    setAnalyticsEnabled(true);
-    const preferences = { essential: true, functional: true, analytics: true, timestamp: new Date().toISOString() };
-    localStorage.setItem('cookie_preferences', JSON.stringify(preferences));
-    alert(t('preferences.alertAccepted'));
+    persist(ACCEPT_ALL_CHOICE, t('preferences.alertAccepted'));
   };
 
   const handleRejectOptional = () => {
-    setEssentialEnabled(true);
-    setFunctionalEnabled(false);
-    setAnalyticsEnabled(false);
-    const preferences = { essential: true, functional: false, analytics: false, timestamp: new Date().toISOString() };
-    localStorage.setItem('cookie_preferences', JSON.stringify(preferences));
-    alert(t('preferences.alertEssential'));
+    persist(ESSENTIAL_ONLY_CHOICE, t('preferences.alertEssential'));
   };
 
   return (
@@ -185,6 +223,10 @@ export default function CookiesPage() {
                         {!type.required && (
                           <div className="flex items-center gap-2">
                             <button
+                              type="button"
+                              role="switch"
+                              aria-checked={type.enabled}
+                              aria-label={type.title}
                               onClick={() => type.setEnabled(!type.enabled)}
                               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                                 type.enabled
@@ -349,6 +391,17 @@ export default function CookiesPage() {
                     {t('thirdParty.googleP1')}{' '}
                     <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer" className="text-primary-600 dark:text-primary-400 hover:underline">
                       {t('thirdParty.googleLink')}
+                    </a>.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-secondary-900 dark:text-white mb-2">
+                    {t('thirdParty.linkedinTitle')}
+                  </h3>
+                  <p className="text-secondary-700 dark:text-secondary-300 text-sm">
+                    {t('thirdParty.linkedinP1')}{' '}
+                    <a href="https://www.linkedin.com/legal/cookie-policy" target="_blank" rel="noopener noreferrer" className="text-primary-600 dark:text-primary-400 hover:underline">
+                      {t('thirdParty.linkedinLink')}
                     </a>.
                   </p>
                 </div>

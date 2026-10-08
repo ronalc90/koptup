@@ -14,7 +14,6 @@ Se ha implementado un sistema **SEO profesional y completo** para KopTup, optimi
 - **Structured Data**: Organization, Website, SoftwareApplication, MedicalBusiness, FAQPage
 - **Nueva sección**: "Auditoría Médica y Gestión de Glosas con IA"
 - **4 servicios médicos destacados** con CTAs
-- **Beneficios con cifras**: "Reduce glosas hasta 80%"
 
 ### 2. SEO PARA 9 DEMOS ✅
 
@@ -223,7 +222,7 @@ koptup/
   description: 'Tu descripción de 150-160 caracteres',
   keywords: ['keyword1', 'keyword2', ...],
   ogImage: '/og-image-servicio.png',
-  canonical: 'https://koptup.com/demo/nuevo-servicio',
+  canonical: 'https://www.koptup.com/demo/nuevo-servicio',
 }
 ```
 
@@ -269,13 +268,13 @@ export default function Layout({ children }) {
 ### Verificar Implementación:
 ```bash
 # Sitemap
-curl https://koptup.com/sitemap.xml
+curl https://www.koptup.com/sitemap.xml
 
 # Robots
-curl https://koptup.com/robots.txt
+curl https://www.koptup.com/robots.txt
 
 # Metadata específica
-curl https://koptup.com/demo/cuentas-medicas | grep -A 5 "og:title"
+curl https://www.koptup.com/demo/cuentas-medicas | grep -A 5 "og:title"
 ```
 
 ### Testing SEO:

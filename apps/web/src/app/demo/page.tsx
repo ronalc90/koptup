@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Card, { CardContent } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
+import { DEMO_CATALOG_SLUGS } from '@/lib/demos';
 import {
   ChatBubbleLeftRightIcon,
   ShoppingCartIcon,
@@ -213,6 +214,17 @@ export default function DemosPage() {
       ],
     },
   ];
+
+  // Los textos que dicen cuántas demos hay usan DEMO_COUNT (src/lib/demos.ts).
+  // Si agregas o quitas una tarjeta aquí, actualiza DEMO_CATALOG_SLUGS.
+  if (process.env.NODE_ENV !== 'production') {
+    const listed = demos.map((d) => d.href.replace('/demo/', '')).join(',');
+    if (listed !== DEMO_CATALOG_SLUGS.join(',')) {
+      console.error(
+        '[demo] El catálogo de /demo no coincide con DEMO_CATALOG_SLUGS (src/lib/demos.ts); actualízalo para que DEMO_COUNT sea correcto.',
+      );
+    }
+  }
 
   const handleCodeSubmit = () => {
     setError('');

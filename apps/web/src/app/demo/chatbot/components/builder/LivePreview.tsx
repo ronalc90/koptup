@@ -22,6 +22,7 @@
 
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { SITE_URL } from '@/lib/site';
 import {
   ChatBubbleOvalLeftIcon,
   PaperAirplaneIcon,
@@ -220,7 +221,7 @@ function BubblePreview({
 }) {
   const iframeSnippet = useMemo(
     () =>
-      `<iframe src="https://koptup.com/embed/chatbot/${botId ?? '{botId}'}" />`,
+      `<iframe src="${SITE_URL}/embed/chatbot/${botId ?? '{botId}'}" />`,
     [botId],
   );
 

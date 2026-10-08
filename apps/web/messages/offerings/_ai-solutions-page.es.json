@@ -1,0 +1,103 @@
+{
+  "aiSolutionsPage": {
+    "badge": "Soluciones de Inteligencia Artificial",
+    "hero": {
+      "title": "Soluciones de IA para Transformar tu Empresa",
+      "subtitle": "Implementamos inteligencia artificial en tu negocio: sistemas RAG que responden con los documentos de tu empresa, chatbots, automatización de procesos, análisis predictivo y sistemas expertos. IA accesible para empresas en Colombia y Latinoamérica.",
+      "cta1": "Ver Demos de IA",
+      "cta2": "Hablar con un Experto",
+      "ragLink": "¿Necesitas una IA que responda con los documentos de tu empresa? Conoce los sistemas RAG"
+    },
+    "solutions": {
+      "title": "Nuestras Soluciones de IA",
+      "subtitle": "Desde sistemas RAG que responden con tus documentos hasta sistemas expertos de toma de decisiones",
+      "items": {
+        "rag": {
+          "badge": "Producto principal",
+          "title": "Sistemas RAG: IA con los Documentos de tu Empresa",
+          "desc": "Asistentes que responden con tus manuales, contratos y políticas, citan la fuente de cada respuesta y dicen «no encontré esa información» cuando la respuesta no está en tus documentos. Piloto con tus documentos en {pilotWeeks} semanas.",
+          "link": "Conoce los sistemas RAG"
+        },
+        "chatbots": {
+          "title": "Chatbots para WhatsApp y Web",
+          "desc": "Asistentes virtuales con IA que responden a tus clientes a cualquier hora en tu sitio web y en WhatsApp, con la información de tu empresa.",
+          "link": "Ver chatbots RAG"
+        },
+        "automation": {
+          "title": "Automatización de Procesos con IA",
+          "desc": "IA que automatiza tareas repetitivas, reduce errores y libera a tu equipo para trabajo estratégico."
+        },
+        "predictive": {
+          "title": "Análisis Predictivo",
+          "desc": "Algoritmos que analizan tus datos y predicen tendencias, demanda y comportamiento de clientes."
+        },
+        "documents": {
+          "title": "Procesamiento Inteligente de Documentos",
+          "desc": "IA que lee, extrae y procesa información de facturas, contratos y documentos automáticamente."
+        },
+        "expert": {
+          "title": "Sistemas Expertos",
+          "desc": "IA que toma decisiones complejas basándose en reglas de negocio y datos históricos."
+        },
+        "content": {
+          "title": "Generación de Contenido con IA",
+          "desc": "IA que crea emails, reportes, descripciones de productos y contenido de marketing personalizado."
+        }
+      }
+    },
+    "why": {
+      "title": "¿Por qué Adoptar IA en tu Empresa?",
+      "items": {
+        "time": {
+          "title": "Menos Tiempo en Tareas Repetitivas",
+          "desc": "La IA busca información, clasifica documentos y responde preguntas frecuentes, para que tu equipo dedique ese tiempo a trabajo de más valor."
+        },
+        "scale": {
+          "title": "Atiende Más sin Recargar a tu Equipo",
+          "desc": "La IA resuelve las consultas repetitivas y tu equipo se concentra en los casos que necesitan a una persona."
+        },
+        "decisions": {
+          "title": "Decisiones más Inteligentes",
+          "desc": "Datos analizados en tiempo real para tomar mejores decisiones de negocio."
+        },
+        "advantage": {
+          "title": "Ventaja Competitiva Real",
+          "desc": "Las empresas que adoptan IA hoy liderarán su industria en los próximos años."
+        }
+      }
+    },
+    "tech": {
+      "title": "Tecnologías de IA que Implementamos",
+      "subtitle": "Trabajamos con las plataformas de IA más avanzadas del mercado",
+      "orchestration": "Orquestación IA",
+      "automation": "Automatización"
+    },
+    "faq": {
+      "title": "Preguntas frecuentes",
+      "items": {
+        "solutions": {
+          "q": "¿Qué soluciones de inteligencia artificial ofrece KopTup?",
+          "a": "Nuestro producto principal son los sistemas RAG: IA que responde con los documentos de tu empresa y cita la fuente. Además implementamos chatbots para WhatsApp y web, automatización de procesos, análisis predictivo, procesamiento inteligente de documentos, sistemas expertos y generación de contenido con IA."
+        },
+        "cost": {
+          "q": "¿Cuánto cuesta implementar inteligencia artificial en mi empresa?",
+          "a": "Depende de la solución y del alcance. Los sistemas RAG tienen precios publicados: piloto de {pilotWeeks} semanas por {pilotPrice} y plan Esencial con implementación de {essentialSetup} más {essentialMonthly} al mes, más IVA si aplica. Las demás soluciones se cotizan según tu caso; en la página de servicios encuentras precios de referencia."
+        },
+        "howTo": {
+          "q": "¿Cómo implementar inteligencia artificial en mi negocio en Colombia?",
+          "a": "Así lo hacemos en KopTup: 1) revisamos tus procesos y documentos para encontrar dónde aporta la IA; 2) elegimos la tecnología adecuada para tu caso; 3) hacemos un piloto con tus datos (en un sistema RAG, con tus documentos en {pilotWeeks} semanas); 4) lo integramos con tus sistemas y capacitamos a tu equipo; 5) damos soporte y mejora continua."
+        },
+        "whoBenefits": {
+          "q": "¿Qué empresas en Colombia pueden beneficiarse de la inteligencia artificial?",
+          "a": "Las que manejan mucha información en documentos o repiten las mismas tareas y consultas todos los días. Por ejemplo: salud (protocolos clínicos, normativa del sector y auditoría de cuentas médicas), legal (contratos, conceptos jurídicos internos y normativa) y soporte o atención al cliente (manuales, políticas y base de conocimiento), además de retail, logística, educación y finanzas."
+        }
+      }
+    },
+    "cta": {
+      "title": "Implementa IA en tu Empresa Hoy",
+      "subtitle": "Agenda una consultoría gratuita. Te mostramos qué soluciones de IA aplican a tu negocio específico.",
+      "button": "Agendar Consultoría Gratis",
+      "demos": "Ver Demos de IA"
+    }
+  }
+}
