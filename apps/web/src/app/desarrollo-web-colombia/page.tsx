@@ -1,12 +1,13 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import Card, { CardContent } from '@/components/ui/Card';
 import HomeHighlights from '@/components/home/HomeHighlights';
 import { DEMO_COUNT } from '@/lib/demos';
+import { getChatbotsPageValues } from '@/lib/chatbots-page';
 import {
   CodeBracketIcon,
   ChatBubbleBottomCenterTextIcon,
@@ -22,10 +23,13 @@ import {
 
 export default function DesarrolloWebColombiaPage() {
   const t = useTranslations('devWebPage');
+  const locale = useLocale();
+  // Precio de los chatbots (sv2d, q3a): el mismo de /chatbots-ia, desde rag-plans.ts.
+  const chatbotPrice = getChatbotsPageValues(locale);
 
   const services = [
     { icon: CodeBracketIcon, title: t('sv1t'), desc: t('sv1d') },
-    { icon: ChatBubbleBottomCenterTextIcon, title: t('sv2t'), desc: t('sv2d') },
+    { icon: ChatBubbleBottomCenterTextIcon, title: t('sv2t'), desc: t('sv2d', chatbotPrice) },
     { icon: ShoppingCartIcon, title: t('sv3t'), desc: t('sv3d') },
     { icon: DevicePhoneMobileIcon, title: t('sv4t'), desc: t('sv4d') },
     { icon: ChartBarIcon, title: t('sv5t'), desc: t('sv5d') },
@@ -49,7 +53,7 @@ export default function DesarrolloWebColombiaPage() {
   const faqs = [
     { q: t('q1q'), a: t('q1a') },
     { q: t('q2q'), a: t('q2a') },
-    { q: t('q3q'), a: t('q3a') },
+    { q: t('q3q'), a: t('q3a', chatbotPrice) },
     { q: t('q4q'), a: t('q4a') },
     { q: t('q5q'), a: t('q5a') },
     { q: t('q6q'), a: t('q6a', { count: DEMO_COUNT }) },

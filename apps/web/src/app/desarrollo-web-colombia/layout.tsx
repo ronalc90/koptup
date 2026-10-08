@@ -1,6 +1,10 @@
 import { Metadata } from 'next';
 import { getBreadcrumbSchema } from '@/lib/seo-config';
 import { SITE_URL, absoluteUrl } from '@/lib/site';
+import { getChatbotsPageValues } from '@/lib/chatbots-page';
+
+// Precio de los chatbots en el FAQ: el mismo de /chatbots-ia, desde rag-plans.ts.
+const chatbotPrice = getChatbotsPageValues('es');
 
 export const metadata: Metadata = {
   title: 'Desarrollo Web y Software a Medida en Colombia',
@@ -86,7 +90,7 @@ const faqSchema = {
       name: '¿KopTup puede desarrollar chatbots para WhatsApp?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. Integramos chatbots con la API oficial de WhatsApp Business usando GPT-4 o Claude AI. El chatbot puede atender clientes 24/7, capturar leads y transferir a agentes humanos. Desde $499 USD.',
+        text: `Sí. Integramos chatbots con la API oficial de WhatsApp Business usando GPT-4 o Claude AI. El chatbot puede atender clientes 24/7, capturar leads y transferir a agentes humanos. Desde ${chatbotPrice.essentialFrom}, o piloto de ${chatbotPrice.pilotFrom} (más IVA si aplica).`,
       },
     },
     {
