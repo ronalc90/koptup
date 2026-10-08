@@ -1,280 +1,654 @@
 {
   "demoTelemed": {
-    "pageTitle": "Telemedicine",
-    "pageSubtitle": "End-to-end teleconsult platform: AI-triaged waiting room, video consults, clinical charts, e-prescriptions, HL7/FHIR labs, and specialty scheduling.",
-    "backToDemos": "Back to demos",
-    "tabs": {
-      "console": "Virtual office",
-      "triage": "AI triage",
-      "scheduling": "Schedule",
-      "lab": "Lab results",
-      "billing": "Payments & copays",
-      "preconsult": "Pre-consult"
+    "meta": {
+      "title": "Telemedicine demo for healthcare providers",
+      "description": "Interactive telemedicine demo with sample data: patient pre-visit form and consents, rule-based symptom guidance, a schedule without holidays, simulated video visit with chart, prescription and orders, SOAP notes, PDF summary, and payments with simulated invoice and RIPS.",
+      "breadcrumbHome": "Home",
+      "breadcrumbDemos": "Demos",
+      "breadcrumbName": "Telemedicine"
     },
-    "compliance": {
-      "title": "Regulatory compliance",
-      "subtitle": "Every session is end-to-end encrypted with an immutable audit trail.",
-      "hipaa": "HIPAA",
-      "gdpr": "GDPR",
-      "habeasData": "Habeas Data CO",
-      "ley1581": "Law 1581 / 2012",
-      "encrypted": "E2E encrypted",
-      "auditLogTitle": "Audit log",
-      "viewAll": "View full log"
+    "header": {
+      "back": "Back to demos",
+      "title": "Telemedicine for healthcare providers",
+      "subtitle": "Walk through a telehealth day at {ips}: patient, clinician and billing.",
+      "sampleBadge": "Sample data",
+      "simBadge": "Simulated video, messages, payments and RIPS",
+      "dayBadge": "Sample day: {date}",
+      "request": "Request a proposal",
+      "reset": "Reset",
+      "resetHint": "Restore the sample data and clear what you did in this browser",
+      "tabsLabel": "Demo sections"
+    },
+    "tabs": {
+      "console": "Clinic (clinician)",
+      "patient": "Patient view",
+      "triage": "Symptom guidance",
+      "scheduling": "Schedule",
+      "lab": "Lab",
+      "billing": "Payments and billing"
     },
     "kpis": {
-      "queue": "In queue",
-      "queueSub": "patients waiting",
-      "avgWait": "Avg. wait",
-      "avgWaitSub": "minutes",
-      "todayCalls": "Today's calls",
-      "todayCallsSub": "completed",
-      "satisfaction": "Satisfaction",
-      "satisfactionSub": "last 30 days"
+      "waiting": "In waiting room",
+      "waitingSub": "patients to see",
+      "avgWait": "Average wait",
+      "avgWaitSub": "minutes (current room)",
+      "done": "Today's visits",
+      "doneSub": "completed visits",
+      "pending": "To collect",
+      "pendingSub": "from patients (copays and self-pay)"
+    },
+    "route": {
+      "title": "Suggested walkthrough (5 steps, under 5 minutes)",
+      "step": "Step {n}",
+      "s1": "As a patient, fill in the pre-visit form and accept the required consents.",
+      "s2": "Describe symptoms: red flags are referred to the ER; everything else books the suggested specialty.",
+      "s3": "As the clinician, refer the patient with chest pain and call Carlos Rodríguez.",
+      "s4": "Review the chart and labs, record the diagnosis, sign the prescription and orders, and finish.",
+      "s5": "Collect the copay with the simulated gateway and review the visit's invoice and RIPS."
+    },
+    "priority": {
+      "red": "Red flag",
+      "yellow": "Priority",
+      "green": "Non-priority"
     },
     "queue": {
       "title": "Virtual waiting room",
-      "subtitle": "Patients triaged by AI in real time",
-      "search": "Search patient...",
-      "waiting": "waiting",
-      "callNow": "Call",
-      "calling": "Calling...",
-      "skip": "Skip",
-      "empty": "No patients in queue",
-      "priority": {
-        "red": "Critical",
-        "yellow": "Urgent",
-        "green": "Stable"
-      },
-      "reason": "Reason",
-      "since": "Since",
-      "vitals": "Vitals",
+      "subtitle": "Sorted by pre-visit priority and waiting time",
+      "search": "Search patient or reason...",
+      "filterLabel": "Filter by priority",
       "filter": {
         "all": "All",
-        "red": "Critical",
-        "yellow": "Urgent",
-        "green": "Stable"
-      }
+        "red": "Red flag",
+        "yellow": "Priority",
+        "green": "Non-priority"
+      },
+      "waiting": "waiting {min} min",
+      "empty": "No patients in the waiting room",
+      "call": "Call",
+      "busy": "Finish the current visit to call another patient.",
+      "alarm": "Red flag: not suitable for a video visit. The patient must go to the ER or call 123 (Colombia's emergency line).",
+      "refer": "Refer to the ER"
     },
-    "consultation": {
-      "title": "Video consult",
-      "noActive": "No active consult",
+    "refer": {
+      "title": "Refer to the ER",
+      "body": "{name} reported red-flag symptoms. A video visit is not the right channel: the patient is told to go to the ER or call 123, and it is recorded in the audit log.",
+      "messageTitle": "Message to the patient (simulated)",
+      "message": "{name}, based on the symptoms you reported you need in-person care right away. Go to the nearest emergency room or call 123. Do not wait for the video visit.",
+      "note": "No real message is sent in the demo. In your project, the notice goes out via WhatsApp Business or SMS and your medical team defines the protocol.",
+      "confirm": "Refer and record"
+    },
+    "video": {
+      "noActive": "No active visit",
       "noActiveHint": "Call a patient from the waiting room to start.",
-      "you": "You (Dr.)",
-      "patient": "Patient",
-      "duration": "Duration",
-      "quality": "Quality",
-      "good": "HD",
-      "controls": {
-        "mute": "Mute",
-        "unmute": "Unmute",
-        "camOn": "Camera",
-        "camOff": "Camera",
-        "share": "Share",
-        "shareStop": "Stop",
-        "record": "Record",
-        "stopRec": "Stop recording",
-        "end": "End"
+      "patientSimulated": "Simulated patient video",
+      "you": "You (clinician)",
+      "selfView": "Your camera",
+      "camOffSelf": "Your camera is off",
+      "mute": "Mute microphone",
+      "unmute": "Unmute microphone",
+      "muted": "Microphone muted",
+      "camStart": "Turn on my camera",
+      "camStop": "Turn off my camera",
+      "share": "Share screen (simulated)",
+      "shareStop": "Stop sharing",
+      "sharingBadge": "Sharing screen (simulated)",
+      "rec": "Record (requires consent)",
+      "recStop": "Stop recording",
+      "recBadge": "REC · simulated",
+      "end": "End",
+      "simTag": "Simulated video",
+      "note": "The patient is a sample image. If you turn on your camera, the image is shown only on your screen: it is not recorded or sent.",
+      "camError": "Your camera could not be used. The visit continues with simulated video.",
+      "errors": {
+        "unsupported": "This browser does not allow using the camera here.",
+        "denied": "You did not allow camera access.",
+        "notFound": "No camera or microphone was found.",
+        "other": "The camera could not be started."
       },
-      "chat": {
-        "title": "Chat",
-        "placeholder": "Type a message...",
-        "send": "Send",
-        "you": "You",
-        "patient": "Patient"
-      },
+      "selfSimulated": "Your image (simulated)",
+      "noteNoCam": "The patient and your image are samples: your camera and microphone are not used."
+    },
+    "chat": {
+      "title": "Visit chat",
+      "scripted": "Sample scripted replies",
+      "hello": "Hello, doctor. Thank you for seeing me.",
+      "generic": "All right, thank you.",
+      "typing": "{name} is typing...",
+      "placeholder": "Write a message to the patient...",
+      "send": "Send message"
+    },
+    "consult": {
+      "panelLabel": "Visit panel",
+      "noActive": "When you call a patient, you will see their chart, labs, prescription and notes here.",
       "tabs": {
         "record": "Chart",
-        "labs": "Lab",
-        "prescription": "Rx",
-        "notes": "Notes"
-      },
-      "notesPlaceholder": "Progress, findings, plan...",
-      "recording": "Recording in progress",
-      "sharing": "Screen sharing",
-      "endConfirm": "End the consult?",
-      "endConfirmYes": "Yes, end",
-      "endConfirmNo": "Continue"
+        "labs": "Labs",
+        "rx": "Prescription and orders",
+        "notes": "SOAP notes"
+      }
     },
-    "patientRecord": {
-      "title": "Patient chart",
-      "age": "y/o",
-      "doc": "ID",
+    "record": {
+      "years": "years",
+      "sex": {
+        "F": "female",
+        "M": "male"
+      },
       "blood": "Blood type",
-      "insurance": "Insurer",
-      "history": "Medical history",
-      "allergies": "Allergies",
-      "meds": "Active medications",
-      "noAllergies": "No known allergies",
-      "consultations": "Previous consults",
-      "vitals": "Vital signs",
-      "vitalsSource": "Wearable",
       "hr": "HR",
       "hrUnit": "bpm",
-      "bp": "BP",
-      "bpUnit": "mmHg",
-      "spo2": "SpO2",
-      "spo2Unit": "%",
-      "temp": "Temp.",
-      "tempUnit": "°C",
-      "steps": "Steps today",
-      "sleep": "Sleep",
-      "sleepUnit": "h",
-      "lastSync": "Last sync",
+      "bp": "Blood pressure",
+      "temp": "Temperature",
+      "glucose": "Blood glucose",
+      "vitalsSource": {
+        "preconsult": "Reported by the patient in the pre-visit form",
+        "homeDevices": "Measured at home with a blood pressure monitor and glucometer (reported by the patient)"
+      },
+      "preconsult": "Pre-visit form",
+      "noPreconsult": "The patient has not filled in the pre-visit form yet.",
+      "onset": "Onset",
+      "intensity": "Intensity",
+      "prev": "Previous treatment",
+      "consentTele": "Video visit",
+      "consentData": "Sensitive data",
+      "consentRec": "Recording",
+      "preconsultAt": "Sent at {time}",
+      "allergies": "Allergies",
+      "noAllergies": "No recorded allergies",
+      "history": "Medical history",
+      "meds": "Current medications",
+      "noMeds": "No recorded medications",
+      "pastConsults": "Previous visits"
+    },
+    "rx": {
+      "dx": "Primary diagnosis (ICD-10)",
+      "dxSearch": "Search by code or name (e.g. J06 or cough)",
+      "dxNone": "No matches in the sample catalog.",
+      "changeDx": "Change",
+      "meds": "Medications",
+      "noMeds": "No medications. Add a common one or type one.",
+      "med": "Medication",
+      "medPh": "Name, strength and form",
       "dose": "Dose",
-      "freq": "Frequency"
+      "freq": "Frequency",
+      "duration": "Duration",
+      "instructions": "Instructions",
+      "remove": "Remove medication",
+      "blankMed": "Other",
+      "allergyAlert": "Allergy alert: the patient is allergic to {classes}. Change or remove the medication to sign.",
+      "allergyClass": {
+        "penicillin": "penicillins",
+        "nsaid": "aspirin and anti-inflammatories (NSAIDs)",
+        "sulfa": "sulfa drugs"
+      },
+      "orders": "Lab orders",
+      "sign": "Sign prescription and orders",
+      "signHint": "To sign you need the diagnosis and at least one medication or order, with no allergy alerts.",
+      "signedBy": "{number} signed by {name} at {time}",
+      "signNote": "Simulated e-signature in the demo. In your project it integrates with an e-signature provider and the PDF is stored in the medical record.",
+      "send": "Send to patient",
+      "sent": "Sent (simulated)",
+      "edit": "Edit (voids the signature)",
+      "pdf": {
+        "title": "Prescription and orders",
+        "patient": "Patient",
+        "name": "Name",
+        "doc": "ID document",
+        "age": "Age",
+        "payer": "Payer",
+        "dx": "Diagnosis",
+        "meds": "Medications",
+        "orders": "Lab orders",
+        "signature": "{reg} · Simulated e-signature · {time}"
+      }
+    },
+    "soap": {
+      "import": "Bring in the pre-visit data",
+      "importS": "Reason: {reason}. Onset: {onset}. Intensity {intensity}/10. Previous treatment: {prev}.",
+      "importO": "Data reported by the patient",
+      "s": "S · Subjective",
+      "o": "O · Objective",
+      "a": "A · Assessment",
+      "p": "P · Plan",
+      "sPh": "What the patient reports",
+      "oPh": "Findings and signs",
+      "aPh": "Diagnostic impression",
+      "pPh": "Treatment, advice, red flags and follow-up"
+    },
+    "end": {
+      "title": "End the visit?",
+      "checks": {
+        "dx": {
+          "ok": "ICD-10 diagnosis recorded",
+          "missing": "ICD-10 diagnosis missing (required for the invoice and RIPS)"
+        },
+        "rx": {
+          "ok": "Prescription signed or no medications",
+          "missing": "There are unsigned medications: sign the prescription or remove them"
+        },
+        "notes": {
+          "ok": "SOAP notes with assessment or plan",
+          "missing": "No assessment or plan in the notes (recommended)"
+        }
+      },
+      "billingPreview": "The visit will be recorded for {value} ({payer}). The patient pays: {share}. The invoice and RIPS are generated (simulated).",
+      "goRx": "Go to prescription and diagnosis",
+      "continue": "Keep the visit open",
+      "confirm": "End and create summary"
+    },
+    "summary": {
+      "title": "Visit summary",
+      "patient": "Patient",
+      "duration": "{min} min",
+      "rxIncluded": "Prescription {number} with {count} medication(s)",
+      "noRx": "No prescription",
+      "orders": "{count} lab order(s)",
+      "billing": "Billing (simulated)",
+      "billingNote": "The visit now appears in Payments and billing with its simulated invoice and RIPS.",
+      "download": "Download summary (PDF)",
+      "send": "Send to patient (simulated)",
+      "goBilling": "View in Payments and billing",
+      "fileName": "visit-summary",
+      "pdfTitle": "Telemedicine visit summary",
+      "modality": "Modality",
+      "modalityValue": "Interactive telemedicine (video visit)",
+      "professional": "Clinician",
+      "clinical": "Visit record"
     },
     "triage": {
-      "title": "AI symptom triage",
-      "subtitle": "Describe your symptoms. The AI will suggest specialties and urgency.",
-      "placeholder": "E.g.: chest pain for two hours, shortness of breath on stairs...",
-      "send": "Analyze",
-      "analyzing": "Analyzing symptoms...",
-      "you": "Patient",
-      "ai": "AI Assistant",
-      "suggestedSpecialties": "Suggested specialties",
-      "urgencyLevel": "Urgency level",
-      "recommendation": "Recommendation",
-      "bookNow": "Book now",
-      "reset": "Reset",
+      "title": "Symptom guidance",
+      "subtitle": "Describe how you feel and we suggest how soon to get care and with which specialty. It works with fixed sample rules.",
+      "intro": "Hi. Tell me your symptoms and since when. If it is an emergency, call 123.",
+      "bot": "Guidance",
+      "you": "You",
+      "placeholder": "E.g.: dry cough and fever for three days",
+      "send": "Get guidance",
+      "analyzing": "Checking the rules...",
+      "examplesTitle": "Quick examples",
       "examples": {
-        "title": "Quick examples",
-        "ex1": "Strong headache for 3 days",
-        "ex2": "Dry cough and 100°F fever",
-        "ex3": "Chest pain and shortness of breath",
-        "ex4": "Itchy skin rash"
+        "ex1": "Dry cough and 38 °C fever",
+        "ex2": "Chest pain and shortness of breath",
+        "ex3": "Itchy skin rash",
+        "ex4": "Anxiety and I can't sleep",
+        "ex5": "Diabetes and high blood pressure follow-up"
       },
-      "ai_intro": "Hi, I'm the clinical assistant. Tell me what's going on and I'll help you find the right specialist.",
-      "disclaimer": "This suggestion does not replace medical judgment."
+      "resultTitle": "Result",
+      "resultEmpty": "Here you will see the suggested priority and the specialties to book.",
+      "ruleApplied": "Rule applied: {rule}",
+      "suggested": "Book with",
+      "book": "Book {spec}",
+      "reset": "Start over",
+      "alarmTitle": "Red flags: do not wait for a video visit",
+      "alarmBody": "Go to the nearest emergency room or call the emergency line.",
+      "call123": "Emergency line 123 (Colombia)",
+      "disclaimer": "Guidance based on fixed sample rules: it does not use AI, it is not a diagnosis and it does not replace medical judgment. In your project, your medical team defines and validates the rules.",
+      "rules": {
+        "chest": "chest pain or shortness of breath",
+        "neuro": "fainting, seizure or loss of strength",
+        "bleeding": "heavy bleeding",
+        "selfharm": "risk of self-harm",
+        "resp": "respiratory symptoms or fever",
+        "head": "headache",
+        "ear": "ear pain",
+        "skin": "skin symptoms",
+        "mental": "mental health",
+        "chronic": "chronic condition follow-up",
+        "default": "general visit"
+      },
+      "reco": {
+        "chest": "These symptoms may be an emergency. Do not wait for a video visit: go to the ER or call 123.",
+        "neuro": "These symptoms may be an emergency. Go to the ER or call 123 right away.",
+        "bleeding": "Heavy bleeding needs in-person care right away: go to the ER or call 123.",
+        "selfharm": "What you feel matters and you do not have to go through it without help. Get help now: go to the ER or call 123.",
+        "resp": "We suggest a video visit today with general medicine. If you have trouble breathing, go to the ER.",
+        "head": "We suggest a video visit within 24 hours. If the pain is sudden and very intense, go to the ER.",
+        "ear": "You can book a video visit in the next few days with general medicine or pediatrics (for a child).",
+        "skin": "You can book dermatology in the next few days. Have a photo of the affected area ready.",
+        "mental": "You can book psychology. If at any time you think about harming yourself, get help right away.",
+        "chronic": "Book your follow-up with internal or general medicine and have your latest blood pressure and glucose readings ready.",
+        "default": "You can book a video visit with general medicine."
+      }
     },
-    "prescription": {
-      "title": "E-prescription",
-      "subtitle": "Digital issuance with cryptographic signature.",
-      "patient": "Patient",
-      "diagnosis": "Diagnosis (ICD-10)",
-      "diagnosisPh": "E.g.: J06.9 — Acute upper respiratory infection",
-      "addMed": "Add medication",
-      "med": "Medication",
-      "medPh": "E.g.: Amoxicillin 500mg",
-      "dose": "Dose",
-      "dosePh": "1 capsule",
-      "frequency": "Frequency",
-      "frequencyPh": "Every 8 hours",
-      "duration": "Duration",
-      "durationPh": "7 days",
-      "instructions": "Instructions",
-      "instructionsPh": "Take with food. Do not stop before completing the treatment.",
-      "remove": "Remove",
-      "signature": "Digital signature",
-      "signed": "Signed",
-      "sign": "Sign prescription",
-      "sendPharmacy": "Send to integrated pharmacy",
-      "sent": "Prescription sent to pharmacy",
-      "noMeds": "No medications added yet",
-      "pharmacy": "Pharmacy",
-      "history": "Recent prescriptions",
-      "rxNumber": "Rx Nº",
-      "issued": "Issued"
+    "scheduling": {
+      "title": "Schedule by specialty",
+      "subtitle": "Today is {date}, {time} (sample day). Full days Monday to Friday, Saturday mornings; no Sundays or holidays.",
+      "specialty": "Specialty",
+      "professional": "Clinician",
+      "modality": "Modality",
+      "modalities": {
+        "video": "Video visit",
+        "phone": "Phone call"
+      },
+      "today": "Today",
+      "holiday": "Holiday",
+      "closed": "Closed",
+      "morning": "Morning only",
+      "slots": "Time slots",
+      "noSlots": "No time slots for this day.",
+      "free": "available",
+      "taken": "taken",
+      "mine": "your appointment",
+      "legend": "Green: available · Gray: taken by another sample appointment · Blue: appointment you booked in this demo.",
+      "bookingFor": "Book {spec} · {date} · {time}",
+      "patientName": "Patient name",
+      "phone": "Mobile (WhatsApp)",
+      "phoneError": "Enter a 10-digit mobile number",
+      "payer": "Payer",
+      "price": {
+        "eps": "Sample copay (cuota moderadora): {amount}. The health insurer (EPS) pays the rest ({value} in total).",
+        "prepaid": "Sample prepaid plan voucher: {amount} (total value {value}).",
+        "private": "Sample self-pay rate: {amount}. Paid online after the visit."
+      },
+      "confirm": "Confirm appointment",
+      "confirmedTitle": "Appointment {code} confirmed",
+      "waPreview": "WhatsApp message to {phone}",
+      "waVideo": "Hi {name}. Your {spec} video visit with {pro} is on {date} at {time}. Join 5 minutes early from the link we will send that day. Code: {code}.",
+      "waPhone": "Hi {name}. Your {spec} phone visit with {pro} is on {date} at {time}. We will call you at this number. Code: {code}.",
+      "copy": "Copy message",
+      "simSend": "Simulated sending: in your project it goes out via WhatsApp Business and email",
+      "listTitle": "Appointments booked in this demo",
+      "listSubtitle": "Stored only in this browser.",
+      "listEmpty": "You have not booked any appointments yet.",
+      "cancelAppt": "Cancel appointment"
     },
-    "preconsult": {
-      "title": "Pre-consult",
-      "subtitle": "Dynamic intake form and informed consents.",
-      "reason": "Reason for visit",
-      "reasonPh": "Briefly describe the reason...",
-      "symptomsStart": "Symptom onset",
-      "symptomsStartPh": "How many days ago",
-      "intensity": "Intensity (1-10)",
-      "previousTreatment": "Previous treatment",
-      "previousTreatmentPh": "Current medications or therapies",
+    "patient": {
+      "title": "Patient view: pre-visit form",
+      "subtitle": "This is how the patient fills in the pre-visit form on their phone before entering the waiting room. What you send shows up in the clinic.",
+      "who": "Who is filling in the form?",
+      "newPatient": "New patient",
+      "inQueue": "in waiting room",
+      "name": "Full name",
+      "namePh": "First and last name",
+      "docType": "Type",
+      "doc": "ID number",
+      "age": "Age",
+      "payer": "Health insurer (EPS), prepaid plan or self-pay",
+      "reason": "What is wrong?",
+      "reasonPh": "Describe your symptoms in your own words",
+      "onset": "Since when?",
+      "onsetPh": "E.g.: 3 days ago",
+      "intensity": "Intensity",
+      "temp": "Temperature (optional)",
+      "bp": "Blood pressure (optional)",
+      "prev": "Have you taken anything?",
+      "prevPh": "Medications or remedies you already took",
       "consents": "Consents",
-      "consentTele": "Telemedicine consent",
-      "consentData": "Personal data processing",
-      "consentRec": "Consult recording",
-      "submit": "Submit form",
-      "submitted": "Pre-consult submitted",
-      "required": "required"
+      "optional": "optional",
+      "consent": {
+        "tele": {
+          "title": "Informed consent for telemedicine",
+          "text": "I understand the visit will be by video with {ips}, that the clinician may tell me to have an in-person visit or go to the ER if needed, and that I can withdraw this consent."
+        },
+        "data": {
+          "title": "Authorization for personal and sensitive data (Colombian Law 1581 of 2012)",
+          "text": "I authorize {ips} to process my personal and health data only for my care, medical record and billing. I can access, update and delete my data."
+        },
+        "rec": {
+          "title": "Visit recording",
+          "text": "I authorize recording the video visit. If you do not authorize it, the clinician cannot record it."
+        }
+      },
+      "submit": "Send and enter the waiting room",
+      "update": "Update pre-visit form",
+      "submitHint": "To send it you need the reason, the required details and both required consents.",
+      "doneTitle": "Done, {name}: you are in the waiting room.",
+      "doneBody": "Approximate turn: {position}. Assigned priority:",
+      "alarm": "Your symptoms are red flags. Do not wait for the video visit: go to the ER or call 123.",
+      "goConsole": "View in the clinic",
+      "waTitle": "Link the patient receives",
+      "waMessage": "Hi Carlos. {ips} is expecting you today at 10:30 for your general medicine video visit. Before joining, fill in your pre-visit form here:",
+      "waNote": "Sample message and link (they do not work outside the demo). In your project they are sent via WhatsApp Business or SMS.",
+      "camTitle": "Test your camera and microphone",
+      "camSubtitle": "Optional. Your browser will ask for permission.",
+      "camStart": "Test camera and microphone",
+      "camStop": "Stop the test",
+      "camIdle": "Your camera will show here",
+      "camPreview": "Your camera preview",
+      "micLevel": "Microphone level: speak to see it move",
+      "noMic": "No microphone detected",
+      "camPrivacy": "Video and sound stay in your browser: they are not recorded or sent to any server."
     },
     "lab": {
       "title": "Lab results",
-      "subtitle": "HL7 / FHIR R4 integration with certified labs.",
-      "test": "Test",
-      "value": "Value",
-      "ref": "Ref. range",
-      "flag": "Flag",
-      "date": "Date",
-      "source": "Source",
-      "normal": "Normal",
-      "high": "High",
-      "low": "Low",
-      "critical": "Critical",
-      "fhirBadge": "FHIR R4",
-      "hl7Badge": "HL7 v2.5",
-      "download": "Download PDF"
+      "subtitle": "Sample results per patient and orders issued in the demo.",
+      "simTag": "Simulated integration",
+      "patient": "Patient",
+      "download": "Download PDF",
+      "fileName": "lab-results",
+      "pdfTitle": "Lab results",
+      "cols": {
+        "test": "Test",
+        "value": "Result",
+        "ref": "Reference",
+        "flag": "Status",
+        "date": "Date"
+      },
+      "flags": {
+        "normal": "Normal",
+        "high": "High",
+        "low": "Low",
+        "critical": "Critical"
+      },
+      "noResults": "No recent lab results.",
+      "orderedToday": "Orders issued today (results pending)",
+      "pending": "pending",
+      "note": "In your project, results come from the lab through an integration (HL7 v2 or FHIR, if the lab supports it) or are uploaded as PDF."
     },
     "billing": {
-      "title": "Payments & copays",
-      "subtitle": "Explanation of benefits (EOB) and history.",
-      "consultation": "Consult",
-      "service": "Service",
-      "billed": "Billed",
-      "covered": "Covered",
-      "copay": "Copay",
-      "patient": "Patient total",
-      "status": "Status",
-      "paid": "Paid",
-      "pending": "Pending",
-      "denied": "Denied",
-      "pay": "Pay",
-      "viewEob": "View EOB",
+      "title": "Payments and billing",
+      "subtitle": "Visits on {date}: service value, what the patient pays and what the payer covers.",
+      "search": "Search patient, visit or invoice",
+      "filters": {
+        "all": "All",
+        "pending": "To collect",
+        "paid": "Paid",
+        "na": "Not billable"
+      },
+      "cols": {
+        "attention": "Visit",
+        "date": "Date",
+        "patient": "Patient",
+        "service": "Service",
+        "payer": "Payer",
+        "dx": "Diagnosis",
+        "value": "Service value",
+        "patientShare": "Patient pays",
+        "payerShare": "Payer covers",
+        "status": "Status",
+        "invoice": "Invoice (simulated)"
+      },
+      "shareKind": {
+        "eps": "Copay (cuota moderadora)",
+        "prepaid": "Prepaid plan voucher",
+        "private": "Self-pay rate"
+      },
+      "status": {
+        "paid": "Paid",
+        "pending": "To collect",
+        "na": "Not billable"
+      },
+      "referral": "ER referral",
+      "collect": "Collect",
+      "detail": "Details",
+      "detailTitle": "Visit",
+      "empty": "No visits match that filter.",
+      "fileName": "visits",
       "totals": {
-        "outOfPocket": "Out-of-pocket YTD",
-        "deductible": "Deductible",
-        "deductibleMet": "met",
-        "ytd": "YTD"
+        "collected": "Collected",
+        "collectedSub": "patient payments today",
+        "pending": "To collect",
+        "pendingSub": "pending copays and rates",
+        "payers": "To bill payers",
+        "payersSub": "health insurers and prepaid plans",
+        "total": "Service value",
+        "totalSub": "visits today"
       },
-      "eobTitle": "Explanation of benefits"
+      "note": "Sample values and rates. In each row, service value = what the patient pays + what the payer covers.",
+      "payTitle": "Collect from the patient",
+      "payBody": "{name} must pay {amount} ({concept}).",
+      "method": "Payment method",
+      "methods": {
+        "pse": "PSE (bank debit)",
+        "card": "Debit or credit card",
+        "wallet": "Digital wallet"
+      },
+      "gatewayNote": "Simulated gateway: no payment details are requested or sent. In your project it connects to Wompi or PayU.",
+      "payNow": "Pay {amount} (simulated)",
+      "processing": "Processing simulated payment...",
+      "approved": "Payment approved (simulated). Reference {ref}.",
+      "notBillable": "Not billable",
+      "rx": "Prescription",
+      "ripsTitle": "Visit RIPS",
+      "ripsYes": "generated",
+      "ripsNo": "not applicable",
+      "ripsGenerated": "Generated (simulated)",
+      "ripsDownload": "Download RIPS (JSON)",
+      "ripsNote": "Simplified, simulated RIPS (Colombia's health service record). In your project it is generated with the current structure and validated together with the healthcare e-invoice through your authorized provider.",
+      "ripsNa": "ER referrals do not generate an invoice or RIPS in this demo."
     },
-    "scheduling": {
-      "title": "Specialty scheduling",
-      "subtitle": "Real-time availability. Book a slot.",
-      "specialty": "Specialty",
-      "professional": "Professional",
-      "any": "Any",
-      "date": "Date",
-      "slots": "Available slots",
-      "book": "Book",
-      "booked": "Booked",
-      "noSlots": "No slots available for this date",
-      "modalities": {
-        "video": "Video",
-        "phone": "Phone",
-        "inPerson": "In person"
+    "audit": {
+      "title": "Audit log",
+      "viewAll": "View all",
+      "fullTitle": "Session audit log",
+      "search": "Search the log",
+      "note": "{count} event(s) from this demo, stored only in this browser.",
+      "fileName": "telemedicine-audit",
+      "cols": {
+        "date": "Date",
+        "time": "Time",
+        "actor": "Who",
+        "event": "Event"
       },
-      "confirmedTitle": "Appointment confirmed",
-      "confirmedMsg": "We've emailed you the details."
+      "actors": {
+        "system": "System",
+        "doctor": "Dr. Patricia Vargas",
+        "patient": "Patient",
+        "billing": "Billing"
+      },
+      "events": {
+        "sessionStart": "Sample day opened",
+        "consultStart": "Started the video visit with {patient}",
+        "consultEnd": "Ended the visit with {patient} · duration {duration}",
+        "referred": "Referred {patient} to the ER (told to call 123)",
+        "camOn": "Turned on their camera (local only)",
+        "camOff": "Turned off their camera",
+        "micOn": "Unmuted the microphone",
+        "micOff": "Muted the microphone",
+        "shareStart": "Shared screen (simulated)",
+        "shareStop": "Stopped sharing screen",
+        "recStart": "Started recording (simulated)",
+        "recStop": "Stopped recording",
+        "recBlocked": "Recording blocked: {patient} did not authorize it",
+        "dxSet": "Recorded diagnosis {code} for {patient}",
+        "rxSigned": "Signed prescription {number} for {patient} (simulated signature)",
+        "rxVoided": "Voided the signature of prescription {number} to edit it",
+        "rxSent": "Sent prescription {number} to {patient} (simulated)",
+        "soapImported": "Brought {patient}'s pre-visit data into the notes",
+        "summarySent": "Sent the visit summary to {patient} (simulated)",
+        "invoiceCreated": "Created invoice {invoice} and the RIPS for {attention} (simulated)",
+        "paid": "Recorded payment for {attention}: {amount} via {method} (simulated)",
+        "csvExported": "Exported {count} visit(s) to CSV",
+        "ripsDownloaded": "Downloaded the RIPS for invoice {invoice}",
+        "labPdf": "Downloaded {patient}'s lab results",
+        "apptBooked": "{spec} appointment for {patient} on {date} at {time}",
+        "apptCancelled": "Cancelled appointment {code}",
+        "preconsultSent": "{patient} sent the pre-visit form · priority {priority}",
+        "camTest": "Tested their camera and microphone (local only)",
+        "triageRun": "Symptom guidance · rule: {rule}"
+      }
+    },
+    "how": {
+      "title": "What is real in this demo and what we build in your project",
+      "subtitle": "The demo runs entirely in your browser with sample data. This is what changes in an implementation for your organization.",
+      "inDemo": "In the demo",
+      "inProject": "In your project",
+      "items": {
+        "video": {
+          "title": "Video visit",
+          "demo": "the patient is a sample image; if your browser and the site allow it, you can turn on your camera and it shows only on your screen.",
+          "project": "video between patient and clinician without installing apps, using a managed or self-hosted WebRTC service."
+        },
+        "whatsapp": {
+          "title": "Reminders and links",
+          "demo": "WhatsApp and email messages are shown but not sent.",
+          "project": "sending via WhatsApp Business, SMS or email with your branding."
+        },
+        "payments": {
+          "title": "Online payments",
+          "demo": "simulated gateway that marks the payment with a test reference.",
+          "project": "PSE, cards and digital wallets through Wompi or PayU."
+        },
+        "invoice": {
+          "title": "Healthcare e-invoice and RIPS",
+          "demo": "simplified, simulated invoice number and RIPS JSON.",
+          "project": "healthcare e-invoice and RIPS through your authorized provider or our billing module."
+        },
+        "signature": {
+          "title": "Signed prescriptions and orders",
+          "demo": "simulated signature and sample PDF generated in your browser.",
+          "project": "clinician e-signature with a signature provider and PDF stored in the medical record."
+        },
+        "lab": {
+          "title": "Lab",
+          "demo": "sample results per patient and pending orders.",
+          "project": "integration with your lab (HL7 v2 or FHIR, if supported) or PDF upload."
+        },
+        "records": {
+          "title": "Chart and visit record",
+          "demo": "chart, pre-visit form, SOAP notes and ICD-10 from a reduced catalog; stored in this browser.",
+          "project": "medical record kept according to regulations, or integration with the one you already use."
+        },
+        "triage": {
+          "title": "Symptom guidance",
+          "demo": "fixed sample rules, no AI; red flags are referred to the ER.",
+          "project": "rules defined and validated by your medical team; optionally supported by supervised AI."
+        },
+        "security": {
+          "title": "Audit and sensitive data",
+          "demo": "log of every action in this session, with CSV export.",
+          "project": "server-side access auditing, user roles, encryption in transit and at rest, and backups."
+        }
+      },
+      "regulation": "The platform is designed to support the requirements of Colombia's Resolution 2654 of 2019 (telehealth and telemedicine) and Law 1581 of 2012 (personal data). Enabling the telemedicine service is the provider's responsibility; each project's regulatory checklist is validated with its advisor."
+    },
+    "footer": {
+      "sampleNote": "Sample data: {ips}, the patients, health insurers, prepaid plan, clinicians, documents and values are fictitious. What you do is stored only in this browser; use Reset to start over.",
+      "cta": "I want telemedicine for my organization"
+    },
+    "pdf": {
+      "sample": "SAMPLE DOCUMENT generated by the telemedicine demo: fictitious data, no clinical or legal validity.",
+      "ipsLine": "Tax ID (NIT) {nit} (fictitious) · {city}",
+      "footer": "Sample document from KopTup's telemedicine demo. Fictitious data; simulated e-signature."
     },
     "specialties": {
       "general": "General medicine",
-      "cardio": "Cardiology",
-      "pneumo": "Pulmonology",
-      "derma": "Dermatology",
-      "psych": "Psychiatry",
       "pedia": "Pediatrics",
-      "neuro": "Neurology",
-      "endo": "Endocrinology",
-      "uro": "Urology",
-      "gyn": "Gynecology"
+      "derma": "Dermatology",
+      "internal": "Internal medicine",
+      "psych": "Psychology"
+    },
+    "toasts": {
+      "pdf": "Downloaded {name}",
+      "csv": "Exported {count} rows to CSV",
+      "json": "Downloaded {name}",
+      "referred": "{name} was referred to the ER and told to call 123 (simulated message).",
+      "noRecConsent": "The patient did not authorize recording in the pre-visit form: it cannot be recorded.",
+      "rxSent": "Prescription sent to {name} via WhatsApp and email (simulated).",
+      "summarySent": "Summary sent to {name} (simulated).",
+      "preconsult": "{name}'s pre-visit form was sent to the waiting room.",
+      "copied": "Message copied to the clipboard.",
+      "copyFailed": "Could not copy. Select the text and copy it.",
+      "apptCancelled": "Appointment {code} cancelled; the slot is free again.",
+      "camOk": "Camera and microphone working.",
+      "reset": "Sample data restored."
+    },
+    "dates": {
+      "months": "Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec",
+      "weekdays": "Sun,Mon,Tue,Wed,Thu,Fri,Sat"
     },
     "common": {
-      "save": "Save",
       "cancel": "Cancel",
       "close": "Close",
-      "confirm": "Confirm",
-      "loading": "Loading...",
-      "yes": "Yes",
-      "no": "No",
-      "min": "min",
-      "now": "now"
+      "simulated": "simulated"
     }
   }
 }

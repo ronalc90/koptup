@@ -1,22 +1,85 @@
-export type Priority = 'red' | 'yellow' | 'green';
-export type ConsultTab = 'record' | 'labs' | 'prescription' | 'notes';
-export type MainTab = 'console' | 'triage' | 'scheduling' | 'lab' | 'billing' | 'preconsult';
+/**
+ * Tipos de la demo de telemedicina. Todo el estado vive en el navegador:
+ * no hay backend, video ni pagos reales (se rotulan como simulados).
+ */
 
-export interface QueuePatient {
+export type Locale = 'es' | 'en';
+/** Texto bilingüe de los datos de ejemplo. */
+export type L = { es: string; en: string };
+/** Texto de datos: bilingüe (datos de ejemplo) o libre (lo que escribe el visitante). */
+export type Txt = L | string;
+
+export type Priority = 'red' | 'yellow' | 'green';
+export type PayerKind = 'eps' | 'prepaid' | 'private';
+export type MainTab = 'console' | 'patient' | 'triage' | 'scheduling' | 'lab' | 'billing';
+export type ConsultTab = 'record' | 'labs' | 'rx' | 'notes';
+export type SpecKey = 'general' | 'pedia' | 'derma' | 'internal' | 'psych';
+export type PatientStatus = 'waiting' | 'inConsult' | 'done' | 'referred';
+export type LabFlag = 'normal' | 'high' | 'low' | 'critical';
+export type AllergyClass = 'penicillin' | 'nsaid' | 'sulfa';
+
+export interface Payer {
+  id: string;
+  name: Txt;
+  kind: PayerKind;
+}
+
+export interface Specialty {
+  key: SpecKey;
+  pro: string;
+  /** Registro médico de ejemplo. */
+  reg: string;
+  /** Valor del servicio por tipo de pagador (COP, valores de ejemplo). */
+  tariff: Record<PayerKind, number>;
+  /** Código CUPS de la consulta (referencia para el RIPS simulado). */
+  cups: string;
+}
+
+export interface LabRow {
+  test: Txt;
+  value: Txt;
+  ref: Txt;
+  flag: LabFlag;
+  date: string;
+}
+
+export interface Preconsult {
+  reason: Txt;
+  onset: Txt;
+  intensity: number;
+  prev: Txt;
+  temp: string;
+  bp: string;
+  consentTele: boolean;
+  consentData: boolean;
+  consentRec: boolean;
+  /** Hora (HH:MM) en que el paciente envió el formulario. */
+  at: string;
+}
+
+export interface Patient {
   id: string;
   name: string;
   age: number;
+  sex?: 'F' | 'M';
+  docType: 'CC' | 'TI' | 'CE';
   doc: string;
-  blood: string;
-  insurance: string;
-  reason: string;
+  blood?: string;
+  payerId: string;
+  reason: Txt;
   priority: Priority;
-  waitingSince: number;
-  allergies: string[];
-  history: string[];
-  meds: { name: string; dose: string; freq: string }[];
-  vitals: { hr: number; bp: string; spo2: number; temp: number; steps: number; sleep: number };
-  pastConsults: { date: string; specialty: string; notes: string }[];
+  waitMin: number;
+  status: PatientStatus;
+  allergies: { label: Txt; cls?: AllergyClass }[];
+  history: Txt[];
+  meds: { name: Txt; dose: string; freq: Txt }[];
+  vitals: { hr?: number; bp?: string; spo2?: number; temp?: number; glucose?: number; source: 'preconsult' | 'homeDevices' };
+  pastConsults: { date: string; spec: SpecKey; notes: Txt }[];
+  preconsult: Preconsult | null;
+  guardian?: Txt;
+  /** Respuestas del paciente en el chat (guion de ejemplo). */
+  script: Txt[];
+  labs: LabRow[];
 }
 
 export interface ChatMessage {
@@ -26,16 +89,19 @@ export interface ChatMessage {
   at: string;
 }
 
-export interface TriageMsg {
-  id: string;
-  from: 'user' | 'ai';
-  text: string;
+export interface Cie10 {
+  code: string;
+  label: L;
 }
 
-export interface TriageResult {
-  urgency: Priority;
-  specialties: string[];
-  recommendation: string;
+export interface MedPreset {
+  id: string;
+  name: L;
+  dose: L;
+  freq: L;
+  duration: L;
+  instructions: L;
+  cls?: AllergyClass;
 }
 
 export interface RxMed {
@@ -45,53 +111,87 @@ export interface RxMed {
   freq: string;
   duration: string;
   instructions: string;
+  cls?: AllergyClass;
 }
 
-export interface LabRow {
-  test: string;
-  value: string;
-  ref: string;
-  flag: 'normal' | 'high' | 'low' | 'critical';
+export interface LabOrder {
+  id: string;
+  label: L;
+}
+
+export interface Soap {
+  s: string;
+  o: string;
+  a: string;
+  p: string;
+}
+
+/** Línea de una receta firmada (texto libre o bilingüe en los datos de ejemplo). */
+export interface RxLine {
+  name: Txt;
+  dose: Txt;
+  freq: Txt;
+  duration: Txt;
+  instructions: Txt;
+}
+
+export interface Prescription {
+  number: string;
+  signedAt: string;
+  meds: RxLine[];
+}
+
+export type PayStatus = 'paid' | 'pending' | 'na';
+export type PayMethod = 'pse' | 'card' | 'wallet';
+
+export interface Attention {
+  id: string;
+  kind: 'consult' | 'referral';
+  patientName: string;
+  docType: string;
+  doc: string;
+  payerId: string;
+  spec: SpecKey;
   date: string;
-  source: 'FHIR' | 'HL7';
+  time: string;
+  durationMin: number;
+  dx: { code: string; label: Txt } | null;
+  value: number;
+  patientShare: number;
+  payerShare: number;
+  payStatus: PayStatus;
+  payMethod?: PayMethod;
+  payRef?: string;
+  invoice: string | null;
+  rips: boolean;
+  rx: Prescription | null;
+  orders: string[];
+  soap: Soap | null;
 }
 
+export interface Appointment {
+  id: string;
+  spec: SpecKey;
+  date: string;
+  time: string;
+  patient: string;
+  phone: string;
+  payerId: string;
+  modality: 'video' | 'phone';
+}
+
+/** Entrada de auditoría: se guarda la clave del texto para mostrarla en el idioma activo. */
 export interface AuditEntry {
+  id: string;
   at: string;
-  actor: string;
-  action: string;
+  actor: 'system' | 'doctor' | 'patient' | 'billing';
+  key: string;
+  params?: Record<string, string | { t: string }>;
 }
 
-export const PRIORITY_STYLES: Record<Priority, { dot: string; chip: string; ring: string }> = {
-  red: { dot: 'bg-red-500', chip: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200', ring: 'ring-red-500' },
-  yellow: { dot: 'bg-yellow-400', chip: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-200', ring: 'ring-yellow-400' },
-  green: { dot: 'bg-emerald-500', chip: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200', ring: 'ring-emerald-500' },
-};
-
-export function avatarColor(seed: string) {
-  const palette = [
-    'from-sky-500 to-indigo-600',
-    'from-rose-500 to-pink-600',
-    'from-emerald-500 to-teal-600',
-    'from-amber-500 to-orange-600',
-    'from-violet-500 to-purple-600',
-  ];
-  let h = 0;
-  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
-  return palette[h % palette.length];
-}
-
-export function initials(name: string) {
-  return name.split(' ').slice(0, 2).map((s) => s[0]).join('').toUpperCase();
-}
-
-export function fmtTimer(s: number) {
-  const m = Math.floor(s / 60).toString().padStart(2, '0');
-  const ss = (s % 60).toString().padStart(2, '0');
-  return `${m}:${ss}`;
-}
-
-export function nowHHMM() {
-  const d = new Date();
-  return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')}`;
+export interface TriageResult {
+  urgency: Priority;
+  alarm: boolean;
+  specs: SpecKey[];
+  rule: string;
 }
