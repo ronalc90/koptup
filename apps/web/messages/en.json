@@ -49,6 +49,11 @@
         "description": "Ask the AI questions about documents and get answers that cite the source. Real AI, no sign-up.",
         "category": "AI with your documents"
       },
+      "medicalAudit": {
+        "title": "Healthcare expert system",
+        "description": "Audits medical claims with rules, CUPS and ICD-10 codes and fee schedules, and flags potential denials. AI extracts the invoice data.",
+        "category": "Medical claims auditing"
+      },
       "dashboard": {
         "title": "Executive Dashboard",
         "description": "Management control panel with KPIs, financial metrics, sales analysis and interactive reports.",

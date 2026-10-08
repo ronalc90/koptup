@@ -49,6 +49,11 @@
         "description": "Hazle preguntas a la IA sobre documentos y recibe respuestas con la fuente citada. IA real, sin registro.",
         "category": "IA con tus documentos"
       },
+      "medicalAudit": {
+        "title": "Sistema experto para salud",
+        "description": "Audita cuentas médicas con reglas, códigos CUPS y CIE-10 y tarifarios, y señala posibles glosas. La IA extrae los datos de las facturas.",
+        "category": "Auditoría de cuentas médicas"
+      },
       "dashboard": {
         "title": "Dashboard Ejecutivo",
         "description": "Panel de control gerencial con KPIs, métricas financieras, análisis de ventas y reportes interactivos.",

@@ -7,9 +7,11 @@ import Card, { CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import Badge from '@/components/ui/Badge';
 import HomeHighlights from '@/components/home/HomeHighlights';
 import { DEMO_COUNT } from '@/lib/demos';
+import { MEDICAL_ACCOUNTS_DEMO_PATH } from '@/lib/rag-page';
 import {
   ShoppingCartIcon,
   ChatBubbleBottomCenterTextIcon,
+  ClipboardDocumentCheckIcon,
   CodeBracketIcon,
   DevicePhoneMobileIcon,
   ShieldCheckIcon,
@@ -79,7 +81,9 @@ export default function HomeContent() {
     },
   ];
 
-  // Demos destacadas: el chatbot RAG (producto principal) va primero.
+  // Demos destacadas: el chatbot RAG (producto principal) va primero. La
+  // segunda es la de cuentas médicas, presentada como "Sistema experto para
+  // salud" (no usa embeddings ni búsqueda vectorial, así que no es un caso RAG).
   const featuredDemos = [
     {
       icon: ChatBubbleBottomCenterTextIcon,
@@ -88,6 +92,14 @@ export default function HomeContent() {
       href: '/demo/chatbot',
       category: th('demos.chatbot.category'),
       color: 'from-purple-500 to-purple-700',
+    },
+    {
+      icon: ClipboardDocumentCheckIcon,
+      title: th('demos.medicalAudit.title'),
+      description: th('demos.medicalAudit.description'),
+      href: MEDICAL_ACCOUNTS_DEMO_PATH,
+      category: th('demos.medicalAudit.category'),
+      color: 'from-blue-500 to-blue-700',
     },
     {
       icon: ShoppingCartIcon,

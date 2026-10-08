@@ -10,12 +10,14 @@ Se ha creado un sistema completo de SEO para **TODOS los demos** de KopTup, opti
 
 ### DEMOS MÉDICOS (Prioridad Alta)
 
-#### 1. **Auditoría de Cuentas Médicas** (`/demo/cuentas-medicas`)
+#### 1. **Sistema experto para salud: auditoría de cuentas médicas** (`/demo/cuentas-medicas`)
 **Prioridad SEO**: 0.95 (Máxima)
 
-**Title**: "Auditoría de Cuentas Médicas con IA | Gestión de Glosas"
+**Title**: "Sistema experto para salud: auditar cuentas médicas | KopTup"
 
-**Description**: "Sistema automatizado de auditoría de cuentas médicas con inteligencia artificial. Detecta y previene glosas administrativas y técnicas. Valida tarifas SOAT, ISS 2001, ISS 2004 y contratos EPS (Nueva EPS, Salud Total, Compensar). Reduce rechazos hasta 80%. Demo gratuito."
+**Description**: "Sistema experto para salud que audita cuentas médicas con reglas, códigos CUPS y CIE-10 y tarifarios SOAT, ISS o de contrato, y señala posibles glosas."
+
+> Se presenta como sistema experto y no como caso RAG: el código de la demo no usa embeddings ni búsqueda vectorial (reglas, búsqueda exacta por código y GPT-4o para extraer datos). Fuente de verdad: `apps/web/src/lib/seo-config.ts`.
 
 **Keywords (25)**:
 - auditoría cuentas médicas

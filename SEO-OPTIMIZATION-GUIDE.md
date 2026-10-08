@@ -41,7 +41,6 @@ Se implementaron los siguientes schemas en JSON-LD:
 - Nueva sección "Auditoría Médica y Gestión de Glosas"
 - 4 servicios médicos principales destacados
 - Keywords estratégicas en títulos y descripciones
-- Beneficios con cifras (reduce glosas hasta 80%)
 - Contenido rico en términos de búsqueda
 
 #### Keywords Principales Implementadas:

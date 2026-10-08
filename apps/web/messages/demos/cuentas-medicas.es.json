@@ -1,8 +1,8 @@
 {
   "demoMedicalAccounts": {
     "backToDemos": "Volver a Demos",
-    "title": "🏥 Auditoría de Cuentas Médicas",
-    "subtitle": "Sistema experto con IA para auditoría automática de facturas de salud",
+    "title": "🏥 Sistema experto para salud",
+    "subtitle": "Auditoría de cuentas médicas: un motor de reglas revisa códigos CUPS y CIE-10 y tarifarios, y la IA extrae los datos de las facturas para señalar posibles glosas.",
     "adminButton": "Administración",
     "viewProcess": "Ver Proceso",
     "ragLink": "¿Quieres una IA que responda con tus protocolos, normativa y tarifarios citando la fuente? Conoce los sistemas RAG"

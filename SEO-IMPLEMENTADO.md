@@ -148,7 +148,6 @@ Se ha completado una optimización SEO integral de la plataforma KopTup, enfocad
    - Icon: CheckCircleIcon
    - Link: /demo/cuentas-medicas
    - Keywords: glosas médicas, reducción glosas
-   - Cifra: "Reduce rechazos hasta un 80%"
 
 3. **Liquidación Automatizada**
    - Icon: CurrencyDollarIcon
@@ -160,8 +159,7 @@ Se ha completado una optimización SEO integral de la plataforma KopTup, enfocad
    - Link: /demo/chatbot
    - Keywords: chatbot médico, asistente IA salud
 
-**Beneficios con Cifras:**
-- ✅ "Reduce glosas hasta 80%"
+**Beneficios:**
 - ✅ "Optimiza facturación médica"
 - ✅ "Cumple normatividad vigente"
 

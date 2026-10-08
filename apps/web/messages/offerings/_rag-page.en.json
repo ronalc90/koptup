@@ -224,7 +224,7 @@
           "desc": "Auditors look up fee schedules, contracts and denial rules while reviewing an invoice, with the source in plain sight."
         }
       ],
-      "demoLink": "See the medical claims auditing demo",
+      "demoLink": "See the “Healthcare expert system” demo: medical claims auditing with rules and AI",
       "disclaimer": "The AI supports your team with cited information; clinical and audit decisions remain with your professionals."
     },
     "legal": {

@@ -14,7 +14,6 @@ Se ha implementado un sistema **SEO profesional y completo** para KopTup, optimi
 - **Structured Data**: Organization, Website, SoftwareApplication, MedicalBusiness, FAQPage
 - **Nueva sección**: "Auditoría Médica y Gestión de Glosas con IA"
 - **4 servicios médicos destacados** con CTAs
-- **Beneficios con cifras**: "Reduce glosas hasta 80%"
 
 ### 2. SEO PARA 9 DEMOS ✅
 

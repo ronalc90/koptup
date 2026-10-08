@@ -8,7 +8,7 @@ export default function CuentasMedicasLayout({ children }: { children: React.Rea
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: 'Inicio', url: '/' },
     { name: 'Demos', url: '/demo' },
-    { name: 'Auditoría de Cuentas Médicas', url: '/demo/cuentas-medicas' },
+    { name: 'Sistema experto para salud', url: '/demo/cuentas-medicas' },
   ]);
 
   return (

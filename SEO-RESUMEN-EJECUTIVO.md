@@ -89,7 +89,6 @@ Archivo modificado: `apps/web/src/app/page.tsx`
 
 2. **Gestión de Glosas**
    - "Identifica y previene glosas administrativas y técnicas"
-   - "Reduce rechazos en facturación médica hasta un 80%"
    - Keywords: glosas médicas, reducción glosas, facturación salud
 
 3. **Liquidación Automatizada**
@@ -101,7 +100,6 @@ Archivo modificado: `apps/web/src/app/page.tsx`
    - Keywords: chatbot médico, asistente IA salud, normatividad
 
 **Sección de Beneficios:**
-- ✅ "Reduce glosas hasta 80%" - Cifra específica que atrae clics
 - ✅ "Optimiza facturación médica" - Valida tarifas SOAT, ISS
 - ✅ "Cumple normatividad vigente" - Ley 100, Resolución 3047
 

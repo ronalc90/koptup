@@ -25,7 +25,11 @@ export const RAG_DEMO_PATH = '/demo/chatbot';
 /** Destino de "Agenda un piloto". */
 export const RAG_PILOT_CONTACT_PATH = '/contact';
 
-/** Demo de auditoría de cuentas médicas (enlazada desde /rag/salud). */
+/**
+ * Demo de auditoría de cuentas médicas, presentada como "Sistema experto para
+ * salud" (no como caso RAG: no usa embeddings ni búsqueda vectorial). Enlazada
+ * desde /rag/salud y desde las demos destacadas de la home.
+ */
 export const MEDICAL_ACCOUNTS_DEMO_PATH = '/demo/cuentas-medicas';
 
 export type RagSectorId = 'salud' | 'legal' | 'soporte';
@@ -48,7 +52,7 @@ export const RAG_SECTORS: readonly RagSector[] = [
   {
     id: 'salud',
     path: '/rag/salud',
-    // Caso "Auditoría de cuentas médicas" → demo de cuentas médicas.
+    // Caso "Auditoría de cuentas médicas" → demo "Sistema experto para salud".
     demo: { path: MEDICAL_ACCOUNTS_DEMO_PATH, caseIndex: 2 },
     hasDisclaimer: true,
   },

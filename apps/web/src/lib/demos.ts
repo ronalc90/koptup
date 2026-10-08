@@ -8,8 +8,9 @@
  * /demo avisa en consola si no coinciden).
  *
  * No se cuentan:
- *  - /demo/cuentas-medicas: no tiene tarjeta en el catálogo; se entra con
- *    código de acceso desde /demo.
+ *  - /demo/cuentas-medicas ("Sistema experto para salud"): no tiene tarjeta en
+ *    el catálogo de /demo (allí se entra con código de acceso); se enlaza
+ *    directamente desde las demos destacadas de la home y desde /rag/salud.
  *  - /demo/sistema-experto: no está enlazada desde el catálogo.
  */
 export const DEMO_CATALOG_SLUGS = [

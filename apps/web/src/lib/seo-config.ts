@@ -161,11 +161,15 @@ export const seoConfig: Record<string, PageSEO> = {
 
   // DEMOS MÉDICOS
 
-  // Demo: Cuentas Médicas (Auditoría)
+  // Demo: Cuentas Médicas (Auditoría). Se presenta como "Sistema experto para
+  // salud" y no como caso RAG: su código (frontend y endpoints /api/auditoria y
+  // /api/documentos-conocimiento) no usa embeddings ni búsqueda vectorial, sino
+  // reglas de auditoría, búsqueda exacta por código CUPS y tarifario, y GPT-4o /
+  // GPT-4o mini para extraer los datos de las facturas.
   'demo-cuentas-medicas': {
-    title: 'Auditoría de Cuentas Médicas y Glosas con IA',
+    title: 'Sistema experto para salud: auditar cuentas médicas',
     description:
-      'Sistema automatizado de auditoría de cuentas médicas con inteligencia artificial. Detecta y previene glosas administrativas y técnicas. Valida tarifas SOAT, ISS 2001, ISS 2004 y contratos EPS (Nueva EPS, Salud Total, Compensar). Reduce rechazos hasta 80%. Demo gratuito.',
+      'Sistema experto para salud que audita cuentas médicas con reglas, códigos CUPS y CIE-10 y tarifarios SOAT, ISS o de contrato, y señala posibles glosas.',
     canonical: `${baseUrl}/demo/cuentas-medicas`,
   },
 
