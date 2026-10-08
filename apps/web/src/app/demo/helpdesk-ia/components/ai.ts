@@ -19,6 +19,9 @@ const STORAGE_KEY = 'koptup.helpdesk.kbBot';
 /** Súbelo si cambian los textos de los artículos: obliga a reindexar. */
 export const KB_VERSION = 1;
 const OWNER_HEADER = 'X-Bot-Owner-Token';
+const UPLOAD_BATCH = 5;
+/** Largo máximo de la pregunta que acepta el backend (2000) con margen. */
+export const MAX_MESSAGE_CHARS = 1900;
 
 export type AiErrorKind = 'network' | 'rateLimited' | 'server';
 
@@ -127,18 +130,21 @@ async function createBot(lang: string, docs: KbDoc[], persona: string, name: str
     body: JSON.stringify({ name, systemPrompt: persona, tone: 'friendly', languages: [lang], avatar: '🎧', color: '#e11d48' }),
   });
   const ownerToken = typeof created.ownerToken === 'string' && created.ownerToken ? created.ownerToken : null;
-  await call(`/bots/${encodeURIComponent(created.botId)}/docs`, {
-    method: 'POST',
-    headers: ownerHeaders(ownerToken),
-    body: JSON.stringify({
-      files: docs.map((d) => ({
-        name: d.name,
-        size: new TextEncoder().encode(d.text).length,
-        mime: 'text/plain',
-        contentBase64: toBase64(d.text),
-      })),
-    }),
-  });
+  // El backend acepta hasta 5 archivos por petición: se suben por lotes.
+  for (let i = 0; i < docs.length; i += UPLOAD_BATCH) {
+    await call(`/bots/${encodeURIComponent(created.botId)}/docs`, {
+      method: 'POST',
+      headers: ownerHeaders(ownerToken),
+      body: JSON.stringify({
+        files: docs.slice(i, i + UPLOAD_BATCH).map((d) => ({
+          name: d.name,
+          size: new TextEncoder().encode(d.text).length,
+          mime: 'text/plain',
+          contentBase64: toBase64(d.text),
+        })),
+      }),
+    });
+  }
   writeStored(lang, { botId: created.botId, ownerToken, version: KB_VERSION, docs: docs.length });
   return { botId: created.botId, ownerToken };
 }
@@ -185,7 +191,7 @@ export async function draftReply(bot: KbBot, message: string): Promise<AiDraft> 
   const r = await call<ChatResponse>(`/bots/${encodeURIComponent(bot.botId)}/chat`, {
     method: 'POST',
     headers: ownerHeaders(bot.ownerToken),
-    body: JSON.stringify({ message, history: [] }),
+    body: JSON.stringify({ message: message.slice(0, MAX_MESSAGE_CHARS), history: [] }),
   });
   const model = r.model || '';
   return {

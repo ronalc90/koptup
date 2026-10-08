@@ -58,7 +58,8 @@ export default function AiDraftPanel({ hd, ticket, customerText, onInsert }: Pro
       name: hd.firstName(ticket.customer),
       channel: t(`channels.${ticket.channel}`),
       subject: tx(ticket.subject),
-      messages: customerText,
+      // Los mensajes más recientes del cliente, recortados para no pasar el límite de la pregunta.
+      messages: customerText.length > 1200 ? `…${customerText.slice(-1200)}` : customerText,
       language: t(`languages.${ticket.language}`),
     });
     try {
