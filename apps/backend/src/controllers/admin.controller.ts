@@ -436,20 +436,31 @@ export const adminGetUsers = async (req: AuthRequest, res: Response): Promise<vo
 export const adminUpdateUserRole = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { role } = req.body as { role: 'user' | 'admin' | 'manager' | 'developer' };
+    const { role } = (req.body ?? {}) as { role?: unknown };
 
-    if (!role) {
-      res.status(400).json({ success: false, message: 'Rol requerido' });
+    // Roles válidos = los del esquema de User (si se agregan roles, se aceptan solos).
+    const validRoles: string[] = ((User.schema.path('role') as any)?.enumValues as string[]) ?? [];
+    if (typeof role !== 'string' || !validRoles.includes(role)) {
+      res.status(400).json({ success: false, message: 'Rol inválido', validRoles });
+      return;
     }
 
-    const user = await User.findByIdAndUpdate(
-      id,
-      { role },
-      { new: true }
-    ).select('-password');
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+      return;
+    }
+
+    // Un admin no puede quitarse a sí mismo el rol (evita quedarse sin administradores).
+    if (req.user?.id === id && role !== 'admin') {
+      res.status(400).json({ success: false, message: 'No puedes quitarte tu propio rol de administrador' });
+      return;
+    }
+
+    const user = await User.findByIdAndUpdate(id, { role }, { new: true }).select('-password');
 
     if (!user) {
       res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+      return;
     }
 
     res.json({

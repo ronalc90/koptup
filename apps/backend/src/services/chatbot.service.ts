@@ -9,6 +9,14 @@ import { extractTextFromPDF } from './pdf.service';
 import { getChatbotModel, IChatbot } from '../models/Chatbot';
 import { logger } from '../utils/logger';
 import fs from 'fs/promises';
+import { getBudgetStatus, recordSpend } from './ai-budget.service';
+import { estimateCostUSD } from './rag-pipeline';
+import { extractTextFromBuffer } from './document-text.service';
+
+/** Límites de la API heredada por sesión (acotan el tamaño del prompt y el costo). */
+const LEGACY_MAX_DOCS_PER_SESSION = 20;
+const LEGACY_CONTEXT_CHARS_PER_DOC = 3000;
+const LEGACY_MAX_CONTEXT_CHARS = 15000;
 
 export interface ChatbotConfig {
   title?: string;
@@ -91,17 +99,27 @@ class ChatbotService {
     const chatbot = await this.getOrCreateSession(sessionId);
 
     for (const file of files) {
+      if (chatbot.documents.length >= LEGACY_MAX_DOCS_PER_SESSION) {
+        logger.warn(`Sesión ${sessionId}: se alcanzó el máximo de ${LEGACY_MAX_DOCS_PER_SESSION} documentos`);
+        await fs.unlink(file.path).catch(() => undefined);
+        continue;
+      }
       try {
         // Extraer texto del documento
         let content = '';
+        const lower = file.originalName.toLowerCase();
 
-        if (file.originalName.toLowerCase().endsWith('.pdf')) {
+        if (lower.endsWith('.pdf')) {
           const extracted = await extractTextFromPDF(file.path);
           content = extracted.text;
-        } else if (
-          file.originalName.toLowerCase().endsWith('.txt') ||
-          file.originalName.toLowerCase().endsWith('.csv')
-        ) {
+        } else if (lower.endsWith('.docx')) {
+          // DOCX se lee de verdad (mammoth), no se guarda vacío.
+          const extracted = await extractTextFromBuffer(await fs.readFile(file.path), {
+            name: file.originalName,
+            mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          });
+          content = extracted.text;
+        } else if (lower.endsWith('.txt') || lower.endsWith('.csv')) {
           content = await fs.readFile(file.path, 'utf-8');
         }
 
@@ -134,7 +152,6 @@ class ChatbotService {
    */
   async sendMessage(sessionId: string, userMessage: string, incomingRestrictedTopics?: string[]): Promise<ChatResponse> {
     const chatbot = await this.getOrCreateSession(sessionId);
-    const openai = getOpenAI();
 
     // Usar los temas restringidos del request (configuración activa del usuario)
     // con fallback a los almacenados en la DB
@@ -183,8 +200,9 @@ class ChatbotService {
     // Construir contexto desde los documentos
     const documentContext = chatbot.documents
       .filter(doc => doc.content && doc.content.length > 0)
-      .map(doc => `--- Documento: ${doc.originalName} ---\n${doc.content.substring(0, 3000)}`)
-      .join('\n\n');
+      .map(doc => `--- Documento: ${doc.originalName} ---\n${doc.content.substring(0, LEGACY_CONTEXT_CHARS_PER_DOC)}`)
+      .join('\n\n')
+      .slice(0, LEGACY_MAX_CONTEXT_CHARS);
 
     // Construir historial de conversación (últimos 5 mensajes)
     const conversationHistory = chatbot.messages
@@ -193,6 +211,20 @@ class ChatbotService {
         role: msg.role,
         content: msg.content,
       }));
+
+    // Tope de gasto mensual compartido con el chatbot (CHATBOT_MONTHLY_BUDGET_USD).
+    // Sin presupuesto o sin poder medirlo (Redis caído) no se llama al modelo.
+    const budget = process.env.OPENAI_API_KEY ? await getBudgetStatus('chatbot') : { available: false, reason: 'unavailable' as const };
+    if (!budget.available) {
+      const unavailableMessage = !process.env.OPENAI_API_KEY
+        ? 'El asistente con IA no está configurado en este servidor en este momento.'
+        : budget.reason === 'budget_exhausted'
+          ? 'Alcanzamos el cupo mensual de IA de esta demo. Escríbenos y te mostramos el chatbot en una llamada.'
+          : 'El asistente con IA no está disponible en este momento. Intenta de nuevo en unos minutos.';
+      chatbot.messages.push({ role: 'assistant', content: unavailableMessage, timestamp: new Date() });
+      await chatbot.save();
+      return { message: unavailableMessage, sessionId };
+    }
 
     try {
       // Construir restricciones para el prompt
@@ -251,6 +283,7 @@ Instrucciones:
 - Puedes sugerirle al usuario que suba documentos para que puedas ayudarle mejor con información específica${restrictionsText}`;
 
       // Llamar a OpenAI
+      const openai = getOpenAI();
       const completion = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages: [
@@ -262,6 +295,10 @@ Instrucciones:
       });
 
       const assistantMessage = completion.choices[0].message.content || 'Lo siento, no pude generar una respuesta.';
+      await recordSpend(
+        'chatbot',
+        estimateCostUSD('gpt-4o-mini', completion.usage?.prompt_tokens ?? 0, completion.usage?.completion_tokens ?? 0),
+      );
 
       // Guardar respuesta del asistente
       chatbot.messages.push({

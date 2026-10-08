@@ -62,16 +62,14 @@ export const register = asyncHandler(async (req: AuthRequest, res: Response) => 
 export const login = asyncHandler(async (req: AuthRequest, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    logger.error('Login validation error:', errors.array());
+    logger.warn('Login validation error');
     throw new AppError('Validation error', 400);
   }
 
   const { email, password } = req.body;
-  logger.info(`Login attempt - Email: ${email}`);
 
   // Get user
   const user = await User.findOne({ email }).select('+password');
-  logger.info(`User found: ${!!user}, Email in DB: ${user?.email}`);
 
   if (!user || !user.password) {
     throw new AppError('Invalid credentials', 401);
@@ -129,8 +127,13 @@ export const refreshToken = asyncHandler(
       throw new AppError('Refresh token required', 400);
     }
 
-    // Verify refresh token
-    const decoded = verifyRefreshToken(refreshToken);
+    // Verify refresh token (firma inválida o vencida → 401, no 500)
+    let decoded: { id: string };
+    try {
+      decoded = verifyRefreshToken(String(refreshToken));
+    } catch {
+      throw new AppError('Invalid refresh token', 401);
+    }
 
     // Check if token exists in Redis
     const storedToken = await redis.get(`refresh_token:${decoded.id}`);

@@ -3,7 +3,13 @@ import auditoriaController, { upload } from '../controllers/auditoria.controller
 import auditoriaMedicaController from '../controllers/auditoria-medica.controller';
 import auditoriaModularController from '../controllers/auditoria-modular.controller';
 
+import { requireStaffOrDemoAccess } from '../middleware/access';
+
 const router = express.Router();
+
+// Política: staff o acceso a la demo /demo/cuentas-medicas (P4: DemoGrant).
+// Va antes de multer: una petición sin acceso no escribe nada en disco.
+router.use(requireStaffOrDemoAccess('cuentas-medicas'));
 
 /**
  * @swagger

@@ -10,8 +10,69 @@ import {
   ContentTemplate,
 } from '../services/content-manager.service';
 import { logger } from '../utils/logger';
+import { requireStaffOrDemoAccess } from '../middleware/access';
+import { consumeRateLimit, getBudgetStatus } from '../services/ai-budget.service';
+import { AuthRequest } from '../types';
 
 const router = Router();
+
+/** Límites de la demo /demo/gestor-contenido (visitantes; el staff no tiene cupo por IP). */
+export const CONTENT_LIMITS = {
+  maxContentChars: 10_000,
+  perWindow: 20,
+  windowSec: 10 * 60,
+  perDay: 100,
+} as const;
+
+/**
+ * Antes de llamar a OpenAI: clave configurada, tope mensual
+ * CONTENT_MONTHLY_BUDGET_USD (Redis) y cupo por IP. Falla cerrada (503) si no
+ * se puede medir el gasto.
+ */
+async function contentAiGate(req: Request, res: Response, next: () => void) {
+  const content = (req.body ?? {}).content;
+  if (typeof content === 'string' && content.length > CONTENT_LIMITS.maxContentChars) {
+    res.status(400).json({ success: false, code: 'content_too_long', message: `El texto supera ${CONTENT_LIMITS.maxContentChars} caracteres.` });
+    return;
+  }
+  if (!process.env.OPENAI_API_KEY) {
+    res.status(503).json({ success: false, code: 'ai_unavailable', message: 'La IA no está configurada en este servidor en este momento.' });
+    return;
+  }
+  const budget = await getBudgetStatus('content');
+  if (!budget.available) {
+    res.status(503).json({
+      success: false,
+      code: budget.reason === 'budget_exhausted' ? 'budget_exhausted' : 'ai_unavailable',
+      message:
+        budget.reason === 'budget_exhausted'
+          ? 'Alcanzamos el cupo mensual de IA de esta demo. Escríbenos y te la mostramos en una llamada.'
+          : 'La IA no está disponible en este momento. Intenta de nuevo en unos minutos.',
+    });
+    return;
+  }
+  if ((req as AuthRequest).demoAccess?.reason !== 'staff') {
+    const ip = req.ip || 'unknown';
+    const [w, d] = await Promise.all([
+      consumeRateLimit({ scope: 'content:10m', ip, limit: CONTENT_LIMITS.perWindow, windowSec: CONTENT_LIMITS.windowSec }),
+      consumeRateLimit({ scope: 'content:day', ip, limit: CONTENT_LIMITS.perDay, windowSec: 24 * 60 * 60 }),
+    ]);
+    if (!w || !d) {
+      res.status(503).json({ success: false, code: 'ai_unavailable', message: 'La IA no está disponible en este momento. Intenta de nuevo en unos minutos.' });
+      return;
+    }
+    if (!w.allowed || !d.allowed) {
+      res.setHeader('Retry-After', String(!w.allowed ? w.retryAfterSec : d.retryAfterSec));
+      res.status(429).json({ success: false, code: 'rate_limited', message: 'Llegaste al límite de solicitudes de IA. Espera unos minutos y vuelve a intentarlo.' });
+      return;
+    }
+  }
+  next();
+}
+
+// Política: staff o acceso a la demo /demo/gestor-contenido (pública por
+// defecto), con tope de gasto y cupo por IP.
+router.use(requireStaffOrDemoAccess('gestor-contenido'), contentAiGate);
 
 /**
  * @swagger
@@ -72,7 +133,7 @@ router.post(
       logger.error('Error in /improve:', error);
       return res.status(500).json({
         success: false,
-        message: error.message || 'Failed to improve content',
+        message: 'No pudimos mejorar el contenido. Intenta de nuevo.',
       });
     }
   }
@@ -145,7 +206,7 @@ router.post(
       logger.error('Error in /change-tone:', error);
       return res.status(500).json({
         success: false,
-        message: error.message || 'Failed to change tone',
+        message: 'No pudimos cambiar el tono. Intenta de nuevo.',
       });
     }
   }
@@ -217,7 +278,7 @@ router.post(
       logger.error('Error in /adjust-length:', error);
       return res.status(500).json({
         success: false,
-        message: error.message || 'Failed to adjust length',
+        message: 'No pudimos ajustar la longitud. Intenta de nuevo.',
       });
     }
   }
@@ -290,7 +351,7 @@ router.post(
       logger.error('Error in /generate-versions:', error);
       return res.status(500).json({
         success: false,
-        message: error.message || 'Failed to generate versions',
+        message: 'No pudimos generar las versiones. Intenta de nuevo.',
       });
     }
   }
@@ -355,7 +416,7 @@ router.post(
       logger.error('Error in /generate:', error);
       return res.status(500).json({
         success: false,
-        message: error.message || 'Failed to generate content',
+        message: 'No pudimos generar el contenido. Intenta de nuevo.',
       });
     }
   }

@@ -61,7 +61,7 @@ function DashboardPageInner() {
     const userData = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
     if (userData) {
       const parsed = JSON.parse(userData);
-      if (parsed.role === 'admin' || parsed.email === 'admin@koptup.com') {
+      if (parsed.role === 'admin') {
         router.push('/admin');
         return;
       }

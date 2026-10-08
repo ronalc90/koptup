@@ -6,7 +6,12 @@ import {
   resetearConfiguraciones,
 } from '../controllers/documentoConocimientoConfig.controller';
 
+import { requireAdmin, requireStaffOrDemoAccess } from '../middleware/access';
+
 const router = Router();
+
+// Política: staff o acceso a la demo /demo/cuentas-medicas; resetear todo, solo admin.
+router.use(requireStaffOrDemoAccess('cuentas-medicas'));
 
 /**
  * @swagger
@@ -79,6 +84,6 @@ router.post('/config/inicializar', inicializarConfiguraciones as RequestHandler)
  *       500:
  *         description: Error del servidor
  */
-router.post('/config/resetear', resetearConfiguraciones as RequestHandler);
+router.post('/config/resetear', ...requireAdmin, resetearConfiguraciones as RequestHandler);
 
 export default router;

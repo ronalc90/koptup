@@ -6,6 +6,9 @@ import { Request, Response } from 'express';
 import { chatbotService } from '../services/chatbot.service';
 import { logger } from '../utils/logger';
 
+/** Largo máximo del mensaje del chatbot por sesión (API heredada). */
+const LEGACY_MAX_MESSAGE_CHARS = 2000;
+
 /**
  * POST /api/chatbot/session
  * Crea o recupera una sesión de chatbot
@@ -101,14 +104,32 @@ export async function sendMessage(req: Request, res: Response) {
       });
     }
 
-    if (!message || message.trim().length === 0) {
+    if (typeof message !== 'string' || message.trim().length === 0) {
       return res.status(400).json({
         success: false,
         error: 'El mensaje no puede estar vacío',
       });
     }
 
-    const response = await chatbotService.sendMessage(sessionId, message, restrictedTopics);
+    if (message.length > LEGACY_MAX_MESSAGE_CHARS) {
+      return res.status(400).json({
+        success: false,
+        error: `El mensaje supera ${LEGACY_MAX_MESSAGE_CHARS} caracteres`,
+      });
+    }
+
+    if (typeof sessionId !== 'string' || !/^[A-Za-z0-9_-]{8,128}$/.test(sessionId)) {
+      return res.status(400).json({
+        success: false,
+        error: 'sessionId inválido',
+      });
+    }
+
+    const topics = Array.isArray(restrictedTopics)
+      ? restrictedTopics.filter((t: unknown) => typeof t === 'string').slice(0, 20).map((t: string) => t.slice(0, 100))
+      : undefined;
+
+    const response = await chatbotService.sendMessage(sessionId, message, topics);
 
     return res.json({
       success: true,

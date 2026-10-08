@@ -1,281 +1,131 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { SITE_URL } from '@/lib/site';
+import { API_BASE } from '@/lib/backend-url';
 
 /**
- * Genera contenido LinkedIn con OpenAI en un solo round-trip:
- *   - Post orgánico (hook, body, CTA, hashtags)
- *   - Ad copy LinkedIn Sponsored (headline, intro, description)
- *   - Carrusel 7 slides (title + bullets por slide)
+ * Proxy fino hacia el backend: POST /api/linkedin-ads/generate.
  *
- * Single-call con response_format JSON Schema → garantiza la forma de la salida.
- * Si OpenAI falla o falta la key, devolvemos 503 y el frontend cae al
- * generador local (generador.ts) automáticamente.
+ * La generación con OpenAI vive en el backend (apps/backend/src/routes/
+ * linkedin-ads.routes.ts), que aplica el acceso a la demo, el límite por cuenta (o por IP) en
+ * Redis y el tope de gasto mensual (LINKEDIN_ADS_MONTHLY_BUDGET_USD). Esta
+ * ruta solo reenvía:
+ *  - el cuerpo JSON tal cual,
+ *  - la sesión (cookie `accessToken` → `Authorization: Bearer`),
+ *  - la IP del visitante (`X-Forwarded-For`, y `X-Client-IP` firmada con
+ *    INTERNAL_API_KEY si está configurada en ambos lados).
+ * Si el backend no responde, devuelve 503 con un mensaje honesto y la demo
+ * sigue mostrando su generador local.
  */
 
 export const runtime = 'nodejs';
-// El cliente usa este endpoint en vivo; no cacheamos respuestas.
 export const dynamic = 'force-dynamic';
 
-interface RequestBody {
-  demo: {
-    titulo: string;
-    tagline: string;
-    industria: string;
-    path: string;
-    emoji: string;
-    problemaResuelve: string;
-    beneficiosClave: string[];
-    publicoObjetivo: string[];
-    metricaImpactante: string;
-    caracteristicasIA: string[];
-    hashtagsEspecificos: string[];
-  };
-  angulo: string;
-  tono: string;
-  anguloLabel?: string;
-  anguloDescripcion?: string;
-  tonoLabel?: string;
-  tonoDescripcion?: string;
+const MAX_BODY_BYTES = 64 * 1024;
+const BACKEND_TIMEOUT_MS = 60_000;
+
+function clientIp(req: NextRequest): string | null {
+  const forwarded = req.headers.get('x-forwarded-for');
+  if (forwarded) {
+    const first = forwarded.split(',')[0]?.trim();
+    if (first) return first;
+  }
+  return req.headers.get('x-real-ip') || req.ip || null;
 }
 
-interface OpenAiPayload {
-  post: {
-    hook: string;
-    body: string;
-    cta: string;
-    hashtags: string[];
-  };
-  ad: {
-    headline: string;
-    introText: string;
-    description: string;
-    cta: 'Más información' | 'Visitar sitio web' | 'Registrarse' | 'Probar demo';
-  };
-  carrusel: Array<{
-    numero: number;
-    titulo: string;
-    bullets: string[];
-    notaVisual: string;
-  }>;
-  // Extra: insight de por qué esta combinación tono+ángulo le sirve a este demo.
-  estrategia: string;
+async function refreshAccessToken(refreshToken: string, baseHeaders: Record<string, string>): Promise<string | null> {
+  try {
+    const res = await fetch(`${API_BASE}/auth/refresh`, {
+      method: 'POST',
+      headers: { ...baseHeaders, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken }),
+      cache: 'no-store',
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as { data?: { accessToken?: string } };
+    return json?.data?.accessToken ?? null;
+  } catch {
+    return null;
+  }
 }
 
-const SYSTEM_PROMPT = `Eres un copywriter senior de LinkedIn para B2B SaaS en LATAM. Tu trabajo es generar contenido orgánico, ad copy y carruseles que:
-- Generen engagement real (no buzzword soup).
-- Conecten con la audiencia objetivo del producto.
-- Usen español colombiano neutro, tratando al lector de "tú" (nunca voseo); se entiende en toda LATAM.
-- Empiecen con un hook fuerte: pregunta, dato sorprendente o promesa concreta.
-- Respeten los límites de LinkedIn (post máx 3000 chars, ad headline 70, intro 150, description 70).
-- Cierren con CTA clara al demo de Koptup.
-- NUNCA inventen métricas o casos de clientes que no estén en el input. Si necesitas un caso, formúlalo como hipótesis ("Imagina una empresa de X que...").
-
-Devuelve JSON estricto cumpliendo el schema. Nada de markdown.`;
-
-function buildUserPrompt(req: RequestBody): string {
-  const d = req.demo;
-  return `Genera contenido LinkedIn para promocionar este producto de Koptup:
-
-PRODUCTO
-- Título: ${d.titulo}
-- Tagline: ${d.tagline}
-- Industria: ${d.industria}
-- Problema que resuelve: ${d.problemaResuelve}
-- Beneficios clave: ${d.beneficiosClave.map((b, i) => `${i + 1}) ${b}`).join('; ')}
-- Capacidades IA: ${d.caracteristicasIA.join(', ')}
-- Público objetivo: ${d.publicoObjetivo.join(', ')}
-- Métrica impactante: ${d.metricaImpactante}
-- URL del demo: ${SITE_URL}${d.path}
-- Emoji del producto: ${d.emoji}
-- Hashtags específicos: ${d.hashtagsEspecificos.join(' ')}
-
-ÁNGULO: ${req.anguloLabel || req.angulo}${req.anguloDescripcion ? ` — ${req.anguloDescripcion}` : ''}
-TONO: ${req.tonoLabel || req.tono}${req.tonoDescripcion ? ` — ${req.tonoDescripcion}` : ''}
-
-ENTREGABLES (todos a la vez, en un único JSON):
-
-1. post.hook: 1 línea. Gancho fuerte que pare el scroll.
-2. post.body: 5-10 líneas. Bullets con emojis. Menciona métrica y caso de uso.
-3. post.cta: 1-2 líneas con la URL ${SITE_URL}${d.path}.
-4. post.hashtags: 6-9 hashtags relevantes (incluye #Koptup obligatorio).
-
-5. ad.headline: máx 70 chars, vendedor.
-6. ad.introText: máx 150 chars, gancho + URL.
-7. ad.description: máx 70 chars, subtítulo.
-8. ad.cta: una de ['Más información','Visitar sitio web','Registrarse','Probar demo'].
-
-9. carrusel: array de 7 slides. Slide 1 = portada con título + emoji. Slide 2 = problema. Slide 3 = solución (bullets). Slide 4 = capacidades IA. Slide 5 = métrica. Slide 6 = para quién. Slide 7 = CTA a la URL.
-   Cada slide tiene: numero (1-7), titulo (corto), bullets (1-4 líneas concisas), notaVisual (instrucción para el diseñador).
-
-10. estrategia: 1-2 líneas explicando por qué este ángulo + tono va a funcionar para esta combinación demo/audiencia.`;
+function withRenewedCookie(res: NextResponse, req: NextRequest, token: string | null): NextResponse {
+  if (token) {
+    res.cookies.set('accessToken', token, {
+      path: '/',
+      maxAge: 15 * 60,
+      sameSite: 'lax',
+      secure: req.nextUrl.protocol === 'https:',
+    });
+  }
+  return res;
 }
-
-const RESPONSE_SCHEMA = {
-  type: 'object',
-  additionalProperties: false,
-  required: ['post', 'ad', 'carrusel', 'estrategia'],
-  properties: {
-    post: {
-      type: 'object',
-      additionalProperties: false,
-      required: ['hook', 'body', 'cta', 'hashtags'],
-      properties: {
-        hook: { type: 'string' },
-        body: { type: 'string' },
-        cta: { type: 'string' },
-        hashtags: {
-          type: 'array',
-          items: { type: 'string' },
-          minItems: 4,
-          maxItems: 12,
-        },
-      },
-    },
-    ad: {
-      type: 'object',
-      additionalProperties: false,
-      required: ['headline', 'introText', 'description', 'cta'],
-      properties: {
-        headline: { type: 'string', maxLength: 90 },
-        introText: { type: 'string', maxLength: 200 },
-        description: { type: 'string', maxLength: 90 },
-        cta: {
-          type: 'string',
-          enum: ['Más información', 'Visitar sitio web', 'Registrarse', 'Probar demo'],
-        },
-      },
-    },
-    carrusel: {
-      type: 'array',
-      minItems: 5,
-      maxItems: 8,
-      items: {
-        type: 'object',
-        additionalProperties: false,
-        required: ['numero', 'titulo', 'bullets', 'notaVisual'],
-        properties: {
-          numero: { type: 'integer', minimum: 1, maximum: 8 },
-          titulo: { type: 'string' },
-          bullets: {
-            type: 'array',
-            items: { type: 'string' },
-            minItems: 1,
-            maxItems: 6,
-          },
-          notaVisual: { type: 'string' },
-        },
-      },
-    },
-    estrategia: { type: 'string' },
-  },
-};
 
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
+  const raw = await req.text();
+  if (raw.length > MAX_BODY_BYTES) {
+    return NextResponse.json({ error: 'La solicitud es demasiado grande.' }, { status: 413 });
+  }
+
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  const ip = clientIp(req);
+  if (ip) {
+    headers['X-Forwarded-For'] = ip;
+    const internalKey = process.env.INTERNAL_API_KEY;
+    if (internalKey) {
+      headers['X-Internal-Key'] = internalKey;
+      headers['X-Client-IP'] = ip;
+    }
+  }
+  // Sesión: el access token dura 15 min; si su cookie ya venció pero hay
+  // refresh token, se renueva aquí (como hace el middleware de /dashboard).
+  let token = req.cookies.get('accessToken')?.value;
+  let renewedToken: string | null = null;
+  const refreshToken = req.cookies.get('refreshToken')?.value;
+  if (!token && refreshToken) {
+    renewedToken = await refreshAccessToken(refreshToken, headers);
+    if (renewedToken) token = renewedToken;
+  }
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  let upstream: Response;
+  try {
+    upstream = await fetch(`${API_BASE}/linkedin-ads/generate`, {
+      method: 'POST',
+      headers,
+      body: raw,
+      cache: 'no-store',
+      signal: AbortSignal.timeout(BACKEND_TIMEOUT_MS),
+    });
+  } catch {
     return NextResponse.json(
-      { error: 'OPENAI_API_KEY no configurada en el servidor.' },
+      { error: 'El servicio de generación con IA no está disponible en este momento. Usa el generador local.' },
       { status: 503 },
     );
   }
 
-  let body: RequestBody;
+  const text = await upstream.text();
+  let json: unknown = null;
   try {
-    body = (await req.json()) as RequestBody;
+    json = text ? JSON.parse(text) : null;
   } catch {
-    return NextResponse.json({ error: 'JSON inválido' }, { status: 400 });
+    json = null;
   }
-
-  if (!body?.demo?.titulo || !body?.angulo || !body?.tono) {
+  if (!json || typeof json !== 'object') {
     return NextResponse.json(
-      { error: 'Faltan campos requeridos: demo, angulo, tono.' },
-      { status: 400 },
+      { error: 'El servicio de generación con IA respondió de forma inesperada. Usa el generador local.' },
+      { status: upstream.ok ? 502 : upstream.status >= 500 ? 503 : upstream.status },
     );
   }
 
-  const model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
-
-  try {
-    const oaResp = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model,
-        temperature: 0.85,
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          { role: 'user', content: buildUserPrompt(body) },
-        ],
-        response_format: {
-          type: 'json_schema',
-          json_schema: {
-            name: 'linkedin_content_pack',
-            strict: true,
-            schema: RESPONSE_SCHEMA,
-          },
-        },
-      }),
-    });
-
-    if (!oaResp.ok) {
-      const errText = await oaResp.text();
-      // Si el modelo no soporta json_schema, reintentamos con json_object (compat).
-      if (oaResp.status === 400 && /response_format|json_schema/i.test(errText)) {
-        const fallback = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${apiKey}`,
-          },
-          body: JSON.stringify({
-            model,
-            temperature: 0.85,
-            messages: [
-              {
-                role: 'system',
-                content:
-                  SYSTEM_PROMPT +
-                  '\n\nDevuelve EXCLUSIVAMENTE un objeto JSON con la forma {post:{hook,body,cta,hashtags[]},ad:{headline,introText,description,cta},carrusel:[{numero,titulo,bullets[],notaVisual}],estrategia}.',
-              },
-              { role: 'user', content: buildUserPrompt(body) },
-            ],
-            response_format: { type: 'json_object' },
-          }),
-        });
-        if (!fallback.ok) {
-          const t = await fallback.text();
-          return NextResponse.json(
-            { error: 'OpenAI rechazó la solicitud', detail: t.slice(0, 400) },
-            { status: 502 },
-          );
-        }
-        const j = await fallback.json();
-        const content = j.choices?.[0]?.message?.content;
-        if (!content) {
-          return NextResponse.json({ error: 'Respuesta vacía de OpenAI' }, { status: 502 });
-        }
-        const parsed = JSON.parse(content) as OpenAiPayload;
-        return NextResponse.json({ data: parsed, model, usage: j.usage });
-      }
-
-      return NextResponse.json(
-        { error: 'OpenAI rechazó la solicitud', detail: errText.slice(0, 400) },
-        { status: 502 },
-      );
-    }
-
-    const json = await oaResp.json();
-    const content = json.choices?.[0]?.message?.content;
-    if (!content) {
-      return NextResponse.json({ error: 'Respuesta vacía de OpenAI' }, { status: 502 });
-    }
-    const parsed = JSON.parse(content) as OpenAiPayload;
-    return NextResponse.json({ data: parsed, model, usage: json.usage });
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Error desconocido';
-    return NextResponse.json({ error: msg }, { status: 500 });
+  // Los errores del backend traen `message` o `error`; la demo muestra `error`
+  // seguido de ". Mostrando versión local…", así que va sin punto final.
+  const body = json as Record<string, unknown>;
+  if (!upstream.ok) {
+    const message = typeof body.error === 'string' ? body.error : typeof body.message === 'string' ? body.message : null;
+    if (message) body.error = message.replace(/[.\s]+$/, '');
   }
+  const res = NextResponse.json(body, { status: upstream.status });
+  const retryAfter = upstream.headers.get('retry-after');
+  if (retryAfter) res.headers.set('Retry-After', retryAfter);
+  return withRenewedCookie(res, req, renewedToken);
 }

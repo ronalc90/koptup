@@ -47,12 +47,30 @@ export interface SemanticSearchResult {
 
 type ViewType = 'all' | 'favorites' | 'recent' | 'trash' | 'folder' | 'settings';
 
+/** Mensaje cuando el backend exige sesión (401): el gestor guarda documentos por cuenta. */
+export const DOCUMENTS_LOGIN_REQUIRED_MESSAGE = 'Inicia sesión para ver y subir tus documentos.';
+
+function isUnauthorized(err: any): boolean {
+  return err?.response?.status === 401;
+}
+
+/** Mensaje para el usuario: sesión requerida, el del backend o el de respaldo. */
+function errorMessage(err: any, fallback: string): string {
+  if (isUnauthorized(err)) return DOCUMENTS_LOGIN_REQUIRED_MESSAGE;
+  return err?.response?.data?.message || fallback;
+}
+
 export function useDocuments(view: ViewType = 'all', selectedFolder?: string) {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [folders, setFolders] = useState<Folder[]>([]);
   const [stats, setStats] = useState<DocumentStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  /**
+   * true si el backend respondió 401: los documentos se guardan por cuenta
+   * (autenticación + aislamiento por usuario), así que hay que iniciar sesión.
+   */
+  const [requiresLogin, setRequiresLogin] = useState(false);
 
   const fetchDocuments = useCallback(async () => {
     try {
@@ -73,9 +91,14 @@ export function useDocuments(view: ViewType = 'all', selectedFolder?: string) {
 
       const response = await api.get('/api/documents', { params });
       setDocuments(response.data.data || []);
+      setRequiresLogin(false);
     } catch (err: any) {
-      console.error('Error fetching documents:', err);
-      setError(err.response?.data?.message || 'Error al cargar documentos');
+      if (isUnauthorized(err)) {
+        setRequiresLogin(true);
+      } else {
+        console.error('Error fetching documents:', err);
+      }
+      setError(errorMessage(err, 'Error al cargar documentos'));
       setDocuments([]);
     } finally {
       setLoading(false);
@@ -86,8 +109,8 @@ export function useDocuments(view: ViewType = 'all', selectedFolder?: string) {
     try {
       const response = await api.get('/api/documents/folders');
       setFolders(response.data.data || []);
-    } catch (err) {
-      console.error('Error fetching folders:', err);
+    } catch (err: any) {
+      if (!isUnauthorized(err)) console.error('Error fetching folders:', err);
       setFolders([]);
     }
   }, []);
@@ -96,8 +119,8 @@ export function useDocuments(view: ViewType = 'all', selectedFolder?: string) {
     try {
       const response = await api.get('/api/documents/stats');
       setStats(response.data.data || null);
-    } catch (err) {
-      console.error('Error fetching stats:', err);
+    } catch (err: any) {
+      if (!isUnauthorized(err)) console.error('Error fetching stats:', err);
       setStats(null);
     }
   }, []);
@@ -138,7 +161,7 @@ export function useDocuments(view: ViewType = 'all', selectedFolder?: string) {
 
         return response.data.data;
       } catch (err: any) {
-        throw new Error(err.response?.data?.message || 'Error al subir documento');
+        throw new Error(errorMessage(err, 'Error al subir documento'));
       }
     },
     [fetchDocuments, fetchFolders, fetchStats]
@@ -150,7 +173,7 @@ export function useDocuments(view: ViewType = 'all', selectedFolder?: string) {
         await api.patch(`/api/documents/${id}`, updates);
         await Promise.all([fetchDocuments(), fetchFolders(), fetchStats()]);
       } catch (err: any) {
-        throw new Error(err.response?.data?.message || 'Error al actualizar documento');
+        throw new Error(errorMessage(err, 'Error al actualizar documento'));
       }
     },
     [fetchDocuments, fetchFolders, fetchStats]
@@ -167,7 +190,7 @@ export function useDocuments(view: ViewType = 'all', selectedFolder?: string) {
         });
         await Promise.all([fetchDocuments(), fetchFolders(), fetchStats()]);
       } catch (err: any) {
-        throw new Error(err.response?.data?.message || 'Error al eliminar documento');
+        throw new Error(errorMessage(err, 'Error al eliminar documento'));
       }
     },
     [fetchDocuments, fetchFolders, fetchStats]
@@ -179,7 +202,7 @@ export function useDocuments(view: ViewType = 'all', selectedFolder?: string) {
         await api.post(`/api/documents/${id}/restore`);
         await Promise.all([fetchDocuments(), fetchFolders(), fetchStats()]);
       } catch (err: any) {
-        throw new Error(err.response?.data?.message || 'Error al restaurar documento');
+        throw new Error(errorMessage(err, 'Error al restaurar documento'));
       }
     },
     [fetchDocuments, fetchFolders, fetchStats]
@@ -212,7 +235,7 @@ export function useDocuments(view: ViewType = 'all', selectedFolder?: string) {
         await api.post('/api/documents/folders', { name });
         await fetchFolders();
       } catch (err: any) {
-        throw new Error(err.response?.data?.message || 'Error al crear carpeta');
+        throw new Error(errorMessage(err, 'Error al crear carpeta'));
       }
     },
     [fetchFolders]
@@ -223,7 +246,7 @@ export function useDocuments(view: ViewType = 'all', selectedFolder?: string) {
       const response = await api.post('/api/documents/search/semantic', { query });
       return response.data.results || [];
     } catch (err: any) {
-      throw new Error(err.response?.data?.message || 'Error en búsqueda semántica');
+      throw new Error(errorMessage(err, 'Error en búsqueda semántica'));
     }
   }, []);
 
@@ -232,7 +255,7 @@ export function useDocuments(view: ViewType = 'all', selectedFolder?: string) {
       const response = await api.get(`/api/documents/${id}/explain`);
       return response.data.data.explanation || '';
     } catch (err: any) {
-      throw new Error(err.response?.data?.message || 'Error al explicar documento');
+      throw new Error(errorMessage(err, 'Error al explicar documento'));
     }
   }, []);
 
@@ -241,7 +264,7 @@ export function useDocuments(view: ViewType = 'all', selectedFolder?: string) {
       const response = await api.post(`/api/documents/${id}/explain-similarity`, { query, similarity });
       return response.data.data.explanation || '';
     } catch (err: any) {
-      throw new Error(err.response?.data?.message || 'Error al explicar similitud');
+      throw new Error(errorMessage(err, 'Error al explicar similitud'));
     }
   }, []);
 
@@ -266,6 +289,7 @@ export function useDocuments(view: ViewType = 'all', selectedFolder?: string) {
     stats,
     loading,
     error,
+    requiresLogin,
     uploadDocument,
     updateDocument,
     deleteDocument,

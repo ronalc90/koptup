@@ -173,12 +173,11 @@ export async function exportExcelFile(req: Request, res: Response): Promise<void
       return;
     }
 
-    // Security: Only allow files from exports directory
+    // Seguridad: solo un nombre de archivo (sin rutas) dentro de uploads/exports.
     const exportsDir = path.resolve('./uploads/exports');
-    const filePath = path.join(exportsDir, file);
+    const filePath = path.resolve(exportsDir, file);
 
-    // Prevent directory traversal
-    if (!filePath.startsWith(exportsDir)) {
+    if (path.basename(file) !== file || !filePath.startsWith(exportsDir + path.sep)) {
       res.status(403).json({
         success: false,
         message: 'Acceso denegado',

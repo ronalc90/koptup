@@ -1,12 +1,11 @@
 // RAG Service for medical validations using Ley100 documents
-import OpenAI from 'openai';
+import { lazyOpenAI } from './openai.service';
 import { DocumentoLey100 } from '../models/DocumentoLey100';
 import { extractTextFromPDF } from './pdf.service';
 import { logger } from '../utils/logger';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Perezoso: no falla al importar si falta OPENAI_API_KEY.
+const openai = lazyOpenAI();
 
 interface RAGContext {
   documentText: string;

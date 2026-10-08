@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import { AuthRequest } from '../types';
+import { isStaffRole } from '../middleware/access';
 import Invoice from '../models/Invoice';
 import Project from '../models/Project';
 import User from '../models/User';
@@ -167,6 +168,11 @@ export const payInvoice = async (req: AuthRequest, res: Response) => {
       return;
     }
 
+    if (invoice.userId.toString() !== userId.toString() && !isStaffRole(req.user?.role)) {
+      res.status(403).json({ success: false, message: 'No tienes permiso para pagar esta factura' });
+      return;
+    }
+
     if (invoice.status === 'paid') {
       res.status(400).json({ success: false, message: 'La factura ya está pagada' });
       return;
@@ -205,6 +211,11 @@ export const downloadInvoice = async (req: AuthRequest, res: Response) => {
     const invoice = await Invoice.findById(id);
     if (!invoice) {
       res.status(404).json({ success: false, message: 'Factura no encontrada' });
+      return;
+    }
+
+    if (invoice.userId.toString() !== userId.toString() && !isStaffRole(req.user?.role)) {
+      res.status(403).json({ success: false, message: 'No tienes permiso para descargar esta factura' });
       return;
     }
 

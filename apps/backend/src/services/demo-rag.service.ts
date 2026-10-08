@@ -20,8 +20,14 @@ import crypto from 'crypto';
 import path from 'path';
 import pdfParse from 'pdf-parse';
 import mammoth from 'mammoth';
-import { getRedisClient } from '../config/redis';
 import { logger } from '../utils/logger';
+import {
+  getBudgetStatus,
+  getMonthlyBudgetUSD as getFeatureMonthlyBudgetUSD,
+  getReadyRedis,
+  recordSpend as recordFeatureSpend,
+  withTimeout,
+} from './ai-budget.service';
 import {
   callOpenAI,
   chunkText,
@@ -70,7 +76,6 @@ function documentTtlMs(): number {
   return Math.min(DEMO_LIMITS.ttlMs, Math.floor(seconds * 1000));
 }
 
-const DEFAULT_MONTHLY_BUDGET_USD = 50;
 /** Chunks recuperados por pregunta (mismo top-K que el chat del chatbot). */
 const TOP_K = 5;
 /** Si BM25 no encuentra coincidencias, se envían los primeros N chunks. */
@@ -89,12 +94,7 @@ const PARSE_TIMEOUT_MS = 20 * 1000;
 const EXCERPT_CHARS = 600;
 
 const REDIS_OP_TIMEOUT_MS = 3000;
-const REDIS_CONNECT_TIMEOUT_MS = 7000;
-/** Tras un fallo de conexión a Redis, no reintentar durante 30 s. */
-const REDIS_RETRY_COOLDOWN_MS = 30 * 1000;
 const DAY_SECONDS = 24 * 60 * 60;
-/** El gasto de cada mes se conserva ~2 meses para consulta y luego expira. */
-const SPEND_KEY_TTL_SECONDS = 62 * DAY_SECONDS;
 
 export const NOT_FOUND_REPLY = 'No encontré esa información en el documento.';
 const NOT_FOUND_REPLY_EN = "I couldn't find that information in the document.";
@@ -171,56 +171,14 @@ export class DemoRagError extends Error {
 //   Configuración, Redis y presupuesto
 // ---------------------------------------------------------------------------
 
-type RedisClient = Awaited<ReturnType<typeof getRedisClient>>;
-
-let redisRetryAfter = 0;
-let warnedInvalidBudget = false;
-
-function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
-  let timer: NodeJS.Timeout | undefined;
-  const timeout = new Promise<never>((_, reject) => {
-    timer = setTimeout(() => reject(new Error(`${label}: timeout de ${ms} ms`)), ms);
-  });
-  return Promise.race([promise, timeout]).finally(() => {
-    if (timer) clearTimeout(timer);
-  });
-}
-
-/** Devuelve el cliente de Redis listo, o null si no hay conexión (falla cerrada). */
-async function getReadyRedis(): Promise<RedisClient | null> {
-  if (Date.now() < redisRetryAfter) return null;
-  try {
-    const client = await withTimeout(getRedisClient(), REDIS_CONNECT_TIMEOUT_MS, 'Redis connect');
-    if (!client.isReady) throw new Error('Redis no está listo');
-    return client;
-  } catch (err) {
-    redisRetryAfter = Date.now() + REDIS_RETRY_COOLDOWN_MS;
-    logger.warn(`[demo-rag] Redis no disponible, la demo queda deshabilitada: ${(err as Error)?.message ?? err}`);
-    return null;
-  }
-}
-
 /**
- * Presupuesto mensual en USD. Sin variable → 50. Un valor inválido o negativo
- * deja la demo sin presupuesto (0): falla cerrada.
+ * Presupuesto mensual en USD (DEMO_MONTHLY_BUDGET_USD, por defecto 50). Un
+ * valor inválido o negativo deja la demo sin presupuesto (0): falla cerrada.
+ * La infraestructura (Redis, clave `demo-rag:spend:YYYY-MM`) es la compartida
+ * de `ai-budget.service.ts`, la misma que usan el chatbot y LinkedIn Ads.
  */
 export function getMonthlyBudgetUSD(): number {
-  const raw = process.env.DEMO_MONTHLY_BUDGET_USD;
-  if (raw === undefined || raw.trim() === '') return DEFAULT_MONTHLY_BUDGET_USD;
-  const value = Number(raw);
-  if (!Number.isFinite(value) || value < 0) {
-    if (!warnedInvalidBudget) {
-      logger.warn('[demo-rag] DEMO_MONTHLY_BUDGET_USD inválido; se usa 0 (demo deshabilitada por presupuesto).');
-      warnedInvalidBudget = true;
-    }
-    return 0;
-  }
-  return value;
-}
-
-/** Mes de facturación en UTC (como factura OpenAI): YYYY-MM. */
-function spendKey(now = new Date()): string {
-  return `demo-rag:spend:${now.toISOString().slice(0, 7)}`;
+  return getFeatureMonthlyBudgetUSD('demo-rag');
 }
 
 /** Día en hora de Colombia (UTC-5, sin horario de verano): YYYY-MM-DD. */
@@ -234,30 +192,9 @@ function dailyUploadsKey(ip: string, now = new Date()): string {
   return `demo-rag:docs:${bogotaDay(now)}:${ipHash}`;
 }
 
-async function readMonthlySpend(client: RedisClient): Promise<number> {
-  const raw = await withTimeout(client.get(spendKey()), REDIS_OP_TIMEOUT_MS, 'Redis GET spend');
-  const value = raw ? Number(raw) : 0;
-  return Number.isFinite(value) ? value : 0;
-}
-
 /** Suma el costo de una llamada a OpenAI al gasto del mes. */
 async function recordSpend(usd: number): Promise<void> {
-  if (!(usd > 0)) return;
-  const client = await getReadyRedis();
-  if (!client) {
-    logger.error(`[demo-rag] No se pudo registrar un gasto de USD ${usd}: Redis no disponible.`);
-    return;
-  }
-  const key = spendKey();
-  try {
-    await withTimeout(
-      client.multi().incrByFloat(key, usd).expire(key, SPEND_KEY_TTL_SECONDS).exec(),
-      REDIS_OP_TIMEOUT_MS,
-      'Redis INCRBYFLOAT spend',
-    );
-  } catch (err) {
-    logger.error(`[demo-rag] No se pudo registrar un gasto de USD ${usd}: ${(err as Error)?.message ?? err}`);
-  }
+  await recordFeatureSpend('demo-rag', usd);
 }
 
 export type DemoDisabledReason = 'disabled' | 'unavailable' | 'budget_exhausted';
@@ -282,17 +219,9 @@ export async function getDemoStatus(): Promise<DemoStatus> {
   if (!process.env.OPENAI_API_KEY) {
     return { enabled: false, reason: 'unavailable', budgetExhausted: false };
   }
-  const client = await getReadyRedis();
-  if (!client) return { enabled: false, reason: 'unavailable', budgetExhausted: false };
-
-  let spend: number;
-  try {
-    spend = await readMonthlySpend(client);
-  } catch (err) {
-    logger.warn(`[demo-rag] No se pudo leer el gasto del mes: ${(err as Error)?.message ?? err}`);
-    return { enabled: false, reason: 'unavailable', budgetExhausted: false };
-  }
-  if (spend >= getMonthlyBudgetUSD()) {
+  const budget = await getBudgetStatus('demo-rag');
+  if (budget.reason === 'unavailable') return { enabled: false, reason: 'unavailable', budgetExhausted: false };
+  if (budget.reason === 'budget_exhausted') {
     return { enabled: false, reason: 'budget_exhausted', budgetExhausted: true };
   }
   return { enabled: true, reason: null, budgetExhausted: false };

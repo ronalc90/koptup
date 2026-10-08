@@ -13,6 +13,7 @@ import {
   SparklesIcon,
 } from '@heroicons/react/24/outline';
 import { API_BASE as API_BASE_URL } from '@/lib/backend-url';
+import { authFetch } from '@/lib/auth-token';
 
 interface EstadisticasExperto {
   totalCuentas: number;
@@ -51,21 +52,21 @@ export default function DashboardAuditoria() {
     setLoading(true);
     try {
       // Cargar estadísticas del sistema experto
-      const resExperto = await fetch(`${API_BASE_URL}/expert/estadisticas`);
+      const resExperto = await authFetch(`${API_BASE_URL}/expert/estadisticas`);
       const dataExperto = await resExperto.json();
       if (dataExperto.success) {
         setEstadisticasExperto(dataExperto.data);
       }
 
       // Cargar estadísticas de CUPS
-      const resCUPS = await fetch(`${API_BASE_URL}/cups/estadisticas`);
+      const resCUPS = await authFetch(`${API_BASE_URL}/cups/estadisticas`);
       const dataCUPS = await resCUPS.json();
       if (dataCUPS.success) {
         setEstadisticasCUPS(dataCUPS.data);
       }
 
       // Cargar estadísticas de vectorización
-      const resVector = await fetch(`${API_BASE_URL}/cups/estadisticas-vectorizacion`);
+      const resVector = await authFetch(`${API_BASE_URL}/cups/estadisticas-vectorizacion`);
       const dataVector = await resVector.json();
       if (dataVector.success) {
         setEstadisticasVector(dataVector.data);

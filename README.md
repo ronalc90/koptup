@@ -40,8 +40,8 @@ Plataforma RAG end-to-end. Ingesta PDF/Word/Excel/CSV/HTML/URLs, chunking, retri
 
 Generador de copies para campañas de LinkedIn con OpenAI server-side. Calendario editorial, plantillas por industria, variantes A/B, preview en formato nativo de LinkedIn.
 
-**Stack real:** Next.js API routes · OpenAI SDK server-side · UI con preview LinkedIn-style.
-**Código:** [`apps/web/src/app/api/linkedin-ads/generate/route.ts`](apps/web/src/app/api/linkedin-ads/generate/route.ts).
+**Stack real:** Express (backend) con OpenAI, límite por cuenta (o por IP sin sesión) en Redis y tope de gasto mensual · ruta de Next como proxy · UI con preview LinkedIn-style.
+**Código:** [`apps/backend/src/routes/linkedin-ads.routes.ts`](apps/backend/src/routes/linkedin-ads.routes.ts) y el proxy [`apps/web/src/app/api/linkedin-ads/generate/route.ts`](apps/web/src/app/api/linkedin-ads/generate/route.ts).
 
 ## Prototipos navegables
 
@@ -127,6 +127,22 @@ La subida de documentos en `/demo/chatbot` (`/api/demo-rag`) queda **apagada** h
 | `TRUST_PROXY_HOPS` | `1` en Railway | Cantidad de proxies delante del backend; define la IP real del visitante para los límites por IP. |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM`, `ADMIN_EMAIL`, `WHATSAPP_PROVIDER` y las de su proveedor | las que ya usa el formulario de contacto | Avisos por email y WhatsApp de cada lead (mismo canal que el formulario de contacto). |
 | `DEMO_RAG_TTL_SECONDS` | **no la definas en Railway** | Solo para pruebas locales: baja el tiempo de vida de 1 hora de los documentos. Se ignora con `NODE_ENV=production`. |
+
+### Backend (Railway): seguridad y topes de IA
+
+Al arrancar, el backend valida sus variables con zod (`apps/backend/src/config/env.ts`): en producción **no arranca** si falta `MONGODB_URI`, `JWT_SECRET` o `JWT_REFRESH_SECRET`; las opcionales que faltan solo quedan como aviso en el log. La lista completa, con su efecto, está en [`apps/backend/.env.example`](apps/backend/.env.example).
+
+| Variable | Valor | Qué hace |
+|---|---|---|
+| `JWT_SECRET`, `JWT_REFRESH_SECRET` | obligatorias, largas y distintas | Firman los tokens de sesión y de renovación. |
+| `CHATBOT_MONTHLY_BUDGET_USD` | por defecto `50` | Tope de gasto mensual en OpenAI del chatbot (Builder, Playground y chat por sesión). Al alcanzarlo, el chat responde en modo extractivo y lo dice. |
+| `LINKEDIN_ADS_MONTHLY_BUDGET_USD` | por defecto `20` | Tope mensual del generador de LinkedIn Ads (además, 5 generaciones cada 10 minutos y 30 al día por cuenta, o por IP si no hay sesión). |
+| `CONTENT_MONTHLY_BUDGET_USD` | por defecto `20` | Tope mensual del gestor de contenido con IA. |
+| `INTERNAL_API_KEY` | opcional, igual en Vercel y Railway | Permite que la web (middleware de `/admin` y `/dashboard`, proxy de LinkedIn Ads) informe la IP real del visitante para los límites por IP (sin ella, esas peticiones cuentan por la IP de salida de Vercel). |
+| `ADMIN_EMAIL` | opcional | Si existe, el arranque asegura el rol admin de esa cuenta (solo si ya está registrada). Sin ella, el arranque no cambia roles; también se puede usar `src/scripts/set-admin.ts`. |
+| `API_DOCS_ENABLED` | `false` en producción | `/api-docs` solo existe fuera de producción o con este valor en `true`. |
+
+Railway revisa `GET /health/live` (el proceso responde) al desplegar; `GET /health` responde 503 si MongoDB no está conectado.
 
 ## Estructura del repo
 

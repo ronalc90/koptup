@@ -7,6 +7,12 @@ export interface AuthRequest extends Request {
     role: string;
     name?: string;
   };
+  /** Lo llena `requireStaffOrDemoAccess`: por qué se permitió el acceso. */
+  demoAccess?: {
+    slug: string;
+    reason: 'staff' | 'public' | 'grant' | 'login_required' | 'no_access';
+    grantId?: string;
+  };
 }
 
 export interface User {

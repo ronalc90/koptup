@@ -218,6 +218,12 @@ router.post('/logout', authenticate, logout as RequestHandler);
 router.get('/profile', authenticate, getProfile as RequestHandler);
 
 /**
+ * GET /api/auth/me — usuario vigente según la BD (id, email, nombre y rol).
+ * Lo usa el middleware de Next para proteger /admin y /dashboard en el servidor.
+ */
+router.get('/me', authenticate, getProfile as RequestHandler);
+
+/**
  * @swagger
  * /api/auth/google:
  *   get:

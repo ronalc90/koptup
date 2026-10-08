@@ -1,6 +1,11 @@
 import axios from 'axios';
+import { withAuth } from '@/lib/auth-token';
 import { BACKEND_URL as API_URL } from '@/lib/backend-url';
 import { downloadBlob } from '@/lib/utils';
+
+// Envía la sesión (Authorization) en cada llamada: el backend exige staff o
+// acceso a la demo de cuentas médicas para estas rutas.
+const http = withAuth(axios.create());
 
 export interface Radicado {
   id: string;
@@ -75,7 +80,7 @@ class LiquidacionService {
    * Crear un nuevo radicado
    */
   async crearRadicado(data: CrearRadicadoData): Promise<Radicado> {
-    const response = await axios.post(`${API_URL}/api/liquidacion/radicados`, data);
+    const response = await http.post(`${API_URL}/api/liquidacion/radicados`, data);
     return response.data.data;
   }
 
@@ -96,7 +101,7 @@ class LiquidacionService {
     if (filtros?.limit) params.append('limit', String(filtros.limit));
     if (filtros?.offset) params.append('offset', String(filtros.offset));
 
-    const response = await axios.get(`${API_URL}/api/liquidacion/radicados?${params}`);
+    const response = await http.get(`${API_URL}/api/liquidacion/radicados?${params}`);
     return response.data;
   }
 
@@ -104,7 +109,7 @@ class LiquidacionService {
    * Obtener un radicado por ID o número
    */
   async obtenerRadicadoPorId(id: string): Promise<RadicadoCompleto> {
-    const response = await axios.get(`${API_URL}/api/liquidacion/radicados/${id}`);
+    const response = await http.get(`${API_URL}/api/liquidacion/radicados/${id}`);
     return response.data.data;
   }
 
@@ -117,7 +122,7 @@ class LiquidacionService {
       formData.append('files', file);
     });
 
-    const response = await axios.post(
+    const response = await http.post(
       `${API_URL}/api/liquidacion/radicados/${id}/documentos`,
       formData,
       {
@@ -133,7 +138,7 @@ class LiquidacionService {
    * Ejecutar liquidación automatizada
    */
   async liquidarRadicado(id: string): Promise<ResultadoLiquidacion> {
-    const response = await axios.post(`${API_URL}/api/liquidacion/radicados/${id}/liquidar`);
+    const response = await http.post(`${API_URL}/api/liquidacion/radicados/${id}/liquidar`);
     return response.data.data;
   }
 
@@ -141,7 +146,7 @@ class LiquidacionService {
    * Descargar Excel de liquidación
    */
   async descargarExcel(id: string): Promise<Blob> {
-    const response = await axios.get(
+    const response = await http.get(
       `${API_URL}/api/liquidacion/radicados/${id}/descargar-excel`,
       {
         responseType: 'blob',
@@ -154,14 +159,14 @@ class LiquidacionService {
    * Eliminar un radicado
    */
   async eliminarRadicado(id: string): Promise<void> {
-    await axios.delete(`${API_URL}/api/liquidacion/radicados/${id}`);
+    await http.delete(`${API_URL}/api/liquidacion/radicados/${id}`);
   }
 
   /**
    * Obtener estadísticas
    */
   async obtenerEstadisticas(): Promise<Estadisticas> {
-    const response = await axios.get(`${API_URL}/api/liquidacion/estadisticas`);
+    const response = await http.get(`${API_URL}/api/liquidacion/estadisticas`);
     return response.data.data;
   }
 

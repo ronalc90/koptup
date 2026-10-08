@@ -2,7 +2,8 @@
 #
 # Corre en cada pull request y en cada push a main:
 #   1. calidad  -> mensajes i18n al día, lint, tipos y títulos de página
-#   2. pruebas  -> Jest del backend y de la web (matriz)
+#   2. pruebas  -> Jest del backend (con MongoDB y Redis para las pruebas de
+#                  integración) y de la web (matriz)
 #   3. build    -> compila el backend (tsc) y la web (next build)
 #   4. e2e      -> levanta MongoDB, Redis, un mock de OpenAI, el backend y la
 #                  web compilados, y corre Playwright
@@ -73,8 +74,28 @@ jobs:
       fail-fast: false
       matrix:
         app: [backend, web]
-    # Las pruebas unitarias actuales no usan MongoDB ni Redis (los servicios
-    # del backend que prueban son en memoria), así que este job no los levanta.
+    # Las pruebas de integración del backend (src/__tests__/integration:
+    # autorización por rol, propiedad de bots, topes de gasto) usan MongoDB y
+    # Redis reales; sin MONGODB_URI_TEST / REDIS_URL_TEST se omiten.
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
 
@@ -88,6 +109,9 @@ jobs:
 
       - name: Jest
         run: npm test --workspace=apps/${{ matrix.app }} -- --ci
+        env:
+          MONGODB_URI_TEST: mongodb://localhost:27017/koptup_ci
+          REDIS_URL_TEST: redis://localhost:6379/15
 
   build:
     name: Build

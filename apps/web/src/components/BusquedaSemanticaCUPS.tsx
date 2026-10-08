@@ -6,6 +6,7 @@ import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import { MagnifyingGlassIcon, SparklesIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { API_BASE as API_BASE_URL } from '@/lib/backend-url';
+import { authFetch } from '@/lib/auth-token';
 
 interface ResultadoBusqueda {
   cups: {
@@ -33,7 +34,7 @@ export default function BusquedaSemanticaCUPS() {
     const inicio = Date.now();
 
     try {
-      const res = await fetch(`${API_BASE_URL}/cups/buscar-semantica`, {
+      const res = await authFetch(`${API_BASE_URL}/cups/buscar-semantica`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

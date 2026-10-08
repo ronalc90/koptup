@@ -13,6 +13,7 @@ import sistemaAprendizajeService from '../services/sistema-aprendizaje.service';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { AppError } from '../middleware/errorHandler';
 
 // Configuración de multer para carga de archivos
 const storage = multer.diskStorage({
@@ -40,7 +41,7 @@ export const upload = multer({
     if (mimetype && extname) {
       return cb(null, true);
     } else {
-      cb(new Error('Solo se permiten archivos Excel, CSV o PDF'));
+      cb(new AppError('Solo se permiten archivos Excel, CSV o PDF', 400));
     }
   },
 });

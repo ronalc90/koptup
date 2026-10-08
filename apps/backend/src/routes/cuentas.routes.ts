@@ -31,8 +31,18 @@ import { upload, handleUploadError } from '../middleware/upload';
 import multer from 'multer';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import { requireStaff } from '../middleware/access';
+import { AppError } from '../middleware/errorHandler';
 
 const router = Router();
+
+/**
+ * Política: solo staff (admin | manager | sales). Herramientas internas del
+ * vertical de salud sin consumidor en la web pública. Este router se monta en
+ * `/api` (prefijos propios), así que la política va RUTA POR RUTA y nunca con
+ * `router.use`, que afectaría a todas las rutas /api montadas después.
+ */
+const staff = requireStaff;
 
 // Configure multer for cuentas-medicas uploads
 const cuentasStorage = multer.diskStorage({
@@ -57,7 +67,7 @@ const cuentasUpload = multer({
     if (ext === '.pdf') {
       cb(null, true);
     } else {
-      cb(new Error('Solo se permiten archivos PDF'));
+      cb(new AppError('Solo se permiten archivos PDF', 400));
     }
   },
 });
@@ -85,7 +95,7 @@ const ley100Upload = multer({
     if (allowedExts.includes(ext)) {
       cb(null, true);
     } else {
-      cb(new Error('Tipo de archivo no permitido'));
+      cb(new AppError('Tipo de archivo no permitido', 400));
     }
   },
 });
@@ -116,8 +126,7 @@ const ley100Upload = multer({
  *       201:
  *         description: Documents uploaded successfully
  */
-router.post(
-  '/ley100/upload',
+router.post('/ley100/upload', ...staff,
   ley100Upload.array('files', 10),
   handleUploadError,
   uploadLey100Documents as RequestHandler
@@ -130,7 +139,7 @@ router.post(
  *     tags: [Ley100]
  *     summary: Get all Ley100 documents
  */
-router.get('/ley100', getLey100Documents as RequestHandler);
+router.get('/ley100', ...staff, getLey100Documents as RequestHandler);
 
 /**
  * @swagger
@@ -139,7 +148,7 @@ router.get('/ley100', getLey100Documents as RequestHandler);
  *     tags: [Ley100]
  *     summary: Delete a Ley100 document
  */
-router.delete('/ley100/:id', deleteLey100Document as RequestHandler);
+router.delete('/ley100/:id', ...staff, deleteLey100Document as RequestHandler);
 
 /**
  * @swagger
@@ -154,7 +163,7 @@ router.delete('/ley100/:id', deleteLey100Document as RequestHandler);
  *         schema:
  *           type: string
  */
-router.patch('/ley100/:id/toggle', toggleLey100Enabled as RequestHandler);
+router.patch('/ley100/:id/toggle', ...staff, toggleLey100Enabled as RequestHandler);
 
 /**
  * @swagger
@@ -175,7 +184,7 @@ router.patch('/ley100/:id/toggle', toggleLey100Enabled as RequestHandler);
  *       201:
  *         description: Cuenta created successfully
  */
-router.post('/cuentas', createCuenta as RequestHandler);
+router.post('/cuentas', ...staff, createCuenta as RequestHandler);
 
 /**
  * @swagger
@@ -184,7 +193,7 @@ router.post('/cuentas', createCuenta as RequestHandler);
  *     tags: [Cuentas]
  *     summary: Get all cuentas médicas
  */
-router.get('/cuentas', getCuentas as RequestHandler);
+router.get('/cuentas', ...staff, getCuentas as RequestHandler);
 
 /**
  * @swagger
@@ -193,7 +202,7 @@ router.get('/cuentas', getCuentas as RequestHandler);
  *     tags: [Cuentas]
  *     summary: Get a cuenta by ID
  */
-router.get('/cuentas/:id', getCuentaById as RequestHandler);
+router.get('/cuentas/:id', ...staff, getCuentaById as RequestHandler);
 
 /**
  * @swagger
@@ -202,7 +211,7 @@ router.get('/cuentas/:id', getCuentaById as RequestHandler);
  *     tags: [Cuentas]
  *     summary: Delete a cuenta
  */
-router.delete('/cuentas/:id', deleteCuenta as RequestHandler);
+router.delete('/cuentas/:id', ...staff, deleteCuenta as RequestHandler);
 
 /**
  * @swagger
@@ -229,8 +238,7 @@ router.delete('/cuentas/:id', deleteCuenta as RequestHandler);
  *                   type: string
  *                   format: binary
  */
-router.post(
-  '/cuentas/:id/upload',
+router.post('/cuentas/:id/upload', ...staff,
   cuentasUpload.array('files', 20),
   handleUploadError,
   uploadFilesToCuenta as RequestHandler
@@ -254,7 +262,7 @@ router.post(
  *         schema:
  *           type: string
  */
-router.delete('/cuentas/:id/files/:filename', deleteFileFromCuenta as RequestHandler);
+router.delete('/cuentas/:id/files/:filename', ...staff, deleteFileFromCuenta as RequestHandler);
 
 /**
  * @swagger
@@ -274,7 +282,7 @@ router.delete('/cuentas/:id/files/:filename', deleteFileFromCuenta as RequestHan
  *         schema:
  *           type: string
  */
-router.patch('/cuentas/:id/files/:filename/toggle', toggleFileEnabled as RequestHandler);
+router.patch('/cuentas/:id/files/:filename/toggle', ...staff, toggleFileEnabled as RequestHandler);
 
 /**
  * @swagger
@@ -294,7 +302,7 @@ router.patch('/cuentas/:id/files/:filename/toggle', toggleFileEnabled as Request
  *                 items:
  *                   type: string
  */
-router.post('/process', processCuentasAndGenerateExcel as RequestHandler);
+router.post('/process', ...staff, processCuentasAndGenerateExcel as RequestHandler);
 
 /**
  * @swagger
@@ -309,7 +317,7 @@ router.post('/process', processCuentasAndGenerateExcel as RequestHandler);
  *         schema:
  *           type: string
  */
-router.get('/export', exportExcelFile as RequestHandler);
+router.get('/export', ...staff, exportExcelFile as RequestHandler);
 
 // ========================================
 // HYBRID PROCESSING ROUTES (DB + OpenAI)
@@ -334,7 +342,7 @@ router.get('/export', exportExcelFile as RequestHandler);
  *                 type: string
  *                 enum: [SOAT, ISS2001, ISS2004]
  */
-router.post('/cuentas/procesar-hibrido', procesarCuentaHibrida as RequestHandler);
+router.post('/cuentas/procesar-hibrido', ...staff, procesarCuentaHibrida as RequestHandler);
 
 /**
  * @swagger
@@ -356,7 +364,7 @@ router.post('/cuentas/procesar-hibrido', procesarCuentaHibrida as RequestHandler
  *         schema:
  *           type: string
  */
-router.get('/cuentas/search/cups', buscarCUPS as RequestHandler);
+router.get('/cuentas/search/cups', ...staff, buscarCUPS as RequestHandler);
 
 /**
  * @swagger
@@ -365,7 +373,7 @@ router.get('/cuentas/search/cups', buscarCUPS as RequestHandler);
  *     tags: [Busqueda]
  *     summary: Search medications
  */
-router.get('/cuentas/search/medicamentos', buscarMedicamentos as RequestHandler);
+router.get('/cuentas/search/medicamentos', ...staff, buscarMedicamentos as RequestHandler);
 
 /**
  * @swagger
@@ -374,7 +382,7 @@ router.get('/cuentas/search/medicamentos', buscarMedicamentos as RequestHandler)
  *     tags: [Busqueda]
  *     summary: Search ICD-10 diagnoses
  */
-router.get('/cuentas/search/diagnosticos', buscarDiagnosticos as RequestHandler);
+router.get('/cuentas/search/diagnosticos', ...staff, buscarDiagnosticos as RequestHandler);
 
 /**
  * @swagger
@@ -383,7 +391,7 @@ router.get('/cuentas/search/diagnosticos', buscarDiagnosticos as RequestHandler)
  *     tags: [Busqueda]
  *     summary: Search materials and supplies
  */
-router.get('/cuentas/search/materiales', buscarMaterialesInsumos as RequestHandler);
+router.get('/cuentas/search/materiales', ...staff, buscarMaterialesInsumos as RequestHandler);
 
 /**
  * @swagger
@@ -405,7 +413,7 @@ router.get('/cuentas/search/materiales', buscarMaterialesInsumos as RequestHandl
  *               tipoTarifa:
  *                 type: string
  */
-router.post('/cuentas/calcular-tarifa', calcularTarifa as RequestHandler);
+router.post('/cuentas/calcular-tarifa', ...staff, calcularTarifa as RequestHandler);
 
 /**
  * @swagger
@@ -414,6 +422,6 @@ router.post('/cuentas/calcular-tarifa', calcularTarifa as RequestHandler);
  *     tags: [Calculos]
  *     summary: Calculate medication costs
  */
-router.post('/cuentas/calcular-costo-medicamentos', calcularCostoMeds as RequestHandler);
+router.post('/cuentas/calcular-costo-medicamentos', ...staff, calcularCostoMeds as RequestHandler);
 
 export default router;

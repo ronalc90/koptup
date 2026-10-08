@@ -16,6 +16,11 @@ import {
 } from '@heroicons/react/24/outline';
 import { FaGoogle, FaGithub } from 'react-icons/fa';
 
+/** true si `path` es una ruta interna del sitio (evita redirecciones abiertas). */
+function isSafeInternalPath(path: string): boolean {
+  return path.startsWith('/') && !path.startsWith('//') && !path.startsWith('/\\');
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const t = useTranslations('loginPage');
@@ -48,7 +53,8 @@ export default function LoginPage() {
       setError(t('errorGeneric'));
     }
 
-    if (redirect && redirect.startsWith('/')) {
+    // Solo rutas internas: '/algo' sí; '//dominio' o '/\\dominio' no (redirección abierta).
+    if (redirect && isSafeInternalPath(redirect)) {
       setRedirectTarget(redirect);
       sessionStorage.setItem('redirectAfterLogin', redirect);
     }
@@ -71,13 +77,11 @@ export default function LoginPage() {
       }
 
       // Detección de admin para enrutar al panel correspondiente
-      const isAdmin =
-        user?.role === 'admin' ||
-        (user?.email || '').toLowerCase() === 'admin@koptup.com';
+      const isAdmin = user?.role === 'admin';
 
       const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
-      if (redirectUrl) {
-        sessionStorage.removeItem('redirectAfterLogin');
+      sessionStorage.removeItem('redirectAfterLogin');
+      if (redirectUrl && isSafeInternalPath(redirectUrl)) {
         router.push(redirectUrl);
       } else if (isAdmin) {
         router.push('/admin');

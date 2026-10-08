@@ -18,6 +18,7 @@ import {
 } from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
 import { api } from '@/lib/api';
+import { ADMIN_PANEL_ROLES, hasRole } from '@/lib/auth-roles';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -32,7 +33,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       return;
     }
     const parsed = JSON.parse(userData);
-    if (!parsed?.role || (parsed.role !== 'admin' && parsed.role !== 'manager')) {
+    // El middleware ya verificó la sesión y el rol en el servidor; esto solo
+    // evita pintar el panel con datos locales desactualizados.
+    if (!hasRole(parsed?.role, ADMIN_PANEL_ROLES)) {
       router.push('/dashboard');
       return;
     }
