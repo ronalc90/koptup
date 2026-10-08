@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs/promises';
 import path from 'path';
-import pdfParse from 'pdf-parse';
+import { parsePdf } from '../utils/pdf-parse';
 import mammoth from 'mammoth';
 import { AuthRequest } from '../types';
 import { AppError, asyncHandler } from '../middleware/errorHandler';
@@ -50,7 +50,7 @@ export const uploadDocument = asyncHandler(
 
       if (ext === '.pdf') {
         const dataBuffer = await fs.readFile(file.path);
-        const pdfData = await pdfParse(dataBuffer);
+        const pdfData = await parsePdf(dataBuffer);
         extractedText = pdfData.text;
       } else if (ext === '.docx') {
         const result = await mammoth.extractRawText({ path: file.path });

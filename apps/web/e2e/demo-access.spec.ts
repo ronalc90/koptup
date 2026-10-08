@@ -1,5 +1,9 @@
-import { expect, test } from '@playwright/test';
+import { HAS_API, NEEDS_API, uniqueEmail } from './support/backend';
 import { collectBrowserErrors } from './support/browser-errors';
+// Con E2E_API_URL, cada prueba es un visitante con su propia IP hacia el
+// backend: el formulario tiene un cupo de 5 solicitudes por IP y por hora, y
+// varias corridas seguidas desde la misma máquina lo agotarían.
+import { expect, test } from './support/fixtures';
 
 /**
  * Sistema de solicitud y acceso a demos (wiki 04) visto por un visitante:
@@ -7,8 +11,9 @@ import { collectBrowserErrors } from './support/browser-errors';
  *  - una demo que requiere acceso o invitación muestra la pantalla de acceso
  *    (con la URL original, noindex y los CTA correctos) en lugar de la demo;
  *  - el formulario /solicitar-demo valida, respeta ?demos= y registra la solicitud.
- * El flujo con el panel (aprobar, activar, revocar) necesita una cuenta admin
- * y se verifica aparte (ver el informe de P5).
+ * El flujo con el panel (aprobar, activar, revocar) está en demo-flow.spec.ts,
+ * los permisos en el servidor en permissions.spec.ts y el cambio de modo desde
+ * el panel en access-mode.spec.ts.
  */
 
 test.describe('acceso a demos (visitante)', () => {
@@ -55,6 +60,9 @@ test.describe('acceso a demos (visitante)', () => {
 });
 
 test.describe('/solicitar-demo', () => {
+  // Registra una solicitud de verdad en el backend al que apunta la web.
+  test.skip(!HAS_API, NEEDS_API);
+
   test('valida, respeta ?demos= y registra la solicitud', async ({ page }, testInfo) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/solicitar-demo?demos=erp,no-existe');
@@ -67,7 +75,8 @@ test.describe('/solicitar-demo', () => {
 
     await page.fill('#nombre', 'Prueba E2E');
     await page.fill('#empresa', 'Empresa E2E');
-    await page.fill('#email', `e2e.${testInfo.project.name}.${Date.now()}@empresa-e2e.co`);
+    // Dominio reservado .test: el acuse (si hay SMTP) nunca llega a un buzón real.
+    await page.fill('#email', uniqueEmail(`solicitud-${testInfo.project.name}`));
     await page.selectOption('#pais', 'Colombia');
     await page.getByRole('radio', { name: '11-50 personas' }).click();
     await page.fill('#casoDeUso', 'Prueba automática del formulario de solicitud de demo.');

@@ -13,7 +13,10 @@
  *
  * Rutas:
  *   POST /v1/chat/completions  texto, stream SSE y response_format
- *                              (json_schema / json_object); las tools se ignoran
+ *                              (json_schema / json_object); las tools se ignoran.
+ *                              Si el prompt trae extractos etiquetados ("[1]",
+ *                              "[p. 2]", "[fragmento 3]"), la respuesta cita el
+ *                              primero, como haría el modelo
  *   POST /v1/embeddings        vectores deterministas de 16 dimensiones
  *                              (float o base64 según encoding_format)
  *   POST /v1/responses         texto
@@ -80,6 +83,14 @@ function lastUserMessage(messages) {
   return msg ? textOf(msg.content) : '';
 }
 
+/**
+ * Etiqueta del primer extracto que trae el prompt, con el formato que usa el
+ * backend: "[1]" (chatbot), "[p. 2]" o "[fragmento 3]" (demo "Prueba con tu
+ * documento"). La respuesta simulada la cita, como haría el modelo real, para
+ * que las pruebas de citas tengan algo que verificar.
+ */
+const EXCERPT_LABEL = /\[(?:\d{1,4}|p\.\s*\d{1,4}|fragmento\s+\d{1,4})\]/i;
+
 function chatAnswer(body) {
   const rf = body.response_format;
   if (rf && rf.type === 'json_schema') return JSON.stringify(sample(rf.json_schema && rf.json_schema.schema, 'campo'));
@@ -88,10 +99,13 @@ function chatAnswer(body) {
     .filter((m) => m.role === 'system')
     .map((m) => textOf(m.content))
     .join('\n');
-  const question = lastUserMessage(body.messages);
-  // Si el prompt trae fragmentos numerados ([1], [2]...), cita el primero
-  // para que las pruebas de citas tengan algo que verificar.
-  const cites = /\[1\]/.test(`${system}\n${question}`) ? ' [1]' : '';
+  const userText = lastUserMessage(body.messages);
+  // El RAG manda "Fragmentos disponibles: … Pregunta del usuario: <pregunta>":
+  // la respuesta repite solo la pregunta, no los extractos.
+  const asked = /Pregunta del usuario:\s*([\s\S]*)$/.exec(userText);
+  const question = (asked ? asked[1] : userText).trim();
+  const label = EXCERPT_LABEL.exec(userText) || EXCERPT_LABEL.exec(system);
+  const cites = label ? ` ${label[0]}` : '';
   return `Respuesta simulada (mock de OpenAI) a: "${question.slice(0, 200)}".${cites}`;
 }
 

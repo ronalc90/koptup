@@ -121,7 +121,7 @@ Las tres son opcionales: si una no existe, su etiqueta no se carga. Aunque exist
 - **Conversiones de LinkedIn:** el Insight Tag mide visitas y audiencias. Las conversiones se crean en Campaign Manager (por ejemplo, por URL); el código no tiene IDs de conversión de LinkedIn.
 - Para ver `plan_name` y los demás parámetros en los informes de GA4, regístralos como dimensiones personalizadas (*Administrar* → *Definiciones personalizadas*).
 
-La web también usa `NEXT_PUBLIC_API_URL` (URL del backend en Railway; la demo "Prueba con tu documento" llama al backend con ella).
+La web también usa `NEXT_PUBLIC_API_URL` (URL del backend en Railway; se fija al compilar: el navegador, el middleware de `/admin`, `/dashboard` y `/demo/<slug>` y la demo "Prueba con tu documento" llaman al backend con ella) y, solo del lado del servidor, `INTERNAL_API_KEY` (opcional; ver la tabla de seguridad del backend: debe ser igual en Vercel y en Railway).
 
 ### Backend (Railway): demo "Prueba con tu documento"
 
@@ -151,8 +151,31 @@ Al arrancar, el backend valida sus variables con zod (`apps/backend/src/config/e
 | `INTERNAL_API_KEY` | opcional, igual en Vercel y Railway | Permite que la web (middleware de `/admin`, `/dashboard` y `/demo/<slug>`, proxy de LinkedIn Ads) informe la IP real del visitante para los límites por IP (sin ella, esas peticiones cuentan por la IP de salida de Vercel). |
 | `ADMIN_EMAIL` | opcional | Si existe, el arranque asegura el rol admin de esa cuenta (solo si ya está registrada). Sin ella, el arranque no cambia roles; también se puede usar `src/scripts/set-admin.ts`. |
 | `API_DOCS_ENABLED` | `false` en producción | `/api-docs` solo existe fuera de producción o con este valor en `true`. |
+| `RATE_LIMIT_WINDOW_MS`, `RATE_LIMIT_MAX_REQUESTS` | por defecto 15 min y `100` | Límite general de la API, por cuenta (con sesión) o por IP. |
+| `AUTH_ME_RATE_LIMIT_MAX` | por defecto `120` por minuto | Cupo propio de `GET /api/auth/me` y `GET /api/demo-access/<slug>`, que el middleware de la web consulta en cada navegación del panel, del portal y de las demos con acceso. |
+| `CHATBOT_RATE_LIMIT_MAX` | por defecto `60` por minuto | Peticiones por IP a `/api/chatbot`. |
+| `CHATBOT_CREATE_LIMIT_PER_HOUR` | por defecto `30` | Bots nuevos por IP cada hora en el Builder del chatbot. |
+| `CHATBOT_EXAMPLE_BOT_IDS` | opcional | IDs, separados por coma, de los bots de ejemplo que todos ven en `GET /api/chatbot/bots` (el resto solo lo ve su dueño). |
+| `CHATBOT_STATE_DIR` | por defecto `./data/chatbots` | Carpeta del estado en disco del chatbot (en Railway el disco es efímero). |
+| `CUPS_IMPORT_DIR` | por defecto `./data/imports` | Única carpeta desde la que el admin puede importar CUPS, solo por nombre de archivo. |
+| `OPENAI_BASE_URL` | **no la definas en Railway** | Solo para pruebas locales y CI: apunta el backend al mock de OpenAI (ver [Pruebas y CI](#pruebas-y-ci)). |
 
 Railway revisa `GET /health/live` (el proceso responde) al desplegar; `GET /health` responde 503 si MongoDB no está conectado.
+
+### Backend (Railway): solicitud y acceso a demos
+
+El modo de acceso de cada demo (abierta, requiere acceso o solo por invitación) no es una variable: se cambia en **Admin › Catálogo de demos** y queda en MongoDB. Estas variables ajustan el resto del sistema:
+
+| Variable | Valor | Qué hace |
+|---|---|---|
+| `FRONTEND_URL` | URL pública de la web (`https://www.koptup.com`) | Base de los enlaces que arma el backend: activación (`/activar/<token>`), Mis demos, restablecer contraseña y los correos. Sin ella usa `http://localhost:3000`. |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM` | opcionales | Acuse a quien pide la demo, correo de aprobación con el enlace de activación y recordatorio 3 días antes de que venza el acceso. Sin SMTP no se envía ningún correo y el panel muestra siempre el enlace para copiarlo o enviarlo por WhatsApp. |
+| `ADMIN_EMAIL`, `WHATSAPP_PROVIDER` y las de su proveedor | opcionales | Aviso al equipo de cada solicitud nueva, por el mismo canal del formulario de contacto. |
+| `PRIVACY_POLICY_VERSION` | por defecto `2026-10` | Versión de la política de tratamiento de datos que se guarda con cada autorización (Ley 1581). Cámbiala cuando publiques una política nueva. |
+| `DEMO_REQUEST_LIMIT_PER_HOUR` | por defecto `5` | Solicitudes válidas por IP cada hora en `/solicitar-demo` (las que tienen errores de formulario no cuentan). |
+| `DEMO_REQUEST_LIMIT_PER_EMAIL_DAY` | por defecto `3` | Solicitudes válidas por email al día. |
+| `DEMO_GRANTS_JOB_ENABLED` | por defecto `true` | Job que marca como vencidos los accesos que pasaron su fecha y envía el recordatorio (si hay SMTP). Usa un candado en Redis para que, con varias instancias, corra una sola. `false` lo apaga en esa instancia. |
+| `DEMO_GRANTS_JOB_INTERVAL_MS` | por defecto `3600000` (1 hora; mínimo `60000`) | Cada cuánto corre ese job. |
 
 ## Estructura del repo
 
@@ -174,21 +197,99 @@ docs/
 npm test               # Jest de backend y web (turbo)
 npm run lint           # ESLint de backend y web
 npm run typecheck      # TypeScript (tsc --noEmit) de backend y web, incluidas las pruebas
-npm run test:e2e       # Playwright contra un sitio ya levantado (ver abajo)
+npm run test:e2e       # Playwright contra un sitio ya levantado (ver "E2E en local")
 ```
 
-- **Backend:** Jest con `ts-jest` ([`apps/backend/jest.config.js`](apps/backend/jest.config.js)). Las pruebas viven en carpetas `__tests__` dentro de `apps/backend/src`.
-- **Web:** Jest con `next/jest` y jsdom ([`apps/web/jest.config.js`](apps/web/jest.config.js)). Las pruebas de humo de las demos renderizan cada página con los mensajes reales en español ([`apps/web/src/test-utils`](apps/web/src/test-utils)) y fallan si la página lanza un error, no pinta nada o usa una clave de traducción inexistente. Ninguna prueba unitaria sale a la red.
-- **E2E:** Playwright ([`apps/web/playwright.config.ts`](apps/web/playwright.config.ts), pruebas en [`apps/web/e2e`](apps/web/e2e)), en escritorio y móvil con el navegador en `es-CO`. Revisa la home, `/rag`, el catálogo `/demo` y cada demo: responden 200, no muestran textos de error y no registran errores en la consola (incluidos los de hidratación de React). Las demos con un error de consola ya conocido están listadas, con su motivo, en [`apps/web/e2e/demos.spec.ts`](apps/web/e2e/demos.spec.ts): la prueba sigue revisándolas, falla si aparece cualquier otro error y también si el error conocido ya no ocurre (para que se borre de la lista). No arranca servidores: corre contra `E2E_BASE_URL` (por defecto `http://localhost:3300`; con `npm run dev` la web queda en el puerto 3000, así que usa `E2E_BASE_URL=http://localhost:3000 npm run test:e2e`) y, si se define `E2E_API_URL`, también revisa el `/health` del backend. Para probar sin clave de OpenAI hay un mock local: `node apps/web/e2e/support/openai-mock.js` y luego `OPENAI_BASE_URL=http://127.0.0.1:3999/v1 OPENAI_API_KEY=sk-test-mock` en el backend.
+### Pruebas unitarias y de integración
+
+- **Backend:** Jest con `ts-jest` ([`apps/backend/jest.config.js`](apps/backend/jest.config.js)). Las pruebas viven en carpetas `__tests__` dentro de `apps/backend/src`: `unit/` no necesita nada; `integration/` (supertest contra la app completa: permisos por rol, sistema de demos, chatbot, topes de gasto, perfil) necesita MongoDB y Redis y se **omite** si no se definen:
+
+  ```bash
+  MONGODB_URI_TEST=mongodb://127.0.0.1:27017/koptup_test \
+  REDIS_URL_TEST=redis://127.0.0.1:6379/15 \
+  npm test --workspace=apps/backend
+  ```
+
+  Usa una base y un índice de Redis solo para pruebas: cada archivo crea y borra su base `<base>_<sufijo>` y las pruebas borran claves de cupos y gasto en ese Redis.
+- **Web:** Jest con `next/jest` y jsdom ([`apps/web/jest.config.js`](apps/web/jest.config.js)): `npm test --workspace=apps/web`. Las pruebas de humo de las demos renderizan cada página con los mensajes reales en español ([`apps/web/src/test-utils`](apps/web/src/test-utils)) y fallan si la página lanza un error, no pinta nada o usa una clave de traducción inexistente. También prueban el middleware de acceso a demos. Ninguna prueba unitaria sale a la red.
+
+### E2E (Playwright)
+
+[`apps/web/playwright.config.ts`](apps/web/playwright.config.ts), pruebas en [`apps/web/e2e`](apps/web/e2e), en escritorio y en móvil (Pixel 7) con el navegador en `es-CO`. No arranca servidores: corre contra una web y un backend ya levantados. Un tercer proyecto, `catalogo`, corre al final y solo `access-mode.spec.ts`, porque cambia el catálogo de demos (un dato global) y no debe cruzarse con las pruebas que abren esa demo.
+
+| Archivo | Qué comprueba |
+|---|---|
+| `smoke.spec.ts` | Home, `/rag` y `/services#planes-rag`: 200, título, un solo H1, el ancla de planes a la vista y cero errores de consola (incluidos los de hidratación de React). |
+| `demos.spec.ts` | El catálogo `/demo` y cada demo: 200, sin textos de error y sin errores de consola. Las demos con un error ya conocido están en [`e2e/support/known-issues.ts`](apps/web/e2e/support/known-issues.ts) con su motivo: la prueba falla si aparece cualquier otro error y también si el conocido deja de ocurrir (la lista solo se achica). |
+| `demo-access.spec.ts` | Lo que ve un visitante: badges del catálogo, pantalla de acceso de una demo por solicitud o privada, formulario `/solicitar-demo` (este último registra una solicitud de verdad: solo con `E2E_API_URL`). |
+| `demo-flow.spec.ts` | El flujo completo con la interfaz de cada persona: el visitante pide una demo → el admin la aprueba en el panel y copia el enlace → el prospecto activa su cuenta, ve Mis demos y abre la demo → el admin revoca → la demo vuelve a pedir acceso. |
+| `permissions.spec.ts` | Autorización en el servidor: un prospecto no entra a `/admin`, un visitante sin sesión no entra a `/dashboard` y una demo privada sin acceso muestra la pantalla de acceso (también con sesión). |
+| `access-mode.spec.ts` | El admin cambia el modo de acceso de una demo en Admin › Catálogo de demos y el sitio lo aplica (espera hasta 90 s por la caché de 60 s del middleware). Corre una vez, en escritorio, cuando terminan las demás (proyecto `catalogo`; si alguna falló, Playwright la marca como no ejecutada) y deja la demo como estaba. |
+| `contact.spec.ts` | El formulario de `/contact` envía el lead y queda guardado (lo lista Admin › Contactos). |
+| `rag-upload.spec.ts` | `/demo/chatbot` › "Prueba con tu documento": sube un PDF de 2 páginas ([`e2e/fixtures`](apps/web/e2e/fixtures)), pregunta, ve la cita de la página y el contador de preguntas pasa de 0/10 a 1/10. |
+| `api-health.spec.ts` | `GET /health` del backend. |
+
+Las pruebas de la plataforma siembran sus datos por la API del backend ([`e2e/support/backend.ts`](apps/web/e2e/support/backend.ts): cuentas, invitaciones, activación, catálogo) con emails únicos en el dominio reservado `.test`. La única excepción es la cuenta admin de pruebas: [`e2e/global-setup.ts`](apps/web/e2e/global-setup.ts) la registra por la API con una contraseña al azar de cada corrida y le da el rol con el script del backend `src/scripts/set-admin.ts` (la API no deja que nadie se asigne el rol admin). Cada visitante de prueba se presenta con su propia IP en `X-Forwarded-For`, como haría el proxy de Railway, para que los cupos por IP (login, contacto, solicitudes, documentos de la demo RAG) se apliquen igual que en producción sin que varias corridas seguidas los agoten.
+
+| Variable | Para qué |
+|---|---|
+| `E2E_BASE_URL` | URL de la web (por defecto `http://localhost:3300`). |
+| `E2E_API_URL` | URL del backend al que apunta esa web. Sin ella, las pruebas que siembran datos se omiten con el motivo y el resto corre solo contra la web. |
+| `E2E_MONGODB_URI` | Base de MongoDB de ese backend, para crear la cuenta admin de pruebas. |
+| `E2E_ADMIN_EMAIL`, `E2E_ADMIN_PASSWORD` | En lugar de `E2E_MONGODB_URI`: una cuenta que ya es admin. Sin ninguna de las dos opciones, la corrida falla con un mensaje claro (las pruebas del panel no se saltan en silencio). |
+| `E2E_ALLOW_REMOTE` | Con `E2E_API_URL`, la corrida se niega a empezar si la web o el backend no son locales (`localhost`, `127.0.0.1`), porque siembra datos y cambia el catálogo. `1` lo permite, solo para un entorno de pruebas desechable (nunca producción). |
+| `E2E_INCLUDE_KNOWN_ISSUES` | `1` para exigir cero errores de consola también en las demos de la lista de problemas conocidos. |
+| `OPENAI_MOCK_PORT`, `OPENAI_MOCK_HOST`, `OPENAI_MOCK_LOG` | Puerto (3999), host (127.0.0.1) y archivo de registro opcional del mock de OpenAI. |
+
+#### E2E en local, paso a paso
+
+Igual que el job de CI: MongoDB 7, Redis 7, el mock de OpenAI ([`apps/web/e2e/support/openai-mock.js`](apps/web/e2e/support/openai-mock.js), sin clave ni costo: responde "Respuesta simulada (mock de OpenAI)…" y cita el primer extracto que recibe), el backend y la web compilados.
+
+```bash
+# 0. MongoDB y Redis
+docker run -d --name koptup-mongo -p 27017:27017 mongo:7
+docker run -d --name koptup-redis -p 6379:6379 redis:7
+
+# 1. Mock de OpenAI (terminal A)
+node apps/web/e2e/support/openai-mock.js                 # http://127.0.0.1:3999/v1
+
+# 2. Backend compilado (terminal B). Los valores son solo para pruebas locales.
+npm run build --workspace=apps/backend
+cd apps/backend && PORT=3001 NODE_ENV=production \
+  MONGODB_URI=mongodb://127.0.0.1:27017/koptup_e2e REDIS_URL=redis://127.0.0.1:6379 \
+  JWT_SECRET=solo-local-e2e JWT_REFRESH_SECRET=solo-local-e2e-refresh \
+  CORS_ORIGIN=http://localhost:3000 FRONTEND_URL=http://localhost:3000 \
+  OPENAI_BASE_URL=http://127.0.0.1:3999/v1 OPENAI_API_KEY=sk-test-mock \
+  DEMO_UPLOAD_ENABLED=true RATE_LIMIT_MAX_REQUESTS=10000 \
+  node dist/index.js
+
+# 3. Web compilada apuntando a ese backend (terminal C)
+NEXT_PUBLIC_API_URL=http://localhost:3001 npm run build --workspace=apps/web
+cd apps/web && npx next start -p 3000
+
+# 4. Playwright (terminal D)
+npx playwright install chromium                          # solo la primera vez
+E2E_BASE_URL=http://localhost:3000 E2E_API_URL=http://localhost:3001 \
+  E2E_MONGODB_URI=mongodb://127.0.0.1:27017/koptup_e2e npm run test:e2e
+
+# Un archivo o un proyecto:
+#   npm run test:e2e -- e2e/demo-flow.spec.ts --project=escritorio
+# El proyecto "catalogo" depende de los otros dos; para correr solo su prueba:
+#   npm run test:e2e -- e2e/access-mode.spec.ts --project=catalogo --no-deps
+```
+
+`RATE_LIMIT_MAX_REQUESTS` alto es necesario porque todas las páginas y demos salen de la misma máquina; los cupos por IP de login, contacto, solicitudes y la demo RAG no se tocan (cada visitante de prueba usa su propia IP). La suite completa tarda unos 4 a 5 minutos con 2 workers (minuto y medio es la prueba del proyecto `catalogo`, que espera dos veces la caché del middleware).
+
+### CI
 
 El workflow [`ci.yml`](.github/workflows/ci.yml) corre en cada pull request y en cada push a `main`, con Node 20:
 
 | Job | Qué hace |
 |---|---|
 | Lint y tipos | Verifica que los mensajes i18n agregados estén al día, ESLint, `tsc` y el formato de los títulos de página |
-| Pruebas unitarias | Jest del backend y de la web |
+| Pruebas unitarias | Jest del backend (con MongoDB y Redis, así que también corren las de integración) y de la web |
 | Build | `tsc` del backend y `next build` de la web (apuntando a un backend local, nunca al de producción) |
-| E2E | Levanta MongoDB 7, Redis 7, el mock de OpenAI, el backend y la web compilados (`next start`) y corre Playwright |
+| E2E | Levanta MongoDB 7, Redis 7, el mock de OpenAI versionado, el backend (`DEMO_UPLOAD_ENABLED=true`) y la web compilados (`next start`) y corre toda la suite de Playwright, incluido el flujo de solicitud → aprobación → activación → acceso → revocación |
 
 ## Despliegue
 

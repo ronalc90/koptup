@@ -98,10 +98,11 @@ npm run typecheck      # tsc --noEmit en web y backend (incluye las pruebas)
 npm run build          # Build de web + backend
 npm test               # Jest en todos los workspaces
 npm run test:e2e       # Playwright contra un sitio ya levantado en E2E_BASE_URL (por defecto http://localhost:3300;
-                       # con `npm run dev` usa E2E_BASE_URL=http://localhost:3000)
+                       # con `npm run dev` usa E2E_BASE_URL=http://localhost:3000). Con E2E_API_URL y
+                       # E2E_MONGODB_URI corren también las pruebas de la plataforma (panel, portal, permisos)
 ```
 
-El workflow [`ci.yml`](.github/workflows/ci.yml) corre todo esto en cada pull request (más el e2e con MongoDB, Redis y un mock de OpenAI).
+Cómo levantar todo para el e2e en local, las pruebas de integración del backend (`MONGODB_URI_TEST`, `REDIS_URL_TEST`) y las variables de cada suite: [README › Pruebas y CI](README.md#pruebas-y-ci). El workflow [`ci.yml`](.github/workflows/ci.yml) corre todo esto en cada pull request (más el e2e con MongoDB, Redis y el mock de OpenAI versionado).
 
 ---
 

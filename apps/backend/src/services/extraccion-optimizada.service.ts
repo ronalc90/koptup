@@ -10,7 +10,7 @@
 
 import * as fs from 'fs';
 import OpenAI from 'openai';
-import pdfParse from 'pdf-parse';
+import { parsePdf } from '../utils/pdf-parse';
 import { DatosFacturaPDF } from './pdf-extractor.service';
 
 /**
@@ -170,7 +170,7 @@ class ExtraccionOptimizadaService {
     for (const pdf of pdfs) {
       try {
         const dataBuffer = fs.readFileSync(pdf.path);
-        const pdfData = await pdfParse(dataBuffer);
+        const pdfData = await parsePdf(dataBuffer);
         const texto = pdfData.text;
         const textoFiltrado = this.filtrarLineasRelevantes(texto);
 

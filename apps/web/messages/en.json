@@ -1494,7 +1494,8 @@
     "backHome": "Back to home",
     "errorPasswordMismatch": "Passwords do not match.",
     "errorPasswordLength": "Password must be at least 8 characters.",
-    "errorTerms": "You must accept the terms and privacy."
+    "errorTerms": "You must accept the terms and privacy.",
+    "fromContact": "We got your message and will reply to the email you gave us. Creating an account is optional."
   },
   "aboutPage": {
     "badge": "About Us",
@@ -1643,7 +1644,9 @@
       "errorSubmit": "Error sending message. Please try again or contact us directly via WhatsApp.",
       "success": {
         "title": "Message sent!",
-        "subtitle": "Thanks for contacting us. We'll respond soon."
+        "subtitle": "Thanks for contacting us. We'll respond soon.",
+        "nextStep": "While we get back to you, you can try our RAG assistant in the demo.",
+        "nextStepCta": "Try the demo"
       }
     },
     "services": {

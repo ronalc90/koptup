@@ -7,7 +7,7 @@
  * contenido, no solo por el nombre o el mimetype que manda el cliente.
  */
 import path from 'path';
-import pdfParse from 'pdf-parse';
+import { parsePdf } from '../utils/pdf-parse';
 import mammoth from 'mammoth';
 
 export type ExtractedKind = 'pdf' | 'docx' | 'text';
@@ -72,7 +72,7 @@ export async function extractTextFromBuffer(
 
   if (isPdf(buffer)) {
     try {
-      const data = await withTimeout(pdfParse(Buffer.from(buffer), { max: MAX_PDF_PAGES }), PARSE_TIMEOUT_MS);
+      const data = await withTimeout(parsePdf(buffer, { max: MAX_PDF_PAGES }), PARSE_TIMEOUT_MS);
       const pages = Number(data?.numpages) || 0;
       if (pages > MAX_PDF_PAGES) throw new UnsupportedDocumentError('too_many_pages');
       return { text: String(data?.text ?? ''), kind: 'pdf', pages };

@@ -1494,7 +1494,8 @@
     "backHome": "Volver al inicio",
     "errorPasswordMismatch": "Las contraseñas no coinciden.",
     "errorPasswordLength": "La contraseña debe tener al menos 8 caracteres.",
-    "errorTerms": "Debes aceptar los términos y la privacidad."
+    "errorTerms": "Debes aceptar los términos y la privacidad.",
+    "fromContact": "Tu mensaje ya nos llegó: te responderemos al correo que indicaste. Crear una cuenta es opcional."
   },
   "aboutPage": {
     "badge": "Sobre Nosotros",
@@ -1643,7 +1644,9 @@
       "errorSubmit": "Error al enviar el mensaje. Por favor intenta de nuevo o contáctanos directamente por WhatsApp.",
       "success": {
         "title": "¡Mensaje enviado!",
-        "subtitle": "Gracias por contactarnos. Te responderemos pronto."
+        "subtitle": "Gracias por contactarnos. Te responderemos pronto.",
+        "nextStep": "Mientras te respondemos, puedes probar nuestro asistente RAG en la demo.",
+        "nextStepCta": "Probar la demo"
       }
     },
     "services": {

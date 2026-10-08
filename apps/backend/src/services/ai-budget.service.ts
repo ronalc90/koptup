@@ -59,11 +59,36 @@ export function withTimeout<T>(promise: Promise<T>, ms: number, label: string): 
   });
 }
 
+/**
+ * Espera el evento `ready` de un cliente que ya abrió la conexión pero aún no
+ * terminó el saludo con Redis (pasa al arrancar: `getRedisClient` devuelve el
+ * cliente apenas está abierto). Sin esta espera, la primera consulta del
+ * arranque caía en el enfriamiento de 30 s y las funciones con IA se veían
+ * "no disponibles" justo después de cada despliegue.
+ */
+async function waitUntilReady(client: RedisClient, ms: number): Promise<void> {
+  if (client.isReady) return;
+  let onReady: (() => void) | undefined;
+  try {
+    await withTimeout(
+      new Promise<void>((resolve) => {
+        onReady = resolve;
+        client.once('ready', resolve);
+      }),
+      ms,
+      'Redis ready',
+    );
+  } finally {
+    if (onReady) client.off('ready', onReady);
+  }
+}
+
 /** Cliente de Redis listo, o null si no hay conexión (falla cerrada). */
 export async function getReadyRedis(): Promise<RedisClient | null> {
   if (Date.now() < redisRetryAfter) return null;
   try {
     const client = await withTimeout(getRedisClient(), REDIS_CONNECT_TIMEOUT_MS, 'Redis connect');
+    await waitUntilReady(client, REDIS_CONNECT_TIMEOUT_MS);
     if (!client.isReady) throw new Error('Redis no está listo');
     return client;
   } catch (err) {

@@ -5,8 +5,12 @@
 #   2. pruebas  -> Jest del backend (con MongoDB y Redis para las pruebas de
 #                  integración) y de la web (matriz)
 #   3. build    -> compila el backend (tsc) y la web (next build)
-#   4. e2e      -> levanta MongoDB, Redis, un mock de OpenAI, el backend y la
-#                  web compilados, y corre Playwright
+#   4. e2e      -> levanta MongoDB, Redis, el mock de OpenAI versionado
+#                  (apps/web/e2e/support/openai-mock.js), el backend y la web
+#                  compilados, y corre Playwright: humo de páginas y demos, y
+#                  la plataforma de punta a punta (solicitud → aprobación →
+#                  activación → acceso → revocación, permisos, modo de acceso
+#                  desde el panel, contacto y la demo RAG con un PDF)
 #
 # Despliegue: este workflow NO despliega. La web la despliega la integración
 # de Vercel con GitHub y la API la despliega Railway desde main (ver README).
@@ -184,6 +188,10 @@ jobs:
     env:
       E2E_BASE_URL: http://localhost:3000
       E2E_API_URL: http://localhost:3001
+      # Base del backend de este job: e2e/global-setup.ts crea ahí la cuenta
+      # admin de pruebas (contraseña al azar de cada corrida) con el script
+      # set-admin del backend. No es un secreto: la base vive solo en el job.
+      E2E_MONGODB_URI: mongodb://localhost:27017/koptup_e2e
     steps:
       - uses: actions/checkout@v4
 
@@ -226,13 +234,23 @@ jobs:
           JWT_SECRET: solo-ci-e2e-no-es-secreto
           JWT_REFRESH_SECRET: solo-ci-e2e-refresh-no-es-secreto
           CORS_ORIGIN: http://localhost:3000
+          # Enlaces de activación que muestra el panel (/activar/<token>).
+          FRONTEND_URL: http://localhost:3000
           OPENAI_BASE_URL: http://127.0.0.1:3999/v1
           OPENAI_API_KEY: sk-test-mock
-          ADMIN_EMAIL: admin@e2e.test
-          # Todas las peticiones de Playwright salen de la misma IP; con el
-          # límite por defecto (100 cada 15 min) las demos que llaman a la API
-          # reciben 429 a mitad de la corrida.
+          # "Prueba con tu documento" (/demo/chatbot): rag-upload.spec.ts sube
+          # un PDF y pregunta contra el mock de OpenAI.
+          DEMO_UPLOAD_ENABLED: 'true'
+          # Todo sale de la misma máquina: con el límite general por defecto
+          # (100 cada 15 min) las demos y el catálogo reciben 429 a mitad de
+          # la corrida.
           RATE_LIMIT_MAX_REQUESTS: '10000'
+          # Los cupos por IP (login, contacto, solicitudes de demo, documentos
+          # de la demo RAG) se respetan tal cual: las pruebas de la plataforma
+          # presentan a cada visitante con su propia IP en X-Forwarded-For,
+          # que el backend lee porque confía en un salto de proxy (igual que
+          # detrás de Railway). Ver apps/web/e2e/support/backend.ts.
+          TRUST_PROXY_HOPS: '1'
 
       - name: Arrancar web (next start)
         working-directory: apps/web

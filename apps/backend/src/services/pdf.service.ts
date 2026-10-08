@@ -1,5 +1,5 @@
 // Service for PDF text extraction
-import pdfParse from 'pdf-parse';
+import { parsePdf } from '../utils/pdf-parse';
 import fs from 'fs/promises';
 import { logger } from '../utils/logger';
 
@@ -17,7 +17,7 @@ export interface ExtractedPDFData {
 export async function extractTextFromPDF(filePath: string): Promise<ExtractedPDFData> {
   try {
     const dataBuffer = await fs.readFile(filePath);
-    const data = await pdfParse(dataBuffer);
+    const data = await parsePdf(dataBuffer);
 
     return {
       text: data.text,

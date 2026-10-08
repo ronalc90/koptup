@@ -18,7 +18,7 @@
  */
 import crypto from 'crypto';
 import path from 'path';
-import pdfParse from 'pdf-parse';
+import { parsePdf } from '../utils/pdf-parse';
 import mammoth from 'mammoth';
 import { logger } from '../utils/logger';
 import {
@@ -363,7 +363,7 @@ interface ExtractedDocument {
 
 async function extractPdf(buffer: Buffer): Promise<ExtractedDocument> {
   const pageTexts: string[] = [];
-  const data = await pdfParse(buffer, {
+  const data = await parsePdf(buffer, {
     // Solo se procesan las primeras 30 páginas; numpages trae el total real.
     max: DEMO_LIMITS.maxPages,
     pagerender: async (pageData: any) => {
@@ -395,26 +395,12 @@ function estimatePages(text: string): number {
   return Math.max(1, Math.ceil(text.trim().length / DEMO_LIMITS.charsPerEstimatedPage));
 }
 
-/**
- * pdf-parse (pdf.js 1.10) a veces falla la PRIMERA vez que procesa ciertos PDF
- * válidos ("bad XRef entry") y el mismo archivo funciona en el siguiente
- * intento. Por eso un PDF se reintenta una vez antes de rechazarlo.
- */
-async function extractPdfWithRetry(buffer: Buffer): Promise<ExtractedDocument> {
-  try {
-    return await extractPdf(Buffer.from(buffer));
-  } catch (err) {
-    if (err instanceof DemoRagError) throw err;
-    return extractPdf(Buffer.from(buffer));
-  }
-}
-
 async function extractDocument(kind: DemoDocKind, buffer: Buffer): Promise<ExtractedDocument> {
   if (!hasValidSignature(kind, buffer)) throw new DemoRagError('invalid_format');
   try {
     const task =
       kind === 'pdf'
-        ? extractPdfWithRetry(buffer)
+        ? extractPdf(buffer)
         : kind === 'docx'
           ? extractDocx(buffer)
           : Promise.resolve(extractTxt(buffer));
