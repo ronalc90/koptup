@@ -108,7 +108,7 @@ flowchart TD
   A["Visitante llega a services"] --> B{"¿Qué busca?"}
   B -->|"IA con sus documentos"| C["Planes RAG"]
   B -->|"Otra solución"| D["Otras soluciones a medida"]
-  C -->|"Piloto"| E["Solicitar demo con plan piloto precargado"]
+  C -->|"Piloto"| E["Modal Solicitar demo con producto y plan precargados"]
   C -->|"Esencial o Profesional"| F["Probar la demo del asistente RAG"]
   C -->|"Empresarial"| G["Agendar llamada"]
   F --> E

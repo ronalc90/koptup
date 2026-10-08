@@ -19,7 +19,7 @@
 
 **Propuesta de valor:** "Revisa el 100 % de las cuentas, no una muestra. La IA lee la factura, los RIPS y los soportes; el motor aplica las reglas de tu convenio y propone cada glosa con su evidencia y su norma; **el auditor decide**. Entrega en Excel con tu plantilla y tablero de valor glosado por causa."
 
-**Qué es según su código (para el reposicionamiento RAG):** no es un RAG. Es un **sistema experto híbrido**: extracción con IA (texto y visión) + motor de reglas + catálogos (CUPS, CIE-10, tarifarios) + una decisión asistida por un modelo de lenguaje. La "Base de conocimiento" de la pantalla Administración es texto fijo dentro del bundle y no alimenta respuestas con cita. El puente con el producto principal es un módulo nuevo **"Consulta normativa y contractual con citas"** (RAG sobre contratos, manuales tarifarios y normas, con el núcleo del [Chatbot RAG](Producto-chatbot-rag-ia.md)). En `/rag/salud` se presenta como **"IA + reglas para cuentas médicas"**, con el botón "Solicitar demo personalizada".
+**Qué es según su código (para el reposicionamiento RAG):** no es un RAG. Es un **sistema experto híbrido**: extracción con IA (texto y visión) + motor de reglas + catálogos (CUPS, CIE-10, tarifarios) + una decisión asistida por un modelo de lenguaje. El flujo de auditoría que usa la demo no usa embeddings ni búsqueda vectorial (solo la búsqueda de CUPS de la consola del [Motor de reglas](Demo-sistema-experto.md) los usa), y la "Base de conocimiento" de la pantalla Administración es texto fijo dentro del bundle que no alimenta respuestas con cita. Por la regla de la especificación RAG (con búsqueda vectorial: "Caso RAG"; sin ella: "Sistema experto para salud"), la etiqueta correcta hoy es **"Sistema experto para salud"**: en `/rag/salud` la tarjeta dice "Auditoría de cuentas médicas · Sistema experto para salud", con el botón "Solicitar demo personalizada". El puente con el producto principal es un módulo nuevo **"Consulta normativa y contractual con citas"** (RAG sobre contratos, manuales tarifarios y normas, con el núcleo del [Chatbot RAG](Producto-chatbot-rag-ia.md), tarea 11); cuando exista, la tarjeta pasa a "IA + reglas + consulta con citas".
 
 ---
 
@@ -61,7 +61,7 @@
 | Tests | Ninguno (ni en la web ni en el backend) | — |
 | Tamaño | Frontend 6.174 líneas (página 2.640 + proceso 988 + catálogos 1.437 + código muerto 760 + API 162 + tipos 164 + layout 23). Backend ≈ 21.000 líneas del módulo + 1.800 del sistema experto + 4.300 de semillas y *scrapers* | `wc -l` |
 | SEO | Indexable y en el sitemap (`AUX_DEMO_SLUGS`); la metadata promete "Reduce rechazos hasta 80 %" y "Demo gratuito" y nombra EPS reales | `apps/web/src/app/sitemap.ts`, `apps/web/src/lib/seo-config.ts` (`demo-cuentas-medicas`) |
-| Acceso | Modal de "código de acceso" fijo en el hub `/demo`, validado en el navegador; no restringe nada (ver [Sistema de demos](04-Sistema-de-Demos.md), sección 10.5) | `apps/web/src/app/demo/page.tsx` |
+| Acceso | Modal con un "código de acceso" fijo e igual para todos en el hub `/demo`: no permite saber quién entra, ni dar vigencia, ni revocar (se reemplaza, ver [Sistema de demos](04-Sistema-de-Demos.md), sección 10.5) | `apps/web/src/app/demo/page.tsx` |
 | Catálogo | No es un offering; `offeringSlug` nulo | `services-catalog.ts` |
 
 **Lo que hace bien:** el flujo central existe de punta a punta: se sube un lote (PDF y Excel/RIPS), la IA extrae factura, paciente, diagnósticos y procedimientos, el sistema compara contra tarifas, autorizaciones y duplicidades, crea glosas y descarga un Excel de varias hojas. La vista **"Proceso paso a paso"** explica cada paso con el dato extraído, el archivo y la ubicación de origen (hoja, columna, fila), algo que un auditor valora mucho porque muestra **por qué** se glosa. Ya hay modelos de datos del dominio colombiano (radicados, convenios, cuotas moderadoras, autorizaciones), un servicio de aprendizaje con retroalimentación humana y conectores configurables a sistemas externos (gestor documental, consulta de autorizaciones).
@@ -151,7 +151,7 @@ flowchart LR
 ### Acceso y solicitud de demo
 
 - **Modo `privado`** (DECISIÓN 1 y [Sistema de demos](04-Sistema-de-Demos.md)): no aparece como abierta en `/demo`; la tarjeta dice "Con invitación" y el botón "Solicitar demo personalizada". Solo el rol `admin` aprueba o invita; `sales` prepara la solicitud y agenda la sesión.
-- **Se elimina el modal del código de acceso fijo** ("código 2020") del hub `/demo` en la misma entrega que activa el control nuevo (sección 10.5 de [Sistema de demos](04-Sistema-de-Demos.md)). Quienes hoy usan el código reciben una **invitación directa** personal.
+- **Se elimina el modal del código de acceso fijo** del hub `/demo` en la misma entrega que activa el control nuevo (sección 10.5 de [Sistema de demos](04-Sistema-de-Demos.md)). Quienes hoy usan el código reciben una **invitación directa** personal.
 - **Puertas de entrada:** tarjeta de `/rag/salud`, landing del producto, invitación directa después de una llamada. Quien abre la demo sin acceso cae en `/demo/acceso?demo=cuentas-medicas&motivo=privado`:
 
 ![Mockup de la pantalla sin acceso: la tarjeta "Cuentas médicas · Demo privada" con el botón "Solicitar demo personalizada"](images/mockups/demo-sin-acceso.png)
