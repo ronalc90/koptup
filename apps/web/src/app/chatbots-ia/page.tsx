@@ -14,6 +14,7 @@ import {
   UserGroupIcon,
   CurrencyDollarIcon,
   ArrowPathIcon,
+  ArrowRightIcon,
 } from '@heroicons/react/24/outline';
 
 export default function ChatbotsIAPage() {
@@ -77,6 +78,13 @@ export default function ChatbotsIAPage() {
                 <Link href="/contact">{t('hero.cta2')}</Link>
               </Button>
             </div>
+            <Link
+              href="/rag"
+              className="mt-8 inline-flex items-center gap-1 text-base font-medium text-white underline decoration-white/50 underline-offset-4 hover:decoration-white"
+            >
+              {t('hero.ragLink')}
+              <ArrowRightIcon className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+            </Link>
           </div>
         </div>
       </section>

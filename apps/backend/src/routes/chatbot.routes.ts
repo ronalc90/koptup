@@ -729,12 +729,30 @@ async function callOpenAI(args: {
   };
 }
 
-function composeExtractiveReply(
-  retrieved: Array<{ chunk: BotChunk; score: number }>,
-  message: string,
-): string {
+/**
+ * Respuesta cuando los documentos no contienen la información. Es la frase
+ * que promete /rag ("Cómo evitamos respuestas inventadas").
+ */
+const NOT_FOUND_REPLY = 'No encontré esa información en los documentos cargados.';
+
+/**
+ * Reglas de respuesta que se agregan SIEMPRE al prompt del sistema, también
+ * cuando el bot tiene un prompt propio (ese prompt solo define rol y tono).
+ * Son las tres reglas que describe /rag#sin-respuestas-inventadas: responder
+ * solo con los fragmentos, citar la fuente y decir "no encontré esa
+ * información" cuando no está.
+ */
+const GROUNDING_RULES = [
+  'Reglas obligatorias para responder:',
+  '1. Responde solo con la información de los fragmentos numerados que acompañan la pregunta. No uses conocimiento externo ni inventes datos.',
+  '2. Cita la fuente de cada dato con el número del fragmento entre corchetes: [1], [2], etc.',
+  `3. Si los fragmentos no contienen la respuesta, o no hay fragmentos, responde "${NOT_FOUND_REPLY}" (en inglés: "I couldn't find that information in the uploaded documents.") y, si sirve, sugiere qué documento cargar.`,
+  'Responde en el idioma de la pregunta y, en español, trata al usuario de "tú".',
+].join('\n');
+
+function composeExtractiveReply(retrieved: Array<{ chunk: BotChunk; score: number }>): string {
   if (retrieved.length === 0) {
-    return `No encontré información relacionada con "${message}". Probá reformular o subir más documentos.`;
+    return `${NOT_FOUND_REPLY} Prueba reformular la pregunta o subir más documentos.`;
   }
   return retrieved
     .map(
@@ -842,10 +860,10 @@ router.post('/bots/:botId/chat', async (req: Request, res: Response) => {
   if (!hasOpenAI) {
     const replyText =
       retrieved.length > 0
-        ? composeExtractiveReply(retrieved, message)
+        ? composeExtractiveReply(retrieved)
         : allChunks.length === 0
-          ? 'Aún no tenés documentos cargados. Subí PDFs, Word, TXT, HTML o agregá una URL en el Builder y volvé a preguntarme.'
-          : `No encontré información relacionada con "${message}" en los documentos cargados.`;
+          ? 'Aún no tienes documentos cargados. Sube un archivo o agrega una URL en el Builder y vuelve a preguntarme.'
+          : NOT_FOUND_REPLY;
     finish({
       reply: replyText,
       confidence: retrieved.length > 0 ? 0.3 : 0,
@@ -857,17 +875,22 @@ router.post('/bots/:botId/chat', async (req: Request, res: Response) => {
 
   // --- Con LLM: armamos contexto y llamamos a OpenAI ----------------------
   const tone = bot?.tone || 'professional';
-  const systemPrompt =
+  // El prompt del bot define rol y tono; GROUNDING_RULES va siempre al final
+  // para que ningún prompt propio desactive las reglas anti-invención.
+  const persona =
     bot?.systemPrompt && bot.systemPrompt.trim().length > 0
       ? bot.systemPrompt
-      : `Sos un asistente virtual con tono ${tone}. Respondé en base a los fragmentos provistos cuando estén disponibles, citando las fuentes con [1], [2], etc. Si no hay fragmentos o no encontrás la respuesta, decilo honestamente y ofrecé al usuario subir más contenido. Sé conciso y directo.`;
+      : `Eres un asistente virtual con tono ${tone}. Sé conciso y directo.`;
+  const systemPrompt = `${persona}\n\n${GROUNDING_RULES}`;
 
   const context =
     retrieved.length > 0
       ? retrieved
           .map((r, i) => `[${i + 1}] (${r.chunk.docName}) ${r.chunk.text}`)
           .join('\n\n')
-      : '(El bot todavía no tiene documentos cargados. Respondé brevemente y sugerí al usuario subir contenido.)';
+      : allChunks.length === 0
+        ? '(Ninguno: el bot todavía no tiene documentos cargados. Aplica la regla 3 y sugiere subir documentos.)'
+        : '(Ninguno: ningún fragmento de los documentos cargados coincide con la pregunta. Aplica la regla 3.)';
 
   try {
     const result = await callOpenAI({
@@ -901,8 +924,10 @@ router.post('/bots/:botId/chat', async (req: Request, res: Response) => {
     console.error('[chatbot] OpenAI call failed:', msg.slice(0, 300));
     const fallbackReply =
       retrieved.length > 0
-        ? `(Modo extractivo por error del proveedor LLM) ${composeExtractiveReply(retrieved, message)}`
-        : 'No pude generar la respuesta (error del proveedor LLM) y todavía no tenés documentos cargados.';
+        ? `(Modo extractivo por error del proveedor LLM) ${composeExtractiveReply(retrieved)}`
+        : allChunks.length === 0
+          ? 'No pude generar la respuesta (error del proveedor LLM) y todavía no tienes documentos cargados.'
+          : NOT_FOUND_REPLY;
     finish({
       reply: fallbackReply,
       confidence: retrieved.length > 0 ? 0.3 : 0,

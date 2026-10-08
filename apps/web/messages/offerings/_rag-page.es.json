@@ -1,0 +1,276 @@
+{
+  "ragPage": {
+    "hero": {
+      "badge": "Base de conocimiento con IA",
+      "title": "Sistemas RAG para empresas en Colombia",
+      "subtitle": "Un sistema RAG es una IA que, antes de responder, busca en los documentos de tu empresa —manuales, contratos, políticas— y te contesta con lo que encontró, citando la fuente.",
+      "ctaDemo": "Prueba con tu documento",
+      "ctaPilot": "Agenda un piloto",
+      "pilotNote": "Piloto con tus documentos en {pilotWeeks} semanas."
+    },
+    "intro": {
+      "title": "¿Qué es RAG? Una base de conocimiento con IA, en palabras simples",
+      "subtitle": "RAG viene del inglés «retrieval augmented generation»: respuestas generadas a partir de una búsqueda en tus documentos. En la práctica, es un chatbot con los documentos de la empresa que no responde de memoria, sino consultando tus archivos.",
+      "points": {
+        "ask": {
+          "title": "Preguntas como le preguntarías a un colega",
+          "desc": "«¿Cuántos días de vacaciones me corresponden?» o «¿Qué dice el contrato con este proveedor sobre penalidades?». Sin buscar carpeta por carpeta."
+        },
+        "search": {
+          "title": "La IA busca en tus documentos, no en internet",
+          "desc": "Solo consulta los documentos que tu empresa decide cargar. Así, las respuestas siguen tus políticas y no lo que dice una página cualquiera."
+        },
+        "cite": {
+          "title": "Responde y te muestra de dónde lo sacó",
+          "desc": "Cada respuesta trae la cita del documento para que la verifiques. Si la información no está en tus documentos, te lo dice."
+        }
+      },
+      "analogy": "Piénsalo como un empleado nuevo que se leyó todos los manuales de la empresa y que, cada vez que responde, te muestra el párrafo de donde lo sacó."
+    },
+    "sectors": {
+      "title": "Casos de uso por sector",
+      "subtitle": "Un chatbot con los documentos de la empresa sirve donde la gente pierde tiempo buscando información en manuales, contratos o normativa."
+    },
+    "how": {
+      "badge": "Para el equipo técnico",
+      "title": "Cómo funciona la retrieval augmented generation (RAG)",
+      "subtitle": "Cuatro pasos entre tus documentos y una respuesta con cita.",
+      "diagramLabel": "Diagrama: documentos, índice, búsqueda y respuesta con cita",
+      "steps": {
+        "docs": {
+          "title": "Documentos",
+          "desc": "Extraemos el texto de tus PDF, Word, TXT o páginas web y lo dividimos en fragmentos por párrafos. Cada fragmento recuerda de qué documento viene."
+        },
+        "index": {
+          "title": "Índice",
+          "desc": "Los fragmentos se guardan en un índice de búsqueda en el servidor. El modelo de IA no se reentrena: tus documentos quedan en el índice, no dentro del modelo."
+        },
+        "search": {
+          "title": "Búsqueda",
+          "desc": "Con cada pregunta, el sistema recupera los fragmentos más relevantes (el «retrieval»). En la demo, la búsqueda es léxica, tipo BM25, y toma los 5 mejores."
+        },
+        "answer": {
+          "title": "Respuesta con cita",
+          "desc": "Un modelo de lenguaje (por defecto, GPT-4o mini de OpenAI) redacta la respuesta con esos fragmentos y marca cada dato con [1], [2]… para que abras la fuente."
+        }
+      },
+      "example": {
+        "title": "Ejemplo ilustrativo",
+        "questionLabel": "Pregunta",
+        "question": "¿Con cuánta anticipación debo pedir vacaciones?",
+        "answerLabel": "Respuesta",
+        "answer": "Debes pedirlas con mínimo 15 días hábiles de anticipación, por escrito a tu jefe inmediato [1].",
+        "sourceLabel": "Fuente",
+        "sourceName": "[1] Reglamento interno.pdf",
+        "sourceQuote": "«Las vacaciones se solicitan por escrito al jefe inmediato con mínimo 15 días hábiles de anticipación…»"
+      }
+    },
+    "security": {
+      "title": "Seguridad y privacidad de tus documentos",
+      "subtitle": "Esto es lo que hace hoy el sistema con tus documentos y tus preguntas.",
+      "items": {
+        "storage": {
+          "title": "Dónde se guardan tus documentos",
+          "desc": "En el servidor de KopTup. Allí extraemos el texto, lo dividimos en fragmentos y construimos el índice de búsqueda. Las preguntas y respuestas también quedan registradas en ese servidor."
+        },
+        "provider": {
+          "title": "Qué proveedor de IA usamos",
+          "desc": "OpenAI, a través de su API. El modelo por defecto es GPT-4o mini. La clave de acceso a OpenAI se queda en nuestro servidor: nunca llega al navegador."
+        },
+        "sent": {
+          "title": "Qué se envía a OpenAI",
+          "desc": "Solo lo necesario para redactar cada respuesta: tu pregunta, los fragmentos más relevantes (no el documento completo), las instrucciones del asistente y los últimos mensajes de la conversación."
+        },
+        "training": {
+          "title": "Tus documentos no entrenan la IA",
+          "desc": "Según la política vigente de la API de OpenAI, por defecto los datos enviados por API no se usan para entrenar sus modelos. OpenAI puede conservarlos hasta 30 días para detectar abusos."
+        },
+        "control": {
+          "title": "Si necesitas más control",
+          "desc": "El plan Profesional agrega permisos por rol, y el Empresarial se despliega en tu nube o en tus servidores (on-premise), con SSO y auditoría."
+        },
+        "demo": {
+          "title": "En la demo pública",
+          "desc": "La demo es para probar cómo funciona: no subas información confidencial."
+        }
+      },
+      "privacyLink": "Lee nuestra política de privacidad"
+    },
+    "accuracy": {
+      "title": "Cómo evitamos respuestas inventadas",
+      "subtitle": "Una IA que inventa respuestas es peor que no tener IA. Por eso el sistema sigue tres reglas.",
+      "rules": {
+        "onlyDocs": {
+          "title": "Responde solo con lo que está en tus documentos",
+          "desc": "El modelo recibe los fragmentos encontrados en tus documentos y la instrucción de basarse en ellos, no en lo que «sabe» de internet."
+        },
+        "cites": {
+          "title": "Cita la fuente",
+          "desc": "Cada respuesta indica de qué documento y fragmento sale, para que la verifiques antes de usarla."
+        },
+        "notFound": {
+          "title": "Dice «no encontré esa información»",
+          "desc": "Cuando la respuesta no está en tus documentos, lo dice en lugar de adivinar. Esas preguntas te muestran qué documento hace falta cargar."
+        }
+      },
+      "measure": "Y lo medimos: el piloto incluye un informe de precisión con 50 preguntas de prueba sobre tus propios documentos."
+    },
+    "integrations": {
+      "title": "Integraciones: Google Drive, SharePoint, WhatsApp, bases de datos y APIs",
+      "subtitle": "Conectamos el asistente a donde ya están tus documentos y a los canales que ya usa tu gente.",
+      "items": {
+        "drive": {
+          "title": "Google Drive",
+          "desc": "Usa carpetas de Google Drive como fuente de documentos del asistente."
+        },
+        "sharepoint": {
+          "title": "SharePoint",
+          "desc": "Conecta las bibliotecas de documentos de SharePoint de tu empresa."
+        },
+        "whatsapp": {
+          "title": "WhatsApp",
+          "desc": "Tus clientes o tu equipo preguntan por WhatsApp y reciben la respuesta con su fuente. Las tarifas de Meta por mensajes se cobran aparte, al costo."
+        },
+        "databases": {
+          "title": "Bases de datos",
+          "desc": "Además de documentos, el asistente puede consultar información de tus bases de datos."
+        },
+        "apis": {
+          "title": "APIs",
+          "desc": "Lleva las respuestas a tu intranet, tu CRM o tus aplicaciones a través de una API."
+        }
+      },
+      "note": "La cantidad de fuentes depende del plan: una en Esencial, hasta tres en Profesional e ilimitadas en Empresarial. WhatsApp está incluido desde el plan Profesional."
+    },
+    "plans": {
+      "title": "Planes y precios",
+      "subtitle": "Empieza con un piloto de {pilotWeeks} semanas con tus propios documentos y escala cuando veas los resultados."
+    },
+    "faq": {
+      "title": "Preguntas frecuentes sobre sistemas RAG",
+      "items": {
+        "whatIsRag": {
+          "q": "¿Qué es RAG?",
+          "a": "RAG (retrieval augmented generation) es una técnica que combina un buscador con un modelo de lenguaje: primero encuentra en tus documentos los fragmentos que responden la pregunta y después la IA redacta la respuesta con esa información, citando la fuente. Funciona como una base de conocimiento con IA a la que le preguntas en lenguaje natural."
+        },
+        "vsChatgpt": {
+          "q": "¿En qué se diferencia de ChatGPT?",
+          "a": "ChatGPT responde con lo que aprendió durante su entrenamiento y no conoce los documentos internos de tu empresa. Un sistema RAG busca primero en tus documentos, responde con lo que encuentra ahí y te muestra la fuente; además, tú decides qué documentos consulta. Para redactar las respuestas usamos modelos de OpenAI, la empresa que creó ChatGPT, a través de su API."
+        },
+        "training": {
+          "q": "¿Mis documentos se usan para entrenar la IA?",
+          "a": "No. Nosotros no entrenamos ningún modelo con tus documentos: el sistema los consulta en cada pregunta y a OpenAI solo le envía la pregunta, los fragmentos relevantes y los últimos mensajes de la conversación. Según la política vigente de la API de OpenAI, por defecto los datos enviados por API no se usan para entrenar sus modelos; OpenAI puede conservarlos hasta 30 días para detectar abusos, o más tiempo si la ley lo exige."
+        },
+        "notFound": {
+          "q": "¿Qué pasa si la respuesta no está en mis documentos?",
+          "a": "El asistente te dice «no encontré esa información» en lugar de inventar una respuesta. Esas preguntas sirven para detectar qué documentos faltan: cuando los cargas, el asistente ya puede responderlas."
+        },
+        "formats": {
+          "q": "¿Qué formatos acepta?",
+          "a": "PDF con texto, Word (DOCX), TXT y páginas web. También podemos conectar documentos de Google Drive o SharePoint y datos de bases de datos o APIs, según el plan. Si tus PDF son escaneos (imágenes sin texto), lo revisamos contigo en el piloto."
+        },
+        "whatsapp": {
+          "q": "¿Funciona en WhatsApp?",
+          "a": "Sí. Desde el plan Profesional, el asistente responde en tu sitio web y en WhatsApp, a través de la API oficial de WhatsApp Business. Las tarifas de Meta por mensajes de WhatsApp se cobran aparte, al costo."
+        },
+        "cost": {
+          "q": "¿Cuánto cuesta?",
+          "a": "El piloto de {pilotWeeks} semanas cuesta {pilotPrice}. El plan Esencial cuesta {essentialSetup} de setup más {essentialMonthly} al mes; el Profesional, {proSetup} de setup más {proMonthly} al mes, y el Empresarial, desde {enterpriseSetup}, con mensualidad según SLA. Todos los precios son más IVA si aplica."
+        },
+        "time": {
+          "q": "¿Cuánto tarda?",
+          "a": "El piloto con tus documentos toma {pilotWeeks} semanas. La implementación toma {essentialWeeks} semanas en el plan Esencial, {proWeeks} semanas en el Profesional y {enterpriseWeeks} semanas en el Empresarial."
+        }
+      }
+    },
+    "cta": {
+      "title": "Prueba RAG con tu propio documento",
+      "subtitle": "Haz preguntas en la demo y mira cómo responde con la fuente citada. Cuando quieras probarlo con los documentos de tu empresa, agenda un piloto de {pilotWeeks} semanas.",
+      "demo": "Prueba con tu documento",
+      "pilot": "Agenda un piloto"
+    }
+  },
+  "ragSectors": {
+    "casesTitle": "Casos de uso",
+    "ragLink": {
+      "title": "¿Cómo funciona un sistema RAG?",
+      "desc": "Conoce cómo la IA busca en tus documentos y cita la fuente, qué pasa con tus datos, las integraciones, los planes y las preguntas frecuentes.",
+      "cta": "Ver sistemas RAG para empresas"
+    },
+    "cta": {
+      "title": "Pruébalo con tus documentos",
+      "subtitle": "Haz preguntas en la demo y mira cómo responde con la fuente citada, o agenda un piloto de {pilotWeeks} semanas con los documentos de tu equipo.",
+      "demo": "Prueba con tu documento",
+      "pilot": "Agenda un piloto"
+    },
+    "salud": {
+      "name": "Salud",
+      "badge": "RAG para salud",
+      "title": "RAG para salud: protocolos clínicos, normativa y auditoría de cuentas médicas",
+      "subtitle": "Una base de conocimiento con IA para clínicas, IPS y EPS: tu equipo pregunta y recibe la respuesta con la cita del protocolo, la norma o el documento de donde sale.",
+      "cardDesc": "Protocolos clínicos, normativa del sector y auditoría de cuentas médicas, con la fuente citada.",
+      "cardLink": "Ver RAG para salud",
+      "cases": [
+        {
+          "title": "Protocolos clínicos",
+          "desc": "El personal asistencial consulta guías y protocolos internos en lenguaje natural y ve el fragmento del documento del que sale cada respuesta."
+        },
+        {
+          "title": "Normativa del sector",
+          "desc": "Resoluciones, circulares y manuales de la normativa de salud en una sola base de consulta, con la norma y el fragmento que respaldan cada respuesta."
+        },
+        {
+          "title": "Auditoría de cuentas médicas",
+          "desc": "Los auditores consultan tarifarios, contratos y reglas de glosas mientras revisan una factura, con la fuente a la vista."
+        }
+      ],
+      "demoLink": "Ver la demo de auditoría de cuentas médicas",
+      "disclaimer": "La IA apoya a tu equipo con información citada; las decisiones clínicas y de auditoría siguen en manos de tus profesionales."
+    },
+    "legal": {
+      "name": "Legal",
+      "badge": "RAG legal",
+      "title": "Buscar en contratos con IA: RAG para áreas legales",
+      "subtitle": "Pregunta en lenguaje natural por tus contratos, conceptos jurídicos internos y normativa, y recibe la respuesta con la cláusula o el documento de donde sale.",
+      "cardDesc": "Buscar en contratos con IA, conceptos jurídicos internos y normativa, con la cláusula citada.",
+      "cardLink": "Ver RAG legal",
+      "cases": [
+        {
+          "title": "Contratos",
+          "desc": "Encuentra qué dice cada contrato sobre plazos, penalidades, renovaciones o confidencialidad, con la cláusula citada y sin leerlo completo."
+        },
+        {
+          "title": "Conceptos jurídicos internos",
+          "desc": "Reutiliza los conceptos y memorandos que ya elaboró tu equipo: el asistente los encuentra y te muestra el documento original."
+        },
+        {
+          "title": "Normativa",
+          "desc": "Consulta las leyes, decretos y reglamentos que aplican a tu empresa y recibe la respuesta con el fragmento de la norma que la respalda."
+        }
+      ],
+      "disclaimer": "El asistente agiliza la búsqueda; la interpretación jurídica sigue en manos de tus abogados."
+    },
+    "soporte": {
+      "name": "Soporte",
+      "badge": "RAG para soporte",
+      "title": "Asistente IA para manuales internos y soporte al cliente",
+      "subtitle": "Tus agentes consultan manuales, políticas y la base de conocimiento en lenguaje natural, y responden a los clientes con información correcta y con fuente.",
+      "cardDesc": "Un asistente IA para manuales internos, políticas y la base de conocimiento de tus agentes.",
+      "cardLink": "Ver RAG para soporte",
+      "cases": [
+        {
+          "title": "Manuales",
+          "desc": "Procedimientos, manuales de producto y guías técnicas a una pregunta de distancia, con el fragmento del manual que respalda cada respuesta."
+        },
+        {
+          "title": "Políticas",
+          "desc": "Garantías, devoluciones, tiempos de entrega o condiciones comerciales: todo tu equipo responde con la misma política vigente, no con la versión que cada uno recuerda."
+        },
+        {
+          "title": "Base de conocimiento para agentes",
+          "desc": "Los agentes nuevos encuentran respuestas sin interrumpir a los más antiguos, y la base de conocimiento se actualiza cuando agregas o cambias documentos."
+        }
+      ]
+    }
+  }
+}

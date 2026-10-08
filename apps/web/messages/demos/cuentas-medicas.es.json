@@ -4,6 +4,7 @@
     "title": "🏥 Auditoría de Cuentas Médicas",
     "subtitle": "Sistema experto con IA para auditoría automática de facturas de salud",
     "adminButton": "Administración",
-    "viewProcess": "Ver Proceso"
+    "viewProcess": "Ver Proceso",
+    "ragLink": "¿Quieres una IA que responda con tus protocolos, normativa y tarifarios citando la fuente? Conoce los sistemas RAG"
   }
 }

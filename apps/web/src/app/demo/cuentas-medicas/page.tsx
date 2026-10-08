@@ -5,6 +5,7 @@ import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useAutoContrast } from '@/hooks/useAutoContrast';
 import {
   ArrowLeftIcon,
@@ -26,6 +27,7 @@ import {
   ShieldCheckIcon,
   TrashIcon,
   CpuChipIcon,
+  ArrowRightIcon,
 } from '@heroicons/react/24/outline';
 import { auditoriaAPI } from './api';
 import { Factura, Estadisticas, ResultadoAuditoria } from './tipos-auditoria';
@@ -49,6 +51,7 @@ interface DocumentoConocimiento {
 }
 
 export default function CuentasMedicasPage() {
+  const t = useTranslations('demoMedicalAccounts');
   const [vista, setVista] = useState<'dashboard' | 'facturas' | 'detalle' | 'crear' | 'proceso' | 'admin'>('dashboard');
   const [mostrarProceso, setMostrarProceso] = useState(false);
   const [procesoEnEjecucion, setProcesoEnEjecucion] = useState(false);
@@ -1551,6 +1554,13 @@ Total de guías implementadas: 125`
                 >
                   Sistema experto con IA para auditoría automática de facturas de salud
                 </p>
+                <Link
+                  href="/rag"
+                  className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary-700 underline decoration-primary-300 underline-offset-4 hover:text-primary-800 hover:decoration-primary-600"
+                >
+                  {t('ragLink')}
+                  <ArrowRightIcon className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                </Link>
               </div>
               <div className="flex space-x-3">
                 <Button

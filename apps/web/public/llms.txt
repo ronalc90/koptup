@@ -25,6 +25,15 @@ KopTup desarrolla software a medida para empresas. No vende productos genéricos
 - Crear aplicaciones móviles (Android / iOS)
 - Implementar soluciones de inteligencia artificial en empresas
 
+## Sistemas RAG (producto principal)
+
+IA que responde con los documentos de cada empresa (retrieval augmented generation): busca en los manuales, contratos y políticas del cliente, responde solo con lo que encuentra, cita la fuente y dice "no encontré esa información" cuando no la tiene. Proveedor de IA: OpenAI vía API (modelo por defecto GPT-4o mini); los documentos se procesan e indexan en el servidor de KopTup y a OpenAI solo se envían la pregunta, los fragmentos relevantes y los últimos mensajes de la conversación (no el documento completo).
+Más info: https://www.koptup.com/rag
+
+- Salud (protocolos clínicos, normativa del sector, auditoría de cuentas médicas): https://www.koptup.com/rag/salud
+- Legal (contratos, conceptos jurídicos internos, normativa): https://www.koptup.com/rag/legal
+- Soporte (manuales, políticas, base de conocimiento para agentes): https://www.koptup.com/rag/soporte
+
 ## Servicios principales
 
 ### 1. Desarrollo de Software a Medida

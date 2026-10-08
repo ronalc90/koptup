@@ -126,6 +126,37 @@ export const seoConfig: Record<string, PageSEO> = {
     canonical: `${baseUrl}/soluciones-ia`,
   },
 
+  // Sistemas RAG: página principal y landings por sector (src/app/rag/*).
+  // /rag usa un `<title>` absoluto (ver src/app/rag/page.tsx) igual a
+  // "<title> | KopTup"; las landings usan la plantilla.
+  rag: {
+    title: 'Sistemas RAG para empresas en Colombia',
+    description:
+      `Sistemas RAG (retrieval augmented generation) para empresas en Colombia: un chatbot con los documentos de tu empresa que cita la fuente. Piloto en ${RAG_PILOT.weeks.max} semanas.`,
+    canonical: `${baseUrl}/rag`,
+  },
+
+  'rag-salud': {
+    title: 'RAG para salud: protocolos, normativa y auditoría',
+    description:
+      'RAG para salud: IA que responde con tus protocolos clínicos y la normativa del sector, cita la fuente y apoya la auditoría de cuentas médicas.',
+    canonical: `${baseUrl}/rag/salud`,
+  },
+
+  'rag-legal': {
+    title: 'Buscar en contratos con IA: RAG para áreas legales',
+    description:
+      'Busca en contratos con IA: un sistema RAG que responde con tus contratos, conceptos jurídicos internos y normativa, y cita la cláusula de donde sale.',
+    canonical: `${baseUrl}/rag/legal`,
+  },
+
+  'rag-soporte': {
+    title: 'Asistente IA para manuales internos y soporte',
+    description:
+      'Asistente IA para manuales internos: tus agentes consultan manuales, políticas y la base de conocimiento con IA y responden con la fuente citada.',
+    canonical: `${baseUrl}/rag/soporte`,
+  },
+
   // DEMOS MÉDICOS
 
   // Demo: Cuentas Médicas (Auditoría)

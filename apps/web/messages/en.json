@@ -742,6 +742,7 @@
   "footer": {
     "description": "We build innovative technology solutions that transform businesses.",
     "services": "Services",
+    "rag": "RAG systems",
     "company": "Company",
     "legal": "Legal",
     "privacy": "Privacy",
@@ -751,6 +752,7 @@
   },
   "nav": {
     "home": "Home",
+    "rag": "RAG",
     "services": "Plans & services",
     "demos": "Demos",
     "solutions": "Solutions",
@@ -2543,7 +2545,8 @@
       "title": "AI Chatbots for Businesses in Latin America",
       "subtitle": "Automate customer service, sales and technical support with intelligent chatbots available 24/7. Integration with WhatsApp Business, websites and mobile apps.",
       "cta1": "Try Free Demo",
-      "cta2": "Request Quote"
+      "cta2": "Request Quote",
+      "ragLink": "How a chatbot built on your company documents works"
     },
     "stats": {
       "s1v": "80%",
@@ -2618,7 +2621,8 @@
       "title": "AI Solutions to Transform Your Business",
       "subtitle": "We implement artificial intelligence in your business: chatbots, process automation, predictive analytics and expert systems. Accessible AI for companies in Colombia and Latin America.",
       "cta1": "See AI Demos",
-      "cta2": "Talk to an Expert"
+      "cta2": "Talk to an Expert",
+      "ragLink": "Need an AI that answers from your company documents? Discover RAG systems"
     },
     "solutionsTitle": "Our AI Solutions",
     "solutionsSubtitle": "From conversational chatbots to expert decision-making systems",

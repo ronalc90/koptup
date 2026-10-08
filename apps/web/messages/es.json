@@ -742,6 +742,7 @@
   "footer": {
     "description": "Desarrollamos soluciones tecnológicas innovadoras que transforman negocios.",
     "services": "Servicios",
+    "rag": "Sistemas RAG",
     "company": "Empresa",
     "legal": "Legal",
     "privacy": "Privacidad",
@@ -751,6 +752,7 @@
   },
   "nav": {
     "home": "Inicio",
+    "rag": "RAG",
     "services": "Planes y servicios",
     "demos": "Demos",
     "solutions": "Soluciones",
@@ -2543,7 +2545,8 @@
       "title": "Chatbots con IA para Empresas en Colombia",
       "subtitle": "Automatiza la atención al cliente, ventas y soporte técnico con chatbots inteligentes disponibles 24/7. Integración con WhatsApp Business, sitio web y apps móviles.",
       "cta1": "Ver Demo Gratis",
-      "cta2": "Solicitar Cotización"
+      "cta2": "Solicitar Cotización",
+      "ragLink": "Cómo funciona un chatbot con los documentos de tu empresa"
     },
     "stats": {
       "s1v": "80%",
@@ -2618,7 +2621,8 @@
       "title": "Soluciones de IA para Transformar tu Empresa",
       "subtitle": "Implementamos inteligencia artificial en tu negocio: chatbots, automatización de procesos, análisis predictivo y sistemas expertos. IA accesible para empresas en Colombia y Latinoamérica.",
       "cta1": "Ver Demos de IA",
-      "cta2": "Hablar con un Experto"
+      "cta2": "Hablar con un Experto",
+      "ragLink": "¿Necesitas una IA que responda con los documentos de tu empresa? Conoce los sistemas RAG"
     },
     "solutionsTitle": "Nuestras Soluciones de IA",
     "solutionsSubtitle": "Desde chatbots conversacionales hasta sistemas expertos de toma de decisiones",

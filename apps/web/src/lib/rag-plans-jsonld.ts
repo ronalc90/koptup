@@ -2,7 +2,7 @@
  * JSON-LD de los planes RAG: un `Service` ("Sistemas RAG para empresas") con
  * cada plan como `Offer`. Se arma con los datos de `rag-plans.ts` y los textos
  * en español de `messages/offerings/_rag-plans.es.json`, para que el marcado
- * siempre coincida con la tabla visible de /services#planes-rag (y de /rag).
+ * siempre coincida con la tabla visible de /services#planes-rag y de /rag#planes-rag.
  *
  * Solo para componentes de servidor (layouts/páginas): importa el JSON de
  * mensajes, que no hace falta en el bundle del cliente.
@@ -106,8 +106,12 @@ export function getRagPlanOffers(url: string = absoluteUrl(RAG_PLANS_PATH)) {
   });
 }
 
-/** `Service` "Sistemas RAG para empresas" con los planes como ofertas. */
-export function getRagServiceJsonLd(pageUrl: string) {
+/**
+ * `Service` "Sistemas RAG para empresas" con los planes como ofertas.
+ * `offersUrl` es la URL de la tabla de planes visible en esa página (por
+ * defecto, /services#planes-rag).
+ */
+export function getRagServiceJsonLd(pageUrl: string, offersUrl: string = absoluteUrl(RAG_PLANS_PATH)) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Service',
@@ -118,6 +122,6 @@ export function getRagServiceJsonLd(pageUrl: string) {
     url: pageUrl,
     provider: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
     areaServed: { '@type': 'Country', name: 'Colombia' },
-    offers: getRagPlanOffers(),
+    offers: getRagPlanOffers(offersUrl),
   };
 }

@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { OFFERINGS } from '@/lib/services-catalog';
+import { RAG_PATH, RAG_SECTORS } from '@/lib/rag-page';
 import { SITE_URL } from '@/lib/site';
 
 // Dominio canónico (con www).
@@ -27,11 +28,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: number;
   }> = [
     { path: '', changeFrequency: 'weekly', priority: 1.0 },
-    // Página principal de sistemas RAG y sus landings por sector.
-    { path: '/rag', changeFrequency: 'monthly', priority: 0.9 },
-    { path: '/rag/salud', changeFrequency: 'monthly', priority: 0.8 },
-    { path: '/rag/legal', changeFrequency: 'monthly', priority: 0.8 },
-    { path: '/rag/soporte', changeFrequency: 'monthly', priority: 0.8 },
+    // Página principal de sistemas RAG y sus landings por sector
+    // (/rag/salud, /rag/legal, /rag/soporte; fuente: src/lib/rag-page.ts).
+    { path: RAG_PATH, changeFrequency: 'monthly', priority: 0.9 },
+    ...RAG_SECTORS.map((s) => ({ path: s.path, changeFrequency: 'monthly' as const, priority: 0.8 })),
     { path: '/desarrollo-web-colombia', changeFrequency: 'monthly', priority: 0.9 },
     { path: '/chatbots-ia', changeFrequency: 'monthly', priority: 0.9 },
     { path: '/soluciones-ia', changeFrequency: 'monthly', priority: 0.9 },

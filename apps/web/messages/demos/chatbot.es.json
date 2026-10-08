@@ -616,6 +616,8 @@
         "cta": "Ir a Builder Mode",
         "close": "Cerrar"
       }
-    }
+    },
+    "ragLink": "Sistemas RAG para empresas",
+    "ragLinkShort": "¿Qué es RAG?"
   }
 }

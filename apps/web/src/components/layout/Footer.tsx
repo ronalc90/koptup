@@ -8,6 +8,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   const services = [
+    { name: t('footer.rag'), href: '/rag' },
     { name: 'Desarrollo Web a Medida', href: '/desarrollo-web-colombia' },
     { name: 'Chatbots con IA', href: '/chatbots-ia' },
     { name: 'Soluciones de IA', href: '/soluciones-ia' },

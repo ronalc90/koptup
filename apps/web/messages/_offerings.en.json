@@ -96,6 +96,280 @@
       "button": "Talk to an expert"
     }
   },
+  "ragPage": {
+    "hero": {
+      "badge": "AI knowledge base",
+      "title": "RAG systems for companies in Colombia",
+      "subtitle": "A RAG system is an AI that, before answering, searches your company's documents —manuals, contracts, policies— and replies with what it found, citing the source.",
+      "ctaDemo": "Try it with your document",
+      "ctaPilot": "Book a pilot",
+      "pilotNote": "Pilot with your documents in {pilotWeeks} weeks."
+    },
+    "intro": {
+      "title": "What is RAG? An AI knowledge base, in plain words",
+      "subtitle": "RAG stands for retrieval augmented generation: answers generated from a search across your documents. In practice, it is a chatbot built on your company's documents that does not answer from memory but by looking up your files.",
+      "points": {
+        "ask": {
+          "title": "Ask the way you would ask a colleague",
+          "desc": "“How many vacation days do I get?” or “What does the contract with this supplier say about penalties?”. No more digging folder by folder."
+        },
+        "search": {
+          "title": "The AI searches your documents, not the internet",
+          "desc": "It only looks at the documents your company chooses to load, so answers follow your policies instead of some random web page."
+        },
+        "cite": {
+          "title": "It answers and shows you where it came from",
+          "desc": "Every answer includes the citation from the document so you can check it. If the information is not in your documents, it tells you."
+        }
+      },
+      "analogy": "Think of it as a new employee who has read every company manual and, every time they answer, shows you the paragraph they took it from."
+    },
+    "sectors": {
+      "title": "Use cases by industry",
+      "subtitle": "A chatbot built on your company's documents helps wherever people waste time looking for information in manuals, contracts or regulations."
+    },
+    "how": {
+      "badge": "For the technical team",
+      "title": "How retrieval augmented generation (RAG) works",
+      "subtitle": "Four steps between your documents and a cited answer.",
+      "diagramLabel": "Diagram: documents, index, search and cited answer",
+      "steps": {
+        "docs": {
+          "title": "Documents",
+          "desc": "We extract the text from your PDF, Word, TXT files or web pages and split it into paragraph-based chunks. Each chunk remembers which document it came from."
+        },
+        "index": {
+          "title": "Index",
+          "desc": "Chunks are stored in a search index on the server. The AI model is not retrained: your documents live in the index, not inside the model."
+        },
+        "search": {
+          "title": "Search",
+          "desc": "For each question, the system retrieves the most relevant chunks (the “retrieval”). In the demo, search is lexical, BM25-style, and keeps the top 5."
+        },
+        "answer": {
+          "title": "Cited answer",
+          "desc": "A language model (GPT-4o mini from OpenAI by default) writes the answer from those chunks and tags each fact with [1], [2]… so you can open the source."
+        }
+      },
+      "example": {
+        "title": "Illustrative example",
+        "questionLabel": "Question",
+        "question": "How far in advance do I need to request vacation?",
+        "answerLabel": "Answer",
+        "answer": "You must request it in writing from your direct manager at least 15 business days in advance [1].",
+        "sourceLabel": "Source",
+        "sourceName": "[1] Internal regulations.pdf",
+        "sourceQuote": "“Vacation must be requested in writing from the direct manager at least 15 business days in advance…”"
+      }
+    },
+    "security": {
+      "title": "Security and privacy of your documents",
+      "subtitle": "This is what the system does today with your documents and your questions.",
+      "items": {
+        "storage": {
+          "title": "Where your documents are stored",
+          "desc": "On KopTup's server. That is where we extract the text, split it into chunks and build the search index. Questions and answers are also logged on that server."
+        },
+        "provider": {
+          "title": "Which AI provider we use",
+          "desc": "OpenAI, through its API. The default model is GPT-4o mini. The OpenAI access key stays on our server: it never reaches the browser."
+        },
+        "sent": {
+          "title": "What is sent to OpenAI",
+          "desc": "Only what is needed to write each answer: your question, the most relevant chunks (not the whole document), the assistant's instructions and the latest messages of the conversation."
+        },
+        "training": {
+          "title": "Your documents do not train the AI",
+          "desc": "Under OpenAI's current API policy, data sent through the API is not used to train its models by default. OpenAI may keep it for up to 30 days to detect abuse."
+        },
+        "control": {
+          "title": "If you need more control",
+          "desc": "The Professional plan adds role-based permissions, and the Enterprise plan is deployed in your cloud or on your own servers (on-premise), with SSO and audit logs."
+        },
+        "demo": {
+          "title": "In the public demo",
+          "desc": "The demo is for trying out how it works: do not upload confidential information."
+        }
+      },
+      "privacyLink": "Read our privacy policy"
+    },
+    "accuracy": {
+      "title": "How we avoid made-up answers",
+      "subtitle": "An AI that makes up answers is worse than no AI at all. That is why the system follows three rules.",
+      "rules": {
+        "onlyDocs": {
+          "title": "It only answers with what is in your documents",
+          "desc": "The model receives the chunks found in your documents and the instruction to rely on them, not on what it “knows” from the internet."
+        },
+        "cites": {
+          "title": "It cites the source",
+          "desc": "Every answer shows which document and chunk it comes from, so you can check it before using it."
+        },
+        "notFound": {
+          "title": "It says “I couldn't find that information”",
+          "desc": "When the answer is not in your documents, it says so instead of guessing. Those questions show you which document is missing."
+        }
+      },
+      "measure": "And we measure it: the pilot includes an accuracy report with 50 test questions about your own documents."
+    },
+    "integrations": {
+      "title": "Integrations: Google Drive, SharePoint, WhatsApp, databases and APIs",
+      "subtitle": "We connect the assistant to where your documents already live and to the channels your people already use.",
+      "items": {
+        "drive": {
+          "title": "Google Drive",
+          "desc": "Use Google Drive folders as the assistant's document source."
+        },
+        "sharepoint": {
+          "title": "SharePoint",
+          "desc": "Connect your company's SharePoint document libraries."
+        },
+        "whatsapp": {
+          "title": "WhatsApp",
+          "desc": "Your customers or your team ask on WhatsApp and get the answer with its source. Meta's message fees are billed separately, at cost."
+        },
+        "databases": {
+          "title": "Databases",
+          "desc": "Besides documents, the assistant can look up information in your databases."
+        },
+        "apis": {
+          "title": "APIs",
+          "desc": "Bring the answers into your intranet, your CRM or your apps through an API."
+        }
+      },
+      "note": "The number of sources depends on the plan: one in Essential, up to three in Professional and unlimited in Enterprise. WhatsApp is included from the Professional plan."
+    },
+    "plans": {
+      "title": "Plans and pricing",
+      "subtitle": "Start with a {pilotWeeks}-week pilot with your own documents and scale up once you see the results."
+    },
+    "faq": {
+      "title": "Frequently asked questions about RAG systems",
+      "items": {
+        "whatIsRag": {
+          "q": "What is RAG?",
+          "a": "RAG (retrieval augmented generation) is a technique that combines a search engine with a language model: it first finds the chunks of your documents that answer the question, and then the AI writes the answer with that information, citing the source. It works like an AI knowledge base you can ask in natural language."
+        },
+        "vsChatgpt": {
+          "q": "How is it different from ChatGPT?",
+          "a": "ChatGPT answers with what it learned during training and does not know your company's internal documents. A RAG system first searches your documents, answers with what it finds there and shows you the source; plus, you decide which documents it uses. To write the answers we use OpenAI models, from the company behind ChatGPT, through its API."
+        },
+        "training": {
+          "q": "Are my documents used to train the AI?",
+          "a": "No. We do not train any model with your documents: the system looks them up for each question and only sends OpenAI the question, the relevant chunks and the latest messages of the conversation. Under OpenAI's current API policy, data sent through the API is not used to train its models by default; OpenAI may keep it for up to 30 days to detect abuse, or longer if the law requires it."
+        },
+        "notFound": {
+          "q": "What happens if the answer is not in my documents?",
+          "a": "The assistant tells you “I couldn't find that information” instead of making up an answer. Those questions help you spot which documents are missing: once you load them, the assistant can answer."
+        },
+        "formats": {
+          "q": "Which formats does it accept?",
+          "a": "PDF with text, Word (DOCX), TXT and web pages. Depending on the plan, we can also connect documents from Google Drive or SharePoint and data from databases or APIs. If your PDFs are scans (images without text), we review it with you during the pilot."
+        },
+        "whatsapp": {
+          "q": "Does it work on WhatsApp?",
+          "a": "Yes. From the Professional plan, the assistant answers on your website and on WhatsApp, through the official WhatsApp Business API. Meta's WhatsApp message fees are billed separately, at cost."
+        },
+        "cost": {
+          "q": "How much does it cost?",
+          "a": "The {pilotWeeks}-week pilot costs {pilotPrice}. The Essential plan costs {essentialSetup} for setup plus {essentialMonthly} per month; Professional, {proSetup} for setup plus {proMonthly} per month; and Enterprise starts at {enterpriseSetup}, with a monthly fee based on the SLA. All prices are plus VAT where applicable."
+        },
+        "time": {
+          "q": "How long does it take?",
+          "a": "The pilot with your documents takes {pilotWeeks} weeks. Implementation takes {essentialWeeks} weeks on the Essential plan, {proWeeks} weeks on Professional and {enterpriseWeeks} weeks on Enterprise."
+        }
+      }
+    },
+    "cta": {
+      "title": "Try RAG with your own document",
+      "subtitle": "Ask questions in the demo and see how it answers with the source cited. When you want to try it with your company's documents, book a {pilotWeeks}-week pilot.",
+      "demo": "Try it with your document",
+      "pilot": "Book a pilot"
+    }
+  },
+  "ragSectors": {
+    "casesTitle": "Use cases",
+    "ragLink": {
+      "title": "How does a RAG system work?",
+      "desc": "Learn how the AI searches your documents and cites the source, what happens to your data, the integrations, the plans and the FAQ.",
+      "cta": "See RAG systems for companies"
+    },
+    "cta": {
+      "title": "Try it with your documents",
+      "subtitle": "Ask questions in the demo and see how it answers with the source cited, or book a {pilotWeeks}-week pilot with your team's documents.",
+      "demo": "Try it with your document",
+      "pilot": "Book a pilot"
+    },
+    "salud": {
+      "name": "Healthcare",
+      "badge": "RAG for healthcare",
+      "title": "RAG for healthcare: clinical protocols, regulations and medical claims auditing",
+      "subtitle": "An AI knowledge base for clinics, providers and health insurers: your team asks and gets the answer with the citation from the protocol, regulation or document it comes from.",
+      "cardDesc": "Clinical protocols, healthcare regulations and medical claims auditing, with the source cited.",
+      "cardLink": "See RAG for healthcare",
+      "cases": [
+        {
+          "title": "Clinical protocols",
+          "desc": "Care staff look up internal guidelines and protocols in natural language and see the document chunk behind each answer."
+        },
+        {
+          "title": "Healthcare regulations",
+          "desc": "Resolutions, circulars and regulatory manuals in a single knowledge base, with the regulation and the chunk that support each answer."
+        },
+        {
+          "title": "Medical claims auditing",
+          "desc": "Auditors look up fee schedules, contracts and denial rules while reviewing an invoice, with the source in plain sight."
+        }
+      ],
+      "demoLink": "See the medical claims auditing demo",
+      "disclaimer": "The AI supports your team with cited information; clinical and audit decisions remain with your professionals."
+    },
+    "legal": {
+      "name": "Legal",
+      "badge": "RAG for legal",
+      "title": "Search contracts with AI: RAG for legal teams",
+      "subtitle": "Ask in natural language about your contracts, internal legal opinions and regulations, and get the answer with the clause or document it comes from.",
+      "cardDesc": "Search contracts with AI, internal legal opinions and regulations, with the clause cited.",
+      "cardLink": "See RAG for legal",
+      "cases": [
+        {
+          "title": "Contracts",
+          "desc": "Find what each contract says about terms, penalties, renewals or confidentiality, with the clause cited and without reading it end to end."
+        },
+        {
+          "title": "Internal legal opinions",
+          "desc": "Reuse the opinions and memos your team has already written: the assistant finds them and shows you the original document."
+        },
+        {
+          "title": "Regulations",
+          "desc": "Look up the laws, decrees and rules that apply to your company and get the answer with the chunk of the regulation that supports it."
+        }
+      ],
+      "disclaimer": "The assistant speeds up the search; legal interpretation stays with your lawyers."
+    },
+    "soporte": {
+      "name": "Support",
+      "badge": "RAG for support",
+      "title": "AI assistant for internal manuals and customer support",
+      "subtitle": "Your agents look up manuals, policies and the knowledge base in natural language, and answer customers with correct, sourced information.",
+      "cardDesc": "An AI assistant for internal manuals, policies and your agents' knowledge base.",
+      "cardLink": "See RAG for support",
+      "cases": [
+        {
+          "title": "Manuals",
+          "desc": "Procedures, product manuals and technical guides one question away, with the manual chunk that supports each answer."
+        },
+        {
+          "title": "Policies",
+          "desc": "Warranties, returns, delivery times or commercial terms: your whole team answers with the same current policy, not the version each person remembers."
+        },
+        {
+          "title": "Knowledge base for agents",
+          "desc": "New agents find answers without interrupting senior ones, and the knowledge base is updated when you add or change documents."
+        }
+      ]
+    }
+  },
   "ragPlans": {
     "badge": "RAG systems",
     "title": "RAG system plans and pricing",
