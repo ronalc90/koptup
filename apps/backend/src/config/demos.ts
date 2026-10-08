@@ -14,8 +14,12 @@ export type DemoRequestState = (typeof DEMO_REQUEST_STATES)[number];
 /** Estados desde los que se puede aprobar o rechazar. */
 export const DEMO_REQUEST_OPEN_STATES: readonly DemoRequestState[] = ['pendiente', 'en_revision'];
 
-/** Estados de un acceso (grant). La vigencia real la decide `expiresAt`. */
-export const DEMO_GRANT_STATES = ['activo', 'expirado', 'revocado'] as const;
+/**
+ * Estados de un acceso (grant). La vigencia real la decide `expiresAt`.
+ * `convertido`: la persona pasó a cliente (propuesta convertida); conserva la
+ * demo como referencia hasta `expiresAt` (90 días desde la conversión).
+ */
+export const DEMO_GRANT_STATES = ['activo', 'expirado', 'revocado', 'convertido'] as const;
 export type DemoGrantState = (typeof DEMO_GRANT_STATES)[number];
 
 /** Tamaño de la empresa del solicitante (número de personas). */

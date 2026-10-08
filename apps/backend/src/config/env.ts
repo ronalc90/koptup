@@ -93,6 +93,12 @@ export const EnvSchema = z.object({
   DEMO_REQUEST_LIMIT_PER_EMAIL_DAY: optionalNumber({ min: 1, int: true }),
   DEMO_GRANTS_JOB_ENABLED: z.enum(['true', 'false']).optional(),
   DEMO_GRANTS_JOB_INTERVAL_MS: optionalNumber({ min: 60000, int: true }),
+  PROPOSALS_JOB_ENABLED: z.enum(['true', 'false']).optional(),
+  PROPOSALS_JOB_INTERVAL_MS: optionalNumber({ min: 60000, int: true }),
+  WOMPI_ENV: z.enum(['sandbox', 'production']).optional(),
+  WOMPI_PUBLIC_KEY: z.string().optional(),
+  WOMPI_INTEGRITY_SECRET: z.string().optional(),
+  WOMPI_EVENTS_SECRET: z.string().optional(),
 });
 
 export type Env = z.infer<typeof EnvSchema>;

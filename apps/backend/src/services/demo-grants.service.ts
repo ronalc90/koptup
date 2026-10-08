@@ -27,7 +27,7 @@ import {
 } from '../config/demos';
 import { normalizeEmailLikeAuth } from '../utils/email-address';
 import { type CatalogEntry, getCatalogMap } from './demo-catalog.service';
-import { daysLeft, effectiveGrantState } from './demo-access.service';
+import { daysLeft, effectiveGrantState, usableGrantFilter } from './demo-access.service';
 import { issueMagicLink } from './magic-link.service';
 import { type AuditActor, recordAudit } from './audit.service';
 import { emailService } from './email.service';
@@ -304,7 +304,7 @@ type GrantLike = Pick<
   | 'nota'
   | 'createdAt'
   | 'updatedAt'
-> & { user?: unknown };
+> & { user?: unknown; convertidoEn?: Date | null; propuesta?: unknown };
 
 export function grantView(g: GrantLike, entry: CatalogEntry | null, now = new Date()) {
   const estadoEfectivo = effectiveGrantState(g, now);
@@ -319,9 +319,9 @@ export function grantView(g: GrantLike, entry: CatalogEntry | null, now = new Da
     demoActiva: entry?.activo ?? true,
     estado: g.estado,
     estadoEfectivo,
-    vigente: estadoEfectivo === 'activo',
+    vigente: estadoEfectivo === 'activo' || estadoEfectivo === 'convertido',
     expiresAt: g.expiresAt,
-    diasRestantes: estadoEfectivo === 'activo' ? daysLeft(g.expiresAt, now) : 0,
+    diasRestantes: estadoEfectivo === 'activo' || estadoEfectivo === 'convertido' ? daysLeft(g.expiresAt, now) : 0,
     ultimoAcceso: g.ultimoAcceso ?? null,
     accesos: g.accesos ?? 0,
     request: g.request ? String(g.request) : null,
@@ -330,6 +330,8 @@ export function grantView(g: GrantLike, entry: CatalogEntry | null, now = new Da
     revocadoEn: g.revocadoEn ?? null,
     motivoRevocacion: g.motivoRevocacion ?? null,
     nota: g.nota ?? null,
+    convertidoEn: g.convertidoEn ?? null,
+    propuesta: g.propuesta ? String(g.propuesta) : null,
     createdAt: g.createdAt,
     updatedAt: g.updatedAt,
     user: populated
@@ -375,7 +377,8 @@ export async function extendGrant(id: string, dias: number, actor: StaffActor, r
     updated = await DemoGrant.findOneAndUpdate(
       { _id: grant._id, estado: { $ne: 'revocado' } },
       {
-        $set: { estado: 'activo', expiresAt: hasta, recordatorioEnviadoEn: null, expiradoEn: null },
+        // Un acceso convertido (cliente) sigue convertido: solo se amplía su referencia.
+        $set: { estado: grant.estado === 'convertido' ? 'convertido' : 'activo', expiresAt: hasta, recordatorioEnviadoEn: null, expiradoEn: null },
         $push: { extensiones: { dias, desde: grant.expiresAt, hasta, por: actor.id, fecha: now } },
       },
       { new: true },
@@ -440,7 +443,7 @@ export async function resendActivation(userId: string, actor: StaffActor, ctx: {
   }
   const now = new Date();
   const link = await issueMagicLink({ userId: user._id as mongoose.Types.ObjectId, proposito: 'activacion', creadoPor: actor.id });
-  const grants = await DemoGrant.find({ user: user._id, estado: 'activo', expiresAt: { $gt: now } });
+  const grants = await DemoGrant.find({ user: user._id, ...usableGrantFilter(now) });
   const catalog = await getCatalogMap(grants.map((g) => g.demoSlug));
   let email: EmailOutcome = { configurado: emailService.isConfigured(), enviado: false };
   if (grants.length > 0) {
@@ -479,8 +482,11 @@ function escapeRegex(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-/** Filtros de estado del listado de accesos (`por_vencer`: vigentes que vencen en 3 días o menos). */
-export const GRANT_LIST_STATES = ['activo', 'por_vencer', 'expirado', 'revocado'] as const;
+/**
+ * Filtros de estado del listado de accesos (`por_vencer`: vigentes que vencen
+ * en 3 días o menos; `convertido`: clientes con la demo como referencia).
+ */
+export const GRANT_LIST_STATES = ['activo', 'por_vencer', 'expirado', 'revocado', 'convertido'] as const;
 export type GrantListState = (typeof GRANT_LIST_STATES)[number];
 
 function grantStateFilter(estado: GrantListState, now: Date): Record<string, unknown> {
@@ -490,9 +496,11 @@ function grantStateFilter(estado: GrantListState, now: Date): Record<string, unk
     case 'por_vencer':
       return { estado: 'activo', expiresAt: { $gt: now, $lte: new Date(now.getTime() + GRANT_REMINDER_DAYS_BEFORE * DAY_MS) } };
     case 'expirado':
-      return { $or: [{ estado: 'expirado' }, { estado: 'activo', expiresAt: { $lte: now } }] };
+      return { $or: [{ estado: 'expirado' }, { estado: { $in: ['activo', 'convertido'] }, expiresAt: { $lte: now } }] };
     case 'revocado':
       return { estado: 'revocado' };
+    case 'convertido':
+      return { estado: 'convertido', expiresAt: { $gt: now } };
   }
 }
 
@@ -628,6 +636,19 @@ export async function createDirectGrants(body: z.infer<typeof DirectGrantSchema>
     actor,
     requestId: null,
   });
+  // Pipeline comercial: lead ligado a la cuenta y en etapa `demo`.
+  const { onDemoAccessGranted } = await import('./leads.service');
+  await onDemoAccessGranted({
+    email,
+    nombre: granted.user.name,
+    empresa: body.empresa,
+    telefono: body.telefono,
+    userId: granted.user.id,
+    demos,
+    source: 'invitacion',
+    actor,
+  });
+
   await recordAudit({
     actor,
     accion: 'demo_grant.create',

@@ -11,8 +11,9 @@
  *  4. Modo `publico` → permitido (`publico`); si hay un acceso vigente se
  *     informa su vencimiento y se registra el uso.
  *  5. Sin sesión → `sin_sesion`.
- *  6. Acceso `activo` con `expiresAt` futuro → permitido (`grant`). La fecha
- *     se compara en cada consulta: no depende del job de expiración.
+ *  6. Acceso `activo` (o `convertido`, la referencia de 90 días de un
+ *     cliente) con `expiresAt` futuro → permitido (`grant`). La fecha se
+ *     compara en cada consulta: no depende del job de expiración.
  *  7. Acceso vencido o marcado `expirado` → `expirado`.
  *  8. Acceso revocado → `revocado`.
  *  9. En otro caso → `sin_acceso`.
@@ -66,11 +67,29 @@ export interface AccessUser {
   role: string;
 }
 
-/** Estado real de un acceso según la hora actual. */
-export function effectiveGrantState(g: Pick<IDemoGrant, 'estado' | 'expiresAt'>, now = new Date()): 'activo' | 'expirado' | 'revocado' {
+export type EffectiveGrantState = 'activo' | 'expirado' | 'revocado' | 'convertido';
+
+/**
+ * Estado real de un acceso según la hora actual. Un acceso `convertido`
+ * (la persona ya es cliente) sigue abriendo la demo como referencia hasta
+ * su `expiresAt`; después cuenta como `expirado`.
+ */
+export function effectiveGrantState(g: Pick<IDemoGrant, 'estado' | 'expiresAt'>, now = new Date()): EffectiveGrantState {
   if (g.estado === 'revocado') return 'revocado';
   if (g.estado === 'expirado' || g.expiresAt.getTime() <= now.getTime()) return 'expirado';
+  if (g.estado === 'convertido') return 'convertido';
   return 'activo';
+}
+
+/** El acceso abre la demo ahora (activo o convertido vigente). */
+export function isGrantUsable(g: Pick<IDemoGrant, 'estado' | 'expiresAt'>, now = new Date()): boolean {
+  const state = effectiveGrantState(g, now);
+  return state === 'activo' || state === 'convertido';
+}
+
+/** Filtro de MongoDB de los accesos que abren la demo ahora. */
+export function usableGrantFilter(now = new Date()): Record<string, unknown> {
+  return { estado: { $in: ['activo', 'convertido'] }, expiresAt: { $gt: now } };
 }
 
 /** Días que le quedan a un acceso (0 si ya venció). */
@@ -151,7 +170,7 @@ export async function evaluateDemoAccess(
   if (entry.accessMode === 'publico') {
     if (!user || dbDown || !mongoose.Types.ObjectId.isValid(user.id)) return result(entry, true, 'publico', null, now);
     try {
-      const grant = await DemoGrant.findOne({ user: user.id, demoSlug: slug, estado: 'activo', expiresAt: { $gt: now } });
+      const grant = await DemoGrant.findOne({ user: user.id, demoSlug: slug, ...usableGrantFilter(now) });
       if (grant) await record(grant);
       return result(entry, true, 'publico', grant, now);
     } catch {
@@ -170,7 +189,7 @@ export async function evaluateDemoAccess(
     return result(entry, false, 'no_disponible', null, now);
   }
 
-  const vigente = grants.find((g) => effectiveGrantState(g, now) === 'activo');
+  const vigente = grants.find((g) => isGrantUsable(g, now));
   if (vigente) {
     await record(vigente);
     return result(entry, true, 'grant', vigente, now);

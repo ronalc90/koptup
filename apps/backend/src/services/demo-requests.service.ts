@@ -43,6 +43,7 @@ import {
   resendActivation,
   resolveDemosForGrant,
 } from './demo-grants.service';
+import { onDemoAccessGranted } from './leads.service';
 import { logger } from '../utils/logger';
 
 const SLUG = /^[a-z0-9-]{2,60}$/;
@@ -431,6 +432,18 @@ export async function approveDemoRequest(id: string, body: z.infer<typeof Approv
     },
     { new: true },
   );
+
+  // Pipeline comercial: el lead pasa a `demo` y queda ligado a la cuenta.
+  await onDemoAccessGranted({
+    email: r.email,
+    nombre: r.nombre,
+    empresa: r.empresa,
+    telefono: r.telefono,
+    userId: granted.user.id,
+    demos,
+    source: 'demo-request',
+    actor,
+  });
 
   await recordAudit({
     actor,

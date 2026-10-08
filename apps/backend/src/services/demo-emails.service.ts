@@ -25,6 +25,11 @@ export function formatDateEs(date: Date): string {
   return date.toLocaleDateString('es-CO', { timeZone: 'America/Bogota', day: 'numeric', month: 'long', year: 'numeric' });
 }
 
+/** Plantilla HTML común de los correos (también la usan las propuestas). */
+export function emailLayout(title: string, bodyHtml: string): string {
+  return layout(title, bodyHtml);
+}
+
 function layout(title: string, bodyHtml: string): string {
   return `<!DOCTYPE html>
 <html lang="es">

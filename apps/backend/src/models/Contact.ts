@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Types } from 'mongoose';
 
 /**
  * Origen del lead. `contact-form` es el formulario de /contact (valor por
@@ -20,6 +20,12 @@ export interface IContact extends Document {
   message: string;
   status: 'new' | 'read' | 'responded';
   source?: ContactSource;
+  /**
+   * Lead del pipeline comercial al que pertenece (deduplicado por email). Lo
+   * fija services/leads.service.ts: al registrar el contacto y, para los
+   * contactos anteriores al pipeline, la migración del arranque.
+   */
+  lead?: Types.ObjectId | null;
   created_at: Date;
 }
 
@@ -33,7 +39,10 @@ const ContactSchema = new Schema<IContact>({
   message: { type: String, required: true },
   status: { type: String, enum: ['new', 'read', 'responded'], default: 'new' },
   source: { type: String, enum: [...CONTACT_SOURCES], default: DEFAULT_CONTACT_SOURCE },
+  lead: { type: Schema.Types.ObjectId, ref: 'Lead' },
   created_at: { type: Date, default: Date.now },
 });
+
+ContactSchema.index({ lead: 1, created_at: -1 });
 
 export default mongoose.model<IContact>('Contact', ContactSchema);

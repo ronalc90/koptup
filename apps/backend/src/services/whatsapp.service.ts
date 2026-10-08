@@ -112,6 +112,34 @@ class WhatsAppService {
   }
 
   /**
+   * Envía un aviso de texto libre al número del equipo (ADMIN_WHATSAPP_NUMBER)
+   * por el proveedor configurado: lo usan el pipeline comercial y las
+   * propuestas. Devuelve false, sin lanzar, si no está configurado o falla.
+   */
+  async sendTeamMessage(messageText: string): Promise<boolean> {
+    if (!this.isConfigured()) {
+      logger.warn('WhatsApp not configured - skipping team message');
+      return false;
+    }
+    try {
+      switch (this.config.provider) {
+        case 'twilio':
+          return await this.sendViaTwilio(messageText);
+        case 'whatsapp-business':
+          return await this.sendViaWhatsAppBusiness(messageText);
+        case 'ultramsg':
+          return await this.sendViaUltraMsg(messageText);
+        default:
+          logger.error('Unknown WhatsApp provider');
+          return false;
+      }
+    } catch (error: any) {
+      logger.error(`Error sending WhatsApp team message: ${error?.message ?? error}`);
+      return false;
+    }
+  }
+
+  /**
    * Formatea el mensaje de contacto
    */
   private formatContactMessage(data: {

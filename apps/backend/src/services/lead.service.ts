@@ -10,11 +10,14 @@
  *
  * El guardado se espera (si Mongo falla, el error sube al caller, igual que
  * antes en el formulario); las notificaciones nunca hacen fallar la petición.
+ * Cada contacto se liga además a su `Lead` del pipeline comercial
+ * (services/leads.service.ts), que agrupa los contactos por email.
  */
 import Contact, { DEFAULT_CONTACT_SOURCE, type ContactSource, type IContact } from '../models/Contact';
 import { logger } from '../utils/logger';
 import { whatsappService } from './whatsapp.service';
 import { emailService } from './email.service';
+import { syncLeadFromContactSafe } from './leads.service';
 
 export interface LeadInput {
   name: string;
@@ -62,6 +65,10 @@ export async function registerLeadWithNotifications(
   });
 
   logger.info(`✅ Contact saved to database with ID: ${contact._id}`);
+
+  // Pipeline comercial: liga el contacto a su Lead (uno por email). Nunca
+  // hace fallar el registro del contacto.
+  await syncLeadFromContactSafe(contact);
 
   const notification = { name, email, phone, company, service, budget, message, source };
 

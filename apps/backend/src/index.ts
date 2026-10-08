@@ -84,6 +84,15 @@ const startServer = async () => {
       logger.warn(`Fallo sembrando el catálogo de demos: ${err?.message ?? err}`);
     }
 
+    // 3c. Pipeline comercial: liga al pipeline los contactos anteriores
+    // (idempotente; no cambia sus datos).
+    try {
+      const { migrateContactsToLeads } = await import('./services/leads.service');
+      await migrateContactsToLeads();
+    } catch (err: any) {
+      logger.warn(`Fallo migrando contactos al pipeline de leads: ${err?.message ?? err}`);
+    }
+
     // 4. Estrategias de Passport (Google OAuth si está configurado).
     try {
       const passportMod = await import('./config/passport');
@@ -104,6 +113,14 @@ const startServer = async () => {
     // Job de vencimiento de accesos a demos y recordatorios (candado en Redis).
     const { startDemoGrantsJob, stopDemoGrantsJob } = await import('./jobs/demo-grants.job');
     startDemoGrantsJob();
+    // Job de vencimiento de propuestas (candado en Redis).
+    const { startProposalsExpiryJob, stopProposalsExpiryJob } = await import('./jobs/proposals-expiry.job');
+    startProposalsExpiryJob();
+    // Pago en línea con Wompi: solo con sus variables (sin ellas no se ofrece).
+    const { readWompiConfig } = await import('./services/wompi.service');
+    const wompi = readWompiConfig();
+    if (wompi.enabled) logger.info(`[wompi] Pago del anticipo con Wompi activo (${wompi.config!.env})`);
+    else if (wompi.reason !== 'faltan_variables') logger.warn(`[wompi] Wompi apagado: ${wompi.reason}`);
 
     // Análisis IA de cuentas médicas con PDFs grandes puede tardar minutos.
     server.timeout = 900000;
@@ -113,6 +130,7 @@ const startServer = async () => {
     const shutdown = (signal: string) => {
       logger.info(`Recibido ${signal}, cerrando...`);
       stopDemoGrantsJob();
+      stopProposalsExpiryJob();
       server.close(() => {
         logger.info('Server closed');
         process.exit(0);
