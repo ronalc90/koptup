@@ -10,7 +10,6 @@ import {
   EyeIcon,
   ShoppingCartIcon,
   XMarkIcon,
-  ArrowsRightLeftIcon,
   SparklesIcon,
   TruckIcon,
   TagIcon,
@@ -24,11 +23,12 @@ import {
   CATEGORY_IDS,
   Product,
   ProductCategory,
+  PhotoDetail,
   imageUrl,
   heroImageUrl,
   HERO_PHOTO_ID,
 } from './products';
-import { useCart, formatPrice } from './shared';
+import { useCart, formatPrice, FREE_SHIPPING_FROM } from './shared';
 
 interface Props {
   onProductClick?: (product: Product) => void;
@@ -101,10 +101,10 @@ export default function StorefrontView({ onProductClick }: Props) {
   return (
     <div>
       <section className="relative overflow-hidden rounded-2xl mb-8 max-w-7xl mx-auto px-0 sm:px-0">
-        <div className="relative h-[280px] sm:h-[360px] md:h-[440px] w-full">
+        <div className="relative h-[400px] sm:h-[360px] md:h-[440px] w-full">
           <Image
             src={heroImageUrl(HERO_PHOTO_ID)}
-            alt={t('hero.title')}
+            alt={t('hero.imageAlt')}
             fill
             priority
             sizes="(max-width: 768px) 100vw, 1600px"
@@ -127,11 +127,11 @@ export default function StorefrontView({ onProductClick }: Props) {
                 <div className="flex flex-wrap gap-3">
                   <Badge className="bg-white text-primary-700 font-bold px-3 py-2 flex items-center gap-2">
                     <TruckIcon className="h-4 w-4" />
-                    {t('hero.freeShipping')}
+                    {t('hero.freeShipping', { amount: formatPrice(FREE_SHIPPING_FROM) })}
                   </Badge>
                   <Badge className="bg-white text-primary-700 font-bold px-3 py-2 flex items-center gap-2">
                     <TagIcon className="h-4 w-4" />
-                    {t('hero.priceGuarantee')}
+                    {t('hero.pricesNote')}
                   </Badge>
                 </div>
               </div>
@@ -289,9 +289,9 @@ function ProductCard({ product, name, isWish, onWish, onAdd, onView, t }: {
           <Image src={imageUrl(product.photoId, 600, 600)} alt={name} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover transition-transform duration-500 group-hover:scale-110" />
           <div className="absolute top-3 left-3 flex flex-col gap-1.5">
             {product.discount && <Badge className="bg-red-600 text-white font-bold">-{product.discount}%</Badge>}
-            {product.badges.includes('new') && <Badge className="bg-green-600 text-white font-bold">NEW</Badge>}
-            {product.badges.includes('bestseller') && !product.badges.includes('new') && <Badge className="bg-amber-500 text-white font-bold">★ TOP</Badge>}
-            {product.badges.includes('eco') && <Badge className="bg-emerald-600 text-white font-bold">ECO</Badge>}
+            {product.badges.includes('new') && <Badge className="bg-green-600 text-white font-bold">{t('product.badges.new')}</Badge>}
+            {product.badges.includes('bestseller') && !product.badges.includes('new') && <Badge className="bg-amber-500 text-white font-bold">★ {t('product.badges.bestseller')}</Badge>}
+            {product.badges.includes('eco') && <Badge className="bg-emerald-600 text-white font-bold">{t('product.badges.eco')}</Badge>}
           </div>
           <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <IconButton onClick={onWish} aria-label={t('product.wishlist')}>
@@ -299,9 +299,6 @@ function ProductCard({ product, name, isWish, onWish, onAdd, onView, t }: {
             </IconButton>
             <IconButton onClick={onView} aria-label={t('product.quickView')}>
               <EyeIcon className="h-5 w-5 text-secondary-700 dark:text-secondary-300" />
-            </IconButton>
-            <IconButton onClick={() => {}} aria-label={t('product.compare')}>
-              <ArrowsRightLeftIcon className="h-5 w-5 text-secondary-700 dark:text-secondary-300" />
             </IconButton>
           </div>
         </div>
@@ -360,8 +357,9 @@ function IconButton({ onClick, children, ...rest }: { onClick: () => void; child
 function ProductModal({ product, name, onClose, onAdd, onCheckout, t }: {
   product: Product; name: string; onClose: () => void; onAdd: () => void; onCheckout: () => void; t: ReturnType<typeof useTranslations>;
 }) {
-  const [mainImg, setMainImg] = useState(product.photoId);
-  const thumbs = [product.photoId, 'photo-1505740420928-5e560c06d30e', 'photo-1523275335684-37898b6baf30', 'photo-1572635196237-14b3f281503f'];
+  // Galería: la foto completa y dos acercamientos de la misma foto.
+  const views: Array<PhotoDetail | undefined> = [undefined, ...product.details];
+  const [active, setActive] = useState(0);
   return (
     <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-2 sm:p-4" onClick={onClose}>
       <div className="bg-white dark:bg-secondary-900 rounded-2xl max-w-4xl w-full max-h-[92vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
@@ -373,12 +371,19 @@ function ProductModal({ product, name, onClose, onAdd, onCheckout, t }: {
         <div className="grid md:grid-cols-2 gap-6 px-6 pb-6">
           <div>
             <div className="relative aspect-square rounded-xl overflow-hidden bg-secondary-100 dark:bg-secondary-800 mb-3">
-              <Image src={imageUrl(mainImg, 800, 800)} alt={name} fill sizes="(max-width: 768px) 100vw, 400px" className="object-cover" />
+              <Image src={imageUrl(product.photoId, 800, 800, views[active])} alt={name} fill sizes="(max-width: 768px) 100vw, 400px" className="object-cover" />
             </div>
             <div className="grid grid-cols-4 gap-2">
-              {thumbs.map((id) => (
-                <button key={id} onClick={() => setMainImg(id)} className={`relative aspect-square rounded-lg overflow-hidden border-2 ${mainImg === id ? 'border-primary-600' : 'border-transparent'}`}>
-                  <Image src={imageUrl(id, 200, 200)} alt="" fill sizes="80px" className="object-cover" />
+              {views.map((detail, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setActive(i)}
+                  aria-label={i === 0 ? t('product.galleryFull') : t('product.galleryDetail', { n: i })}
+                  aria-pressed={active === i}
+                  className={`relative aspect-square rounded-lg overflow-hidden border-2 ${active === i ? 'border-primary-600' : 'border-transparent'}`}
+                >
+                  <Image src={imageUrl(product.photoId, 200, 200, detail)} alt="" fill sizes="80px" className="object-cover" />
                 </button>
               ))}
             </div>
@@ -394,6 +399,7 @@ function ProductModal({ product, name, onClose, onAdd, onCheckout, t }: {
             <div className="mb-4">
               {product.originalPrice && <span className="text-sm text-secondary-400 line-through mr-2">{formatPrice(product.originalPrice)}</span>}
               <span className="text-3xl font-bold text-primary-600">{formatPrice(product.price)}</span>
+              <p className="text-xs text-secondary-500 mt-1">{t('product.taxIncluded')}</p>
             </div>
             <p className="text-sm text-secondary-600 dark:text-secondary-300 mb-4">{t('product.description')}</p>
             <div className="bg-secondary-50 dark:bg-secondary-800 rounded-lg p-4 mb-4 text-sm space-y-1">
