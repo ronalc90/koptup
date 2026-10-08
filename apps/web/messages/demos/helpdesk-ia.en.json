@@ -1,44 +1,89 @@
 {
   "demoHelpdesk": {
-    "pageTitle": "AI help desk",
-    "pageSubtitle": "Omnichannel ticketing hub with smart routing, assisted replies, and live SLA",
+    "meta": {
+      "title": "AI Helpdesk: omnichannel service desk demo",
+      "description": "Interactive service desk demo for Colombia with sample data: one ticket inbox for email, web chat, WhatsApp, Messenger, Telegram and calls; automatic classification and assignment, AI reply drafts grounded in your knowledge base, SLAs, macros, CSAT/NPS and PQRS tracked in business days.",
+      "breadcrumbHome": "Home",
+      "breadcrumbDemos": "Demos",
+      "breadcrumbName": "AI Helpdesk"
+    },
+    "pageTitle": "AI Helpdesk",
+    "pageSubtitle": "Omnichannel service desk: one inbox for all your channels, automatic classification and assignment, AI reply drafts, SLAs and PQRS tracked in business days. Try it: simulate a ticket, answer it and close it.",
+    "sampleBadge": "Sample data",
+    "sampleBadgeHint": "This is the service desk of three fictitious brands (Moda Andina, Conecta Sabana and Cooperativa Ceiba). Customers, contacts, orders, amounts and filing numbers are made up. Reference date of the data: Thursday, October 8, 2026.",
+    "howItWorks": {
+      "title": "What is real in this demo",
+      "show": "Show",
+      "hide": "Hide",
+      "real": "Everything runs in your browser with the sample data: filters, search, classification, assignment by skill and workload, macros, SLAs with escalation, PQRS with business days and Colombian public holidays, surveys, metrics and CSV export. Your changes are saved only in this browser.",
+      "ai": "“Draft with AI” really calls an AI model from our server and answers only with the articles of this demo’s knowledge base, citing the source. If the server has no AI key configured, it shows you the most relevant excerpts and tells you so.",
+      "simulated": "Channels and sending are simulated: no message or survey is actually sent. Classification, confidence and auto-reply use keyword rules, not an AI model.",
+      "project": "In your project we connect your real channels (for example, WhatsApp Business and your email), load your knowledge base and, if you need it, classify tickets with an AI model trained on your own tickets."
+    },
+    "reset": {
+      "button": "Reset data",
+      "confirm": "Go back to the sample data? The changes you made in this browser will be deleted.",
+      "yes": "Yes, reset",
+      "done": "Sample data restored."
+    },
+    "clock": {
+      "label": "Demo clock: {date}, {time}",
+      "hint": "Simulated demo clock: it moves one minute for every real minute. SLAs and PQRS terms are calculated with this time.",
+      "advance": "+15 min",
+      "advanceHint": "Move the demo clock forward 15 minutes to watch SLAs expire",
+      "advanced": "You moved the demo clock forward 15 minutes."
+    },
     "brandLabel": "Brand",
-    "departmentLabel": "Department",
+    "categoryLabel": "Area",
     "brands": {
       "all": "All brands",
-      "alpha": "Alpha Retail",
-      "beta": "Beta Telecom",
-      "gamma": "Gamma Banking"
+      "moda": "Moda Andina (online store)",
+      "conecta": "Conecta Sabana (internet and TV)",
+      "ceiba": "Cooperativa Ceiba (savings and loans)"
     },
-    "departments": {
-      "all": "All departments",
-      "billing": "Billing",
-      "support": "Tech support",
-      "sales": "Sales",
-      "retention": "Retention"
+    "categories": {
+      "all": "All areas",
+      "billing": "Billing and payments",
+      "tech": "Technical support",
+      "orders": "Orders and shipping",
+      "account": "Account and access",
+      "cancel": "Cancellations and retention",
+      "general": "General"
     },
     "metrics": {
-      "title": "Live SLA dashboard",
-      "frt": "First response time",
-      "frtUnit": "min",
-      "aht": "Avg handle time",
-      "ahtUnit": "min",
-      "fcr": "First call resolution",
-      "csat": "CSAT",
-      "deflection": "AI deflection",
-      "trendUp": "vs last week",
-      "trendDown": "vs last week"
+      "active": "Active tickets",
+      "activeSub": "{count, plural, =0 {all assigned} one {# unassigned} other {# unassigned}}",
+      "activeHint": "Open or pending tickets in the inbox.",
+      "breached": "Breached SLAs",
+      "breachedSub": "{count, plural, =0 {none due in the next 30 min} one {# due in under 30 min} other {# due in under 30 min}}",
+      "breachedHint": "Open tickets past the first-response or resolution time of the sample SLA policy (PQRS are measured in business days).",
+      "frt": "Average first response",
+      "frtSub": "{count, plural, one {across # answered ticket} other {across # answered tickets}}",
+      "frtHint": "Average time between a ticket’s arrival and the first reply from an agent or the auto-reply.",
+      "csat": "Average CSAT",
+      "csatSub": "NPS {nps} · {count, plural, one {# survey} other {# surveys}}",
+      "csatEmpty": "no surveys",
+      "csatHint": "Average of the 1–5 ratings in the surveys. NPS is the percentage of promoters (9–10) minus the percentage of detractors (0–6).",
+      "auto": "Answered automatically",
+      "autoSub": "{sent} of {total} new messages answered by the auto-reply",
+      "autoHint": "New messages the auto-reply answered without an agent, out of all messages evaluated in the log."
     },
     "channels": {
       "title": "Channels",
       "all": "All",
       "email": "Email",
+      "webchat": "Web chat",
       "whatsapp": "WhatsApp",
-      "instagram": "Instagram",
-      "facebook": "Facebook",
-      "twitter": "X / Twitter",
-      "chat": "Web chat",
-      "voice": "Voice"
+      "messenger": "Messenger",
+      "telegram": "Telegram",
+      "voice": "Call",
+      "planHint": "Included from the {plan} plan",
+      "planNote": "Email and web chat from the Basic plan; WhatsApp, Messenger and Telegram from Professional; calls (transcribed) from Advanced. Simulated here."
+    },
+    "plans": {
+      "basic": "Basic",
+      "pro": "Professional",
+      "advanced": "Advanced"
     },
     "priorities": {
       "title": "Priority",
@@ -58,183 +103,590 @@
       "pending": "Pending",
       "resolved": "Resolved"
     },
+    "languages": {
+      "es": "Spanish",
+      "en": "English"
+    },
+    "skills": {
+      "billing": "Billing",
+      "tech": "Technical support",
+      "orders": "Orders",
+      "account": "Accounts",
+      "retention": "Retention",
+      "english": "English"
+    },
     "inbox": {
       "title": "Ticket inbox",
-      "search": "Search tickets, customers or subjects…",
-      "noResults": "No tickets match the current filters",
-      "newTicketCta": "Simulate incoming ticket",
-      "slaIn": "SLA in",
-      "slaBreached": "SLA breached",
-      "assigned": "Assigned to",
+      "search": "Search by ticket, customer, subject, filing number or text…",
+      "newTicket": "Simulate incoming ticket",
+      "noResults": "No tickets match those filters.",
+      "count": "{count, plural, one {# ticket} other {# tickets}}",
       "unassigned": "Unassigned",
-      "ticketsCount": "{count} tickets"
+      "viewLabel": "View",
+      "views": {
+        "all": "All",
+        "open": "Open",
+        "pending": "Pending",
+        "resolved": "Resolved",
+        "unassigned": "Unassigned",
+        "atRisk": "SLA at risk"
+      },
+      "sortLabel": "Sort",
+      "sorts": {
+        "sla": "SLA due soonest",
+        "recent": "Newest",
+        "priority": "Priority"
+      },
+      "export": "Export CSV",
+      "exported": "{count, plural, one {You exported # ticket to CSV.} other {You exported # tickets to CSV.}}",
+      "csv": {
+        "file": "koptup-helpdesk-tickets.csv",
+        "id": "Ticket",
+        "subject": "Subject",
+        "customer": "Customer",
+        "city": "City",
+        "channel": "Channel",
+        "brand": "Brand",
+        "area": "Area",
+        "priority": "Priority",
+        "status": "Status",
+        "assignee": "Assigned to",
+        "created": "Created",
+        "sla": "SLA remaining",
+        "pqrs": "PQRS filing number",
+        "slaBreached": "Breached"
+      }
+    },
+    "sla": {
+      "firstIn": "1st reply in {time}",
+      "resolutionIn": "Resolution in {time}",
+      "breached": "SLA breached {time} ago",
+      "waiting": "Waiting on customer",
+      "waitingHint": "You already replied to the customer; the SLA is measured again when they answer.",
+      "pqrsLeft": "{n, plural, one {Due in # business day} other {Due in # business days}}",
+      "pqrsToday": "Due today",
+      "pqrsOverdue": "{n, plural, one {Overdue by # business day} other {Overdue by # business days}}",
+      "pqrsHint": "PQRS are measured against their term in business days (excluding weekends and Colombian public holidays).",
+      "policyHint": "Sample SLA policy, in calendar minutes: first reply 15 min (urgent), 30 min (high), 1 h (medium), 4 h (low); resolution 4 h, 8 h, 24 h and 48 h. When breached, the priority goes up and the supervisor is notified (simulated notice)."
+    },
+    "time": {
+      "now": "now",
+      "minutes": "{n} min",
+      "hours": "{h} h",
+      "hoursMinutes": "{h} h {m} min",
+      "days": "{d} d",
+      "daysHours": "{d} d {h} h",
+      "minutesAgo": "{n} min ago",
+      "hoursAgo": "{n} h ago",
+      "daysAgo": "{n} d ago"
+    },
+    "dates": {
+      "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+      "months": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+      "short": "{wd}, {m} {d}, {y}",
+      "dateTime": "{date}, {time}"
     },
     "routing": {
-      "title": "Smart routing",
-      "incoming": "Incoming ticket",
-      "analyzing": "Analyzing intent and required skills…",
-      "matched": "ML: Skill matched",
-      "agentSuggested": "Suggested agent",
-      "confidence": "Confidence",
-      "accept": "Auto-assign",
-      "manual": "Assign manually",
-      "done": "Routing completed",
-      "tag": "Tags"
+      "incoming": "Incoming ticket {id}",
+      "classified": "Classified by rules: {area} · {sentiment} sentiment · suggested priority {priority} · language {language} · confidence {confidence}",
+      "macros": "Automatic macros applied: {names}",
+      "noMacros": "No automatic macro matches.",
+      "auto": {
+        "sent": "Auto-reply sent with the knowledge base article (simulated sending).",
+        "belowThreshold": "Auto-reply: confidence is below the threshold, so it goes to an agent.",
+        "notEligible": "Auto-reply: does not apply (topic without auto-reply, negative message or another language), so it goes to an agent.",
+        "off": "Auto-reply is off: it goes to an agent."
+      },
+      "autoAnswered": "It now waits for the customer’s reply, with no agent assigned.",
+      "assigned": "Assigned to {agent}: needs {required}; lowest workload among {candidates}.",
+      "assignedByMacro": "Assigned to {agent} by a macro.",
+      "candidate": "{name} ({load} active)",
+      "anySkill": "any skill",
+      "priorityChanged": "Final priority: {priority}",
+      "open": "Open the ticket"
     },
     "detail": {
-      "empty": "Select a ticket to see the details",
-      "subject": "Subject",
-      "customer": "Customer",
-      "channel": "Channel",
-      "priority": "Priority",
-      "sentiment": "Sentiment",
-      "createdAt": "Created",
-      "conversation": "Conversation",
-      "agent": "Agent",
-      "you": "You",
-      "customerRole": "Customer",
-      "internalNotes": "Internal notes",
-      "addNote": "Add an internal note…",
-      "addNoteCta": "Save note",
-      "noNotes": "No internal notes yet",
-      "suggestedReplies": "AI suggested replies",
-      "insertSuggestion": "Insert suggestion",
-      "regenerate": "Regenerate",
-      "replyPlaceholder": "Type your reply to the customer…",
-      "send": "Send reply",
+      "empty": "Select a ticket to see its details.",
+      "created": "Arrived {date} ({ago})",
       "resolve": "Mark resolved",
+      "reopen": "Reopen",
       "escalate": "Escalate",
-      "tags": "Tags",
-      "messageInserted": "Suggestion inserted into draft",
-      "replySent": "Reply sent to the customer",
-      "noteAdded": "Internal note saved",
-      "resolvedToast": "Ticket marked as resolved"
+      "survey": "Send survey (simulated)",
+      "surveyAgain": "Repeat survey (simulated)",
+      "assignee": "Assigned to",
+      "priority": "Priority",
+      "area": "Area",
+      "autoAssign": "Assign automatically",
+      "pqrsInfo": "PQRS · {type} · filing number {radicado} from {date}",
+      "escalatedInfo": "Escalated to {target} {ago}",
+      "conversation": "Conversation",
+      "customerRole": "Customer",
+      "autoReplyRole": "Auto-reply",
+      "ackRole": "Automatic acknowledgment",
+      "simulateCustomer": "Simulate customer reply",
+      "reply": "Your reply",
+      "replyPlaceholder": "Write your reply to the customer or insert a template or the AI draft…",
+      "send": "Send reply",
+      "sendNote": "Simulated sending: in your project it goes out via {channel}. Here it is added to the conversation and the ticket moves to “Pending”.",
+      "macro": "Apply macro",
+      "macroPlaceholder": "Choose a macro…",
+      "macroApply": "Apply",
+      "pqrsLabel": "Mark as PQRS",
+      "pqrsNone": "Not a PQRS",
+      "internalNotes": "Internal notes",
+      "noNotes": "No internal notes yet.",
+      "addNote": "Add an internal note…",
+      "addNoteCta": "Save note"
+    },
+    "classification": {
+      "title": "Automatic classification (rules)",
+      "area": "Suggested area",
+      "sentiment": "Sentiment",
+      "priority": "Suggested priority",
+      "language": "Language",
+      "confidence": "Confidence",
+      "keywords": "Keywords found",
+      "none": "none",
+      "hint": "Calculated with keyword rules over the customer’s messages, not with an AI model. Confidence goes up with each keyword of the area and down when there are keywords from other areas.",
+      "reasons": {
+        "legal": "mentions an authority or legal action",
+        "outage": "service down and negative message",
+        "negative": "negative message",
+        "positive": "positive message",
+        "general": "general inquiry",
+        "default": "no urgency signals"
+      }
+    },
+    "templates": {
+      "title": "Suggested replies from the knowledge base",
+      "none": "There are no articles for this area.",
+      "insert": "Insert"
+    },
+    "ai": {
+      "title": "AI draft",
+      "button": "Draft with AI",
+      "again": "Generate again",
+      "hint": "Calls an AI model from our server. It answers only with the articles of this demo’s knowledge base and cites the source; review it before sending.",
+      "preparing": "Loading the knowledge base on the server…",
+      "asking": "Asking the model…",
+      "modeLlm": "Generated by {model} in {ms} ms · approx. cost USD {cost}",
+      "modeExtractive": "The server has no AI key configured: these are the most relevant excerpts from the knowledge base (extractive mode, no model).",
+      "modeProviderError": "The AI provider did not respond: these are the most relevant excerpts from the knowledge base (extractive mode).",
+      "sources": "Sources",
+      "insert": "Insert into the reply (without citations)",
+      "errors": {
+        "network": "We couldn’t reach the AI server. Use the knowledge base templates or try again.",
+        "rateLimited": "There are too many requests right now. Wait a minute and try again.",
+        "server": "The AI server returned an error. Try again in a moment."
+      },
+      "botName": "AI Helpdesk (demo) · knowledge base",
+      "persona": "You are a customer service agent at a service desk in Colombia. You write reply drafts that a human agent reviews before sending: friendly, clear and short (2 to 4 sentences).",
+      "docTemplateLabel": "Model reply for the customer:",
+      "docNamePlaceholder": "[name]",
+      "prompt": "Write the reply the agent will send to this customer, using the knowledge base.\nCustomer: {name} · Channel: {channel} · Subject: {subject}\nCustomer messages:\n{messages}\nGreet the customer by name and write the reply in {language}. If the knowledge base does not cover the case, say so and suggest escalating it."
+    },
+    "escalate": {
+      "title": "Escalate {id}",
+      "subtitle": "Choose who you escalate it to and why. It is recorded in the internal notes.",
+      "target": "Escalate to",
+      "targets": {
+        "level2": "Level 2 support",
+        "supervisor": "Shift supervisor",
+        "quality": "Quality and PQRS",
+        "billingArea": "Payments team"
+      },
+      "targetHints": {
+        "level2": "Technical issues that level 1 cannot solve",
+        "supervisor": "Upset customers, exceptions or compensation",
+        "quality": "Formal complaints and legal risk",
+        "billingArea": "Reversals, refunds and invoice adjustments"
+      },
+      "reason": "Reason",
+      "reasonPlaceholder": "E.g.: the customer asks for compensation for the three-day outage.",
+      "reasonError": "Write the reason (at least 5 characters).",
+      "raise": "Raise the priority one level",
+      "alreadyUrgent": "Priority is already Urgent",
+      "submit": "Escalate ticket",
+      "note": "Notifying the team is simulated: in your project it is sent by email or internal chat, or a task is created in your tool (for example, Jira)."
     },
     "kb": {
       "title": "Knowledge base",
       "search": "Search articles…",
-      "contextual": "Contextual suggestions",
-      "views": "views",
-      "useArticle": "Use article",
-      "noResults": "No articles match this query",
+      "contextual": "Suggested for {id}",
+      "useArticle": "Use in reply",
+      "useDisabled": "Select an open ticket to use the article",
+      "autoReplyTag": "auto-reply",
+      "noResults": "No articles match that search.",
       "articles": {
-        "a1Title": "How to issue a refund",
-        "a1Snippet": "Step-by-step guide to process partial or full refunds in under 3 minutes.",
-        "a2Title": "Reset account password",
-        "a2Snippet": "Secure recovery flow with two-step verification.",
-        "a3Title": "Update shipping address",
-        "a3Snippet": "Change the address after order confirmation without restarting the flow.",
-        "a4Title": "Extended warranty policy",
-        "a4Snippet": "Coverage, deadlines and exclusions for Premium warranty.",
-        "a5Title": "Set up 2FA in the app",
-        "a5Snippet": "Quick activation via authenticator app or SMS.",
-        "a6Title": "Slow connection troubleshooting",
-        "a6Snippet": "8-step checklist before escalating to tier 2."
+        "refund": {
+          "title": "How to process a refund or a duplicate charge",
+          "body": "Check in the payment gateway that there are two approved transactions. If the charge is duplicated, request the reversal from the payments panel: the money returns to the payment method in 3 to 8 business days, depending on the bank. Record the request number in the ticket and let the customer know.",
+          "reply": "Hi {name}, we confirmed the duplicate charge and have already requested the refund. The money returns to your payment method in 3 to 8 business days, depending on your bank. We’ll email you the receipt."
+        },
+        "einvoice": {
+          "title": "I didn’t receive my electronic invoice",
+          "body": "The electronic invoice is emailed to the registered address when it is issued. If it doesn’t arrive, check the spam folder and confirm the registered email is correct. The PDF and XML can be downloaded from “My invoices” at any time. If the email is wrong, update it and resend the invoice.",
+          "reply": "Hi {name}, your electronic invoice is sent to the email address you registered, so please also check your spam folder. You can download the PDF and XML from “My invoices” anytime. If you prefer, we can resend it to another email."
+        },
+        "pse": {
+          "title": "Pending or declined PSE payments",
+          "body": "A PSE payment can stay pending for up to 30 minutes while the bank confirms it. If the bank declines it, no money is debited. If the customer sees the debit and the payment shows as declined, the bank reverses the money automatically in 1 to 3 business days.",
+          "reply": "Hi {name}, a PSE payment can stay pending for up to 30 minutes while your bank confirms it. If the bank declined it and you see the debit, the reversal is automatic within 1 to 3 business days. If it doesn’t show up, write to us with the receipt."
+        },
+        "password": {
+          "title": "Reset your password or access code",
+          "body": "On the sign-in screen choose “Forgot your password?”. A link is sent to the registered email, valid for 15 minutes. If the SMS verification code doesn’t arrive, check the signal and that the registered number is correct; a new code can be requested every 60 seconds.",
+          "reply": "Hi {name}, on the sign-in screen choose “Forgot your password?” and you’ll get a link by email, valid for 15 minutes. If the SMS code doesn’t arrive, you can request a new one every 60 seconds. If it still doesn’t work, reply here and we’ll help you."
+        },
+        "orderStatus": {
+          "title": "Order status and tracking number",
+          "body": "The tracking number is emailed when the order leaves the warehouse and also appears in “My orders”. Shipping to major cities takes 2 to 4 business days, and to other towns 4 to 7 business days.",
+          "reply": "Hi {name}, you can check your order status under “My orders” with your tracking number, which is also emailed to you when the order leaves the warehouse. Shipping to major cities takes 2 to 4 business days. If it doesn’t arrive within that time, reply here and we’ll look into it."
+        },
+        "address": {
+          "title": "Change the delivery address",
+          "body": "The address can be changed as long as the order has not left the warehouse. Confirm the full new address (neighborhood, apartment and city) and update it on the order. If it has already shipped, request the change from the carrier, which may charge a fee.",
+          "reply": "Hi {name}, we can change the address as long as your order hasn’t left the warehouse. Send us the full address (neighborhood, apartment and city) and we’ll update it right away."
+        },
+        "returns": {
+          "title": "Exchanges and returns",
+          "body": "For online purchases, customers have a right of withdrawal within 5 business days after delivery (Colombian Consumer Statute, Law 1480 of 2011). Size exchanges are requested in “My orders” within 30 days after delivery, with the item unused and with its tags.",
+          "reply": "Hi {name}, you can request the exchange in “My orders” within 30 days after delivery, with the item unused and with its tags. If you’d rather return it, you have a right of withdrawal within 5 business days after delivery."
+        },
+        "slowInternet": {
+          "title": "Slow or intermittent internet: troubleshooting",
+          "body": "Before escalating: 1) check whether there is a reported outage in the area; 2) ask the customer to unplug the modem for 30 seconds; 3) test the speed over a cable; 4) check how many devices are connected. If the internet light is still red, escalate to level 2 support.",
+          "reply": "Hi {name}, let’s check it together: unplug the modem for 30 seconds and plug it back in. If the internet light is still red, let us know and we’ll escalate the case to technical support right away."
+        },
+        "visit": {
+          "title": "Schedule or reschedule a technician visit",
+          "body": "Technician visits are scheduled in a morning slot (8:00 to 12:00) or an afternoon slot (14:00 to 18:00), Monday to Saturday. The technician confirms by WhatsApp one hour before. If the visit doesn’t happen because of the company, it is not charged.",
+          "reply": "Hi {name}, we can schedule the visit in the morning slot (8:00 to 12:00) or the afternoon slot (14:00 to 18:00), Monday to Saturday. The technician will confirm by WhatsApp one hour before. Which slot works for you?"
+        },
+        "cancelPlan": {
+          "title": "Cancel or pause a plan",
+          "body": "Before cancelling, offer an alternative: switching to a cheaper plan or pausing the service for up to 2 months. If the customer insists, file the cancellation request; it takes effect at the end of the billing cycle.",
+          "reply": "Hi {name}, before cancelling, we can move you to a cheaper plan or pause the service for up to 2 months at no cost. If you prefer to cancel, we’ll file your request and it will take effect at the end of your billing cycle."
+        }
       }
     },
     "autoReply": {
-      "title": "AI auto-reply",
-      "subtitle": "AI replies automatically when confidence exceeds the configured threshold",
-      "enable": "Enable auto-reply",
+      "title": "Auto-reply",
+      "subtitle": "Answers frequent questions on its own when the classification confidence is above the threshold; everything else goes to an agent.",
+      "enable": "Turn on auto-reply",
       "threshold": "Confidence threshold",
-      "log": "Recent log",
-      "channel": "Channel",
-      "time": "Time",
-      "intent": "Intent",
-      "confidence": "Confidence",
-      "result": "Result",
+      "preview": "With a {threshold} threshold, {would} of the {eligible} eligible messages in the log would have been answered automatically.",
+      "log": "New message log",
+      "empty": "No messages evaluated yet.",
       "results": {
-        "sent": "Sent",
-        "escalated": "Escalated",
-        "queued": "Queued"
+        "sent": "Answered automatically",
+        "belowThreshold": "Below threshold",
+        "notEligible": "To an agent",
+        "off": "Off"
       },
-      "empty": "No auto-replies have been triggered yet"
-    },
-    "csat": {
-      "title": "Post-resolution CSAT / NPS",
-      "subtitle": "Surveys sent after closing a ticket",
-      "openSurvey": "Preview survey",
-      "modalTitle": "How would you rate the support you received?",
-      "modalSubtitle": "Ticket {id} resolved by {agent}",
-      "comment": "Optional comment",
-      "commentPlaceholder": "Tell us what we can improve…",
-      "submit": "Submit rating",
-      "cancel": "Cancel",
-      "thanks": "Thanks for your feedback!",
-      "byAgent": "Avg by agent",
-      "tickets": "tickets"
+      "note": "Eligible: topics with an auto-reply article, in the knowledge base language and without negative sentiment. In this demo, confidence comes from the rules and sending is simulated."
     },
     "macros": {
-      "title": "Macros & automations",
-      "subtitle": "If-then rules your team can apply in one click",
+      "title": "Macros and automations",
+      "subtitle": "IF/THEN rules: applied automatically to new tickets or with one click from the ticket.",
       "if": "IF",
       "then": "THEN",
-      "runs": "runs",
-      "addNew": "Create macro",
-      "items": {
-        "m1If": "Subject contains 'refund' and priority ≥ High",
-        "m1Then": "Assign to Finance + 'refund-express' template + tag 'urgent'",
-        "m2If": "Negative sentiment and previous CSAT < 3",
-        "m2Then": "Escalate to Retention + notify supervisor",
-        "m3If": "WhatsApp channel and out-of-office hours",
-        "m3Then": "Send ack + schedule 09:00 callback",
-        "m4If": "VIP customer and SLA < 15 min",
-        "m4Then": "Bump priority to Urgent + assign best agent available"
+      "and": "and",
+      "auto": "Automatic on new tickets",
+      "manual": "Manual only",
+      "runs": "{count, plural, =0 {No runs} one {# run} other {# runs}}",
+      "create": "Create macro",
+      "empty": "No macros yet. Create the first one.",
+      "toggle": "Turn “{name}” on or off",
+      "delete": "Delete “{name}”",
+      "note": "Runs include the sample tickets in the inbox and the ones you make in this demo.",
+      "seed": {
+        "m1": "Refunds",
+        "m2": "Churn risk",
+        "m3": "WhatsApp acknowledgment",
+        "m4": "Mentions the SIC"
+      },
+      "describe": {
+        "category": "the area is {value}",
+        "channel": "the channel is {value}",
+        "priorityAtLeast": "the priority is {value} or higher",
+        "sentiment": "the sentiment is {value}",
+        "keyword": "the message contains “{value}”",
+        "assign": "assign to {agent}",
+        "priority": "priority {value}",
+        "tag": "tag “{value}”",
+        "ack": "send an acknowledgment (simulated)"
+      },
+      "builder": {
+        "title": "Create macro",
+        "subtitle": "Define the conditions (all must be met) and the actions.",
+        "name": "Name",
+        "namePlaceholder": "E.g.: Appliance warranties",
+        "nameError": "Write a name with at least 3 characters.",
+        "conditions": "Conditions (IF)",
+        "conditionType": "Condition type",
+        "conditionTypes": {
+          "category": "The area is",
+          "channel": "The channel is",
+          "priorityAtLeast": "The priority is at least",
+          "sentiment": "The sentiment is",
+          "keyword": "The message contains"
+        },
+        "value": "Value",
+        "keywordPlaceholder": "Comma-separated words, e.g.: warranty, damaged",
+        "keywordError": "Write at least one word for the “The message contains” condition.",
+        "addCondition": "Add condition",
+        "actions": "Actions (THEN)",
+        "actionType": "Action type",
+        "actionTypes": {
+          "assign": "Assign to",
+          "priority": "Change priority to",
+          "tag": "Add tag",
+          "ack": "Send acknowledgment"
+        },
+        "tagPlaceholder": "E.g.: warranty",
+        "tagError": "Write the tag name.",
+        "ackHint": "Adds the “We received your message…” reply to the conversation (simulated sending).",
+        "addAction": "Add action",
+        "remove": "Remove",
+        "auto": "Apply it automatically to new tickets that meet the conditions",
+        "save": "Save macro"
       }
     },
-    "skills": {
-      "billing": "Billing",
-      "spanish": "Spanish",
-      "english": "English",
-      "tech": "Technical",
-      "vip": "VIP",
-      "retention": "Retention"
+    "csat": {
+      "title": "CSAT and NPS after resolution",
+      "subtitle": "A short survey the customer receives when you close their ticket.",
+      "average": "CSAT (1 to 5)",
+      "nps": "NPS",
+      "npsHint": "Percentage of promoters (9–10) minus percentage of detractors (0–6).",
+      "surveys": "surveys",
+      "open": "Answer the survey for {id}",
+      "openDisabled": "Answer a survey",
+      "openHint": "Resolve a ticket to answer its survey as if you were the customer.",
+      "byAgent": "Average by agent",
+      "count": "{count, plural, =0 {no surveys} one {# survey} other {# surveys}}",
+      "comments": "Latest comments",
+      "note": "Includes 9 sample surveys from the last week plus the ones you answer here; sending to the customer is simulated.",
+      "modal": {
+        "title": "How would you rate the service you received?",
+        "subtitle": "This is how the customer sees the survey for ticket {id}, handled by {agent} ({channel}).",
+        "scoreLabel": "Rating",
+        "stars": "{n, plural, one {# star} other {# stars}}",
+        "npsLabel": "How likely are you to recommend us to a friend or colleague? (0 to 10)",
+        "npsLow": "Not likely at all",
+        "npsHigh": "Very likely",
+        "comment": "Comment (optional)",
+        "commentPlaceholder": "Tell us what we could do better…",
+        "submit": "Send rating",
+        "note": "Simulated survey: in your project it is sent through the ticket’s channel and the result feeds the dashboard."
+      }
     },
-    "tickets": {
-      "t1Subject": "Duplicate charge on March invoice",
-      "t1Preview": "Hi, I see two identical $129.90 charges on the same day and haven't gotten a reply…",
-      "t2Subject": "Can't sign in from the app",
-      "t2Preview": "Every time I enter my password it says invalid user, but I'm sure that…",
-      "t3Subject": "I want to cancel my Premium subscription",
-      "t3Preview": "I haven't used the service for three months and need to cancel before the next charge.",
-      "t4Subject": "Change shipping address for order #88421",
-      "t4Preview": "I just placed the order and entered the wrong street — can you update it before shipping?",
-      "t5Subject": "Praise for the agent who helped me yesterday",
-      "t5Preview": "Just wanted to say thanks — María was amazing and solved everything in minutes.",
-      "t6Subject": "Flaky internet since Monday",
-      "t6Preview": "It drops every 10 minutes and I've rebooted the router five times. This is unacceptable.",
-      "t7Subject": "Question about extended warranty",
-      "t7Preview": "I bought a laptop 11 months ago and want to know whether Premium warranty applies.",
-      "t8Subject": "Refund pending for two weeks",
-      "t8Preview": "They told me it would arrive in 5 business days and nothing. I'll file a complaint."
+    "pqrs": {
+      "title": "PQRS: petitions, complaints, claims, suggestions and compliments",
+      "subtitle": "Filing number, term and due date in business days, calculated as of {date}.",
+      "badge": "PQRS",
+      "filterLabel": "Filter PQRS",
+      "filters": {
+        "all": "All",
+        "open": "Open",
+        "dueSoon": "Due soon (3 business days or less)",
+        "overdue": "Overdue",
+        "answered": "Answered"
+      },
+      "columns": {
+        "radicado": "Filing number",
+        "type": "Type",
+        "customer": "Customer and subject",
+        "filed": "Filed",
+        "due": "Due",
+        "left": "Remaining",
+        "state": "Status"
+      },
+      "states": {
+        "answered": "Answered",
+        "overdue": "Overdue",
+        "dueSoon": "Due soon",
+        "onTime": "On time"
+      },
+      "types": {
+        "peticion": "Petition",
+        "queja": "Complaint",
+        "reclamo": "Claim",
+        "sugerencia": "Suggestion",
+        "felicitacion": "Compliment"
+      },
+      "mobileDates": "Filed {filed} · due {due}",
+      "empty": "No PQRS match that filter.",
+      "export": "Export CSV",
+      "exported": "{count, plural, one {You exported # PQRS to CSV.} other {You exported # PQRS to CSV.}}",
+      "termNote": "Sample term: {days} business days from the day after filing (the general term for petitions under Colombian Law 1755 of 2015). Saturdays, Sundays and Colombian public holidays are excluded. Check with your legal advisor which terms apply to your industry; in your project they are configured per type.",
+      "csv": {
+        "file": "koptup-helpdesk-pqrs.csv",
+        "radicado": "Filing number",
+        "type": "Type",
+        "customer": "Customer",
+        "subject": "Subject",
+        "channel": "Channel",
+        "filed": "Filing date",
+        "due": "Due date",
+        "left": "Business days remaining",
+        "state": "Status",
+        "ticket": "Ticket"
+      }
     },
-    "messages": {
-      "agent1": "Good morning — I'm really sorry for the inconvenience. I'm reviewing the invoice details right now.",
-      "customer1": "Hello, I've been waiting days for a reply. This is really frustrating.",
-      "agent2": "Completely understand. I can see the two charges and I'll process the duplicate refund right away.",
-      "customer2": "Thanks so much for the quick action."
+    "notes": {
+      "slaBreach": "SLA breached: priority went from {from} to {to} and the shift supervisor was notified (simulated notice).",
+      "slaBreachUrgent": "SLA breached with Urgent priority: the shift supervisor was notified (simulated notice).",
+      "escalated": "Escalated to {target}: {reason}",
+      "reopened": "Ticket reopened.",
+      "routed": "Automatically assigned to {agent}: needs {skill}; lowest workload among {count, plural, one {# agent} other {# agents}} with that skill.",
+      "routedEnglish": "Automatically assigned to {agent}: needs {skill} and English; lowest workload among {count, plural, one {# agent} other {# agents}} with those skills.",
+      "routedEnglishOnly": "Automatically assigned to {agent}: needs English; lowest workload among {count, plural, one {# agent} other {# agents}} who speak it.",
+      "macroAuto": "Automatic macro applied: “{name}”.",
+      "macroApplied": "Macro applied: “{name}”.",
+      "pqrsMarked": "Marked as PQRS ({type}) with filing number {radicado}.",
+      "pqrsType": "PQRS type changed to {type}.",
+      "pqrsRemoved": "PQRS mark removed."
     },
-    "suggestions": {
-      "s1": "Hi {name}, sorry for the inconvenience. We've confirmed the duplicate charge and will process the $129.90 refund within 24 hours. You'll receive an email confirmation.",
-      "s2": "Hi {name}, to reset your password please visit /recover — you'll receive a link valid for 15 minutes. If it doesn't arrive, check your spam folder or let us know.",
-      "s3": "Hi {name}, we can pause your subscription for 30 days at no cost while you decide. Want me to do that now?"
+    "newTicket": {
+      "title": "Simulate incoming ticket",
+      "subtitle": "Pick an example or write your own message: the demo classifies it, applies the macros, decides whether to auto-reply and assigns it.",
+      "examples": "Examples",
+      "customer": "Customer",
+      "customerError": "Write the customer’s name.",
+      "contact": "Contact",
+      "channel": "Channel",
+      "brand": "Brand",
+      "city": "City",
+      "message": "Customer message",
+      "messageError": "Write a message with at least 10 characters.",
+      "note": "The message never leaves your browser: classification and assignment use this demo’s rules.",
+      "submit": "Receive ticket"
     },
-    "agents": {
-      "maria": "María González",
-      "carlos": "Carlos Ruiz",
-      "ana": "Ana Pereira",
-      "luis": "Luis Martínez",
-      "you": "You (Demo)"
+    "toasts": {
+      "articleInserted": "You inserted “{title}” into your reply.",
+      "replySent": "Reply added to the conversation (simulated sending via {channel}).",
+      "customerReplied": "The customer replied (simulated): the ticket is “Open” again.",
+      "noteAdded": "Internal note saved.",
+      "resolved": "Ticket resolved. You can send the survey (simulated).",
+      "reopened": "Ticket reopened.",
+      "assigned": "Ticket assigned to {agent}.",
+      "unassigned": "Ticket unassigned.",
+      "autoAssigned": "Automatically assigned to {agent}.",
+      "priority": "Priority changed to {priority}.",
+      "category": "Area changed to {area}.",
+      "escalated": "Ticket escalated to {target}.",
+      "pqrs": "Marked as PQRS: {type}.",
+      "pqrsRemoved": "PQRS mark removed.",
+      "macroApplied": "Macro “{name}” applied.",
+      "macroCreated": "Macro “{name}” created.",
+      "macroDeleted": "Macro “{name}” deleted.",
+      "survey": "Survey recorded (simulated: in your project it reaches the customer via {channel})."
     },
     "common": {
-      "minutesAgo": "{n} min ago",
-      "hoursAgo": "{n} h ago",
-      "daysAgo": "{n} d ago",
       "close": "Close",
-      "save": "Save",
       "cancel": "Cancel",
-      "showMore": "Show more",
-      "showLess": "Show less"
+      "you": "You",
+      "system": "System",
+      "pct": "{n}%"
+    },
+    "data": {
+      "ack": "We received your message. An agent will reply shortly. (Automatic message)",
+      "customerReply": "All set, thank you so much for your help.",
+      "tickets": {
+        "t1": {
+          "subject": "I was charged twice through PSE",
+          "m1": "Hi, yesterday I paid for my order #MA-20931 through PSE and my bank statement shows two charges of COP 189,900. Please refund one of them.",
+          "m3": "Hi Lucía, I’m sorry for the trouble. I’m already checking the two charges on your order #MA-20931 with the payments team.",
+          "m4": "Thanks. How long will it take to get my money back? This is the third time this has happened and I’m fed up.",
+          "n1": "Frequent customer. The payment gateway shows two approved transactions 40 seconds apart."
+        },
+        "t2": {
+          "subject": "No internet since last night",
+          "m1": "(Call transcript) I’ve had no internet since last night. I already restarted the modem three times and the internet light is still red. I work from home and this is unacceptable.",
+          "m2": "Javier, I checked your service: there’s a reported outage in your area. Your case is logged and I’ll let you know as soon as we have an estimated fix time.",
+          "n1": "Area-wide outage at the Villavicencio Centro node. Network incident open with level 2 support."
+        },
+        "t3": {
+          "subject": "I want to cancel my TV plan",
+          "m1": "Good morning. I want to cancel my TV plan because I hardly use it. What do I need to do?",
+          "m3": "Hi Marta, we filed your request under number PQRS-2026-0418. Before you cancel, I can move you to the internet-only plan, which lowers your bill without changing your speed. Shall I send you the comparison?"
+        },
+        "t4": {
+          "subject": "Change the delivery address for order #MA-21055",
+          "m1": "Hi, I just placed order #MA-21055 and got the address wrong. It’s Carrera 45 # 12-30, apartment 502. Can you change it before it ships?"
+        },
+        "t5": {
+          "subject": "Thanks for the great service",
+          "m1": "I just wanted to thank Ana: she helped me exchange a size in minutes. Excellent service!",
+          "m2": "Thank you, Sofía! We’re so glad. We’re here for whatever you need."
+        },
+        "t6": {
+          "subject": "My electronic invoice didn’t arrive",
+          "m1": "Good morning. This month my electronic invoice for the internet service never reached my email, and I need it for my business accounting.",
+          "n1": "First-reply SLA breached: priority went from Medium to High and the shift supervisor was notified (simulated notice)."
+        },
+        "t7": {
+          "subject": "Can’t sign in to their account",
+          "m1": "Hi, I'm trying to log in to my account to check my order, but it says my password is wrong. I already tried twice. Can you help me, please?"
+        },
+        "t8": {
+          "subject": "Refund pending for three weeks",
+          "m1": "I returned a jacket on September 14 and was told the COP 249,900 refund would arrive within 5 business days. It’s been three weeks and nobody answers me. If I don’t get a solution today, I’ll file a complaint with the SIC."
+        },
+        "t9": {
+          "subject": "Where is my order #MA-20877?",
+          "m1": "Hi, can you tell me where my order #MA-20877 is? I bought it on Monday and I still don’t have the shipping tracking number.",
+          "m2": "Hi Valentina, you can check your order status under “My orders” with your tracking number, which is also emailed to you when the order leaves the warehouse. Shipping to major cities takes 2 to 4 business days. If it doesn’t arrive within that time, reply here and we’ll look into it."
+        },
+        "t10": {
+          "subject": "Claim for a charged technician visit that never happened",
+          "m1": "I was charged COP 80,000 for a technician visit that never happened: nobody came on September 18. I’m asking you to credit that amount on my next invoice.",
+          "m2": "Hi Hernán, we filed your claim under number PQRS-2026-0402. We’re checking the visit order with the technical team and will reply within the legal term.",
+          "m3": "Any news? It’s been more than ten days.",
+          "n1": "The technician reported “customer not home”, but there’s no photo or signature of the visit. I suggest crediting the COP 80,000 on the October bill."
+        },
+        "t11": {
+          "subject": "Not getting the code to sign in to the app",
+          "m1": "Hi, I’m trying to get into the cooperative’s app and the SMS verification code never arrives. I already checked that my number is correct."
+        },
+        "t12": {
+          "subject": "Request for a certificate of contributions and loan status",
+          "m1": "Good afternoon. I need a certificate of my contributions and my loan status to present at the bank. How do I request it?",
+          "m2": "Hi Andrés, we filed your petition under number PQRS-2026-0410. The collections department issues the certificate and we’ll send it to your registered email."
+        }
+      },
+      "surveys": {
+        "s1": "Ana solved my size exchange in minutes.",
+        "s5": "The technician arrived two hours late.",
+        "s9": "They refunded the duplicate charge the same day."
+      },
+      "incoming": {
+        "pse": {
+          "label": "Double PSE charge",
+          "text": "Hi, I paid for my purchase through PSE and COP 159,900 was taken from my account twice. Can you refund the duplicate charge? I’m really annoyed."
+        },
+        "outage": {
+          "label": "Internet down (call)",
+          "text": "(Call transcript) I’ve had no internet since this morning and the wifi signal doesn’t show up. I already restarted the router. I need the service to work and this is unacceptable."
+        },
+        "tracking": {
+          "label": "Where is my order?",
+          "text": "Hi, where is my order #MA-21102? It’s been three days and I want to know the shipping tracking number."
+        },
+        "password": {
+          "label": "Password reset",
+          "text": "Hello, I forgot my password and I can't log in to my account. Can you help me, please?"
+        },
+        "sic": {
+          "label": "Complaint mentioning the SIC",
+          "text": "Good afternoon. For a month I’ve been asking you to fix a COP 95,000 charge on my invoice and nobody gives me a solution. If you don’t fix it this week, I’ll file a complaint with the Superintendency of Industry and Commerce (SIC)."
+        },
+        "cancel": {
+          "label": "Subscription cancellation",
+          "text": "Hi, I want to cancel my TV subscription starting next month. How do I do it?"
+        }
+      }
     }
   }
 }
