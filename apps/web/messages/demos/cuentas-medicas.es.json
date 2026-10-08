@@ -1,10 +1,349 @@
 {
   "demoMedicalAccounts": {
-    "backToDemos": "Volver a Demos",
-    "title": "🏥 Sistema experto para salud",
-    "subtitle": "Auditoría de cuentas médicas: un motor de reglas revisa códigos CUPS y CIE-10 y tarifarios, y la IA extrae los datos de las facturas para señalar posibles glosas.",
-    "adminButton": "Administración",
-    "viewProcess": "Ver Proceso",
-    "ragLink": "¿Quieres una IA que responda con tus protocolos, normativa y tarifarios citando la fuente? Conoce los sistemas RAG"
+    "backToDemos": "Volver a las demos",
+    "title": "Sistema experto para salud",
+    "subtitle": "Auditoría de cuentas médicas: la IA lee la factura en PDF, el motor compara cada código CUPS con un tarifario de ejemplo y propone glosas. Tú, como auditor, confirmas, ajustas o descartas cada una.",
+    "ragLink": "¿Quieres una IA que responda con tus protocolos, normativa y tarifarios citando la fuente? Conoce los sistemas RAG",
+    "badges": {
+      "sampleData": "Datos de ejemplo",
+      "private": "Demo privada"
+    },
+    "tabs": {
+      "label": "Secciones de la demo",
+      "dashboard": "Tablero",
+      "invoices": "Facturas",
+      "howItWorks": "Cómo audita"
+    },
+    "auditButton": "Auditar factura",
+    "sharedSpaceNote": "Este espacio de demo es compartido: las personas con acceso ven las mismas facturas. No subas datos reales de pacientes.",
+    "common": {
+      "retry": "Reintentar",
+      "refresh": "Actualizar",
+      "loading": "Cargando…",
+      "cancel": "Cancelar",
+      "close": "Cerrar",
+      "confirmDelete": "Sí, eliminar",
+      "keep": "No",
+      "delete": "Eliminar"
+    },
+    "access": {
+      "title": "Tu acceso a esta demo no está activo",
+      "body": "Esta es una demo privada: solo la usan las personas a las que el equipo de KopTup les dio acceso. Si ya lo tenías, puede que haya vencido o que tu sesión se haya cerrado.",
+      "login": "Iniciar sesión",
+      "request": "Solicitar acceso"
+    },
+    "errors": {
+      "network": "No pudimos conectar con el servidor de la demo. Intenta de nuevo en unos minutos.",
+      "server": "El servidor de la demo respondió con un error. Intenta de nuevo.",
+      "notFound": "Esta factura ya no existe: puede que alguien la haya eliminado.",
+      "saveDecision": "No se pudo guardar la decisión. Intenta de nuevo.",
+      "delete": "No se pudo eliminar la factura. Intenta de nuevo.",
+      "report": "No se pudo generar el archivo. Intenta de nuevo."
+    },
+    "entities": {
+      "provider": "Prestador de ejemplo",
+      "payer": "Pagador de ejemplo"
+    },
+    "states": {
+      "radicada": "Radicada",
+      "enAuditoria": "En auditoría",
+      "auditada": "Auditada",
+      "glosada": "Glosada",
+      "aceptada": "Aceptada",
+      "pagada": "Pagada",
+      "rechazada": "Rechazada"
+    },
+    "denialTypes": {
+      "tarifa": "Diferencia de tarifa",
+      "soporte": "Soportes",
+      "pertinencia": "Pertinencia",
+      "duplicidad": "Duplicidad",
+      "autorizacion": "Autorización",
+      "facturacion": "Facturación",
+      "otro": "Otra"
+    },
+    "dashboard": {
+      "kpis": {
+        "invoices": "Facturas",
+        "billed": "Valor facturado",
+        "denied": "Valor glosado",
+        "toPay": "Valor a pagar"
+      },
+      "kpiHint": "El valor glosado cambia cuando confirmas, ajustas o descartas glosas en el detalle de cada factura.",
+      "byState": "Facturas por estado",
+      "byType": "Glosas por tipo",
+      "invoicesCount": "{count, plural, one {# factura} other {# facturas}}",
+      "denialsCount": "{count, plural, one {# glosa} other {# glosas}}",
+      "noDenials": "Todavía no hay glosas.",
+      "emptyTitle": "Aún no hay facturas en este espacio",
+      "emptyBody": "Audita con un clic la factura de ejemplo (datos ficticios) o sube un PDF de prueba.",
+      "emptyCta": "Auditar la factura de ejemplo",
+      "emptyUpload": "Subir un PDF",
+      "stepsTitle": "Así funciona esta demo",
+      "steps": {
+        "s1": {
+          "title": "Cargas la factura",
+          "desc": "PDF con texto seleccionable (no escaneado)."
+        },
+        "s2": {
+          "title": "La IA lee los datos",
+          "desc": "Número, paciente, diagnóstico CIE-10, autorización y la tabla de procedimientos."
+        },
+        "s3": {
+          "title": "El motor aplica el tarifario",
+          "desc": "Compara cada código CUPS con el tarifario de ejemplo y calcula la diferencia."
+        },
+        "s4": {
+          "title": "La IA redacta una propuesta",
+          "desc": "Valor a pagar y justificación. Es una propuesta: no decide por ti."
+        },
+        "s5": {
+          "title": "Tú decides y descargas",
+          "desc": "Confirmas, ajustas o descartas cada glosa y descargas el reporte en CSV o PDF."
+        }
+      }
+    },
+    "upload": {
+      "title": "Auditar factura",
+      "intro": "Sube la factura en PDF. La demo lee el texto, extrae los datos con IA, compara cada código CUPS con el tarifario de ejemplo y propone glosas.",
+      "sampleTitle": "¿No tienes una factura de prueba?",
+      "sampleBody": "Usa la factura de ejemplo: datos ficticios de «Clínica Demo Los Andes» con dos procedimientos por encima del tarifario.",
+      "useSample": "Usar factura de ejemplo",
+      "downloadSample": "Descargar factura de ejemplo (PDF)",
+      "dropzone": "Arrastra los PDF aquí o",
+      "choose": "elige archivos",
+      "limits": "Solo PDF con texto seleccionable (no escaneado) · Máx. 10 MB por archivo · Hasta 10 archivos",
+      "multiNote": "Si subes varias facturas, la demo consolida sus procedimientos en una sola cuenta.",
+      "selected": "Archivos seleccionados ({count})",
+      "remove": "Quitar {name}",
+      "consent": "Confirmo que los archivos no contienen datos reales de pacientes.",
+      "sharedNote": "Lo que subas queda visible para las demás personas con acceso a esta demo hasta que lo elimines desde Facturas.",
+      "submit": "{count, plural, one {Auditar # archivo} other {Auditar # archivos}}",
+      "processing": "Leyendo el PDF y consultando el modelo de IA… puede tardar hasta un minuto.",
+      "errors": {
+        "notPdf": "{name} no es un PDF.",
+        "tooBig": "{name} pesa más de 10 MB.",
+        "tooMany": "Puedes subir hasta 10 archivos.",
+        "sample": "No se pudo generar la factura de ejemplo.",
+        "noInvoice": "La demo no encontró una factura legible en los archivos. Revisa que el PDF tenga texto seleccionable (no escaneado). También puede que el servicio de IA no esté disponible en este momento.",
+        "server": "El servidor no pudo procesar los archivos. Intenta de nuevo en unos minutos."
+      },
+      "resultTitle": "Factura {number} auditada",
+      "resultProcedures": "Procedimientos leídos",
+      "resultMethod": "Cómo se leyó",
+      "methods": {
+        "HIBRIDO": "Tabla por patrones + IA",
+        "IA": "Solo con IA",
+        "REGEX": "Solo con patrones"
+      },
+      "resultDenials": "Glosas propuestas",
+      "resultToPay": "Valor a pagar propuesto",
+      "resultReview": "El modelo marcó esta factura para revisión del auditor.",
+      "viewDetail": "Ver detalle y decidir glosas",
+      "another": "Auditar otra factura",
+      "failedTitle": "No se pudo auditar"
+    },
+    "invoices": {
+      "title": "Facturas",
+      "search": "Buscar por número de factura",
+      "state": "Estado",
+      "allStates": "Todos",
+      "from": "Registrada desde",
+      "to": "Registrada hasta",
+      "clear": "Limpiar filtros",
+      "exportCsv": "Exportar CSV",
+      "showing": "Mostrando {shown} de {total}",
+      "loadMore": "Cargar más",
+      "updatedAt": "Actualizado a las {time}",
+      "empty": "Aún no hay facturas. Audita la factura de ejemplo o sube un PDF.",
+      "noResults": "Ninguna factura coincide con los filtros.",
+      "columns": {
+        "number": "Factura",
+        "state": "Estado",
+        "provider": "Prestador",
+        "payer": "Pagador",
+        "registered": "Registrada",
+        "billed": "Facturado",
+        "denied": "Glosado",
+        "toPay": "A pagar"
+      },
+      "view": "Ver detalle",
+      "deleteQuestion": "¿Eliminar la factura {number} y sus glosas?",
+      "deleted": "Factura {number} eliminada"
+    },
+    "detail": {
+      "back": "Volver a facturas",
+      "title": "Factura {number}",
+      "registered": "Registrada el {date}",
+      "downloadCsv": "Descargar CSV",
+      "downloadPdf": "Informe PDF",
+      "values": {
+        "billed": "Valor facturado",
+        "vat": "IVA",
+        "denied": "Valor glosado",
+        "toPay": "Valor a pagar"
+      },
+      "review": {
+        "title": "Decisión del auditor",
+        "progress": "{done} de {total} glosas decididas",
+        "complete": "Revisión completa: decidiste todas las glosas.",
+        "none": "Sin glosas propuestas: todos los valores están dentro del tarifario de ejemplo.",
+        "flagged": "El modelo marcó esta factura para revisión humana."
+      },
+      "proposal": {
+        "title": "Propuesta del modelo de IA",
+        "note": "Texto generado por el modelo. Es una propuesta: la decisión es del auditor.",
+        "empty": "El modelo no dejó una justificación para esta factura."
+      },
+      "patient": {
+        "title": "Paciente y atención",
+        "name": "Paciente",
+        "document": "Documento",
+        "diagnosis": "Diagnóstico (CIE-10)",
+        "authorization": "Autorización",
+        "noAuthorization": "Sin número de autorización",
+        "copay": "Copago",
+        "moderatorFee": "Cuota moderadora",
+        "notRead": "No leído"
+      },
+      "procedures": {
+        "title": "Procedimientos ({count})",
+        "code": "CUPS",
+        "description": "Descripción",
+        "qty": "Cant.",
+        "billed": "Facturado",
+        "tariff": "Tarifa de ejemplo",
+        "difference": "Diferencia",
+        "proposed": "Glosa propuesta",
+        "notInTariff": "No está en el tarifario",
+        "empty": "La demo no encontró procedimientos en esta factura."
+      },
+      "trace": {
+        "title": "Cómo se llegó a esta propuesta",
+        "read": "Lectura del PDF",
+        "readValue": "{method} · {count, plural, one {# procedimiento} other {# procedimientos}}",
+        "readUnknown": "{count, plural, one {# procedimiento leído} other {# procedimientos leídos}}",
+        "tariff": "Tarifario de ejemplo",
+        "tariffValue": "{over} de {total} por encima de la tarifa",
+        "model": "Propuesta del modelo",
+        "modelFlagged": "Pidió revisión humana",
+        "modelOk": "Sin alertas",
+        "auditor": "Decisión del auditor",
+        "auditorNone": "Sin glosas que decidir"
+      }
+    },
+    "denials": {
+      "title": "Glosas propuestas ({count})",
+      "rule": "Regla {code}",
+      "proposedValue": "Valor propuesto",
+      "currentValue": "Valor glosado",
+      "tariffText": "{procedure}: se facturó {billed} por unidad y el tarifario de ejemplo permite {tariff}.",
+      "noTariffText": "{procedure}: el código no está en el tarifario de ejemplo; el motor de la demo propone glosar el {percent} % (regla provisional).",
+      "engineText": "Ver texto original del motor",
+      "confirm": "Confirmar",
+      "adjust": "Ajustar",
+      "discard": "Descartar",
+      "reopen": "Reabrir",
+      "newValue": "Nuevo valor glosado (COP)",
+      "note": "Nota del auditor",
+      "notePlaceholder": "Ej.: tarifa pactada en el otrosí 2 del convenio",
+      "noteRequired": "Escribe una nota para descartar la glosa.",
+      "save": "Guardar decisión",
+      "invalidValue": "Escribe un valor entre 0 y {max}.",
+      "saved": "Decisión guardada",
+      "decision": {
+        "pendiente": "Pendiente",
+        "confirmada": "Confirmada por el auditor",
+        "ajustada": "Ajustada por el auditor",
+        "descartada": "Descartada por el auditor"
+      }
+    },
+    "howItWorks": {
+      "title": "Cómo audita esta demo",
+      "intro": "Esto es exactamente lo que hace el motor de la demo con cada factura. Lo demás se configura en tu proyecto.",
+      "pipeline": {
+        "s1": {
+          "title": "Lectura del PDF",
+          "desc": "El servidor extrae el texto del PDF. Los PDF escaneados (imagen) no se leen en esta demo."
+        },
+        "s2": {
+          "title": "Extracción con IA",
+          "desc": "La tabla de procedimientos se lee con patrones (código, descripción, cantidad y valores). Un modelo de lenguaje de OpenAI (GPT-4o mini) extrae el número de factura, el paciente, el diagnóstico CIE-10 y la autorización."
+        },
+        "s3": {
+          "title": "Tarifario y reglas",
+          "desc": "Cada código CUPS se compara con el tarifario de ejemplo. Si el valor facturado supera la tarifa, se propone una glosa por la diferencia."
+        },
+        "s4": {
+          "title": "Propuesta del modelo",
+          "desc": "Un segundo modelo de OpenAI (GPT-4o) revisa los datos y redacta una propuesta: valor a pagar, justificación y si hace falta revisión humana."
+        },
+        "s5": {
+          "title": "Decisión del auditor",
+          "desc": "Tú confirmas, ajustas o descartas cada glosa con una nota. El servidor recalcula los totales y puedes descargar el reporte en CSV o PDF."
+        }
+      },
+      "tariffTitle": "Tarifario de ejemplo",
+      "tariffNote": "Códigos y valores de ejemplo que usa el motor de la demo. No corresponden a ningún contrato ni manual tarifario real.",
+      "tariffSearch": "Buscar código o procedimiento",
+      "tariffCols": {
+        "code": "CUPS",
+        "description": "Procedimiento",
+        "value": "Valor de ejemplo"
+      },
+      "tariffEmpty": "Ningún código coincide con la búsqueda.",
+      "rulesTitle": "Reglas que aplica",
+      "rules": {
+        "r1": "Valor facturado mayor que la tarifa de ejemplo: glosa por la diferencia multiplicada por la cantidad (regla 202, diferencia de tarifa).",
+        "r2": "Código que no está en el tarifario de ejemplo: el motor propone glosar el 30 % del valor. Es una regla provisional de la demo; en tu proyecto se reemplaza por las tarifas de tu convenio.",
+        "r3": "Los códigos de regla (como 202) son internos de la demo; en tu proyecto se mapean al Manual Único de Devoluciones, Glosas y Respuestas vigente."
+      },
+      "notIncludedTitle": "Qué no hace esta demo (se implementa en tu proyecto)",
+      "notIncluded": {
+        "n1": "Leer RIPS (JSON o Excel) y cruzarlos con el PDF.",
+        "n2": "Validar autorizaciones con el pagador (vigencia y cantidades).",
+        "n3": "Revisar pertinencia clínica diagnóstico–procedimiento y medicamentos.",
+        "n4": "Detectar duplicidades entre facturas.",
+        "n5": "Tomar el prestador y el pagador del PDF: la demo usa un prestador y un pagador de ejemplo.",
+        "n6": "Aplicar convenios por pagador y catálogos oficiales (CUPS, CIE-10) con su versión.",
+        "n7": "Leer PDF escaneados (OCR).",
+        "n8": "Separar los datos por cliente: en esta demo el espacio es compartido."
+      },
+      "projectNote": "En tu proyecto conectamos tus convenios y tarifarios, los catálogos oficiales y tus reglas, y procesamos RIPS y soportes."
+    },
+    "report": {
+      "listFileName": "facturas-auditoria-demo",
+      "detailFileName": "auditoria-demo",
+      "noDenial": "Sin glosa",
+      "notInTariff": "No está en el tarifario",
+      "total": "TOTAL",
+      "sampleNote": "Datos de ejemplo",
+      "columns": {
+        "invoice": "Factura",
+        "code": "CUPS",
+        "description": "Descripción",
+        "qty": "Cantidad",
+        "billed": "Valor facturado",
+        "tariff": "Tarifa de ejemplo",
+        "difference": "Diferencia",
+        "proposed": "Glosa propuesta",
+        "final": "Glosa final",
+        "decision": "Decisión del auditor",
+        "note": "Nota del auditor"
+      },
+      "pdf": {
+        "sampleBanner": "DATOS DE EJEMPLO - DEMO DE KOPTUP - NO ES UN DOCUMENTO OFICIAL",
+        "title": "Informe de auditoría - factura {number}",
+        "registered": "Registrada",
+        "state": "Estado",
+        "values": "Valores",
+        "procedures": "Procedimientos",
+        "denials": "Glosas y decisión del auditor",
+        "proposed": "propuesta",
+        "final": "final",
+        "aiProposal": "Propuesta del modelo de IA",
+        "footer": "Generado en la demo «Sistema experto para salud» de KopTup con el tarifario de ejemplo. Los prestadores y pagadores son de ejemplo."
+      }
+    }
   }
 }
