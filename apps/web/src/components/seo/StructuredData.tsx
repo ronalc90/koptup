@@ -105,7 +105,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
       '@type': 'OfferCatalog',
       name: 'Servicios de Desarrollo de Software',
       itemListElement: [
-        { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Chatbots con IA para empresas', url: absoluteUrl('/chatbots-ia') } },
+        { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Chatbots RAG para WhatsApp y web', url: absoluteUrl('/chatbots-ia') } },
         { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Soluciones de Inteligencia Artificial', url: absoluteUrl('/soluciones-ia') } },
         { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Desarrollo web a medida', url: absoluteUrl('/desarrollo-web-colombia') } },
         { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'E-commerce profesional' } },

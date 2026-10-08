@@ -10,7 +10,7 @@ export default function Footer() {
   const services = [
     { name: t('footer.rag'), href: '/rag' },
     { name: 'Desarrollo Web a Medida', href: '/desarrollo-web-colombia' },
-    { name: 'Chatbots con IA', href: '/chatbots-ia' },
+    { name: 'Chatbots RAG', href: '/chatbots-ia' },
     { name: 'Soluciones de IA', href: '/soluciones-ia' },
     { name: 'E-commerce', href: '/services#otras-soluciones' },
     { name: t('services.mobile.title'), href: '/services#otras-soluciones' },

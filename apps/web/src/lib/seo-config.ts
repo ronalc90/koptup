@@ -112,10 +112,11 @@ export const seoConfig: Record<string, PageSEO> = {
     canonical: `${baseUrl}/desarrollo-web-colombia`,
   },
 
+  // Usada por src/app/chatbots-ia/layout.tsx (precios de rag-plans.ts).
   'chatbots-ia': {
-    title: 'Chatbots con IA para Empresas en Colombia',
+    title: 'Chatbots RAG para WhatsApp y web',
     description:
-      'Implementamos chatbots con inteligencia artificial para empresas en Colombia. Integración con WhatsApp Business, GPT-4 y Claude AI. Atención 24/7, captura de leads y ventas automatizadas. Desde $499 USD.',
+      `Chatbots RAG para WhatsApp y tu sitio web: responden con los documentos de tu empresa y citan la fuente. Desde ${formatRagCOP(RAG_ESSENTIAL.setup.cop)}, o piloto de ${formatRagCOP(RAG_PILOT.setup.cop)}.`,
     canonical: `${baseUrl}/chatbots-ia`,
   },
 

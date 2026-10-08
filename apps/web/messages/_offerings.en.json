@@ -1,4 +1,151 @@
 {
+  "chatbotsPage": {
+    "hero": {
+      "badge": "RAG chatbots",
+      "title": "RAG chatbots for WhatsApp and the web",
+      "subtitle": "A chatbot that answers your customers and your team with your company's documents —manuals, policies, catalogs, FAQs— and cites the source of every answer. On your website and on WhatsApp.",
+      "ctaDemo": "Try the demo",
+      "ctaPilot": "Book a pilot",
+      "price": "From {essentialFrom}, or a {pilotFrom} pilot. Plus VAT where applicable.",
+      "ragLink": "How a chatbot built on your company documents works"
+    },
+    "benefits": {
+      "title": "A chatbot that answers with your documents, not from memory",
+      "subtitle": "A RAG (retrieval augmented generation) chatbot first searches your company's documents and then answers with what it found. That way, its answers follow your policies and can be checked.",
+      "items": {
+        "docs": {
+          "title": "It answers with your documents",
+          "desc": "It replies with what your manuals, policies, catalogs and FAQs say, not with what it finds on the internet."
+        },
+        "cites": {
+          "title": "It cites the source",
+          "desc": "Every answer shows which document it comes from, so your customer or your team can check it."
+        },
+        "updates": {
+          "title": "It updates when you add or change documents",
+          "desc": "No model needs retraining: the chatbot looks up your documents for every question, so it answers with the version you have loaded."
+        },
+        "notFound": {
+          "title": "It doesn't make up answers",
+          "desc": "If the answer is not in your documents, it says “I couldn't find that information” instead of guessing."
+        },
+        "anyHour": {
+          "title": "It answers at any hour",
+          "desc": "Your customers and your team get the answer right away, also outside office hours, without waiting for someone to look up the document."
+        },
+        "sources": {
+          "title": "Connected to your sources",
+          "desc": "Google Drive, SharePoint or manual document upload; depending on the plan, also databases and APIs."
+        }
+      }
+    },
+    "channels": {
+      "title": "On your website and on WhatsApp",
+      "subtitle": "The same assistant, with the same sources, on the channels your customers and your team already use.",
+      "web": {
+        "title": "Website",
+        "plan": "From the Essential plan",
+        "desc": "A chat widget on your website that answers with your documents and shows the source of every answer."
+      },
+      "whatsapp": {
+        "title": "WhatsApp",
+        "plan": "From the Professional plan",
+        "desc": "Your customers or your team ask on WhatsApp and get the answer with its source, through the official WhatsApp Business API. The Professional plan includes web and WhatsApp."
+      },
+      "metaNote": "Meta's WhatsApp messaging fees are billed separately, at cost."
+    },
+    "useCases": {
+      "title": "Use cases",
+      "subtitle": "It helps wherever people ask the same thing over and over and the answer is already written in some document.",
+      "items": {
+        "customers": {
+          "title": "Customer service",
+          "desc": "It answers on WhatsApp or on your website about shipping, warranties, returns and terms of service, citing the policy."
+        },
+        "support": {
+          "title": "Support and help desk",
+          "desc": "Your agents look up manuals, policies and the knowledge base without leaving the conversation with the customer.",
+          "link": "See RAG for support"
+        },
+        "health": {
+          "title": "Healthcare",
+          "desc": "Staff look up clinical protocols and industry regulations, and auditors look up fee schedules, contracts and denial rules for medical claims.",
+          "link": "See RAG for healthcare"
+        },
+        "legal": {
+          "title": "Legal",
+          "desc": "Ask what each contract, internal legal opinion or regulation says, and get the answer with the clause cited.",
+          "link": "See RAG for legal"
+        },
+        "hr": {
+          "title": "Human resources",
+          "desc": "Employees ask about vacation, leave and benefits, and the chatbot answers with the internal regulations."
+        },
+        "education": {
+          "title": "Education",
+          "desc": "Students and applicants ask about programs, requirements and regulations, and get the answer with the institutional document."
+        }
+      }
+    },
+    "process": {
+      "title": "How do we implement your chatbot?",
+      "subtitle": "Pilot with your documents in {pilotWeeks} weeks and Essential plan implementation in {essentialWeeks} weeks.",
+      "steps": {
+        "pilot": {
+          "title": "1. Pilot ({pilotWeeks} weeks)",
+          "desc": "We load up to 100 documents from one source, you test the chatbot in a web interface with citations and you get an accuracy report with 50 test questions."
+        },
+        "implementation": {
+          "title": "2. Implementation",
+          "desc": "We connect your sources and configure the chatbot: {essentialWeeks} weeks on the Essential plan and {proWeeks} weeks on Professional, which adds WhatsApp."
+        },
+        "launch": {
+          "title": "3. Launch",
+          "desc": "We publish the widget on your website and, from the Professional plan, the chatbot on WhatsApp."
+        },
+        "updates": {
+          "title": "4. Updates and support",
+          "desc": "When you add or change documents, the chatbot updates. On the Essential plan, the monthly fee includes hosting, document updates and support Mon–Fri."
+        }
+      }
+    },
+    "faq": {
+      "title": "Frequently asked questions about RAG chatbots",
+      "items": {
+        "cost": {
+          "q": "How much does a RAG chatbot cost?",
+          "a": "From {essentialFrom}, or a {pilotFrom} pilot. In detail: the {pilotWeeks}-week pilot costs {pilotPrice}; the Essential plan (website), {essentialSetup} for setup plus {essentialMonthly} per month; and Professional (website and WhatsApp), {proSetup} for setup plus {proMonthly} per month. All prices are plus VAT where applicable, and Meta's WhatsApp messaging fees are billed separately, at cost."
+        },
+        "time": {
+          "q": "How quickly can I have my chatbot running?",
+          "a": "The pilot with your documents takes {pilotWeeks} weeks. Implementation takes {essentialWeeks} weeks on the Essential plan and {proWeeks} weeks on Professional, which adds WhatsApp and up to 3 sources."
+        },
+        "whatsapp": {
+          "q": "Does the chatbot work on WhatsApp?",
+          "a": "Yes. From the Professional plan, the chatbot answers on your website and on WhatsApp, through the official WhatsApp Business API. The Essential plan includes the widget for your website. Meta's WhatsApp messaging fees are billed separately, at cost."
+        },
+        "technology": {
+          "q": "What AI technology do you use?",
+          "a": "RAG (retrieval augmented generation): the chatbot searches your documents for the chunks that answer the question, and an OpenAI language model —by default, GPT-4o mini, through its API— writes the answer with that information and cites the source. Under OpenAI's current API policy, data sent through the API is not used to train its models by default."
+        },
+        "updates": {
+          "q": "How does the chatbot stay up to date?",
+          "a": "It updates when you add or change documents. No model needs retraining: the chatbot looks up your documents for every question. On the Essential plan, the monthly fee includes document updates."
+        },
+        "notFound": {
+          "q": "What happens if the chatbot doesn't know the answer?",
+          "a": "It says “I couldn't find that information” instead of making up an answer. Those questions show you which documents are missing: once you load them, the chatbot can answer."
+        }
+      }
+    },
+    "cta": {
+      "title": "Want a chatbot that answers with your documents?",
+      "subtitle": "Try the free demo, no sign-up required, or book a {pilotWeeks}-week pilot with your company's documents.",
+      "demo": "Try the demo",
+      "pilot": "Book a pilot",
+      "plans": "See plans and pricing"
+    }
+  },
   "offeringsCatalog": {
     "section": {
       "title": "Other custom solutions",

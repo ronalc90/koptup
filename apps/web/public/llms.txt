@@ -39,8 +39,8 @@ Más info: https://www.koptup.com/rag
 ### 1. Desarrollo de Software a Medida
 Aplicaciones web y sistemas empresariales personalizados. Stack: React, Next.js, Node.js, Python, TypeScript.
 
-### 2. Chatbots con Inteligencia Artificial
-Chatbots inteligentes integrados con WhatsApp Business API, web y apps móviles. Tecnologías: OpenAI GPT-4, Claude AI, LangChain, RAG. Desde COP 9.900.000, o piloto de COP 3.900.000 (ver planes RAG abajo).
+### 2. Chatbots RAG para WhatsApp y web
+Chatbots que responden con los documentos de la empresa y citan la fuente: widget para el sitio web desde el plan Esencial y WhatsApp (API oficial de WhatsApp Business) desde el plan Profesional. Se actualizan cuando el cliente agrega o cambia documentos; si la respuesta no está en los documentos, dicen "no encontré esa información". IA: OpenAI vía API (modelo por defecto GPT-4o mini). Desde COP 9.900.000, o piloto de COP 3.900.000 (ver planes RAG abajo); tiempos: piloto en 2 semanas, Esencial en 3–4 semanas.
 Más info: https://www.koptup.com/chatbots-ia
 
 ### 3. Soluciones de IA para Empresas
@@ -109,7 +109,7 @@ KopTup ofrece demos interactivos sin registro para evaluar sus soluciones:
 - Servicios: https://www.koptup.com/services
 - Precios: https://www.koptup.com/services#planes-rag
 - Nosotros: https://www.koptup.com/about
-- Chatbots con IA: https://www.koptup.com/chatbots-ia
+- Chatbots RAG para WhatsApp y web: https://www.koptup.com/chatbots-ia
 - Soluciones de IA: https://www.koptup.com/soluciones-ia
 - Desarrollo web Colombia: https://www.koptup.com/desarrollo-web-colombia
 - Contacto: https://www.koptup.com/contact
@@ -120,6 +120,6 @@ KopTup ofrece demos interactivos sin registro para evaluar sus soluciones:
 
 **¿Cuánto cuesta desarrollar software con KopTup?** Los sistemas RAG empiezan con un piloto de 2 semanas por COP 3.900.000 (USD 1.200); el plan Esencial cuesta COP 9.900.000 de setup + COP 1.490.000 al mes, más IVA si aplica. Las demás soluciones a medida se cotizan según el alcance. Ofrecen cotización gratuita.
 
-**¿KopTup hace chatbots?** Sí. Es uno de sus servicios principales. Integran chatbots con WhatsApp Business, GPT-4 y Claude AI.
+**¿KopTup hace chatbots?** Sí: chatbots RAG para WhatsApp y web, que responden con los documentos de la empresa y citan la fuente (https://www.koptup.com/chatbots-ia). Usan modelos de OpenAI vía API.
 
 **¿KopTup puede hacer mi tienda online?** Sí. Desarrollan e-commerce completo con pasarelas de pago colombianas e internacionales.
