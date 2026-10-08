@@ -155,16 +155,7 @@ removeConsole: process.env.NODE_ENV === 'production'
 ### 6. Analytics y Monitoreo
 
 #### A. Google Analytics 4
-```html
-<!-- Agregar a layout.tsx o app -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-XXXXXXXXXX');
-</script>
-```
+Ya está integrado (junto con Google Ads y LinkedIn Insight Tag) en `apps/web/src/components/analytics/Analytics.tsx`: se carga solo si existe `NEXT_PUBLIC_GA_ID` y después de que el visitante acepte cookies. No pegues el script de gtag a mano en `layout.tsx` (se cargaría sin consentimiento). Ver "Variables de entorno" en el `README.md`.
 
 #### B. Hotjar o Microsoft Clarity
 Para analizar comportamiento de usuarios.

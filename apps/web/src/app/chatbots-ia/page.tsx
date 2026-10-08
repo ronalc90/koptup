@@ -22,6 +22,7 @@ import {
 import { CHATBOTS_FAQ_KEYS, CHATBOTS_USE_CASES, getChatbotsPageValues } from '@/lib/chatbots-page';
 import { RAG_DEMO_PATH, RAG_PATH, getRagSector } from '@/lib/rag-page';
 import { RAG_PLANS_PATH, ragPlanContactHref } from '@/lib/rag-plans';
+import { trackPlanClick } from '@/lib/analytics';
 
 const BENEFITS = [
   { key: 'docs', icon: DocumentTextIcon },
@@ -48,7 +49,16 @@ export default function ChatbotsIAPage() {
   const t = useTranslations('chatbotsPage');
   const locale = useLocale();
   const values = getChatbotsPageValues(locale);
+  const tRag = useTranslations('ragPlans');
   const pilotHref = ragPlanContactHref('piloto');
+  // Los CTA "Agenda un piloto" llevan al plan Piloto RAG: cuentan como plan_click.
+  const trackPilotClick = () =>
+    trackPlanClick({
+      plan_name: tRag('plans.piloto.name'),
+      plan_id: 'piloto',
+      plan_group: 'planes_rag',
+      cta: 'quote',
+    });
 
   return (
     <>
@@ -71,7 +81,9 @@ export default function ChatbotsIAPage() {
                 <Link href={RAG_DEMO_PATH}>{t('hero.ctaDemo')}</Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/50 text-white hover:bg-white/10" asChild>
-                <Link href={pilotHref}>{t('hero.ctaPilot')}</Link>
+                <Link href={pilotHref} onClick={trackPilotClick}>
+                  {t('hero.ctaPilot')}
+                </Link>
               </Button>
             </div>
             <p className="mt-4 text-sm text-purple-100">{t('hero.price', values)}</p>
@@ -262,7 +274,9 @@ export default function ChatbotsIAPage() {
               <Link href={RAG_DEMO_PATH}>{t('cta.demo')}</Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/50 text-white hover:bg-white/10" asChild>
-              <Link href={pilotHref}>{t('cta.pilot')}</Link>
+              <Link href={pilotHref} onClick={trackPilotClick}>
+                {t('cta.pilot')}
+              </Link>
             </Button>
           </div>
           <p className="mt-6 text-sm text-purple-100">{t('hero.price', values)}</p>

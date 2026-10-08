@@ -299,7 +299,7 @@
       "title": "Política de Privacidad",
       "subtitle": "Cómo recopilamos, usamos y protegemos tu información personal"
     },
-    "updatedBadge": "Actualizado: Noviembre 2025",
+    "updatedBadge": "Actualizado: Octubre 2026",
     "heroClaim": "Su confianza es nuestra prioridad",
     "intro": {
       "title": "Introducción",
@@ -422,7 +422,7 @@
     },
     "s6": {
       "title": "6. Cookies y Tecnologías Similares",
-      "p1": "Utilizamos cookies y tecnologías similares para mejorar su experiencia, analizar el uso de nuestros servicios y personalizar el contenido. Las cookies son pequeños archivos de texto que se almacenan en su dispositivo.",
+      "p1": "Utilizamos cookies y tecnologías similares para mejorar su experiencia, analizar el uso de nuestros servicios, medir los resultados de nuestros anuncios y personalizar el contenido. Las cookies de analítica y de marketing (Google Analytics, Google Ads y LinkedIn) solo se activan con consentimiento. Las cookies son pequeños archivos de texto que se almacenan en su dispositivo.",
       "p2": "Puede controlar el uso de cookies a través de la configuración de su navegador. Sin embargo, tenga en cuenta que deshabilitar las cookies puede afectar la funcionalidad de nuestros servicios.",
       "p3": "Para más información, consulte nuestra",
       "link": "Política de Cookies"
@@ -449,7 +449,7 @@
       "labelAddress": "Dirección:"
     },
     "footer": {
-      "updated": "Última actualización: Noviembre 2025",
+      "updated": "Última actualización: Octubre 2026",
       "copyright": "© 2025 KopTup - Soluciones Tecnológicas. Todos los derechos reservados."
     }
   },
@@ -616,12 +616,12 @@
       "title": "Política de Cookies",
       "subtitle": "Información sobre las cookies y cómo las usamos"
     },
-    "updatedBadge": "Actualizado: Noviembre 2025",
+    "updatedBadge": "Actualizado: Octubre 2026",
     "heroClaim": "Preferencias transparentes y controladas por ti",
     "intro": {
       "title": "¿Qué son las Cookies?",
       "p1": "Las cookies son pequeños archivos de texto que se almacenan en su dispositivo (computadora, tablet o móvil) cuando visita un sitio web. Las cookies permiten que el sitio web recuerde sus acciones y preferencias durante un período de tiempo, para que no tenga que volver a configurarlas cada vez que regrese al sitio o navegue de una página a otra.",
-      "p2": "En KopTup utilizamos cookies para mejorar su experiencia de navegación, analizar el uso de nuestro sitio y personalizar el contenido. Esta política explica qué cookies utilizamos y por qué."
+      "p2": "En KopTup utilizamos cookies para mejorar su experiencia de navegación, analizar el uso de nuestro sitio, medir los resultados de nuestros anuncios y personalizar el contenido. Esta política explica qué cookies utilizamos y por qué."
     },
     "types": {
       "title": "Tipos de Cookies que Utilizamos",
@@ -651,8 +651,8 @@
         },
         "ck4": {
           "purpose": "Almacenar preferencias de cookies",
-          "duration": "1 año",
-          "type": "Primera parte"
+          "duration": "Hasta que se borre",
+          "type": "Primera parte (almacenamiento local)"
         }
       },
       "ct2": {
@@ -683,14 +683,33 @@
           "type": "Terceros (Google)"
         },
         "ck2": {
-          "purpose": "Google Analytics - Distinguir usuarios",
-          "duration": "24 horas",
+          "purpose": "Google Analytics - Mantener el estado de la sesión",
+          "duration": "2 años",
+          "type": "Terceros (Google)"
+        }
+      },
+      "ct4": {
+        "title": "Cookies de Marketing",
+        "description": "Cookies que miden los resultados de nuestros anuncios en Google Ads y LinkedIn",
+        "ck1": {
+          "purpose": "Google Ads - Atribuir conversiones a los anuncios",
+          "duration": "90 días",
+          "type": "Terceros (Google)"
+        },
+        "ck2": {
+          "purpose": "Google Ads - Guardar el clic en el anuncio con el que se llegó al sitio",
+          "duration": "90 días",
           "type": "Terceros (Google)"
         },
         "ck3": {
-          "purpose": "Google Analytics - Limitar tasa de solicitudes",
-          "duration": "1 minuto",
-          "type": "Terceros (Google)"
+          "purpose": "LinkedIn - Atribuir conversiones y remarketing de anuncios",
+          "duration": "30 días",
+          "type": "Terceros (LinkedIn)"
+        },
+        "ck4": {
+          "purpose": "LinkedIn - Identificar el navegador",
+          "duration": "1 año",
+          "type": "Terceros (LinkedIn)"
         }
       }
     },
@@ -714,10 +733,13 @@
     },
     "thirdParty": {
       "title": "Cookies de Terceros",
-      "p1": "Algunos de nuestros socios comerciales utilizan cookies en nuestro sitio (por ejemplo, Google Analytics). No tenemos acceso ni control sobre estas cookies. Esta política de cookies cubre el uso de cookies por parte de KopTup y no el uso de cookies por parte de terceros.",
-      "googleTitle": "Google Analytics",
-      "googleP1": "Utilizamos Google Analytics para analizar el uso de nuestro sitio web. Para más información sobre cómo Google utiliza los datos, visite",
-      "googleLink": "políticas de Google"
+      "p1": "Algunos de nuestros socios comerciales utilizan cookies en nuestro sitio (por ejemplo, Google Analytics, Google Ads y LinkedIn), que solo se activan con consentimiento. No tenemos acceso ni control sobre estas cookies. Esta política de cookies cubre el uso de cookies por parte de KopTup y no el uso de cookies por parte de terceros.",
+      "googleTitle": "Google Analytics y Google Ads",
+      "googleP1": "Utilizamos Google Analytics para analizar el uso de nuestro sitio web y Google Ads para medir los resultados de nuestros anuncios. Para más información sobre cómo Google utiliza los datos, visite",
+      "googleLink": "políticas de Google",
+      "linkedinTitle": "LinkedIn Insight Tag",
+      "linkedinP1": "Utilizamos LinkedIn Insight Tag para medir los resultados de nuestras campañas en LinkedIn. Más información en la",
+      "linkedinLink": "política de cookies de LinkedIn"
     },
     "updates": {
       "title": "Actualizaciones de esta Política",
@@ -731,11 +753,19 @@
       "labelPhone": "Teléfono:"
     },
     "footer": {
-      "updated": "Última actualización: Noviembre 2025",
+      "updated": "Última actualización: Octubre 2026",
       "copyright": "© 2025 KopTup - Soluciones Tecnológicas. Todos los derechos reservados.",
       "linkPrivacy": "Política de Privacidad",
       "linkTerms": "Términos y Condiciones"
     }
+  },
+  "cookieBanner": {
+    "ariaLabel": "Aviso de cookies",
+    "title": "Usamos cookies",
+    "text": "Usamos cookies esenciales para que el sitio funcione. Si aceptas, también usamos cookies de analítica y de marketing para entender cómo se usa el sitio y medir nuestros anuncios.",
+    "settings": "Configurar cookies",
+    "reject": "Rechazar",
+    "accept": "Aceptar"
   },
   "notFoundPage": {
     "badge": "Página no encontrada",

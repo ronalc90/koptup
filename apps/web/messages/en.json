@@ -299,7 +299,7 @@
       "title": "Privacy Policy",
       "subtitle": "How we collect, use and protect your personal information"
     },
-    "updatedBadge": "Updated: November 2025",
+    "updatedBadge": "Updated: October 2026",
     "heroClaim": "Your trust is our priority",
     "intro": {
       "title": "Introduction",
@@ -422,7 +422,7 @@
     },
     "s6": {
       "title": "6. Cookies and Similar Technologies",
-      "p1": "We use cookies and similar technologies to improve your experience, analyze the use of our services and personalize content. Cookies are small text files stored on your device.",
+      "p1": "We use cookies and similar technologies to improve your experience, analyze the use of our services, measure the results of our ads and personalize content. Analytics and marketing cookies (Google Analytics, Google Ads and LinkedIn) are only activated with consent. Cookies are small text files stored on your device.",
       "p2": "You can control the use of cookies through your browser settings. However, please note that disabling cookies may affect the functionality of our services.",
       "p3": "For more information, see our",
       "link": "Cookie Policy"
@@ -449,7 +449,7 @@
       "labelAddress": "Address:"
     },
     "footer": {
-      "updated": "Last updated: November 2025",
+      "updated": "Last updated: October 2026",
       "copyright": "© 2025 KopTup - Tech Solutions. All rights reserved."
     }
   },
@@ -616,12 +616,12 @@
       "title": "Cookie Policy",
       "subtitle": "Information about cookies and how we use them"
     },
-    "updatedBadge": "Updated: November 2025",
+    "updatedBadge": "Updated: October 2026",
     "heroClaim": "Transparent preferences controlled by you",
     "intro": {
       "title": "What are Cookies?",
       "p1": "Cookies are small text files stored on your device (computer, tablet or mobile) when you visit a website. Cookies allow the website to remember your actions and preferences over a period of time, so you don't have to re-enter them every time you return to the site or navigate from one page to another.",
-      "p2": "At KopTup we use cookies to improve your browsing experience, analyze the use of our site and personalize content. This policy explains what cookies we use and why."
+      "p2": "At KopTup we use cookies to improve your browsing experience, analyze the use of our site, measure the results of our ads and personalize content. This policy explains what cookies we use and why."
     },
     "types": {
       "title": "Types of Cookies We Use",
@@ -651,8 +651,8 @@
         },
         "ck4": {
           "purpose": "Store cookie preferences",
-          "duration": "1 year",
-          "type": "First party"
+          "duration": "Until deleted",
+          "type": "First party (local storage)"
         }
       },
       "ct2": {
@@ -683,14 +683,33 @@
           "type": "Third party (Google)"
         },
         "ck2": {
-          "purpose": "Google Analytics - Distinguish users",
-          "duration": "24 hours",
+          "purpose": "Google Analytics - Persist session state",
+          "duration": "2 years",
+          "type": "Third party (Google)"
+        }
+      },
+      "ct4": {
+        "title": "Marketing Cookies",
+        "description": "Cookies that measure the results of our ads on Google Ads and LinkedIn",
+        "ck1": {
+          "purpose": "Google Ads - Attribute conversions to ads",
+          "duration": "90 days",
+          "type": "Third party (Google)"
+        },
+        "ck2": {
+          "purpose": "Google Ads - Store the ad click that brought the visitor to the site",
+          "duration": "90 days",
           "type": "Third party (Google)"
         },
         "ck3": {
-          "purpose": "Google Analytics - Throttle request rate",
-          "duration": "1 minute",
-          "type": "Third party (Google)"
+          "purpose": "LinkedIn - Ad conversion tracking and retargeting",
+          "duration": "30 days",
+          "type": "Third party (LinkedIn)"
+        },
+        "ck4": {
+          "purpose": "LinkedIn - Identify the browser",
+          "duration": "1 year",
+          "type": "Third party (LinkedIn)"
         }
       }
     },
@@ -714,10 +733,13 @@
     },
     "thirdParty": {
       "title": "Third-Party Cookies",
-      "p1": "Some of our business partners use cookies on our site (e.g., Google Analytics). We have no access to or control over these cookies. This cookie policy covers the use of cookies by KopTup and not the use of cookies by third parties.",
-      "googleTitle": "Google Analytics",
-      "googleP1": "We use Google Analytics to analyze the use of our website. For more information on how Google uses data, visit",
-      "googleLink": "Google's policies"
+      "p1": "Some of our business partners use cookies on our site (e.g., Google Analytics, Google Ads and LinkedIn), which are only activated with consent. We have no access to or control over these cookies. This cookie policy covers the use of cookies by KopTup and not the use of cookies by third parties.",
+      "googleTitle": "Google Analytics and Google Ads",
+      "googleP1": "We use Google Analytics to analyze the use of our website and Google Ads to measure the results of our ads. For more information on how Google uses data, visit",
+      "googleLink": "Google's policies",
+      "linkedinTitle": "LinkedIn Insight Tag",
+      "linkedinP1": "We use the LinkedIn Insight Tag to measure the results of our LinkedIn campaigns. More information in the",
+      "linkedinLink": "LinkedIn cookie policy"
     },
     "updates": {
       "title": "Updates to this Policy",
@@ -731,11 +753,19 @@
       "labelPhone": "Phone:"
     },
     "footer": {
-      "updated": "Last updated: November 2025",
+      "updated": "Last updated: October 2026",
       "copyright": "© 2025 KopTup - Tech Solutions. All rights reserved.",
       "linkPrivacy": "Privacy Policy",
       "linkTerms": "Terms & Conditions"
     }
+  },
+  "cookieBanner": {
+    "ariaLabel": "Cookie notice",
+    "title": "We use cookies",
+    "text": "We use essential cookies to make the site work. If you accept, we also use analytics and marketing cookies to understand how the site is used and to measure our ads.",
+    "settings": "Cookie settings",
+    "reject": "Reject",
+    "accept": "Accept"
   },
   "notFoundPage": {
     "badge": "Page not found",

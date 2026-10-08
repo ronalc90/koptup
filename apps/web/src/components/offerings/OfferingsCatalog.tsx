@@ -60,6 +60,7 @@ import {
   type UnlimitedOrNumber,
 } from '@/lib/services-catalog';
 import { formatRagCOP } from '@/lib/rag-plans';
+import { trackPlanClick, type PlanClickParams } from '@/lib/analytics';
 
 type Modality = 'compra' | 'saas';
 
@@ -137,6 +138,22 @@ function formatLimit(value: UnlimitedOrNumber, unlimitedLabel: string, naLabel: 
   if (value === 'unlimited') return unlimitedLabel;
   if (value === 0) return naLabel;
   return new Intl.NumberFormat('es-CO').format(value);
+}
+
+/** Evento `plan_click` de una solución del catálogo "Otras soluciones a medida". */
+function trackOfferingClick(
+  offering: Offering,
+  planName: string,
+  cta: PlanClickParams['cta'],
+  extra: { plan_tier?: TierKey; modality?: Modality } = {},
+): void {
+  trackPlanClick({
+    plan_name: planName,
+    plan_id: offering.slug,
+    plan_group: 'otras_soluciones',
+    cta,
+    ...extra,
+  });
 }
 
 function getTierAccent(idx: number): string {
@@ -229,11 +246,23 @@ function OfferingCard({ offering, globalModality, currency, onOpen }: OfferingCa
         </div>
 
         <div className="flex gap-2 mt-auto pt-2">
-          <Button variant="primary" size="sm" className="flex-1" onClick={() => onOpen(offering.slug)}>
+          <Button
+            variant="primary"
+            size="sm"
+            className="flex-1"
+            onClick={() => {
+              trackOfferingClick(offering, t('name'), 'details');
+              onOpen(offering.slug);
+            }}
+          >
             {tp('card.viewMore')}
           </Button>
           {offering.demoSlug ? (
-            <Link href={`/demo/${offering.demoSlug}`} className="flex-1">
+            <Link
+              href={`/demo/${offering.demoSlug}`}
+              className="flex-1"
+              onClick={() => trackOfferingClick(offering, t('name'), 'demo')}
+            >
               <Button variant="outline" size="sm" className="w-full">
                 {tp('card.viewDemo')}
               </Button>
@@ -491,13 +520,25 @@ function OfferingModal({ offering, initialModality, currency, onClose }: Offerin
 
             {/* CTA */}
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <Link href={`/contact?service=${offering.slug}&tier=${tier.key}&modality=${modality}`} className="flex-1">
+              <Link
+                href={`/contact?service=${offering.slug}&tier=${tier.key}&modality=${modality}`}
+                className="flex-1"
+                onClick={() =>
+                  trackOfferingClick(offering, t('name'), 'quote', { plan_tier: tier.key, modality })
+                }
+              >
                 <Button variant="primary" size="md" className="w-full">
                   {tp('modal.quote')}
                 </Button>
               </Link>
               {offering.demoSlug ? (
-                <Link href={`/demo/${offering.demoSlug}`} className="flex-1">
+                <Link
+                  href={`/demo/${offering.demoSlug}`}
+                  className="flex-1"
+                  onClick={() =>
+                    trackOfferingClick(offering, t('name'), 'demo', { plan_tier: tier.key, modality })
+                  }
+                >
                   <Button variant="outline" size="md" className="w-full">
                     {tp('card.viewDemo')}
                   </Button>

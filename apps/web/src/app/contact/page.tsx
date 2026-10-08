@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
+import { track, trackWhatsappClick } from '@/lib/analytics';
 import { RAG_SERVICE_SLUG, isRagPlanId } from '@/lib/rag-plans';
 import Button from '@/components/ui/Button';
 import Card, { CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
@@ -96,6 +97,14 @@ function ContactPageInner() {
           ? { ...formData, service: `${cotizandoLabel} — ${t('quote.plan', { plan: planLabel })}` }
           : formData;
       await api.submitContactForm(payload);
+
+      // Conversión `generate_lead` (solo envío exitoso). Sin datos personales:
+      // el servicio solo si es una opción del formulario y el plan RAG por id.
+      track('generate_lead', {
+        lead_source: 'contact_form',
+        service: baseServices.includes(formData.service) ? formData.service : undefined,
+        plan_id: isRagQuote && isRagPlanId(queryPlan) ? queryPlan : undefined,
+      });
 
       setIsSubmitted(true);
 
@@ -517,6 +526,7 @@ function ContactPageInner() {
                       href="https://wa.me/573024794842"
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={() => trackWhatsappClick('contact_page')}
                       className="w-12 h-12 bg-green-100 dark:bg-green-950 rounded-lg flex items-center justify-center hover:bg-green-200 dark:hover:bg-green-900 transition-colors"
                       title="WhatsApp"
                     >

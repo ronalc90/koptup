@@ -1,14 +1,14 @@
 /**
- * Ganchos de medición de la demo de chatbot.
- *
- * FASE 7: aquí se envían los eventos a GA4 / Google Ads / LinkedIn Insight Tag
- * (solo si el usuario aceptó cookies). Hoy no envían nada; los componentes ya
- * los llaman en el momento correcto:
+ * Eventos de medición de la demo de chatbot (GA4 vía `track()` de
+ * `@/lib/analytics`; solo se envían si el visitante aceptó cookies y la
+ * etiqueta está configurada). Los componentes los llaman en el momento
+ * correcto:
  *  - `demo_start`: primera pregunta en la demo (documento de ejemplo o propio),
- *    una vez por visita a /demo/chatbot — ver `page.tsx` (markDemoStart).
- *  - `demo_upload`: documento subido en "Prueba con tu documento" — ver
- *    `upload/UploadDemo.tsx` (handleUploaded).
+ *    una vez por carga de /demo/chatbot — ver `page.tsx` (markDemoStart).
+ *  - `demo_upload`: documento subido con éxito en "Prueba con tu documento" —
+ *    ver `upload/UploadDemo.tsx` (handleUploaded).
  */
+import { track } from '@/lib/analytics';
 import type { DemoDocKind } from './upload/api';
 
 export type DemoEventMode = 'sample' | 'upload';
@@ -23,12 +23,15 @@ export interface DemoUploadEvent {
   pages: number;
 }
 
-/** Evento `demo_start` (primera pregunta). Fase 7: enviarlo a las etiquetas. */
+/** Evento `demo_start` (primera pregunta). */
 export function trackDemoStart(event: DemoStartEvent): void {
-  void event;
+  track('demo_start', { demo_mode: event.mode });
 }
 
-/** Evento `demo_upload` (documento subido). Fase 7: enviarlo a las etiquetas. */
+/**
+ * Evento `demo_upload` (documento subido). Solo tipo y páginas: nunca el
+ * nombre ni el contenido del archivo.
+ */
 export function trackDemoUpload(event: DemoUploadEvent): void {
-  void event;
+  track('demo_upload', { file_type: event.fileType, pages: event.pages });
 }

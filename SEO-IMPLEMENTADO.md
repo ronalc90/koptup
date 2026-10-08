@@ -213,7 +213,7 @@ https://www.koptup.com/blog                  (Prioridad 0.7, Weekly)
 4. **Google Analytics 4**
    - [ ] Crear cuenta en https://analytics.google.com
    - [ ] Obtener ID de medición (G-XXXXXXXXXX)
-   - [ ] Agregar script a layout.tsx
+   - [ ] Configurar `NEXT_PUBLIC_GA_ID` en Vercel y redesplegar (no agregar el script a mano: se carga con consentimiento; ver "Variables de entorno" en el README)
 
 5. **Google Business Profile**
    - [ ] Crear en https://www.google.com/business/

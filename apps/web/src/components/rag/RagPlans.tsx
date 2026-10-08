@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
+import { trackPlanClick } from '@/lib/analytics';
 import {
   ChatBubbleLeftRightIcon,
   CheckCircleIcon,
@@ -175,7 +176,18 @@ export function RagPlanCard({ plan, showCta = true }: { plan: RagPlan; showCta?:
         {showCta ? (
           <div className="mt-auto pt-2">
             <Button variant="primary" size="sm" fullWidth asChild>
-              <Link href={ragPlanContactHref(plan.id)} data-plan={plan.id}>
+              <Link
+                href={ragPlanContactHref(plan.id)}
+                data-plan={plan.id}
+                onClick={() =>
+                  trackPlanClick({
+                    plan_name: t(`${key}.name`),
+                    plan_id: plan.id,
+                    plan_group: 'planes_rag',
+                    cta: 'quote',
+                  })
+                }
+              >
                 {t(`${key}.cta`)}
               </Link>
             </Button>

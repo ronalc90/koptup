@@ -6,6 +6,8 @@ import { NextIntlClientProvider } from 'next-intl';
 import ThemeProvider from '@/components/providers/ThemeProvider';
 import ConditionalLayout from '@/components/layout/ConditionalLayout';
 import ClientToaster from '../components/ClientToaster';
+import Analytics from '@/components/analytics/Analytics';
+import CookieBanner from '@/components/consent/CookieBanner';
 import { HOME_DESCRIPTION, HOME_TITLE, SITE_NAME, SITE_URL, TITLE_TEMPLATE } from '@/lib/site';
 import './globals.css';
 
@@ -159,6 +161,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
             {/* Client-only toaster */}
             <ClientToaster />
+
+            {/* Consentimiento de cookies y etiquetas de medición (GA4, Google
+                Ads, LinkedIn): solo con variable de entorno y consentimiento. */}
+            <CookieBanner />
+            <Analytics />
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>
