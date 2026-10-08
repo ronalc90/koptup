@@ -1,319 +1,598 @@
 {
   "demoBilling": {
-    "pageTitle": "Facturación Electrónica multi-país",
-    "pageSubtitle": "Plataforma fiscal unificada para LATAM: emite, recibe, valida y almacena documentos con cumplimiento normativo en 8 países.",
-    "back": "Volver a demos",
-    "selectCountry": "País fiscal",
-    "selectCountryHelp": "Cambia el régimen, los identificadores tributarios y los impuestos aplicados.",
-    "countries": {
-      "colombia": {
-        "name": "Colombia",
-        "authority": "DIAN",
-        "currency": "COP",
-        "currencySymbol": "$",
-        "taxId": "NIT",
-        "docPrefix": "FE",
-        "vat": "IVA 19%",
-        "extraTax": "ReteIVA 15%",
-        "ica": "ICA 11.04 x mil",
-        "storageYears": "10"
-      },
-      "mexico": {
-        "name": "México",
-        "authority": "SAT",
-        "currency": "MXN",
-        "currencySymbol": "$",
-        "taxId": "RFC",
-        "docPrefix": "CFDI",
-        "vat": "IVA 16%",
-        "extraTax": "ISR 10%",
-        "ica": "IEPS variable",
-        "storageYears": "5"
-      },
-      "argentina": {
-        "name": "Argentina",
-        "authority": "AFIP",
-        "currency": "ARS",
-        "currencySymbol": "$",
-        "taxId": "CUIT",
-        "docPrefix": "FCE-A",
-        "vat": "IVA 21%",
-        "extraTax": "Percep. IIBB 3%",
-        "ica": "Imp. internos",
-        "storageYears": "10"
-      },
-      "chile": {
-        "name": "Chile",
-        "authority": "SII",
-        "currency": "CLP",
-        "currencySymbol": "$",
-        "taxId": "RUT",
-        "docPrefix": "DTE-33",
-        "vat": "IVA 19%",
-        "extraTax": "Retención 13%",
-        "ica": "Imp. específico",
-        "storageYears": "6"
-      },
-      "peru": {
-        "name": "Perú",
-        "authority": "SUNAT",
-        "currency": "PEN",
-        "currencySymbol": "S/",
-        "taxId": "RUC",
-        "docPrefix": "F001",
-        "vat": "IGV 18%",
-        "extraTax": "Retención 3%",
-        "ica": "Detracción 12%",
-        "storageYears": "5"
-      },
-      "uruguay": {
-        "name": "Uruguay",
-        "authority": "DGI",
-        "currency": "UYU",
-        "currencySymbol": "$",
-        "taxId": "RUT",
-        "docPrefix": "eFactura",
-        "vat": "IVA 22%",
-        "extraTax": "IRPF 7%",
-        "ica": "Imp. específicos",
-        "storageYears": "10"
-      },
-      "paraguay": {
-        "name": "Paraguay",
-        "authority": "SET",
-        "currency": "PYG",
-        "currencySymbol": "₲",
-        "taxId": "RUC",
-        "docPrefix": "DE",
-        "vat": "IVA 10%",
-        "extraTax": "Retención IVA 30%",
-        "ica": "Imp. selectivo",
-        "storageYears": "5"
-      },
-      "ecuador": {
-        "name": "Ecuador",
-        "authority": "SRI",
-        "currency": "USD",
-        "currencySymbol": "$",
-        "taxId": "RUC",
-        "docPrefix": "FAC-001",
-        "vat": "IVA 15%",
-        "extraTax": "Retención fuente 8%",
-        "ica": "ICE variable",
-        "storageYears": "7"
+    "meta": {
+      "title": "Facturación electrónica DIAN: simulador",
+      "description": "Simulador de facturación electrónica para Colombia con datos de ejemplo: emite facturas, notas crédito y débito y documento equivalente POS; valida el NIT con su dígito de verificación, calcula el IVA por tarifa y genera CUFE de ejemplo, QR, PDF y XML. Incluye eventos RADIAN para facturas de proveedores y libros exportables. Nada se envía a la DIAN.",
+      "breadcrumbHome": "Inicio",
+      "breadcrumbDemos": "Demos",
+      "breadcrumbName": "Facturación electrónica DIAN"
+    },
+    "common": {
+      "cancel": "Cancelar",
+      "close": "Cerrar",
+      "monthsShort": "ene,feb,mar,abr,may,jun,jul,ago,sep,oct,nov,dic"
+    },
+    "header": {
+      "back": "Volver a demos",
+      "sampleBadge": "Datos de ejemplo",
+      "simBadge": "Simulación: nada se envía a la DIAN",
+      "reset": "Restablecer datos",
+      "resetConfirm": "¿Borrar tus cambios y volver a los datos de ejemplo?",
+      "resetYes": "Sí, restablecer",
+      "resetDone": "Datos de ejemplo restablecidos",
+      "storageFull": "Tu navegador no tiene espacio para guardar los cambios (¿un logo muy pesado?). La demo sigue funcionando, pero no los recordará al recargar."
+    },
+    "hero": {
+      "kicker": "Simulador de facturación electrónica · Colombia",
+      "title": "Facturación electrónica DIAN desde tu propio sistema",
+      "subtitle": "Emite facturas, notas crédito y débito y documento equivalente POS; descarga el PDF con QR y el XML; responde las facturas de tus proveedores con eventos RADIAN y exporta los libros del período.",
+      "simNote": "Todo corre en tu navegador con empresas y cifras ficticias. La firma, la transmisión y la validación de la DIAN están simuladas, y tus cambios se guardan solo en este equipo.",
+      "dateNote": "Fecha de la simulación: {date}."
+    },
+    "metrics": {
+      "label": "Indicadores de la simulación",
+      "issued": "Emitidos en octubre",
+      "issuedHint": "Facturas, notas y POS del mes",
+      "issuedQueued": "{n} en cola de contingencia",
+      "acceptance": "Aceptación DIAN (simulada)",
+      "acceptanceHint": "{accepted} de {total} documentos transmitidos",
+      "rejected": "Rechazos por corregir",
+      "rejectedHint": "Corrígelos en Documentos emitidos",
+      "rejectedNone": "Sin rechazos pendientes",
+      "radian": "Proveedores por gestionar",
+      "radianHint": "Facturas con eventos RADIAN pendientes (de {total})",
+      "rateValue": "{rate} %"
+    },
+    "tour": {
+      "title": "Prueba el flujo en 3 minutos",
+      "subtitle": "Cada paso se marca solo cuando lo haces. Toca un paso para ir a su sección.",
+      "done": "{done} de {total}",
+      "steps": {
+        "invoice": "Emite una factura con un NIT válido (prueba 901234517-9)",
+        "download": "Descarga el PDF con QR o el XML de un documento",
+        "creditNote": "Emite una nota crédito sobre una factura",
+        "radian": "Registra un evento RADIAN en una factura de proveedor",
+        "export": "Exporta un libro fiscal en CSV o PDF"
       }
     },
-    "topMetrics": {
-      "emittedToday": "Emitidas hoy",
-      "acceptanceRate": "Tasa aceptación",
-      "avgResponse": "Respuesta promedio",
-      "storage": "Documentos almacenados"
+    "docTypes": {
+      "factura": "Factura electrónica de venta",
+      "notaCredito": "Nota crédito electrónica",
+      "notaDebito": "Nota débito electrónica",
+      "pos": "Documento equivalente electrónico POS"
     },
-    "sections": {
-      "emission": "Emisión",
-      "documents": "Documentos emitidos",
-      "reception": "Recepción proveedores",
-      "reports": "Reportes fiscales",
-      "api": "API y SDKs",
-      "whiteLabel": "White-label resellers",
-      "storage": "Almacenamiento legal"
+    "docTypesShort": {
+      "factura": "Factura",
+      "notaCredito": "Nota crédito",
+      "notaDebito": "Nota débito",
+      "pos": "POS"
+    },
+    "status": {
+      "accepted": "Aceptado",
+      "rejected": "Rechazado",
+      "contingency": "En contingencia"
+    },
+    "taxOptions": {
+      "iva19": "IVA 19 %",
+      "iva5": "IVA 5 %",
+      "exento": "Exento (0 %)",
+      "excluido": "Excluido o no causa IVA"
+    },
+    "reteOptions": {
+      "none": "Sin retención",
+      "servicios": "Servicios 4 %",
+      "honorarios": "Honorarios 11 %",
+      "compras": "Compras 2,5 %",
+      "software": "Software 3,5 %"
+    },
+    "creditConcepts": {
+      "1": "1 · Devolución parcial o no aceptación parcial del servicio",
+      "2": "2 · Anulación de la factura",
+      "3": "3 · Rebaja o descuento parcial o total",
+      "4": "4 · Ajuste de precio",
+      "5": "5 · Descuento comercial por pronto pago",
+      "6": "6 · Descuento comercial por volumen de ventas"
+    },
+    "debitConcepts": {
+      "1": "1 · Intereses",
+      "2": "2 · Gastos por cobrar",
+      "3": "3 · Cambio del valor",
+      "4": "4 · Otros"
     },
     "emission": {
       "title": "Emisión de documentos",
-      "subtitle": "Construye el documento, valida en tiempo real y envíalo a {authority}.",
+      "subtitle": "Arma el documento, revisa las validaciones previas y emítelo. La transmisión a la DIAN es simulada.",
       "tabs": {
-        "factura": "Factura",
+        "factura": "Factura de venta",
         "notaCredito": "Nota crédito",
         "notaDebito": "Nota débito",
-        "pos": "POS",
+        "pos": "Documento POS",
         "contingencia": "Contingencia"
       },
-      "form": {
-        "client": "Cliente",
-        "fields": {
-          "taxId": "{taxId} del receptor",
-          "taxIdPlaceholder": "Escribe el {taxId}",
-          "name": "Razón social",
-          "namePlaceholder": "Nombre o empresa",
-          "email": "Correo electrónico",
-          "emailPlaceholder": "facturas@cliente.com",
-          "city": "Ciudad",
-          "cityPlaceholder": "Bogotá, CDMX, Lima..."
-        },
-        "validation": {
-          "checking": "Validando en {authority}...",
-          "valid": "Receptor verificado en {authority}",
-          "invalid": "Identificador inválido o no inscrito",
-          "format": "Formato esperado: {format}"
-        },
-        "lines": "Líneas del documento",
-        "addLine": "Agregar línea",
-        "removeLine": "Eliminar",
-        "lineFields": {
-          "description": "Descripción",
-          "qty": "Cant.",
-          "unitPrice": "Valor unitario",
-          "vatRate": "IVA %",
-          "withholding": "Reten. %"
-        },
-        "summary": "Resumen",
-        "subtotal": "Subtotal",
-        "vat": "IVA",
-        "withholding": "Retención",
-        "ica": "ICA / municipal",
-        "total": "Total a pagar",
-        "submit": "Emitir documento",
-        "submitting": "Firmando y enviando a {authority}...",
-        "reset": "Limpiar"
+      "dianDownBanner": "Modo contingencia activo: la DIAN (simulada) no responde. Lo que emitas queda en cola y se transmite cuando restablezcas el servicio en la pestaña Contingencia.",
+      "resolution": "Resolución de numeración de ejemplo {number} del {date} · prefijo {prefix} del {from} al {to} · siguiente: {next} · quedan {left} números.",
+      "nextNumber": "Siguiente número: {next}.",
+      "emit": {
+        "factura": "Emitir factura",
+        "notaCredito": "Emitir nota crédito",
+        "notaDebito": "Emitir nota débito",
+        "pos": "Emitir documento POS"
       },
-      "preview": {
-        "title": "Vista previa PDF",
-        "subtitle": "Representación gráfica del documento",
-        "issuer": "Emisor",
-        "issuerName": "Koptup Tech S.A.S.",
-        "issuerTaxId": "900.555.123-4",
-        "receiver": "Receptor",
-        "noReceiver": "Completa los datos del cliente",
-        "docNumber": "Documento",
-        "issueDate": "Fecha emisión",
-        "cufeLabel": "Identificador único",
-        "cufePending": "Pendiente de firma",
-        "qrLabel": "Código QR fiscal",
-        "footer": "Documento generado por Koptup — vista demo"
+      "emitContingency": "Emitir en contingencia",
+      "clear": "Limpiar formulario",
+      "cryptoError": "Tu navegador no permitió calcular el CUFE (Web Crypto). Abre la demo con https."
+    },
+    "form": {
+      "frequent": "Cliente frecuente",
+      "frequentPlaceholder": "Elige un cliente de ejemplo…",
+      "idType": "Tipo de documento",
+      "idTypes": {
+        "NIT": "NIT",
+        "CC": "Cédula de ciudadanía"
       },
-      "result": {
-        "signing": "Firmando documento con certificado digital",
-        "sending": "Enviando a {authority}",
-        "validating": "Validando estructura XML/UBL",
-        "accepted": "Aceptada por {authority}",
-        "acceptedSub": "El documento ha sido firmado y registrado correctamente.",
-        "uuidLabel": "CUFE / UUID",
-        "downloadPdf": "Descargar PDF",
-        "downloadXml": "Descargar XML",
-        "newDoc": "Emitir otro"
+      "nit": "NIT con dígito de verificación",
+      "cc": "Número de cédula",
+      "nitHelp": "Escribe el NIT con su DV, por ejemplo 901234517-9. El DV se valida con el algoritmo de la DIAN.",
+      "ccHelp": "Entre 6 y 10 dígitos, sin puntos.",
+      "nitState": {
+        "empty": "Escribe el NIT con su DV.",
+        "ok": "DV correcto ({dv})",
+        "missingDv": "Falta el dígito de verificación: debería ser {dv}.",
+        "badDv": "El DV no corresponde: debería ser {dv}.",
+        "short": "Escribe entre 8 y 10 dígitos y el DV (ej. 901234517-9)."
+      },
+      "useDv": "Usar DV {dv}",
+      "nitAutofill": "Cliente frecuente encontrado: completamos la razón social, el correo y la ciudad.",
+      "name": "Razón social o nombre",
+      "namePlaceholder": "Nombre del cliente",
+      "email": "Correo para recibir la factura",
+      "city": "Ciudad",
+      "cityPlaceholder": "Bogotá D.C.",
+      "retIva": "Es agente de retención de IVA (practica ReteIVA del 15 %)",
+      "retIca": "Practica ReteICA",
+      "retIcaRate": "Tarifa ReteICA por mil (ejemplo)",
+      "lines": "Líneas",
+      "addLine": "Línea vacía",
+      "addFromCatalog": "Agregar del catálogo…",
+      "noLines": "No hay líneas. Agrega una del catálogo o una línea vacía.",
+      "removeLine": "Quitar la línea {n}",
+      "line": {
+        "description": "Descripción",
+        "descriptionN": "Descripción de la línea {n}",
+        "qty": "Cantidad",
+        "unitPrice": "Valor unitario (sin IVA)",
+        "tax": "IVA",
+        "rete": "Retención en la fuente",
+        "base": "Base"
+      },
+      "paymentForm": "Forma de pago",
+      "paymentForms": {
+        "contado": "Contado",
+        "credito": "Crédito"
+      },
+      "creditDays": "Plazo",
+      "daysN": "{n} días",
+      "dueDate": "Vence el {date}.",
+      "paymentMethod": "Medio de pago",
+      "paymentMethods": {
+        "transferencia": "Transferencia",
+        "efectivo": "Efectivo",
+        "tarjeta": "Tarjeta"
       }
+    },
+    "summary": {
+      "subtotal": "Subtotal",
+      "base": "Base {tax}",
+      "ivaTotal": "Total IVA",
+      "total": "Total del documento",
+      "retTitle": "Retenciones que te practicaría el comprador (informativas)",
+      "retFuente": "ReteFuente",
+      "retIva": "ReteIVA (15 % del IVA)",
+      "retIca": "ReteICA",
+      "net": "Neto estimado a recibir",
+      "retNote": "Las retenciones las practica el comprador: no restan del total del documento. Son tarifas de referencia que se ajustan con tu contador."
+    },
+    "issues": {
+      "title": "Antes de emitir, corrige:",
+      "idEmpty": "Escribe el NIT o la cédula del adquirente.",
+      "idShort": "El NIT debe tener entre 8 y 10 dígitos más el DV.",
+      "idMissingDv": "Agrega el dígito de verificación del NIT (debería ser {dv}).",
+      "idBadDv": "El dígito de verificación del NIT no corresponde (debería ser {dv}).",
+      "ccInvalid": "La cédula debe tener entre 6 y 10 dígitos.",
+      "nameEmpty": "Escribe la razón social o el nombre.",
+      "emailInvalid": "Escribe un correo válido para entregar el documento.",
+      "noLines": "Agrega al menos una línea.",
+      "lineInvalid": "Completa la descripción, la cantidad y el valor de la línea {n}.",
+      "noRef": "Elige la factura de referencia.",
+      "noConcept": "Elige el concepto de la nota.",
+      "noteNoAmount": "Indica las cantidades o el valor de la nota.",
+      "overBalance": "La nota crédito supera el saldo de la factura ({balance}).",
+      "overQty": "En la línea {n} puedes devolver como máximo {max}.",
+      "voidWithNotes": "Esta factura ya tiene notas crédito: usa devolución o descuento por el saldo.",
+      "rangeExhausted": "Se agotó el rango de numeración de ejemplo."
+    },
+    "note": {
+      "helpCredit": "En Colombia una factura aceptada no se anula ni se edita: se corrige con una nota crédito que la referencia y que queda ligada a ella.",
+      "helpDebit": "La nota débito aumenta el valor de una factura ya emitida (intereses, gastos o cambios de valor) y queda ligada a ella.",
+      "ref": "Factura de referencia",
+      "refPlaceholder": "Elige una factura…",
+      "noInvoices": "No hay facturas aceptadas para referenciar",
+      "refOption": "{id} · {client} · saldo {balance}",
+      "concept": "Concepto",
+      "conceptPlaceholder": "Elige el concepto…",
+      "refClient": "Cliente: {client}",
+      "refTotal": "Total factura: {total}",
+      "balance": "Saldo de la factura: {balance}",
+      "returnTitle": "Cantidades a devolver o no aceptadas",
+      "returnQtyFor": "Cantidad a devolver de {item}",
+      "available": "disponible: {n}",
+      "fullVoid": "Se acredita la factura completa ({total}). La factura no se borra: esta nota crédito la deja en saldo cero.",
+      "adjustBase": "Valor de la nota (sin IVA)",
+      "adjustTax": "IVA de la nota",
+      "adjustLine": "{concept} sobre {ref}",
+      "description": "Motivo (aparece en el documento)",
+      "descriptionPlaceholder": "Ej.: tres horas de capacitación no prestadas"
+    },
+    "pos": {
+      "help": "Documento equivalente electrónico para ventas en punto de venta. Si el comprador pide el documento con sus datos, ingrésalos.",
+      "linkPos": "Ver la demo de POS",
+      "finalConsumer": "Consumidor final (222222222222)",
+      "withBuyer": "Con datos del comprador"
+    },
+    "phases": {
+      "xml": "XML UBL 2.1 generado",
+      "sign": "Firmado con el certificado digital (simulado)",
+      "transmit": "Transmitido al proveedor tecnológico (simulado)",
+      "validate": "Validado por la DIAN (simulado)",
+      "deliver": "PDF y XML entregados al adquirente (simulado)",
+      "failed": "La DIAN no respondió (simulado): queda en cola de contingencia"
+    },
+    "contingency": {
+      "title": "Contingencia: ¿qué pasa si la DIAN no responde?",
+      "text": "Sigues facturando: el documento se genera y se entrega al cliente, queda en una cola y se transmite cuando se restablece el servicio, dentro del plazo que fija la norma.",
+      "tip": "Prueba: activa la simulación, ve a «Factura de venta» y emite; vuelve aquí y restablece el servicio para transmitir la cola.",
+      "toggleOn": "Simular que la DIAN no responde",
+      "active": "La DIAN (simulada) no responde",
+      "restore": "Restablecer y transmitir ({n})",
+      "restoreEmpty": "Restablecer el servicio",
+      "transmitPending": "Transmitir pendientes ({n})",
+      "restored": "Servicio restablecido (simulado)",
+      "queueTitle": "Cola de contingencia",
+      "queueEmpty": "No hay documentos en cola. Activa la simulación y emite una factura para verla aquí.",
+      "transmitting": "Transmitiendo…",
+      "done": "{n} documentos transmitidos y aceptados (simulado)"
+    },
+    "success": {
+      "accepted": "{doc} aceptado por la DIAN (simulado)",
+      "queued": "{doc} en cola de contingencia",
+      "acceptedSub": "PDF y XML entregados a {email} (simulado).",
+      "acceptedNoEmail": "Entrégalo al comprador impreso o por el canal que prefieras.",
+      "queuedSub": "Ya puedes entregarlo al cliente; se transmitirá cuando restablezcas el servicio en la pestaña Contingencia.",
+      "cufeLabel": "CUFE de ejemplo (SHA-384)",
+      "cudeLabel": "CUDE de ejemplo (SHA-384)",
+      "cufeNote": "Calculado en tu navegador con la fórmula del anexo técnico de la DIAN, datos ficticios y una clave técnica de ejemplo (ambiente de pruebas). El QR es real: escanéalo para ver sus datos.",
+      "pdf": "Descargar PDF",
+      "xml": "Descargar XML",
+      "view": "Ver detalle y enviar",
+      "another": "Emitir otro documento"
+    },
+    "preview": {
+      "title": "Vista previa del documento",
+      "subtitle": "Así se verá la representación gráfica (PDF).",
+      "showing": "Mostrando {id}, recién emitido.",
+      "customize": "Personalizar emisor",
+      "issuerExtra": "Responsable de IVA",
+      "buyer": "Adquirente",
+      "noBuyer": "Completa los datos del adquirente",
+      "noLines": "Sin líneas",
+      "more": "+ {n} líneas más",
+      "qrPending": "Se genera al emitir",
+      "qrPendingShort": "QR al emitir",
+      "qrAlt": "Código QR del documento {id}",
+      "footer": "Representación gráfica de ejemplo generada en el simulador. Sin validez fiscal."
+    },
+    "issuer": {
+      "title": "Personaliza el emisor",
+      "subtitle": "Mira la demo con los datos de tu empresa: se aplican a la vista previa, al PDF y al XML y se guardan solo en este navegador.",
+      "name": "Razón social",
+      "nit": "NIT con DV",
+      "city": "Ciudad",
+      "address": "Dirección",
+      "email": "Correo de facturación",
+      "phone": "Teléfono",
+      "prefix": "Prefijo de facturas",
+      "prefixHelp": "De 2 a 4 letras. En tu proyecto se usa el prefijo de tu resolución.",
+      "logo": "Logo (PNG o JPG, máximo 300 KB)",
+      "logoUpload": "Subir logo",
+      "logoRemove": "Quitar logo",
+      "logoAlt": "Logo del emisor",
+      "logoTooBig": "El logo pesa más de 300 KB.",
+      "logoType": "Usa una imagen PNG o JPG.",
+      "restore": "Usar el emisor de ejemplo",
+      "save": "Guardar",
+      "saved": "Emisor actualizado",
+      "errors": {
+        "name": "Escribe la razón social.",
+        "nit": "Revisa el NIT y su DV (debería ser {dv}).",
+        "prefix": "El prefijo debe tener de 2 a 4 letras.",
+        "email": "Escribe un correo válido."
+      }
+    },
+    "pdf": {
+      "number": "No.",
+      "issued": "Emisión",
+      "due": "Vencimiento",
+      "payment": "Pago",
+      "sample": "DOCUMENTO DE EJEMPLO generado en el simulador de KopTup: no se transmitió a la DIAN y no tiene validez fiscal.",
+      "watermark": "EJEMPLO",
+      "reference": "Referencia: factura {id} del {date} (CUFE {cufe})",
+      "concept": "Concepto: {concept}",
+      "note": "Motivo: {note}",
+      "cols": {
+        "n": "#",
+        "desc": "Descripción",
+        "qty": "Cant.",
+        "unit": "Valor unitario",
+        "tax": "IVA",
+        "base": "Base"
+      },
+      "retTitle": "Retenciones informativas",
+      "resolution": "Resolución de numeración de ejemplo No. {number} del {date}, prefijo {prefix} del {from} al {to}, vigente hasta el {validTo}.",
+      "qrCaption": "Escanea para ver los datos",
+      "footer": "Representación gráfica de ejemplo generada en tu navegador. En tu proyecto el documento se firma y se transmite a la DIAN a través de un proveedor tecnológico autorizado."
     },
     "documents": {
       "title": "Documentos emitidos",
-      "subtitle": "Trazabilidad completa de cada documento ante la autoridad fiscal.",
+      "subtitle": "Busca, filtra y ordena. Abre cada documento para ver su historial, descargar el PDF con QR y el XML, enviarlo o emitirle una nota.",
+      "search": "Buscar por número, cliente o NIT…",
       "filters": {
-        "all": "Todos",
-        "accepted": "Aceptada",
-        "pending": "Pendiente",
-        "rejected": "Rechazada",
-        "voided": "Anulada",
-        "search": "Buscar por número, cliente o {taxId}..."
+        "type": "Filtrar por tipo",
+        "allTypes": "Todos los tipos",
+        "status": "Filtrar por estado",
+        "allStatus": "Todos los estados"
       },
-      "table": {
-        "number": "Número",
-        "client": "Cliente",
-        "date": "Fecha",
-        "amount": "Total",
-        "status": "Estado",
-        "actions": "Acciones",
-        "resend": "Reenviar",
-        "pdf": "PDF",
-        "xml": "XML",
-        "void": "Anular"
+      "sort": "Ordenar",
+      "sortOptions": {
+        "newest": "Más recientes",
+        "oldest": "Más antiguos",
+        "amountDesc": "Mayor valor",
+        "amountAsc": "Menor valor"
       },
-      "empty": "No hay documentos con esos filtros."
+      "count": "{n} de {total} documentos",
+      "export": "Exportar CSV",
+      "exportDone": "CSV descargado con {n} documentos",
+      "empty": "No hay documentos con esos filtros.",
+      "actionsCol": "Acciones",
+      "actions": {
+        "view": "Ver",
+        "credit": "Nota crédito",
+        "debit": "Nota débito",
+        "fix": "Corregir y reenviar"
+      },
+      "refLabel": "Ref. {id}",
+      "cufePending": "Calculando el CUFE… intenta de nuevo en un momento.",
+      "downloaded": "{file} descargado",
+      "downloadError": "No se pudo generar el archivo."
+    },
+    "detail": {
+      "issued": "Emitido el {date} a las {time}",
+      "due": "vence el {date}",
+      "rejection": "Motivo del rechazo (simulado): {reason}",
+      "notes": "Notas asociadas",
+      "noNotes": "Sin notas crédito ni débito.",
+      "history": "Historial",
+      "send": "Enviar al cliente (simulado)",
+      "channel": "Canal",
+      "channels": {
+        "email": "Correo",
+        "whatsapp": "WhatsApp"
+      },
+      "target": "Destino",
+      "sendButton": "Enviar",
+      "sendNote": "En la demo no sale ningún mensaje: queda registrado en el historial. En tu proyecto se envía por correo o por WhatsApp Business.",
+      "sent": "Enviado a {to} (simulado)",
+      "badEmail": "Escribe un correo válido.",
+      "badPhone": "Escribe un número de celular válido."
+    },
+    "rejection": {
+      "badDv": "el dígito de verificación del NIT del adquirente no corresponde (regla de validación de ejemplo)."
+    },
+    "history": {
+      "xml": "XML UBL 2.1 generado",
+      "signed": "Firmado (simulado)",
+      "transmitted": "Transmitido a la DIAN (simulado)",
+      "accepted": "Aceptado por la DIAN (simulado)",
+      "rejected": "Rechazado por la DIAN (simulado)",
+      "queued": "En cola de contingencia: la DIAN no respondía (simulado)",
+      "delivered": "PDF y XML entregados a {detail} (simulado)",
+      "sent": "Reenviado a {detail} (simulado)",
+      "corrected": "Corregido: {detail}",
+      "noteIssued": "Se emitió {detail} sobre esta factura"
+    },
+    "fix": {
+      "title": "Corregir y reenviar {id}",
+      "text": "La DIAN (simulada) rechazó el documento: {reason} Corrige el NIT y vuelve a transmitirlo con el mismo número.",
+      "nit": "NIT del adquirente con DV",
+      "submit": "Reenviar (simulado)",
+      "done": "{id} corregido, reenviado y aceptado (simulado)"
     },
     "reception": {
-      "title": "Recepción de facturas de proveedores",
-      "subtitle": "OCR automático, validación de {taxId} y conciliación contable.",
+      "title": "Facturas de proveedores (RADIAN)",
+      "subtitle": "Las facturas de tus proveedores llegan como XML con su PDF. Valídalas y registra los eventos RADIAN en orden: acuse, recibo del bien o servicio y aceptación o reclamo.",
       "stats": {
-        "incoming": "Entrantes",
-        "validated": "Validadas",
-        "rejected": "Rechazadas"
+        "pending": "Por gestionar",
+        "accepted": "Aceptadas",
+        "claimed": "Reclamadas"
       },
-      "list": {
-        "supplier": "Proveedor",
-        "amount": "Monto",
-        "date": "Fecha",
-        "validations": "Validaciones",
-        "ocr": "OCR",
-        "taxIdCheck": "Verif. {taxId}",
-        "duplicateCheck": "Duplicidad",
-        "approve": "Aprobar",
-        "reject": "Rechazar",
-        "approved": "Aprobada",
-        "rejectedLabel": "Rechazada"
-      }
+      "invoice": "Factura {number}",
+      "dates": "Emitida el {issued} · recibida el {received}",
+      "amounts": "Base {base} · IVA {iva} · Total {total}",
+      "checks": {
+        "cufe": "CUFE de 96 caracteres",
+        "nit": "NIT del proveedor con DV válido",
+        "addressed": "Dirigida a tu NIT",
+        "notAddressed": "Dirigida a otro NIT ({nit})",
+        "notDuplicate": "No duplicada"
+      },
+      "stage": {
+        "new": "Nueva",
+        "acknowledged": "Con acuse",
+        "received": "Bien o servicio recibido",
+        "accepted": "Aceptada",
+        "tacit": "Aceptación tácita",
+        "claimed": "Reclamada"
+      },
+      "events": {
+        "030": "Acuse de recibo",
+        "031": "Reclamo",
+        "032": "Recibo del bien o servicio",
+        "033": "Aceptación expresa",
+        "034": "Aceptación tácita"
+      },
+      "actions": {
+        "ack": "Acuse de recibo (030)",
+        "receive": "Recibo del bien o servicio (032)",
+        "accept": "Aceptar (033)",
+        "claim": "Reclamar (031)"
+      },
+      "claimReason": "Motivo del reclamo",
+      "claimReasons": {
+        "01": "01 · Documento con inconsistencias",
+        "02": "02 · Mercancía no entregada totalmente",
+        "03": "03 · Mercancía no entregada parcialmente",
+        "04": "04 · Servicio no prestado"
+      },
+      "claimConfirm": "Registrar reclamo",
+      "deadline": "Plazo para aceptar o reclamar: {date} ({n, plural, one {queda # día hábil} other {quedan # días hábiles}}; si no respondes, opera la aceptación tácita).",
+      "deadlinePassed": "Venció el plazo sin reclamo: opera la aceptación tácita.",
+      "suggestClaim": "Esta factura no está dirigida a tu NIT: lo indicado es reclamarla con el motivo 01.",
+      "closed": "Gestión cerrada",
+      "eventDone": "Evento {code} ({name}) registrado para {number} (simulado)",
+      "note": "Simulado: en tu proyecto los eventos se registran ante la DIAN a través del proveedor tecnológico, y las facturas llegan al buzón de correo de recepción."
     },
     "reports": {
-      "title": "Reportes fiscales",
-      "subtitle": "Libros oficiales listos para presentar a la autoridad.",
+      "title": "Libros y reportes",
+      "subtitle": "Se calculan con los documentos de esta simulación. Descárgalos en CSV (se abre en Excel) o en PDF.",
       "period": "Período",
-      "months": {
-        "1": "Enero",
-        "2": "Febrero",
-        "3": "Marzo",
-        "4": "Abril",
-        "5": "Mayo",
-        "6": "Junio",
-        "7": "Julio",
-        "8": "Agosto",
-        "9": "Septiembre",
-        "10": "Octubre",
-        "11": "Noviembre",
-        "12": "Diciembre"
+      "periods": {
+        "2026-08": "Agosto 2026",
+        "2026-09": "Septiembre 2026",
+        "2026-10": "Octubre 2026",
+        "all": "Agosto a octubre 2026"
       },
       "books": {
         "sales": "Libro de ventas",
         "purchases": "Libro de compras",
-        "vat": "Resumen IVA",
-        "withholding": "Retenciones aplicadas"
+        "vat": "Resumen de IVA",
+        "withholding": "Retenciones (informativas)"
       },
-      "totalDocs": "documentos",
-      "totalAmount": "Monto total",
-      "export": "Exportar",
-      "formats": {
-        "pdf": "PDF",
-        "excel": "Excel",
-        "xml": "XML"
-      }
+      "files": {
+        "sales": "libro-ventas",
+        "purchases": "libro-compras",
+        "vat": "resumen-iva",
+        "withholding": "retenciones"
+      },
+      "notes": {
+        "sales": "Facturas, POS y notas débito suman; las notas crédito restan. No incluye documentos rechazados.",
+        "purchases": "Facturas de proveedores del período; no incluye las reclamadas.",
+        "vat": "Resumen estimado para revisar con tu contador; no reemplaza la declaración.",
+        "withholding": "Retenciones que te practicarían tus clientes según las tarifas de referencia."
+      },
+      "cols": {
+        "date": "Fecha",
+        "doc": "Documento",
+        "type": "Tipo",
+        "client": "Cliente",
+        "supplier": "Proveedor",
+        "nit": "NIT",
+        "concept": "Concepto",
+        "base": "Base",
+        "iva": "IVA",
+        "total": "Total",
+        "status": "Estado",
+        "ref": "Referencia",
+        "retFuente": "ReteFuente",
+        "retIva": "ReteIVA",
+        "retIca": "ReteICA"
+      },
+      "vat": {
+        "generated19": "IVA generado 19 %",
+        "generated5": "IVA generado 5 %",
+        "exempt": "Ventas exentas",
+        "excluded": "Ventas excluidas o no gravadas",
+        "creditNotes": "Notas crédito (resta)",
+        "debitNotes": "Notas débito (suma)",
+        "deductible": "IVA descontable en compras",
+        "balance": "Saldo estimado de IVA"
+      },
+      "csv": "CSV (Excel)",
+      "rows": "{n} registros",
+      "empty": "Sin movimientos en el período.",
+      "totalRow": "Total",
+      "downloaded": "{file} descargado",
+      "pdfSample": "Datos de ejemplo del simulador de KopTup. No es un reporte oficial."
     },
     "api": {
-      "title": "API y SDKs",
-      "subtitle": "Integra Koptup en tu ERP, e-commerce o sistema POS en minutos.",
-      "languages": {
-        "ts": "TypeScript",
-        "python": "Python",
-        "go": "Go"
+      "title": "API para conectar tu sistema",
+      "badge": "Diseño de referencia",
+      "subtitle": "Así se integra tu e-commerce, ERP o POS: tu sistema envía la venta y recibe el estado por webhook. Esta API se construye en tu proyecto; no es un servicio público disponible hoy.",
+      "tabs": {
+        "request": "Solicitud",
+        "response": "Respuesta",
+        "webhook": "Webhook"
       },
-      "endpoints": "Endpoints destacados",
-      "webhooks": "Eventos webhook",
-      "webhookEvents": {
-        "accepted": "invoice.accepted — el documento fue aceptado por la autoridad",
-        "rejected": "invoice.rejected — el documento fue rechazado, ver motivo",
-        "received": "invoice.received — recibiste un documento de proveedor",
-        "void": "invoice.voided — un documento fue anulado",
-        "credit": "credit_note.issued — se emitió una nota crédito ligada"
+      "live": "La solicitud se arma con lo que tienes en el formulario de emisión.",
+      "copy": "Copiar",
+      "copied": "Copiado al portapapeles",
+      "copyError": "Tu navegador no permitió copiar. Selecciona el texto y cópialo.",
+      "endpoints": "Endpoints",
+      "webhooks": "Eventos de webhook",
+      "endpointDesc": {
+        "invoices": "Emitir factura de venta",
+        "creditNotes": "Emitir nota crédito",
+        "debitNotes": "Emitir nota débito",
+        "pos": "Emitir documento equivalente POS",
+        "status": "Consultar estado y CUFE",
+        "pdf": "Descargar la representación gráfica",
+        "xml": "Descargar el XML",
+        "reception": "Listar facturas de proveedores",
+        "events": "Registrar un evento RADIAN",
+        "reports": "Libro de ventas del período"
+      },
+      "webhookDesc": {
+        "invoice_accepted": "El documento fue aceptado por la DIAN.",
+        "invoice_rejected": "El documento fue rechazado; incluye la regla incumplida.",
+        "credit_note_issued": "Se emitió una nota crédito ligada a una factura.",
+        "debit_note_issued": "Se emitió una nota débito ligada a una factura.",
+        "reception_received": "Llegó una factura de proveedor.",
+        "reception_event_registered": "Se registró un evento RADIAN."
       }
     },
-    "whiteLabel": {
-      "title": "White-label resellers",
-      "subtitle": "Revende la plataforma con tu marca, dominio y branding.",
-      "toggle": "Modo white-label activo",
-      "toggleOff": "Activa el modo para gestionar tus marcas",
-      "addBrand": "Nueva marca",
-      "brands": {
-        "domain": "Dominio",
-        "clients": "Clientes",
-        "monthlyDocs": "Docs/mes",
-        "status": "Estado",
-        "active": "Activa",
-        "trial": "En prueba"
+    "project": {
+      "title": "Qué se implementa en tu proyecto",
+      "subtitle": "Lo que esta demo simula y cómo funciona en producción.",
+      "items": {
+        "provider": {
+          "title": "Transmisión a la DIAN",
+          "text": "A través de un proveedor tecnológico autorizado aliado o de tu propio software habilitado ante la DIAN. KopTup no es proveedor tecnológico autorizado."
+        },
+        "signature": {
+          "title": "Firma digital",
+          "text": "Con el certificado de firma de tu empresa o del proveedor tecnológico."
+        },
+        "integration": {
+          "title": "Integración con tu sistema",
+          "text": "Tu e-commerce, ERP, POS o software de salud emite por API, y el PDF y el XML le llegan a tu cliente por correo o WhatsApp."
+        },
+        "storage": {
+          "title": "Conservación",
+          "text": "Los XML y PDF se guardan por el tiempo que exige la norma colombiana, con copias de seguridad; el almacenamiento y el cifrado se configuran en la implementación."
+        },
+        "countries": {
+          "title": "Otros países",
+          "text": "México, Perú y Chile se cotizan aparte (plan Avanzado). Este simulador muestra solo Colombia."
+        }
       }
-    },
-    "storage": {
-      "title": "Almacenamiento legal",
-      "subtitle": "Cada país exige un período mínimo de custodia.",
-      "yearsLabel": "años requeridos",
-      "storedDocs": "documentos en custodia",
-      "encrypted": "Cifrado AES-256",
-      "immutable": "Almacenamiento inmutable",
-      "audit": "Auditoría disponible"
     }
   }
 }
