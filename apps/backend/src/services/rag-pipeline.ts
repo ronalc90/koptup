@@ -223,7 +223,10 @@ export async function callOpenAI(args: {
     },
   ];
 
-  const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+  // Misma base que el SDK oficial de OpenAI: OPENAI_BASE_URL si existe (mock
+  // local, CI o un proxy compatible); si no, la API pública.
+  const baseUrl = (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').trim().replace(/\/+$/, '');
+  const resp = await fetch(`${baseUrl}/chat/completions`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${args.apiKey}`,

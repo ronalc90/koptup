@@ -1,16 +1,16 @@
 /**
  * Servicio de Integración con CUPS Oficial de SISPRO
  *
- * Permite importar códigos CUPS desde archivos CSV/Excel y sincronizar
+ * Permite importar códigos CUPS desde archivos CSV/Excel (.xlsx) y sincronizar
  * con el catálogo oficial de SISPRO.
  */
 
-import XLSX from 'xlsx';
 import csv from 'csv-parser';
 import fs from 'fs/promises';
 import { createReadStream } from 'fs';
 import CUPS from '../models/CUPS';
 import { logger } from '../utils/logger';
+import { leerHojaComoObjetos } from '../utils/excel-reader';
 
 // ============================================================================
 // INTERFACES
@@ -133,11 +133,8 @@ export class CupsSisproService {
     try {
       logger.info(`Importando CUPS desde Excel: ${rutaArchivo}`);
 
-      // Leer archivo Excel
-      const workbook = XLSX.readFile(rutaArchivo);
-      const nombreHoja = opciones.nombreHoja || workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[nombreHoja];
-      const registros = XLSX.utils.sheet_to_json(worksheet);
+      // Leer archivo Excel (.xlsx) con ExcelJS
+      const { nombreHoja, filas: registros } = await leerHojaComoObjetos(rutaArchivo, opciones.nombreHoja);
 
       resultados.total = registros.length;
       logger.info(`${registros.length} registros encontrados en hoja "${nombreHoja}"`);

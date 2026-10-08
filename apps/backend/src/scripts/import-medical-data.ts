@@ -1,13 +1,13 @@
 import fs from 'fs';
 import path from 'path';
 import csv from 'csv-parser';
-import XLSX from 'xlsx';
 import { connectDB } from '../config/mongodb';
 import CUPS from '../models/CUPS';
 import Medicamento from '../models/Medicamento';
 import Diagnostico from '../models/Diagnostico';
 import MaterialInsumo from '../models/MaterialInsumo';
 import { logger } from '../utils/logger';
+import { leerHojaComoObjetos } from '../utils/excel-reader';
 
 /**
  * Script para importar datos médicos desde archivos CSV/Excel
@@ -40,13 +40,11 @@ async function readCSV(filePath: string): Promise<any[]> {
 }
 
 /**
- * Leer archivo Excel
+ * Leer archivo Excel (.xlsx, primera hoja) con ExcelJS
  */
-function readExcel(filePath: string): any[] {
-  const workbook = XLSX.readFile(filePath);
-  const sheetName = workbook.SheetNames[0];
-  const worksheet = workbook.Sheets[sheetName];
-  return XLSX.utils.sheet_to_json(worksheet);
+async function readExcel(filePath: string): Promise<any[]> {
+  const { filas } = await leerHojaComoObjetos(filePath);
+  return filas;
 }
 
 /**
@@ -59,7 +57,7 @@ async function importCUPS(filePath: string, options: ImportOptions = {}): Promis
   try {
     logger.info(`Importando CUPS desde ${filePath}...`);
 
-    const data = filePath.endsWith('.csv') ? await readCSV(filePath) : readExcel(filePath);
+    const data = filePath.endsWith('.csv') ? await readCSV(filePath) : await readExcel(filePath);
 
     if (options.truncate) {
       logger.info('Limpiando colección CUPS...');
@@ -114,7 +112,7 @@ async function importMedicamentos(filePath: string, options: ImportOptions = {})
   try {
     logger.info(`Importando medicamentos desde ${filePath}...`);
 
-    const data = filePath.endsWith('.csv') ? await readCSV(filePath) : readExcel(filePath);
+    const data = filePath.endsWith('.csv') ? await readCSV(filePath) : await readExcel(filePath);
 
     if (options.truncate) {
       logger.info('Limpiando colección medicamentos...');
@@ -173,7 +171,7 @@ async function importDiagnosticos(filePath: string, options: ImportOptions = {})
   try {
     logger.info(`Importando diagnósticos desde ${filePath}...`);
 
-    const data = filePath.endsWith('.csv') ? await readCSV(filePath) : readExcel(filePath);
+    const data = filePath.endsWith('.csv') ? await readCSV(filePath) : await readExcel(filePath);
 
     if (options.truncate) {
       logger.info('Limpiando colección diagnósticos...');
@@ -225,7 +223,7 @@ async function importMaterialesInsumos(filePath: string, options: ImportOptions 
   try {
     logger.info(`Importando materiales/insumos desde ${filePath}...`);
 
-    const data = filePath.endsWith('.csv') ? await readCSV(filePath) : readExcel(filePath);
+    const data = filePath.endsWith('.csv') ? await readCSV(filePath) : await readExcel(filePath);
 
     if (options.truncate) {
       logger.info('Limpiando colección materiales/insumos...');

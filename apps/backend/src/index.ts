@@ -47,13 +47,15 @@ const allowedOrigins = process.env.NODE_ENV === 'production'
   ? [
       'https://koptup.com',
       'https://www.koptup.com',
-      ...(process.env.CORS_ORIGIN?.split(',').filter(Boolean) || [])
+      ...(process.env.CORS_ORIGIN?.split(',').map((o) => o.trim()).filter(Boolean) || [])
     ]
   : [
       'http://localhost:3000',
       'http://localhost:3001',
       'https://koptup.com',
-      'https://www.koptup.com'
+      'https://www.koptup.com',
+      // En local también se respeta CORS_ORIGIN (p. ej. la web en otro puerto)
+      ...(process.env.CORS_ORIGIN?.split(',').map((o) => o.trim()).filter(Boolean) || [])
     ];
 
 logger.info('CORS origins configurados:', allowedOrigins);

@@ -4,7 +4,7 @@
 
 ### Prerrequisitos
 - Docker Desktop instalado y ejecutándose
-- Node.js 18+ (para desarrollo)
+- Node.js 20.9+ (para desarrollo)
 
 ### Pasos:
 

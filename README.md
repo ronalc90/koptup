@@ -6,7 +6,7 @@
 
 [![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org)
-[![Node.js](https://img.shields.io/badge/Node.js-18%2B-43853d?logo=node.js)](https://nodejs.org)
+[![Node.js](https://img.shields.io/badge/Node.js-20.9%2B-43853d?logo=node.js)](https://nodejs.org)
 [![MongoDB](https://img.shields.io/badge/MongoDB-7-47A248?logo=mongodb)](https://mongodb.com)
 [![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o-412991?logo=openai)](https://openai.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -55,7 +55,7 @@ Tecnologías que realmente usamos en este repo:
 
 **Frontend:** Next.js 14 (App Router) · React 18 · TypeScript · TailwindCSS · next-intl (ES/EN) · next-themes · Framer Motion · React Hook Form + Zod · SWR · Axios · Recharts · date-fns
 
-**Backend:** Node.js 18+ · Express · TypeScript · Mongoose (MongoDB 7) · OpenAI SDK · JWT · bcryptjs · Multer · Helmet · Swagger (OpenAPI 3)
+**Backend:** Node.js 20.9+ · Express · TypeScript · Mongoose (MongoDB 7) · OpenAI SDK · JWT · bcryptjs · Multer · Helmet · Swagger (OpenAPI 3)
 
 **Storage & infra:** AWS S3 (uploads) · Docker · Vercel (web) · Railway (API)
 
@@ -169,7 +169,7 @@ El workflow [`ci.yml`](.github/workflows/ci.yml) corre en cada pull request y en
 GitHub Actions **no despliega**: el workflow de CI solo verifica. El despliegue lo hacen las integraciones de cada plataforma con el repositorio de GitHub:
 
 - **Web:** Vercel (proyecto conectado al repositorio).
-- **API:** Railway, que construye con Nixpacks según [`apps/backend/railway.json`](apps/backend/railway.json) (`npm install && npm run build` y arranca con `npm run start`).
+- **API:** Railway, que construye con Nixpacks según [`apps/backend/railway.json`](apps/backend/railway.json) (`npm install && npm run build` y arranca con `npm run start`). Nixpacks elige la versión de Node con `engines.node` de [`apps/backend/package.json`](apps/backend/package.json) (`>=20.9.0`; si el servicio no define `NIXPACKS_NODE_VERSION`, hoy resuelve a Node 24 LTS) e instala también las `devDependencies` para compilar (`NPM_CONFIG_PRODUCTION=false`): TypeScript y los `@types/*` están ahí.
 
 Las variables de cada entorno se configuran en esas plataformas (ver [Variables de entorno](#variables-de-entorno)). Los secretos nunca van en el repositorio: el único archivo de entorno versionado, `apps/web/.env.production`, solo tiene las URL públicas del sitio y de la API.
 

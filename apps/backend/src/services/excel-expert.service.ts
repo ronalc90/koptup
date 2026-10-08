@@ -7,9 +7,14 @@
  * 3. Registro de Atenciones
  * 4. Procedimientos por Atención
  * 5. Glosas
+ * (más una hoja de Resumen Ejecutivo)
+ *
+ * Usa ExcelJS (antes `xlsx`/SheetJS, retirado por avisos de seguridad sin
+ * corrección en npm). La generación es asíncrona: `generarExcelCompleto`
+ * devuelve una promesa con el Buffer del .xlsx.
  */
 
-import XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { format } from 'date-fns';
 import {
   ResultadoSistemaExperto,
@@ -21,50 +26,86 @@ import {
 } from '../types/expert-system.types';
 import { logger } from '../utils/logger';
 
+type Fila = ExcelJS.CellValue[];
+
+/** Formato de moneda de las columnas de valores (el mismo que se usaba con xlsx). */
+const FORMATO_MONEDA = '$#,##0.00';
+
 export class ExcelExpertService {
   /**
    * Genera Excel completo con las 5 hojas
    */
-  generarExcelCompleto(resultado: ResultadoSistemaExperto): Buffer {
+  async generarExcelCompleto(resultado: ResultadoSistemaExperto): Promise<Buffer> {
     logger.info('Generando Excel con 5 hojas...');
 
-    const workbook = XLSX.utils.book_new();
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = 'KopTup';
+    workbook.created = new Date();
 
     // Hoja 1: Radicación / Factura General
-    const hoja1 = this.generarHoja1Radicacion(resultado.hoja1_radicacion);
-    XLSX.utils.book_append_sheet(workbook, hoja1, '1. Radicación');
+    this.agregarHoja(workbook, '1. Radicación', this.generarHoja1Radicacion(resultado.hoja1_radicacion));
 
     // Hoja 2: Detalle de la Factura
-    const hoja2 = this.generarHoja2Detalle(resultado.hoja2_detalles);
-    XLSX.utils.book_append_sheet(workbook, hoja2, '2. Detalle Factura');
+    this.agregarHoja(workbook, '2. Detalle Factura', this.generarHoja2Detalle(resultado.hoja2_detalles));
 
     // Hoja 3: Registro de Atenciones
-    const hoja3 = this.generarHoja3Atenciones(resultado.hoja3_atenciones);
-    XLSX.utils.book_append_sheet(workbook, hoja3, '3. Atenciones');
+    this.agregarHoja(workbook, '3. Atenciones', this.generarHoja3Atenciones(resultado.hoja3_atenciones));
 
-    // Hoja 4: Procedimientos por Atención
-    const hoja4 = this.generarHoja4Procedimientos(resultado.hoja4_procedimientos);
-    XLSX.utils.book_append_sheet(workbook, hoja4, '4. Procedimientos');
+    // Hoja 4: Procedimientos por Atención (columnas de valores en moneda)
+    this.agregarHoja(
+      workbook,
+      '4. Procedimientos',
+      this.generarHoja4Procedimientos(resultado.hoja4_procedimientos),
+      [7, 8, 9, 10, 13, 14, 17]
+    );
 
-    // Hoja 5: Glosas
-    const hoja5 = this.generarHoja5Glosas(resultado.hoja5_glosas);
-    XLSX.utils.book_append_sheet(workbook, hoja5, '5. Glosas');
+    // Hoja 5: Glosas (Vr Unit, Valor Total y Valor Final en moneda)
+    this.agregarHoja(workbook, '5. Glosas', this.generarHoja5Glosas(resultado.hoja5_glosas), [6, 7, 10]);
 
     // Hoja 6: Resumen Ejecutivo (bonus)
-    const hoja6 = this.generarHojaResumen(resultado);
-    XLSX.utils.book_append_sheet(workbook, hoja6, 'Resumen Ejecutivo');
+    const resumen = this.agregarHoja(workbook, 'Resumen Ejecutivo', this.generarHojaResumen(resultado));
+    // Total Facturado, Total Glosado y Total a Pagar (filas 13 a 15, columna B)
+    for (const celda of ['B13', 'B14', 'B15']) {
+      resumen.getCell(celda).numFmt = FORMATO_MONEDA;
+    }
 
     // Generar buffer
-    const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+    const buffer = Buffer.from(await workbook.xlsx.writeBuffer());
     logger.info('Excel generado exitosamente');
     return buffer;
   }
 
   /**
+   * Agrega una hoja con las filas dadas. `columnasMoneda` son índices de
+   * columna en base 0; el formato se aplica desde la fila 2 (la 1 es el
+   * encabezado).
+   */
+  private agregarHoja(
+    workbook: ExcelJS.Workbook,
+    nombre: string,
+    filas: Fila[],
+    columnasMoneda: number[] = []
+  ): ExcelJS.Worksheet {
+    const hoja = workbook.addWorksheet(nombre);
+    for (const fila of filas) {
+      hoja.addRow(fila.map((valor) => (valor === undefined ? null : valor)));
+    }
+    for (let numeroFila = 2; numeroFila <= filas.length; numeroFila++) {
+      for (const columna of columnasMoneda) {
+        const celda = hoja.getRow(numeroFila).getCell(columna + 1);
+        if (celda.value !== null && celda.value !== undefined && celda.value !== '') {
+          celda.numFmt = FORMATO_MONEDA;
+        }
+      }
+    }
+    return hoja;
+  }
+
+  /**
    * HOJA 1: Radicación / Factura General
    */
-  private generarHoja1Radicacion(datos: RadicacionFacturaGeneral): XLSX.WorkSheet {
-    const rows = [
+  private generarHoja1Radicacion(datos: RadicacionFacturaGeneral): Fila[] {
+    const rows: Fila[] = [
       // Encabezados
       [
         'Nro Radicación',
@@ -111,14 +152,14 @@ export class ExcelExpertService {
       ],
     ];
 
-    return XLSX.utils.aoa_to_sheet(rows);
+    return rows;
   }
 
   /**
    * HOJA 2: Detalle de la Factura
    */
-  private generarHoja2Detalle(datos: DetalleFactura[]): XLSX.WorkSheet {
-    const rows = [
+  private generarHoja2Detalle(datos: DetalleFactura[]): Fila[] {
+    const rows: Fila[] = [
       // Encabezados
       [
         'Línea/Consecutivo',
@@ -163,14 +204,14 @@ export class ExcelExpertService {
       ]),
     ];
 
-    return XLSX.utils.aoa_to_sheet(rows);
+    return rows;
   }
 
   /**
    * HOJA 3: Registro de Atenciones
    */
-  private generarHoja3Atenciones(datos: RegistroAtencion[]): XLSX.WorkSheet {
-    const rows = [
+  private generarHoja3Atenciones(datos: RegistroAtencion[]): Fila[] {
+    const rows: Fila[] = [
       // Encabezados
       [
         'Nro Radicación',
@@ -197,14 +238,14 @@ export class ExcelExpertService {
       ]),
     ];
 
-    return XLSX.utils.aoa_to_sheet(rows);
+    return rows;
   }
 
   /**
    * HOJA 4: Procedimientos por Atención
    */
-  private generarHoja4Procedimientos(datos: ProcedimientoAtencion[]): XLSX.WorkSheet {
-    const rows = [
+  private generarHoja4Procedimientos(datos: ProcedimientoAtencion[]): Fila[] {
+    const rows: Fila[] = [
       // Encabezados
       [
         'Nro Radicación',
@@ -251,30 +292,15 @@ export class ExcelExpertService {
       ]),
     ];
 
-    const worksheet = XLSX.utils.aoa_to_sheet(rows);
-
-    // Aplicar formato de moneda a columnas de valores
-    const columnasMoneda = [7, 8, 9, 10, 13, 14, 17]; // índices de columnas con valores
-    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
-
-    for (let R = 1; R <= range.e.r; R++) {
-      // Empezar desde 1 para saltar encabezados
-      for (const C of columnasMoneda) {
-        const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
-        if (worksheet[cellAddress]) {
-          worksheet[cellAddress].z = '$#,##0.00';
-        }
-      }
-    }
-
-    return worksheet;
+    // El formato de moneda (columnas 7, 8, 9, 10, 13, 14 y 17) lo aplica agregarHoja
+    return rows;
   }
 
   /**
    * HOJA 5: Glosas
    */
-  private generarHoja5Glosas(datos: GlosaDetalle[]): XLSX.WorkSheet {
-    const rows = [
+  private generarHoja5Glosas(datos: GlosaDetalle[]): Fila[] {
+    const rows: Fila[] = [
       // Encabezados
       [
         'Nro Radicación',
@@ -305,29 +331,15 @@ export class ExcelExpertService {
       ]),
     ];
 
-    const worksheet = XLSX.utils.aoa_to_sheet(rows);
-
-    // Aplicar formato de moneda
-    const columnasMoneda = [6, 7, 10]; // Vr Unit, Valor Total, Valor Final
-    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
-
-    for (let R = 1; R <= range.e.r; R++) {
-      for (const C of columnasMoneda) {
-        const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
-        if (worksheet[cellAddress]) {
-          worksheet[cellAddress].z = '$#,##0.00';
-        }
-      }
-    }
-
-    return worksheet;
+    // El formato de moneda (columnas 6, 7 y 10) lo aplica agregarHoja
+    return rows;
   }
 
   /**
    * HOJA BONUS: Resumen Ejecutivo
    */
-  private generarHojaResumen(resultado: ResultadoSistemaExperto): XLSX.WorkSheet {
-    const rows = [
+  private generarHojaResumen(resultado: ResultadoSistemaExperto): Fila[] {
+    const rows: Fila[] = [
       ['RESUMEN EJECUTIVO - AUDITORÍA DE CUENTA MÉDICA'],
       [],
       ['Fecha de Procesamiento:', this.formatearFecha(resultado.metadata.fechaProcesamiento)],
@@ -355,14 +367,9 @@ export class ExcelExpertService {
       ...Object.entries(resultado.resumen.glosasPorTipo).map(([codigo, cantidad]) => [codigo, cantidad]),
     ];
 
-    const worksheet = XLSX.utils.aoa_to_sheet(rows);
-
-    // Aplicar formato de moneda a valores
-    worksheet['B13'] = { t: 'n', v: resultado.resumen.totalFacturado, z: '$#,##0.00' };
-    worksheet['B14'] = { t: 'n', v: resultado.resumen.totalGlosado, z: '$#,##0.00' };
-    worksheet['B15'] = { t: 'n', v: resultado.resumen.totalAPagar, z: '$#,##0.00' };
-
-    return worksheet;
+    // Las filas 13 a 15 (columna B) llevan los totales como número; el
+    // formato de moneda lo aplica generarExcelCompleto.
+    return rows;
   }
 
   /**
@@ -382,7 +389,7 @@ export class ExcelExpertService {
    * Guarda el Excel en un archivo
    */
   async guardarExcel(resultado: ResultadoSistemaExperto, rutaDestino: string): Promise<void> {
-    const buffer = this.generarExcelCompleto(resultado);
+    const buffer = await this.generarExcelCompleto(resultado);
     const fs = await import('fs/promises');
     await fs.writeFile(rutaDestino, buffer);
     logger.info(`Excel guardado en: ${rutaDestino}`);

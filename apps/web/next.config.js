@@ -65,10 +65,18 @@ const nextConfig = {
   },
 
 
-  // Image optimization
+  // Optimización de imágenes. `images.domains` está obsoleto desde Next 14:
+  // `remotePatterns` limita el optimizador a HTTPS y a lo único que pasa por
+  // él: las fotos de Unsplash de /about y de la demo de ecommerce. No se
+  // permiten `localhost` (evita que /_next/image pida recursos internos) ni el
+  // bucket de uploads (guarda archivos que suben los usuarios; los avatares e
+  // íconos se muestran con `unoptimized`).
+  // Sin AVIF: la rama 14 de Next no tiene parche para GHSA-2xp9-vwfh-vxw4
+  // (ejecución remota vía libheif al optimizar AVIF, solo si se autoaloja con
+  // `next start`; corregido en 15.5.24). WebP basta para estas fotos.
   images: {
-    domains: ['localhost', 'koptup-uploads.s3.amazonaws.com', 'images.unsplash.com'],
-    formats: ['image/avif', 'image/webp'],
+    remotePatterns: [{ protocol: 'https', hostname: 'images.unsplash.com', pathname: '/photo-**' }],
+    formats: ['image/webp'],
   },
 
   // Performance optimizations

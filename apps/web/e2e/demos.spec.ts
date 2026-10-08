@@ -32,19 +32,27 @@ const HYDRATION_ERROR = /Minified React error #(418|423|425)\b|Hydration failed|
  * - falla si aparece cualquier error que no coincida con `patron` (un error
  *   nuevo nunca queda tapado por la lista);
  * - falla si el error conocido ya no ocurre, para que se borre la entrada
- *   (la lista solo se achica).
+ *   (la lista solo se achica), salvo que sea `intermitente`: entonces solo
+ *   deja una anotación "problema conocido no apareció" en el reporte.
  * Para exigir cero errores también en estas demos:
  * E2E_INCLUDE_KNOWN_ISSUES=1 npm run test:e2e
  */
 interface KnownIssue {
   motivo: string;
   patron: RegExp;
+  /** El error no sale en todas las cargas: no se exige que aparezca. */
+  intermitente?: boolean;
 }
 
+// Intermitente: con 10 cargas seguidas por demo, automatizacion, chatbot,
+// facturacion-electronica y pos cargaron alguna vez sin el error (depende de
+// qué alcanza a pintarse antes de hidratar), y exigirlo hacía fallar la
+// prueba al azar.
 const HYDRATION_TO_LOCALE: KnownIssue = {
   motivo:
     'hidratación (#418/#423/#425) con el navegador en es-CO: la página formatea números o fechas con toLocaleString() sin locale y el servidor no pinta lo mismo que el navegador',
   patron: HYDRATION_ERROR,
+  intermitente: true,
 };
 
 const KNOWN_CONSOLE_ISSUES: Record<string, KnownIssue> = {
@@ -109,6 +117,12 @@ for (const { route, slug } of ROUTES) {
       test.info().annotations.push({ type: 'problema conocido', description: `pendiente pista demos: ${known.motivo}` });
       const unexpected = errors.filter((error) => !known.patron.test(error));
       expect(unexpected, `errores nuevos (fuera del problema conocido) al abrir ${route}`).toEqual([]);
+      if (known.intermitente) {
+        if (errors.length === 0) {
+          test.info().annotations.push({ type: 'problema conocido no apareció', description: `${route} (intermitente)` });
+        }
+        return;
+      }
       expect(
         errors.length,
         `${route} ya no registra el problema conocido: borra "${slug}" de KNOWN_CONSOLE_ISSUES en e2e/demos.spec.ts`,

@@ -23,7 +23,6 @@ Esta guía te ayudará a desplegar tu aplicación en **Vercel** (frontend) y **R
 ### APIs y Servicios:
 - **OpenAI API Key** - https://platform.openai.com/api-keys
 - **AWS S3** (opcional, para archivos)
-- **Pinecone** (opcional, para RAG)
 
 ---
 
@@ -125,9 +124,6 @@ GOOGLE_CLIENT_ID=tu-google-client-id
 GOOGLE_CLIENT_SECRET=tu-google-secret
 GOOGLE_CALLBACK_URL=https://tu-app.railway.app/api/auth/google/callback
 
-# Pinecone (para RAG)
-PINECONE_API_KEY=tu-pinecone-key
-PINECONE_INDEX=tu-index
 ```
 
 ### Paso 7: Desplegar
@@ -359,11 +355,9 @@ Health:   https://tu-app.railway.app/health
 **Causa:** Dependencias no instaladas
 
 **Solución:**
-1. Verifica que todas las dependencias estén en `dependencies` (no en `devDependencies`)
-2. TypeScript types deben estar en `dependencies` para producción:
-   ```bash
-   npm install --save @types/express @types/node
-   ```
+1. Las librerías que el servidor carga al ejecutarse (`require`/`import` en `dist/`) deben estar en `dependencies`.
+2. TypeScript y los `@types/*` solo se usan para compilar y viven en `devDependencies`. Nixpacks las instala en el build porque fija `NPM_CONFIG_PRODUCTION=false`. Si en Railway defines `NPM_CONFIG_PRODUCTION=true` u `NPM_CONFIG_OMIT=dev`, quítalas: con ellas `npm run build` no encuentra `tsc` ni los tipos.
+3. Node: Nixpacks usa `engines.node` de `apps/backend/package.json` (`>=20.9.0`). `sharp` 0.35 y `nodemailer` 10 exigen Node 20 o superior; no fijes `NIXPACKS_NODE_VERSION=18`.
 
 ### Problema: "OPENAI_API_KEY environment variable is missing" al iniciar
 

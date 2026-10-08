@@ -156,7 +156,7 @@ export async function generarExcelExperto(req: Request, res: Response) {
     });
 
     // Generar Excel
-    const buffer = excelExpertService.generarExcelCompleto(resultado);
+    const buffer = await excelExpertService.generarExcelCompleto(resultado);
 
     // Configurar headers para descarga
     const nombreArchivo = `Cuenta_${cuenta.numeroCuenta}_${nroRadicacion || cuentaId}_${Date.now()}.xlsx`;
@@ -220,7 +220,7 @@ export async function procesarYDescargarExcel(req: Request, res: Response) {
     });
 
     // Generar Excel
-    const buffer = excelExpertService.generarExcelCompleto(resultado);
+    const buffer = await excelExpertService.generarExcelCompleto(resultado);
 
     // Guardar metadatos
     cuenta.metadata = {
