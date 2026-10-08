@@ -35,7 +35,7 @@
 
 **Qué es.** Un asistente que responde **solo con lo que está en los documentos de la empresa** (manuales, contratos, políticas, protocolos), **cita la fuente** de cada respuesta y dice "no encontré esa información" cuando la respuesta no está. Se usa en la web y, desde el plan Profesional, en WhatsApp.
 
-**Dónde se vende** (rama `rag-reposicionamiento`):
+**Dónde se vende** (rama `rag-reposicionamiento`: implementado en rama, pendiente de merge):
 
 | Pieza | Ruta | Papel |
 |---|---|---|
@@ -77,18 +77,18 @@ Estos planes **reemplazan** la tarjeta "Chatbot RAG con IA" del catálogo y sus 
 
 **Recomendación comercial:** vender ya el **Piloto**; el **Esencial con carga manual** desde el Paq. 6; el **Profesional** desde el Paq. 9, o antes si el primer cliente financia su construcción dentro del proyecto. El **Empresarial** siempre es un proyecto a medida.
 
-**Estado de la rama `rag-reposicionamiento`** (sin fusionar en `main`; el detalle está en [Reposicionamiento RAG](13-Reposicionamiento-RAG.md)):
+**Estado de la rama `rag-reposicionamiento`:** implementado en rama, pendiente de merge. Las 7 etapas están hechas en 13 commits y pasaron la auditoría final; el detalle está en [Reposicionamiento RAG](13-Reposicionamiento-RAG.md).
 
 | Etapa de la especificación | Contenido | Estado al 8 de octubre de 2026 |
 |---|---|---|
-| E1. SEO técnico | Dominio con `www`, plantilla de títulos, sin meta keywords, botones a `/services#planes-rag` | Hecha en la rama |
-| E2. Inicio | H1 "IA que responde con los documentos de tu empresa", botones, cifras verificables, chatbot primero | Hecha en la rama |
-| E3. `/rag` y sectores | Página pilar, `/rag/salud`, `/rag/legal`, `/rag/soporte`, "RAG" en menú y footer | Hecha en la rama |
-| E4. Precios | Sección `#planes-rag` y `TRM_REFERENCIA = 3300` para el resto | Hecha en la rama |
-| E5. Coherencia | `/chatbots-ia`, `/soluciones-ia`, botones de demo de QA y VPN, `/demo/cuentas-medicas` como "Sistema experto para salud" y voseo a "tú" en todo el sitio | Hecha en la rama |
-| E6. "Prueba con tu documento" | Subida de PDF, DOCX o TXT con límites, borrado a la hora y tope de gasto | En curso |
-| E7. Medición | GA4, Google Ads y LinkedIn Insight con banner de consentimiento | Pendiente |
-| Fusión en `main` | Revisión, pruebas y despliegue | Pendiente (paquete 1 del [Roadmap](12-Roadmap.md)) |
+| E1. SEO técnico | Dominio con `www`, plantilla de títulos, sin meta keywords, botones a `/services#planes-rag` | Implementado en rama, pendiente de merge |
+| E2. Inicio | H1 "IA que responde con los documentos de tu empresa", botones, cifras verificables, chatbot primero | Implementado en rama, pendiente de merge |
+| E3. `/rag` y sectores | Página pilar, `/rag/salud`, `/rag/legal`, `/rag/soporte`, "RAG" en menú y footer | Implementado en rama, pendiente de merge |
+| E4. Precios | Sección `#planes-rag` y `TRM_REFERENCIA = 3300` para el resto | Implementado en rama, pendiente de merge |
+| E5. Coherencia | `/chatbots-ia`, `/soluciones-ia`, botones de demo de QA y VPN, `/demo/cuentas-medicas` como "Sistema experto para salud" y voseo a "tú" en todo el sitio | Implementado en rama, pendiente de merge |
+| E6. "Prueba con tu documento" | Subida de PDF, DOCX o TXT con límites, borrado a la hora y tope de gasto (API `/api/demo-rag`) | Implementado en rama, pendiente de merge. Apagado hasta configurar Railway |
+| E7. Medición | GA4, Google Ads y LinkedIn Insight con banner de consentimiento y 5 eventos | Implementado en rama, pendiente de merge. Sin IDs reales todavía |
+| Fusión en `main` | Revisión, pruebas y despliegue | Pendiente de la aprobación del dueño (paquete 1 del [Roadmap](12-Roadmap.md)) |
 
 ---
 

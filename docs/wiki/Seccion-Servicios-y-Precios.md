@@ -1,6 +1,6 @@
 # Servicios y precios
 
-> Rutas: `/services` (y `/pricing`, que solo redirige) · Archivos principales: `apps/web/src/app/services/{page,layout}.tsx`, `apps/web/src/components/offerings/OfferingsCatalog.tsx`, `apps/web/src/lib/services-catalog.ts`, `apps/web/messages/offerings/*.{es,en}.json` (incluye `_page.*.json`), `apps/web/src/app/api/trm/route.ts`, `apps/web/src/app/pricing/*` · Prioridad: **P0** · Esfuerzo total: **XL** (≈ 30 días-dev en la Fase 1, de los cuales ≈ 4 ya avanzan en la rama `rag-reposicionamiento`; el resto en las Fases 2 a 5)
+> Rutas: `/services` (y `/pricing`, que solo redirige) · Archivos principales: `apps/web/src/app/services/{page,layout}.tsx`, `apps/web/src/components/offerings/OfferingsCatalog.tsx`, `apps/web/src/lib/services-catalog.ts`, `apps/web/messages/offerings/*.{es,en}.json` (incluye `_page.*.json`), `apps/web/src/app/api/trm/route.ts`, `apps/web/src/app/pricing/*` · Prioridad: **P0** · Esfuerzo total: **XL** (≈ 30 días-dev en la Fase 1, de los cuales ≈ 4 ya están hechos en la rama `rag-reposicionamiento`, pendiente de merge; el resto en las Fases 2 a 5)
 
 ![Captura actual de /services: hero "Planes y servicios" con voseo, caja "Cómo escalamos", buscador, selector Comprar/SaaS, COP/USD con "TRM en vivo" y chips de categoría](images/actual/servicios.jpg)
 
@@ -143,9 +143,9 @@ Ya está implementada en la rama `rag-reposicionamiento` (etapa E4, commit `5828
 | **Profesional** | Setup COP 24.900.000 / USD 7.490 + COP 2.990.000 / USD 890 al mes | 6–8 semanas | Hasta 3 fuentes, 10.000 documentos, web y WhatsApp, permisos por rol, panel de métricas, hasta 15.000 preguntas al mes, soporte prioritario y revisión mensual de calidad | **Solicitar demo guiada** (`plan=profesional`) | Probar la demo |
 | **Empresarial** | Desde COP 59.900.000 / USD 17.900; mensualidad según SLA | 10–14 semanas | Fuentes ilimitadas, nube del cliente u on-premise, SSO, auditoría, código fuente incluido | **Agendar llamada** | Solicitar propuesta |
 
-![Vista previa de /services#planes-rag en la rama rag-reposicionamiento: tarjetas Piloto RAG, Esencial, Profesional y Empresarial con precios en COP y USD fijos, "Más IVA si aplica" y el bloque "Ten en cuenta" con la pregunta adicional y las tarifas de Meta](images/mockups/rag-vista-previa-planes.jpg)
+![/services#planes-rag en la rama rag-reposicionamiento: tarjetas Piloto RAG, Esencial, Profesional y Empresarial con setup y mensualidad en COP y USD fijos y "Más IVA si aplica"](images/despues/rag-planes.jpg)
 
-*Vista previa de la sección `#planes-rag` (build local de la rama `rag-reposicionamiento`; aún no está en producción). Los botones de la vista previa ("Agenda tu piloto", "Elegir Esencial", "Elegir Profesional", "Cotizar Empresarial") van hoy a `/contact` con el plan preseleccionado; la tabla de arriba describe el destino final con el formulario "Solicitar demo".*
+*Sección `#planes-rag` en un build de la rama `rag-reposicionamiento` terminada (pendiente de merge; aún no está en producción). Los botones de las tarjetas ("Agenda tu piloto", "Elegir Esencial", "Elegir Profesional", "Cotizar Empresarial") van hoy a `/contact` con el plan preseleccionado; la tabla de arriba describe el destino final con el formulario "Solicitar demo".*
 
 Notas visibles debajo de la tabla:
 

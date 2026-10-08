@@ -2,7 +2,7 @@
 
 > Cómo está KopTup hoy como negocio, como producto y como software, antes de ejecutar el plan. Es el punto de partida de la [Visión de producto](02-Vision-de-Producto.md) y del [Roadmap](12-Roadmap.md).
 >
-> **Base de la evidencia:** sitio en producción (`www.koptup.com`, rama `main`) y código del monorepo al **8 de octubre de 2026**, más lo que ya cambia la rama `rag-reposicionamiento` (en curso, sin fusionar). Las capturas son de producción, en escritorio (1440 × 900) y móvil (390 × 844). Las mediciones de calidad (pruebas, lint, tipos, auditoría de dependencias y build local) están detalladas en [Seguridad y calidad](10-Seguridad-y-Calidad.md).
+> **Base de la evidencia:** sitio en producción (`www.koptup.com`, rama `main`) y código del monorepo al **8 de octubre de 2026**, más lo que ya cambia la rama `rag-reposicionamiento` (hecho en la rama, pendiente de merge). Las capturas son de producción, en escritorio (1440 × 900) y móvil (390 × 844). Las mediciones de calidad (pruebas, lint, tipos, auditoría de dependencias y build local) están detalladas en [Seguridad y calidad](10-Seguridad-y-Calidad.md).
 >
 > **Sobre seguridad:** esta wiki es pública. Los hallazgos de seguridad se describen en términos genéricos, como tareas; el detalle se gestiona fuera de la wiki.
 

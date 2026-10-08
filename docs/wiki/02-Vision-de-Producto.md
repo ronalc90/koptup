@@ -4,7 +4,7 @@
 >
 > **Decisión del dueño (vigente al 8 de octubre de 2026):** el producto principal de KopTup son los **sistemas RAG**. Prevalece sobre cualquier versión anterior del plan que presentara a KopTup como agencia genérica de software a medida o que pusiera otra demo en el centro.
 >
-> Páginas relacionadas: [Diagnóstico](01-Diagnostico.md) (de dónde se parte), [Sistemas RAG](Producto-chatbot-rag-ia.md) (el producto principal en detalle), [Reposicionamiento RAG](13-Reposicionamiento-RAG.md) (los cambios del sitio, en curso), [Flujo del cliente](03-Flujo-del-Cliente.md), [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md), [Comercial, marketing y legal](11-Comercial-Marketing-y-Legal.md) y [Roadmap](12-Roadmap.md).
+> Páginas relacionadas: [Diagnóstico](01-Diagnostico.md) (de dónde se parte), [Sistemas RAG](Producto-chatbot-rag-ia.md) (el producto principal en detalle), [Reposicionamiento RAG](13-Reposicionamiento-RAG.md) (los cambios del sitio, hechos en la rama `rag-reposicionamiento` y pendientes de merge), [Flujo del cliente](03-Flujo-del-Cliente.md), [Sistema de demos](04-Sistema-de-Demos.md), [Catálogo de productos](08-Catalogo-de-Productos.md), [Comercial, marketing y legal](11-Comercial-Marketing-y-Legal.md) y [Roadmap](12-Roadmap.md).
 
 ---
 

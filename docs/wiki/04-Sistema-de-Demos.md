@@ -82,8 +82,8 @@ Lo que existe hoy en `main` (producción) para pedir, dar y medir el acceso a la
 | Panel de administración | Usuarios, contactos, conversaciones, entregables, facturas, pedidos y configuración. Nada de solicitudes, accesos, leads ni catálogo de demos | [Panel de administración](05-Panel-de-Administracion.md), sección 2 |
 | Portal | `/dashboard` pensado para clientes con proyecto. No tiene "Mis demos" | [Portal del cliente](06-Portal-del-Cliente.md) |
 | Avisos internos | El formulario de contacto ya avisa al equipo por email y por WhatsApp (Twilio). Es la base que reutiliza el outbox de la sección 11 | `apps/backend/src/controllers/contact.controller.ts` |
-| Medición | Sin analítica en producción. GA4, Google Ads, LinkedIn Insight y sus 5 eventos están especificados para la rama `rag-reposicionamiento` (todavía sin código) | [Reposicionamiento RAG](13-Reposicionamiento-RAG.md) |
-| Demo RAG | `/demo/chatbot` es pública. En la rama, "Prueba con tu documento" envía el email como lead `demo-rag` por el canal del formulario de contacto (en curso, sin fusionar) | [Sistemas RAG](Producto-chatbot-rag-ia.md) |
+| Medición | Sin analítica en producción. El banner de cookies, GA4, Google Ads, LinkedIn Insight y sus 5 eventos están hechos en la rama `rag-reposicionamiento` (pendiente de merge), todavía sin IDs reales | [Reposicionamiento RAG](13-Reposicionamiento-RAG.md) |
+| Demo RAG | `/demo/chatbot` es pública. "Prueba con tu documento" está hecho en la rama `rag-reposicionamiento` (pendiente de merge): la API `/api/demo-rag` registra el email como lead `demo-rag` con el mismo servicio del formulario de contacto (`services/lead.service.ts`, `Contact.source`). Queda apagado hasta configurarlo en Railway | [Sistemas RAG](Producto-chatbot-rag-ia.md) |
 
 ### 1.2 Problemas que resuelve
 
@@ -892,8 +892,8 @@ sequenceDiagram
 | Ruta | Estado | Rol | Descripción |
 |---|---|---|---|
 | `/productos/[slug]` | Nueva | público | Landing de cada producto con el CTA según el modo. Detalle en [Landing de producto](Seccion-Landing-de-Producto.md) |
-| `/rag`, `/rag/salud`, `/rag/legal`, `/rag/soporte` | Nuevas (rama `rag-reposicionamiento`) | público | Landings del producto principal. Sus CTA son "Prueba con tu documento" (→ `/demo/chatbot`) y "Agenda un piloto"; cuando exista el formulario se agrega "Solicitar demo guiada" como opción secundaria |
-| `/demo/chatbot` | Modificada (rama `rag-reposicionamiento`) | público | Demo RAG con documento de ejemplo y "Prueba con tu documento" (email + autorización Ley 1581). No usa `/demo/acceso` ni pase de demo |
+| `/rag`, `/rag/salud`, `/rag/legal`, `/rag/soporte` | Nuevas (hecho en la rama `rag-reposicionamiento`, pendiente de merge) | público | Landings del producto principal. Sus CTA son "Prueba con tu documento" (→ `/demo/chatbot`) y "Agenda un piloto"; cuando exista el formulario se agrega "Solicitar demo guiada" como opción secundaria |
+| `/demo/chatbot` | Modificada (hecho en la rama `rag-reposicionamiento`, pendiente de merge) | público | Demo RAG con documento de ejemplo y "Prueba con tu documento" (email + autorización Ley 1581, API `/api/demo-rag`). No usa `/demo/acceso` ni pase de demo |
 | `/solicitar-demo` | Nueva | público | Formulario en 2 pasos (también en modal desde las landings y las demos) |
 | `/solicitar-demo/gracias` | Nueva | público | Confirmación con código, qué pasa ahora y "Agendar llamada" |
 | `/demo` | Modificada | público | Etiquetas por modo ("Abierta", "Requiere solicitud"). Las privadas no se listan. Se elimina el modal del código de acceso |
@@ -1039,7 +1039,7 @@ Las maquetas cargan sus datos simulados en el bundle público. Por eso el contro
   - `cuentas.routes.ts` y `liquidacion.routes.ts`, si se confirma que solo las usan estas demos.
 - **Staff:** siempre pasa.
 - **Antes de aplicarlo:** confirmar que ninguna función pública del sitio usa esas rutas.
-- **El chatbot RAG es `publico`:** no exige grant. Mantiene sus cupos por IP y por documento y el tope de gasto mensual (`DEMO_MONTHLY_BUDGET_USD`) de la rama `rag-reposicionamiento`. Un grant solo **aumenta** el cupo (Fase 2).
+- **El chatbot RAG es `publico`:** no exige grant. Mantiene sus cupos por IP y por documento y el tope de gasto mensual (`DEMO_MONTHLY_BUDGET_USD`), hechos en la rama `rag-reposicionamiento` (pendiente de merge). Un grant solo **aumenta** el cupo (Fase 2).
 - **Demos con IA:** cupo diario por acceso (`quotas.aiActionsPerDay`) y apagado de emergencia (`active = false`).
 
 ### 10.5 Migración del código de acceso actual
@@ -1252,12 +1252,12 @@ Hay tres capas.
 
 | Capa | Dónde | Consentimiento | Para qué |
 |---|---|---|---|
-| Embudo público | GA4, Google Ads y LinkedIn Insight (rama `rag-reposicionamiento`) | Solo si el visitante acepta cookies | Atribución de pauta y conversión de las landings |
+| Embudo público | GA4, Google Ads y LinkedIn Insight (hecho en la rama `rag-reposicionamiento`, pendiente de merge) | Solo si el visitante acepta cookies | Atribución de pauta y conversión de las landings |
 | Uso de las demos | `DemoEvent`, propio (`POST /api/demo-events`) | Con acceso: es parte del servicio y está informado en la autorización. Anónimo: solo con consentimiento de analítica | Salud del acceso, puntaje y avisos al comercial |
 | Hitos del negocio | Se calculan desde la base (solicitudes, accesos, Leads, propuestas) | No aplica (no hay rastreo) | Tablero de métricas |
 
 **Eventos del embudo público:**
-- Ya definidos en la rama RAG: `generate_lead`, `demo_start`, `demo_upload`, `whatsapp_click`, `plan_click`.
+- Ya implementados en la rama `rag-reposicionamiento` (pendiente de merge): `generate_lead`, `demo_start`, `demo_upload`, `whatsapp_click`, `plan_click`.
 - Nuevos:
   - `demo_request_open`: abre el formulario.
   - `demo_request_step1`: completa el paso 1.
@@ -1344,7 +1344,7 @@ Este diseño cumple las exigencias de la ley así. Debe validarlo un asesor lega
 
 **"Prueba con tu documento" (demo pública del chatbot RAG)**
 - No usa el formulario de solicitud: pide solo el email y la casilla de autorización (sin marcar) con enlace a `/privacy`.
-- Su `ConsentRecord` se guarda con canal `demo_rag` y el Lead queda con la finalidad "responder sobre el documento y contacto comercial".
+- Su `ConsentRecord` se guarda con canal `demo_rag` y el Lead queda con la finalidad "responder sobre el documento y contacto comercial". Mientras no exista el Lead unificado, la rama `rag-reposicionamiento` (pendiente de merge) deja la fecha de la autorización en el mensaje del lead `demo-rag`, y el backend rechaza la subida sin autorización.
 - La política debe informar la transmisión internacional al proveedor de IA y que el documento se borra a la hora.
 - El documento nunca se guarda en almacenamiento permanente y el Lead solo registra datos de uso (páginas, preguntas usadas), no el contenido.
 - Detalle en [Reposicionamiento RAG](13-Reposicionamiento-RAG.md).
@@ -1478,7 +1478,7 @@ Pasar la sesión a cookies httpOnly es P1 y no bloquea este sistema.
 | `SLACK_WEBHOOK_URL` (opcional) | backend | Avisos al canal de ventas |
 | `PRIVACY_POLICY_VERSION` | web y backend | Versión vigente de la política |
 
-Las variables de la demo pública del chatbot y de la medición para anuncios (`DEMO_UPLOAD_ENABLED`, `DEMO_MONTHLY_BUDGET_USD`, `NEXT_PUBLIC_GA_ID`, `NEXT_PUBLIC_GOOGLE_ADS_ID`, `NEXT_PUBLIC_LINKEDIN_PARTNER_ID`) vienen de la rama `rag-reposicionamiento` y están en [Reposicionamiento RAG](13-Reposicionamiento-RAG.md).
+Las variables de la demo pública del chatbot y de la medición para anuncios (`DEMO_UPLOAD_ENABLED`, `DEMO_MONTHLY_BUDGET_USD`, `REDIS_URL`, `TRUST_PROXY_HOPS`, `NEXT_PUBLIC_GA_ID`, `NEXT_PUBLIC_GOOGLE_ADS_ID`, `NEXT_PUBLIC_LINKEDIN_PARTNER_ID`, entre otras) vienen de la rama `rag-reposicionamiento` (hecho, pendiente de merge). La lista final, con dónde se configura cada una, está en [Reposicionamiento RAG](13-Reposicionamiento-RAG.md#variables-de-entorno).
 
 ---
 

@@ -14,7 +14,7 @@ El pedido que la originó: que KopTup sea **un producto adecuado, vendible y cla
 
 1. **KopTup es una empresa colombiana cuyo producto principal son los sistemas RAG:** IA que responde con los documentos de cada empresa y cita la fuente.
 2. **Hoy el sitio en producción no lo dice:** se presenta como agencia genérica, con cifras sin respaldo y el RAG escondido entre 27 productos ([Diagnóstico](01-Diagnostico.md)).
-3. **El reposicionamiento RAG ya está en marcha** en la rama `rag-reposicionamiento`: inicio, `/rag`, landings por sector y planes publicados; falta terminarlo y fusionarlo ([Reposicionamiento RAG](13-Reposicionamiento-RAG.md)).
+3. **El reposicionamiento RAG está implementado en la rama `rag-reposicionamiento`, pendiente de merge:** inicio, `/rag`, landings por sector, planes publicados, "Prueba con tu documento" y medición para anuncios. Falta que el dueño apruebe el merge y configurar las variables ([Reposicionamiento RAG](13-Reposicionamiento-RAG.md)).
 4. **Embudo principal:** anuncio → `/rag` o landing del sector → demo pública sin registro → "Prueba con tu documento" (lead) → **Piloto RAG** de 2 semanas → plan **Esencial**, **Profesional** o **Empresarial**.
 5. **Las 26 "Otras soluciones a medida"** se venden como proyecto, con landing propia `/productos/<slug>`; su suscripción queda en lista de espera ([Visión de producto](02-Vision-de-Producto.md)).
 6. **Sistema de demos:** cada demo es `publico`, `solicitud` o `privado`; el prospecto la solicita, el equipo aprueba en **Admin › Solicitudes de demo** y el prospecto entra con un enlace mágico a **Portal › Mis demos**.
@@ -46,8 +46,8 @@ El pedido que la originó: que KopTup sea **un producto adecuado, vendible y cla
 | **Esfuerzo** | Para 1 dev senior: S (≤ 2 días) · M (3–5 días) · L (1–2 semanas) · XL (más de 2 semanas) |
 | **Modos de acceso** | `publico` (abierta, sin cuenta) · `solicitud` (vista previa y acceso aprobado) · `privado` (solo por invitación del admin) |
 | **Hoy, producción, `main`** | Lo que está publicado en `www.koptup.com` |
-| **La rama** | `rag-reposicionamiento`: el reposicionamiento RAG, en curso y sin fusionar |
-| **Capturas** | `images/actual/`: producción. `images/mockups/`: pantallas propuestas que aún no existen, salvo las `rag-vista-previa-*`, que son de un build local de la rama |
+| **La rama** | `rag-reposicionamiento`: el reposicionamiento RAG, terminado (13 commits) y pendiente de merge |
+| **Capturas** | `images/actual/`: producción. `images/despues/`: capturas reales de la rama `rag-reposicionamiento` terminada. `images/mockups/`: pantallas propuestas que aún no existen |
 | **Metas numéricas** | Metas iniciales a validar con datos reales, no resultados actuales |
 | **"Validar"** | Requiere decisión del dueño o concepto del contador o de un abogado |
 | **Seguridad** | Por ser una wiki pública, solo se describe como tareas genéricas |
@@ -169,19 +169,19 @@ Al **8 de octubre de 2026**:
 | Frente | Estado | Dónde |
 |---|---|---|
 | Plan de producto | Documentado en esta wiki. Todo lo que se describe como nuevo es **plan**: no está construido salvo que la página diga lo contrario | Esta wiki |
-| Reposicionamiento RAG | En la rama `rag-reposicionamiento`, con 10 commits sobre `main`. **Hechas:** E1 SEO técnico, E2 inicio, E3 `/rag` y landings por sector, E4 precios y E5 coherencia (incluido el paso del voseo a "tú"). **En curso:** E6 "Prueba con tu documento". **Pendiente:** E7 medición para anuncios. **Sin fusionar ni desplegar** | [Reposicionamiento RAG](13-Reposicionamiento-RAG.md) |
+| Reposicionamiento RAG | **Implementado en la rama `rag-reposicionamiento`, pendiente de merge:** 13 commits sobre `main` con las 7 etapas hechas (E1 SEO técnico, E2 inicio, E3 `/rag` y landings por sector, E4 precios, E5 coherencia con el paso del voseo a "tú", E6 "Prueba con tu documento" y E7 medición para anuncios) y la auditoría final. **Sin fusionar ni desplegar**; "Prueba con tu documento" queda apagada hasta configurarla en Railway | [Reposicionamiento RAG](13-Reposicionamiento-RAG.md) |
 | Fase 0 — Endurecimiento | Pendiente. Es prerrequisito para activar el control de acceso a las demos y para enviar tráfico pagado a la demo del RAG | [Seguridad y calidad](10-Seguridad-y-Calidad.md), [Backend y API](09-Backend-y-API.md) |
 | Sistema de solicitud y acceso a demos | Especificado (modelos, API, pantallas y mockups); sin construir. Se entrega en dos hitos de la Fase 1: 1a (P0) y 1b (P1) | [Sistema de demos](04-Sistema-de-Demos.md), [Panel de administración](05-Panel-de-Administracion.md), [Portal del cliente](06-Portal-del-Cliente.md) |
 | Landings `/productos/<slug>` | Especificadas (plantilla, contenido por producto y mockup); sin construir | [Landing de producto](Seccion-Landing-de-Producto.md) |
 | Decisiones del dueño | Abiertas: mantenimiento de la compra, pasarelas y cobro en USD, publicación de casos y otras | [Comercial, marketing y legal](11-Comercial-Marketing-y-Legal.md), sección 17 |
 
-![Vista previa de /rag en la rama rag-reposicionamiento: H1 "Sistemas RAG para empresas en Colombia", botones "Prueba con tu documento" y "Agenda un piloto" y la sección "¿Qué es RAG? Explicado en palabras simples"](images/mockups/rag-vista-previa-pagina-rag.jpg)
+![/rag en la rama rag-reposicionamiento: H1 "Sistemas RAG para empresas en Colombia", botones "Prueba con tu documento" y "Agenda un piloto" y el inicio de "¿Qué es RAG?"](images/despues/rag-pagina-rag.jpg)
 
-*Vista previa de `/rag` en un build local de la rama. Todavía no está en producción.*
+*`/rag` en un build de la rama terminada. Todavía no está en producción. Más capturas en la galería "Después" de [Reposicionamiento RAG](13-Reposicionamiento-RAG.md).*
 
 **Próximos pasos:**
 
-1. Revisar la rama con el dueño, terminar E6 y E7, y fusionarla en `main` ([checklist para publicar](13-Reposicionamiento-RAG.md#checklist-para-publicar)).
+1. Revisar la vista previa de la rama con el dueño, configurar las variables en Vercel y Railway, y fusionarla en `main` cuando el dueño lo apruebe ([Para publicar](13-Reposicionamiento-RAG.md#para-publicar)).
 2. Arrancar las tareas P0 de la Fase 0, empezando por la persistencia y la seguridad del chatbot.
 3. Cerrar las decisiones abiertas que bloquean precios, cobro y contratos.
 4. Construir el hito 1a del sistema de demos: solicitud, aprobación en el panel, enlace mágico y Mis demos.

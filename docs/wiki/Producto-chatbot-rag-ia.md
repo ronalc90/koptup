@@ -50,23 +50,23 @@ Las demás ofertas del catálogo pasan a **"Otras soluciones a medida"**. Varias
 
 ## Estado actual
 
-Evidencia en `main` (producción) y en la rama `rag-reposicionamiento` (en curso, sin fusionar). Estado al 8 de octubre de 2026.
+Evidencia en `main` (producción) y en la rama `rag-reposicionamiento`, que ya está terminada: lo que figura en su columna está hecho en la rama `rag-reposicionamiento` (pendiente de merge). Estado al 8 de octubre de 2026.
 
 | Aspecto | En producción (`main`) | En la rama `rag-reposicionamiento` | Evidencia |
 |---|---|---|---|
 | Posicionamiento | La home dice "Transformamos tus ideas en soluciones tecnológicas"; el chatbot es una tarjeta más entre 27 | Home, `/rag`, landings por sector, "RAG" en el menú y en el footer | `src/components/home/HomeContent.tsx`, `src/app/rag/` (rama) |
 | Precio | 4 niveles del catálogo viejo (compra y SaaS) y "desde $499 USD" en `/chatbots-ia` | **Planes RAG** en `/services#planes-rag` y en `/rag`; la tarjeta "Chatbot RAG con IA" se oculta del catálogo | `src/lib/rag-plans.ts`, `src/components/rag/RagPlans.tsx` (rama) |
-| Demo | Existe, con dos modos: **Playground** y **Builder** (`page.tsx`, 776 líneas; `components/builder/BuilderMode.tsx`) | Igual, más un enlace a `/rag`. "Prueba con tu documento": **en curso** | `apps/web/src/app/demo/chatbot/` |
+| Demo | Existe, con dos modos: **Playground** y **Builder** (`page.tsx`, 776 líneas; `components/builder/BuilderMode.tsx`) | Tercer modo **"Prueba con tu documento"**, enlace a `/rag` y title "Demo RAG: prueba con tu documento": hecho en la rama `rag-reposicionamiento` (pendiente de merge). La subida queda apagada hasta configurarla en Railway | `apps/web/src/app/demo/chatbot/`, `components/upload/` (rama) |
 | Real o maqueta | **Parcialmente real.** El chat llama al backend (`chatWithBot` en `components/builder/api.ts`), con búsqueda por palabras clave (tipo BM25) y OpenAI si hay clave; sin clave responde en modo extractivo. Pipeline, telemetría, fuentes conectadas y escenarios son simulados (`components/data.ts`) | Igual | `page.tsx` líneas 290–365, `components/data.ts` |
 | Respuestas con fuente | El prompt de los bots de la demo no obligaba a responder solo con los documentos | **Resuelto:** reglas fijas que se agregan siempre al prompt (solo fragmentos, citas [1], [2]… y "No encontré esa información en los documentos cargados.") | `GROUNDING_RULES` y `NOT_FOUND_REPLY` en `chatbot.routes.ts` (rama) |
-| Backend | Rutas reales en `chatbot.routes.ts` (943 líneas): bots, documentos, URLs, chat, conversaciones y modelos. Estado en `Map` en memoria y volcado a disco (`data/chatbot-store.ts`), que se pierde en cada despliegue | Igual (la persistencia es Fase 0) | `chatbot.routes.ts`, `chatbot-store.ts` |
-| Ingesta de PDF y DOCX | La ruta de bots solo decodifica texto plano (`decodeBase64Text`); la ruta heredada sí usa `services/pdf.service.ts`, y `mammoth` está instalado | Igual. La etapa 6 de la especificación (subida de documento propio) debe resolverlo para la demo | `chatbot.routes.ts` línea 155 |
+| Backend | Rutas reales en `chatbot.routes.ts` (943 líneas): bots, documentos, URLs, chat, conversaciones y modelos. Estado en `Map` en memoria y volcado a disco (`data/chatbot-store.ts`), que se pierde en cada despliegue | Igual para los bots (la persistencia es Fase 0). Nueva API `/api/demo-rag` para "Prueba con tu documento", con el pipeline compartido en `services/rag-pipeline.ts` | `chatbot.routes.ts`, `chatbot-store.ts`, `routes/demo-rag.routes.ts` (rama) |
+| Ingesta de PDF y DOCX | La ruta de bots solo decodifica texto plano (`decodeBase64Text`); la ruta heredada sí usa `services/pdf.service.ts`, y `mammoth` está instalado | Resuelto para la demo: `/api/demo-rag` lee PDF por página (`pdf-parse`) y DOCX (`mammoth`). La ruta de bots del Builder sigue igual (Fase 2, tarea 11) | `services/demo-rag.service.ts` (rama), `chatbot.routes.ts` línea 155 |
 | Backend heredado | Segunda API "por sesión" (`/session`, `/upload`, `/message`) con modelo Mongo `Chatbot`; solo la usa la página huérfana `/demo/chatbot/preview` (498 líneas) y los proxies `apps/web/src/app/api/chatbot/*` | Igual | `apps/web/src/hooks/useChatbot.ts` |
 | Widget embebible | `LivePreview.tsx` y `EmbedCode.tsx` muestran un iframe a `/embed/chatbot/<botId>`, un script de CDN, un paquete React y un webhook que no existen en el repo | Igual (Fase 2) | `components/builder/` |
 | Integraciones (Drive, SharePoint, WhatsApp, bases de datos, APIs) | No existen | `/rag` las presenta por plan (una fuente en Esencial, hasta 3 en Profesional, WhatsApp desde Profesional); **no hay código de conectores** | `messages/offerings/_rag-page.es.json` (rama) |
-| SEO de la demo | Title "Chatbot Médico con IA para el Sector Salud" y breadcrumb de salud, aunque la demo es genérica | Pendiente (tarea 7) | `seoConfig['demo-chatbot']` en `src/lib/seo-config.ts` |
+| SEO de la demo | Title "Chatbot Médico con IA para el Sector Salud" y breadcrumb de salud, aunque la demo es genérica | **Resuelto:** title "Demo RAG: prueba con tu documento" e imagen para redes con el mensaje RAG. El encabezado dentro de la demo sigue en inglés (tarea 15) | `seoConfig['demo-chatbot']` en `src/lib/seo-config.ts` |
 | i18n ES/EN | Sí (`messages/demos/chatbot.{es,en}.json`, ~28 KB cada uno), con voseo ("Hacé", "Probá") y datos de ejemplo en inglés fijos en `data.ts` | Voseo corregido (commit `d2a4f66`); los datos de ejemplo en inglés siguen (Fase 2) | `messages/demos/chatbot.es.json` |
-| Medición | No hay analítica | Pendiente (etapa 7, todavía sin código en la rama) | — |
+| Medición | No hay analítica | Hecho en la rama `rag-reposicionamiento` (pendiente de merge): banner de cookies, GA4, Google Ads, LinkedIn Insight y los 5 eventos, sin IDs reales configurados todavía | `src/lib/analytics.ts`, `src/components/consent/CookieBanner.tsx` (rama) |
 | Tests | Un smoke test (`__tests__/page.test.tsx`, 11 líneas) que hoy no se ejecuta | Igual | [Seguridad y calidad](10-Seguridad-y-Calidad.md) |
 | Tamaño | 5.469 líneas en `apps/web/src/app/demo/chatbot/` (4.162 en `components/`) | — | `wc -l` |
 
@@ -80,15 +80,16 @@ Evidencia en `main` (producción) y en la rama `rag-reposicionamiento` (en curso
 | 4 | **Métricas simuladas presentadas como reales:** `StatsWidget` cambia valores al azar cada 4 s y `PipelinePanel` muestra pasos y modelos que el backend no ejecuta | Pendiente (Fase 2, tarea 15) |
 | 5 | **Mensaje sobretécnico:** "19 capas de plataforma" (`Sidebar.tsx`, `CapabilityPanel.tsx`) y tooltips para ingenieros | Pendiente (Fase 2, tarea 15) |
 | 6 | **El widget embebible no funciona fuera de la demo** (ver tabla) y el micrositio `/chatbot/<id>` de `BuilderMode.tsx` tampoco existe | Pendiente (Fase 2, tarea 12) |
-| 7 | **PDF y DOCX no se leen en la ruta de bots** | Pendiente (Fase 1 para la demo, tarea 5; Fase 2 para el núcleo, tarea 11) |
+| 7 | **PDF y DOCX no se leen en la ruta de bots** | Para la demo, hecho en la rama `rag-reposicionamiento` (pendiente de merge) con `/api/demo-rag`. En la ruta de bots del Builder sigue pendiente (Fase 2, tarea 11) |
 | 8 | **La ingesta de URLs existe en la API (`ingestBotUrls`) pero no hay campo en `ConfigPanel.tsx`** | Pendiente (Fase 2, tarea 17) |
 | 9 | **Botones sin acción:** 👍, 👎 y "Regenerar" en `ChatPanel.tsx` | Pendiente (Fase 2, tarea 16) |
-| 10 | **SEO contradictorio** de `/demo/chatbot` (metadata de "chatbot médico") | Pendiente (Fase 1, tarea 7) |
-| 11 | **Precio contradictorio** ("desde $499 USD" frente al catálogo) | Resuelto en la rama para `/chatbots-ia`, la home, `/register`, `/services` y `llms.txt`. Quedan restos en `/desarrollo-web-colombia` y `/bienvenido-producthunt` (Fase 1, tarea 7) |
+| 10 | **SEO contradictorio** de `/demo/chatbot` (metadata de "chatbot médico") | Resuelto en la rama (title "Demo RAG: prueba con tu documento") |
+| 11 | **Precio contradictorio** ("desde $499 USD" frente al catálogo) | Resuelto en la rama en `/chatbots-ia`, la home, `/register`, `/services`, `llms.txt`, `/desarrollo-web-colombia` y `/bienvenido-producthunt` (auditoría final) |
 | 12 | **El prompt no obligaba a responder solo con los documentos** | Resuelto en la rama (`GROUNDING_RULES`) |
 | 13 | **`/rag` anuncia integraciones y widget que aún no tienen código.** Es correcto como oferta (se construyen en el proyecto de cada plan), pero deben existir antes de entregar el primer plan Esencial o Profesional | Pendiente (Fase 2, tareas 12–14) |
 | 14 | **La sección de seguridad de `/rag` describe el almacenamiento actual** (servidor de KopTup). Cuando la Fase 0 mueva los datos a MongoDB y al almacenamiento de objetos, hay que actualizar ese texto | Pendiente (Fase 0, tarea 1) |
-| 15 | **Endurecimiento pendiente:** antes de recibir tráfico pagado hay que completar las tareas genéricas de la Fase 0 (autenticación y autorización en servidor, límites de costo y rate-limit en endpoints de IA, rotación de credenciales) | Pendiente (Fase 0, tareas 1–3) |
+| 15 | **Endurecimiento pendiente:** antes de recibir tráfico pagado hay que completar las tareas genéricas de la Fase 0 (autenticación y autorización en servidor, límites de costo y rate-limit en endpoints de IA, rotación de credenciales). "Prueba con tu documento" ya tiene sus límites y su tope en la rama, pero el modo Builder & Embed y las preguntas libres del Playground siguen sin tope de costo | Pendiente (Fase 0, tareas 1–3) |
+| 16 | **El encabezado de la demo sigue en inglés** ("Enterprise RAG Chatbot") y promete cosas que la demo no hace ("hybrid retrieval", "orquestación de agentes") | Pendiente (Fase 2, tarea 15) |
 
 ---
 
@@ -96,16 +97,16 @@ Evidencia en `main` (producción) y en la rama `rag-reposicionamiento` (en curso
 
 Lo que todavía impide vender el producto con pauta y entregar los planes que el sitio ya anuncia. Cada punto remite a su tarea.
 
-1. **Que el reposicionamiento llegue a producción.** La home, `/rag`, las landings por sector y los planes RAG existen solo en la rama `rag-reposicionamiento`; producción sigue mostrando el chatbot como una tarjeta más con "desde $499 USD" (tarea 4).
-2. **Terminar "Prueba con tu documento".** Es el gancho de captación de la pauta y sigue en curso sin commit; además, la ruta de bots todavía no lee PDF ni DOCX (tarea 5).
-3. **Medir antes de pautar.** Sin banner de consentimiento, GA4, Google Ads, LinkedIn Insight y los 5 eventos no hay conversiones que optimizar (tarea 6).
+1. **Que el reposicionamiento llegue a producción.** La home, `/rag`, las landings por sector y los planes RAG están hechos en la rama `rag-reposicionamiento` (pendiente de merge); producción sigue mostrando el chatbot como una tarjeta más con "desde $499 USD" (tarea 4).
+2. **Encender "Prueba con tu documento".** Es el gancho de captación de la pauta y está hecho en la rama `rag-reposicionamiento` (pendiente de merge), pero queda apagado hasta configurar Redis, la clave de OpenAI y `DEMO_UPLOAD_ENABLED` en Railway (tarea 5). La ruta de bots del Builder todavía no lee PDF ni DOCX (tarea 11).
+3. **Medir antes de pautar.** El banner de consentimiento, GA4, Google Ads, LinkedIn Insight y los 5 eventos están hechos en la rama `rag-reposicionamiento` (pendiente de merge); faltan los IDs reales y las conversiones en Google Ads y LinkedIn (tarea 6).
 4. **Endurecer el backend antes de recibir tráfico pagado.** Persistencia real, autorización en servidor, aislamiento por cuenta, topes de costo de IA y credenciales rotadas (tareas 1–3).
 5. **Una demo que le hable al comprador colombiano.** Plantillas por sector en español, sin respuesta prefabricada, sin métricas al azar ni pasos simulados (tareas 15 y 16).
 6. **Kit de entrega del Piloto.** Orden de servicio, plan de 2 semanas, set de 50 preguntas, plantilla del informe de precisión, condiciones publicadas en `/terms#piloto` y enlace de pago (tarea 10 y [Comercial, marketing y legal](11-Comercial-Marketing-y-Legal.md)).
 7. **Lo que venden Esencial y Profesional.** Widget embebible, conectores de Google Drive y SharePoint, canal de WhatsApp, permisos por rol y panel de métricas: `/rag` los anuncia, pero no hay código de conectores ni widget funcional fuera de la demo (tareas 11–14 y 19). Deben existir antes de entregar el primer plan.
 8. **Definiciones contractuales claras:** qué es una "pregunta", una "fuente" y un "documento"; qué incluye el "soporte prioritario"; SLA base del plan Empresarial (recomendaciones de [Planes y precios](#planes-y-precios)).
 9. **Prueba social verificable.** No hay casos ni testimonios, y no se inventan. El primer caso sale del informe de precisión de un Piloto real, con autorización escrita (tarea 24).
-10. **SEO coherente de la demo.** El title de `/demo/chatbot` todavía habla de "chatbot médico" (tarea 7).
+10. **Una demo coherente con `/rag`.** El title de `/demo/chatbot` ya está corregido en la rama (tarea 7), pero el encabezado de la demo sigue en inglés y promete "hybrid retrieval" y "orquestación de agentes" (tarea 15).
 
 ---
 
@@ -137,7 +138,7 @@ flowchart TD
 |---|---|---|---|
 | 1. Landing | `/rag` explica qué es RAG, casos por sector, cómo funciona, seguridad, cómo evita respuestas inventadas, integraciones, planes y FAQ. Las landings por sector son cortas: H1, 3 casos, enlace a `/rag` y CTA | Pauta en Google y LinkedIn hacia `/rag` o la landing del sector | `src/app/rag/`, `src/components/rag/` (rama) |
 | 2. Demo pública | `/demo/chatbot` con un documento de ejemplo. No pide registro | Cupo por visitante y tope mensual de gasto | `apps/web/src/app/demo/chatbot/` |
-| 3. "Prueba con tu documento" | Sube un PDF, DOCX o TXT y pregunta sobre él. Solo da su email y marca la autorización de datos | El email entra como **lead con origen `demo-rag`** por el mismo canal del formulario de contacto (hoy `POST /api/contact`, modelo `Contact`; con el sistema de demos, un `Lead` con canal `demo_rag` en **Admin › Leads**). El comercial lo contacta en 1 día hábil | Etapa 6 de la especificación (en curso) |
+| 3. "Prueba con tu documento" | Sube un PDF, DOCX o TXT y pregunta sobre él. Solo da su email y marca la autorización de datos | El email entra como **lead con origen `demo-rag`** por el mismo canal del formulario de contacto (en la rama, `services/lead.service.ts` guarda un `Contact` con `source = demo-rag` y avisa por email y WhatsApp; con el sistema de demos, un `Lead` con canal `demo_rag` en **Admin › Leads**). El comercial lo contacta en 1 día hábil | Etapa 6: hecho en la rama `rag-reposicionamiento` (pendiente de merge), API `/api/demo-rag` |
 | 4. Agenda un piloto | Botones "Agenda un piloto" (en `/rag` va a `/contact`; en `/chatbots-ia` y en la tabla de planes va a `/contact?service=sistema-rag&plan=piloto`, con el plan prellenado) | Llamada de 30 min, alcance y orden de servicio | `/contact` (rama) |
 | 5. Piloto RAG | Su propio asistente con una fuente y hasta 100 documentos, interfaz web con citas | Informe de precisión con 50 preguntas | Kit del Piloto (tarea 10) |
 | 6. Plan | Propuesta del plan Esencial, Profesional o Empresarial con el crédito del Piloto | Implementación y operación mensual | [Panel de administración](05-Panel-de-Administracion.md) (propuestas, Fase 3) |
@@ -171,9 +172,9 @@ Este producto no usa la plantilla `/productos/<slug>`: su landing es **`/rag`**,
 - Técnicas: "RAG", "retrieval augmented generation", "base de conocimiento con IA" → `/rag`.
 - De problema: "chatbot con los documentos de la empresa" → `/chatbots-ia`; "buscar en contratos con IA" → `/rag/legal`; "asistente IA para manuales internos" → `/rag/soporte`.
 
-![Vista previa de /rag en la rama rag-reposicionamiento: H1 "Sistemas RAG para empresas en Colombia", botones "Prueba con tu documento" y "Agenda un piloto", y la sección "¿Qué es RAG?"](images/mockups/rag-vista-previa-pagina-rag.jpg)
+![/rag en la rama rag-reposicionamiento: H1 "Sistemas RAG para empresas en Colombia", botones "Prueba con tu documento" y "Agenda un piloto", y el inicio de "¿Qué es RAG?"](images/despues/rag-pagina-rag.jpg)
 
-*Vista previa de `/rag` (build local de la rama `rag-reposicionamiento`; aún no está en producción).*
+*`/rag` en un build de la rama `rag-reposicionamiento` terminada (pendiente de merge; aún no está en producción). Más capturas en la galería "Después" de [Reposicionamiento RAG](13-Reposicionamiento-RAG.md).*
 
 ### Demo interactiva
 
@@ -182,7 +183,7 @@ Mejoras por pantalla (Fase 2), plantillas por sector y recorrido guiado.
 | Pantalla / componente | Hoy | Cambiar a |
 |---|---|---|
 | `TopBar.tsx` | Selector "Tenant" (Acme/Globex/Umbrella) sin efecto; selector de modelo; insignia "Online · cluster GPU activo" | Selector **"Sector de ejemplo"** (Salud, Legal, Soporte, RR. HH.) que cambia documentos, bienvenida y preguntas sugeridas. Quitar la insignia y el selector de idioma propio (usar el del sitio) |
-| `ModeToggle.tsx` | "Playground / Builder" | **"Prueba el asistente" / "Prueba con tu documento" / "Configura el tuyo"** |
+| `ModeToggle.tsx` | "Playground / Builder" en `main`. La rama agrega el tercer modo: "Playground RAG / Prueba con tu documento / Builder & Embed" (hecho, pendiente de merge) | **"Prueba el asistente" / "Prueba con tu documento" / "Configura el tuyo"** |
 | Panel "Fuentes conectadas" (`CONNECTED_SOURCES`) | Notion, Slack y Confluence con cifras inventadas | Documentos reales del sector de ejemplo o del visitante, con páginas y hora de borrado |
 | `Sidebar.tsx` + `CapabilityPanel.tsx` | "19 capas" abiertas por defecto | Pestaña colapsada **"Para tu equipo técnico"** con 6 bloques en lenguaje simple (ingesta, búsqueda, respuesta con citas, seguridad, métricas, integraciones), coherente con `/rag` |
 | `ChatPanel.tsx` | Respuesta provisional por regex; 👍/👎/Regenerar sin acción | "Buscando en los documentos…" hasta la respuesta real; 5 preguntas sugeridas por sector (una fuera de alcance a propósito, para mostrar "No encontré esa información"); 👍/👎 y "Regenerar" funcionales |
@@ -224,18 +225,22 @@ flowchart LR
 | Builder ("Configura el tuyo": marca, documentos, URLs, código para insertar) | Vista previa pública; guardar un bot propio exige un acceso (`DemoGrant`) | Cupo ampliado del grant (Fase 2) |
 | Demo guiada | Por "Agenda un piloto" o por el formulario "Solicitar demo" cuando exista | Sesión con un comercial |
 
-#### "Prueba con tu documento" (etapa 6 de la especificación, en curso)
+#### "Prueba con tu documento" (etapa 6: hecho en la rama rag-reposicionamiento, pendiente de merge)
 
 - **Qué pide:** solo el email y una casilla **sin marcar** de autorización de tratamiento de datos (Ley 1581 de 2012) con enlace a `/privacy`. Nada más.
 - **Lead:** el email se envía como lead con origen **`demo-rag`** por el mismo canal del formulario de contacto. Llega al equipo como hoy llegan los contactos (email y WhatsApp internos).
-- **Límites:** 10 preguntas por documento y 3 documentos por IP al día. El rate limit y el contador de gasto usan el Redis que ya tiene el proyecto (`REDIS_URL`); si no está disponible, la función queda apagada con `DEMO_UPLOAD_ENABLED=false`.
-- **Borrado:** el documento y su índice se borran a la hora (TTL de 1 hora). Nada queda en almacenamiento permanente.
+- **Límites:** 10 preguntas por documento y 3 documentos por IP al día. El cupo diario y el contador de gasto usan el Redis que ya tiene el proyecto (`REDIS_URL`). La función solo se enciende con `DEMO_UPLOAD_ENABLED=true`, Redis y `OPENAI_API_KEY`; si falta algo, queda apagada y muestra "Agenda una demo con nosotros".
+- **Borrado:** el documento y su índice viven solo en la memoria del servidor y se borran a la hora (TTL de 1 hora). Nada queda en almacenamiento permanente.
 - **Tope de gasto:** `DEMO_MONTHLY_BUDGET_USD` (por defecto 50). Al alcanzarlo, la subida se desactiva y aparece "Agenda una demo con nosotros" → `/contact`.
 - **Citas:** cada respuesta cita la página o el fragmento del documento.
 - **Aviso visible:** "No subas información confidencial en la demo".
 - **Eventos:** `demo_upload` al subir el documento y `demo_start` en la primera pregunta (con consentimiento de cookies).
 
-El contrato propuesto para el backend (ticket de carga, `POST /api/chatbot/demo-docs`, `/ask` y borrado) está en [Backend y API](09-Backend-y-API.md), sección 3.7. La rama lo está implementando (sin commit todavía) como una API propia en `/api/demo-rag`, con el documento y su índice solo en memoria durante una hora; al fusionarse prevalece el contrato de la rama. El detalle de límites, variables y Ley 1581 está en [Reposicionamiento RAG](13-Reposicionamiento-RAG.md).
+![Pestaña "Prueba con tu documento" en estado no disponible, con "Agenda una demo con nosotros" y "Usar la demo con el documento de ejemplo"](images/despues/rag-demo-subida.jpg)
+
+*"Prueba con tu documento" en la rama, con `DEMO_UPLOAD_ENABLED` apagada: así debe fallar mientras no esté configurada en Railway.*
+
+El contrato del backend es la API propia **`/api/demo-rag`** de la rama (`GET /status`, `POST /documents`, `GET /documents/:docId`, `POST /documents/:docId/questions` y `DELETE /documents/:docId`), sin ticket ni cuenta: el email y la autorización viajan con el archivo. Detalle en [Backend y API](09-Backend-y-API.md), sección 3.7. Límites, variables y Ley 1581 en [Reposicionamiento RAG](13-Reposicionamiento-RAG.md).
 
 El formulario "Solicitar demo" y los accesos con `DemoGrant` acompañan a este producto (demo guiada, acceso ampliado con la marca del prospecto y demos privadas de salud), pero no son su puerta de entrada. Ver [Cómo se vende ahora](#cómo-se-vende-ahora).
 
@@ -318,12 +323,13 @@ Fuente única en el código de la rama: `apps/web/src/lib/rag-plans.ts` (montos)
 
 ## Seguridad y privacidad
 
-Lo que `/rag` dice hoy (y debe seguir siendo cierto):
+Lo que `/rag` dice en la rama (y debe seguir siendo cierto):
 
 - Los documentos se procesan, fragmentan e indexan en el servidor de KopTup; las preguntas y respuestas quedan registradas allí.
 - El proveedor de IA es **OpenAI** vía API, con **GPT-4o mini** por defecto. La clave del proveedor vive solo en el servidor.
 - A OpenAI se envía lo necesario para cada respuesta: la pregunta, los fragmentos más relevantes (no el documento completo), las instrucciones del asistente y los últimos mensajes.
 - Según la política vigente de la API de OpenAI, por defecto los datos enviados por API no se usan para entrenar modelos, y pueden conservarse hasta 30 días para detectar abusos. Si la política cambia, se actualiza la FAQ de `/rag`.
+- En la demo pública ("Prueba con tu documento"), el archivo se procesa solo en la memoria del servidor; el documento, su índice y la conversación se borran una hora después de subirlo, y solo se guarda el email, con su autorización, y el tipo y la extensión del documento, no su contenido.
 - No se prometen certificaciones.
 
 Plan para reforzarlo (tareas genéricas, sin detalles de implementación sensibles):
@@ -339,15 +345,17 @@ Plan para reforzarlo (tareas genéricas, sin detalles de implementación sensibl
 
 | Evento | Cuándo | Parámetros (nunca datos personales) |
 |---|---|---|
-| `generate_lead` | Se envía el formulario de contacto (y, en la etapa 6, el email de "Prueba con tu documento") | `lead_source` (`contacto`, `demo-rag`), `plan` si viene prellenado |
-| `demo_start` | Primera pregunta en la demo | `demo_slug`, `mode` (ejemplo o documento propio) |
-| `demo_upload` | Documento subido | `file_type`, `pages` |
-| `whatsapp_click` | Clic en un botón de WhatsApp | `source_page` |
-| `plan_click` | Clic en el CTA de un plan | `plan` (`piloto`, `esencial`, `profesional`, `empresarial`) |
+| `generate_lead` | Se envía con éxito el formulario de `/contact` | `lead_source`, `service`, `plan_id` si viene de un plan RAG |
+| `demo_start` | Primera pregunta en la demo, en cada carga de la página | `demo_mode` (`sample`: documento de ejemplo; `upload`: documento propio) |
+| `demo_upload` | Documento subido con éxito en "Prueba con tu documento" (el lead `demo-rag` lo registra el backend) | `file_type`, `pages` |
+| `whatsapp_click` | Clic en el botón de WhatsApp de `/contact` | `link_location` |
+| `plan_click` | Clic en el CTA de un plan RAG o de una tarjeta de "Otras soluciones a medida" | `plan_name`, `plan_id` (`piloto`, `esencial`, `profesional`, `empresarial`…), `plan_group`, `cta` |
+
+Todo esto está hecho en la rama `rag-reposicionamiento` (pendiente de merge).
 
 - Las etiquetas (GA4, Google Ads y LinkedIn Insight) solo se cargan si existen `NEXT_PUBLIC_GA_ID`, `NEXT_PUBLIC_GOOGLE_ADS_ID` y `NEXT_PUBLIC_LINKEDIN_PARTNER_ID`, y solo **después** de que el visitante acepta cookies en el banner.
 - Conversiones sugeridas para pauta: `generate_lead` (principal) y `demo_upload` (secundaria) en Google Ads; `generate_lead` en LinkedIn.
-- En el backend, el gasto de IA de la demo se mide contra `DEMO_MONTHLY_BUDGET_USD` y, con la pasarela de IA de la Fase 0, en `AiUsage` (`feature = demo_doc`).
+- En el backend, el gasto de IA de "Prueba con tu documento" se mide contra `DEMO_MONTHLY_BUDGET_USD` con un contador mensual en Redis (hecho en la rama) y, con la pasarela de IA de la Fase 0, en `AiUsage` (`feature = demo_doc`).
 - El embudo completo (landing → demo → lead `demo-rag` → piloto → plan) se ve en **Admin › Métricas** cuando exista el sistema de demos ([Panel de administración](05-Panel-de-Administracion.md)).
 
 ---
@@ -373,9 +381,9 @@ flowchart TD
 
 ### Fase 1 — Funnel y solicitud de demos (incluye el reposicionamiento RAG)
 
-- **Revisar y fusionar la rama `rag-reposicionamiento`** (etapas 1–7 de la especificación del dueño, ver [Reposicionamiento RAG](13-Reposicionamiento-RAG.md)). Ya tiene en commits el SEO técnico, la home, `/rag` y sectores, los planes en `/services` y la coherencia de la etapa 5 (incluidos la presentación de cuentas médicas y el paso del voseo a "tú"); falta terminar "Prueba con tu documento" (en curso) y la medición (pendiente).
-- "Prueba con tu documento" con todos sus límites, lead `demo-rag` y Ley 1581.
-- Banner de consentimiento, GA4, Google Ads, LinkedIn Insight y los 5 eventos.
+- **Revisar y fusionar la rama `rag-reposicionamiento`** (etapas 1–7 de la especificación del dueño, ver [Reposicionamiento RAG](13-Reposicionamiento-RAG.md)). Las 7 etapas están hechas en la rama (13 commits, pendiente de merge): SEO técnico, home, `/rag` y sectores, planes en `/services`, coherencia (incluidos la presentación de cuentas médicas y el paso del voseo a "tú"), "Prueba con tu documento" y medición.
+- Encender "Prueba con tu documento" (hecho en la rama, con todos sus límites, lead `demo-rag` y Ley 1581) cuando Redis y la clave de OpenAI estén listos en Railway.
+- Configurar los IDs de GA4, Google Ads y LinkedIn Insight (el banner y los 5 eventos están hechos en la rama) y crear las conversiones.
 - Lead unificado y registro de la demo en el catálogo como `publico` (sistema de demos).
 - Kit de entrega del Piloto.
 
@@ -412,10 +420,10 @@ flowchart TD
 | 1 | Persistir bots, documentos, fragmentos y conversaciones en MongoDB y los archivos en almacenamiento de objetos, con migración desde el estado actual (= [Backend y API](09-Backend-y-API.md), tarea 10) | Fase 0 — Endurecimiento | P0 | M | Tras redesplegar el backend, los bots y documentos de prueba siguen disponibles; una prueba de integración lo verifica |
 | 2 | Exigir autenticación y autorización en servidor en todas las rutas del chatbot, con aislamiento de bots por cuenta, rate-limit con almacén compartido y tope de costo de IA por visitante, por cuenta y mensual | Fase 0 — Endurecimiento | P0 | M | Un usuario solo ve y modifica sus bots; superar el cupo devuelve un mensaje claro; con el tope agotado no se llama al proveedor |
 | 3 | Rotar las credenciales de los servicios que usa el chatbot y actualizar sus dependencias | Fase 0 — Endurecimiento | P0 | S | Lista de rotación firmada en el checklist de operación (sin valores); `npm audit --omit=dev` sin vulnerabilidades altas ni críticas |
-| 4 | Revisar y fusionar en `main` la rama `rag-reposicionamiento` (etapas 1–5 ya en commits) después de que pasen lint, build y `npm run check-titles` | Fase 1 — Funnel y solicitud de demos | P0 | M | En producción la home muestra "IA que responde con los documentos de tu empresa"; `/rag`, `/rag/salud`, `/rag/legal` y `/rag/soporte` responden 200 y están en el sitemap; `/services#planes-rag` muestra los montos exactos de esta página |
-| 5 | "Prueba con tu documento" (etapa 6): PDF, DOCX o TXT ≤ 5 MB y ≤ 30 páginas; email + autorización Ley 1581; lead `demo-rag` por el canal de contacto; 10 preguntas por documento; 3 documentos por IP al día; TTL de 1 hora; `DEMO_MONTHLY_BUDGET_USD`; `DEMO_UPLOAD_ENABLED`; citas con página o fragmento; aviso "No subas información confidencial en la demo" | Fase 1 — Funnel y solicitud de demos | P0 | M | Un PDF de 30 páginas queda listo en < 20 s y la respuesta cita la página correcta; a la hora el documento y su índice ya no existen; la pregunta 11 recibe un mensaje claro; con el tope agotado la subida se apaga y aparece "Agenda una demo con nosotros" |
-| 6 | Medición (etapa 7): banner de consentimiento con aceptar y rechazar; GA4, Google Ads y LinkedIn Insight solo con su variable y después de aceptar; eventos `generate_lead`, `demo_start`, `demo_upload`, `whatsapp_click` y `plan_click`; variables documentadas en el README | Fase 1 — Funnel y solicitud de demos | P0 | S | Sin aceptar no se carga ningún script de terceros (verificado en la pestaña de red); al aceptar, los 5 eventos llegan a la vista de depuración de GA4; las conversiones existen en Google Ads y LinkedIn |
-| 7 | Coherencia pendiente tras la etapa 5: title y description de `/demo/chatbot` que describan la demo RAG; restos de "$499" en `/desarrollo-web-colombia` y `/bienvenido-producthunt`; confirmar al fusionar que el paso del voseo a "tú" (ya hecho en la rama) sigue completo | Fase 1 — Funnel y solicitud de demos | P1 | S | Una búsqueda de "499" fuera de las demos da 0; el title de `/demo/chatbot` no menciona "médico"; una búsqueda de las formas de voseo de la especificación en `messages/` y `src/` da 0 |
+| 4 | Revisar y fusionar en `main` la rama `rag-reposicionamiento` (las 7 etapas hechas en 13 commits; lint, build y `npm run check-titles` ya pasan en la rama) cuando el dueño lo apruebe | Fase 1 — Funnel y solicitud de demos | P0 | M | En producción la home muestra "IA que responde con los documentos de tu empresa"; `/rag`, `/rag/salud`, `/rag/legal` y `/rag/soporte` responden 200 y están en el sitemap; `/services#planes-rag` muestra los montos exactos de esta página |
+| 5 | **Hecho en la rama `rag-reposicionamiento` (pendiente de merge); falta encenderlo en producción.** "Prueba con tu documento" (etapa 6, API `/api/demo-rag`): PDF, DOCX o TXT ≤ 5 MB y ≤ 30 páginas; email + autorización Ley 1581; lead `demo-rag` por el canal de contacto; 10 preguntas por documento; 3 documentos por IP al día; TTL de 1 hora; `DEMO_MONTHLY_BUDGET_USD`; `DEMO_UPLOAD_ENABLED`; citas con página o fragmento; aviso "No subas información confidencial en la demo" | Fase 1 — Funnel y solicitud de demos | P0 | M | Un PDF de 30 páginas queda listo en < 20 s y la respuesta cita la página correcta; a la hora el documento y su índice ya no existen; la pregunta 11 recibe un mensaje claro; con el tope agotado la subida se apaga y aparece "Agenda una demo con nosotros" |
+| 6 | **Hecho en la rama `rag-reposicionamiento` (pendiente de merge); faltan los IDs reales y las conversiones.** Medición (etapa 7): banner de consentimiento con aceptar y rechazar; GA4, Google Ads y LinkedIn Insight solo con su variable y después de aceptar; eventos `generate_lead`, `demo_start`, `demo_upload`, `whatsapp_click` y `plan_click`; variables documentadas en el README | Fase 1 — Funnel y solicitud de demos | P0 | S | Sin aceptar no se carga ningún script de terceros (verificado en la pestaña de red); al aceptar, los 5 eventos llegan a la vista de depuración de GA4; las conversiones existen en Google Ads y LinkedIn |
+| 7 | **Hecho en la rama `rag-reposicionamiento` (pendiente de merge).** Coherencia pendiente tras la etapa 5: title y description de `/demo/chatbot` que describan la demo RAG; restos de "$499" en `/desarrollo-web-colombia` y `/bienvenido-producthunt`; confirmar al fusionar que el paso del voseo a "tú" (ya hecho en la rama) sigue completo | Fase 1 — Funnel y solicitud de demos | P1 | S | Una búsqueda de "499" fuera de las demos da 0; el title de `/demo/chatbot` no menciona "médico"; una búsqueda de las formas de voseo de la especificación en `messages/` y `src/` da 0 |
 | 8 | Lead unificado: el email de "Prueba con tu documento" crea o actualiza un `Lead` (canal `demo_rag`) con su `ConsentRecord` y aparece en **Admin › Leads** con los datos de uso (páginas, preguntas usadas), nunca con el contenido del documento | Fase 1 — Funnel y solicitud de demos | P1 | S | Un mismo email que llega por contacto y por la demo produce un solo Lead con 2 actividades; el panel muestra el origen |
 | 9 | Registrar `/demo/chatbot` en el catálogo de demos como `publico` (`DemoCatalogItem`) con el banner "Solicita tu demo guiada" que lleva a "Agenda un piloto" | Fase 1 — Funnel y solicitud de demos | P1 | S | El catálogo lo muestra como público; el banner abre el formulario con `plan=piloto` y emite su evento |
 | 10 | Kit de entrega del Piloto RAG: espacio aislado por cliente (una fuente, hasta 100 documentos, su marca), plan de 2 semanas, set de 50 preguntas con respuesta esperada y plantilla del informe de precisión | Fase 1 — Funnel y solicitud de demos | P0 | S | El primer Piloto se entrega en ≤ 10 días hábiles con un informe que muestra % de respuestas correctas con cita y % de "No encontré esa información" correctos |

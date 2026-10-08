@@ -393,15 +393,15 @@ Cada subsección dice qué hace el módulo, su estado, la decisión y los cambio
 
 - **Qué hace:** guarda el mensaje del formulario y avisa al equipo por WhatsApp y por email.
 - **Estado:**
-  - `service` es obligatorio, así que "Prueba con tu documento" no encaja.
+  - En `main`, `service` es obligatorio, así que "Prueba con tu documento" no encaja. La rama `rag-reposicionamiento` (hecho, pendiente de merge) lo resuelve con `services/lead.service.ts` (`registerLead`), que comparten el formulario y la demo.
   - Los avisos se disparan sin esperar y sin reintento.
   - El log escribe nombre, email y teléfono.
   - Hay dos rutas de prueba en el mismo router.
 - **Decisión: refactorizar.** `POST /api/contact` pasa a ser **el canal único de Leads** fuera del formulario de demo.
 - **Cambios:**
-  1. Upsert del `Lead` por email, `ConsentRecord` y `Contact` con `leadId`, `source` (`contacto` o `demo_rag`), `offeringSlug` y `plan`. Es la tarea 4 de Sistema de demos. La rama `rag-reposicionamiento` está agregando (sin commit todavía) `Contact.source` con los valores `contact-form` y `demo-rag`; la migración del Lead los normaliza a `contacto` y `demo_rag`.
+  1. Upsert del `Lead` por email, `ConsentRecord` y `Contact` con `leadId`, `source` (`contacto` o `demo_rag`), `offeringSlug` y `plan`. Es la tarea 4 de Sistema de demos. Hecho en la rama `rag-reposicionamiento` (pendiente de merge): `Contact.source` con los valores `contact-form` y `demo-rag`; la migración del Lead los normaliza a `contacto` y `demo_rag`.
   2. Turnstile, honeypot y tiempo mínimo de llenado (sección 15 de Sistema de demos).
-  3. Con `source = demo_rag`, la respuesta incluye un **ticket de carga** firmado de 60 minutos para "Prueba con tu documento" (sección 3.7).
+  3. "Prueba con tu documento" no pasa por `POST /api/contact` ni usa ticket: la API `/api/demo-rag` recibe el email y la autorización junto con el archivo y registra el lead con el mismo servicio (sección 3.7).
   4. Los avisos al equipo salen por el outbox, con plantillas y sin datos de contacto del prospecto en WhatsApp.
   5. Se eliminan las rutas de prueba de email y WhatsApp de este router (sección 15).
   6. Los logs registran solo el id del Lead, nunca el email.
@@ -448,7 +448,8 @@ No existen hoy. Se crean con el sistema de demos (sección 12 de Sistema de demo
 - **Estado:**
   - Estado en memoria más un archivo JSON en disco.
   - PDF y DOCX no se interpretan en la API de bots: se tratan como texto.
-  - Los límites de uso y de costo de la IA se rediseñan con la pasarela de IA de la Fase 0.
+  - Los límites de uso y de costo de la IA se rediseñan con la pasarela de IA de la Fase 0. Mientras tanto, el Builder y las preguntas libres del Playground no tienen tope de costo.
+  - La rama `rag-reposicionamiento` (hecho, pendiente de merge) agregó las reglas de respuesta con fuente (`GROUNDING_RULES`) y la API `/api/demo-rag` de "Prueba con tu documento", con el pipeline compartido en `services/rag-pipeline.ts`.
   - Los modelos están en una constante del archivo.
   - Es el producto principal del reposicionamiento ([Sistemas RAG](Producto-chatbot-rag-ia.md), [Reposicionamiento RAG](13-Reposicionamiento-RAG.md)).
 - **Decisión: refactorizar** la API de bots y **eliminar** la heredada.
@@ -457,7 +458,7 @@ No existen hoy. Se crean con el sistema de demos (sección 12 de Sistema de demo
      - Migración idempotente desde `state.json`.
      - Los bots de demo anónimos llevan `expiresAt`.
   2. **Pasarela de IA (Fase 0, tarea 5).** Cupos por visitante (IP en hash y `sessionId`), por grant y tope mensual de la demo (`DEMO_MONTHLY_BUDGET_USD`). El modelo se elige por variable de entorno.
-  3. **"Prueba con tu documento" (Fase 1, tarea 15).** Contrato del backend, más abajo.
+  3. **"Prueba con tu documento" (Fase 1, tarea 15).** Hecho en la rama `rag-reposicionamiento` (pendiente de merge) como API propia en `/api/demo-rag`. Contrato del backend, más abajo.
   4. **Núcleo RAG (Fase 2, tarea 16).**
      - Ingesta real de PDF y DOCX con `pdf-parse` y `mammoth`, que ya son dependencias.
      - Fragmentos con número de página.
@@ -526,47 +527,59 @@ erDiagram
 
 El comportamiento lo define el dueño: PDF, DOCX o TXT de hasta 5 MB y 30 páginas; solo email y autorización Ley 1581; 10 preguntas por documento; 3 documentos por IP al día; borrado a la hora; tope mensual; respuestas con cita.
 
-La rama `rag-reposicionamiento` ya cambió `chatbot.routes.ts` (reglas para responder solo con los documentos y citar) y está implementando esta demo, todavía sin commit, como una API propia montada en `/api/demo-rag` (`routes/demo-rag.routes.ts` y `services/demo-rag.service.ts`): el documento, sus fragmentos y su índice viven solo en memoria con un TTL de 1 hora; el cupo por IP y el gasto del mes se cuentan en Redis, y la función queda apagada si falta `DEMO_UPLOAD_ENABLED=true`, Redis o la clave del proveedor de IA. Al fusionarla prevalece el contrato de la rama y se actualiza esta sección; el diagrama de abajo es el diseño objetivo con persistencia y pasarela de IA.
+Está hecho en la rama `rag-reposicionamiento` (pendiente de merge) como una API propia montada en **`/api/demo-rag`** (`routes/demo-rag.routes.ts` y `services/demo-rag.service.ts`), con el pipeline del chatbot movido a `services/rag-pipeline.ts`. **No usa ticket, cuenta ni `POST /api/contact`:** el email y la autorización viajan con el archivo, y el lead se registra con `services/lead.service.ts`, el mismo servicio del formulario de contacto (`Contact.source = demo-rag`). La misma rama agregó a `chatbot.routes.ts` las reglas para responder solo con los documentos y citar (`GROUNDING_RULES`).
+
+- **Encendido (falla cerrada):** solo funciona con `DEMO_UPLOAD_ENABLED=true`, `OPENAI_API_KEY` y Redis conectado. Si falta algo, o si el gasto del mes llegó a `DEMO_MONTHLY_BUDGET_USD`, la subida y las preguntas responden 503 y la web muestra "Agenda una demo con nosotros".
+- **Almacenamiento:** el archivo se recibe en memoria y nunca va a disco. El documento, sus fragmentos y su índice viven en un mapa en memoria con TTL de 1 hora y un barrido periódico; nada va a MongoDB ni al almacenamiento de objetos. Redis guarda solo el cupo diario por IP (con hash) y el gasto del mes.
+- **Modelo y costo:** `gpt-4o-mini` fijo. El costo de cada respuesta se calcula con el uso que informa OpenAI y se suma al gasto del mes (mes UTC).
+- **Límites extra:** además del cupo diario, hay un límite de solicitudes por IP cada 10 minutos en la subida y en las preguntas. La IP real depende de `TRUST_PROXY_HOPS`.
 
 ```mermaid
 sequenceDiagram
   autonumber
   participant V as Visitante
   participant W as Web Next
-  participant A as API backend
-  participant S as Almacenamiento
-  participant G as Pasarela de IA
+  participant A as API demo-rag
+  participant R as Redis
+  participant O as OpenAI
   participant D as MongoDB
-  V->>W: Email, autorización Ley 1581 y archivo
-  W->>A: POST /api/contact con source demo_rag y captcha
-  A->>D: Upsert del Lead, ConsentRecord y Contact
-  A-->>W: 201 con ticket de carga de 60 min
-  W->>A: POST /api/chatbot/demo-docs con el ticket y el archivo
-  A->>A: Tipo, tamaño, páginas, cupo por IP y presupuesto del mes
+  W->>A: GET /api/demo-rag/status
+  A->>R: Lee el gasto del mes
+  A-->>W: Encendida o motivo, sin montos
+  V->>W: Archivo, email y autorización Ley 1581
+  W->>A: POST /api/demo-rag/documents con file, email y consent
+  A->>A: Encendido, formato, tamaño, email y autorización
+  A->>R: Reserva el cupo diario por IP
+  A->>A: Extrae el texto, cuenta páginas y arma el índice en memoria
   alt Fuera de los límites
-    A-->>W: 413, 422 o 429 con un código claro
+    A->>R: Devuelve el cupo si el documento se rechaza
+    A-->>W: 4xx con un código estable y un mensaje claro
   else Dentro de los límites
-    A->>S: Guarda el archivo en demo-docs con expiración
-    A->>G: Fragmenta, genera embeddings y mide el costo
-    A->>D: BotDocument y BotChunk con expiresAt a 1 hora
-    A-->>W: docId, páginas y 10 preguntas disponibles
+    A->>D: Lead demo-rag por el servicio del formulario de contacto
+    A-->>W: 201 con docId, páginas, preguntas disponibles y vencimiento
   end
   V->>W: Pregunta
-  W->>A: POST /api/chatbot/demo-docs/:docId/ask
-  A->>G: Recupera fragmentos y genera la respuesta con cita
-  G-->>A: Respuesta con página y fragmento citados
-  A-->>W: Respuesta con citas y preguntas restantes
-  Note over A,D: El job demo-docs-cleanup corre cada 10 min y borra documento, fragmentos y archivo al cumplirse la hora
+  W->>A: POST /api/demo-rag/documents/:docId/questions
+  A->>A: Reserva la pregunta y busca los fragmentos
+  A->>O: Pregunta y fragmentos relevantes
+  O-->>A: Respuesta y uso de tokens
+  A->>R: Suma el costo al gasto del mes
+  A-->>W: Respuesta con citas por página o fragmento y preguntas restantes
+  Note over A: Un barrido periódico borra de memoria los documentos vencidos a la hora
 ```
 > [Ver diagrama como imagen](images/diagramas/09-Backend-y-API-4.png)
 
-| Endpoint | Rol | Reglas |
+| Endpoint | Acceso | Reglas |
 |---|---|---|
-| `POST /api/chatbot/demo-docs` | público con ticket | `multipart` con `file` y `ticket`. Valida la extensión **y** el contenido real del archivo, ≤ 5 MB y ≤ 30 páginas. Cupo de 3 documentos por IP al día y por Lead. Si el tope mensual está agotado, responde `429 presupuesto_agotado` sin llamar a la IA |
-| `POST /api/chatbot/demo-docs/:docId/ask` | público con el mismo ticket | `{question}` de hasta 500 caracteres. Máximo 10 preguntas por documento. Responde `{answer, citations[{page, snippet}], questionsLeft}`. Si no hay evidencia, responde "no encontré esa información en el documento" |
-| `DELETE /api/chatbot/demo-docs/:docId` | público con el mismo ticket | Borrado inmediato a pedido del visitante |
+| `GET /api/demo-rag/status` | público | Responde si la demo está encendida, el motivo si no lo está (`disabled`, `unavailable` o `budget_exhausted`) y los límites públicos. Nunca expone montos ni se guarda en caché |
+| `POST /api/demo-rag/documents` | público, sin ticket | `multipart` con `file`, `email` y `consent=true`. Valida extensión, tipo y contenido real del archivo, ≤ 5 MB y ≤ 30 páginas, email válido y autorización. Cupo de 3 documentos por IP al día. Responde 201 con el documento (`docId`, tipo, unidad de cita, páginas, preguntas usadas y restantes, vencimiento) y registra el lead `demo-rag` sin bloquear la respuesta |
+| `GET /api/demo-rag/documents/:docId` | público | Estado del documento (preguntas usadas y vencimiento). 404 si ya se borró |
+| `POST /api/demo-rag/documents/:docId/questions` | público | `{question}` de hasta 500 caracteres. Máximo 10 preguntas por documento; una pregunta que falla no se descuenta. Responde `{answer, citations[{page o fragment, excerpt}], notFound, questionsUsed, questionsRemaining}`. Si no hay evidencia, responde "No encontré esa información en el documento." |
+| `DELETE /api/demo-rag/documents/:docId` | público | Borra el documento de memoria antes de la hora. La web lo usa cuando el visitante sube otro documento |
 
-Los eventos `demo_upload` y `demo_start` los emite la web con GA4. El backend registra el uso en `AiUsage` con `feature = demo_doc`.
+Los errores responden `{success: false, code, message}` con códigos estables que la web traduce (por ejemplo `invalid_format`, `file_too_large`, `too_many_pages`, `daily_limit`, `question_limit`, `budget_exhausted` y `demo_disabled`).
+
+Los eventos `demo_upload` y `demo_start` los emite la web con GA4, solo con consentimiento. **Con la Fase 0**, la pasarela de IA registra además el uso en `AiUsage` (`feature = demo_doc`) y el rate-limit pasa al almacén compartido; **con la Fase 2**, la demo usa el núcleo RAG (embeddings y búsqueda híbrida). El documento sigue sin guardarse fuera de la memoria.
 
 #### 3.8 Documentos (gestor documental)
 
@@ -730,7 +743,7 @@ Dónde vive cada pieza. Los nombres y archivos son los de [Sistema de demos](04-
 | Middlewares | `middleware/auth.ts` (`authenticate`, `optionalAuthenticate`, `requirePermission`), `middleware/requireDemoGrant.ts`, `middleware/rateLimiter.ts` (almacén compartido), `middleware/validate.ts` (zod), `middleware/requestId.ts`, `middleware/internalApiKey.ts` | `requireDemoGrant` acepta uno o varios slugs (por ejemplo, CUPS compartido entre dos demos) |
 | Servicios | `demo-state`, `demo-access`, `lead-scoring`, `sla`, `magic-link`, `audit`, `turnstile`, `notification-dispatcher`, `email`, `whatsapp`, `storage`, `ai-gateway` | `ai-gateway` y `storage` son nuevos de esta página |
 | Rutas | `routes/{demo-catalog,demo-requests,demo-grants,demo-access,demo-events,leads,metrics,audit-log,privacy,me,webhooks}.routes.ts` | Se registran en `app.ts` en el mismo orden de la tabla de la sección 14 |
-| Jobs | `jobs/{index,lease,outbox-dispatcher,grant-lifecycle,invitations-reminder,sla-monitor,usage-rollup,daily-digest,privacy-retention}.ts` | Esta página agrega `demo-docs-cleanup`, `grant-cleanup`, `exports-cleanup` y `ai-budget-watch` (sección 6) |
+| Jobs | `jobs/{index,lease,outbox-dispatcher,grant-lifecycle,invitations-reminder,sla-monitor,usage-rollup,daily-digest,privacy-retention}.ts` | Esta página agrega `grant-cleanup`, `exports-cleanup` y `ai-budget-watch` (sección 6) |
 | Plantillas | `templates/demo/*`, `templates/cuenta/*` | Las de cuenta vienen de [Autenticación](Seccion-Autenticacion.md), tarea 19 |
 | Scripts | `scripts/{seed-demo-catalog,migrate-roles,backfill-leads,set-admin}.ts` | Corren como migraciones registradas (sección 13) |
 
@@ -798,7 +811,6 @@ flowchart TD
 
 | Job | Frecuencia | Acción | Prioridad |
 |---|---|---|---|
-| `demo-docs-cleanup` | Cada 10 min | Borra los documentos de "Prueba con tu documento" con `expiresAt` vencido: archivo, fragmentos y `BotDocument` | P0 |
 | `grant-cleanup` | Cada hora | Borra los datos y archivos de los espacios de demo (documentos, bots personalizados, lotes de salud) de grants `revocado`, o `expirado` hace más de 30 días | P1 |
 | `exports-cleanup` | Diario | Respaldo del ciclo de vida del bucket: borra los exportes de más de 7 días y sus referencias | P2 |
 | `ai-budget-watch` | Cada hora | Suma `AiUsage` del mes por función y avisa al 80 % y al 100 % del tope | P0 |
@@ -851,7 +863,7 @@ flowchart TD
   - `BotChunk {botId}` e índice vectorial de Atlas sobre `embedding` (Fase 2);
   - `Document {ownerType, ownerId, is_deleted}`;
   - `WebhookEvent {provider, eventId}` único.
-- **Retenciones con TTL**, alineadas con la sección 14 de Sistema de demos: `DemoEvent` 13 meses, `BotMessage` de demo 90 días, `BotDocument` de "Prueba con tu documento" 1 hora y `AiDecision` 24 meses.
+- **Retenciones con TTL**, alineadas con la sección 14 de Sistema de demos: `DemoEvent` 13 meses, `BotMessage` de demo 90 días y `AiDecision` 24 meses. Los documentos de "Prueba con tu documento" no llegan a MongoDB: viven solo en memoria 1 hora (sección 3.7).
 - **Migraciones:**
   - archivos `scripts/migrations/NNN-nombre.ts`, registrados en la colección `Migration`;
   - se ejecutan con `npm run migrate` como comando previo al despliegue en Railway;
@@ -877,7 +889,6 @@ flowchart TD
 | `orders/{orderId}/` | Adjuntos de pedidos | Indefinido | `uploads/orders` |
 | `deliverables/{projectId}/` | Entregables | Indefinido | — |
 | `chatbot/{botId}/` | Documentos de bots | Hasta que se borre el bot; los bots de demo vencen | Base64 en memoria y `uploads/chatbot` |
-| `demo-docs/` | "Prueba con tu documento" | Borrado por el job a la hora; regla del bucket a 1 día como respaldo | — |
 | `salud/{spaceId}/` | Lotes de facturas, soportes y documentos de conocimiento | Según el grant o el contrato | `uploads/cuentas-medicas`, `uploads/ley100` |
 | `exports/` | Excel y PDF generados | 7 días | `uploads/exports` |
 | `quotes/` | PDF de propuestas (Fase 3) | Indefinido | — |
@@ -898,6 +909,7 @@ flowchart TD
 | Uso | Fase | Si Redis no está disponible |
 |---|---|---|
 | Almacén del rate-limit (`rate-limit-redis`) por IP, email y usuario | 0 | Cae a memoria por instancia y deja una advertencia en el log. La API sigue respondiendo |
+| Cupo diario por IP y gasto del mes de "Prueba con tu documento" (hecho en la rama `rag-reposicionamiento`, pendiente de merge, con el cliente actual `config/redis.ts`) | 1 | La subida y las preguntas quedan apagadas (falla cerrada); la demo con el documento de ejemplo sigue funcionando |
 | Caché: modos del catálogo (60 s), inicio del panel (30 s), tabla de precios de IA | 1 | Se calcula en cada petición |
 | Colas BullMQ | 2 | El worker no procesa; la API responde `503 cola_no_disponible` en los endpoints que encolan. Alerta inmediata |
 | Sesiones, tokens de un solo uso | **Nunca** | — (viven en MongoDB) |
@@ -967,9 +979,9 @@ export const env = loadEnv();
 
 | Grupo | Variables | Obligatoria en producción | Cambio |
 |---|---|---|---|
-| Núcleo | `NODE_ENV`, `PORT`, `API_URL`, `FRONTEND_URL`, `CORS_ORIGIN`, `TRUST_PROXY`, `LOG_LEVEL` | Sí (salvo `LOG_LEVEL`) | `TRUST_PROXY` y `LOG_LEVEL` son nuevas |
+| Núcleo | `NODE_ENV`, `PORT`, `API_URL`, `FRONTEND_URL`, `CORS_ORIGIN`, `TRUST_PROXY`, `LOG_LEVEL` | Sí (salvo `LOG_LEVEL`) | `TRUST_PROXY` y `LOG_LEVEL` son nuevas. La rama `rag-reposicionamiento` ya usa `TRUST_PROXY_HOPS` con el mismo fin (ver la nota de abajo) |
 | Base de datos | `MONGODB_URI` | Sí | Se elimina `MONGO_URI` (duplicada) |
-| Redis | `REDIS_URL` | Desde la Fase 2 | — |
+| Redis | `REDIS_URL` | Desde la Fase 1 para "Prueba con tu documento" (sin Redis queda apagada); para las colas, desde la Fase 2 | — |
 | Autenticación | `JWT_SECRET`, `JWT_EXPIRES_IN`, `COOKIE_DOMAIN`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_CALLBACK_URL`, `INTERNAL_API_KEY` | Sí (Google, si se usa) | `JWT_REFRESH_SECRET` y `JWT_REFRESH_EXPIRES_IN` se retiran cuando el refresco sea opaco en `AuthSession` |
 | Anti-abuso | `TURNSTILE_SECRET_KEY`, `RATE_LIMIT_WINDOW_MS`, `RATE_LIMIT_MAX_REQUESTS` | Sí | `TURNSTILE_SECRET_KEY` es nueva |
 | IA | `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `AI_MODEL_FAST`, `AI_MODEL_SMART`, `AI_MODEL_VISION`, `AI_EMBEDDING_MODEL`, `AI_MONTHLY_BUDGET_USD`, `DEMO_MONTHLY_BUDGET_USD`, `AI_DISABLED_FEATURES` | Los topes y los modelos, sí | `OPENAI_MODEL` se reemplaza por `AI_MODEL_FAST`. Se eliminan `PINECONE_*` |
@@ -981,6 +993,8 @@ export const env = loadEnv();
 | Observabilidad | `SENTRY_DSN`, `SENTRY_ENVIRONMENT` | Sí | Nuevas |
 | Módulos | `SALUD_ENABLED`, `API_DOCS_ENABLED` | No | Nuevas |
 | Solo scripts | `SEED_ADMIN_PASSWORD`, `SEED_CLIENT_PASSWORD` | No | Salen del esquema del servidor; las lee solo el script de semilla de desarrollo |
+
+Las variables que la rama `rag-reposicionamiento` (hecho, pendiente de merge) agrega al backend (`DEMO_UPLOAD_ENABLED`, `DEMO_MONTHLY_BUDGET_USD`, `TRUST_PROXY_HOPS` y `DEMO_RAG_TTL_SECONDS`, esta última solo para pruebas locales) y dónde se configura cada una están en [Reposicionamiento RAG](13-Reposicionamiento-RAG.md#variables-de-entorno). El esquema zod las incorpora; como `TRUST_PROXY_HOPS` cumple la función de `TRUST_PROXY`, se deja un solo nombre.
 
 ### 10. Estructura de carpetas objetivo
 
@@ -998,11 +1012,11 @@ apps/backend/
 │   ├── controllers/            # un controlador por recurso; sin lógica de negocio
 │   ├── services/               # demo-access, demo-state, magic-link, audit, ai-gateway, storage, notification-dispatcher...
 │   │   └── channels/           # adaptadores email, whatsapp, inapp, slack
-│   ├── jobs/                   # outbox-dispatcher, grant-lifecycle, demo-docs-cleanup, ai-budget-watch...
+│   ├── jobs/                   # outbox-dispatcher, grant-lifecycle, grant-cleanup, ai-budget-watch...
 │   ├── templates/              # demo/ y cuenta/ (ES y EN)
 │   ├── modules/                # Fase 2: productos autocontenidos
 │   │   ├── rag-core/           # ingesta, fragmentos, embeddings, búsqueda híbrida, citas
-│   │   ├── chatbot/            # bots, demo-docs, conversaciones
+│   │   ├── chatbot/            # bots, demo-rag, conversaciones
 │   │   ├── documents/          # gestor documental
 │   │   ├── content-ai/         # asistente de contenido
 │   │   └── salud/              # cuentas médicas, auditoría, CUPS, Ley 100, liquidación, reglas, motor de reglas
@@ -1061,7 +1075,7 @@ flowchart TD
   1. **Esquemas zod en `src/schemas/`.** Cada ruta nueva declara `body`, `query`, `params` y la respuesta. El middleware `validate(schema)` los usa para validar.
   2. **Registro OpenAPI** (`config/openapi.ts`, con `@asteasolutions/zod-to-openapi`).
      - Cada esquema se registra con su ruta, método, permiso requerido (extensión `x-permission`) y ejemplos.
-     - Esquemas de seguridad: cookie de sesión, cabecera interna y ticket de carga.
+     - Esquemas de seguridad: cookie de sesión y cabecera interna.
   3. **`npm run openapi`** escribe `openapi.json`.
      - CI lo regenera y falla si hay diferencias sin confirmar.
      - CI también falla si una ruta montada no tiene esquema (`scripts/check-routes.ts` compara el inventario de Express con el OpenAPI).
@@ -1130,8 +1144,8 @@ Estado: **Nuevo**, **Modificado**, **Se mantiene** o **Se elimina**. El detalle 
 | `GET /api/demo-access/:demoSlug` | sesión opcional o cabecera interna | Nuevo: `{allowed, reason, mode, expiresAt, grantId, company}`; registra `open` o `denied`. Fuente de verdad | 1 · Sistema de demos |
 | `POST /api/demo-events` | con grant, o anónimo con consentimiento | Nuevo: lote de hasta 20 eventos | 1 · Sistema de demos |
 | `GET /api/unsubscribe/:token` | público (token) | Nuevo: baja de comunicaciones comerciales | 1 · Sistema de demos |
-| `POST /api/contact` | público | Modificado: upsert del Lead (`contacto` o `demo_rag`), conserva producto y plan, Turnstile; con `demo_rag` devuelve el ticket de carga | 1 · Sistema de demos y esta página |
-| `POST /api/chatbot/demo-docs`, `POST /api/chatbot/demo-docs/:docId/ask`, `DELETE /api/chatbot/demo-docs/:docId` | público con ticket | Nuevo: "Prueba con tu documento" (sección 3.7) | 1 · esta página |
+| `POST /api/contact` | público | Modificado: upsert del Lead (`contacto` o `demo_rag`), conserva producto y plan, Turnstile. Comparte `services/lead.service.ts` con `/api/demo-rag` (hecho en la rama `rag-reposicionamiento`, pendiente de merge) | 1 · Sistema de demos y esta página |
+| `GET /api/demo-rag/status`, `POST /api/demo-rag/documents`, `GET /api/demo-rag/documents/:docId`, `POST /api/demo-rag/documents/:docId/questions`, `DELETE /api/demo-rag/documents/:docId` | público, sin ticket | Nuevo: "Prueba con tu documento" (sección 3.7). Hecho en la rama `rag-reposicionamiento` (pendiente de merge) | 1 · esta página |
 | `POST /api/chatbot/bots`, `GET/PATCH/DELETE /api/chatbot/bots/:botId`, `POST /api/chatbot/bots/:botId/chat`… (12 rutas) | público con cupo; dueño o grant para editar | Modificado: persistencia en MongoDB, pasarela de IA, pertenencia por `sessionId` o grant | 0–2 · Chatbot RAG |
 | `GET /api/content/*` y `POST /api/content/*` (5 rutas) | público con cupo; grant amplía | Modificado: pasarela de IA y zod | 0–1 · esta página |
 | `GET /api/documents` y lectura del corpus de muestra | público (solo lectura) | Modificado: modo muestra | 1 · Gestor documental |
@@ -1215,7 +1229,7 @@ Estado: **Nuevo**, **Modificado**, **Se mantiene** o **Se elimina**. El detalle 
 | `GET /api/demo-pass` | Nuevo: emite y renueva la cookie del pase de demo (15 min) después de consultar `demo-access` con la cabecera interna | 1 · Sistema de demos |
 | `POST /api/linkedin-ads/generate` | Modificado: exige el pase o rol de staff, cupo y tope; reporta el uso a `POST /api/internal/ai-usage` | 0–1 · Demo LinkedIn Ads |
 | `/api/chatbot/{config,info,message,messages,upload}` | **Se eliminan** junto con la API heredada | 2 · Chatbot RAG |
-| `/api/trm` | **Se elimina** en la rama `rag-reposicionamiento` (TRM de referencia fija) | 1 |
+| `/api/trm` | **Se elimina**: hecho en la rama `rag-reposicionamiento` (pendiente de merge), con TRM de referencia fija | 1 |
 
 ### 15. Limpieza de código muerto
 
@@ -1285,7 +1299,7 @@ La revisión detallada no se publica porque la wiki es pública. Estas son las t
 | `cuentas-medicas` | `privado` | `/api/auditoria/*`, `/api/documentos-conocimiento/*` (desde `demo/cuentas-medicas/api.ts` y `page.tsx`) | `requireDemoGrant('cuentas-medicas')`. El staff pasa siempre |
 | `sistema-experto` | `privado` | `/api/expert/estadisticas`, `/api/cups/estadisticas`, `/api/cups/estadisticas-vectorizacion`, `/api/cups/buscar-semantica` (desde `components/DashboardAuditoria.tsx` y `BusquedaSemanticaCUPS.tsx`) | `requireDemoGrant(['sistema-experto', 'cuentas-medicas'])` |
 | `linkedin-ads` | `solicitud` | Route handler de Next `/api/linkedin-ads/generate` | Pase de demo o `demo-access`, cupo y reporte a `POST /api/internal/ai-usage` |
-| `chatbot` | `publico` | `/api/chatbot/bots/*`, `/api/chatbot/models`, `/api/chatbot/demo-docs/*` | Sin grant: cupos por visitante y por documento, más el tope mensual. Un grant amplía el cupo y personaliza (Fase 2) |
+| `chatbot` | `publico` | `/api/chatbot/bots/*`, `/api/chatbot/models`, `/api/demo-rag/*` | Sin grant: cupos por visitante y por documento, más el tope mensual. Un grant amplía el cupo y personaliza (Fase 2) |
 | `gestor-documentos` | `publico` | `/api/documents/*` | Lectura del corpus de muestra sin grant. Subir, OCR y explicar, con grant y cupos |
 | `gestor-contenido` | `publico` | `/api/content/*` | Cupo anónimo por IP; un grant lo amplía (`quotas.aiActionsPerDay`) |
 | Páginas internas `/liquidacion` y `/test` (fuera del catálogo) | — | `/api/liquidacion/*`, `/api/reglas-facturacion/*`, `/api/cuentas/*`, `/api/ley100*` | Solo staff (`salud.interno`) hasta consolidarse o eliminarse (Fase 2) |
@@ -1373,7 +1387,7 @@ Tallas para 1 dev senior: **S** ≤ 2 días · **M** 3–5 días · **L** 1–2 
 | 12 | MongoDB con réplica (Atlas recomendado): transacciones, copias de seguridad con restauración probada, usuario por entorno, índices y TTL de la sección 7, `docker-compose.dev.yml` con réplica, entorno de staging | Fase 0 — Endurecimiento | P0 | S | `approve` en staging corre dentro de una transacción real. Restauración probada y documentada (objetivo de pérdida de datos ≤ 24 h). Staging no contiene datos personales de producción |
 | 13 | Backend del sistema de demos: modelos, permisos, bitácora, Leads, catálogo, solicitudes, estados, API pública, de portal y de equipo, enlace mágico, `demo-access`, `requireDemoGrant`, outbox y jobs base (= tareas 1–15 de [Sistema de demos](04-Sistema-de-Demos.md)) | Fase 1 — Funnel y solicitud de demos | P0 | XL | Se cumplen los criterios de las tareas 1–15 de Sistema de demos y las pruebas de integración de su sección 18 pasan en CI |
 | 14 | Mensajería unificada, segunda parte: adaptadores en `services/channels/` (email transaccional con SPF, DKIM y DMARC, WhatsApp Cloud API, in-app, Slack) y migración de los envíos existentes (contacto, pedidos, restablecimiento) al outbox | Fase 1 — Funnel y solicitud de demos | P0 | M | Ningún controlador llama directo a `emailService` ni a `whatsappService`. Un fallo simulado del proveedor se reintenta sin duplicar. Un correo de prueba llega con DKIM válido |
-| 15 | "Prueba con tu documento": ticket de carga desde `POST /api/contact` (`demo_rag`), `POST/DELETE /api/chatbot/demo-docs` y `/ask`, límites (5 MB, 30 páginas, 10 preguntas, 3 documentos por IP al día), borrado a la hora (`demo-docs-cleanup`), tope `DEMO_MONTHLY_BUDGET_USD` y citas por página | Fase 1 — Funnel y solicitud de demos | P0 | M | Un PDF de 30 páginas queda listo en < 20 s y la respuesta cita la página correcta. A la hora, el archivo y los fragmentos ya no existen. La pregunta 11 responde 429 con un mensaje claro. Con el tope agotado, no se llama al proveedor |
+| 15 | **Hecho en la rama `rag-reposicionamiento` (pendiente de merge).** "Prueba con tu documento": API `/api/demo-rag` sin ticket (estado, subida, consulta, preguntas y borrado), lead `demo-rag` con `services/lead.service.ts`, límites (5 MB, 30 páginas, 10 preguntas, 3 documentos por IP al día), documento solo en memoria con borrado a la hora, tope `DEMO_MONTHLY_BUDGET_USD`, encendido con `DEMO_UPLOAD_ENABLED` y citas por página o fragmento | Fase 1 — Funnel y solicitud de demos | P0 | M | Un PDF de 30 páginas queda listo en < 20 s y la respuesta cita la página correcta. A la hora, el documento y sus fragmentos ya no existen. La pregunta 11 responde 429 con un mensaje claro. Con el tope agotado, no se llama al proveedor. Falta probarlo con la clave real en Railway |
 | 16 | Núcleo RAG compartido (`modules/rag-core/`): ingesta de PDF, DOCX, TXT y URL con límites, fragmentos con página, un solo modelo de embeddings, búsqueda híbrida BM25 + vectorial con Atlas Vector Search y citas; lo usan el chatbot, "Prueba con tu documento", documentos y la consulta normativa de salud | Fase 2 — Demos vendibles | P1 | L | Las 3 implementaciones de embeddings quedan reemplazadas. Un set de evaluación de 50 preguntas con respuesta conocida da ≥ 90 % de citas correctas y corre en CI |
 | 17 | Documentos por espacio: corpus de muestra público de solo lectura, escritura con grant y cupos, pertenencia por usuario o grant, borrado de los documentos de grants vencidos (`grant-cleanup`) | Fase 1 — Funnel y solicitud de demos | P1 | M | Sin grant se lista el corpus de muestra y "Subir" pide acceso. Con grant, al superar el cupo se ve "cupo agotado". Un grant revocado deja 0 documentos en ≤ 1 h |
 | 18 | Gestor de contenido detrás de la pasarela de IA, con cupo anónimo por IP y cupo por grant, validación zod, límite de entrada y corrección de `hasRealBackend` en la semilla | Fase 1 — Funnel y solicitud de demos | P1 | S | Un visitante anónimo agota su cupo diario y recibe un mensaje claro. El gasto del módulo aparece en `AiUsage` con `feature = content` |

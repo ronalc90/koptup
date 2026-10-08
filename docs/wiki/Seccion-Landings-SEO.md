@@ -1,6 +1,6 @@
 # Landings SEO y de campaña
 
-> Rutas: `/chatbots-ia`, `/soluciones-ia`, `/desarrollo-web-colombia`, `/bienvenido-producthunt`, `/liquidacion` (y subrutas), `/test`; relación con `/rag`, `/rag/salud`, `/rag/legal` y `/rag/soporte` (rama `rag-reposicionamiento`) · Archivos principales: `apps/web/src/app/{chatbots-ia,soluciones-ia,desarrollo-web-colombia,bienvenido-producthunt}/{page,layout}.tsx`, `apps/web/src/app/liquidacion/**`, `apps/web/src/app/test/**`, `apps/web/messages/{es,en}.json` (namespaces `chatbotsPage`, `aiSolutionsPage`, `devWebPage`), `apps/web/src/app/sitemap.ts`, `apps/web/public/{robots.txt,llms.txt}` · Prioridad: **P0** · Esfuerzo total: **XL** (≈ 20–25 días-dev en las Fases 0 y 1, parte ya en curso en la rama `rag-reposicionamiento`; el resto en las Fases 2 y 5)
+> Rutas: `/chatbots-ia`, `/soluciones-ia`, `/desarrollo-web-colombia`, `/bienvenido-producthunt`, `/liquidacion` (y subrutas), `/test`; relación con `/rag`, `/rag/salud`, `/rag/legal` y `/rag/soporte` (rama `rag-reposicionamiento`) · Archivos principales: `apps/web/src/app/{chatbots-ia,soluciones-ia,desarrollo-web-colombia,bienvenido-producthunt}/{page,layout}.tsx`, `apps/web/src/app/liquidacion/**`, `apps/web/src/app/test/**`, `apps/web/messages/{es,en}.json` (namespaces `chatbotsPage`, `aiSolutionsPage`, `devWebPage`), `apps/web/src/app/sitemap.ts`, `apps/web/public/{robots.txt,llms.txt}` · Prioridad: **P0** · Esfuerzo total: **XL** (≈ 20–25 días-dev en las Fases 0 y 1, parte ya hecha en la rama `rag-reposicionamiento`, pendiente de merge; el resto en las Fases 2 y 5)
 
 ![Captura actual de /chatbots-ia: hero morado "Chatbots con IA para Empresas en Colombia", botones Ver Demo Gratis y Solicitar Cotización, y cifras 80 %, 3x y 60 %](images/actual/chatbots-ia.jpg)
 
@@ -207,9 +207,9 @@ Evidencia de la rama `main`. La rama `rag-reposicionamiento` (commit `2df589a`) 
 
 La reescritura la define la especificación RAG (etapa E5 de la rama). Este plan agrega la conexión con el sistema de demos y el detalle de copy.
 
-![Vista previa de /chatbots-ia reescrita en la rama rag-reposicionamiento: H1 "Chatbots RAG para WhatsApp y web", botones "Probar la demo" y "Agenda un piloto", "Desde COP 9.900.000, o piloto de COP 3.900.000. Más IVA si aplica" y los 4 datos verificables](images/mockups/rag-vista-previa-chatbots-ia.jpg)
+![/chatbots-ia reescrita en la rama rag-reposicionamiento: H1 "Chatbots RAG para WhatsApp y web", botones "Probar la demo" y "Agenda un piloto" y "Desde COP 9.900.000, o piloto de COP 3.900.000. Más IVA si aplica"](images/despues/rag-chatbots-ia.jpg)
 
-*Así quedó el hero en la rama (commit `576d6df`, sin fusionar). La tabla de abajo describe el destino completo, que además conecta la landing con el formulario "Solicitar demo".*
+*Así quedó el hero en la rama terminada (commit `576d6df`; hecho en la rama `rag-reposicionamiento`, pendiente de merge). La tabla de abajo describe el destino completo, que además conecta la landing con el formulario "Solicitar demo".*
 
 | Elemento | Copy o cambio |
 |---|---|
