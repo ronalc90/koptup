@@ -436,7 +436,7 @@
         },
         "demo": {
           "title": "In the public demo",
-          "desc": "The demo is for trying out how it works: do not upload confidential information."
+          "desc": "In “Try your own document”, the file is processed only in the server's memory (it is not saved to disk or to a database), and the document, its index and the conversation are deleted 1 hour after upload. We only keep your email, with your authorization, and the document's type and length, not its content. Even so, do not upload confidential information."
         }
       },
       "privacyLink": "Read our privacy policy"

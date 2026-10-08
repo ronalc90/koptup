@@ -36,6 +36,8 @@ import StatsWidget from './components/StatsWidget';
 import TopBar from './components/TopBar';
 import ModeToggle, { type ChatbotMode } from './components/builder/ModeToggle';
 import BuilderMode from './components/builder/BuilderMode';
+import UploadDemo from './components/upload/UploadDemo';
+import { trackDemoStart, type DemoEventMode } from './components/demoEvents';
 import { chatWithBot, createBot, type RemoteChatReplySource } from './components/builder/api';
 import Tooltip from './components/ui/Tooltip';
 import InfoIcon from './components/ui/InfoIcon';
@@ -203,6 +205,16 @@ export default function ChatbotDemoPage() {
   const [pipelineRunning, setPipelineRunning] = useState(false);
   const stepIndex = usePipelineRunner(pipelineSteps, pipelineRunning);
 
+  // FASE 7: `demo_start` = primera pregunta de la visita, con el documento de
+  // ejemplo (Playground) o con el documento propio (Prueba con tu documento).
+  const demoStartedRef = useRef(false);
+  const markDemoStart = useCallback((demoMode: DemoEventMode) => {
+    if (demoStartedRef.current) return;
+    demoStartedRef.current = true;
+    trackDemoStart({ mode: demoMode });
+  }, []);
+  const markUploadQuestion = useCallback(() => markDemoStart('upload'), [markDemoStart]);
+
   // Telemetría agregada
   const [aggTokens, setAggTokens] = useState(0);
   const [aggLatency, setAggLatency] = useState(0);
@@ -248,6 +260,7 @@ export default function ChatbotDemoPage() {
   const runScenario = useCallback(
     (key: ScenarioKey) => {
       if (isStreaming) return;
+      markDemoStart('sample');
       const payload = SCENARIO_DATA[key];
       const question = t(`scenarios.${key}.question`);
       const answer = t(`scenarios.${key}.answer`);
@@ -284,11 +297,12 @@ export default function ChatbotDemoPage() {
       setIsStreaming(true);
       setThinkingId(asstId);
     },
-    [isStreaming, t],
+    [isStreaming, markDemoStart, t],
   );
 
   const handleSend = useCallback(() => {
     if (!input.trim() || isStreaming) return;
+    markDemoStart('sample');
     const q = input.toLowerCase();
     const key: ScenarioKey =
       /sql|revenue|facturar|warehouse|snowflake/.test(q) ? 'sql'
@@ -362,7 +376,7 @@ export default function ChatbotDemoPage() {
         /* offline / error → mantenemos el provisional */
       }
     })();
-  }, [input, isStreaming, modelId, t]);
+  }, [input, isStreaming, markDemoStart, modelId, t]);
 
   const handleCiteClick = useCallback((c: SourceChunk) => setOpenChunk(c), []);
 
@@ -463,7 +477,13 @@ export default function ChatbotDemoPage() {
   const isDesktop = device === 'desktop';
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] flex-col bg-secondary-50 text-secondary-900 dark:bg-secondary-950 dark:text-secondary-100 md:h-[calc(100vh-5rem)]">
+    <div
+      className={`flex flex-col bg-secondary-50 text-secondary-900 dark:bg-secondary-950 dark:text-secondary-100 md:h-[calc(100vh-5rem)] ${
+        // En "Prueba con tu documento" la página crece en móvil (scroll normal)
+        // para que el chat no quede aplastado bajo el TopBar.
+        mode === 'upload' ? 'min-h-[calc(100vh-4rem)] md:min-h-0' : 'h-[calc(100vh-4rem)]'
+      }`}
+    >
       <TopBar
         tenant={tenant}
         onTenantChange={setTenant}
@@ -471,7 +491,11 @@ export default function ChatbotDemoPage() {
         onModelChange={setModelId}
         locale={locale}
         onLocaleChange={handleLocaleChange}
-        onRunSample={runScenario}
+        onRunSample={(key) => {
+          // El ejemplo se ve en el Playground: desde otro modo, vuelve a él.
+          setMode('playground');
+          runScenario(key);
+        }}
         isStreaming={isStreaming}
         device={device}
         onDeviceChange={setDevice}
@@ -480,7 +504,9 @@ export default function ChatbotDemoPage() {
 
       <ModeToggle mode={mode} onChange={setMode} />
 
-      {mode === 'builder' ? <BuilderMode /> : (
+      {mode === 'builder' ? <BuilderMode /> : mode === 'upload' ? (
+        <UploadDemo onUseSample={() => setMode('playground')} onQuestion={markUploadQuestion} />
+      ) : (
       <>
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar (oculto en mobile-view) */}

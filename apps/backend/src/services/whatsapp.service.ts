@@ -83,6 +83,8 @@ class WhatsAppService {
     service: string;
     budget?: string;
     message: string;
+    /** Origen del lead (p. ej. `demo-rag`); se muestra si no es el formulario. */
+    source?: string;
   }): Promise<boolean> {
     if (!this.isConfigured()) {
       logger.warn('WhatsApp not configured - skipping notification');
@@ -120,6 +122,7 @@ class WhatsAppService {
     service: string;
     budget?: string;
     message: string;
+    source?: string;
   }): string {
     let msg = `🔔 *Nuevo Formulario de Contacto - KopTup*
 
@@ -135,6 +138,10 @@ class WhatsAppService {
     }
 
     msg += `\n💼 *Servicio:* ${data.service}`;
+
+    if (data.source && data.source !== 'contact-form') {
+      msg += `\n🧭 *Origen:* ${data.source}`;
+    }
 
     if (data.budget) {
       msg += `\n💰 *Presupuesto:* ${data.budget}`;

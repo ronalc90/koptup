@@ -490,6 +490,8 @@ export const adminGetContacts = async (req: AuthRequest, res: Response): Promise
       budget: contact.budget,
       message: contact.message,
       status: contact.status,
+      // Origen del lead: 'contact-form' (también los antiguos, sin el campo) o 'demo-rag'.
+      source: contact.source ?? 'contact-form',
       createdAt: contact.created_at,
     }));
 

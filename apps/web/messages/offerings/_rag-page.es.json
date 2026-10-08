@@ -91,7 +91,7 @@
         },
         "demo": {
           "title": "En la demo pública",
-          "desc": "La demo es para probar cómo funciona: no subas información confidencial."
+          "desc": "En «Prueba con tu documento», el archivo se procesa solo en la memoria del servidor (no se guarda en disco ni en una base de datos) y el documento, su índice y la conversación se borran 1 hora después de subirlo. Solo guardamos tu email, con tu autorización, y el tipo y la extensión del documento, no su contenido. Aun así, no subas información confidencial."
         }
       },
       "privacyLink": "Lee nuestra política de privacidad"

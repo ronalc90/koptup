@@ -173,11 +173,11 @@ export const seoConfig: Record<string, PageSEO> = {
     canonical: `${baseUrl}/demo/cuentas-medicas`,
   },
 
-  // Demo: Chatbot Médico
+  // Demo: Chatbot RAG (Playground, "Prueba con tu documento" y Builder)
   'demo-chatbot': {
-    title: 'Chatbot Médico con IA para el Sector Salud',
+    title: 'Demo RAG: prueba con tu documento',
     description:
-      'Chatbot inteligente especializado en salud. Consulta normatividad (Ley 100, Resolución 3047), códigos CUPS, CIE-10, tarifas médicas y procedimientos. Integra documentos de conocimiento con IA. Respuestas instantáneas basadas en contratos EPS y guías clínicas. Demo interactivo.',
+      'Sube un PDF, DOCX o TXT y hazle preguntas a un chatbot RAG que cita la página o el fragmento de donde sale cada respuesta. También puedes probar la demo con un documento de ejemplo, sin registro.',
     canonical: `${baseUrl}/demo/chatbot`,
   },
 
