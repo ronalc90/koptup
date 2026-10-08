@@ -1,0 +1,775 @@
+{
+  "demoBiDashboard": {
+    "meta": {
+      "title": "Executive dashboard",
+      "seoTitle": "Executive dashboard demo: sales, finance and receivables",
+      "seoDescription": "Interactive demo with sample data from a Colombian company (or your own CSV): sales vs. target, margin, receivables aging, 13-week cash flow, statistical projection, rule-based alerts, guided questions and a PDF report. Everything is calculated in your browser.",
+      "breadcrumbHome": "Home",
+      "breadcrumbDemos": "Demos"
+    },
+    "time": {
+      "monthsLong": [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ],
+      "monthsShort": [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec"
+      ],
+      "quarterPrefix": "Q",
+      "ytd": "year to date",
+      "monthYear": "{month} {year}"
+    },
+    "common": {
+      "close": "Close"
+    },
+    "nav": {
+      "label": "Dashboard sections",
+      "resumen": "Overview",
+      "finanzas": "Finance",
+      "clientes": "Customers",
+      "preguntas": "Ask your data",
+      "alertas": "Alerts",
+      "fuentes": "Data sources",
+      "configuracion": "Settings"
+    },
+    "shell": {
+      "product": "Executive dashboard",
+      "expand": "Expand sidebar",
+      "collapse": "Collapse sidebar",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu",
+      "sidebarSample": "Sample data: the company, customers, tax ID and figures are fictitious and generated in your browser.",
+      "sidebarUpload": "You are viewing the data from your file. It never leaves your browser; reloading takes you back to the sample data.",
+      "pdf": "PDF report",
+      "pdfBusy": "Generating…",
+      "period": "Period",
+      "periodKinds": {
+        "month": "Month",
+        "quarter": "Quarter",
+        "year": "Year"
+      },
+      "sampleBadge": "Sample data",
+      "sampleHint": "Fictitious company and figures, generated with a fixed seed so every view adds up.",
+      "uploadBadge": "Your file",
+      "uploadHint": "Data from the CSV you uploaded. It is processed only in your browser.",
+      "nit": "Tax ID (NIT) {nit}",
+      "backToSample": "Back to sample data",
+      "cutoff": "Data as of {date}",
+      "currency": "Figures in Colombian pesos (COP), excluding VAT",
+      "intro": {
+        "resumen": "Indicators for {period} against the target and the same period last year.",
+        "finanzas": "Income statement for {period}, receivables aging and projected cash flow.",
+        "clientes": "Sales, margin, receivables and segment for each customer in {period}.",
+        "preguntas": "Guided questions answered with the dashboard figures.",
+        "alertas": "Deviations detected by rules and a preview of the weekly summary.",
+        "fuentes": "Where the data comes from and how to try the dashboard with your own file.",
+        "configuracion": "Company, sales target, alert thresholds and summary recipients."
+      }
+    },
+    "search": {
+      "label": "Search the dashboard",
+      "placeholder": "Search customers, invoices or sections…",
+      "results": "Search results",
+      "empty": "No results for “{q}”.",
+      "hintView": "Go to section",
+      "hintCustomer": "{city} · sales in period: {sales}",
+      "hintInvoice": "{customer} · {value} · {date}",
+      "kinds": {
+        "view": "Section",
+        "customer": "Customer",
+        "invoice": "Invoice"
+      }
+    },
+    "bell": {
+      "open": "{count, plural, =0 {Alerts: no active alerts} one {Alerts: # active alert} other {Alerts: # active alerts}}",
+      "title": "Alerts for the period",
+      "close": "Close alerts",
+      "empty": "No alerts with the current thresholds.",
+      "viewAll": "See all alerts"
+    },
+    "sectors": {
+      "comercio": {
+        "name": "Retail and distribution",
+        "description": "Food and cleaning products distributor with customers in Bogotá, Medellín, Cali and Barranquilla.",
+        "cityLabel": "City",
+        "cityLabelPlural": "Cities",
+        "lines": {
+          "lacteos": "Dairy and chilled",
+          "granos": "Grains and groceries",
+          "aseo": "Cleaning and personal care"
+        }
+      },
+      "salud": {
+        "name": "Healthcare (outpatient clinic)",
+        "description": "Outpatient clinic with four sites; its customers are health insurers (EPS), insurance companies and private patients.",
+        "cityLabel": "Site",
+        "cityLabelPlural": "Sites",
+        "lines": {
+          "consulta": "Outpatient consultations",
+          "laboratorio": "Clinical laboratory",
+          "imagenes": "Diagnostic imaging",
+          "cirugia": "Day surgery"
+        }
+      },
+      "servicios": {
+        "name": "Professional services",
+        "description": "Consulting firm with offices in Bogotá, Medellín, Bucaramanga and Pereira.",
+        "cityLabel": "City",
+        "cityLabelPlural": "Cities",
+        "lines": {
+          "consultoria": "Management consulting",
+          "auditoria": "Audit and statutory audit",
+          "outsourcing": "Accounting and payroll outsourcing",
+          "capacitacion": "Corporate training"
+        }
+      },
+      "upload": {
+        "cityLabel": "City or site",
+        "cityLabelPlural": "Cities or sites"
+      },
+      "expenses": {
+        "nomina": "Administrative and sales payroll",
+        "arriendo": "Rent",
+        "fletes": "Freight and logistics",
+        "marketing": "Marketing",
+        "tecnologia": "Technology and software",
+        "servicios": "Utilities",
+        "mantenimiento": "Equipment maintenance",
+        "viajes": "Travel",
+        "otros": "Other expenses"
+      }
+    },
+    "kpis": {
+      "sales": {
+        "title": "Net sales",
+        "badge": "{pct} of target",
+        "badgeHint": "Attainment against the period target",
+        "note": "Target: {budget} · attainment {pct}",
+        "noGoal": "No target: there is no prior-year data to compare against"
+      },
+      "margin": {
+        "title": "Gross margin",
+        "note": "{delta} vs. the same period last year",
+        "noPrev": "No prior-year data to compare",
+        "formula": "(sales − cost of sales) ÷ sales",
+        "noCost": "Your file has no cost column: add one to see the margin"
+      },
+      "overdue": {
+        "title": "Receivables > 60 days past due",
+        "note": "Balance as of {date}",
+        "badgeHint": "Change vs. the end of the previous period",
+        "prev": "End of previous period: {value}"
+      },
+      "customers": {
+        "title": "Buying customers",
+        "note": "Distinct customers with at least one invoice in the period"
+      },
+      "ticket": {
+        "title": "Average ticket",
+        "note": "{count, plural, one {Sales ÷ # invoice} other {Sales ÷ # invoices}}"
+      },
+      "yoy": "{pct} vs. last year",
+      "yoyVs": "{pct} vs. {year}"
+    },
+    "charts": {
+      "actual": "Actual sales",
+      "budget": "Target",
+      "forecast": "Projection",
+      "salesAria": "Actual monthly sales, target and projection",
+      "range": "80% range: {low} to {high}",
+      "compliance": "Attainment: {pct}",
+      "complianceShort": "Attainment",
+      "ofGoal": "{pct} of target",
+      "goalMarker": "Period target",
+      "cashAria": "Projected weekly cash balance",
+      "showTable": "Show table",
+      "showChart": "Show chart",
+      "month": "Month"
+    },
+    "overview": {
+      "salesTitle": "Sales {year}: actual, target and projection",
+      "salesSubtitle": "Target = same month of {prev} + {goal}%. Projection: {method}, 80% band. No AI involved.",
+      "salesSubtitleNoForecast": "Target = same month of {prev} + {goal}%. Not enough months to project.",
+      "method": {
+        "seasonal": "same month last year × growth of the last 3 months",
+        "trend": "linear trend of the last months"
+      },
+      "cityTitle": "Sales by {dim} vs. target",
+      "citySubtitle": "Green: on target · amber: up to 5% below · red: more than 5% below.",
+      "linesTitle": "Sales by business line",
+      "linesSubtitle": "Share of the period’s sales and gross margin of each line.",
+      "marginShort": "margin {pct}",
+      "others": "{count, plural, one {# more line} other {# more lines}}",
+      "total": "Total",
+      "findingsTitle": "Automatic summary",
+      "findingsSubtitle": "Findings for the period that quote the dashboard figures.",
+      "findingKinds": {
+        "sales": "Sales vs. target",
+        "margin": "Gross margin",
+        "overdue": "Receivables over 90 days",
+        "forecast": "Projection"
+      },
+      "goTo": {
+        "finanzas": "See in Finance",
+        "clientes": "See in Customers"
+      },
+      "copy": "Copy summary",
+      "copied": "Summary copied to the clipboard",
+      "copyError": "Could not copy: your browser blocked the clipboard",
+      "noFindings": "There is not enough data to generate findings for this period.",
+      "findingsNote": "These texts are built with rules from the period’s figures; this demo does not use AI. In your project, an AI model can write the summary from the same aggregates (no personal data)."
+    },
+    "findings": {
+      "salesBelow": "Sales for {period} total {sales}, {gap} below target ({budget}). {city} explains the largest gap: {cityDiff} less than expected ({cityCompliance} of its target).",
+      "salesAbove": "Sales for {period} total {sales}, {gap} above target ({budget}). {city} contributes the most: {cityDiff} above expectations ({cityCompliance} of its target).",
+      "margin": "Gross margin is {margin} vs. {prev} in the same period last year ({delta}). The line that changed the most is {line}: from {linePrev} to {lineMargin}.",
+      "overdue": "Receivables more than 90 days past due total {over90}. {count, plural, one {One customer accounts} other {# customers account}} for {share}: {names}.",
+      "forecast": "At the current pace, {range} would close at {value} (80% range: {low} to {high}), {compliance} of target.",
+      "forecastNoBudget": "At the current pace, {range} would close at {value} (80% range: {low} to {high})."
+    },
+    "finance": {
+      "uploadTitle": "Finance with your file",
+      "uploadSubtitle": "The full income statement, receivables and cash flow need your accounting and receivables data. With a sales CSV only gross profit can be calculated.",
+      "uploadNoCost": "Your file has no cost column, so gross profit cannot be calculated. In your project, these views are fed directly from your accounting software.",
+      "backToSample": "Back to sample data",
+      "pnl": {
+        "title": "Income statement vs. budget",
+        "subtitle": "{period}. Sales budget = target (last year + {goal}%).",
+        "concept": "Item",
+        "real": "Actual",
+        "budget": "Budget",
+        "variance": "Variance",
+        "ofSales": "% of sales",
+        "rows": {
+          "sales": "Net sales",
+          "cost": "Cost of sales",
+          "gross": "Gross profit",
+          "expenses": "Operating expenses",
+          "operating": "Operating profit"
+        },
+        "note": "Budgeted cost = sales target × last year’s cost ratio. Budgeted expenses = same period last year + 6%. Sales and cost are the sum of the period’s invoices, the same ones you see in Overview and Customers."
+      },
+      "aging": {
+        "title": "Receivables aging",
+        "subtitle": "Open invoices as of {date}: {total}. Days counted from the due date.",
+        "bucket": "Bucket",
+        "buckets": {
+          "current": "Not yet due",
+          "d1_30": "1 to 30 days",
+          "d31_60": "31 to 60 days",
+          "d61_90": "61 to 90 days",
+          "d90": "Over 90 days"
+        },
+        "export": "Export receivables (CSV)",
+        "topTitle": "Customers with the largest balance over 60 days past due",
+        "customer": "Customer",
+        "over60": "> 60 days",
+        "over90": "> 90 days",
+        "totalOpen": "Total balance",
+        "concentration": "These customers account for {share} of receivables over 60 days past due."
+      },
+      "exported": "{file} downloaded ({count, plural, one {# invoice} other {# invoices}})",
+      "csv": {
+        "invoice": "Invoice",
+        "customer": "Customer",
+        "date": "Date",
+        "due": "Due date",
+        "daysOverdue": "Days past due",
+        "bucket": "Bucket",
+        "value": "Amount (COP)"
+      },
+      "cash": {
+        "title": "13-week cash flow",
+        "subtitle": "Projection from the cut-off date ({date}). Hover over each week to see inflows and outflows.",
+        "showWeeks": "Show weekly detail",
+        "hideWeeks": "Hide detail",
+        "weekOf": "Week of {date}",
+        "kpi": {
+          "today": "Cash at cut-off",
+          "min": "Lowest-cash week",
+          "week8": "Cash in 8 weeks",
+          "week13": "Cash in 13 weeks"
+        },
+        "legendBalance": "Balance at week end",
+        "legendMin": "Lowest-cash week",
+        "legendBelow": "Below minimum cash",
+        "legendFloor": "Minimum cash ({floor})",
+        "legendMarkers": "IVA = bimonthly VAT payment · P = service bonus (prima)",
+        "markerTax": "IVA",
+        "markerBonus": "P",
+        "weekRange": "Week {n}: {start} to {end}",
+        "week": "Week",
+        "inflows": "Inflows",
+        "outflows": "Outflows",
+        "collections": "Receivables collected",
+        "newSales": "New sales collected",
+        "suppliers": "Suppliers",
+        "payroll": "Payroll and bonus",
+        "rentOther": "Rent and other",
+        "tax": "VAT",
+        "balance": "Balance",
+        "method": "How it is calculated: open receivables are collected on their due date plus each customer’s average delay (whatever is already past that delay is spread over the next 4 weeks, and invoices more than 180 days past due, {excluded}, are not projected); projected sales are collected according to each customer’s terms and delay (on average {days} days); suppliers paid at {supplierDays} days; payroll twice a month, service bonus in December, rent on the 5th and other expenses spread across the month.",
+        "taxNote": "Bimonthly VAT is 19% of taxable sales minus VAT on taxable purchases. The payment date ({date}) is an example: the real one depends on the last digit of the tax ID in the DIAN calendar."
+      },
+      "moves": {
+        "title": "Key movements",
+        "subtitle": "Largest collections, payroll, rent and VAT paid in {period}.",
+        "date": "Date",
+        "concept": "Item",
+        "amount": "Amount",
+        "collection": "Collection from {customer}",
+        "tax": "Bimonthly VAT payment ({from} – {to})",
+        "payroll": "Payroll payment · {month}",
+        "rent": "Rent payment · {month}",
+        "note": "Collections include invoiced VAT. They come from the same dashboard invoices (payment date); payroll and rent come from the month’s expenses."
+      }
+    },
+    "customers": {
+      "title": "Customer ranking",
+      "subtitle": "{period}. “At risk”: buys {drop}% or less than in the same period last year.",
+      "export": "Export CSV",
+      "exported": "{file} downloaded ({count, plural, one {# row} other {# rows}})",
+      "all": "All ({count})",
+      "segments": {
+        "nuevo": "New",
+        "recurrente": "Recurring",
+        "riesgo": "At risk"
+      },
+      "search": "Search customer, city or sales rep",
+      "allCities": "All {dim}",
+      "sortBy": "Sort by",
+      "sort": {
+        "sales_desc": "Highest sales",
+        "yoy_asc": "Largest drop vs. last year",
+        "yoy_desc": "Largest growth",
+        "margin_desc": "Highest margin",
+        "overdue_desc": "Largest past-due balance",
+        "name_asc": "Name (A–Z)"
+      },
+      "showing": "{count, plural, =0 {No customers match} one {Showing # of {total} customers} other {Showing # of {total} customers}}",
+      "empty": "No customers match those filters.",
+      "col": {
+        "customer": "Customer",
+        "sales": "Sales",
+        "yoy": "Vs. last year",
+        "margin": "Margin",
+        "overdue": "Past due",
+        "segment": "Segment"
+      },
+      "noPrev": "No data",
+      "segmentNote": "Rule-based segments: “New” = first purchase in the last 180 days; “At risk” = buys {drop}% or less than a year ago; “Recurring” = everyone else. Change the threshold in Settings.",
+      "csv": {
+        "customer": "Customer",
+        "seller": "Sales rep",
+        "sales": "Sales (COP)",
+        "prevSales": "Sales last year (COP)",
+        "yoy": "Change (%)",
+        "margin": "Gross margin (%)",
+        "invoices": "Invoices",
+        "overdue": "Past-due balance (COP)",
+        "segment": "Segment",
+        "invoice": "Invoice",
+        "date": "Date",
+        "line": "Line",
+        "cost": "Cost (COP)",
+        "due": "Due date",
+        "paid": "Payment date",
+        "daysOverdue": "Days past due"
+      },
+      "detail": {
+        "subtitle": "{city} · sales rep: {seller} · customer since {since}",
+        "export": "Export period invoices",
+        "close": "Close",
+        "sales": "Sales · {period}",
+        "yoy": "Vs. last year",
+        "margin": "Gross margin",
+        "payment": "Payment",
+        "paymentValue": "{term}-day terms · {delay} days average delay",
+        "segmentWhy": {
+          "nuevo": "First purchase less than 180 days ago.",
+          "recurrente": "Buys steadily compared with last year.",
+          "riesgo": "Buys {drop}% or less than in the same period last year."
+        },
+        "last12": "Sales over the last 12 months",
+        "openTitle": "Open invoices as of {date}",
+        "notDue": "Not yet due",
+        "more": "{count, plural, one {And # more invoice} other {And # more invoices}} (export receivables from Finance).",
+        "noOpen": "No open invoices.",
+        "invoicesTitle": "{count, plural, =0 {No invoices in the period} one {# invoice in the period} other {# invoices in the period}}",
+        "noInvoices": "No purchases in this period.",
+        "moreInvoices": "{count, plural, one {And # more invoice in the CSV} other {And # more invoices in the CSV}}."
+      },
+      "invoice": {
+        "title": "Invoice {id}",
+        "date": "Date",
+        "customer": "Customer",
+        "line": "Line",
+        "seller": "Sales rep",
+        "value": "Amount (excl. VAT)",
+        "cost": "Cost",
+        "margin": "Gross margin",
+        "due": "Due date",
+        "status": "Status at cut-off",
+        "paidOn": "Paid on {date}",
+        "pending": "Open",
+        "viewCustomer": "View customer",
+        "close": "Close",
+        "noteSample": "Sample (fictitious) invoice. In your project, the detail comes from your accounting software or the electronic invoice XML files.",
+        "noteUpload": "Row from your file. If it had no invoice number, the row number is shown."
+      }
+    },
+    "ask": {
+      "title": "Guided questions",
+      "subtitle": "Pick a question or type it. Answers are calculated with the figures for {period}.",
+      "q": {
+        "customersDown": "Which customers buy less than last year?",
+        "margin": "Why did gross margin change?",
+        "cityGoal": "Which city or site is furthest from target?",
+        "overdue": "Who accounts for most past-due receivables?",
+        "cash8": "How much cash will I have in 8 weeks?",
+        "forecast": "How would the next 3 months close?"
+      },
+      "inputLabel": "Type your question",
+      "placeholder": "E.g.: which customers buy less?",
+      "send": "Ask",
+      "miss": "This demo only answers the guided questions above (margin, customers, targets by city, receivables, cash and projection) and did not recognize “{text}”. In your project, free-form questions are answered by an AI model over authorized views of your data.",
+      "note": "No AI in this demo: each guided question runs a calculation on the same dashboard data and shows how it was done. What you type is matched against keywords in your browser; it is not sent to any server.",
+      "clear": "Clear answers",
+      "youAsked": "You asked",
+      "howTitle": "How I calculated it",
+      "share": "{pct} of sales",
+      "weekLabel": "Week {n} ({date})",
+      "weekFlows": "Inflows {inflow} · outflows {outflow}",
+      "over90": "{value} over 90 days",
+      "range": "80% range: {low} to {high}",
+      "a": {
+        "margin": "In {period} gross margin went from {prev} to {now} ({delta}). The line that dropped the most is {line}.",
+        "customersDown": "{count, plural, one {# customer buys} other {# customers buy}} less than in the same period last year in {period}; together that is {lost} less.",
+        "customersDownNone": "No customer buys less than in the same period last year in {period}.",
+        "cash8": "At the end of week 8 ({date}) you would have {balance}. The lowest point is {min}, in the week of {minDate}.",
+        "cityGoal": "The {dim} furthest from target in {period} is {city}: at {pct} of its target, {gap} below.",
+        "noData": "There is no target to compare against in this period.",
+        "overdue": "Receivables more than 60 days past due total {total} as of {date}. {count, plural, one {One customer accounts} other {# customers account}} for {share}.",
+        "forecast": "At the current pace, {from} – {to} would close at {value}, {pct} of target (80% range: {low} to {high}).",
+        "forecastNoGoal": "At the current pace, {from} – {to} would close at {value} (80% range: {low} to {high})."
+      },
+      "how": {
+        "margin": "Margin = (sales − cost) ÷ sales, by line, comparing the period with the same months of {prevYear}. Lines are sorted from the largest drop to the largest increase.",
+        "customersDown": "For each customer I compare the period’s sales with the same months of {prevYear} (only customers who were already buying) and sort by the difference in pesos.",
+        "cash8": "This is week 8 of the 13-week cash flow in Finance: it starts from cash at cut-off ({date}: {start}) and adds projected collections and subtracts payments week by week.",
+        "cityGoal": "Target for each city or site = its sales in the same months of {prevYear} + {goal}%. Attainment = sales ÷ target.",
+        "overdue": "I add up open invoices more than 60 days past due at the end of the period and group them by customer.",
+        "forecastSeasonal": "Each month = sales of the same month last year × growth of the last 3 months vs. the same months last year ({growth}). The 80% band comes from the error this method had in the months already known (deviation {sigma}).",
+        "forecastTrend": "Linear trend of the last months with data. The 80% band comes from the deviation from that trend ({sigma})."
+      }
+    },
+    "alerts": {
+      "title": "Alerts for the period",
+      "subtitle": "Rules are evaluated every time you change the period, the data or the thresholds.",
+      "editThresholds": "Edit thresholds",
+      "empty": "No alerts with the current thresholds.",
+      "rules": "Rules: sales or a city more than {goalGap}% below target · a line whose margin is {marginDrop} pts lower than last year · receivables > 90 days up more than {overdueGrowth}% vs. the previous close · projected cash below {cashFloor} · customers buying {riskDrop}% or less than a year ago · projection below target.",
+      "severity": {
+        "critical": "Critical",
+        "warning": "Warning",
+        "info": "Info"
+      },
+      "goTo": {
+        "resumen": "See in Overview",
+        "finanzas": "See in Finance",
+        "clientes": "See in Customers"
+      },
+      "items": {
+        "salesGoal": {
+          "title": "Sales below target",
+          "text": "Sales for {period} total {sales}, {gap} below target ({budget})."
+        },
+        "cityGoal": {
+          "title": "{city} below target",
+          "text": "{city} sells {sales}, {gap} below its target ({budget})."
+        },
+        "lineMargin": {
+          "title": "{line} margin is falling",
+          "text": "Gross margin for {line} is {margin}: {drop} pts less than in the same period last year ({prev})."
+        },
+        "overdue90": {
+          "title": "Receivables over 90 days are rising",
+          "text": "Receivables more than 90 days past due went from {before} to {now} ({growth}) vs. the end of the previous period."
+        },
+        "cashFloor": {
+          "title": "Projected cash below the minimum",
+          "text": "In the week of {start} to {end}, projected cash drops to {balance}, below the minimum of {floor}."
+        },
+        "customersRisk": {
+          "title": "{count, plural, one {# customer at risk} other {# customers at risk}}",
+          "text": "They buy {drop}% or less than in the same period last year: {names}{count, plural, one {} =2 {} =3 {} other { and others}}. Together that is {lost} less."
+        },
+        "forecastGoal": {
+          "title": "Projection below target",
+          "text": "At the current pace, {range} would close at {value}, {compliance} of target."
+        }
+      }
+    },
+    "weekly": {
+      "title": "Monday summary · {company}",
+      "sales": "Sales for {period}: {sales} ({compliance} of target)",
+      "salesNoGoal": "Sales for {period}: {sales}",
+      "margin": "Gross margin: {margin} ({delta} vs. last year)",
+      "marginNoPrev": "Gross margin: {margin}",
+      "overdue": "Receivables > 60 days past due: {over60}",
+      "alerts": "{count, plural, one {# active alert} other {# active alerts}}; the main one: {top}",
+      "noAlerts": "No active alerts",
+      "forecast": "Projection {range}: {value}",
+      "link": "Open dashboard: {link}",
+      "linkPlaceholder": "Open dashboard: link to your dashboard",
+      "previewTitle": "Monday summary (preview)",
+      "previewSubtitle": "This is how the weekly summary would arrive by WhatsApp or email, with the figures for the selected period.",
+      "channel": "Channel",
+      "channels": {
+        "whatsapp": "WhatsApp",
+        "email": "Email"
+      },
+      "mondayTime": "Monday 7:00 a.m.",
+      "emailTo": "To:",
+      "emailSubjectLabel": "Subject:",
+      "emailSubject": "Weekly summary for {company}",
+      "recipients": "Configured recipients",
+      "noRecipients": "No recipients for this channel.",
+      "editRecipients": "Edit recipients",
+      "copy": "Copy text",
+      "copied": "Summary text copied",
+      "copyError": "Could not copy: your browser blocked the clipboard",
+      "openWhatsapp": "Share on WhatsApp",
+      "openEmail": "Open in your email",
+      "simulated": "Simulated in the demo: nothing is sent automatically. “Share on WhatsApp” opens WhatsApp with the text so you can pick the contact, and “Open in your email” opens your email app. In your project, the summary is sent automatically every Monday via WhatsApp Business (with a Meta-approved template) or email."
+    },
+    "sources": {
+      "currentTitle": "Active data source",
+      "sampleName": "Sample data for {company} ({sector})",
+      "uploadName": "Your file: {file}",
+      "stats": "{rows} invoices · {customers} customers · {from} to {to} · as of {cutoff}",
+      "sampleHow": "Generated in your browser with a fixed seed: always the same, and every view comes from the same invoices. Company, customers, sales reps and tax ID are fictitious.",
+      "uploadHow": "Only the views that depend on sales are recalculated (Overview, Customers, sales questions and alerts). Receivables and cash flow need your accounting data.",
+      "downloadSample": "Download sample CSV",
+      "downloadUpload": "Download normalized data",
+      "downloaded": "{file} downloaded ({count, plural, one {# row} other {# rows}})",
+      "backToSample": "Back to sample data",
+      "uploadTitle": "Try it with your CSV",
+      "uploadSubtitle": "Upload a sales CSV and see the dashboard with your own numbers.",
+      "dropHint": "Drag your .csv file here or pick it from your computer.",
+      "choose": "Choose CSV file",
+      "limits": "Up to {mb} MB and {rows} rows.",
+      "format": {
+        "required": "Minimum columns: date, customer and sale amount (excluding VAT).",
+        "optional": "Optional: city or site, line or category, sales rep, cost and invoice number.",
+        "excel": "From Excel: File › Save as › CSV. Accepted separators: semicolon, comma or tab.",
+        "numbers": "Dates like 2026-09-30 or 30/09/2026. Amounts like 1.250.000, 1,250,000, 1250000 or $ 1.250.000."
+      },
+      "parsed": "{file}: {rows} rows and {cols} columns. Check which column holds each field.",
+      "fields": {
+        "date": "Date",
+        "customer": "Customer",
+        "value": "Sale amount",
+        "city": "City or site",
+        "line": "Line or category",
+        "seller": "Sales rep",
+        "cost": "Cost",
+        "invoice": "Invoice number"
+      },
+      "optional": "optional",
+      "noColumn": "— Do not use —",
+      "columnN": "Column {n}",
+      "preview": "First 5 rows of the file",
+      "missing": "Pick the column for: {fields}.",
+      "use": "Use this file",
+      "cancel": "Cancel",
+      "loaded": "Dashboard recalculated with {used, plural, one {# row} other {# rows}} from {file}",
+      "loadedSkipped": "Dashboard recalculated with {used, plural, one {# row} other {# rows}} from {file} ({skipped, plural, one {# row ignored} other {# rows ignored}} because of an empty or invalid date, amount or customer)",
+      "truncated": "Only the first {max} rows were used.",
+      "placeholders": {
+        "noCity": "No city",
+        "noLine": "No line",
+        "noSeller": "No sales rep"
+      },
+      "errors": {
+        "type": "The file must be a .csv (from Excel: Save as › CSV).",
+        "size": "The file is larger than {mb} MB.",
+        "empty": "The file has no headers or rows.",
+        "read": "The file could not be read.",
+        "noRows": "No row could be used: {badDate} with an invalid date, {badValue} with an invalid amount and {noCustomer} without a customer. Check the column mapping."
+      },
+      "privacy": "Your file is read in this browser: it is not sent to any server or stored. Reloading the page takes you back to the sample data.",
+      "template": {
+        "date": "date",
+        "invoice": "invoice",
+        "customer": "customer",
+        "city": "city",
+        "line": "line",
+        "seller": "seller",
+        "value": "value",
+        "cost": "cost"
+      },
+      "connectorsTitle": "Sources we connect in your project",
+      "connectorsSubtitle": "There are no live connections in this demo: these integrations are set up during implementation.",
+      "inProject": "Set up in your project",
+      "connectors": {
+        "csv": {
+          "name": "Excel and CSV",
+          "desc": "Files in a shared folder, loaded on a schedule."
+        },
+        "sheets": {
+          "name": "Google Sheets",
+          "desc": "Spreadsheets your team already updates, read with read-only permissions."
+        },
+        "postgres": {
+          "name": "PostgreSQL",
+          "desc": "Direct read-only connection to your database."
+        },
+        "siigo": {
+          "name": "Siigo",
+          "desc": "Sales, purchases and receivables from your accounting software."
+        },
+        "sapb1": {
+          "name": "SAP Business One",
+          "desc": "Invoicing, inventory and receivables from your ERP."
+        },
+        "hubspot": {
+          "name": "HubSpot",
+          "desc": "CRM deals and opportunities to compare with what was invoiced."
+        }
+      },
+      "connectorsNote": "Each connector, the refresh frequency and the indicators are defined with you during implementation."
+    },
+    "settings": {
+      "companyTitle": "Sample company",
+      "companySubtitle": "Change the name, tax ID and city shown in the dashboard, the PDF and the weekly summary.",
+      "sector": "Sample sector",
+      "sectorUploadNote": "You are viewing your file: the sector only changes the sample data.",
+      "companyName": "Company name",
+      "companyNit": "Tax ID (NIT, without check digit)",
+      "nitHint": "Shown as {nit} (the check digit is calculated automatically).",
+      "companyCity": "City",
+      "goalsTitle": "Sales target and alert thresholds",
+      "goalsSubtitle": "Saved per sector; they recalculate attainment, alerts and segments.",
+      "goal": "Target: growth vs. last year",
+      "goalHint": "Each month’s target = sales of the same month last year + this percentage.",
+      "thresholds": {
+        "goalGap": "Gap vs. target",
+        "marginDrop": "Margin drop per line",
+        "overdueGrowth": "Increase in receivables > 90 days",
+        "riskDrop": "Drop for “customer at risk”",
+        "cashFloor": "Minimum cash"
+      },
+      "units": {
+        "goalGap": "%",
+        "marginDrop": "pts",
+        "overdueGrowth": "%",
+        "riskDrop": "%",
+        "cashFloor": "M COP"
+      },
+      "thresholdHints": {
+        "goalGap": "Alert if sales (or a city) fall further below target.",
+        "marginDrop": "Alert if a line loses these points vs. last year.",
+        "overdueGrowth": "Alert if receivables > 90 days grow more vs. the previous close.",
+        "riskDrop": "Customers buying this percentage or less than a year ago.",
+        "cashFloor": "Alert if any cash-flow week falls below it (millions of pesos)."
+      },
+      "recipientsTitle": "Monday summary recipients",
+      "recipientsSubtitle": "Used in the weekly summary preview (Alerts).",
+      "addRecipient": "Add recipient",
+      "recipientName": "Name or role {n}",
+      "channel": "Channel",
+      "channels": {
+        "email": "Email",
+        "whatsapp": "WhatsApp"
+      },
+      "email": "Email address",
+      "phone": "Mobile (with country code)",
+      "removeRecipient": "Remove {name}",
+      "noRecipients": "No recipients.",
+      "recipientsNote": "Nothing is sent in the demo: recipients only appear in the preview. In your project, the Monday delivery is scheduled with these details.",
+      "roles": {
+        "ceo": "General management",
+        "cfo": "Finance management"
+      },
+      "resetAll": "Reset everything",
+      "unsaved": "You have unsaved changes",
+      "upToDate": "No pending changes",
+      "discard": "Discard changes",
+      "save": "Save changes",
+      "saved": "Settings saved in this browser",
+      "storageNote": "Saved only in this browser (localStorage); nobody else sees it. Current target for the sector: {goal}%.",
+      "resetTitle": "Reset the demo?",
+      "resetText": "You go back to the sample data, the fictitious company, the default targets and thresholds and the latest month with data. If you uploaded a file, it is discarded.",
+      "resetConfirm": "Yes, reset",
+      "resetDone": "Demo reset",
+      "cancel": "Cancel",
+      "errors": {
+        "title": "Please check:",
+        "name": "The company name cannot be empty.",
+        "nit": "The tax ID must have 6 to 10 digits.",
+        "goal": "The target must be between −50% and 100%.",
+        "threshold": "Check the value of “{field}”.",
+        "email": "{name}’s email address is not valid.",
+        "phone": "{name}’s mobile number must have at least 10 digits."
+      }
+    },
+    "report": {
+      "title": "Executive report · {period}",
+      "subtitle": "{company} · Tax ID (NIT) {nit} · {city} · data as of {cutoff}",
+      "subtitleUpload": "File: {file} · data as of {cutoff}",
+      "badgeSample": "Sample data: the company, customers and figures are fictitious. Report generated in your browser with the same figures as the dashboard.",
+      "badgeUpload": "Data from the file you uploaded, processed in your browser.",
+      "findings": "Automatic summary",
+      "byCity": "Sales by {dim}",
+      "byLine": "Sales by business line",
+      "topCustomers": "Top customers",
+      "aging": "Receivables aging as of {date}",
+      "cash": "13-week cash flow from {date}",
+      "cashNote": "Cash at cut-off: {start}. Lowest point: {min} in the week of {week}.",
+      "alerts": "Alerts",
+      "method": "How the figures were calculated",
+      "methodGoal": "Target = sales of the same months last year + {goal}%.",
+      "methodForecast": "Projection {range}: statistical method (same month last year × recent growth, or linear trend), 80% band with a deviation of {sigma}. No AI involved.",
+      "noForecast": "Not enough months to project.",
+      "methodSample": "Sample data generated with a fixed seed; every view comes from the same invoices.",
+      "methodUpload": "Calculated with the rows of the file you uploaded.",
+      "sales": "Sales",
+      "goal": "Target",
+      "compliance": "Attainment",
+      "share": "Share",
+      "line": "Line",
+      "margin": "Margin",
+      "marginPrev": "Margin last year",
+      "customer": "Customer",
+      "yoy": "Vs. last year",
+      "overdue": "Past due",
+      "amount": "Amount",
+      "footer": "Koptup executive dashboard demo · sample data",
+      "page": "Page {n} of {total}",
+      "done": "Report downloaded: {file}",
+      "error": "The PDF could not be generated. Please try again."
+    }
+  }
+}

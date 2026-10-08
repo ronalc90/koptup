@@ -1,289 +1,776 @@
 {
   "demoScraping": {
     "meta": {
-      "title": "Scraping and data extraction platform",
-      "subtitle": "Point-and-click builder, AI schema extraction, a headless browser cluster, stealth anti-bot, scheduler, diff detection, and multichannel outputs.",
-      "ethicalMode": "Ethical mode",
-      "live": "Live",
-      "menu": "Menu"
+      "title": "Data extraction and monitoring",
+      "seoTitle": "Demo: data extraction and monitoring from websites and documents",
+      "seoDescription": "Try a data extractor with sample sources: public procurement radar, prices from fictional stores with a click-to-field builder, regulations and supplier documents. Detect changes, set up alerts, download CSV and review each source's legal sheet. Sample data.",
+      "breadcrumbHome": "Home",
+      "breadcrumbDemos": "Demos",
+      "company": "{company} · NIT {nit} · fictional company",
+      "sampleBadge": "Sample data",
+      "sampleHint": "The company, public entities, stores, suppliers and figures are fictional. Cut-off date: Oct 8, 2026.",
+      "responsibleSeal": "Responsible extraction",
+      "responsibleHint": "Open the source's compliance sheet",
+      "running": "Updating {source}",
+      "menu": "Open sources",
+      "closeMenu": "Close sources",
+      "tabsLabel": "Source sections",
+      "loading": "Loading sample data…"
     },
     "actions": {
-      "newScraper": "New scraper",
-      "run": "Run",
-      "running": "Scraping...",
-      "stop": "Stop",
-      "save": "Save",
-      "clone": "Clone",
-      "exportSchema": "Export schema",
-      "testSelector": "Test selector",
-      "addField": "Add field",
-      "delete": "Delete",
-      "edit": "Edit"
+      "runNow": "Update now",
+      "running": "Updating…",
+      "reset": "Reset demo",
+      "resetTitle": "Reset the demo?",
+      "resetConfirm": "Your fields, rules, new sources and runs saved in this browser are deleted and the demo goes back to the sample data.",
+      "resetDone": "Demo reset",
+      "cancel": "Cancel",
+      "close": "Close",
+      "discard": "Discard",
+      "downloadCsv": "Download CSV",
+      "downloadJson": "Download JSON",
+      "copy": "Copy",
+      "copied": "Copied to clipboard",
+      "copyFailed": "Your browser blocked copying; select the text and copy it manually",
+      "pause": "Pause source",
+      "resume": "Resume",
+      "requestTrial": "Request a trial extraction",
+      "back": "Back",
+      "next": "Next"
+    },
+    "run": {
+      "finished": "{source}: {records} records and {changes} changes",
+      "failed": "The extraction could not run",
+      "hint": "Run the selected source with your current settings",
+      "pausedHint": "The source is paused: resume it to run it",
+      "reviewHint": "New sources run after the legal review",
+      "inProgress": "Running {source}",
+      "pausedNotice": "Source paused: it does not run on schedule or with “Update now”.",
+      "pendingConfig": "There are changes since the last run (settings or sample pages). Run “Update now” to see the result."
     },
     "tabs": {
-      "dashboard": "Dashboard",
-      "builder": "Visual builder",
-      "schedule": "Scheduler",
-      "proxies": "Proxies",
-      "antibot": "Anti-bot",
-      "outputs": "Outputs",
-      "diff": "Diff detection",
-      "monitoring": "Monitoring",
-      "cluster": "Cluster",
-      "compliance": "GDPR"
+      "overview": "Overview",
+      "builder": "Builder",
+      "changes": "Detected changes",
+      "alerts": "When and what to alert",
+      "delivery": "Where you get the data",
+      "history": "History",
+      "compliance": "Source compliance"
     },
-    "dashboard": {
-      "title": "Operations overview",
-      "subtitle": "Last 24 hours",
-      "kpis": {
-        "activeScrapers": "Active scrapers",
-        "pagesPerDay": "Pages/day",
-        "successRate": "Success rate",
-        "captchasSolved": "Captchas solved",
-        "proxyCost": "Proxy cost"
+    "sources": {
+      "kind": {
+        "api": "Open data with an API",
+        "web": "Public web pages",
+        "documents": "PDF documents"
       },
-      "chartTitle": "Runs in the last 24h",
-      "chartLegend": "Success vs. error per hour",
-      "topScrapers": "Most active scrapers",
-      "recentAlerts": "Recent alerts",
-      "alerts": {
-        "domChange": "DOM changed on Amazon PE · auto-fix applied",
-        "rateLimit": "Rate limit hit on MercadoLibre · backoff active",
-        "proxyDown": "Residential proxy pe-03 is down",
-        "captchaSurge": "Captcha surge on Linio · 3.2x"
+      "contratacion": {
+        "name": "Public procurement radar",
+        "short": "Procurement",
+        "description": "New public procurement processes that match what you sell, filtered by keywords, department and amount.",
+        "simulated": "Simulated in the demo: the processes come from a sample file with fictional entities. In your project it connects to the public procurement open data API (for example, SECOP II on datos.gov.co). The filter, the comparison and the alerts are calculated here for real."
+      },
+      "precios": {
+        "name": "Competitor prices",
+        "short": "Prices",
+        "description": "Price, availability and shipping of the products you care about in three fictional online stores.",
+        "simulated": "The three stores are sample pages generated by the demo (.example domains). The extraction is real: your fields are applied with CSS selectors on those pages in your browser. No external site is visited."
+      },
+      "normativa": {
+        "name": "Regulations and circulars",
+        "short": "Regulations",
+        "description": "New resolutions and circulars from the entities you follow, ready for your assistant's knowledge base.",
+        "simulated": "Simulated in the demo: the regulations and entities are fictional and come from a sample file. In your project, the public regulation pages you choose are checked."
+      },
+      "documentos": {
+        "name": "Supplier documents",
+        "short": "Documents",
+        "description": "NIT, company name, economic activity and dates extracted from RUT, certificates and PDF invoices.",
+        "simulated": "Simulated in the demo: the PDFs and how they are read are samples (in your project they are read with OCR and AI). The NIT check-digit validation and the confidence threshold are calculated here for real."
       }
     },
-    "scrapers": {
-      "listTitle": "My scrapers",
-      "searchPlaceholder": "Search scrapers...",
-      "filterAll": "All",
-      "filterRunning": "Running",
-      "filterIdle": "Idle",
-      "filterError": "Error",
-      "status": {
-        "running": "Running",
-        "idle": "Idle",
-        "error": "Error",
-        "paused": "Paused"
+    "sidebar": {
+      "title": "My sources",
+      "newSource": "New",
+      "newSourceHint": "Add a source in 3 steps",
+      "search": "Search sources…",
+      "filters": {
+        "all": "All",
+        "active": "Active",
+        "paused": "Paused",
+        "review": "In review"
       },
-      "lastRun": "ago",
-      "items": "items"
+      "status": {
+        "active": "Active",
+        "paused": "Paused",
+        "partial": "With warnings",
+        "error": "Failed",
+        "review": "In review"
+      },
+      "records": "{count, plural, one {{formatted} record} other {{formatted} records}}",
+      "updated": "{when}",
+      "empty": "No source matches the filter.",
+      "note": "Your settings are saved only in this browser."
+    },
+    "tour": {
+      "title": "Suggested tour",
+      "progress": "{done} of {total}",
+      "show": "Show",
+      "hide": "Hide",
+      "done": "Done",
+      "steps": {
+        "radar": {
+          "title": "Procurement radar",
+          "hint": "Open a process in the table and see why it matches."
+        },
+        "field": {
+          "title": "Create a field with one click",
+          "hint": "In the builder, click “Envío gratis” (free shipping) in a store."
+        },
+        "change": {
+          "title": "See the price change",
+          "hint": "In Prices › Detected changes: the drill dropped 11%."
+        },
+        "download": {
+          "title": "Download the CSV",
+          "hint": "Open it in Excel with the source's data."
+        },
+        "legal": {
+          "title": "Check the legal sheet",
+          "hint": "Terms of use, robots.txt and Colombia's Law 1581 per source."
+        }
+      },
+      "cta": "Which source do you need? Tell us and we will check whether it can be extracted before quoting."
+    },
+    "overview": {
+      "kpis": {
+        "records": "Records",
+        "newToday": "New today",
+        "otherChanges": "Other changes",
+        "quality": "Quality",
+        "updated": "Last update"
+      },
+      "qualityHint": {
+        "fields": "required fields filled",
+        "docs": "documents validated without review"
+      },
+      "chartTitle": "Records per run (last 14 days)",
+      "chartHint": "One scheduled run per day; today's bar is your latest run.",
+      "chartAria": "Bar chart of records per day; today: {today}",
+      "barTitle": "{date}: {value} records",
+      "today": "Today",
+      "alertsTitle": "Today's alerts",
+      "configureAlerts": "Configure",
+      "noAlerts": "No active rule matches the latest run.",
+      "tableTitle": "Data from the latest run",
+      "tableHint": {
+        "contratacion": "Only processes that match your radar. Click one to see the details.",
+        "precios": "One row per product and store, with the fields you defined in the builder.",
+        "normativa": "Regulations from the entities you follow.",
+        "documentos": "One document per row; those that fail validation stay in review."
+      },
+      "resumed": "Source resumed",
+      "pausedToast": "Source paused",
+      "rag": {
+        "sent": "{count, plural, one {# document sent} other {# documents sent}} to the assistant's knowledge base (simulated)",
+        "sendAll": "Send pending to the assistant ({count})",
+        "send": "Send",
+        "note": "Simulated in the demo: in your project, these documents are loaded into your RAG assistant's knowledge base so it answers citing the regulation.",
+        "chatbotLink": "See the RAG assistant demo"
+      },
+      "process": {
+        "open": "See details of process {ref}",
+        "openHint": "See details",
+        "daysLeft": "{days, plural, =0 {closes today} one {# day left} other {# days left}}",
+        "whyTitle": "Why it matches",
+        "whyKeyword": "Keyword: “{keyword}”",
+        "whyDepartment": "Department you follow: {department}",
+        "whyAmount": "Amount equal to or above {min}",
+        "sampleNote": "Sample process with a fictional entity."
+      },
+      "docs": {
+        "fix": "Fix",
+        "approve": "Approve",
+        "dvExplain": "The check digit read from the document ({read}) does not match the one for NIT {nit}. Type the correct digit to validate it.",
+        "dvLabel": "Check digit",
+        "dvWrong": "{dv} does not match this NIT either.",
+        "dvOk": "Correct: the digit matches the DIAN calculation.",
+        "dvHow": "The digit is calculated in your browser with DIAN's modulo 11 algorithm.",
+        "lowExplain": "This document was read with {confidence}% confidence, below the threshold. If you checked the data against the PDF, approve it.",
+        "saved": "{file}: reviewed",
+        "saveFix": "Save fix"
+      }
+    },
+    "alertsText": {
+      "priceDrop": "{product} dropped {pct} at {store}",
+      "stockBelow": "{product} is down to {stock} units at {store}",
+      "outOfStock": "{product} is out of stock at {store}",
+      "newProcessOver": "{count, plural, one {# new process} other {# new processes}} for {amount} or more in {department}",
+      "closingSoon": "{ref} ({entity}) {days, plural, =0 {closes today} one {closes in # day} other {closes in # days}}",
+      "newDoc": "New regulation: {title}",
+      "docReviewDv": "{file}: the check digit does not match",
+      "docReviewConfidence": "{file}: low-confidence reading"
+    },
+    "table": {
+      "search": "Search the table…",
+      "count": "{shown} of {total}",
+      "sortBy": "Sort by {column}",
+      "required": "Required",
+      "asc": "ascending",
+      "desc": "descending",
+      "empty": "No matching records."
+    },
+    "columns": {
+      "store": "Store",
+      "ref": "Reference",
+      "entity": "Entity",
+      "object": "Purpose",
+      "modality": "Procedure",
+      "location": "Location",
+      "amount": "Amount",
+      "published": "Published",
+      "closes": "Closes",
+      "processStatus": "Status",
+      "keyword": "Keyword",
+      "number": "Number",
+      "normType": "Type",
+      "title": "Title",
+      "date": "Date",
+      "pdf": "PDF",
+      "rag": "Assistant",
+      "file": "File",
+      "docType": "Document type",
+      "nit": "NIT-DV read",
+      "companyName": "Company name",
+      "legalRep": "Legal representative",
+      "ciiu": "Activity (CIIU)",
+      "docDate": "Document date",
+      "confidence": "Confidence",
+      "docStatus": "Status"
+    },
+    "values": {
+      "modality": {
+        "minima": "Minimum amount",
+        "abreviada": "Abbreviated selection",
+        "licitacion": "Public tender",
+        "directa": "Direct award"
+      },
+      "processStatus": {
+        "open": "Open",
+        "closed": "Closed"
+      },
+      "normType": {
+        "resolucion": "Resolution",
+        "circular": "Circular",
+        "decreto": "Decree",
+        "concepto": "Opinion"
+      },
+      "rag": {
+        "pending": "Pending",
+        "sent": "Sent (simulated)"
+      },
+      "docType": {
+        "rut": "RUT (tax ID)",
+        "camara": "Certificate of existence",
+        "factura": "PDF invoice"
+      },
+      "docStatus": {
+        "validated": "Validated",
+        "reviewDv": "In review: check digit mismatch",
+        "reviewConfidence": "In review: low confidence",
+        "corrected": "Reviewed by a person"
+      },
+      "trigger": {
+        "scheduled": "Scheduled",
+        "manual": "Manual (Update now)",
+        "retry": "Retry"
+      },
+      "runStatus": {
+        "ok": "Successful",
+        "partial": "With warnings",
+        "error": "Failed"
+      }
     },
     "builder": {
-      "title": "Visual builder",
-      "subtitle": "Click fields in the preview to start extracting them",
-      "previewTitle": "Target page",
-      "previewUrl": "URL",
-      "previewDevice": "Device",
+      "title": "Builder: point and click",
+      "subtitle": "Turn on selection and click on the sample page: each click creates a field with its CSS selector and value. Then test it, adjust it and save it.",
+      "unsaved": "Unsaved changes",
+      "save": "Save settings",
+      "saved": "Settings saved. They apply on the next run.",
+      "exists": "That field already exists: {name}",
+      "created": "Field “{name}” created ({selector})",
+      "storesLabel": "Sample store",
+      "deviceLabel": "Preview width",
       "devices": {
         "desktop": "Desktop",
         "tablet": "Tablet",
-        "mobile": "Mobile"
+        "mobile": "Phone"
       },
-      "fieldsTitle": "Fields to extract",
-      "fieldsEmpty": "No fields yet — click the preview to add one.",
-      "fields": {
-        "name": "Name",
-        "selector": "CSS selector",
-        "type": "Type",
-        "required": "Required",
-        "add": "Add field",
-        "types": {
-          "text": "Text",
-          "number": "Number",
-          "url": "URL",
-          "image": "Image",
-          "html": "HTML",
-          "list": "List"
-        },
-        "sample": {
-          "title": "Title",
-          "price": "Price",
-          "author": "Author",
-          "image": "Main image",
-          "rating": "Rating",
-          "stock": "Stock available"
+      "selectMode": "Selection mode",
+      "selectOn": "Selection on: click a price, a name or the shipping",
+      "selectOff": "Selection off",
+      "simulate": {
+        "button": "Simulate a change in the stores ({n} of {total})",
+        "none": "You already applied the sample changes",
+        "reset": "Reset stores",
+        "done": {
+          "1": "Ferretería La Tuerca Demo lowered the drill's price. Run “Update now” to detect it.",
+          "2": "Casa del Tornillo Demo ran out of the drill. Run “Update now” to detect it.",
+          "3": "Herramientas El Martillo Demo listed the vinyl paint. Run “Update now” to detect it."
         }
       },
-      "pagination": {
-        "title": "Pagination",
-        "selectorLabel": "Next button selector",
-        "maxPages": "Max pages"
-      },
-      "ai": {
-        "toggle": "Use LLM with schema",
-        "toggleHint": "Falls back to AI extraction with Claude or GPT when the HTML shifts",
-        "schemaTitle": "Pydantic-style schema",
-        "previewTitle": "AI extraction preview",
-        "previewSubtitle": "Structured JSON returned by the model",
-        "modelLabel": "Model"
-      }
-    },
-    "schedule": {
-      "title": "Scheduler",
-      "subtitle": "Decide when the scraper runs",
-      "modeLabel": "Mode",
-      "modes": {
-        "single": "One-off",
-        "recurring": "Recurring",
-        "onEvent": "On event"
-      },
-      "cronLabel": "Cron expression",
-      "cronHint": "e.g. 0 */2 * * * · every 2 hours",
-      "nextRunsTitle": "Next 5 runs",
-      "triggers": {
-        "title": "Change-based triggers",
-        "subtitle": "Fire actions when the extracted data changes",
-        "priceChange": "Price change",
-        "stockChange": "Stock change",
-        "newItem": "New item detected",
-        "removed": "Item removed"
-      },
-      "concurrencyLabel": "Max concurrency",
-      "retriesLabel": "Retries"
-    },
-    "proxies": {
-      "title": "Proxy management",
-      "subtitle": "Global pool with smart rotation",
-      "rotation": "Auto-rotation",
-      "rotationHint": "Rotate IP every N requests or after a 403 / 429",
+      "previewLabel": "Sample page of {store}",
+      "previewNote": "Fictional page generated by the demo. Links do not navigate.",
+      "recordSelector": "Record selector (each product)",
+      "recordHint": "{count, plural, =0 {No records found on this page.} one {Finds # record on this page.} other {Finds # records on this page.}}",
+      "invalidSelector": "Invalid selector",
+      "fieldsTitle": "Fields ({count})",
+      "newFieldName": "New field",
+      "addField": "Add manually",
+      "fieldsHint": "Required fields count toward quality. Save and run “Update now” to apply the changes to the data.",
+      "previewTitle": "Extraction preview: {store}",
+      "previewSummary": "{rows} rows · quality {quality}",
+      "viewLabel": "Preview format",
+      "viewTable": "Table",
+      "previewEmpty": "No rows: check the record selector and the fields.",
+      "aiNote": "In the demo, extraction uses only CSS selectors in your browser (no AI). In your project, if a page changes and a selector stops working, AI proposes the new selector and an engineer approves it before it is applied.",
+      "fieldName": "Field name",
+      "fieldType": "Data type",
       "types": {
-        "datacenter": "Datacenter",
-        "residential": "Residential",
-        "mobile": "Mobile"
+        "text": "Text",
+        "number": "Number",
+        "price": "Price (COP)",
+        "link": "Link",
+        "image": "Image"
       },
-      "table": {
-        "country": "Country",
-        "type": "Type",
-        "latency": "Latency",
-        "status": "Status",
-        "successRate": "Success",
-        "lastUsed": "Last used"
+      "deleteField": "Delete field {name}",
+      "selector": "CSS selector",
+      "selectorPlaceholder": "E.g. .precio-actual",
+      "scope": "Where to look",
+      "scopes": {
+        "record": "Inside each record",
+        "page": "Whole page"
       },
-      "status": {
-        "healthy": "Healthy",
-        "degraded": "Degraded",
-        "down": "Down"
-      },
-      "costLabel": "Estimated monthly cost"
+      "required": "Required",
+      "test": "Test",
+      "emptySelector": "Type a selector or create the field with a click",
+      "noMatches": "No matches on this page",
+      "matchInfo": "{count, plural, one {# value} other {# values}}",
+      "testResult": "{count, plural, =0 {nothing highlighted} one {# highlighted} other {# highlighted}}",
+      "fieldsEmpty": "No fields yet. Click the page to create one."
     },
-    "antibot": {
-      "title": "Anti-bot evasion",
-      "subtitle": "Stay under the detection radar",
-      "options": {
-        "fingerprinting": "Fingerprint randomization",
-        "fingerprintingHint": "Randomize canvas, WebGL, fonts, and plugins per session",
-        "stealth": "Stealth plugin",
-        "stealthHint": "Hide navigator.webdriver and CDP signals",
-        "humanLike": "Human-like behavior",
-        "humanLikeHint": "Simulate mouse movement, scroll speed, and natural delays",
-        "tlsFingerprint": "TLS / JA3 spoofing",
-        "tlsHint": "Mimic a real Chrome TLS fingerprint"
-      },
-      "captchaTitle": "Captcha solver",
-      "captchaHint": "Service for reCAPTCHA, hCaptcha, and Cloudflare Turnstile",
-      "captchaProvider": "Provider",
-      "providers": {
-        "twoCaptcha": "2Captcha",
-        "antiCaptcha": "Anti-Captcha",
-        "capsolver": "CapSolver",
-        "none": "None"
-      },
-      "userAgentLabel": "User-agent pool"
+    "sandbox": {
+      "title": "Try it with your HTML",
+      "subtitle": "Paste a page's HTML code (for example, from “View page source”) and extract fields with the same builder.",
+      "open": "Open",
+      "close": "Close",
+      "label": "Page HTML",
+      "placeholder": "Paste the page HTML here (for example, a table or a product list)",
+      "load": "Load HTML",
+      "useSample": "Use a sample",
+      "clear": "Clear",
+      "privacy": "The HTML is processed only in your browser: it is not sent to any server. Scripts, styles, forms and frames are removed, and images are not downloaded.",
+      "info": "{elements} elements loaded · {removed} tags removed for safety",
+      "truncated": "(the first 300,000 characters were used)",
+      "address": "Your HTML (offline)",
+      "previewLabel": "Preview of your HTML",
+      "recordSelector": "Record selector (optional)",
+      "recordHint": "If each row or card shares a class (for example tr.fila), type it here; otherwise each field returns a list."
     },
-    "outputs": {
-      "title": "Outputs",
-      "subtitle": "Ship extracted data to multiple destinations",
-      "channels": {
-        "webhook": "Webhook",
-        "s3": "Amazon S3",
-        "db": "Database",
-        "sheets": "Google Sheets",
-        "airtable": "Airtable"
-      },
-      "configWebhook": "Webhook URL",
-      "configS3Bucket": "S3 bucket",
-      "configS3Region": "Region",
-      "configDbUrl": "Connection string",
-      "configSheetsId": "Spreadsheet ID",
-      "configAirtableBase": "Base ID",
-      "enabled": "Enabled",
-      "format": "Format",
-      "formats": {
-        "json": "JSON",
-        "csv": "CSV",
-        "parquet": "Parquet",
-        "ndjson": "NDJSON"
+    "radar": {
+      "title": "Radar criteria",
+      "subtitle": "This source uses an open data API: it needs no selectors. Define which processes you care about.",
+      "keywords": "Keywords in the process purpose (Spanish)",
+      "removeKeyword": "Remove “{keyword}”",
+      "noKeywords": "Without keywords no process matches.",
+      "keywordPlaceholder": "E.g. cemento",
+      "add": "Add",
+      "departments": "Departments",
+      "minAmount": "Minimum amount (COP)",
+      "simulatedNote": "Changes apply on the next run. Sample data: fictional entities.",
+      "previewTitle": "With these criteria {matched} of today's {total} processes match",
+      "previewHint": "Preview over the day's sample file.",
+      "fits": "Matches",
+      "noFit": "No match",
+      "why": {
+        "keyword": "no keyword",
+        "department": "department not included",
+        "amount": "amount below the minimum"
       }
     },
-    "diff": {
-      "title": "Diff detection",
-      "subtitle": "Changes between the last run and this one",
-      "previous": "Previous run",
-      "current": "Current run",
-      "summary": "Summary",
-      "added": "Added",
-      "removed": "Removed",
-      "modified": "Modified",
+    "norm": {
+      "title": "Which regulations to follow",
+      "subtitle": "Choose the entities and, optionally, a keyword. New regulations can go to your assistant's knowledge base.",
+      "entities": "Entities (fictional)",
+      "keyword": "Keyword (optional)",
+      "keywordPlaceholder": "E.g. herramientas",
+      "simulatedNote": "Changes apply on the next run.",
+      "previewTitle": "You follow {followed} of {total} published regulations",
+      "followed": "Followed",
+      "notFollowed": "Not followed"
+    },
+    "docsCfg": {
+      "title": "Document fields and validation",
+      "subtitle": "Choose which data to extract from each document and from which confidence they are approved automatically.",
+      "threshold": "Confidence threshold: {value}",
+      "thresholdHint": "Documents read with lower confidence go to human review. The NIT is always validated with its check digit.",
+      "columns": "Columns to extract",
+      "personalData": "personal data",
+      "simulatedNote": "Changes apply on the next run. The PDF reading is a sample.",
+      "previewTitle": "How the documents would end up with this threshold",
+      "confidence": "confidence {value}",
+      "sampleTitle": "Fields read from a sample RUT",
+      "sampleHeader": "Registro Único Tributario (sample)",
+      "sampleNit": "NIT",
+      "sampleName": "Company name",
+      "sampleCiiu": "Main economic activity",
+      "sampleRep": "Legal representative",
+      "sampleNote": "Fictional document. In green, company data; in yellow, personal data that is only extracted if you choose it."
+    },
+    "changes": {
+      "title": "Detected changes",
+      "subtitle": "Field-by-field comparison between yesterday's run ({before}) and the latest one ({after}).",
+      "filterLabel": "Filter by change type",
+      "kinds": {
+        "all": "All",
+        "added": "New",
+        "modified": "Modified",
+        "removed": "Removed"
+      },
+      "none": "No changes since yesterday's run.",
+      "noneFiltered": "No changes of this type.",
+      "badge": {
+        "added": "New",
+        "modified": "Modified",
+        "removed": "Removed"
+      },
+      "ruleExists": "Alert created",
+      "createRule": {
+        "priceDrop": "Alert me if the price drops",
+        "stockBelow": "Alert me if availability drops",
+        "closingSoon": "Alert me before it closes"
+      },
+      "ruleCreated": "Alert created for “{title}”. See it in “When and what to alert”.",
       "field": "Field",
-      "noChanges": "No changes detected"
+      "before": "Before",
+      "after": "Now",
+      "variation": "Change",
+      "note": {
+        "contratacion": "Sample processes change from one day to the next: new ones published, closings and addenda that move the closing date.",
+        "precios": "The comparison uses your fields: if you remove the Price field, the demo can no longer detect price changes. Use “Simulate a change in the stores” in the builder to create new changes.",
+        "normativa": "New regulations from the entities you follow show up here.",
+        "documentos": "Documents that arrived in the folder since the previous run."
+      }
     },
-    "monitoring": {
-      "title": "Monitoring and logs",
-      "subtitle": "Recent runs with AI auto-fix",
-      "autoFixTitle": "AI auto-fix is on",
-      "autoFixHint": "When the DOM shifts, the LLM regenerates selectors automatically",
-      "table": {
-        "scraper": "Scraper",
-        "status": "Status",
-        "duration": "Duration",
-        "items": "Items",
-        "errors": "Errors",
-        "startedAt": "Started"
+    "alerts": {
+      "title": "When and what to alert",
+      "subtitle": "Schedule the source and define which changes deserve an alert.",
+      "when": "Frequency",
+      "whenHint": "Colombia time.",
+      "presets": {
+        "daily6": "Every day at 6:00 AM",
+        "businessHours": "Every hour from 7:00 AM to 6:00 PM, Monday to Friday",
+        "every4h": "Every 4 hours",
+        "weeklyMon": "Every Monday at 7:00 AM",
+        "custom": "Advanced (cron expression)"
       },
-      "logsTitle": "Real-time logs",
-      "notification": "DOM changed on target.com · LLM auto-fix regenerated 3 selectors in 1.8s"
+      "cronLabel": "Cron expression (minute hour day month weekday)",
+      "cronHint": "Example: 30 6 * * 1-5 = Monday to Friday at 6:30 AM.",
+      "cronInvalid": "Invalid expression: use 5 fields with numbers, *, ranges (1-5), lists (1,3) or steps (*/2).",
+      "nextRuns": "Next 5 runs",
+      "noRuns": "No runs in the next two years with this expression.",
+      "pausedNote": "The source is paused: these runs will not happen until you resume it.",
+      "demoClock": "Calculated from the demo clock ({now}). Nothing runs on its own in the demo: use “Update now”.",
+      "rulesTitle": "Alert rules",
+      "rulesHint": "They are evaluated against the latest run; the result shows in the Overview and in the message on the right.",
+      "noRules": "This source has no rules.",
+      "ruleToggle": "Turn the rule on or off",
+      "ruleText": {
+        "priceDrop": "Price drops at least",
+        "stockBelow": "Availability drops to",
+        "newProcessOver": "New process with an amount from",
+        "closingSoon": "A matching process closes in",
+        "newDoc": "New regulation containing",
+        "docReview": "A document goes to review"
+      },
+      "onlyFor": "Only for: {target}",
+      "valueLabel": "Rule value",
+      "anyKeyword": "any word",
+      "units": {
+        "priceDrop": "%",
+        "stockBelow": "units or fewer",
+        "closingSoon": "days or fewer"
+      },
+      "deleteRule": "Delete rule",
+      "newRuleType": "New rule type",
+      "ruleAdded": "Rule added",
+      "addRule": "Add rule",
+      "channelsTitle": "Channels",
+      "channels": {
+        "email": "Email",
+        "teams": "Microsoft Teams",
+        "whatsapp": "WhatsApp Business"
+      },
+      "previewTitle": "Today's message ({count, plural, one {# alert} other {# alerts}})",
+      "message": {
+        "header": "{source} · {date}",
+        "none": "No alerts with the active rules.",
+        "footer": "Sample data · data extraction and monitoring demo"
+      },
+      "copy": "Copy message",
+      "sendTest": "Send test (simulated)",
+      "sentToast": "Simulated: in your project this message is sent via {channels}.",
+      "simulatedNote": "Simulated in the demo: no email or message is sent. In your project it connects to your email, Microsoft Teams or WhatsApp Business.",
+      "sentTitle": "Test sends (simulated)",
+      "sentNone": "You have not sent any tests yet.",
+      "sentLines": "{count, plural, =0 {no alerts} one {# alert} other {# alerts}}"
     },
-    "cluster": {
-      "title": "Playwright cluster on K8s",
-      "subtitle": "Autoscaling pool of headless browser workers",
-      "workersTitle": "Active workers",
-      "loadLabel": "Load",
-      "nodeLabel": "Node",
-      "browserLabel": "Browser",
-      "browsers": {
-        "chromium": "Chromium",
-        "firefox": "Firefox",
-        "webkit": "WebKit"
+    "delivery": {
+      "title": "Where you get the data",
+      "subtitle": "What you see in the demo can be downloaded now; connections to your tools are set up in your project.",
+      "downloaded": "You downloaded {file}",
+      "inProject": "Set up in your project",
+      "inDemo": "Works in the demo",
+      "files": {
+        "title": "Excel (CSV) and JSON",
+        "text": "{count} records from “{source}” from the latest run.",
+        "note": "The CSV uses commas and UTF-8 encoding so spreadsheet apps open it with separate columns."
       },
-      "autoscale": "HPA autoscaling",
-      "autoscaleHint": "Min 3, max 32 pods based on the job queue"
+      "sheets": {
+        "title": "Google Sheets",
+        "text": "One tab per source, updated after every run."
+      },
+      "showExample": "See example",
+      "hideExample": "Hide example",
+      "bi": {
+        "title": "Power BI or your database",
+        "text": "One table per source with typed columns and the date of each run, ready for your dashboards.",
+        "table": "Table: {name}",
+        "column": "Column",
+        "type": "Type",
+        "types": {
+          "text": "text",
+          "number": "number",
+          "price": "number (COP)",
+          "link": "text (URL)",
+          "image": "text (URL)",
+          "date": "date",
+          "percent": "number (%)",
+          "status": "text"
+        },
+        "runAt": "Run date"
+      },
+      "api": {
+        "title": "API or webhook",
+        "text": "After each run, your system gets a notice with the changes (webhook) or queries the data through an API."
+      },
+      "notify": {
+        "title": "Alerts by email, Teams or WhatsApp",
+        "text": "Only when a rule is met, not a technical log.",
+        "button": "Set up alerts"
+      }
+    },
+    "history": {
+      "title": "Run history",
+      "subtitle": "Each run is logged with its status, records, changes and quality. Open a row to see the log.",
+      "scopeLabel": "Which sources to show",
+      "thisSource": "This source",
+      "allSources": "All",
+      "when": "Date and time",
+      "source": "Source",
+      "trigger": "Trigger",
+      "status": "Status",
+      "records": "Records",
+      "changes": "Changes",
+      "quality": "Quality",
+      "toggleLog": "Show or hide the log",
+      "notes": {
+        "apiDown": "The API answered “service unavailable”; it was retried 10 minutes later.",
+        "layoutChange": "The store changed its page layout and some fields came back empty.",
+        "selectorApproved": "An engineer approved the new selector and the run completed."
+      },
+      "repairTitle": "What happens when a page changes?",
+      "repairText": "Quality monitoring detects empty fields or fewer records than usual (see October 5 in Prices). In your project, AI proposes the new selector, an engineer approves it and the run is repeated; repair time depends on the plan."
     },
     "compliance": {
-      "title": "GDPR and ethics",
-      "subtitle": "Compliance, retention, and respect for target sites",
-      "robotsTitle": "Honor robots.txt",
-      "robotsHint": "Respect Disallow and Crawl-delay directives",
-      "rateLimitTitle": "Respectful rate limiting",
-      "rateLimitHint": "Default cap of 1 request per second per domain",
-      "dsrTitle": "DSR handling",
-      "dsrHint": "Endpoints for deletion, portability, and rectification",
-      "retentionTitle": "Data retention",
-      "retentionLabel": "Days",
-      "piiTitle": "PII detection",
-      "piiHint": "Auto-hash emails, phone numbers, and addresses",
-      "auditTitle": "Immutable audit log"
+      "title": "Source compliance",
+      "subtitle": "Before extracting, each source has a reviewed sheet: terms of use, robots.txt, request pace and personal data (Colombia's Law 1581 of 2012).",
+      "download": "Download sheet (.txt)",
+      "fileTitle": "Compliance sheet: {source}",
+      "fileSample": "Sample sheet generated by the data extraction and monitoring demo.",
+      "origin": "Origin",
+      "fields": {
+        "sourceType": "Source type",
+        "terms": "Terms of use",
+        "robots": "robots.txt",
+        "rate": "Request pace",
+        "identification": "Extractor identification",
+        "personalData": "Personal data",
+        "legalBasis": "Legal basis",
+        "retention": "Retention",
+        "owner": "Owner",
+        "reviewed": "Last review"
+      },
+      "sheets": {
+        "contratacion": {
+          "sourceType": "Open data published by the State, queried through its official API.",
+          "terms": "Reviewed: open data allows reuse when the source is cited.",
+          "robots": "Not applicable: the API is used, no pages are browsed.",
+          "rate": "One query per run, with pagination.",
+          "identification": "The client's application credential.",
+          "personalData": "Not extracted: only entity, purpose, amount, dates and process status.",
+          "legalBasis": "Public information (Colombia's Law 1712 of 2014 on transparency).",
+          "retention": "24 months.",
+          "owner": "Sales coordination (sample).",
+          "reviewed": "Sep 1, 2026"
+        },
+        "precios": {
+          "sourceType": "Public online store pages (three fictional stores in the demo).",
+          "terms": "Reviewed per store before quoting: if a store forbids automated access, it is not extracted.",
+          "robots": "Respected: only allowed paths and the crawl delay it sets.",
+          "rate": "One page every 10 seconds per store, outside peak hours.",
+          "identification": "Extractor identified with a client contact email.",
+          "personalData": "Excluded: no reviews, names or buyer data are extracted.",
+          "legalBasis": "Public commercial information; no personal data.",
+          "retention": "12 months.",
+          "owner": "Sales management (sample).",
+          "reviewed": "Sep 15, 2026"
+        },
+        "normativa": {
+          "sourceType": "Public regulation pages of entities (fictional in the demo).",
+          "terms": "Reviewed: public content, free to consult.",
+          "robots": "Respected: only the news section.",
+          "rate": "One page every 5 seconds.",
+          "identification": "Extractor identified with a client contact email.",
+          "personalData": "Only number, date, entity, title and link to the public PDF.",
+          "legalBasis": "Public information (Colombia's Law 1712 of 2014 on transparency).",
+          "retention": "While the regulation is in force.",
+          "owner": "Legal department (sample).",
+          "reviewed": "Sep 20, 2026"
+        },
+        "documentos": {
+          "sourceType": "Documents your suppliers hand in for onboarding (RUT, certificates, invoices).",
+          "terms": "Provided by the supplier for this purpose.",
+          "robots": "Not applicable: no pages are browsed.",
+          "rate": "Processed when they arrive in the folder.",
+          "identification": "Not applicable.",
+          "personalData": "Only the legal representative's name (if you choose to extract it). No ID numbers, phone numbers or personal emails are extracted.",
+          "legalBasis": "Supplier authorization and contractual relationship (Colombia's Law 1581 of 2012).",
+          "retention": "Per your data processing policy (example: for the duration of the business relationship).",
+          "owner": "Purchasing (sample).",
+          "reviewed": "Sep 28, 2026"
+        }
+      },
+      "sheetTitle": "Sheet: {source}",
+      "readOnly": "Read only",
+      "sampleNote": "Sample sheet. In your project it is signed by Koptup and your company before the extractor is built.",
+      "principlesTitle": "How we extract",
+      "principles": {
+        "apiFirst": "APIs and open data first; web pages only when there is no other way.",
+        "review": "Review of each source's terms of use and robots.txt before quoting.",
+        "pace": "Moderate request pace and an identified extractor.",
+        "noEvasion": "We do not bypass captchas, logins or other access controls.",
+        "personal": "No personal data unless there is a legal basis (Law 1581 of 2012).",
+        "log": "A log of every run."
+      },
+      "promise": "If a source does not allow extraction, we tell you before quoting.",
+      "logTitle": "Recent log",
+      "logRecords": "{count, plural, one {# record} other {# records}}",
+      "logNote": "Includes the runs you make in the demo."
     },
-    "logs": {
-      "starting": "[INFO] Starting run for",
-      "proxy": "[NET] Proxy selected",
-      "request": "[NET] GET",
-      "parse": "[PARSE] Extracted",
-      "captcha": "[BOT] Captcha detected · solving with",
-      "retry": "[WARN] Retrying after 429",
-      "success": "[OK] Run completed",
-      "error": "[ERR] Selector failed",
-      "autofix": "[AI] Selector regenerated by LLM"
+    "log": {
+      "webDemo": "[Demo] The three stores are sample pages generated in your browser: no external site is visited.",
+      "config": "Settings: {pages} pages and {fields} fields.",
+      "policy": "The source sheet applies: one page every 10 s per store and an identified extractor (no waiting in the demo).",
+      "storeExtract": "{store}: {records} records extracted.",
+      "fieldInvalid": "The selector of field “{field}” is invalid.",
+      "fieldEmpty": "{store}: required field “{field}” was empty in {count} records.",
+      "noKeyField": "There is no text field to identify each product: the comparison uses the position on the page.",
+      "compare": "Comparison with the previous run: {changes} changes.",
+      "done": "Done: {records} records, {changes} changes, quality {quality}.",
+      "donePartial": "Finished with warnings: {records} records, {changes} changes, quality {quality}.",
+      "doneError": "No records: check the record selector and the fields.",
+      "apiDemo": "[Simulated] The demo reads a sample file; in your project, the public procurement open data API.",
+      "apiQuery": "Processes published in the day's file: {total}.",
+      "radarFilter": "Radar filter: {matched} of {total} match.",
+      "normDemo": "[Simulated] In the demo the updates come from a sample file.",
+      "normFound": "Published regulations: {total}; from the entities you follow: {followed}.",
+      "docsDemo": "[Simulated] The PDFs and how they are read are samples; in your project they are read with OCR and AI.",
+      "docsRead": "Documents in the folder: {total} ({newDocs} new).",
+      "docDv": "{file}: the check digit read ({read}) does not match the calculated one ({expected}). Sent to review.",
+      "docLow": "{file}: {confidence}% confidence, below the {threshold}% threshold. Sent to review.",
+      "donePartialDocs": "Finished with {review} documents in review: {records} documents, {changes} changes, quality {quality}.",
+      "apiDown": "The API answered “service unavailable” (503). Retry scheduled in 10 minutes.",
+      "retryOk": "Retry succeeded: {records} records.",
+      "layoutChange": "Casa del Tornillo Demo changed its layout: Price and Availability were empty in 5 records. The team was notified.",
+      "selectorApproved": "New selector approved by an engineer; run completed."
+    },
+    "wizard": {
+      "title": "New source · step {step} of {total}",
+      "step1Hint": "Tell us where the data comes from.",
+      "name": "Name",
+      "namePlaceholder": "E.g. Cement prices at hardware stores",
+      "kind": "Source type",
+      "url": "Address (URL)",
+      "originDocs": "Where the documents arrive",
+      "originDocsPlaceholder": "E.g. Purchasing shared folder",
+      "urlInvalid": "Type a full address starting with https://",
+      "noVisit": "The demo does not visit this address: it is only saved in your browser.",
+      "step2Hint": "Which data do you need from this source?",
+      "fields": {
+        "product": "Product",
+        "price": "Price",
+        "previousPrice": "Previous price",
+        "availability": "Availability",
+        "shipping": "Shipping",
+        "link": "Link",
+        "entity": "Entity",
+        "object": "Purpose",
+        "amount": "Amount",
+        "date": "Date",
+        "location": "Location",
+        "status": "Status",
+        "nit": "NIT",
+        "companyName": "Company name",
+        "legalRep": "Legal representative",
+        "ciiu": "Activity (CIIU)",
+        "docDate": "Document date",
+        "total": "Total amount"
+      },
+      "customField": "Other data…",
+      "removeField": "Remove {field}",
+      "personalWarning": "If you choose personal data, we review the legal basis (Law 1581 of 2012) before extracting it.",
+      "frequency": "Frequency",
+      "destination": "Where you want to get the data",
+      "destinations": {
+        "csv": "Excel or CSV",
+        "sheets": "Google Sheets",
+        "bi": "Power BI or database",
+        "api": "API or webhook",
+        "email": "Email summary"
+      },
+      "reviewNote": "The source stays “in review”. In a real project we review terms of use, robots.txt and personal data before building the extractor; if the source does not allow it, we tell you.",
+      "finish": "Save source",
+      "created": "Source saved in review"
+    },
+    "review": {
+      "summaryTitle": "Trial extraction request",
+      "fields": "Data you need",
+      "subtitle": "Source in review since {when}. Not extracted yet.",
+      "checksTitle": "Review before extracting",
+      "checks": {
+        "terms": "Source terms of use",
+        "robots": "robots.txt and allowed sections",
+        "personal": "Personal data and legal basis (Law 1581 of 2012)",
+        "api": "Whether there is an API or open data to use instead",
+        "pace": "Agreed request pace"
+      },
+      "pending": "pending",
+      "demoNote": "In the demo this review does not move forward on its own: the team does it when you request the trial extraction.",
+      "nextTitle": "Next step",
+      "nextText": "Copy the summary and request a trial extraction: we review the source and, if possible, send you a sample.",
+      "copySummary": "Copy summary",
+      "delete": "Delete source",
+      "deleted": "Source deleted"
     }
   }
 }

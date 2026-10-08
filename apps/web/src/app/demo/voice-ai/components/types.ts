@@ -1,80 +1,135 @@
-export type Speaker = 'ai' | 'customer' | 'human';
+export type Speaker = 'ai' | 'customer';
 export type Sentiment = 'positive' | 'neutral' | 'negative';
-export type FnStatus = 'pending' | 'running' | 'done';
-export type FnKey = 'check_balance' | 'unblock_card' | 'schedule_appointment' | 'transfer_human';
+export type Direction = 'inbound' | 'outbound';
+export type ScenarioId = 'banca' | 'salud' | 'cobranza' | 'pedido';
+export type FlowNode = 'greeting' | 'identify' | 'intent' | 'action' | 'close' | 'transfer';
+export type FnStatus = 'pending' | 'running' | 'done' | 'skipped';
 
+/** Fase de la llamada de ejemplo en el reproductor. */
+export type Phase = 'idle' | 'playing' | 'paused' | 'transferred' | 'ended';
+
+/** Resultado de una llamada en el registro. */
+export type CallResult = 'resolved' | 'transferred' | 'abandoned' | 'voicemail' | 'noAnswer';
+
+export type FnKey =
+  | 'verifyCustomer'
+  | 'getTransactions'
+  | 'registerTravel'
+  | 'unblockCard'
+  | 'getAppointment'
+  | 'findAvailability'
+  | 'rescheduleAppointment'
+  | 'sendWhatsapp'
+  | 'getBalance'
+  | 'quotePaymentPlan'
+  | 'createAgreement'
+  | 'createPaymentLink'
+  | 'getOrder'
+  | 'createTicket'
+  | 'transferToHuman'
+  | 'logCallCrm';
+
+/** Turno del guion. El texto vive en messages: demoVoice.scenarios.<id>.turns.<key>. */
 export interface Turn {
-  id: number;
+  key: string;
   speaker: Speaker;
-  textKey: string;
-  intentKey?: string;
+  sentiment: Sentiment;
+  node: FlowNode;
+  /** Intención detectada en este turno (clave de demoVoice.intents). */
+  intent?: string;
+  /** Confianza de ejemplo (0–1) de la intención. */
   confidence?: number;
-  sentiment: Sentiment;
-  latencyMs: number;
-  redacted?: boolean;
-  codeSwitch?: boolean;
-  fn?: FnKey;
+  /** Funciones que el agente invoca en este turno. */
+  fns?: FnKey[];
+  /** El turno contiene un dato sensible que se muestra enmascarado. */
+  masked?: boolean;
+  /** Turno con el aviso de grabación y tratamiento de datos (Ley 1581). */
+  notice?: boolean;
 }
 
-export interface QueueRow {
-  id: string;
+export interface FnCall {
+  key: FnKey;
+  /** Sistema con el que se conectaría en un proyecto real (clave de demoVoice.systems). */
+  system: string;
+  /** Argumentos de ejemplo (se muestran como JSON). */
+  args: Record<string, string | number | boolean>;
+}
+
+export interface Scenario {
+  id: ScenarioId;
+  direction: Direction;
+  /** Número del cliente, ya enmascarado. */
   number: string;
-  direction: 'inbound' | 'outbound';
-  duration: string;
-  status: 'live' | 'completed' | 'voicemail' | 'missed' | 'transferred';
-  sentiment: Sentiment;
-  confidence: number;
+  /** Datos sensibles enmascarados que se insertan en el guion. */
+  maskedData: Record<string, string>;
+  turns: Turn[];
+  fns: FnCall[];
+  /** Fecha y hora de la llamada saliente (para validar la ventana de contacto). */
+  scheduled?: { date: string; time: string };
+  /** Llamada de cobranza: aplica la ventana horaria de la Ley 2300. */
+  collections?: boolean;
 }
 
-export const TURNS: Turn[] = [
-  { id: 1, speaker: 'customer', textKey: 't1', intentKey: 'card_unblock',    confidence: 0.94, sentiment: 'negative', latencyMs: 210, redacted: true },
-  { id: 2, speaker: 'ai',       textKey: 't2',                                                  sentiment: 'neutral',  latencyMs: 240, fn: 'check_balance' },
-  { id: 3, speaker: 'customer', textKey: 't3', intentKey: 'travel_notice',   confidence: 0.91, sentiment: 'neutral',  latencyMs: 195 },
-  { id: 4, speaker: 'ai',       textKey: 't4',                                                  sentiment: 'positive', latencyMs: 260, fn: 'unblock_card', codeSwitch: true },
-  { id: 5, speaker: 'customer', textKey: 't5',                                                  sentiment: 'positive', latencyMs: 180 },
-  { id: 6, speaker: 'ai',       textKey: 't6',                                                  sentiment: 'positive', latencyMs: 230 },
-  { id: 7, speaker: 'customer', textKey: 't7', intentKey: 'book_appointment',confidence: 0.97, sentiment: 'positive', latencyMs: 205 },
-  { id: 8, speaker: 'ai',       textKey: 't8',                                                  sentiment: 'positive', latencyMs: 250, fn: 'schedule_appointment' },
-];
+/** Fila del registro de llamadas. */
+export interface CallRow {
+  id: string;
+  /** Hora local HH:MM (fija en los datos de ejemplo). */
+  time: string;
+  number: string;
+  direction: Direction;
+  /** Clave de demoVoice.intents con el motivo principal. */
+  intent: string;
+  durationSec: number;
+  result: CallResult;
+  sentiment: Sentiment;
+  /** Encuesta de satisfacción 1–5 (null si no respondió). */
+  csat: number | null;
+  scenario?: ScenarioId;
+  /** Llamada hecha por la persona en esta demo. */
+  mine?: boolean;
+}
 
-export const STT_PROVIDERS: { id: 'whisper' | 'deepgram' | 'assembly'; latency: number }[] = [
-  { id: 'whisper',  latency: 320 },
-  { id: 'deepgram', latency: 180 },
-  { id: 'assembly', latency: 240 },
-];
-export const TTS_PROVIDERS: { id: 'eleven' | 'cartesia' | 'playht' }[] = [
-  { id: 'eleven' }, { id: 'cartesia' }, { id: 'playht' },
-];
-export const TELE_PROVIDERS: { id: 'twilio' | 'vonage' | 'telnyx' }[] = [
-  { id: 'twilio' }, { id: 'vonage' }, { id: 'telnyx' },
-];
+/** Contacto de la campaña saliente. */
+export interface CampaignContact {
+  id: string;
+  name: string;
+  number: string;
+  /** Fecha programada AAAA-MM-DD (2026). */
+  date: string;
+  /** Hora programada HH:MM (24 h). */
+  time: string;
+  excluded?: boolean;
+  /** Fecha del último contacto (para la regla de frecuencia). */
+  lastContact?: string;
+  /** Resultado si la llamada se permite. */
+  outcome: 'agreement' | 'voicemail' | 'paid' | 'noAnswer' | 'callback';
+}
 
-export const INBOUND: QueueRow[] = [
-  { id: 'i1', number: '+56 9 4521 8830', direction: 'inbound', duration: '02:14', status: 'live',        sentiment: 'positive', confidence: 0.94 },
-  { id: 'i2', number: '+56 2 2890 1145', direction: 'inbound', duration: '04:38', status: 'completed',   sentiment: 'neutral',  confidence: 0.88 },
-  { id: 'i3', number: '+56 9 7732 5519', direction: 'inbound', duration: '00:42', status: 'missed',     sentiment: 'negative', confidence: 0.61 },
-  { id: 'i4', number: '+51 1 642 3399',  direction: 'inbound', duration: '06:11', status: 'transferred',sentiment: 'neutral',  confidence: 0.79 },
-];
-export const OUTBOUND: QueueRow[] = [
-  { id: 'o1', number: '+56 9 5544 8821', direction: 'outbound', duration: '01:48', status: 'completed', sentiment: 'positive', confidence: 0.92 },
-  { id: 'o2', number: '+56 9 2233 9087', direction: 'outbound', duration: '00:18', status: 'voicemail', sentiment: 'neutral',  confidence: 0.74 },
-  { id: 'o3', number: '+56 9 8801 5562', direction: 'outbound', duration: '03:02', status: 'completed', sentiment: 'positive', confidence: 0.90 },
-  { id: 'o4', number: '+54 11 4456 9912',direction: 'outbound', duration: '00:00', status: 'missed',    sentiment: 'neutral',  confidence: 0.55 },
-];
+export type BlockReason = 'sunday' | 'holiday' | 'beforeOpen' | 'afterClose' | 'excluded' | 'frequency' | 'outOfRange' | 'invalid';
+
+export type ContactCheck =
+  | { kind: 'allowed' }
+  | { kind: 'blocked'; reason: BlockReason; holiday?: string };
 
 export const SENTIMENT_TONE: Record<Sentiment, string> = {
   positive: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
-  neutral:  'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
+  neutral: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
   negative: 'bg-rose-500/15 text-rose-300 border-rose-500/30',
 };
 
-export const STATUS_TONE: Record<QueueRow['status'], string> = {
-  live:        'bg-emerald-500/15 text-emerald-300',
-  completed:   'bg-cyan-500/15 text-cyan-300',
-  voicemail:   'bg-amber-500/15 text-amber-300',
-  missed:      'bg-rose-500/15 text-rose-300',
+export const RESULT_TONE: Record<CallResult, string> = {
+  resolved: 'bg-emerald-500/15 text-emerald-300',
   transferred: 'bg-violet-500/15 text-violet-300',
+  abandoned: 'bg-rose-500/15 text-rose-300',
+  voicemail: 'bg-amber-500/15 text-amber-300',
+  noAnswer: 'bg-slate-500/20 text-slate-300',
 };
 
-export function pad(n: number) { return n.toString().padStart(2, '0'); }
-export function fmtTime(s: number) { return `${pad(Math.floor(s / 60))}:${pad(s % 60)}`; }
+export function pad(n: number) {
+  return n.toString().padStart(2, '0');
+}
+
+export function fmtTime(s: number) {
+  const total = Math.max(0, Math.floor(s));
+  return `${pad(Math.floor(total / 60))}:${pad(total % 60)}`;
+}

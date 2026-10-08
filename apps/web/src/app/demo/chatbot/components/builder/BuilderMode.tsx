@@ -1,409 +1,388 @@
 'use client';
 
 /**
- * BuilderMode — modo "Builder & Embed" del demo de chatbot.
+ * BuilderMode — modo "Configura el tuyo" de /demo/chatbot.
  *
- * Wires:
- *  - Identidad / apariencia / comportamiento (ConfigPanel)
- *  - Subida real de archivos al backend (`POST /api/chatbot/bots/:id/docs`)
- *  - Persistencia de bots en localStorage + backend (`POST /api/chatbot/bots`)
- *  - Live preview con iframe REAL apuntando a `/embed/chatbot/{botId}`
- *  - EmbedCode con URLs reales (iframe, script, react, webhook)
- *  - Compartir micrositio (`/chatbot/{botId}`)
- *
- * SOLID: cada panel sub-componente recibe sólo lo que necesita; el estado
- * vive en este orquestador y se serializa contra el backend.
+ * Todo es real:
+ *  - Guardar crea o actualiza el bot en el backend (`POST`/`PATCH /api/chatbot/bots`),
+ *    con el token de dueño si el backend lo entrega (ver `api.ts`).
+ *  - Los documentos de texto se suben a `POST /api/chatbot/bots/:id/docs` y se
+ *    pueden borrar.
+ *  - La vista previa usa el widget real (`/widget.js` + `/embed/chatbot/<id>`).
+ *  - El código para insertar solo ofrece lo que funciona (script e iframe).
+ *  - "Conversaciones" lee el historial real del bot y lo exporta a CSV.
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
+import { ArrowTopRightOnSquareIcon, LinkIcon } from '@heroicons/react/24/outline';
 import { SITE_URL } from '@/lib/site';
 
 import ConfigPanel from './ConfigPanel';
 import LivePreview from './LivePreview';
 import EmbedCode from './EmbedCode';
-import TenantSelector, { CURRENT_BOT_LS_KEY } from './TenantSelector';
-import type { BuilderWidgetConfig, MockKnowledgeDoc, WidgetCornerPosition } from './widgetConfig';
+import ConversationsPanel from './ConversationsPanel';
+import MyBotsMenu from './MyBotsMenu';
 import {
-  AVATAR_CHOICES,
-  DEFAULT_BOT_ID,
-  MOCK_DOCS,
-  TONE_CHOICES,
-} from './widgetConfig';
-import {
+  BotApiError,
   createBot,
   deleteBotDoc,
   fileToBase64,
+  forgetBot,
   getBot,
+  listOwnedBots,
   patchBot,
+  rememberBot,
+  textToBase64,
   uploadBotDocs,
   type RemoteBotConfig,
   type RemoteBotDoc,
 } from './api';
+import {
+  MAX_FILES_PER_UPLOAD,
+  MAX_TEXT_FILE_BYTES,
+  TEXT_EXTENSIONS,
+  composeSystemPrompt,
+  fromRemote,
+  sameConfig,
+  type BuilderWidgetConfig,
+} from './widgetConfig';
+import { getSampleCompanies, getSampleCompany, type SampleCompanyKey, type SampleLocale } from '../sampleKnowledge';
 
-const LOCAL_STORAGE_KEY = 'koptup.chatbot.builder.bots';
+const MIME_BY_EXT: Record<string, string> = { '.txt': 'text/plain', '.md': 'text/markdown', '.csv': 'text/csv' };
 
-interface PersistedBots {
-  [botId: string]: BuilderWidgetConfig;
+function extOf(name: string): string {
+  const i = name.lastIndexOf('.');
+  return i >= 0 ? name.slice(i).toLowerCase() : '';
 }
 
-function readLocal(): PersistedBots {
-  if (typeof window === 'undefined') return {};
+/** Actualiza ?mode=builder&botId=… sin recargar ni navegar. */
+function syncUrl(botId: string | null) {
   try {
-    const raw = window.localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (!raw) return {};
-    return JSON.parse(raw) as PersistedBots;
+    const url = new URL(window.location.href);
+    url.searchParams.set('mode', 'builder');
+    if (botId) url.searchParams.set('botId', botId);
+    else url.searchParams.delete('botId');
+    window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}`);
   } catch {
-    return {};
+    /* sin History API */
   }
 }
-
-function writeLocal(data: PersistedBots) {
-  if (typeof window === 'undefined') return;
-  try {
-    window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
-  } catch {
-    /* ignore quota */
-  }
-}
-
-function toBuilderConfig(remote: RemoteBotConfig & { docs?: RemoteBotDoc[] }): BuilderWidgetConfig {
-  return {
-    botId: remote.botId,
-    botName: remote.name,
-    primaryColor: remote.color,
-    position: remote.position,
-    avatar: remote.avatar,
-    welcome: remote.welcome,
-    systemPrompt: remote.systemPrompt,
-    tone: (['professional', 'friendly', 'technical', 'casual'].includes(remote.tone)
-      ? remote.tone
-      : 'professional') as BuilderWidgetConfig['tone'],
-    languages: (remote.languages as BuilderWidgetConfig['languages']) ?? ['es', 'en'],
-    docs: (remote.docs ?? []).map((d) => ({
-      id: d.id,
-      name: d.name,
-      sizeKb: Math.max(1, Math.round(d.size / 1024)),
-      chunks: Math.max(1, Math.round(d.size / 4096) || 1),
-    })),
-  };
-}
-
-function toRemotePayload(c: BuilderWidgetConfig): Partial<RemoteBotConfig> {
-  return {
-    name: c.botName,
-    color: c.primaryColor,
-    position: c.position,
-    avatar: c.avatar,
-    welcome: c.welcome,
-    systemPrompt: c.systemPrompt,
-    tone: c.tone,
-    languages: c.languages,
-  };
-}
-
-const DEFAULT_CONFIG: BuilderWidgetConfig = {
-  botName: 'Koptup Assistant',
-  primaryColor: '#4F46E5',
-  position: 'br',
-  avatar: '🤖',
-  welcome: '¡Hola! ¿En qué puedo ayudarte hoy?',
-  systemPrompt:
-    'You are a helpful enterprise assistant grounded in the uploaded knowledge base. Cite sources when possible.',
-  tone: 'professional',
-  languages: ['es', 'en'],
-  docs: MOCK_DOCS.slice(0, 2),
-  botId: DEFAULT_BOT_ID,
-};
-
-const POSITIONS: WidgetCornerPosition[] = ['br', 'bl', 'tr', 'tl'];
 
 export default function BuilderMode() {
   const t = useTranslations('demoChatbot.builder');
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const urlBotId = searchParams?.get('botId') ?? null;
+  const locale: SampleLocale = useLocale() === 'en' ? 'en' : 'es';
+  const sampleCompanies = useMemo(() => getSampleCompanies(locale), [locale]);
 
-  const [config, setConfig] = useState<BuilderWidgetConfig>(DEFAULT_CONFIG);
-  const [persistedBotId, setPersistedBotId] = useState<string | null>(null);
+  const defaults = useMemo<BuilderWidgetConfig>(
+    () => ({
+      botName: t('defaults.botName'),
+      primaryColor: '#4F46E5',
+      position: 'br',
+      avatar: '💬',
+      welcome: t('defaults.welcome'),
+      instructions: t('defaults.instructions'),
+      tone: 'friendly',
+    }),
+    [t],
+  );
+
+  const [config, setConfig] = useState<BuilderWidgetConfig>(defaults);
+  const [savedConfig, setSavedConfig] = useState<BuilderWidgetConfig | null>(null);
+  const [botId, setBotId] = useState<string | null>(null);
+  const [docs, setDocs] = useState<RemoteBotDoc[]>([]);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const hydrated = useRef(false);
+  const [nonce, setNonce] = useState(0);
+  const [origin, setOrigin] = useState(SITE_URL);
 
-  // Hidratar desde URL → backend o localStorage
   useEffect(() => {
-    if (hydrated.current) return;
-    hydrated.current = true;
-    if (!urlBotId) return;
-    const local = readLocal();
-    const cached = local[urlBotId];
-    if (cached) {
-      setConfig({ ...cached, botId: urlBotId });
-      setPersistedBotId(urlBotId);
+    setOrigin(window.location.origin);
+  }, []);
+
+  const applyRemote = useCallback((remote: RemoteBotConfig) => {
+    const cfg = fromRemote(remote);
+    setConfig(cfg);
+    setSavedConfig(cfg);
+    setBotId(remote.botId);
+    setDocs(remote.docs ?? []);
+    setNonce((n) => n + 1);
+    syncUrl(remote.botId);
+  }, []);
+
+  const loadBot = useCallback(
+    async (id: string, opts?: { silent?: boolean }) => {
+      try {
+        const remote = await getBot(id);
+        applyRemote(remote);
+        if (!opts?.silent) toast.success(t('myBots.selected', { name: remote.name }));
+      } catch (err) {
+        if (err instanceof BotApiError && err.status === 404) {
+          const name = listOwnedBots('builder').find((b) => b.botId === id)?.name ?? id;
+          forgetBot(id);
+          toast.error(t('myBots.removedMissing', { name }));
+          syncUrl(null);
+        } else {
+          toast.error(t('myBots.loadFailed'));
+        }
+      }
+    },
+    [applyRemote, t],
+  );
+
+  // Al entrar: el bot de la URL (?botId=) o el último bot propio de este navegador.
+  useEffect(() => {
+    let fromUrl: string | null = null;
+    try {
+      fromUrl = new URLSearchParams(window.location.search).get('botId');
+    } catch {
+      fromUrl = null;
     }
-    // Siempre intentar refrescar contra el backend para tener los docs actualizados.
-    // Conservamos `avatarImage` (data URL) desde la cache local: el backend no
-    // lo persiste (in-memory, sin BBDD), pero la UX del Builder lo necesita.
-    getBot(urlBotId)
-      .then((remote) => {
-        const fromRemote = toBuilderConfig(remote);
-        const preservedAvatarImage = cached?.avatarImage;
-        setConfig(
-          preservedAvatarImage
-            ? { ...fromRemote, avatarImage: preservedAvatarImage }
-            : fromRemote,
-        );
-        setPersistedBotId(remote.botId);
-      })
-      .catch(() => {
-        /* offline ok, ya hidratamos de local */
-      });
-  }, [urlBotId]);
+    const id = fromUrl && /^[a-zA-Z0-9_-]{3,64}$/.test(fromUrl) ? fromUrl : listOwnedBots('builder')[0]?.botId;
+    if (id) void loadBot(id, { silent: true });
+    // Solo al montar.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const patchConfig = useCallback((patch: Partial<BuilderWidgetConfig>) => {
     setConfig((c) => ({ ...c, ...patch }));
   }, []);
 
-  const persistLocal = useCallback((id: string, c: BuilderWidgetConfig) => {
-    const all = readLocal();
-    all[id] = { ...c, botId: id };
-    writeLocal(all);
-  }, []);
+  const dirty = !sameConfig(config, savedConfig);
 
-  /** Crea (o actualiza) el bot en el backend y devuelve el botId remoto. */
-  const ensureSaved = useCallback(async (): Promise<string> => {
+  /** Guarda el bot (crea o actualiza) y devuelve su id. */
+  const save = useCallback(async (): Promise<string | null> => {
     setSaving(true);
+    const payload: Partial<RemoteBotConfig> = {
+      name: config.botName.trim() || t('defaults.botName'),
+      color: config.primaryColor,
+      position: config.position,
+      avatar: config.avatar,
+      welcome: config.welcome.trim() || t('preview.defaultWelcome'),
+      systemPrompt: composeSystemPrompt(config.instructions, t('toneLine', { tone: t(`fields.tones.${config.tone}`) })),
+      tone: config.tone,
+      languages: [locale],
+    };
     try {
-      const payload = toRemotePayload(config);
-      let remote: RemoteBotConfig;
-      if (persistedBotId) {
-        remote = await patchBot(persistedBotId, payload);
-      } else {
-        remote = await createBot(payload);
-      }
-      const newId = remote.botId;
-      const nextLocal: BuilderWidgetConfig = { ...config, botId: newId };
-      setConfig(nextLocal);
-      setPersistedBotId(newId);
-      persistLocal(newId, nextLocal);
-      if (urlBotId !== newId) {
-        router.replace(`?botId=${encodeURIComponent(newId)}`);
-      }
-      return newId;
+      const remote = botId ? await patchBot(botId, payload) : await createBot(payload, { kind: 'builder' });
+      rememberBot(remote.botId, { name: remote.name, kind: 'builder' });
+      const cfg = { ...config, botName: remote.name, welcome: remote.welcome };
+      setConfig(cfg);
+      setSavedConfig(cfg);
+      setBotId(remote.botId);
+      if (remote.docs) setDocs(remote.docs);
+      setNonce((n) => n + 1);
+      syncUrl(remote.botId);
+      toast.success(t('actions.saved'));
+      return remote.botId;
+    } catch (err) {
+      if (err instanceof BotApiError && (err.status === 401 || err.status === 403)) toast.error(t('actions.notOwner'));
+      else toast.error(t('actions.saveFailed'));
+      return null;
     } finally {
       setSaving(false);
     }
-  }, [config, persistedBotId, persistLocal, router, urlBotId]);
+  }, [botId, config, locale, t]);
 
-  const handleSave = useCallback(async () => {
-    try {
-      const id = await ensureSaved();
-      toast.success(`Bot guardado · ID: ${id}`);
-    } catch (err: any) {
-      toast.error(`No pude guardar el bot: ${err?.message ?? 'error'}`);
-    }
-  }, [ensureSaved]);
-
-  const handleUploadFiles = useCallback(
+  const handleUpload = useCallback(
     async (files: File[]) => {
-      if (files.length === 0) return;
+      const valid: File[] = [];
+      for (const f of files.slice(0, MAX_FILES_PER_UPLOAD)) {
+        if (!TEXT_EXTENSIONS.includes(extOf(f.name))) toast.error(t('knowledge.unsupported', { name: f.name }));
+        else if (f.size > MAX_TEXT_FILE_BYTES) toast.error(t('knowledge.tooBig', { name: f.name }));
+        else valid.push(f);
+      }
+      if (valid.length === 0) return;
       setUploading(true);
-      const tid = toast.loading('Subiendo archivos...');
       try {
-        const botId = persistedBotId ?? (await ensureSaved());
+        const id = botId ?? (await save());
+        if (!id) return;
         const payload = await Promise.all(
-          files.map(async (f) => ({
+          valid.map(async (f) => ({
             name: f.name,
             size: f.size,
-            mime: f.type || 'application/octet-stream',
+            mime: f.type || MIME_BY_EXT[extOf(f.name)] || 'text/plain',
             contentBase64: await fileToBase64(f),
           })),
         );
-        const result = await uploadBotDocs(botId, payload);
-        const newDocs: MockKnowledgeDoc[] = result.docs.map((d) => ({
-          id: d.id,
-          name: d.name,
-          sizeKb: Math.max(1, Math.round(d.size / 1024)),
-          chunks: Math.max(1, Math.round(d.size / 4096) || 1),
-        }));
-        const next = { ...config, botId, docs: newDocs };
-        setConfig(next);
-        persistLocal(botId, next);
-        toast.success(`${files.length} archivo(s) subido(s)`, { id: tid });
-      } catch (err: any) {
-        toast.error(`Upload falló: ${err?.message ?? 'error'}`, { id: tid });
+        const result = await uploadBotDocs(id, payload);
+        setDocs(result.docs);
+        toast.success(t('knowledge.uploaded', { count: valid.length }));
+      } catch (err) {
+        if (err instanceof BotApiError && (err.status === 401 || err.status === 403)) toast.error(t('actions.notOwner'));
+        else toast.error(t('knowledge.uploadFailed'));
       } finally {
         setUploading(false);
       }
     },
-    [config, ensureSaved, persistLocal, persistedBotId],
+    [botId, save, t],
+  );
+
+  const handleLoadSample = useCallback(
+    async (key: SampleCompanyKey) => {
+      const company = getSampleCompany(key, locale);
+      setUploading(true);
+      try {
+        const id = botId ?? (await save());
+        if (!id) return;
+        const result = await uploadBotDocs(
+          id,
+          company.docs.map((d) => ({
+            name: d.fileName,
+            size: new TextEncoder().encode(d.text).length,
+            mime: 'text/plain',
+            contentBase64: textToBase64(d.text),
+          })),
+        );
+        setDocs(result.docs);
+        toast.success(t('knowledge.sampleLoaded'));
+      } catch (err) {
+        if (err instanceof BotApiError && (err.status === 401 || err.status === 403)) toast.error(t('actions.notOwner'));
+        else toast.error(t('knowledge.uploadFailed'));
+      } finally {
+        setUploading(false);
+      }
+    },
+    [botId, locale, save, t],
   );
 
   const handleRemoveDoc = useCallback(
     async (docId: string) => {
-      if (!persistedBotId) {
-        // doc local únicamente
-        const next = { ...config, docs: config.docs.filter((d) => d.id !== docId) };
-        setConfig(next);
-        return;
-      }
+      if (!botId) return;
       try {
-        const result = await deleteBotDoc(persistedBotId, docId);
-        const newDocs: MockKnowledgeDoc[] = result.docs.map((d) => ({
-          id: d.id,
-          name: d.name,
-          sizeKb: Math.max(1, Math.round(d.size / 1024)),
-          chunks: Math.max(1, Math.round(d.size / 4096) || 1),
-        }));
-        const next = { ...config, docs: newDocs };
-        setConfig(next);
-        persistLocal(persistedBotId, next);
-        toast.success('Documento eliminado');
-      } catch (err: any) {
-        toast.error(`No pude borrar el documento: ${err?.message ?? 'error'}`);
+        const result = await deleteBotDoc(botId, docId);
+        setDocs(result.docs);
+        toast.success(t('knowledge.removed'));
+      } catch (err) {
+        if (err instanceof BotApiError && (err.status === 401 || err.status === 403)) toast.error(t('actions.notOwner'));
+        else toast.error(t('knowledge.removeFailed'));
       }
     },
-    [config, persistLocal, persistedBotId],
+    [botId, t],
   );
 
-  /**
-   * Cambia el tenant activo. Trae la config del bot seleccionado del backend
-   * y actualiza la URL (`?botId=…`) para que el resto de la página (Playground
-   * incluido) lo levante en el próximo render.
-   */
-  const handleSelectTenant = useCallback(
-    async (botId: string) => {
-      try {
-        const remote = await getBot(botId);
-        const local = readLocal();
-        const cached = local[botId];
-        const fromRemote = toBuilderConfig(remote);
-        const next = cached?.avatarImage
-          ? { ...fromRemote, avatarImage: cached.avatarImage }
-          : fromRemote;
-        setConfig(next);
-        setPersistedBotId(botId);
-        persistLocal(botId, next);
-        if (typeof window !== 'undefined') {
-          try {
-            window.localStorage.setItem(CURRENT_BOT_LS_KEY, botId);
-            window.localStorage.setItem('koptup.chatbot.demoBotId', botId);
-          } catch {
-            /* ignore */
-          }
-        }
-        router.replace(`?botId=${encodeURIComponent(botId)}`);
-        toast.success(`Tenant activo: ${remote.name}`);
-      } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : 'error';
-        toast.error(`No pude cargar el bot: ${msg}`);
-      }
+  const resetToNew = useCallback(() => {
+    setConfig(defaults);
+    setSavedConfig(null);
+    setBotId(null);
+    setDocs([]);
+    syncUrl(null);
+  }, [defaults]);
+
+  const handleCreateNew = useCallback(() => {
+    resetToNew();
+    toast.success(t('myBots.newReady'));
+  }, [resetToNew, t]);
+
+  const handleDeleted = useCallback(
+    (deletedId: string) => {
+      if (deletedId === botId) resetToNew();
     },
-    [persistLocal, router],
+    [botId, resetToNew],
   );
 
-  /** Limpia el estado para empezar un bot nuevo (no toca el backend hasta save). */
-  const handleCreateNewTenant = useCallback(() => {
-    setConfig({ ...DEFAULT_CONFIG, botId: DEFAULT_BOT_ID });
-    setPersistedBotId(null);
-    if (typeof window !== 'undefined') {
-      try {
-        window.localStorage.removeItem(CURRENT_BOT_LS_KEY);
-        window.localStorage.removeItem('koptup.chatbot.demoBotId');
-      } catch {
-        /* ignore */
-      }
-    }
-    router.replace('?');
-    toast.success('Nuevo bot listo. Configura y guarda para persistir.');
-  }, [router]);
+  const chatUrl = botId ? `${origin}/embed/chatbot/${encodeURIComponent(botId)}` : '';
 
-  /** El bot activo fue eliminado: volvemos al estado "sin guardar". */
-  const handleTenantDeleted = useCallback(() => {
-    setConfig({ ...DEFAULT_CONFIG, botId: DEFAULT_BOT_ID });
-    setPersistedBotId(null);
-    router.replace('?');
-  }, [router]);
-
-  const handleShareMicrosite = useCallback(async () => {
+  const handleCopyLink = useCallback(async () => {
+    if (!chatUrl) return;
     try {
-      const id = persistedBotId ?? (await ensureSaved());
-      const url = `${SITE_URL}/chatbot/${id}`;
-      if (typeof navigator !== 'undefined' && navigator.clipboard) {
-        await navigator.clipboard.writeText(url);
-      }
-      toast.success(`Link copiado: ${url}`);
-    } catch (err: any) {
-      toast.error(`Compartir falló: ${err?.message ?? 'error'}`);
+      await navigator.clipboard.writeText(chatUrl);
+      toast.success(t('actions.linkCopied', { url: chatUrl }));
+    } catch {
+      toast(t('actions.copyFailed', { url: chatUrl }));
     }
-  }, [ensureSaved, persistedBotId]);
-
-  const headerTitle = useMemo(() => t('title'), [t]);
-  const headerSubtitle = useMemo(() => t('subtitle'), [t]);
+  }, [chatUrl, t]);
 
   return (
-    <div className="flex flex-1 flex-col overflow-y-auto bg-secondary-50 dark:bg-secondary-950">
-      <header className="flex flex-col gap-3 border-b border-secondary-200 bg-white px-4 py-3 dark:border-secondary-800 dark:bg-secondary-900 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-1 flex-col bg-secondary-50 dark:bg-secondary-950">
+      <header className="flex flex-col gap-3 border-b border-secondary-200 bg-white px-4 py-3 dark:border-secondary-800 dark:bg-secondary-900 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
-          <h2 className="text-base font-bold text-secondary-900 dark:text-white">
-            {headerTitle}
-          </h2>
-          <p className="text-xs text-secondary-500 dark:text-secondary-400">
-            {headerSubtitle}
-          </p>
+          <h2 className="text-base font-bold text-secondary-900 dark:text-white">{t('title')}</h2>
+          <p className="text-xs text-secondary-500 dark:text-secondary-400">{t('subtitle')}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <TenantSelector
-            currentBotId={persistedBotId}
-            onSelect={handleSelectTenant}
-            onCreateNew={handleCreateNewTenant}
-            onDeleted={handleTenantDeleted}
+          <MyBotsMenu
+            currentBotId={botId}
+            refreshKey={nonce}
+            onSelect={(id) => void loadBot(id)}
+            onCreateNew={handleCreateNew}
+            onDeleted={handleDeleted}
           />
-          {persistedBotId ? (
-            <span className="rounded-md bg-secondary-100 px-2 py-1 font-mono text-[11px] text-secondary-700 dark:bg-secondary-800 dark:text-secondary-200">
-              {persistedBotId}
+          {botId ? (
+            <span className="max-w-full truncate rounded-md bg-secondary-100 px-2 py-1 font-mono text-[11px] text-secondary-700 dark:bg-secondary-800 dark:text-secondary-200">
+              {botId}
+            </span>
+          ) : null}
+          {dirty && botId ? (
+            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800 dark:bg-amber-900/40 dark:text-amber-200">
+              {t('actions.unsaved')}
             </span>
           ) : null}
           <button
             type="button"
-            onClick={handleSave}
+            onClick={() => void save()}
             disabled={saving}
             className="rounded-md bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-primary-700 disabled:opacity-60"
           >
             {saving ? t('actions.saving') : t('actions.save')}
           </button>
-          <button
-            type="button"
-            onClick={handleShareMicrosite}
-            className="rounded-md border border-primary-600 px-3 py-1.5 text-xs font-semibold text-primary-700 hover:bg-primary-50 dark:text-primary-200 dark:hover:bg-primary-950"
-          >
-            {t('actions.share')}
-          </button>
+          {botId ? (
+            <>
+              <button
+                type="button"
+                onClick={() => void handleCopyLink()}
+                className="inline-flex items-center gap-1 rounded-md border border-primary-600 px-3 py-1.5 text-xs font-semibold text-primary-700 hover:bg-primary-50 dark:text-primary-200 dark:hover:bg-primary-950"
+              >
+                <LinkIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                {t('actions.copyLink')}
+              </button>
+              <a
+                href={`/embed/chatbot/${encodeURIComponent(botId)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 rounded-md px-2 py-1.5 text-xs font-semibold text-primary-700 hover:bg-primary-50 dark:text-primary-200 dark:hover:bg-primary-950"
+              >
+                <ArrowTopRightOnSquareIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                {t('actions.openChat')}
+              </a>
+            </>
+          ) : null}
         </div>
       </header>
 
       <div className="grid flex-1 grid-cols-1 gap-4 p-4 lg:grid-cols-12">
-        <section className="lg:col-span-4" aria-label="builder-config">
+        <section className="min-w-0 lg:col-span-4" aria-label={t('configTitle')}>
           <ConfigPanel
             config={config}
             onChange={patchConfig}
-            avatarChoices={AVATAR_CHOICES}
-            toneChoices={TONE_CHOICES}
-            positions={POSITIONS}
-            onUpload={handleUploadFiles}
-            onRemoveDoc={handleRemoveDoc}
+            docs={docs}
+            onUpload={(files) => void handleUpload(files)}
+            onRemoveDoc={(id) => void handleRemoveDoc(id)}
+            onLoadSample={(key) => void handleLoadSample(key)}
+            sampleCompanies={sampleCompanies}
             uploading={uploading}
           />
         </section>
 
-        <section className="lg:col-span-5" aria-label="builder-preview">
-          <LivePreview config={config} botId={persistedBotId} />
+        <section className="min-w-0 lg:col-span-5" aria-label={t('preview.title')}>
+          <LivePreview
+            config={config}
+            botId={botId}
+            dirty={dirty}
+            nonce={nonce}
+            origin={origin}
+            saving={saving}
+            onSave={() => void save()}
+          />
         </section>
 
-        <section className="lg:col-span-3" aria-label="builder-embed">
-          <EmbedCode config={config} botId={persistedBotId} />
+        <section className="flex min-w-0 flex-col gap-4 lg:col-span-3" aria-label={t('embed.title')}>
+          <EmbedCode config={config} botId={botId} origin={origin} />
+        </section>
+
+        <section className="min-w-0 lg:col-span-12" aria-label={t('conversations.title')}>
+          <ConversationsPanel botId={botId} refreshKey={nonce} />
         </section>
       </div>
     </div>

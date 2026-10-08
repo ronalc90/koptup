@@ -1,289 +1,776 @@
 {
   "demoScraping": {
     "meta": {
-      "title": "Plataforma de Scraping & Extracción",
-      "subtitle": "Builder visual point-and-click, IA con schemas, cluster de browsers headless, anti-bot stealth, scheduler, diff detection y outputs multi-canal.",
-      "ethicalMode": "Modo ético",
-      "live": "En vivo",
-      "menu": "Menú"
+      "title": "Extracción y monitoreo de datos",
+      "seoTitle": "Demo: extracción y monitoreo de datos de la web y de documentos",
+      "seoDescription": "Prueba un extractor de datos con fuentes de ejemplo: radar de contratación pública, precios de tiendas ficticias con constructor de campos por clic, normativa y documentos de proveedores. Detecta cambios, configura alertas, descarga CSV y revisa la ficha legal de cada fuente. Datos de ejemplo.",
+      "breadcrumbHome": "Inicio",
+      "breadcrumbDemos": "Demos",
+      "company": "{company} · NIT {nit} · empresa ficticia",
+      "sampleBadge": "Datos de ejemplo",
+      "sampleHint": "La empresa, las entidades, las tiendas, los proveedores y las cifras son ficticios. Fecha de corte: 8 oct. 2026.",
+      "responsibleSeal": "Extracción responsable",
+      "responsibleHint": "Abre la ficha de cumplimiento de la fuente",
+      "running": "Actualizando {source}",
+      "menu": "Abrir fuentes",
+      "closeMenu": "Cerrar fuentes",
+      "tabsLabel": "Secciones de la fuente",
+      "loading": "Cargando los datos de ejemplo…"
     },
     "actions": {
-      "newScraper": "Nuevo scraper",
-      "run": "Ejecutar",
-      "running": "Scrapeando...",
-      "stop": "Detener",
-      "save": "Guardar",
-      "clone": "Clonar",
-      "exportSchema": "Exportar schema",
-      "testSelector": "Probar selector",
-      "addField": "Agregar campo",
-      "delete": "Eliminar",
-      "edit": "Editar"
+      "runNow": "Actualizar ahora",
+      "running": "Actualizando…",
+      "reset": "Reiniciar demo",
+      "resetTitle": "¿Reiniciar la demo?",
+      "resetConfirm": "Se borran tus campos, reglas, fuentes nuevas y ejecuciones guardadas en este navegador, y la demo vuelve a los datos de ejemplo.",
+      "resetDone": "Demo reiniciada",
+      "cancel": "Cancelar",
+      "close": "Cerrar",
+      "discard": "Descartar",
+      "downloadCsv": "Descargar CSV",
+      "downloadJson": "Descargar JSON",
+      "copy": "Copiar",
+      "copied": "Copiado al portapapeles",
+      "copyFailed": "Tu navegador no permitió copiar; selecciona el texto y cópialo a mano",
+      "pause": "Pausar fuente",
+      "resume": "Reanudar",
+      "requestTrial": "Pide una extracción de prueba",
+      "back": "Atrás",
+      "next": "Siguiente"
+    },
+    "run": {
+      "finished": "{source}: {records} registros y {changes} cambios",
+      "failed": "No se pudo ejecutar la extracción",
+      "hint": "Ejecuta la fuente seleccionada con tu configuración actual",
+      "pausedHint": "La fuente está pausada: reanúdala para ejecutarla",
+      "reviewHint": "Las fuentes nuevas se ejecutan después de la revisión legal",
+      "inProgress": "Ejecutando {source}",
+      "pausedNotice": "Fuente pausada: no se ejecuta en el horario programado ni con «Actualizar ahora».",
+      "pendingConfig": "Hay cambios desde la última ejecución (configuración o páginas de ejemplo). Ejecuta «Actualizar ahora» para ver el resultado."
     },
     "tabs": {
-      "dashboard": "Dashboard",
-      "builder": "Builder visual",
-      "schedule": "Scheduler",
-      "proxies": "Proxies",
-      "antibot": "Anti-bot",
-      "outputs": "Outputs",
-      "diff": "Diff detection",
-      "monitoring": "Monitoring",
-      "cluster": "Cluster",
-      "compliance": "GDPR"
+      "overview": "Resumen",
+      "builder": "Constructor",
+      "changes": "Cambios detectados",
+      "alerts": "Cuándo y qué avisar",
+      "delivery": "Dónde recibes los datos",
+      "history": "Historial",
+      "compliance": "Cumplimiento de la fuente"
     },
-    "dashboard": {
-      "title": "Resumen operacional",
-      "subtitle": "Últimas 24 horas",
-      "kpis": {
-        "activeScrapers": "Scrapers activos",
-        "pagesPerDay": "Páginas/día",
-        "successRate": "Tasa de éxito",
-        "captchasSolved": "Captchas resueltos",
-        "proxyCost": "Costo proxies"
+    "sources": {
+      "kind": {
+        "api": "Datos abiertos con API",
+        "web": "Páginas web públicas",
+        "documents": "Documentos PDF"
       },
-      "chartTitle": "Runs últimas 24h",
-      "chartLegend": "Éxito vs error por hora",
-      "topScrapers": "Scrapers más activos",
-      "recentAlerts": "Alertas recientes",
-      "alerts": {
-        "domChange": "DOM cambió en Amazon-PE — auto-fix aplicado",
-        "rateLimit": "Rate-limit detectado en MercadoLibre — backoff activo",
-        "proxyDown": "Proxy residencial pe-03 caído",
-        "captchaSurge": "Pico de captchas en Linio (×3.2)"
+      "contratacion": {
+        "name": "Radar de contratación pública",
+        "short": "Contratación",
+        "description": "Procesos de contratación nuevos que encajan con lo que vendes, filtrados por palabras clave, departamento y cuantía.",
+        "simulated": "Simulado en la demo: los procesos vienen de un archivo de ejemplo con entidades ficticias. En tu proyecto se conecta a la API de datos abiertos de contratación pública (por ejemplo, SECOP II en datos.gov.co). El filtro, la comparación y las alertas sí se calculan aquí."
+      },
+      "precios": {
+        "name": "Precios de la competencia",
+        "short": "Precios",
+        "description": "Precio, disponibilidad y envío de los productos que te interesan en tres tiendas en línea ficticias.",
+        "simulated": "Las tres tiendas son páginas de ejemplo generadas por la demo (dominios .example). La extracción es real: tus campos se aplican con selectores CSS sobre esas páginas en tu navegador. No se visita ningún sitio externo."
+      },
+      "normativa": {
+        "name": "Normativa y circulares",
+        "short": "Normativa",
+        "description": "Resoluciones y circulares nuevas de las entidades que sigues, listas para la base de conocimiento de tu asistente.",
+        "simulated": "Simulado en la demo: las normas y las entidades son ficticias y vienen de un archivo de ejemplo. En tu proyecto se consultan las páginas públicas de normativa que elijas."
+      },
+      "documentos": {
+        "name": "Documentos de proveedores",
+        "short": "Documentos",
+        "description": "NIT, razón social, actividad económica y fechas extraídos de RUT, certificados y facturas en PDF.",
+        "simulated": "Simulado en la demo: los PDF y su lectura son de ejemplo (en tu proyecto se leen con OCR e IA). La validación del dígito de verificación del NIT y el umbral de confianza sí se calculan aquí."
       }
     },
-    "scrapers": {
-      "listTitle": "Mis scrapers",
-      "searchPlaceholder": "Buscar scraper...",
-      "filterAll": "Todos",
-      "filterRunning": "Corriendo",
-      "filterIdle": "Idle",
-      "filterError": "Error",
+    "sidebar": {
+      "title": "Mis fuentes",
+      "newSource": "Nueva",
+      "newSourceHint": "Agrega una fuente en 3 pasos",
+      "search": "Buscar fuente…",
+      "filters": {
+        "all": "Todas",
+        "active": "Activas",
+        "paused": "Pausadas",
+        "review": "En revisión"
+      },
       "status": {
-        "running": "Corriendo",
-        "idle": "Idle",
-        "error": "Error",
-        "paused": "Pausado"
+        "active": "Activa",
+        "paused": "Pausada",
+        "partial": "Con avisos",
+        "error": "Con error",
+        "review": "En revisión"
       },
-      "lastRun": "Hace",
-      "items": "items"
+      "records": "{count, plural, one {{formatted} registro} other {{formatted} registros}}",
+      "updated": "{when}",
+      "empty": "Ninguna fuente coincide con el filtro.",
+      "note": "Tu configuración se guarda solo en este navegador."
     },
-    "builder": {
-      "title": "Builder visual",
-      "subtitle": "Apunta y haz clic sobre el preview para extraer campos",
-      "previewTitle": "Preview página objetivo",
-      "previewUrl": "URL",
-      "previewDevice": "Dispositivo",
-      "devices": {
-        "desktop": "Desktop",
-        "tablet": "Tablet",
-        "mobile": "Mobile"
-      },
-      "fieldsTitle": "Campos a extraer",
-      "fieldsEmpty": "Aún no hay campos. Haz clic en el preview para crear uno.",
-      "fields": {
-        "name": "Nombre",
-        "selector": "Selector CSS",
-        "type": "Tipo",
-        "required": "Requerido",
-        "add": "Agregar campo",
-        "types": {
-          "text": "Texto",
-          "number": "Número",
-          "url": "URL",
-          "image": "Imagen",
-          "html": "HTML",
-          "list": "Lista"
+    "tour": {
+      "title": "Recorrido sugerido",
+      "progress": "{done} de {total}",
+      "show": "Mostrar",
+      "hide": "Ocultar",
+      "done": "Hecho",
+      "steps": {
+        "radar": {
+          "title": "Radar de contratación",
+          "hint": "Abre un proceso de la tabla y mira por qué te encaja."
         },
-        "sample": {
-          "title": "Título",
-          "price": "Precio",
-          "author": "Autor",
-          "image": "Imagen principal",
-          "rating": "Calificación",
-          "stock": "Stock disponible"
+        "field": {
+          "title": "Crea un campo con un clic",
+          "hint": "En el constructor, haz clic en «Envío gratis» de una tienda."
+        },
+        "change": {
+          "title": "Mira el cambio de precio",
+          "hint": "En Precios › Cambios detectados: el taladro bajó 11 %."
+        },
+        "download": {
+          "title": "Descarga el CSV",
+          "hint": "Ábrelo en Excel con los datos de la fuente."
+        },
+        "legal": {
+          "title": "Revisa la ficha legal",
+          "hint": "Términos de uso, robots.txt y Ley 1581 por fuente."
         }
       },
-      "pagination": {
-        "title": "Paginación",
-        "selectorLabel": "Selector botón siguiente",
-        "maxPages": "Máximo páginas"
+      "cta": "¿Qué fuente necesitas? Cuéntanos y revisamos si se puede extraer antes de cotizar."
+    },
+    "overview": {
+      "kpis": {
+        "records": "Registros",
+        "newToday": "Nuevos hoy",
+        "otherChanges": "Otros cambios",
+        "quality": "Calidad",
+        "updated": "Última actualización"
       },
-      "ai": {
-        "toggle": "Usar LLM con schema",
-        "toggleHint": "Activa extracción inteligente con Claude / GPT cuando el HTML cambia",
-        "schemaTitle": "Schema Pydantic-like",
-        "previewTitle": "Preview extracción IA",
-        "previewSubtitle": "JSON estructurado retornado por el modelo",
-        "modelLabel": "Modelo"
+      "qualityHint": {
+        "fields": "campos obligatorios completos",
+        "docs": "documentos validados sin revisión"
+      },
+      "chartTitle": "Registros por ejecución (últimos 14 días)",
+      "chartHint": "Una ejecución programada al día; la barra de hoy es tu última ejecución.",
+      "chartAria": "Gráfico de barras de registros por día; hoy: {today}",
+      "barTitle": "{date}: {value} registros",
+      "today": "Hoy",
+      "alertsTitle": "Alertas de hoy",
+      "configureAlerts": "Configurar",
+      "noAlerts": "Ninguna regla activa se cumple con la última ejecución.",
+      "tableTitle": "Datos de la última ejecución",
+      "tableHint": {
+        "contratacion": "Solo los procesos que encajan con tu radar. Haz clic en uno para ver el detalle.",
+        "precios": "Una fila por producto y tienda, con los campos que definiste en el constructor.",
+        "normativa": "Normas de las entidades que sigues.",
+        "documentos": "Un documento por fila; los que no pasan la validación quedan en revisión."
+      },
+      "resumed": "Fuente reanudada",
+      "pausedToast": "Fuente pausada",
+      "rag": {
+        "sent": "{count, plural, one {# documento enviado} other {# documentos enviados}} a la base del asistente (simulado)",
+        "sendAll": "Enviar pendientes al asistente ({count})",
+        "send": "Enviar",
+        "note": "Simulado en la demo: en tu proyecto, estos documentos se cargan a la base de conocimiento de tu asistente RAG para que responda con la norma citada.",
+        "chatbotLink": "Ver la demo del asistente RAG"
+      },
+      "process": {
+        "open": "Ver detalle del proceso {ref}",
+        "openHint": "Ver detalle",
+        "daysLeft": "{days, plural, =0 {cierra hoy} one {faltan # día} other {faltan # días}}",
+        "whyTitle": "Por qué te encaja",
+        "whyKeyword": "Palabra clave: «{keyword}»",
+        "whyDepartment": "Departamento que sigues: {department}",
+        "whyAmount": "Cuantía igual o mayor a {min}",
+        "sampleNote": "Proceso de ejemplo con entidad ficticia."
+      },
+      "docs": {
+        "fix": "Corregir",
+        "approve": "Aprobar",
+        "dvExplain": "El dígito de verificación leído del documento ({read}) no coincide con el que corresponde al NIT {nit}. Escribe el dígito correcto para validarlo.",
+        "dvLabel": "Dígito de verificación",
+        "dvWrong": "{dv} tampoco corresponde a este NIT.",
+        "dvOk": "Correcto: el dígito coincide con el cálculo de la DIAN.",
+        "dvHow": "El dígito se calcula en tu navegador con el algoritmo de módulo 11 de la DIAN.",
+        "lowExplain": "La lectura de este documento tuvo una confianza de {confidence} %, por debajo del umbral. Si revisaste los datos contra el PDF, apruébalo.",
+        "saved": "{file}: revisado",
+        "saveFix": "Guardar corrección"
       }
     },
-    "schedule": {
-      "title": "Scheduler",
-      "subtitle": "Programa cuándo correr el scraper",
-      "modeLabel": "Modo",
-      "modes": {
-        "single": "Una vez",
-        "recurring": "Recurrente",
-        "onEvent": "On-event"
-      },
-      "cronLabel": "Expresión cron",
-      "cronHint": "Ej. 0 */2 * * * — cada 2 horas",
-      "nextRunsTitle": "Próximos 5 runs",
-      "triggers": {
-        "title": "On-change triggers",
-        "subtitle": "Disparar acciones cuando los datos cambian",
-        "priceChange": "Cambio de precio",
-        "stockChange": "Cambio de stock",
-        "newItem": "Nuevo item detectado",
-        "removed": "Item removido"
-      },
-      "concurrencyLabel": "Concurrencia máx.",
-      "retriesLabel": "Reintentos"
+    "alertsText": {
+      "priceDrop": "{product} bajó {pct} en {store}",
+      "stockBelow": "{product} quedó con {stock} unidades en {store}",
+      "outOfStock": "{product} se agotó en {store}",
+      "newProcessOver": "{count, plural, one {# proceso nuevo} other {# procesos nuevos}} por {amount} o más en {department}",
+      "closingSoon": "{ref} ({entity}) {days, plural, =0 {cierra hoy} one {cierra en # día} other {cierra en # días}}",
+      "newDoc": "Nueva norma: {title}",
+      "docReviewDv": "{file}: el dígito de verificación no coincide",
+      "docReviewConfidence": "{file}: lectura con confianza baja"
     },
-    "proxies": {
-      "title": "Gestión de proxies",
-      "subtitle": "Pool global con rotación inteligente",
-      "rotation": "Rotación automática",
-      "rotationHint": "Cambiar IP cada N requests o tras 403/429",
+    "table": {
+      "search": "Buscar en la tabla…",
+      "count": "{shown} de {total}",
+      "sortBy": "Ordenar por {column}",
+      "required": "Obligatorio",
+      "asc": "ascendente",
+      "desc": "descendente",
+      "empty": "No hay registros que coincidan."
+    },
+    "columns": {
+      "store": "Tienda",
+      "ref": "Referencia",
+      "entity": "Entidad",
+      "object": "Objeto",
+      "modality": "Modalidad",
+      "location": "Lugar",
+      "amount": "Cuantía",
+      "published": "Publicado",
+      "closes": "Cierre",
+      "processStatus": "Estado",
+      "keyword": "Palabra clave",
+      "number": "Número",
+      "normType": "Tipo",
+      "title": "Título",
+      "date": "Fecha",
+      "pdf": "PDF",
+      "rag": "Asistente",
+      "file": "Archivo",
+      "docType": "Tipo de documento",
+      "nit": "NIT-DV leído",
+      "companyName": "Razón social",
+      "legalRep": "Representante legal",
+      "ciiu": "Actividad (CIIU)",
+      "docDate": "Fecha del documento",
+      "confidence": "Confianza",
+      "docStatus": "Estado"
+    },
+    "values": {
+      "modality": {
+        "minima": "Mínima cuantía",
+        "abreviada": "Selección abreviada",
+        "licitacion": "Licitación pública",
+        "directa": "Contratación directa"
+      },
+      "processStatus": {
+        "open": "Abierto",
+        "closed": "Cerrado"
+      },
+      "normType": {
+        "resolucion": "Resolución",
+        "circular": "Circular",
+        "decreto": "Decreto",
+        "concepto": "Concepto"
+      },
+      "rag": {
+        "pending": "Pendiente",
+        "sent": "Enviado (simulado)"
+      },
+      "docType": {
+        "rut": "RUT",
+        "camara": "Certificado de existencia",
+        "factura": "Factura en PDF"
+      },
+      "docStatus": {
+        "validated": "Validado",
+        "reviewDv": "En revisión: DV no coincide",
+        "reviewConfidence": "En revisión: confianza baja",
+        "corrected": "Revisado por una persona"
+      },
+      "trigger": {
+        "scheduled": "Programada",
+        "manual": "Manual (Actualizar ahora)",
+        "retry": "Reintento"
+      },
+      "runStatus": {
+        "ok": "Correcta",
+        "partial": "Con avisos",
+        "error": "Con error"
+      }
+    },
+    "builder": {
+      "title": "Constructor: apunta y haz clic",
+      "subtitle": "Activa la selección y haz clic sobre la página de ejemplo: cada clic crea un campo con su selector CSS y su valor. Luego pruébalo, ajústalo y guárdalo.",
+      "unsaved": "Cambios sin guardar",
+      "save": "Guardar configuración",
+      "saved": "Configuración guardada. Se aplica en la próxima ejecución.",
+      "exists": "Ese campo ya existe: {name}",
+      "created": "Campo «{name}» creado ({selector})",
+      "storesLabel": "Tienda de ejemplo",
+      "deviceLabel": "Ancho de la vista previa",
+      "devices": {
+        "desktop": "Escritorio",
+        "tablet": "Tableta",
+        "mobile": "Celular"
+      },
+      "selectMode": "Modo selección",
+      "selectOn": "Selección activa: haz clic en un precio, un nombre o el envío",
+      "selectOff": "Selección apagada",
+      "simulate": {
+        "button": "Simular un cambio en las tiendas ({n} de {total})",
+        "none": "Ya aplicaste los cambios de ejemplo",
+        "reset": "Restablecer tiendas",
+        "done": {
+          "1": "Ferretería La Tuerca Demo bajó el precio del taladro. Ejecuta «Actualizar ahora» para detectarlo.",
+          "2": "Casa del Tornillo Demo agotó el taladro. Ejecuta «Actualizar ahora» para detectarlo.",
+          "3": "Herramientas El Martillo Demo publicó la pintura vinilo. Ejecuta «Actualizar ahora» para detectarla."
+        }
+      },
+      "previewLabel": "Página de ejemplo de {store}",
+      "previewNote": "Página ficticia generada por la demo. Los enlaces no navegan.",
+      "recordSelector": "Selector del registro (cada producto)",
+      "recordHint": "{count, plural, =0 {No encuentra registros en esta página.} one {Encuentra # registro en esta página.} other {Encuentra # registros en esta página.}}",
+      "invalidSelector": "Selector no válido",
+      "fieldsTitle": "Campos ({count})",
+      "newFieldName": "Campo nuevo",
+      "addField": "Agregar a mano",
+      "fieldsHint": "Los campos obligatorios cuentan para la calidad. Guarda y ejecuta «Actualizar ahora» para aplicar los cambios a los datos.",
+      "previewTitle": "Vista previa de la extracción: {store}",
+      "previewSummary": "{rows} filas · calidad {quality}",
+      "viewLabel": "Formato de la vista previa",
+      "viewTable": "Tabla",
+      "previewEmpty": "Sin filas: revisa el selector del registro y los campos.",
+      "aiNote": "En la demo, la extracción usa solo selectores CSS en tu navegador (no usa IA). En tu proyecto, si una página cambia y un selector deja de funcionar, la IA propone el selector nuevo y un ingeniero lo aprueba antes de aplicarlo.",
+      "fieldName": "Nombre del campo",
+      "fieldType": "Tipo de dato",
       "types": {
-        "datacenter": "Datacenter",
-        "residential": "Residencial",
-        "mobile": "Mobile"
+        "text": "Texto",
+        "number": "Número",
+        "price": "Precio (COP)",
+        "link": "Enlace",
+        "image": "Imagen"
       },
-      "table": {
-        "country": "País",
-        "type": "Tipo",
-        "latency": "Latencia",
-        "status": "Estado",
-        "successRate": "Éxito",
-        "lastUsed": "Último uso"
+      "deleteField": "Eliminar el campo {name}",
+      "selector": "Selector CSS",
+      "selectorPlaceholder": "Ej.: .precio-actual",
+      "scope": "Dónde se busca",
+      "scopes": {
+        "record": "Dentro de cada registro",
+        "page": "En toda la página"
       },
-      "status": {
-        "healthy": "Saludable",
-        "degraded": "Degradado",
-        "down": "Caído"
-      },
-      "costLabel": "Costo estimado mensual"
+      "required": "Obligatorio",
+      "test": "Probar",
+      "emptySelector": "Escribe un selector o crea el campo con un clic",
+      "noMatches": "Sin coincidencias en esta página",
+      "matchInfo": "{count, plural, one {# valor} other {# valores}}",
+      "testResult": "{count, plural, =0 {nada resaltado} one {# resaltado} other {# resaltados}}",
+      "fieldsEmpty": "Aún no hay campos. Haz clic en la página para crear uno."
     },
-    "antibot": {
-      "title": "Evasión anti-bot",
-      "subtitle": "Técnicas para evitar detección",
-      "options": {
-        "fingerprinting": "Fingerprint randomization",
-        "fingerprintingHint": "Canvas, WebGL, fonts y plugins aleatorizados por sesión",
-        "stealth": "Stealth plugin",
-        "stealthHint": "Oculta señales de navigator.webdriver y CDP",
-        "humanLike": "Human-like behavior",
-        "humanLikeHint": "Mouse movements, scroll velocity y delays naturales",
-        "tlsFingerprint": "TLS / JA3 spoofing",
-        "tlsHint": "Falsifica fingerprint TLS de Chrome real"
-      },
-      "captchaTitle": "Captcha solver",
-      "captchaHint": "Servicio para resolver reCAPTCHA, hCaptcha y Cloudflare Turnstile",
-      "captchaProvider": "Proveedor",
-      "providers": {
-        "twoCaptcha": "2Captcha",
-        "antiCaptcha": "Anti-Captcha",
-        "capsolver": "CapSolver",
-        "none": "Ninguno"
-      },
-      "userAgentLabel": "Pool de User-Agents"
+    "sandbox": {
+      "title": "Prueba con tu HTML",
+      "subtitle": "Pega el código HTML de una página (por ejemplo, con «Ver código fuente») y extrae campos con el mismo constructor.",
+      "open": "Abrir",
+      "close": "Cerrar",
+      "label": "HTML de la página",
+      "placeholder": "Pega aquí el HTML de la página (por ejemplo, una tabla o una lista de productos)",
+      "load": "Cargar HTML",
+      "useSample": "Usar un ejemplo",
+      "clear": "Limpiar",
+      "privacy": "El HTML se procesa solo en tu navegador: no se envía a ningún servidor. Se quitan scripts, estilos, formularios y marcos, y las imágenes no se descargan.",
+      "info": "{elements} elementos cargados · {removed} etiquetas quitadas por seguridad",
+      "truncated": "(se tomaron los primeros 300.000 caracteres)",
+      "address": "Tu HTML (sin conexión)",
+      "previewLabel": "Vista previa de tu HTML",
+      "recordSelector": "Selector del registro (opcional)",
+      "recordHint": "Si cada fila o tarjeta tiene una clase común (por ejemplo tr.fila), escríbela aquí; si no, cada campo devuelve una lista."
     },
-    "outputs": {
-      "title": "Outputs",
-      "subtitle": "Multi-destino para los datos extraídos",
-      "channels": {
-        "webhook": "Webhook",
-        "s3": "Amazon S3",
-        "db": "Base de datos",
-        "sheets": "Google Sheets",
-        "airtable": "Airtable"
-      },
-      "configWebhook": "URL del webhook",
-      "configS3Bucket": "Bucket S3",
-      "configS3Region": "Región",
-      "configDbUrl": "Connection string",
-      "configSheetsId": "Spreadsheet ID",
-      "configAirtableBase": "Base ID",
-      "enabled": "Habilitado",
-      "format": "Formato",
-      "formats": {
-        "json": "JSON",
-        "csv": "CSV",
-        "parquet": "Parquet",
-        "ndjson": "NDJSON"
+    "radar": {
+      "title": "Criterios del radar",
+      "subtitle": "Esta fuente usa una API de datos abiertos: no necesita selectores. Define qué procesos te interesan.",
+      "keywords": "Palabras clave en el objeto del proceso",
+      "removeKeyword": "Quitar «{keyword}»",
+      "noKeywords": "Sin palabras clave ningún proceso encaja.",
+      "keywordPlaceholder": "Ej.: cemento",
+      "add": "Agregar",
+      "departments": "Departamentos",
+      "minAmount": "Cuantía mínima (COP)",
+      "simulatedNote": "Los cambios se aplican en la próxima ejecución. Datos de ejemplo: entidades ficticias.",
+      "previewTitle": "Con estos criterios encajan {matched} de {total} procesos de hoy",
+      "previewHint": "Vista previa sobre el archivo de ejemplo del día.",
+      "fits": "Encaja",
+      "noFit": "No encaja",
+      "why": {
+        "keyword": "ninguna palabra clave",
+        "department": "departamento no incluido",
+        "amount": "cuantía menor a la mínima"
       }
     },
-    "diff": {
-      "title": "Diff detection",
-      "subtitle": "Cambios entre el run anterior y el actual",
-      "previous": "Run anterior",
-      "current": "Run actual",
-      "summary": "Resumen",
-      "added": "Agregados",
-      "removed": "Removidos",
-      "modified": "Modificados",
+    "norm": {
+      "title": "Qué normativa seguir",
+      "subtitle": "Elige las entidades y, si quieres, una palabra clave. Las normas nuevas pueden ir a la base de tu asistente.",
+      "entities": "Entidades (ficticias)",
+      "keyword": "Palabra clave (opcional)",
+      "keywordPlaceholder": "Ej.: herramientas",
+      "simulatedNote": "Los cambios se aplican en la próxima ejecución.",
+      "previewTitle": "Sigues {followed} de {total} normas publicadas",
+      "followed": "Se sigue",
+      "notFollowed": "No se sigue"
+    },
+    "docsCfg": {
+      "title": "Campos y validación de documentos",
+      "subtitle": "Elige qué datos extraer de cada documento y desde qué confianza se aprueban solos.",
+      "threshold": "Umbral de confianza: {value}",
+      "thresholdHint": "Los documentos leídos con menos confianza pasan a revisión humana. El NIT siempre se valida con su dígito de verificación.",
+      "columns": "Columnas a extraer",
+      "personalData": "dato personal",
+      "simulatedNote": "Los cambios se aplican en la próxima ejecución. La lectura del PDF es de ejemplo.",
+      "previewTitle": "Así quedarían los documentos con este umbral",
+      "confidence": "confianza {value}",
+      "sampleTitle": "Campos leídos de un RUT de ejemplo",
+      "sampleHeader": "Registro Único Tributario (ejemplo)",
+      "sampleNit": "NIT",
+      "sampleName": "Razón social",
+      "sampleCiiu": "Actividad económica principal",
+      "sampleRep": "Representante legal",
+      "sampleNote": "Documento ficticio. En verde, los datos de la empresa; en amarillo, un dato personal que solo se extrae si lo eliges."
+    },
+    "changes": {
+      "title": "Cambios detectados",
+      "subtitle": "Comparación campo por campo entre la ejecución de ayer ({before}) y la última ({after}).",
+      "filterLabel": "Filtrar por tipo de cambio",
+      "kinds": {
+        "all": "Todos",
+        "added": "Nuevos",
+        "modified": "Modificados",
+        "removed": "Retirados"
+      },
+      "none": "Sin cambios desde la ejecución de ayer.",
+      "noneFiltered": "No hay cambios de este tipo.",
+      "badge": {
+        "added": "Nuevo",
+        "modified": "Modificado",
+        "removed": "Retirado"
+      },
+      "ruleExists": "Alerta creada",
+      "createRule": {
+        "priceDrop": "Avísame si baja el precio",
+        "stockBelow": "Avísame si baja la disponibilidad",
+        "closingSoon": "Avísame antes del cierre"
+      },
+      "ruleCreated": "Alerta creada para «{title}». La ves en «Cuándo y qué avisar».",
       "field": "Campo",
-      "noChanges": "Sin cambios detectados"
+      "before": "Antes",
+      "after": "Ahora",
+      "variation": "Variación",
+      "note": {
+        "contratacion": "Los procesos de ejemplo cambian de un día a otro: nuevos publicados, cierres y adendas que mueven la fecha de cierre.",
+        "precios": "La comparación se hace con tus campos: si quitas el campo Precio, la demo ya no puede detectar cambios de precio. Usa «Simular un cambio en las tiendas» en el constructor para generar cambios nuevos.",
+        "normativa": "Las normas nuevas de las entidades que sigues aparecen aquí.",
+        "documentos": "Los documentos que llegaron a la carpeta desde la ejecución anterior."
+      }
     },
-    "monitoring": {
-      "title": "Monitoring & logs",
-      "subtitle": "Runs recientes con auto-fix por IA",
-      "autoFixTitle": "Auto-fix IA habilitado",
-      "autoFixHint": "Cuando el DOM cambia, el LLM regenera selectores automáticamente",
-      "table": {
-        "scraper": "Scraper",
-        "status": "Estado",
-        "duration": "Duración",
-        "items": "Items",
-        "errors": "Errores",
-        "startedAt": "Inicio"
+    "alerts": {
+      "title": "Cuándo y qué avisar",
+      "subtitle": "Programa la frecuencia de la fuente y define qué cambios merecen una alerta.",
+      "when": "Frecuencia",
+      "whenHint": "Hora de Colombia.",
+      "presets": {
+        "daily6": "Todos los días a las 6:00 a. m.",
+        "businessHours": "Cada hora de 7:00 a. m. a 6:00 p. m., de lunes a viernes",
+        "every4h": "Cada 4 horas",
+        "weeklyMon": "Cada lunes a las 7:00 a. m.",
+        "custom": "Avanzado (expresión cron)"
       },
-      "logsTitle": "Logs en tiempo real",
-      "notification": "DOM cambió en target.com — auto-fix LLM regeneró 3 selectores en 1.8s"
+      "cronLabel": "Expresión cron (minuto hora día mes día-de-la-semana)",
+      "cronHint": "Ejemplo: 30 6 * * 1-5 = de lunes a viernes a las 6:30 a. m.",
+      "cronInvalid": "Expresión no válida: usa 5 campos con números, *, rangos (1-5), listas (1,3) o pasos (*/2).",
+      "nextRuns": "Próximas 5 ejecuciones",
+      "noRuns": "Sin ejecuciones en los próximos dos años con esta expresión.",
+      "pausedNote": "La fuente está pausada: estas ejecuciones no ocurrirán hasta que la reanudes.",
+      "demoClock": "Calculadas desde el reloj de la demo ({now}). En la demo nada corre solo: usa «Actualizar ahora».",
+      "rulesTitle": "Reglas de alerta",
+      "rulesHint": "Se evalúan contra la última ejecución; el resultado aparece en el Resumen y en el mensaje de la derecha.",
+      "noRules": "Esta fuente no tiene reglas.",
+      "ruleToggle": "Activar o desactivar la regla",
+      "ruleText": {
+        "priceDrop": "El precio baja al menos",
+        "stockBelow": "La disponibilidad baja a",
+        "newProcessOver": "Proceso nuevo con cuantía desde",
+        "closingSoon": "Un proceso que encaja cierra en",
+        "newDoc": "Norma nueva que contenga",
+        "docReview": "Un documento queda en revisión"
+      },
+      "onlyFor": "Solo para: {target}",
+      "valueLabel": "Valor de la regla",
+      "anyKeyword": "cualquier palabra",
+      "units": {
+        "priceDrop": "%",
+        "stockBelow": "unidades o menos",
+        "closingSoon": "días o menos"
+      },
+      "deleteRule": "Eliminar regla",
+      "newRuleType": "Tipo de regla nueva",
+      "ruleAdded": "Regla agregada",
+      "addRule": "Agregar regla",
+      "channelsTitle": "Canales",
+      "channels": {
+        "email": "Correo",
+        "teams": "Microsoft Teams",
+        "whatsapp": "WhatsApp Business"
+      },
+      "previewTitle": "Mensaje de hoy ({count, plural, one {# alerta} other {# alertas}})",
+      "message": {
+        "header": "{source} · {date}",
+        "none": "Sin alertas con las reglas activas.",
+        "footer": "Datos de ejemplo · demo de extracción y monitoreo de datos"
+      },
+      "copy": "Copiar mensaje",
+      "sendTest": "Enviar prueba (simulada)",
+      "sentToast": "Simulado: en tu proyecto este mensaje se envía por {channels}.",
+      "simulatedNote": "Simulado en la demo: no se envía ningún correo ni mensaje. En tu proyecto se conecta a tu correo, a Microsoft Teams o a WhatsApp Business.",
+      "sentTitle": "Envíos de prueba (simulados)",
+      "sentNone": "Aún no has enviado pruebas.",
+      "sentLines": "{count, plural, =0 {sin alertas} one {# alerta} other {# alertas}}"
     },
-    "cluster": {
-      "title": "Cluster Playwright en K8s",
-      "subtitle": "Pool de workers headless con autoscaling",
-      "workersTitle": "Workers activos",
-      "loadLabel": "Carga",
-      "nodeLabel": "Nodo",
-      "browserLabel": "Browser",
-      "browsers": {
-        "chromium": "Chromium",
-        "firefox": "Firefox",
-        "webkit": "WebKit"
+    "delivery": {
+      "title": "Dónde recibes los datos",
+      "subtitle": "Lo que ves en la demo se puede descargar ya; las conexiones a tus herramientas se configuran en tu proyecto.",
+      "downloaded": "Descargaste {file}",
+      "inProject": "Se configura en tu proyecto",
+      "inDemo": "Funciona en la demo",
+      "files": {
+        "title": "Excel (CSV) y JSON",
+        "text": "{count} registros de «{source}» de la última ejecución, con columnas en español.",
+        "note": "El CSV usa punto y coma y codificación UTF-8 para que Excel en español lo abra con tildes y columnas separadas."
       },
-      "autoscale": "Autoscaling HPA",
-      "autoscaleHint": "Min 3 — Max 32 pods según cola de jobs"
+      "sheets": {
+        "title": "Google Sheets",
+        "text": "Una pestaña por fuente que se actualiza después de cada ejecución."
+      },
+      "showExample": "Ver ejemplo",
+      "hideExample": "Ocultar ejemplo",
+      "bi": {
+        "title": "Power BI o tu base de datos",
+        "text": "Una tabla por fuente con columnas tipadas y la fecha de cada ejecución, lista para tus tableros.",
+        "table": "Tabla: {name}",
+        "column": "Columna",
+        "type": "Tipo",
+        "types": {
+          "text": "texto",
+          "number": "número",
+          "price": "número (COP)",
+          "link": "texto (URL)",
+          "image": "texto (URL)",
+          "date": "fecha",
+          "percent": "número (%)",
+          "status": "texto"
+        },
+        "runAt": "Fecha de la ejecución"
+      },
+      "api": {
+        "title": "API o webhook",
+        "text": "Después de cada ejecución, tu sistema recibe un aviso con los cambios (webhook) o consulta los datos por API."
+      },
+      "notify": {
+        "title": "Alertas por correo, Teams o WhatsApp",
+        "text": "Solo cuando se cumple una regla, no un log técnico.",
+        "button": "Configurar alertas"
+      }
+    },
+    "history": {
+      "title": "Historial de ejecuciones",
+      "subtitle": "Cada ejecución queda registrada con su estado, registros, cambios y calidad. Abre una fila para ver la bitácora.",
+      "scopeLabel": "Qué fuentes mostrar",
+      "thisSource": "Esta fuente",
+      "allSources": "Todas",
+      "when": "Fecha y hora",
+      "source": "Fuente",
+      "trigger": "Origen",
+      "status": "Estado",
+      "records": "Registros",
+      "changes": "Cambios",
+      "quality": "Calidad",
+      "toggleLog": "Mostrar u ocultar la bitácora",
+      "notes": {
+        "apiDown": "La API respondió «servicio no disponible»; se reintentó a los 10 minutos.",
+        "layoutChange": "La tienda cambió el diseño de su página y algunos campos quedaron vacíos.",
+        "selectorApproved": "Un ingeniero aprobó el selector nuevo y la ejecución salió completa."
+      },
+      "repairTitle": "¿Qué pasa cuando una página cambia?",
+      "repairText": "El monitoreo de calidad detecta campos vacíos o menos registros de lo normal (mira el 5 de octubre en Precios). En tu proyecto, la IA propone el selector nuevo, un ingeniero lo aprueba y se vuelve a ejecutar; el tiempo de reparación depende del plan."
     },
     "compliance": {
-      "title": "GDPR & ética",
-      "subtitle": "Compliance, retención y respeto al sitio",
-      "robotsTitle": "Honrar robots.txt",
-      "robotsHint": "Respetar Disallow y Crawl-delay del sitio objetivo",
-      "rateLimitTitle": "Rate limiting respetuoso",
-      "rateLimitHint": "Máx. 1 request/seg por dominio por defecto",
-      "dsrTitle": "DSR handling",
-      "dsrHint": "Endpoints para eliminación, portabilidad y rectificación",
-      "retentionTitle": "Retención de datos",
-      "retentionLabel": "Días",
-      "piiTitle": "Detección de PII",
-      "piiHint": "Hash automático de emails, teléfonos y direcciones",
-      "auditTitle": "Audit log inmutable"
+      "title": "Cumplimiento de la fuente",
+      "subtitle": "Antes de extraer, cada fuente tiene una ficha revisada: términos de uso, robots.txt, ritmo de consulta y datos personales (Ley 1581 de 2012).",
+      "download": "Descargar ficha (.txt)",
+      "fileTitle": "Ficha de cumplimiento: {source}",
+      "fileSample": "Ficha de ejemplo generada por la demo de extracción y monitoreo de datos.",
+      "origin": "Origen",
+      "fields": {
+        "sourceType": "Tipo de fuente",
+        "terms": "Términos de uso",
+        "robots": "robots.txt",
+        "rate": "Ritmo de consulta",
+        "identification": "Identificación del extractor",
+        "personalData": "Datos personales",
+        "legalBasis": "Base legal",
+        "retention": "Retención",
+        "owner": "Responsable",
+        "reviewed": "Última revisión"
+      },
+      "sheets": {
+        "contratacion": {
+          "sourceType": "Datos abiertos publicados por el Estado, consultados por su API oficial.",
+          "terms": "Revisados: los datos abiertos permiten su reutilización citando la fuente.",
+          "robots": "No aplica: se usa la API, no se navegan páginas.",
+          "rate": "Una consulta por ejecución, con paginación.",
+          "identification": "Credencial de aplicación del cliente.",
+          "personalData": "No se extraen: solo entidad, objeto, cuantía, fechas y estado del proceso.",
+          "legalBasis": "Información pública (Ley 1712 de 2014 de transparencia).",
+          "retention": "24 meses.",
+          "owner": "Coordinación comercial (ejemplo).",
+          "reviewed": "1 sept. 2026"
+        },
+        "precios": {
+          "sourceType": "Páginas públicas de tiendas en línea (en la demo, tres tiendas ficticias).",
+          "terms": "Revisados por tienda antes de cotizar: si una tienda prohíbe la consulta automatizada, no se extrae.",
+          "robots": "Se respeta: solo rutas permitidas y el tiempo de espera que indique.",
+          "rate": "Una página cada 10 segundos por tienda, fuera de horas pico.",
+          "identification": "Extractor identificado con un correo de contacto del cliente.",
+          "personalData": "Excluidos: no se extraen reseñas, nombres ni datos de compradores.",
+          "legalBasis": "Información comercial pública; sin datos personales.",
+          "retention": "12 meses.",
+          "owner": "Gerencia comercial (ejemplo).",
+          "reviewed": "15 sept. 2026"
+        },
+        "normativa": {
+          "sourceType": "Páginas públicas de normativa de entidades (ficticias en la demo).",
+          "terms": "Revisados: contenido público de libre consulta.",
+          "robots": "Se respeta: solo la sección de novedades.",
+          "rate": "Una página cada 5 segundos.",
+          "identification": "Extractor identificado con un correo de contacto del cliente.",
+          "personalData": "Solo número, fecha, entidad, título y enlace al PDF público.",
+          "legalBasis": "Información pública (Ley 1712 de 2014 de transparencia).",
+          "retention": "Mientras la norma esté vigente.",
+          "owner": "Área jurídica (ejemplo).",
+          "reviewed": "20 sept. 2026"
+        },
+        "documentos": {
+          "sourceType": "Documentos que entregan tus proveedores para su vinculación (RUT, certificados, facturas).",
+          "terms": "Entregados por el proveedor para este fin.",
+          "robots": "No aplica: no se navegan páginas.",
+          "rate": "Se procesan al llegar a la carpeta.",
+          "identification": "No aplica.",
+          "personalData": "Solo el nombre del representante legal (si eliges extraerlo). No se extraen cédulas, teléfonos ni correos personales.",
+          "legalBasis": "Autorización del proveedor y relación contractual (Ley 1581 de 2012).",
+          "retention": "Según tu política de tratamiento de datos (ejemplo: mientras dure la relación comercial).",
+          "owner": "Compras (ejemplo).",
+          "reviewed": "28 sept. 2026"
+        }
+      },
+      "sheetTitle": "Ficha: {source}",
+      "readOnly": "Solo lectura",
+      "sampleNote": "Ficha de ejemplo. En tu proyecto la firman Koptup y tu empresa antes de construir el extractor.",
+      "principlesTitle": "Cómo extraemos",
+      "principles": {
+        "apiFirst": "Primero APIs y datos abiertos; páginas web solo cuando no hay otra vía.",
+        "review": "Revisión de términos de uso y robots.txt de cada fuente antes de cotizar.",
+        "pace": "Ritmo de consulta moderado y extractor identificado.",
+        "noEvasion": "No eludimos captchas, inicios de sesión ni otros controles de acceso.",
+        "personal": "Sin datos personales salvo base legal (Ley 1581 de 2012).",
+        "log": "Bitácora de cada ejecución."
+      },
+      "promise": "Si una fuente no permite la extracción, te lo decimos antes de cotizar.",
+      "logTitle": "Bitácora reciente",
+      "logRecords": "{count, plural, one {# registro} other {# registros}}",
+      "logNote": "Incluye las ejecuciones que hagas en la demo."
     },
-    "logs": {
-      "starting": "[INFO] Iniciando run para",
-      "proxy": "[NET] Proxy seleccionado",
-      "request": "[NET] GET",
-      "parse": "[PARSE] Extraídos",
-      "captcha": "[BOT] Captcha detectado — resolviendo con",
-      "retry": "[WARN] Retry tras 429",
-      "success": "[OK] Run completado",
-      "error": "[ERR] Fallo en selector",
-      "autofix": "[AI] Selector regenerado por LLM"
+    "log": {
+      "webDemo": "[Demo] Las tres tiendas son páginas de ejemplo generadas en tu navegador: no se visita ningún sitio externo.",
+      "config": "Configuración: {pages} páginas y {fields} campos.",
+      "policy": "Se aplica la ficha de la fuente: una página cada 10 s por tienda y extractor identificado (en la demo no hay espera).",
+      "storeExtract": "{store}: {records} registros extraídos.",
+      "fieldInvalid": "El selector del campo «{field}» no es válido.",
+      "fieldEmpty": "{store}: el campo obligatorio «{field}» quedó vacío en {count} registros.",
+      "noKeyField": "No hay un campo de texto para identificar cada producto: la comparación usa la posición en la página.",
+      "compare": "Comparación con la ejecución anterior: {changes} cambios.",
+      "done": "Listo: {records} registros, {changes} cambios, calidad {quality}.",
+      "donePartial": "Terminó con avisos: {records} registros, {changes} cambios, calidad {quality}.",
+      "doneError": "Sin registros: revisa el selector del registro y los campos.",
+      "apiDemo": "[Simulado] En la demo se lee un archivo de ejemplo; en tu proyecto, la API de datos abiertos de contratación.",
+      "apiQuery": "Procesos publicados en el archivo del día: {total}.",
+      "radarFilter": "Filtro del radar: encajan {matched} de {total}.",
+      "normDemo": "[Simulado] En la demo las novedades vienen de un archivo de ejemplo.",
+      "normFound": "Normas publicadas: {total}; de las entidades que sigues: {followed}.",
+      "docsDemo": "[Simulado] Los PDF y su lectura son de ejemplo; en tu proyecto se leen con OCR e IA.",
+      "docsRead": "Documentos en la carpeta: {total} ({newDocs} nuevos).",
+      "docDv": "{file}: el dígito de verificación leído ({read}) no coincide con el calculado ({expected}). Pasa a revisión.",
+      "docLow": "{file}: confianza {confidence} %, menor que el umbral de {threshold} %. Pasa a revisión.",
+      "donePartialDocs": "Terminó con {review} documentos en revisión: {records} documentos, {changes} cambios, calidad {quality}.",
+      "apiDown": "La API respondió «servicio no disponible» (503). Reintento programado en 10 minutos.",
+      "retryOk": "Reintento correcto: {records} registros.",
+      "layoutChange": "Casa del Tornillo Demo cambió el diseño: Precio y Disponibilidad quedaron vacíos en 5 registros. Se avisó al equipo.",
+      "selectorApproved": "Selector nuevo aprobado por un ingeniero; ejecución completa."
+    },
+    "wizard": {
+      "title": "Nueva fuente · paso {step} de {total}",
+      "step1Hint": "Cuéntanos de dónde salen los datos.",
+      "name": "Nombre",
+      "namePlaceholder": "Ej.: Precios de cemento en ferreterías",
+      "kind": "Tipo de fuente",
+      "url": "Dirección (URL)",
+      "originDocs": "Dónde llegan los documentos",
+      "originDocsPlaceholder": "Ej.: carpeta compartida de Compras",
+      "urlInvalid": "Escribe una dirección completa que empiece por https://",
+      "noVisit": "En la demo no visitamos esta dirección: solo se guarda en tu navegador.",
+      "step2Hint": "¿Qué datos necesitas de esta fuente?",
+      "fields": {
+        "product": "Producto",
+        "price": "Precio",
+        "previousPrice": "Precio anterior",
+        "availability": "Disponibilidad",
+        "shipping": "Envío",
+        "link": "Enlace",
+        "entity": "Entidad",
+        "object": "Objeto",
+        "amount": "Cuantía",
+        "date": "Fecha",
+        "location": "Lugar",
+        "status": "Estado",
+        "nit": "NIT",
+        "companyName": "Razón social",
+        "legalRep": "Representante legal",
+        "ciiu": "Actividad (CIIU)",
+        "docDate": "Fecha del documento",
+        "total": "Valor total"
+      },
+      "customField": "Otro dato…",
+      "removeField": "Quitar {field}",
+      "personalWarning": "Si eliges datos personales, revisamos la base legal (Ley 1581 de 2012) antes de extraerlos.",
+      "frequency": "Frecuencia",
+      "destination": "Dónde quieres recibir los datos",
+      "destinations": {
+        "csv": "Excel o CSV",
+        "sheets": "Google Sheets",
+        "bi": "Power BI o base de datos",
+        "api": "API o webhook",
+        "email": "Correo con resumen"
+      },
+      "reviewNote": "La fuente queda «en revisión». En un proyecto real revisamos términos de uso, robots.txt y datos personales antes de construir el extractor; si la fuente no lo permite, te lo decimos.",
+      "finish": "Guardar fuente",
+      "created": "Fuente guardada en revisión"
+    },
+    "review": {
+      "summaryTitle": "Solicitud de extracción de prueba",
+      "fields": "Datos que necesitas",
+      "subtitle": "Fuente en revisión desde {when}. Aún no se extrae.",
+      "checksTitle": "Revisión antes de extraer",
+      "checks": {
+        "terms": "Términos de uso de la fuente",
+        "robots": "robots.txt y secciones permitidas",
+        "personal": "Datos personales y base legal (Ley 1581 de 2012)",
+        "api": "Si existe una API o datos abiertos para usar en su lugar",
+        "pace": "Ritmo de consulta acordado"
+      },
+      "pending": "pendiente",
+      "demoNote": "En la demo esta revisión no avanza sola: la hace el equipo cuando pides la extracción de prueba.",
+      "nextTitle": "Siguiente paso",
+      "nextText": "Copia el resumen y pídenos una extracción de prueba: revisamos la fuente y, si se puede, te entregamos una muestra.",
+      "copySummary": "Copiar resumen",
+      "delete": "Eliminar fuente",
+      "deleted": "Fuente eliminada"
     }
   }
 }

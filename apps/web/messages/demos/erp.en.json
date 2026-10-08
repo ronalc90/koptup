@@ -2,228 +2,936 @@
   "demoErp": {
     "meta": {
       "title": "Modular ERP",
-      "subtitle": "Integrated enterprise suite with accounting, finance, inventory, sales, purchasing, HR, and manufacturing modules.",
-      "poweredByAI": "AI-powered"
+      "subtitle": "Sales, inventory across three warehouses, purchasing with approvals, production, accounting, receivables and payroll for a fictitious company. What you do in one module shows up in the others.",
+      "sampleBadge": "Sample data",
+      "sampleHint": "Fictitious company and figures generated for the demo (January–September 2026). DIAN, banks and WhatsApp are simulated.",
+      "seoTitle": "ERP demo: sales, inventory, purchasing and accounting",
+      "seoDescription": "Try a modular ERP with sample data: quote, order and invoice that reduce stock and post the journal entry, purchase orders with approvals, bank reconciliation, receivables aging, payroll and production. DIAN validation is simulated.",
+      "breadcrumbHome": "Home",
+      "breadcrumbDemos": "Demos"
     },
     "topbar": {
       "company": "Company",
+      "companyAll": "Montevera Group (consolidated)",
       "currency": "Currency",
-      "country": "Country",
+      "cop": "COP (pesos)",
+      "usd": "USD (fixed rate)",
       "period": "Period",
-      "searchPlaceholder": "Search transactions, SKUs, employees...",
-      "newTransaction": "New transaction"
-    },
-    "companies": {
-      "holding": "KopTup Holding S.A.",
-      "co": "KopTup Colombia SAS",
-      "mx": "KopTup Mexico S. de R.L.",
-      "ar": "KopTup Argentina S.A.",
-      "cl": "KopTup Chile SpA",
-      "pe": "KopTup Peru S.A.C."
-    },
-    "currencies": {
-      "usd": "USD - US Dollar",
-      "cop": "COP - Colombian Peso",
-      "mxn": "MXN - Mexican Peso",
-      "ars": "ARS - Argentine Peso",
-      "clp": "CLP - Chilean Peso",
-      "pen": "PEN - Peruvian Sol"
+      "search": "Search",
+      "searchPlaceholder": "Invoice, customer, SKU…",
+      "clearSearch": "Clear search",
+      "resultsIn": "Matches in:",
+      "workDate": "Open period: September 2026 · new transactions are dated {date}",
+      "trmNote": "USD converted at a fixed sample exchange rate of {trm}",
+      "savedLocally": "Your changes are saved only in this browser",
+      "reset": "Reset sample data",
+      "resetTitle": "Reset the sample data?",
+      "resetBody": "This deletes the quotes, invoices, orders, payments and other changes you made in this demo, and brings back the original data.",
+      "resetConfirm": "Yes, reset",
+      "resetDone": "Done: you are back to the sample data."
     },
     "periods": {
-      "q1": "Q1 2026",
-      "q2": "Q2 2026",
-      "month": "May 2026",
-      "ytd": "Year to date"
-    },
-    "kpis": {
-      "revenue": "Revenue",
-      "grossMargin": "Gross margin",
-      "ebitda": "EBITDA",
-      "cash": "Cash position",
-      "ar": "Accounts receivable",
-      "ap": "Accounts payable",
-      "vsLastMonth": "vs last month"
+      "2026-09": "September 2026",
+      "2026-08": "August 2026",
+      "2026-07": "July 2026",
+      "q3": "Q3 2026",
+      "ytd": "Year 2026 (Jan–Sep)",
+      "prev_2026-09": "August 2026",
+      "prev_2026-08": "July 2026",
+      "prev_2026-07": "June 2026",
+      "prev_q3": "Q2 2026",
+      "prev_ytd": "—"
     },
     "modules": {
-      "accounting": "Accounting",
-      "finance": "Finance",
-      "inventory": "Inventory",
+      "aria": "ERP modules",
       "sales": "Sales",
+      "inventory": "Inventory",
       "purchases": "Purchasing",
-      "hr": "HR",
-      "manufacturing": "Manufacturing"
+      "accounting": "Accounting",
+      "finance": "Treasury & receivables",
+      "hr": "People",
+      "manufacturing": "Production"
     },
-    "accounting": {
-      "title": "General journal — double entry",
-      "subtitle": "Accounting records with balanced debits and credits",
-      "tableDate": "Date",
-      "tableEntry": "Entry",
-      "tableAccount": "Account",
-      "tableDescription": "Description",
-      "tableDebit": "Debit",
-      "tableCredit": "Credit",
-      "totals": "Totals",
-      "plTitle": "Income statement",
-      "plRevenue": "Operating revenue",
-      "plCogs": "Cost of sales",
-      "plGross": "Gross profit",
-      "plOpex": "Operating expenses",
-      "plEbitda": "EBITDA",
-      "plTax": "Taxes",
-      "plNet": "Net income",
-      "balanceTitle": "Balance sheet",
-      "assets": "Assets",
-      "liabilities": "Liabilities",
-      "equity": "Equity",
-      "viewDetail": "View detail"
+    "common": {
+      "close": "Close",
+      "cancel": "Cancel",
+      "showMore": "Show more ({shown} of {total})",
+      "exportCsv": "Export CSV",
+      "csvDone": "You downloaded a CSV with {n} rows.",
+      "noResults": "No results for your search in this period.",
+      "currency": "Currency",
+      "moduleNames": {
+        "sales": "Sales",
+        "inventory": "Inventory",
+        "purchases": "Purchasing",
+        "accounting": "Accounting",
+        "finance": "Treasury & receivables",
+        "hr": "People",
+        "manufacturing": "Production"
+      }
     },
-    "finance": {
-      "cashFlowTitle": "Cash flow",
-      "cashFlowSubtitle": "Inflows and outflows over the last 6 months",
-      "inflows": "Inflows",
-      "outflows": "Outflows",
-      "net": "Net",
-      "arAging": "AR aging",
-      "apAging": "AP aging",
-      "bucketCurrent": "Current",
-      "bucket30": "1-30 days",
-      "bucket60": "31-60 days",
-      "bucket90": "61-90 days",
-      "bucket90plus": "+90 days",
-      "reconciliation": "Bank reconciliation",
-      "reconciliationSubtitle": "AI-suggested matches",
-      "matched": "Matched",
-      "review": "Review",
-      "aiSuggested": "AI-suggested",
-      "confidence": "Confidence",
-      "bankMovement": "Bank movement",
-      "ledgerEntry": "Ledger entry"
+    "kpis": {
+      "aria": "Period indicators",
+      "revenue": "Net sales",
+      "grossMargin": "Gross margin",
+      "ebitda": "EBITDA",
+      "cash": "Cash and banks",
+      "ar": "Receivables (AR)",
+      "ap": "Payables (AP)",
+      "arOverdue": "Over 60 days: {value}",
+      "vs": "vs. {period}",
+      "ytdNote": "Year to date",
+      "deltaUp": "Up from the previous period",
+      "deltaDown": "Down from the previous period"
     },
-    "inventory": {
-      "title": "SKU master",
-      "subtitle": "Multi-warehouse stock with FIFO/LIFO valuation",
-      "sku": "SKU",
-      "product": "Product",
-      "warehouse": "Warehouse",
-      "stock": "Stock",
-      "min": "Min.",
-      "valuation": "Valuation",
-      "method": "Method",
-      "unitCost": "Unit cost",
-      "totalValue": "Total value",
-      "status": "Status",
-      "lowStock": "Low stock",
-      "ok": "OK",
-      "out": "Out of stock",
-      "wh1": "Bogota Central",
-      "wh2": "Medellin North",
-      "wh3": "CDMX Logistics",
-      "alerts": "Active alerts",
-      "alertLow": "Below reorder point",
-      "alertOut": "Out of stock"
+    "flow": {
+      "title": "End-to-end walkthrough",
+      "progress": "{done} of {total} steps done",
+      "intro": "Each step is checked when you actually do it in the demo. Click a step to go to its module.",
+      "done": "You completed the walkthrough! Look at how the indicators above changed.",
+      "steps": {
+        "invoice": {
+          "module": "Sales",
+          "text": "Turn a quote into an order and invoice it: stock goes down and the journal entry is posted."
+        },
+        "reorder": {
+          "module": "Inventory",
+          "text": "Create a purchase order from a reorder-point alert (or from MRP)."
+        },
+        "approve": {
+          "module": "Purchasing",
+          "text": "Approve your PO (purchasing manager and, above COP 20M, management) and receive the goods."
+        },
+        "reconcile": {
+          "module": "Treasury",
+          "text": "Reconcile a bank statement line: a customer's PSE payment or the 4x1000 tax."
+        },
+        "ledger": {
+          "module": "Accounting",
+          "text": "See the automatic entries for your invoice and the updated financial statements."
+        }
+      }
+    },
+    "warehouses": {
+      "bog": "Bogotá (Fontibón)",
+      "med": "Medellín (Itagüí)",
+      "baq": "Barranquilla"
+    },
+    "entryDesc": {
+      "opening": "Opening balances at December 31, 2025",
+      "sale": "Sales invoice {doc} · {third}",
+      "creditNote": "Credit note {doc} (return of {ref}) · {third}",
+      "receipt_pse": "PSE collection for {doc} · {third}",
+      "receipt_transfer": "Transfer collection for {doc} · {third}",
+      "receipt_deposit": "Deposit collection for {doc} · {third}",
+      "purchase": "Purchase {doc}, supplier invoice {ref} · {third}",
+      "payment": "Payment of {doc} · {third}",
+      "prodStart": "Materials issued to {doc} ({item})",
+      "prodFinish": "Finished goods received from {doc} ({item})",
+      "exp_rent": "Warehouse rent · {month}",
+      "exp_utilities": "Utilities · {month}",
+      "exp_maintenance": "Maintenance · {month}",
+      "exp_depreciation": "Depreciation · {month}",
+      "exp_bankFee": "Bank fees · {month}",
+      "exp_gmf": "Financial transactions tax (4x1000) · {month}",
+      "exp_opCost": "Logistics operating cost · {month}",
+      "exp_unidentified": "Unidentified deposit · {month}",
+      "payroll": "Payroll and contributions · {month}",
+      "taxVat": "VAT payment for the two-month period ending {month}",
+      "taxWithholding": "Withholding tax payment for {month}"
+    },
+    "accounts": {
+      "1105": "Cash",
+      "1110": "Banks",
+      "1305": "Customers",
+      "1405": "Raw materials",
+      "1410": "Work in process",
+      "1430": "Finished goods",
+      "1435": "Merchandise for resale",
+      "1520": "Machinery and equipment",
+      "1524": "Office equipment",
+      "1540": "Vehicles",
+      "1592": "Accumulated depreciation",
+      "2205": "Domestic suppliers",
+      "2365": "Withholding tax payable",
+      "2408": "VAT payable",
+      "2610": "Employee benefits provisions",
+      "2805": "Advances received",
+      "3105": "Paid-in capital",
+      "3705": "Retained earnings",
+      "4120": "Revenue · manufacturing",
+      "4135": "Revenue · wholesale and retail",
+      "4145": "Revenue · transport and storage",
+      "4175": "Sales returns (DR)",
+      "5105": "Personnel expenses",
+      "5115": "Taxes",
+      "5120": "Rent",
+      "5135": "Services",
+      "5145": "Maintenance and repairs",
+      "5160": "Depreciation",
+      "5195": "Miscellaneous",
+      "5305": "Financial expenses",
+      "6120": "Cost of sales · manufacturing",
+      "6135": "Cost of sales · trade",
+      "6145": "Cost of sales · transport and storage"
     },
     "sales": {
-      "title": "Electronic invoicing",
-      "subtitle": "Real-time DIAN / SAT integration",
-      "invoice": "Invoice",
-      "customer": "Customer",
-      "date": "Date",
-      "amount": "Amount",
-      "tax": "Tax",
-      "status": "DIAN/SAT status",
-      "type": "Type",
-      "typeInv": "Invoice",
-      "typeCN": "Credit note",
-      "typeDN": "Debit note",
-      "accepted": "Accepted",
-      "pending": "Pending",
-      "rejected": "Rejected",
-      "resend": "Resend",
-      "view": "View"
+      "title": "Sales: quote → order → invoice",
+      "subtitle": "Invoicing checks warehouse stock, reduces inventory, posts the journal entry and moves the invoice to receivables.",
+      "newQuote": "New quote",
+      "summary": {
+        "quotes": "Open quotes (incl. VAT)",
+        "orders": "Orders to invoice (incl. VAT)",
+        "invoiced": "Invoiced in the period (incl. VAT)"
+      },
+      "views": {
+        "all": "All",
+        "quote": "Quotes",
+        "order": "Orders",
+        "invoiced": "Invoices"
+      },
+      "empty": "There are no sales documents in this period.",
+      "cols": {
+        "doc": "Document",
+        "status": "Status",
+        "customer": "Customer",
+        "date": "Date",
+        "total": "Total",
+        "open": "Balance",
+        "actions": "Actions"
+      },
+      "csv": {
+        "doc": "Document",
+        "status": "Status",
+        "company": "Company",
+        "customer": "Customer",
+        "nit": "Tax ID (NIT)",
+        "date": "Date",
+        "subtotal": "Subtotal",
+        "vat": "VAT",
+        "total": "Total",
+        "open": "Balance at 2026-09-30",
+        "dian": "DIAN",
+        "currency": "Currency"
+      },
+      "dianSimulated": "Accepted (simulated)",
+      "status": {
+        "quote": "Quote",
+        "order": "Order",
+        "invoiced": "Invoice",
+        "credited": "Voided by {doc}",
+        "paid": "Paid",
+        "overdue": "{days} d overdue",
+        "receivable": "Receivable"
+      },
+      "yours": "YOURS",
+      "periodSwitched": "We switched the period to September 2026 so you can see the transaction.",
+      "toasts": {
+        "ordered": "{doc} is now an order.",
+        "invoiced": "Invoice {doc} issued. Simulated DIAN validation in progress…",
+        "credited": "Credit note {doc} recorded: the goods went back to the warehouse.",
+        "quoted": "Quote {doc} created.",
+        "paid": "Collection {doc} recorded for {inv}."
+      },
+      "actions": {
+        "toOrder": "Convert to order",
+        "invoice": "Invoice",
+        "pay": "Record payment",
+        "view": "View {doc}",
+        "creditNote": "Credit note (full return)"
+      },
+      "docType": {
+        "quote": "Quote",
+        "order": "Order",
+        "invoiced": "Electronic invoice"
+      },
+      "info": {
+        "nit": "Tax ID (NIT)",
+        "city": "City",
+        "warehouse": "Warehouse",
+        "term": "Terms",
+        "termDays": "{days} days",
+        "quote": "Quote",
+        "order": "Order",
+        "invoice": "Invoice",
+        "due": "Due"
+      },
+      "lines": {
+        "item": "Product",
+        "qty": "Qty",
+        "price": "Price",
+        "vat": "VAT",
+        "subtotal": "Subtotal",
+        "excluded": "Excluded",
+        "vatTotal": "VAT",
+        "total": "Total",
+        "open": "Balance due"
+      },
+      "shortage": {
+        "title": "Not enough stock in {wh} to invoice:",
+        "line": "{item}: you need {need} and there are {have}.",
+        "go": "Go to Inventory to transfer or buy"
+      },
+      "dian": {
+        "sending": "Sending to DIAN… (simulated)",
+        "accepted": "Accepted by DIAN (simulated)",
+        "note": "In the demo the DIAN response is simulated. In your project the invoice is sent to DIAN through an authorized technology provider and delivered to the customer.",
+        "link": "See the e-invoicing demo"
+      },
+      "trace": {
+        "title": "What this document generated",
+        "sale": "Journal entry {doc} (revenue, VAT, cost of sales and inventory)",
+        "creditNote": "Credit note entry {doc}",
+        "seeEntry": "See in Accounting",
+        "receipt": "Collection {doc} on {date} for {amount}",
+        "stock": "Stock issued from the {wh} warehouse (see the stock card in Inventory)"
+      },
+      "creditNote": {
+        "title": "Credit note for {doc}",
+        "confirm": "Record credit note",
+        "body": "The whole invoice is voided: the goods go back to {wh}, revenue, VAT and cost are reversed, and the customer's balance goes to zero."
+      },
+      "form": {
+        "title": "New quote",
+        "subtitle": "Created with date {date} and list prices (before VAT).",
+        "company": "Selling company",
+        "customer": "Customer",
+        "warehouse": "Shipping warehouse",
+        "item": "Product or service",
+        "qty": "Quantity",
+        "available": "Available: {qty}",
+        "removeLine": "Remove line",
+        "addLine": "Add line",
+        "totals": "Subtotal {subtotal} · VAT {vat} · Total {total}",
+        "errorLines": "Add at least one line with a quantity.",
+        "errorDup": "Some products are repeated: merge their quantities into one line.",
+        "save": "Create quote",
+        "note": "A quote does not move inventory or accounting. Stock is checked when you invoice."
+      },
+      "payment": {
+        "title": "Record payment for {doc}",
+        "save": "Record collection",
+        "open": "Balance due: {amount}",
+        "amount": "Amount received (COP)",
+        "method": "Payment method",
+        "methods": {
+          "pse": "PSE",
+          "transfer": "Bank transfer",
+          "deposit": "Deposit"
+        },
+        "error": "Enter an amount between 1 and {max}.",
+        "note": "Recorded with date {date}: debits Banks and credits Customers."
+      }
+    },
+    "inventory": {
+      "title": "Inventory by warehouse",
+      "subtitle": "Stock and value at {date}. Click a SKU to see its stock card.",
+      "noInventoryLog": "Montevera Logística provides storage services and has no inventory of its own. Choose “Surtidora Montevera” or the consolidated view.",
+      "periodSwitched": "We switched the period to September 2026 so you can see the transaction.",
+      "toasts": {
+        "poCreated": "Purchase order {doc} created for {supplier}: approve it in Purchasing.",
+        "transferred": "Transfer {doc}: {qty} of {item} from {from} to {to}."
+      },
+      "cols": {
+        "sku": "SKU",
+        "item": "Product",
+        "warehouse": "Warehouse",
+        "stock": "On hand",
+        "reorder": "Reorder point",
+        "unitCost": "Unit cost",
+        "value": "Value",
+        "status": "Status"
+      },
+      "status": {
+        "ok": "OK",
+        "low": "Below reorder",
+        "out": "Out of stock"
+      },
+      "transfer": {
+        "open": "Transfer between warehouses",
+        "title": "Warehouse transfer",
+        "subtitle": "Move units from one warehouse to another at average cost.",
+        "from": "From",
+        "to": "To",
+        "qty": "Quantity",
+        "available": "Available in {wh}: {qty}",
+        "errorSame": "Choose different warehouses.",
+        "errorQty": "Enter a quantity greater than zero.",
+        "errorStock": "Only {have} are available in the source warehouse.",
+        "save": "Record transfer",
+        "note": "A transfer does not change the total inventory value or post a journal entry; it does show up on each warehouse's stock card."
+      },
+      "filters": {
+        "warehouse": "Warehouse",
+        "allWarehouses": "All warehouses",
+        "kind": "Type",
+        "allKinds": "All types"
+      },
+      "kinds": {
+        "merch": "Merchandise",
+        "finished": "Finished goods",
+        "raw": "Raw materials and packaging"
+      },
+      "method": {
+        "label": "Valuation",
+        "avg": "Weighted average",
+        "fifo": "FIFO",
+        "totals": "Total value: {avg} at weighted average · {fifo} at FIFO (difference {diff}).",
+        "policy": "Accounting uses weighted average; FIFO is shown for comparison."
+      },
+      "shownTotal": "Value of the rows shown: {value}",
+      "alerts": {
+        "title": "Reorder alerts",
+        "subtitle": "Products below their reorder point at the cut-off date.",
+        "none": "No products are below their reorder point.",
+        "out": "Out of stock · reorder at {reorder}",
+        "low": "{qty} on hand · reorder at {reorder}",
+        "inProgress": "A PO is already in progress: {doc}",
+        "createPo": "Create PO for {qty}",
+        "produce": "Schedule production",
+        "transfer": "Transfer from Bogotá",
+        "pastPeriod": "You are viewing a closed period: actions are available in September 2026."
+      },
+      "kardex": {
+        "open": "View stock card for {sku}",
+        "hint": "Value and unit cost change with the selected valuation method.",
+        "title": "Stock card for {sku}",
+        "subtitle": "movements in the period, newest first",
+        "allWarehouses": "All warehouses",
+        "empty": "This product had no movements in the period.",
+        "date": "Date",
+        "doc": "Document",
+        "type": "Type",
+        "in": "In",
+        "out": "Out",
+        "unit": "Unit cost",
+        "balance": "Balance",
+        "note": "With “All warehouses”, transfers are hidden because they do not change the total balance.",
+        "kinds": {
+          "opening": "Opening balance",
+          "purchase": "Purchase",
+          "sale": "Sale",
+          "return": "Return",
+          "transferIn": "Transfer (in)",
+          "transferOut": "Transfer (out)",
+          "prodOut": "Issued to production",
+          "prodIn": "Finished goods"
+        }
+      }
     },
     "purchases": {
       "title": "Purchase orders",
-      "subtitle": "Supplier management with OCR + workflow",
-      "poNumber": "PO",
-      "supplier": "Supplier",
-      "date": "Date",
-      "amount": "Amount",
-      "status": "Status",
-      "approvalFlow": "Approval workflow",
-      "level1": "Supervisor",
-      "level2": "Manager",
-      "level3": "Director",
-      "approved": "Approved",
-      "inReview": "In review",
-      "rejected": "Rejected",
-      "ocrTitle": "Supplier invoice OCR",
-      "ocrSubtitle": "Processed by AI: 12 fields extracted",
-      "fieldNit": "Supplier Tax ID",
-      "fieldDate": "Issue date",
-      "fieldDue": "Due date",
-      "fieldSubtotal": "Subtotal",
-      "fieldTax": "VAT 19%",
-      "fieldTotal": "Total",
-      "fieldItems": "Detected items",
-      "uploadInvoice": "Upload invoice",
-      "extractedAt": "Extracted 2 min ago"
+      "subtitle": "Tiered approval, receipt with the supplier's invoice, and payment.",
+      "noPurchasesLog": "Montevera Logística has no inventory purchases in this demo. Choose “Surtidora Montevera” or the consolidated view.",
+      "newPo": "New purchase order",
+      "views": {
+        "pending": "To approve ({n})",
+        "approved": "To receive ({n})",
+        "received": "Received",
+        "all": "All"
+      },
+      "empty": "No purchase orders in this view for the period.",
+      "csv": {
+        "doc": "PO",
+        "status": "Status",
+        "supplier": "Supplier",
+        "nit": "Tax ID (NIT)",
+        "date": "Date",
+        "warehouse": "Warehouse",
+        "subtotal": "Subtotal",
+        "vat": "VAT",
+        "total": "Total",
+        "withholding": "Withholding",
+        "payable": "Payable",
+        "open": "Balance at 2026-09-30"
+      },
+      "status": {
+        "pending": "To approve",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "received": "Received · unpaid",
+        "paid": "Paid"
+      },
+      "rules": {
+        "title": "How it works",
+        "level1": "Every PO is approved by the purchasing manager.",
+        "level2": "If the total including VAT is {amount} or more, management approves it too.",
+        "receive": "On receipt, the goods enter the warehouse and the supplier invoice is booked (you can upload its XML to compare it with the PO).",
+        "withholding": "A {pct}% withholding tax is applied to the subtotal (sample rate).",
+        "demoNote": "In the demo you can approve at every level. In your project each level is approved by its assigned role, with the amounts you define."
+      },
+      "origin": {
+        "manual": "CREATED BY YOU",
+        "reorder": "FROM REORDER ALERT",
+        "mrp": "FROM MRP"
+      },
+      "itemsCount": "{n, plural, one {1 product} other {# products}}: {first}…",
+      "openAmount": "Payable {amount} · due {due}",
+      "flow": {
+        "aria": "Purchase order workflow",
+        "level1": "Purchasing manager",
+        "level2": "Management",
+        "receive": "Receipt",
+        "pay": "Payment"
+      },
+      "rejectedReason": "Rejection reason: {reason}",
+      "actions": {
+        "approveAs": "Approve as {role}",
+        "reject": "Reject",
+        "receive": "Receive goods",
+        "pay": "Pay {amount}",
+        "detail": "View details"
+      },
+      "toasts": {
+        "approvedFinal": "{doc} approved by {role}. You can now receive the goods.",
+        "approvedLevel": "{doc} approved by {role}. Management approval is still needed.",
+        "paid": "Payment {doc} of {amount} recorded for {po}.",
+        "received": "{doc} received in {wh}: inventory and accounts payable were updated.",
+        "rejected": "{doc} rejected.",
+        "created": "Purchase order {doc} created. Now approve it."
+      },
+      "periodSwitched": "We switched the period to September 2026 so you can see the transaction.",
+      "detail": {
+        "title": "Purchase order",
+        "item": "Product",
+        "qty": "Qty",
+        "cost": "Cost",
+        "vat": "VAT",
+        "subtotal": "Subtotal",
+        "excluded": "Excluded",
+        "vatTotal": "VAT",
+        "total": "Total",
+        "withholding": "Withholding tax",
+        "payable": "Net payable",
+        "history": "History",
+        "created": "Created on {date}",
+        "approved": "Approved by {role} on {date}",
+        "received": "Received on {date} with invoice {invoice} ({source})",
+        "source": {
+          "xml": "XML",
+          "manual": "typed in"
+        },
+        "paid": "Payment {doc} on {date} for {amount}",
+        "seeEntry": "See entry {doc}"
+      },
+      "receive": {
+        "title": "Receive {doc}",
+        "save": "Receive and book invoice",
+        "invoiceNo": "Supplier invoice number",
+        "xml": "Invoice XML (optional)",
+        "upload": "Upload XML",
+        "sample": "Download sample XML",
+        "xmlHint": "It is read in your browser and is not sent to any server. Accepts the (simplified) UBL 2.1 structure of the Colombian e-invoice.",
+        "vatCredit": "Input VAT",
+        "match": "XML vs. PO comparison ({lines} lines in the XML)",
+        "field": "Field",
+        "inXml": "In the XML",
+        "inPo": "In the PO",
+        "fields": {
+          "supplier": "Supplier tax ID",
+          "order": "Purchase order",
+          "subtotal": "Subtotal",
+          "vat": "VAT",
+          "total": "Total"
+        },
+        "ok": "Matches",
+        "diff": "Different",
+        "mismatch": "The invoice does not match the PO. Check with the supplier, or receive without the XML by typing the invoice number.",
+        "effect": "On confirm: the goods enter {wh} (average cost updated) and the purchase entry is posted with input VAT, withholding and the payable.",
+        "errors": {
+          "tooBig": "The file is larger than 2 MB.",
+          "notXml": "The file is not valid XML.",
+          "notInvoice": "The XML is not a UBL invoice (no Invoice element).",
+          "missing": "The XML is missing the invoice number or the total."
+        }
+      },
+      "reject": {
+        "title": "Reject {doc}",
+        "save": "Reject order",
+        "reason": "Reason",
+        "placeholder": "E.g.: price above the last purchase"
+      },
+      "form": {
+        "title": "New purchase order",
+        "subtitle": "The proposed cost is each product's current average cost.",
+        "supplier": "Supplier",
+        "warehouse": "Destination warehouse",
+        "item": "Product",
+        "qty": "Quantity",
+        "cost": "Unit cost: {cost}",
+        "removeLine": "Remove line",
+        "addLine": "Add line",
+        "totals": "Total incl. VAT {total} · {levels, plural, one {1 approval level} other {# approval levels}}",
+        "errorLines": "Add at least one line with a quantity.",
+        "errorDup": "Some products are repeated: merge their quantities into one line.",
+        "errorRaw": "Raw materials and packaging are only received at the Bogotá warehouse (plant).",
+        "save": "Create purchase order"
+      }
+    },
+    "accounting": {
+      "tabs": {
+        "journal": "General journal",
+        "trial": "Trial balance",
+        "statements": "Financial statements"
+      },
+      "journal": {
+        "title": "General journal (PUC)",
+        "subtitle": "Double-entry postings generated by each transaction. Click a voucher to see its source.",
+        "empty": "There are no entries in this period.",
+        "totals": "Totals ({n} vouchers)"
+      },
+      "cols": {
+        "date": "Date",
+        "entry": "Voucher",
+        "company": "Company",
+        "account": "Account",
+        "description": "Description / party",
+        "third": "Party",
+        "debit": "Debit",
+        "credit": "Credit"
+      },
+      "yours": "YOURS",
+      "manual": {
+        "open": "Manual entry",
+        "title": "New manual entry",
+        "subtitle": "Adjustment voucher: debits must equal credits.",
+        "company": "Company",
+        "desc": "Description",
+        "descPlaceholder": "E.g.: reclassification of September expenses",
+        "removeLine": "Remove line",
+        "addLine": "Add line",
+        "sums": "Debits {debit} · Credits {credit} · Difference {diff}",
+        "note": "Recorded on Sep 30, 2026 and immediately reflected in the trial balance and financial statements.",
+        "save": "Post entry",
+        "done": "Entry {doc} posted.",
+        "errorDesc": "Enter a description.",
+        "errorLines": "You need at least two lines with an amount.",
+        "errorBoth": "Each line must have a debit or a credit, not both.",
+        "errorBalance": "Debits and credits must be equal and greater than zero."
+      },
+      "periodSwitched": "We switched the period to September 2026 so you can see the transaction.",
+      "entry": {
+        "title": "Voucher",
+        "goSource": "See the document in {module}",
+        "totals": "Totals",
+        "balanced": "Debits = credits",
+        "unbalanced": "Out of balance",
+        "manual": "Manual entry posted by you.",
+        "source": {
+          "opening": "Demo opening balances.",
+          "sale": "Posted automatically when invoicing.",
+          "creditNote": "Posted automatically by the credit note.",
+          "receipt": "Posted automatically when recording the collection.",
+          "purchase": "Posted automatically when receiving the purchase.",
+          "payment": "Posted automatically when paying the supplier.",
+          "expense": "Posted automatically by the expense accrual or bank movement.",
+          "payroll": "Posted automatically when running payroll.",
+          "tax": "Posted automatically when paying the tax (account balance at cut-off).",
+          "prodStart": "Posted automatically when starting the production order.",
+          "prodFinish": "Posted automatically when finishing the production order."
+        }
+      },
+      "trial": {
+        "title": "Trial balance",
+        "subtitle": "From {from} to {to}",
+        "ok": "Balanced",
+        "notOk": "Out of balance",
+        "opening": "Opening balance",
+        "closing": "Closing balance",
+        "totals": "Totals",
+        "note": "Debit balances are positive and credit balances negative. Closing balances always add up to zero."
+      },
+      "pl": {
+        "title": "Income statement",
+        "subtitle": "From {from} to {to}",
+        "revenue": "Net operating revenue",
+        "cogs": "Cost of sales",
+        "gross": "Gross profit",
+        "opex": "Operating expenses",
+        "operating": "Operating income",
+        "nonOperating": "Non-operating (financial) expenses",
+        "preTax": "Income before taxes",
+        "tax": "Estimated income tax provision ({pct}%)",
+        "net": "Estimated net income",
+        "ebitda": "EBITDA",
+        "ebitdaNote": "Operating income + depreciation for the period ({dep}).",
+        "taxNote": "The income tax provision is a demo estimate and is not posted as an entry."
+      },
+      "bs": {
+        "title": "Statement of financial position",
+        "subtitle": "At {date}",
+        "ok": "Assets = Liabilities + Equity",
+        "notOk": "Out of balance",
+        "currentAssets": "Current assets (cash, banks, receivables, inventory)",
+        "fixedAssets": "Property, plant and equipment (net)",
+        "assets": "Total assets",
+        "liabilities": "Total liabilities",
+        "capital": "Capital and retained earnings",
+        "result": "Income for the year (before taxes)",
+        "equity": "Total equity",
+        "note": "Figures come from the same journal entries. In your project you can keep the books here or send the movements to your accounting software."
+      }
+    },
+    "finance": {
+      "periodSwitched": "We switched the period to September 2026 so you can see the transaction.",
+      "cash": {
+        "title": "Cash flow",
+        "subtitle": "Monthly cash and bank inflows and outflows, calculated from the entries.",
+        "aria": "Chart of monthly inflows and outflows",
+        "tooltip": "{month}: inflows {inflow} · outflows {outflow}",
+        "inflows": "Inflows",
+        "outflows": "Outflows",
+        "net": "Net for the period: {value}"
+      },
+      "aging": {
+        "ar": "Receivables aging",
+        "ap": "Payables aging",
+        "cutoff": "Cut-off {date} · {n} documents",
+        "buckets": {
+          "current": "Not yet due",
+          "d30": "1–30 days past due",
+          "d60": "31–60 days past due",
+          "d90": "61–90 days past due",
+          "d90plus": "Over 90 days past due"
+        }
+      },
+      "ar": {
+        "title": "Receivables by customer",
+        "subtitle": "Invoices with a balance at {date}, sorted by overdue balance.",
+        "empty": "There are no outstanding receivables.",
+        "customer": "Customer",
+        "company": "Company",
+        "doc": "Invoice",
+        "date": "Date",
+        "due": "Due",
+        "days": "Days overdue",
+        "open": "Balance",
+        "invoices": "Invoices",
+        "overdue": "Overdue",
+        "over60": "Overdue > 60 d",
+        "actions": "Actions",
+        "hide": "Hide",
+        "show": "View invoices",
+        "remind": "Reminder",
+        "line": "dated {date}, due {due}",
+        "daysOverdue": "{days} days overdue",
+        "notDue": "not yet due"
+      },
+      "reminder": {
+        "title": "Payment reminder",
+        "text": "Hello, {customer} team: this is {company} reaching out because you have {n, plural, one {1 overdue invoice} other {# overdue invoices}} for {amount}: {list}. Could you confirm the payment date? Thank you.",
+        "copied": "Message copied.",
+        "copyError": "We could not copy the text; select it and copy it manually.",
+        "copy": "Copy message",
+        "note": "Simulated: the demo does not send anything. In your project the reminder is sent through WhatsApp Business or email, manually or on a schedule."
+      },
+      "recon": {
+        "title": "Bank reconciliation",
+        "subtitle": "Bank statement lines for the period. Suggestions come from rules (reference, amount and customer name), not AI.",
+        "import": "Import statement (CSV)",
+        "views": {
+          "pending": "Pending ({n})",
+          "matched": "Reconciled",
+          "all": "All"
+        },
+        "nonePending": "There are no pending lines to reconcile in this period.",
+        "note": "Demo statement lines are sample data. In your project you import your bank's Excel or CSV statements; a direct connection depends on each bank.",
+        "imported": "imported",
+        "matchedByYou": "Reconciled by you with {doc}",
+        "matchedWith": "Reconciled with {doc}",
+        "suggestion": "Suggestion",
+        "suggest": {
+          "receipt": "record the collection of {doc} ({customer})",
+          "bankFee": "record as a bank fee",
+          "gmf": "record the financial transactions tax (4x1000)",
+          "unidentified": "record as an unidentified deposit"
+        },
+        "why": "Why",
+        "reasons": {
+          "reference": "the description includes the invoice number",
+          "amount": "the amount equals the invoice balance",
+          "customer": "the description includes the customer's name",
+          "gmf": "the description says GMF / 4x1000",
+          "fee": "the description says fee",
+          "outflow": "it is a debit without a reference",
+          "noMatch": "no invoice has that reference or amount"
+        },
+        "matched": "Reconciled",
+        "confidence": {
+          "high": "Strong match",
+          "medium": "Review"
+        },
+        "applyTo": "Apply to an invoice…",
+        "useSuggested": "Use the suggested one",
+        "acceptReceipt": "Record collection",
+        "accept": {
+          "bankFee": "Record fee",
+          "gmf": "Record 4x1000",
+          "unidentified": "Record as unidentified"
+        },
+        "toasts": {
+          "receipt": "Collection recorded and reconciled: {doc} left receivables.",
+          "bankFee": "Bank fee recorded and reconciled.",
+          "gmf": "4x1000 recorded and reconciled.",
+          "unidentified": "Deposit recorded under “Advances received” until the customer is identified."
+        }
+      },
+      "import": {
+        "title": "Import bank statement",
+        "subtitle": "CSV file with columns: date, description, amount.",
+        "save": "Import {n} lines",
+        "company": "Company account",
+        "choose": "Choose CSV file",
+        "sample": "Download sample CSV",
+        "format": "Dates YYYY-MM-DD or DD/MM/YYYY between January 1, 2026 and {max}. Positive amounts for inflows, negative for outflows. Separator ; or ,.",
+        "preview": "{n} lines ready to import ({skipped} rows skipped for format).",
+        "date": "Date",
+        "desc": "Description",
+        "amount": "Amount",
+        "note": "The file is read in your browser and is not sent to any server.",
+        "done": "You imported {n} lines. Review them under “Pending”.",
+        "errors": {
+          "tooBig": "The file is larger than 1 MB.",
+          "empty": "The file is empty.",
+          "noRows": "We found no valid rows. Check the format."
+        }
+      }
     },
     "hr": {
-      "title": "Human capital",
-      "subtitle": "Employees, vacation and payroll",
-      "employees": "Active employees",
-      "onVacation": "On vacation",
-      "payrollMonth": "Monthly payroll",
-      "headcount": "Headcount",
-      "name": "Name",
-      "position": "Position",
-      "department": "Department",
-      "salary": "Base salary",
-      "statusActive": "Active",
-      "statusVacation": "Vacation",
-      "vacationsTitle": "Vacation requests",
-      "from": "From",
-      "to": "To",
-      "days": "Days",
-      "approve": "Approve",
-      "reject": "Reject",
-      "payrollTitle": "Payroll summary"
+      "kpi": {
+        "employees": "People on payroll",
+        "employeesNote": "For the selected company",
+        "onVacation": "On vacation",
+        "onVacationNote": "At {date}",
+        "payrollCost": "Payroll cost for the period",
+        "payrollCostNote": "{n, plural, one {1 payroll run} other {# payroll runs}} (salary + contributions + benefits)"
+      },
+      "staff": {
+        "title": "People",
+        "subtitle": "Positions, areas and monthly base salary.",
+        "empty": "No people match the search.",
+        "name": "Name",
+        "position": "Position",
+        "dept": "Area",
+        "city": "City",
+        "salary": "Base salary",
+        "status": "Status",
+        "vacation": "On vacation",
+        "active": "Active"
+      },
+      "depts": {
+        "management": "Management",
+        "finance": "Administration and finance",
+        "purchasing": "Purchasing",
+        "sales": "Sales",
+        "warehouse": "Warehouses",
+        "production": "Production",
+        "people": "People",
+        "operations": "Logistics operations"
+      },
+      "vacations": {
+        "title": "Vacation requests",
+        "empty": "There are no requests.",
+        "status": {
+          "pending": "Pending",
+          "approved": "Approved",
+          "rejected": "Rejected"
+        },
+        "range": "{from} → {to} · {days} business days",
+        "approve": "Approve",
+        "reject": "Reject"
+      },
+      "payroll": {
+        "title": "Payroll for the period",
+        "subtitle": "Each payroll run posts its journal entry and its electronic payroll submission.",
+        "empty": "There are no payroll runs in this period.",
+        "month": "Month",
+        "company": "Company",
+        "headcount": "People",
+        "gross": "Salaries",
+        "cost": "Employer cost",
+        "eStatus": "Electronic payroll",
+        "actions": "Actions",
+        "e": {
+          "pending": "Not yet sent",
+          "sending": "Sending… (simulated)",
+          "accepted": "Accepted (simulated)"
+        },
+        "transmit": "Send to DIAN (simulated)",
+        "seeEntry": "See entry",
+        "factorNote": "Employer cost uses sample factors (salary × {factor}: contributions and statutory benefits). In your project payroll is calculated person by person under current law.",
+        "hrmsNote": "Electronic payroll submission is simulated in the demo; in your project it goes through an authorized technology provider. Detailed payroll (adjustments, overtime, sick leave) lives in the people module.",
+        "hrmsLink": "See the HRMS demo"
+      },
+      "toasts": {
+        "approved": "{name}'s vacation approved.",
+        "rejected": "{name}'s vacation rejected.",
+        "transmitting": "Sending the {month} electronic payroll for {company} (simulated)…"
+      }
     },
     "manufacturing": {
-      "title": "Manufacturing & MRP",
-      "subtitle": "BOM, work orders, and planning suggestions",
-      "bomTitle": "Bill of materials (BOM)",
-      "qty": "Qty.",
-      "workOrders": "Work orders",
-      "wo": "WO",
-      "product": "Product",
-      "qtyOrdered": "Qty. ordered",
-      "progress": "Progress",
-      "dueDate": "Due",
-      "mrpTitle": "MRP suggestions",
-      "mrpSubtitle": "AI-powered recommendations",
-      "buy": "Buy",
-      "produce": "Produce",
-      "transfer": "Transfer",
-      "reason": "Reason",
-      "reasonLow": "Stock below minimum",
-      "reasonForecast": "Projected Q3 demand",
-      "reasonLead": "Long lead time"
-    },
-    "modal": {
-      "transactionDetail": "Transaction detail",
-      "reference": "Reference",
-      "createdBy": "Created by",
-      "createdAt": "Created",
-      "approvedBy": "Approved by",
-      "notes": "Notes",
-      "audit": "Audit",
-      "close": "Close",
-      "noteText": "Transaction recorded successfully. Automatic reconciliation completed by AI with 98% confidence."
+      "title": "Production",
+      "noManufacturingLog": "Montevera Logística does not produce. Choose “Surtidora Montevera” or the consolidated view.",
+      "periodSwitched": "We switched the period to September 2026 so you can see the transaction.",
+      "yours": "YOURS",
+      "toasts": {
+        "started": "{doc} started: materials were issued from inventory.",
+        "finished": "{doc} finished: {qty} of {item} entered the Bogotá warehouse.",
+        "created": "Production order {doc} created."
+      },
+      "bom": {
+        "title": "Bill of materials (BOM)",
+        "subtitle": "Components per unit with their current average cost.",
+        "product": "Product",
+        "perUnit": "per unit",
+        "unitCost": "Standard cost per unit",
+        "price": "Sale price (before VAT)",
+        "margin": "Gross margin",
+        "note": "If a component's cost changes (after a new purchase), the standard cost is recalculated.",
+        "phantom": "sub-assembly"
+      },
+      "orders": {
+        "title": "Production orders",
+        "subtitle": "Bogotá plant. Starting issues materials; finishing receives the finished goods at actual cost.",
+        "new": "New order",
+        "empty": "There are no production orders in this period.",
+        "status": {
+          "planned": "Planned",
+          "inProgress": "In progress",
+          "done": "Finished"
+        },
+        "dates": "Created {created} · started {start} · finished {finish}",
+        "start": "Start (issue materials)",
+        "finish": "Finish (receive into warehouse)",
+        "consumes": "Uses:",
+        "units": "units",
+        "shortage": "Missing materials: {list}. Use MRP below to buy them."
+      },
+      "mrp": {
+        "title": "Material requirements planning (MRP)",
+        "subtitle": "Calculated from planned orders, the bill of materials, stock and reorder points.",
+        "buyTitle": "Raw materials and packaging",
+        "buyLine": "Stock {have} · required {required} · left {after} · reorder {reorder}",
+        "covered": "Covered",
+        "poOpen": "PO in progress: {doc}",
+        "createPo": "Create PO for {qty}",
+        "produceTitle": "Finished goods (Bogotá)",
+        "produceLine": "Stock {have} · in production or planned {planned} · reorder {reorder}",
+        "createOp": "Plan {qty}",
+        "note": "These are calculation rules, not AI. In your project you can add the sales forecast and each supplier's lead times."
+      },
+      "form": {
+        "title": "New production order",
+        "subtitle": "It is created as planned; MRP takes it into account right away.",
+        "qty": "Quantity to produce",
+        "errorQty": "Enter a quantity between 1 and 50,000.",
+        "save": "Create order"
+      }
     },
     "footer": {
-      "demo": "Interactive demo",
-      "note": "Simulated data for demonstration purposes"
+      "sample": "Sample data: Surtidora Montevera S.A.S. and Montevera Logística S.A.S. are fictitious companies; customers, suppliers, people, tax IDs and figures are made up.",
+      "integrations": "DIAN validation (e-invoice and electronic payroll), bank statements and WhatsApp reminders are simulated in the demo. In your project they connect to an authorized technology provider, your bank's statements, and WhatsApp Business or email.",
+      "storage": "What you do here is saved only in this browser, and you can reset it at any time."
     }
   }
 }

@@ -1,280 +1,654 @@
 {
   "demoTelemed": {
-    "pageTitle": "Telemedicina",
-    "pageSubtitle": "Plataforma integral de teleconsulta: sala de espera con triage IA, video consulta, ficha clínica, receta electrónica, laboratorio HL7/FHIR y agenda por especialidad.",
-    "backToDemos": "Volver a demos",
+    "meta": {
+      "title": "Demo de telemedicina para IPS",
+      "description": "Demo interactiva de telemedicina con datos de ejemplo: pre-consulta y consentimientos del paciente, orientación de síntomas por reglas, agenda sin festivos, videoconsulta simulada con ficha, receta y órdenes, notas SOAP, resumen en PDF y pagos con factura y RIPS simulados.",
+      "breadcrumbHome": "Inicio",
+      "breadcrumbDemos": "Demos",
+      "breadcrumbName": "Telemedicina"
+    },
+    "header": {
+      "back": "Volver a demos",
+      "title": "Telemedicina para IPS",
+      "subtitle": "Recorre una jornada de teleconsulta en {ips}: paciente, profesional y facturación.",
+      "sampleBadge": "Datos de ejemplo",
+      "simBadge": "Video, mensajes, pagos y RIPS simulados",
+      "dayBadge": "Jornada del {date}",
+      "request": "Solicitar propuesta",
+      "reset": "Restablecer",
+      "resetHint": "Vuelve a los datos de ejemplo y borra lo que hiciste en este navegador",
+      "tabsLabel": "Secciones de la demo"
+    },
     "tabs": {
-      "console": "Consultorio virtual",
-      "triage": "Triage IA",
+      "console": "Consultorio (profesional)",
+      "patient": "Vista del paciente",
+      "triage": "Orientación de síntomas",
       "scheduling": "Agenda",
       "lab": "Laboratorio",
-      "billing": "Pagos & copagos",
-      "preconsult": "Pre-consulta"
-    },
-    "compliance": {
-      "title": "Cumplimiento normativo",
-      "subtitle": "Toda la sesión está cifrada extremo a extremo. Auditoría inmutable.",
-      "hipaa": "HIPAA",
-      "gdpr": "GDPR",
-      "habeasData": "Habeas Data CO",
-      "ley1581": "Ley 1581 / 2012",
-      "encrypted": "E2E cifrado",
-      "auditLogTitle": "Audit log",
-      "viewAll": "Ver completo"
+      "billing": "Pagos y facturación"
     },
     "kpis": {
-      "queue": "En cola",
-      "queueSub": "pacientes esperando",
+      "waiting": "En sala de espera",
+      "waitingSub": "pacientes por atender",
       "avgWait": "Espera promedio",
-      "avgWaitSub": "minutos",
-      "todayCalls": "Consultas hoy",
-      "todayCallsSub": "completadas",
-      "satisfaction": "Satisfacción",
-      "satisfactionSub": "últimos 30 días"
+      "avgWaitSub": "minutos (sala actual)",
+      "done": "Atenciones de hoy",
+      "doneSub": "consultas finalizadas",
+      "pending": "Por cobrar",
+      "pendingSub": "a pacientes (cuotas y particulares)"
+    },
+    "route": {
+      "title": "Recorrido sugerido (5 pasos, menos de 5 minutos)",
+      "step": "Paso {n}",
+      "s1": "Como paciente, llena la pre-consulta y acepta los consentimientos obligatorios.",
+      "s2": "Describe síntomas: los signos de alarma derivan a urgencias; el resto agenda con la especialidad sugerida.",
+      "s3": "Como profesional, deriva a la paciente con dolor en el pecho y llama a Carlos Rodríguez.",
+      "s4": "Revisa ficha y laboratorios, registra el diagnóstico, firma la receta y las órdenes y finaliza.",
+      "s5": "Cobra la cuota con la pasarela simulada y revisa la factura y el RIPS de la atención."
+    },
+    "priority": {
+      "red": "Signo de alarma",
+      "yellow": "Prioritaria",
+      "green": "No prioritaria"
     },
     "queue": {
       "title": "Sala de espera virtual",
-      "subtitle": "Pacientes triados por IA en tiempo real",
-      "search": "Buscar paciente...",
-      "waiting": "esperando",
-      "callNow": "Llamar",
-      "calling": "Llamando...",
-      "skip": "Saltar",
-      "empty": "No hay pacientes en cola",
-      "priority": {
-        "red": "Crítico",
-        "yellow": "Urgente",
-        "green": "Estable"
-      },
-      "reason": "Motivo",
-      "since": "Desde",
-      "vitals": "Signos",
+      "subtitle": "Ordenada por prioridad de la pre-consulta y tiempo de espera",
+      "search": "Buscar paciente o motivo...",
+      "filterLabel": "Filtrar por prioridad",
       "filter": {
         "all": "Todos",
-        "red": "Críticos",
-        "yellow": "Urgentes",
-        "green": "Estables"
-      }
+        "red": "Alarma",
+        "yellow": "Prioritarios",
+        "green": "No prioritarios"
+      },
+      "waiting": "{min} min esperando",
+      "empty": "No hay pacientes en la sala de espera",
+      "call": "Llamar",
+      "busy": "Finaliza la consulta actual para llamar a otro paciente.",
+      "alarm": "Signo de alarma: no se atiende por teleconsulta. Hay que indicarle ir a urgencias o llamar a la línea 123.",
+      "refer": "Derivar a urgencias"
     },
-    "consultation": {
-      "title": "Video consulta",
+    "refer": {
+      "title": "Derivar a urgencias",
+      "body": "{name} reportó síntomas de alarma. La teleconsulta no es el canal adecuado: se le indica acudir a urgencias o llamar a la línea 123 y queda registrado en la auditoría.",
+      "messageTitle": "Mensaje al paciente (simulado)",
+      "message": "{name}, por los síntomas que reportaste necesitas atención presencial inmediata. Ve al servicio de urgencias más cercano o llama a la línea 123. No esperes la teleconsulta.",
+      "note": "En la demo no se envía ningún mensaje real. En tu proyecto, el aviso sale por WhatsApp Business o SMS y el protocolo lo define tu equipo médico.",
+      "confirm": "Derivar y registrar"
+    },
+    "video": {
       "noActive": "No hay consulta activa",
-      "noActiveHint": "Llama a un paciente desde la sala de espera para comenzar.",
-      "you": "Tú (Dr.)",
-      "patient": "Paciente",
-      "duration": "Duración",
-      "quality": "Calidad",
-      "good": "HD",
-      "controls": {
-        "mute": "Silenciar",
-        "unmute": "Activar audio",
-        "camOn": "Cámara",
-        "camOff": "Cámara",
-        "share": "Compartir",
-        "shareStop": "Detener",
-        "record": "Grabar",
-        "stopRec": "Detener grabación",
-        "end": "Finalizar"
+      "noActiveHint": "Llama a un paciente desde la sala de espera para empezar.",
+      "patientSimulated": "Video del paciente simulado",
+      "you": "Tú (profesional)",
+      "selfView": "Tu cámara",
+      "camOffSelf": "Tu cámara está apagada",
+      "mute": "Silenciar micrófono",
+      "unmute": "Activar micrófono",
+      "muted": "Micrófono silenciado",
+      "camStart": "Encender mi cámara",
+      "camStop": "Apagar mi cámara",
+      "share": "Compartir pantalla (simulado)",
+      "shareStop": "Dejar de compartir",
+      "sharingBadge": "Compartiendo pantalla (simulado)",
+      "rec": "Grabar (requiere consentimiento)",
+      "recStop": "Detener grabación",
+      "recBadge": "REC · simulada",
+      "end": "Finalizar",
+      "simTag": "Video simulado",
+      "note": "El paciente es una imagen de ejemplo. Si enciendes tu cámara, la imagen se ve solo en tu pantalla: no se graba ni se envía.",
+      "camError": "No se pudo usar tu cámara. La consulta sigue con video simulado.",
+      "errors": {
+        "unsupported": "Este navegador no permite usar la cámara aquí.",
+        "denied": "No diste permiso para usar la cámara.",
+        "notFound": "No encontramos una cámara o un micrófono.",
+        "other": "No se pudo iniciar la cámara."
       },
-      "chat": {
-        "title": "Chat",
-        "placeholder": "Escribir mensaje...",
-        "send": "Enviar",
-        "you": "Tú",
-        "patient": "Paciente"
-      },
+      "selfSimulated": "Tu imagen (simulada)",
+      "noteNoCam": "El paciente y tu imagen son de ejemplo: no se usa la cámara ni el micrófono de tu equipo."
+    },
+    "chat": {
+      "title": "Chat de la consulta",
+      "scripted": "Respuestas con guion de ejemplo",
+      "hello": "Hola, doctora. Gracias por atenderme.",
+      "generic": "De acuerdo, gracias.",
+      "typing": "{name} está escribiendo...",
+      "placeholder": "Escribe un mensaje al paciente...",
+      "send": "Enviar mensaje"
+    },
+    "consult": {
+      "panelLabel": "Panel de la consulta",
+      "noActive": "Cuando llames a un paciente, aquí verás su ficha, laboratorios, receta y notas.",
       "tabs": {
         "record": "Ficha",
         "labs": "Laboratorio",
-        "prescription": "Receta",
-        "notes": "Notas"
-      },
-      "notesPlaceholder": "Evolución, hallazgos, plan...",
-      "recording": "Grabación activa",
-      "sharing": "Compartiendo pantalla",
-      "endConfirm": "¿Finalizar consulta?",
-      "endConfirmYes": "Sí, finalizar",
-      "endConfirmNo": "Continuar"
+        "rx": "Receta y órdenes",
+        "notes": "Notas SOAP"
+      }
     },
-    "patientRecord": {
-      "title": "Ficha del paciente",
-      "age": "años",
-      "doc": "Documento",
-      "blood": "Tipo de sangre",
-      "insurance": "Aseguradora",
-      "history": "Antecedentes",
-      "allergies": "Alergias",
-      "meds": "Medicamentos activos",
-      "noAllergies": "Sin alergias registradas",
-      "consultations": "Consultas previas",
-      "vitals": "Signos vitales",
-      "vitalsSource": "Wearable",
+    "record": {
+      "years": "años",
+      "sex": {
+        "F": "femenino",
+        "M": "masculino"
+      },
+      "blood": "Grupo",
       "hr": "FC",
       "hrUnit": "lpm",
       "bp": "Presión",
-      "bpUnit": "mmHg",
-      "spo2": "SpO2",
-      "spo2Unit": "%",
       "temp": "Temperatura",
-      "tempUnit": "°C",
-      "steps": "Pasos hoy",
-      "sleep": "Sueño",
-      "sleepUnit": "h",
-      "lastSync": "Última sincronización",
+      "glucose": "Glucometría",
+      "vitalsSource": {
+        "preconsult": "Datos que reportó el paciente en la pre-consulta",
+        "homeDevices": "Tomados en casa con tensiómetro y glucómetro (reportados por el paciente)"
+      },
+      "preconsult": "Pre-consulta",
+      "noPreconsult": "El paciente aún no ha llenado la pre-consulta.",
+      "onset": "Inicio",
+      "intensity": "Intensidad",
+      "prev": "Tratamiento previo",
+      "consentTele": "Teleconsulta",
+      "consentData": "Datos sensibles",
+      "consentRec": "Grabación",
+      "preconsultAt": "Enviada a las {time}",
+      "allergies": "Alergias",
+      "noAllergies": "Sin alergias registradas",
+      "history": "Antecedentes",
+      "meds": "Medicamentos actuales",
+      "noMeds": "Sin medicamentos registrados",
+      "pastConsults": "Atenciones anteriores"
+    },
+    "rx": {
+      "dx": "Diagnóstico principal (CIE-10)",
+      "dxSearch": "Busca por código o nombre (p. ej. J06 o tos)",
+      "dxNone": "No hay coincidencias en el catálogo de ejemplo.",
+      "changeDx": "Cambiar",
+      "meds": "Medicamentos",
+      "noMeds": "Sin medicamentos. Agrega uno frecuente o escribe uno.",
+      "med": "Medicamento",
+      "medPh": "Nombre, concentración y forma",
       "dose": "Dosis",
-      "freq": "Frecuencia"
+      "freq": "Frecuencia",
+      "duration": "Duración",
+      "instructions": "Indicaciones",
+      "remove": "Quitar medicamento",
+      "blankMed": "Otro",
+      "allergyAlert": "Alerta de alergia: el paciente es alérgico a {classes}. Cambia o quita el medicamento para poder firmar.",
+      "allergyClass": {
+        "penicillin": "penicilinas",
+        "nsaid": "ácido acetilsalicílico y antiinflamatorios (AINE)",
+        "sulfa": "sulfas"
+      },
+      "orders": "Órdenes de laboratorio",
+      "sign": "Firmar receta y órdenes",
+      "signHint": "Para firmar necesitas el diagnóstico y al menos un medicamento u orden, sin alertas de alergia.",
+      "signedBy": "{number} firmada por {name} a las {time}",
+      "signNote": "Firma electrónica simulada en la demo. En tu proyecto se integra con un proveedor de firma electrónica y el PDF queda en la historia clínica.",
+      "send": "Enviar al paciente",
+      "sent": "Enviada (simulado)",
+      "edit": "Editar (anula la firma)",
+      "pdf": {
+        "title": "Fórmula médica y órdenes",
+        "patient": "Paciente",
+        "name": "Nombre",
+        "doc": "Documento",
+        "age": "Edad",
+        "payer": "Pagador",
+        "dx": "Diagnóstico",
+        "meds": "Medicamentos",
+        "orders": "Órdenes de laboratorio",
+        "signature": "{reg} · Firma electrónica simulada · {time}"
+      }
+    },
+    "soap": {
+      "import": "Traer datos de la pre-consulta",
+      "importS": "Motivo: {reason}. Inicio: {onset}. Intensidad {intensity}/10. Tratamiento previo: {prev}.",
+      "importO": "Datos reportados por el paciente",
+      "s": "S · Subjetivo",
+      "o": "O · Objetivo",
+      "a": "A · Análisis",
+      "p": "P · Plan",
+      "sPh": "Lo que cuenta el paciente",
+      "oPh": "Hallazgos y signos",
+      "aPh": "Impresión diagnóstica",
+      "pPh": "Tratamiento, recomendaciones, signos de alarma y control"
+    },
+    "end": {
+      "title": "¿Finalizar la consulta?",
+      "checks": {
+        "dx": {
+          "ok": "Diagnóstico CIE-10 registrado",
+          "missing": "Falta el diagnóstico CIE-10 (obligatorio para la factura y el RIPS)"
+        },
+        "rx": {
+          "ok": "Receta firmada o sin medicamentos",
+          "missing": "Hay medicamentos sin firmar: firma la receta o quítalos"
+        },
+        "notes": {
+          "ok": "Notas SOAP con análisis o plan",
+          "missing": "Sin análisis ni plan en las notas (recomendado)"
+        }
+      },
+      "billingPreview": "Se registrará la atención por {value} ({payer}). Paga el paciente: {share}. Se generan la factura y el RIPS (simulados).",
+      "goRx": "Ir a receta y diagnóstico",
+      "continue": "Seguir en la consulta",
+      "confirm": "Finalizar y generar resumen"
+    },
+    "summary": {
+      "title": "Resumen de la atención",
+      "patient": "Paciente",
+      "duration": "{min} min",
+      "rxIncluded": "Receta {number} con {count} medicamento(s)",
+      "noRx": "Sin receta",
+      "orders": "{count} orden(es) de laboratorio",
+      "billing": "Facturación (simulada)",
+      "billingNote": "La atención ya aparece en Pagos y facturación con su factura y su RIPS simulados.",
+      "download": "Descargar resumen (PDF)",
+      "send": "Enviar al paciente (simulado)",
+      "goBilling": "Ver en Pagos y facturación",
+      "fileName": "resumen-atencion",
+      "pdfTitle": "Resumen de la atención por telemedicina",
+      "modality": "Modalidad",
+      "modalityValue": "Telemedicina interactiva (videoconsulta)",
+      "professional": "Profesional",
+      "clinical": "Registro de la atención"
     },
     "triage": {
-      "title": "Triage IA con síntomas",
-      "subtitle": "Describe tus síntomas. La IA sugerirá especialidades y nivel de urgencia.",
-      "placeholder": "Ej: dolor de pecho desde hace dos horas, falta de aire al subir escaleras...",
-      "send": "Analizar",
-      "analyzing": "Analizando síntomas...",
-      "you": "Paciente",
-      "ai": "Asistente IA",
-      "suggestedSpecialties": "Especialidades sugeridas",
-      "urgencyLevel": "Nivel de urgencia",
-      "recommendation": "Recomendación",
-      "bookNow": "Reservar ahora",
-      "reset": "Reiniciar",
+      "title": "Orientación de síntomas",
+      "subtitle": "Escribe lo que sientes y te sugerimos qué tan pronto consultar y con qué especialidad. Funciona con reglas fijas de ejemplo.",
+      "intro": "Hola. Cuéntame qué síntomas tienes y desde cuándo. Si es una emergencia, llama a la línea 123.",
+      "bot": "Orientación",
+      "you": "Tú",
+      "placeholder": "Ej.: tos seca y fiebre desde hace tres días",
+      "send": "Orientar",
+      "analyzing": "Revisando las reglas...",
+      "examplesTitle": "Ejemplos rápidos",
       "examples": {
-        "title": "Ejemplos rápidos",
-        "ex1": "Dolor de cabeza fuerte hace 3 días",
-        "ex2": "Tos seca y fiebre 38°C",
-        "ex3": "Dolor en el pecho y dificultad para respirar",
-        "ex4": "Erupción en la piel con picazón"
+        "ex1": "Tos seca y fiebre de 38 °C",
+        "ex2": "Dolor en el pecho y dificultad para respirar",
+        "ex3": "Erupción en la piel con picazón",
+        "ex4": "Ansiedad y no puedo dormir",
+        "ex5": "Control de diabetes y presión alta"
       },
-      "ai_intro": "Hola, soy el asistente clínico. Cuéntame qué te pasa y te ayudo a encontrar el especialista adecuado.",
-      "disclaimer": "Esta sugerencia no reemplaza el criterio médico."
-    },
-    "prescription": {
-      "title": "Receta electrónica",
-      "subtitle": "Emisión digital con firma criptográfica.",
-      "patient": "Paciente",
-      "diagnosis": "Diagnóstico (CIE-10)",
-      "diagnosisPh": "Ej: J06.9 — Infección aguda vías respiratorias",
-      "addMed": "Agregar medicamento",
-      "med": "Medicamento",
-      "medPh": "Ej: Amoxicilina 500mg",
-      "dose": "Dosis",
-      "dosePh": "1 cápsula",
-      "frequency": "Frecuencia",
-      "frequencyPh": "Cada 8 horas",
-      "duration": "Duración",
-      "durationPh": "7 días",
-      "instructions": "Indicaciones",
-      "instructionsPh": "Tomar con alimentos. No suspender antes de finalizar el tratamiento.",
-      "remove": "Quitar",
-      "signature": "Firma digital",
-      "signed": "Firmada",
-      "sign": "Firmar receta",
-      "sendPharmacy": "Enviar a farmacia integrada",
-      "sent": "Receta enviada a farmacia",
-      "noMeds": "Aún no agregaste medicamentos",
-      "pharmacy": "Farmacia",
-      "history": "Recetas recientes",
-      "rxNumber": "Nº receta",
-      "issued": "Emitida"
-    },
-    "preconsult": {
-      "title": "Pre-consulta",
-      "subtitle": "Formulario dinámico previo + consentimientos informados.",
-      "reason": "Motivo de consulta",
-      "reasonPh": "Describe brevemente el motivo...",
-      "symptomsStart": "Inicio de síntomas",
-      "symptomsStartPh": "Hace cuántos días",
-      "intensity": "Intensidad (1-10)",
-      "previousTreatment": "Tratamiento previo",
-      "previousTreatmentPh": "Medicamentos o terapias actuales",
-      "consents": "Consentimientos",
-      "consentTele": "Consentimiento para teleconsulta",
-      "consentData": "Tratamiento de datos personales",
-      "consentRec": "Grabación de la consulta",
-      "submit": "Enviar formulario",
-      "submitted": "Pre-consulta enviada",
-      "required": "obligatorio"
-    },
-    "lab": {
-      "title": "Resultados de laboratorio",
-      "subtitle": "Integración HL7 / FHIR R4 con laboratorios certificados.",
-      "test": "Análisis",
-      "value": "Valor",
-      "ref": "Rango ref.",
-      "flag": "Flag",
-      "date": "Fecha",
-      "source": "Origen",
-      "normal": "Normal",
-      "high": "Alto",
-      "low": "Bajo",
-      "critical": "Crítico",
-      "fhirBadge": "FHIR R4",
-      "hl7Badge": "HL7 v2.5",
-      "download": "Descargar PDF"
-    },
-    "billing": {
-      "title": "Pagos & copagos",
-      "subtitle": "Explicación de beneficios (EOB) e historial.",
-      "consultation": "Consulta",
-      "service": "Servicio",
-      "billed": "Facturado",
-      "covered": "Cubierto",
-      "copay": "Copago",
-      "patient": "Total paciente",
-      "status": "Estado",
-      "paid": "Pagado",
-      "pending": "Pendiente",
-      "denied": "Denegado",
-      "pay": "Pagar",
-      "viewEob": "Ver EOB",
-      "totals": {
-        "outOfPocket": "Gasto del año",
-        "deductible": "Deducible",
-        "deductibleMet": "consumido",
-        "ytd": "YTD"
+      "resultTitle": "Resultado",
+      "resultEmpty": "Aquí verás la prioridad sugerida y las especialidades para agendar.",
+      "ruleApplied": "Regla aplicada: {rule}",
+      "suggested": "Agenda con",
+      "book": "Agendar {spec}",
+      "reset": "Empezar de nuevo",
+      "alarmTitle": "Signos de alarma: no esperes una teleconsulta",
+      "alarmBody": "Ve al servicio de urgencias más cercano o llama a la línea de emergencias.",
+      "call123": "Línea de emergencias 123",
+      "disclaimer": "Orientación por reglas fijas de ejemplo: no usa IA y no es un diagnóstico ni reemplaza el criterio médico. En tu proyecto, las reglas las define y valida tu equipo médico.",
+      "rules": {
+        "chest": "dolor en el pecho o dificultad para respirar",
+        "neuro": "desmayo, convulsión o pérdida de fuerza",
+        "bleeding": "sangrado abundante",
+        "selfharm": "riesgo de hacerse daño",
+        "resp": "síntomas respiratorios o fiebre",
+        "head": "dolor de cabeza",
+        "ear": "dolor de oído",
+        "skin": "síntomas de la piel",
+        "mental": "salud mental",
+        "chronic": "control de enfermedad crónica",
+        "default": "consulta general"
       },
-      "eobTitle": "Explicación de beneficios"
+      "reco": {
+        "chest": "Estos síntomas pueden ser una emergencia. No esperes la teleconsulta: ve a urgencias o llama a la línea 123.",
+        "neuro": "Estos síntomas pueden ser una emergencia. Ve a urgencias o llama a la línea 123 de inmediato.",
+        "bleeding": "Un sangrado abundante requiere atención presencial inmediata: ve a urgencias o llama a la línea 123.",
+        "selfharm": "Lo que sientes es importante y no tienes que pasarlo sin ayuda. Busca ayuda inmediata: ve a urgencias o llama a la línea 123.",
+        "resp": "Te sugerimos una teleconsulta hoy con medicina general. Si aparece dificultad para respirar, ve a urgencias.",
+        "head": "Te sugerimos una teleconsulta en las próximas 24 horas. Si el dolor es súbito y muy intenso, ve a urgencias.",
+        "ear": "Puedes agendar una teleconsulta en los próximos días con medicina general o pediatría (si es un niño).",
+        "skin": "Puedes agendar dermatología en los próximos días. Ten a mano una foto de la zona afectada.",
+        "mental": "Puedes agendar psicología. Si en algún momento piensas en hacerte daño, busca ayuda inmediata.",
+        "chronic": "Agenda tu control con medicina interna o general y ten a mano tus últimas tomas de presión y glucosa.",
+        "default": "Puedes agendar una teleconsulta con medicina general."
+      }
     },
     "scheduling": {
       "title": "Agenda por especialidad",
-      "subtitle": "Disponibilidad en tiempo real. Reserva un horario.",
+      "subtitle": "Hoy es {date}, {time} (jornada de ejemplo). Lunes a viernes jornada completa, sábados en la mañana; sin domingos ni festivos.",
       "specialty": "Especialidad",
       "professional": "Profesional",
-      "any": "Cualquiera",
-      "date": "Fecha",
-      "slots": "Horarios disponibles",
-      "book": "Reservar",
-      "booked": "Reservado",
-      "noSlots": "No hay horarios disponibles para esta fecha",
+      "modality": "Modalidad",
       "modalities": {
-        "video": "Video",
-        "phone": "Teléfono",
-        "inPerson": "Presencial"
+        "video": "Videoconsulta",
+        "phone": "Llamada"
       },
-      "confirmedTitle": "Cita confirmada",
-      "confirmedMsg": "Te enviamos los detalles por correo electrónico."
+      "today": "Hoy",
+      "holiday": "Festivo",
+      "closed": "Cerrado",
+      "morning": "Solo mañana",
+      "slots": "Horarios",
+      "noSlots": "No hay horarios para este día.",
+      "free": "disponible",
+      "taken": "ocupado",
+      "mine": "tu cita",
+      "legend": "Verde: disponible · Gris: ocupado por otra cita de ejemplo · Azul: cita que agendaste en esta demo.",
+      "bookingFor": "Agendar {spec} · {date} · {time}",
+      "patientName": "Nombre del paciente",
+      "phone": "Celular (WhatsApp)",
+      "phoneError": "Escribe un celular de 10 dígitos",
+      "payer": "Pagador",
+      "price": {
+        "eps": "Cuota moderadora de ejemplo: {amount}. El resto ({value} en total) lo paga la EPS.",
+        "prepaid": "Bono de la prepagada de ejemplo: {amount} (valor total {value}).",
+        "private": "Tarifa particular de ejemplo: {amount}. Se paga en línea después de la consulta."
+      },
+      "confirm": "Confirmar cita",
+      "confirmedTitle": "Cita {code} confirmada",
+      "waPreview": "Mensaje de WhatsApp para {phone}",
+      "waVideo": "Hola, {name}. Tu teleconsulta de {spec} con {pro} es el {date} a las {time}. Entra 5 minutos antes desde el enlace que te enviaremos ese día. Código: {code}.",
+      "waPhone": "Hola, {name}. Tu consulta telefónica de {spec} con {pro} es el {date} a las {time}. Te llamaremos a este número. Código: {code}.",
+      "copy": "Copiar mensaje",
+      "simSend": "Envío simulado: en tu proyecto sale por WhatsApp Business y correo",
+      "listTitle": "Citas agendadas en esta demo",
+      "listSubtitle": "Se guardan solo en este navegador.",
+      "listEmpty": "Aún no has agendado citas.",
+      "cancelAppt": "Cancelar cita"
+    },
+    "patient": {
+      "title": "Vista del paciente: pre-consulta",
+      "subtitle": "Así llena el paciente su pre-consulta desde el celular antes de entrar a la sala de espera. Lo que envíes aparece en el consultorio.",
+      "who": "¿Quién llena la pre-consulta?",
+      "newPatient": "Paciente nuevo",
+      "inQueue": "en sala de espera",
+      "name": "Nombre completo",
+      "namePh": "Nombre y apellido",
+      "docType": "Tipo",
+      "doc": "Número de documento",
+      "age": "Edad",
+      "payer": "EPS, prepagada o particular",
+      "reason": "¿Qué te pasa?",
+      "reasonPh": "Describe tus síntomas con tus palabras",
+      "onset": "¿Desde cuándo?",
+      "onsetPh": "Ej.: hace 3 días",
+      "intensity": "Intensidad",
+      "temp": "Temperatura (opcional)",
+      "bp": "Presión arterial (opcional)",
+      "prev": "¿Has tomado algo?",
+      "prevPh": "Medicamentos o remedios que ya tomaste",
+      "consents": "Consentimientos",
+      "optional": "opcional",
+      "consent": {
+        "tele": {
+          "title": "Consentimiento informado de telemedicina",
+          "text": "Entiendo que la atención será por video con {ips}, que el profesional puede indicarme una consulta presencial o ir a urgencias si lo considera necesario y que puedo retirar este consentimiento."
+        },
+        "data": {
+          "title": "Autorización de datos personales y sensibles (Ley 1581 de 2012)",
+          "text": "Autorizo a {ips} a tratar mis datos personales y de salud solo para mi atención, la historia clínica y la facturación. Puedo conocer, actualizar y suprimir mis datos."
+        },
+        "rec": {
+          "title": "Grabación de la consulta",
+          "text": "Autorizo grabar la videoconsulta. Si no lo autorizas, el profesional no podrá grabarla."
+        }
+      },
+      "submit": "Enviar y entrar a la sala de espera",
+      "update": "Actualizar pre-consulta",
+      "submitHint": "Para enviar necesitas el motivo, los datos obligatorios y los dos consentimientos obligatorios.",
+      "doneTitle": "Listo, {name}: ya estás en la sala de espera.",
+      "doneBody": "Turno aproximado: {position}. Prioridad asignada:",
+      "alarm": "Tus síntomas son signos de alarma. No esperes la teleconsulta: ve a urgencias o llama a la línea 123.",
+      "goConsole": "Ver en el consultorio",
+      "waTitle": "Enlace que recibe el paciente",
+      "waMessage": "Hola, Carlos. {ips} te espera hoy a las 10:30 para tu teleconsulta de medicina general. Antes de entrar, llena tu pre-consulta aquí:",
+      "waNote": "Mensaje y enlace de ejemplo (no funcionan fuera de la demo). En tu proyecto se envían por WhatsApp Business o SMS.",
+      "camTitle": "Prueba tu cámara y micrófono",
+      "camSubtitle": "Opcional. El navegador te pedirá permiso.",
+      "camStart": "Probar cámara y micrófono",
+      "camStop": "Detener la prueba",
+      "camIdle": "Aquí verás tu cámara",
+      "camPreview": "Vista previa de tu cámara",
+      "micLevel": "Nivel del micrófono: habla para verlo moverse",
+      "noMic": "No se detectó micrófono",
+      "camPrivacy": "La imagen y el sonido se quedan en tu navegador: no se graban ni se envían a ningún servidor."
+    },
+    "lab": {
+      "title": "Resultados de laboratorio",
+      "subtitle": "Resultados de ejemplo por paciente y órdenes emitidas en la demo.",
+      "simTag": "Integración simulada",
+      "patient": "Paciente",
+      "download": "Descargar PDF",
+      "fileName": "laboratorio",
+      "pdfTitle": "Resultados de laboratorio",
+      "cols": {
+        "test": "Examen",
+        "value": "Resultado",
+        "ref": "Referencia",
+        "flag": "Estado",
+        "date": "Fecha"
+      },
+      "flags": {
+        "normal": "Normal",
+        "high": "Alto",
+        "low": "Bajo",
+        "critical": "Crítico"
+      },
+      "noResults": "Sin resultados de laboratorio recientes.",
+      "orderedToday": "Órdenes emitidas hoy (pendientes de resultado)",
+      "pending": "pendiente",
+      "note": "En tu proyecto, los resultados llegan del laboratorio por integración (HL7 v2 o FHIR, si el laboratorio lo soporta) o se cargan en PDF."
+    },
+    "billing": {
+      "title": "Pagos y facturación",
+      "subtitle": "Atenciones del {date}: valor del servicio, lo que paga el paciente y lo que cubre el pagador.",
+      "search": "Buscar paciente, atención o factura",
+      "filters": {
+        "all": "Todas",
+        "pending": "Por cobrar",
+        "paid": "Pagadas",
+        "na": "No facturables"
+      },
+      "cols": {
+        "attention": "Atención",
+        "date": "Fecha",
+        "patient": "Paciente",
+        "service": "Servicio",
+        "payer": "Pagador",
+        "dx": "Diagnóstico",
+        "value": "Valor del servicio",
+        "patientShare": "Paga el paciente",
+        "payerShare": "Cubre el pagador",
+        "status": "Estado",
+        "invoice": "Factura (simulada)"
+      },
+      "shareKind": {
+        "eps": "Cuota moderadora",
+        "prepaid": "Bono prepagada",
+        "private": "Tarifa particular"
+      },
+      "status": {
+        "paid": "Pagado",
+        "pending": "Por cobrar",
+        "na": "No facturable"
+      },
+      "referral": "Derivación a urgencias",
+      "collect": "Cobrar",
+      "detail": "Detalle",
+      "detailTitle": "Atención",
+      "empty": "No hay atenciones con ese filtro.",
+      "fileName": "atenciones",
+      "totals": {
+        "collected": "Recaudado",
+        "collectedSub": "pagos de pacientes hoy",
+        "pending": "Por cobrar",
+        "pendingSub": "cuotas y tarifas pendientes",
+        "payers": "Por radicar a pagadores",
+        "payersSub": "EPS y prepagadas",
+        "total": "Valor de servicios",
+        "totalSub": "atenciones del día"
+      },
+      "note": "Valores y tarifas de ejemplo. En cada fila, el valor del servicio = lo que paga el paciente + lo que cubre el pagador.",
+      "payTitle": "Cobrar al paciente",
+      "payBody": "{name} debe pagar {amount} ({concept}).",
+      "method": "Medio de pago",
+      "methods": {
+        "pse": "PSE (débito a cuenta)",
+        "card": "Tarjeta débito o crédito",
+        "wallet": "Billetera digital"
+      },
+      "gatewayNote": "Pasarela simulada: no se pide ni se envía ningún dato de pago. En tu proyecto se conecta a Wompi o PayU.",
+      "payNow": "Pagar {amount} (simulado)",
+      "processing": "Procesando pago simulado...",
+      "approved": "Pago aprobado (simulado). Referencia {ref}.",
+      "notBillable": "No facturable",
+      "rx": "Receta",
+      "ripsTitle": "RIPS de la atención",
+      "ripsYes": "generado",
+      "ripsNo": "no aplica",
+      "ripsGenerated": "Generado (simulado)",
+      "ripsDownload": "Descargar RIPS (JSON)",
+      "ripsNote": "RIPS simplificado y simulado. En tu proyecto se genera con la estructura vigente y se valida junto con la factura electrónica de venta en salud a través de tu proveedor autorizado.",
+      "ripsNa": "Las derivaciones a urgencias no generan factura ni RIPS en esta demo."
+    },
+    "audit": {
+      "title": "Registro de auditoría",
+      "viewAll": "Ver completo",
+      "fullTitle": "Registro de auditoría de la sesión",
+      "search": "Buscar en el registro",
+      "note": "{count} evento(s) de esta demo, guardados solo en este navegador.",
+      "fileName": "auditoria-telemedicina",
+      "cols": {
+        "date": "Fecha",
+        "time": "Hora",
+        "actor": "Quién",
+        "event": "Evento"
+      },
+      "actors": {
+        "system": "Sistema",
+        "doctor": "Dra. Patricia Vargas",
+        "patient": "Paciente",
+        "billing": "Facturación"
+      },
+      "events": {
+        "sessionStart": "Jornada de ejemplo abierta",
+        "consultStart": "Inició la teleconsulta con {patient}",
+        "consultEnd": "Finalizó la consulta con {patient} · duración {duration}",
+        "referred": "Derivó a {patient} a urgencias (línea 123 indicada)",
+        "camOn": "Encendió su cámara (solo local)",
+        "camOff": "Apagó su cámara",
+        "micOn": "Activó el micrófono",
+        "micOff": "Silenció el micrófono",
+        "shareStart": "Compartió pantalla (simulado)",
+        "shareStop": "Dejó de compartir pantalla",
+        "recStart": "Inició la grabación (simulada)",
+        "recStop": "Detuvo la grabación",
+        "recBlocked": "Grabación bloqueada: {patient} no la autorizó",
+        "dxSet": "Registró el diagnóstico {code} para {patient}",
+        "rxSigned": "Firmó la receta {number} de {patient} (firma simulada)",
+        "rxVoided": "Anuló la firma de la receta {number} para editarla",
+        "rxSent": "Envió la receta {number} a {patient} (simulado)",
+        "soapImported": "Trajo la pre-consulta de {patient} a las notas",
+        "summarySent": "Envió el resumen de la atención a {patient} (simulado)",
+        "invoiceCreated": "Generó la factura {invoice} y el RIPS de {attention} (simulados)",
+        "paid": "Registró el pago de {attention}: {amount} por {method} (simulado)",
+        "csvExported": "Exportó {count} atención(es) a CSV",
+        "ripsDownloaded": "Descargó el RIPS de la factura {invoice}",
+        "labPdf": "Descargó los resultados de laboratorio de {patient}",
+        "apptBooked": "Cita de {spec} para {patient} el {date} a las {time}",
+        "apptCancelled": "Canceló la cita {code}",
+        "preconsultSent": "{patient} envió la pre-consulta · prioridad {priority}",
+        "camTest": "Probó su cámara y micrófono (solo local)",
+        "triageRun": "Orientación de síntomas · regla: {rule}"
+      }
+    },
+    "how": {
+      "title": "Qué es real en esta demo y qué se implementa en tu proyecto",
+      "subtitle": "La demo corre completa en tu navegador con datos de ejemplo. Esto es lo que cambia en una implementación para tu IPS.",
+      "inDemo": "En la demo",
+      "inProject": "En tu proyecto",
+      "items": {
+        "video": {
+          "title": "Videoconsulta",
+          "demo": "el paciente es una imagen de ejemplo; si el navegador y el sitio lo permiten, puedes encender tu cámara y se ve solo en tu pantalla.",
+          "project": "video entre paciente y profesional sin instalar apps, con un servicio WebRTC gestionado o autoalojado."
+        },
+        "whatsapp": {
+          "title": "Recordatorios y enlaces",
+          "demo": "los mensajes de WhatsApp y correo se muestran, pero no se envían.",
+          "project": "envío por WhatsApp Business, SMS o correo con tu marca."
+        },
+        "payments": {
+          "title": "Pagos en línea",
+          "demo": "pasarela simulada que marca el pago con una referencia de prueba.",
+          "project": "PSE, tarjetas y billeteras digitales con Wompi o PayU."
+        },
+        "invoice": {
+          "title": "Factura electrónica en salud y RIPS",
+          "demo": "número de factura y RIPS JSON simplificados y simulados.",
+          "project": "factura electrónica de venta en salud y RIPS con tu proveedor autorizado o nuestro módulo de facturación."
+        },
+        "signature": {
+          "title": "Receta y órdenes firmadas",
+          "demo": "firma simulada y PDF de ejemplo generado en tu navegador.",
+          "project": "firma electrónica del profesional con un proveedor de firma y PDF en la historia clínica."
+        },
+        "lab": {
+          "title": "Laboratorio",
+          "demo": "resultados de ejemplo por paciente y órdenes pendientes.",
+          "project": "integración con tu laboratorio (HL7 v2 o FHIR, si lo soporta) o carga de PDF."
+        },
+        "records": {
+          "title": "Ficha y registro de la atención",
+          "demo": "ficha, pre-consulta, notas SOAP y CIE-10 de un catálogo reducido; se guardan en este navegador.",
+          "project": "historia clínica con conservación según la norma o integración con la que ya usas."
+        },
+        "triage": {
+          "title": "Orientación de síntomas",
+          "demo": "reglas fijas de ejemplo, sin IA; los signos de alarma derivan a urgencias.",
+          "project": "reglas definidas y validadas por tu equipo médico; opcionalmente apoyo con IA supervisada."
+        },
+        "security": {
+          "title": "Auditoría y datos sensibles",
+          "demo": "registro de cada acción de esta sesión, con exportación CSV.",
+          "project": "auditoría de accesos en el servidor, roles por usuario, cifrado en tránsito y en reposo y copias de seguridad."
+        }
+      },
+      "regulation": "La plataforma se diseña para apoyar los requisitos de la Resolución 2654 de 2019 (telesalud y telemedicina) y la Ley 1581 de 2012 (datos personales). La habilitación del servicio de telemedicina es responsabilidad de la IPS; la matriz normativa de cada proyecto se valida con su asesor."
+    },
+    "footer": {
+      "sampleNote": "Datos de ejemplo: {ips}, los pacientes, las EPS, la prepagada, los profesionales, los documentos y los valores son ficticios. Lo que hagas se guarda solo en este navegador; usa Restablecer para empezar de nuevo.",
+      "cta": "Quiero telemedicina para mi IPS"
+    },
+    "pdf": {
+      "sample": "DOCUMENTO DE EJEMPLO generado por la demo de telemedicina: datos ficticios, sin validez clínica ni legal.",
+      "ipsLine": "NIT {nit} (ficticio) · {city}",
+      "footer": "Documento de ejemplo de la demo de telemedicina de KopTup. Datos ficticios; firma electrónica simulada."
     },
     "specialties": {
       "general": "Medicina general",
-      "cardio": "Cardiología",
-      "pneumo": "Neumología",
-      "derma": "Dermatología",
-      "psych": "Psiquiatría",
       "pedia": "Pediatría",
-      "neuro": "Neurología",
-      "endo": "Endocrinología",
-      "uro": "Urología",
-      "gyn": "Ginecología"
+      "derma": "Dermatología",
+      "internal": "Medicina interna",
+      "psych": "Psicología"
+    },
+    "toasts": {
+      "pdf": "Se descargó {name}",
+      "csv": "Se exportaron {count} filas a CSV",
+      "json": "Se descargó {name}",
+      "referred": "Se derivó a {name} a urgencias y se le indicó la línea 123 (mensaje simulado).",
+      "noRecConsent": "El paciente no autorizó la grabación en la pre-consulta: no se puede grabar.",
+      "rxSent": "Receta enviada a {name} por WhatsApp y correo (simulado).",
+      "summarySent": "Resumen enviado a {name} (simulado).",
+      "preconsult": "Pre-consulta de {name} enviada a la sala de espera.",
+      "copied": "Mensaje copiado al portapapeles.",
+      "copyFailed": "No se pudo copiar. Selecciona el texto y cópialo.",
+      "apptCancelled": "Cita {code} cancelada; el horario quedó libre.",
+      "camOk": "Cámara y micrófono funcionando.",
+      "reset": "Datos de ejemplo restablecidos."
+    },
+    "dates": {
+      "months": "ene,feb,mar,abr,may,jun,jul,ago,sep,oct,nov,dic",
+      "weekdays": "dom,lun,mar,mié,jue,vie,sáb"
     },
     "common": {
-      "save": "Guardar",
       "cancel": "Cancelar",
       "close": "Cerrar",
-      "confirm": "Confirmar",
-      "loading": "Cargando...",
-      "yes": "Sí",
-      "no": "No",
-      "min": "min",
-      "now": "ahora"
+      "simulated": "simulado"
     }
   }
 }

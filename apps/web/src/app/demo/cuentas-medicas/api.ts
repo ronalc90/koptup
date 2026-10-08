@@ -1,162 +1,149 @@
-import { Factura, ResultadoAuditoria, Estadisticas, Tarifario } from './tipos-auditoria';
-import { BACKEND_URL as API_URL } from '@/lib/backend-url';
-import { downloadBlob } from '@/lib/utils';
+import Cookies from 'js-cookie';
+import { API_BASE } from '@/lib/backend-url';
+import type {
+  DetalleFactura,
+  Estadisticas,
+  Factura,
+  FiltrosFacturas,
+  ResultadoProcesamiento,
+} from './tipos-auditoria';
 
-// Asegurarse de que siempre use /api
-const API_BASE = API_URL.endsWith('/api') ? API_URL : `${API_URL}/api`;
+/**
+ * Cliente de la demo para /api/auditoria.
+ *
+ * Todas las llamadas envían el token de sesión (cookie `accessToken`, la misma
+ * que usa `src/lib/api.ts`) como `Authorization: Bearer`. La demo es privada:
+ * el backend puede responder 401/403 si la persona no tiene un acceso activo, y
+ * la página lo muestra como "Tu acceso a esta demo no está activo".
+ */
+
+export class ApiError extends Error {
+  readonly status: number;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+  }
+}
+
+/** 401 (sin sesión o vencida) o 403 (sin acceso a la demo). */
+export function esErrorDeAcceso(error: unknown): boolean {
+  return error instanceof ApiError && (error.status === 401 || error.status === 403);
+}
+
+let refrescoEnCurso: Promise<string | null> | null = null;
+
+/** Renueva el token de acceso con el refresh token (mismo flujo que src/lib/api.ts). */
+function refrescarToken(): Promise<string | null> {
+  const refreshToken = Cookies.get('refreshToken');
+  if (!refreshToken) return Promise.resolve(null);
+  if (!refrescoEnCurso) {
+    refrescoEnCurso = (async () => {
+      try {
+        const resp = await fetch(`${API_BASE}/auth/refresh`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refreshToken }),
+        });
+        if (!resp.ok) return null;
+        const cuerpo = await resp.json();
+        const token: string | undefined = cuerpo?.data?.accessToken;
+        if (token) Cookies.set('accessToken', token, { expires: 1 / 96 });
+        return token ?? null;
+      } catch {
+        return null;
+      } finally {
+        refrescoEnCurso = null;
+      }
+    })();
+  }
+  return refrescoEnCurso;
+}
+
+async function solicitar(ruta: string, init: RequestInit = {}, reintentar = true): Promise<Response> {
+  const headers = new Headers(init.headers);
+  const token = Cookies.get('accessToken');
+  if (token) headers.set('Authorization', `Bearer ${token}`);
+
+  let resp: Response;
+  try {
+    resp = await fetch(`${API_BASE}${ruta}`, { ...init, headers });
+  } catch {
+    throw new ApiError(0, 'network');
+  }
+
+  if (resp.status === 401 && reintentar && Cookies.get('refreshToken')) {
+    const nuevo = await refrescarToken();
+    if (nuevo) return solicitar(ruta, init, false);
+  }
+
+  if (!resp.ok) {
+    let mensaje = '';
+    try {
+      const cuerpo = await resp.clone().json();
+      mensaje = typeof cuerpo?.message === 'string' ? cuerpo.message : '';
+    } catch {
+      // respuesta sin JSON
+    }
+    throw new ApiError(resp.status, mensaje);
+  }
+  return resp;
+}
+
+async function datos<T>(ruta: string, init?: RequestInit): Promise<T> {
+  const resp = await solicitar(ruta, init);
+  const cuerpo = await resp.json();
+  return cuerpo.data as T;
+}
 
 export const auditoriaAPI = {
-  // Facturas
-  async obtenerFacturas(params?: {
-    estado?: string;
-    eps?: string;
-    desde?: string;
-    hasta?: string;
-    page?: number;
-    limit?: number;
-  }) {
-    const queryParams = new URLSearchParams();
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value) queryParams.append(key, value.toString());
-      });
-    }
-
-    const response = await fetch(`${API_BASE}/auditoria/facturas?${queryParams}`);
-    if (!response.ok) throw new Error('Error al obtener facturas');
-    return response.json();
+  obtenerEstadisticas(): Promise<Estadisticas> {
+    return datos<Estadisticas>('/auditoria/estadisticas');
   },
 
-  async obtenerFacturaPorId(id: string) {
-    const response = await fetch(`${API_BASE}/auditoria/facturas/${id}`);
-    if (!response.ok) throw new Error('Error al obtener factura');
-    return response.json();
+  async obtenerFacturas(
+    filtros: FiltrosFacturas,
+    page = 1,
+    limit = 20,
+  ): Promise<{ facturas: Factura[]; total: number }> {
+    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+    if (filtros.estado) params.set('estado', filtros.estado);
+    if (filtros.desde) params.set('desde', `${filtros.desde}T00:00:00-05:00`);
+    // "hasta" incluye todo ese día en hora de Colombia (el backend compara con <=).
+    if (filtros.hasta) params.set('hasta', `${filtros.hasta}T23:59:59.999-05:00`);
+    const resp = await solicitar(`/auditoria/facturas?${params.toString()}`);
+    const cuerpo = await resp.json();
+    return { facturas: (cuerpo.data ?? []) as Factura[], total: Number(cuerpo.pagination?.total ?? 0) };
   },
 
-  async crearFactura(factura: Partial<Factura>) {
-    const response = await fetch(`${API_BASE}/auditoria/facturas`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(factura),
-    });
-    if (!response.ok) throw new Error('Error al crear factura');
-    return response.json();
+  obtenerFactura(id: string): Promise<DetalleFactura> {
+    return datos<DetalleFactura>(`/auditoria/facturas/${encodeURIComponent(id)}`);
   },
 
-  async eliminarFactura(id: string) {
-    const response = await fetch(`${API_BASE}/auditoria/facturas/${id}`, {
-      method: 'DELETE',
-    });
-    if (!response.ok) throw new Error('Error al eliminar factura');
-    return response.json();
+  async eliminarFactura(id: string): Promise<void> {
+    await solicitar(`/auditoria/facturas/${encodeURIComponent(id)}`, { method: 'DELETE' });
   },
 
-  async ejecutarAuditoria(facturaId: string): Promise<{ success: boolean; data: ResultadoAuditoria }> {
-    const response = await fetch(`${API_BASE}/auditoria/facturas/${facturaId}/auditar`, {
-      method: 'POST',
-    });
-    if (!response.ok) throw new Error('Error al ejecutar auditoría');
-    return response.json();
-  },
-
-  async descargarExcel(facturaId: string) {
-    const response = await fetch(`${API_BASE}/auditoria/facturas/${facturaId}/excel`);
-    if (!response.ok) throw new Error('Error al generar Excel');
-
-    const blob = await response.blob();
-    downloadBlob(blob, `Auditoria_${facturaId}_${Date.now()}.xlsx`);
-  },
-
-  // Soportes
-  async subirSoporte(formData: FormData) {
-    const response = await fetch(`${API_BASE}/auditoria/soportes`, {
+  /** Sube los PDF: el backend extrae los datos con IA, aplica el tarifario de ejemplo y guarda la factura. */
+  auditarPDF(archivos: File[]): Promise<ResultadoProcesamiento> {
+    const formData = new FormData();
+    archivos.forEach((archivo) => formData.append('files', archivo));
+    return datos<ResultadoProcesamiento>('/auditoria/procesar-facturas-pdf', {
       method: 'POST',
       body: formData,
     });
-    if (!response.ok) throw new Error('Error al subir soporte');
-    return response.json();
   },
 
-  // Tarifarios
-  async obtenerTarifarios(params?: { tipo?: string; eps?: string; activo?: boolean }) {
-    const queryParams = new URLSearchParams();
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined) queryParams.append(key, value.toString());
-      });
-    }
-
-    const response = await fetch(`${API_BASE}/auditoria/tarifarios?${queryParams}`);
-    if (!response.ok) throw new Error('Error al obtener tarifarios');
-    return response.json();
-  },
-
-  // Glosas
-  async actualizarGlosa(glosaId: string, updates: any) {
-    const response = await fetch(`${API_BASE}/auditoria/glosas/${glosaId}`, {
+  /** Decisión del auditor sobre una glosa; el backend recalcula los totales de la factura. */
+  async actualizarGlosa(
+    id: string,
+    cambios: { estado: string; valorGlosado: number; observaciones: string },
+  ): Promise<void> {
+    await solicitar(`/auditoria/glosas/${encodeURIComponent(id)}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updates),
+      body: JSON.stringify(cambios),
     });
-    if (!response.ok) throw new Error('Error al actualizar glosa');
-    return response.json();
-  },
-
-  // Estadísticas
-  async obtenerEstadisticas(params?: { desde?: string; hasta?: string }): Promise<{ success: boolean; data: Estadisticas }> {
-    const queryParams = new URLSearchParams();
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value) queryParams.append(key, value);
-      });
-    }
-
-    const response = await fetch(`${API_BASE}/auditoria/estadisticas?${queryParams}`);
-    if (!response.ok) throw new Error('Error al obtener estadísticas');
-    return response.json();
-  },
-
-  // Auditoría Paso a Paso
-  async iniciarAuditoriaPasoPaso(facturaId: string) {
-    const response = await fetch(`${API_BASE}/auditoria/facturas/${facturaId}/auditar-paso-a-paso`, {
-      method: 'POST',
-    });
-    if (!response.ok) throw new Error('Error al iniciar auditoría paso a paso');
-    return response.json();
-  },
-
-  async avanzarPaso(sesionId: string) {
-    const response = await fetch(`${API_BASE}/auditoria/sesion/${sesionId}/siguiente`, {
-      method: 'POST',
-    });
-    if (!response.ok) throw new Error('Error al avanzar paso');
-    return response.json();
-  },
-
-  async obtenerSesion(sesionId: string) {
-    const response = await fetch(`${API_BASE}/auditoria/sesion/${sesionId}`);
-    if (!response.ok) throw new Error('Error al obtener sesión');
-    return response.json();
-  },
-
-  // Procesamiento de PDFs de Facturas Médicas con Extracción Real
-  async procesarFacturasPDF(formData: FormData) {
-    const response = await fetch(`${API_BASE}/auditoria/procesar-facturas-pdf`, {
-      method: 'POST',
-      body: formData,
-    });
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Error al procesar PDFs');
-    }
-    return response.json();
-  },
-
-  async descargarExcelAuditoriaMedica(facturaId: string) {
-    const response = await fetch(`${API_BASE}/auditoria/facturas/${facturaId}/excel-auditoria-medica`);
-    if (!response.ok) throw new Error('Error al generar Excel de auditoría médica');
-
-    const blob = await response.blob();
-    downloadBlob(blob, `Auditoria_NuevaEPS_${facturaId}_${Date.now()}.xlsx`);
   },
 };

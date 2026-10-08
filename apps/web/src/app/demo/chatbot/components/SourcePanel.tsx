@@ -1,21 +1,34 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { XMarkIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import type { SourceChunk } from './data';
-import Tooltip from './ui/Tooltip';
+import InfoIcon from './ui/InfoIcon';
 
 interface SourcePanelProps {
   chunk: SourceChunk | null;
   onClose: () => void;
+  /** Si el documento está disponible completo (documentos de ejemplo), abre el visor. */
+  onOpenDocument?: (chunk: SourceChunk) => void;
 }
 
 /**
- * Drawer derecho con el chunk original que sustenta una cita inline.
- * Visualiza scores (chunk + rerank), fuente, página y el snippet en mono.
+ * Panel lateral con el fragmento real que sustenta una cita: documento,
+ * posición de la cita, puntaje BM25 que devolvió el backend y el texto exacto.
  */
-export default function SourcePanel({ chunk, onClose }: SourcePanelProps) {
+export default function SourcePanel({ chunk, onClose, onOpenDocument }: SourcePanelProps) {
   const t = useTranslations('demoChatbot');
+
+  useEffect(() => {
+    if (!chunk) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [chunk, onClose]);
+
   if (!chunk) return null;
 
   return (
@@ -35,80 +48,56 @@ export default function SourcePanel({ chunk, onClose }: SourcePanelProps) {
             <h3 id="source-panel-title" className="text-base font-bold text-secondary-900 dark:text-white">
               {t('sourcePanel.title')}
             </h3>
-            <p className="mt-0.5 text-xs text-secondary-500 dark:text-secondary-400">
-              {t('sourcePanel.subtitle')}
-            </p>
+            <p className="mt-0.5 text-xs text-secondary-500 dark:text-secondary-400">{t('sourcePanel.subtitle')}</p>
           </div>
-          <Tooltip content={t('sourcePanel.close')} side="left">
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label={t('sourcePanel.close')}
-              className="rounded-md p-1.5 text-secondary-500 transition hover:bg-secondary-100 hover:text-secondary-900 dark:hover:bg-secondary-800 dark:hover:text-white"
-            >
-              <XMarkIcon className="h-5 w-5" />
-            </button>
-          </Tooltip>
-        </header>
-
-        <div className="grid grid-cols-2 gap-2 border-b border-secondary-200 px-5 py-3 text-xs dark:border-secondary-800">
-          <div className="col-span-2">
-            <div className="text-[10px] uppercase tracking-wide text-secondary-500 dark:text-secondary-400">
-              {t('sourcePanel.source')}
-            </div>
-            <div className="font-semibold text-secondary-900 dark:text-secondary-100">
-              {chunk.sourceName ?? t(`sources.${chunk.sourceKey}`)}
-            </div>
-          </div>
-          <div>
-            <div className="text-[10px] uppercase tracking-wide text-secondary-500 dark:text-secondary-400">
-              {t('sourcePanel.chunkScore')}
-            </div>
-            <div className="font-mono text-secondary-900 dark:text-secondary-100">
-              {chunk.score.toFixed(2)}
-            </div>
-          </div>
-          <div>
-            <div className="text-[10px] uppercase tracking-wide text-secondary-500 dark:text-secondary-400">
-              {t('sourcePanel.rerankScore')}
-            </div>
-            <div className="font-mono text-secondary-900 dark:text-secondary-100">
-              {chunk.rerankScore.toFixed(2)}
-            </div>
-          </div>
-          {chunk.page ? (
-            <div>
-              <div className="text-[10px] uppercase tracking-wide text-secondary-500 dark:text-secondary-400">
-                {t('sourcePanel.page')}
-              </div>
-              <div className="font-mono text-secondary-900 dark:text-secondary-100">
-                {chunk.page}
-              </div>
-            </div>
-          ) : null}
-          <div>
-            <div className="text-[10px] uppercase tracking-wide text-secondary-500 dark:text-secondary-400">
-              {t('sourcePanel.updated')}
-            </div>
-            <div className="font-mono text-secondary-900 dark:text-secondary-100">
-              {chunk.updated}
-            </div>
-          </div>
-        </div>
-
-        <pre className="flex-1 overflow-auto whitespace-pre-wrap break-words bg-secondary-50 px-5 py-4 font-mono text-xs leading-relaxed text-secondary-800 dark:bg-secondary-950 dark:text-secondary-200">
-          {chunk.snippet}
-        </pre>
-
-        <footer className="border-t border-secondary-200 px-5 py-3 dark:border-secondary-800">
           <button
             type="button"
-            className="inline-flex items-center gap-1 text-xs font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-300"
+            onClick={onClose}
+            aria-label={t('sourcePanel.close')}
+            className="rounded-md p-1.5 text-secondary-500 transition hover:bg-secondary-100 hover:text-secondary-900 dark:hover:bg-secondary-800 dark:hover:text-white"
           >
-            <ArrowTopRightOnSquareIcon className="h-4 w-4" />
-            {t('sourcePanel.openOriginal')}
+            <XMarkIcon className="h-5 w-5" />
           </button>
-        </footer>
+        </header>
+
+        <dl className="grid grid-cols-2 gap-x-3 gap-y-2 border-b border-secondary-200 px-5 py-3 text-xs dark:border-secondary-800">
+          <div className="col-span-2">
+            <dt className="text-[10px] uppercase tracking-wide text-secondary-500 dark:text-secondary-400">
+              {t('sourcePanel.document')}
+            </dt>
+            <dd className="break-words font-semibold text-secondary-900 dark:text-secondary-100">{chunk.docName}</dd>
+          </div>
+          <div>
+            <dt className="text-[10px] uppercase tracking-wide text-secondary-500 dark:text-secondary-400">
+              {t('sourcePanel.position')}
+            </dt>
+            <dd className="font-mono text-secondary-900 dark:text-secondary-100">[{chunk.index}]</dd>
+          </div>
+          <div>
+            <dt className="flex items-center gap-1 text-[10px] uppercase tracking-wide text-secondary-500 dark:text-secondary-400">
+              {t('sourcePanel.score')}
+              <InfoIcon content={t('sourcePanel.scoreHint')} size="xs" side="bottom" align="end" />
+            </dt>
+            <dd className="font-mono text-secondary-900 dark:text-secondary-100">{chunk.score.toFixed(3)}</dd>
+          </div>
+        </dl>
+
+        <p className="flex-1 overflow-auto whitespace-pre-wrap break-words bg-secondary-50 px-5 py-4 text-sm leading-relaxed text-secondary-800 dark:bg-secondary-950 dark:text-secondary-200">
+          {chunk.text}
+        </p>
+
+        {onOpenDocument ? (
+          <footer className="border-t border-secondary-200 px-5 py-3 dark:border-secondary-800">
+            <button
+              type="button"
+              onClick={() => onOpenDocument(chunk)}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-300"
+            >
+              <DocumentTextIcon className="h-4 w-4" aria-hidden="true" />
+              {t('sourcePanel.openDocument')}
+            </button>
+          </footer>
+        ) : null}
       </aside>
     </div>
   );

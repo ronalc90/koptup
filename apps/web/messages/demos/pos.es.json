@@ -1,249 +1,537 @@
 {
   "demoPos": {
     "meta": {
-      "title": "POS / Punto de Venta",
-      "subtitle": "Suite omnicanal: restaurante, retail, autoservicio y kiosko con facturación electrónica, fidelización y hardware integrado.",
-      "demo": "Demo interactivo"
+      "title": "POS para retail y restaurantes: demo interactiva",
+      "description": "Demo de punto de venta con datos de ejemplo de Colombia: vende con lector de código de barras, balanza o por mesas con comandas a cocina, cobra con pago mixto, emite un documento equivalente POS de ejemplo, sigue vendiendo sin internet y cierra caja con reporte X y Z. Incluye consola de sedes con inventario y traslados.",
+      "breadcrumbHome": "Inicio",
+      "breadcrumbDemos": "Demos",
+      "breadcrumbName": "POS para retail y restaurantes"
     },
-    "topbar": {
-      "store": "Tienda",
-      "stores": {
-        "main": "Sucursal Centro",
-        "north": "Sucursal Norte",
-        "airport": "Aeropuerto T1"
-      },
-      "currency": "Moneda",
-      "language": "Idioma",
+    "pageTitle": "POS para retail y restaurantes",
+    "pageSubtitle": "Vende con lector de código de barras y balanza, o por mesas con comandas a cocina. Cobra con pago mixto, emite el documento equivalente POS, sigue vendiendo sin internet y cierra caja con reporte Z. Todo funciona en esta página.",
+    "sampleBadge": "Datos de ejemplo",
+    "sampleHint": "Los negocios (Mercado La Ceiba y Fogón Andino), sus NIT, sedes, direcciones, empleados, clientes, cédulas, celulares, códigos de barras, existencias y cifras son inventados.",
+    "howItWorks": {
+      "title": "Qué es real en esta demo",
+      "real": "Todo se calcula en tu navegador: existencias por sede, impuestos incluidos en el precio (IVA 19 %, IVA 5 %, exentos o INC 8 %), puntos, cambio, propina, comandas, reportes X y Z, arqueo de caja, comisiones y consola de sedes. Tus ventas y cambios se guardan solo en este navegador.",
+      "scanner": "El campo «Escanear» acepta un lector de código de barras real conectado como teclado (USB o Bluetooth); si no tienes uno, usa los códigos de ejemplo.",
+      "simulated": "Son simulados: la transmisión del documento a la DIAN (el CUDE se calcula aquí con SHA-384, en ambiente de pruebas, y no sale de tu navegador), el datafono, el cobro con QR, la balanza, la impresora y el cajón, y el envío del recibo por WhatsApp o correo. El botón «Sin internet» es un interruptor de la demo: no corta tu conexión.",
+      "project": "En tu proyecto, la caja se instala como aplicación en tablet o PC, guarda las ventas en el dispositivo cuando se cae internet y las sincroniza al volver, emite el documento electrónico con tu proveedor tecnológico autorizado y se conecta a tu datafono, impresora térmica, lector, cajón monedero y balanza."
+    },
+    "tour": {
+      "title": "Recorrido sugerido (3 minutos)",
+      "steps": {
+        "1": "Retail: pulsa «Escanear», usa un código de ejemplo y pesa un producto por kilo con «Leer balanza».",
+        "2": "En el ticket busca el cliente 300 123 4567, canjea 500 puntos y cobra con pago mixto: parte en efectivo y el resto con tarjeta o QR.",
+        "3": "Activa «Sin internet», haz otra venta (queda en cola) y vuelve a conectarte para ver la sincronización.",
+        "4": "Restaurante: abre una mesa en «Mesas», toma el pedido con modificadores, envíalo a cocina y avanza la comanda en «Cocina (KDS)».",
+        "5": "En «Reportes X/Z» revisa lo vendido por medio de pago y cierra el turno con arqueo; en «Sedes» traslada existencias entre sedes."
+      }
+    },
+    "reset": {
+      "button": "Restablecer datos",
+      "confirm": "¿Borrar tus ventas y cambios de esta demo?",
+      "yes": "Sí, restablecer",
+      "done": "Datos de ejemplo restablecidos"
+    },
+    "presets": {
+      "label": "Tipo de negocio",
+      "retail": "Retail · minimercado",
+      "restaurant": "Restaurante"
+    },
+    "toolbar": {
+      "sede": "Sede",
+      "sedeToast": "Ahora vendes en {name}",
       "online": "En línea",
-      "offline": "Modo offline",
-      "offlineHint": "Sincronización pendiente · {n} tickets",
-      "searchPlaceholder": "Buscar producto, SKU o código de barras",
-      "scan": "Escanear",
-      "shift": "Turno abierto",
-      "shiftBy": "Cajero: {name}"
+      "offline": "Sin internet",
+      "queued": "{n, plural, =0 {sin ventas en cola} one {# venta en cola} other {# ventas en cola}}",
+      "syncing": "Sincronizando {n, plural, one {# venta} other {# ventas}}…",
+      "offlineTitle": "Simula un corte de internet: la caja sigue vendiendo y deja los documentos en cola",
+      "onlineTitle": "Vuelve a conectar y sincroniza la cola (simulado)",
+      "offlineToast": "Sin internet (simulado): sigues vendiendo y los documentos quedan en cola",
+      "onlineToast": "Conexión restablecida",
+      "onlineSyncToast": "Conexión restablecida: sincronizando {n, plural, one {# venta} other {# ventas}} (simulado)",
+      "shiftOpen": "Caja abierta · Turno {n} · {name}",
+      "shiftClosed": "Caja cerrada"
     },
-    "modes": {
-      "restaurant": "Restaurante",
-      "retail": "Retail",
-      "selfcheckout": "Self-checkout",
-      "kiosk": "Kiosko"
+    "tabs": {
+      "label": "Secciones del POS",
+      "sale": "Venta",
+      "tables": "Mesas",
+      "kds": "Cocina (KDS)",
+      "reports": "Reportes X/Z",
+      "console": "Sedes",
+      "staff": "Empleados"
     },
     "categories": {
       "all": "Todo",
+      "pantry": "Despensa",
+      "dairy": "Lácteos y huevos",
+      "produce": "Frutas y verduras",
       "drinks": "Bebidas",
-      "food": "Comida",
-      "snacks": "Snacks",
+      "cleaning": "Aseo",
+      "mains": "Platos fuertes",
+      "starters": "Entradas",
       "desserts": "Postres"
     },
-    "products": {
-      "title": "Catálogo",
-      "happyHour": "Happy Hour",
-      "combo": "Combo",
-      "lowStock": "Stock bajo",
-      "stock": "Stock: {n}",
-      "addedToast": "{name} agregado"
+    "tax": {
+      "iva19": "IVA 19 %",
+      "iva5": "IVA 5 %",
+      "exento": "Exento o excluido",
+      "inc8": "INC 8 %"
     },
-    "ticket": {
-      "title": "Ticket actual",
-      "empty": "Sin productos. Agrega ítems del catálogo.",
-      "table": "Mesa {n}",
-      "waiter": "Mesero: {name}",
-      "customer": "Cliente",
-      "noCustomer": "Sin cliente asignado",
-      "addCustomer": "Asignar cliente",
-      "removeCustomer": "Quitar",
-      "modifiers": "Modificadores",
-      "note": "Nota",
-      "discount": "Descuento",
-      "applyDiscount": "Aplicar descuento",
-      "subtotal": "Subtotal",
-      "tax": "IVA (19%)",
-      "tip": "Propina",
-      "total": "Total",
-      "pay": "Cobrar",
-      "send": "Enviar a cocina",
-      "void": "Anular ítem",
-      "clear": "Limpiar ticket"
+    "catalog": {
+      "searchRetail": "Buscar por nombre o código de barras",
+      "searchRestaurant": "Buscar en la carta",
+      "categoriesLabel": "Categorías",
+      "added": "{name} agregado",
+      "combo": "Combo",
+      "happyHour": "Hora feliz",
+      "happyHourActive": "Hora feliz activa",
+      "happyHourOn": "Hora feliz activada: −20 % en cerveza nacional",
+      "happyHourOff": "Hora feliz desactivada",
+      "left": "Quedan {n}",
+      "outOfStock": "Agotado",
+      "noResults": "No hay productos que coincidan.",
+      "pricesNote": "Precios al público con impuestos incluidos. Las tarifas de impuesto son de ejemplo: en tu proyecto las define tu contador por producto."
+    },
+    "scan": {
+      "button": "Escanear",
+      "label": "Escanea el código de barras o escríbelo y presiona Enter",
+      "add": "Agregar",
+      "hint": "Funciona con un lector conectado como teclado. Códigos de ejemplo:",
+      "notFound": "El código {code} no está en el catálogo."
+    },
+    "weigh": {
+      "title": "Pesar · {name}",
+      "subtitle": "Precio por kilo: {price}",
+      "read": "Leer balanza (simulado)",
+      "manual": "Peso en kg",
+      "available": "Disponible en esta sede: {kg}",
+      "invalid": "Escribe un peso entre 0,01 y 20 kg."
     },
     "modifiers": {
       "title": "Modificadores · {name}",
-      "size": "Tamaño",
-      "sizes": {
-        "small": "Pequeño",
-        "medium": "Mediano",
-        "large": "Grande"
+      "subtitle": "Lo que elijas sale en la comanda de cocina o bar.",
+      "items": {
+        "half": "Media porción",
+        "avocado": "Aguacate",
+        "egg": "Huevo frito",
+        "chicharron": "Chicharrón extra",
+        "noOnion": "Sin cebolla",
+        "milk": "En leche",
+        "noSugar": "Sin azúcar",
+        "noIce": "Sin hielo"
       },
-      "extras": "Extras",
-      "extrasItems": {
-        "cheese": "Queso extra",
-        "bacon": "Tocineta",
-        "sauce": "Salsa BBQ",
-        "ice": "Sin hielo",
-        "sugar": "Sin azúcar"
-      },
-      "notes": "Notas para cocina",
-      "notesPlaceholder": "Ej: sin cebolla, término medio...",
-      "cancel": "Cancelar",
+      "notes": "Nota para cocina",
+      "notesPlaceholder": "Ej.: término medio, sin sal…",
       "add": "Agregar al ticket"
     },
+    "ticket": {
+      "title": "Ticket",
+      "clear": "Vaciar ticket",
+      "counter": "Mostrador / para llevar",
+      "tableInfo": "Mesa {n} · {guests} pers.",
+      "waiter": "Mesero/a: {name}",
+      "changeTable": "Cambiar mesa",
+      "seller": "Asesor/a",
+      "noSeller": "Sin asesor",
+      "emptyRetail": "Escanea o toca un producto para agregarlo.",
+      "emptyRestaurant": "Toca un plato o bebida para agregarlo.",
+      "each": "{price} c/u",
+      "weighed": "Pesado en balanza",
+      "removeLine": "Quitar {name}",
+      "less": "Una unidad menos de {name}",
+      "more": "Una unidad más de {name}",
+      "sentBadge": "Enviado: {n}",
+      "gross": "Total productos",
+      "pointsDiscount": "Canje de {points} puntos",
+      "base": "Base sin impuestos",
+      "onBase": "base {base}",
+      "total": "Total",
+      "send": "Enviar a cocina ({n})",
+      "sentToast": "Comanda enviada: {kitchen, plural, one {# ítem} other {# ítems}} a cocina y {bar, plural, one {# ítem} other {# ítems}} a bar",
+      "bill": "Pre-cuenta",
+      "billToast": "Mesa {n}: cuenta pedida",
+      "pay": "Cobrar {amount}",
+      "goToTicket": "Ver ticket ({n}) · {amount}"
+    },
     "loyalty": {
-      "title": "Programa de fidelización",
-      "lookupPlaceholder": "Cédula o teléfono",
+      "lookupPlaceholder": "Cédula o celular del cliente",
       "search": "Buscar",
-      "found": "{name} · {points} puntos",
-      "tier": "Nivel: {tier}",
+      "hint": "Prueba con {phone} o la cédula {doc}.",
+      "notFound": "No está registrado.",
+      "summary": "{points} puntos · Nivel {tier}",
       "tiers": {
         "bronze": "Bronce",
         "silver": "Plata",
         "gold": "Oro"
       },
-      "redeem": "Canjear {points} pts (-{amount})",
-      "notFound": "Cliente no encontrado",
-      "ptsEarned": "Acumulará {points} pts con esta compra"
+      "remove": "Quitar cliente",
+      "redeem": "Canjear {points} pts (−{amount})",
+      "undoRedeem": "Deshacer canje",
+      "cannotRedeem": "Se canjean bloques de {points} puntos por {amount}.",
+      "ptsEarned": "Ganará {points} puntos con esta compra",
+      "register": {
+        "open": "Registrarlo",
+        "title": "Registrar cliente frecuente",
+        "name": "Nombre completo",
+        "doc": "Cédula",
+        "phone": "Celular",
+        "consent": "El cliente autoriza el tratamiento de sus datos para el programa de puntos (Ley 1581 de 2012).",
+        "save": "Registrar",
+        "done": "Cliente registrado y asignado al ticket",
+        "errors": {
+          "name": "Escribe el nombre completo.",
+          "doc": "La cédula debe tener entre 5 y 10 dígitos.",
+          "phone": "El celular debe tener 10 dígitos y empezar por 3.",
+          "consent": "Falta la autorización de datos del cliente.",
+          "exists": "Ya hay un cliente con esa cédula o celular."
+        }
+      }
     },
     "checkout": {
-      "title": "Cobrar pedido",
+      "title": "Cobrar",
       "total": "Total a pagar",
-      "pending": "Pendiente",
       "received": "Recibido",
+      "pending": "Falta",
       "change": "Cambio",
+      "tip": {
+        "title": "Propina voluntaria: pregúntale al cliente",
+        "hint": "Se calcula sobre la base sin impuestos ({base}) y el cliente puede no dejarla.",
+        "none": "Sin propina",
+        "suggested": "10 % sugerida",
+        "amount": "Propina: {amount}"
+      },
+      "methodsTitle": "Medio de pago",
+      "splitHint": "puedes combinar varios hasta cubrir el total",
       "methods": {
         "cash": "Efectivo",
-        "card": "Tarjeta",
-        "qr": "QR / PSE",
-        "wallet": "Billetera digital",
-        "bnpl": "BNPL · 3 cuotas"
+        "card": "Tarjeta (datafono)",
+        "qr": "QR (Bre-B o billetera)",
+        "gift": "Bono de regalo"
       },
-      "cardModes": {
-        "chip": "Chip",
-        "tap": "Contactless",
-        "swipe": "Banda"
+      "methodHints": {
+        "cash": "Si el cliente paga de más, la demo calcula el cambio.",
+        "card": "Simulado: en tu proyecto se integra con el datafono de tu adquirente.",
+        "qr": "Simulado: en tu proyecto el QR se genera con tu pasarela o banco.",
+        "gift": "Bonos de ejemplo: BONO50 ($50.000) y BONO20 ($20.000)."
       },
-      "split": "Pago dividido",
-      "splitHint": "Suma métodos hasta cubrir el total",
-      "addPayment": "Agregar pago",
-      "remove": "Quitar",
-      "cancel": "Cancelar",
+      "amount": "Monto",
+      "add": {
+        "cash": "Recibir efectivo",
+        "card": "Cobrar en datafono",
+        "qr": "Generar QR",
+        "gift": "Aplicar bono"
+      },
+      "exact": "Exacto {amount}",
+      "giftPlaceholder": "Código del bono",
+      "device": {
+        "card": "Esperando el datafono… (simulado)",
+        "qr": "Esperando la confirmación del pago QR… (simulado)"
+      },
+      "auth": "Aut. {code}",
+      "remove": "Quitar pago",
+      "errors": {
+        "amount": "Escribe un monto válido.",
+        "covered": "El total ya está cubierto.",
+        "giftUnknown": "Ese bono no existe. Prueba BONO50 o BONO20.",
+        "giftEmpty": "Ese bono ya no tiene saldo."
+      },
+      "buyer": {
+        "title": "Documento para el cliente",
+        "final": "Consumidor final",
+        "finalHint": "Documento equivalente electrónico POS",
+        "invoice": "Pide factura electrónica",
+        "invoiceHint": "Con su NIT o cédula y correo",
+        "docType": "Tipo de documento",
+        "docTypes": {
+          "CC": "Cédula (CC)",
+          "NIT": "NIT",
+          "CE": "Cédula de extranjería"
+        },
+        "doc": "Número de documento",
+        "name": "Nombre o razón social",
+        "email": "Correo para enviar la factura"
+      },
+      "missing": {
+        "tip": "Pregunta por la propina (puede ser «Sin propina»).",
+        "pending": "Falta cobrar {amount}.",
+        "buyer": "Completa los datos de la factura (documento, nombre y correo)."
+      },
       "confirm": "Confirmar cobro",
-      "processing": "Procesando...",
-      "approved": "Aprobado",
-      "tip": "Propina sugerida"
+      "processing": "Registrando…"
     },
     "receipt": {
-      "title": "Recibo electrónico",
-      "thermal": "Vista térmica 80mm",
-      "store": "KopTup · Sucursal Centro",
-      "address": "Cra 11 # 93-46 · Bogotá",
-      "nit": "NIT 900.123.456-7",
-      "ticket": "Ticket #{n}",
-      "cashier": "Cajero: {name}",
-      "thanks": "¡Gracias por tu compra!",
-      "dian": "DIAN · Factura electrónica aceptada",
-      "cufe": "CUFE: {code}",
-      "send": "Enviar recibo",
-      "email": "Email",
-      "whatsapp": "WhatsApp",
-      "sms": "SMS",
-      "print": "Imprimir",
-      "newSale": "Nueva venta",
-      "sent": "Enviado a {channel}"
-    },
-    "kds": {
-      "title": "Kitchen Display (KDS)",
-      "subtitle": "Comandas activas en cocina",
-      "order": "Comanda #{n}",
+      "titlePos": "Documento equivalente POS",
+      "titleInvoice": "Factura electrónica de venta",
+      "thermal": "Vista de impresión térmica de 80 mm · documento de ejemplo",
+      "docPos": "DOCUMENTO EQUIVALENTE ELECTRÓNICO POS",
+      "docInvoice": "FACTURA ELECTRÓNICA DE VENTA",
+      "number": "No. {n}",
+      "resolution": "Resolución DIAN de ejemplo {n} · prefijo {prefix}",
+      "date": "Fecha: {date}",
+      "cashier": "Cajero/a: {name}",
       "table": "Mesa {n}",
-      "elapsed": "{min} min",
-      "states": {
-        "new": "Nueva",
-        "cooking": "En cocina",
-        "ready": "Lista"
+      "waiter": "Mesero/a: {name}",
+      "seller": "Asesor/a: {name}",
+      "buyer": "Adquirente",
+      "finalConsumer": "Consumidor final",
+      "perKg": "{price}/kg",
+      "tip": "Propina voluntaria",
+      "points": "Puntos ganados: {earned} · canjeados: {redeemed}",
+      "cudeNote": "Código de ejemplo calculado en tu navegador (SHA-384, ambiente de pruebas). No se envió a la DIAN.",
+      "refunded": "ANULADO con nota crédito {nc}",
+      "thanks": "¡Gracias por tu compra!",
+      "sampleFooter": "Documento de demostración sin validez fiscal.",
+      "send": "Enviar al cliente (simulado)",
+      "channels": {
+        "whatsapp": "WhatsApp",
+        "email": "Correo"
       },
-      "markReady": "Marcar lista",
-      "deliver": "Entregar",
-      "empty": "Sin comandas pendientes"
+      "emailPlaceholder": "correo@ejemplo.com",
+      "phonePlaceholder": "Celular, ej. 300 123 4567",
+      "sendBtn": "Enviar",
+      "sentMsg": "Listo: se enviaría a {dest} por {channel}. Simulado: en la demo no sale ningún mensaje.",
+      "errors": {
+        "email": "Escribe un correo válido.",
+        "phone": "Escribe un celular de 10 dígitos."
+      },
+      "print": "Imprimir",
+      "printing": "Abriendo el diálogo de impresión del navegador…",
+      "done": "Listo"
+    },
+    "status": {
+      "sent": "Transmitido (simulado)",
+      "sending": "Transmitiendo…",
+      "queued": "En cola sin internet",
+      "hint": {
+        "sent": "En la demo la transmisión es simulada.",
+        "sending": "Simulación del envío al proveedor tecnológico.",
+        "queued": "Se transmitirá cuando vuelvas a conectarte."
+      }
     },
     "tables": {
-      "title": "Gestión de mesas",
-      "subtitle": "Asigna mesero y ticket por mesa",
+      "title": "Mesas",
+      "subtitle": "Toca una mesa libre para abrirla con su mesero/a o una ocupada para seguir su pedido.",
       "table": "Mesa {n}",
-      "seats": "{n} pers.",
+      "seats": "{n} puestos",
+      "guestsOf": "{n} de {seats} puestos",
       "states": {
         "free": "Libre",
         "busy": "Ocupada",
         "bill": "Cuenta pedida"
       },
-      "openTicket": "Abrir ticket",
-      "assignWaiter": "Asignar mesero",
-      "waiters": {
-        "ana": "Ana M.",
-        "luis": "Luis G.",
-        "sofia": "Sofía P.",
-        "diego": "Diego R."
-      }
+      "items": "{n, plural, one {# ítem} other {# ítems}} · {amount}",
+      "inKitchen": "{n, plural, one {# comanda en cocina} other {# comandas en cocina}}",
+      "tapToOpen": "Toca para abrir",
+      "counterHint": "Ventas sin mesa",
+      "openTitle": "Abrir mesa {n}",
+      "waiter": "Mesero/a",
+      "guests": "Personas",
+      "noWaiters": "No hay meseros en turno en esta sede. Marca la entrada de alguno en «Empleados».",
+      "openConfirm": "Abrir mesa",
+      "release": "Liberar mesa sin consumo"
     },
-    "employees": {
-      "title": "Empleados",
-      "clockIn": "Entrada",
-      "clockOut": "Salida",
-      "active": "En turno",
-      "off": "Fuera",
-      "hours": "{h}h trabajadas",
-      "commission": "Comisión: {amount}",
-      "punch": "Marcar"
+    "kds": {
+      "title": "Cocina (KDS)",
+      "subtitle": "Comandas de esta sede por estación, con el tiempo que llevan.",
+      "stations": {
+        "all": "Todas",
+        "kitchen": "Cocina",
+        "bar": "Bar"
+      },
+      "counts": "{n} nuevas · {p} en preparación · {r} listas",
+      "order": "Comanda #{n}",
+      "elapsed": "{min} min",
+      "states": {
+        "new": "Nueva",
+        "preparing": "En preparación",
+        "ready": "Lista"
+      },
+      "start": "Empezar a preparar",
+      "markReady": "Marcar lista",
+      "deliver": "Entregar a la mesa",
+      "empty": "No hay comandas pendientes.",
+      "note": "Verde: menos de 8 minutos; amarillo: hasta 15; rojo: más de 15. En tu proyecto esta vista corre en una pantalla de cocina conectada a la caja."
     },
     "reports": {
-      "title": "Reporte X / Z",
-      "subtitle": "Resumen del turno actual",
-      "sales": "Ventas",
-      "tickets": "Tickets emitidos",
-      "avgTicket": "Ticket promedio",
-      "cash": "Efectivo",
-      "card": "Tarjeta",
-      "digital": "Digital",
-      "voids": "Anulaciones",
-      "refunds": "Devoluciones",
-      "topProduct": "Producto top",
+      "title": "Reporte X · Turno {n}",
+      "openSince": "abierto desde las {time}",
+      "printX": "Imprimir X",
       "closeShift": "Cerrar turno (Z)",
-      "printX": "Imprimir X"
+      "empty": "Aún no hay ventas en este turno. Haz una venta en «Venta» y vuelve: el reporte se calcula con lo que vendas.",
+      "sales": "Ventas cobradas",
+      "salesSubTips": "Incluye propinas",
+      "docs": "Documentos",
+      "avgTicket": "Ticket promedio",
+      "expectedSub": "Base {base} + efectivo neto",
+      "tips": "Propinas",
+      "discounts": "Descuentos por puntos",
+      "voids": "Ítems anulados",
+      "voidsSub": "Quitados después de enviarlos a cocina",
+      "refunds": "Devoluciones",
+      "byMethod": "Por medio de pago",
+      "cashNet": "El efectivo ya descuenta el cambio entregado.",
+      "taxes": "Impuestos del turno",
+      "rate": "Tarifa",
+      "tax": "Impuesto",
+      "top": "Productos más vendidos",
+      "salesList": "Ventas del turno ({n})",
+      "salesListHint": "Puedes ver cada documento o anularlo con nota crédito: devuelve existencias, puntos y saldo de bonos.",
+      "noSales": "Sin ventas todavía.",
+      "docPosShort": "POS",
+      "docInvoiceShort": "Factura",
+      "refundedBadge": "Anulada · {nc}",
+      "view": "Ver",
+      "refund": "Anular",
+      "refundConfirm": "¿Anular con nota crédito?",
+      "refundDone": "Venta {n} anulada con nota crédito",
+      "closures": "Cierres Z de esta sesión"
+    },
+    "shift": {
+      "openTitle": "Abrir caja",
+      "openSubtitle": "Registra la base en efectivo con la que empieza el turno.",
+      "base": "Base de caja",
+      "baseInvalid": "Escribe un valor válido.",
+      "cashier": "Cajero/a del turno",
+      "openConfirm": "Abrir turno",
+      "openedToast": "Caja abierta: ya puedes vender",
+      "closeTitle": "Cerrar turno (Z)",
+      "closeSubtitle": "{n, plural, =0 {Sin ventas en el turno} one {# venta en el turno} other {# ventas en el turno}}. Cuenta el efectivo del cajón.",
+      "cashSales": "Efectivo neto de ventas",
+      "expected": "Efectivo esperado",
+      "counted": "Efectivo contado",
+      "diff": "Diferencia",
+      "diffZero": "Cuadra exacto.",
+      "diffOver": "Sobran {amount}.",
+      "diffShort": "Faltan {amount}.",
+      "useExpected": "Usar el valor esperado",
+      "closeConfirm": "Cerrar y generar Z",
+      "closedBanner": "La caja de esta sede está cerrada. Ábrela para seguir vendiendo.",
+      "closedShort": "Caja cerrada"
+    },
+    "z": {
+      "title": "Reporte Z · Turno {n}"
     },
     "cash": {
-      "title": "Gestión de caja",
-      "open": "Apertura de caja",
-      "close": "Cierre de caja",
-      "opening": "Monto de apertura",
-      "expected": "Esperado en caja",
-      "counted": "Conteo manual",
-      "diff": "Diferencia",
-      "confirm": "Confirmar",
-      "withdraw": "Retiro",
-      "deposit": "Ingreso"
+      "title": "Caja",
+      "openSince": "Turno {n} desde las {time} · {name}"
     },
     "hardware": {
-      "title": "Hardware",
-      "subtitle": "Periféricos conectados",
-      "printer": "Impresora térmica",
-      "scanner": "Escáner BT",
+      "title": "Periféricos",
+      "subtitle": "Simulados en la demo; en tu proyecto se conectan a la caja.",
+      "printer": "Impresora térmica 80 mm",
+      "scanner": "Lector de código de barras",
+      "terminal": "Datafono",
       "scale": "Balanza",
-      "reader": "Lector chip/NFC",
       "drawer": "Cajón monedero",
-      "connected": "Conectado",
-      "disconnected": "Sin conexión",
-      "reconnect": "Reconectar"
+      "testBtn": {
+        "printer": "Probar",
+        "scanner": "Abrir campo",
+        "terminal": "Probar",
+        "scale": "Probar",
+        "drawer": "Abrir"
+      },
+      "test": {
+        "printer": "Página de prueba enviada a la impresora (simulado)",
+        "scanner": "Campo de escaneo listo: escanea o escribe un código",
+        "terminal": "Datafono respondió correctamente (simulado)",
+        "scale": "Balanza en cero y lista (simulado)",
+        "drawer": "Cajón monedero abierto (simulado)"
+      }
     },
-    "tabs": {
-      "sale": "Venta",
-      "tables": "Mesas",
-      "kds": "Cocina (KDS)",
-      "reports": "Reportes",
-      "employees": "Empleados"
+    "console": {
+      "title": "Consola de sedes · {business}",
+      "subtitle": "Ventas de hoy por sede, existencias de todas las sedes, traslados y precio central.",
+      "current": "Sede donde estás vendiendo",
+      "open": "Caja abierta",
+      "closed": "Caja cerrada",
+      "myTill": "Tu caja (esta demo)",
+      "otherTills": "Otras cajas (ejemplo)",
+      "salesValue": "{n} · {amount}",
+      "dayTotal": "Total del día",
+      "lowStock": "{n, plural, one {# producto con existencias bajas} other {# productos con existencias bajas}}",
+      "switch": "Vender en esta sede",
+      "chainTotal": "Total de la cadena hoy: {amount}.",
+      "otherTillsNote": "Las otras cajas son datos de ejemplo fijos; tu caja suma lo que vendes aquí.",
+      "stockTitle": "Existencias por sede",
+      "stockHint": "Se descuentan al vender y vuelven al anular. En rojo, las que están en el mínimo o por debajo.",
+      "onlyLow": "Solo existencias bajas",
+      "product": "Producto",
+      "price": "Precio central",
+      "minLabel": "Mínimo: {n}",
+      "low": "Existencias bajas",
+      "prices": {
+        "label": "Nuevo precio de {name}",
+        "edit": "Cambiar el precio de {name}",
+        "changed": "Cambiado",
+        "invalid": "Escribe un precio entre $100 y $10.000.000.",
+        "saved": "Precio actualizado en todas las sedes",
+        "note": "El precio central aplica a todas las sedes desde el próximo producto que agregues al ticket."
+      },
+      "transfer": {
+        "title": "Trasladar existencias entre sedes",
+        "hint": "Mueve existencias de una sede a otra; no se puede trasladar lo que está en un ticket abierto. Requiere conexión.",
+        "from": "Sede de origen",
+        "to": "Sede de destino",
+        "fromOpt": "Desde {name}",
+        "toOpt": "Hacia {name}",
+        "qty": "Cantidad",
+        "units": "Unid.",
+        "button": "Trasladar",
+        "done": "Traslado registrado: {qty} de {name}",
+        "errors": {
+          "offline": "Sin internet no se pueden registrar traslados (en la demo, vuelve a «En línea»).",
+          "same": "Elige sedes distintas.",
+          "qty": "Escribe una cantidad válida (unidades enteras o kg).",
+          "stock": "La sede de origen solo tiene {n} disponibles."
+        }
+      }
+    },
+    "staff": {
+      "title": "Empleados de la sede",
+      "subtitle": "Marca entradas y salidas; las cifras salen de las ventas del turno {n}.",
+      "roles": {
+        "cashier": "Cajero/a",
+        "seller": "Asesor/a de ventas",
+        "supervisor": "Supervisor/a",
+        "waiter": "Mesero/a",
+        "cook": "Cocina",
+        "bartender": "Bar"
+      },
+      "since": "entrada {time}",
+      "out": "salida {time}",
+      "notToday": "sin marcar hoy",
+      "active": "En turno",
+      "off": "Fuera de turno",
+      "clockIn": "Marcar entrada",
+      "clockOut": "Marcar salida",
+      "inToast": "Entrada registrada: {name}",
+      "outToast": "Salida registrada: {name}",
+      "metrics": {
+        "cashier": "Cobró {n, plural, one {# venta} other {# ventas}} · {amount}",
+        "seller": "Ventas asignadas (sin impuestos): {amount} · comisión {pct}: {commission}",
+        "waiter": "{open, plural, one {# mesa abierta} other {# mesas abiertas}} · {n, plural, one {# cuenta cobrada} other {# cuentas cobradas}} · propinas {tips}",
+        "station": "{n, plural, one {# comanda en su estación} other {# comandas en su estación}}"
+      },
+      "note": "Solo los meseros en turno pueden abrir mesas y solo los asesores en turno aparecen en el ticket."
+    },
+    "errors": {
+      "closed": "La caja está cerrada: ábrela para vender.",
+      "stock": "No hay existencias suficientes en esta sede.",
+      "tableNotOpen": "Abre primero la mesa en «Mesas».",
+      "checkout": "No se pudo registrar el cobro. Revisa el ticket."
     },
     "common": {
       "close": "Cerrar",
+      "cancel": "Cancelar",
       "save": "Guardar",
-      "back": "Volver",
+      "show": "Ver",
+      "hide": "Ocultar",
       "yes": "Sí",
-      "no": "No"
+      "no": "No",
+      "simulated": "simulado"
     }
   }
 }

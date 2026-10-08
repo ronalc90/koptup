@@ -1,111 +1,152 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { LAYERS, type LayerKey } from './data';
-import Tooltip from './ui/Tooltip';
+import {
+  ArrowPathIcon,
+  CheckCircleIcon,
+  DocumentTextIcon,
+  ExclamationTriangleIcon,
+} from '@heroicons/react/24/outline';
+import { INCLUDED_KEYS, type IncludedKey } from './data';
+import { splitParagraphs, type SampleCompany, type SampleDocument } from './sampleKnowledge';
 import InfoIcon from './ui/InfoIcon';
 
+export type KbPhase = 'preparing' | 'ready' | 'error';
+
 interface SidebarProps {
-  activeLayer: LayerKey | null;
-  onSelect: (key: LayerKey) => void;
+  company: SampleCompany;
+  kbPhase: KbPhase;
+  docsIndexed: number;
+  onRetry: () => void;
+  onOpenDocument: (doc: SampleDocument) => void;
+  activeIncluded: IncludedKey | null;
+  onSelectIncluded: (key: IncludedKey) => void;
 }
 
 /**
- * Navegación lateral por las 19 capas de la plataforma RAG.
- * Todas las capas visibles por defecto con scroll vertical.
- * Buscador en el header filtra in-line.
+ * Columna izquierda del Playground:
+ *  1. Los documentos de la empresa de ejemplo (lo único que consulta el
+ *     asistente) y su estado de indexación real en el backend.
+ *  2. "Qué incluye hoy": solo capacidades que existen en el código.
  */
-export default function Sidebar({ activeLayer, onSelect }: SidebarProps) {
+export default function Sidebar({
+  company,
+  kbPhase,
+  docsIndexed,
+  onRetry,
+  onOpenDocument,
+  activeIncluded,
+  onSelectIncluded,
+}: SidebarProps) {
   const t = useTranslations('demoChatbot');
-  const [filter, setFilter] = useState('');
-
-  const filtered = useMemo(() => {
-    const q = filter.trim().toLowerCase();
-    if (!q) return LAYERS;
-    return LAYERS.filter((l) => {
-      const title = t(`layers.${l.key}.title`).toLowerCase();
-      const summary = t(`layers.${l.key}.summary`).toLowerCase();
-      return title.includes(q) || summary.includes(q);
-    });
-  }, [filter, t]);
-
-  const renderItem = (layer: (typeof LAYERS)[number]) => {
-    const isActive = activeLayer === layer.key;
-    const tooltip = t(`ux.layers.${layer.key}`);
-    return (
-      <li key={layer.key}>
-        <Tooltip content={tooltip} side="right" align="center" maxWidth={280}>
-          <button
-            type="button"
-            onClick={() => onSelect(layer.key)}
-            className={`group flex w-full items-start gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs transition-all ${
-              isActive
-                ? 'bg-primary-50 text-primary-900 shadow-sm ring-1 ring-primary-200 dark:bg-primary-950/70 dark:text-primary-100 dark:ring-primary-800/60'
-                : 'text-secondary-700 hover:bg-white hover:shadow-sm hover:ring-1 hover:ring-secondary-200 dark:text-secondary-300 dark:hover:bg-secondary-800/60 dark:hover:ring-secondary-700'
-            }`}
-            aria-current={isActive ? 'true' : undefined}
-          >
-            <span
-              className={`mt-0.5 inline-flex h-5 w-7 shrink-0 items-center justify-center rounded font-mono text-[9px] font-bold ${
-                isActive
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-secondary-200 text-secondary-700 group-hover:bg-primary-100 group-hover:text-primary-800 dark:bg-secondary-800 dark:text-secondary-300 dark:group-hover:bg-primary-900/40 dark:group-hover:text-primary-200'
-              }`}
-            >
-              {layer.glyph}
-            </span>
-            <span className="flex-1 leading-tight">
-              <span className="block font-semibold tracking-tight">
-                {t(`layers.${layer.key}.title`)}
-              </span>
-              <span className="mt-0.5 block text-[10.5px] text-secondary-500 dark:text-secondary-400">
-                {t(`layers.${layer.key}.summary`)}
-              </span>
-            </span>
-          </button>
-        </Tooltip>
-      </li>
-    );
-  };
 
   return (
     <aside
-      className="flex min-h-0 w-full flex-1 flex-col border-r border-secondary-200 bg-white/70 backdrop-blur dark:border-secondary-800 dark:bg-secondary-900/70"
-      aria-label={t('sidebar.title')}
+      className="flex min-h-0 w-full flex-1 flex-col overflow-y-auto border-r border-secondary-200 bg-white/70 backdrop-blur dark:border-secondary-800 dark:bg-secondary-900/70"
+      aria-label={t('kb.title')}
     >
-      <div className="border-b border-secondary-200 px-4 py-4 dark:border-secondary-800">
+      <section className="border-b border-secondary-200 px-4 py-3 dark:border-secondary-800">
         <div className="flex items-center justify-between gap-2">
           <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-secondary-500 dark:text-secondary-400">
-            {t('sidebar.title')}
+            {t('kb.title')}
           </p>
-          <InfoIcon content={t('ux.sectionInfo.sidebar')} side="bottom" align="end" />
+          <InfoIcon content={t('kb.subtitle')} side="bottom" align="end" />
         </div>
-        <p className="mt-1.5 text-[11px] leading-relaxed text-secondary-500 dark:text-secondary-400">
-          {t('sidebar.subtitle')}
+        <p className="mt-1 text-sm font-semibold text-secondary-900 dark:text-white">{company.name}</p>
+        <p className="text-[11px] text-secondary-500 dark:text-secondary-400">
+          {t('companies.sectorCity', { sector: company.sector, city: company.city })} · {t('companies.fictitious')}
         </p>
-        <input
-          type="search"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          placeholder={t('sidebar.search')}
-          className="mt-3 w-full rounded-md border border-secondary-200 bg-white px-2.5 py-1.5 text-xs text-secondary-900 placeholder:text-secondary-400 transition focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-secondary-700 dark:bg-secondary-900 dark:text-secondary-100"
-          aria-label={t('sidebar.search')}
-        />
-      </div>
 
-      <nav className="min-h-0 flex-1 overflow-y-auto px-2 py-3">
-        {filtered.length === 0 ? (
-          <p className="px-3 py-6 text-center text-xs text-secondary-400">
-            {t('sidebar.noResults')}
+        <div className="mt-2 text-[11px]" role="status">
+          {kbPhase === 'preparing' ? (
+            <span className="inline-flex items-center gap-1 text-secondary-500 dark:text-secondary-400">
+              <ArrowPathIcon className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+              {t('kb.preparing')}
+            </span>
+          ) : kbPhase === 'ready' ? (
+            <span className="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-300">
+              <CheckCircleIcon className="h-3.5 w-3.5" aria-hidden="true" />
+              {t('kb.ready', { count: docsIndexed })}
+            </span>
+          ) : (
+            <span className="inline-flex flex-wrap items-center gap-1 text-red-700 dark:text-red-300">
+              <ExclamationTriangleIcon className="h-3.5 w-3.5" aria-hidden="true" />
+              {t('kb.error')}
+              <button
+                type="button"
+                onClick={onRetry}
+                className="rounded border border-red-200 px-1.5 py-0.5 font-semibold hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-950/40"
+              >
+                {t('kb.retry')}
+              </button>
+            </span>
+          )}
+        </div>
+
+        <ul className="mt-2 space-y-1.5">
+          {company.docs.map((d) => (
+            <li key={d.fileName}>
+              <button
+                type="button"
+                onClick={() => onOpenDocument(d)}
+                className="flex w-full items-center gap-2 rounded-md bg-secondary-50 px-2.5 py-1.5 text-left text-xs ring-1 ring-secondary-100 transition hover:ring-primary-300 dark:bg-secondary-800/60 dark:ring-secondary-700/60 dark:hover:ring-primary-700"
+                aria-label={`${t('kb.open')}: ${d.fileName}`}
+              >
+                <DocumentTextIcon className="h-4 w-4 shrink-0 text-secondary-500 dark:text-secondary-400" aria-hidden="true" />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate font-semibold text-secondary-800 dark:text-secondary-100">{d.fileName}</span>
+                  <span className="block text-[10px] text-secondary-500 dark:text-secondary-400">
+                    {t('kb.sections', { count: splitParagraphs(d.text).length })}
+                  </span>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="px-2 py-3">
+        <div className="flex items-center justify-between gap-2 px-2">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-secondary-500 dark:text-secondary-400">
+            {t('included.title')}
           </p>
-        ) : (
-          <ul className="space-y-1">{filtered.map(renderItem)}</ul>
-        )}
-        <p className="mt-3 px-3 text-[10px] text-secondary-400 dark:text-secondary-500">
-          {filtered.length} / {LAYERS.length} capacidades
+          <InfoIcon content={t('included.subtitle')} side="bottom" align="end" />
+        </div>
+        <ul className="mt-2 space-y-1">
+          {INCLUDED_KEYS.map((key) => {
+            const active = activeIncluded === key;
+            return (
+              <li key={key}>
+                <button
+                  type="button"
+                  onClick={() => onSelectIncluded(key)}
+                  aria-current={active ? 'true' : undefined}
+                  className={`flex w-full items-start gap-2 rounded-lg px-2.5 py-2 text-left text-xs transition ${
+                    active
+                      ? 'bg-primary-50 text-primary-900 ring-1 ring-primary-200 dark:bg-primary-950/70 dark:text-primary-100 dark:ring-primary-800/60'
+                      : 'text-secondary-700 hover:bg-white hover:shadow-sm hover:ring-1 hover:ring-secondary-200 dark:text-secondary-300 dark:hover:bg-secondary-800/60 dark:hover:ring-secondary-700'
+                  }`}
+                >
+                  <CheckCircleIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" aria-hidden="true" />
+                  <span className="leading-tight">
+                    <span className="block font-semibold">{t(`included.items.${key}.title`)}</span>
+                    <span className="mt-0.5 block text-[10.5px] text-secondary-500 dark:text-secondary-400">
+                      {t(`included.items.${key}.summary`)}
+                    </span>
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+        <p className="mt-3 px-2 text-[10.5px] leading-relaxed text-secondary-500 dark:text-secondary-400">
+          {t('included.future')}{' '}
+          <Link href="/services#planes-rag" className="font-semibold text-primary-600 hover:underline dark:text-primary-400">
+            {t('included.futureLink')}
+          </Link>
         </p>
-      </nav>
+      </section>
     </aside>
   );
 }

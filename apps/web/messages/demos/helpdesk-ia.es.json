@@ -1,44 +1,89 @@
 {
   "demoHelpdesk": {
-    "pageTitle": "Help Desk con IA",
-    "pageSubtitle": "Centro omnicanal de tickets con enrutamiento inteligente, respuestas asistidas y SLA en tiempo real",
+    "meta": {
+      "title": "Helpdesk con IA: demo de mesa de ayuda omnicanal",
+      "description": "Demo interactiva de una mesa de ayuda para Colombia con datos de ejemplo: bandeja de tickets de correo, chat web, WhatsApp, Messenger, Telegram y llamadas; clasificación y asignación automáticas, borradores de respuesta con IA sobre tu base de conocimiento, SLA, macros, CSAT/NPS y PQRS en días hábiles.",
+      "breadcrumbHome": "Inicio",
+      "breadcrumbDemos": "Demos",
+      "breadcrumbName": "Helpdesk con IA"
+    },
+    "pageTitle": "Helpdesk con IA",
+    "pageSubtitle": "Mesa de ayuda omnicanal: una sola bandeja para tus canales, clasificación y asignación automáticas, borradores de respuesta con IA, SLA y PQRS en días hábiles. Pruébala: simula un ticket, respóndelo y ciérralo.",
+    "sampleBadge": "Datos de ejemplo",
+    "sampleBadgeHint": "Es la mesa de ayuda de tres marcas ficticias (Moda Andina, Conecta Sabana y Cooperativa Ceiba). Clientes, contactos, pedidos, montos y radicados son inventados. Fecha de referencia de los datos: jueves 8 de octubre de 2026.",
+    "howItWorks": {
+      "title": "Qué es real en esta demo",
+      "show": "Ver",
+      "hide": "Ocultar",
+      "real": "Todo funciona en tu navegador con los datos de ejemplo: filtros, búsqueda, clasificación, asignación por habilidad y carga, macros, SLA con escalamiento, PQRS con días hábiles y festivos de Colombia, encuestas, métricas y exportación a CSV. Tus cambios se guardan solo en este navegador.",
+      "ai": "«Redactar con IA» sí llama a un modelo de IA desde nuestro servidor y responde solo con los artículos de la base de conocimiento de esta demo, citando la fuente. Si el servidor no tiene una clave de IA configurada, te muestra los fragmentos más relevantes y te lo dice.",
+      "simulated": "Los canales y los envíos son simulados: no sale ningún mensaje ni encuesta. La clasificación, la confianza y la respuesta automática usan reglas de palabras clave, no un modelo de IA.",
+      "project": "En tu proyecto conectamos tus canales reales (por ejemplo, WhatsApp Business y tu correo), cargamos tu base de conocimiento y, si lo necesitas, hacemos la clasificación con un modelo de IA entrenado con tus tickets."
+    },
+    "reset": {
+      "button": "Restablecer datos",
+      "confirm": "¿Volver a los datos de ejemplo? Se borran los cambios que hiciste en este navegador.",
+      "yes": "Sí, restablecer",
+      "done": "Datos de ejemplo restablecidos."
+    },
+    "clock": {
+      "label": "Reloj de la demo: {date}, {time}",
+      "hint": "Reloj simulado de la demo: avanza un minuto por cada minuto real. El SLA y los términos PQRS se calculan con esta hora.",
+      "advance": "+15 min",
+      "advanceHint": "Adelanta el reloj de la demo 15 minutos para ver cómo vence el SLA",
+      "advanced": "Adelantaste el reloj de la demo 15 minutos."
+    },
     "brandLabel": "Marca",
-    "departmentLabel": "Departamento",
+    "categoryLabel": "Área",
     "brands": {
       "all": "Todas las marcas",
-      "alpha": "Alpha Retail",
-      "beta": "Beta Telecom",
-      "gamma": "Gamma Banking"
+      "moda": "Moda Andina (tienda en línea)",
+      "conecta": "Conecta Sabana (internet y TV)",
+      "ceiba": "Cooperativa Ceiba (ahorro y crédito)"
     },
-    "departments": {
-      "all": "Todos los departamentos",
-      "billing": "Facturación",
-      "support": "Soporte técnico",
-      "sales": "Ventas",
-      "retention": "Retención"
+    "categories": {
+      "all": "Todas las áreas",
+      "billing": "Facturación y pagos",
+      "tech": "Soporte técnico",
+      "orders": "Pedidos y envíos",
+      "account": "Cuenta y acceso",
+      "cancel": "Cancelaciones y retención",
+      "general": "General"
     },
     "metrics": {
-      "title": "Panel SLA en vivo",
-      "frt": "Tiempo primera respuesta",
-      "frtUnit": "min",
-      "aht": "Tiempo medio gestión",
-      "ahtUnit": "min",
-      "fcr": "Resolución primera llamada",
-      "csat": "CSAT",
-      "deflection": "Deflexión IA",
-      "trendUp": "vs semana pasada",
-      "trendDown": "vs semana pasada"
+      "active": "Tickets activos",
+      "activeSub": "{count, plural, =0 {todos asignados} one {# sin asignar} other {# sin asignar}}",
+      "activeHint": "Tickets abiertos o pendientes de la bandeja.",
+      "breached": "SLA vencidos",
+      "breachedSub": "{count, plural, =0 {ninguno vence en los próximos 30 min} one {# vence en menos de 30 min} other {# vencen en menos de 30 min}}",
+      "breachedHint": "Tickets abiertos que pasaron el tiempo de primera respuesta o de resolución de la política de SLA de ejemplo (los PQRS se miden en días hábiles).",
+      "frt": "Primera respuesta promedio",
+      "frtSub": "{count, plural, one {en # ticket respondido} other {en # tickets respondidos}}",
+      "frtHint": "Promedio del tiempo entre la llegada del ticket y la primera respuesta de un agente o de la respuesta automática.",
+      "csat": "CSAT promedio",
+      "csatSub": "NPS {nps} · {count, plural, one {# encuesta} other {# encuestas}}",
+      "csatEmpty": "sin encuestas",
+      "csatHint": "Promedio de las calificaciones de 1 a 5 de las encuestas. El NPS es el porcentaje de promotores (9–10) menos el de detractores (0–6).",
+      "auto": "Respondidos solos",
+      "autoSub": "{sent} de {total} mensajes nuevos con respuesta automática",
+      "autoHint": "Mensajes nuevos que la respuesta automática contestó sin un agente, sobre el total evaluado en el registro."
     },
     "channels": {
       "title": "Canales",
       "all": "Todos",
-      "email": "Email",
+      "email": "Correo",
+      "webchat": "Chat web",
       "whatsapp": "WhatsApp",
-      "instagram": "Instagram",
-      "facebook": "Facebook",
-      "twitter": "X / Twitter",
-      "chat": "Chat web",
-      "voice": "Voz"
+      "messenger": "Messenger",
+      "telegram": "Telegram",
+      "voice": "Llamada",
+      "planHint": "Incluido desde el plan {plan}",
+      "planNote": "Correo y chat web desde el plan Básico; WhatsApp, Messenger y Telegram desde Profesional; llamadas (transcritas) desde Avanzado. Aquí son simulados."
+    },
+    "plans": {
+      "basic": "Básico",
+      "pro": "Profesional",
+      "advanced": "Avanzado"
     },
     "priorities": {
       "title": "Prioridad",
@@ -58,183 +103,590 @@
       "pending": "Pendiente",
       "resolved": "Resuelto"
     },
+    "languages": {
+      "es": "Español",
+      "en": "Inglés"
+    },
+    "skills": {
+      "billing": "Facturación",
+      "tech": "Soporte técnico",
+      "orders": "Pedidos",
+      "account": "Cuentas",
+      "retention": "Retención",
+      "english": "Inglés"
+    },
     "inbox": {
       "title": "Bandeja de tickets",
-      "search": "Buscar tickets, clientes o asuntos…",
-      "noResults": "No se encontraron tickets con esos filtros",
-      "newTicketCta": "Simular ticket entrante",
-      "slaIn": "SLA en",
-      "slaBreached": "SLA vencido",
-      "assigned": "Asignado a",
+      "search": "Buscar por ticket, cliente, asunto, radicado o texto…",
+      "newTicket": "Simular ticket entrante",
+      "noResults": "No hay tickets con esos filtros.",
+      "count": "{count, plural, one {# ticket} other {# tickets}}",
       "unassigned": "Sin asignar",
-      "ticketsCount": "{count} tickets"
+      "viewLabel": "Ver",
+      "views": {
+        "all": "Todos",
+        "open": "Abiertos",
+        "pending": "Pendientes",
+        "resolved": "Resueltos",
+        "unassigned": "Sin asignar",
+        "atRisk": "SLA en riesgo"
+      },
+      "sortLabel": "Ordenar",
+      "sorts": {
+        "sla": "SLA más próximo",
+        "recent": "Más recientes",
+        "priority": "Prioridad"
+      },
+      "export": "Exportar CSV",
+      "exported": "{count, plural, one {Exportaste # ticket a CSV.} other {Exportaste # tickets a CSV.}}",
+      "csv": {
+        "file": "koptup-helpdesk-tickets.csv",
+        "id": "Ticket",
+        "subject": "Asunto",
+        "customer": "Cliente",
+        "city": "Ciudad",
+        "channel": "Canal",
+        "brand": "Marca",
+        "area": "Área",
+        "priority": "Prioridad",
+        "status": "Estado",
+        "assignee": "Asignado a",
+        "created": "Creado",
+        "sla": "SLA restante",
+        "pqrs": "Radicado PQRS",
+        "slaBreached": "Vencido"
+      }
+    },
+    "sla": {
+      "firstIn": "1.ª respuesta en {time}",
+      "resolutionIn": "Resolución en {time}",
+      "breached": "SLA vencido hace {time}",
+      "waiting": "Esperando al cliente",
+      "waitingHint": "Ya le respondiste al cliente; el SLA se vuelve a medir cuando responda.",
+      "pqrsLeft": "{n, plural, one {Vence en # día hábil} other {Vence en # días hábiles}}",
+      "pqrsToday": "Vence hoy",
+      "pqrsOverdue": "{n, plural, one {Vencida hace # día hábil} other {Vencida hace # días hábiles}}",
+      "pqrsHint": "Las PQRS se miden con el término en días hábiles (sin fines de semana ni festivos de Colombia).",
+      "policyHint": "Política de SLA de ejemplo, en minutos corridos: primera respuesta 15 min (urgente), 30 min (alta), 1 h (media), 4 h (baja); resolución 4 h, 8 h, 24 h y 48 h. Si vence, sube la prioridad y se avisa a la supervisora (aviso simulado)."
+    },
+    "time": {
+      "now": "ahora",
+      "minutes": "{n} min",
+      "hours": "{h} h",
+      "hoursMinutes": "{h} h {m} min",
+      "days": "{d} d",
+      "daysHours": "{d} d {h} h",
+      "minutesAgo": "hace {n} min",
+      "hoursAgo": "hace {n} h",
+      "daysAgo": "hace {n} d"
+    },
+    "dates": {
+      "weekdays": ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"],
+      "months": ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sept", "oct", "nov", "dic"],
+      "short": "{wd} {d} {m} {y}",
+      "dateTime": "{date}, {time}"
     },
     "routing": {
-      "title": "Enrutamiento inteligente",
-      "incoming": "Ticket entrante",
-      "analyzing": "Analizando intención y skills…",
-      "matched": "ML: Skill asignado",
-      "agentSuggested": "Agente sugerido",
-      "confidence": "Confianza",
-      "accept": "Asignar automáticamente",
-      "manual": "Asignar manualmente",
-      "done": "Asignación completada",
-      "tag": "Etiquetas"
+      "incoming": "Ticket entrante {id}",
+      "classified": "Clasificado por reglas: {area} · sentimiento {sentiment} · prioridad sugerida {priority} · idioma {language} · confianza {confidence}",
+      "macros": "Macros automáticas aplicadas: {names}",
+      "noMacros": "Ninguna macro automática coincide.",
+      "auto": {
+        "sent": "Respuesta automática enviada con el artículo de la base de conocimiento (envío simulado).",
+        "belowThreshold": "Respuesta automática: la confianza no llega al umbral, pasa a un agente.",
+        "notEligible": "Respuesta automática: no aplica (tema sin respuesta automática, mensaje negativo u otro idioma), pasa a un agente.",
+        "off": "Respuesta automática apagada: pasa a un agente."
+      },
+      "autoAnswered": "Queda pendiente de la respuesta del cliente, sin agente asignado.",
+      "assigned": "Asignado a {agent}: requiere {required}; menor carga entre {candidates}.",
+      "assignedByMacro": "Asignado a {agent} por una macro.",
+      "candidate": "{name} ({load} activos)",
+      "anySkill": "cualquier habilidad",
+      "priorityChanged": "Prioridad final: {priority}",
+      "open": "Ver el ticket"
     },
     "detail": {
-      "empty": "Selecciona un ticket para ver el detalle",
-      "subject": "Asunto",
-      "customer": "Cliente",
-      "channel": "Canal",
-      "priority": "Prioridad",
-      "sentiment": "Sentimiento",
-      "createdAt": "Creado",
-      "conversation": "Conversación",
-      "agent": "Agente",
-      "you": "Tú",
-      "customerRole": "Cliente",
-      "internalNotes": "Notas internas",
-      "addNote": "Agregar nota interna…",
-      "addNoteCta": "Guardar nota",
-      "noNotes": "Aún no hay notas internas",
-      "suggestedReplies": "Respuestas sugeridas por IA",
-      "insertSuggestion": "Insertar sugerencia",
-      "regenerate": "Regenerar",
-      "replyPlaceholder": "Escribe tu respuesta al cliente…",
-      "send": "Enviar respuesta",
+      "empty": "Selecciona un ticket para ver el detalle.",
+      "created": "Llegó el {date} ({ago})",
       "resolve": "Marcar resuelto",
+      "reopen": "Reabrir",
       "escalate": "Escalar",
-      "tags": "Etiquetas",
-      "messageInserted": "Sugerencia insertada en el borrador",
-      "replySent": "Respuesta enviada al cliente",
-      "noteAdded": "Nota interna añadida",
-      "resolvedToast": "Ticket marcado como resuelto"
+      "survey": "Enviar encuesta (simulada)",
+      "surveyAgain": "Repetir encuesta (simulada)",
+      "assignee": "Asignado a",
+      "priority": "Prioridad",
+      "area": "Área",
+      "autoAssign": "Asignar automáticamente",
+      "pqrsInfo": "PQRS · {type} · radicado {radicado} del {date}",
+      "escalatedInfo": "Escalado a {target} {ago}",
+      "conversation": "Conversación",
+      "customerRole": "Cliente",
+      "autoReplyRole": "Respuesta automática",
+      "ackRole": "Acuse automático",
+      "simulateCustomer": "Simular respuesta del cliente",
+      "reply": "Tu respuesta",
+      "replyPlaceholder": "Escribe tu respuesta al cliente o inserta una plantilla o el borrador de la IA…",
+      "send": "Enviar respuesta",
+      "sendNote": "Envío simulado: en tu proyecto sale por {channel}. Aquí queda en la conversación y el ticket pasa a «Pendiente».",
+      "macro": "Aplicar macro",
+      "macroPlaceholder": "Elige una macro…",
+      "macroApply": "Aplicar",
+      "pqrsLabel": "Marcar como PQRS",
+      "pqrsNone": "No es PQRS",
+      "internalNotes": "Notas internas",
+      "noNotes": "Aún no hay notas internas.",
+      "addNote": "Agregar nota interna…",
+      "addNoteCta": "Guardar nota"
+    },
+    "classification": {
+      "title": "Clasificación automática (reglas)",
+      "area": "Área sugerida",
+      "sentiment": "Sentimiento",
+      "priority": "Prioridad sugerida",
+      "language": "Idioma",
+      "confidence": "Confianza",
+      "keywords": "Palabras clave detectadas",
+      "none": "ninguna",
+      "hint": "Se calcula con reglas de palabras clave sobre los mensajes del cliente, no con un modelo de IA. La confianza sube con cada palabra del área y baja si hay palabras de otras áreas.",
+      "reasons": {
+        "legal": "menciona una autoridad o acción legal",
+        "outage": "servicio caído y mensaje negativo",
+        "negative": "mensaje negativo",
+        "positive": "mensaje positivo",
+        "general": "consulta general",
+        "default": "sin señales de urgencia"
+      }
+    },
+    "templates": {
+      "title": "Respuestas sugeridas de la base de conocimiento",
+      "none": "No hay artículos para esta área.",
+      "insert": "Insertar"
+    },
+    "ai": {
+      "title": "Borrador con IA",
+      "button": "Redactar con IA",
+      "again": "Generar otra vez",
+      "hint": "Llama a un modelo de IA desde nuestro servidor. Responde solo con los artículos de la base de conocimiento de esta demo y cita la fuente; revísalo antes de enviarlo.",
+      "preparing": "Cargando la base de conocimiento en el servidor…",
+      "asking": "Consultando el modelo…",
+      "modeLlm": "Generado por {model} en {ms} ms · costo aprox. USD {cost}",
+      "modeExtractive": "El servidor no tiene una clave de IA configurada: estos son los fragmentos más relevantes de la base de conocimiento (modo extractivo, sin modelo).",
+      "modeProviderError": "El proveedor de IA no respondió: estos son los fragmentos más relevantes de la base de conocimiento (modo extractivo).",
+      "sources": "Fuentes",
+      "insert": "Insertar en la respuesta (sin las citas)",
+      "errors": {
+        "network": "No pudimos conectar con el servidor de IA. Usa las plantillas de la base de conocimiento o inténtalo de nuevo.",
+        "rateLimited": "Hay demasiadas solicitudes en este momento. Espera un minuto y vuelve a intentarlo.",
+        "server": "El servidor de IA respondió con un error. Inténtalo de nuevo en un momento."
+      },
+      "botName": "Helpdesk con IA (demo) · base de conocimiento",
+      "persona": "Eres agente de servicio al cliente de una mesa de ayuda en Colombia. Redactas borradores de respuesta que un agente humano revisa antes de enviar: cordiales, claros y breves (2 a 4 frases), en español de Colombia, tratando al cliente de tú.",
+      "docTemplateLabel": "Respuesta modelo para el cliente:",
+      "docNamePlaceholder": "[nombre]",
+      "prompt": "Redacta la respuesta que el agente le enviará a este cliente, usando la base de conocimiento.\nCliente: {name} · Canal: {channel} · Asunto: {subject}\nMensajes del cliente:\n{messages}\nSaluda al cliente por su nombre y escribe la respuesta en {language}. Si la base de conocimiento no cubre el caso, dilo y propón escalarlo."
+    },
+    "escalate": {
+      "title": "Escalar {id}",
+      "subtitle": "Elige a quién lo escalas y por qué. Queda en las notas internas.",
+      "target": "Escalar a",
+      "targets": {
+        "level2": "Soporte nivel 2",
+        "supervisor": "Supervisora de turno",
+        "quality": "Calidad y PQRS",
+        "billingArea": "Área de pagos"
+      },
+      "targetHints": {
+        "level2": "Fallas técnicas que el primer nivel no resuelve",
+        "supervisor": "Clientes molestos, excepciones o compensaciones",
+        "quality": "Quejas formales y riesgo legal",
+        "billingArea": "Reversiones, reembolsos y ajustes de factura"
+      },
+      "reason": "Motivo",
+      "reasonPlaceholder": "Ej.: el cliente pide compensación por la falla de tres días.",
+      "reasonError": "Escribe el motivo (mínimo 5 caracteres).",
+      "raise": "Subir la prioridad un nivel",
+      "alreadyUrgent": "La prioridad ya es Urgente",
+      "submit": "Escalar ticket",
+      "note": "El aviso al área es simulado: en tu proyecto se notifica por correo, chat interno o se crea la tarea en tu herramienta (por ejemplo, Jira)."
     },
     "kb": {
       "title": "Base de conocimiento",
       "search": "Buscar artículos…",
-      "contextual": "Sugerencias contextuales",
-      "views": "vistas",
-      "useArticle": "Usar artículo",
-      "noResults": "Sin artículos para esta búsqueda",
+      "contextual": "Sugeridos para {id}",
+      "useArticle": "Usar en la respuesta",
+      "useDisabled": "Selecciona un ticket abierto para usar el artículo",
+      "autoReplyTag": "respuesta automática",
+      "noResults": "No hay artículos para esa búsqueda.",
       "articles": {
-        "a1Title": "Cómo emitir un reembolso",
-        "a1Snippet": "Guía paso a paso para procesar reembolsos parciales o totales en menos de 3 minutos.",
-        "a2Title": "Restablecer contraseña de cuenta",
-        "a2Snippet": "Proceso seguro de recuperación con verificación en dos pasos.",
-        "a3Title": "Actualizar dirección de envío",
-        "a3Snippet": "Modificar dirección después de la confirmación del pedido sin reiniciar el proceso.",
-        "a4Title": "Política de garantía extendida",
-        "a4Snippet": "Cobertura, plazos y exclusiones de la garantía Premium.",
-        "a5Title": "Configurar 2FA en la app",
-        "a5Snippet": "Activación rápida con app autenticadora o SMS.",
-        "a6Title": "Diagnóstico de conexión lenta",
-        "a6Snippet": "Checklist de 8 pasos antes de escalar a nivel 2."
+        "refund": {
+          "title": "Cómo procesar un reembolso o un cobro duplicado",
+          "body": "Verifica en la pasarela de pagos que haya dos transacciones aprobadas. Si el cobro está duplicado, solicita la reversión desde el panel de pagos: el dinero vuelve al medio de pago en 3 a 8 días hábiles, según el banco. Registra el número de la solicitud en el ticket y avisa al cliente.",
+          "reply": "Hola, {name}. Confirmamos el cobro duplicado y ya solicitamos la devolución. El dinero vuelve a tu medio de pago en 3 a 8 días hábiles, según tu banco. Te enviamos el comprobante a tu correo."
+        },
+        "einvoice": {
+          "title": "No recibí mi factura electrónica",
+          "body": "La factura electrónica se envía al correo registrado cuando se emite. Si no llega, revisa la carpeta de correo no deseado y confirma que el correo registrado esté bien. Desde «Mis facturas» se pueden descargar el PDF y el XML en cualquier momento. Si el correo está mal, actualízalo y reenvía la factura.",
+          "reply": "Hola, {name}. Tu factura electrónica se envía al correo que tienes registrado: revisa también la carpeta de correo no deseado. En «Mis facturas» puedes descargar el PDF y el XML cuando quieras. Si prefieres, te la reenviamos a otro correo."
+        },
+        "pse": {
+          "title": "Pagos por PSE pendientes o rechazados",
+          "body": "Un pago por PSE puede quedar pendiente hasta 30 minutos mientras el banco lo confirma. Si el banco lo rechaza, no se descuenta dinero. Si el cliente ve el descuento y el pago figura rechazado, el banco reversa el dinero automáticamente en 1 a 3 días hábiles.",
+          "reply": "Hola, {name}. Un pago por PSE puede quedar pendiente hasta 30 minutos mientras tu banco lo confirma. Si el banco lo rechazó y ves el descuento, la reversión es automática en 1 a 3 días hábiles. Si no se refleja, escríbenos con el comprobante."
+        },
+        "password": {
+          "title": "Restablecer la contraseña o el código de acceso",
+          "body": "En la pantalla de inicio de sesión elige «¿Olvidaste tu contraseña?». Llega un enlace al correo registrado, válido por 15 minutos. Si el código de verificación por SMS no llega, revisa la señal y que el número registrado sea correcto; se puede pedir un código nuevo cada 60 segundos.",
+          "reply": "Hola, {name}. En la pantalla de inicio de sesión elige «¿Olvidaste tu contraseña?» y te llega un enlace a tu correo, válido por 15 minutos. Si el código por SMS no llega, puedes pedir uno nuevo cada 60 segundos. Si sigue sin funcionar, respóndenos y te ayudamos."
+        },
+        "orderStatus": {
+          "title": "Estado del pedido y número de guía",
+          "body": "El número de guía llega al correo cuando el pedido sale de bodega y también aparece en «Mis pedidos». Los envíos a ciudades principales tardan de 2 a 4 días hábiles y a otros municipios, de 4 a 7 días hábiles.",
+          "reply": "Hola, {name}. Puedes ver el estado de tu pedido en «Mis pedidos» con tu número de guía, que también te llega al correo cuando el pedido sale de bodega. Los envíos a ciudades principales tardan de 2 a 4 días hábiles. Si no lo recibes en ese plazo, respóndenos y lo revisamos."
+        },
+        "address": {
+          "title": "Cambiar la dirección de entrega",
+          "body": "La dirección se puede cambiar mientras el pedido no haya salido de bodega. Confirma la nueva dirección completa (barrio, apartamento y ciudad) y actualízala en el pedido. Si ya salió, se solicita el cambio a la transportadora, que puede cobrar un recargo.",
+          "reply": "Hola, {name}. Podemos cambiar la dirección mientras tu pedido no haya salido de bodega. Confírmanos la dirección completa (barrio, apartamento y ciudad) y la actualizamos de inmediato."
+        },
+        "returns": {
+          "title": "Cambios y devoluciones",
+          "body": "En compras en línea, el cliente tiene derecho de retracto dentro de los 5 días hábiles siguientes a la entrega (Estatuto del Consumidor, Ley 1480 de 2011). Los cambios de talla se piden en «Mis pedidos» dentro de los 30 días siguientes a la entrega, con la prenda sin uso y con etiquetas.",
+          "reply": "Hola, {name}. Puedes pedir el cambio en «Mis pedidos» dentro de los 30 días siguientes a la entrega, con la prenda sin uso y con etiquetas. Si prefieres devolverla, tienes derecho de retracto dentro de los 5 días hábiles siguientes a la entrega."
+        },
+        "slowInternet": {
+          "title": "Internet lento o intermitente: diagnóstico",
+          "body": "Antes de escalar: 1) confirma si hay una falla reportada en el sector; 2) pide reiniciar el módem 30 segundos; 3) prueba la velocidad por cable; 4) revisa cuántos equipos están conectados. Si la luz de internet sigue en rojo, escala a soporte nivel 2.",
+          "reply": "Hola, {name}. Te ayudamos a revisarlo: desconecta el módem 30 segundos y vuelve a conectarlo. Si la luz de internet sigue en rojo, cuéntanos y escalamos el caso a soporte técnico de inmediato."
+        },
+        "visit": {
+          "title": "Agendar o reprogramar una visita técnica",
+          "body": "Las visitas técnicas se agendan en la franja de la mañana (8:00 a 12:00) o de la tarde (14:00 a 18:00), de lunes a sábado. El técnico confirma por WhatsApp una hora antes. Si la visita no se hace por causa de la empresa, no se cobra.",
+          "reply": "Hola, {name}. Podemos agendar la visita en la franja de la mañana (8:00 a 12:00) o de la tarde (14:00 a 18:00), de lunes a sábado. El técnico te confirma por WhatsApp una hora antes. ¿Qué franja te sirve?"
+        },
+        "cancelPlan": {
+          "title": "Cancelar o pausar un plan",
+          "body": "Antes de cancelar, ofrece una alternativa: cambiar a un plan más económico o pausar el servicio hasta por 2 meses. Si el cliente insiste, radica la solicitud de cancelación; se hace efectiva al final del ciclo de facturación.",
+          "reply": "Hola, {name}. Antes de cancelar, podemos pasarte a un plan más económico o pausar el servicio hasta por 2 meses sin costo. Si prefieres cancelar, radicamos tu solicitud y se hace efectiva al final de tu ciclo de facturación."
+        }
       }
     },
     "autoReply": {
-      "title": "IA Auto-respuesta",
-      "subtitle": "La IA responde automáticamente cuando supera el umbral configurado",
-      "enable": "Habilitar auto-respuesta",
+      "title": "Respuesta automática",
+      "subtitle": "Contesta sola las preguntas frecuentes cuando la confianza de la clasificación supera el umbral; lo demás pasa a un agente.",
+      "enable": "Activar la respuesta automática",
       "threshold": "Umbral de confianza",
-      "log": "Registro reciente",
-      "channel": "Canal",
-      "time": "Hora",
-      "intent": "Intención",
-      "confidence": "Confianza",
-      "result": "Resultado",
+      "preview": "Con un umbral de {threshold} se habrían respondido solos {would} de los {eligible} mensajes elegibles del registro.",
+      "log": "Registro de mensajes nuevos",
+      "empty": "Aún no hay mensajes evaluados.",
       "results": {
-        "sent": "Enviada",
-        "escalated": "Escalada",
-        "queued": "En cola"
+        "sent": "Respondido solo",
+        "belowThreshold": "Bajo el umbral",
+        "notEligible": "A un agente",
+        "off": "Apagada"
       },
-      "empty": "Aún no se han ejecutado auto-respuestas"
-    },
-    "csat": {
-      "title": "CSAT / NPS post-resolución",
-      "subtitle": "Encuestas enviadas tras cerrar el ticket",
-      "openSurvey": "Vista previa de encuesta",
-      "modalTitle": "¿Cómo calificarías la atención recibida?",
-      "modalSubtitle": "Ticket {id} resuelto por {agent}",
-      "comment": "Comentario opcional",
-      "commentPlaceholder": "Cuéntanos qué podemos mejorar…",
-      "submit": "Enviar valoración",
-      "cancel": "Cancelar",
-      "thanks": "¡Gracias por tu valoración!",
-      "byAgent": "Promedio por agente",
-      "tickets": "tickets"
+      "note": "Elegibles: temas con artículo de respuesta automática, en el idioma de la base de conocimiento y sin sentimiento negativo. En esta demo la confianza viene de las reglas y el envío es simulado."
     },
     "macros": {
       "title": "Macros y automatizaciones",
-      "subtitle": "Reglas if-then que tu equipo aplica con un clic",
+      "subtitle": "Reglas SI/ENTONCES: se aplican solas a los tickets nuevos o con un clic desde el ticket.",
       "if": "SI",
       "then": "ENTONCES",
-      "runs": "ejecuciones",
-      "addNew": "Crear macro",
-      "items": {
-        "m1If": "Asunto contiene 'reembolso' y prioridad ≥ Alta",
-        "m1Then": "Asignar a Finanzas + plantilla 'reembolso-express' + etiquetar 'urgente'",
-        "m2If": "Sentimiento negativo y CSAT previo < 3",
-        "m2Then": "Escalar a Retención + notificar supervisor",
-        "m3If": "Canal WhatsApp y horario fuera de oficina",
-        "m3Then": "Enviar acuse + agendar callback 09:00",
-        "m4If": "Cliente VIP y SLA < 15 min",
-        "m4Then": "Subir prioridad a Urgente + asignar mejor agente disponible"
+      "and": "y",
+      "auto": "Automática en tickets nuevos",
+      "manual": "Solo manual",
+      "runs": "{count, plural, =0 {Sin ejecuciones} one {# ejecución} other {# ejecuciones}}",
+      "create": "Crear macro",
+      "empty": "No hay macros. Crea la primera.",
+      "toggle": "Activar o pausar «{name}»",
+      "delete": "Eliminar «{name}»",
+      "note": "Las ejecuciones incluyen los tickets de ejemplo de la bandeja y las que hagas en esta demo.",
+      "seed": {
+        "m1": "Reembolsos",
+        "m2": "Riesgo de fuga",
+        "m3": "Acuse por WhatsApp",
+        "m4": "Mención a la SIC"
+      },
+      "describe": {
+        "category": "el área es {value}",
+        "channel": "el canal es {value}",
+        "priorityAtLeast": "la prioridad es {value} o mayor",
+        "sentiment": "el sentimiento es {value}",
+        "keyword": "el mensaje contiene «{value}»",
+        "assign": "asignar a {agent}",
+        "priority": "prioridad {value}",
+        "tag": "etiqueta «{value}»",
+        "ack": "enviar acuse de recibo (simulado)"
+      },
+      "builder": {
+        "title": "Crear macro",
+        "subtitle": "Define las condiciones (se deben cumplir todas) y las acciones.",
+        "name": "Nombre",
+        "namePlaceholder": "Ej.: Garantías de electrodomésticos",
+        "nameError": "Escribe un nombre de al menos 3 caracteres.",
+        "conditions": "Condiciones (SI)",
+        "conditionType": "Tipo de condición",
+        "conditionTypes": {
+          "category": "El área es",
+          "channel": "El canal es",
+          "priorityAtLeast": "La prioridad es al menos",
+          "sentiment": "El sentimiento es",
+          "keyword": "El mensaje contiene"
+        },
+        "value": "Valor",
+        "keywordPlaceholder": "Palabras separadas por coma, p. ej.: garantía, dañado",
+        "keywordError": "Escribe al menos una palabra para la condición «El mensaje contiene».",
+        "addCondition": "Agregar condición",
+        "actions": "Acciones (ENTONCES)",
+        "actionType": "Tipo de acción",
+        "actionTypes": {
+          "assign": "Asignar a",
+          "priority": "Cambiar prioridad a",
+          "tag": "Agregar etiqueta",
+          "ack": "Enviar acuse de recibo"
+        },
+        "tagPlaceholder": "Ej.: garantia",
+        "tagError": "Escribe el nombre de la etiqueta.",
+        "ackHint": "Agrega a la conversación el mensaje «Recibimos tu mensaje…» (envío simulado).",
+        "addAction": "Agregar acción",
+        "remove": "Quitar",
+        "auto": "Aplicarla sola a los tickets nuevos que cumplan las condiciones",
+        "save": "Guardar macro"
       }
     },
-    "skills": {
-      "billing": "Facturación",
-      "spanish": "Español",
-      "english": "Inglés",
-      "tech": "Técnico",
-      "vip": "VIP",
-      "retention": "Retención"
+    "csat": {
+      "title": "CSAT y NPS después de resolver",
+      "subtitle": "Encuesta corta que recibe el cliente cuando cierras su ticket.",
+      "average": "CSAT (1 a 5)",
+      "nps": "NPS",
+      "npsHint": "Porcentaje de promotores (9–10) menos porcentaje de detractores (0–6).",
+      "surveys": "encuestas",
+      "open": "Responder la encuesta de {id}",
+      "openDisabled": "Responder una encuesta",
+      "openHint": "Resuelve un ticket para responder su encuesta como si fueras el cliente.",
+      "byAgent": "Promedio por agente",
+      "count": "{count, plural, =0 {sin encuestas} one {# encuesta} other {# encuestas}}",
+      "comments": "Últimos comentarios",
+      "note": "Incluye 9 encuestas de ejemplo de la última semana y las que respondas aquí; el envío al cliente es simulado.",
+      "modal": {
+        "title": "¿Cómo calificarías la atención que recibiste?",
+        "subtitle": "Así ve el cliente la encuesta del ticket {id}, atendido por {agent} ({channel}).",
+        "scoreLabel": "Calificación",
+        "stars": "{n, plural, one {# estrella} other {# estrellas}}",
+        "npsLabel": "¿Qué tan probable es que nos recomiendes a un amigo o colega? (0 a 10)",
+        "npsLow": "Nada probable",
+        "npsHigh": "Muy probable",
+        "comment": "Comentario (opcional)",
+        "commentPlaceholder": "Cuéntanos qué podemos mejorar…",
+        "submit": "Enviar calificación",
+        "note": "Encuesta simulada: en tu proyecto se envía por el mismo canal del ticket y el resultado entra al tablero."
+      }
     },
-    "tickets": {
-      "t1Subject": "Cobro duplicado en factura de marzo",
-      "t1Preview": "Hola, vi dos cargos idénticos por $129.90 el mismo día y no he recibido respuesta…",
-      "t2Subject": "No puedo iniciar sesión desde la app",
-      "t2Preview": "Cada vez que ingreso mi contraseña me dice usuario inválido pero estoy seguro de que…",
-      "t3Subject": "Quiero cancelar mi suscripción Premium",
-      "t3Preview": "Llevo tres meses sin usar el servicio y necesito cancelar antes del próximo cobro.",
-      "t4Subject": "Cambiar dirección de envío del pedido #88421",
-      "t4Preview": "Acabo de comprar y me equivoqué de calle, ¿pueden actualizarla antes del despacho?",
-      "t5Subject": "Felicitar al agente que me atendió ayer",
-      "t5Preview": "Solo quería agradecer, María fue increíble y resolvió todo en minutos.",
-      "t6Subject": "Internet intermitente desde el lunes",
-      "t6Preview": "Se cae cada 10 minutos y ya reinicié el router cinco veces, esto es inaceptable.",
-      "t7Subject": "Consulta sobre garantía extendida",
-      "t7Preview": "Compré un laptop hace 11 meses y quiero saber si aplica garantía Premium.",
-      "t8Subject": "Reembolso pendiente hace dos semanas",
-      "t8Preview": "Me dijeron que llegaba en 5 días hábiles y nada. Voy a poner queja en SERNAC."
+    "pqrs": {
+      "title": "PQRS: peticiones, quejas, reclamos, sugerencias y felicitaciones",
+      "subtitle": "Radicado, término y vencimiento en días hábiles, calculados al {date}.",
+      "badge": "PQRS",
+      "filterLabel": "Filtrar PQRS",
+      "filters": {
+        "all": "Todas",
+        "open": "Abiertas",
+        "dueSoon": "Por vencer (3 días hábiles o menos)",
+        "overdue": "Vencidas",
+        "answered": "Respondidas"
+      },
+      "columns": {
+        "radicado": "Radicado",
+        "type": "Tipo",
+        "customer": "Cliente y asunto",
+        "filed": "Radicada",
+        "due": "Vence",
+        "left": "Faltan",
+        "state": "Estado"
+      },
+      "states": {
+        "answered": "Respondida",
+        "overdue": "Vencida",
+        "dueSoon": "Por vencer",
+        "onTime": "En término"
+      },
+      "types": {
+        "peticion": "Petición",
+        "queja": "Queja",
+        "reclamo": "Reclamo",
+        "sugerencia": "Sugerencia",
+        "felicitacion": "Felicitación"
+      },
+      "mobileDates": "Radicada {filed} · vence {due}",
+      "empty": "No hay PQRS con ese filtro.",
+      "export": "Exportar CSV",
+      "exported": "{count, plural, one {Exportaste # PQRS a CSV.} other {Exportaste # PQRS a CSV.}}",
+      "termNote": "Término de ejemplo: {days} días hábiles desde el día siguiente a la radicación (el término general del derecho de petición en la Ley 1755 de 2015). Se excluyen sábados, domingos y festivos de Colombia. Valida con tu asesor legal los términos que aplican a tu sector; en tu proyecto se configuran por tipo.",
+      "csv": {
+        "file": "koptup-helpdesk-pqrs.csv",
+        "radicado": "Radicado",
+        "type": "Tipo",
+        "customer": "Cliente",
+        "subject": "Asunto",
+        "channel": "Canal",
+        "filed": "Fecha de radicación",
+        "due": "Fecha de vencimiento",
+        "left": "Días hábiles restantes",
+        "state": "Estado",
+        "ticket": "Ticket"
+      }
     },
-    "messages": {
-      "agent1": "Buenos días, lamento mucho la molestia. Estoy revisando ahora mismo el detalle de tu factura.",
-      "customer1": "Hola, llevo días esperando una respuesta. Esto es realmente frustrante.",
-      "agent2": "Entiendo perfectamente. Veo los dos cargos y procederé con el reembolso del duplicado de inmediato.",
-      "customer2": "Te agradezco mucho la rapidez."
+    "notes": {
+      "slaBreach": "SLA vencido: la prioridad subió de {from} a {to} y se avisó a la supervisora de turno (aviso simulado).",
+      "slaBreachUrgent": "SLA vencido con prioridad Urgente: se avisó a la supervisora de turno (aviso simulado).",
+      "escalated": "Escalado a {target}: {reason}",
+      "reopened": "Ticket reabierto.",
+      "routed": "Asignado automáticamente a {agent}: requiere {skill}; menor carga entre {count, plural, one {# agente} other {# agentes}} con esa habilidad.",
+      "routedEnglish": "Asignado automáticamente a {agent}: requiere {skill} e inglés; menor carga entre {count, plural, one {# agente} other {# agentes}} con esas habilidades.",
+      "routedEnglishOnly": "Asignado automáticamente a {agent}: requiere inglés; menor carga entre {count, plural, one {# agente} other {# agentes}} que lo hablan.",
+      "macroAuto": "Macro automática aplicada: «{name}».",
+      "macroApplied": "Macro aplicada: «{name}».",
+      "pqrsMarked": "Marcado como PQRS ({type}) con el radicado {radicado}.",
+      "pqrsType": "Tipo de PQRS cambiado a {type}.",
+      "pqrsRemoved": "Se quitó la marca de PQRS."
     },
-    "suggestions": {
-      "s1": "Hola {name}, lamentamos el inconveniente. Hemos validado el cobro duplicado y procesaremos el reembolso de $129.90 en las próximas 24 horas. Te enviaremos confirmación por email.",
-      "s2": "Buen día {name}, para resetear tu contraseña ingresa a /recuperar, recibirás un enlace válido por 15 minutos. Si no llega, revisa spam o avísanos.",
-      "s3": "Hola {name}, podemos pausar tu suscripción 30 días sin costo mientras decides. ¿Te gustaría que lo haga ahora?"
+    "newTicket": {
+      "title": "Simular ticket entrante",
+      "subtitle": "Elige un ejemplo o escribe tu propio mensaje: la demo lo clasifica, aplica las macros, decide si responde sola y lo asigna.",
+      "examples": "Ejemplos",
+      "customer": "Cliente",
+      "customerError": "Escribe el nombre del cliente.",
+      "contact": "Contacto",
+      "channel": "Canal",
+      "brand": "Marca",
+      "city": "Ciudad",
+      "message": "Mensaje del cliente",
+      "messageError": "Escribe un mensaje de al menos 10 caracteres.",
+      "note": "El mensaje no sale de tu navegador: la clasificación y la asignación usan reglas de esta demo.",
+      "submit": "Recibir ticket"
     },
-    "agents": {
-      "maria": "María González",
-      "carlos": "Carlos Ruiz",
-      "ana": "Ana Pereira",
-      "luis": "Luis Martínez",
-      "you": "Tú (Demo)"
+    "toasts": {
+      "articleInserted": "Insertaste «{title}» en tu respuesta.",
+      "replySent": "Respuesta agregada a la conversación (envío simulado por {channel}).",
+      "customerReplied": "El cliente respondió (simulado): el ticket vuelve a «Abierto».",
+      "noteAdded": "Nota interna guardada.",
+      "resolved": "Ticket resuelto. Puedes enviar la encuesta (simulada).",
+      "reopened": "Ticket reabierto.",
+      "assigned": "Ticket asignado a {agent}.",
+      "unassigned": "Ticket sin asignar.",
+      "autoAssigned": "Asignado automáticamente a {agent}.",
+      "priority": "Prioridad cambiada a {priority}.",
+      "category": "Área cambiada a {area}.",
+      "escalated": "Ticket escalado a {target}.",
+      "pqrs": "Marcado como PQRS: {type}.",
+      "pqrsRemoved": "Se quitó la marca de PQRS.",
+      "macroApplied": "Macro «{name}» aplicada.",
+      "macroCreated": "Macro «{name}» creada.",
+      "macroDeleted": "Macro «{name}» eliminada.",
+      "survey": "Encuesta registrada (simulada: en tu proyecto llega al cliente por {channel})."
     },
     "common": {
-      "minutesAgo": "hace {n} min",
-      "hoursAgo": "hace {n} h",
-      "daysAgo": "hace {n} d",
       "close": "Cerrar",
-      "save": "Guardar",
       "cancel": "Cancelar",
-      "showMore": "Ver más",
-      "showLess": "Ver menos"
+      "you": "Tú",
+      "system": "Sistema",
+      "pct": "{n} %"
+    },
+    "data": {
+      "ack": "Recibimos tu mensaje. Un agente te responde en breve. (Mensaje automático)",
+      "customerReply": "Listo, muchas gracias por la ayuda.",
+      "tickets": {
+        "t1": {
+          "subject": "Me cobraron dos veces por PSE",
+          "m1": "Hola, ayer pagué mi pedido #MA-20931 por PSE y en el extracto del banco me aparecen dos cargos de $189.900. Necesito que me devuelvan uno, por favor.",
+          "m3": "Hola, Lucía. Lamento la molestia. Ya estoy revisando con el área de pagos los dos cargos de tu pedido #MA-20931.",
+          "m4": "Gracias. ¿En cuánto tiempo me devuelven la plata? Es la tercera vez que me pasa y ya estoy cansada.",
+          "n1": "Clienta frecuente. En la pasarela de pagos aparecen dos transacciones aprobadas con 40 segundos de diferencia."
+        },
+        "t2": {
+          "subject": "Sin internet desde anoche",
+          "m1": "(Transcripción de la llamada) Desde anoche no tengo internet. Ya reinicié el módem tres veces y la luz de internet sigue en rojo. Trabajo desde la casa y esto es inaceptable.",
+          "m2": "Javier, ya revisé tu servicio: hay una falla reportada en tu sector. Te dejo el caso registrado y te aviso apenas tengamos la hora estimada de solución.",
+          "n1": "Falla masiva en el nodo Villavicencio Centro. Incidente de red abierto con soporte nivel 2."
+        },
+        "t3": {
+          "subject": "Quiero cancelar el plan de TV",
+          "m1": "Buenos días. Quiero cancelar el plan de TV porque casi no lo uso. ¿Qué tengo que hacer para darlo de baja?",
+          "m3": "Hola, Marta. Radicamos tu solicitud con el número PQRS-2026-0418. Antes de cancelar, puedo pasarte al plan solo internet, que te baja la factura sin cambiar tu velocidad. ¿Te envío la comparación?"
+        },
+        "t4": {
+          "subject": "Cambiar la dirección de entrega del pedido #MA-21055",
+          "m1": "Hola, acabo de hacer el pedido #MA-21055 y me equivoqué en la dirección. Es Carrera 45 # 12-30, apartamento 502. ¿La pueden cambiar antes del envío?"
+        },
+        "t5": {
+          "subject": "Felicitaciones por la atención",
+          "m1": "Solo quería agradecer a Ana: me ayudó con el cambio de talla en minutos. ¡Excelente servicio!",
+          "m2": "¡Gracias, Sofía! Nos alegra mucho. Aquí estamos para lo que necesites."
+        },
+        "t6": {
+          "subject": "No me llegó la factura electrónica",
+          "m1": "Buenos días. Este mes no me llegó al correo la factura electrónica del servicio de internet y la necesito para la contabilidad de mi negocio.",
+          "n1": "SLA de primera respuesta vencido: la prioridad subió de Media a Alta y se avisó a la supervisora de turno (aviso simulado)."
+        },
+        "t7": {
+          "subject": "No puede iniciar sesión en su cuenta",
+          "m1": "Hi, I'm trying to log in to my account to check my order, but it says my password is wrong. I already tried twice. Can you help me, please?"
+        },
+        "t8": {
+          "subject": "Reembolso pendiente hace tres semanas",
+          "m1": "Devolví una chaqueta el 14 de septiembre y me dijeron que el reembolso de $249.900 llegaba en 5 días hábiles. Ya van tres semanas y nadie me responde. Si hoy no tengo solución, voy a poner una queja ante la SIC."
+        },
+        "t9": {
+          "subject": "¿Dónde va mi pedido #MA-20877?",
+          "m1": "Hola, ¿me pueden decir dónde va mi pedido #MA-20877? Lo compré el lunes y todavía no tengo la guía del envío.",
+          "m2": "Hola, Valentina. Puedes ver el estado de tu pedido en «Mis pedidos» con tu número de guía, que también te llega al correo cuando el pedido sale de bodega. Los envíos a ciudades principales tardan de 2 a 4 días hábiles. Si no lo recibes en ese plazo, respóndenos y lo revisamos."
+        },
+        "t10": {
+          "subject": "Reclamo por el cobro de una visita técnica que no se hizo",
+          "m1": "Me cobraron $80.000 por una visita técnica que nunca se hizo: nadie vino el 18 de septiembre. Pido que me devuelvan ese valor en la próxima factura.",
+          "m2": "Hola, Hernán. Radicamos tu reclamo con el número PQRS-2026-0402. Estamos validando la orden de visita con el área técnica y te respondemos dentro del término.",
+          "m3": "¿Hay alguna novedad? Ya pasaron más de diez días.",
+          "n1": "El técnico reportó «cliente ausente», pero no hay foto ni firma de la visita. Propongo abonar los $80.000 en la factura de octubre."
+        },
+        "t11": {
+          "subject": "No le llega el código para entrar a la app",
+          "m1": "Buenas, intento entrar a la app de la cooperativa y no me llega el código de verificación por SMS. Ya revisé que mi número esté bien."
+        },
+        "t12": {
+          "subject": "Solicitud de certificado de aportes y de crédito",
+          "m1": "Buenas tardes. Necesito un certificado de mis aportes y del estado de mi crédito para presentarlo en el banco. ¿Cómo lo solicito?",
+          "m2": "Hola, Andrés. Radicamos tu petición con el número PQRS-2026-0410. El área de cartera expide el certificado y te lo enviamos al correo que tienes registrado."
+        }
+      },
+      "surveys": {
+        "s1": "Ana me resolvió el cambio de talla en minutos.",
+        "s5": "La visita técnica llegó dos horas tarde.",
+        "s9": "Me devolvieron el cobro duplicado el mismo día."
+      },
+      "incoming": {
+        "pse": {
+          "label": "Cobro doble por PSE",
+          "text": "Hola, pagué mi compra por PSE y me descontaron dos veces $159.900 de la cuenta. ¿Me pueden devolver el cobro repetido? Estoy muy molesta."
+        },
+        "outage": {
+          "label": "Internet caído (llamada)",
+          "text": "(Transcripción de la llamada) No tengo internet desde esta mañana y la señal del wifi no aparece. Ya reinicié el router. Necesito el servicio para trabajar y esto es inaceptable."
+        },
+        "tracking": {
+          "label": "¿Dónde está mi pedido?",
+          "text": "Hola, ¿dónde está mi pedido #MA-21102? Ya pasaron tres días y quiero saber el número de guía del envío."
+        },
+        "password": {
+          "label": "Contraseña (cliente en inglés)",
+          "text": "Hello, I forgot my password and I can't log in to my account. Can you help me, please?"
+        },
+        "sic": {
+          "label": "Queja con mención a la SIC",
+          "text": "Buenas tardes. Llevo un mes pidiendo que corrijan un cobro de $95.000 en mi factura y nadie me da solución. Si esta semana no lo resuelven, pongo la queja ante la Superintendencia de Industria y Comercio (SIC)."
+        },
+        "cancel": {
+          "label": "Cancelación de suscripción",
+          "text": "Hola, quiero cancelar mi suscripción de TV a partir del próximo mes. ¿Cómo hago?"
+        }
+      }
     }
   }
 }

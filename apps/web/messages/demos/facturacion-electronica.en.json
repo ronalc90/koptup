@@ -1,319 +1,598 @@
 {
   "demoBilling": {
-    "pageTitle": "Multi-country electronic invoicing",
-    "pageSubtitle": "Unified fiscal platform for LatAm: issue, receive, validate, and archive documents with regulatory compliance across 8 countries.",
-    "back": "Back to demos",
-    "selectCountry": "Tax country",
-    "selectCountryHelp": "Switches the fiscal regime, tax identifiers, and applicable taxes.",
-    "countries": {
-      "colombia": {
-        "name": "Colombia",
-        "authority": "DIAN",
-        "currency": "COP",
-        "currencySymbol": "$",
-        "taxId": "NIT",
-        "docPrefix": "FE",
-        "vat": "VAT 19%",
-        "extraTax": "VAT Withh. 15%",
-        "ica": "ICA 11.04 per 1000",
-        "storageYears": "10"
-      },
-      "mexico": {
-        "name": "Mexico",
-        "authority": "SAT",
-        "currency": "MXN",
-        "currencySymbol": "$",
-        "taxId": "RFC",
-        "docPrefix": "CFDI",
-        "vat": "VAT 16%",
-        "extraTax": "ISR 10%",
-        "ica": "Variable IEPS",
-        "storageYears": "5"
-      },
-      "argentina": {
-        "name": "Argentina",
-        "authority": "AFIP",
-        "currency": "ARS",
-        "currencySymbol": "$",
-        "taxId": "CUIT",
-        "docPrefix": "FCE-A",
-        "vat": "VAT 21%",
-        "extraTax": "IIBB Perc. 3%",
-        "ica": "Internal taxes",
-        "storageYears": "10"
-      },
-      "chile": {
-        "name": "Chile",
-        "authority": "SII",
-        "currency": "CLP",
-        "currencySymbol": "$",
-        "taxId": "RUT",
-        "docPrefix": "DTE-33",
-        "vat": "VAT 19%",
-        "extraTax": "Withholding 13%",
-        "ica": "Specific tax",
-        "storageYears": "6"
-      },
-      "peru": {
-        "name": "Peru",
-        "authority": "SUNAT",
-        "currency": "PEN",
-        "currencySymbol": "S/",
-        "taxId": "RUC",
-        "docPrefix": "F001",
-        "vat": "IGV 18%",
-        "extraTax": "Withholding 3%",
-        "ica": "Detraction 12%",
-        "storageYears": "5"
-      },
-      "uruguay": {
-        "name": "Uruguay",
-        "authority": "DGI",
-        "currency": "UYU",
-        "currencySymbol": "$",
-        "taxId": "RUT",
-        "docPrefix": "eInvoice",
-        "vat": "VAT 22%",
-        "extraTax": "IRPF 7%",
-        "ica": "Specific taxes",
-        "storageYears": "10"
-      },
-      "paraguay": {
-        "name": "Paraguay",
-        "authority": "SET",
-        "currency": "PYG",
-        "currencySymbol": "₲",
-        "taxId": "RUC",
-        "docPrefix": "DE",
-        "vat": "VAT 10%",
-        "extraTax": "VAT Withh. 30%",
-        "ica": "Selective tax",
-        "storageYears": "5"
-      },
-      "ecuador": {
-        "name": "Ecuador",
-        "authority": "SRI",
-        "currency": "USD",
-        "currencySymbol": "$",
-        "taxId": "RUC",
-        "docPrefix": "FAC-001",
-        "vat": "VAT 15%",
-        "extraTax": "Source withh. 8%",
-        "ica": "Variable ICE",
-        "storageYears": "7"
+    "meta": {
+      "title": "DIAN e-invoicing: simulator",
+      "description": "E-invoicing simulator for Colombia with sample data: issue invoices, credit and debit notes and POS equivalent documents; validate the NIT check digit, compute VAT per rate and generate a sample CUFE, QR code, PDF and XML. Includes RADIAN events for supplier invoices and exportable ledgers. Nothing is sent to the DIAN.",
+      "breadcrumbHome": "Home",
+      "breadcrumbDemos": "Demos",
+      "breadcrumbName": "DIAN e-invoicing"
+    },
+    "common": {
+      "cancel": "Cancel",
+      "close": "Close",
+      "monthsShort": "Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec"
+    },
+    "header": {
+      "back": "Back to demos",
+      "sampleBadge": "Sample data",
+      "simBadge": "Simulation: nothing is sent to the DIAN",
+      "reset": "Reset data",
+      "resetConfirm": "Discard your changes and go back to the sample data?",
+      "resetYes": "Yes, reset",
+      "resetDone": "Sample data restored",
+      "storageFull": "Your browser has no room to save your changes (a very large logo?). The demo still works, but it won't remember them after a reload."
+    },
+    "hero": {
+      "kicker": "E-invoicing simulator · Colombia",
+      "title": "DIAN e-invoicing from your own system",
+      "subtitle": "Issue invoices, credit and debit notes and POS equivalent documents; download the PDF with its QR code and the XML; answer your suppliers' invoices with RADIAN events and export the period ledgers.",
+      "simNote": "Everything runs in your browser with fictitious companies and figures. Signing, transmission and DIAN validation are simulated, and your changes are stored only on this device.",
+      "dateNote": "Simulation date: {date}."
+    },
+    "metrics": {
+      "label": "Simulation indicators",
+      "issued": "Issued in October",
+      "issuedHint": "Invoices, notes and POS this month",
+      "issuedQueued": "{n} in the contingency queue",
+      "acceptance": "DIAN acceptance (simulated)",
+      "acceptanceHint": "{accepted} of {total} transmitted documents",
+      "rejected": "Rejections to fix",
+      "rejectedHint": "Fix them in Issued documents",
+      "rejectedNone": "No pending rejections",
+      "radian": "Supplier invoices to handle",
+      "radianHint": "Invoices with pending RADIAN events (of {total})",
+      "rateValue": "{rate}%"
+    },
+    "tour": {
+      "title": "Try the flow in 3 minutes",
+      "subtitle": "Each step checks itself off when you do it. Tap a step to jump to its section.",
+      "done": "{done} of {total}",
+      "steps": {
+        "invoice": "Issue an invoice with a valid NIT (try 901234517-9)",
+        "download": "Download a document's PDF with QR code or its XML",
+        "creditNote": "Issue a credit note against an invoice",
+        "radian": "Register a RADIAN event on a supplier invoice",
+        "export": "Export a tax ledger as CSV or PDF"
       }
     },
-    "topMetrics": {
-      "emittedToday": "Issued today",
-      "acceptanceRate": "Acceptance rate",
-      "avgResponse": "Average response",
-      "storage": "Documents archived"
+    "docTypes": {
+      "factura": "Electronic sales invoice",
+      "notaCredito": "Electronic credit note",
+      "notaDebito": "Electronic debit note",
+      "pos": "Electronic POS equivalent document"
     },
-    "sections": {
-      "emission": "Issuing",
-      "documents": "Issued documents",
-      "reception": "Supplier reception",
-      "reports": "Fiscal reports",
-      "api": "API and SDKs",
-      "whiteLabel": "White-label resellers",
-      "storage": "Legal storage"
+    "docTypesShort": {
+      "factura": "Invoice",
+      "notaCredito": "Credit note",
+      "notaDebito": "Debit note",
+      "pos": "POS"
+    },
+    "status": {
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "contingency": "In contingency"
+    },
+    "taxOptions": {
+      "iva19": "VAT 19%",
+      "iva5": "VAT 5%",
+      "exento": "Exempt (0%)",
+      "excluido": "Excluded / no VAT"
+    },
+    "reteOptions": {
+      "none": "No withholding",
+      "servicios": "Services 4%",
+      "honorarios": "Fees 11%",
+      "compras": "Purchases 2.5%",
+      "software": "Software 3.5%"
+    },
+    "creditConcepts": {
+      "1": "1 · Partial return or partial non-acceptance of the service",
+      "2": "2 · Invoice cancellation",
+      "3": "3 · Partial or full discount",
+      "4": "4 · Price adjustment",
+      "5": "5 · Early payment discount",
+      "6": "6 · Volume discount"
+    },
+    "debitConcepts": {
+      "1": "1 · Interest",
+      "2": "2 · Charges to collect",
+      "3": "3 · Change in value",
+      "4": "4 · Other"
     },
     "emission": {
       "title": "Document issuing",
-      "subtitle": "Build the document, validate in real time and send it to {authority}.",
+      "subtitle": "Build the document, review the pre-validations and issue it. Transmission to the DIAN is simulated.",
       "tabs": {
-        "factura": "Invoice",
+        "factura": "Sales invoice",
         "notaCredito": "Credit note",
         "notaDebito": "Debit note",
-        "pos": "POS",
+        "pos": "POS document",
         "contingencia": "Contingency"
       },
-      "form": {
-        "client": "Customer",
-        "fields": {
-          "taxId": "Receiver {taxId}",
-          "taxIdPlaceholder": "Type the {taxId}",
-          "name": "Legal name",
-          "namePlaceholder": "Name or company",
-          "email": "Email",
-          "emailPlaceholder": "billing@customer.com",
-          "city": "City",
-          "cityPlaceholder": "Bogota, CDMX, Lima..."
-        },
-        "validation": {
-          "checking": "Validating with {authority}...",
-          "valid": "Receiver verified by {authority}",
-          "invalid": "Invalid or unregistered identifier",
-          "format": "Expected format: {format}"
-        },
-        "lines": "Document lines",
-        "addLine": "Add line",
-        "removeLine": "Remove",
-        "lineFields": {
-          "description": "Description",
-          "qty": "Qty",
-          "unitPrice": "Unit price",
-          "vatRate": "VAT %",
-          "withholding": "Withh. %"
-        },
-        "summary": "Summary",
-        "subtotal": "Subtotal",
-        "vat": "VAT",
-        "withholding": "Withholding",
-        "ica": "ICA / municipal",
-        "total": "Total to pay",
-        "submit": "Issue document",
-        "submitting": "Signing and sending to {authority}...",
-        "reset": "Reset"
+      "dianDownBanner": "Contingency mode on: the (simulated) DIAN is not responding. Whatever you issue is queued and transmitted when you restore the service in the Contingency tab.",
+      "resolution": "Sample numbering resolution {number} dated {date} · prefix {prefix} from {from} to {to} · next: {next} · {left} numbers left.",
+      "nextNumber": "Next number: {next}.",
+      "emit": {
+        "factura": "Issue invoice",
+        "notaCredito": "Issue credit note",
+        "notaDebito": "Issue debit note",
+        "pos": "Issue POS document"
       },
-      "preview": {
-        "title": "PDF preview",
-        "subtitle": "Graphic representation of the document",
-        "issuer": "Issuer",
-        "issuerName": "Koptup Tech S.A.S.",
-        "issuerTaxId": "900.555.123-4",
-        "receiver": "Receiver",
-        "noReceiver": "Complete the customer details",
-        "docNumber": "Document",
-        "issueDate": "Issue date",
-        "cufeLabel": "Unique identifier",
-        "cufePending": "Awaiting signature",
-        "qrLabel": "Fiscal QR code",
-        "footer": "Document generated by Koptup — demo view"
+      "emitContingency": "Issue in contingency",
+      "clear": "Clear form",
+      "cryptoError": "Your browser did not allow computing the CUFE (Web Crypto). Open the demo over https."
+    },
+    "form": {
+      "frequent": "Frequent customer",
+      "frequentPlaceholder": "Pick a sample customer…",
+      "idType": "ID type",
+      "idTypes": {
+        "NIT": "NIT (tax ID)",
+        "CC": "Citizenship ID card"
       },
-      "result": {
-        "signing": "Signing document with digital certificate",
-        "sending": "Sending to {authority}",
-        "validating": "Validating XML/UBL structure",
-        "accepted": "Accepted by {authority}",
-        "acceptedSub": "The document has been signed and successfully registered.",
-        "uuidLabel": "CUFE / UUID",
-        "downloadPdf": "Download PDF",
-        "downloadXml": "Download XML",
-        "newDoc": "Issue another"
+      "nit": "NIT with check digit",
+      "cc": "ID card number",
+      "nitHelp": "Type the NIT with its check digit, e.g. 901234517-9. The check digit is validated with the DIAN algorithm.",
+      "ccHelp": "6 to 10 digits, no dots.",
+      "nitState": {
+        "empty": "Type the NIT with its check digit.",
+        "ok": "Check digit OK ({dv})",
+        "missingDv": "Check digit missing: it should be {dv}.",
+        "badDv": "Wrong check digit: it should be {dv}.",
+        "short": "Type 8 to 10 digits plus the check digit (e.g. 901234517-9)."
+      },
+      "useDv": "Use check digit {dv}",
+      "nitAutofill": "Frequent customer found: we filled in the company name, email and city.",
+      "name": "Company or person name",
+      "namePlaceholder": "Customer name",
+      "email": "Email to receive the invoice",
+      "city": "City",
+      "cityPlaceholder": "Bogotá D.C.",
+      "retIva": "VAT withholding agent (applies 15% VAT withholding)",
+      "retIca": "Applies ICA withholding",
+      "retIcaRate": "ICA withholding rate per thousand (sample)",
+      "lines": "Lines",
+      "addLine": "Empty line",
+      "addFromCatalog": "Add from catalog…",
+      "noLines": "No lines. Add one from the catalog or an empty line.",
+      "removeLine": "Remove line {n}",
+      "line": {
+        "description": "Description",
+        "descriptionN": "Description of line {n}",
+        "qty": "Quantity",
+        "unitPrice": "Unit price (before VAT)",
+        "tax": "VAT",
+        "rete": "Income tax withholding",
+        "base": "Base"
+      },
+      "paymentForm": "Payment terms",
+      "paymentForms": {
+        "contado": "Cash",
+        "credito": "Credit"
+      },
+      "creditDays": "Term",
+      "daysN": "{n} days",
+      "dueDate": "Due on {date}.",
+      "paymentMethod": "Payment method",
+      "paymentMethods": {
+        "transferencia": "Bank transfer",
+        "efectivo": "Cash",
+        "tarjeta": "Card"
       }
+    },
+    "summary": {
+      "subtotal": "Subtotal",
+      "base": "Base {tax}",
+      "ivaTotal": "Total VAT",
+      "total": "Document total",
+      "retTitle": "Withholdings the buyer would apply (informative)",
+      "retFuente": "Income tax withholding",
+      "retIva": "VAT withholding (15% of VAT)",
+      "retIca": "ICA withholding",
+      "net": "Estimated net to collect",
+      "retNote": "Withholdings are applied by the buyer: they don't reduce the document total. These are reference rates to be adjusted with your accountant."
+    },
+    "issues": {
+      "title": "Before issuing, fix:",
+      "idEmpty": "Type the buyer's NIT or ID card number.",
+      "idShort": "The NIT must have 8 to 10 digits plus the check digit.",
+      "idMissingDv": "Add the NIT check digit (it should be {dv}).",
+      "idBadDv": "The NIT check digit is wrong (it should be {dv}).",
+      "ccInvalid": "The ID card number must have 6 to 10 digits.",
+      "nameEmpty": "Type the company or person name.",
+      "emailInvalid": "Type a valid email to deliver the document.",
+      "noLines": "Add at least one line.",
+      "lineInvalid": "Complete the description, quantity and price of line {n}.",
+      "noRef": "Pick the referenced invoice.",
+      "noConcept": "Pick the note concept.",
+      "noteNoAmount": "Enter the quantities or the amount of the note.",
+      "overBalance": "The credit note exceeds the invoice balance ({balance}).",
+      "overQty": "On line {n} you can return at most {max}.",
+      "voidWithNotes": "This invoice already has credit notes: use a return or a discount for the balance.",
+      "rangeExhausted": "The sample numbering range is used up."
+    },
+    "note": {
+      "helpCredit": "In Colombia an accepted invoice is never deleted or edited: it is corrected with a credit note that references it and stays linked to it.",
+      "helpDebit": "A debit note increases the value of an invoice already issued (interest, charges or value changes) and stays linked to it.",
+      "ref": "Referenced invoice",
+      "refPlaceholder": "Pick an invoice…",
+      "noInvoices": "No accepted invoices to reference",
+      "refOption": "{id} · {client} · balance {balance}",
+      "concept": "Concept",
+      "conceptPlaceholder": "Pick the concept…",
+      "refClient": "Customer: {client}",
+      "refTotal": "Invoice total: {total}",
+      "balance": "Invoice balance: {balance}",
+      "returnTitle": "Quantities returned or not accepted",
+      "returnQtyFor": "Quantity to return of {item}",
+      "available": "available: {n}",
+      "fullVoid": "The whole invoice is credited ({total}). The invoice is not deleted: this credit note brings its balance to zero.",
+      "adjustBase": "Note amount (before VAT)",
+      "adjustTax": "Note VAT",
+      "adjustLine": "{concept} on {ref}",
+      "description": "Reason (shown on the document)",
+      "descriptionPlaceholder": "E.g. three training hours not delivered"
+    },
+    "pos": {
+      "help": "Electronic equivalent document for point-of-sale sales. If the buyer asks for the document with their details, enter them.",
+      "linkPos": "See the POS demo",
+      "finalConsumer": "Final consumer (222222222222)",
+      "withBuyer": "With buyer details"
+    },
+    "phases": {
+      "xml": "UBL 2.1 XML generated",
+      "sign": "Signed with the digital certificate (simulated)",
+      "transmit": "Transmitted to the technology provider (simulated)",
+      "validate": "Validated by the DIAN (simulated)",
+      "deliver": "PDF and XML delivered to the buyer (simulated)",
+      "failed": "The DIAN did not respond (simulated): queued for contingency"
+    },
+    "contingency": {
+      "title": "Contingency: what if the DIAN does not respond?",
+      "text": "You keep invoicing: the document is generated and delivered to the customer, waits in a queue and is transmitted when the service is back, within the deadline set by the regulation.",
+      "tip": "Try it: turn on the simulation, go to “Sales invoice” and issue; come back here and restore the service to transmit the queue.",
+      "toggleOn": "Simulate that the DIAN is not responding",
+      "active": "The (simulated) DIAN is not responding",
+      "restore": "Restore and transmit ({n})",
+      "restoreEmpty": "Restore the service",
+      "transmitPending": "Transmit pending ({n})",
+      "restored": "Service restored (simulated)",
+      "queueTitle": "Contingency queue",
+      "queueEmpty": "No queued documents. Turn on the simulation and issue an invoice to see it here.",
+      "transmitting": "Transmitting…",
+      "done": "{n} documents transmitted and accepted (simulated)"
+    },
+    "success": {
+      "accepted": "{doc} accepted by the DIAN (simulated)",
+      "queued": "{doc} in the contingency queue",
+      "acceptedSub": "PDF and XML delivered to {email} (simulated).",
+      "acceptedNoEmail": "Hand it to the buyer printed or through the channel you prefer.",
+      "queuedSub": "You can already hand it to the customer; it will be transmitted when you restore the service in the Contingency tab.",
+      "cufeLabel": "Sample CUFE (SHA-384)",
+      "cudeLabel": "Sample CUDE (SHA-384)",
+      "cufeNote": "Computed in your browser with the DIAN technical annex formula, fictitious data and a sample technical key (test environment). The QR code is real: scan it to see its data.",
+      "pdf": "Download PDF",
+      "xml": "Download XML",
+      "view": "View details and send",
+      "another": "Issue another document"
+    },
+    "preview": {
+      "title": "Document preview",
+      "subtitle": "This is how the graphic representation (PDF) will look.",
+      "showing": "Showing {id}, just issued.",
+      "customize": "Customize issuer",
+      "issuerExtra": "VAT registered",
+      "buyer": "Buyer",
+      "noBuyer": "Complete the buyer details",
+      "noLines": "No lines",
+      "more": "+ {n} more lines",
+      "qrPending": "Generated when issuing",
+      "qrPendingShort": "QR on issue",
+      "qrAlt": "QR code of document {id}",
+      "footer": "Sample graphic representation generated in the simulator. No tax validity."
+    },
+    "issuer": {
+      "title": "Customize the issuer",
+      "subtitle": "See the demo with your company details: they apply to the preview, the PDF and the XML and are stored only in this browser.",
+      "name": "Company name",
+      "nit": "NIT with check digit",
+      "city": "City",
+      "address": "Address",
+      "email": "Billing email",
+      "phone": "Phone",
+      "prefix": "Invoice prefix",
+      "prefixHelp": "2 to 4 letters. In your project, the prefix of your resolution is used.",
+      "logo": "Logo (PNG or JPG, 300 KB max.)",
+      "logoUpload": "Upload logo",
+      "logoRemove": "Remove logo",
+      "logoAlt": "Issuer logo",
+      "logoTooBig": "The logo is larger than 300 KB.",
+      "logoType": "Use a PNG or JPG image.",
+      "restore": "Use the sample issuer",
+      "save": "Save",
+      "saved": "Issuer updated",
+      "errors": {
+        "name": "Type the company name.",
+        "nit": "Check the NIT and its check digit (it should be {dv}).",
+        "prefix": "The prefix must have 2 to 4 letters.",
+        "email": "Type a valid email."
+      }
+    },
+    "pdf": {
+      "number": "No.",
+      "issued": "Issued",
+      "due": "Due",
+      "payment": "Payment",
+      "sample": "SAMPLE DOCUMENT generated in the KopTup simulator: it was not transmitted to the DIAN and has no tax validity.",
+      "watermark": "SAMPLE",
+      "reference": "Reference: invoice {id} dated {date} (CUFE {cufe})",
+      "concept": "Concept: {concept}",
+      "note": "Reason: {note}",
+      "cols": {
+        "n": "#",
+        "desc": "Description",
+        "qty": "Qty",
+        "unit": "Unit price",
+        "tax": "VAT",
+        "base": "Base"
+      },
+      "retTitle": "Informative withholdings",
+      "resolution": "Sample numbering resolution No. {number} dated {date}, prefix {prefix} from {from} to {to}, valid until {validTo}.",
+      "qrCaption": "Scan to see the data",
+      "footer": "Sample graphic representation generated in your browser. In your project the document is signed and transmitted to the DIAN through an authorized technology provider."
     },
     "documents": {
       "title": "Issued documents",
-      "subtitle": "Full traceability of every document with the fiscal authority.",
+      "subtitle": "Search, filter and sort. Open each document to see its history, download the PDF with QR code and the XML, send it or issue a note against it.",
+      "search": "Search by number, customer or NIT…",
       "filters": {
-        "all": "All",
-        "accepted": "Accepted",
-        "pending": "Pending",
-        "rejected": "Rejected",
-        "voided": "Voided",
-        "search": "Search by number, customer or {taxId}..."
+        "type": "Filter by type",
+        "allTypes": "All types",
+        "status": "Filter by status",
+        "allStatus": "All statuses"
       },
-      "table": {
-        "number": "Number",
-        "client": "Customer",
-        "date": "Date",
-        "amount": "Total",
-        "status": "Status",
-        "actions": "Actions",
-        "resend": "Resend",
-        "pdf": "PDF",
-        "xml": "XML",
-        "void": "Void"
+      "sort": "Sort",
+      "sortOptions": {
+        "newest": "Newest",
+        "oldest": "Oldest",
+        "amountDesc": "Highest amount",
+        "amountAsc": "Lowest amount"
       },
-      "empty": "No documents match these filters."
+      "count": "{n} of {total} documents",
+      "export": "Export CSV",
+      "exportDone": "CSV downloaded with {n} documents",
+      "empty": "No documents match those filters.",
+      "actionsCol": "Actions",
+      "actions": {
+        "view": "View",
+        "credit": "Credit note",
+        "debit": "Debit note",
+        "fix": "Fix and resend"
+      },
+      "refLabel": "Ref. {id}",
+      "cufePending": "Computing the CUFE… try again in a moment.",
+      "downloaded": "{file} downloaded",
+      "downloadError": "The file could not be generated."
+    },
+    "detail": {
+      "issued": "Issued on {date} at {time}",
+      "due": "due on {date}",
+      "rejection": "Rejection reason (simulated): {reason}",
+      "notes": "Linked notes",
+      "noNotes": "No credit or debit notes.",
+      "history": "History",
+      "send": "Send to the customer (simulated)",
+      "channel": "Channel",
+      "channels": {
+        "email": "Email",
+        "whatsapp": "WhatsApp"
+      },
+      "target": "Recipient",
+      "sendButton": "Send",
+      "sendNote": "No message leaves the demo: it is logged in the history. In your project it is sent by email or WhatsApp Business.",
+      "sent": "Sent to {to} (simulated)",
+      "badEmail": "Type a valid email.",
+      "badPhone": "Type a valid mobile number."
+    },
+    "rejection": {
+      "badDv": "the buyer's NIT check digit is wrong (sample validation rule)."
+    },
+    "history": {
+      "xml": "UBL 2.1 XML generated",
+      "signed": "Signed (simulated)",
+      "transmitted": "Transmitted to the DIAN (simulated)",
+      "accepted": "Accepted by the DIAN (simulated)",
+      "rejected": "Rejected by the DIAN (simulated)",
+      "queued": "In the contingency queue: the DIAN was not responding (simulated)",
+      "delivered": "PDF and XML delivered to {detail} (simulated)",
+      "sent": "Resent to {detail} (simulated)",
+      "corrected": "Fixed: {detail}",
+      "noteIssued": "{detail} was issued against this invoice"
+    },
+    "fix": {
+      "title": "Fix and resend {id}",
+      "text": "The (simulated) DIAN rejected the document: {reason} Fix the NIT and transmit it again with the same number.",
+      "nit": "Buyer NIT with check digit",
+      "submit": "Resend (simulated)",
+      "done": "{id} fixed, resent and accepted (simulated)"
     },
     "reception": {
-      "title": "Supplier invoice reception",
-      "subtitle": "Automatic OCR, {taxId} validation, and accounting reconciliation.",
+      "title": "Supplier invoices (RADIAN)",
+      "subtitle": "Your suppliers' invoices arrive as XML with their PDF. Validate them and register the RADIAN events in order: acknowledgment, receipt of goods or services, and acceptance or claim.",
       "stats": {
-        "incoming": "Incoming",
-        "validated": "Validated",
-        "rejected": "Rejected"
+        "pending": "To handle",
+        "accepted": "Accepted",
+        "claimed": "Claimed"
       },
-      "list": {
-        "supplier": "Supplier",
-        "amount": "Amount",
-        "date": "Date",
-        "validations": "Validations",
-        "ocr": "OCR",
-        "taxIdCheck": "{taxId} check",
-        "duplicateCheck": "Duplicate check",
-        "approve": "Approve",
-        "reject": "Reject",
-        "approved": "Approved",
-        "rejectedLabel": "Rejected"
-      }
+      "invoice": "Invoice {number}",
+      "dates": "Issued on {issued} · received on {received}",
+      "amounts": "Base {base} · VAT {iva} · Total {total}",
+      "checks": {
+        "cufe": "96-character CUFE",
+        "nit": "Supplier NIT with valid check digit",
+        "addressed": "Addressed to your NIT",
+        "notAddressed": "Addressed to another NIT ({nit})",
+        "notDuplicate": "Not a duplicate"
+      },
+      "stage": {
+        "new": "New",
+        "acknowledged": "Acknowledged",
+        "received": "Goods or service received",
+        "accepted": "Accepted",
+        "tacit": "Tacit acceptance",
+        "claimed": "Claimed"
+      },
+      "events": {
+        "030": "Acknowledgment of receipt",
+        "031": "Claim",
+        "032": "Receipt of goods or service",
+        "033": "Express acceptance",
+        "034": "Tacit acceptance"
+      },
+      "actions": {
+        "ack": "Acknowledge receipt (030)",
+        "receive": "Goods or service received (032)",
+        "accept": "Accept (033)",
+        "claim": "Claim (031)"
+      },
+      "claimReason": "Claim reason",
+      "claimReasons": {
+        "01": "01 · Document with inconsistencies",
+        "02": "02 · Goods not fully delivered",
+        "03": "03 · Goods partially not delivered",
+        "04": "04 · Service not provided"
+      },
+      "claimConfirm": "Register claim",
+      "deadline": "Deadline to accept or claim: {date} ({n, plural, one {# business day left} other {# business days left}}; if you don't answer, tacit acceptance applies).",
+      "deadlinePassed": "The deadline passed with no claim: tacit acceptance applies.",
+      "suggestClaim": "This invoice is not addressed to your NIT: the right move is to claim it with reason 01.",
+      "closed": "Handling closed",
+      "eventDone": "Event {code} ({name}) registered for {number} (simulated)",
+      "note": "Simulated: in your project the events are registered with the DIAN through the technology provider, and invoices arrive in the reception mailbox."
     },
     "reports": {
-      "title": "Fiscal reports",
-      "subtitle": "Official books ready for submission to the authority.",
+      "title": "Ledgers and reports",
+      "subtitle": "Computed from the documents in this simulation. Download them as CSV (opens in Excel) or PDF.",
       "period": "Period",
-      "months": {
-        "1": "January",
-        "2": "February",
-        "3": "March",
-        "4": "April",
-        "5": "May",
-        "6": "June",
-        "7": "July",
-        "8": "August",
-        "9": "September",
-        "10": "October",
-        "11": "November",
-        "12": "December"
+      "periods": {
+        "2026-08": "August 2026",
+        "2026-09": "September 2026",
+        "2026-10": "October 2026",
+        "all": "August to October 2026"
       },
       "books": {
-        "sales": "Sales book",
-        "purchases": "Purchases book",
+        "sales": "Sales ledger",
+        "purchases": "Purchase ledger",
         "vat": "VAT summary",
-        "withholding": "Applied withholdings"
+        "withholding": "Withholdings (informative)"
       },
-      "totalDocs": "documents",
-      "totalAmount": "Total amount",
-      "export": "Export",
-      "formats": {
-        "pdf": "PDF",
-        "excel": "Excel",
-        "xml": "XML"
-      }
+      "files": {
+        "sales": "sales-ledger",
+        "purchases": "purchase-ledger",
+        "vat": "vat-summary",
+        "withholding": "withholdings"
+      },
+      "notes": {
+        "sales": "Invoices, POS documents and debit notes add up; credit notes subtract. Rejected documents are excluded.",
+        "purchases": "Supplier invoices in the period; claimed ones are excluded.",
+        "vat": "Estimated summary to review with your accountant; it does not replace the tax return.",
+        "withholding": "Withholdings your customers would apply according to the reference rates."
+      },
+      "cols": {
+        "date": "Date",
+        "doc": "Document",
+        "type": "Type",
+        "client": "Customer",
+        "supplier": "Supplier",
+        "nit": "NIT",
+        "concept": "Concept",
+        "base": "Base",
+        "iva": "VAT",
+        "total": "Total",
+        "status": "Status",
+        "ref": "Reference",
+        "retFuente": "Income tax w/h",
+        "retIva": "VAT w/h",
+        "retIca": "ICA w/h"
+      },
+      "vat": {
+        "generated19": "VAT charged 19%",
+        "generated5": "VAT charged 5%",
+        "exempt": "Exempt sales",
+        "excluded": "Excluded or non-taxed sales",
+        "creditNotes": "Credit notes (subtract)",
+        "debitNotes": "Debit notes (add)",
+        "deductible": "Deductible VAT on purchases",
+        "balance": "Estimated VAT balance"
+      },
+      "csv": "CSV (Excel)",
+      "rows": "{n} records",
+      "empty": "No activity in the period.",
+      "totalRow": "Total",
+      "downloaded": "{file} downloaded",
+      "pdfSample": "Sample data from the KopTup simulator. Not an official report."
     },
     "api": {
-      "title": "API and SDKs",
-      "subtitle": "Integrate Koptup into your ERP, e-commerce or POS in minutes.",
-      "languages": {
-        "ts": "TypeScript",
-        "python": "Python",
-        "go": "Go"
+      "title": "API to connect your system",
+      "badge": "Reference design",
+      "subtitle": "This is how your e-commerce, ERP or POS integrates: your system sends the sale and receives the status by webhook. This API is built in your project; it is not a public service available today.",
+      "tabs": {
+        "request": "Request",
+        "response": "Response",
+        "webhook": "Webhook"
       },
-      "endpoints": "Featured endpoints",
+      "live": "The request is built from what you have in the issuing form.",
+      "copy": "Copy",
+      "copied": "Copied to the clipboard",
+      "copyError": "Your browser did not allow copying. Select the text and copy it.",
+      "endpoints": "Endpoints",
       "webhooks": "Webhook events",
-      "webhookEvents": {
-        "accepted": "invoice.accepted — document accepted by the authority",
-        "rejected": "invoice.rejected — document rejected, see reason",
-        "received": "invoice.received — you received a supplier document",
-        "void": "invoice.voided — a document was voided",
-        "credit": "credit_note.issued — a linked credit note was issued"
+      "endpointDesc": {
+        "invoices": "Issue a sales invoice",
+        "creditNotes": "Issue a credit note",
+        "debitNotes": "Issue a debit note",
+        "pos": "Issue a POS equivalent document",
+        "status": "Get status and CUFE",
+        "pdf": "Download the graphic representation",
+        "xml": "Download the XML",
+        "reception": "List supplier invoices",
+        "events": "Register a RADIAN event",
+        "reports": "Sales ledger for the period"
+      },
+      "webhookDesc": {
+        "invoice_accepted": "The document was accepted by the DIAN.",
+        "invoice_rejected": "The document was rejected; includes the failed rule.",
+        "credit_note_issued": "A credit note linked to an invoice was issued.",
+        "debit_note_issued": "A debit note linked to an invoice was issued.",
+        "reception_received": "A supplier invoice arrived.",
+        "reception_event_registered": "A RADIAN event was registered."
       }
     },
-    "whiteLabel": {
-      "title": "White-label resellers",
-      "subtitle": "Resell the platform under your brand, domain, and theme.",
-      "toggle": "White-label mode active",
-      "toggleOff": "Enable the mode to manage your brands",
-      "addBrand": "New brand",
-      "brands": {
-        "domain": "Domain",
-        "clients": "Customers",
-        "monthlyDocs": "Docs/month",
-        "status": "Status",
-        "active": "Active",
-        "trial": "Trial"
+    "project": {
+      "title": "What gets built in your project",
+      "subtitle": "What this demo simulates and how it works in production.",
+      "items": {
+        "provider": {
+          "title": "Transmission to the DIAN",
+          "text": "Through a partner authorized technology provider or your own software enabled with the DIAN. KopTup is not an authorized technology provider."
+        },
+        "signature": {
+          "title": "Digital signature",
+          "text": "With your company's signing certificate or the technology provider's."
+        },
+        "integration": {
+          "title": "Integration with your system",
+          "text": "Your e-commerce, ERP, POS or healthcare software issues through the API, and your customer gets the PDF and XML by email or WhatsApp."
+        },
+        "storage": {
+          "title": "Retention",
+          "text": "XML and PDF files are kept for the period required by Colombian regulations, with backups; storage and encryption are configured during implementation."
+        },
+        "countries": {
+          "title": "Other countries",
+          "text": "Mexico, Peru and Chile are quoted separately (Advanced plan). This simulator shows Colombia only."
+        }
       }
-    },
-    "storage": {
-      "title": "Legal storage",
-      "subtitle": "Every country requires a minimum custody period.",
-      "yearsLabel": "years required",
-      "storedDocs": "documents in custody",
-      "encrypted": "AES-256 encryption",
-      "immutable": "Immutable storage",
-      "audit": "Audit ready"
     }
   }
 }

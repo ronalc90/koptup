@@ -1,162 +1,76 @@
 'use client';
 
 /**
- * EmbedCode — columna derecha del Builder.
- *
- * Genera el snippet de embed según la pestaña elegida y permite copiarlo
- * al portapapeles. Muestra un toast efímero al copiar.
+ * EmbedCode — código para insertar el bot en otro sitio. Solo ofrece lo que
+ * existe y funciona:
+ *  - Script: `/widget.js` (apps/web/public/widget.js) con `data-bot-id`,
+ *    `data-color` y `data-position`: inserta un botón flotante y el iframe
+ *    del chat.
+ *  - Iframe: la página pública `/embed/chatbot/<id>`.
  */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import {
-  ClipboardDocumentIcon,
-  CheckIcon,
-} from '@heroicons/react/24/outline';
+import { ClipboardDocumentIcon, CheckIcon } from '@heroicons/react/24/outline';
 
-import { SITE_URL } from '@/lib/site';
-import type { BuilderWidgetConfig, EmbedTabKey } from './widgetConfig';
+import type { BuilderWidgetConfig } from './widgetConfig';
+import { escapeAttr } from './widgetConfig';
+
+type EmbedTabKey = 'script' | 'iframe';
+const TABS: readonly EmbedTabKey[] = ['script', 'iframe'];
 
 interface EmbedCodeProps {
   config: BuilderWidgetConfig;
-  /** Cuando hay un botId persistido, los snippets usan URLs reales. */
   botId: string | null;
+  origin: string;
 }
 
-const TABS: readonly EmbedTabKey[] = ['script', 'iframe', 'react', 'webhook'];
-
-function buildSnippet(
-  tab: EmbedTabKey,
-  c: BuilderWidgetConfig,
-  effectiveBotId: string,
-): string {
-  const cfg = {
-    botId: effectiveBotId,
-    botName: c.botName,
-    primaryColor: c.primaryColor,
-    position: c.position,
-    avatar: c.avatar,
-    welcome: c.welcome,
-    tone: c.tone,
-    languages: c.languages,
-  };
-
-  const iframeSrc = `${SITE_URL}/embed/chatbot/${effectiveBotId}`;
-  const webhookUrl = `${SITE_URL}/api/chatbot/bots/${effectiveBotId}/webhook`;
-
-  switch (tab) {
-    case 'script':
-      return [
-        '<!-- Koptup chatbot widget -->',
-        '<script>',
-        `  window.KoptupChatbot = ${JSON.stringify(cfg, null, 2).replace(/\n/g, '\n  ')};`,
-        '  (function(){',
-        '    var f = document.createElement("iframe");',
-        `    f.src = "${iframeSrc}";`,
-        '    f.title = window.KoptupChatbot.botName;',
-        '    f.style.cssText = "position:fixed;bottom:20px;right:20px;width:380px;height:600px;border:none;z-index:2147483647;background:transparent";',
-        '    f.allow = "microphone; clipboard-write";',
-        '    document.body.appendChild(f);',
-        '  })();',
-        '</script>',
-        `<script src="https://cdn.koptup.com/widget.js?bot=${effectiveBotId}" async></script>`,
-      ].join('\n');
-
-    case 'iframe':
-      return [
-        '<iframe',
-        `  src="${iframeSrc}"`,
-        '  width="380"',
-        '  height="600"',
-        '  frameborder="0"',
-        `  title="${c.botName}"`,
-        '  allow="microphone"',
-        '  style="position:fixed;bottom:20px;right:20px;border:none;background:transparent;z-index:2147483647"',
-        '></iframe>',
-      ].join('\n');
-
-    case 'react':
-      return [
-        "import { KopTupChatbot } from '@koptup/widget-react';",
-        '',
-        'export default function App() {',
-        '  return (',
-        '    <KopTupChatbot',
-        `      botId="${effectiveBotId}"`,
-        `      primaryColor="${c.primaryColor}"`,
-        `      position="${c.position}"`,
-        `      avatar="${c.avatar}"`,
-        `      welcome={${JSON.stringify(c.welcome)}}`,
-        `      tone="${c.tone}"`,
-        `      languages={${JSON.stringify(c.languages)}}`,
-        '    />',
-        '  );',
-        '}',
-      ].join('\n');
-
-    case 'webhook':
-    default:
-      return [
-        `# Webhook URL para ${c.botName}`,
-        `POST ${webhookUrl}`,
-        '',
-        '# Headers',
-        'Content-Type: application/json',
-        '',
-        '# Body de ejemplo',
-        JSON.stringify(
-          {
-            message: 'Hola, ¿cuál es el horario de atención?',
-            history: [],
-          },
-          null,
-          2,
-        ),
-        '',
-        '# Respuesta',
-        '# { "botId": "...", "reply": "...", "sources": [...] }',
-      ].join('\n');
+export function buildSnippet(tab: EmbedTabKey, c: BuilderWidgetConfig, botId: string, origin: string): string {
+  if (tab === 'script') {
+    return [
+      '<script',
+      `  src="${escapeAttr(origin)}/widget.js"`,
+      `  data-bot-id="${escapeAttr(botId)}"`,
+      `  data-color="${escapeAttr(c.primaryColor)}"`,
+      `  data-position="${escapeAttr(c.position)}"`,
+      '  async',
+      '></script>',
+    ].join('\n');
   }
+  return [
+    '<iframe',
+    `  src="${escapeAttr(origin)}/embed/chatbot/${encodeURIComponent(botId)}"`,
+    `  title="${escapeAttr(c.botName)}"`,
+    '  width="380"',
+    '  height="600"',
+    '  style="border:0;border-radius:16px;max-width:100%"',
+    '  loading="lazy"',
+    '></iframe>',
+  ].join('\n');
 }
 
-/**
- * Coloreo "casual" del snippet: tags HTML/JSX, strings y comentarios.
- * No es un highlighter real; sólo un toque de UX.
- */
-function highlight(snippet: string): React.ReactNode {
-  const lines = snippet.split('\n');
-  return lines.map((line, idx) => {
-    const isComment = /^\s*(\/\/|#|<!--)/.test(line);
-    return (
-      <div
-        key={idx}
-        className={isComment ? 'text-secondary-500 dark:text-secondary-500' : ''}
-      >
-        {line.length === 0 ? ' ' : line}
-      </div>
-    );
-  });
-}
-
-export default function EmbedCode({ config, botId }: EmbedCodeProps) {
-  const t = useTranslations('demoChatbot.builder');
-  const [tab, setTab] = useState<EmbedTabKey>('iframe');
+export default function EmbedCode({ config, botId, origin }: EmbedCodeProps) {
+  const t = useTranslations('demoChatbot.builder.embed');
+  const [tab, setTab] = useState<EmbedTabKey>('script');
   const [copied, setCopied] = useState(false);
 
-  const effectiveBotId = botId ?? config.botId;
-  const snippet = useMemo(
-    () => buildSnippet(tab, config, effectiveBotId),
-    [tab, config, effectiveBotId],
-  );
+  const snippet = useMemo(() => (botId ? buildSnippet(tab, config, botId, origin) : ''), [tab, config, botId, origin]);
 
   const onCopy = useCallback(async () => {
+    if (!snippet) return;
     try {
-      if (typeof navigator !== 'undefined' && navigator.clipboard) {
-        await navigator.clipboard.writeText(snippet);
-      }
+      await navigator.clipboard.writeText(snippet);
       setCopied(true);
     } catch {
-      setCopied(true);
+      // Sin permiso de portapapeles: seleccionamos el texto para copiarlo a mano.
+      const pre = document.getElementById('chatbot-embed-snippet');
+      const range = document.createRange();
+      if (pre) {
+        range.selectNodeContents(pre);
+        const sel = window.getSelection();
+        sel?.removeAllRanges();
+        sel?.addRange(range);
+      }
     }
   }, [snippet]);
 
@@ -167,20 +81,16 @@ export default function EmbedCode({ config, botId }: EmbedCodeProps) {
   }, [copied]);
 
   return (
-    <div className="flex h-full flex-col rounded-lg border border-secondary-200 bg-white shadow-sm dark:border-secondary-800 dark:bg-secondary-900">
+    <div className="flex flex-col rounded-lg border border-secondary-200 bg-white shadow-sm dark:border-secondary-800 dark:bg-secondary-900">
       <header className="border-b border-secondary-200 px-4 py-3 dark:border-secondary-800">
-        <h3 className="text-sm font-bold text-secondary-900 dark:text-white">
-          {t('embed.title')}
-        </h3>
-        <p className="text-[11px] text-secondary-500 dark:text-secondary-400">
-          {t('embed.subtitle')}
-        </p>
+        <h3 className="text-sm font-bold text-secondary-900 dark:text-white">{t('title')}</h3>
+        <p className="text-[11px] text-secondary-500 dark:text-secondary-400">{t('subtitle')}</p>
       </header>
 
-      {/* Tabs */}
       <div
-        className="flex gap-0.5 border-b border-secondary-200 bg-secondary-50 px-2 pt-2 dark:border-secondary-800 dark:bg-secondary-950"
+        className="flex flex-wrap gap-0.5 border-b border-secondary-200 bg-secondary-50 px-2 pt-2 dark:border-secondary-800 dark:bg-secondary-950"
         role="tablist"
+        aria-label={t('title')}
       >
         {TABS.map((tk) => {
           const active = tab === tk;
@@ -197,55 +107,55 @@ export default function EmbedCode({ config, botId }: EmbedCodeProps) {
                   : 'text-secondary-500 hover:text-secondary-700 dark:text-secondary-400 dark:hover:text-secondary-200'
               }`}
             >
-              {t(`embed.tabs.${tk}`)}
+              {t(`tabs.${tk}`)}
             </button>
           );
         })}
       </div>
 
-      <div className="relative flex-1 overflow-hidden p-3">
-        <pre className="h-full overflow-auto rounded-md bg-secondary-950 p-3 font-mono text-[11px] leading-relaxed text-secondary-100">
-          <code>{highlight(snippet)}</code>
-        </pre>
-
-        <button
-          type="button"
-          onClick={onCopy}
-          className="absolute right-5 top-5 flex items-center gap-1 rounded-md bg-secondary-800/90 px-2 py-1 text-[11px] font-medium text-white shadow ring-1 ring-white/10 hover:bg-secondary-700"
-          aria-label={t('embed.copy')}
-        >
-          {copied ? (
-            <>
-              <CheckIcon className="h-3.5 w-3.5" />
-              {t('embed.copied')}
-            </>
-          ) : (
-            <>
-              <ClipboardDocumentIcon className="h-3.5 w-3.5" />
-              {t('embed.copy')}
-            </>
-          )}
-        </button>
-
-        {copied ? (
-          <div
-            role="status"
-            aria-live="polite"
-            className="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-emerald-600 px-3 py-1 text-[11px] font-semibold text-white shadow-lg"
-          >
-            {t('embed.copied')}
-          </div>
-        ) : null}
+      <div className="relative p-3">
+        {botId ? (
+          <>
+            <pre
+              id="chatbot-embed-snippet"
+              className="max-h-64 overflow-auto rounded-md bg-secondary-950 p-3 pr-20 font-mono text-[11px] leading-relaxed text-secondary-100"
+            >
+              <code>{snippet}</code>
+            </pre>
+            <button
+              type="button"
+              onClick={onCopy}
+              className="absolute right-5 top-5 flex items-center gap-1 rounded-md bg-secondary-800/90 px-2 py-1 text-[11px] font-medium text-white shadow ring-1 ring-white/10 hover:bg-secondary-700"
+            >
+              {copied ? <CheckIcon className="h-3.5 w-3.5" /> : <ClipboardDocumentIcon className="h-3.5 w-3.5" />}
+              {copied ? t('copied') : t('copy')}
+            </button>
+            {copied ? (
+              <span role="status" className="sr-only">
+                {t('copied')}
+              </span>
+            ) : null}
+            <p className="mt-2 text-[10.5px] leading-snug text-secondary-500 dark:text-secondary-400">
+              {tab === 'script' ? t('scriptHelp') : t('iframeHelp')}
+            </p>
+            <p className="mt-1 text-[10.5px] leading-snug text-secondary-500 dark:text-secondary-400">
+              {t('cspNote', { origin })}
+            </p>
+          </>
+        ) : (
+          <p className="rounded-md border border-dashed border-secondary-300 px-3 py-6 text-center text-xs text-secondary-500 dark:border-secondary-700 dark:text-secondary-400">
+            {t('saveFirst')}
+          </p>
+        )}
       </div>
 
-      <footer className="flex items-center justify-between gap-2 border-t border-secondary-200 px-3 py-2 text-[10px] text-secondary-500 dark:border-secondary-800 dark:text-secondary-400">
-        <span className="truncate">
-          {t('embed.botId')}: <span className="font-mono">{effectiveBotId}</span>
-        </span>
-        <span className="font-mono">
-          {!botId ? t('embed.saveFirst') : tab === 'webhook' ? t('embed.webhookTitle') : null}
-        </span>
-      </footer>
+      {botId ? (
+        <footer className="border-t border-secondary-200 px-3 py-2 text-[10px] text-secondary-500 dark:border-secondary-800 dark:text-secondary-400">
+          <span className="break-all">
+            {t('botId')}: <span className="font-mono">{botId}</span>
+          </span>
+        </footer>
+      ) : null}
     </div>
   );
 }

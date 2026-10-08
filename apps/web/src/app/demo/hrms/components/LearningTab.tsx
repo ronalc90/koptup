@@ -1,104 +1,136 @@
 'use client';
 
+import { useState } from 'react';
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { AcademicCapIcon } from '@heroicons/react/24/outline';
+import toast from 'react-hot-toast';
+import { AcademicCapIcon, ArrowDownTrayIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
+import { diffDays } from '../lib/dates';
+import { csv, download } from '../lib/payroll';
+import { useHr } from '../lib/store';
+import type { Course } from '../lib/types';
+import { Progress, SectionTitle, Stat, TabIntro, btn, useFmt, usePos } from './ui';
 
-type CourseStatus = 'completed' | 'inProgress' | 'overdue' | 'notStarted';
+type CourseState = 'done' | 'late' | 'soon' | 'onTrack';
 
-interface Course {
-  name: string;
-  duration: string;
-  progress: number;
-  status: CourseStatus;
-  due: string;
+export function courseState(c: Course, base: string, activeIds: Set<string>): { state: CourseState; assigned: number; completed: number; pending: string[] } {
+  const assigned = c.assigned.filter((id) => activeIds.has(id));
+  const completed = c.completed.filter((id) => activeIds.has(id));
+  const pending = assigned.filter((id) => !completed.includes(id));
+  const state: CourseState = pending.length === 0 ? 'done' : c.due < base ? 'late' : diffDays(base, c.due) <= 15 ? 'soon' : 'onTrack';
+  return { state, assigned: assigned.length, completed: completed.length, pending };
 }
 
-const sections: { key: string; courses: Course[] }[] = [
-  {
-    key: 'mandatory',
-    courses: [
-      { name: 'Código de Ética 2026', duration: '45 min', progress: 100, status: 'completed', due: '2026-04-30' },
-      { name: 'Prevención Acoso Laboral', duration: '60 min', progress: 100, status: 'completed', due: '2026-04-30' },
-      { name: 'Ciberseguridad básica', duration: '30 min', progress: 35, status: 'inProgress', due: '2026-06-15' },
-      { name: 'PESV (CO)', duration: '90 min', progress: 0, status: 'overdue', due: '2026-04-30' },
-    ],
-  },
-  {
-    key: 'recommended',
-    courses: [
-      { name: 'Liderazgo situacional', duration: '4 hrs', progress: 60, status: 'inProgress', due: '2026-08-31' },
-      { name: 'Feedback radical', duration: '2 hrs', progress: 0, status: 'notStarted', due: '2026-09-30' },
-      { name: 'TypeScript avanzado', duration: '8 hrs', progress: 22, status: 'inProgress', due: '2026-10-31' },
-    ],
-  },
-  {
-    key: 'compliance',
-    courses: [
-      { name: 'SAGRILAFT', duration: '60 min', progress: 100, status: 'completed', due: '2026-04-30' },
-      { name: 'Protección de datos', duration: '45 min', progress: 80, status: 'inProgress', due: '2026-06-30' },
-    ],
-  },
-];
-
-function statusVariant(s: CourseStatus): 'success' | 'warning' | 'danger' | 'default' {
-  if (s === 'completed') return 'success';
-  if (s === 'inProgress') return 'warning';
-  if (s === 'overdue') return 'danger';
-  return 'default';
-}
+const variant: Record<CourseState, 'success' | 'danger' | 'warning' | 'info'> = { done: 'success', late: 'danger', soon: 'warning', onTrack: 'info' };
 
 export default function LearningTab() {
-  const t = useTranslations('demoHrms');
+  const t = useTranslations('demoHrms.learning');
+  const tc = useTranslations('demoHrms.courses');
+  const pos = usePos();
+  const { state, dispatch, openProfile } = useHr();
+  const f = useFmt();
+  const [open, setOpen] = useState<string | null>(null);
+  const activeIds = new Set(state.employees.filter((e) => e.status !== 'retired').map((e) => e.id));
+  const byId = new Map(state.employees.map((e) => [e.id, e]));
+  const rows = state.courses.map((c) => ({ c, ...courseState(c, state.baseDate, activeIds) }));
+  const assigned = rows.reduce((a, r) => a + r.assigned, 0);
+  const completed = rows.reduce((a, r) => a + r.completed, 0);
+  const late = rows.filter((r) => r.state === 'late');
+
+  const exportCsv = () => {
+    const out: (string | number)[][] = [[t('csv.course'), t('csv.name'), t('csv.position'), t('csv.status'), t('csv.due')]];
+    rows.forEach(({ c }) => c.assigned.filter((id) => activeIds.has(id)).forEach((id) => {
+      const e = byId.get(id)!;
+      out.push([tc(c.id), e.name, pos(e), c.completed.includes(id) ? t('csv.done') : t('csv.pending'), c.due]);
+    }));
+    download(`plan-formacion-${state.baseDate}.csv`, csv(out));
+    toast.success(t('exported', { n: out.length - 1 }));
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-bold text-secondary-900 dark:text-white">{t('learning.title')}</h2>
-        <p className="text-secondary-600 dark:text-secondary-400 text-sm">{t('learning.subtitle')}</p>
+      <TabIntro title={t('title')} subtitle={t('subtitle')} />
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Stat label={t('stat.compliance')} value={f.pct((completed / Math.max(1, assigned)) * 100)} sub={t('stat.complianceSub', { done: completed, total: assigned })} />
+        <Stat label={t('stat.courses')} value={state.courses.length} sub={t('stat.coursesSub')} />
+        <Stat label={t('stat.late')} value={late.length} sub={t('stat.lateSub', { n: late.reduce((a, r) => a + r.pending.length, 0) })} />
+        <Stat label={t('stat.hours')} value={f.int(rows.reduce((a, r) => a + r.c.hours * r.completed, 0))} sub={t('stat.hoursSub')} />
       </div>
 
-      {sections.map((section) => (
-        <Card key={section.key} variant="bordered">
-          <h3 className="font-bold text-secondary-900 dark:text-white mb-4">{t(`learning.${section.key}`)}</h3>
-          <div className="space-y-3">
-            {section.courses.map((c) => (
-              <div key={c.name} className="p-3 rounded-lg bg-secondary-50 dark:bg-secondary-800">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex items-start gap-2 min-w-0 flex-1">
-                    <AcademicCapIcon className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
+      <Card variant="bordered">
+        <SectionTitle
+          title={t('plan')}
+          subtitle={t('planSub')}
+          action={
+            <>
+              <button type="button" className={btn.outline} onClick={exportCsv}><ArrowDownTrayIcon className="w-4 h-4" />CSV</button>
+              <Link href="/demo/lms" className={btn.outline}>
+                <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+                {t('openLms')}
+              </Link>
+            </>
+          }
+        />
+        <ul className="space-y-3">
+          {rows.map(({ c, state: st, assigned: a, completed: d, pending }) => {
+            const pct = (d / Math.max(1, a)) * 100;
+            return (
+              <li key={c.id} className="p-3 rounded-lg bg-secondary-50 dark:bg-secondary-800">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
+                  <div className="flex items-start gap-2 min-w-0">
+                    <AcademicCapIcon className="w-5 h-5 text-violet-600 shrink-0 mt-0.5" />
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-secondary-900 dark:text-white">{c.name}</p>
-                      <p className="text-xs text-secondary-500">
-                        {c.duration} · {t('learning.due')}: {c.due}
-                      </p>
+                      <p className="text-sm font-semibold text-secondary-900 dark:text-white">{tc(c.id)}</p>
+                      <p className="text-xs text-secondary-500">{t('meta', { hours: c.hours, date: f.date(c.due), audience: t(`audience.${c.id}`) })}</p>
                     </div>
                   </div>
-                  <Badge variant={statusVariant(c.status)} size="sm">
-                    {t(`learning.${c.status}`)}
-                  </Badge>
+                  <Badge variant={variant[st]} size="sm">{t(`state.${st}`)}</Badge>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 h-1.5 bg-secondary-200 dark:bg-secondary-700 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full ${c.status === 'overdue' ? 'bg-red-500' : 'bg-primary-600'}`}
-                      style={{ width: `${c.progress}%` }}
-                    />
-                  </div>
-                  <span className="text-xs font-semibold text-secondary-700 dark:text-secondary-300 w-10 text-right">
-                    {c.progress}%
-                  </span>
-                  {c.status !== 'completed' && (
-                    <button className="text-xs font-medium text-primary-600 hover:underline">
-                      {t('learning.start')}
-                    </button>
-                  )}
+                  <div className="flex-1"><Progress value={pct} tone={st === 'late' ? 'red' : st === 'done' ? 'emerald' : 'violet'} /></div>
+                  <span className="text-xs font-semibold w-20 text-right">{d}/{a}</span>
                 </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-      ))}
+                {pending.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-2 mt-2">
+                    <button type="button" className={btn.small} onClick={() => setOpen(open === c.id ? null : c.id)} aria-expanded={open === c.id}>
+                      {open === c.id ? t('hidePending') : t('showPending', { n: pending.length })}
+                    </button>
+                    {c.remindedOn === state.baseDate ? (
+                      <span className="text-xs text-emerald-700 dark:text-emerald-300">{t('reminded')}</span>
+                    ) : (
+                      <button
+                        type="button"
+                        className={btn.small}
+                        onClick={() => {
+                          dispatch({ type: 'course.remind', id: c.id });
+                          toast.success(t('remindedToast', { n: pending.length }));
+                        }}
+                      >
+                        {t('remind')}
+                      </button>
+                    )}
+                  </div>
+                )}
+                {open === c.id && (
+                  <ul className="mt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
+                    {pending.map((id) => (
+                      <li key={id}>
+                        <button type="button" onClick={() => openProfile(id)} className="text-xs text-violet-700 dark:text-violet-300 hover:underline text-left">
+                          {byId.get(id)?.name}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+        <p className="text-[11px] text-secondary-500 mt-3">{t('note')}</p>
+      </Card>
     </div>
   );
 }

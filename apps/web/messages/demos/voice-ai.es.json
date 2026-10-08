@@ -1,243 +1,790 @@
 {
   "demoVoice": {
-    "pageTitle": "Voice AI / Call Center con IA",
-    "pageSubtitle": "Cockpit de voz: agente conversacional, transcripción en vivo, sentiment, function calling, campañas outbound y handoff a humano.",
-    "back": "Volver a demos",
-    "status": {
-      "live": "EN VIVO",
-      "connected": "Conectado",
-      "ringing": "Llamando",
-      "ended": "Finalizada"
+    "meta": {
+      "title": "Demo de agente de voz con IA para call center",
+      "description": "Demo interactiva con datos de ejemplo: escucha cuatro llamadas en español (banca, salud, cobranza y pedidos) con la voz de tu navegador, transcripción sincronizada y enmascarada, intención, sentimiento, acciones simuladas del agente, transferencia a un asesor con contexto, campaña saliente con horarios de contacto y métricas calculadas.",
+      "breadcrumbHome": "Inicio",
+      "breadcrumbDemos": "Demos",
+      "breadcrumbName": "Agente de voz con IA"
+    },
+    "header": {
+      "back": "Volver a demos",
+      "title": "Agente de voz con IA para call center",
+      "subtitle": "Escucha llamadas de ejemplo de un agente de voz: transcripción, intención, sentimiento, acciones del agente y transferencia a un asesor con todo el contexto.",
+      "sampleBadge": "Datos de ejemplo",
+      "scriptBadge": "Llamadas con guion",
+      "requestDemo": "Solicitar demo con tu guion",
+      "reset": "Restablecer",
+      "resetHint": "Borra tus llamadas de prueba, la personalización y la campaña simulada",
+      "resetDone": "Demo restablecida."
+    },
+    "picker": {
+      "title": "1. Elige un escenario",
+      "subtitle": "Cada escenario es una llamada completa con guion fijo: siempre suena y se ve igual.",
+      "turns": "{count} turnos",
+      "selected": "Seleccionado",
+      "personalizeTitle": "Escucha cómo sonaría con tu empresa",
+      "company": "Nombre de tu empresa",
+      "companyPlaceholder": "Ej.: Mi Empresa S.A.S.",
+      "agent": "Nombre del agente",
+      "agentPlaceholder": "Sofía",
+      "personalizeHint": "Se usa en el saludo de la llamada. Se guarda solo en este navegador."
+    },
+    "direction": {
+      "inbound": "Entrante",
+      "outbound": "Saliente"
     },
     "call": {
-      "title": "Llamada activa",
-      "agentName": "Aurora · Agente IA",
-      "agentRole": "Voicebot empresarial",
-      "customer": "Cliente",
-      "duration": "Duración",
+      "title": "2. Escucha la llamada",
+      "status": {
+        "idle": "Lista para iniciar",
+        "playing": "En curso",
+        "paused": "En pausa",
+        "transferred": "Transferida a un asesor",
+        "ended": "Finalizada"
+      },
       "channel": "Canal",
-      "channelInbound": "Entrante",
-      "channelOutbound": "Saliente",
-      "barge": "Barge-in activado",
-      "recording": "Esta llamada está siendo grabada · Aviso reproducido",
+      "number": "Número",
+      "duration": "Duración",
+      "agentRole": "Agente de voz con IA · {company}",
+      "speakingAgent": "Habla {agent}",
+      "speakingCustomer": "Habla el cliente",
+      "silent": "Sin voz en este momento",
+      "waveform": "Actividad de voz (ilustrativa)",
+      "recording": "Aviso de grabación y tratamiento de datos al inicio de la llamada (Ley 1581 de 2012)",
       "controls": {
-        "mute": "Silenciar",
-        "unmute": "Activar audio",
-        "hold": "Retener",
+        "start": "Iniciar llamada",
+        "pause": "Pausar",
         "resume": "Reanudar",
-        "transfer": "Transferir",
+        "voiceOn": "Voz activada",
+        "voiceOff": "Voz silenciada",
+        "transfer": "Transferir a un asesor",
         "hangup": "Colgar",
-        "start": "Simular llamada",
-        "stop": "Detener simulación"
+        "restart": "Repetir llamada",
+        "skip": "Saltar al final",
+        "speed": "Velocidad",
+        "voiceUnavailable": "Voz no disponible"
+      },
+      "voice": {
+        "available": "Escuchas la voz sintetizada de tu navegador ({voice}). En tu proyecto se usa una voz neural en español colombiano de un proveedor de voz (TTS).",
+        "unavailable": "Tu navegador no tiene voces en español instaladas: la llamada avanza solo con la transcripción.",
+        "unsupported": "Tu navegador no permite síntesis de voz: la llamada avanza solo con la transcripción.",
+        "muted": "Voz silenciada: la llamada avanza solo con la transcripción."
       }
     },
     "transcript": {
-      "title": "Transcripción en vivo",
-      "subtitle": "Diarización turno a turno · STT streaming",
-      "you": "Cliente",
-      "ai": "Aurora IA",
-      "human": "Agente humano",
-      "latency": "Latencia STT",
-      "ms": "ms",
-      "good": "óptima",
-      "warn": "alta",
-      "redacted": "PCI redactado",
-      "redactedHint": "Datos sensibles eliminados antes de almacenar",
-      "codeSwitch": "Code-switching ES/EN detectado",
-      "empty": "Inicia la simulación para ver la transcripción."
-    },
-    "turns": {
-      "t1": "Hola, llamo porque mi tarjeta terminada en {card} fue rechazada en una compra.",
-      "t2": "Hola, soy Aurora. Lamento el inconveniente. Ya verifiqué tu cuenta: la transacción fue bloqueada por nuestro sistema de fraude porque ocurrió fuera del país habitual.",
-      "t3": "Ah, sí. Estoy de viaje en Lima hasta el viernes. ¿Puede desbloquearla?",
-      "t4": "Claro. Voy a registrar tu viaje en el sistema y autorizar transacciones desde Perú hasta el 30 de mayo. Could you confirm your full name, please?",
-      "t5": "Ronald Coronel, RUT 18.234.567-9.",
-      "t6": "Perfecto Ronald. Confirmado: notificación de viaje registrada y tarjeta habilitada. ¿Necesitas algo más?",
-      "t7": "También quería agendar una cita con un asesor para hablar de inversiones.",
-      "t8": "Te agendé el martes 20 a las 10:00 con Mariana Soto. Te llegará confirmación por SMS."
+      "title": "Transcripción",
+      "subtitle": "Sincronizada con la llamada · los datos sensibles se enmascaran antes de guardarse",
+      "empty": "Pulsa «Iniciar llamada» para empezar.",
+      "ai": "{agent} (IA)",
+      "customer": "Cliente",
+      "masked": "Dato enmascarado",
+      "notice": "Aviso de grabación",
+      "speaking": "hablando",
+      "transferredManual": "Transferiste la llamada a {human} ({team}) con el resumen de la conversación.",
+      "transferredAuto": "El agente transfirió la llamada a {human} ({team}) con el resumen de la conversación.",
+      "hungUp": "La llamada se colgó antes de terminar.",
+      "download": "Descargar transcripción (.txt)",
+      "fileHeader": "Transcripción de ejemplo · {scenario} · {company}",
+      "fileNote": "Datos de ejemplo. Los datos sensibles aparecen enmascarados.",
+      "aiShort": "IA",
+      "customerShort": "C",
+      "fileName": "transcripcion-{scenario}.txt"
     },
     "sentiment": {
-      "title": "Sentiment en vivo",
-      "subtitle": "Análisis emocional turno a turno",
+      "title": "Sentimiento",
+      "subtitle": "Cómo se siente el cliente en cada turno",
       "positive": "Positivo",
       "neutral": "Neutro",
       "negative": "Negativo",
-      "current": "Estado actual",
+      "current": "Ahora",
       "trend": "Tendencia",
-      "trendImproving": "Mejorando",
-      "trendStable": "Estable",
-      "trendDeclining": "Empeorando"
+      "improving": "Mejorando",
+      "stable": "Estable",
+      "declining": "Empeorando",
+      "waiting": "Aún no hay turnos del cliente."
     },
     "intent": {
-      "title": "Intent detectado",
-      "subtitle": "Clasificación NLU + confianza",
+      "title": "Intención detectada",
+      "subtitle": "Lo que el cliente quiere resolver",
       "confidence": "Confianza",
-      "items": {
-        "card_unblock": "Desbloqueo de tarjeta",
-        "travel_notice": "Aviso de viaje",
-        "book_appointment": "Agendar cita",
-        "balance_inquiry": "Consulta de saldo",
-        "transfer_agent": "Transferir a humano",
-        "greeting": "Saludo / Bienvenida"
+      "none": "Aún no se detecta ninguna intención.",
+      "note": "Valores de ejemplo precalculados para cada turno; en tu proyecto los calcula el modelo durante la llamada."
+    },
+    "intents": {
+      "cardDeclined": "Compra rechazada con tarjeta",
+      "travelNotice": "Aviso de viaje",
+      "confirmAppointment": "Confirmar cita",
+      "rescheduleAppointment": "Reprogramar cita",
+      "paymentReminder": "Recordatorio de pago",
+      "paymentAgreement": "Acuerdo de pago",
+      "orderStatus": "Estado de pedido",
+      "damagedProduct": "Producto dañado (garantía)",
+      "balanceInquiry": "Consulta de saldo",
+      "billingClaim": "Reclamo por cobro"
+    },
+    "flow": {
+      "title": "Flujo de la llamada",
+      "subtitle": "Cómo está diseñado el agente para este escenario. El paso resaltado es el actual.",
+      "nodes": {
+        "greeting": "Saludo y aviso",
+        "identify": "Identificación",
+        "intent": "Intención",
+        "action": "Acciones",
+        "close": "Cierre",
+        "transfer": "Transferencia"
+      },
+      "done": "hecho",
+      "current": "en curso",
+      "pending": "pendiente"
+    },
+    "actions": {
+      "title": "Acciones del agente",
+      "subtitle": "Funciones que el agente llama durante la conversación (function calling)",
+      "status": {
+        "pending": "pendiente",
+        "running": "ejecutando…",
+        "done": "completada",
+        "skipped": "no se ejecutó"
+      },
+      "request": "Solicitud",
+      "response": "Respuesta",
+      "showDetail": "Ver detalle",
+      "hideDetail": "Ocultar detalle",
+      "simulated": "Respuesta simulada. En tu proyecto se conecta a {system}.",
+      "progress": "{done} de {total} completadas",
+      "jsonFn": "funcion",
+      "jsonArgs": "argumentos"
+    },
+    "fns": {
+      "verifyCustomer": {
+        "name": "verificar_cliente",
+        "desc": "Valida la identidad del cliente"
+      },
+      "getTransactions": {
+        "name": "consultar_movimientos",
+        "desc": "Consulta las últimas transacciones de la tarjeta"
+      },
+      "registerTravel": {
+        "name": "registrar_aviso_viaje",
+        "desc": "Registra el país y las fechas del viaje"
+      },
+      "unblockCard": {
+        "name": "habilitar_tarjeta",
+        "desc": "Habilita la tarjeta para compras en el exterior"
+      },
+      "getAppointment": {
+        "name": "consultar_cita",
+        "desc": "Busca la cita programada del paciente"
+      },
+      "findAvailability": {
+        "name": "consultar_disponibilidad",
+        "desc": "Busca cupos libres en la agenda"
+      },
+      "rescheduleAppointment": {
+        "name": "reprogramar_cita",
+        "desc": "Mueve la cita y libera el cupo anterior"
+      },
+      "sendWhatsapp": {
+        "name": "enviar_whatsapp",
+        "desc": "Envía una plantilla de WhatsApp al cliente"
+      },
+      "getBalance": {
+        "name": "consultar_saldo",
+        "desc": "Consulta la cuota y el estado del crédito"
+      },
+      "quotePaymentPlan": {
+        "name": "simular_acuerdo",
+        "desc": "Calcula un plan de pagos posible"
+      },
+      "createAgreement": {
+        "name": "registrar_acuerdo",
+        "desc": "Registra el acuerdo de pago"
+      },
+      "createPaymentLink": {
+        "name": "generar_link_pago",
+        "desc": "Genera un link de pago para la primera cuota"
+      },
+      "getOrder": {
+        "name": "consultar_pedido",
+        "desc": "Consulta el estado y los paquetes del pedido"
+      },
+      "createTicket": {
+        "name": "crear_caso",
+        "desc": "Abre un caso en la mesa de ayuda"
+      },
+      "transferToHuman": {
+        "name": "transferir_a_asesor",
+        "desc": "Pasa la llamada a un asesor con el resumen"
+      },
+      "logCallCrm": {
+        "name": "registrar_llamada_crm",
+        "desc": "Guarda la llamada y su resultado en el CRM"
       }
     },
-    "functions": {
-      "title": "Function calling ejecutado",
-      "subtitle": "Herramientas invocadas por el modelo durante la llamada",
-      "running": "ejecutando…",
-      "done": "completado",
+    "systems": {
+      "core": "tu core bancario",
+      "agenda": "tu agenda médica",
+      "cartera": "tu sistema de cartera",
+      "pagos": "tu pasarela de pagos (p. ej. Wompi o PayU)",
+      "whatsapp": "WhatsApp Business (API oficial)",
+      "crm": "tu CRM",
+      "tienda": "tu tienda en línea",
+      "helpdesk": "tu mesa de ayuda",
+      "colas": "tu plataforma de contact center"
+    },
+    "handoff": {
+      "title": "Transferencia a un asesor",
+      "subtitle": "Ficha que recibe la persona que toma la llamada",
+      "preview": "Vista previa: esto recibiría el asesor si transfieres ahora.",
+      "sent": "Enviada a {human} ({team}).",
+      "reason": "Motivo",
+      "identity": "Identidad",
+      "verified": "Verificada · {doc}",
+      "notVerified": "Sin verificar",
+      "actionsDone": "Acciones hechas",
+      "none": "Ninguna todavía",
+      "mood": "Sentimiento",
+      "next": "Siguiente paso sugerido",
+      "button": "Transferir a un asesor",
+      "needsCall": "Inicia la llamada para poder transferirla.",
+      "done": "Llamada transferida",
+      "ended": "La llamada terminó sin pasar a un asesor: el agente IA la resolvió o se colgó."
+    },
+    "assist": {
+      "title": "Asistente del asesor",
+      "subtitle": "Sugerencias para quien recibe la llamada transferida",
+      "inactive": "Se activa cuando la llamada pasa a un asesor.",
+      "active": "Activo: la llamada está con {human}.",
+      "kbTitle": "Artículos de la base de conocimiento",
+      "kbHint": "Toca un artículo para leerlo."
+    },
+    "compliance": {
+      "title": "Cumplimiento",
+      "subtitle": "Controles de esta llamada",
+      "notice": "Aviso de grabación y tratamiento de datos (Ley 1581 de 2012)",
+      "noticeOk": "Reproducido al inicio de la llamada.",
+      "noticePending": "Se reproduce en el primer turno.",
+      "masking": "Enmascaramiento de documentos y correos",
+      "maskingOk": "{count, plural, one {# dato enmascarado} other {# datos enmascarados}} en la transcripción.",
+      "maskingPending": "Aún no hay datos sensibles en la llamada.",
+      "identity": "Verificación de identidad antes de dar información",
+      "identityOk": "Cliente verificado antes de consultar o modificar datos.",
+      "identityPending": "Pendiente: el agente aún no ha verificado la identidad.",
+      "window": "Horario de contacto en cobranza (Ley 2300 de 2023)",
+      "windowOk": "Llamada programada el {when}: dentro del horario permitido.",
+      "windowBlocked": "Llamada programada el {when}: {reason}.",
+      "windowInbound": "No aplica: es una llamada entrante.",
+      "windowNotCollections": "No aplica: no es una llamada de cobranza.",
+      "statusOk": "cumplido",
+      "statusPending": "pendiente",
+      "statusNa": "no aplica"
+    },
+    "summary": {
+      "title": "Resumen de la llamada",
+      "subtitle": "Generado con los datos de esta llamada",
+      "duration": "Duración",
       "result": "Resultado",
-      "items": {
-        "check_balance": {
-          "name": "check_balance",
-          "desc": "Consultar saldo de cuenta",
-          "result": "Saldo disponible: $1.245.300 CLP"
-        },
-        "unblock_card": {
-          "name": "unblock_card",
-          "desc": "Desbloquear tarjeta por viaje",
-          "result": "Tarjeta ****{card} habilitada en PE hasta 30-05"
-        },
-        "schedule_appointment": {
-          "name": "schedule_appointment",
-          "desc": "Agendar cita con asesor",
-          "result": "Cita confirmada · Mar 20 10:00 · Mariana Soto"
-        },
-        "transfer_human": {
-          "name": "transfer_to_human",
-          "desc": "Escalar a agente humano",
-          "result": "Transferencia en cola · ETA 12s"
-        }
-      }
+      "reason": "Motivo principal",
+      "actions": "Acciones completadas",
+      "actionsValue": "{done} de {total}",
+      "sentiment": "Sentimiento (inicio → final)",
+      "masked": "Datos enmascarados",
+      "copy": "Copiar resumen",
+      "copied": "Resumen copiado.",
+      "copyFailed": "No se pudo copiar: tu navegador bloqueó el portapapeles.",
+      "savedToLog": "La llamada quedó en el registro de llamadas como «Tu prueba».",
+      "results": {
+        "resolved": "Resuelta por el agente IA",
+        "transferred": "Transferida a un asesor",
+        "abandoned": "Colgada antes de terminar"
+      },
+      "downloadShort": "Descargar transcripción"
     },
-    "providers": {
-      "title": "Stack de voz",
-      "subtitle": "Cambia de proveedor STT/TTS en caliente",
-      "stt": "Speech-to-Text",
-      "tts": "Text-to-Speech",
-      "telephony": "Telefonía",
-      "bargeIn": "Barge-in / Interrupción",
-      "bargeInHint": "Permite que el cliente interrumpa al bot mientras habla",
-      "language": "Idioma",
-      "languageEs": "Español (CL)",
-      "languageEn": "English (US)",
-      "languageMixed": "ES + EN (code-switching)",
-      "items": {
-        "whisper": "Whisper v3",
-        "deepgram": "Deepgram Nova-3",
-        "assembly": "AssemblyAI Universal",
-        "eleven": "ElevenLabs Turbo v2",
-        "cartesia": "Cartesia Sonic",
-        "playht": "Play.ht 2.0",
-        "twilio": "Twilio Voice",
-        "vonage": "Vonage",
-        "telnyx": "Telnyx"
-      }
-    },
-    "queues": {
-      "title": "Llamadas",
-      "subtitle": "Cola unificada inbound / outbound",
+    "log": {
+      "title": "Registro de llamadas",
+      "subtitle": "Jornada de ejemplo del jueves 8 de octubre de 2026, más tus llamadas de prueba",
       "tabs": {
+        "all": "Todas",
         "inbound": "Entrantes",
         "outbound": "Salientes"
       },
       "columns": {
+        "time": "Hora",
         "number": "Número",
-        "direction": "Dirección",
+        "reason": "Motivo",
         "duration": "Duración",
-        "status": "Estado",
-        "sentiment": "Sentiment",
-        "confidence": "Confianza IA"
+        "result": "Resultado",
+        "sentiment": "Sentimiento",
+        "csat": "Encuesta",
+        "scenario": "Escenario"
       },
-      "statuses": {
-        "live": "En curso",
-        "completed": "Completada",
-        "voicemail": "Buzón",
-        "missed": "Perdida",
-        "transferred": "Transferida"
-      }
+      "open": "Abrir",
+      "openHint": "Carga el escenario de ejemplo de este tipo de llamada",
+      "mine": "Tu prueba",
+      "results": {
+        "resolved": "Resuelta por IA",
+        "transferred": "Transferida",
+        "abandoned": "Colgada",
+        "voicemail": "Buzón de voz",
+        "noAnswer": "No contestó"
+      },
+      "export": "Exportar CSV",
+      "exported": "Registro exportado.",
+      "empty": "No hay llamadas en esta vista.",
+      "clearMine": "Borrar mis pruebas",
+      "cleared": "Se borraron tus llamadas de prueba.",
+      "noCsat": "—",
+      "fileName": "registro-llamadas-ejemplo.csv"
+    },
+    "kpis": {
+      "title": "Métricas de la jornada",
+      "subtitle": "Calculadas con el registro de llamadas (datos de ejemplo + tus pruebas)",
+      "total": "Llamadas",
+      "totalSub": "{answered} atendidas",
+      "containment": "Contención",
+      "containmentSub": "atendidas que la IA resolvió sin pasar a un humano",
+      "aht": "Duración media (TMO)",
+      "ahtSub": "de las llamadas atendidas",
+      "transferred": "Transferidas",
+      "transferredSub": "pasaron a un asesor",
+      "csat": "Satisfacción",
+      "csatSub": "promedio de {n} encuestas (1 a 5)",
+      "csatNone": "sin encuestas",
+      "positive": "Sentimiento positivo",
+      "positiveSub": "de las llamadas atendidas"
     },
     "campaign": {
-      "title": "Campaña outbound",
-      "subtitle": "Predictive dialer + voicemail drop",
-      "name": "Cobranza preventiva mayo",
-      "predictive": "Predictive dialer",
-      "predictiveHint": "Marca múltiples números y conecta solo respuestas humanas",
+      "title": "Campaña saliente: recordatorio de pago",
+      "subtitle": "Cuota de octubre de 2026 · {count} contactos programados entre el 8 y el 13 de octubre",
+      "rulesTitle": "Reglas que aplica el marcador",
+      "rules": {
+        "window": "Lunes a viernes de 7:00 a 19:00 y sábados de 8:00 a 15:00",
+        "noSunday": "Sin llamadas los domingos ni los festivos de Colombia",
+        "frequency": "Máximo 1 llamada por semana a cada persona (regla configurada en esta campaña)",
+        "exclusion": "Lista de exclusión: personas que pidieron no ser contactadas"
+      },
+      "legalNote": "Referencia: Ley 2300 de 2023 (horarios de contacto en cobranza). Las reglas exactas se validan con tu asesor legal y se configuran en la implementación.",
+      "run": "Simular campaña",
+      "running": "Marcando…",
+      "reset": "Reiniciar campaña",
+      "export": "Exportar resultados (CSV)",
+      "exported": "Resultados exportados.",
+      "fileName": "campana-recordatorio-pago.csv",
+      "columns": {
+        "contact": "Contacto",
+        "number": "Número",
+        "scheduled": "Programada",
+        "result": "Resultado"
+      },
+      "waiting": "En espera",
+      "outcomes": {
+        "agreement": "Contestó · acuerdo de pago",
+        "voicemail": "Buzón de voz · mensaje dejado",
+        "paid": "Contestó · ya había pagado",
+        "noAnswer": "No contestó",
+        "callback": "Contestó · pidió que lo llamen después"
+      },
+      "blocked": {
+        "sunday": "Bloqueada: es domingo",
+        "holiday": "Bloqueada: festivo ({name})",
+        "beforeOpen": "Bloqueada: antes del horario permitido",
+        "afterClose": "Bloqueada: después del horario permitido",
+        "excluded": "Excluida: está en la lista de exclusión",
+        "frequency": "Bloqueada: ya se contactó esta semana",
+        "outOfRange": "La demo solo trae los festivos de 2026",
+        "invalid": "Fecha u hora no válida"
+      },
       "metrics": {
-        "contacted": "Contactados",
-        "connected": "Conectados",
-        "voicemail": "Buzón detectado",
-        "completed": "Completadas",
-        "answerRate": "Tasa respuesta"
+        "scheduled": "Programados",
+        "blocked": "Bloqueados por regla",
+        "dialed": "Marcados",
+        "connected": "Contestaron",
+        "voicemail": "Buzón de voz",
+        "agreements": "Acuerdos de pago"
       },
-      "events": {
-        "title": "Log de eventos",
-        "amd": "AMD: contestador detectado en {number}",
-        "drop": "Voicemail drop reproducido en {number}",
-        "human": "Humano detectado en {number} · ruteando a agente",
-        "dnc": "Número {number} en lista DNC · descartado"
+      "simulated": "Simulado en la demo: no se hace ninguna llamada. En tu proyecto el marcador usa tu troncal SIP o un proveedor de telefonía.",
+      "tester": {
+        "title": "Prueba la regla de horario",
+        "subtitle": "Elige una fecha de 2026 y una hora para ver si el marcador llamaría.",
+        "date": "Fecha",
+        "time": "Hora",
+        "allowed": "Permitido: {when}",
+        "blocked": "{reason} · {when}"
       }
     },
-    "handoff": {
-      "title": "Handoff a humano",
-      "subtitle": "Transferencia con contexto completo del cliente",
-      "button": "Transferir a agente humano",
-      "transferred": "Transferido a Carla Méndez · Equipo Premium",
-      "contextTitle": "Contexto compartido",
+    "dates": {
+      "long": "{weekday} {day} de {month} de {year}, {time}",
+      "short": "{weekday} {day} {month} · {time}",
+      "weekdays": {
+        "d0": "domingo",
+        "d1": "lunes",
+        "d2": "martes",
+        "d3": "miércoles",
+        "d4": "jueves",
+        "d5": "viernes",
+        "d6": "sábado"
+      },
+      "weekdaysShort": {
+        "d0": "dom",
+        "d1": "lun",
+        "d2": "mar",
+        "d3": "mié",
+        "d4": "jue",
+        "d5": "vie",
+        "d6": "sáb"
+      },
+      "months": {
+        "m1": "enero",
+        "m2": "febrero",
+        "m3": "marzo",
+        "m4": "abril",
+        "m5": "mayo",
+        "m6": "junio",
+        "m7": "julio",
+        "m8": "agosto",
+        "m9": "septiembre",
+        "m10": "octubre",
+        "m11": "noviembre",
+        "m12": "diciembre"
+      },
+      "monthsShort": {
+        "m1": "ene",
+        "m2": "feb",
+        "m3": "mar",
+        "m4": "abr",
+        "m5": "may",
+        "m6": "jun",
+        "m7": "jul",
+        "m8": "ago",
+        "m9": "sep",
+        "m10": "oct",
+        "m11": "nov",
+        "m12": "dic"
+      }
+    },
+    "holidays": {
+      "newYear": "Año Nuevo",
+      "epiphany": "Reyes Magos",
+      "saintJoseph": "San José",
+      "holyThursday": "Jueves Santo",
+      "goodFriday": "Viernes Santo",
+      "labour": "Día del Trabajo",
+      "ascension": "Ascensión del Señor",
+      "corpusChristi": "Corpus Christi",
+      "sacredHeart": "Sagrado Corazón",
+      "saintsPeterPaul": "San Pedro y San Pablo",
+      "independence": "Día de la Independencia",
+      "boyaca": "Batalla de Boyacá",
+      "assumption": "Asunción de la Virgen",
+      "raceDay": "Día de la Diversidad Étnica y Cultural",
+      "allSaints": "Todos los Santos",
+      "cartagena": "Independencia de Cartagena",
+      "immaculate": "Inmaculada Concepción",
+      "christmas": "Navidad"
+    },
+    "settings": {
+      "title": "Voz de la demo",
+      "subtitle": "La voz la genera tu navegador con las voces que tenga disponibles (Web Speech API). La demo no usa servidores propios para la voz.",
+      "voice": "Voz del agente",
+      "voiceAuto": "Automática ({name})",
+      "noVoices": "Este navegador no tiene voces en español.",
+      "customerVoice": "El cliente usa otra voz disponible o un tono más grave.",
+      "speed": "Velocidad de la llamada"
+    },
+    "implementation": {
+      "title": "Cómo se implementa en tu empresa",
+      "subtitle": "Nada de esto se conecta en la demo: se elige y configura en tu proyecto.",
       "items": {
-        "intent": "Intent",
-        "history": "Historial",
-        "value": "Valor cliente",
-        "lang": "Idioma",
-        "mood": "Mood"
+        "telephony": {
+          "title": "Telefonía",
+          "desc": "Número local +57 o tu troncal SIP o PBX (Asterisk, Issabel) mediante un proveedor de telefonía como Twilio o Telnyx."
+        },
+        "stt": {
+          "title": "Reconocimiento de voz (STT)",
+          "desc": "Convierte la voz del cliente en texto mientras habla (por ejemplo, con Deepgram o Whisper)."
+        },
+        "llm": {
+          "title": "Modelo de lenguaje",
+          "desc": "Entiende la intención, decide qué acción ejecutar y redacta la respuesta según tus guiones y políticas."
+        },
+        "tts": {
+          "title": "Voz del agente (TTS)",
+          "desc": "Voz neural en español colombiano (por ejemplo, ElevenLabs, Azure o Cartesia)."
+        },
+        "integrations": {
+          "title": "Integraciones",
+          "desc": "Tu core, agenda, CRM, mesa de ayuda, WhatsApp Business y pasarela de pagos, por API."
+        }
       },
-      "values": {
-        "historyVal": "3 llamadas últimos 30 días",
-        "valueVal": "Premium · LTV $24.500.000"
+      "costNote": "Los minutos de telefonía, reconocimiento de voz, voz sintetizada y modelo de lenguaje los pagas directamente a cada proveedor."
+    },
+    "glossary": {
+      "title": "Glosario",
+      "items": {
+        "stt": {
+          "term": "STT (voz a texto)",
+          "def": "Reconocimiento de voz: convierte lo que dice el cliente en texto."
+        },
+        "tts": {
+          "term": "TTS (texto a voz)",
+          "def": "Síntesis de voz: convierte la respuesta del agente en audio."
+        },
+        "intent": {
+          "term": "Intención",
+          "def": "Lo que el cliente quiere resolver (por ejemplo, reprogramar una cita)."
+        },
+        "sentiment": {
+          "term": "Sentimiento",
+          "def": "Si el cliente suena satisfecho, neutro o molesto en cada turno."
+        },
+        "functions": {
+          "term": "Acciones (function calling)",
+          "def": "Consultas o cambios que el agente hace en tus sistemas durante la llamada."
+        },
+        "handoff": {
+          "term": "Transferencia con contexto",
+          "def": "Pasar la llamada a una persona junto con el resumen, para que el cliente no repita nada."
+        },
+        "containment": {
+          "term": "Contención",
+          "def": "Porcentaje de llamadas atendidas que el agente IA resuelve sin pasar a un humano."
+        },
+        "aht": {
+          "term": "TMO (AHT)",
+          "def": "Tiempo medio de operación: cuánto dura en promedio una llamada atendida."
+        },
+        "csat": {
+          "term": "Satisfacción (CSAT)",
+          "def": "Promedio de la encuesta de 1 a 5 al final de la llamada."
+        },
+        "bargeIn": {
+          "term": "Interrupción (barge-in)",
+          "def": "Permite que el cliente hable encima del agente y este se detenga a escuchar."
+        }
       }
     },
-    "assist": {
-      "title": "Agent Assist en vivo",
-      "subtitle": "Sugerencias en tiempo real para el agente humano",
-      "kbTitle": "Base de conocimiento",
-      "kbHint": "Artículos sugeridos según la consulta del cliente",
-      "suggestions": {
-        "s1": "Confirma identidad antes de modificar la tarjeta",
-        "s2": "Ofrece seguro de viaje (cross-sell · +$8.900 CLP/mes)",
-        "s3": "Cierra con encuesta NPS al finalizar"
+    "footer": {
+      "sampleNote": "Datos de ejemplo: las empresas, las personas, los números y los documentos son ficticios. Las llamadas siguen un guion fijo (en esta demo no se ejecuta ningún modelo de IA), la voz la genera tu navegador y las integraciones (core bancario, agenda, cartera, WhatsApp, pagos, CRM) son simuladas. Tus llamadas de prueba y la personalización se guardan solo en este navegador.",
+      "cta": "Solicitar demo con tu guion"
+    },
+    "scenarios": {
+      "banca": {
+        "name": "Banca: compra rechazada en un viaje",
+        "desc": "El cliente llama porque le rechazaron una compra en el exterior; el agente verifica su identidad, registra el aviso de viaje y habilita la tarjeta.",
+        "company": "Banco Arrayán",
+        "customer": "Camila Rojas",
+        "human": "Andrés Pardo",
+        "team": "Tarjetas",
+        "nextStep": "Confirmar que la compra en Lima ya se aprobó y recordarle que puede registrar avisos de viaje en la app.",
+        "spoken": {
+          "doc": "uno cero dos nueve ocho cuatro cuatro cinco seis siete"
+        },
+        "turns": {
+          "t1": "Hola, soy {agent}, la asistente virtual de {company}. Te cuento que esta llamada se graba por calidad y seguridad, y que tratamos tus datos según nuestra política de privacidad. ¿En qué te puedo ayudar?",
+          "t2": "Hola. Me rechazaron una compra con mi tarjeta de crédito y no entiendo por qué.",
+          "t3": "Lamento el inconveniente. Para ayudarte, ¿me confirmas tu número de cédula?",
+          "t4": "Claro, es la {doc}.",
+          "t5": "Gracias, Camila, ya verifiqué tu identidad. Veo que anoche se rechazó una compra por 386.000 pesos en Lima: nuestro sistema de seguridad la bloqueó porque se hizo fuera de Colombia.",
+          "t6": "Sí, estoy de viaje en Lima hasta el 16 de octubre. ¿Me la pueden habilitar?",
+          "t7": "Listo: registré tu aviso de viaje a Perú hasta el 16 de octubre y habilité tu tarjeta terminada en 1234 para compras allá. Ya puedes intentar la compra de nuevo.",
+          "t8": "Perfecto, muchas gracias.",
+          "t9": "Con gusto, Camila. Dejé registrada esta llamada en tu historial. ¡Buen viaje!"
+        },
+        "results": {
+          "verifyCustomer": "Cliente verificada: Camila R. · CC ****4567",
+          "getTransactions": "Rechazo el 07/10/2026 a las 21:42 · Lima (PE) · $ 386.000 COP · motivo: compra fuera de Colombia",
+          "registerTravel": "Aviso de viaje registrado: Perú, hasta el 16/10/2026",
+          "unblockCard": "Tarjeta ****1234 habilitada para compras en Perú hasta el 16/10/2026",
+          "logCallCrm": "Caso CRM-20481 creado: resuelta por el agente IA"
+        },
+        "flow": {
+          "greeting": "Saludo con el nombre del banco y aviso de grabación y tratamiento de datos.",
+          "identify": "Pide la cédula y la valida contra el core antes de dar información.",
+          "intent": "Detecta «compra rechazada» y luego «aviso de viaje».",
+          "action": "Consulta movimientos, registra el viaje y habilita la tarjeta.",
+          "end": "Confirma, registra la llamada en el CRM y se despide."
+        },
+        "assist": {
+          "s1": "Confirma con Camila que la compra en Lima ya se aprobó.",
+          "s2": "Recuérdale que puede registrar avisos de viaje desde la app.",
+          "s3": "No le pidas de nuevo la cédula: el agente IA ya la verificó."
+        },
+        "kb": {
+          "a1": {
+            "title": "Habilitar una tarjeta por compra en el exterior",
+            "body": "Si la persona está verificada y confirma el viaje, registra el aviso y habilita la tarjeta para el país y las fechas indicadas. No hace falta expedir una tarjeta nueva."
+          },
+          "a2": {
+            "title": "Aviso de viaje: vigencia y países",
+            "body": "El aviso cubre hasta 90 días y varios países. Se puede modificar o cancelar desde la app o por teléfono."
+          }
+        }
       },
-      "kb": {
-        "a1": "KB-204 · Desbloqueo por viaje internacional",
-        "a2": "KB-187 · Política de aviso de viaje 2025",
-        "a3": "KB-091 · Cross-sell seguros para viajeros"
+      "salud": {
+        "name": "Salud: confirmar o reprogramar una cita",
+        "desc": "Llamada saliente para confirmar una cita médica; el paciente pide moverla y el agente consulta la agenda, la reprograma y envía la confirmación por WhatsApp.",
+        "company": "IPS Monteclaro",
+        "customer": "Jorge Medina",
+        "human": "Paula Vélez",
+        "team": "Agendamiento",
+        "nextStep": "Si el paciente necesita otro horario, ofrecer las franjas disponibles de la semana siguiente.",
+        "spoken": {
+          "doc": "siete nueve cuatro cinco cero ocho nueve uno dos"
+        },
+        "turns": {
+          "t1": "Buenos días, habla {agent}, la asistente virtual de {company}. Esta llamada se graba por calidad y tratamos tus datos según nuestra política de privacidad. ¿Hablo con Jorge Medina?",
+          "t2": "Sí, con él.",
+          "t3": "Gracias, Jorge. Para proteger tu información, ¿me confirmas tu número de documento?",
+          "t4": "Sí, es la {doc}.",
+          "t5": "Perfecto. Te llamo para confirmar tu cita de medicina interna el martes 13 de octubre a las 7:20 de la mañana en la sede Chapinero. ¿Puedes asistir?",
+          "t6": "Uy, ese día no puedo. ¿Me la pueden pasar para el jueves en la tarde?",
+          "t7": "Claro. El jueves 15 de octubre hay cupo a las 2:40 o a las 4:00 de la tarde con la misma médica. ¿Cuál prefieres?",
+          "t8": "A las 4:00, por favor.",
+          "t9": "Listo: tu cita quedó para el jueves 15 de octubre a las 4:00 de la tarde en la sede Chapinero. Liberé el cupo del martes y te envié la confirmación por WhatsApp.",
+          "t10": "Perfecto, gracias.",
+          "t11": "Con gusto, Jorge. Recuerda llegar 15 minutos antes. ¡Que tengas buen día!"
+        },
+        "results": {
+          "verifyCustomer": "Paciente verificado: Jorge M. · CC ****8912",
+          "getAppointment": "Cita CT-77310 · medicina interna · mar 13/10/2026, 7:20 a. m. · sede Chapinero",
+          "findAvailability": "Cupos el jue 15/10/2026: 2:40 p. m. y 4:00 p. m.",
+          "rescheduleAppointment": "Cita CT-77310 movida al jue 15/10/2026, 4:00 p. m.; cupo del martes liberado",
+          "sendWhatsapp": "Plantilla «confirmación de cita» enviada a +57 311 *** 5129",
+          "logCallCrm": "Caso CRM-20502 creado: cita reprogramada"
+        },
+        "flow": {
+          "greeting": "Saludo, aviso de grabación y confirmación de que habla con el paciente.",
+          "identify": "Valida el documento contra la agenda de la IPS.",
+          "intent": "Confirmar la cita; el paciente pide reprogramarla.",
+          "action": "Busca cupos, reprograma la cita y envía la confirmación por WhatsApp.",
+          "end": "Recuerda llegar 15 minutos antes y registra la llamada en el CRM."
+        },
+        "assist": {
+          "s1": "Confirma que la nueva hora le sirve y que conoce la dirección de la sede.",
+          "s2": "Si pide otro especialista, revisa la autorización de su EPS.",
+          "s3": "Recuérdale llevar los exámenes previos."
+        },
+        "kb": {
+          "a1": {
+            "title": "Política de reprogramación de citas",
+            "body": "Las citas se pueden reprogramar sin costo hasta 2 horas antes. El cupo liberado vuelve a la agenda de inmediato."
+          },
+          "a2": {
+            "title": "Preparación para la cita de medicina interna",
+            "body": "Llegar 15 minutos antes con el documento de identidad y los exámenes de los últimos 6 meses."
+          }
+        }
+      },
+      "cobranza": {
+        "name": "Cobranza preventiva: acuerdo de pago",
+        "desc": "Llamada saliente dentro del horario permitido para recordar una cuota; la clienta propone pagar en dos partes y el agente registra el acuerdo y envía el link de pago por WhatsApp.",
+        "company": "Créditos Guadua",
+        "customer": "Natalia Ortiz",
+        "human": "Sergio Cárdenas",
+        "team": "Cartera",
+        "nextStep": "Hacer seguimiento al pago del 15 de octubre; si no llega, volver a llamar dentro del horario permitido.",
+        "spoken": {
+          "doc": "cinco dos uno cero cuatro tres tres cero siete"
+        },
+        "turns": {
+          "t1": "Hola, habla {agent}, la asistente virtual de {company}. Esta llamada se graba y tratamos tus datos según nuestra política de privacidad. ¿Hablo con Natalia Ortiz?",
+          "t2": "Sí, soy yo.",
+          "t3": "Gracias, Natalia. Para validar tu identidad, ¿me confirmas tu número de cédula?",
+          "t4": "Es la {doc}.",
+          "t5": "Gracias. Te llamo para recordarte que la cuota de octubre de tu crédito, por 412.500 pesos, vence el 15 de octubre. ¿Podrás pagarla a tiempo?",
+          "t6": "Este mes estoy apretada. Puedo pagar la mitad ahora y el resto a fin de mes.",
+          "t7": "Entiendo. Te puedo ofrecer un acuerdo: 206.250 pesos hasta el 15 de octubre y 206.250 pesos hasta el 30 de octubre, sin intereses de mora si cumples las dos fechas. ¿Te sirve?",
+          "t8": "Sí, me sirve.",
+          "t9": "Listo: registré el acuerdo de pago y te envié por WhatsApp el link para pagar la primera parte.",
+          "t10": "Perfecto, muchas gracias.",
+          "t11": "Gracias a ti, Natalia. Que tengas buen día."
+        },
+        "results": {
+          "verifyCustomer": "Clienta verificada: Natalia O. · CC ****3307",
+          "getBalance": "Crédito CR-40917 · cuota de octubre: $ 412.500 COP · vence el 15/10/2026 · sin mora",
+          "quotePaymentPlan": "Plan propuesto: 2 pagos de $ 206.250 COP (15/10/2026 y 30/10/2026)",
+          "createAgreement": "Acuerdo AP-1186 registrado: 2 pagos de $ 206.250 COP",
+          "createPaymentLink": "Link de pago generado por $ 206.250 COP; vence el 15/10/2026",
+          "sendWhatsapp": "Plantilla «link de pago» enviada a +57 318 *** 4410",
+          "logCallCrm": "Caso CRM-20517 creado: acuerdo de pago"
+        },
+        "flow": {
+          "greeting": "Llama dentro del horario permitido; saludo y aviso de grabación.",
+          "identify": "Valida la cédula contra el sistema de cartera.",
+          "intent": "Recuerda la cuota; la clienta pide un acuerdo de pago.",
+          "action": "Propone un plan, registra el acuerdo y envía el link de pago por WhatsApp.",
+          "end": "Cierra la llamada y registra el resultado en el CRM."
+        },
+        "assist": {
+          "s1": "Confirma las dos fechas del acuerdo y el valor de cada pago.",
+          "s2": "Explica que el link de pago llegó por WhatsApp y vence el 15 de octubre.",
+          "s3": "Si pide más plazo, revisa las opciones de refinanciación vigentes."
+        },
+        "kb": {
+          "a1": {
+            "title": "Acuerdos de pago: condiciones",
+            "body": "Una cuota se puede dividir en 2 pagos dentro del mismo mes, sin intereses de mora si se cumplen las fechas."
+          },
+          "a2": {
+            "title": "Horarios de contacto en cobranza",
+            "body": "Llama solo de lunes a viernes de 7:00 a 19:00 y los sábados de 8:00 a 15:00; nunca domingos ni festivos. Respeta la lista de exclusión."
+          }
+        }
+      },
+      "pedido": {
+        "name": "Pedido: estado y producto dañado",
+        "desc": "El cliente pregunta por su pedido y reporta un producto dañado; el agente abre un caso de garantía y transfiere la llamada a un asesor con el resumen.",
+        "company": "Casa Tucán",
+        "customer": "Felipe Arango",
+        "human": "Andrea Salazar",
+        "team": "Servicio al cliente",
+        "nextStep": "Gestionar el cambio de la licuadora: confirmar la dirección y programar la recogida.",
+        "spoken": {
+          "email": "felipe punto arango arroba correo punto com"
+        },
+        "turns": {
+          "t1": "Hola, soy {agent}, la asistente virtual de {company}. Esta llamada se graba por calidad y tratamos tus datos según nuestra política de privacidad. ¿En qué te ayudo?",
+          "t2": "Hola, quiero saber dónde está mi pedido TU-58213.",
+          "t3": "Con gusto. Para confirmar que eres el titular, ¿me dices el correo con el que hiciste la compra?",
+          "t4": "Sí, es {email}.",
+          "t5": "Gracias, Felipe. Tu pedido TU-58213 salió de nuestra bodega en Funza y está en reparto en Medellín; la transportadora estima entregarlo hoy entre las 2:00 y las 6:00 de la tarde.",
+          "t6": "Es que ya me llegó una parte y la licuadora vino con el vaso roto. Estoy bastante molesto.",
+          "t7": "Lamento mucho lo de la licuadora. Ya abrí un caso de garantía y te envié un WhatsApp para que adjuntes las fotos. Te voy a comunicar con un asesor para que gestione el cambio.",
+          "t8": "Está bien, gracias.",
+          "t9": "Te transfiero ahora con {human}, de servicio al cliente. Ya le compartí el resumen de la llamada para que no tengas que repetir nada."
+        },
+        "results": {
+          "verifyCustomer": "Cliente verificado: Felipe A. · pedido TU-58213",
+          "getOrder": "Pedido TU-58213 · 2 paquetes · 1 entregado · 1 en reparto en Medellín (hoy, 2:00–6:00 p. m.)",
+          "createTicket": "Caso de garantía GAR-3094 abierto · prioridad alta",
+          "sendWhatsapp": "Plantilla «enviar fotos de garantía» enviada a +57 315 *** 7710",
+          "transferToHuman": "Transferida a la cola de servicio al cliente con el resumen de la llamada",
+          "logCallCrm": "Caso CRM-20533 creado: transferida a un asesor"
+        },
+        "flow": {
+          "greeting": "Saludo y aviso de grabación.",
+          "identify": "Valida el correo de la compra contra la tienda.",
+          "intent": "Estado del pedido y luego «producto dañado».",
+          "action": "Consulta el pedido, abre un caso de garantía y pide fotos por WhatsApp.",
+          "end": "Transfiere a un asesor con el resumen de la llamada."
+        },
+        "assist": {
+          "s1": "Discúlpate por el producto dañado: el cliente está molesto.",
+          "s2": "Ofrece el cambio con recogida a domicilio sin costo.",
+          "s3": "Confirma que recibió el WhatsApp para enviar las fotos."
+        },
+        "kb": {
+          "a1": {
+            "title": "Garantía por producto dañado en el envío",
+            "body": "Si el producto llega dañado, se cambia sin costo. Se piden fotos del producto y del empaque, y se programa la recogida en 48 horas hábiles."
+          },
+          "a2": {
+            "title": "Pedidos con varios paquetes",
+            "body": "Un pedido puede llegar en varios paquetes desde bodegas distintas; cada paquete tiene su propio seguimiento."
+          }
+        }
       }
-    },
-    "compliance": {
-      "title": "Compliance & Seguridad",
-      "subtitle": "Controles regulatorios activos",
-      "dnc": "DNC list",
-      "dncOk": "Número no está en lista · OK para llamar",
-      "recording": "Aviso de grabación",
-      "recordingOk": "Disclosure reproducido al inicio",
-      "pci": "Redacción PCI",
-      "pciOk": "Tarjetas detectadas y enmascaradas en el transcript",
-      "gdpr": "Consentimiento GDPR",
-      "gdprOk": "Opt-in vigente hasta 2026-12-31"
-    },
-    "analytics": {
-      "title": "Analytics del contact center",
-      "subtitle": "KPIs en tiempo real",
-      "csat": "CSAT",
-      "csatSub": "satisfacción cliente",
-      "aht": "AHT",
-      "ahtSub": "tiempo medio manejo",
-      "fcr": "FCR",
-      "fcrSub": "resolución primer contacto",
-      "containment": "Containment",
-      "containmentSub": "resuelto sin humano",
-      "volume": "Volumen 24h",
-      "volumeSub": "llamadas procesadas"
-    },
-    "waveform": "Onda de voz en vivo"
+    }
   }
 }

@@ -1,556 +1,816 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   ArrowLeftIcon,
-  PhoneIcon,
-  PhoneXMarkIcon,
+  ArrowPathIcon,
+  ArrowsRightLeftIcon,
+  BeakerIcon,
+  ChevronDoubleRightIcon,
+  CpuChipIcon,
+  InformationCircleIcon,
   MicrophoneIcon,
   PauseCircleIcon,
+  PhoneIcon,
+  PhoneXMarkIcon,
   PlayCircleIcon,
-  ArrowsRightLeftIcon,
-  SignalIcon,
-  SparklesIcon,
-  ShieldCheckIcon,
-  BoltIcon,
-  CheckCircleIcon,
-  ChartBarIcon,
-  UserGroupIcon,
-  LanguageIcon,
-  BookOpenIcon,
-  ServerStackIcon,
-  ArrowTrendingUpIcon,
-  ArrowTrendingDownIcon,
-  ArrowRightCircleIcon,
-  CpuChipIcon,
   SpeakerWaveIcon,
   SpeakerXMarkIcon,
+  WrenchScrewdriverIcon,
+  BookOpenIcon,
+  UserCircleIcon,
 } from '@heroicons/react/24/outline';
 
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
-import Badge from '@/components/ui/Badge';
 import { cn } from '@/lib/utils';
 import Waveform from './components/Waveform';
+import CampaignPanel, { blockReasonText } from './components/CampaignPanel';
+import CallLog, { KpiPanel } from './components/CallLog';
 import {
-  TURNS, STT_PROVIDERS, TTS_PROVIDERS, TELE_PROVIDERS, INBOUND, OUTBOUND,
-  SENTIMENT_TONE, STATUS_TONE, fmtTime,
-} from './components/types';
-import type { Sentiment, FnKey } from './components/types';
+  ActionsPanel, AssistPanel, CompliancePanel, FlowPanel, HandoffPanel, IntentPanel, SentimentPanel, SummaryPanel, TranscriptPanel,
+} from './components/panels';
+import type { CallView } from './components/panels';
+import { PanelTitle } from './components/parts';
+import type { CheckState } from './components/parts';
+import { SAMPLE_CALLS, SCENARIOS, getScenario } from './components/scenarios';
 import {
-  TranscriptTurn, SentimentGauge, ProviderGroup, ContextRow, ComplianceRow, Metric, KpiCard,
-} from './components/parts';
+  buildTimeline, callClock, checkContactWindow, downloadText, estimateTurnSeconds, fnStatuses, sentimentTrend,
+} from './components/engine';
+import { formatWhen } from './components/format';
+import { useSpeech } from './components/useSpeech';
+import type { CallResult, CallRow, Phase, ScenarioId, Sentiment } from './components/types';
+import { fmtTime } from './components/types';
+
+/** Solicitud de demo: formulario de contacto con el producto preseleccionado. */
+const REQUEST_DEMO_HREF = '/contact?service=voice-ai-callcenter';
+const STORAGE_KEY = 'koptup-demo-voice-ai-v1';
+/** Registro de ejemplo ordenado por hora (entrantes y salientes mezcladas). */
+const SAMPLE_BY_TIME = [...SAMPLE_CALLS].sort((a, b) => a.time.localeCompare(b.time));
+const TICK_MS = 200;
+const SPEEDS = [1, 1.5, 2] as const;
+type Speed = (typeof SPEEDS)[number];
+type EndReason = 'completed' | 'transferred' | 'hungup';
+
+interface Saved {
+  calls?: CallRow[];
+  company?: string;
+  agent?: string;
+  voiceUri?: string;
+  speed?: Speed;
+  voiceOn?: boolean;
+}
 
 export default function VoiceAIPage() {
   const t = useTranslations('demoVoice');
+  const locale = useLocale() === 'en' ? 'en' : 'es';
+  const speech = useSpeech(locale);
 
-  const [callActive, setCallActive] = useState(true);
-  const [muted, setMuted] = useState(false);
-  const [onHold, setOnHold] = useState(false);
-  const [duration, setDuration] = useState(132);
-  const [visibleTurns, setVisibleTurns] = useState(4);
+  const [scenarioId, setScenarioId] = useState<ScenarioId>('banca');
+  const scenario = getScenario(scenarioId);
+  const [phase, setPhase] = useState<Phase>('idle');
+  const [cursor, setCursor] = useState(-1);
+  const [elapsed, setElapsed] = useState(0);
+  const [endReason, setEndReason] = useState<EndReason | null>(null);
+  const [manualTransfer, setManualTransfer] = useState(false);
 
-  const [stt, setStt] = useState<typeof STT_PROVIDERS[number]['id']>('deepgram');
-  const [tts, setTts] = useState<typeof TTS_PROVIDERS[number]['id']>('eleven');
-  const [tele, setTele] = useState<typeof TELE_PROVIDERS[number]['id']>('twilio');
-  const [bargeIn, setBargeIn] = useState(true);
-  const [language, setLanguage] = useState<'es' | 'en' | 'mixed'>('mixed');
+  const [voiceOn, setVoiceOn] = useState(true);
+  const [speed, setSpeed] = useState<Speed>(1);
+  const [voiceUri, setVoiceUri] = useState('');
+  const [company, setCompany] = useState('');
+  const [agent, setAgent] = useState('');
+  const [myCalls, setMyCalls] = useState<CallRow[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  const [resetKey, setResetKey] = useState(0);
 
-  const [queueTab, setQueueTab] = useState<'inbound' | 'outbound'>('inbound');
-  const [handedOff, setHandedOff] = useState(false);
-  const [predictive, setPredictive] = useState(true);
+  const spokenRef = useRef(-1);
+  const recordedRef = useRef(false);
+  const elapsedRef = useRef(0);
+  elapsedRef.current = elapsed;
+  const callCardRef = useRef<HTMLDivElement>(null);
 
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  /* ---------------------------- Persistencia ---------------------------- */
   useEffect(() => {
-    if (!callActive || onHold) return;
-    timerRef.current = setInterval(() => {
-      setDuration((d) => d + 1);
-      setVisibleTurns((v) => (v < TURNS.length ? v + (Math.random() > 0.55 ? 1 : 0) : v));
-    }, 1000);
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [callActive, onHold]);
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const s = JSON.parse(raw) as Saved;
+        if (Array.isArray(s.calls)) setMyCalls(s.calls.slice(0, 50));
+        if (typeof s.company === 'string') setCompany(s.company);
+        if (typeof s.agent === 'string') setAgent(s.agent);
+        if (typeof s.voiceUri === 'string') setVoiceUri(s.voiceUri);
+        if (s.speed && SPEEDS.includes(s.speed)) setSpeed(s.speed);
+        if (typeof s.voiceOn === 'boolean') setVoiceOn(s.voiceOn);
+      }
+    } catch {
+      /* almacenamiento no disponible */
+    }
+    setLoaded(true);
+  }, []);
 
-  const shownTurns = TURNS.slice(0, visibleTurns);
-  const lastTurn = shownTurns[shownTurns.length - 1];
-  const currentSentiment: Sentiment = lastTurn?.sentiment ?? 'neutral';
+  useEffect(() => {
+    if (!loaded) return;
+    try {
+      const data: Saved = { calls: myCalls, company, agent, voiceUri, speed, voiceOn };
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch {
+      /* almacenamiento no disponible */
+    }
+  }, [loaded, myCalls, company, agent, voiceUri, speed, voiceOn]);
 
-  const order: Record<Sentiment, number> = { negative: 0, neutral: 1, positive: 2 };
-  const trend = useMemo<'improving' | 'stable' | 'declining'>(() => {
-    if (shownTurns.length < 2) return 'stable';
-    const a = order[shownTurns[shownTurns.length - 2].sentiment];
-    const b = order[shownTurns[shownTurns.length - 1].sentiment];
-    return b > a ? 'improving' : b < a ? 'declining' : 'stable';
-  }, [shownTurns]);
+  useEffect(() => {
+    if (!toast) return;
+    const id = setTimeout(() => setToast(null), 2600);
+    return () => clearTimeout(id);
+  }, [toast]);
+  const notify = useCallback((msg: string) => setToast(msg), []);
 
-  const sttLatency = STT_PROVIDERS.find((p) => p.id === stt)!.latency;
-  const latencyGood = sttLatency < 300;
+  /* ------------------------------ Guion ------------------------------ */
+  const agentName = agent.trim() || t('picker.agentPlaceholder');
+  const companyName = company.trim() || t(`scenarios.${scenarioId}.company`);
+  const human = t(`scenarios.${scenarioId}.human`);
+  const team = t(`scenarios.${scenarioId}.team`);
 
-  const executedFns = useMemo(() => {
-    const set = new Set<FnKey>();
-    shownTurns.forEach((tn) => tn.fn && set.add(tn.fn));
-    if (handedOff) set.add('transfer_human');
-    return Array.from(set);
-  }, [shownTurns, handedOff]);
+  const texts = useMemo(() => {
+    const base = { agent: agentName, company: companyName, human };
+    const spoken: Record<string, string> = {};
+    Object.keys(scenario.maskedData).forEach((k) => {
+      spoken[k] = t(`scenarios.${scenario.id}.spoken.${k}`);
+    });
+    return scenario.turns.map((tn) => ({
+      shown: t(`scenarios.${scenario.id}.turns.${tn.key}`, { ...base, ...scenario.maskedData }),
+      spoken: t(`scenarios.${scenario.id}.turns.${tn.key}`, { ...base, ...spoken }),
+    }));
+  }, [scenario, agentName, companyName, human, t]);
 
-  const lastIntentTurn = [...shownTurns].reverse().find((x) => x.intentKey);
+  const durations = useMemo(() => texts.map((x) => estimateTurnSeconds(x.shown)), [texts]);
+  const at = useMemo(() => buildTimeline(durations), [durations]);
+  const last = scenario.turns.length - 1;
+  const endsWithTransfer = scenario.turns[last].fns?.includes('transferToHuman') ?? false;
+  const curDurMs = cursor >= 0 ? durations[Math.min(cursor, last)] * 1000 : 0;
+  const turnFinished = cursor >= 0 && elapsed >= curDurMs;
+  const clock = callClock(at, durations, cursor, elapsed);
 
-  const handleStartStop = () => {
-    if (callActive) setCallActive(false);
-    else {
-      setCallActive(true);
-      setDuration(0);
-      setVisibleTurns(1);
-      setHandedOff(false);
-      setOnHold(false);
+  /* --------------------------- Reproductor --------------------------- */
+  const finish = useCallback(
+    (reason: EndReason) => {
+      speech.cancel();
+      setEndReason(reason);
+      setPhase(reason === 'transferred' ? 'transferred' : 'ended');
+    },
+    [speech],
+  );
+
+  // Reloj del guion: avanza mientras la llamada está en curso.
+  useEffect(() => {
+    if (phase !== 'playing') return;
+    const id = setInterval(() => setElapsed((e) => e + TICK_MS * speed), TICK_MS);
+    return () => clearInterval(id);
+  }, [phase, speed]);
+
+  // Paso al siguiente turno: cuando se cumple el tiempo del guion y la voz terminó.
+  useEffect(() => {
+    if (phase !== 'playing' || cursor < 0) return;
+    const speaking = speech.speakingRef.current;
+    const watchdog = elapsed > curDurMs * 3 + 4000;
+    if (elapsed < curDurMs || (speaking && !watchdog)) return;
+    if (speaking) speech.cancel();
+    if (cursor < last) {
+      setCursor(cursor + 1);
+      setElapsed(0);
+    } else {
+      finish(endsWithTransfer ? 'transferred' : 'completed');
+    }
+  }, [elapsed, phase, cursor, curDurMs, last, endsWithTransfer, finish, speech]);
+
+  // Voz: habla cada turno al empezar (o al reanudar si aún queda buena parte del turno).
+  useEffect(() => {
+    if (phase !== 'playing' || cursor < 0 || !voiceOn || !speech.available) return;
+    if (spokenRef.current === cursor && elapsedRef.current > durations[cursor] * 1000 * 0.6) return;
+    spokenRef.current = cursor;
+    speech.speak(texts[cursor].spoken, {
+      voiceUri,
+      customer: scenario.turns[cursor].speaker === 'customer',
+      rate: 1 + (speed - 1) * 0.7,
+    });
+    // Solo al cambiar de turno, de fase o al activar la voz.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cursor, phase, voiceOn, speech.available]);
+
+  // Registro de la llamada al terminar.
+  useEffect(() => {
+    if ((phase !== 'ended' && phase !== 'transferred') || recordedRef.current || cursor < 0) return;
+    recordedRef.current = true;
+    const played = scenario.turns.slice(0, cursor + 1);
+    const intentTurn = [...played].reverse().find((x) => x.intent) ?? scenario.turns.find((x) => x.intent);
+    const lastCustomer = [...played].reverse().find((x) => x.speaker === 'customer');
+    const result: CallResult = endReason === 'transferred' ? 'transferred' : endReason === 'hungup' ? 'abandoned' : 'resolved';
+    let time = '--:--';
+    try {
+      time = new Intl.DateTimeFormat(locale === 'en' ? 'en-US' : 'es-CO', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+        timeZone: 'America/Bogota',
+      }).format(new Date());
+    } catch {
+      /* sin Intl */
+    }
+    const row: CallRow = {
+      id: `mine-${Date.now()}`,
+      time,
+      number: scenario.number,
+      direction: scenario.direction,
+      intent: intentTurn?.intent ?? 'orderStatus',
+      durationSec: Math.round(callClock(at, durations, cursor, elapsedRef.current)),
+      result,
+      sentiment: lastCustomer?.sentiment ?? 'neutral',
+      csat: null,
+      scenario: scenario.id,
+      mine: true,
+    };
+    setMyCalls((prev) => [row, ...prev].slice(0, 50));
+  }, [phase, endReason, cursor, scenario, at, durations, locale]);
+
+  const resetCall = useCallback(() => {
+    speech.cancel();
+    spokenRef.current = -1;
+    recordedRef.current = false;
+    setPhase('idle');
+    setCursor(-1);
+    setElapsed(0);
+    setEndReason(null);
+    setManualTransfer(false);
+  }, [speech]);
+
+  const start = () => {
+    resetCall();
+    setCursor(0);
+    setPhase('playing');
+  };
+  const pause = () => {
+    speech.cancel();
+    setPhase('paused');
+  };
+  const resume = () => setPhase('playing');
+  const hangup = () => finish(cursor >= last ? (endsWithTransfer ? 'transferred' : 'completed') : 'hungup');
+  const transfer = () => {
+    setManualTransfer(!endsWithTransfer || cursor < last);
+    finish('transferred');
+  };
+  const skipToEnd = () => {
+    speech.cancel();
+    spokenRef.current = last;
+    setCursor(last);
+    setElapsed(durations[last] * 1000);
+    finish(endsWithTransfer ? 'transferred' : 'completed');
+  };
+  const toggleVoice = () => {
+    if (voiceOn) speech.cancel();
+    setVoiceOn(!voiceOn);
+  };
+  const chooseScenario = (id: ScenarioId) => {
+    resetCall();
+    setScenarioId(id);
+  };
+  const openFromLog = (id: ScenarioId) => {
+    chooseScenario(id);
+    callCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+  const resetAll = () => {
+    resetCall();
+    setScenarioId('banca');
+    setMyCalls([]);
+    setCompany('');
+    setAgent('');
+    setVoiceUri('');
+    setSpeed(1);
+    setVoiceOn(true);
+    setResetKey((k) => k + 1);
+    try {
+      window.localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      /* almacenamiento no disponible */
+    }
+    notify(t('header.resetDone'));
+  };
+
+  /* --------------------------- Vista derivada --------------------------- */
+  const shownTurns = phase === 'idle' ? [] : scenario.turns.slice(0, cursor + 1);
+  const customerSeq: Sentiment[] = shownTurns.filter((x) => x.speaker === 'customer').map((x) => x.sentiment);
+  const intentTurn = [...shownTurns].reverse().find((x) => x.intent);
+  const fnStatus = fnStatuses(scenario, cursor, turnFinished, phase);
+  const noticeIdx = scenario.turns.findIndex((x) => x.notice);
+  const callOver = phase === 'ended' || phase === 'transferred';
+  const view: CallView = {
+    t,
+    locale,
+    scenario,
+    phase,
+    cursor,
+    turnFinished,
+    shownTurns,
+    at,
+    textOf: (i) => texts[i].shown,
+    agentName,
+    companyName,
+    human,
+    team,
+    sentiment: customerSeq.length ? customerSeq[customerSeq.length - 1] : null,
+    firstSentiment: customerSeq.length ? customerSeq[0] : null,
+    trend: sentimentTrend(customerSeq),
+    intentTurn,
+    fnStatus,
+    verified: fnStatus.verifyCustomer === 'done',
+    maskedCount: shownTurns.filter((x) => x.masked).length,
+    noticeDone: noticeIdx >= 0 && (noticeIdx < cursor || (noticeIdx === cursor && (turnFinished || callOver))),
+    manualTransfer,
+    endReason,
+    clock,
+  };
+
+  const windowCheck: { state: CheckState; desc: string } = (() => {
+    if (scenario.direction === 'inbound') return { state: 'na', desc: t('compliance.windowInbound') };
+    if (!scenario.collections || !scenario.scheduled) return { state: 'na', desc: t('compliance.windowNotCollections') };
+    const when = formatWhen(t, scenario.scheduled.date, scenario.scheduled.time);
+    const r = checkContactWindow(scenario.scheduled.date, scenario.scheduled.time);
+    return r.kind === 'allowed'
+      ? { state: 'ok', desc: t('compliance.windowOk', { when }) }
+      : { state: 'pending', desc: t('compliance.windowBlocked', { when, reason: blockReasonText(t, r) }) };
+  })();
+
+  const allCalls = useMemo(() => [...myCalls, ...SAMPLE_BY_TIME], [myCalls]);
+
+  /* ---------------------------- Exportaciones ---------------------------- */
+  const transcriptText = () => {
+    const lines = [
+      t('transcript.fileHeader', { scenario: t(`scenarios.${scenario.id}.name`), company: companyName }),
+      t('transcript.fileNote'),
+      '',
+      ...shownTurns.map(
+        (tn, i) => `[${fmtTime(at[i])}] ${tn.speaker === 'ai' ? t('transcript.ai', { agent: agentName }) : t('transcript.customer')}: ${texts[i].shown}`,
+      ),
+    ];
+    if (phase === 'transferred') {
+      lines.push('', t(manualTransfer ? 'transcript.transferredManual' : 'transcript.transferredAuto', { human, team }));
+    }
+    if (phase === 'ended' && endReason === 'hungup') lines.push('', t('transcript.hungUp'));
+    return lines.join('\n');
+  };
+  const downloadTranscript = () => downloadText(t('transcript.fileName', { scenario: scenario.id }), transcriptText(), 'text/plain');
+
+  const summaryText = () => {
+    const result = endReason === 'transferred' ? 'transferred' : endReason === 'hungup' ? 'abandoned' : 'resolved';
+    const done = scenario.fns.filter((f) => fnStatus[f.key] === 'done').length;
+    return [
+      `${t('summary.title')} · ${t(`scenarios.${scenario.id}.name`)} · ${companyName}`,
+      `${t('summary.duration')}: ${fmtTime(clock)}`,
+      `${t('summary.result')}: ${t(`summary.results.${result}`)}`,
+      `${t('summary.reason')}: ${intentTurn?.intent ? t(`intents.${intentTurn.intent}`) : '—'}`,
+      `${t('summary.actions')}: ${t('summary.actionsValue', { done, total: scenario.fns.length })}`,
+      `${t('summary.sentiment')}: ${view.firstSentiment && view.sentiment ? `${t(`sentiment.${view.firstSentiment}`)} → ${t(`sentiment.${view.sentiment}`)}` : '—'}`,
+      `${t('summary.masked')}: ${view.maskedCount}`,
+      '',
+      t('transcript.fileNote'),
+    ].join('\n');
+  };
+  const copySummary = async () => {
+    try {
+      await navigator.clipboard.writeText(summaryText());
+      notify(t('summary.copied'));
+    } catch {
+      notify(t('summary.copyFailed'));
     }
   };
 
-  const queueRows = queueTab === 'inbound' ? INBOUND : OUTBOUND;
-  const langLabel = (l: typeof language) => t(`providers.language${l === 'es' ? 'Es' : l === 'en' ? 'En' : 'Mixed'}`);
-  const trendLabel = t(`sentiment.trend${trend.charAt(0).toUpperCase() + trend.slice(1)}`);
+  /* ------------------------------- Render ------------------------------- */
+  const active = phase === 'playing' || phase === 'paused';
+  const currentTurn = cursor >= 0 ? scenario.turns[Math.min(cursor, last)] : null;
+  const someoneSpeaking = phase === 'playing' && !!currentTurn && !turnFinished;
+  const voiceName = speech.voices.find((vv) => vv.uri === voiceUri)?.name ?? speech.voices[0]?.name ?? '';
+  const voiceNote = !speech.supported
+    ? t('call.voice.unsupported')
+    : !speech.available
+      ? t('call.voice.unavailable')
+      : !voiceOn
+        ? t('call.voice.muted')
+        : t('call.voice.available', { voice: voiceName });
+  const speedLabel = (s: Speed) => (locale === 'en' ? `${s}×` : `${String(s).replace('.', ',')}×`);
+
+  const statusTone: Record<Phase, string> = {
+    idle: 'bg-slate-700/40 text-slate-300 border-slate-600/50',
+    playing: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+    paused: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+    transferred: 'bg-violet-500/15 text-violet-300 border-violet-500/30',
+    ended: 'bg-slate-700/40 text-slate-300 border-slate-600/50',
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-secondary-950 to-slate-950 text-slate-100">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="rounded-2xl bg-gradient-to-br from-sky-600 to-sky-800 p-6 sm:p-8 mb-8 shadow-sm flex items-start justify-between gap-4 flex-wrap">
-          <div>
-            <Link href="/demo">
-              <Button variant="ghost" className="mb-3 text-sky-100 hover:text-white hover:bg-white/10">
-                <ArrowLeftIcon className="h-4 w-4 mr-2" />{t('back')}
+        {/* Encabezado */}
+        <div className="rounded-2xl bg-gradient-to-br from-sky-600 to-sky-800 p-6 sm:p-8 mb-6 shadow-sm">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="min-w-0">
+              <Button variant="ghost" className="mb-3 text-sky-100 hover:text-white hover:bg-white/10" asChild>
+                <Link href="/demo">
+                  <ArrowLeftIcon className="h-4 w-4 mr-2" />
+                  {t('header.back')}
+                </Link>
               </Button>
-            </Link>
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight flex items-center gap-3 text-white">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm shadow-lg">
-                <SparklesIcon className="h-6 w-6 text-white" />
-              </span>
-              {t('pageTitle')}
-            </h1>
-            <p className="text-lg text-sky-50/90 mt-2 max-w-3xl">{t('pageSubtitle')}</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {TELE_PROVIDERS.map((p) => (
-              <button key={p.id} onClick={() => setTele(p.id)}
-                className={cn(
-                  'flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium transition-colors',
-                  tele === p.id
-                    ? 'border-emerald-300/60 bg-emerald-500/20 text-emerald-100'
-                    : 'border-white/20 bg-white/10 text-sky-50/80 hover:bg-white/15 hover:text-white'
-                )}>
-                <span className={cn('h-1.5 w-1.5 rounded-full', tele === p.id ? 'bg-emerald-300 animate-pulse' : 'bg-white/40')} />
-                {t(`providers.items.${p.id}`)}
-              </button>
-            ))}
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight flex items-center gap-3 text-white">
+                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm shadow-lg">
+                  <MicrophoneIcon className="h-6 w-6 text-white" />
+                </span>
+                {t('header.title')}
+              </h1>
+              <p className="text-base sm:text-lg text-sky-50/90 mt-2 max-w-3xl">{t('header.subtitle')}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="inline-flex items-center gap-1 rounded-full border border-white/30 bg-white/10 px-2.5 py-0.5 text-xs text-white">
+                  <BeakerIcon className="h-3.5 w-3.5" />
+                  {t('header.sampleBadge')}
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full border border-white/30 bg-white/10 px-2.5 py-0.5 text-xs text-white">
+                  <InformationCircleIcon className="h-3.5 w-3.5" />
+                  {t('header.scriptBadge')}
+                </span>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" variant="outline" className="bg-white text-sky-800 border-white hover:bg-sky-50" asChild>
+                <Link href={REQUEST_DEMO_HREF}>{t('header.requestDemo')}</Link>
+              </Button>
+              <Button size="sm" variant="ghost" className="text-sky-50 hover:text-white hover:bg-white/10" onClick={resetAll} title={t('header.resetHint')}>
+                <ArrowPathIcon className="h-4 w-4 mr-1" />
+                {t('header.reset')}
+              </Button>
+            </div>
           </div>
         </div>
 
-        {/* CALL + sentiment/intent */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card variant="bordered" className="lg:col-span-2 bg-slate-900/60 border-slate-800 backdrop-blur" padding="lg">
-            <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
-              <div className="flex items-center gap-3">
-                <Badge className="bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse mr-1.5" />
-                  {callActive ? t('status.live') : t('status.ended')}
-                </Badge>
-                <span className="text-xs text-slate-500">·</span>
-                <span className="text-xs text-slate-400">{t('call.channel')}: {t('call.channelInbound')}</span>
-                {bargeIn && <Badge className="bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">{t('call.barge')}</Badge>}
+        {/* 1. Escenario */}
+        <Card variant="bordered" className="bg-slate-900/60 border-slate-800 mb-6" padding="md">
+          <PanelTitle icon={<PhoneIcon className="h-4 w-4 text-sky-400" />} title={t('picker.title')} subtitle={t('picker.subtitle')} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3" role="radiogroup" aria-label={t('picker.title')}>
+            {SCENARIOS.map((s) => {
+              const sel = s.id === scenarioId;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={sel}
+                  onClick={() => chooseScenario(s.id)}
+                  className={cn(
+                    'text-left rounded-xl border p-3 transition-colors min-w-0',
+                    sel ? 'border-cyan-400/60 bg-cyan-500/10' : 'border-slate-700/60 bg-slate-800/30 hover:bg-slate-800/60',
+                  )}
+                >
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <span className="text-[10px] uppercase tracking-wide text-slate-400">
+                      {t(`direction.${s.direction}`)} · {t('picker.turns', { count: s.turns.length })}
+                    </span>
+                    {sel && <span className="text-[10px] font-semibold text-cyan-300">{t('picker.selected')}</span>}
+                  </div>
+                  <div className="text-sm font-semibold text-white">{t(`scenarios.${s.id}.name`)}</div>
+                  <p className="mt-1 text-xs text-slate-400">{t(`scenarios.${s.id}.desc`)}</p>
+                </button>
+              );
+            })}
+          </div>
+          <div className="mt-4 rounded-lg border border-slate-700/60 bg-slate-800/30 p-3">
+            <div className="text-xs font-medium text-slate-200 mb-2">{t('picker.personalizeTitle')}</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <label className="text-[11px] text-slate-400">
+                {t('picker.company')}
+                <input
+                  type="text"
+                  value={company}
+                  maxLength={40}
+                  onChange={(e) => setCompany(e.target.value)}
+                  placeholder={t('picker.companyPlaceholder')}
+                  className="mt-1 w-full rounded-md border border-slate-700 bg-slate-900 px-2.5 py-1.5 text-sm text-slate-100 placeholder:text-slate-500"
+                />
+              </label>
+              <label className="text-[11px] text-slate-400">
+                {t('picker.agent')}
+                <input
+                  type="text"
+                  value={agent}
+                  maxLength={20}
+                  onChange={(e) => setAgent(e.target.value)}
+                  placeholder={t('picker.agentPlaceholder')}
+                  className="mt-1 w-full rounded-md border border-slate-700 bg-slate-900 px-2.5 py-1.5 text-sm text-slate-100 placeholder:text-slate-500"
+                />
+              </label>
+            </div>
+            <p className="mt-2 text-[11px] text-slate-500">{t('picker.personalizeHint')}</p>
+          </div>
+        </Card>
+
+        {/* 2. Llamada + sentimiento/intención */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 scroll-mt-24" ref={callCardRef}>
+          <Card variant="bordered" className="lg:col-span-2 bg-slate-900/60 border-slate-800 backdrop-blur" padding="md">
+            <div className="flex items-start justify-between mb-5 flex-wrap gap-3">
+              <div className="min-w-0">
+                <h2 className="font-semibold text-white text-base mb-1.5">{t('call.title')}</h2>
+                <div className="flex items-center gap-2 flex-wrap text-xs text-slate-400">
+                  <span className={cn('inline-flex items-center rounded-full border px-2 py-0.5 font-medium', statusTone[phase])} data-testid="voice-status">
+                    {phase === 'playing' && <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse mr-1.5" />}
+                    {t(`call.status.${phase}`)}
+                  </span>
+                  <span>
+                    {t('call.channel')}: {t(`direction.${scenario.direction}`)}
+                  </span>
+                  <span>
+                    {t('call.number')}: <span className="font-mono">{scenario.number}</span>
+                  </span>
+                </div>
               </div>
               <div className="text-right">
-                <div className="text-xs text-slate-500 uppercase tracking-wider">{t('call.duration')}</div>
-                <div className="text-2xl font-mono font-bold text-white tabular-nums">{fmtTime(duration)}</div>
+                <div className="text-xs text-slate-400 uppercase tracking-wider">{t('call.duration')}</div>
+                <div className="text-2xl font-mono font-bold text-white tabular-nums" data-testid="voice-clock">
+                  {fmtTime(clock)}
+                </div>
               </div>
             </div>
 
-            <div className="flex flex-col items-center mb-6">
+            <div className="flex flex-col items-center mb-5">
               <div className="relative">
-                <div className={cn(
-                  'h-28 w-28 rounded-full bg-gradient-to-br from-cyan-500 via-violet-500 to-fuchsia-600 flex items-center justify-center shadow-2xl shadow-violet-500/30',
-                  callActive && !onHold && 'ring-4 ring-violet-500/40 animate-pulse'
-                )}>
-                  <CpuChipIcon className="h-12 w-12 text-white" />
+                <div
+                  className={cn(
+                    'h-24 w-24 rounded-full flex items-center justify-center shadow-2xl transition-colors',
+                    currentTurn?.speaker === 'customer' && someoneSpeaking
+                      ? 'bg-gradient-to-br from-amber-500 to-rose-500 shadow-amber-500/30'
+                      : 'bg-gradient-to-br from-cyan-500 via-violet-500 to-fuchsia-600 shadow-violet-500/30',
+                    phase === 'playing' && 'ring-4 ring-violet-500/30',
+                  )}
+                >
+                  {currentTurn?.speaker === 'customer' && someoneSpeaking ? (
+                    <UserCircleIcon className="h-11 w-11 text-white" />
+                  ) : (
+                    <CpuChipIcon className="h-11 w-11 text-white" />
+                  )}
                 </div>
-                {callActive && !onHold && (
+                {someoneSpeaking && voiceOn && speech.available && (
                   <span className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-emerald-500 border-4 border-slate-900 flex items-center justify-center">
                     <SpeakerWaveIcon className="h-3 w-3 text-white" />
                   </span>
                 )}
               </div>
               <div className="mt-3 text-center">
-                <div className="font-semibold text-lg text-white">{t('call.agentName')}</div>
-                <div className="text-xs text-slate-400">{t('call.agentRole')}</div>
-              </div>
-              <Waveform active={callActive && !onHold && !muted} className="w-full max-w-md mt-5" />
-              <div className="mt-2 text-[10px] uppercase tracking-widest text-slate-500">{t('waveform')}</div>
-            </div>
-
-            <div className="flex justify-center flex-wrap gap-3 mb-2">
-              <button onClick={() => setMuted(!muted)}
-                className={cn('flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-colors',
-                  muted ? 'border-rose-500/40 bg-rose-500/10 text-rose-300'
-                        : 'border-slate-700 bg-slate-800/60 text-slate-200 hover:bg-slate-800')}>
-                {muted ? <SpeakerXMarkIcon className="h-4 w-4" /> : <MicrophoneIcon className="h-4 w-4" />}
-                {muted ? t('call.controls.unmute') : t('call.controls.mute')}
-              </button>
-              <button onClick={() => setOnHold(!onHold)}
-                className={cn('flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-colors',
-                  onHold ? 'border-amber-500/40 bg-amber-500/10 text-amber-300'
-                         : 'border-slate-700 bg-slate-800/60 text-slate-200 hover:bg-slate-800')}>
-                {onHold ? <PlayCircleIcon className="h-4 w-4" /> : <PauseCircleIcon className="h-4 w-4" />}
-                {onHold ? t('call.controls.resume') : t('call.controls.hold')}
-              </button>
-              <button onClick={() => setHandedOff(true)} disabled={handedOff}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-violet-500/40 bg-violet-500/10 text-violet-300 text-sm font-medium hover:bg-violet-500/20 disabled:opacity-50 disabled:cursor-not-allowed">
-                <ArrowsRightLeftIcon className="h-4 w-4" />{t('call.controls.transfer')}
-              </button>
-              <button onClick={handleStartStop}
-                className={cn('flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white shadow-lg transition-colors',
-                  callActive ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-500/30' : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/30')}>
-                {callActive ? <PhoneXMarkIcon className="h-4 w-4" /> : <PhoneIcon className="h-4 w-4" />}
-                {callActive ? t('call.controls.hangup') : t('call.controls.start')}
-              </button>
-            </div>
-
-            <div className="mt-4 flex items-center justify-center gap-2 text-[11px] text-slate-500">
-              <ShieldCheckIcon className="h-3.5 w-3.5" />{t('call.recording')}
-            </div>
-          </Card>
-
-          <div className="space-y-6">
-            <Card variant="bordered" className="bg-slate-900/60 border-slate-800" padding="md">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <div className="font-semibold text-white flex items-center gap-2">
-                    <ChartBarIcon className="h-4 w-4 text-cyan-400" />{t('sentiment.title')}
-                  </div>
-                  <div className="text-xs text-slate-500">{t('sentiment.subtitle')}</div>
+                <div className="font-semibold text-lg text-white">{agentName}</div>
+                <div className="text-xs text-slate-400">{t('call.agentRole', { company: companyName })}</div>
+                <div className="mt-1 text-xs text-cyan-300 min-h-[1rem]" aria-live="polite">
+                  {someoneSpeaking
+                    ? currentTurn?.speaker === 'ai'
+                      ? t('call.speakingAgent', { agent: agentName })
+                      : t('call.speakingCustomer')
+                    : phase === 'playing'
+                      ? t('call.silent')
+                      : ''}
                 </div>
               </div>
-              <SentimentGauge value={currentSentiment} t={t} />
-              <div className="mt-4 flex items-center justify-between text-xs">
-                <span className="text-slate-500">{t('sentiment.trend')}</span>
-                <span className={cn('flex items-center gap-1 font-medium',
-                  trend === 'improving' && 'text-emerald-400',
-                  trend === 'stable' && 'text-cyan-400',
-                  trend === 'declining' && 'text-rose-400')}>
-                  {trend === 'improving' && <ArrowTrendingUpIcon className="h-3.5 w-3.5" />}
-                  {trend === 'declining' && <ArrowTrendingDownIcon className="h-3.5 w-3.5" />}
-                  {trend === 'stable' && <SignalIcon className="h-3.5 w-3.5" />}
-                  {trendLabel}
-                </span>
-              </div>
-            </Card>
+              <Waveform active={someoneSpeaking} speaker={currentTurn?.speaker ?? 'ai'} className="w-full max-w-md mt-3" />
+              <div className="mt-1 text-[10px] uppercase tracking-widest text-slate-500">{t('call.waveform')}</div>
+            </div>
 
-            <Card variant="bordered" className="bg-slate-900/60 border-slate-800" padding="md">
-              <div className="font-semibold text-white flex items-center gap-2">
-                <BoltIcon className="h-4 w-4 text-amber-400" />{t('intent.title')}
-              </div>
-              <div className="text-xs text-slate-500 mb-3">{t('intent.subtitle')}</div>
-              {lastIntentTurn ? (
+            <div className="flex justify-center flex-wrap gap-2.5 mb-3">
+              {phase === 'idle' && (
+                <button
+                  type="button"
+                  onClick={start}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-500/30"
+                >
+                  <PhoneIcon className="h-4 w-4" />
+                  {t('call.controls.start')}
+                </button>
+              )}
+              {active && (
                 <>
-                  <div className="text-base font-semibold text-white">{t(`intent.items.${lastIntentTurn.intentKey}`)}</div>
-                  <div className="mt-3 flex items-center justify-between text-xs text-slate-400 mb-1.5">
-                    <span>{t('intent.confidence')}</span>
-                    <span className="font-mono text-emerald-300">{Math.round((lastIntentTurn.confidence ?? 0) * 100)}%</span>
-                  </div>
-                  <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-emerald-500 to-cyan-400" style={{ width: `${Math.round((lastIntentTurn.confidence ?? 0) * 100)}%` }} />
-                  </div>
+                  <button
+                    type="button"
+                    onClick={phase === 'playing' ? pause : resume}
+                    className={cn(
+                      'flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-colors',
+                      phase === 'paused' ? 'border-amber-500/40 bg-amber-500/10 text-amber-300' : 'border-slate-700 bg-slate-800/60 text-slate-200 hover:bg-slate-800',
+                    )}
+                  >
+                    {phase === 'paused' ? <PlayCircleIcon className="h-4 w-4" /> : <PauseCircleIcon className="h-4 w-4" />}
+                    {phase === 'paused' ? t('call.controls.resume') : t('call.controls.pause')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={transfer}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-violet-500/40 bg-violet-500/10 text-violet-300 text-sm font-medium hover:bg-violet-500/20"
+                  >
+                    <ArrowsRightLeftIcon className="h-4 w-4" />
+                    {t('call.controls.transfer')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={skipToEnd}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-800/60 text-slate-200 text-sm font-medium hover:bg-slate-800"
+                  >
+                    <ChevronDoubleRightIcon className="h-4 w-4" />
+                    {t('call.controls.skip')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={hangup}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 shadow-lg shadow-rose-500/30"
+                  >
+                    <PhoneXMarkIcon className="h-4 w-4" />
+                    {t('call.controls.hangup')}
+                  </button>
                 </>
-              ) : <div className="text-sm text-slate-500">{t('transcript.empty')}</div>}
-            </Card>
-          </div>
-        </div>
-
-        {/* TRANSCRIPT + PROVIDERS */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-          <Card variant="bordered" className="lg:col-span-2 bg-slate-900/60 border-slate-800" padding="md">
-            <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-              <div>
-                <div className="font-semibold text-white flex items-center gap-2">
-                  <LanguageIcon className="h-4 w-4 text-violet-400" />{t('transcript.title')}
-                </div>
-                <div className="text-xs text-slate-500">{t('transcript.subtitle')}</div>
-              </div>
-              <Badge className={cn('border',
-                latencyGood ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
-                            : 'bg-amber-500/15 text-amber-300 border-amber-500/30')}>
-                {t('transcript.latency')}: {sttLatency}{t('transcript.ms')} · {latencyGood ? t('transcript.good') : t('transcript.warn')}
-              </Badge>
-            </div>
-
-            <div className="space-y-3 max-h-[420px] overflow-y-auto pr-2 voice-scroll">
-              {shownTurns.length === 0 && <div className="text-sm text-slate-500 py-10 text-center">{t('transcript.empty')}</div>}
-              {shownTurns.map((turn) => <TranscriptTurn key={turn.id} turn={turn} t={t} index={turn.id} totalDur={duration} />)}
-              {handedOff && (
-                <div className="rounded-xl border border-violet-500/30 bg-violet-500/5 p-3 text-xs text-violet-200 flex items-start gap-2">
-                  <ArrowRightCircleIcon className="h-4 w-4 mt-0.5 shrink-0" />{t('handoff.transferred')}
-                </div>
+              )}
+              {callOver && (
+                <button
+                  type="button"
+                  onClick={start}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-500/30"
+                >
+                  <ArrowPathIcon className="h-4 w-4" />
+                  {t('call.controls.restart')}
+                </button>
               )}
             </div>
-          </Card>
 
-          <Card variant="bordered" className="bg-slate-900/60 border-slate-800" padding="md">
-            <div className="font-semibold text-white flex items-center gap-2">
-              <ServerStackIcon className="h-4 w-4 text-cyan-400" />{t('providers.title')}
-            </div>
-            <div className="text-xs text-slate-500 mb-4">{t('providers.subtitle')}</div>
-
-            <ProviderGroup label={t('providers.stt')}
-              options={STT_PROVIDERS.map((p) => ({ id: p.id, label: t(`providers.items.${p.id}`), meta: `${p.latency}${t('transcript.ms')}` }))}
-              value={stt} onChange={(v) => setStt(v as typeof stt)} />
-            <div className="mt-4">
-              <ProviderGroup label={t('providers.tts')}
-                options={TTS_PROVIDERS.map((p) => ({ id: p.id, label: t(`providers.items.${p.id}`) }))}
-                value={tts} onChange={(v) => setTts(v as typeof tts)} />
-            </div>
-
-            <div className="mt-5 pt-4 border-t border-slate-800">
-              <div className="text-xs font-medium text-slate-300 mb-2">{t('providers.language')}</div>
-              <div className="flex flex-wrap gap-2">
-                {(['es', 'en', 'mixed'] as const).map((l) => (
-                  <button key={l} onClick={() => setLanguage(l)}
-                    className={cn('px-3 py-1.5 rounded-lg text-xs border transition-colors',
-                      language === l ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-300'
-                                     : 'border-slate-700 bg-slate-800/60 text-slate-400 hover:text-slate-200')}>
-                    {langLabel(l)}
+            <div className="flex justify-center flex-wrap items-center gap-2 text-xs">
+              <button
+                type="button"
+                onClick={toggleVoice}
+                aria-pressed={voiceOn && speech.available}
+                disabled={!speech.available}
+                className={cn(
+                  'inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed',
+                  voiceOn && speech.available ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300' : 'border-slate-600 bg-slate-800/60 text-slate-300',
+                )}
+              >
+                {voiceOn && speech.available ? <SpeakerWaveIcon className="h-4 w-4" /> : <SpeakerXMarkIcon className="h-4 w-4" />}
+                {!speech.available ? t('call.controls.voiceUnavailable') : voiceOn ? t('call.controls.voiceOn') : t('call.controls.voiceOff')}
+              </button>
+              <span className="text-slate-400 ml-1">{t('call.controls.speed')}:</span>
+              <div className="inline-flex rounded-lg border border-slate-700 p-0.5 bg-slate-900/60" role="group" aria-label={t('call.controls.speed')}>
+                {SPEEDS.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    aria-pressed={speed === s}
+                    onClick={() => setSpeed(s)}
+                    className={cn('px-2 py-0.5 rounded-md', speed === s ? 'bg-cyan-500/15 text-cyan-300' : 'text-slate-400 hover:text-slate-200')}
+                  >
+                    {speedLabel(s)}
                   </button>
                 ))}
               </div>
             </div>
-
-            <label className="mt-5 pt-4 border-t border-slate-800 flex items-start gap-3 cursor-pointer">
-              <input type="checkbox" checked={bargeIn} onChange={(e) => setBargeIn(e.target.checked)}
-                className="mt-0.5 h-4 w-4 rounded border-slate-600 bg-slate-800 text-cyan-500 focus:ring-cyan-500" />
-              <span>
-                <span className="block text-sm font-medium text-white">{t('providers.bargeIn')}</span>
-                <span className="block text-xs text-slate-500">{t('providers.bargeInHint')}</span>
-              </span>
-            </label>
-          </Card>
-        </div>
-
-        {/* FUNCTIONS + HANDOFF + ASSIST */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-          <Card variant="bordered" className="lg:col-span-2 bg-slate-900/60 border-slate-800" padding="md">
-            <div className="font-semibold text-white flex items-center gap-2">
-              <BoltIcon className="h-4 w-4 text-amber-400" />{t('functions.title')}
-            </div>
-            <div className="text-xs text-slate-500 mb-4">{t('functions.subtitle')}</div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {(['check_balance', 'unblock_card', 'schedule_appointment', 'transfer_human'] as FnKey[]).map((fk) => {
-                const done = executedFns.includes(fk);
-                return (
-                  <div key={fk}
-                    className={cn('rounded-xl border p-3 transition-colors',
-                      done ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-slate-700/60 bg-slate-800/30')}>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <code className="text-xs font-mono text-cyan-300">{t(`functions.items.${fk}.name`)}()</code>
-                      <Badge size="sm" className={cn(done
-                        ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
-                        : 'bg-slate-700/40 text-slate-400 border border-slate-600/40')}>
-                        {done ? <><CheckCircleIcon className="h-3 w-3 mr-1" />{t('functions.done')}</> : t('functions.running')}
-                      </Badge>
-                    </div>
-                    <div className="text-xs text-slate-400 mb-2">{t(`functions.items.${fk}.desc`)}</div>
-                    {done && (
-                      <div className="text-xs text-slate-200 bg-slate-950/50 rounded-md px-2 py-1.5 border border-slate-800">
-                        <span className="text-slate-500">{t('functions.result')}: </span>
-                        {t(`functions.items.${fk}.result`, { card: '1234' })}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+            <p className="mt-3 text-center text-[11px] text-slate-400" data-testid="voice-note">
+              {voiceNote}
+            </p>
+            <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-[11px] text-slate-500">{t('call.recording')}</p>
           </Card>
 
           <div className="space-y-6">
-            <Card variant="bordered" className="bg-slate-900/60 border-slate-800" padding="md">
-              <div className="font-semibold text-white flex items-center gap-2">
-                <UserGroupIcon className="h-4 w-4 text-violet-400" />{t('handoff.title')}
-              </div>
-              <div className="text-xs text-slate-500 mb-3">{t('handoff.subtitle')}</div>
-
-              <div className="space-y-1.5 text-xs mb-4">
-                <ContextRow label={t('handoff.items.intent')}  value={lastIntentTurn ? t(`intent.items.${lastIntentTurn.intentKey}`) : '—'} />
-                <ContextRow label={t('handoff.items.history')} value={t('handoff.values.historyVal')} />
-                <ContextRow label={t('handoff.items.value')}   value={t('handoff.values.valueVal')} />
-                <ContextRow label={t('handoff.items.lang')}    value={langLabel(language)} />
-                <ContextRow label={t('handoff.items.mood')}    value={t(`sentiment.${currentSentiment}`)} />
-              </div>
-
-              <button onClick={() => setHandedOff(true)} disabled={handedOff}
-                className={cn('w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                  handedOff ? 'bg-violet-500/20 text-violet-300 cursor-not-allowed'
-                            : 'bg-violet-600 hover:bg-violet-700 text-white shadow-lg shadow-violet-500/20')}>
-                <ArrowsRightLeftIcon className="h-4 w-4" />
-                {handedOff ? t('handoff.transferred') : t('handoff.button')}
-              </button>
-            </Card>
-
-            <Card variant="bordered" className="bg-slate-900/60 border-slate-800" padding="md">
-              <div className="font-semibold text-white flex items-center gap-2">
-                <SparklesIcon className="h-4 w-4 text-cyan-400" />{t('assist.title')}
-              </div>
-              <div className="text-xs text-slate-500 mb-3">{t('assist.subtitle')}</div>
-
-              <ul className="space-y-2 text-xs mb-4">
-                {(['s1', 's2', 's3'] as const).map((s) => (
-                  <li key={s} className="flex items-start gap-2 rounded-lg bg-slate-800/40 border border-slate-700/40 p-2">
-                    <CheckCircleIcon className="h-4 w-4 text-emerald-400 mt-0.5 shrink-0" />
-                    <span className="text-slate-200">{t(`assist.suggestions.${s}`)}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="pt-3 border-t border-slate-800">
-                <div className="text-xs font-medium text-slate-300 flex items-center gap-1.5 mb-1.5">
-                  <BookOpenIcon className="h-3.5 w-3.5 text-cyan-400" />{t('assist.kbTitle')}
-                </div>
-                <div className="text-[11px] text-slate-500 mb-2">{t('assist.kbHint')}</div>
-                <ul className="space-y-1.5 text-xs">
-                  {(['a1', 'a2', 'a3'] as const).map((a) => (
-                    <li key={a} className="text-cyan-300 hover:text-cyan-200 cursor-pointer">{t(`assist.kb.${a}`)}</li>
-                  ))}
-                </ul>
-              </div>
-            </Card>
+            <SentimentPanel v={view} />
+            <IntentPanel v={view} />
           </div>
         </div>
 
-        {/* QUEUE + CAMPAIGN */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-          <Card variant="bordered" className="lg:col-span-2 bg-slate-900/60 border-slate-800" padding="md">
-            <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-              <div>
-                <div className="font-semibold text-white flex items-center gap-2">
-                  <PhoneIcon className="h-4 w-4 text-emerald-400" />{t('queues.title')}
-                </div>
-                <div className="text-xs text-slate-500">{t('queues.subtitle')}</div>
-              </div>
-              <div className="inline-flex rounded-lg border border-slate-700 p-0.5 bg-slate-900/60">
-                {(['inbound', 'outbound'] as const).map((tab) => (
-                  <button key={tab} onClick={() => setQueueTab(tab)}
-                    className={cn('px-3 py-1 text-xs rounded-md transition-colors',
-                      queueTab === tab ? 'bg-cyan-500/15 text-cyan-300' : 'text-slate-400 hover:text-slate-200')}>
-                    {t(`queues.tabs.${tab}`)}
-                  </button>
-                ))}
-              </div>
-            </div>
+        <SummaryPanel v={view} onCopy={copySummary} onDownload={downloadTranscript} />
 
-            <div className="overflow-x-auto -mx-2">
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="text-left text-slate-500 border-b border-slate-800">
-                    <th className="font-medium px-2 py-2">{t('queues.columns.number')}</th>
-                    <th className="font-medium px-2 py-2">{t('queues.columns.duration')}</th>
-                    <th className="font-medium px-2 py-2">{t('queues.columns.status')}</th>
-                    <th className="font-medium px-2 py-2">{t('queues.columns.sentiment')}</th>
-                    <th className="font-medium px-2 py-2 text-right">{t('queues.columns.confidence')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {queueRows.map((row) => (
-                    <tr key={row.id} className="border-b border-slate-800/60 hover:bg-slate-800/30">
-                      <td className="px-2 py-2.5 font-mono text-slate-200">{row.number}</td>
-                      <td className="px-2 py-2.5 font-mono text-slate-300">{row.duration}</td>
-                      <td className="px-2 py-2.5">
-                        <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-[11px]', STATUS_TONE[row.status])}>
-                          {row.status === 'live' && <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse mr-1" />}
-                          {t(`queues.statuses.${row.status}`)}
-                        </span>
-                      </td>
-                      <td className="px-2 py-2.5">
-                        <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-[11px] border', SENTIMENT_TONE[row.sentiment])}>
-                          {t(`sentiment.${row.sentiment}`)}
-                        </span>
-                      </td>
-                      <td className="px-2 py-2.5 text-right font-mono text-slate-200">{Math.round(row.confidence * 100)}%</td>
-                    </tr>
+        {/* Transcripción + flujo */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          <TranscriptPanel v={view} onDownload={downloadTranscript} />
+          <FlowPanel v={view} />
+        </div>
+
+        {/* Acciones + transferencia + asistente */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          <ActionsPanel v={view} />
+          <div className="space-y-6">
+            <HandoffPanel v={view} onTransfer={transfer} />
+            <AssistPanel v={view} />
+          </div>
+        </div>
+
+        {/* Cumplimiento + métricas */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          <CompliancePanel v={view} window={windowCheck} />
+          <KpiPanel rows={allCalls} t={t} locale={locale} />
+        </div>
+
+        {/* Registro de llamadas */}
+        <div className="mt-6">
+          <CallLog
+            rows={allCalls}
+            t={t}
+            onOpen={openFromLog}
+            onClearMine={() => {
+              setMyCalls([]);
+              notify(t('log.cleared'));
+            }}
+            notify={notify}
+          />
+        </div>
+
+        {/* Campaña saliente */}
+        <div className="mt-6">
+          <CampaignPanel t={t} notify={notify} resetKey={resetKey} />
+        </div>
+
+        {/* Voz + implementación */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          <Card variant="bordered" className="bg-slate-900/60 border-slate-800" padding="md">
+            <PanelTitle icon={<SpeakerWaveIcon className="h-4 w-4 text-cyan-400" />} title={t('settings.title')} subtitle={t('settings.subtitle')} />
+            {speech.available ? (
+              <label className="block text-xs text-slate-300">
+                {t('settings.voice')}
+                <select
+                  value={voiceUri}
+                  onChange={(e) => setVoiceUri(e.target.value)}
+                  className="mt-1 w-full rounded-md border border-slate-700 bg-slate-900 px-2.5 py-1.5 text-sm text-slate-100"
+                >
+                  <option value="">{t('settings.voiceAuto', { name: speech.voices[0]?.name ?? '' })}</option>
+                  {speech.voices.map((vv) => (
+                    <option key={vv.uri} value={vv.uri}>
+                      {vv.name} ({vv.lang})
+                    </option>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                </select>
+                <span className="mt-2 block text-[11px] text-slate-500">{t('settings.customerVoice')}</span>
+              </label>
+            ) : (
+              <p className="text-xs text-slate-400">{speech.supported ? t('settings.noVoices') : t('call.voice.unsupported')}</p>
+            )}
           </Card>
 
-          <Card variant="bordered" className="bg-slate-900/60 border-slate-800" padding="md">
-            <div className="font-semibold text-white flex items-center gap-2">
-              <ArrowTrendingUpIcon className="h-4 w-4 text-emerald-400" />{t('campaign.title')}
-            </div>
-            <div className="text-xs text-slate-500 mb-3">{t('campaign.subtitle')}</div>
-
-            <div className="rounded-lg border border-slate-700/60 bg-slate-800/40 p-3 mb-3">
-              <div className="text-sm font-medium text-white">{t('campaign.name')}</div>
-              <label className="mt-2 flex items-start gap-2 cursor-pointer">
-                <input type="checkbox" checked={predictive} onChange={(e) => setPredictive(e.target.checked)}
-                  className="mt-0.5 h-3.5 w-3.5 rounded border-slate-600 bg-slate-800 text-emerald-500 focus:ring-emerald-500" />
-                <span>
-                  <span className="block text-xs font-medium text-slate-200">{t('campaign.predictive')}</span>
-                  <span className="block text-[11px] text-slate-500">{t('campaign.predictiveHint')}</span>
-                </span>
-              </label>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <Metric label={t('campaign.metrics.contacted')} value="1.284" />
-              <Metric label={t('campaign.metrics.connected')} value="612" />
-              <Metric label={t('campaign.metrics.voicemail')} value="298" />
-              <Metric label={t('campaign.metrics.answerRate')} value="47.6%" />
-            </div>
-
-            <div className="mt-4 pt-3 border-t border-slate-800">
-              <div className="text-xs font-medium text-slate-300 mb-2">{t('campaign.events.title')}</div>
-              <ul className="space-y-1.5 text-[11px] text-slate-400 font-mono">
-                <li><span className="text-emerald-400">●</span> {t('campaign.events.human', { number: '+56 9 4521 8830' })}</li>
-                <li><span className="text-amber-400">●</span> {t('campaign.events.amd',    { number: '+56 9 2233 9087' })}</li>
-                <li><span className="text-cyan-400">●</span> {t('campaign.events.drop',   { number: '+56 9 2233 9087' })}</li>
-                <li><span className="text-rose-400">●</span> {t('campaign.events.dnc',    { number: '+54 11 4456 9912' })}</li>
-              </ul>
-            </div>
+          <Card variant="bordered" className="lg:col-span-2 bg-slate-900/60 border-slate-800" padding="md">
+            <PanelTitle
+              icon={<WrenchScrewdriverIcon className="h-4 w-4 text-amber-400" />}
+              title={t('implementation.title')}
+              subtitle={t('implementation.subtitle')}
+            />
+            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              {(['telephony', 'stt', 'llm', 'tts', 'integrations'] as const).map((k) => (
+                <div key={k} className="rounded-lg border border-slate-700/60 bg-slate-800/30 p-2.5">
+                  <dt className="font-medium text-slate-100">{t(`implementation.items.${k}.title`)}</dt>
+                  <dd className="mt-0.5 text-slate-400">{t(`implementation.items.${k}.desc`)}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="mt-3 text-[11px] text-slate-400">{t('implementation.costNote')}</p>
           </Card>
         </div>
 
-        {/* COMPLIANCE + ANALYTICS */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-          <Card variant="bordered" className="bg-slate-900/60 border-slate-800" padding="md">
-            <div className="font-semibold text-white flex items-center gap-2">
-              <ShieldCheckIcon className="h-4 w-4 text-emerald-400" />{t('compliance.title')}
-            </div>
-            <div className="text-xs text-slate-500 mb-3">{t('compliance.subtitle')}</div>
-            <ul className="space-y-2 text-xs">
-              <ComplianceRow title={t('compliance.dnc')}       desc={t('compliance.dncOk')} />
-              <ComplianceRow title={t('compliance.recording')} desc={t('compliance.recordingOk')} />
-              <ComplianceRow title={t('compliance.pci')}       desc={t('compliance.pciOk')} highlight />
-              <ComplianceRow title={t('compliance.gdpr')}      desc={t('compliance.gdprOk')} />
-            </ul>
-          </Card>
+        {/* Glosario */}
+        <Card variant="bordered" className="bg-slate-900/60 border-slate-800 mt-6" padding="md">
+          <PanelTitle icon={<BookOpenIcon className="h-4 w-4 text-violet-400" />} title={t('glossary.title')} />
+          <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3 text-xs">
+            {(['stt', 'tts', 'intent', 'sentiment', 'functions', 'handoff', 'containment', 'aht', 'csat', 'bargeIn'] as const).map((k) => (
+              <div key={k}>
+                <dt className="font-medium text-slate-100">{t(`glossary.items.${k}.term`)}</dt>
+                <dd className="text-slate-400">{t(`glossary.items.${k}.def`)}</dd>
+              </div>
+            ))}
+          </dl>
+        </Card>
 
-          <Card variant="bordered" className="lg:col-span-2 bg-slate-900/60 border-slate-800" padding="md">
-            <div className="font-semibold text-white flex items-center gap-2">
-              <ChartBarIcon className="h-4 w-4 text-cyan-400" />{t('analytics.title')}
-            </div>
-            <div className="text-xs text-slate-500 mb-4">{t('analytics.subtitle')}</div>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-              <KpiCard label={t('analytics.csat')}        sub={t('analytics.csatSub')}        value="4.7/5" tone="emerald" />
-              <KpiCard label={t('analytics.aht')}         sub={t('analytics.ahtSub')}         value="2:48" tone="cyan" />
-              <KpiCard label={t('analytics.fcr')}         sub={t('analytics.fcrSub')}         value="82%" tone="violet" />
-              <KpiCard label={t('analytics.containment')} sub={t('analytics.containmentSub')} value="64%" tone="fuchsia" />
-              <KpiCard label={t('analytics.volume')}      sub={t('analytics.volumeSub')}      value="3.412" tone="amber" />
-            </div>
-          </Card>
+        {/* Nota de datos de ejemplo */}
+        <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-slate-800 bg-slate-900/40 p-4 text-xs text-slate-400">
+          <p className="flex gap-2">
+            <InformationCircleIcon className="h-4 w-4 shrink-0 text-slate-500" />
+            {t('footer.sampleNote')}
+          </p>
+          <Button size="sm" variant="outline" className="!border-slate-500 !text-slate-100 hover:!bg-slate-800 shrink-0" asChild>
+            <Link href={REQUEST_DEMO_HREF}>{t('footer.cta')}</Link>
+          </Button>
         </div>
       </div>
 
+      <div aria-live="polite" className="fixed bottom-4 right-4 left-4 sm:left-auto z-[120] flex justify-end pointer-events-none">
+        {toast && (
+          <div className="pointer-events-auto rounded-lg border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm text-slate-100 shadow-xl" role="status">
+            {toast}
+          </div>
+        )}
+      </div>
+
       <style jsx global>{`
-        .voice-scroll::-webkit-scrollbar { width: 6px; }
-        .voice-scroll::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.25); border-radius: 9999px; }
-        .voice-scroll::-webkit-scrollbar-track { background: transparent; }
+        .voice-scroll::-webkit-scrollbar {
+          width: 6px;
+        }
+        .voice-scroll::-webkit-scrollbar-thumb {
+          background: rgba(148, 163, 184, 0.25);
+          border-radius: 9999px;
+        }
+        .voice-scroll::-webkit-scrollbar-track {
+          background: transparent;
+        }
       `}</style>
     </div>
   );

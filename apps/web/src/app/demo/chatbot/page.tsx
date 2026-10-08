@@ -1,220 +1,135 @@
 'use client';
 
 /**
- * Enterprise RAG Chatbot — flagship demo.
+ * Demo RAG (producto principal de KopTup) — /demo/chatbot.
  *
- * Orquesta:
- *  - Sidebar de 19 capas de plataforma (primarias + collapse "más")
- *  - Chat central con streaming token-by-token y citas inline
- *  - PipelinePanel en vivo a la derecha (collapse on demand)
- *  - SourcePanel para "source highlighting" del chunk citado
- *  - CapabilityPanel modal con bullets por capa
- *  - StatsWidget flotante colapsable con telemetría agregada
- *  - TopBar con tenant / model / locale / device toggle / run sample
- *  - Onboarding tour de 4 pasos (dismiss persistido en localStorage)
- *
- * Toda la data es mock (ver components/data.ts). Llamada real opcional via chatWithBot.
+ * Tres modos:
+ *  - "Prueba el asistente" (Playground): tres empresas FICTICIAS con sus
+ *    documentos (`components/sampleKnowledge.ts`). Al elegir una, el navegador
+ *    crea un bot real en el backend y le sube esos textos; cada pregunta va a
+ *    `POST /api/chatbot/bots/:id/chat` (búsqueda BM25 top 5 → modelo de OpenAI
+ *    o modo extractivo → citas). No hay respuestas prefabricadas, métricas
+ *    aleatorias ni pasos simulados: todo lo que se muestra sale de la
+ *    respuesta del backend o se mide en el navegador.
+ *  - "Prueba con tu documento": `components/upload/` (API /api/demo-rag).
+ *  - "Configura el tuyo": `components/builder/` (bot propio, widget real y
+ *    código para insertar).
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+import toast from 'react-hot-toast';
 import {
-  BookOpenIcon,
-  ChatBubbleLeftRightIcon,
-  XMarkIcon,
-  ChevronDoubleRightIcon,
-  ChevronDoubleLeftIcon,
   ArrowRightIcon,
+  BookOpenIcon,
+  ChevronDoubleLeftIcon,
+  ChevronDoubleRightIcon,
+  DocumentTextIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
 
-import Sidebar from './components/Sidebar';
-import ChatPanel, { type ChatMessage } from './components/ChatPanel';
+import Sidebar, { type KbPhase } from './components/Sidebar';
+import ChatPanel from './components/ChatPanel';
 import PipelinePanel from './components/PipelinePanel';
 import CapabilityPanel from './components/CapabilityPanel';
 import SourcePanel from './components/SourcePanel';
-import StatsWidget from './components/StatsWidget';
-import TopBar from './components/TopBar';
+import DocumentViewer from './components/DocumentViewer';
+import StatsWidget, { type SessionStats } from './components/StatsWidget';
+import TopBar, { type AiStatus } from './components/TopBar';
 import ModeToggle, { type ChatbotMode } from './components/builder/ModeToggle';
 import BuilderMode from './components/builder/BuilderMode';
 import UploadDemo from './components/upload/UploadDemo';
-import { trackDemoStart, type DemoEventMode } from './components/demoEvents';
-import { chatWithBot, createBot, type RemoteChatReplySource } from './components/builder/api';
-import Tooltip from './components/ui/Tooltip';
-import InfoIcon from './components/ui/InfoIcon';
 import DeviceFrame, { type DeviceKind } from './components/ui/DeviceFrame';
+import { trackDemoStart, type DemoEventMode } from './components/demoEvents';
 import {
-  CONNECTED_SOURCES,
-  SCENARIO_DATA,
-  type LayerKey,
-  type PipelineStepData,
-  type ScenarioKey,
+  BotApiError,
+  chatWithBot,
+  getBot,
+  isGenerativeReply,
+  isNotFoundReply,
+  listModels,
+  type RemoteModelMeta,
+} from './components/builder/api';
+import { ensureSampleBot, resetSampleBot, type SampleBotState } from './components/sampleBot';
+import {
+  findSampleDocument,
+  getSampleCompanies,
+  getSampleCompany,
+  type SampleCompany,
+  type SampleCompanyKey,
+  type SampleDocument,
+  type SampleLocale,
+} from './components/sampleKnowledge';
+import {
+  DEFAULT_MODEL_ID,
+  countCitations,
+  type AnswerMeta,
+  type ChatMessage,
+  type IncludedKey,
   type SourceChunk,
-  TENANTS,
 } from './components/data';
 
-type TenantId = (typeof TENANTS)[number]['id'];
+const ONBOARDING_LS_KEY = 'koptup.demo.chatbot.tour.v2';
+const MODES: readonly ChatbotMode[] = ['playground', 'upload', 'builder'];
+const HISTORY_TURNS = 10;
 
-/**
- * El paso "llm" del pipeline muestra el modelo elegido en el TopBar (el
- * backend solo usa modelos de OpenAI), no un valor fijo del escenario.
- */
-function withSelectedModel(steps: PipelineStepData[], modelId: string): PipelineStepData[] {
-  return steps.map((step) => (step.key === 'llm' ? { ...step, detail: modelId } : step));
+function welcomeMessage(company: SampleCompany): ChatMessage {
+  return { id: `welcome-${company.key}`, role: 'assistant', content: company.welcome, welcome: true };
 }
 
-const STREAM_CHAR_INTERVAL_MS = 18;
-const ONBOARDING_LS_KEY = 'koptup.demo.chatbot.onboarded';
-const PLAYGROUND_BOT_LS_KEY = 'koptup.chatbot.demoBotId';
-
-/**
- * Convierte las citas que devuelve el backend (RAG real sobre docs subidos
- * por el usuario) al shape `SourceChunk` que esperan ChatPanel/SourcePanel.
- * Si el backend no envía sources, devolvemos undefined para que la UI caiga
- * al payload del escenario.
- */
-function mapRemoteSources(remote: RemoteChatReplySource[] | undefined): SourceChunk[] | undefined {
-  if (!remote || remote.length === 0) return undefined;
-  return remote.map((s) => ({
-    id: s.id,
-    // El backend no clasifica la fuente; usamos 'confluence' como placeholder
-    // y exponemos `sourceName` para que la UI muestre el nombre real del doc.
-    sourceKey: 'confluence' as SourceChunk['sourceKey'],
-    sourceName: s.name,
-    score: typeof s.score === 'number' ? s.score : 0,
-    rerankScore: typeof s.score === 'number' ? s.score : 0,
-    updated: new Date().toISOString().slice(0, 10),
-    snippet: s.chunk ?? '',
-  }));
-}
-
-/**
- * Resuelve el botId del Playground: 1) URL `?botId=`, 2) localStorage,
- * 3) si no existe ninguno, crea uno nuevo en el backend y lo cachea.
- */
-async function resolvePlaygroundBotId(): Promise<string | null> {
-  if (typeof window === 'undefined') return null;
-  try {
-    const params = new URLSearchParams(window.location.search);
-    const fromUrl = params.get('botId');
-    if (fromUrl) return fromUrl;
-    const cached = window.localStorage.getItem(PLAYGROUND_BOT_LS_KEY);
-    if (cached) return cached;
-    const created = await createBot({ name: 'Playground Demo' });
-    window.localStorage.setItem(PLAYGROUND_BOT_LS_KEY, created.botId);
-    return created.botId;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Hook auxiliar: simula la animación step-by-step del pipeline.
- * Devuelve el índice del step activo (o -1/length para idle/done).
- */
-function usePipelineRunner(steps: PipelineStepData[], running: boolean): number {
-  const [stepIndex, setStepIndex] = useState<number>(-1);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    if (!running || steps.length === 0) return;
-    setStepIndex(0);
-    let i = 0;
-    const tick = () => {
-      i += 1;
-      if (i >= steps.length) {
-        setStepIndex(steps.length);
-        return;
-      }
-      setStepIndex(i);
-      const wait = Math.max(80, Math.min(420, steps[i].durationMs / 3));
-      timeoutRef.current = setTimeout(tick, wait);
-    };
-    const firstWait = Math.max(80, Math.min(420, steps[0].durationMs / 3));
-    timeoutRef.current = setTimeout(tick, firstWait);
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, [running, steps]);
-
-  // Reset when steps reference changes and we're not running.
-  useEffect(() => {
-    if (!running) setStepIndex(steps.length > 0 ? steps.length : -1);
-  }, [running, steps]);
-
-  return stepIndex;
-}
-
-/**
- * Hook auxiliar: anima la escritura char-by-char del último mensaje del assistant.
- */
-function useStreamingMessage(
-  messageId: string | null,
-  fullText: string | null,
-  onDone: () => void,
-): number {
-  const [chars, setChars] = useState(0);
-  const onDoneRef = useRef(onDone);
-  onDoneRef.current = onDone;
-
-  useEffect(() => {
-    if (!messageId || !fullText) {
-      setChars(0);
-      return;
-    }
-    setChars(0);
-    let i = 0;
-    const step = () => {
-      i = Math.min(i + 2, fullText.length);
-      setChars(i);
-      if (i >= fullText.length) {
-        onDoneRef.current();
-        return;
-      }
-      timer = setTimeout(step, STREAM_CHAR_INTERVAL_MS);
-    };
-    let timer = setTimeout(step, 350);
-    return () => clearTimeout(timer);
-  }, [messageId, fullText]);
-
-  return chars;
+/** Historial que se envía al backend (solo turnos reales, sin bienvenida ni errores). */
+function toHistory(messages: ChatMessage[]): Array<{ role: string; content: string }> {
+  return messages
+    .filter((m) => !m.welcome && !m.pending && !m.errorKey && m.content.trim().length > 0)
+    .slice(-HISTORY_TURNS)
+    .map((m) => ({ role: m.role, content: m.content }));
 }
 
 export default function ChatbotDemoPage() {
   const t = useTranslations('demoChatbot');
+  const locale: SampleLocale = useLocale() === 'en' ? 'en' : 'es';
+  const companies = useMemo(() => getSampleCompanies(locale), [locale]);
 
-  // UI state
+  // --- UI ---------------------------------------------------------------
   const [mode, setMode] = useState<ChatbotMode>('playground');
-  const [tenant, setTenant] = useState<TenantId>('acme');
-  const [modelId, setModelId] = useState<string>('gpt-4o-mini');
-  const [locale, setLocale] = useState<'es' | 'en'>('es');
-  const [activeLayer, setActiveLayer] = useState<LayerKey | null>(null);
-  const [openChunk, setOpenChunk] = useState<SourceChunk | null>(null);
-  const [showPipeline, setShowPipeline] = useState(true);
-  const [showSidebar, setShowSidebar] = useState(true);
-  const [showSources, setShowSources] = useState(false);
+  /** true cuando ya se leyó ?mode= de la URL (evita indexar la empresa si se entra a otro modo). */
+  const [modeResolved, setModeResolved] = useState(false);
+  const [companyKey, setCompanyKey] = useState<SampleCompanyKey>('rrhh');
+  const company = useMemo(() => getSampleCompany(companyKey, locale), [companyKey, locale]);
   const [device, setDevice] = useState<DeviceKind>('desktop');
-  const [showSettings, setShowSettings] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(true);
+  const [showPipeline, setShowPipeline] = useState(true);
+  const [showDrawer, setShowDrawer] = useState(false);
+  const [activeIncluded, setActiveIncluded] = useState<IncludedKey | null>(null);
+  const [openChunk, setOpenChunk] = useState<SourceChunk | null>(null);
+  const [viewer, setViewer] = useState<{ doc: SampleDocument; highlight: string | null } | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingStep, setOnboardingStep] = useState(0);
 
-  // Chat state
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  // --- IA (estado real del backend) --------------------------------------
+  const [models, setModels] = useState<RemoteModelMeta[]>([]);
+  const [aiStatus, setAiStatus] = useState<AiStatus>('checking');
+  const [modelId, setModelId] = useState<string>(DEFAULT_MODEL_ID);
+
+  // --- Base de conocimiento de la empresa de ejemplo ----------------------
+  const [kbPhase, setKbPhase] = useState<KbPhase>('preparing');
+  const [botState, setBotState] = useState<SampleBotState | null>(null);
+  const [kbAttempt, setKbAttempt] = useState(0);
+  const botPromiseRef = useRef<Promise<SampleBotState> | null>(null);
+
+  // --- Chat --------------------------------------------------------------
+  const [messages, setMessages] = useState<ChatMessage[]>(() => [welcomeMessage(getSampleCompany('rrhh', locale))]);
+  const messagesRef = useRef(messages);
+  messagesRef.current = messages;
+  // Respuestas de empresas anteriores en esta pestaña (para las métricas de la sesión).
+  const [archived, setArchived] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
-  const [isStreaming, setIsStreaming] = useState(false);
-  const [thinkingId, setThinkingId] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const busyRef = useRef(false);
+  const idRef = useRef(0);
+  const askedRef = useRef<Set<string>>(new Set());
 
-  // Pipeline state
-  const [pipelineSteps, setPipelineSteps] = useState<PipelineStepData[]>([]);
-  const [pipelineTotals, setPipelineTotals] = useState<{
-    latencyMs: number;
-    tokens: number;
-    cost: number;
-  }>({ latencyMs: 0, tokens: 0, cost: 0 });
-  const [pipelineRunning, setPipelineRunning] = useState(false);
-  const stepIndex = usePipelineRunner(pipelineSteps, pipelineRunning);
-
-  // FASE 7: `demo_start` = primera pregunta de la visita, con el documento de
-  // ejemplo (Playground) o con el documento propio (Prueba con tu documento).
+  // `demo_start` = primera pregunta de la visita (documento de ejemplo o propio).
   const demoStartedRef = useRef(false);
   const markDemoStart = useCallback((demoMode: DemoEventMode) => {
     if (demoStartedRef.current) return;
@@ -223,517 +138,477 @@ export default function ChatbotDemoPage() {
   }, []);
   const markUploadQuestion = useCallback(() => markDemoStart('upload'), [markDemoStart]);
 
-  // Telemetría agregada
-  const [aggTokens, setAggTokens] = useState(0);
-  const [aggLatency, setAggLatency] = useState(0);
-  const [aggCost, setAggCost] = useState(0);
-  const [cacheHit, setCacheHit] = useState(64.2);
-  const [drift, setDrift] = useState(0.8);
-  const [faithfulness, setFaithfulness] = useState(94);
-  const [hallucination, setHallucination] = useState(0.6);
-
-  // Drift / faithfulness / hallucination drift cada 4s (visual)
+  // Modo inicial desde la URL (?mode=upload|builder), solo en el cliente.
   useEffect(() => {
-    const id = setInterval(() => {
-      setCacheHit((v) => Math.max(40, Math.min(95, v + (Math.random() - 0.5) * 4)));
-      setDrift((v) => Math.max(0.1, Math.min(3.5, v + (Math.random() - 0.5) * 0.4)));
-      setFaithfulness((v) => Math.max(80, Math.min(99, v + (Math.random() - 0.5) * 2)));
-      setHallucination((v) => Math.max(0.1, Math.min(3, v + (Math.random() - 0.5) * 0.3)));
-    }, 4000);
-    return () => clearInterval(id);
-  }, []);
-
-  // Animación de streaming
-  const streamingMsg = messages.find((m) => m.id === thinkingId && m.role === 'assistant');
-  const targetText = streamingMsg && !streamingMsg.done ? streamingMsg.content : null;
-  const streamedChars = useStreamingMessage(thinkingId, targetText, () => {
-    setMessages((prev) =>
-      prev.map((m) =>
-        m.id === thinkingId ? { ...m, done: true, streamedChars: m.content.length } : m,
-      ),
-    );
-    setIsStreaming(false);
-    setThinkingId(null);
-    setPipelineRunning(false);
-  });
-
-  // Reflejar streamedChars en el mensaje
-  useEffect(() => {
-    if (!thinkingId) return;
-    setMessages((prev) =>
-      prev.map((m) => (m.id === thinkingId ? { ...m, streamedChars } : m)),
-    );
-  }, [streamedChars, thinkingId]);
-
-  const runScenario = useCallback(
-    (key: ScenarioKey) => {
-      if (isStreaming) return;
-      markDemoStart('sample');
-      const payload = SCENARIO_DATA[key];
-      const question = t(`scenarios.${key}.question`);
-      const answer = t(`scenarios.${key}.answer`);
-
-      const userMsg: ChatMessage = {
-        id: `u-${Date.now()}`,
-        role: 'user',
-        content: question,
-      };
-      const asstId = `a-${Date.now() + 1}`;
-      const asstMsg: ChatMessage = {
-        id: asstId,
-        role: 'assistant',
-        content: answer,
-        scenario: key,
-        sources: payload.sources,
-        confidence: payload.confidence,
-        streamedChars: 0,
-        done: false,
-      };
-
-      setMessages((prev) => [...prev, userMsg, asstMsg]);
-      setInput('');
-      setPipelineSteps(withSelectedModel(payload.pipeline, modelId));
-      setPipelineTotals({
-        latencyMs: payload.totalLatencyMs,
-        tokens: payload.totalTokens,
-        cost: payload.costUsd,
-      });
-      setAggTokens((v) => v + payload.totalTokens);
-      setAggLatency(payload.totalLatencyMs);
-      setAggCost((v) => v + payload.costUsd);
-      setPipelineRunning(true);
-      setIsStreaming(true);
-      setThinkingId(asstId);
-    },
-    [isStreaming, markDemoStart, modelId, t],
-  );
-
-  const handleSend = useCallback(() => {
-    if (!input.trim() || isStreaming) return;
-    markDemoStart('sample');
-    const q = input.toLowerCase();
-    const key: ScenarioKey =
-      /sql|revenue|facturar|warehouse|snowflake/.test(q) ? 'sql'
-      : /code|funcion|función|class|implement|refresh|token/.test(q) ? 'code'
-      : /graph|depend|teams|service|equipo/.test(q) ? 'graph'
-      : /ticket|incident|payments|multi-hop|relacion/.test(q) ? 'multiHop'
-      : 'docs';
-    const payload = SCENARIO_DATA[key];
-    const userMsg: ChatMessage = { id: `u-${Date.now()}`, role: 'user', content: input };
-    const asstId = `a-${Date.now() + 1}`;
-
-    // Mensaje provisional con la respuesta de escenario; lo reemplazamos cuando
-    // llegue la respuesta del backend (que cita los docs realmente cargados).
-    const provisional = t(`scenarios.${key}.answer`);
-    const asstMsg: ChatMessage = {
-      id: asstId,
-      role: 'assistant',
-      content: provisional,
-      scenario: key,
-      sources: payload.sources,
-      confidence: payload.confidence,
-      streamedChars: 0,
-      done: false,
-    };
-    setMessages((prev) => [...prev, userMsg, asstMsg]);
-    const sentInput = input;
-    setInput('');
-    setPipelineSteps(withSelectedModel(payload.pipeline, modelId));
-    setPipelineTotals({
-      latencyMs: payload.totalLatencyMs,
-      tokens: payload.totalTokens,
-      cost: payload.costUsd,
-    });
-    setAggTokens((v) => v + payload.totalTokens);
-    setAggLatency(payload.totalLatencyMs);
-    setAggCost((v) => v + payload.costUsd);
-    setPipelineRunning(true);
-    setIsStreaming(true);
-    setThinkingId(asstId);
-
-    // Disparamos la llamada REAL al backend con retrieval BM25-lite sobre los
-    // documentos que el usuario haya subido. Si todavía no hay docs (o no
-    // matchea ninguno), el backend responde honestamente y la UI lo refleja.
-    void (async () => {
-      const botId = await resolvePlaygroundBotId();
-      if (!botId) return;
-      try {
-        const res = await chatWithBot(botId, sentInput, [], modelId);
-        const mappedSources = mapRemoteSources(res.sources);
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === asstId
-              ? {
-                  ...m,
-                  content: res.reply || provisional,
-                  // Si hay sources reales del backend, las usamos; si no,
-                  // mantenemos el payload del escenario (UX consistente).
-                  sources: mappedSources ?? m.sources,
-                  confidence:
-                    typeof res.confidence === 'number'
-                      ? Math.round(res.confidence * 100)
-                      : m.confidence,
-                }
-              : m,
-          ),
-        );
-        if (typeof res.latencyMs === 'number') setAggLatency(res.latencyMs);
-        if (typeof res.costUSD === 'number') setAggCost((v) => v + res.costUSD!);
-        if (res.tokens?.total) setAggTokens((v) => v + res.tokens!.total!);
-      } catch {
-        /* offline / error → mantenemos el provisional */
-      }
-    })();
-  }, [input, isStreaming, markDemoStart, modelId, t]);
-
-  const handleCiteClick = useCallback((c: SourceChunk) => setOpenChunk(c), []);
-
-  // Inicializar con un saludo
-  useEffect(() => {
-    if (messages.length === 0) {
-      setMessages([
-        {
-          id: 'welcome',
-          role: 'assistant',
-          content:
-            t('chat.assistant') +
-            ' · ' +
-            t('chat.subtitle') +
-            '\n\n→ ' +
-            t('chat.scenarios') +
-            ': ' +
-            [t('chat.scenarioLabels.docs'), t('chat.scenarioLabels.multiHop'), t('chat.scenarioLabels.code'), t('chat.scenarioLabels.sql'), t('chat.scenarioLabels.graph')].join(' · '),
-          done: true,
-          streamedChars: undefined,
-        },
-      ]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Onboarding: si nunca se completó, mostrar el tour. Se persiste en localStorage.
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
     try {
-      const dismissed = window.localStorage.getItem(ONBOARDING_LS_KEY);
-      if (!dismissed) setShowOnboarding(true);
+      const fromUrl = new URLSearchParams(window.location.search).get('mode');
+      if (fromUrl && (MODES as readonly string[]).includes(fromUrl)) setMode(fromUrl as ChatbotMode);
     } catch {
-      // localStorage no disponible (modo privado, etc.); no bloqueamos.
+      /* URL no disponible */
+    }
+    setModeResolved(true);
+  }, []);
+
+  const changeMode = useCallback((next: ChatbotMode) => {
+    setMode(next);
+    try {
+      const url = new URL(window.location.href);
+      if (next === 'playground') url.searchParams.delete('mode');
+      else url.searchParams.set('mode', next);
+      if (next !== 'builder') url.searchParams.delete('botId');
+      window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}`);
+    } catch {
+      /* sin History API: el modo igual cambia */
     }
   }, []);
+
+  // Modelos y estado de la IA: GET /api/chatbot/models.
+  useEffect(() => {
+    let cancelled = false;
+    listModels()
+      .then((data) => {
+        if (cancelled) return;
+        setModels(data.available);
+        setAiStatus(data.activeProvider ? 'generative' : 'extractive');
+        const enabled = data.available.filter((m) => m.enabled);
+        setModelId((current) =>
+          enabled.some((m) => m.id === current) ? current : (enabled.find((m) => m.recommended) ?? enabled[0])?.id ?? current,
+        );
+      })
+      .catch(() => {
+        if (!cancelled) setAiStatus('offline');
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Indexa (o reutiliza) el bot de la empresa elegida en el backend (solo en este modo).
+  const inPlayground = mode === 'playground';
+  useEffect(() => {
+    if (!modeResolved || !inPlayground) return;
+    let cancelled = false;
+    setKbPhase('preparing');
+    setBotState(null);
+    const p = ensureSampleBot(company, locale);
+    botPromiseRef.current = p;
+    p.then((state) => {
+      if (cancelled) return;
+      setBotState(state);
+      setKbPhase('ready');
+    }).catch(() => {
+      if (!cancelled) setKbPhase('error');
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [company, locale, kbAttempt, inPlayground, modeResolved]);
+
+  // Recorrido de bienvenida (se guarda en localStorage al cerrarlo).
+  useEffect(() => {
+    try {
+      if (!window.localStorage.getItem(ONBOARDING_LS_KEY)) setShowOnboarding(true);
+    } catch {
+      /* localStorage no disponible: no mostramos el recorrido */
+    }
+  }, []);
+
+  // El panel lateral en móvil se cierra con Escape.
+  useEffect(() => {
+    if (!showDrawer) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowDrawer(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [showDrawer]);
 
   const dismissOnboarding = useCallback(() => {
     setShowOnboarding(false);
-    if (typeof window !== 'undefined') {
+    try {
+      window.localStorage.setItem(ONBOARDING_LS_KEY, '1');
+    } catch {
+      /* noop */
+    }
+  }, []);
+
+  const handleCompanyChange = useCallback(
+    (key: SampleCompanyKey) => {
+      if (key === companyKey) return;
+      setCompanyKey(key);
+      setArchived((prev) => [...prev, ...messagesRef.current.filter((m) => m.meta || m.feedback)]);
+      setMessages([welcomeMessage(getSampleCompany(key, locale))]);
+      askedRef.current = new Set();
+      setOpenChunk(null);
+      setViewer(null);
+      setInput('');
+    },
+    [companyKey, locale],
+  );
+
+  /** ¿El bot sigue teniendo sus documentos? (si el servidor perdió su estado, se reindexa). */
+  const botStillIndexed = useCallback(
+    async (botId: string) => {
       try {
-        window.localStorage.setItem(ONBOARDING_LS_KEY, '1');
-      } catch {
-        /* noop */
+        const bot = await getBot(botId);
+        return (bot.docs?.length ?? 0) >= company.docs.length;
+      } catch (err) {
+        return !(err instanceof BotApiError && err.status === 404);
       }
-    }
-  }, []);
+    },
+    [company],
+  );
 
-  // Cuando cambia locale via dropdown, actualizamos cookie + recargamos (best-effort).
-  const handleLocaleChange = useCallback((l: 'es' | 'en') => {
-    setLocale(l);
-    if (typeof document !== 'undefined') {
-      document.cookie = `locale=${l}; path=/; max-age=31536000`;
-      // Soft reload para que next-intl tome el nuevo locale.
-      if (typeof window !== 'undefined') window.location.reload();
-    }
-  }, []);
+  /** Pregunta real al backend. `replaceId` reutiliza una respuesta existente ("Volver a preguntar"). */
+  const ask = useCallback(
+    async (question: string, replaceId?: string) => {
+      const q = question.trim();
+      if (!q || busyRef.current) return;
+      busyRef.current = true;
+      setBusy(true);
+      markDemoStart('sample');
+      askedRef.current.add(q);
 
-  const sourcesPanel = useMemo(
-    () => (
-      <div className="border-b border-secondary-200 px-4 py-3 dark:border-secondary-800">
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-secondary-500 dark:text-secondary-400">
-            {t('ingestionStats.title')}
-          </p>
-          <InfoIcon content={t('ux.sectionInfo.sources')} side="bottom" align="end" />
-        </div>
-        <ul className="mt-2 space-y-1.5">
-          {CONNECTED_SOURCES.map((s) => (
-            <li
-              key={s.key}
-              className="flex items-center justify-between gap-2 rounded-md bg-secondary-50 px-2.5 py-1.5 text-xs ring-1 ring-secondary-100 transition hover:ring-primary-200 dark:bg-secondary-800/60 dark:ring-secondary-700/60 dark:hover:ring-primary-800"
-            >
-              <div className="min-w-0">
-                <div className="truncate font-semibold text-secondary-800 dark:text-secondary-100">
-                  {t(`sources.${s.key}`)}
-                </div>
-                <div className="text-[10px] text-secondary-500 dark:text-secondary-400">
-                  {t('ingestionStats.lastSync')}: {s.lastSync}
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="font-mono text-xs font-bold text-secondary-900 dark:text-white">
-                  {s.count.toLocaleString()}
-                </div>
-                <div className="text-[10px] text-secondary-500 dark:text-secondary-400">
-                  {t(`ingestionStats.${s.unitKey}`)}
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-    ),
+      const current = messagesRef.current;
+      let asstId: string;
+      let history: Array<{ role: string; content: string }>;
+      if (replaceId) {
+        asstId = replaceId;
+        const idx = current.findIndex((m) => m.id === replaceId);
+        // Historial: todo lo anterior a la pregunta que originó esta respuesta.
+        history = toHistory(current.slice(0, Math.max(0, idx - 1)));
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === replaceId
+              ? { ...m, pending: true, errorKey: undefined, content: '', sources: undefined, meta: undefined, feedback: undefined }
+              : m,
+          ),
+        );
+      } else {
+        idRef.current += 1;
+        const userId = `u-${idRef.current}`;
+        asstId = `a-${idRef.current}`;
+        history = toHistory(current);
+        setMessages((prev) => [
+          ...prev,
+          { id: userId, role: 'user', content: q },
+          { id: asstId, role: 'assistant', content: '', pending: true, question: q },
+        ]);
+      }
+
+      try {
+        let state = await (botPromiseRef.current ?? ensureSampleBot(company, locale));
+        let started = performance.now();
+        let res = await chatWithBot(state.botId, q, history, modelId);
+        if (res.sources.length === 0 && !(await botStillIndexed(state.botId))) {
+          // El backend perdió los documentos (p. ej. se reinició): se reindexa y se repite una vez.
+          resetSampleBot(company, locale);
+          setKbPhase('preparing');
+          const p = ensureSampleBot(company, locale);
+          botPromiseRef.current = p;
+          state = await p;
+          setBotState(state);
+          setKbPhase('ready');
+          started = performance.now();
+          res = await chatWithBot(state.botId, q, history, modelId);
+        }
+        const clientLatencyMs = Math.round(performance.now() - started);
+        const sources: SourceChunk[] = res.sources.map((s, i) => ({
+          id: s.id,
+          index: s.index ?? i + 1,
+          docName: s.name,
+          score: typeof s.score === 'number' ? s.score : 0,
+          text: s.chunk ?? '',
+        }));
+        const generative = isGenerativeReply(res);
+        const notFound = isNotFoundReply(res);
+        const meta: AnswerMeta = {
+          model: res.model ?? '—',
+          generative,
+          providerError: !!res.error,
+          backendLatencyMs: generative ? res.latencyMs : undefined,
+          clientLatencyMs,
+          tokens: res.tokens,
+          costUSD: res.costUSD,
+          notFound,
+          citationsUsed: countCitations(res.reply, sources.length),
+          docsIndexed: state.docs.length,
+        };
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === asstId ? { ...m, pending: false, content: res.reply, sources, meta, question: q } : m,
+          ),
+        );
+      } catch (err) {
+        const errorKey = err instanceof BotApiError && err.status === 0 ? 'errorNetwork' : 'errorGeneric';
+        setMessages((prev) =>
+          prev.map((m) => (m.id === asstId ? { ...m, pending: false, errorKey, question: q } : m)),
+        );
+      } finally {
+        busyRef.current = false;
+        setBusy(false);
+      }
+    },
+    [botStillIndexed, company, locale, markDemoStart, modelId],
+  );
+
+  const handleSend = useCallback(() => {
+    const q = input.trim();
+    if (!q || busyRef.current) return;
+    setInput('');
+    void ask(q);
+  }, [ask, input]);
+
+  const handleRegenerate = useCallback(
+    (messageId: string) => {
+      const msg = messagesRef.current.find((m) => m.id === messageId);
+      if (msg?.question) void ask(msg.question, messageId);
+    },
+    [ask],
+  );
+
+  const handleFeedback = useCallback(
+    (messageId: string, value: 'up' | 'down') => {
+      setMessages((prev) =>
+        prev.map((m) => (m.id === messageId ? { ...m, feedback: m.feedback === value ? undefined : value } : m)),
+      );
+      toast.success(t('chat.feedbackSaved'), { id: 'chatbot-feedback' });
+    },
     [t],
   );
 
+  /** "Pregunta de ejemplo": la siguiente sugerida que aún no se ha hecho. */
+  const handleAskSample = useCallback(() => {
+    if (mode !== 'playground') changeMode('playground');
+    const all = [...company.questions, company.outOfScope];
+    let next = all.find((q) => !askedRef.current.has(q));
+    if (!next) {
+      askedRef.current = new Set();
+      next = all[0];
+    }
+    void ask(next);
+  }, [ask, changeMode, company, mode]);
+
+  const handleOpenChunkDocument = useCallback(
+    (chunk: SourceChunk) => {
+      const doc = findSampleDocument(company, chunk.docName);
+      if (!doc) return;
+      setOpenChunk(null);
+      setViewer({ doc, highlight: chunk.text });
+    },
+    [company],
+  );
+
+  const closeChunk = useCallback(() => setOpenChunk(null), []);
+  const closeViewer = useCallback(() => setViewer(null), []);
+  const closeIncluded = useCallback(() => setActiveIncluded(null), []);
+
+  // Última respuesta (para "Cómo se respondió").
+  const lastAnswer = useMemo(
+    () => [...messages].reverse().find((m) => m.role === 'assistant' && !m.welcome && (m.meta || m.pending)),
+    [messages],
+  );
+
+  // Métricas de la sesión con las respuestas reales.
+  const stats: SessionStats = useMemo(() => {
+    const all = [...archived, ...messages];
+    const answers = all.filter((m) => m.role === 'assistant' && m.meta);
+    const latencies = answers.map((m) => m.meta!.clientLatencyMs);
+    return {
+      questions: answers.length,
+      withSources: answers.filter((m) => !m.meta!.notFound && (m.sources?.length ?? 0) > 0).length,
+      notFound: answers.filter((m) => m.meta!.notFound).length,
+      avgLatencyMs: latencies.length ? Math.round(latencies.reduce((a, b) => a + b, 0) / latencies.length) : 0,
+      tokens: answers.reduce((sum, m) => sum + (m.meta!.tokens?.total ?? 0), 0),
+      costUSD: answers.reduce((sum, m) => sum + (m.meta!.costUSD ?? 0), 0),
+      feedbackUp: all.filter((m) => m.feedback === 'up').length,
+      feedbackDown: all.filter((m) => m.feedback === 'down').length,
+    };
+  }, [archived, messages]);
+
+  // Si hay clave de IA pero la última llamada al proveedor falló, se dice en la barra.
+  const effectiveAiStatus: AiStatus =
+    aiStatus === 'generative' && lastAnswer?.meta?.providerError ? 'degraded' : aiStatus;
+
   const isDesktop = device === 'desktop';
+  const chunkDocAvailable = openChunk ? !!findSampleDocument(company, openChunk.docName) : false;
+
+  const sidebar = (
+    <Sidebar
+      company={company}
+      kbPhase={kbPhase}
+      docsIndexed={botState?.docs.length ?? 0}
+      onRetry={() => setKbAttempt((n) => n + 1)}
+      onOpenDocument={(doc) => {
+        setShowDrawer(false);
+        setViewer({ doc, highlight: null });
+      }}
+      activeIncluded={activeIncluded}
+      onSelectIncluded={(k) => {
+        setShowDrawer(false);
+        setActiveIncluded(k);
+      }}
+    />
+  );
 
   return (
     <div
-      className={`flex flex-col bg-secondary-50 text-secondary-900 dark:bg-secondary-950 dark:text-secondary-100 md:h-[calc(100vh-5rem)] ${
-        // En "Prueba con tu documento" la página crece en móvil (scroll normal)
-        // para que el chat no quede aplastado bajo el TopBar.
-        mode === 'upload' ? 'min-h-[calc(100vh-4rem)] md:min-h-0' : 'h-[calc(100vh-4rem)]'
+      className={`flex flex-col bg-secondary-50 text-secondary-900 dark:bg-secondary-950 dark:text-secondary-100 ${
+        mode === 'playground' ? 'h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)]' : 'min-h-[calc(100vh-4rem)] md:min-h-[calc(100vh-5rem)]'
       }`}
     >
       <TopBar
-        tenant={tenant}
-        onTenantChange={setTenant}
+        aiStatus={effectiveAiStatus}
+        showPlaygroundControls={mode === 'playground'}
+        companies={companies}
+        companyKey={companyKey}
+        onCompanyChange={handleCompanyChange}
+        models={models}
         modelId={modelId}
         onModelChange={setModelId}
-        locale={locale}
-        onLocaleChange={handleLocaleChange}
-        onRunSample={(key) => {
-          // El ejemplo se ve en el Playground: desde otro modo, vuelve a él.
-          setMode('playground');
-          runScenario(key);
-        }}
-        isStreaming={isStreaming}
+        onAskSample={handleAskSample}
+        askDisabled={busy}
         device={device}
         onDeviceChange={setDevice}
-        onOpenSettings={() => setShowSettings(true)}
       />
 
-      <ModeToggle mode={mode} onChange={setMode} />
+      <ModeToggle mode={mode} onChange={changeMode} />
 
-      {mode === 'builder' ? <BuilderMode /> : mode === 'upload' ? (
-        <UploadDemo onUseSample={() => setMode('playground')} onQuestion={markUploadQuestion} />
+      {mode === 'builder' ? (
+        <BuilderMode />
+      ) : mode === 'upload' ? (
+        <UploadDemo onUseSample={() => changeMode('playground')} onQuestion={markUploadQuestion} />
       ) : (
-      <>
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar (oculto en mobile-view) */}
-        {showSidebar && isDesktop ? (
-          <div className="hidden w-72 shrink-0 flex-col overflow-hidden md:flex">
-            {sourcesPanel}
-            <Sidebar activeLayer={activeLayer} onSelect={(k) => setActiveLayer(k)} />
-          </div>
-        ) : null}
+        <>
+          <div className="flex min-h-0 flex-1 overflow-hidden">
+            {showSidebar && isDesktop ? (
+              <div className="hidden w-72 shrink-0 flex-col overflow-hidden md:flex">{sidebar}</div>
+            ) : null}
 
-        {/* Center: chat (envuelto en device frame cuando device=mobile) */}
-        <main className="flex flex-1 flex-col overflow-hidden">
-          <div className="flex items-center justify-between gap-2 border-b border-secondary-200 bg-white/85 px-3 py-2 backdrop-blur dark:border-secondary-800 dark:bg-secondary-900/85">
-            <Tooltip content={t('ux.tooltips.toggleSidebar')} side="bottom">
-              <button
-                type="button"
-                onClick={() => setShowSidebar((v) => !v)}
-                disabled={!isDesktop}
-                className="hidden items-center gap-1 rounded-md border border-secondary-200 px-2 py-1 text-[11px] font-medium text-secondary-600 transition hover:border-primary-300 hover:bg-secondary-50 hover:text-secondary-900 disabled:cursor-not-allowed disabled:opacity-50 dark:border-secondary-700 dark:text-secondary-300 dark:hover:bg-secondary-800 dark:hover:text-white md:inline-flex"
-                aria-label={t('ux.tooltips.toggleSidebar')}
-              >
-                {showSidebar ? (
-                  <ChevronDoubleLeftIcon className="h-3.5 w-3.5" />
-                ) : (
-                  <ChevronDoubleRightIcon className="h-3.5 w-3.5" />
-                )}
-                <BookOpenIcon className="h-3.5 w-3.5" />
-                {t('sidebar.title')}
-              </button>
-            </Tooltip>
-            <Tooltip content={t('ux.tooltips.toggleSources')} side="bottom">
-              <button
-                type="button"
-                onClick={() => setShowSources((v) => !v)}
-                className="inline-flex items-center gap-1 rounded-md border border-secondary-200 px-2 py-1 text-[11px] font-medium text-secondary-600 transition hover:border-primary-300 hover:bg-secondary-50 hover:text-secondary-900 dark:border-secondary-700 dark:text-secondary-300 dark:hover:bg-secondary-800 dark:hover:text-white md:hidden"
-              >
-                <ChatBubbleLeftRightIcon className="h-3.5 w-3.5" />
-                {t('ingestionStats.title')}
-              </button>
-            </Tooltip>
-            <Tooltip content={t('ux.tooltips.togglePipeline')} side="bottom" align="end">
-              <button
-                type="button"
-                onClick={() => setShowPipeline((v) => !v)}
-                disabled={!isDesktop}
-                className="inline-flex items-center gap-1 rounded-md border border-secondary-200 px-2 py-1 text-[11px] font-medium text-secondary-600 transition hover:border-primary-300 hover:bg-secondary-50 hover:text-secondary-900 disabled:cursor-not-allowed disabled:opacity-50 dark:border-secondary-700 dark:text-secondary-300 dark:hover:bg-secondary-800 dark:hover:text-white"
-                aria-label={t('ux.tooltips.togglePipeline')}
-              >
-                {showPipeline ? (
-                  <ChevronDoubleRightIcon className="h-3.5 w-3.5" />
-                ) : (
-                  <ChevronDoubleLeftIcon className="h-3.5 w-3.5" />
-                )}
-                {t('pipeline.title')}
-              </button>
-            </Tooltip>
-          </div>
-
-          <div className="flex-1 overflow-hidden">
-            <DeviceFrame
-              device={device}
-              label={device === 'mobile' ? t('ux.device.mobileFrameLabel') : undefined}
-              ariaLabel={t('ux.device.label')}
-            >
-              <ChatPanel
-                messages={messages}
-                input={input}
-                onInput={setInput}
-                onSend={handleSend}
-                onRunScenario={runScenario}
-                onCiteClick={handleCiteClick}
-                isStreaming={isStreaming}
-                thinkingMessageId={
-                  thinkingId && streamedChars === 0 ? thinkingId : null
-                }
-              />
-            </DeviceFrame>
-          </div>
-        </main>
-
-        {/* Pipeline right (oculto en mobile-view) */}
-        {showPipeline && isDesktop ? (
-          <div className="hidden w-80 shrink-0 lg:flex">
-            <PipelinePanel
-              running={pipelineRunning}
-              activeStepIndex={stepIndex}
-              steps={pipelineSteps}
-              totalLatencyMs={pipelineTotals.latencyMs}
-              totalTokens={pipelineTotals.tokens}
-              costUsd={pipelineTotals.cost}
-            />
-          </div>
-        ) : null}
-      </div>
-
-      {/* Modales */}
-      <CapabilityPanel layerKey={activeLayer} onClose={() => setActiveLayer(null)} />
-      <SourcePanel chunk={openChunk} onClose={() => setOpenChunk(null)} />
-
-      {/* Drawer mobile de sources */}
-      {showSources ? (
-        <div
-          className="fixed inset-0 z-40 flex items-stretch bg-black/50 md:hidden"
-          onClick={() => setShowSources(false)}
-        >
-          <div
-            className="w-72 bg-white shadow-2xl dark:bg-secondary-900"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between px-4 py-3">
-              <span className="text-sm font-bold">{t('sidebar.title')}</span>
-              <button
-                type="button"
-                onClick={() => setShowSources(false)}
-                aria-label={t('sourcePanel.close')}
-                className="rounded p-1 hover:bg-secondary-100 dark:hover:bg-secondary-800"
-              >
-                <XMarkIcon className="h-5 w-5" />
-              </button>
-            </div>
-            {sourcesPanel}
-            <Sidebar
-              activeLayer={activeLayer}
-              onSelect={(k) => {
-                setActiveLayer(k);
-                setShowSources(false);
-              }}
-            />
-          </div>
-        </div>
-      ) : null}
-
-      {/* Settings drawer (presentación: explicación + CTA a Builder Mode) */}
-      {showSettings ? (
-        <div
-          className="fixed inset-0 z-40 flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="settings-title"
-          onClick={() => setShowSettings(false)}
-        >
-          <div
-            className="w-full max-w-md rounded-2xl border border-secondary-200 bg-white p-6 shadow-2xl dark:border-secondary-700 dark:bg-secondary-900"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <h2
-                  id="settings-title"
-                  className="text-lg font-bold tracking-tight text-secondary-900 dark:text-white"
+            <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
+              <div className="flex items-center justify-between gap-2 border-b border-secondary-200 bg-white/85 px-3 py-1.5 backdrop-blur dark:border-secondary-800 dark:bg-secondary-900/85">
+                <button
+                  type="button"
+                  onClick={() => setShowSidebar((v) => !v)}
+                  disabled={!isDesktop}
+                  aria-expanded={showSidebar && isDesktop}
+                  className="hidden items-center gap-1 rounded-md border border-secondary-200 px-2 py-1 text-[11px] font-medium text-secondary-600 transition hover:border-primary-300 hover:bg-secondary-50 hover:text-secondary-900 disabled:cursor-not-allowed disabled:opacity-50 dark:border-secondary-700 dark:text-secondary-300 dark:hover:bg-secondary-800 dark:hover:text-white md:inline-flex"
                 >
-                  {t('ux.advancedConfig.title')}
-                </h2>
-                <p className="mt-1.5 text-[13px] leading-relaxed text-secondary-600 dark:text-secondary-300">
-                  {t('ux.advancedConfig.body')}
-                </p>
+                  {showSidebar ? <ChevronDoubleLeftIcon className="h-3.5 w-3.5" /> : <ChevronDoubleRightIcon className="h-3.5 w-3.5" />}
+                  <BookOpenIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                  {t('kb.title')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowDrawer(true)}
+                  className="inline-flex items-center gap-1 rounded-md border border-secondary-200 px-2 py-1 text-[11px] font-medium text-secondary-600 transition hover:border-primary-300 hover:bg-secondary-50 hover:text-secondary-900 dark:border-secondary-700 dark:text-secondary-300 dark:hover:bg-secondary-800 dark:hover:text-white md:hidden"
+                >
+                  <DocumentTextIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                  {t('kb.title')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowPipeline((v) => !v)}
+                  disabled={!isDesktop}
+                  aria-expanded={showPipeline && isDesktop}
+                  className="hidden items-center gap-1 rounded-md border border-secondary-200 px-2 py-1 text-[11px] font-medium text-secondary-600 transition hover:border-primary-300 hover:bg-secondary-50 hover:text-secondary-900 disabled:cursor-not-allowed disabled:opacity-50 dark:border-secondary-700 dark:text-secondary-300 dark:hover:bg-secondary-800 dark:hover:text-white lg:inline-flex"
+                >
+                  {showPipeline ? <ChevronDoubleRightIcon className="h-3.5 w-3.5" /> : <ChevronDoubleLeftIcon className="h-3.5 w-3.5" />}
+                  {t('pipeline.toggle')}
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setShowSettings(false)}
-                aria-label={t('ux.advancedConfig.close')}
-                className="rounded-md p-1.5 text-secondary-500 transition hover:bg-secondary-100 hover:text-secondary-900 dark:hover:bg-secondary-800 dark:hover:text-white"
-              >
-                <XMarkIcon className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="mt-5 flex flex-wrap items-center justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setShowSettings(false)}
-                className="rounded-md border border-secondary-200 bg-white px-3 py-1.5 text-xs font-medium text-secondary-700 transition hover:bg-secondary-50 dark:border-secondary-700 dark:bg-secondary-900 dark:text-secondary-200 dark:hover:bg-secondary-800"
-              >
-                {t('ux.advancedConfig.close')}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowSettings(false);
-                  setMode('builder');
-                }}
-                className="inline-flex items-center gap-1.5 rounded-md bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-primary-700"
-              >
-                {t('ux.advancedConfig.cta')}
-                <ArrowRightIcon className="h-3.5 w-3.5" />
-              </button>
-            </div>
+
+              <div className="min-h-0 flex-1 overflow-hidden">
+                <DeviceFrame
+                  device={device}
+                  label={device === 'mobile' ? t('topBar.device.mobileFrameLabel') : undefined}
+                  ariaLabel={t('topBar.device.label')}
+                >
+                  <ChatPanel
+                    companyName={company.name}
+                    messages={messages}
+                    input={input}
+                    onInput={setInput}
+                    onSend={handleSend}
+                    suggestions={company.questions}
+                    outOfScope={company.outOfScope}
+                    onAsk={(q) => void ask(q)}
+                    onCiteClick={setOpenChunk}
+                    onFeedback={handleFeedback}
+                    onRegenerate={handleRegenerate}
+                    busy={busy}
+                    preparing={kbPhase === 'preparing'}
+                  />
+                </DeviceFrame>
+              </div>
+            </main>
+
+            {showPipeline && isDesktop ? (
+              <div className="hidden w-80 shrink-0 lg:flex">
+                <PipelinePanel
+                  running={!!lastAnswer?.pending}
+                  meta={lastAnswer?.pending ? null : lastAnswer?.meta ?? null}
+                  sources={lastAnswer?.sources ?? []}
+                />
+              </div>
+            ) : null}
           </div>
-        </div>
-      ) : null}
 
-      <StatsWidget
-        tokens={aggTokens}
-        latencyMs={aggLatency}
-        costUsd={aggCost}
-        cacheHitPct={cacheHit}
-        driftPct={drift}
-        faithfulnessPct={faithfulness}
-        hallucinationPct={hallucination}
-      />
+          <CapabilityPanel itemKey={activeIncluded} onClose={closeIncluded} />
+          <SourcePanel
+            chunk={openChunk}
+            onClose={closeChunk}
+            onOpenDocument={chunkDocAvailable ? handleOpenChunkDocument : undefined}
+          />
+          <DocumentViewer
+            doc={viewer?.doc ?? null}
+            companyName={company.name}
+            highlight={viewer?.highlight}
+            onClose={closeViewer}
+          />
 
-      {/* Onboarding tour: 4 pasos. Persistido en localStorage. */}
-      {showOnboarding ? (
-        <OnboardingTour
-          step={onboardingStep}
-          onNext={() => setOnboardingStep((s) => Math.min(3, s + 1))}
-          onSkip={dismissOnboarding}
-          onDone={dismissOnboarding}
-        />
-      ) : null}
-      </>
+          {showDrawer ? (
+            <div className="fixed inset-0 z-[150] flex items-stretch bg-black/50 md:hidden" onClick={() => setShowDrawer(false)}>
+              <div
+                className="flex w-80 max-w-[85vw] flex-col bg-white shadow-2xl dark:bg-secondary-900"
+                onClick={(e) => e.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+                aria-label={t('kb.title')}
+              >
+                <div className="flex items-center justify-between border-b border-secondary-200 px-4 py-3 dark:border-secondary-800">
+                  <span className="text-sm font-bold">{t('kb.title')}</span>
+                  <button
+                    type="button"
+                    onClick={() => setShowDrawer(false)}
+                    aria-label={t('sourcePanel.close')}
+                    className="rounded p-1 hover:bg-secondary-100 dark:hover:bg-secondary-800"
+                  >
+                    <XMarkIcon className="h-5 w-5" />
+                  </button>
+                </div>
+                <div className="flex min-h-0 flex-1 flex-col">{sidebar}</div>
+              </div>
+            </div>
+          ) : null}
+
+          <StatsWidget stats={stats} />
+
+          {showOnboarding ? (
+            <OnboardingTour
+              step={onboardingStep}
+              onNext={() => setOnboardingStep((s) => Math.min(4, s + 1))}
+              onSkip={dismissOnboarding}
+              onDone={dismissOnboarding}
+            />
+          ) : null}
+        </>
       )}
     </div>
   );
 }
 
-/**
- * Onboarding inline. Overlay sutil + tarjeta central con 4 pasos.
- * Dismiss persistido en localStorage para no molestar en visitas siguientes.
- */
+/** Recorrido de 5 pasos. Se guarda en localStorage para no repetirlo. */
 function OnboardingTour({
   step,
   onNext,
@@ -745,52 +620,40 @@ function OnboardingTour({
   onSkip: () => void;
   onDone: () => void;
 }) {
-  const t = useTranslations('demoChatbot');
-  const steps = [
-    { title: t('ux.onboarding.step1Title'), body: t('ux.onboarding.step1Body') },
-    { title: t('ux.onboarding.step2Title'), body: t('ux.onboarding.step2Body') },
-    { title: t('ux.onboarding.step3Title'), body: t('ux.onboarding.step3Body') },
-    { title: t('ux.onboarding.step4Title'), body: t('ux.onboarding.step4Body') },
-  ];
+  const t = useTranslations('demoChatbot.onboarding');
+  const steps = [1, 2, 3, 4, 5].map((n) => ({ title: t(`step${n}Title`), body: t(`step${n}Body`) }));
   const current = steps[Math.min(step, steps.length - 1)];
   const isLast = step >= steps.length - 1;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/30 p-4 backdrop-blur-[2px] sm:items-center"
+      className="fixed inset-0 z-[220] flex items-end justify-center bg-black/30 p-4 backdrop-blur-[2px] sm:items-center"
       role="dialog"
       aria-modal="true"
       aria-labelledby="onboarding-title"
     >
       <div className="w-full max-w-md rounded-2xl border border-secondary-200 bg-white p-6 shadow-2xl dark:border-secondary-700 dark:bg-secondary-900">
         <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary-600 dark:text-primary-300">
-          {t('ux.onboarding.title')} · {step + 1}/{steps.length}
+          {t('title')} · {step + 1}/{steps.length}
         </p>
-        <h2
-          id="onboarding-title"
-          className="mt-1.5 text-lg font-bold tracking-tight text-secondary-900 dark:text-white"
-        >
+        <h2 id="onboarding-title" className="mt-1.5 text-lg font-bold tracking-tight text-secondary-900 dark:text-white">
           {current.title}
         </h2>
-        <p className="mt-2 text-[13px] leading-relaxed text-secondary-600 dark:text-secondary-300">
-          {current.body}
-        </p>
+        <p className="mt-2 text-[13px] leading-relaxed text-secondary-600 dark:text-secondary-300">{current.body}</p>
         <div className="mt-5 flex items-center justify-between gap-2">
           <button
             type="button"
             onClick={onSkip}
             className="text-[11px] font-medium text-secondary-500 transition hover:text-secondary-800 dark:text-secondary-400 dark:hover:text-secondary-100"
           >
-            {t('ux.onboarding.skip')}
+            {t('skip')}
           </button>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5" aria-hidden="true">
             {steps.map((_, i) => (
               <span
                 key={i}
                 className={`h-1.5 w-1.5 rounded-full transition ${
-                  i === step
-                    ? 'bg-primary-600 dark:bg-primary-400'
-                    : 'bg-secondary-300 dark:bg-secondary-700'
+                  i === step ? 'bg-primary-600 dark:bg-primary-400' : 'bg-secondary-300 dark:bg-secondary-700'
                 }`}
               />
             ))}
@@ -800,8 +663,8 @@ function OnboardingTour({
             onClick={isLast ? onDone : onNext}
             className="inline-flex items-center gap-1.5 rounded-md bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-primary-700"
           >
-            {isLast ? t('ux.onboarding.done') : t('ux.onboarding.next')}
-            <ArrowRightIcon className="h-3.5 w-3.5" />
+            {isLast ? t('done') : t('next')}
+            <ArrowRightIcon className="h-3.5 w-3.5" aria-hidden="true" />
           </button>
         </div>
       </div>

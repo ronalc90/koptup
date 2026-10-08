@@ -1,296 +1,885 @@
 {
   "demoLoyalty": {
-    "pageTitle": "Loyalty · omnichannel customer retention",
-    "pageSubtitle": "Points, tiers, missions, coalitions, and retention analytics for retail, banking, and services.",
-    "tabs": {
-      "member": "Member view",
-      "admin": "Admin",
-      "analytics": "Analytics"
+    "meta": {
+      "title": "Loyalty program: interactive demo",
+      "description": "Demo of a points club for a fictitious drugstore chain with sample Colombian data: enroll customers with data-processing consent, record checkout purchases with multipliers, redeem rewards, set up tiers, missions and campaigns within allowed hours, and see the points liability. Everything is calculated in your browser.",
+      "breadcrumbHome": "Home",
+      "breadcrumbDemos": "Demos",
+      "breadcrumbName": "Loyalty program"
+    },
+    "pageTitle": "Loyalty program",
+    "pageBrand": "Example: {club}, by {brand} (fictitious drugstore)",
+    "pageSubtitle": "Enroll customers at checkout, award points with rules by category, day and channel, redeem the store's own rewards and measure what the program costs. Everything works on this page with sample data.",
+    "sampleBadge": "Sample data",
+    "sampleHint": "{brand} (NIT {nit}), {club}, its stores, members, ID numbers, phone numbers, partners and all figures are made up.",
+    "howItWorks": {
+      "title": "What is real in this demo",
+      "real": "Calculated for real in your browser: the points for each purchase (base rule plus multipliers by category, day and channel), the balance as the sum of the points ledger, tiers, redemptions with coupons and checkout discounts, missions, referrals, fraud rules, allowed campaign hours, the cost simulator, the points liability and the CSV export. Your changes are saved only in this browser.",
+      "simulated": "Simulated: sending WhatsApp, email or SMS (you see the preview, no message is sent), the Apple Wallet and Google Wallet pass (preview), sweepstakes, and the figures for the 29,200-member base (KPIs, cohorts, mission results, A/B tests and partners). The WhatsApp and email buttons in “Invite friends” do open your app with the message ready.",
+      "project": "In your project, the checkout connects to your POS or online store through an API, points live in a points ledger in your database, messages go out through WhatsApp Business with approved templates, the pass is issued for Apple Wallet and Google Wallet with your brand, and reports come from your real data."
+    },
+    "tour": {
+      "title": "Suggested walkthrough (3 minutes)",
+      "steps": {
+        "1": "Checkout: search 300 555 0142 (Laura) and record $185,000 in Personal care on Tuesday: she earns 370 points thanks to double points on Tuesdays. You can also enroll someone new with their consent.",
+        "2": "Record another purchase, for example $420,000 in Dermocosmetics: Laura moves up to Gold and completes the “Buy 2 times this month” mission.",
+        "3": "Member app: check the balance and activity, claim the mission and redeem “Free delivery” (600 points): the balance drops and you get a coupon.",
+        "4": "Settings › Points: change the day rule to ×3 and see in the simulator how many points the same purchase earns and what the program costs.",
+        "5": "Results: review the points liability and what you did in the demo, export the activity as CSV and create a campaign from a segment within the hours allowed by Law 2300."
+      }
+    },
+    "reset": {
+      "button": "Reset data",
+      "confirm": "Delete your purchases, redemptions and changes in this demo?",
+      "yes": "Yes, reset",
+      "done": "Sample data restored"
     },
     "common": {
-      "active": "Active",
-      "paused": "Paused",
-      "draft": "Draft",
-      "save": "Save",
-      "edit": "Edit",
-      "create": "Create",
-      "view": "View",
-      "redeem": "Redeem",
-      "share": "Share",
-      "invite": "Invite",
+      "show": "Show",
+      "hide": "Hide",
+      "cancel": "Cancel",
+      "close": "Close",
+      "done": "Done",
       "points": "points",
       "pts": "pts",
-      "available": "available",
-      "expiringSoon": "expiring soon",
-      "members": "members"
+      "sample": "sample"
     },
-    "member": {
-      "greeting": "Hi, Ronald",
-      "memberSince": "Member since March 2022",
-      "pointsLabel": "Available points",
-      "expiringSoon": "{count} pts expire on June 30",
-      "tier": {
-        "current": "Current tier",
-        "next": "Next tier",
-        "progressTo": "{points} pts to {tier}",
-        "perks": "Perks",
-        "bronze": "Bronze",
-        "silver": "Silver",
-        "gold": "Gold",
-        "platinum": "Platinum",
-        "perksList": {
-          "freeShipping": "Free shipping",
-          "doublePoints": "2x points on your birthday",
-          "earlyAccess": "Early access to sales",
-          "conciergeSupport": "24/7 concierge support",
-          "vipEvents": "Exclusive VIP events",
-          "personalShopper": "Personal shopper"
+    "tabs": {
+      "label": "Demo sections",
+      "cashier": "Checkout",
+      "member": "Member app",
+      "config": "Settings",
+      "results": "Results"
+    },
+    "tiers": {
+      "classic": "Classic",
+      "silver": "Silver",
+      "gold": "Gold",
+      "diamond": "Diamond"
+    },
+    "categories": {
+      "personalCare": "Personal care",
+      "otc": "Over-the-counter medicines",
+      "dermo": "Dermocosmetics",
+      "baby": "Baby and maternity",
+      "vitamins": "Vitamins and supplements",
+      "rx": "Prescription medicines"
+    },
+    "channels": {
+      "store": "Store",
+      "app": "App",
+      "delivery": "Delivery"
+    },
+    "months": {
+      "1": "Jan",
+      "2": "Feb",
+      "3": "Mar",
+      "4": "Apr",
+      "5": "May",
+      "6": "Jun",
+      "7": "Jul",
+      "8": "Aug",
+      "9": "Sep",
+      "10": "Oct",
+      "11": "Nov",
+      "12": "Dec"
+    },
+    "monthsLong": {
+      "1": "January",
+      "2": "February",
+      "3": "March",
+      "4": "April",
+      "5": "May",
+      "6": "June",
+      "7": "July",
+      "8": "August",
+      "9": "September",
+      "10": "October",
+      "11": "November",
+      "12": "December"
+    },
+    "weekdays": {
+      "0": "Sunday",
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday"
+    },
+    "weekdaysPlural": {
+      "0": "Sundays",
+      "1": "Mondays",
+      "2": "Tuesdays",
+      "3": "Wednesdays",
+      "4": "Thursdays",
+      "5": "Fridays",
+      "6": "Saturdays"
+    },
+    "fmt": {
+      "date": "{m} {d}, {y}"
+    },
+    "segments": {
+      "all": "All members",
+      "silverGold": "Silver and Gold",
+      "vip": "VIP",
+      "atRisk": "At risk of leaving",
+      "nearTier": "Close to the next tier",
+      "dormant": "Inactive",
+      "birthdays": "Birthdays this month"
+    },
+    "perks": {
+      "classic": {
+        "0": "Points on every purchase",
+        "1": "Birthday voucher",
+        "2": "Member offers"
+      },
+      "silver": {
+        "0": "Free delivery from $60,000",
+        "1": "Birthday voucher",
+        "2": "Early access to offers"
+      },
+      "gold": {
+        "0": "Free delivery, always",
+        "1": "Free dermocosmetic advice",
+        "2": "Priority support line"
+      },
+      "diamond": {
+        "0": "Everything in Gold",
+        "1": "Anniversary gift",
+        "2": "Invitations to product launches"
+      }
+    },
+    "rewards": {
+      "items": {
+        "voucher10": { "name": "$10,000 voucher", "desc": "Discount on your next purchase" },
+        "voucher25": { "name": "$25,000 voucher", "desc": "Discount on your next purchase" },
+        "handCream": { "name": "Hand cream 60 ml", "desc": "Store brand; pick it up at any store" },
+        "travelKit": { "name": "Personal care travel kit", "desc": "Toothbrush, toothpaste and hand sanitizer" },
+        "bottle": { "name": "Club water bottle 500 ml", "desc": "Limited edition" },
+        "delivery": { "name": "Free delivery", "desc": "One free delivery on your next order" },
+        "pressure": { "name": "Blood pressure check", "desc": "In store, by appointment" },
+        "dermoAdvice": { "name": "Dermocosmetic advice", "desc": "30 minutes with an advisor in store" },
+        "foodBank": { "name": "Donation to a food bank", "desc": "$5,000 for a partner foundation (fictitious)" },
+        "schoolKits": { "name": "School supplies donation", "desc": "$10,000 for school kits from a partner foundation (fictitious)" }
+      }
+    },
+    "coupons": {
+      "title": "Redemption ready!",
+      "donationTitle": "Thank you for your donation!",
+      "birthday": "{value} birthday voucher",
+      "donationText": "You donated the equivalent of {value} (no money is transferred in the demo).",
+      "useVoucher": "Show it at checkout or pick it in “Redeem in this sale” on the Checkout tab.",
+      "useItem": "Show it at any store to claim it.",
+      "balance": "Your balance now: {balance} points.",
+      "note": "Sample code generated in your browser.",
+      "listTitle": "My coupons",
+      "listSubtitle": "Coupons from redemptions and gifts",
+      "empty": "You have no coupons yet. Redeem a reward or claim your birthday gift.",
+      "status": {
+        "valid": "Valid",
+        "used": "Used",
+        "donated": "Donated"
+      }
+    },
+    "missions": {
+      "types": {
+        "purchasesMonth": "Buy {n, plural, one {# time} other {# times}} this month",
+        "appPurchases": "Make {n, plural, one {# purchase} other {# purchases}} in the app or for delivery",
+        "referrals": "Invite {n, plural, one {# friend who joins} other {# friends who join}}",
+        "profile": "Complete your profile (email and birthday)"
+      }
+    },
+    "tx": {
+      "opening": "Balance carried over from 2025",
+      "earn": "Purchase of {amount} · {category}",
+      "summary": "Purchases from January to September 2026",
+      "redeem": "Redemption: {name}",
+      "redeemSummary": "Redemptions from January to September 2026",
+      "welcome": "Welcome bonus",
+      "referral": "Referral: {name}",
+      "mission": "Mission: {name}",
+      "reversal": "Reversal of sale {id}"
+    },
+    "export": {
+      "button": "Export activity (CSV)",
+      "date": "Date",
+      "time": "Time",
+      "member": "Member",
+      "cedula": "ID number",
+      "type": "Type",
+      "detail": "Detail",
+      "points": "Points",
+      "balance": "Balance",
+      "origin": "Source",
+      "fromDemo": "Demo",
+      "sample": "Sample",
+      "done": "CSV downloaded with {n} entries",
+      "kinds": {
+        "opening": "Opening balance",
+        "earn": "Purchase",
+        "redeem": "Redemption",
+        "welcome": "Welcome",
+        "referral": "Referral",
+        "mission": "Mission",
+        "reversal": "Reversal",
+        "summary": "Purchases (summary)"
+      }
+    },
+    "cashier": {
+      "search": {
+        "title": "Find customer",
+        "subtitle": "By phone or ID number, just like at a drugstore checkout.",
+        "label": "Phone or ID number",
+        "placeholder": "Phone or ID number",
+        "button": "Search",
+        "hint": "Try 300 555 0142 (Laura Martínez) or a number that doesn't exist to enroll someone new.",
+        "tooShort": "Type at least 3 digits.",
+        "none": "No member matches “{q}”.",
+        "enrollNew": "Enroll new customer",
+        "selected": "{name} is at the checkout"
+      },
+      "enroll": {
+        "open": "Enroll customer",
+        "title": "Enroll in the club",
+        "subtitle": "The customer joins {club} and earns the welcome bonus.",
+        "name": "Full name",
+        "namePh": "First and last name",
+        "cedula": "ID number (cédula)",
+        "phone": "Mobile phone",
+        "email": "Email (optional)",
+        "emailPh": "name@email.com",
+        "birthMonth": "Birthday month (optional)",
+        "noBirth": "Prefers not to say",
+        "sede": "Enrollment store",
+        "referrer": "Phone of the member who invited them (optional)",
+        "referrerHint": "If a member invited them, both earn referral points. Try 300 555 0142.",
+        "consent": "The customer authorizes {brand} to process their personal data to run the loyalty program, under Colombian Law 1581 of 2012 and the data processing policy. (Required)",
+        "optIn": "Agrees to receive club messages on WhatsApp (optional; they can withdraw consent at any time).",
+        "legalNote": "In the demo, consent is stored only in your browser. In your project it is saved with date, channel and policy version so you can prove it.",
+        "submit": "Enroll",
+        "toast": "Enrollment done: {name} earned {points} welcome points",
+        "errors": {
+          "name": "Enter the full name.",
+          "cedula": "The ID number must have 6 to 10 digits.",
+          "phone": "The phone must have 10 digits and start with 3.",
+          "email": "Check the email.",
+          "consent": "Without data-processing consent the customer cannot be enrolled.",
+          "duplicateCedula": "A member with that ID number already exists.",
+          "duplicatePhone": "A member with that phone already exists.",
+          "referrerNotFound": "That phone doesn't belong to any member."
         }
       },
-      "wallet": {
-        "title": "Wallet pass",
-        "subtitle": "Add to Apple Wallet or Google Wallet",
-        "memberCode": "Member code",
-        "addApple": "Add to Apple Wallet",
-        "addGoogle": "Add to Google Wallet",
-        "tapToFlip": "Tap to flip"
+      "member": {
+        "title": "Customer at checkout",
+        "worth": "Worth {value} in rewards",
+        "whatsappYes": "Accepts WhatsApp messages",
+        "whatsappNo": "Did not authorize WhatsApp messages",
+        "coupons": "{n, plural, one {# valid coupon} other {# valid coupons}}",
+        "frozen": "Points frozen by a fraud review: cannot redeem"
+      },
+      "sale": {
+        "title": "Record purchase",
+        "subtitle": "Points are calculated with the Settings rules and reach the {club} member app.",
+        "sede": "Store",
+        "day": "Purchase day",
+        "dayHint": "Simulated week of October 5–11, 2026.",
+        "channel": "Channel",
+        "lines": "Products by category",
+        "category": "Category",
+        "amount": "Amount",
+        "removeLine": "Remove line",
+        "addLine": "Add category",
+        "redeem": "Redeem in this sale",
+        "redeemHint": "The voucher is deducted from the total and points are calculated on the amount paid.",
+        "noRedeem": "No redemption",
+        "redeemReward": "{name} ({pts} points)",
+        "notEnough": "not enough points",
+        "redeemCoupon": "Coupon {code} · {value}",
+        "calc": "Points calculation",
+        "noPoints": "earns no points",
+        "lineCalc": "{base} × {mult} = {points} pts",
+        "dayRuleApplied": "{day} rule",
+        "empty": "Enter an amount to see the points.",
+        "subtotal": "Subtotal",
+        "discount": "Voucher applied",
+        "total": "Total to pay",
+        "earns": "Points earned",
+        "uses": "Points used",
+        "balanceAfter": "Balance after purchase",
+        "submit": "Record {name}'s purchase",
+        "rule": "Base rule: 1 point per {base}.",
+        "toast": "Sale {id} recorded: +{points} points",
+        "errors": {
+          "noLines": "Add at least one amount.",
+          "insufficient": "The balance is not enough for that voucher.",
+          "couponInvalid": "That coupon is no longer valid.",
+          "frozen": "This customer's points are frozen by a fraud alert: record the purchase without redemption."
+        }
+      },
+      "result": {
+        "title": "Sale {id} recorded · +{points} points",
+        "paid": "paid {amount}",
+        "upgraded": "{name} moved up to {tier}!",
+        "fraud": "This purchase triggered a fraud rule: review it in Settings › Fraud.",
+        "whatsappTitle": "Message to the customer (preview)",
+        "whatsapp": "Hi {name}. You earned {points} points at {club} for your {amount} purchase. Your balance is {balance} points.",
+        "noWhatsapp": "No WhatsApp is sent: the customer did not authorize messages.",
+        "whatsappNote": "Simulated: no message is sent in the demo. In your project it goes out through WhatsApp Business with an approved template, only to people who authorized it.",
+        "openApp": "View {name}'s app"
+      },
+      "history": {
+        "title": "Sales recorded in this demo",
+        "subtitle": "You can reverse a sale: the points it gave are deducted and the points it used are returned.",
+        "empty": "You haven't recorded any sales yet.",
+        "sale": "Sale",
+        "when": "Date and store",
+        "member": "Customer",
+        "paid": "Paid",
+        "points": "Points",
+        "action": "Action",
+        "reversed": "Reversed",
+        "confirm": "Yes, reverse",
+        "reverse": "Reverse",
+        "reversedToast": "Sale {id} reversed"
+      }
+    },
+    "member": {
+      "viewAs": "View the app as",
+      "newTag": "enrolled in the demo",
+      "viewAsHint": "Checkout and the app share the same data.",
+      "greeting": "Hi {name}",
+      "since": "Member since {date}",
+      "pointsLabel": "Available points",
+      "worth": "Worth {value} in rewards",
+      "frozen": "Points frozen for review",
+      "expiring": "{points} points expire on {date}",
+      "expiryRule": "Your points expire {months} months after you earn them.",
+      "toNext": "{points} points to {tier}",
+      "topTier": "You are at the top tier",
+      "progressLabel": "Progress to the next tier",
+      "yearPoints": "{points} purchase points in 2026 (they count toward your tier)",
+      "birthday": {
+        "title": "Happy birthday month, {name}!",
+        "subtitle": "Your gift: a {value} voucher to use this month.",
+        "claimed": "Gift claimed: coupon {code}.",
+        "toast": "Gift claimed: coupon {code}",
+        "done": "Claimed",
+        "cta": "Claim gift"
       },
       "rewards": {
         "title": "Rewards catalog",
-        "subtitle": "Redeem points for experiences and partner offers",
+        "subtitle": "The drugstore's own rewards. Each point is worth {value}.",
+        "filter": "Filter rewards",
         "categories": {
           "all": "All",
-          "giftcards": "Gift cards",
-          "experiences": "Experiences",
+          "vouchers": "Vouchers",
           "products": "Products",
+          "services": "Services",
           "donations": "Donations"
         },
-        "items": {
-          "starbucks": "Starbucks $10",
-          "amazon": "Amazon $25",
-          "netflix": "Netflix 1 month",
-          "spotify": "Spotify Premium",
-          "uber": "Uber $20",
-          "concert": "VIP concert ticket",
-          "spa": "Luxury spa day",
-          "donation": "Donate to UNICEF"
-        },
-        "stockLow": "Low stock",
-        "redeemed": "Redeemed",
-        "insufficientPoints": "Not enough points"
+        "outOfStock": "Out of stock",
+        "stock": "{n} left",
+        "redeem": "Redeem",
+        "missing": "{n} pts short",
+        "frozen": "Points frozen",
+        "confirmTitle": "Confirm redemption",
+        "confirmText": "Redeem “{name}” for {pts} points? Your balance will be {after} points.",
+        "confirm": "Yes, redeem",
+        "toast": "You redeemed {pts} points. Balance: {balance}",
+        "errors": {
+          "insufficient": "You don't have enough points.",
+          "outOfStock": "That reward is out of stock.",
+          "frozen": "Your points are frozen for review."
+        }
       },
       "missions": {
-        "title": "Weekly missions",
-        "subtitle": "Complete challenges to earn bonus points",
-        "items": {
-          "buy3": {
-            "title": "Place 3 orders this week",
-            "reward": "+500 pts"
-          },
-          "review": {
-            "title": "Write 2 reviews",
-            "reward": "+150 pts"
-          },
-          "refer": {
-            "title": "Refer a friend",
-            "reward": "+300 pts"
-          },
-          "app": {
-            "title": "Enable push notifications",
-            "reward": "+50 pts"
-          }
-        },
+        "title": "This month's missions",
+        "subtitle": "Challenges that add extra points. Progress comes from the purchases and referrals you record in the demo.",
+        "none": "No active missions. Turn them on in Settings › Missions.",
         "progress": "{current}/{total}",
-        "claim": "Claim"
+        "claimed": "Claimed",
+        "claim": "Claim",
+        "toast": "+{pts} mission points",
+        "howTo": {
+          "purchasesMonth": "Record purchases at Checkout",
+          "appPurchases": "At Checkout choose the App or Delivery channel",
+          "referrals": "Enroll someone with your phone as referrer",
+          "profile": "Completed with email and birthday month"
+        }
+      },
+      "movements": {
+        "title": "Your activity",
+        "subtitle": "The balance is the sum of these entries (points ledger).",
+        "new": "demo",
+        "sum": "Sum of entries: {balance} points",
+        "less": "Show less",
+        "all": "Show all {n} entries"
+      },
+      "wallet": {
+        "title": "Digital card",
+        "subtitle": "This is how the club card looks on a phone.",
+        "flip": "Flip the card",
+        "tierLine": "{tier} tier",
+        "memberCode": "Member code",
+        "tap": "Tap the card to see the code.",
+        "add": "See it in Apple Wallet or Google Wallet",
+        "previewTitle": "Pass preview (simulated)",
+        "balance": "Balance",
+        "level": "Tier",
+        "previewNote": "Simulated preview: the demo does not generate the pass file. In your project the pass is issued for Apple Wallet and Google Wallet with your brand and the balance updates after every purchase."
       },
       "referrals": {
         "title": "Invite friends, earn points",
-        "subtitle": "Get 500 pts for every friend who joins",
-        "yourLink": "Your referral link",
-        "friendsInvited": "Friends invited",
-        "pointsEarned": "Points earned",
-        "copy": "Copy",
-        "copied": "Copied!",
-        "channels": "Share via"
-      },
-      "birthday": {
-        "title": "Happy birthday month, Ronald",
-        "subtitle": "There's a special gift waiting for you",
-        "cta": "Claim gift"
+        "subtitle": "You earn {you} points and your friend {friend} when they join with your phone number.",
+        "friends": "Friends who joined",
+        "earned": "Referral points",
+        "yourLink": "Your link (sample domain)",
+        "copy": "Copy link",
+        "copied": "Link copied",
+        "copyFail": "Couldn't copy: select the link and copy it.",
+        "share": "Share via",
+        "email": "Email",
+        "subject": "Join me at {club}",
+        "message": "Join {club} with my link and get {points} welcome points: {link}",
+        "note": "WhatsApp and Email open your app with the message ready. The link is a sample: in the demo the referral is recorded at Checkout with the inviting member's phone."
       },
       "streak": {
-        "title": "Visit streak",
-        "days": "{days} days",
-        "subtitle": "Keep the streak alive for bonus points"
+        "months": "{n, plural, one {# month} other {# months}}",
+        "title": "in a row with purchases",
+        "kept": "You already bought this month: the streak continues.",
+        "keep": "Buy this month to keep your streak.",
+        "chart": "Months of 2026 with purchases"
+      },
+      "badges": {
+        "title": "Badges",
+        "earned": "earned",
+        "locked": "locked",
+        "items": {
+          "first": { "name": "First purchase", "how": "Buy with your club account" },
+          "streak3": { "name": "Regular customer", "how": "3 months in a row with purchases" },
+          "ambassador": { "name": "Ambassador", "how": "Invite someone who joins" },
+          "solidarity": { "name": "Big heart", "how": "Donate points to a foundation" },
+          "gold": { "name": "Gold tier", "how": "Reach Gold this year" }
+        }
       },
       "leaderboard": {
-        "title": "Top 10 this month",
-        "subtitle": "See how you stack up against other members",
+        "title": "Monthly ranking",
+        "off": "Off for privacy. If the business turns it on (Settings › Missions), members see a top 10 with short names.",
+        "subtitle": "Purchase points in {month} (sample names)",
         "you": "You",
-        "rank": "Rank"
+        "yourRank": "Your position: {rank} with {pts} points."
       }
     },
-    "admin": {
-      "title": "Admin console",
-      "subtitle": "Configure programs, rules, campaigns, and monitoring.",
+    "config": {
+      "title": "Program settings",
+      "subtitle": "What the business team adjusts. Changes apply right away at Checkout, in the member app and in Results.",
       "tabs": {
         "points": "Points",
         "tiers": "Tiers",
         "missions": "Missions",
         "referrals": "Referrals",
         "cashback": "Cashback",
-        "sweepstakes": "Sweepstakes"
+        "sweepstakes": "Sweepstakes",
+        "campaigns": "Campaigns",
+        "allies": "Partners",
+        "fraud": "Fraud",
+        "experiments": "A/B tests"
       },
-      "programs": {
-        "points": {
-          "title": "Earning rules · rules engine",
-          "subtitle": "Set how points are earned by category and channel",
-          "baseRate": "Base rate",
-          "baseHelp": "1 point per $1 spent",
-          "multipliers": "Category multipliers",
-          "categories": {
-            "groceries": "Groceries",
-            "fashion": "Fashion",
-            "electronics": "Electronics",
-            "travel": "Travel",
-            "dining": "Dining"
-          },
-          "channels": "Channel multipliers",
-          "channelList": {
-            "web": "Web",
-            "app": "Mobile app",
-            "pos": "Point of sale",
-            "marketplace": "Marketplace"
-          }
+      "points": {
+        "title": "Earning rules",
+        "subtitle": "How points are earned: base rule, multipliers and day rule.",
+        "reset": "Reset rules",
+        "resetDone": "Sample rules restored",
+        "base": "Base rule",
+        "baseOption": "1 point per {amount}",
+        "value": "Point value when redeeming",
+        "valueOption": "1 point = {amount}",
+        "returnPct": "With this rule you give back {pct}% of each purchase in points (without multipliers).",
+        "byCategory": "Multiplier by category",
+        "rxNote": "In this example prescription medicines earn no points (×0).",
+        "byChannel": "Multiplier by channel",
+        "dayRule": "Day rule",
+        "dayCategory": "Category",
+        "dayWeekday": "Day",
+        "dayMult": "Multiplier",
+        "dayRuleText": "Active: ×{mult} points on {category} on {day}.",
+        "dayRuleOff": "No day rule.",
+        "welcome": "Welcome bonus (points)",
+        "expiry": "Points validity",
+        "expiryOption": "{months} months",
+        "liveNote": "Changes are saved instantly and used on the next Checkout purchase.",
+        "simTitle": "Points simulator",
+        "simSubtitle": "Try a purchase with the current rules.",
+        "simAmount": "Purchase amount",
+        "simCategory": "Category",
+        "simChannel": "Channel",
+        "simDay": "Day",
+        "simResult": "{base} × {mult}. Worth {value} in rewards ({pct}% of the purchase).",
+        "costTitle": "How much does the program cost?",
+        "costSubtitle": "Monthly estimate with the base rule.",
+        "costSales": "Monthly sales to members ($)",
+        "costExpired": "% of points that expire unused",
+        "costIssued": "Points issued per month",
+        "costGross": "Value of those points",
+        "costNet": "Estimated monthly cost",
+        "costNote": "Formula: sales ÷ base rule × point value × (1 − % expired). Multipliers and bonuses increase it depending on how much they are used."
+      },
+      "tiers": {
+        "title": "Tiers",
+        "subtitle": "Purchase points accumulated in the year to enter each tier.",
+        "from": "From (points in the year)",
+        "members": "{n} members",
+        "invalid": "Thresholds must increase: Silver < Gold < Diamond, and Silver above 0.",
+        "save": "Save tiers",
+        "saved": "Tiers saved: the app and Results now use the new thresholds",
+        "discard": "Discard changes",
+        "note": "Counts use the 29,200-member sample base plus the members you enroll in the demo.",
+        "downgrade": "Move down one tier after {months} months without purchases",
+        "downgradeEffect": "With this rule {n} members would move down at the next review."
+      },
+      "missions": {
+        "title": "Missions",
+        "subtitle": "Turn them on or pause them; the member app shows only active ones.",
+        "active": "Active",
+        "paused": "Paused",
+        "toggle": "Turn “{name}” on or off",
+        "reward": "Reward",
+        "stats": "Completed by {completion}% of members · purchases +{lift}%",
+        "noStats": "No results yet.",
+        "newTitle": "New mission",
+        "newSubtitle": "It shows up right away in the member app.",
+        "name": "Name (optional)",
+        "nameHint": "If left empty, the challenge description is used.",
+        "type": "Challenge type",
+        "types": {
+          "purchasesMonth": "Purchases in the month",
+          "appPurchases": "App or delivery purchases",
+          "referrals": "Referred friends",
+          "profile": "Complete profile"
         },
-        "tiers": {
-          "title": "Tier configurator",
-          "subtitle": "Tune upgrade and downgrade thresholds",
-          "upgradeAt": "Upgrade to {tier} at",
-          "downgradeAfter": "Downgrade after {months} months inactive",
-          "membersIn": "{count} members"
-        },
-        "missions": {
-          "title": "Missions and challenges",
-          "subtitle": "Build gamified, multichannel missions",
-          "running": "Running",
-          "completion": "Completion",
-          "uplift": "Uplift"
-        },
-        "referrals": {
-          "title": "Referral program",
-          "subtitle": "Track dual rewards for referrer and referee",
-          "rewardReferrer": "Referrer reward",
-          "rewardReferee": "Referee reward",
-          "totalReferrals": "Total referrals",
-          "conversion": "Conversion"
-        },
-        "cashback": {
-          "title": "Smart cashback",
-          "subtitle": "Return as points or balance, by segment",
-          "rate": "Average rate",
-          "redeemed": "Redeemed this month",
-          "segments": "Active segments"
-        },
-        "sweepstakes": {
-          "title": "Sweepstakes and experiences",
-          "subtitle": "Tickets redeemable in premium prize draws",
-          "activeDraws": "Active draws",
-          "tickets": "Tickets issued",
-          "winners": "Winners announced"
+        "target": "Target",
+        "create": "Create mission",
+        "created": "Mission created: it now shows in the app",
+        "leaderboardTitle": "Member ranking",
+        "leaderboardSubtitle": "A monthly top 10 in the app.",
+        "leaderboardToggle": "Show ranking to members",
+        "leaderboardOn": "Ranking visible in the app",
+        "leaderboardOff": "Ranking hidden",
+        "leaderboardNote": "Off by default for privacy: it only shows first name and last-name initial.",
+        "claimsCount": "Missions claimed in this demo: {n}"
+      },
+      "referrals": {
+        "title": "Referral program",
+        "subtitle": "A reward for the inviter and for the new member.",
+        "referrer": "Points for the inviter",
+        "referee": "Points for the new member",
+        "cost": "Cost per referral: {value}",
+        "total": "Total referrals",
+        "conversion": "Invitees who buy",
+        "blocked": "Referrals blocked by fraud rules",
+        "session": "Referrals in this demo",
+        "sessionSub": "Enrolled at Checkout with a referrer phone",
+        "howTo": "To try it, enroll someone at Checkout with 300 555 0142 in “Phone of the member who invited them”."
+      },
+      "cashback": {
+        "title": "Cashback",
+        "subtitle": "An alternative to points: give back a percentage of the purchase as store credit in pesos.",
+        "sim": "Simulator",
+        "tier": "Tier",
+        "result": "{pct}% back as store credit. With points and the base rule you give back {points}%.",
+        "note": "It is a simulator to compare models: Checkout in this demo awards points."
+      },
+      "sweepstakes": {
+        "legal": "In Colombia, promotional sweepstakes need authorization from Coljuegos before being announced. In the demo the draw is simulated and the winner comes from a list of fictitious names.",
+        "title": "Sweepstakes",
+        "subtitle": "Members exchange points for tickets.",
+        "line": "Prize: {prize} · {date} · {cost} points per ticket · {n} participants",
+        "winner": "Winner: {name}",
+        "done": "Drawn",
+        "run": "Draw (simulated)",
+        "drawn": "Simulated winner: {name}",
+        "note": "Participants and tickets are sample data.",
+        "newTitle": "New sweepstakes",
+        "name": "Name",
+        "namePh": "Year-end sweepstakes",
+        "prize": "Prize",
+        "prizePh": "Holiday gift basket",
+        "date": "Date",
+        "cost": "Points per ticket",
+        "create": "Create sweepstakes",
+        "created": "Sweepstakes created",
+        "items": {
+          "basket": { "name": "October sweepstakes", "prize": "Personal care gift basket" },
+          "skincare": { "name": "September sweepstakes", "prize": "Dermocosmetic kit" }
         }
       },
       "campaigns": {
-        "title": "Multichannel campaign templates",
-        "subtitle": "Run a single campaign across web, app, POS, email, and WhatsApp",
+        "title": "Campaigns",
+        "subtitle": "WhatsApp, email, SMS or in-app messages for a segment.",
+        "defaultMessage": "Hi '{name}'. This weekend you get double points at {club}. Your balance: '{points}' points.",
+        "name": "Campaign",
+        "namePh": "E.g.: Double points on vitamins",
+        "audience": "Audience",
+        "schedule": "Schedule",
+        "channel": "Channel",
+        "status": "Status",
+        "action": "Action",
+        "daily": "Monday to Saturday, {time}",
+        "weekly": "{day}, {time}",
         "channels": {
-          "web": "Web",
-          "app": "App",
-          "pos": "POS",
+          "whatsapp": "WhatsApp",
           "email": "Email",
-          "whatsapp": "WhatsApp"
+          "sms": "SMS",
+          "app": "In-app notification"
         },
+        "statuses": {
+          "scheduled": "Scheduled",
+          "active": "Active",
+          "paused": "Paused",
+          "draft": "Draft"
+        },
+        "toast": {
+          "paused": "“{name}” paused",
+          "scheduled": "“{name}” scheduled"
+        },
+        "pause": "Pause",
+        "resume": "Schedule",
+        "audienceNote": "Audience = segment members who authorized that channel (sample percentages). It changes with tier thresholds and with the members you enroll.",
+        "newTitle": "New campaign",
+        "newSubtitle": "The demo checks the allowed hours and calculates the audience.",
+        "segment": "Segment",
+        "day": "Send day",
+        "time": "Time",
+        "legalOk": "Allowed time.",
+        "legal": {
+          "sunday": "Commercial messages cannot be sent on Sundays.",
+          "weekday": "Monday to Friday only between 7:00 a.m. and 7:00 p.m.",
+          "saturday": "Saturdays only between 8:00 a.m. and 3:00 p.m."
+        },
+        "legalRule": "Colombian Law 2300 of 2023: Monday to Friday 7:00 a.m. to 7:00 p.m.; Saturdays 8:00 a.m. to 3:00 p.m.; never on Sundays or public holidays (the demo does not check holidays).",
+        "audienceCalc": "It would reach {n} members by {channel}.",
+        "message": "Message",
+        "messageHint": "Variables: '{name}' and '{points}'.",
+        "preview": "Preview",
+        "save": "Schedule campaign",
+        "saved": "Campaign scheduled for {n} members",
+        "test": "Send test (simulated)",
+        "testSent": "Simulated test via {channel}: no message is sent in the demo",
+        "sendNote": "Simulated: the demo sends no messages. In your project they go out through WhatsApp Business (approved templates), your email or SMS provider, and only to people who authorized the channel.",
         "items": {
           "doublePoints": "Double points weekend",
-          "winback": "Win back inactive members",
-          "vipDay": "Exclusive VIP day",
-          "birthday": "Birthday auto-send"
-        },
-        "audience": "Audience",
-        "scheduled": "Scheduled"
+          "winback": "We miss you: comeback voucher",
+          "birthday": "Happy birthday (automatic)",
+          "dermoLaunch": "Dermocosmetics launch"
+        }
       },
-      "coalitions": {
-        "title": "Partner coalitions",
-        "subtitle": "Share a points pool across brands",
-        "partners": "Partners",
-        "sharedPool": "Shared pool",
-        "addPartner": "Add partner"
+      "allies": {
+        "title": "Partners (coalition)",
+        "subtitle": "Partner businesses where {club} members also earn points.",
+        "add": "Add partner",
+        "empty": "No partners.",
+        "categories": {
+          "bakery": "Bakery",
+          "optics": "Optician",
+          "laundry": "Laundry",
+          "gym": "Gym",
+          "other": "Other"
+        },
+        "remove": "Remove {name}",
+        "removed": "{name} is no longer a partner",
+        "rate": "{n, plural, one {# point} other {# points}} per $1,000",
+        "month": "{n} points issued this month",
+        "newAlly": "New partner: no activity yet",
+        "pool": "Points issued by partners this month",
+        "poolCost": "In a coalition each partner pays for the points it issues: at the current point value that is {value}.",
+        "note": "Partners and figures are fictitious. In a real coalition there is an agreement with each partner and their checkouts connect through an API.",
+        "addTitle": "Add partner",
+        "name": "Business name",
+        "nameHint": "Use a sample name.",
+        "city": "City",
+        "category": "Type",
+        "rateLabel": "Points per $1,000",
+        "save": "Add",
+        "added": "{name} added as a partner"
       },
       "fraud": {
-        "title": "Fraud detection",
-        "subtitle": "Real-time alerts",
-        "alerts": {
-          "farming": "Point farming detected",
-          "multiAccount": "Suspicious multi-account activity",
-          "fakeReferral": "Fake referral blocked",
-          "abnormalRedeem": "Unusual redemption pattern"
+        "title": "Fraud",
+        "subtitle": "Rules that flag suspicious activity for review.",
+        "ruleSameDay": "Rule active in the demo: {n} or more purchases by the same member on the same day.",
+        "ruleHigh": "Rule active in the demo: a purchase of {amount} or more.",
+        "kinds": {
+          "anomalous": "Abnormal earning",
+          "duplicate": "Duplicate accounts",
+          "referral": "Suspicious referrals",
+          "redeem": "Unusual redemption",
+          "sameDay": "Many purchases in one day",
+          "highAmount": "Very large purchase"
         },
+        "fromDemo": "from your demo",
         "severity": {
           "high": "High",
           "medium": "Medium",
           "low": "Low"
         },
-        "review": "Review"
+        "status": {
+          "open": "Open",
+          "frozen": "Points frozen",
+          "dismissed": "Dismissed"
+        },
+        "review": "Review",
+        "detail": {
+          "sameDay": "This member has {n} or more purchases on the same day in the demo.",
+          "highAmount": "The purchase is {amount} or more."
+        },
+        "samples": {
+          "f1": {
+            "detail": "5 purchases in 10 minutes with the same phone at 2 stores in different cities.",
+            "events": {
+              "0": "Oct 6, 2026 10:02 · Chapinero · $96,000 · +96 pts",
+              "1": "Oct 6, 2026 10:05 · Chapinero · $88,000 · +88 pts",
+              "2": "Oct 6, 2026 10:11 · Laureles · $102,000 · +102 pts"
+            }
+          },
+          "f2": {
+            "detail": "3 accounts with the same ID number and different phones.",
+            "events": {
+              "0": "Account 1 · enrolled in Chapinero on Sep 14, 2026",
+              "1": "Account 2 · enrolled in Granada on Sep 21, 2026",
+              "2": "Account 3 · enrolled in Laureles on Oct 2, 2026"
+            }
+          },
+          "f3": {
+            "detail": "8 referrals enrolled from the same device in one day.",
+            "events": {
+              "0": "Oct 5, 2026 18:40 · 3 enrollments in 6 minutes",
+              "1": "Oct 5, 2026 19:02 · 3 enrollments in 4 minutes",
+              "2": "Oct 5, 2026 19:30 · 2 enrollments without purchases"
+            }
+          },
+          "f4": {
+            "detail": "Redemption of 6,000 points 2 minutes after earning them.",
+            "events": {
+              "0": "Oct 4, 2026 16:20 · purchase of $612,000 · +612 pts",
+              "1": "Oct 4, 2026 16:21 · manual adjustment +5,400 pts",
+              "2": "Oct 4, 2026 16:22 · redemption of 6,000 pts"
+            }
+          }
+        },
+        "evidence": "Activity",
+        "saleLine": "{id} · {date} {time} · {sede} · {amount} · +{points} pts",
+        "suggested": "Suggested action",
+        "actions": {
+          "anomalous": "Freeze the points and call the customer to verify.",
+          "duplicate": "Merge the accounts and cancel the repeated welcome bonuses.",
+          "referral": "Hold referral points until each invitee's first purchase.",
+          "redeem": "Check who made the manual adjustment before approving the redemption.",
+          "sameDay": "Confirm with the store that the purchases are real.",
+          "highAmount": "Validate the invoice before releasing the points."
+        },
+        "note": "When frozen, the member cannot redeem at Checkout or in the app in this demo. In your project the rules are tuned to your business and every decision is logged in an audit trail.",
+        "dismiss": "Dismiss alert",
+        "dismissedToast": "Alert dismissed",
+        "freeze": "Freeze points",
+        "frozenToast": "Points frozen: no redemptions until reviewed"
       },
       "experiments": {
-        "title": "A/B test program mechanics",
-        "subtitle": "Experiment with earning, redemption, and UX",
-        "running": "Running",
-        "uplift": "Uplift",
+        "title": "A/B tests",
+        "subtitle": "Compare two versions of a mechanic with groups of members.",
+        "finished": "Finished",
+        "running": "Running · {days} days",
+        "finish": "Finish and apply the winner",
+        "note": "Sample results. In your project groups are assigned at random and measured with your sales.",
         "items": {
-          "tripleMultiplier": "Triple points vs. double points",
-          "tierFastTrack": "Silver fast-track vs. control",
-          "missionLayout": "Mission layout A/B test"
+          "tripleTuesday": {
+            "name": "Double vs. triple points on Tuesdays",
+            "metric": "Members who buy Personal care on Tuesday",
+            "a": "A · double points",
+            "b": "B · triple points",
+            "result": "Double points stays: triple only adds 0.7 percentage points and costs 50% more."
+          },
+          "welcome300": {
+            "name": "Welcome bonus of 100 vs. 300 points",
+            "metric": "New members who buy again within 30 days",
+            "a": "A · 100 points",
+            "b": "B · 300 points",
+            "result": "300 points wins: the welcome bonus is now 300 in Settings › Points."
+          },
+          "birthdayBonus": {
+            "name": "Birthday message with and without a voucher",
+            "metric": "Members who buy in their birthday month",
+            "a": "A · greeting only",
+            "b": "B · greeting and $15,000 voucher",
+            "result": "Greeting with voucher wins: it is the gift you already see in the app."
+          }
         }
       }
     },
     "analytics": {
-      "title": "Analytics and insights",
-      "subtitle": "Real-time KPIs across the entire program",
+      "title": "Results",
+      "subtitle": "At the top, what you did in this demo; below, the 29,200-member sample base.",
+      "session": {
+        "title": "What you did in this demo",
+        "subtitle": "Based on the purchases, redemptions and enrollments you recorded.",
+        "sales": "Purchases recorded",
+        "issued": "Points added",
+        "burned": "Points deducted (redemptions and reversals)",
+        "members": "Members enrolled",
+        "alerts": "Fraud alerts"
+      },
       "kpis": {
-        "activeMembers": "Active members",
-        "redemptionRate": "Redemption rate",
-        "engagement": "Engagement",
-        "ltvUplift": "LTV uplift",
-        "breakage": "Breakage · expired points",
-        "aovDelta": "AOV vs. non-members"
+        "title": "Program indicators",
+        "members": "Members",
+        "membersSub": "{n} enrolled in the demo",
+        "active": "Active (90 days)",
+        "activeSub": "{pct}% of the base",
+        "redemption": "Redemption rate",
+        "redemptionSub": "Points issued in 12 months that were redeemed",
+        "ticket": "Average member ticket",
+        "ticketSub": "Non-members: {other} (+{pct}%)",
+        "expired": "Expired points",
+        "expiredSub": "Issued points that expire unused",
+        "liability": "Points liability",
+        "liabilitySub": "{pts} outstanding points × {value}",
+        "cost": "Estimated program cost: {cost} per month with member sales of {sales} (base rule; adjust it in Settings › Points)."
+      },
+      "tiers": {
+        "title": "Members by tier",
+        "subtitle": "Using the thresholds in Settings › Tiers.",
+        "total": "Total: {n} members"
+      },
+      "top": {
+        "title": "Most redeemed rewards",
+        "subtitle": "Last 30 days; includes your redemptions in the demo.",
+        "reward": "Reward",
+        "redemptions": "Redemptions",
+        "points": "Points",
+        "cost": "Cost",
+        "yours": "+{n} yours"
+      },
+      "segments": {
+        "title": "Suggested segments",
+        "subtitle": "Groups calculated with recency, frequency and tier rules (there is no AI model in this demo).",
+        "rules": {
+          "vip": "Gold and Diamond with a purchase in the last 30 days",
+          "atRisk": "Used to buy every month and have been away 60 to 120 days",
+          "nearTier": "Less than 500 points from the next tier",
+          "dormant": "More than 180 days without buying"
+        },
+        "actions": {
+          "vip": "Early access to dermocosmetic launches",
+          "atRisk": "300-point bonus if they buy within 15 days",
+          "nearTier": "Remind them how many points they need",
+          "dormant": "Reactivation message with free delivery"
+        },
+        "create": "Create campaign",
+        "note": "Sample sizes; “Close to the next tier” and “VIP” are recalculated with the tier thresholds."
       },
       "cohort": {
-        "title": "Cohort retention",
-        "subtitle": "Active members, by sign-up month",
-        "month": "Month"
-      },
-      "topRewards": {
-        "title": "Top redeemed rewards",
-        "subtitle": "Last 30 days",
-        "redemptions": "Redemptions",
-        "pointsBurned": "Points burned"
-      },
-      "tierDistribution": {
-        "title": "Tier distribution",
-        "subtitle": "Current member base"
-      },
-      "ml": {
-        "title": "ML personalization",
-        "subtitle": "Recommendations by segment",
-        "segments": {
-          "vip": "High-value VIPs",
-          "atRisk": "At risk of churn",
-          "rising": "Climbing tiers",
-          "dormant": "Dormant 90+ days"
-        },
-        "recommendation": "Recommendation",
-        "expectedUplift": "Expected uplift"
+        "title": "Retention by enrollment month",
+        "subtitle": "% of each month's members who keep buying.",
+        "month": "Enrolled in",
+        "after": "Month {n}"
       }
     }
   }

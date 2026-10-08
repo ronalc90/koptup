@@ -1,0 +1,755 @@
+{
+  "demoCms": {
+    "meta": {
+      "seoTitle": "Headless CMS demo: content models, visual editor and API",
+      "seoDescription": "Try a headless CMS with sample data: content models, visual block editor, web and app preview, SEO checks, roles, approvals, scheduled publishing, webhooks and a JSON API. AI writing assistant included.",
+      "breadcrumbHome": "Home",
+      "breadcrumbDemos": "Demos",
+      "breadcrumb": "Headless CMS"
+    },
+    "bar": {
+      "title": "Headless CMS",
+      "sample": "Sample data",
+      "sampleHint": "Fictitious company, people, addresses, phone numbers and domains. Your changes are saved only in this browser.",
+      "subtitle": "Model your content, edit it in a visual editor, approve it and publish it to your website, your app and your assistant from a single panel.",
+      "company": "{name} (fictitious company) · website, app and assistant",
+      "viewAs": "View as",
+      "switched": "You are now viewing the demo as {name} ({role}).",
+      "reset": "Reset data",
+      "storageOff": "Your browser does not allow saving data: changes will be lost when you reload the page.",
+      "resetTitle": "Reset the sample data?",
+      "resetBody": "This deletes the entries, images, fields and publications you created or changed in this browser and loads the sample data again.",
+      "resetConfirm": "Reset",
+      "resetDone": "Done: the sample data was loaded again.",
+      "cancel": "Cancel",
+      "loading": "Loading the sample data…"
+    },
+    "common": {
+      "close": "Close"
+    },
+    "nav": {
+      "label": "CMS sections",
+      "home": "Home",
+      "entries": "Entries",
+      "models": "Models",
+      "media": "Media",
+      "publishing": "Publishing",
+      "api": "Delivery API",
+      "roles": "Roles and permissions"
+    },
+    "roles": {
+      "writer": {
+        "name": "Writer",
+        "desc": "Creates entries, edits drafts and published entries (as a draft) and sends them for review."
+      },
+      "editor": {
+        "name": "Editor",
+        "desc": "Reviews, approves, schedules and publishes; can edit any entry."
+      },
+      "admin": {
+        "name": "Administrator",
+        "desc": "Everything above, plus content models and webhooks."
+      }
+    },
+    "status": {
+      "draft": "Draft",
+      "review": "In review",
+      "approved": "Approved",
+      "scheduled": "Scheduled",
+      "published": "Published",
+      "live": "A published version exists",
+      "liveHint": "The site keeps showing the published version until you publish these changes."
+    },
+    "types": {
+      "page": {
+        "name": "Page",
+        "desc": "Site pages (home, about us) built with blocks.",
+        "example": "Careers"
+      },
+      "article": {
+        "name": "Blog article",
+        "desc": "News, guides and announcements with date, category and cover image.",
+        "example": "How to prepare for your lab test"
+      },
+      "location": {
+        "name": "Location",
+        "desc": "Each location with address, hours, WhatsApp, photo and the services it offers.",
+        "example": "Laureles location"
+      },
+      "service": {
+        "name": "Service",
+        "desc": "Services with summary, self-pay rate from, preparation and image.",
+        "example": "Cardiology"
+      },
+      "faq": {
+        "name": "FAQ",
+        "desc": "Questions and answers shown on the site that the assistant can cite.",
+        "example": "Can I change my appointment time?"
+      }
+    },
+    "fields": {
+      "page": {
+        "title": "Title",
+        "summary": "Summary",
+        "heroImage": "Main image",
+        "body": "Block content"
+      },
+      "article": {
+        "title": "Title",
+        "excerpt": "Excerpt",
+        "category": "Category",
+        "cover": "Cover image",
+        "body": "Block content"
+      },
+      "location": {
+        "name": "Location name",
+        "city": "City",
+        "address": "Address",
+        "hours": "Opening hours",
+        "whatsapp": "Location WhatsApp",
+        "photo": "Photo",
+        "services": "Services offered",
+        "description": "Description"
+      },
+      "service": {
+        "name": "Service name",
+        "summary": "Summary",
+        "priceFrom": "Self-pay rate from (COP)",
+        "preparation": "Preparation",
+        "image": "Image"
+      },
+      "faq": {
+        "question": "Question",
+        "answer": "Answer",
+        "service": "Related service",
+        "assistant": "Available to the site assistant"
+      }
+    },
+    "kinds": {
+      "text": "Short text",
+      "longText": "Long text",
+      "number": "Number",
+      "boolean": "Yes / no",
+      "date": "Date",
+      "phone": "Phone",
+      "image": "Image",
+      "reference": "Reference",
+      "references": "References (several)",
+      "blocks": "Blocks (visual editor)"
+    },
+    "home": {
+      "hello": "Hi, {name}",
+      "roleLine": "You are viewing the demo with the {role} role. {desc} Switch person with “View as” to try the permissions.",
+      "entriesCount": "{n, plural, one {# entry} other {# entries}}",
+      "tourTitle": "5-step tour",
+      "tourProgress": "{done} of {total} done",
+      "tourIntro": "Each step is checked automatically when you actually do it in the demo.",
+      "stepDone": "Step completed",
+      "go": "Go",
+      "tour": {
+        "model": {
+          "title": "1. See how content is modeled",
+          "desc": "Open “Content models” and review the “Location” type: fields, required and translatable. As an administrator you can add a field."
+        },
+        "edit": {
+          "title": "2. Edit the Chapinero location and watch the preview",
+          "desc": "Change the hours or the photo: the web and app preview updates as you type."
+        },
+        "assistant": {
+          "title": "3. Ask the writing assistant for a shorter version",
+          "desc": "In the “AI assistant” tab use “Short version for the app” and apply it to the field."
+        },
+        "publish": {
+          "title": "4. Send for review, approve and publish",
+          "desc": "Send as Writer, switch to Editor with “View as”, approve and publish. See the webhook under “Publishing” and the JSON in the “API” tab."
+        },
+        "rag": {
+          "title": "5. Publish the FAQ and ask the site assistant",
+          "desc": "Publish “How do I prepare for an abdominal ultrasound?” and ask about the ultrasound in the preview: the assistant cites the published answer."
+        }
+      },
+      "truthTitle": "What is real in this demo",
+      "truth": {
+        "browser": {
+          "title": "Works in your browser:",
+          "desc": "models, entries, visual editor, preview, SEO checks, roles, approvals, scheduling, versions and the API JSON. It is saved in this browser."
+        },
+        "ai": {
+          "title": "Real AI:",
+          "desc": "the writing assistant sends the text to the KopTup backend, which calls a language model."
+        },
+        "simulated": {
+          "title": "Simulated:",
+          "desc": "webhooks (nothing is sent), the .example domains, the image CDN and the site assistant (keyword search over the published FAQs)."
+        },
+        "project": {
+          "title": "In your project:",
+          "desc": "we implement it with your content model, your site and your app, permissions enforced on the server and the integrations you need."
+        }
+      },
+      "scheduledTitle": "Upcoming scheduled publications",
+      "scheduledEmpty": "Nothing is scheduled.",
+      "inMinutes": "{n, plural, =0 {in less than a minute} one {in # minute} other {in # minutes}}",
+      "inHours": "{n, plural, one {in # hour} other {in # hours}}",
+      "inDays": "{n, plural, one {in # day} other {in # days}}",
+      "activityTitle": "Recent activity",
+      "activityEmpty": "No activity in this session yet. What you do will show up here."
+    },
+    "activity": {
+      "created": "created “{title}”",
+      "edited": "edited “{title}” (back to draft)",
+      "saved": "saved a version of “{title}”",
+      "submitted": "sent “{title}” for review",
+      "approved": "approved “{title}”",
+      "changesRequested": "requested changes on “{title}”",
+      "published": "published “{title}”",
+      "autoPublished": "published “{title}” (scheduled publication)",
+      "scheduled": "scheduled “{title}”",
+      "unscheduled": "cancelled the schedule of “{title}”",
+      "unpublished": "unpublished “{title}”",
+      "discarded": "discarded the unpublished changes of “{title}”",
+      "restored": "restored a version of “{title}”",
+      "duplicated": "duplicated “{detail}”",
+      "deleted": "deleted “{title}”",
+      "fieldAdded": "added the field {detail}",
+      "fieldRemoved": "removed the field {detail}",
+      "mediaAdded": "uploaded the image {detail}",
+      "mediaRemoved": "deleted the image {detail}",
+      "webhookToggled": "changed the “{detail}” webhook",
+      "webhookResent": "resent a delivery to the “{detail}” webhook"
+    },
+    "entries": {
+      "title": "Entries",
+      "subtitle": "{shown} of {total} entries",
+      "new": "New entry",
+      "newTitle": "New entry",
+      "typeLabel": "Content type",
+      "titleLabel": "Title",
+      "slugPreview": "It will be published at {path}",
+      "create": "Create and edit",
+      "created": "Entry created as a draft.",
+      "cancel": "Cancel",
+      "exportCsv": "Export CSV",
+      "csvDone": "You downloaded {n, plural, one {# entry} other {# entries}} as CSV.",
+      "csv": {
+        "title": "Title",
+        "type": "Type",
+        "status": "Status",
+        "path": "Path",
+        "enMissing": "Untranslated fields (EN)",
+        "author": "Author",
+        "updated": "Last edit",
+        "published": "Published"
+      },
+      "search": "Search by title or slug",
+      "filterType": "Filter by type",
+      "allTypes": "All types",
+      "filterStatus": "Filter by status",
+      "allStatuses": "All statuses",
+      "filterLang": "Filter by language",
+      "allLangs": "All languages",
+      "langComplete": "English translation complete",
+      "langMissing": "English translation missing",
+      "filterAuthor": "Filter by author",
+      "allAuthors": "All authors",
+      "sortBy": "Sort by",
+      "sort": {
+        "updated": "Last edit",
+        "title": "Title (A–Z)",
+        "type": "Type"
+      },
+      "clear": "Clear filters",
+      "empty": "No entries match those filters.",
+      "col": {
+        "title": "Title",
+        "type": "Type",
+        "status": "Status",
+        "langs": "Languages",
+        "author": "Author",
+        "updated": "Last edit",
+        "actions": "Actions"
+      },
+      "untitled": "(untitled)",
+      "enMissing": "{n, plural, one {# untranslated field} other {# untranslated fields}}",
+      "enComplete": "Translation complete",
+      "edit": "Edit",
+      "duplicate": "Duplicate",
+      "duplicated": "Entry duplicated as a draft.",
+      "delete": "Delete",
+      "deleteNotAllowed": "Your role cannot delete this entry",
+      "deleteTitle": "Delete the entry?",
+      "deleteBody": "“{title}” and its versions will be deleted. References from other entries are removed.",
+      "deleteLive": "The entry is published: the site will be notified to remove it (simulated webhook).",
+      "deleteConfirm": "Delete",
+      "deleted": "Entry deleted."
+    },
+    "editor": {
+      "back": "Back to entries",
+      "gone": "This entry no longer exists (maybe you deleted it).",
+      "untitled": "(untitled)",
+      "meta": "Created by {author} · last edited by {editor}, {date}",
+      "publishedOn": "published on {date}",
+      "scheduledFor": "will be published on {date} (Colombia time)",
+      "contentLanguage": "Content language",
+      "saveVersion": "Save version",
+      "saved": "Version saved to the history.",
+      "submit": "Send for review",
+      "submitted": "Sent for review.",
+      "discard": "Discard changes",
+      "discarded": "You went back to the published version.",
+      "approve": "Approve",
+      "approved": "Entry approved: it can now be published or scheduled.",
+      "requestChanges": "Request changes",
+      "publishNow": "Publish now",
+      "published": "Published: the site, the app and the assistant were notified (simulated webhooks).",
+      "scheduleBtn": "Schedule…",
+      "unschedule": "Cancel schedule",
+      "unscheduled": "Schedule cancelled: the entry is still approved.",
+      "unpublish": "Unpublish",
+      "unpublished": "Entry unpublished: the API no longer delivers it.",
+      "delete": "Delete entry",
+      "backToDraft": "You edited an approved or published entry: it went back to draft. The site keeps showing the published version.",
+      "waitingApproval": "With the {role} role you cannot approve. Switch to Editor with “View as” to approve or request changes.",
+      "waitingPublish": "With the {role} role you cannot publish. Switch to Editor with “View as” to publish or schedule.",
+      "readOnly": "Read only: with the {role} role you cannot edit entries in the “{status}” status.",
+      "reviewNote": "The editor requested changes: “{note}”",
+      "changesNote": "There are unpublished changes: the site and the API show the published version until you publish again.",
+      "issuesTitle": "Before sending or publishing, fix:",
+      "issues": {
+        "required": "The required field “{field}” is missing (in Spanish).",
+        "slugInvalid": "The slug can only contain lowercase letters, numbers and hyphens.",
+        "slugTaken": "Another entry of this type already uses that slug."
+      },
+      "translationPending": "{n, plural, one {# field is not translated yet} other {# fields are not translated yet}}: meanwhile, the English site shows the Spanish text.",
+      "formLabel": "Entry fields",
+      "panelLabel": "Preview and tools",
+      "slug": "Slug (address on the site)",
+      "slugFromTitle": "From title",
+      "slugPath": "Public path: {path}",
+      "sharedAllLangs": "same in every language",
+      "fallbackNote": "Not translated: the Spanish text will be shown.",
+      "copyFromEs": "Copy the Spanish text",
+      "chars": "{n}/{max} characters",
+      "assistantHint": "If it is on and the question is published, the site assistant can cite it.",
+      "noReference": "No related service",
+      "notPublished": "(not published)",
+      "tabs": {
+        "preview": "Preview",
+        "seo": "SEO",
+        "api": "API",
+        "history": "History",
+        "ai": "AI assistant"
+      },
+      "previewVersion": "Preview version",
+      "previewModes": {
+        "draft": "Draft",
+        "live": "Published"
+      },
+      "requestTitle": "Request changes",
+      "requestNote": "What needs to change?",
+      "requestPlaceholder": "E.g.: the photo needs alt text and Saturday hours are missing.",
+      "send": "Send",
+      "changesRequested": "The entry went back to draft with your comments.",
+      "cancel": "Cancel",
+      "deleteTitle": "Delete the entry?",
+      "deleteBody": "“{title}” and its versions will be deleted. This cannot be undone (except with “Reset data”).",
+      "deleteConfirm": "Delete",
+      "deleted": "Entry deleted.",
+      "schedule": {
+        "title": "Schedule publication",
+        "when": "Date and time (Colombia time)",
+        "future": "Pick a date and time in the future.",
+        "inOneMinute": "In ~1 minute",
+        "tomorrow7": "Tomorrow, 7:00 a.m.",
+        "nextWeek": "In a week, 7:00 a.m.",
+        "note": "While the demo is open, the scheduler checks every 5 seconds. If you close the tab, the entry is published the next time you open the demo, with the date you scheduled.",
+        "confirm": "Schedule",
+        "cancel": "Cancel",
+        "done": "Scheduled for {date}."
+      },
+      "noChangesSinceVersion": "No changes since the last version"
+    },
+    "blocks": {
+      "empty": "No blocks yet. Add the first one.",
+      "add": "Add block:",
+      "kinds": {
+        "heading": "Heading",
+        "paragraph": "Paragraph",
+        "image": "Image",
+        "button": "Button",
+        "faq": "Question and answer"
+      },
+      "moveUp": "Move block up",
+      "moveDown": "Move block down",
+      "remove": "Remove block",
+      "level": "Heading level",
+      "paragraphPlaceholder": "Type here. Use the toolbar for bold, lists and links.",
+      "translatePlaceholder": "Type the translation of this paragraph.",
+      "caption": "Caption",
+      "chooseImage": "Choose image",
+      "changeImage": "Change image",
+      "buttonLabel": "Button text",
+      "buttonHref": "Link (e.g. /sedes)",
+      "badHref": "Use an internal path (/sedes) or an address starting with https://.",
+      "question": "Question",
+      "answer": "Answer"
+    },
+    "rich": {
+      "toolbar": "Paragraph formatting",
+      "bold": "Bold",
+      "italic": "Italic",
+      "bullets": "Bulleted list",
+      "numbers": "Numbered list",
+      "link": "Insert link",
+      "clear": "Clear formatting",
+      "linkUrl": "Link address",
+      "linkApply": "Apply",
+      "linkCancel": "Cancel",
+      "linkHint": "Internal path (/servicios/fisioterapia) or an https://, mailto: or tel: address.",
+      "linkInvalid": "That link is not valid: use /path, https://, mailto: or tel:."
+    },
+    "media": {
+      "title": "Media library",
+      "subtitle": "{n} images · {missing, plural, =0 {all with alt text} one {# without alt text} other {# without alt text}}",
+      "upload": "Upload image",
+      "uploading": "Processing…",
+      "uploaded": "Image added to the library (saved only in this browser).",
+      "errors": {
+        "notImage": "That file is not an image.",
+        "tooBig": "The image is larger than {mb} MB.",
+        "unreadable": "We could not read that image."
+      },
+      "search": "Search by name",
+      "onlyNoAlt": "Only without alt text",
+      "empty": "No images match those filters.",
+      "usedCount": "{n, plural, =0 {unused} one {used in # entry} other {used in # entries}}",
+      "uploadedTag": "uploaded by you",
+      "sampleTag": "sample illustration",
+      "noAlt": "No alt text",
+      "pickTitle": "Choose image",
+      "none": "No image",
+      "choose": "Choose",
+      "change": "Change",
+      "remove": "Remove",
+      "close": "Close",
+      "meta": "{w} × {h} px · {kb} KB",
+      "focalHint": "Click the image to set the focal point ({x}%, {y}%): it drives the crop in every format.",
+      "crops": {
+        "web": "Web 16:9",
+        "app": "App 4:5",
+        "social": "Social 1:1"
+      },
+      "alt": "Alt text",
+      "altPlaceholder": "Describe the image for people who cannot see it.",
+      "altNote": "Alt text helps accessibility and SEO. Each entry's SEO panel warns you when it is missing.",
+      "usedIn": "Used in",
+      "unused": "This image is not used in any entry.",
+      "delete": "Delete image",
+      "inUse": "It cannot be deleted while an entry uses it",
+      "noDeletePerm": "Your role cannot delete images",
+      "removed": "Image deleted.",
+      "note": "The illustrations are samples. Images you upload are resized and saved only in this browser; in your project they go to your storage or image CDN."
+    },
+    "preview": {
+      "channel": "Channel",
+      "channels": {
+        "web": "Website",
+        "app": "App"
+      },
+      "device": "Device",
+      "devices": {
+        "desktop": "Desktop",
+        "mobile": "Mobile"
+      },
+      "draftMode": "Showing the draft (updates as you type).",
+      "liveMode": "Showing the published version.",
+      "draftRibbon": "Draft preview · not published",
+      "nav": {
+        "home": "Home",
+        "locations": "Locations",
+        "locationsPath": "sedes",
+        "services": "Services",
+        "servicesPath": "servicios",
+        "blog": "Blog",
+        "blogPath": "blog",
+        "faq": "FAQ",
+        "faqPath": "preguntas-frecuentes"
+      },
+      "notYetPublished": "Not published",
+      "address": "Address",
+      "hours": "Opening hours",
+      "whatsapp": "Message us on WhatsApp · {phone}",
+      "whatsappShort": "Message on WhatsApp",
+      "whatsappSimulated": "On your site, this button opens WhatsApp with {phone}. In the demo it is simulated.",
+      "linkSimulated": "On the sample site, this link goes to {href}.",
+      "servicesHere": "Services at this location",
+      "from": "From {price}",
+      "preparation": "Preparation",
+      "availableAt": "Available at:",
+      "faqSection": "FAQ",
+      "relatedService": "See service: {name}",
+      "assistantOn": "Available to the site assistant once published.",
+      "assistantOff": "Not available to the site assistant.",
+      "yes": "Yes",
+      "no": "No",
+      "footer": "Sample site · Montaña Azul clinic network (fictitious company)",
+      "askAssistant": "Ask the assistant",
+      "appNote": "The app receives the same content through the API and shows it with its own design.",
+      "simulatedNote": "Preview simulated in your browser: in your project it is your real site and app, reading the content through the API."
+    },
+    "assistant": {
+      "title": "Site assistant",
+      "close": "Close assistant",
+      "disclaimer": "Simulation: keyword search over {n, plural, =0 {the published FAQs (none available yet)} one {# published FAQ} other {# published FAQs}}. In your project, your AI assistant answers from the same content.",
+      "suggest1": "How do I prepare for an ultrasound?",
+      "suggest2": "Can I book on WhatsApp?",
+      "placeholder": "Type your question",
+      "send": "Send",
+      "source": "Source: FAQ “{title}”",
+      "publishedOn": "published on {date}",
+      "noAnswer": "I could not find that in the published content. If you publish an FAQ about it, I will be able to cite it."
+    },
+    "seo": {
+      "metaTitle": "Search engine title",
+      "metaDescription": "Meta description",
+      "titleCount": "{n} characters (recommended: {min}–{max}). If empty, the entry title is used.",
+      "descCount": "{n} characters (recommended: {min}–{max}).",
+      "serp": "How it would look in a search engine",
+      "noDescription": "No meta description: the search engine will pick a snippet of the text.",
+      "checksTitle": "Checks: {passed} of {total} passing",
+      "checks": {
+        "titleLength": {
+          "ok": "Title is {value} characters long (between {min} and {max}).",
+          "ko": "Title is {value} characters long: ideally between {min} and {max}."
+        },
+        "descriptionLength": {
+          "ok": "Meta description is {value} characters long (between {min} and {max}).",
+          "ko": "Meta description is {value} characters long: ideally between {min} and {max}."
+        },
+        "slug": {
+          "ok": "Valid and unique slug: {value}.",
+          "ko": "Invalid or duplicate slug: “{value}”."
+        },
+        "singleH1": {
+          "ok": "A single H1 (the entry title).",
+          "ko": "There are {value} H1s: the title is already the H1; use H2 or H3 in blocks."
+        },
+        "imageAlt": {
+          "ok": "Every image has alt text.",
+          "ko": "Images without alt text: {value}."
+        },
+        "internalLink": {
+          "ok": "It has {value, plural, one {# internal link} other {# internal links}}.",
+          "ko": "No internal links: link to another page of the site (for example, /sedes)."
+        },
+        "bodyLength": {
+          "ok": "The article has {value} words.",
+          "ko": "The article has {value} words: aim for 80 or more."
+        }
+      },
+      "note": "The checks are computed from this entry's real content in the selected language. They do not replace a full SEO audit of the site."
+    },
+    "api": {
+      "title": "Delivery API",
+      "subtitle": "This is how your site, your app or your assistant reads the content. Change the filters and look at the JSON: it comes from this demo's data.",
+      "type": "Content type",
+      "allTypes": "All",
+      "locale": "Language",
+      "preview": "Include drafts (preview)",
+      "previewToken": "preview token",
+      "response": "Response",
+      "results": "{n, plural, one {# result} other {# results}}",
+      "copy": "Copy JSON",
+      "copied": "Copied to the clipboard.",
+      "copyFailed": "We could not copy: select the text and copy it manually.",
+      "download": "Download .json",
+      "downloaded": "JSON downloaded.",
+      "snippets": "How to consume it",
+      "snippet": {
+        "next": "Next.js",
+        "curl": "cURL"
+      },
+      "snippetComment": "the publish webhook revalidates this tag",
+      "copyCode": "Copy code",
+      "point1": "Without preview, the API only delivers published content; drafts never leave.",
+      "point2": "If a translation is missing, it delivers the Spanish text and flags it in “localeFallback”.",
+      "point3": "Images come with alt text, size and focal point so each channel can crop them.",
+      "simulated": "API simulated in your browser with this demo's data (.example domains). In your project the CMS server serves it, with REST or GraphQL as you need.",
+      "version": "Version",
+      "publishedVersion": "Published",
+      "previewVersion": "Preview (draft)",
+      "notPublished": "This entry has no published version: the API responds 404. With preview (and its token) you would see the draft."
+    },
+    "history": {
+      "reasons": {
+        "created": "Created",
+        "saved": "Version saved",
+        "submitted": "Sent for review",
+        "approved": "Approved",
+        "published": "Published",
+        "restored": "Version restored",
+        "discarded": "Changes discarded"
+      },
+      "latest": "latest",
+      "sameAsCurrent": "same as current",
+      "differs": "{n, plural, one {# part differs from the current one} other {# parts differ from the current one}}",
+      "restore": "Restore",
+      "restored": "Version restored: review it and send it again.",
+      "activity": "Activity on this entry in this session",
+      "note": "Changes are saved automatically in this browser; “Save version”, sending, approving and publishing create a point in the history."
+    },
+    "ai": {
+      "realNote": "Real AI: the selected text is sent to the KopTup backend, which processes it with a language model. Do not include personal data.",
+      "target": "Text to work on",
+      "emptySource": "This field is empty in the selected language.",
+      "words": "{n, plural, one {# word} other {# words}}",
+      "improve": "Improve writing",
+      "shorter": "Short version for the app",
+      "tooShort": "The text is already short (fewer than 12 words).",
+      "tones": {
+        "formal": "Formal tone",
+        "tecnico": "Technical tone",
+        "persuasivo": "Persuasive tone"
+      },
+      "versions": "3 versions",
+      "working": "Generating…",
+      "result": "AI proposal",
+      "apply": "Apply to field",
+      "applyThis": "Apply this one",
+      "applied": "Text applied to “{field}”.",
+      "copy": "Copy",
+      "copied": "Copied to the clipboard.",
+      "copyFailed": "We could not copy the text.",
+      "discard": "Discard",
+      "option": "Option {n} · {tone}",
+      "uses": "{n, plural, =0 {You have not used the AI in this visit yet.} one {You used the AI # time in this visit.} other {You used the AI # times in this visit.}}",
+      "readOnly": "Your role cannot edit this entry in its current status, so you cannot apply texts.",
+      "noTargets": "This entry has no text fields to work on with the AI.",
+      "errors": {
+        "network": "We could not reach the AI server. Check your connection or try again later; the rest of the demo keeps working.",
+        "timeout": "The AI took too long to respond. Try again with a shorter text.",
+        "notConfigured": "The AI assistant is not configured on this server (the model key is missing). The rest of the demo works the same.",
+        "rateLimited": "You reached the request limit for now. Wait a few minutes and try again.",
+        "invalid": "The server did not accept that text. Try a longer or different text.",
+        "server": "The AI service responded with an error. Try again in a moment."
+      }
+    },
+    "models": {
+      "title": "Content models",
+      "subtitle": "In a headless CMS the content is structured: each type defines its fields and each channel (web, app, assistant) applies its own design.",
+      "typesLabel": "Content types",
+      "entriesCount": "{n, plural, one {# entry} other {# entries}}",
+      "apiId": "API ID",
+      "route": "Route on the site",
+      "addField": "Add field",
+      "adminOnly": "Only Administrators can change the models. Use “View as” to try it.",
+      "col": {
+        "field": "Field",
+        "apiId": "API ID",
+        "kind": "Type",
+        "required": "Required",
+        "localized": "Translatable",
+        "actions": "Actions"
+      },
+      "custom": "custom",
+      "yes": "Yes",
+      "no": "No",
+      "removeField": "Remove field",
+      "fieldRemoved": "Field removed from the model and its entries.",
+      "headlessNote": "The demo's base fields cannot be deleted; fields you add show up in the editor, in the preview (additional information) and in the API JSON.",
+      "addTitle": "Add a field to “{type}”",
+      "labelEs": "Field name (Spanish)",
+      "labelEn": "Field name (English, optional)",
+      "labelPlaceholder": "E.g.: Parqueadero",
+      "idPreview": "API ID: {id}",
+      "idTaken": "A field with the ID {id} already exists.",
+      "kind": "Field type",
+      "required": "Required to publish",
+      "localized": "Translatable (one value per language)",
+      "requiredWarn": "Existing entries of this type cannot be sent or published until they fill in this field.",
+      "save": "Add",
+      "cancel": "Cancel",
+      "fieldAdded": "Field “{name}” added: it already shows up in the editor and the API."
+    },
+    "publishing": {
+      "title": "Publishing",
+      "subtitle": "Editorial queue, scheduled publications and notifications (webhooks) to your channels.",
+      "emptyColumn": "Nothing here.",
+      "approve": "Approve",
+      "approvedToast": "Entry approved.",
+      "publishNow": "Publish now",
+      "publishedToast": "Entry published.",
+      "scheduledAt": "{date} · {rel}",
+      "by": "{name} · {date}",
+      "blocked": "It has pending fields: open it to fix them.",
+      "writerNote": "As a Writer you can see the queue, but approving and publishing belong to Editors. Use “View as” to switch person.",
+      "webhooksTitle": "Webhooks on publish",
+      "targets": {
+        "site": {
+          "name": "Website",
+          "desc": "Regenerates the affected pages (revalidation)."
+        },
+        "app": {
+          "name": "App",
+          "desc": "Tells the app to refresh its content."
+        },
+        "assistant": {
+          "name": "Assistant",
+          "desc": "Reindexes the FAQs the assistant can cite."
+        }
+      },
+      "hookOn": "Webhook enabled.",
+      "hookOff": "Webhook disabled: that channel will no longer be notified.",
+      "adminOnly": "Only Administrators can enable, disable or resend webhooks.",
+      "deliveriesTitle": "Recent deliveries",
+      "deliveriesEmpty": "No deliveries yet. Publish or unpublish an entry to see them here.",
+      "col": {
+        "time": "Time",
+        "event": "Event",
+        "target": "Target",
+        "entry": "Entry",
+        "paths": "Paths",
+        "result": "Result",
+        "actions": "Actions"
+      },
+      "events": {
+        "entry": {
+          "published": "Publish",
+          "unpublished": "Unpublish",
+          "deleted": "Delete"
+        }
+      },
+      "auto": "scheduled",
+      "resent": "resent",
+      "simulatedOk": "200 · simulated",
+      "resend": "Resend",
+      "resentToast": "Delivery resent (simulated).",
+      "simulatedNote": "Simulated: the demo sends nothing to the internet and the domains are .example. In your project, publishing calls your site's revalidation, your app and your assistant's reindexing."
+    },
+    "rolesView": {
+      "title": "Roles and permissions",
+      "subtitle": "Three sample people with different roles. Switch person and try: buttons and actions follow these permissions.",
+      "viewAs": "View as this person",
+      "current": "You are viewing as this person",
+      "switched": "You are now viewing the demo as {name}.",
+      "permission": "Permission",
+      "yes": "Allowed",
+      "no": "Not allowed",
+      "note": "In the demo, each action's logic checks the permission again (hiding buttons is not enough). In your project, permissions are enforced on the CMS server and can be integrated with your company's sign-in if you need it."
+    },
+    "perms": {
+      "entry_create": "Create entries",
+      "entry_editDraft": "Edit drafts and published entries (creates a draft)",
+      "entry_editAny": "Edit entries in any status",
+      "entry_submit": "Send for review",
+      "entry_approve": "Approve or request changes",
+      "entry_publish": "Publish and schedule",
+      "entry_unpublish": "Unpublish",
+      "entry_delete": "Delete entries",
+      "models_manage": "Change content models",
+      "media_upload": "Upload images and edit their alt text",
+      "media_delete": "Delete images",
+      "webhooks_manage": "Manage webhooks"
+    }
+  }
+}

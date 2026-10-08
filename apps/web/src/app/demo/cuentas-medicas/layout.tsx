@@ -1,10 +1,13 @@
 import { Metadata } from 'next';
 import { generateMetadata, getBreadcrumbSchema } from '@/lib/seo-config';
 
-export const metadata: Metadata = generateMetadata('demo-cuentas-medicas');
+// Demo privada (solo con acceso concedido por el admin): no se indexa.
+export const metadata: Metadata = {
+  ...generateMetadata('demo-cuentas-medicas'),
+  robots: { index: false, follow: false },
+};
 
 export default function CuentasMedicasLayout({ children }: { children: React.ReactNode }) {
-  // Breadcrumb structured data
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: 'Inicio', url: '/' },
     { name: 'Demos', url: '/demo' },

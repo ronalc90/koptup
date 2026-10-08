@@ -2,260 +2,840 @@
   "demoDelivery": {
     "meta": {
       "title": "Delivery app",
-      "subtitle": "One platform for customers, drivers, merchants, and ops, with live tracking, in-app payments, and ML routing.",
-      "demo": "Interactive demo"
+      "badge": "Interactive demo",
+      "subtitle": "Your own delivery channel in 4 connected apps: the order you place as a customer reaches the store, operations and the courier, and the delivery with a code closes it in all of them.",
+      "sampleData": "Sample data",
+      "sampleDataHint": "Brand, stores, customers, couriers, orders and figures are fictitious. Payments, WhatsApp messages, calls, GPS and the map are simulated.",
+      "footer": "Demo with sample data from a fictitious brand (Fogón Demo) with 3 stores in Bogotá. Payments with Nequi, Daviplata, PSE or card, the WhatsApp message, the masked call, the courier position and the map are simulated: in your project they connect to the payment gateway, WhatsApp Business, a telephony provider, the courier's phone GPS and a map service (e.g. Google Maps or Mapbox). What you do is saved only in this browser.",
+      "seoTitle": "Delivery app: customer, store, operations and courier",
+      "seoDescription": "Interactive demo of an own delivery channel with sample data: order with simulated payment, store acceptance, assignment of the nearest courier, delivery with a code and calculated timing reports. Simulated map and tracking.",
+      "breadcrumbHome": "Home",
+      "breadcrumbDemos": "Demos"
     },
     "tabs": {
+      "label": "Demo apps",
       "customer": "Customer",
-      "driver": "Driver",
-      "merchant": "Merchant",
-      "ops": "Ops"
+      "merchant": "Store",
+      "ops": "Operations",
+      "driver": "Courier",
+      "count": {
+        "customer": "{n, plural, one {# item in the cart} other {# items in the cart}}",
+        "merchant": "{n, plural, one {# order to accept} other {# orders to accept}}",
+        "ops": "{n, plural, one {# alert} other {# alerts}}",
+        "driver": "{n, plural, one {# order offer} other {# order offers}}"
+      }
+    },
+    "controls": {
+      "autoOn": "Auto-advance: on",
+      "autoOff": "Auto-advance",
+      "autoHint": "Simulates the store, operations and the courier: your order moves one step forward every 4 seconds.",
+      "autoOnToast": "Auto-advance on: your order will move forward by itself",
+      "autoOffToast": "Auto-advance off",
+      "reset": "Reset demo",
+      "resetHint": "Go back to the initial sample data",
+      "resetTitle": "Reset the demo?",
+      "resetBody": "This deletes {n, plural, =0 {the changes you made} one {your order and the changes you made} other {your # orders and the changes you made}}, and restores the sample day at 7:05 PM.",
+      "resetConfirm": "Reset",
+      "resetToast": "Demo reset"
+    },
+    "tour": {
+      "title": "Suggested walkthrough: one order end to end",
+      "show": "Show suggested walkthrough ({done}/{total})",
+      "hide": "Hide",
+      "steps": {
+        "order": "Order and pay (simulated)",
+        "accept": "Accept the order within 45 s",
+        "assign": "Assign the nearest courier",
+        "deliver": "Pick up and deliver with the code",
+        "rate": "Rate the delivery"
+      },
+      "next": {
+        "order": "Start in Customer: add dishes to the cart and place the order.",
+        "accept": "Next: in Store, accept order {id} before the 45 s run out.",
+        "assign": "Next: in Operations, assign a courier to order {id} (Dispatch or Alerts).",
+        "deliver": "Next: in Store, mark order {id} “Ready for pickup”; then, in Courier, accept the offer, pick it up and confirm the delivery with the code the customer sees.",
+        "rate": "Next: in Customer, rate the delivery of order {id}."
+      },
+      "done": "Done! You followed the order through the 4 apps. In Operations, check the time per stage and the commission you did not pay.",
+      "failed": "Order {id} was rejected or cancelled. Place another order in Customer to continue the walkthrough.",
+      "here": "This step happens in the app you are looking at: {step}.",
+      "doneHere": "This step is already done."
+    },
+    "activity": {
+      "title": "Activity across apps",
+      "hint": "Every action in one app shows up in the others. The demo clock started at 7:05 PM and runs in real time.",
+      "clockHint": "Demo clock",
+      "empty": "Here you will see your order move from one app to another.",
+      "app": {
+        "customer": "Customer",
+        "merchant": "Store",
+        "ops": "Operations",
+        "driver": "Courier",
+        "system": "Demo"
+      }
+    },
+    "log": {
+      "orderPlaced": "Order {id} sent to {sede} · {method}",
+      "accepted": "{sede} accepted {id} · ready in {min} min",
+      "acceptedByOps": "Operations accepted {id} on behalf of the store ({min} min)",
+      "rejected": "{sede} rejected {id}: {reason}",
+      "ready": "{id} ready for pickup at {sede}",
+      "assigned": "Offer for {id} sent to {driver}",
+      "reassigned": "{id} reassigned to {driver}",
+      "driverAccepted": "{driver} accepted {id}",
+      "driverRejected": "{driver} rejected {id}: {reason}",
+      "pickedUp": "{id} picked up: on its way",
+      "delivered": "{id} delivered ({method})",
+      "cancelled": "{id} cancelled: {reason}",
+      "rated": "The customer rated {id} with {stars} stars",
+      "lateNotified": "Operations told the customer that {id} is late",
+      "soldOut": "{sede} marked “{item}” sold out",
+      "available": "{sede} made “{item}” available again",
+      "sedeClosed": "{sede} closed: not taking orders",
+      "sedeOpened": "{sede} opened",
+      "surchargeOn": "Rain surcharge on for new orders",
+      "surchargeOff": "Rain surcharge off",
+      "bonusOn": "Rain bonus for couriers on",
+      "bonusOff": "Rain bonus off",
+      "alertBlocked": "Review “{alert}”: block applied",
+      "alertDismissed": "Review “{alert}”: dismissed",
+      "unblocked": "Account unblocked",
+      "driverOnline": "{driver} went online",
+      "driverOffline": "{driver} went offline",
+      "docUpdated": "Document updated: {doc}",
+      "autoOn": "Auto-advance on",
+      "autoOff": "Auto-advance off"
     },
     "common": {
       "back": "Back",
-      "next": "Continue",
-      "confirm": "Confirm",
       "cancel": "Cancel",
-      "accept": "Accept",
-      "reject": "Reject",
-      "online": "Online",
-      "offline": "Offline",
-      "min": "min",
-      "km": "km",
-      "from": "From",
       "save": "Save",
-      "search": "Search",
-      "viewAll": "View all"
+      "close": "Close",
+      "min": "min",
+      "less": "Remove one",
+      "more": "Add one",
+      "copy": "Copy",
+      "copied": "Copied to clipboard",
+      "copyFailed": "Could not copy: select the text and copy it manually",
+      "understood": "Got it",
+      "yours": "Yours",
+      "yes": "yes",
+      "no": "no",
+      "mapHint": "Illustrative map, not to scale · simulated position",
+      "mapHintOps": "Illustrative map of Bogotá, not to scale · simulated positions"
+    },
+    "stage": {
+      "pending": "Awaiting confirmation",
+      "preparing": "Being prepared",
+      "ready": "Ready for pickup",
+      "pickedUp": "On the way",
+      "delivered": "Delivered",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    },
+    "months": [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ],
+    "vehicle": {
+      "moto": "Motorcycle",
+      "bici": "Bicycle"
+    },
+    "sedes": {
+      "chapinero": "Chapinero store",
+      "usaquen": "Usaquén store",
+      "cedritos": "Cedritos store"
+    },
+    "zones": {
+      "chapinero": "Chapinero",
+      "usaquen": "Usaquén",
+      "cedritos": "Cedritos",
+      "suba": "Suba",
+      "teusaquillo": "Teusaquillo",
+      "kennedy": "Kennedy",
+      "fontibon": "Fontibón"
+    },
+    "menu": {
+      "categories": {
+        "all": "All",
+        "platos": "Main dishes",
+        "sopas": "Soups",
+        "antojos": "Snacks",
+        "bebidas": "Drinks",
+        "postres": "Desserts"
+      },
+      "choices": {
+        "termino": "Doneness",
+        "base": "Preparation"
+      },
+      "options": {
+        "sinChicharron": "No pork crackling",
+        "sinHuevo": "No egg",
+        "aguacateExtra": "Extra avocado",
+        "terminoMedio": "Medium",
+        "terminoTresCuartos": "Medium well",
+        "terminoBienAsado": "Well done",
+        "papaCriolla": "Creole potatoes instead of fries",
+        "sinCrema": "No cream",
+        "sinAlcaparras": "No capers",
+        "conArroz": "With white rice",
+        "ajiAparte": "Hot sauce on the side",
+        "enAgua": "With water",
+        "enLeche": "With milk"
+      },
+      "items": {
+        "bandeja": {
+          "name": "Bandeja paisa",
+          "desc": "Beans, rice, pork crackling, ground beef, egg, sweet plantain, arepa and avocado"
+        },
+        "churrasco": {
+          "name": "Churrasco steak 300 g",
+          "desc": "With fries, salad and chimichurri"
+        },
+        "pollo": {
+          "name": "Half roast chicken",
+          "desc": "With arepa, boiled potatoes and salad"
+        },
+        "ajiaco": {
+          "name": "Ajiaco santafereño",
+          "desc": "Chicken, three kinds of potato and corn; cream and capers on the side"
+        },
+        "sancocho": {
+          "name": "Hen sancocho",
+          "desc": "With cassava, plantain, corn and rice on the side"
+        },
+        "arepa": {
+          "name": "Sweet corn arepa with cheese",
+          "desc": "Sweet fresh-corn arepa with farmer's cheese"
+        },
+        "empanadas": {
+          "name": "Pipián empanadas (3)",
+          "desc": "Filled with potato and peanut, with hot sauce"
+        },
+        "patacon": {
+          "name": "Patacón with hogao",
+          "desc": "Large fried plantain with hogao and guacamole"
+        },
+        "limonada": {
+          "name": "Coconut lemonade",
+          "desc": "Frozen lemonade with coconut cream"
+        },
+        "jugoLulo": {
+          "name": "Lulo juice",
+          "desc": "Fresh juice, with water or milk"
+        },
+        "aguaGas": {
+          "name": "Sparkling water 600 ml",
+          "desc": "Single bottle"
+        },
+        "natas": {
+          "name": "Natas dessert",
+          "desc": "Traditional recipe with raisins"
+        },
+        "arrozLeche": {
+          "name": "Rice pudding",
+          "desc": "With cinnamon and raisins"
+        }
+      }
+    },
+    "payments": {
+      "nequi": {
+        "name": "Nequi",
+        "desc": "Mobile payment (simulated)"
+      },
+      "daviplata": {
+        "name": "Daviplata",
+        "desc": "Mobile payment (simulated)"
+      },
+      "pse": {
+        "name": "PSE",
+        "desc": "Debit from your bank account (simulated)"
+      },
+      "card": {
+        "name": "Card •••• 0457",
+        "desc": "Saved credit or debit card (simulated)"
+      },
+      "cash": {
+        "name": "Cash on delivery",
+        "desc": "Pay on delivery; the courier carries change"
+      },
+      "dataphone": {
+        "name": "Card terminal on delivery",
+        "desc": "Pay by card on delivery"
+      }
+    },
+    "reasons": {
+      "reject": {
+        "soldOut": "an item sold out",
+        "busy": "the kitchen is full",
+        "outOfArea": "address out of coverage",
+        "closing": "the store is about to close"
+      },
+      "driver": {
+        "tooFar": "it is too far for me",
+        "noSpace": "no room in my delivery bag",
+        "finishing": "I am finishing another order"
+      },
+      "cancel": {
+        "customer": "cancelled by the customer",
+        "noResponse": "the store did not respond"
+      }
+    },
+    "ratingComments": {
+      "c0": "Arrived hot and on time",
+      "c1": "Very friendly courier",
+      "c2": "Everything complete and well packed",
+      "c3": "Fast, as always",
+      "c4": "The bandeja was amazing",
+      "c5": "Arrived a bit late"
+    },
+    "chat": {
+      "title": "Chat with {name}",
+      "driver": "the courier",
+      "empty": "No messages yet.",
+      "placeholder": "Write a message…",
+      "send": "Send",
+      "fromOps": "Operations",
+      "closed": "Chat opens when a courier accepts your order and closes when it is delivered.",
+      "customerNote": "In the demo your messages reach the Courier app (Courier tab, current task).",
+      "quick": {
+        "comingDown": "Coming down",
+        "ringBell": "Please ring the bell",
+        "leaveReception": "Leave it at the front desk",
+        "onMyWay": "On my way with your order",
+        "atDoor": "I am outside",
+        "cantFind": "I can't find the address, can you help me?",
+        "lateNotice": "your order is running a bit late. We are on it and will keep you posted."
+      }
+    },
+    "call": {
+      "title": "Masked call (simulated)",
+      "connecting": "Connecting you with {name}",
+      "body": "With a proxy number, neither the customer nor the courier sees the other's number. No call is made in the demo; in your project it connects to a telephony provider."
+    },
+    "nav": {
+      "follow": "Continue on {street} heading {heading} for {km}",
+      "followUntil": "Continue on {street} heading {heading} for {km} until {until}",
+      "turn": "Turn {dir} onto {street} and continue {heading} for {km}",
+      "arrive": "You have arrived: {address}",
+      "heading": {
+        "north": "north",
+        "south": "south",
+        "east": "east",
+        "west": "west"
+      },
+      "dir": {
+        "left": "left",
+        "right": "right"
+      }
+    },
+    "pod": {
+      "title": "Confirm delivery of {id}",
+      "mode": {
+        "code": "Customer code",
+        "photoSignature": "Photo and signature"
+      },
+      "codeLabel": "4-digit code the customer gave you",
+      "codeFormat": "Enter the 4 digits.",
+      "codeWrong": "The code does not match. Ask the customer again.",
+      "hintOwn": "In the demo: the code is in the Customer app (order tracking and WhatsApp preview).",
+      "hintSample": "In the demo: the code for this sample order is {code}.",
+      "photo": "Delivery photo",
+      "photoPick": "Take or choose a photo",
+      "photoType": "The file must be an image.",
+      "photoAlt": "Delivery photo",
+      "signature": "Recipient's signature",
+      "clear": "Clear",
+      "signatureArea": "Signature area",
+      "signHere": "Sign with your finger or the mouse.",
+      "signed": "Signature captured.",
+      "needBoth": "To deliver without a code you need the photo and the signature.",
+      "privacy": "In the demo the photo and signature never leave your browser; in your project they are stored as proof of delivery.",
+      "confirm": "Confirm delivery",
+      "done": "Order {id} delivered"
+    },
+    "docs": {
+      "title": "Courier documents",
+      "issues": "{n, plural, one {# to review} other {# to review}}",
+      "allValid": "Up to date",
+      "items": {
+        "cedula": "National ID (cédula)",
+        "licencia": "Driver's license",
+        "soat": "SOAT (mandatory insurance)",
+        "tecnomecanica": "Vehicle inspection",
+        "tarjetaPropiedad": "Vehicle registration",
+        "seguridadSocial": "Social security payment (PILA)"
+      },
+      "expired": "Expired on {date}",
+      "expiresIn": "Expires in {n, plural, one {# day} other {# days}} ({date})",
+      "validUntil": "Valid until {date}",
+      "noExpiry": "No expiry · verified",
+      "uploaded": "file: {file}",
+      "update": "Update",
+      "updateTitle": "Update: {doc}",
+      "file": "File (photo or PDF)",
+      "newDate": "New expiry date",
+      "needFile": "Choose the document file.",
+      "needDate": "Enter an expiry date after the demo date.",
+      "savedToast": "{doc}: updated",
+      "privacy": "In the demo the file never leaves your browser (only its name is saved); in your project it is uploaded encrypted and reviewed by your team.",
+      "note": "Expiry dates are calculated against the demo date ({date}). You are warned when 15 days or fewer are left."
     },
     "customer": {
-      "greeting": "Hi, Sofia",
-      "address": "245 Reforma Ave, Polanco",
-      "searchPlaceholder": "What are you craving today?",
-      "categoriesTitle": "Categories",
-      "categories": {
-        "food": "Food",
-        "groceries": "Groceries",
-        "pharmacy": "Pharmacy",
-        "tech": "Tech"
+      "addressLabels": {
+        "casa": "Home",
+        "oficina": "Office"
       },
-      "near": "Near you",
-      "promoBanner": "Prime membership · 30 days free · zero delivery fees",
-      "loyalty": "{points} KopUp points",
-      "restaurant": {
-        "fee": "Delivery {fee}",
-        "eta": "{eta} min",
-        "rating": "{rating}",
-        "free": "Free",
-        "categoriesTitle": "Menu",
+      "home": {
+        "deliverTo": "Deliver to · {label}",
+        "points": "{points} points",
+        "greeting": "Hi, {name}. What are you ordering from {brand} today?",
+        "blocked": "Operations blocked your account in the demo (rule-based review). Unblock it in Operations › Rule-based review or reset the demo.",
+        "activeOrder": "Order in progress {id}",
+        "track": "View",
+        "servedBy": "Served by {sede}",
+        "fee": "delivery {fee}",
+        "eta": "{from}–{to} min",
+        "changeSede": "Change",
+        "noCoverage": "No open store covers this address (8 km coverage).",
+        "seeSedes": "See stores",
+        "search": "Search the menu: ajiaco, lemonade…",
+        "categories": "Menu categories",
+        "noResults": "We found no “{q}” in this category.",
+        "viewAll": "See the whole menu",
         "popular": "Popular",
-        "addToCart": "Add · {price}",
-        "modifiers": "Customize",
-        "noteLabel": "Note to the restaurant",
-        "notePlaceholder": "No onions, sauce on the side..."
+        "soldOut": "Sold out at this store",
+        "add": "Add {item}",
+        "added": "{item} added to the cart",
+        "myOrders": "My orders ({n})",
+        "viewCart": "View cart · {n} · {total}",
+        "pickSede": "Choose the store",
+        "pickSedeHint": "Distance and delivery fee from {address}.",
+        "closed": "Closed",
+        "outOfCoverage": "Out of coverage",
+        "selected": "Selected",
+        "available": "Available",
+        "useNearest": "Use the nearest one"
+      },
+      "club": {
+        "offer": "{brand} Club: free delivery on orders from {min}. 30-day trial (simulated).",
+        "active": "Club active: free delivery on orders from {min}.",
+        "cta": "Join",
+        "cancel": "Cancel",
+        "activated": "Club activated (simulated)",
+        "cancelled": "Club cancelled"
+      },
+      "item": {
+        "add": "Add · {total}",
+        "required": "required",
+        "extras": "Customize",
+        "noteHint": "Anything else? Write it in the note for the store, in the cart."
       },
       "cart": {
         "title": "Your cart",
-        "empty": "Your cart is empty",
+        "empty": "Your cart is empty.",
+        "goMenu": "Go to the menu",
+        "from": "Order to {sede}",
+        "lineSoldOut": "Sold out at this store: remove it to continue",
+        "remove": "Remove from cart",
+        "noteLabel": "Note for the store",
+        "notePlaceholder": "E.g.: no onion, sauces on the side…",
+        "tipLabel": "Tip for the courier (optional)",
+        "tipHint": "100% goes to the person who brings your order.",
+        "noTip": "No tip",
+        "paymentMethod": "Payment method",
+        "cashWith": "How much will you pay with? (optional)",
+        "cashPlaceholder": "E.g.: 100000",
+        "change": "The courier will bring {change} in change.",
+        "paymentNote": "Simulated payments: nothing is charged. In your project they connect to the gateway you choose (e.g. Wompi or PayU) and to cash on delivery.",
+        "usePoints": "Use {points} points (−{value}) · you have {balance}",
+        "pointsMissing": "You need {n} more points to redeem a discount.",
+        "split": "Split the bill",
+        "people": "{n, plural, one {Just me} other {# people}}",
         "subtotal": "Subtotal",
         "deliveryFee": "Delivery",
-        "service": "Service",
+        "freeClub": "Free (Club)",
+        "clubMissing": "Add {n} more for the Club's free delivery.",
+        "rainFee": "Rain surcharge",
+        "pointsDiscount": "Points discount",
         "tip": "Tip",
         "total": "Total",
-        "checkout": "Pay {total}",
-        "tipLabel": "Add a tip",
-        "splitPayment": "Split the bill",
-        "splitWith": "Split with {n} friends",
-        "paymentMethod": "Payment method",
-        "cards": {
-          "visa": "Visa ••4521",
-          "mc": "Mastercard ••8800",
-          "wallet": "KopUp Wallet"
+        "perPerson": "Split {n} ways: {amount} each",
+        "pay": "Pay {total} (simulated)",
+        "placeCod": "Place order · pay {total} on delivery",
+        "items": "{n, plural, one {# item} other {# items}}: {lines}",
+        "sentCod": "Order {id} sent to the store",
+        "paidOnline": "Payment approved with {method} (simulated) · order {id} sent to the store",
+        "errors": {
+          "empty": "Add at least one item.",
+          "noSede": "No open store covers your address.",
+          "soldOut": "Some items are sold out at the store: remove them from the cart.",
+          "cash": "The cash you will pay with does not cover the total.",
+          "blocked": "Your account is blocked in the demo: unblock it in Operations."
         }
       },
       "tracking": {
-        "title": "Your order is on the way",
-        "etaLabel": "Arrives in",
-        "driverName": "Diego R.",
-        "driverRating": "4.9",
-        "driverPlate": "Motorbike · ABC-123",
-        "chat": "Chat",
-        "call": "Call",
-        "status": {
-          "confirmed": "Confirmed",
-          "preparing": "Preparing",
-          "onTheWay": "On the way",
-          "delivered": "Delivered"
+        "title": "Order {id}",
+        "noOrderTitle": "Tracking",
+        "noOrder": "You have not placed any orders yet.",
+        "headline": {
+          "pending": "Waiting for the store to confirm",
+          "preparing": "The store is preparing your order",
+          "ready": "Your order is ready",
+          "pickedUp": "Your order is on its way",
+          "delivered": "Order delivered!",
+          "rejected": "The store could not take your order",
+          "cancelled": "Order cancelled"
         },
-        "mapHint": "Live map",
+        "sub": {
+          "pending": "The store has {s} s to respond.",
+          "pendingLate": "The store did not respond in time: Operations already got an alert.",
+          "preparing": "{sede} is preparing it in about {min} min.",
+          "readyDriver": "Waiting for {driver} to pick it up.",
+          "readyNoDriver": "Operations is assigning a courier.",
+          "pickedUp": "{driver} is heading to your address.",
+          "delivered": "Delivered at {time} · {min} min after you ordered.",
+          "rejected": "Reason: {reason}. Nothing was charged (simulated).",
+          "cancelled": "Nothing was charged (simulated)."
+        },
+        "eta": "Estimated arrival",
+        "promised": "Promised: by {time}",
+        "code": "Delivery code",
+        "demoHint": "In the demo: go to the Store tab to accept the order, or turn on “Auto-advance”.",
+        "goMerchant": "Go to Store",
+        "cancel": "Cancel order",
+        "cancelledToast": "Order {id} cancelled",
+        "offered": "Offer sent to {driver}; waiting for them to accept.",
         "you": "You",
-        "driver": "Driver",
-        "store": "Store"
-      },
-      "chat": {
-        "title": "Chat with {name}",
-        "placeholder": "Type a message...",
-        "quick": {
-          "outside": "I'm outside",
-          "ring": "Please ring the doorbell",
-          "leave": "Leave at the door"
+        "chat": "Chat with the courier",
+        "call": "Call the courier",
+        "whatsapp": {
+          "title": "Preview of the WhatsApp message you get",
+          "message": "{brand}: your order {id} is confirmed and arrives around {time}\nTrack it here: {link}\nDelivery code: {code} (give it to the courier)",
+          "note": "Simulated: nothing is sent. In your project it is sent with WhatsApp Business; the link is an example."
         },
-        "driverHi": "Hey! On my way — ETA 8 min.",
-        "driverArrived": "I'm at the building entrance."
+        "rated": "Thanks for your rating",
+        "pointsEarned": "You earned {n} points with this order · you now have {balance}.",
+        "rateTitle": "How was your order?",
+        "ratePlaceholder": "Tell us (optional)",
+        "sendRating": "Send rating",
+        "thanks": "Thanks! Your rating reached the store and the courier",
+        "summary": "Order details · {total}",
+        "note": "Note: {note}",
+        "keepShopping": "Keep ordering",
+        "myOrders": "My orders"
       },
-      "membership": {
-        "title": "KopUp Prime",
-        "perks": [
-          "Free delivery on orders over $150",
-          "10% cashback on pharmacy purchases",
-          "24/7 priority support"
-        ],
-        "cta": "Start 30-day free trial",
-        "active": "Membership is active"
-      }
-    },
-    "driver": {
-      "header": "Hi, Diego",
-      "statusOnline": "Online · accepting orders",
-      "statusOffline": "Offline",
-      "earnings": {
-        "today": "Today",
-        "week": "Week",
-        "trips": "{n} trips",
-        "hours": "{h} h online"
+      "orders": {
+        "title": "My orders",
+        "empty": "You have not placed any orders in this demo yet."
       },
-      "nextPickup": {
-        "title": "Next pickup",
-        "store": "Sushi Lab · Polanco",
-        "items": "{n} items",
-        "distance": "{km} km · {min} min",
-        "accept": "Accept",
-        "skip": "Skip"
-      },
-      "batch": {
-        "title": "Batched pickups",
-        "badge": "ML routing · 2 stops",
-        "stop1": "1. Pick up at Sushi Lab",
-        "stop2": "2. Pick up at Bao Bar",
-        "stop3": "3. Drop off for Sofia M.",
-        "stop4": "4. Drop off for Luis G."
-      },
-      "navigation": {
-        "title": "Navigation",
-        "steps": [
-          "Head straight for 200 m on Reforma Ave",
-          "Turn right onto Schiller St",
-          "Continue 600 m to the destination",
-          "You've arrived at Polanco 102"
-        ]
-      },
-      "pod": {
-        "title": "Proof of delivery",
-        "photo": "Take photo",
-        "signature": "Customer signature",
-        "submit": "Confirm delivery",
-        "captured": "Photo captured",
-        "signed": "Signature captured"
-      },
-      "ratings": {
-        "title": "Recent ratings",
-        "items": [
-          "5★ — flawless delivery",
-          "5★ — really friendly",
-          "4★ — on time"
-        ]
-      },
-      "kyc": {
-        "title": "Driver onboarding",
-        "step1": "Upload ID",
-        "step2": "Upload driver's license",
-        "step3": "Take a verification selfie",
-        "step4": "Approved",
-        "uploadedBadge": "Verified"
+      "address": {
+        "title": "Addresses",
+        "savedList": "Saved addresses",
+        "saved": "Address saved",
+        "newTitle": "Add an address",
+        "streetType": "Street type",
+        "main": "Number",
+        "cross": "Cross street",
+        "placa": "Door no.",
+        "extra": "Details",
+        "extraPlaceholder": "Apt, tower, complex…",
+        "label": "Name",
+        "labelPlaceholder": "E.g.: My mom's house",
+        "defaultLabel": "New address",
+        "covered": "Served by {sede}, {km} away · delivery {fee}",
+        "notCovered": "No open store covers this address (8 km). You can still save it.",
+        "invalid": "Check the address: use numbers like 85, 127C or 38 Sur, and a door number like 32.",
+        "note": "Distance is estimated by blocks from the Colombian street grid. In your project the address is geocoded with a map service and the pin is confirmed.",
+        "save": "Save and use"
       }
     },
     "merchant": {
-      "header": "Sushi Lab · Polanco",
-      "openLabel": "Store is open",
+      "subtitle": "Store app · orders, menu and today's sales",
+      "open": "Open",
+      "closed": "Closed",
+      "sedePicker": "Store",
+      "closedNote": "The store is closed: Customer cannot order from it and is offered another store.",
+      "openedToast": "{sede} open",
+      "closedToast": "{sede} closed: not taking new orders",
       "kpis": {
-        "salesToday": "Sales today",
-        "aov": "Avg order value",
-        "orders": "Orders",
-        "peakHour": "Peak hour"
+        "sales": "Today's sales",
+        "orders": "Today's orders",
+        "rejected": "{n} rejected or cancelled",
+        "avgTicket": "Average ticket",
+        "peak": "Peak hour",
+        "note": "Calculated from today's sample orders and the ones you place in the demo (excluding delivery fee and tip)."
       },
-      "incoming": {
-        "title": "Incoming orders",
-        "newOrder": "New order",
-        "timer": "{s}s left to respond",
-        "items": "{n} items · {total}",
-        "prepTime": "Prep time · {min} min"
-      },
-      "menu": {
-        "title": "Menu",
-        "categories": ["Starters", "Rolls", "Drinks", "Desserts"],
-        "stock": "Stock · {n}",
-        "outOfStock": "Out of stock (86'd)",
-        "markOut": "Mark 86",
-        "markIn": "Reactivate",
-        "edit": "Edit"
-      },
-      "analytics": {
-        "title": "Analytics",
-        "topSellers": "Top sellers",
-        "salesTrend": "Weekly trend",
-        "ratingsAvg": "Avg rating"
-      },
-      "items": {
-        "philly": "Philly Roll",
-        "spicy": "Spicy Tuna",
-        "tempura": "Tempura Roll",
-        "edamame": "Edamame",
-        "miso": "Miso Soup",
-        "matcha": "Matcha Latte"
-      }
+      "incoming": "Orders to accept",
+      "noIncoming": "No orders to accept. Place one in the Customer app.",
+      "respondIn": "Respond in {s} s",
+      "escalated": "No response · escalated to Operations",
+      "note": "Note: {note}",
+      "prepTime": "Preparation time",
+      "prepOption": "{min} min",
+      "reject": "Reject",
+      "accept": "Accept",
+      "acceptedToast": "Order {id} accepted · ready in {min} min",
+      "rejectTitle": "Reject {id}",
+      "rejectHint": "The customer will see the reason and is not charged.",
+      "rejectedToast": "Order {id} rejected",
+      "preparing": "Being prepared",
+      "none": "None for now.",
+      "prepProgress": "{elapsed} of {min} min",
+      "driverComing": "{driver} is coming to pick it up",
+      "driverOffered": "Offer sent to {driver}",
+      "noDriver": "No courier: Operations assigns one",
+      "markReady": "Ready for pickup",
+      "readyToast": "{id} ready for pickup",
+      "ready": "Ready for pickup",
+      "waitingDriver": "Waiting for {driver}",
+      "menuTitle": "Store menu",
+      "menuHint": "What you mark sold out here shows as sold out in the Customer app for this store.",
+      "soldOut": "Sold out",
+      "markSoldOut": "Sold out",
+      "makeAvailable": "Restore",
+      "soldOutToast": "You marked “{item}” sold out at this store",
+      "availableToast": "You restored “{item}”",
+      "analytics": "Today's sales",
+      "topItems": "Best sellers (units)",
+      "salesByHour": "Sales by hour",
+      "rating": "Average rating ({n} reviews)"
+    },
+    "driver": {
+      "hello": "Hi, {name}",
+      "online": "Online",
+      "offline": "Offline",
+      "onlineSwitch": "Go online or offline",
+      "viewAs": "View the app as",
+      "offersN": "{n, plural, one {# offer} other {# offers}}",
+      "earningsToday": "Today's earnings",
+      "trips": "{n, plural, one {# delivery} other {# deliveries}}",
+      "tips": "tips {tips}",
+      "ratingTitle": "Rating",
+      "ratingsN": "{n, plural, =0 {no ratings} one {# rating} other {# ratings}}",
+      "payRule": "Sample pay per delivery: {base} + {perKm} per km, plus tip and bonus. In your project you define it.",
+      "offlineNote": "You are offline: you do not receive order offers.",
+      "cantGoOffline": "Finish your orders and answer your offers before going offline.",
+      "onlineToast": "Online: you can now receive orders",
+      "offlineToast": "Offline",
+      "offers": "Order offers",
+      "noOffers": "No offers for now. Operations sends them from Dispatch.",
+      "offlineNoOffers": "Go online to receive offers.",
+      "pickupAt": "Pick up at {sede} ({address})",
+      "deliverTo": "Deliver in {zone}",
+      "rainBonus": "Includes a rain bonus of {bonus}",
+      "payBreakdown": "Includes a tip of {tip}",
+      "reject": "Reject",
+      "accept": "Accept",
+      "acceptedToast": "You accepted {id}: head to the store",
+      "rejectedToast": "You rejected {id}: it goes back to Operations",
+      "rejectTitle": "Reject {id}",
+      "rejectHint": "Operations will see the reason and assign someone else.",
+      "currentTask": "Current task",
+      "goToSede": "Go to {sede}: {address}",
+      "pickup": "I picked up the order",
+      "pickedToast": "{id} picked up: the customer now sees it on the way",
+      "waitingSede": "The store is still preparing it (~{min} min left). Once it is marked ready you can pick it up.",
+      "deliverAt": "Deliver to {name}: {address}",
+      "collectCash": "Collect {total} in cash.",
+      "collectCashChange": "Collect {total} in cash: they pay with {with}, bring {change} in change.",
+      "collectDataphone": "Collect {total} with the card terminal.",
+      "prepaid": "Already paid with {method}: do not collect anything.",
+      "chat": "Chat",
+      "call": "Call",
+      "confirmDelivery": "Confirm delivery",
+      "navigation": "Directions",
+      "navNote": "By blocks, approximate. In your project it opens Google Maps or Waze.",
+      "nextStep": "Next direction",
+      "route": "Multi-stop route",
+      "routeHint": "{n, plural, one {# stop} other {# stops}} · {km} in total. Ordered by proximity (a simple rule in the demo; in your project, a routing engine).",
+      "stopPickup": "Pick up {id} · {place}",
+      "stopDropoff": "Deliver {id} · {place}",
+      "recentRatings": "Recent ratings",
+      "noRatings": "No ratings yet.",
+      "footer": "Earnings, ratings and documents are calculated from this demo's sample data."
     },
     "ops": {
-      "header": "Ops control center",
-      "activeDeliveries": "Live deliveries",
-      "driversOnline": "Drivers online",
-      "avgEta": "Avg ETA",
-      "surgeNow": "Active surge",
-      "heatmap": {
-        "title": "Demand by zone · next hour",
-        "zones": ["Polanco", "Roma", "Condesa", "Downtown", "Reforma", "Coyoacan"],
-        "legendLow": "Low",
-        "legendHigh": "High"
+      "title": "Operations center · {brand}",
+      "subtitle": "Sample day, {date} · demo clock {time}",
+      "exportCsv": "Export orders (CSV)",
+      "csvToast": "CSV downloaded with {n} orders",
+      "kpis": {
+        "orders": "Orders today",
+        "ordersHint": "{n} rejected or cancelled",
+        "active": "In progress",
+        "drivers": "Couriers online",
+        "avgDelivery": "Average delivery time",
+        "onTime": "Delivered on time",
+        "avgTicket": "Average ticket",
+        "note": "Everything is calculated from today's sample orders and the ones you place in the demo; nothing is hard-coded."
       },
-      "surge": {
-        "title": "Dynamic pricing",
-        "multiplier": "Multiplier",
-        "reason": "Reason",
-        "reasons": {
-          "rain": "Rain detected",
-          "peak": "Peak hour",
-          "event": "Major event nearby"
+      "mapTitle": "Operations map",
+      "legend": {
+        "sede": "Stores",
+        "driver": "Couriers online",
+        "order": "Destination of orders in progress"
+      },
+      "alertsTitle": "Alerts",
+      "noAlerts": "No alerts right now.",
+      "alerts": {
+        "noResponse": "The store did not respond to order {id} within 45 s",
+        "unassigned": "Order {id} has no courier",
+        "late": "Order {id} is {min} min late against the promised time",
+        "driverRejected": "A courier rejected order {id}: it needs reassigning",
+        "gpsFar": "Delivery of {id} confirmed {m} m away from the address",
+        "sharedPhone": "Phone {phone} appears in {n} different accounts",
+        "bigCash": "Order {id} from a new customer paying on delivery for {total}"
+      },
+      "acceptForSede": "Accept for the store",
+      "acceptedByOps": "You accepted {id} on behalf of the store",
+      "cancelOrder": "Cancel order",
+      "cancelledToast": "Order {id} cancelled",
+      "assign": "Assign",
+      "reassign": "Reassign",
+      "customerNotified": "Customer notified",
+      "notifyCustomer": "Notify the customer",
+      "notifiedToast": "Notice sent to the chat of order {id}",
+      "detail": "Details",
+      "detailOf": "Details of {id}",
+      "dispatchTitle": "Dispatch",
+      "dispatchHint": "Assign or reassign couriers. The system suggests the free courier closest to the store (a simple rule, not AI).",
+      "table": {
+        "order": "Order",
+        "sede": "Store",
+        "status": "Status",
+        "driver": "Courier",
+        "promised": "Promised delivery",
+        "actions": "Actions"
+      },
+      "offerSent": "Offer sent",
+      "driverAccepted": "Accepted",
+      "waitingSede": "Waiting for the store",
+      "noDriver": "No courier",
+      "lateBy": "{min} min late",
+      "noActive": "No orders in progress.",
+      "rain": {
+        "title": "Rain in the city",
+        "hint": "Turn it on when it rains: it applies to new orders.",
+        "surcharge": "Customer surcharge of {amount}",
+        "surchargeDesc": "Added to the delivery fee in the Customer cart.",
+        "bonus": "Courier bonus of {amount}",
+        "bonusDesc": "Added to the pay of new offers in the Courier app.",
+        "surchargeOn": "Rain surcharge on",
+        "surchargeOff": "Rain surcharge off",
+        "bonusOn": "Rain bonus on",
+        "bonusOff": "Rain bonus off"
+      },
+      "reports": {
+        "title": "Times and zones",
+        "hint": "Average of {n} orders delivered today.",
+        "stages": "Average minutes per stage",
+        "stage": {
+          "accept": "Store acceptance",
+          "prep": "Preparation",
+          "waitPickup": "Waiting for the courier",
+          "ride": "Ride to the customer"
         },
-        "apply": "Apply surge"
+        "byZone": "Orders by zone"
       },
-      "dispatch": {
-        "title": "Dispatch · manual override",
-        "order": "Order #{id}",
-        "assignedTo": "Assigned to {driver}",
-        "reassign": "Reassign",
-        "candidates": "Nearby drivers"
+      "savings": {
+        "title": "Commission you did not pay today",
+        "hint": "If these orders had come through an aggregator app. Adjust the assumptions.",
+        "pct": "Aggregator commission (%)",
+        "cost": "Cost per own delivery",
+        "base": "Sales of {n} delivered orders",
+        "gross": "Commission avoided ({pct}%)",
+        "ownCost": "Cost of your deliveries",
+        "fees": "Delivery fees charged to customers",
+        "net": "Estimated net savings",
+        "note": "Estimate with sample data. It excludes software maintenance, payment gateway fees and maps."
       },
-      "fraud": {
-        "title": "Fraud monitoring",
-        "alerts": {
-          "gps": "GPS spoofing detected · driver #{id}",
-          "multi": "Suspicious multi-account · customer #{id}",
-          "chargeback": "Chargeback risk · order #{id}"
+      "review": {
+        "title": "Rule-based review",
+        "hint": "Configurable rules, not AI: delivery confirmed more than {m} m from the address, one phone in 3 or more accounts, and first pay-on-delivery orders above {total}.",
+        "rule": {
+          "gpsFar": "Delivery far from the address",
+          "sharedPhone": "Repeated phone",
+          "bigCash": "Large pay-on-delivery from a new customer"
         },
-        "review": "Review"
+        "review": "Review",
+        "resolved": {
+          "dismissed": "Dismissed",
+          "blocked": "Blocked"
+        },
+        "modalTitle": "Review alert",
+        "explain": {
+          "gpsFar": "The courier's phone GPS marked the confirmation far from the address. It may be a GPS error or a bad delivery: check with the courier.",
+          "sharedPhone": "Several accounts with the same phone may be someone abusing welcome discounts.",
+          "bigCash": "A large first order paid on delivery may be a prank or a risk for the courier: confirm it by phone before dispatching it."
+        },
+        "podInfo": "Confirmed {m} m away · {driver}",
+        "dismiss": "Dismiss (false alarm)",
+        "block": "Block account",
+        "suspendDriver": "Suspend the courier",
+        "note": "In the demo the block only affects this simulation; in your project it is recorded in the audit log.",
+        "dismissedToast": "Alert dismissed",
+        "blockedToast": "Block applied in the demo",
+        "blocked": "Blocked accounts",
+        "unblock": "Unblock",
+        "unblockedToast": "Account unblocked"
       },
-      "forecast": {
-        "title": "Demand forecast",
-        "nextHour": "Next hour · +{pct}%",
-        "model": "Model · GBM v3.1"
+      "drivers": {
+        "title": "Couriers",
+        "offline": "Offline",
+        "busy": "{n, plural, one {# order in progress} other {# orders in progress}}",
+        "free": "Free",
+        "done": "{n} delivered today",
+        "open": "View their app",
+        "suspended": "Suspended"
+      },
+      "assignTitle": "Assign {id} · {sede}",
+      "assignHint": "Online couriers, ordered by workload and distance to the store. Whoever gets the offer must accept it in their app.",
+      "noDrivers": "No couriers online.",
+      "suggested": "Suggested",
+      "current": "Assigned",
+      "assignedToast": "Offer for {id} sent to {driver}. See it in the Courier tab.",
+      "offlineCount": "Offline or suspended (not listed): {n}",
+      "detailTitle": "Order {id}",
+      "timeline": "Timeline",
+      "events": {
+        "created": "Created",
+        "accepted": "Accepted by the store",
+        "ready": "Ready for pickup",
+        "assigned": "Courier assigned",
+        "pickedUp": "Picked up",
+        "delivered": "Delivered"
+      },
+      "detailDriver": "Courier: {driver}",
+      "detailCode": "code {code}",
+      "detailRating": "Rating: {stars} of 5",
+      "rejectReason": "Rejection reason: {reason}",
+      "csv": {
+        "order": "order",
+        "sede": "store",
+        "zone": "zone",
+        "status": "status",
+        "created": "order_time",
+        "delivered": "delivery_time",
+        "minutes": "minutes",
+        "onTime": "on_time",
+        "subtotal": "subtotal",
+        "fee": "delivery_fee",
+        "tip": "tip",
+        "total": "total",
+        "payment": "payment_method",
+        "driver": "courier",
+        "rating": "rating"
       }
     }
   }

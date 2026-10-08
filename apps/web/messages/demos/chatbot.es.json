@@ -1,623 +1,399 @@
 {
   "demoChatbot": {
-    "pageTitle": "Enterprise RAG Chatbot",
-    "pageSubtitle": "Plataforma RAG completa con orquestación de agentes, hybrid retrieval, observabilidad y seguridad enterprise",
+    "pageTitle": "Demo RAG: IA que responde con documentos",
+    "pageSubtitle": "Busca en los documentos cargados, responde con un modelo de OpenAI y cita la fuente. Si la respuesta no está, te lo dice.",
+    "sampleDataBadge": "Datos de ejemplo",
+    "sampleDataTooltip": "Las empresas y sus documentos son ficticios. Las respuestas sí las genera el servidor real de la demo.",
+    "modes": {
+      "ariaLabel": "Modos de la demo",
+      "playground": "Prueba el asistente",
+      "playgroundHint": "Empresas ficticias con sus documentos: pregunta y abre la cita",
+      "upload": "Prueba con tu documento",
+      "uploadHint": "Sube tu PDF, DOCX o TXT y pregúntale: cada respuesta cita la fuente",
+      "builder": "Configura el tuyo",
+      "builderHint": "Crea tu bot, súbele textos y llévalo a tu sitio con el código"
+    },
     "topBar": {
-      "tenant": "Tenant",
+      "company": "Empresa de ejemplo",
+      "companyTooltip": "Cambia la base de conocimiento: cada empresa ficticia tiene sus propios documentos y preguntas sugeridas.",
       "model": "Modelo",
-      "language": "Idioma",
-      "runSample": "Correr query de ejemplo",
-      "newSession": "Nueva sesión",
-      "online": "Online"
-    },
-    "sidebar": {
-      "title": "Capas de plataforma",
-      "subtitle": "Haz clic en cualquier capa para ver el detalle",
-      "search": "Buscar capacidad...",
-      "noResults": "Sin resultados para tu búsqueda."
-    },
-    "layers": {
-      "ingestion": {
-        "title": "Ingesta y procesamiento",
-        "summary": "Pipeline multi-fuente con OCR, parsing estructurado, dedupe y versionado.",
-        "items": [
-          "Conectores: PDF, Office, HTML, email, Slack, Notion, Confluence, GitHub, Jira",
-          "Bases de datos: Postgres, MySQL, Snowflake, BigQuery, MongoDB",
-          "Audio y video con transcripción automática (Whisper-class)",
-          "OCR avanzado con LayoutLM y detección de tablas",
-          "Extracción de entidades, deduplicación SHA-256, versionado documental",
-          "Pipeline ETL distribuido con metadata enrichment automático"
-        ]
-      },
-      "chunking": {
-        "title": "Chunking avanzado",
-        "summary": "Estrategias context-aware con jerarquías padre-hijo y ventanas deslizantes.",
-        "items": [
-          "Semantic chunking guiado por embeddings y boundaries gramaticales",
-          "Parent-child chunks para hierarchical retrieval",
-          "Sliding windows con solapamiento adaptativo",
-          "Adaptive chunk sizing según densidad informacional",
-          "Code-aware y table-aware chunking",
-          "Multi-modal chunking (texto, imágenes, audio sincronizado)"
-        ]
-      },
-      "retrieval": {
-        "title": "Retrieval",
-        "summary": "Hybrid search dense + sparse + BM25, multi-index, multi-hop y federated.",
-        "items": [
-          "Dense vectors (1536-d) + sparse (SPLADE) + BM25 + keyword",
-          "Multi-index retrieval con metadata filtering",
-          "Temporal y graph retrieval",
-          "Semantic routing entre tenants y dominios",
-          "Federated retrieval cross-region",
-          "Multi-hop y recursive retrieval con cross-document reasoning"
-        ]
-      },
-      "query": {
-        "title": "Query understanding",
-        "summary": "Reescritura, HyDE, expansión y descomposición multi-query.",
-        "items": [
-          "Query rewriting con LLM y plantillas dominio-específicas",
-          "HyDE (Hypothetical Document Embeddings)",
-          "Query expansion y multi-query generation",
-          "Intent classification y decomposition",
-          "Semantic normalization y temporal understanding",
-          "Domain-aware parsing por tenant"
-        ]
-      },
-      "ranking": {
-        "title": "Ranking",
-        "summary": "Cross-encoder reranking multi-stage con diversidad y frescura.",
-        "items": [
-          "Cross-encoder reranking (bge-reranker-large)",
-          "Multi-stage reranking (recall → precision)",
-          "Diversity reranking (MMR)",
-          "Freshness reranking con decay temporal",
-          "Citation-aware reranking",
-          "Personalization reranking por usuario/rol"
-        ]
-      },
-      "context": {
-        "title": "Context engineering",
-        "summary": "Compresión, dedupe, citation alignment y ventanas dinámicas.",
-        "items": [
-          "Context compression con LLMLingua",
-          "Noise removal y dedupe semántico",
-          "Token optimization y context prioritization",
-          "Citation alignment chunk → token",
-          "Structured prompt assembly con Jinja",
-          "Dynamic context windows y memory-aware injection"
-        ]
-      },
-      "agents": {
-        "title": "Agentes",
-        "summary": "Agentic RAG con planner/executor, reflexión y workflow graphs.",
-        "items": [
-          "Planner/executor con tool calling",
-          "Multi-agent orchestration (ReAct, Reflexion)",
-          "Reflection loops y self-correction",
-          "Retry strategies con exponential backoff",
-          "Workflow graphs (LangGraph-style)",
-          "Autonomous task decomposition"
-        ]
-      },
-      "tools": {
-        "title": "Tools integradas",
-        "summary": "SQL, web, código, knowledge graph, browser automation.",
-        "items": [
-          "SQL querying contra warehouses",
-          "Web search y browser automation",
-          "Code execution sandbox (Python, Node)",
-          "API orchestration y SaaS integrations",
-          "Knowledge graph queries (Cypher, SPARQL)",
-          "File manipulation y data analysis"
-        ]
-      },
-      "memory": {
-        "title": "Memoria",
-        "summary": "Conversational, long-term, episódica y organizacional.",
-        "items": [
-          "Conversational memory por sesión",
-          "Long-term semantic memory por usuario",
-          "Episodic memory de interacciones pasadas",
-          "User personalization y preferencias",
-          "Organizational memory compartida por tenant",
-          "Editable memory con audit trail"
-        ]
-      },
-      "multimodal": {
-        "title": "Multi-modalidad",
-        "summary": "Texto, imágenes, audio, video y diagramas.",
-        "items": [
-          "Text embeddings (text-embedding-3-large)",
-          "Image embeddings (CLIP) con OCR fallback",
-          "Audio embeddings y transcripción",
-          "Video frame sampling + transcripción",
-          "Vision-language retrieval cross-modal",
-          "Diagramas con extracción de relaciones"
-        ]
-      },
-      "models": {
-        "title": "Modelos",
-        "summary": "Multi-LLM routing, embeddings ensemble, rerankers fine-tuned.",
-        "items": [
-          "Claude Sonnet, Opus, Haiku",
-          "GPT-4o, GPT-4o-mini, o1",
-          "Llama 3.1 70B, Mistral Large self-hosted",
-          "Embedding ensembles con domain adapters",
-          "Fine-tuned rerankers por vertical",
-          "Quantized inference (AWQ, GPTQ)"
-        ]
-      },
-      "infra": {
-        "title": "Infraestructura",
-        "summary": "Distribuida, GPU clusters, async, streaming, multi-region HA.",
-        "items": [
-          "Arquitectura distribuida sobre Kubernetes",
-          "GPU inference clusters (A100, H100)",
-          "Horizontal scaling y async pipelines",
-          "Streaming responses sobre SSE/WebSocket",
-          "Smart caching y load balancing",
-          "Sharded vector stores multi-region con failover"
-        ]
-      },
-      "security": {
-        "title": "Seguridad enterprise",
-        "summary": "RBAC, ACL, tenant isolation, PII masking, anti-injection.",
-        "items": [
-          "RBAC y ACL filtering en retrieval",
-          "Tenant isolation con Row-Level Security",
-          "Encryption at rest (AES-256) y in transit (TLS 1.3)",
-          "Secrets management (Vault, AWS KMS)",
-          "PII masking automático y audit logs inmutables",
-          "Prompt injection y jailbreak defense"
-        ]
-      },
-      "observability": {
-        "title": "Observabilidad",
-        "summary": "Tracing, token y latency analytics, hallucination tracking.",
-        "items": [
-          "Full request tracing (OpenTelemetry)",
-          "Retrieval tracing con chunk inspection",
-          "Token, latency y cost analytics por tenant",
-          "Hallucination tracking y groundedness scores",
-          "User behavior analytics",
-          "Failure diagnostics con replay"
-        ]
-      },
-      "eval": {
-        "title": "Evaluación",
-        "summary": "Precision/recall, faithfulness, citation accuracy, benchmarks.",
-        "items": [
-          "Retrieval precision/recall@k",
-          "Faithfulness y groundedness automáticos",
-          "Citation accuracy y hallucination detection",
-          "Response quality (LLM-as-judge)",
-          "Benchmark suites: RAGAS, TruLens",
-          "Human-in-the-loop y regression testing"
-        ]
-      },
-      "optimization": {
-        "title": "Optimización avanzada",
-        "summary": "Semantic caching, adaptive retrieval, speculative decoding.",
-        "items": [
-          "Semantic cache con embedding similarity",
-          "Adaptive retrieval y dynamic top-k",
-          "Speculative decoding y prompt optimization",
-          "Context pruning agresivo",
-          "Embedding optimization (PQ, OPQ)",
-          "Latency-aware y cost-aware routing"
-        ]
-      },
-      "knowledge": {
-        "title": "Conocimiento avanzado",
-        "summary": "Knowledge graphs, ontologías y graph neural retrieval.",
-        "items": [
-          "Knowledge graphs construidos automáticamente",
-          "Entity linking contra Wikidata y catálogos internos",
-          "Ontologías por dominio",
-          "Relationship reasoning multi-hop",
-          "Semantic graphs versionados",
-          "Graph neural retrieval (GNN re-ranking)"
-        ]
-      },
-      "production": {
-        "title": "Producción real",
-        "summary": "CI/CD, canary, A/B, feature flags, auto rollback.",
-        "items": [
-          "CI/CD con pipelines de evaluación bloqueantes",
-          "Canary deployments y A/B testing",
-          "Feature flags por tenant",
-          "Monitoring con SLOs y alerting",
-          "Auto rollback ante regresión de eval",
-          "Disaster recovery y SLA management"
-        ]
-      },
-      "nextLevel": {
-        "title": "Capacidades next-level",
-        "summary": "Self-improving retrieval, autonomous indexing, research agents.",
-        "items": [
-          "Self-improving retrieval con feedback loops",
-          "Autonomous indexing y continuous learning",
-          "Synthetic data generation para eval",
-          "Automatic eval generation",
-          "Multi-step reasoning graphs",
-          "Research-agent behavior y self-healing pipelines",
-          "Long-context orchestration y enterprise knowledge mesh"
-        ]
+      "modelTooltip": "Modelo de OpenAI que redacta la respuesta con los fragmentos encontrados. El servidor solo acepta estos tres.",
+      "askSample": "Pregunta de ejemplo",
+      "askSampleTooltip": "Envía la siguiente pregunta sugerida de la empresa elegida.",
+      "device": {
+        "label": "Vista previa",
+        "desktop": "Escritorio",
+        "mobile": "Celular",
+        "switchToDesktop": "Ver en escritorio",
+        "switchToMobile": "Ver en un teléfono",
+        "mobileFrameLabel": "Así se ve en un teléfono"
       }
     },
-    "pipeline": {
-      "title": "Pipeline en vivo",
-      "subtitle": "Cada query atraviesa estos pasos. Tiempos y tokens reales del run.",
-      "totalLatency": "Latencia total",
-      "totalTokens": "Tokens totales",
-      "estCost": "Costo estimado",
-      "idle": "Esperando una nueva query...",
-      "steps": {
-        "rewrite": "Query rewriting + HyDE",
-        "retrieve": "Hybrid retrieval (dense + sparse + BM25)",
-        "rerank": "Cross-encoder reranking",
-        "context": "Context engineering",
-        "llm": "LLM generation",
-        "cite": "Citation alignment",
-        "respond": "Respuesta final"
+    "models": {
+      "providerRequires": "requiere clave de API",
+      "recommended": "recomendado",
+      "checking": "Comprobando la IA…",
+      "activeModel": "IA generativa activa",
+      "activeModelTooltip": "El servidor tiene clave de OpenAI: el modelo redacta la respuesta solo con los fragmentos encontrados y cita la fuente.",
+      "extractiveMode": "Modo extractivo (sin clave de IA)",
+      "extractiveModeTooltip": "El servidor no tiene clave de OpenAI: el asistente muestra los fragmentos encontrados, con su cita, sin redactar una respuesta.",
+      "offline": "Servidor no disponible",
+      "offlineTooltip": "No pudimos conectar con el servidor de la demo. Revisa tu conexión e inténtalo de nuevo.",
+      "degraded": "IA sin respuesta: modo extractivo",
+      "degradedTooltip": "El servidor tiene clave de OpenAI, pero la última llamada al proveedor falló. Se muestran los fragmentos encontrados, con su cita."
+    },
+    "companies": {
+      "sectorCity": "{sector} · {city}",
+      "fictitious": "empresa ficticia"
+    },
+    "kb": {
+      "title": "Documentos de la empresa",
+      "subtitle": "Esto es lo único que consulta el asistente. Haz clic en un documento para leerlo completo.",
+      "preparing": "Indexando los documentos en el servidor…",
+      "ready": "{count, plural, one {# documento indexado} other {# documentos indexados}} en el servidor",
+      "error": "No pudimos indexar los documentos. Revisa tu conexión.",
+      "retry": "Reintentar",
+      "sections": "{count, plural, one {# sección} other {# secciones}}",
+      "open": "Ver documento"
+    },
+    "included": {
+      "title": "Qué incluye hoy",
+      "subtitle": "Lo que hace esta demo de verdad. Haz clic para ver el detalle.",
+      "future": "En tu proyecto se construyen además los conectores (Google Drive, SharePoint), el canal de WhatsApp, los permisos por rol y el panel de métricas, según el plan.",
+      "futureLink": "Ver planes RAG",
+      "close": "Cerrar",
+      "items": {
+        "ingest": {
+          "title": "Carga de documentos",
+          "summary": "Texto, PDF, DOCX y TXT según el modo de la demo.",
+          "items": [
+            "Aquí: los documentos de la empresa ficticia se suben como texto al servidor al elegirla.",
+            "«Prueba con tu documento»: PDF (con número de página), DOCX y TXT de hasta 5 MB y 30 páginas.",
+            "«Configura el tuyo»: archivos de texto (TXT, MD o CSV) para tu bot."
+          ]
+        },
+        "chunking": {
+          "title": "Fragmentación",
+          "summary": "Cada documento se parte por párrafos.",
+          "items": [
+            "Los párrafos de hasta unos 800 caracteres quedan como un fragmento.",
+            "Los párrafos más largos se dividen por oraciones en bloques de unos 500 caracteres.",
+            "Cada fragmento guarda el nombre del documento para poder citarlo."
+          ]
+        },
+        "search": {
+          "title": "Búsqueda por palabras (BM25)",
+          "summary": "Encuentra los 5 fragmentos más relevantes.",
+          "items": [
+            "Compara las palabras de tu pregunta con las de cada fragmento (BM25: frecuencia de la palabra ponderada por lo poco común que es).",
+            "Envía al modelo solo los 5 fragmentos con mejor puntaje.",
+            "Es búsqueda léxica: usa palabras que aparezcan en los documentos. La búsqueda semántica (embeddings) se configura en tu proyecto."
+          ]
+        },
+        "answer": {
+          "title": "Respuesta con citas",
+          "summary": "Solo con los fragmentos y citando [1], [2]…",
+          "items": [
+            "El servidor agrega siempre tres reglas al modelo: responder solo con los fragmentos, citar la fuente de cada dato y decir «No encontré esa información en los documentos cargados.» si no está.",
+            "Cada cita [n] abre el fragmento exacto y el documento de donde salió."
+          ]
+        },
+        "models": {
+          "title": "Modelos de OpenAI",
+          "summary": "GPT-4o mini, GPT-4o o GPT-4 Turbo.",
+          "items": [
+            "Eliges el modelo arriba; el servidor solo acepta estos tres.",
+            "Sin clave de API, la demo pasa a modo extractivo: muestra los fragmentos encontrados con su cita, sin redactar."
+          ]
+        },
+        "widget": {
+          "title": "Widget para tu sitio",
+          "summary": "Botón flotante o iframe con tu bot.",
+          "items": [
+            "En «Configura el tuyo» guardas tu bot y copias el código: un script (botón flotante con el chat) o un iframe.",
+            "El chat insertado conversa con el mismo servidor y muestra las citas."
+          ]
+        },
+        "history": {
+          "title": "Historial de conversaciones",
+          "summary": "Preguntas, respuestas y fuentes de tu bot.",
+          "items": [
+            "En «Configura el tuyo» ves las conversaciones de tu bot, cuántas tuvieron fuente y cuántas no se encontraron.",
+            "Puedes exportarlas a CSV o borrarlas."
+          ]
+        }
       }
     },
     "chat": {
       "title": "Conversación",
-      "subtitle": "Streaming token-by-token con citas inline clickeables",
-      "placeholder": "Haz una pregunta sobre tus documentos...",
+      "subtitle": "Respuestas con los documentos de {company}",
+      "placeholder": "Pregunta algo sobre los documentos de la empresa…",
       "send": "Enviar",
       "you": "Tú",
-      "assistant": "Koptup RAG",
-      "thinking": "Pensando...",
-      "confidence": "Confianza",
+      "assistant": "Asistente RAG",
+      "thinking": "Buscando en los documentos…",
+      "preparing": "Indexando los documentos de la empresa…",
       "sources": "Fuentes",
-      "viewSource": "Ver fuente",
-      "viewPipeline": "Ver pipeline",
-      "regenerate": "Regenerar",
-      "feedbackUp": "Buena respuesta",
+      "suggested": "Preguntas sugeridas",
+      "outOfScopeTag": "no está en los documentos",
+      "emptyTitle": "Prueba una pregunta",
+      "emptySubtitle": "Elige una pregunta sugerida o escribe la tuya. La última no está en los documentos, a propósito.",
+      "regenerate": "Volver a preguntar",
+      "regenerateTooltip": "Envía otra vez la misma pregunta al servidor y reemplaza esta respuesta.",
+      "feedbackUp": "Respuesta útil",
       "feedbackDown": "Respuesta a mejorar",
-      "scenarios": "Escenarios mock",
-      "suggestions": "Prueba una de estas preguntas",
-      "emptyHint": "Tu chatbot está listo. Sube documentos o lanza una pregunta de muestra.",
-      "relativeTime": {
-        "now": "ahora",
-        "secondsAgo": "hace {seconds}s",
-        "minutesAgo": "hace {minutes} min",
-        "hoursAgo": "hace {hours} h",
-        "daysAgo": "hace {days} d"
-      },
-      "suggestionPrompts": {
-        "summary": "Resúmeme lo principal de mis documentos",
-        "search": "¿Qué dicen los docs sobre {topic}?",
-        "compare": "Compara los dos documentos más relevantes",
-        "lookup": "¿Qué hay cargado actualmente en el bot?"
-      },
-      "scenarioLabels": {
-        "docs": "RAG sobre documentos",
-        "multiHop": "Multi-hop reasoning",
-        "code": "Sobre código",
-        "sql": "Pregunta sobre SQL",
-        "graph": "Knowledge graph"
-      }
+      "feedbackSaved": "Valoración guardada en las métricas de esta sesión",
+      "generatedBy": "Redactada por {model} con {count, plural, one {# fragmento} other {# fragmentos}}",
+      "extractive": "Modo extractivo: fragmentos encontrados, citados tal cual",
+      "providerError": "El proveedor de IA no respondió: se muestran los fragmentos encontrados (modo extractivo)",
+      "notFound": "No está en los documentos: el asistente no inventa una respuesta.",
+      "errorNetwork": "No pudimos conectar con el servidor de la demo. Inténtalo de nuevo.",
+      "errorGeneric": "Algo salió mal al responder. Inténtalo de nuevo.",
+      "retry": "Reintentar",
+      "citationTooltip": "Fragmento citado: haz clic para verlo completo",
+      "sourceButton": "Ver la fuente {n}: {name}"
     },
-    "scenarios": {
-      "docs": {
-        "question": "¿Cuál es nuestra política de retención de datos para clientes enterprise?",
-        "answer": "Según la política vigente, los clientes Enterprise tienen retención de **7 años** para datos transaccionales [1] y **3 años** para logs de aplicación [2]. La purga se hace automáticamente con jobs nocturnos y queda registrada en el audit trail [1]. Los datos sensibles (PII) se anonimizan a los 90 días si el usuario solicita borrado [2]."
+    "pipeline": {
+      "title": "Cómo se respondió",
+      "subtitle": "Los pasos que ejecutó el servidor para la última respuesta, con los datos que devolvió.",
+      "toggle": "Cómo se respondió",
+      "idle": "Haz una pregunta para ver los pasos.",
+      "running": "Esperando la respuesta del servidor…",
+      "steps": {
+        "chunking": {
+          "title": "1. Fragmentación",
+          "detail": "{docs, plural, one {# documento partido} other {# documentos partidos}} por párrafos al indexar"
+        },
+        "search": {
+          "title": "2. Búsqueda BM25 (top 5)",
+          "detail": "{count, plural, one {# fragmento encontrado} other {# fragmentos encontrados}} · mejor puntaje {score}",
+          "none": "Ningún fragmento coincide con las palabras de la pregunta"
+        },
+        "prompt": {
+          "title": "3. Instrucciones al modelo",
+          "detail": "{count, plural, =0 {Sin fragmentos: el modelo debe responder que no lo encontró} one {# fragmento numerado} other {# fragmentos numerados}} + reglas de citar y no inventar",
+          "extractive": "No aplica: sin modelo no hay instrucciones que enviar"
+        },
+        "model": {
+          "title": "4. Modelo",
+          "detail": "{model} · {latency} ms en el servidor",
+          "extractive": "Sin modelo (modo extractivo)",
+          "error": "El proveedor de IA falló; se usó el modo extractivo"
+        },
+        "citations": {
+          "title": "5. Citas",
+          "detail": "{count, plural, =0 {Sin citas en el texto} one {# cita en la respuesta} other {# citas en la respuesta}}",
+          "notFound": "Respuesta «no encontré»: sin citas"
+        }
       },
-      "multiHop": {
-        "question": "¿Qué tickets de soporte de la semana pasada se relacionan con el incidente del payments-svc del lunes?",
-        "answer": "Encontré **4 tickets** correlacionados con el incidente #INC-2049 del lunes en payments-svc [1]: dos reportan timeouts en `/charge` [2], uno reporta refunds duplicados [3] y el cuarto reporta latencias en el dashboard de finanzas [1]. La causa raíz común es el retry loop sin idempotency-key descrito en el RCA [3]."
-      },
-      "code": {
-        "question": "Muéstrame cómo implementamos rotación de refresh tokens.",
-        "answer": "La rotación vive en `RefreshService.rotate()` [1]. Verifica la firma JWT, consulta una denylist en Redis, agrega el `jti` consumido y emite un nuevo par access/refresh [2]. El controller usa `validate(RefreshDto)` y maneja `RevokedTokenError` con un 401 [1]."
-      },
-      "sql": {
-        "question": "¿Cuánto facturamos en LATAM el último trimestre?",
-        "answer": "Ejecuté la query contra el warehouse de Snowflake [1]: **USD 4.82M** en Q4 LATAM, +18% YoY. El detalle por país está en el adjunto [2]. La fuente es la vista `analytics.fct_revenue_country` materializada cada hora [1]."
-      },
-      "graph": {
-        "question": "¿Qué equipos dependen del servicio auth-core?",
-        "answer": "El knowledge graph muestra **6 equipos** consumiendo `auth-core` [1]: web-platform, mobile, payments-svc, billing, helpdesk y partners-api [2]. payments-svc es el de mayor tráfico (p95 12k req/min) [1]. Hay 2 deprecations pendientes en mobile a Q1 [2]."
+      "totals": {
+        "latency": "Tiempo total",
+        "latencyHint": "Medido en tu navegador: desde que envías la pregunta hasta que llega la respuesta.",
+        "tokens": "Tokens",
+        "tokensHint": "Tokens de entrada y salida que reportó OpenAI. En modo extractivo no hay tokens.",
+        "cost": "Costo estimado",
+        "costHint": "Estimación del servidor en USD con el precio público del modelo.",
+        "notAvailable": "—"
       }
-    },
-    "sourcePanel": {
-      "title": "Fragmento original",
-      "subtitle": "El chunk recuperado y rerankeado que sustenta la cita",
-      "source": "Fuente",
-      "chunkScore": "Score de chunk",
-      "rerankScore": "Score de rerank",
-      "page": "Página",
-      "updated": "Actualizado",
-      "close": "Cerrar",
-      "openOriginal": "Abrir documento original"
     },
     "stats": {
+      "title": "Métricas de esta sesión",
+      "toggle": "Mostrar u ocultar las métricas de esta sesión",
+      "hint": "Se calculan con las respuestas reales de esta pestaña; se reinician al recargar.",
+      "questions": "Preguntas",
+      "withSources": "Con fuente",
+      "notFound": "No encontré",
+      "avgLatency": "Tiempo medio",
       "tokens": "Tokens",
-      "latency": "Latencia",
-      "cost": "Costo",
-      "cacheHit": "Cache hit",
-      "drift": "Drift",
-      "faithfulness": "Faithfulness",
-      "hallucination": "Hallucination",
-      "title": "Telemetría en vivo"
+      "cost": "Costo (USD)",
+      "feedback": "Útil / a mejorar"
     },
-    "sources": {
-      "notion": "Notion · Engineering",
-      "slack": "Slack · #engineering",
-      "confluence": "Confluence · Product Wiki",
-      "github": "GitHub · koptup/api-core",
-      "snowflake": "Snowflake · analytics.fct_revenue_country",
-      "graph": "Knowledge graph · services"
+    "sourcePanel": {
+      "title": "Fragmento citado",
+      "subtitle": "El texto exacto que el servidor encontró y entregó al modelo.",
+      "document": "Documento",
+      "position": "Cita",
+      "score": "Puntaje BM25",
+      "scoreHint": "Qué tanto coinciden las palabras de la pregunta con este fragmento (más alto = más relevante).",
+      "openDocument": "Ver documento completo",
+      "close": "Cerrar"
     },
-    "tenants": {
-      "acme": "Acme Corp (Enterprise)",
-      "globex": "Globex Industries",
-      "umbrella": "Umbrella Group",
-      "selectBot": "Seleccionar bot",
-      "createBot": "Crear nuevo bot",
-      "deleteBot": "Eliminar bot",
-      "deleteConfirm": "¿Eliminar el bot \"{name}\"? Se borran documentos, fragmentos y conversaciones.",
-      "deleted": "Bot \"{name}\" eliminado",
-      "deleteFailed": "No pude eliminar el bot",
-      "empty": "Todavía no creaste ningún bot. Configura uno arriba y toca Guardar.",
-      "docsCount": "{count, plural, =0 {sin docs} one {1 doc} other {# docs}}",
-      "conversationsCount": "{count, plural, =0 {sin conversaciones} one {1 conversación} other {# conversaciones}}"
+    "docViewer": {
+      "title": "Documento de ejemplo",
+      "highlighted": "El fragmento citado está resaltado.",
+      "fictitious": "Documento ficticio de {company}, creado para esta demo.",
+      "close": "Cerrar"
     },
-    "models": {
-      "selectModel": "Modelo LLM",
-      "providerOpenAI": "OpenAI",
-      "providerRequires": "requiere API key",
-      "activeModel": "{name} activo",
-      "activeModelTooltip": "Modelo LLM real respondiendo. Las respuestas consumen tokens del proveedor.",
-      "extractiveMode": "Sin LLM (modo extractivo)",
-      "extractiveModeTooltip": "No hay API key del proveedor. El bot cita fragmentos sin generar lenguaje natural.",
-      "costThisMonth": "Costo estimado este mes",
-      "costPerRequest": "Costo de este request"
-    },
-    "ingestionStats": {
-      "title": "Fuentes conectadas",
-      "docs": "documentos",
-      "messages": "mensajes",
-      "pages": "páginas",
-      "lastSync": "Última sincro"
-    },
-    "common": {
-      "items": "elementos",
-      "active": "activo",
-      "passive": "pasivo",
-      "ms": "ms",
-      "tokens": "tokens",
-      "back": "Volver",
-      "viewAll": "Ver todo"
-    },
-    "modes": {
-      "playground": "Playground RAG",
-      "playgroundHint": "Showcase enterprise: 19 capas, pipeline en vivo, citas",
-      "builder": "Builder & Embed",
-      "builderHint": "Personaliza el widget, genera el snippet y embébelo en tu sitio",
-      "upload": "Prueba con tu documento",
-      "uploadHint": "Sube tu PDF, DOCX o TXT y pregúntale: cada respuesta cita la fuente"
+    "onboarding": {
+      "title": "Recorrido",
+      "skip": "Saltar recorrido",
+      "next": "Siguiente",
+      "done": "Empezar",
+      "step1Title": "Elige una empresa de ejemplo",
+      "step1Body": "Arriba cambias entre tres empresas ficticias (recursos humanos, tienda en línea y salud). Cada una tiene sus propios documentos.",
+      "step2Title": "Haz una pregunta sugerida",
+      "step2Body": "El servidor busca en esos documentos y la respuesta trae citas [1], [2]… con la fuente.",
+      "step3Title": "Abre la fuente",
+      "step3Body": "Haz clic en una cita para ver el fragmento exacto y el documento completo de donde salió.",
+      "step4Title": "Pregunta algo que no esté",
+      "step4Body": "Si la información no está en los documentos, el asistente responde «No encontré esa información» en lugar de inventarla.",
+      "step5Title": "Prueba con tu documento o configura el tuyo",
+      "step5Body": "Sube tu PDF, DOCX o TXT, o crea tu propio bot y llévalo a tu sitio con el código para insertar."
     },
     "builder": {
-      "title": "Builder de chatbot embebible",
-      "subtitle": "Personaliza el look, el comportamiento y exporta el snippet de embed",
-      "configTitle": "Configuración del widget",
+      "title": "Configura tu asistente",
+      "subtitle": "Crea tu bot, súbele documentos de texto, pruébalo aquí y llévalo a tu sitio con el código para insertar.",
+      "configTitle": "Configuración",
+      "myBots": {
+        "label": "Mis bots",
+        "title": "Bots guardados en este navegador",
+        "empty": "Aún no tienes bots guardados. Configura uno y toca «Guardar bot».",
+        "create": "Nuevo bot",
+        "delete": "Eliminar bot",
+        "deleteConfirm": "¿Eliminar el bot «{name}»? Se borran sus documentos y conversaciones.",
+        "deleted": "Bot «{name}» eliminado",
+        "deleteFailed": "No pudimos eliminar el bot",
+        "loadFailed": "No pudimos cargar el bot: puede que ya no exista en el servidor.",
+        "removedMissing": "El bot «{name}» ya no existe en el servidor y se quitó de tu lista.",
+        "newReady": "Bot nuevo listo: configúralo y guárdalo.",
+        "selected": "Bot cargado: {name}"
+      },
+      "actions": {
+        "save": "Guardar bot",
+        "saving": "Guardando…",
+        "saved": "Bot guardado",
+        "saveFailed": "No pudimos guardar el bot",
+        "notOwner": "El servidor no te reconoce como dueño de este bot. Crea uno nuevo.",
+        "unsaved": "Cambios sin guardar",
+        "copyLink": "Copiar enlace del chat",
+        "linkCopied": "Enlace copiado: {url}",
+        "copyFailed": "No pudimos copiar el enlace: {url}",
+        "openChat": "Abrir chat"
+      },
       "sections": {
         "identity": "Identidad",
         "appearance": "Apariencia",
         "behavior": "Comportamiento",
-        "knowledge": "Base de conocimiento"
+        "knowledge": "Documentos"
       },
       "fields": {
         "botName": "Nombre del bot",
-        "botNamePh": "Ej: Koptup Assistant",
+        "botNamePh": "Ej.: Asistente de Mi Empresa",
         "welcome": "Mensaje de bienvenida",
-        "welcomePh": "Ej: ¡Hola! ¿En qué te puedo ayudar?",
-        "placeholder": "Placeholder del input",
-        "placeholderPh": "Ej: Escribe tu pregunta...",
-        "systemPrompt": "System prompt / instrucciones",
-        "systemPromptPh": "Eres un asistente experto en... Responde siempre en español, con tono profesional...",
-        "primaryColor": "Color primario",
-        "accentColor": "Color de acento",
-        "position": "Posición del widget",
-        "positionBR": "Inferior derecha",
-        "positionBL": "Inferior izquierda",
-        "positionTR": "Superior derecha",
-        "positionTL": "Superior izquierda",
-        "avatar": "Avatar del bot",
-        "avatarImage": "Logo del bot (opcional)",
-        "avatarImageBtn": "Subir logo",
-        "avatarImageRemove": "Quitar",
-        "avatarImageHint": "PNG, JPG o WebP · máx. 500 KB",
-        "avatarImageBadType": "Formato no soportado. Usa PNG, JPG o WebP.",
-        "avatarImageTooBig": "El archivo supera 500 KB. Reduce el tamaño.",
-        "tone": "Tono de voz",
+        "welcomePh": "Ej.: ¡Hola! ¿En qué te puedo ayudar?",
+        "primaryColor": "Color principal",
+        "position": "Posición del botón en tu sitio",
+        "positionBR": "Abajo a la derecha",
+        "positionBL": "Abajo a la izquierda",
+        "positionTR": "Arriba a la derecha",
+        "positionTL": "Arriba a la izquierda",
+        "avatar": "Ícono del bot",
+        "instructions": "Instrucciones para el asistente",
+        "instructionsPh": "Ej.: Eres el asistente de Mi Empresa. Responde en frases cortas.",
+        "instructionsHint": "Definen el rol y el estilo. El servidor agrega siempre sus reglas: responder solo con tus documentos y citar la fuente. Se aplican cuando la IA generativa está activa.",
+        "tone": "Tono",
         "tones": {
           "professional": "Profesional",
           "friendly": "Amigable",
           "technical": "Técnico",
-          "casual": "Casual"
-        },
-        "languages": "Idiomas habilitados",
-        "shape": "Forma del botón",
-        "shapeRound": "Redonda",
-        "shapeSquare": "Cuadrada",
-        "openOnLoad": "Abrir al cargar",
-        "showBranding": "Mostrar branding 'Powered by Koptup'"
-      },
-      "knowledge": {
-        "title": "Documentos cargados",
-        "drop": "Arrastra archivos o haz clic para seleccionar",
-        "hint": "PDF, DOCX, TXT, MD, CSV · máx. 10MB por archivo",
-        "addMock": "Agregar documento de ejemplo",
-        "empty": "Aún no cargaste documentos. Sube PDFs, docs o notas para que el bot los use como contexto.",
-        "remove": "Quitar",
-        "indexed": "Indexado",
-        "chunks": "chunks",
-        "uploading": "Subiendo archivos..."
-      },
-      "preview": {
-        "title": "Preview en vivo",
-        "subtitle": "Así se va a ver el widget en tu sitio. Haz clic en el botón para abrirlo.",
-        "subtitleReal": "Iframe real apuntando a /embed/chatbot/{botId}",
-        "saveHint": "Guarda el bot para ver el preview real con iframe.",
-        "notSaved": "Sin guardar · simulación",
-        "bubbleHint": "Click para abrir",
-        "send": "Enviar",
-        "sampleUser": "¿Tienen plan empresa?",
-        "sampleBot": "Sí, contamos con planes Pro, Business y Enterprise con SLA, SSO y soporte prioritario. ¿Quieres que te muestre los precios?",
-        "poweredBy": "Powered by Koptup",
-        "modeLabel": "Modo de previsualización",
-        "modes": {
-          "desktop": "Escritorio",
-          "mobile": "Celular",
-          "bubble": "Burbuja"
-        },
-        "bubble": {
-          "intro": "Así se ve el widget cuando un usuario aterriza en tu sitio. Haz clic en la burbuja para ver el panel del chat.",
-          "openButton": "Abrir chat",
-          "closeButton": "Cerrar chat",
-          "snippetComment": "Intégralo así en tu sitio:"
-        },
-        "defaultName": "Asistente",
-        "defaultWelcome": "¡Hola! ¿En qué te puedo ayudar?",
-        "inputPlaceholder": "Escribe tu mensaje...",
-        "mobileFrame": {
-          "time": "9:41",
-          "status": "5G ●●● 100%"
+          "casual": "Cercano"
         }
       },
-      "embed": {
-        "title": "Snippet de embed",
-        "subtitle": "Pega este snippet antes del cierre de </body> en tu sitio",
-        "tabs": {
-          "script": "Script tag",
-          "iframe": "iframe",
-          "react": "React",
-          "webhook": "Webhook"
+      "defaults": {
+        "botName": "Asistente de Mi Empresa",
+        "welcome": "¡Hola! Soy el asistente virtual. Pregúntame sobre nuestros documentos.",
+        "instructions": "Eres el asistente virtual de la empresa. Responde en frases cortas y claras."
+      },
+      "toneLine": "Tono de las respuestas: {tone}.",
+      "knowledge": {
+        "drop": "Arrastra archivos o haz clic para elegirlos",
+        "hint": "TXT, MD o CSV · máx. 2 MB por archivo",
+        "pdfHint": "¿PDF o DOCX? Pruébalos en «Prueba con tu documento».",
+        "uploading": "Subiendo archivos…",
+        "empty": "Aún no hay documentos. Sube archivos de texto o carga los de una empresa de ejemplo.",
+        "remove": "Quitar documento",
+        "uploaded": "{count, plural, one {# archivo subido} other {# archivos subidos}}",
+        "uploadFailed": "No pudimos subir los archivos",
+        "removed": "Documento eliminado",
+        "removeFailed": "No pudimos eliminar el documento",
+        "unsupported": "{name}: formato no soportado aquí (usa TXT, MD o CSV)",
+        "tooBig": "{name}: pesa más de 2 MB",
+        "loadSample": "Cargar documentos de ejemplo",
+        "loadSampleOf": "Documentos de {company}",
+        "sampleLoaded": "Documentos de ejemplo cargados"
+      },
+      "preview": {
+        "title": "Vista previa",
+        "subtitleReal": "Este es el widget real (script + chat insertado) conversando con el servidor.",
+        "subtitleLocal": "Vista previa local. Guarda el bot para probar el widget real.",
+        "saveToTest": "Guarda el bot para conversar con él aquí",
+        "unsavedChanges": "Tienes cambios sin guardar: guárdalos para verlos en el widget real.",
+        "modeLabel": "Modo de vista previa",
+        "modes": {
+          "desktop": "Sitio web",
+          "mobile": "Celular",
+          "page": "Enlace directo"
         },
+        "siteTitle": "Sitio de ejemplo",
+        "siteBody": "Aquí iría el contenido de tu página. El botón del chat aparece en la esquina que elegiste.",
+        "bubbleOpen": "Abrir chat",
+        "bubbleClose": "Cerrar chat",
+        "defaultName": "Asistente",
+        "defaultWelcome": "¡Hola! ¿En qué te puedo ayudar?",
+        "inputDisabled": "Guarda el bot para escribir",
+        "poweredBy": "Con tecnología de KopTup"
+      },
+      "embed": {
+        "title": "Código para tu sitio",
+        "subtitle": "Copia uno de estos códigos y pégalo en el HTML de tu página.",
+        "tabs": {
+          "script": "Botón flotante (script)",
+          "iframe": "Iframe"
+        },
+        "scriptHelp": "Pégalo antes del cierre de la etiqueta body. Muestra un botón flotante que abre el chat. Puedes cambiar el color (data-color) y la posición (data-position: br, bl, tr o tl).",
+        "iframeHelp": "Pégalo donde quieras mostrar el chat dentro de tu página.",
+        "cspNote": "Si tu sitio tiene una política de seguridad (CSP), permite {origin} en script-src y frame-src.",
         "copy": "Copiar",
         "copied": "¡Copiado!",
-        "botId": "Bot ID",
-        "regenerate": "Regenerar ID",
-        "webhookTitle": "URL del webhook",
-        "webhookHint": "Configura esta URL en tu backend para recibir cada conversación",
-        "saveFirst": "Guarda el bot para activar el embed"
+        "saveFirst": "Guarda el bot para obtener el código",
+        "botId": "ID del bot"
       },
-      "actions": {
-        "save": "Guardar bot",
-        "saving": "Guardando...",
-        "share": "Compartir micrositio"
+      "conversations": {
+        "title": "Conversaciones",
+        "subtitle": "Lo que le han preguntado a tu bot (aquí, en el enlace directo o en tu sitio).",
+        "refresh": "Actualizar",
+        "export": "Exportar CSV",
+        "clear": "Borrar historial",
+        "clearConfirm": "¿Borrar todas las conversaciones de este bot?",
+        "cleared": "Historial borrado",
+        "exported": "CSV descargado",
+        "empty": "Todavía no hay conversaciones. Pregúntale algo en la vista previa.",
+        "saveFirst": "Guarda el bot para ver sus conversaciones.",
+        "loadFailed": "No pudimos cargar las conversaciones.",
+        "questions": "Preguntas",
+        "withSources": "Con fuente",
+        "notFound": "No encontré",
+        "user": "Pregunta",
+        "assistant": "Respuesta",
+        "sources": "Fuentes",
+        "date": "Fecha",
+        "notOwner": "Solo el dueño del bot puede ver sus conversaciones: este navegador no tiene su token."
       }
     },
-    "ux": {
-      "device": {
-        "label": "Vista previa",
-        "desktop": "Desktop",
-        "mobile": "Móvil",
-        "switchToDesktop": "Ver en escritorio",
-        "switchToMobile": "Ver en móvil",
-        "mobileFrameLabel": "Cómo se ve en un teléfono"
-      },
-      "tooltips": {
-        "tenant": "Tenant activo: aísla datos, permisos y métricas por organización (multi-tenant con RLS).",
-        "model": "Modelo LLM que responde. Se enruta por costo/latencia/contexto desde el orquestador.",
-        "language": "Idioma de la interfaz. Aplica al locale de next-intl al recargar.",
-        "runSample": "Ejecuta una query mock pre-armada para ver el pipeline en vivo.",
-        "online": "Sistema operativo: cluster GPU activo y vector store accesible.",
-        "toggleSidebar": "Mostrar/ocultar el catálogo de capas de plataforma.",
-        "togglePipeline": "Mostrar/ocultar el panel del pipeline en vivo.",
-        "toggleSources": "Abrir el panel de fuentes conectadas.",
-        "toggleStats": "Abrir/cerrar la telemetría agregada.",
-        "newSession": "Reinicia la conversación sin perder configuración.",
-        "settings": "Configuración avanzada del playground.",
-        "settingsHint": "Para personalizar nombre, colores, prompt y embed, cambia a Builder Mode.",
-        "citation": "Fragmento citado por el modelo. Click para ver el chunk original con score.",
-        "confidence": "Confianza calibrada del modelo en la respuesta basada en groundedness y citations.",
-        "scenarioPicker": "Queries pre-armadas que cubren RAG sobre docs, multi-hop, código, SQL y graph.",
-        "feedbackUp": "Marcar esta respuesta como buena (alimenta el reranker y eval).",
-        "feedbackDown": "Marcar esta respuesta como mejorable (genera ticket en eval suite).",
-        "regenerate": "Volver a generar la respuesta con el mismo contexto.",
-        "send": "Enviar la pregunta. Enter para mandar, Shift+Enter para salto de línea."
-      },
-      "sectionInfo": {
-        "sidebar": "Catálogo de las 19 capas de la plataforma RAG. Click en una para ver capacidades.",
-        "pipeline": "Cada query atraviesa estos pasos: rewrite → retrieve → rerank → context → LLM → cite → respond.",
-        "stats": "Métricas agregadas de la sesión. Algunas (cache, drift, faithfulness) se simulan en vivo.",
-        "sources": "Conectores activos al vector store. Sincronizados cron + webhook + CDC."
-      },
-      "sidebarMore": {
-        "showMore": "+{count} más",
-        "hide": "Ocultar",
-        "advanced": "Avanzadas"
-      },
-      "layers": {
-        "ingestion": "Pipeline multi-fuente que normaliza PDFs, DBs, audio y video al vector store.",
-        "chunking": "Cómo se parten los documentos para que los chunks sean óptimos para retrieval.",
-        "retrieval": "Cómo se encuentran los chunks más relevantes (dense + sparse + BM25).",
-        "query": "Cómo se entiende la pregunta del usuario: rewrite, HyDE y descomposición.",
-        "ranking": "Reordenamiento cross-encoder para precisión, diversidad y frescura.",
-        "context": "Compresión, dedup y armado del prompt final con citations.",
-        "agents": "Planner/executor, ReAct, Reflexion y workflow graphs.",
-        "tools": "Herramientas externas: SQL, web, code sandbox, knowledge graph.",
-        "memory": "Memoria conversacional, semántica de largo plazo y organizacional.",
-        "multimodal": "Texto, imágenes, audio, video y diagramas en un solo espacio embebido.",
-        "models": "Multi-LLM routing: cada query va al mejor modelo por costo/latencia.",
-        "infra": "Infra distribuida: Kubernetes, GPU clusters, streaming, multi-región.",
-        "security": "RBAC, ACL, tenant isolation, encryption, audit logs, anti-injection.",
-        "observability": "Tracing, métricas, hallucination tracking y replay de fallos.",
-        "eval": "Evaluación automática: faithfulness, citation accuracy y benchmarks.",
-        "optimization": "Caching semántico, retrieval adaptativo y speculative decoding.",
-        "knowledge": "Knowledge graphs, ontologías y graph neural retrieval.",
-        "production": "CI/CD, canary, A/B, feature flags y auto rollback.",
-        "nextLevel": "Self-improving, autonomous indexing y research agents."
-      },
-      "stats": {
-        "tokens": "Total de tokens consumidos en la sesión (input + output).",
-        "latency": "Latencia del último run end-to-end (rewrite → respond).",
-        "cost": "Costo agregado estimado en USD para la sesión actual.",
-        "cacheHit": "Porcentaje de queries servidas por el semantic cache (sin LLM call).",
-        "drift": "Desvío del distribución de embeddings vs baseline. >2% requiere atención.",
-        "faithfulness": "Cuán fielmente la respuesta refleja los chunks recuperados. Ideal ≥90%.",
-        "hallucination": "Detección automática de afirmaciones no fundamentadas. Ideal <1%."
-      },
-      "pipelineMini": {
-        "title": "Pipeline",
-        "idle": "Idle",
-        "running": "Corriendo",
-        "done": "Listo",
-        "openFull": "Ver pipeline completo"
-      },
-      "empty": {
-        "title": "Prueba una query",
-        "subtitle": "Elige un escenario mock o escribe tu propia pregunta abajo.",
-        "tryThis": "Prueba esto"
-      },
-      "onboarding": {
-        "title": "Bienvenido al Playground RAG",
-        "skip": "Saltar tour",
-        "next": "Siguiente",
-        "done": "Listo",
-        "step1Title": "Esto es el chat",
-        "step1Body": "Haz una pregunta o corre un escenario. Las respuestas vienen con citas clickeables.",
-        "step2Title": "19 capas enterprise",
-        "step2Body": "Cada ítem representa una capa de la plataforma. Click para explorar capacidades.",
-        "step3Title": "Pipeline en vivo",
-        "step3Body": "Mira cada paso (rewrite, retrieve, rerank, LLM...) con tiempos y tokens reales.",
-        "step4Title": "Builder Mode",
-        "step4Body": "Personaliza colores, prompt y exporta el snippet para embeber en tu sitio."
-      },
-      "advancedConfig": {
-        "title": "Configuración avanzada",
-        "body": "Para personalizar nombre, colores, prompt del sistema y generar un snippet de embed listo para producción, cambia al modo Builder.",
-        "cta": "Ir a Builder Mode",
-        "close": "Cerrar"
-      }
+    "embedPage": {
+      "loading": "Cargando el asistente…",
+      "notFoundTitle": "Este asistente no está disponible",
+      "notFoundBody": "Puede que el enlace esté mal o que el bot se haya eliminado.",
+      "placeholder": "Escribe tu pregunta…",
+      "send": "Enviar",
+      "thinking": "Buscando en los documentos…",
+      "sources": "Fuentes",
+      "close": "Cerrar chat",
+      "poweredBy": "Con tecnología de KopTup",
+      "errorNetwork": "No pudimos conectar con el servidor. Inténtalo de nuevo.",
+      "retry": "Reintentar",
+      "sourceTitle": "Fuente [{n}] · {name}",
+      "hideSource": "Ocultar fuente"
     },
     "ragLink": "Sistemas RAG para empresas",
     "ragLinkShort": "¿Qué es RAG?",
