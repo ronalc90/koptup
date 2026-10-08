@@ -1016,7 +1016,8 @@ export const OFFERINGS: Offering[] = [
   /* 26. qa-automatizado-ia */
   {
     slug: 'qa-automatizado-ia',
-    demoSlug: 'chatbot',
+    // Sin demo propia: antes apuntaba a /demo/chatbot (otro producto).
+    demoSlug: '',
     category: 'devTools',
     icon: 'CheckBadgeIcon',
     gradient: 'from-teal-700 to-emerald-900',
@@ -1044,7 +1045,8 @@ export const OFFERINGS: Offering[] = [
   /* 27. vpn-empresarial */
   {
     slug: 'vpn-empresarial',
-    demoSlug: 'saas-boilerplate',
+    // Sin demo propia: antes apuntaba a /demo/saas-boilerplate (otro producto).
+    demoSlug: '',
     category: 'security',
     icon: 'ShieldCheckIcon',
     gradient: 'from-blue-700 to-slate-900',
