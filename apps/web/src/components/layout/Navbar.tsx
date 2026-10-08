@@ -313,7 +313,7 @@ const toggleLanguage = () => {
                   <Link href="/login">{t('nav.login')}</Link>
                 </Button>
                 <Button size="sm" asChild>
-                  <Link href="/pricing">Quiero esto</Link>
+                  <Link href="/services#planes-rag">Quiero esto</Link>
                 </Button>
               </>
             )}
@@ -397,7 +397,7 @@ const toggleLanguage = () => {
                     <Link href="/login">{t('nav.login')}</Link>
                   </Button>
                   <Button size="sm" fullWidth asChild>
-                    <Link href="/pricing">Quiero esto</Link>
+                    <Link href="/services#planes-rag">Quiero esto</Link>
                   </Button>
                 </>
               )}

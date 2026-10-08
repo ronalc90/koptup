@@ -249,7 +249,7 @@ export default function DesarrolloWebColombiaPage() {
               <Link href="/contact">{t('ctaButton')}</Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/50 text-white hover:bg-white/10" asChild>
-              <Link href="/pricing">{useTranslations('common')('requestQuote')}</Link>
+              <Link href="/services#planes-rag">{useTranslations('common')('requestQuote')}</Link>
             </Button>
           </div>
         </div>

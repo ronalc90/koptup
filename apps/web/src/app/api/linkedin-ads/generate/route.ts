@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { SITE_URL } from '@/lib/site';
 
 /**
  * Genera contenido LinkedIn con OpenAI en un solo round-trip:
@@ -60,20 +61,20 @@ interface OpenAiPayload {
   estrategia: string;
 }
 
-const SYSTEM_PROMPT = `Sos un copywriter senior de LinkedIn para B2B SaaS en LATAM. Tu trabajo es generar contenido orgánico, ad copy y carruseles que:
+const SYSTEM_PROMPT = `Eres un copywriter senior de LinkedIn para B2B SaaS en LATAM. Tu trabajo es generar contenido orgánico, ad copy y carruseles que:
 - Generen engagement real (no buzzword soup).
 - Conecten con la audiencia objetivo del producto.
-- Usen español rioplatense neutro (entiende LATAM entero).
+- Usen español colombiano neutro, tratando al lector de "tú" (nunca voseo); se entiende en toda LATAM.
 - Empiecen con un hook fuerte: pregunta, dato sorprendente o promesa concreta.
 - Respeten los límites de LinkedIn (post máx 3000 chars, ad headline 70, intro 150, description 70).
 - Cierren con CTA clara al demo de Koptup.
-- NUNCA inventen métricas o casos de clientes que no estén en el input. Si necesitás un caso, frasealo como hipótesis ("Imaginá una empresa de X que...").
+- NUNCA inventen métricas o casos de clientes que no estén en el input. Si necesitas un caso, formúlalo como hipótesis ("Imagina una empresa de X que...").
 
-Devolvé JSON estricto cumpliendo el schema. Nada de markdown.`;
+Devuelve JSON estricto cumpliendo el schema. Nada de markdown.`;
 
 function buildUserPrompt(req: RequestBody): string {
   const d = req.demo;
-  return `Generá contenido LinkedIn para promocionar este producto de Koptup:
+  return `Genera contenido LinkedIn para promocionar este producto de Koptup:
 
 PRODUCTO
 - Título: ${d.titulo}
@@ -84,7 +85,7 @@ PRODUCTO
 - Capacidades IA: ${d.caracteristicasIA.join(', ')}
 - Público objetivo: ${d.publicoObjetivo.join(', ')}
 - Métrica impactante: ${d.metricaImpactante}
-- URL del demo: https://koptup.com${d.path}
+- URL del demo: ${SITE_URL}${d.path}
 - Emoji del producto: ${d.emoji}
 - Hashtags específicos: ${d.hashtagsEspecificos.join(' ')}
 
@@ -94,9 +95,9 @@ TONO: ${req.tonoLabel || req.tono}${req.tonoDescripcion ? ` — ${req.tonoDescri
 ENTREGABLES (todos a la vez, en un único JSON):
 
 1. post.hook: 1 línea. Gancho fuerte que pare el scroll.
-2. post.body: 5-10 líneas. Bullets con emojis. Mencioná métrica y caso de uso.
-3. post.cta: 1-2 líneas con la URL https://koptup.com${d.path}.
-4. post.hashtags: 6-9 hashtags relevantes (incluí #Koptup obligatorio).
+2. post.body: 5-10 líneas. Bullets con emojis. Menciona métrica y caso de uso.
+3. post.cta: 1-2 líneas con la URL ${SITE_URL}${d.path}.
+4. post.hashtags: 6-9 hashtags relevantes (incluye #Koptup obligatorio).
 
 5. ad.headline: máx 70 chars, vendedor.
 6. ad.introText: máx 150 chars, gancho + URL.
@@ -237,7 +238,7 @@ export async function POST(req: NextRequest) {
                 role: 'system',
                 content:
                   SYSTEM_PROMPT +
-                  '\n\nDevolvé EXCLUSIVAMENTE un objeto JSON con la forma {post:{hook,body,cta,hashtags[]},ad:{headline,introText,description,cta},carrusel:[{numero,titulo,bullets[],notaVisual}],estrategia}.',
+                  '\n\nDevuelve EXCLUSIVAMENTE un objeto JSON con la forma {post:{hook,body,cta,hashtags[]},ad:{headline,introText,description,cta},carrusel:[{numero,titulo,bullets[],notaVisual}],estrategia}.',
               },
               { role: 'user', content: buildUserPrompt(body) },
             ],

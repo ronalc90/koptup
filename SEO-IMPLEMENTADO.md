@@ -119,7 +119,7 @@ Se ha completado una optimización SEO integral de la plataforma KopTup, enfocad
 ✅ 10+ URLs principales
 ✅ Prioridades: 0.7 - 1.0
 ✅ Frecuencias: daily, weekly, monthly
-✅ URL: https://koptup.com/sitemap.xml
+✅ URL: https://www.koptup.com/sitemap.xml
 ```
 
 ### Robots.txt
@@ -171,16 +171,16 @@ Se ha completado una optimización SEO integral de la plataforma KopTup, enfocad
 
 ### Sitemap Incluye:
 ```
-https://koptup.com/                      (Prioridad 1.0, Daily)
-https://koptup.com/demo/auditoria-medica (Prioridad 0.9, Weekly)
-https://koptup.com/demo/chatbot          (Prioridad 0.9, Weekly)
-https://koptup.com/demo/gestor-contenido (Prioridad 0.9, Weekly)
-https://koptup.com/demo/cuentas-medicas  (Prioridad 0.9, Weekly)
-https://koptup.com/services              (Prioridad 0.8, Monthly)
-https://koptup.com/pricing               (Prioridad 0.8, Monthly)
-https://koptup.com/about                 (Prioridad 0.7, Monthly)
-https://koptup.com/contact               (Prioridad 0.7, Monthly)
-https://koptup.com/blog                  (Prioridad 0.7, Weekly)
+https://www.koptup.com/                      (Prioridad 1.0, Daily)
+https://www.koptup.com/demo/auditoria-medica (Prioridad 0.9, Weekly)
+https://www.koptup.com/demo/chatbot          (Prioridad 0.9, Weekly)
+https://www.koptup.com/demo/gestor-contenido (Prioridad 0.9, Weekly)
+https://www.koptup.com/demo/cuentas-medicas  (Prioridad 0.9, Weekly)
+https://www.koptup.com/services              (Prioridad 0.8, Monthly)
+https://www.koptup.com/pricing               (Prioridad 0.8, Monthly)
+https://www.koptup.com/about                 (Prioridad 0.7, Monthly)
+https://www.koptup.com/contact               (Prioridad 0.7, Monthly)
+https://www.koptup.com/blog                  (Prioridad 0.7, Weekly)
 ```
 
 ---
@@ -206,7 +206,7 @@ https://koptup.com/blog                  (Prioridad 0.7, Weekly)
 3. **Google Search Console**
    - [ ] Verificar en https://search.google.com/search-console
    - [ ] Agregar propiedad koptup.com
-   - [ ] Enviar sitemap: https://koptup.com/sitemap.xml
+   - [ ] Enviar sitemap: https://www.koptup.com/sitemap.xml
    - [ ] Copiar código de verificación
    - [ ] Actualizar en layout.tsx línea 108
 
@@ -252,12 +252,12 @@ https://koptup.com/blog                  (Prioridad 0.7, Weekly)
 
 1. **Sitemap**
    ```bash
-   curl https://koptup.com/sitemap.xml
+   curl https://www.koptup.com/sitemap.xml
    ```
 
 2. **Robots.txt**
    ```bash
-   curl https://koptup.com/robots.txt
+   curl https://www.koptup.com/robots.txt
    ```
 
 3. **Metadata**
@@ -278,16 +278,16 @@ https://koptup.com/blog                  (Prioridad 0.7, Weekly)
 
 1. **Facebook**
    - https://developers.facebook.com/tools/debug/
-   - Ingresar: https://koptup.com
+   - Ingresar: https://www.koptup.com
    - Click "Scrape Again"
 
 2. **Twitter**
    - https://cards-dev.twitter.com/validator
-   - Ingresar: https://koptup.com
+   - Ingresar: https://www.koptup.com
 
 3. **LinkedIn**
    - https://www.linkedin.com/post-inspector/
-   - Ingresar: https://koptup.com
+   - Ingresar: https://www.koptup.com
 
 ---
 

@@ -9,6 +9,7 @@
  * edita en LinkedIn antes de publicar.
  */
 
+import { SITE_URL } from '@/lib/site';
 import {
   ANGULOS_LABELS,
   HASHTAGS_GLOBALES,
@@ -142,7 +143,7 @@ export function generarPost(
   angulo: AnguloPost,
   tono: TonoPost,
   variante: number = 0,
-  baseUrl: string = 'https://koptup.com',
+  baseUrl: string = SITE_URL,
 ): PostGenerado {
   const seedBase = hashSeed(`${demo.id}-${angulo}-${tono}-${variante}`);
   const hooks = HOOK_PLANTILLAS[angulo](demo);

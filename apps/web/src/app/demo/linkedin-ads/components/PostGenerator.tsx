@@ -11,6 +11,7 @@ import {
   ExclamationTriangleIcon,
   BoltIcon,
 } from '@heroicons/react/24/outline';
+import { SITE_URL } from '@/lib/site';
 import {
   ANGULOS_LABELS,
   KOPTUP_DEMOS,
@@ -441,7 +442,7 @@ function AdCopyView({
   onCopy: (k: string, t: string) => void;
   copiado: string | null;
 }) {
-  const completo = `Headline: ${ad.headline}\n\nIntro: ${ad.introText}\n\nDescription: ${ad.description}\n\nCTA Button: ${ad.cta}\n\nDestino: https://koptup.com${demo.path}`;
+  const completo = `Headline: ${ad.headline}\n\nIntro: ${ad.introText}\n\nDescription: ${ad.description}\n\nCTA Button: ${ad.cta}\n\nDestino: ${SITE_URL}${demo.path}`;
 
   return (
     <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
@@ -450,7 +451,7 @@ function AdCopyView({
         <Campo label="Intro text (descripción larga)" maxLen={150} value={ad.introText} />
         <Campo label="Description" maxLen={70} value={ad.description} />
         <Campo label="CTA Button" maxLen={20} value={ad.cta} />
-        <Campo label="URL de destino" maxLen={500} value={`https://koptup.com${demo.path}`} />
+        <Campo label="URL de destino" maxLen={500} value={`${SITE_URL}${demo.path}`} />
         <button
           type="button"
           onClick={() => onCopy('ad', completo)}

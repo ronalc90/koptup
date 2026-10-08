@@ -6,6 +6,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import ThemeProvider from '@/components/providers/ThemeProvider';
 import ConditionalLayout from '@/components/layout/ConditionalLayout';
 import ClientToaster from '../components/ClientToaster';
+import { SITE_NAME, SITE_URL, TITLE_TEMPLATE } from '@/lib/site';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
@@ -16,11 +17,17 @@ const poppins = Poppins({
   display: 'swap',
 });
 
+// Título por defecto (home y páginas sin metadata propia). Ya trae el sufijo
+// porque el `default` del layout raíz no pasa por la plantilla.
+const DEFAULT_TITLE = 'Desarrollo de Software a Medida | KopTup';
+
 export const metadata = {
-  metadataBase: new URL('https://koptup.com'),
+  metadataBase: new URL(SITE_URL),
+  // Formato final: "<título> | KopTup", ≤ 60 caracteres
+  // (verificar con `node scripts/check-titles.mjs`).
   title: {
-    default: 'KopTup - Desarrollo de Software a Medida | Demos Interactivas',
-    template: '%s | KopTup - Software a Medida',
+    default: DEFAULT_TITLE,
+    template: TITLE_TEMPLATE,
   },
   manifest: '/manifest.json',
   appleWebApp: {
@@ -41,9 +48,9 @@ export const metadata = {
   openGraph: {
     type: 'website',
     locale: 'es_CO',
-    url: 'https://koptup.com',
-    siteName: 'KopTup',
-    title: 'KopTup - Desarrollo de Software a Medida | Demos Interactivas',
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: DEFAULT_TITLE,
     description:
       'Desarrollo de software personalizado para empresas. E-commerce, chatbots con IA, dashboards, gestión documental y más. Prueba 27 prototipos interactivos sin registro.',
     images: [
@@ -57,7 +64,7 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'KopTup - Desarrollo de Software a Medida | Demos Interactivas',
+    title: DEFAULT_TITLE,
     description:
       'Desarrollo de software personalizado para empresas. E-commerce, chatbots con IA, dashboards y más. Prueba 27 prototipos interactivos sin registro.',
     images: ['/og-image.png'],
@@ -80,7 +87,7 @@ export const metadata = {
   // No declaramos hreflang porque el idioma es por cookie y no hay rutas /es /en
   // distintas; un hreflang que apunta a la misma URL no aporta nada.
   alternates: {
-    canonical: 'https://koptup.com',
+    canonical: SITE_URL,
   },
 };
 
@@ -89,7 +96,7 @@ async function loadAggregate(locale: string, name: 'demos' | 'offerings'): Promi
     const mod = await import(`../../messages/_${name}.${locale}.json`);
     return (mod as any).default ?? mod;
   } catch (err) {
-    console.warn(`[layout] no aggregate for ${name}.${locale} — corré "npm run merge-messages"`, err);
+    console.warn(`[layout] no aggregate for ${name}.${locale} — ejecuta "npm run merge-messages"`, err);
     return {};
   }
 }

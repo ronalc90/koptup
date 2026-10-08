@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { generateMetadata, getBreadcrumbSchema } from '@/lib/seo-config';
+import { SITE_URL, absoluteUrl } from '@/lib/site';
 
 export const metadata: Metadata = generateMetadata('services');
 
@@ -7,13 +8,13 @@ const serviceSchema = {
   '@context': 'https://schema.org',
   '@type': 'ProfessionalService',
   name: 'KopTup - Servicios de Desarrollo de Software',
-  url: 'https://koptup.com/services',
+  url: absoluteUrl('/services'),
   description:
     'Desarrollo de software a medida: e-commerce, chatbots con IA, apps móviles, dashboards, automatización e integración de sistemas.',
   provider: {
     '@type': 'Organization',
     name: 'KopTup',
-    url: 'https://koptup.com',
+    url: SITE_URL,
   },
   areaServed: 'Colombia',
   hasOfferCatalog: {

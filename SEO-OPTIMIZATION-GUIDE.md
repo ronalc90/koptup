@@ -24,7 +24,7 @@ Se implementaron los siguientes schemas en JSON-LD:
 - Frecuencias de actualización optimizadas
 - Prioridades configuradas por importancia
 
-**URL**: https://koptup.com/sitemap.xml
+**URL**: https://www.koptup.com/sitemap.xml
 
 ### 4. Robots.txt Optimizado
 - Permite rastreo de páginas públicas y demos
@@ -67,9 +67,9 @@ Se implementaron los siguientes schemas en JSON-LD:
 ```bash
 # Pasos a seguir:
 1. Ve a https://search.google.com/search-console
-2. Agrega la propiedad: https://koptup.com
+2. Agrega la propiedad: https://www.koptup.com
 3. Verifica la propiedad (método recomendado: DNS o archivo HTML)
-4. Envía el sitemap: https://koptup.com/sitemap.xml
+4. Envía el sitemap: https://www.koptup.com/sitemap.xml
 5. Solicita indexación de las páginas principales
 ```
 
@@ -266,7 +266,7 @@ curl http://localhost:3000/robots.txt
 ```bash
 # Lighthouse CLI
 npm install -g lighthouse
-lighthouse https://koptup.com --view
+lighthouse https://www.koptup.com --view
 
 # O usar PageSpeed Insights:
 # https://pagespeed.web.dev/

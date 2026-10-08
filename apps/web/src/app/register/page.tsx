@@ -491,7 +491,7 @@ function RegisterPageInner() {
                   Al crear tu cuenta podrás configurar este plan, integrar tus APIs y empezar a usarlo en minutos.
                 </div>
                 <Link
-                  href="/pricing"
+                  href="/services#planes-rag"
                   className="block mt-3 text-xs text-center text-primary-600 dark:text-primary-400 hover:underline"
                 >
                   Cambiar de plan

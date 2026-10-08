@@ -11,7 +11,7 @@
 [![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o-412991?logo=openai)](https://openai.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-[**koptup.com**](https://koptup.com) · [Catálogo de prototipos](https://koptup.com/demo) · [Planes y servicios](https://koptup.com/services) · [Contacto](https://koptup.com/contact)
+[**www.koptup.com**](https://www.koptup.com) · [Catálogo de prototipos](https://www.koptup.com/demo) · [Planes y servicios](https://www.koptup.com/services) · [Contacto](https://www.koptup.com/contact)
 
 </div>
 
@@ -29,14 +29,14 @@ No es un SaaS ni un producto. Es la vitrina de un equipo que cobra por construir
 
 ## Aplicaciones reales
 
-### [Chatbot RAG con IA](https://koptup.com/demo/chatbot)
+### [Chatbot RAG con IA](https://www.koptup.com/demo/chatbot)
 
 Plataforma RAG end-to-end. Ingesta PDF/Word/Excel/CSV/HTML/URLs, chunking, retrieval BM25 con TF·IDF, llamadas a OpenAI Chat Completions (GPT-4o-mini por defecto, configurable) con citas inline `[1] [2]` clickeables. Builder visual para personalizar avatar/color/posición, 3 modos de preview (desktop/móvil/bubble) y generación de embed code (iframe / script / componente React).
 
 **Stack real:** Next.js · TypeScript · Express · OpenAI SDK · BM25 implementado a mano · persistencia en archivos JSON.
 **Código:** [`apps/backend/src/routes/chatbot.routes.ts`](apps/backend/src/routes/chatbot.routes.ts) — 11 endpoints REST, 940+ líneas.
 
-### [Generador de LinkedIn Ads](https://koptup.com/demo/linkedin-ads)
+### [Generador de LinkedIn Ads](https://www.koptup.com/demo/linkedin-ads)
 
 Generador de copies para campañas de LinkedIn con OpenAI server-side. Calendario editorial, plantillas por industria, variantes A/B, preview en formato nativo de LinkedIn.
 
@@ -47,7 +47,7 @@ Generador de copies para campañas de LinkedIn con OpenAI server-side. Calendari
 
 El resto (25 vistas: CRM, ERP, POS, HRMS, WMS, LMS, helpdesk, telemedicina, facturación electrónica, voice AI, e-commerce, automatización de workflows, scraping, etc.) son **mockups interactivos con datos simulados realistas**. Cubren el flujo de UI completo — tabs, formularios validados, gráficas, drag-and-drop, modales — pero los datos son fixtures, no provienen de un backend de producción. Sirven para que un cliente potencial vea cómo se vería un ERP o un CRM moderno antes de contratarnos para construirlo.
 
-Catálogo filtrable por categoría: **<https://koptup.com/demo>**
+Catálogo filtrable por categoría: **<https://www.koptup.com/demo>**
 
 ## Stack
 
@@ -96,7 +96,7 @@ infra/
 
 ## Estado del proyecto
 
-- **Producción:** [koptup.com](https://koptup.com) (Vercel) + API en Railway.
+- **Producción:** [www.koptup.com](https://www.koptup.com) (Vercel) + API en Railway.
 - **Chatbot RAG:** integración real con OpenAI, persistencia en disco, multi-tenant.
 - **25 prototipos restantes:** UI completa, datos simulados, no production-ready sin trabajo adicional.
 - **Roadmap inmediato:** S3 real para uploads del RAG, autenticación de tenants, métricas de uso.
@@ -106,7 +106,7 @@ infra/
 Construimos a medida lo que viste en los prototipos — o lo que necesités que no esté acá. Tarifas en COP y USD, propuesta en 48h hábiles.
 
 - **Email:** [dirox7@gmail.com](mailto:dirox7@gmail.com)
-- **Sitio:** [koptup.com/contact](https://koptup.com/contact)
+- **Sitio:** [www.koptup.com/contact](https://www.koptup.com/contact)
 - **LinkedIn:** [/in/ronalc90](https://www.linkedin.com/in/ronalc90)
 
 ## Licencia

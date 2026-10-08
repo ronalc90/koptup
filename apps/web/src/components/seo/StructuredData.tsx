@@ -1,7 +1,12 @@
 /**
  * Structured Data Component for SEO
  * Implements Schema.org JSON-LD markup for better search engine understanding
+ *
+ * Regla: no publicar cifras que no podamos respaldar (ratings, reseñas,
+ * número de clientes). Por eso no hay `aggregateRating`.
  */
+
+import { SITE_URL, absoluteUrl } from '@/lib/site';
 
 interface StructuredDataProps {
   type: 'organization' | 'website' | 'service' | 'article' | 'softwareApplication' | 'localBusiness';
@@ -14,10 +19,10 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
     '@type': 'Organization',
     name: 'KopTup',
     alternateName: 'KopTup Soluciones Tecnológicas',
-    url: 'https://koptup.com',
+    url: SITE_URL,
     logo: {
       '@type': 'ImageObject',
-      url: 'https://koptup.com/og-image.png',
+      url: absoluteUrl('/og-image.png'),
       width: 1200,
       height: 630,
     },
@@ -43,7 +48,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
       {
         '@type': 'ContactPoint',
         contactType: 'customer support',
-        url: 'https://koptup.com/contact',
+        url: absoluteUrl('/contact'),
         availableLanguage: ['Spanish', 'English'],
       },
     ],
@@ -85,20 +90,13 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
       '@type': 'OfferCatalog',
       name: 'Servicios de Desarrollo de Software',
       itemListElement: [
-        { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Chatbots con IA para empresas', url: 'https://koptup.com/chatbots-ia' } },
-        { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Soluciones de Inteligencia Artificial', url: 'https://koptup.com/soluciones-ia' } },
-        { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Desarrollo web a medida', url: 'https://koptup.com/desarrollo-web-colombia' } },
+        { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Chatbots con IA para empresas', url: absoluteUrl('/chatbots-ia') } },
+        { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Soluciones de Inteligencia Artificial', url: absoluteUrl('/soluciones-ia') } },
+        { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Desarrollo web a medida', url: absoluteUrl('/desarrollo-web-colombia') } },
         { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'E-commerce profesional' } },
         { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Aplicaciones móviles iOS y Android' } },
         { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Consultoría tecnológica' } },
       ],
-    },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.9',
-      reviewCount: '67',
-      bestRating: '5',
-      worstRating: '1',
     },
   });
 
@@ -106,18 +104,10 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'KopTup',
-    url: 'https://koptup.com',
+    url: SITE_URL,
     description:
       'Desarrollo de software a medida para empresas. Prueba nuestras demos interactivas: e-commerce, chatbots IA, dashboards, gestión documental y más.',
     inLanguage: 'es-CO',
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: {
-        '@type': 'EntryPoint',
-        urlTemplate: 'https://koptup.com/search?q={search_term_string}',
-      },
-      'query-input': 'required name=search_term_string',
-    },
   });
 
   const getSoftwareApplicationSchema = () => ({
@@ -145,12 +135,6 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
       'Control de proyectos y tareas',
       'Integraciones con APIs externas',
     ],
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      ratingCount: '50',
-      bestRating: '5',
-    },
   });
 
   const getServiceSchema = () => ({
@@ -220,15 +204,15 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
   const getLocalBusinessSchema = () => ({
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
-    '@id': 'https://koptup.com/#localbusiness',
+    '@id': `${SITE_URL}/#localbusiness`,
     name: 'KopTup - Soluciones Tecnológicas',
     description:
       'Empresa de desarrollo de software a medida en Bogotá, Colombia. E-commerce, chatbots con IA, dashboards, aplicaciones móviles y soluciones tecnológicas personalizadas.',
-    url: 'https://koptup.com',
+    url: SITE_URL,
     telephone: '+57-302-479-4842',
     email: 'ronald@koptup.com',
-    image: 'https://koptup.com/og-image.png',
-    logo: 'https://koptup.com/logo.svg',
+    image: absoluteUrl('/og-image.png'),
+    logo: absoluteUrl('/logo.svg'),
     priceRange: '$$ - $$$$',
     currenciesAccepted: 'COP, USD',
     paymentAccepted: 'Transferencia bancaria, tarjeta de crédito',
@@ -254,13 +238,6 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
       },
     ],
     sameAs: ['https://www.linkedin.com/company/koptup'],
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      ratingCount: '50',
-      bestRating: '5',
-      worstRating: '1',
-    },
     hasMap: 'https://maps.google.com/?q=Av.+68+%231-63,+Bogotá,+Colombia',
     areaServed: [
       { '@type': 'Country', name: 'Colombia' },

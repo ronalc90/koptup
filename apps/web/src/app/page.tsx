@@ -166,7 +166,7 @@ export default function HomePage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
-                <Link href="/pricing">{t('hero.cta1')}</Link>
+                <Link href="/services#planes-rag">{t('hero.cta1')}</Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
                 <Link href="/contact">{t('hero.cta2')}</Link>
@@ -344,7 +344,7 @@ export default function HomePage() {
               <Link href="/contact">{t('common.requestQuote')}</Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <Link href="/pricing">{th('cta.button')}</Link>
+              <Link href="/services#planes-rag">{th('cta.button')}</Link>
             </Button>
           </div>
         </div>

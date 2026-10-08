@@ -206,7 +206,7 @@ export default function BienvenidoProductHuntPage() {
               <Link href="/contact">Hablar con el equipo</Link>
             </Button>
             <Button size="lg" className="border-2 border-white/60 text-white hover:bg-white/10" asChild>
-              <Link href="/pricing">Ver precios</Link>
+              <Link href="/services#planes-rag">Ver precios</Link>
             </Button>
           </div>
         </div>

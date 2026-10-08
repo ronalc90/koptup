@@ -1,33 +1,16 @@
 import { Metadata } from 'next';
 import { getBreadcrumbSchema } from '@/lib/seo-config';
+import { SITE_URL, absoluteUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: 'Empresa de Desarrollo Web y Software a Medida | KopTup Colombia',
+  title: 'Desarrollo Web y Software a Medida en Colombia',
   description:
-    'Contrata a KopTup para desarrollar tu aplicación web, chatbot con IA, e-commerce o sistema empresarial. Empresa de desarrollo de software a medida con sede en Colombia, trabajamos con clientes en todo el mundo. +100 proyectos. Cotización gratis.',
-  keywords: [
-    'empresa de desarrollo de software colombia',
-    'desarrollo web colombia',
-    'contratar empresa desarrollo software',
-    'desarrollo web a medida colombia',
-    'empresa software bogotá',
-    'contratar desarrolladores web colombia',
-    'agencia desarrollo software colombia',
-    'desarrollo aplicaciones web colombia',
-    'software a medida colombia',
-    'empresa tecnología colombia',
-    'desarrollo software empresa',
-    'contratar desarrollo web',
-    'desarrollo de software a medida',
-    'empresa software latinoamerica',
-    'desarrollo web latinoamerica',
-    'offshore software development colombia',
-  ],
-  alternates: { canonical: 'https://koptup.com/desarrollo-web-colombia' },
+    'Contrata a KopTup para desarrollar tu aplicación web, chatbot con IA, e-commerce o sistema empresarial. Empresa de desarrollo de software a medida con sede en Colombia, trabajamos con clientes en todo el mundo. Cotización gratis.',
+  alternates: { canonical: absoluteUrl('/desarrollo-web-colombia') },
   openGraph: {
-    title: 'Empresa de Desarrollo Web a Medida | KopTup Colombia',
-    description: '+100 proyectos entregados. Aplicaciones web, chatbots IA, e-commerce y apps móviles. Trabajamos con clientes en todo el mundo. Cotización gratis.',
-    url: 'https://koptup.com/desarrollo-web-colombia',
+    title: 'Empresa de Desarrollo Web a Medida | KopTup',
+    description: 'Aplicaciones web, chatbots IA, e-commerce y apps móviles a medida. Trabajamos con clientes en todo el mundo. Cotización gratis.',
+    url: absoluteUrl('/desarrollo-web-colombia'),
     siteName: 'KopTup',
     images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Desarrollo Web Colombia - KopTup' }],
     locale: 'es_CO',
@@ -47,7 +30,7 @@ const serviceSchema = {
   name: 'KopTup - Desarrollo de Software a Medida',
   description:
     'Empresa de desarrollo de software a medida con sede en Bogotá, Colombia. Desarrollamos aplicaciones web, chatbots con IA, e-commerce, apps móviles, dashboards y sistemas empresariales para clientes en Colombia y todo el mundo.',
-  url: 'https://koptup.com',
+  url: SITE_URL,
   telephone: '+57-302-479-4842',
   address: {
     '@type': 'PostalAddress',
@@ -76,13 +59,6 @@ const serviceSchema = {
     ],
   },
   priceRange: '$499 - $50,000 USD',
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '4.9',
-    reviewCount: '67',
-    bestRating: '5',
-    worstRating: '1',
-  },
 };
 
 const faqSchema = {

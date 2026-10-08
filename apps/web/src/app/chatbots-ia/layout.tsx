@@ -1,33 +1,16 @@
 import { Metadata } from 'next';
 import { getBreadcrumbSchema } from '@/lib/seo-config';
+import { SITE_URL, absoluteUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: 'Chatbots con IA para Empresas | Venta e Implementación de Chatbots Colombia',
+  title: 'Chatbots con IA para Empresas en Colombia',
   description:
     'Implementamos chatbots con inteligencia artificial para empresas en Colombia y Latinoamérica. Integración con WhatsApp Business, GPT-4 y Claude AI. Atención 24/7, captura de leads y ventas automatizadas. Desde $499 USD.',
-  keywords: [
-    'chatbot con ia',
-    'chatbot inteligencia artificial',
-    'implementar chatbot empresa',
-    'venta chatbots colombia',
-    'chatbot whatsapp colombia',
-    'chatbot para negocios',
-    'asistente virtual ia',
-    'chatbot gpt colombia',
-    'chatbot whatsapp business',
-    'chatbot ventas automatizadas',
-    'chatbot atención al cliente',
-    'chatbot 24/7',
-    'chatbot empresarial colombia',
-    'comprar chatbot ia',
-    'chatbot para ecommerce',
-    'automatización atención cliente',
-  ],
-  alternates: { canonical: 'https://koptup.com/chatbots-ia' },
+  alternates: { canonical: absoluteUrl('/chatbots-ia') },
   openGraph: {
-    title: 'Chatbots con IA para Empresas | KopTup Colombia',
+    title: 'Chatbots con IA para Empresas | KopTup',
     description: 'Implementamos chatbots inteligentes con WhatsApp, GPT-4 y Claude. Atención 24/7 desde $499 USD.',
-    url: 'https://koptup.com/chatbots-ia',
+    url: absoluteUrl('/chatbots-ia'),
     siteName: 'KopTup',
     images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Chatbots con IA - KopTup' }],
     locale: 'es_CO',
@@ -59,7 +42,7 @@ const chatbotSchema = {
   provider: {
     '@type': 'Organization',
     name: 'KopTup',
-    url: 'https://koptup.com',
+    url: SITE_URL,
   },
   featureList: [
     'Integración con WhatsApp Business API',
@@ -97,7 +80,7 @@ const faqSchema = {
       name: '¿Dónde puedo comprar un chatbot con IA para mi negocio?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'KopTup desarrolla y vende chatbots con IA personalizados para empresas en Colombia y Latinoamérica. Puedes solicitar una demo gratuita o una cotización en koptup.com/contact. Somos expertos en implementación de chatbots con WhatsApp Business, GPT-4 y Claude AI.',
+        text: 'KopTup desarrolla y vende chatbots con IA personalizados para empresas en Colombia y Latinoamérica. Puedes solicitar una demo gratuita o una cotización en www.koptup.com/contact. Somos expertos en implementación de chatbots con WhatsApp Business, GPT-4 y Claude AI.',
       },
     },
     {

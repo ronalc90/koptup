@@ -62,7 +62,7 @@ Archivo creado: `apps/web/src/app/sitemap.ts`
 - /demo/cuentas-medicas (prioridad 0.9)
 - /services, /pricing, /about, /contact, /blog
 
-**URL:** https://koptup.com/sitemap.xml
+**URL:** https://www.koptup.com/sitemap.xml
 
 ### 🤖 5. Robots.txt Optimizado
 
@@ -297,8 +297,8 @@ Archivo creado: `apps/web/src/app/manifest.ts`
 
 ### Esta Semana
 - [ ] Verificar que el sitio carga correctamente
-- [ ] Probar sitemap: https://koptup.com/sitemap.xml
-- [ ] Probar robots.txt: https://koptup.com/robots.txt
+- [ ] Probar sitemap: https://www.koptup.com/sitemap.xml
+- [ ] Probar robots.txt: https://www.koptup.com/robots.txt
 - [ ] Verificar SSL para www.koptup.com
 - [ ] Crear imágenes SEO (og-image, logo, favicon)
 - [ ] Instalar Google Analytics 4

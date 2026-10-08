@@ -1,7 +1,9 @@
 import { MetadataRoute } from 'next';
 import { OFFERINGS } from '@/lib/services-catalog';
+import { SITE_URL } from '@/lib/site';
 
-const baseUrl = 'https://koptup.com';
+// Dominio canónico (con www).
+const baseUrl = SITE_URL;
 
 /**
  * Fecha de última modificación estable. Usamos una constante (no `new Date()`)
@@ -25,6 +27,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: number;
   }> = [
     { path: '', changeFrequency: 'weekly', priority: 1.0 },
+    // Página principal de sistemas RAG y sus landings por sector.
+    { path: '/rag', changeFrequency: 'monthly', priority: 0.9 },
+    { path: '/rag/salud', changeFrequency: 'monthly', priority: 0.8 },
+    { path: '/rag/legal', changeFrequency: 'monthly', priority: 0.8 },
+    { path: '/rag/soporte', changeFrequency: 'monthly', priority: 0.8 },
     { path: '/desarrollo-web-colombia', changeFrequency: 'monthly', priority: 0.9 },
     { path: '/chatbots-ia', changeFrequency: 'monthly', priority: 0.9 },
     { path: '/soluciones-ia', changeFrequency: 'monthly', priority: 0.9 },

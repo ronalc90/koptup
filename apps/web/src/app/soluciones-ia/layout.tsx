@@ -1,33 +1,16 @@
 import { Metadata } from 'next';
 import { getBreadcrumbSchema } from '@/lib/seo-config';
+import { SITE_URL, absoluteUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: 'Soluciones de Inteligencia Artificial para Empresas | KopTup Colombia',
+  title: 'Soluciones de Inteligencia Artificial para Empresas',
   description:
     'Implementamos soluciones de inteligencia artificial para empresas en Colombia y Latinoamérica. Chatbots con IA, automatización de procesos, análisis predictivo, sistemas expertos y generación de contenido con GPT-4 y Claude AI. Consultoría gratuita.',
-  keywords: [
-    'soluciones de inteligencia artificial',
-    'inteligencia artificial para empresas',
-    'implementar IA empresa',
-    'automatización con IA',
-    'análisis predictivo',
-    'machine learning colombia',
-    'IA colombia',
-    'inteligencia artificial colombia',
-    'empresa IA bogotá',
-    'transformación digital IA',
-    'automatización procesos IA',
-    'chatbot inteligencia artificial colombia',
-    'sistema experto IA',
-    'procesamiento documentos IA',
-    'GPT-4 empresas',
-    'Claude AI empresas',
-  ],
-  alternates: { canonical: 'https://koptup.com/soluciones-ia' },
+  alternates: { canonical: absoluteUrl('/soluciones-ia') },
   openGraph: {
     title: 'Soluciones de Inteligencia Artificial para Empresas | KopTup',
     description: 'Chatbots, automatización, análisis predictivo y sistemas expertos con IA para tu empresa en Colombia.',
-    url: 'https://koptup.com/soluciones-ia',
+    url: absoluteUrl('/soluciones-ia'),
     siteName: 'KopTup',
     images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Soluciones IA - KopTup' }],
     locale: 'es_CO',
@@ -35,7 +18,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Soluciones de IA para Empresas | KopTup Colombia',
+    title: 'Soluciones de IA para Empresas | KopTup',
     description: 'Implementamos IA en tu empresa: chatbots, automatización, análisis predictivo. Consultoría gratuita.',
     images: ['/og-image.png'],
   },
@@ -51,7 +34,7 @@ const aiSchema = {
   provider: {
     '@type': 'Organization',
     name: 'KopTup',
-    url: 'https://koptup.com',
+    url: SITE_URL,
     areaServed: ['Colombia', 'Latinoamérica'],
   },
   offers: {
