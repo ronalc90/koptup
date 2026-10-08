@@ -5,131 +5,110 @@ import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import {
   MagnifyingGlassIcon,
-  StarIcon,
   HeartIcon,
   EyeIcon,
   ShoppingCartIcon,
-  XMarkIcon,
   SparklesIcon,
   TruckIcon,
   TagIcon,
+  MinusIcon,
+  PlusIcon,
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolidIcon, StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 import Card, { CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import {
-  PRODUCTS,
   CATEGORY_IDS,
-  Product,
-  ProductCategory,
-  PhotoDetail,
-  imageUrl,
   heroImageUrl,
   HERO_PHOTO_ID,
+  totalStock,
+  discountPct,
+  WAREHOUSE_IDS,
+  type Product,
+  type ProductCategory,
+  type PhotoDetail,
 } from './products';
-import { useCart, formatPrice, FREE_SHIPPING_FROM } from './shared';
+import { formatPrice, FREE_SHIPPING_FROM } from './pricing';
+import { bestsellerIds } from './analytics';
+import { useStore } from './store';
+import { Modal, ProductImage, inputClass } from './ui';
 
-interface Props {
-  onProductClick?: (product: Product) => void;
-}
+type SortId = 'relevance' | 'priceAsc' | 'priceDesc' | 'rating';
+const SORTS: SortId[] = ['relevance', 'priceAsc', 'priceDesc', 'rating'];
 
-export default function StorefrontView({ onProductClick }: Props) {
+export default function StorefrontView() {
   const t = useTranslations('demoEcommerce2');
-  const { add, pushRecentlyViewed, recentlyViewed, itemCount, goToCheckout } = useCart();
+  const { state, clock, addToCart, pushRecentlyViewed, recentlyViewed, cartCount, setView, productName, productById, toggleWish } = useStore();
 
   const [search, setSearch] = useState('');
-  const [category, setCategory] = useState<ProductCategory | 'all'>('all');
-  const [wishlist, setWishlist] = useState<number[]>([]);
+  const [category, setCategory] = useState<ProductCategory | 'all' | 'favorites'>('all');
+  const [sort, setSort] = useState<SortId>('relevance');
   const [showSuggest, setShowSuggest] = useState(false);
-  const [activeProduct, setActiveProduct] = useState<Product | null>(null);
+  const [activeId, setActiveId] = useState<number | null>(null);
   const searchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function onDoc(e: MouseEvent) {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
-        setShowSuggest(false);
-      }
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) setShowSuggest(false);
     }
     document.addEventListener('mousedown', onDoc);
     return () => document.removeEventListener('mousedown', onDoc);
   }, []);
 
-  const productName = (p: Product) => {
-    const k = `productNames.${p.nameKey}` as const;
-    try {
-      return t(k);
-    } catch {
-      return p.sku;
-    }
+  const visible = useMemo(() => state.products.filter((p) => !p.hidden), [state.products]);
+  const bestsellers = useMemo(() => bestsellerIds(state.orders, state.products, clock), [state.orders, state.products, clock]);
+
+  const matches = (p: Product, q: string) => {
+    const query = q.trim().toLowerCase();
+    return !query || productName(p).toLowerCase().includes(query) || p.sku.toLowerCase().includes(query);
   };
 
-  const suggestions = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return [];
-    return PRODUCTS
-      .filter((p) => productName(p).toLowerCase().includes(q) || p.sku.toLowerCase().includes(q))
-      .slice(0, 5);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search]);
+  const suggestions = search.trim() ? visible.filter((p) => matches(p, search)).slice(0, 5) : [];
 
   const filtered = useMemo(() => {
-    return PRODUCTS.filter((p) => {
-      const matchCat = category === 'all' || p.category === category;
-      const matchSearch =
-        !search.trim() || productName(p).toLowerCase().includes(search.toLowerCase());
-      return matchCat && matchSearch;
+    const list = visible.filter((p) => {
+      const inCat = category === 'all' || (category === 'favorites' ? state.wishlist.includes(p.id) : p.category === category);
+      return inCat && matches(p, search);
     });
+    const sorted = [...list];
+    if (sort === 'priceAsc') sorted.sort((a, b) => a.price - b.price);
+    if (sort === 'priceDesc') sorted.sort((a, b) => b.price - a.price);
+    if (sort === 'rating') sorted.sort((a, b) => b.rating - a.rating || b.reviews - a.reviews);
+    return sorted;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [category, search]);
-
-  const recommended = useMemo(
-    () => PRODUCTS.filter((p) => p.badges.includes('bestseller')).slice(0, 6),
-    []
-  );
-
-  function toggleWish(id: number) {
-    setWishlist((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
-  }
+  }, [visible, category, search, sort, state.wishlist, productName]);
 
   function openProduct(p: Product) {
-    pushRecentlyViewed(p);
-    setActiveProduct(p);
-    onProductClick?.(p);
+    pushRecentlyViewed(p.id);
+    setActiveId(p.id);
   }
+
+  const active = activeId != null ? productById.get(activeId) : undefined;
+  const recent = recentlyViewed.map((id) => productById.get(id)).filter((p): p is Product => !!p && !p.hidden);
+  const best = bestsellers.map((id) => productById.get(id)).filter((p): p is Product => !!p);
 
   return (
     <div>
-      <section className="relative overflow-hidden rounded-2xl mb-8 max-w-7xl mx-auto px-0 sm:px-0">
-        <div className="relative h-[400px] sm:h-[360px] md:h-[440px] w-full">
-          <Image
-            src={heroImageUrl(HERO_PHOTO_ID)}
-            alt={t('hero.imageAlt')}
-            fill
-            priority
-            sizes="(max-width: 768px) 100vw, 1600px"
-            className="object-cover"
-          />
+      <section className="relative mx-auto mb-8 max-w-7xl overflow-hidden rounded-2xl">
+        <div className="relative h-[400px] w-full sm:h-[360px] md:h-[440px]">
+          <Image src={heroImageUrl(HERO_PHOTO_ID)} alt={t('hero.imageAlt')} fill priority sizes="(max-width: 768px) 100vw, 1600px" className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-r from-secondary-950/80 via-secondary-950/40 to-transparent" />
           <div className="absolute inset-0 flex items-center">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="max-w-xl text-white">
-                <div className="inline-flex items-center gap-2 bg-primary-600/90 backdrop-blur px-3 py-1 rounded-full mb-4">
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary-600/90 px-3 py-1 backdrop-blur">
                   <SparklesIcon className="h-4 w-4" />
-                  <span className="text-xs font-semibold uppercase tracking-wide">
-                    {t('hero.badge')}
-                  </span>
+                  <span className="text-xs font-semibold uppercase tracking-wide">{t('hero.badge')}</span>
                 </div>
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mb-3">
-                  {t('hero.title')}
-                </h1>
-                <p className="text-base sm:text-lg opacity-90 mb-6">{t('hero.subtitle')}</p>
+                <h1 className="mb-3 text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">{t('hero.title')}</h1>
+                <p className="mb-6 text-base opacity-90 sm:text-lg">{t('hero.subtitle')}</p>
                 <div className="flex flex-wrap gap-3">
-                  <Badge className="bg-white text-primary-700 font-bold px-3 py-2 flex items-center gap-2">
+                  <Badge className="flex items-center gap-2 bg-white px-3 py-2 font-bold text-primary-700">
                     <TruckIcon className="h-4 w-4" />
-                    {t('hero.freeShipping', { amount: formatPrice(FREE_SHIPPING_FROM) })}
+                    {state.rules.freeShipping ? t('hero.freeShipping', { amount: formatPrice(FREE_SHIPPING_FROM) }) : t('hero.shippingFlat')}
                   </Badge>
-                  <Badge className="bg-white text-primary-700 font-bold px-3 py-2 flex items-center gap-2">
+                  <Badge className="flex items-center gap-2 bg-white px-3 py-2 font-bold text-primary-700">
                     <TagIcon className="h-4 w-4" />
                     {t('hero.pricesNote')}
                   </Badge>
@@ -140,12 +119,12 @@ export default function StorefrontView({ onProductClick }: Props) {
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-6 space-y-4">
           <div ref={searchRef} className="relative">
-            <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-secondary-400" />
+            <MagnifyingGlassIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-secondary-400" />
             <input
-              type="text"
+              type="search"
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -154,29 +133,29 @@ export default function StorefrontView({ onProductClick }: Props) {
               onFocus={() => setShowSuggest(true)}
               placeholder={t('search.placeholder')}
               aria-label={t('search.placeholder')}
-              className="w-full pl-12 pr-4 py-3 text-base border border-secondary-300 dark:border-secondary-700 rounded-xl bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full rounded-xl border border-secondary-300 bg-white py-3 pl-12 pr-4 text-base text-secondary-900 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-secondary-700 dark:bg-secondary-900 dark:text-white"
             />
             {showSuggest && suggestions.length > 0 && (
-              <div className="absolute top-full mt-2 left-0 right-0 bg-white dark:bg-secondary-900 border border-secondary-200 dark:border-secondary-700 rounded-xl shadow-xl z-30 overflow-hidden">
-                <div className="p-2 text-xs uppercase tracking-wide text-secondary-500 border-b border-secondary-200 dark:border-secondary-700">
-                  {t('search.suggestions')}
-                </div>
+              <div className="absolute left-0 right-0 top-full z-30 mt-2 overflow-hidden rounded-xl border border-secondary-200 bg-white shadow-xl dark:border-secondary-700 dark:bg-secondary-900">
+                <div className="border-b border-secondary-200 p-2 text-xs uppercase tracking-wide text-secondary-500 dark:border-secondary-700">{t('search.suggestions')}</div>
                 {suggestions.map((p) => (
                   <button
                     key={p.id}
+                    type="button"
                     onClick={() => {
-                      setSearch(productName(p));
                       setShowSuggest(false);
                       openProduct(p);
                     }}
-                    className="flex items-center gap-3 w-full p-3 hover:bg-secondary-50 dark:hover:bg-secondary-800 text-left"
+                    className="flex w-full items-center gap-3 p-3 text-left hover:bg-secondary-50 dark:hover:bg-secondary-800"
                   >
-                    <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-secondary-100 dark:bg-secondary-800 shrink-0">
-                      <Image src={imageUrl(p.photoId, 80, 80)} alt={productName(p)} fill sizes="40px" className="object-cover" />
+                    <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-secondary-100 dark:bg-secondary-800">
+                      <ProductImage product={p} alt={productName(p)} size={80} sizes="40px" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-secondary-900 dark:text-white truncate">{productName(p)}</div>
-                      <div className="text-xs text-secondary-500">{t(`categories.${p.category}`)} • {formatPrice(p.price)}</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-medium text-secondary-900 dark:text-white">{productName(p)}</div>
+                      <div className="text-xs text-secondary-500">
+                        {p.sku} • {t(`categories.${p.category}`)} • {formatPrice(p.price)}
+                      </div>
                     </div>
                   </button>
                 ))}
@@ -184,55 +163,81 @@ export default function StorefrontView({ onProductClick }: Props) {
             )}
           </div>
 
-          <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-            <CategoryPill active={category === 'all'} label={t('categories.all')} onClick={() => setCategory('all')} />
-            {CATEGORY_IDS.map((c) => (
-              <CategoryPill key={c} active={category === c} label={t(`categories.${c}`)} onClick={() => setCategory(c)} />
-            ))}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+              <CategoryPill active={category === 'all'} label={t('categories.all')} onClick={() => setCategory('all')} />
+              {CATEGORY_IDS.map((c) => (
+                <CategoryPill key={c} active={category === c} label={t(`categories.${c}`)} onClick={() => setCategory(c)} />
+              ))}
+              <CategoryPill
+                active={category === 'favorites'}
+                label={t('categories.favorites', { n: state.wishlist.length })}
+                onClick={() => setCategory('favorites')}
+              />
+            </div>
+            <label className="flex shrink-0 items-center gap-2 text-sm text-secondary-600 dark:text-secondary-300">
+              <span>{t('sort.label')}</span>
+              <select value={sort} onChange={(e) => setSort(e.target.value as SortId)} className={`${inputClass} w-auto`}>
+                {SORTS.map((s) => (
+                  <option key={s} value={s}>
+                    {t(`sort.${s}`)}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
         </div>
 
-        {category === 'all' && !search && (
+        {category === 'all' && !search && best.length > 0 && (
           <section className="mb-10">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 dark:text-white flex items-center gap-2">
+            <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+              <h2 className="flex items-center gap-2 text-xl font-bold text-secondary-900 dark:text-white sm:text-2xl">
                 <SparklesIcon className="h-6 w-6 text-primary-600" />
                 {t('sections.recommended')}
               </h2>
               <span className="text-xs text-secondary-500">{t('sections.recommendedHint')}</span>
             </div>
-            <div className="flex gap-4 overflow-x-auto pb-2 -mx-2 px-2 snap-x">
-              {recommended.map((p) => (
-                <div key={p.id} className="snap-start shrink-0 w-56">
-                  <MiniCard product={p} name={productName(p)} onOpen={() => openProduct(p)} onAdd={() => add(p)} />
+            <div className="-mx-2 flex snap-x gap-4 overflow-x-auto px-2 pb-2">
+              {best.map((p) => (
+                <div key={p.id} className="w-56 shrink-0 snap-start">
+                  <MiniCard product={p} name={productName(p)} onOpen={() => openProduct(p)} onAdd={() => addToCart(p.id)} addLabel={t('product.addToCartNamed', { name: productName(p) })} />
                 </div>
               ))}
             </div>
           </section>
         )}
 
-        <section className="mb-10">
-          <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 dark:text-white mb-4">
-            {search ? `${t('search.resultsFor')} "${search}"` : t('sections.allProducts')}
+        <section id="ecommerce-productos" className="mb-10 scroll-mt-40">
+          <h2 className="mb-4 text-xl font-bold text-secondary-900 dark:text-white sm:text-2xl">
+            {search ? `${t('search.resultsFor')} "${search}"` : category === 'favorites' ? t('sections.favorites') : t('sections.allProducts')}
             <span className="ml-2 text-sm font-normal text-secondary-500">({filtered.length})</span>
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
             {filtered.map((p) => (
-              <ProductCard key={p.id} product={p} name={productName(p)} isWish={wishlist.includes(p.id)} onWish={() => toggleWish(p.id)} onAdd={() => add(p)} onView={() => openProduct(p)} t={t} />
+              <ProductCard
+                key={p.id}
+                product={p}
+                name={productName(p)}
+                bestseller={bestsellers.includes(p.id)}
+                isWish={state.wishlist.includes(p.id)}
+                onWish={() => toggleWish(p.id)}
+                onAdd={() => addToCart(p.id)}
+                onView={() => openProduct(p)}
+              />
             ))}
           </div>
           {filtered.length === 0 && (
-            <div className="text-center py-16 text-secondary-500">{t('sections.empty')}</div>
+            <div className="py-16 text-center text-secondary-500">{category === 'favorites' ? t('sections.favoritesEmpty') : t('sections.empty')}</div>
           )}
         </section>
 
-        {recentlyViewed.length > 0 && (
+        {recent.length > 0 && (
           <section className="mb-12">
-            <h2 className="text-xl font-bold text-secondary-900 dark:text-white mb-4">{t('sections.recentlyViewed')}</h2>
-            <div className="flex gap-4 overflow-x-auto pb-2 -mx-2 px-2 snap-x">
-              {recentlyViewed.map((p) => (
-                <div key={p.id} className="snap-start shrink-0 w-44">
-                  <MiniCard product={p} name={productName(p)} onOpen={() => openProduct(p)} onAdd={() => add(p)} />
+            <h2 className="mb-4 text-xl font-bold text-secondary-900 dark:text-white">{t('sections.recentlyViewed')}</h2>
+            <div className="-mx-2 flex snap-x gap-4 overflow-x-auto px-2 pb-2">
+              {recent.map((p) => (
+                <div key={p.id} className="w-44 shrink-0 snap-start">
+                  <MiniCard product={p} name={productName(p)} onOpen={() => openProduct(p)} onAdd={() => addToCart(p.id)} addLabel={t('product.addToCartNamed', { name: productName(p) })} />
                 </div>
               ))}
             </div>
@@ -240,26 +245,33 @@ export default function StorefrontView({ onProductClick }: Props) {
         )}
       </div>
 
-      {itemCount > 0 && (
+      {cartCount > 0 && (
         <button
-          onClick={goToCheckout}
-          className="fixed bottom-6 right-6 z-40 bg-primary-600 hover:bg-primary-700 text-white rounded-full shadow-2xl px-5 py-3 flex items-center gap-3 transition-transform hover:scale-105"
-          aria-label={t('cart.goToCheckout')}
+          type="button"
+          onClick={() => setView('checkout')}
+          className="fixed bottom-6 right-4 z-40 flex items-center gap-3 rounded-full bg-primary-600 px-5 py-3 text-white shadow-2xl transition-transform hover:scale-105 hover:bg-primary-700 sm:right-6"
         >
           <ShoppingCartIcon className="h-6 w-6" />
           <span className="font-semibold">{t('cart.goToCheckout')}</span>
-          <span className="bg-white text-primary-600 font-bold rounded-full h-7 min-w-[28px] px-2 flex items-center justify-center text-sm">{itemCount}</span>
+          <span className="flex h-7 min-w-[28px] items-center justify-center rounded-full bg-white px-2 text-sm font-bold text-primary-600">{cartCount}</span>
         </button>
       )}
 
-      {activeProduct && (
+      {active && (
         <ProductModal
-          product={activeProduct}
-          name={productName(activeProduct)}
-          onClose={() => setActiveProduct(null)}
-          onAdd={() => { add(activeProduct); setActiveProduct(null); }}
-          onCheckout={() => { add(activeProduct); setActiveProduct(null); goToCheckout(); }}
-          t={t}
+          key={active.id}
+          product={active}
+          name={productName(active)}
+          onClose={() => setActiveId(null)}
+          onAdd={(qty) => {
+            addToCart(active.id, qty);
+            setActiveId(null);
+          }}
+          onBuy={(qty) => {
+            if (qty > 0) addToCart(active.id, qty);
+            setActiveId(null);
+            setView('checkout');
+          }}
         />
       )}
     </div>
@@ -269,9 +281,11 @@ export default function StorefrontView({ onProductClick }: Props) {
 function CategoryPill({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
   return (
     <button
+      type="button"
       onClick={onClick}
-      className={`px-4 py-2 rounded-full font-medium text-sm whitespace-nowrap transition-colors ${
-        active ? 'bg-primary-600 text-white shadow' : 'bg-secondary-100 dark:bg-secondary-800 text-secondary-700 dark:text-secondary-300 hover:bg-secondary-200 dark:hover:bg-secondary-700'
+      aria-pressed={active}
+      className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+        active ? 'bg-primary-600 text-white shadow' : 'bg-secondary-100 text-secondary-700 hover:bg-secondary-200 dark:bg-secondary-800 dark:text-secondary-300 dark:hover:bg-secondary-700'
       }`}
     >
       {label}
@@ -279,45 +293,59 @@ function CategoryPill({ active, label, onClick }: { active: boolean; label: stri
   );
 }
 
-function ProductCard({ product, name, isWish, onWish, onAdd, onView, t }: {
-  product: Product; name: string; isWish: boolean; onWish: () => void; onAdd: () => void; onView: () => void; t: ReturnType<typeof useTranslations>;
-}) {
+function Stars({ product }: { product: Product }) {
+  const t = useTranslations('demoEcommerce2');
+  if (!product.reviews) return <p className="mb-2 text-xs text-secondary-500">{t('product.noReviews')}</p>;
   return (
-    <Card variant="bordered" padding="none" className="overflow-hidden group transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+    <div className="mb-2 flex items-center gap-1" aria-label={t('product.ratingLabel', { rating: product.rating, n: product.reviews })}>
+      {[0, 1, 2, 3, 4].map((i) => (
+        <StarSolidIcon key={i} className={`h-3.5 w-3.5 ${i < Math.round(product.rating) ? 'text-yellow-500' : 'text-secondary-300 dark:text-secondary-700'}`} />
+      ))}
+      <span className="ml-1 text-xs text-secondary-500">({product.reviews})</span>
+    </div>
+  );
+}
+
+function ProductCard({ product, name, bestseller, isWish, onWish, onAdd, onView }: {
+  product: Product; name: string; bestseller: boolean; isWish: boolean; onWish: () => void; onAdd: () => void; onView: () => void;
+}) {
+  const t = useTranslations('demoEcommerce2');
+  const stock = totalStock(product);
+  const discount = discountPct(product);
+  return (
+    <Card variant="bordered" padding="none" className="group overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
       <CardContent className="p-0">
         <div className="relative aspect-square overflow-hidden bg-secondary-100 dark:bg-secondary-800">
-          <Image src={imageUrl(product.photoId, 600, 600)} alt={name} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover transition-transform duration-500 group-hover:scale-110" />
-          <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-            {product.discount && <Badge className="bg-red-600 text-white font-bold">-{product.discount}%</Badge>}
-            {product.badges.includes('new') && <Badge className="bg-green-600 text-white font-bold">{t('product.badges.new')}</Badge>}
-            {product.badges.includes('bestseller') && !product.badges.includes('new') && <Badge className="bg-amber-500 text-white font-bold">★ {t('product.badges.bestseller')}</Badge>}
-            {product.badges.includes('eco') && <Badge className="bg-emerald-600 text-white font-bold">{t('product.badges.eco')}</Badge>}
+          <ProductImage product={product} alt={name} size={600} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover transition-transform duration-500 group-hover:scale-110" />
+          <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
+            {stock === 0 && <Badge className="bg-secondary-800 font-bold text-white">{t('product.badges.soldOut')}</Badge>}
+            {discount && <Badge className="bg-red-600 font-bold text-white">-{discount}%</Badge>}
+            {product.badges.includes('new') && <Badge className="bg-green-600 font-bold text-white">{t('product.badges.new')}</Badge>}
+            {bestseller && <Badge className="bg-amber-500 font-bold text-white">★ {t('product.badges.bestseller')}</Badge>}
+            {product.badges.includes('eco') && <Badge className="bg-emerald-600 font-bold text-white">{t('product.badges.eco')}</Badge>}
           </div>
-          <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <IconButton onClick={onWish} aria-label={t('product.wishlist')}>
+          <div className="absolute right-3 top-3 flex flex-col gap-2 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
+            <IconButton onClick={onWish} label={isWish ? t('product.wishlistRemove') : t('product.wishlistAdd')} pressed={isWish}>
               {isWish ? <HeartSolidIcon className="h-5 w-5 text-red-600" /> : <HeartIcon className="h-5 w-5 text-secondary-700 dark:text-secondary-300" />}
             </IconButton>
-            <IconButton onClick={onView} aria-label={t('product.quickView')}>
+            <IconButton onClick={onView} label={t('product.quickView')}>
               <EyeIcon className="h-5 w-5 text-secondary-700 dark:text-secondary-300" />
             </IconButton>
           </div>
         </div>
         <div className="p-4">
-          <button type="button" onClick={onView} className="block text-left font-semibold text-base text-secondary-900 dark:text-white mb-1 line-clamp-2 hover:text-primary-600">
+          <button type="button" onClick={onView} className="mb-1 block text-left text-base font-semibold text-secondary-900 line-clamp-2 hover:text-primary-600 dark:text-white">
             {name}
           </button>
-          <div className="flex items-center gap-1 mb-2">
-            {[0, 1, 2, 3, 4].map((i) => (
-              <StarSolidIcon key={i} className={`h-3.5 w-3.5 ${i < Math.floor(product.rating) ? 'text-yellow-500' : 'text-secondary-300 dark:text-secondary-700'}`} />
-            ))}
-            <span className="text-xs text-secondary-500 ml-1">({product.reviews})</span>
-          </div>
+          <Stars product={product} />
           <div className="flex items-end justify-between gap-2">
             <div>
-              {product.originalPrice && <p className="text-xs text-secondary-400 line-through">{formatPrice(product.originalPrice)}</p>}
+              {product.originalPrice && discount && <p className="text-xs text-secondary-400 line-through">{formatPrice(product.originalPrice)}</p>}
               <p className="text-lg font-bold text-primary-600 dark:text-primary-400">{formatPrice(product.price)}</p>
             </div>
-            <Button size="sm" onClick={onAdd}>{t('product.addToCart')}</Button>
+            <Button size="sm" onClick={onAdd} disabled={stock === 0} aria-label={t('product.addToCartNamed', { name })}>
+              {stock === 0 ? t('product.soldOut') : t('product.addToCart')}
+            </Button>
           </div>
         </div>
       </CardContent>
@@ -325,20 +353,23 @@ function ProductCard({ product, name, isWish, onWish, onAdd, onView, t }: {
   );
 }
 
-function MiniCard({ product, name, onOpen, onAdd }: { product: Product; name: string; onOpen: () => void; onAdd: () => void }) {
+function MiniCard({ product, name, onOpen, onAdd, addLabel }: { product: Product; name: string; onOpen: () => void; onAdd: () => void; addLabel: string }) {
+  const stock = totalStock(product);
   return (
     <Card variant="bordered" padding="none" className="overflow-hidden">
       <CardContent className="p-0">
-        <button onClick={onOpen} className="block w-full">
+        <button type="button" onClick={onOpen} className="block w-full" aria-label={name}>
           <div className="relative aspect-square overflow-hidden bg-secondary-100 dark:bg-secondary-800">
-            <Image src={imageUrl(product.photoId, 400, 400)} alt={name} fill sizes="224px" className="object-cover" />
+            <ProductImage product={product} alt={name} size={400} sizes="224px" />
           </div>
         </button>
         <div className="p-3">
-          <p className="text-sm font-semibold text-secondary-900 dark:text-white line-clamp-2 mb-1">{name}</p>
+          <p className="mb-1 text-sm font-semibold text-secondary-900 line-clamp-2 dark:text-white">{name}</p>
           <div className="flex items-center justify-between">
             <span className="text-sm font-bold text-primary-600 dark:text-primary-400">{formatPrice(product.price)}</span>
-            <Button size="sm" variant="outline" onClick={onAdd} className="!px-2 !py-1 !text-xs">+</Button>
+            <Button size="sm" variant="outline" onClick={onAdd} disabled={stock === 0} aria-label={addLabel} className="!px-2 !py-1 !text-xs">
+              <PlusIcon className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </CardContent>
@@ -346,74 +377,103 @@ function MiniCard({ product, name, onOpen, onAdd }: { product: Product; name: st
   );
 }
 
-function IconButton({ onClick, children, ...rest }: { onClick: () => void; children: React.ReactNode; 'aria-label'?: string }) {
+function IconButton({ onClick, children, label, pressed }: { onClick: () => void; children: React.ReactNode; label: string; pressed?: boolean }) {
   return (
-    <button onClick={onClick} className="p-2 bg-white dark:bg-secondary-900 rounded-full shadow hover:scale-110 transition-transform" {...rest}>
+    <button type="button" onClick={onClick} aria-label={label} title={label} aria-pressed={pressed} className="rounded-full bg-white p-2 shadow transition-transform hover:scale-110 dark:bg-secondary-900">
       {children}
     </button>
   );
 }
 
-function ProductModal({ product, name, onClose, onAdd, onCheckout, t }: {
-  product: Product; name: string; onClose: () => void; onAdd: () => void; onCheckout: () => void; t: ReturnType<typeof useTranslations>;
+function ProductModal({ product, name, onClose, onAdd, onBuy }: {
+  product: Product; name: string; onClose: () => void; onAdd: (qty: number) => void; onBuy: (qty: number) => void;
 }) {
+  const t = useTranslations('demoEcommerce2');
+  const { state } = useStore();
   // Galería: la foto completa y dos acercamientos de la misma foto.
-  const views: Array<PhotoDetail | undefined> = [undefined, ...product.details];
-  const [active, setActive] = useState(0);
+  const views: Array<PhotoDetail | undefined> = product.photoId ? [undefined, ...product.details] : [undefined];
+  const [activeView, setActiveView] = useState(0);
+  const stock = totalStock(product);
+  const inCart = state.cart.find((c) => c.productId === product.id)?.qty ?? 0;
+  const maxQty = Math.max(0, stock - inCart);
+  const [qty, setQty] = useState(maxQty > 0 ? 1 : 0);
+  const discount = discountPct(product);
+
   return (
-    <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-2 sm:p-4" onClick={onClose}>
-      <div className="bg-white dark:bg-secondary-900 rounded-2xl max-w-4xl w-full max-h-[92vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        <div className="flex justify-end p-3">
-          <button onClick={onClose} className="p-2 hover:bg-secondary-100 dark:hover:bg-secondary-800 rounded-lg">
-            <XMarkIcon className="h-6 w-6" />
-          </button>
-        </div>
-        <div className="grid md:grid-cols-2 gap-6 px-6 pb-6">
-          <div>
-            <div className="relative aspect-square rounded-xl overflow-hidden bg-secondary-100 dark:bg-secondary-800 mb-3">
-              <Image src={imageUrl(product.photoId, 800, 800, views[active])} alt={name} fill sizes="(max-width: 768px) 100vw, 400px" className="object-cover" />
-            </div>
+    <Modal title={name} onClose={onClose} size="lg">
+      <div className="grid gap-6 md:grid-cols-2">
+        <div>
+          <div className="relative mb-3 aspect-square overflow-hidden rounded-xl bg-secondary-100 dark:bg-secondary-800">
+            <ProductImage product={product} alt={name} size={800} sizes="(max-width: 768px) 100vw, 400px" detail={views[activeView]} />
+          </div>
+          {views.length > 1 && (
             <div className="grid grid-cols-4 gap-2">
               {views.map((detail, i) => (
                 <button
                   key={i}
                   type="button"
-                  onClick={() => setActive(i)}
+                  onClick={() => setActiveView(i)}
                   aria-label={i === 0 ? t('product.galleryFull') : t('product.galleryDetail', { n: i })}
-                  aria-pressed={active === i}
-                  className={`relative aspect-square rounded-lg overflow-hidden border-2 ${active === i ? 'border-primary-600' : 'border-transparent'}`}
+                  aria-pressed={activeView === i}
+                  className={`relative aspect-square overflow-hidden rounded-lg border-2 ${activeView === i ? 'border-primary-600' : 'border-transparent'}`}
                 >
-                  <Image src={imageUrl(product.photoId, 200, 200, detail)} alt="" fill sizes="80px" className="object-cover" />
+                  <ProductImage product={product} alt="" size={200} sizes="80px" detail={detail} />
                 </button>
               ))}
             </div>
+          )}
+        </div>
+        <div>
+          <Stars product={product} />
+          <div className="mb-4">
+            {product.originalPrice && discount && <span className="mr-2 text-sm text-secondary-400 line-through">{formatPrice(product.originalPrice)}</span>}
+            <span className="text-3xl font-bold text-primary-600">{formatPrice(product.price)}</span>
+            <p className="mt-1 text-xs text-secondary-500">{t('product.taxIncluded')}</p>
           </div>
-          <div>
-            <h2 className="text-2xl font-bold text-secondary-900 dark:text-white mb-2">{name}</h2>
-            <div className="flex items-center gap-2 mb-3">
-              {[0, 1, 2, 3, 4].map((i) => (
-                <StarIcon key={i} className={`h-5 w-5 ${i < Math.floor(product.rating) ? 'text-yellow-500 fill-yellow-500' : 'text-secondary-300'}`} />
+          <p className="mb-4 text-sm text-secondary-600 dark:text-secondary-300">{product.description || t('product.description')}</p>
+          <div className="mb-4 space-y-1 rounded-lg bg-secondary-50 p-4 text-sm dark:bg-secondary-800">
+            <p>
+              <strong>{t('product.sku')}:</strong> {product.sku}
+            </p>
+            <p>
+              <strong>{t('product.category')}:</strong> {t(`categories.${product.category}`)}
+            </p>
+            <p>
+              <strong>{t('product.availability')}:</strong>{' '}
+              {stock === 0 ? t('product.soldOut') : t('product.unitsAvailable', { n: stock })}
+            </p>
+            <ul className="mt-1 grid grid-cols-3 gap-2 text-xs text-secondary-600 dark:text-secondary-300">
+              {WAREHOUSE_IDS.map((wh) => (
+                <li key={wh} className="rounded bg-white px-2 py-1 text-center dark:bg-secondary-900">
+                  <span className="block font-semibold">{t(`warehouses.${wh}`)}</span>
+                  {product.warehouses[wh]} {t('common.unitsShort')}
+                </li>
               ))}
-              <span className="text-sm text-secondary-500">{product.reviews} {t('product.reviewsCount')}</span>
+            </ul>
+          </div>
+          <div className="mb-3 flex items-center gap-3">
+            <span className="text-sm text-secondary-600 dark:text-secondary-300">{t('product.quantity')}</span>
+            <div className="flex items-center gap-2">
+              <button type="button" onClick={() => setQty((q) => Math.max(1, q - 1))} disabled={qty <= 1} className="rounded bg-secondary-200 p-1.5 disabled:opacity-40 dark:bg-secondary-700" aria-label={t('checkout.cart.decrease')}>
+                <MinusIcon className="h-4 w-4" />
+              </button>
+              <span className="w-8 text-center font-semibold" aria-live="polite">{qty}</span>
+              <button type="button" onClick={() => setQty((q) => Math.min(maxQty, q + 1))} disabled={qty >= maxQty} className="rounded bg-secondary-200 p-1.5 disabled:opacity-40 dark:bg-secondary-700" aria-label={t('checkout.cart.increase')}>
+                <PlusIcon className="h-4 w-4" />
+              </button>
             </div>
-            <div className="mb-4">
-              {product.originalPrice && <span className="text-sm text-secondary-400 line-through mr-2">{formatPrice(product.originalPrice)}</span>}
-              <span className="text-3xl font-bold text-primary-600">{formatPrice(product.price)}</span>
-              <p className="text-xs text-secondary-500 mt-1">{t('product.taxIncluded')}</p>
-            </div>
-            <p className="text-sm text-secondary-600 dark:text-secondary-300 mb-4">{t('product.description')}</p>
-            <div className="bg-secondary-50 dark:bg-secondary-800 rounded-lg p-4 mb-4 text-sm space-y-1">
-              <p><strong>SKU:</strong> {product.sku}</p>
-              <p><strong>{t('product.category')}:</strong> {t(`categories.${product.category}`)}</p>
-              <p><strong>{t('product.stock')}:</strong> {product.stock}</p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Button onClick={onCheckout} className="flex-1">{t('product.buyNow')}</Button>
-              <Button onClick={onAdd} variant="outline" className="flex-1">{t('product.addToCart')}</Button>
-            </div>
+            {inCart > 0 && <span className="text-xs text-secondary-500">{t('product.inCart', { n: inCart })}</span>}
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Button onClick={() => onBuy(qty)} disabled={qty === 0 && inCart === 0} className="flex-1">
+              {qty === 0 && inCart > 0 ? t('cart.goToCheckout') : t('product.buyNow')}
+            </Button>
+            <Button onClick={() => onAdd(qty)} disabled={qty === 0} variant="outline" className="flex-1">
+              {t('product.addToCart')}
+            </Button>
           </div>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }
