@@ -13,9 +13,14 @@
 
 import { Metadata } from 'next';
 import { DEMO_COUNT } from './demos';
+import { formatRagCOP, getRagPlan } from './rag-plans';
 import { HOME_DESCRIPTION, SITE_NAME, SITE_URL, TITLE_TEMPLATE } from './site';
 
 const baseUrl = SITE_URL;
+
+// Precios citados en la description de /services (fuente: src/lib/rag-plans.ts).
+const RAG_PILOT = getRagPlan('piloto');
+const RAG_ESSENTIAL = getRagPlan('esencial');
 
 export interface PageSEO {
   title: string;
@@ -36,9 +41,9 @@ export const seoConfig: Record<string, PageSEO> = {
 
   // Services page
   services: {
-    title: 'Servicios de Desarrollo de Software e IA',
+    title: 'Precios de sistemas RAG y software a medida',
     description:
-      'Servicios profesionales de desarrollo de software a medida: e-commerce, chatbots con IA, aplicaciones móviles, dashboards, integración de sistemas, consultoría tecnológica y diseño UX/UI. Soluciones para empresas en Colombia y Latinoamérica.',
+      `Sistemas RAG: piloto de ${RAG_PILOT.weeks.max} semanas por ${formatRagCOP(RAG_PILOT.setup.cop)} y planes desde ${formatRagCOP(RAG_ESSENTIAL.setup.cop)} (precios en COP y USD, más IVA si aplica). Y otras soluciones a medida.`,
     canonical: `${baseUrl}/services`,
   },
 
@@ -46,7 +51,7 @@ export const seoConfig: Record<string, PageSEO> = {
   pricing: {
     title: 'Planes y Precios',
     description:
-      'Planes de desarrollo de software a medida para cada necesidad. Desde proyectos básicos ($499 USD) hasta soluciones enterprise personalizadas. Incluye diseño, desarrollo, deploy y soporte. Cotización sin compromiso.',
+      'Planes de sistemas RAG con precios en COP y USD, más IVA si aplica, y otras soluciones de software a medida.',
     // `/pricing` redirige a `/services#planes-rag`: el canónico es /services.
     canonical: `${baseUrl}/services`,
   },

@@ -8,7 +8,14 @@
  *   - `compra`: el cliente compra el software (setup one-time + mantenimiento
  *     opcional). El código fuente queda en su poder.
  *   - `saas`: suscripción mensual hospedada por KopTup (setup mínimo + cuota
- *     mensual). Cancelás cuando quieras.
+ *     mensual). Cancelas cuando quieras.
+ *
+ * Los precios se fijan en COP. El valor en USD que muestra /services se
+ * calcula siempre con `TRM_REFERENCIA` (sin TRM en vivo).
+ *
+ * `chatbot-rag-ia` sigue en `OFFERINGS` (lo usan el sitemap y la demo
+ * /demo/chatbot), pero /services no muestra su tarjeta: la reemplazan los
+ * planes RAG de `src/lib/rag-plans.ts`.
  *
  * Las cadenas visibles (nombres, descripciones, bullets) viven en
  * `messages/offerings/<slug>.{es,en}.json` para soportar i18n.
@@ -112,10 +119,12 @@ export interface Offering {
 /* Helpers de presentación: COP, USD, ciclos                                   */
 /* -------------------------------------------------------------------------- */
 
-/** TRM de referencia (fallback si la API falla): 1 USD = $4.000 COP. */
-export const TRM_FALLBACK = 4000;
-/** Compat: la antigua constante. */
-export const USD_RATE = TRM_FALLBACK;
+/**
+ * TRM de referencia (COP por 1 USD) para mostrar en USD los precios del
+ * catálogo "Otras soluciones a medida". Es la única tasa que se usa: no hay
+ * conversión con TRM en vivo. Los planes RAG no la usan (tienen USD fijos).
+ */
+export const TRM_REFERENCIA = 3300;
 
 export type DisplayCurrency = 'COP' | 'USD';
 
@@ -128,9 +137,10 @@ export function formatCOP(value: number): string {
   }).format(value);
 }
 
-export function copToUsd(cop: number, rate: number = TRM_FALLBACK): number {
+/** Convierte COP a USD con `TRM_REFERENCIA`, redondeado a decenas. */
+export function copToUsd(cop: number): number {
   if (cop === 0) return 0;
-  return Math.round(cop / rate / 10) * 10;
+  return Math.round(cop / TRM_REFERENCIA / 10) * 10;
 }
 
 export function formatUSD(usd: number): string {
@@ -142,12 +152,8 @@ export function formatUSD(usd: number): string {
   }).format(usd);
 }
 
-export function formatMoney(
-  amountCOP: number,
-  currency: DisplayCurrency,
-  rate: number = TRM_FALLBACK,
-): string {
-  if (currency === 'USD') return formatUSD(copToUsd(amountCOP, rate));
+export function formatMoney(amountCOP: number, currency: DisplayCurrency): string {
+  if (currency === 'USD') return formatUSD(copToUsd(amountCOP));
   return formatCOP(amountCOP);
 }
 

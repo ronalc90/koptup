@@ -7,7 +7,21 @@
  */
 
 import { DEMO_COUNT } from '@/lib/demos';
+import { RAG_PLANS, formatRagCOP, formatRagUSD, getRagPlan } from '@/lib/rag-plans';
 import { HOME_DESCRIPTION, SITE_URL, absoluteUrl } from '@/lib/site';
+
+// Precios de los planes RAG (src/lib/rag-plans.ts) que citan el JSON-LD.
+const RAG_PILOT = getRagPlan('piloto');
+const RAG_ESSENTIAL = getRagPlan('esencial');
+const RAG_LOWEST_COP = Math.min(...RAG_PLANS.map((p) => p.setup.cop));
+const RAG_PRICE_ANSWER = [
+  `Los sistemas RAG empiezan con un piloto de ${RAG_PILOT.weeks.max} semanas por ${formatRagCOP(RAG_PILOT.setup.cop)} (${formatRagUSD(RAG_PILOT.setup.usd)}).`,
+  `El plan Esencial cuesta ${formatRagCOP(RAG_ESSENTIAL.setup.cop)} de setup${
+    RAG_ESSENTIAL.monthly ? ` más ${formatRagCOP(RAG_ESSENTIAL.monthly.cop)} al mes` : ''
+  }; todos los precios son más IVA si aplica.`,
+  `Las demás soluciones a medida tienen precios de referencia en COP en ${absoluteUrl('/services')} y el valor final depende del alcance.`,
+  'Contáctanos para recibir una cotización sin compromiso.',
+].join(' ');
 
 interface StructuredDataProps {
   type: 'organization' | 'website' | 'service' | 'article' | 'softwareApplication' | 'localBusiness';
@@ -116,12 +130,13 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
     name: 'KopTup - Software a Medida',
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
+    // Planes RAG de /services#planes-rag (sin highPrice: Empresarial es "desde").
     offers: {
       '@type': 'AggregateOffer',
-      lowPrice: '500',
-      highPrice: '50000',
-      priceCurrency: 'USD',
-      offerCount: '3',
+      lowPrice: String(RAG_LOWEST_COP),
+      priceCurrency: 'COP',
+      offerCount: String(RAG_PLANS.length),
+      url: absoluteUrl('/services#planes-rag'),
     },
     description:
       'Plataforma de desarrollo de software empresarial a medida. E-commerce, chatbots con IA, dashboards, gestión documental, sistemas de reservas y más.',
@@ -303,7 +318,7 @@ export function FAQStructuredData() {
         name: '¿Cuánto cuesta desarrollar software a medida con KopTup?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Ofrecemos planes desde $499 USD para proyectos básicos hasta soluciones enterprise personalizadas. El costo final depende de la complejidad, funcionalidades y alcance del proyecto. Contacta con nosotros para recibir una cotización personalizada sin compromiso.',
+          text: RAG_PRICE_ANSWER,
         },
       },
       {

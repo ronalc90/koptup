@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { generateMetadata, getBreadcrumbSchema } from '@/lib/seo-config';
 import { SITE_URL, absoluteUrl } from '@/lib/site';
+import { getRagServiceJsonLd } from '@/lib/rag-plans-jsonld';
 
 export const metadata: Metadata = generateMetadata('services');
 
@@ -31,6 +32,9 @@ const serviceSchema = {
   },
 };
 
+// Planes RAG de la sección #planes-rag (precios visibles en la página).
+const ragServiceSchema = getRagServiceJsonLd(absoluteUrl('/services'));
+
 export default function ServicesLayout({ children }: { children: React.ReactNode }) {
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: 'Inicio', url: '/' },
@@ -41,6 +45,7 @@ export default function ServicesLayout({ children }: { children: React.ReactNode
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ragServiceSchema) }} />
       {children}
     </>
   );

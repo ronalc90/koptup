@@ -362,7 +362,7 @@ const timeline: TimelineItem[] = [
     year: '2026',
     title: 'Vitrina y dos apps reales',
     description:
-      `${DEMO_COUNT} vistas interactivas en línea (${LIVE_AI_DEMO_COUNT} con integración real a OpenAI: chatbot RAG y generador de LinkedIn Ads, el resto mockups), planes en COP/USD con TRM en vivo, sitio comercial completo.`,
+      `${DEMO_COUNT} vistas interactivas en línea (${LIVE_AI_DEMO_COUNT} con integración real a OpenAI: chatbot RAG y generador de LinkedIn Ads, el resto mockups), planes RAG con precios fijos en COP y USD, sitio comercial completo.`,
     highlight: true,
   },
   {

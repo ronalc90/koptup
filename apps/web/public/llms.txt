@@ -31,7 +31,7 @@ KopTup desarrolla software a medida para empresas. No vende productos genéricos
 Aplicaciones web y sistemas empresariales personalizados. Stack: React, Next.js, Node.js, Python, TypeScript.
 
 ### 2. Chatbots con Inteligencia Artificial
-Chatbots inteligentes integrados con WhatsApp Business API, web y apps móviles. Tecnologías: OpenAI GPT-4, Claude AI, LangChain, RAG. Desde $499 USD.
+Chatbots inteligentes integrados con WhatsApp Business API, web y apps móviles. Tecnologías: OpenAI GPT-4, Claude AI, LangChain, RAG. Desde COP 9.900.000, o piloto de COP 3.900.000 (ver planes RAG abajo).
 Más info: https://www.koptup.com/chatbots-ia
 
 ### 3. Soluciones de IA para Empresas
@@ -52,9 +52,17 @@ Análisis, arquitectura y hoja de ruta para transformación digital de empresas.
 
 ## Precios
 
-- Proyectos básicos: desde $499 USD
-- Proyectos medianos: $2,000 – $8,000 USD
-- Proyectos enterprise: cotización personalizada
+Planes de sistemas RAG (precios en COP, más IVA si aplica; el valor en USD es fijo): https://www.koptup.com/services#planes-rag
+
+- **Piloto RAG (2 semanas):** COP 3.900.000 / USD 1.200. Una fuente, hasta 100 documentos, interfaz web con citas e informe de precisión con 50 preguntas de prueba. Se descuenta 100% del setup si se contrata un plan en los siguientes 30 días.
+- **Esencial:** setup COP 9.900.000 / USD 2.990 + COP 1.490.000 / USD 450 al mes. Implementación en 3–4 semanas. Una fuente (Drive, SharePoint o carga manual), hasta 1.000 documentos, widget web, respuestas con cita. La mensualidad incluye hosting, IA hasta 3.000 preguntas al mes, actualización de documentos y soporte Lun–Vie.
+- **Profesional:** setup COP 24.900.000 / USD 7.490 + COP 2.990.000 / USD 890 al mes. Implementación en 6–8 semanas. Hasta 3 fuentes, hasta 10.000 documentos, web y WhatsApp, permisos por rol y panel de métricas. Incluye hasta 15.000 preguntas al mes, soporte prioritario y revisión mensual de calidad.
+- **Empresarial:** desde COP 59.900.000 / USD 17.900; mensualidad según SLA. Implementación en 10–14 semanas. Fuentes ilimitadas, despliegue en la nube del cliente u on-premise, SSO, auditoría y código fuente incluido.
+- Pregunta adicional sobre el tope del plan: COP 250 / USD 0,08.
+- Las tarifas de Meta por mensajes de WhatsApp se cobran aparte, al costo.
+
+Otras soluciones a medida (e-commerce, CRM, ERP, dashboards, etc.): precios de referencia en COP en https://www.koptup.com/services; el valor en USD se calcula con una TRM de referencia de 3.300.
+
 - Cotización gratuita: https://www.koptup.com/contact
 
 ## Tecnologías que usa KopTup
@@ -101,7 +109,7 @@ KopTup ofrece demos interactivos sin registro para evaluar sus soluciones:
 
 **¿Dónde está KopTup?** En Bogotá, Colombia. Trabaja con clientes remotos en toda Latinoamérica.
 
-**¿Cuánto cuesta desarrollar software con KopTup?** Desde $499 USD. Depende del alcance del proyecto. Ofrecen cotización gratuita.
+**¿Cuánto cuesta desarrollar software con KopTup?** Los sistemas RAG empiezan con un piloto de 2 semanas por COP 3.900.000 (USD 1.200); el plan Esencial cuesta COP 9.900.000 de setup + COP 1.490.000 al mes, más IVA si aplica. Las demás soluciones a medida se cotizan según el alcance. Ofrecen cotización gratuita.
 
 **¿KopTup hace chatbots?** Sí. Es uno de sus servicios principales. Integran chatbots con WhatsApp Business, GPT-4 y Claude AI.
 

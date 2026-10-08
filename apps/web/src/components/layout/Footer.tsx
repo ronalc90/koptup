@@ -11,8 +11,8 @@ export default function Footer() {
     { name: 'Desarrollo Web a Medida', href: '/desarrollo-web-colombia' },
     { name: 'Chatbots con IA', href: '/chatbots-ia' },
     { name: 'Soluciones de IA', href: '/soluciones-ia' },
-    { name: 'E-commerce', href: '/services#ecommerce' },
-    { name: t('services.mobile.title'), href: '/services#mobile' },
+    { name: 'E-commerce', href: '/services#otras-soluciones' },
+    { name: t('services.mobile.title'), href: '/services#otras-soluciones' },
   ];
 
   const company = [

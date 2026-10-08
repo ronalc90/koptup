@@ -23,7 +23,7 @@ Koptup es el portafolio comercial de un estudio de desarrollo a medida. Construi
 
 - **2 aplicaciones reales** que puedes usar hoy: un chatbot RAG con OpenAI y un generador de copy para LinkedIn Ads.
 - **24 prototipos navegables** que muestran cómo se ve y se siente cada solución antes de que la construyamos para ti.
-- **Sitio comercial** (catálogo de servicios, precios en COP/USD con TRM en vivo, sobre nosotros, contacto).
+- **Sitio comercial** (planes RAG con precios fijos en COP y USD, catálogo de otras soluciones a medida en COP con referencia en USD a una TRM fija de 3.300, sobre nosotros, contacto).
 
 No es un SaaS ni un producto. Es la vitrina de un equipo que cobra por construir cosas a medida.
 

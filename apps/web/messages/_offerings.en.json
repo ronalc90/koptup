@@ -1,7 +1,7 @@
 {
   "offeringsCatalog": {
-    "hero": {
-      "title": "Plans and services",
+    "section": {
+      "title": "Other custom solutions",
       "subtitle": "Choose how to work with us: buy the software (we hand over the source code) or subscribe to the monthly SaaS (we host it for you)."
     },
     "search": "Search...",
@@ -22,8 +22,7 @@
       "label": "Currency",
       "cop": "COP",
       "usd": "USD",
-      "trmLive": "Live FX rate {value} (datos.gov.co)",
-      "trmCached": "FX ~{value}"
+      "trmReference": "Prices are set in COP. The USD value is a reference calculated at an exchange rate of {value} per dollar."
     },
     "card": {
       "viewMore": "View more details",
@@ -95,6 +94,93 @@
       "title": "Not sure which to pick?",
       "body": "Talk to us and we will help you decide whether to buy the software or use our SaaS.",
       "button": "Talk to an expert"
+    }
+  },
+  "ragPlans": {
+    "badge": "RAG systems",
+    "title": "RAG system plans and pricing",
+    "subtitle": "AI that answers with your company's documents and cites the source. Start with a 2-week pilot using your own documents.",
+    "taxNote": "Prices in COP and USD, plus VAT if applicable.",
+    "price": {
+      "oneTime": "One-time payment",
+      "setup": "Setup",
+      "setupFrom": "Setup from",
+      "monthly": "Monthly fee",
+      "perMonth": "/mo",
+      "monthlyBySla": "Based on SLA",
+      "tax": "Plus VAT if applicable"
+    },
+    "duration": {
+      "pilot": "{weeks} weeks",
+      "implementation": "Implementation in {min}–{max} weeks"
+    },
+    "featuresTitle": "What's included",
+    "monthlyIncludesTitle": "The monthly fee includes",
+    "plans": {
+      "piloto": {
+        "name": "RAG Pilot",
+        "tagline": "Validate the AI with your own documents before rolling it out.",
+        "features": [
+          "One document source",
+          "Up to 100 documents",
+          "Web interface with cited answers",
+          "Accuracy report with 50 test questions"
+        ],
+        "note": "If you sign up for a plan within the following 30 days, we deduct 100% of what you paid for the pilot from the setup.",
+        "cta": "Book your pilot"
+      },
+      "esencial": {
+        "name": "Essential",
+        "tagline": "An assistant with your company's documents on your website.",
+        "features": [
+          "One source (Drive, SharePoint or manual upload)",
+          "Up to 1,000 documents",
+          "Web widget",
+          "Answers that cite the source"
+        ],
+        "monthlyIncludes": [
+          "Hosting",
+          "AI for up to 3,000 questions per month",
+          "Document updates",
+          "Support Mon–Fri"
+        ],
+        "cta": "Choose Essential"
+      },
+      "profesional": {
+        "name": "Professional",
+        "tagline": "Multiple sources, web and WhatsApp, with role-based permissions and metrics.",
+        "features": [
+          "Up to 3 sources",
+          "Up to 10,000 documents",
+          "Web and WhatsApp",
+          "Role-based permissions",
+          "Metrics dashboard"
+        ],
+        "monthlyIncludes": [
+          "Up to 15,000 questions per month",
+          "Priority support",
+          "Monthly quality review"
+        ],
+        "cta": "Choose Professional"
+      },
+      "empresarial": {
+        "name": "Enterprise",
+        "tagline": "Runs on your own infrastructure, with SSO and auditing.",
+        "features": [
+          "Unlimited sources",
+          "Deployment on your cloud or on-premise",
+          "SSO",
+          "Auditing",
+          "Source code included"
+        ],
+        "cta": "Get an Enterprise quote"
+      }
+    },
+    "notes": {
+      "title": "Good to know",
+      "tax": "COP and USD prices exclude VAT, which is added if applicable.",
+      "extraQuestion": "Each additional question over your plan's monthly cap costs {cop} / {usd}.",
+      "whatsapp": "Meta's WhatsApp messaging fees are billed separately, at cost."
     }
   },
   "offering_appDelivery": {
