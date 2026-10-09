@@ -1,4 +1,4 @@
-**[Inicio](Home.md)** · **[Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md)**
+**[Inicio](Home.md)** · **[Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md)** · **[Correcciones pendientes](16-Correcciones-Pendientes.md)**
 
 **Documentación (lo que existe hoy)**
 - [Índice de la documentación](Doc-00-Indice.md)

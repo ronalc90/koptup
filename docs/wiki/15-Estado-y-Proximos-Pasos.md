@@ -42,14 +42,12 @@ chatbot, cuentas-medicas, sistema-experto, crm-ia, linkedin-ads, erp, pos, code-
 3. **Pendientes reportados por las fases:** escapar el HTML de los datos del formulario en el correo al admin; quitar la ruta pública `/test`; corregir cifras del README y el `docker-compose.yml`, que apunta a un `Dockerfile` del backend que no existe; error de `/api/expert/generar-excel` cuando la IA no devuelve procedimientos; permisos de la configuración del sistema experto para prospectos con acceso; achicar la lista de errores de hidratación conocidos.
 4. **Repaso de honestidad en todo el sitio:** textos del catálogo de "Otras soluciones a medida" (modalidad SaaS solo donde haya base real), `/about`, `/bienvenido-producthunt`, `/desarrollo-web-colombia`.
 5. **Diseño y animaciones:** investigación de motion design, sistema de movimiento, animación protagonista que explique RAG, microinteracciones, easter eggs (paleta Ctrl+K, código Konami, mensaje en consola, 404 ingeniosa) y revisión adversarial con video y medición de fluidez.
-6. **Hallazgos de los diagramas de flujo:** al dibujar los flujos contra el código salieron 37 puntos que no cuadran. Entre ellos:
+6. **Correcciones pendientes:** al documentar el sitio y dibujar sus diagramas contra el código aparecieron cerca de 140 puntos. Sin repetir quedan 97, ordenados de P0 a P3 en [Correcciones pendientes](16-Correcciones-Pendientes.md). Los más urgentes, además de volver a levantar el backend, son estos:
    - no hay forma de suprimir datos personales, como pide la Ley 1581;
-   - el chatbot guarda las conversaciones de prueba sin avisarlo;
    - el formulario de contacto no pide la autorización de datos;
-   - el botón de GitHub del inicio de sesión no hace nada;
-   - cambiar de idioma pierde los parámetros de la URL.
-
-   La lista completa, con el archivo de cada uno, está en [Diagramas de flujo › Hallazgos](Doc-14-Diagramas-de-Flujo.md#hallazgos).
+   - no se pueden crear facturas, entregables ni conversaciones;
+   - "Nuevo pedido" apunta a una dirección local;
+   - quedan ajustes de seguridad en rutas heredadas, que no se detallan en la wiki pública.
 7. Verificación final completa, actualización de la wiki, PR y merge.
 
 ## Acciones del dueño
@@ -58,5 +56,6 @@ chatbot, cuentas-medicas, sistema-experto, crm-ia, linkedin-ads, erp, pos, code-
 - **Urgente:** cambiar en Railway la contraseña de MongoDB de producción y los secretos `JWT_SECRET` y `JWT_REFRESH_SECRET`. Estuvieron en archivos del repositorio público; ya se quitaron, pero siguen en el historial.
 - **Variables del backend (Railway):** `JWT_REFRESH_SECRET` (necesaria para iniciar sesión), `ADMIN_EMAIL` (cuenta que se asegura como admin al arrancar), `FRONTEND_URL=https://www.koptup.com` (enlaces de los correos), `SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASS`/`EMAIL_FROM` (correos automáticos), `REDIS_URL` (límites y topes de gasto), `OPENAI_API_KEY`, y para encender la demo con documento propio `DEMO_UPLOAD_ENABLED=true`. Lista completa en el `README.md`.
 - **Variables de la web (Vercel), opcionales:** `NEXT_PUBLIC_GA_ID`, `NEXT_PUBLIC_GOOGLE_ADS_ID`, `NEXT_PUBLIC_LINKEDIN_PARTNER_ID` (redesplegar después de crearlas).
-- **Wiki de GitHub:** activarla en Settings › Features › Wikis y crear una primera página; luego re-ejecutar el workflow "Publicar wiki".
+- **Wiki de GitHub:** ✅ activada. Cada cambio en `docs/wiki/` se publica solo con el workflow "Publicar wiki".
+- **Vercel:** hay dos proyectos que despliegan `main` (`koptup`, con el dominio, y `koptup-web`). Conviene dejar uno solo para no cambiar variables en el equivocado.
 - **Pagos:** decidir la pasarela (Wompi, PayU o Stripe) para el cobro del anticipo en línea.
