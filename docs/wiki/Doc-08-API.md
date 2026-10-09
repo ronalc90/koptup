@@ -26,7 +26,7 @@
 Cada petición pasa por las mismas capas antes de llegar al código que hace el trabajo. Si una capa la rechaza, la petición no sigue.
 
 ```mermaid
-flowchart LR
+flowchart TD
     classDef cliente fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
     classDef capa fill:#e0e7ff,stroke:#4f46e5,color:#312e81
     classDef dato fill:#f1f5f9,stroke:#64748b,color:#334155
@@ -59,7 +59,7 @@ flowchart LR
     K --> AI
 ```
 
-*De izquierda a derecha: seguridad, CORS, tamaño del cuerpo, cupo de peticiones, política de la ruta y, al final, el controlador que lee o escribe en MongoDB, Redis u OpenAI.*
+*De arriba abajo: seguridad, CORS, tamaño del cuerpo, cupo de peticiones, política de la ruta y, al final, el controlador que lee o escribe en MongoDB, Redis u OpenAI.*
 
 El recorrido más importante de la API es el de una demo: alguien la pide, el equipo la aprueba, la persona activa su cuenta y la abre. El GIF muestra **las peticiones reales** de ese recorrido, una por cuadro:
 
@@ -248,7 +248,7 @@ Todas exigen sesión. Cada controlador filtra por la cuenta que llama (o permite
 |---|---|---|---|---|
 | GET | `/api/projects/dashboard/stats` | Autenticado | Resumen del portal | → `{ totalProjects, activeProjects, tasks, recentActivity }` |
 | GET | `/api/projects` | Autenticado | Proyectos donde la cuenta es cliente o gerente | → lista |
-| POST | `/api/projects` | Autenticado | Crear un proyecto (quien lo crea queda como gerente) | `{ name, description?, client_id?, manager_id?, status?, priority?, budget?, start_date?, end_date?, estimated_hours? }` |
+| POST | `/api/projects` | Autenticado | Crear un proyecto (si no se indica `manager_id`, quien lo crea queda como gerente) | `{ name, description?, client_id?, manager_id?, status?, priority?, budget?, start_date?, end_date?, estimated_hours? }` |
 | GET / PUT / DELETE | `/api/projects/:id` | Cliente o gerente (borrar: solo el gerente) | Ver, editar o borrar | PUT acepta `name, description, status, priority, budget, fechas, horas, progress` |
 | GET | `/api/projects/:id/members`, `/api/projects/:id/tasks` | Participante | Miembros y tareas | → listas |
 | POST | `/api/projects/:id/tasks`, PUT `/api/projects/tasks/:id` | Participante | Crear o editar tareas | `{ title, description?, status?, priority?, assigned_to?, due_date? … }` |
@@ -530,7 +530,7 @@ sequenceDiagram
             A->>M: Vincula la cuenta del email o crea una prospect invitada
             A->>M: Crea un DemoGrant por demo (o extiende el vigente)
             A->>M: Emite el enlace de activación (72 h, solo se guarda su hash)
-            A->>S: Correo con el enlace (espera hasta 15 s)
+            A->>S: Correo con el enlace si hay SMTP (espera hasta 15 s)
             A->>M: Registra demo_request.approve en la bitácora
             A-->>E: 200 con activationUrl, accesos y si el correo salió
         end
