@@ -1,6 +1,6 @@
 # Correcciones pendientes
 
-> Al documentar todo el sitio contra el código de `main` y al dibujar sus diagramas de flujo aparecieron cerca de 140 puntos que no funcionan, confunden o no cumplen lo que prometen. Esta página los reúne sin repetir, ordenados por prioridad, para corregirlos desde el martes. Cada punto enlaza la página donde se explica con más detalle.
+> Al documentar todo el sitio contra el código de `main` y al dibujar sus diagramas de flujo aparecieron más de 200 puntos que no funcionan, confunden o no cumplen lo que prometen. Esta página los reúne sin repetir, ordenados por prioridad, para corregirlos desde el martes. Cada punto enlaza la página donde se explica con más detalle.
 >
 > Las limitaciones propias de cada demo no se repiten aquí: están en la sección **Limitaciones conocidas** de su guía ([Guía de demos](Doc-07-Guia-de-Demos.md)).
 
@@ -27,7 +27,7 @@ flowchart LR
 | Prioridad | Qué agrupa | Puntos |
 |---|---|---|
 | **P0** | Lo que impide vender hoy o es un riesgo legal o de seguridad | 10 |
-| **P1** | Funciones que el cliente o el equipo usan y no sirven | 24 |
+| **P1** | Funciones que el cliente o el equipo usan y no sirven, incluidas las demos | 34 |
 | **P2** | Detalles del panel, de la operación y de la configuración | 33 |
 | **P3** | SEO, coherencia de textos y código que sobra | 30 |
 
@@ -95,6 +95,21 @@ flowchart LR
 | 1.22 | **Los bots de "Configura el tuyo", los adjuntos y los registros se pierden en cada despliegue** de Railway, porque el disco es efímero | [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md) |
 | 1.23 | **No hay monitoreo ni alertas:** la caída actual del backend no avisó a nadie | [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md) |
 | 1.24 | **`main` no exige CI en verde,** y Vercel y Railway despliegan sin esperarlo | [Flujos de administración › Hallazgos](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#hallazgos) |
+
+### Demos
+
+| # | Qué pasa | Detalle |
+|---|---|---|
+| 1.25 | **Las tarjetas del catálogo de 20 demos prometen funciones que la demo no tiene** ("ML", "multi-país", integraciones, cumplimiento). Es el repaso de honestidad pendiente | [Guía de demos › Limitaciones comunes](Doc-07-Guia-de-Demos.md#limitaciones-comunes) |
+| 1.26 | **7 demos sin revisar** tienen botones que no hacen nada, no dicen que usan datos de ejemplo y mezclan textos en inglés | [Guía de demos](Doc-07-Guia-de-Demos.md) |
+| 1.27 | **El gestor documental es una demo abierta cuya API exige sesión:** un visitante ve "Error al cargar documentos" | [Guía: gestor documental](Guia-Demo-gestor-documentos.md) |
+| 1.28 | **La verificación del certificado del LMS** (a la que lleva el QR) pide acceso a la demo, así que un tercero no puede verificarlo | [Guía: LMS](Guia-Demo-lms.md) |
+| 1.29 | **El chatbot dice "Revisa tu conexión"** cuando lo que pasó es que se superó el límite de bots nuevos por hora y por IP | [Guía: chatbot](Guia-Demo-chatbot.md) |
+| 1.30 | **"Solicitar acceso" mal dirigido dentro de las demos de salud:** en cuentas médicas apunta a una ruta que no existe y en el motor de reglas lleva a `/contact` | [Guía: cuentas médicas](Guia-Demo-cuentas-medicas.md), [Guía: motor de reglas](Guia-Demo-sistema-experto.md) |
+| 1.31 | **"Ver Planes y Precios"** al final de las demos de otras soluciones lleva a los planes RAG | [Guía de demos › Limitaciones comunes](Doc-07-Guia-de-Demos.md#limitaciones-comunes) |
+| 1.32 | **Errores de hidratación de React** con el navegador en español en wms-logistica, automatizacion y moderacion-contenido | [Guía de demos › Limitaciones comunes](Doc-07-Guia-de-Demos.md#limitaciones-comunes) |
+| 1.33 | **Telemedicina:** la política de permisos del sitio bloquea la cámara y el micrófono, así que la prueba de cámara de la videoconsulta nunca aparece | [Guía: telemedicina](Guia-Demo-telemedicina.md) |
+| 1.34 | **La nota de "Simular ticket entrante" del helpdesk dice que el mensaje no sale del navegador,** pero "Redactar con IA" lo envía al servidor | [Guía: helpdesk](Guia-Demo-helpdesk-ia.md) |
 
 ---
 

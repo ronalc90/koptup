@@ -275,9 +275,9 @@ Se abre con **Ver app del colaborador** y se cierra con la X o con Escape. Es la
 
 ```mermaid
 sequenceDiagram
-    participant C as "App del colaborador"
-    participant B as "Servidor KopTup (/api/chatbot)"
-    participant M as "Modelo de IA"
+    participant C as App del colaborador
+    participant B as Servidor KopTup /api/chatbot
+    participant M as Modelo de IA
     C->>B: Primera vez: crea el bot y sube los 5 documentos
     B-->>C: Identificador del bot (se guarda en el navegador)
     C->>B: Pregunta y últimos mensajes
