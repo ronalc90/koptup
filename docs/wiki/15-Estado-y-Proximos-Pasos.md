@@ -42,7 +42,15 @@ chatbot, cuentas-medicas, sistema-experto, crm-ia, linkedin-ads, erp, pos, code-
 3. **Pendientes reportados por las fases:** escapar el HTML de los datos del formulario en el correo al admin; quitar la ruta pública `/test`; corregir cifras del README y el `docker-compose.yml`, que apunta a un `Dockerfile` del backend que no existe; error de `/api/expert/generar-excel` cuando la IA no devuelve procedimientos; permisos de la configuración del sistema experto para prospectos con acceso; achicar la lista de errores de hidratación conocidos.
 4. **Repaso de honestidad en todo el sitio:** textos del catálogo de "Otras soluciones a medida" (modalidad SaaS solo donde haya base real), `/about`, `/bienvenido-producthunt`, `/desarrollo-web-colombia`.
 5. **Diseño y animaciones:** investigación de motion design, sistema de movimiento, animación protagonista que explique RAG, microinteracciones, easter eggs (paleta Ctrl+K, código Konami, mensaje en consola, 404 ingeniosa) y revisión adversarial con video y medición de fluidez.
-6. Verificación final completa, actualización de la wiki, PR y merge.
+6. **Hallazgos de los diagramas de flujo:** al dibujar los flujos contra el código salieron 37 puntos que no cuadran. Entre ellos:
+   - no hay forma de suprimir datos personales, como pide la Ley 1581;
+   - el chatbot guarda las conversaciones de prueba sin avisarlo;
+   - el formulario de contacto no pide la autorización de datos;
+   - el botón de GitHub del inicio de sesión no hace nada;
+   - cambiar de idioma pierde los parámetros de la URL.
+
+   La lista completa, con el archivo de cada uno, está en [Diagramas de flujo › Hallazgos](Doc-14-Diagramas-de-Flujo.md#hallazgos).
+7. Verificación final completa, actualización de la wiki, PR y merge.
 
 ## Acciones del dueño
 

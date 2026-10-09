@@ -1,5 +1,12 @@
 **[Inicio](Home.md)** · **[Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md)**
 
+**Documentación (lo que existe hoy)**
+- [Índice de la documentación](Doc-00-Indice.md)
+- [Diagramas de flujo](Doc-14-Diagramas-de-Flujo.md)
+  - [Negocio y cliente](Doc-14-1-Flujos-de-Negocio.md)
+  - [Administración y operación](Doc-14-2-Flujos-de-Administracion-y-Operacion.md)
+  - [Técnicos](Doc-14-3-Flujos-Tecnicos.md)
+
 **Estrategia**
 - [01 · Diagnóstico](01-Diagnostico.md)
 - [02 · Visión de producto](02-Vision-de-Producto.md)

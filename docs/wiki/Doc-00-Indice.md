@@ -12,10 +12,10 @@
 
 ```mermaid
 flowchart LR
-    classDef visitante fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
-    classDef admin fill:#fef3c7,stroke:#d97706,color:#78350f
-    classDef sistema fill:#e0e7ff,stroke:#4f46e5,color:#312e81
-    classDef externo fill:#f1f5f9,stroke:#64748b,color:#334155
+    classDef visitante fill:#dbeafe,stroke:#2563eb,color:#0f172a
+    classDef sistema fill:#f1f5f9,stroke:#475569,color:#0f172a
+    classDef admin fill:#f3e8ff,stroke:#9333ea,color:#0f172a
+    classDef aviso fill:#dcfce7,stroke:#16a34a,color:#0f172a
 
     IDX["Doc-00 Índice"]
 
@@ -40,8 +40,8 @@ flowchart LR
         D09["09 Modelos de datos"]:::sistema
     end
 
-    D14["14 Diagramas de flujo"]:::externo
-    D13["13 Glosario y preguntas"]:::externo
+    D14["14 Diagramas de flujo"]:::aviso
+    D13["13 Glosario y preguntas"]:::aviso
 
     IDX --> USO
     IDX --> GESTION
@@ -54,7 +54,7 @@ flowchart LR
     D01 --> D08 --> D09
 ```
 
-*Las páginas en azul explican el sitio desde el lado del usuario, las ámbar desde el lado del equipo de KopTup y las moradas por dentro.*
+*En azul, las páginas que explican el sitio desde el lado del usuario; en morado, las del equipo de KopTup; en gris, cómo está construido por dentro; en verde, las páginas de consulta.*
 
 ---
 
@@ -110,16 +110,18 @@ flowchart LR
 | **Datos de ejemplo** | La demo muestra información ficticia preparada para la demostración; se indica en cada guía |
 | **En desarrollo** | Existe en el plan pero todavía no está en `main`; ver [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md) |
 
-Los diagramas usan siempre los mismos colores:
+Los diagramas usan siempre los mismos colores (detalle en [Diagramas de flujo](Doc-14-Diagramas-de-Flujo.md#leyenda-de-colores)):
 
 | Color | Significa |
 |---|---|
 | Azul | Lo que hace el visitante, el prospecto o el cliente |
-| Morado | Lo que hace el sistema por su cuenta |
-| Ámbar | Lo que hace el administrador o el equipo |
-| Rombo | Una decisión |
-| Rojo | Un error o un rechazo |
-| Gris | Un servicio externo (correo, OpenAI, Vercel, Railway) |
+| Gris | Lo que hace el sistema: web, backend, base de datos o Redis |
+| Morado | Lo que hace el equipo de KopTup (admin o comercial) |
+| Verde | Un aviso: correo, WhatsApp o notificación |
+| Ámbar (rombo) | Una decisión |
+| Rojo | Un error, un bloqueo o un camino degradado |
+| Fucsia | Un servicio externo (OpenAI, Railway, Vercel, GitHub, Google) |
+| Blanco con borde punteado | En desarrollo: todavía no está en `main` |
 
 ---
 
