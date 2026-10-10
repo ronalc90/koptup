@@ -1,6 +1,6 @@
 # Estado del trabajo y próximos pasos
 
-> Corte: 8 de octubre de 2026. El trabajo se pausó a pedido del dueño y continúa el martes. Esta página resume qué quedó integrado en `main`, qué falta y qué tiene que hacer el dueño.
+> Corte: 10 de octubre de 2026. El trabajo se pausó otra vez a pedido del dueño y continúa el martes. Esta página resume qué está en `main`, qué avanzó en la rama de trabajo `ccr-55ceecf7-dpc10i`, qué falta y qué tiene que hacer el dueño.
 
 ## Qué quedó en `main`
 
@@ -12,7 +12,6 @@
 | Pruebas: Jest en backend y web, Playwright de punta a punta y CI válido | ✅ | `README.md`, `.github/workflows/ci.yml` |
 | Dependencias: Next 14.2.35 y paquetes con vulnerabilidades actualizados | ✅ | |
 | Seguridad: autorización en el servidor, propiedad de bots del chatbot, topes de gasto de IA, secretos fuera del repo | ✅ | [Seguridad y calidad](10-Seguridad-y-Calidad.md) |
-| Revisión de seguridad aplicada en las rutas heredadas (portal del cliente, documentos, chatbot, salud, inicio de sesión y correos) | ✅ | [Roles y permisos](Doc-10-Roles-y-Permisos.md), [API](Doc-08-API.md) |
 | Sistema de solicitud y acceso a demos | ✅ | [Sistema de demos](04-Sistema-de-Demos.md) |
 | 21 demos revisadas: funcionales, sin botones muertos y con promesas verificables | ✅ | ver lista abajo |
 
@@ -36,17 +35,34 @@ Valores iniciales: con solicitud → voice-ai, erp, delivery, hrms, lms, telemed
 
 chatbot, cuentas-medicas, sistema-experto, crm-ia, linkedin-ads, erp, pos, code-review-ia, helpdesk-ia, voice-ai, ecommerce, facturacion-electronica, hrms, loyalty, telemedicina, control-proyectos, delivery, dashboard-ejecutivo, lms, scraping, gestor-contenido.
 
+## Avance del 10 de octubre (rama `ccr-55ceecf7-dpc10i`, todavía no en `main`)
+
+Se trabajó en dos pistas en paralelo. Cada paso tiene un implementador y un revisor adversarial que lo verifica antes de hacer commit.
+
+| Paso | Estado |
+|---|---|
+| Revisión de seguridad de las rutas heredadas | ✅ Revisado y con commit |
+| Privacidad y Ley 1581: Admin › Privacidad (exportar y suprimir los datos de una persona), plazo de conservación, autorización en el formulario de contacto, chatbot guardado en MongoDB, política de privacidad, cookies y términos reescritos | ✅ Revisado y con commit |
+| Sitio público: embudo RAG, SEO, contenido verificable e inglés completo | ✅ Revisado y con commit |
+| Operación: variables, monitoreo programado, CI de seguridad, errores uniformes y código sin uso eliminado | ✅ Revisado y con commit |
+| Portal del cliente y panel (facturas, entregables, pedidos, mensajes, usuarios, bitácora, sesiones) | 🟡 A medias, en un commit `wip` sin revisar |
+| Las 7 demos que faltaban (saas-boilerplate, sistema-reservas, wms-logistica, firma-electronica, gestor-documentos, automatizacion, moderacion-contenido) | 🟡 Implementadas con commit; falta su revisión adversarial |
+| Corrección de las limitaciones de las otras 21 demos | 🟡 chatbot y cuentas-medicas a medias (commit `wip`); las demás sin empezar |
+
+Los commits marcados `wip` y "NO FUSIONAR" no deben ir a `main` hasta que pasen su revisión.
+
 ## Qué falta (martes)
 
-1. **Flujo de compra** (fases P7–P9): pipeline de leads, "Solicitar propuesta", propuestas con página pública para aceptarlas, anticipo (enlace de pago, transferencia o Wompi con claves) y conversión a proyecto y cliente. Hay avance sin revisar guardado en la rama `ccr-55ceecf7-dpc10i` (commit marcado `wip`); no está en `main`.
-2. **7 demos por revisar:** saas-boilerplate, sistema-reservas y wms-logistica (con avance guardado en el mismo commit `wip`); firma-electronica, gestor-documentos, automatizacion y moderacion-contenido (sin empezar).
-3. **Pendientes reportados por las fases:** permisos de la configuración del sistema experto para prospectos con acceso; achicar la lista de errores de hidratación conocidos. (Las cifras del README, el `docker-compose.yml` roto y el error de `/api/expert/generar-excel` sin procedimientos ya se corrigieron.)
-4. **Repaso de honestidad en todo el sitio:** quedan los textos del catálogo de "Otras soluciones a medida" (modalidad SaaS solo donde haya base real). `/about`, `/bienvenido-producthunt`, `/desarrollo-web-colombia`, las landings, el pie, el JSON-LD y `llms.txt` ya solo dicen lo que se puede comprobar; los datos que debe aportar el dueño están en [Páginas públicas › Limitaciones conocidas](Doc-03-Paginas-Publicas.md#16-limitaciones-conocidas).
-5. **Diseño y animaciones:** investigación de motion design, sistema de movimiento, animación protagonista que explique RAG, microinteracciones, easter eggs (paleta Ctrl+K, código Konami, mensaje en consola, 404 ingeniosa) y revisión adversarial con video y medición de fluidez.
-6. **Correcciones pendientes:** al documentar el sitio y dibujar sus diagramas contra el código y al recorrer las 28 demos aparecieron más de 200 puntos. Sin repetir y sin contar los detalles de cada demo, los que quedan están ordenados de P0 a P3 en [Correcciones pendientes](16-Correcciones-Pendientes.md) (la página lleva el conteo al día). Los más urgentes, además de volver a levantar el backend, son estos:
+1. **Terminar y revisar el portal del cliente y el panel** (commit `wip` del 10 de octubre).
+2. **Flujo de compra** (fases P7–P9): pipeline de leads, "Solicitar propuesta", propuestas con página pública para aceptarlas, anticipo (enlace de pago, transferencia o Wompi con claves) y conversión a proyecto y cliente. El backend tiene avance sin revisar en el commit `wip` del 8 de octubre.
+3. **Demos:** revisión adversarial de las 7 demos implementadas; terminar chatbot y cuentas-medicas; corregir las limitaciones de las otras 19 según su guía; catálogo honesto (tarjetas del hub, páginas de producto y un solo nombre por demo); sonda final en las 28.
+4. **Pendientes reportados por las fases:** permisos de la configuración del sistema experto para prospectos con acceso; achicar la lista de errores de hidratación conocidos. (Las cifras del README, el `docker-compose.yml` roto y el error de `/api/expert/generar-excel` sin procedimientos ya están corregidos en la rama de trabajo.)
+5. **Repaso de honestidad en todo el sitio:** quedan los textos del catálogo de "Otras soluciones a medida" (modalidad SaaS solo donde haya base real). `/about`, `/bienvenido-producthunt`, `/desarrollo-web-colombia`, las landings, el pie, el JSON-LD y `llms.txt` ya solo dicen lo que se puede comprobar; los datos que debe aportar el dueño están en [Páginas públicas › Limitaciones conocidas](Doc-03-Paginas-Publicas.md#16-limitaciones-conocidas).
+6. **Diseño y animaciones:** investigación de motion design, sistema de movimiento, animación protagonista que explique RAG, microinteracciones, easter eggs (paleta Ctrl+K, código Konami, mensaje en consola, 404 ingeniosa) y revisión adversarial con video y medición de fluidez.
+7. **Correcciones pendientes:** al documentar el sitio y dibujar sus diagramas contra el código y al recorrer las 28 demos aparecieron más de 200 puntos. Sin repetir y sin contar los detalles de cada demo, los que quedan están ordenados de P0 a P3 en [Correcciones pendientes](16-Correcciones-Pendientes.md) (la página lleva el conteo al día). Los más urgentes, además de volver a levantar el backend, son estos:
    - no se pueden crear facturas, entregables ni conversaciones;
    - "Nuevo pedido" apunta a una dirección local.
-7. Verificación final completa, actualización de la wiki, PR y merge.
+8. Crítico de completitud, verificación final completa, actualización de la wiki, PR y merge.
 
 ## Acciones del dueño
 
