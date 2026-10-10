@@ -1,160 +1,475 @@
 {
-  "demoDocsPro": {
-    "section": {
-      "title": "Enterprise DMS Capabilities",
-      "subtitle": "Advanced features for enterprises with high document volumes and strict compliance needs."
-    },
-    "tabs": {
-      "ingesta": "Multi-channel ingestion",
-      "ocr": "OCR + extraction",
-      "search": "Hybrid Search",
-      "clauses": "Clauses",
-      "compare": "Version compare",
-      "watermark": "Dynamic watermarks",
-      "retention": "Retention & Legal Hold",
-      "encryption": "Zero-knowledge",
-      "ediscovery": "E-discovery",
-      "sign": "E-signature"
-    },
-    "ingesta": {
-      "title": "Multi-channel ingestion",
-      "subtitle": "Five official paths to send documents into the vault, all with audit and antivirus.",
-      "channels": {
-        "email": { "name": "Email-to-vault", "desc": "Forward any email and attachments get indexed." },
-        "scan": { "name": "Mobile Scan-to-vault", "desc": "iOS/Android app with JPEG capture + auto OCR." },
-        "office": { "name": "Office plugin", "desc": "Save from Word, Excel and Outlook with one click." },
-        "drive": { "name": "Drive sync", "desc": "Sync folders from Google Drive and OneDrive." },
-        "api": { "name": "API upload", "desc": "REST endpoint with HMAC signing and per-tenant quotas." }
+  "demoDocs": {
+    "shell": {
+      "back": "Back to the demo catalog",
+      "title": "AI document manager",
+      "sampleBadge": "Sample data",
+      "sampleHint": "The company, people, tax IDs (NIT), amounts and documents are fictitious.",
+      "serverBadge": "Your documents on the server",
+      "caseLine": "Sample case: the records of {company} (NIT {nit}, {city}), a fictitious company. Organize them as you like: changes stay in your browser.",
+      "serverLine": "The documents you upload with your account: the server extracts the text, AI summarizes and tags them, and you can search them by meaning. Each account only sees its own.",
+      "loading": "Loading the document manager…",
+      "modeLabel": "Document source",
+      "modes": {
+        "sample": "Sample data",
+        "server": "My documents"
       },
-      "emailLabel": "Your Email-to-vault address",
-      "copy": "Copy",
-      "copied": "Copied!"
+      "menu": "Views and folders"
     },
-    "ocr": {
-      "title": "OCR + data extraction",
-      "subtitle": "Upload an invoice or contract and AI extracts entities, tables and bounding boxes.",
-      "drop": "Drop a PDF here or click to simulate",
-      "supports": "PDF · PNG · JPG · TIFF (up to 50 MB)",
-      "preview": "Preview with bounding boxes",
-      "table": "Extracted table",
-      "entities": "Recognized entities",
-      "headers": { "concept": "Concept", "qty": "Qty", "unit": "Unit", "total": "Total" },
-      "entity": {
-        "name": "Company name",
-        "nit": "Tax ID",
-        "date": "Issue date",
-        "amount": "Total amount",
-        "city": "City"
-      }
+    "how": {
+      "title": "What is real and what is simulated",
+      "realTitle": "Really works",
+      "real": [
+        "Sample data: favorites, rename, move to a folder, create folders, trash, restore, delete permanently and reset. Saved in your browser.",
+        "Search in each document's name, tags and text, showing the matching snippet; filters by type, date and tag; sorting.",
+        "Rule-based clause detection with a risk level on the open contract's text; word-by-word comparison between versions.",
+        "Retention by folder: the keep-until date of each document is calculated, and legal hold blocks the trash.",
+        "Downloads generated in your browser: CSV inventory, audit package (CSV or JSON) and a watermarked PDF copy.",
+        "My documents (signed in): upload PDF, DOCX, TXT and CSV, AI summary and tags, search by meaning, “Explain with AI” and “Why this result?” on the server, with an AI spending cap."
+      ],
+      "simTitle": "Sample or simulated",
+      "sim": [
+        "The construction company's 16 documents are fictitious; their summaries, keywords and explanations are written in advance (not generated live by AI).",
+        "The OCR reading of the scanned invoices is sample data: this demo does not process any image.",
+        "With sample data, “Search by meaning” widens the search with synonyms in your browser; it does not use AI.",
+        "Retention periods are illustrative and the rule only applies in this demo, not on the server."
+      ],
+      "tourTitle": "Suggested tour",
+      "tour": [
+        "Search for “cláusula penal” (the documents are in Spanish) and look at the highlighted snippet on each card.",
+        "Open the works contract: click “Detect clauses” and then “Compare versions”.",
+        "Open a scanned invoice and click “View OCR reading”.",
+        "Turn on legal hold for “Contracts” (archive icon next to Folders) and try to move a contract to the trash.",
+        "Export the inventory or build an audit package; to upload your documents, go to “My documents”."
+      ],
+      "buildTitle": "What we build in your project",
+      "build": [
+        "Real OCR for scanned documents and reading of electronic invoices.",
+        "Intake by email, phone, Google Drive or SharePoint, and through an API.",
+        "Folder permissions, access auditing and your company's records retention schedule (TRD).",
+        "Connection to your RAG assistant to ask your documents questions and get answers with the source."
+      ]
     },
-    "search": {
-      "title": "Hybrid Search (BM25 + Dense)",
-      "subtitle": "Combines lexical matching with embeddings for maximum precision.",
-      "placeholder": "E.g. confidentiality clause in 2025 contracts",
-      "go": "Search",
-      "modes": { "bm25": "BM25", "dense": "Dense", "hybrid": "Hybrid" },
-      "score": "score",
-      "results": "results"
-    },
-    "clauses": {
-      "title": "Contract clause extraction",
-      "subtitle": "Detects and classifies critical clauses with automatic risk level.",
-      "doc": "Service_Agreement_2026.pdf",
-      "items": {
-        "confidentiality": { "name": "Confidentiality", "snippet": "The parties shall keep strict confidentiality..." },
-        "payment": { "name": "Payment", "snippet": "Payment shall be made within 30 days after..." },
-        "indemnity": { "name": "Indemnity", "snippet": "The provider shall be liable for any direct damages..." },
-        "termination": { "name": "Termination", "snippet": "Either party may terminate the agreement..." }
+    "sidebar": {
+      "brand": "Document manager",
+      "navLabel": "Views and folders",
+      "upload": "Upload documents",
+      "resetSample": "Reset sample data",
+      "views": {
+        "all": "All documents",
+        "favorites": "Favorites",
+        "recent": "Recent",
+        "trash": "Trash"
       },
-      "risk": { "low": "Low", "medium": "Medium", "high": "High" }
+      "foldersTitle": "Folders",
+      "newFolder": "New folder",
+      "retention": "Retention by folder",
+      "holdBadge": "Legal hold",
+      "storage": "Storage",
+      "storageUsed": "{size} in {count, plural, one {# document} other {# documents}}",
+      "storageSample": "Sample sizes."
     },
-    "compare": {
-      "title": "Smart version comparison",
-      "subtitle": "Side-by-side diff with additions, deletions and semantic changes highlighted.",
-      "before": "v1.0 — original",
-      "after": "v1.1 — proposal",
-      "summary": "3 additions · 2 deletions · 1 clause change"
+    "folders": {
+      "contracts": "Contracts",
+      "invoices": "Supplier invoices",
+      "minutes": "Minutes and notes",
+      "licenses": "Permits and bonds",
+      "hr": "Human resources",
+      "finance": "Finance",
+      "general": "General"
+    },
+    "toolbar": {
+      "searchLabel": "Search the documents",
+      "searchPlaceholder": "Search by name, tag or document text…",
+      "clear": "Clear the search",
+      "semantic": "Search by meaning",
+      "semanticHint": "Type what you are looking for first",
+      "filters": "Filters",
+      "export": "Export CSV",
+      "audit": "Audit package",
+      "suggested": "Try (documents are in Spanish):",
+      "results": "{count, plural, =0 {No documents} one {# document} other {# documents}}",
+      "typeLabel": "Type",
+      "types": {
+        "all": "All types",
+        "pdf": "PDF",
+        "docx": "Word",
+        "txt": "Text",
+        "csv": "CSV",
+        "other": "Other"
+      },
+      "dateLabel": "Date",
+      "dates": {
+        "all": "Any date",
+        "d7": "Last 7 days",
+        "d30": "Last 30 days",
+        "d365": "Last year"
+      },
+      "tagLabel": "Tag",
+      "tagAll": "All tags",
+      "sortLabel": "Sort",
+      "sort": {
+        "relevance": "Relevance (when searching)",
+        "newest": "Newest",
+        "oldest": "Oldest",
+        "name": "Name (A-Z)",
+        "size": "Size"
+      },
+      "clearFilters": "Clear filters"
+    },
+    "list": {
+      "label": "Documents",
+      "gridLabel": "Document list",
+      "empty": {
+        "all": "There are no documents in this view.",
+        "favorites": "No favorites yet: use the star on a card.",
+        "recent": "There are no recent documents.",
+        "trash": "The trash is empty.",
+        "folder": "This folder is empty. Move documents into it from the document panel.",
+        "search": "No document matches the search or the filters."
+      },
+      "trashNote": "Documents in the trash can be restored or deleted permanently.",
+      "emptyTrash": "Empty trash",
+      "favorite": "Mark as favorite",
+      "unfavorite": "Remove from favorites",
+      "rename": "Rename",
+      "restore": "Restore",
+      "destroy": "Delete permanently",
+      "deletedOn": "In the trash since {date}",
+      "matchIn": "In the text:",
+      "folderPolicy": "Retention: {policy}",
+      "changeRetention": "Change retention"
+    },
+    "upload": {
+      "dropTitle": "Drag files here or click to choose them",
+      "dropHint": "PDF, DOCX, TXT or CSV up to 10 MB. The server extracts the text and AI writes the summary, tags and keywords.",
+      "toFolder": "They are saved in the folder: {folder}",
+      "progress": "Uploading {index} of {total}: {name} ({pct}%)",
+      "processing": "Analyzing {name} on the server ({index} of {total})…",
+      "problem": {
+        "type": "{name}: file type not supported. Use PDF, DOCX, TXT or CSV.",
+        "size": "{name}: it is larger than 10 MB.",
+        "empty": "{name}: the file is empty."
+      },
+      "sampleTitle": "You are looking at sample data",
+      "sampleText": "To upload your own documents and analyze them with AI, sign in or request access.",
+      "sampleTextSession": "To upload your documents and analyze them with AI, switch to “My documents”.",
+      "goServer": "Go to My documents"
+    },
+    "access": {
+      "title": "Sign in or request access to upload your documents",
+      "text": "Documents are stored per account: once you sign in, the server keeps your files and only you can see them.",
+      "points": [
+        "Upload PDF, DOCX, TXT or CSV files up to 10 MB.",
+        "AI writes the summary, tags and keywords for each one.",
+        "Search them by meaning and ask “Explain with AI”.",
+        "Organize them with favorites, folders and trash."
+      ],
+      "login": "Sign in",
+      "request": "Request access",
+      "sample": "Keep using the sample data"
+    },
+    "server": {
+      "loading": "Fetching your documents…",
+      "errorTitle": "We couldn't fetch your documents",
+      "retry": "Try again",
+      "emptyText": "You have no documents yet. Upload a PDF, DOCX, TXT or CSV to see it summarized and tagged, or explore the sample data."
+    },
+    "panel": {
+      "label": "Document {name}",
+      "preview": "Preview",
+      "previewText": "Document text",
+      "previewScan": "Scanned image (sample rendering)",
+      "noPreview": "The demo does not keep a copy of the file to display: here you see what the server extracted and analyzed.",
+      "watermarkOn": "View with watermark",
+      "watermarkOff": "Remove watermark",
+      "watermarkHint": "The watermark shows your name, the date and an ID; it is repeated in the PDF copy.",
+      "downloadCopy": "Download watermarked copy (PDF)",
+      "summarySample": "Summary (written in advance for the sample data)",
+      "summaryAi": "AI summary",
+      "noSummary": "The server saved this document without an AI summary (text too short or not extractable, or AI not available).",
+      "keywords": "Keywords",
+      "entities": "Data found",
+      "entityKinds": {
+        "party": "Company",
+        "nit": "Tax ID (NIT)",
+        "value": "Amount",
+        "date": "Date",
+        "term": "Term",
+        "city": "City",
+        "person": "Person",
+        "role": "Role",
+        "reference": "Number"
+      },
+      "folder": "Folder",
+      "retentionTitle": "Retention",
+      "keepUntil": "{policy}: kept until {date}",
+      "keepPerm": "Kept permanently",
+      "noPolicy": "No retention policy",
+      "onHold": "Legal hold active",
+      "holdExplain": "The folder is under legal hold: its documents cannot be moved to the trash or deleted until you remove it.",
+      "editRetention": "Change the folder's retention",
+      "tools": "Tools",
+      "ocr": "View OCR reading",
+      "clauses": "Detect clauses",
+      "versions": "Compare versions ({count})",
+      "noTools": "This document has no clauses, versions or OCR reading.",
+      "serverToolsNote": "OCR reading, clauses, versions and the watermarked copy are available in the sample data: the demo server keeps the extracted text, not the file to display.",
+      "signText": "Need to sign it?",
+      "signLink": "Try the Electronic signature demo",
+      "explainSample": "View explanation",
+      "explainAi": "Explain with AI",
+      "explaining": "AI is reading the document…",
+      "explanationTitle": "Document explanation",
+      "explanationSample": "Written in advance for the sample data (it does not call the AI).",
+      "explanationAi": "Generated by AI on the server.",
+      "explanationEmpty": "The AI returned no text.",
+      "trash": "Move to trash"
     },
     "watermark": {
-      "title": "Dynamic watermarks",
-      "subtitle": "Personalized watermark per user and session, embedded on export.",
-      "label": "Viewed by",
-      "id": "ID"
+      "label": "Viewed by {name} · {date}",
+      "visitor": "Visitor",
+      "pdfFooter": "Controlled copy of a sample document - AI document manager (demo)"
+    },
+    "ocr": {
+      "title": "Invoice OCR reading",
+      "note": "Sample reading written in advance for this scanned invoice: the demo does not process images. In your project an OCR engine is connected and the data is checked against the electronic invoice.",
+      "image": "Scanned image",
+      "highlight": "Highlight the fields read",
+      "fieldsTitle": "Fields read",
+      "fields": {
+        "issuer": "Issuer",
+        "nit": "Issuer tax ID (NIT)",
+        "number": "Number",
+        "date": "Issue date",
+        "cufe": "CUFE",
+        "buyer": "Buyer",
+        "subtotal": "Subtotal",
+        "iva": "VAT 19%",
+        "total": "Total"
+      },
+      "confidence": "Confidence {pct}%",
+      "review": "review",
+      "checksTitle": "Checks (calculated in your browser)",
+      "checks": {
+        "nitOk": "The NIT check digit is correct.",
+        "nitBad": "The NIT check digit does not match.",
+        "linesOk": "The sum of the lines matches the subtotal.",
+        "linesBad": "The sum of the lines does not match the subtotal.",
+        "totalOk": "Subtotal plus VAT equals the total.",
+        "totalBad": "Subtotal plus VAT does not equal the total."
+      },
+      "linesTitle": "Lines read",
+      "headers": {
+        "concept": "Item",
+        "qty": "Qty",
+        "unit": "Unit price",
+        "total": "Total"
+      },
+      "totalsLine": "Subtotal {subtotal} · VAT {iva} · Total {total}",
+      "download": "Download fields (CSV)",
+      "csvField": "Field",
+      "csvValue": "Value",
+      "csvConfidence": "Confidence (%)"
+    },
+    "clauses": {
+      "title": "Detected clauses",
+      "note": "Rule-based detection in your browser on this document's text. In your project it is done with AI and reviewed by your legal team.",
+      "none": "No clauses were found in this document.",
+      "summary": "{total, plural, one {# clause} other {# clauses}}: {high} high risk, {medium} medium risk and {low} low risk.",
+      "filterLabel": "Filter by risk",
+      "filterAll": "All",
+      "types": {
+        "payment": "Payment",
+        "penalty": "Penalty clause or fines",
+        "renewal": "Automatic renewal",
+        "termination": "Termination",
+        "confidentiality": "Confidentiality",
+        "indemnity": "Indemnity",
+        "guarantee": "Guarantees and bonds",
+        "term": "Term or validity",
+        "dispute": "Dispute resolution"
+      },
+      "risk": {
+        "low": "Low risk",
+        "medium": "Medium risk",
+        "high": "High risk"
+      },
+      "reasons": {
+        "penaltyPercent": "Penalty or fines of up to {percent}%: high from 15%, medium from 10%.",
+        "penaltyNoPercent": "Penalty without a defined percentage.",
+        "renewal": "It renews by itself: check how much notice is required.",
+        "indemnityUnlimited": "Liability with no cap.",
+        "indemnity": "One party is liable for damages.",
+        "terminationFree": "One party can terminate without paying compensation.",
+        "terminationCost": "Ending early has a cost.",
+        "termination": "Termination with notice.",
+        "paymentLong": "Payment term longer than 45 days.",
+        "payment": "Payment terms.",
+        "guarantee": "Requires guarantees or bonds.",
+        "confidentiality": "Confidentiality obligation.",
+        "dispute": "Defines how disputes are resolved.",
+        "term": "Sets the term or validity."
+      }
+    },
+    "versions": {
+      "title": "Compare versions",
+      "note": "Word-by-word comparison calculated in your browser with the text of each version.",
+      "history": "Version history",
+      "from": "Earlier version",
+      "to": "Newer version",
+      "same": "Choose two different versions to compare them.",
+      "summary": "{changes, plural, one {# change} other {# changes}}, {additions, plural, one {# added passage} other {# added passages}} and {deletions, plural, one {# removed passage} other {# removed passages}} ({added, plural, one {# new word} other {# new words}} and {removed, plural, one {# removed} other {# removed}}).",
+      "legendDel": "Removed",
+      "legendAdd": "Added"
     },
     "retention": {
-      "title": "Retention & Legal Hold",
-      "subtitle": "Per-folder policies with WORM (Write Once Read Many) lock and legal notice.",
-      "headers": { "folder": "Folder", "policy": "Policy", "expires": "Expires", "worm": "WORM", "hold": "Legal Hold" },
-      "policies": { "p7": "7 years", "p10": "10 years", "p3": "3 years", "perm": "Permanent" },
-      "active": "Active",
-      "inactive": "Inactive"
+      "title": "Retention by folder",
+      "note": "Illustrative periods: in your project they are set up with your company's records retention schedule (TRD). In this demo the rule is saved in your browser and applied on this screen.",
+      "holdHelp": "Legal hold prevents moving the folder's documents to the trash or deleting them, for example during an audit or a lawsuit.",
+      "headers": {
+        "folder": "Folder",
+        "policy": "Kept for",
+        "docs": "Documents",
+        "hold": "Legal hold"
+      },
+      "policyFor": "Retention period for {folder}",
+      "holdLabel": "Legal hold on {folder}",
+      "inTrash": "(+{count} in the trash)",
+      "policies": {
+        "none": "No policy",
+        "y1": "1 year",
+        "y3": "3 years",
+        "y5": "5 years",
+        "y10": "10 years",
+        "perm": "Permanent"
+      },
+      "reset": "Reset",
+      "done": "Done"
     },
-    "encryption": {
-      "title": "Zero-knowledge encryption",
-      "subtitle": "The client owns the keys. Not even Koptup can read the content.",
-      "toggle": "Enable BYO-key encryption",
-      "badge": "BYO-key active",
-      "flow": {
-        "1": "1. Client generates local key",
-        "2": "2. Document is encrypted in the browser",
-        "3": "3. Only ciphertext travels to the server",
-        "4": "4. Decryption only with your key"
-      }
-    },
-    "ediscovery": {
-      "title": "E-discovery export",
-      "subtitle": "Complex search with legal filters and EDRM-format export.",
+    "audit": {
+      "title": "Audit package",
+      "noteSample": "Gathers the documents that meet the criteria and downloads their index (CSV) or a JSON package with each document's text. It is built in your browser from the sample data.",
+      "noteServer": "Gathers your documents that meet the criteria and downloads their index (CSV) or a JSON with their data and summaries. It is built in your browser from the list the server returned.",
       "keywords": "Keywords",
-      "custodian": "Custodian",
-      "dateFrom": "From",
-      "dateTo": "To",
-      "format": "Format",
-      "generate": "Generate bundle",
-      "ready": "Bundle ready: 248 documents · 1.4 GB"
-    },
-    "sign": {
-      "title": "Integrated e-signature",
-      "subtitle": "Four signature levels compatible with eIDAS and Colombia's Law 527.",
-      "button": "Sign electronically",
-      "menuTitle": "Choose signature level",
-      "levels": {
-        "simple": { "name": "Simple", "desc": "Click acceptance + IP + timestamp" },
-        "advanced": { "name": "Advanced", "desc": "Identification + biometric authentication" },
-        "qualified": { "name": "Qualified", "desc": "Certificate issued by accredited entity" },
-        "ley527": { "name": "Law 527 CO", "desc": "Digital signature with recognized entity certificate" }
+      "keywordsHint": "Searches the name, tags and text",
+      "folder": "Folder",
+      "folderAll": "All folders",
+      "from": "From",
+      "to": "To",
+      "includeTrash": "Include documents in the trash",
+      "matches": "{count, plural, =0 {No document meets the criteria} one {# document meets the criteria} other {# documents meet the criteria}}",
+      "downloadCsv": "Download index (CSV)",
+      "downloadJson": "Download package (JSON)",
+      "stateActive": "Active",
+      "stateTrash": "In the trash",
+      "yes": "Yes",
+      "no": "No",
+      "cols": {
+        "name": "Name",
+        "folder": "Folder",
+        "type": "Type",
+        "size": "Size (bytes)",
+        "date": "Date",
+        "state": "Status",
+        "tags": "Tags",
+        "keepUntil": "Kept until",
+        "hold": "Legal hold"
       }
     },
-    "topbar": {
-      "modeLabel": "Mode",
-      "modeHint": "Switch the search algorithm"
+    "semantic": {
+      "title": "Search by meaning",
+      "query": "Query: “{query}”",
+      "sampleNote": "Sample data: the search is widened with related terms (sample synonyms) in your browser, without AI. In “My documents”, signed in, this button uses AI on the server.",
+      "serverNote": "AI compares the meaning of your query with each document and shows those above 50% similarity.",
+      "searching": "Searching…",
+      "noResults": "No related documents found. Try other words.",
+      "noResultsServer": "No document is above 50% similarity. Try other words.",
+      "relevance": {
+        "high": "Very relevant",
+        "mid": "Relevant",
+        "low": "Somewhat relevant"
+      },
+      "similarity": "{pct}% similarity",
+      "open": "Open document",
+      "why": "Why this result?",
+      "explaining": "AI is explaining…",
+      "whyDirect": "It matches what you typed: {terms}.",
+      "whyRelated": "And related terms: {terms}.",
+      "whySnippet": "Snippet:"
     },
-    "uploadMenu": {
-      "label": "Upload document",
-      "title": "Pick an ingestion channel",
-      "subtitle": "Five official paths to send documents into the vault."
+    "confirm": {
+      "trashTitle": "Move to trash?",
+      "trashText": "“{name}” will go to the Trash. From there you can restore it or delete it permanently.",
+      "trashOk": "Move to trash",
+      "destroyTitle": "Delete permanently?",
+      "destroyTextSample": "“{name}” will disappear from the sample data in your browser. You can bring it back with “Reset sample data”.",
+      "destroyTextServer": "“{name}” will be deleted from the server. This cannot be undone.",
+      "destroyOk": "Delete permanently",
+      "emptyTitle": "Empty the trash?",
+      "emptyText": "{count, plural, =0 {There are no documents to delete.} one {# document will be deleted permanently.} other {# documents will be deleted permanently.}}",
+      "emptyHeld": "{count, plural, one {# document stays} other {# documents stay}} in the trash because its folder is under legal hold.",
+      "emptyOk": "Empty trash",
+      "resetTitle": "Reset the sample data?",
+      "resetText": "The 16 documents, folders and retention rules go back to their original state. Your changes to the sample data are lost.",
+      "resetOk": "Reset"
     },
-    "viewer": {
-      "actionsTitle": "PRO actions",
-      "processOcr": "Process with OCR",
-      "detectClauses": "Detect clauses",
-      "compareVersions": "Compare versions",
-      "watermarkToggle": "Apply watermark",
-      "watermarkOn": "Watermark active",
-      "encryptionBadge": "Zero-knowledge BYO-key encryption",
-      "encryptionTooltip": "Only the client holds the keys; content never travels in cleartext.",
-      "close": "Close"
+    "rename": {
+      "title": "Rename document",
+      "label": "File name",
+      "save": "Save"
     },
-    "globalActions": {
-      "ediscovery": "E-discovery",
-      "encryption": "Encryption",
-      "ediscoveryTitle": "E-discovery search",
-      "encryptionTitle": "Encryption settings"
+    "newFolder": {
+      "title": "New folder",
+      "label": "Folder name",
+      "create": "Create folder",
+      "hintSample": "The folder is saved in your browser, with the sample data.",
+      "hintServer": "The folder stays in this browser until you move or upload a document into it; from then on the server keeps it.",
+      "errors": {
+        "empty": "Type a name.",
+        "exists": "There is already a folder with that name.",
+        "tooLong": "Use 60 characters at most."
+      }
     },
-    "folderBadges": {
-      "worm": "WORM",
-      "hold": "Legal Hold",
-      "policyShort": "Retention",
-      "openPanel": "View retention policies"
+    "toasts": {
+      "renamed": "Name updated.",
+      "moved": "Document moved to “{folder}”.",
+      "trashed": "Document moved to the trash.",
+      "restored": "Document restored.",
+      "destroyed": "Document deleted permanently.",
+      "trashEmptied": "{count, plural, =0 {There were no documents to delete.} one {# document was deleted.} other {# documents were deleted.}}",
+      "trashEmptiedHeld": "{count, plural, one {# document was deleted} other {# documents were deleted}}; {held} under legal hold remain in the trash.",
+      "folderCreated": "Folder “{folder}” created.",
+      "uploaded": "{count, plural, one {# document uploaded.} other {# documents uploaded.}}",
+      "uploadedNoAi": "{count, plural, one {# document was saved} other {# documents were saved}} without AI analysis (AI quota used up or AI not available).",
+      "sampleReset": "Sample data reset.",
+      "onHold": "“{folder}” is under legal hold: it cannot be deleted.",
+      "exported": "{count, plural, one {Inventory of # document downloaded.} other {Inventory of # documents downloaded.}}",
+      "auditReady": "{count, plural, one {Package with # document downloaded.} other {Package with # documents downloaded.}}",
+      "downloaded": "File downloaded.",
+      "copyReady": "Watermarked copy downloaded."
+    },
+    "errors": {
+      "login": "Your session is not active. Sign in to see and upload your documents.",
+      "rateLimit": "You made many requests in a row. Wait a moment and try again.",
+      "forbidden": "The server did not allow this action.",
+      "notFound": "The document no longer exists on the server.",
+      "fileType": "File type not supported. Use PDF, DOCX, TXT or CSV.",
+      "fileSize": "The file is larger than 10 MB.",
+      "noText": "This document has no text the AI can read.",
+      "aiOff": "AI is not configured on this server.",
+      "aiBudget": "This feature's monthly AI quota is used up. Write to us and we'll help with your case.",
+      "aiUserLimit": "You reached your account's daily limit of AI requests. Try again tomorrow.",
+      "aiUnavailable": "AI is not available right now. Try again in a few minutes.",
+      "network": "There is no connection to the server. Check your connection and try again.",
+      "server": "The server had a problem. Try again in a few minutes.",
+      "pdf": "The PDF could not be generated."
+    },
+    "common": {
+      "cancel": "Cancel",
+      "close": "Close",
+      "show": "Show",
+      "hide": "Hide"
     }
   }
 }
