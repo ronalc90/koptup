@@ -1,14 +1,31 @@
-'use client';
-
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import Button from '@/components/ui/Button';
 import Card, { CardContent } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
+import BackButton from '@/components/errors/BackButton';
 import { ExclamationTriangleIcon, HomeIcon } from '@heroicons/react/24/outline';
 
-export default function NotFoundPage() {
-  const t = useTranslations('notFoundPage');
+/**
+ * Página 404. Título propio y sin la canonical ni el og:url de la home. El
+ * `noindex` lo agrega Next a toda respuesta 404, así que aquí `robots: null`
+ * quita el `index, follow` heredado del layout raíz y queda un solo meta robots.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('notFoundPage');
+  return {
+    title: t('metaTitle'),
+    description: t('subtitle'),
+    robots: null,
+    alternates: { canonical: null },
+    openGraph: null,
+    twitter: null,
+  };
+}
+
+export default async function NotFoundPage() {
+  const t = await getTranslations('notFoundPage');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:from-secondary-950 dark:via-black dark:to-primary-950 flex items-center justify-center px-4">
@@ -28,9 +45,7 @@ export default function NotFoundPage() {
             <Button size="lg" asChild>
               <Link href="/"><HomeIcon className="h-5 w-5 mr-2" />{t('homeButton')}</Link>
             </Button>
-            <Button size="lg" variant="outline" onClick={() => typeof window !== 'undefined' && window.history.back()}>
-              {t('backButton')}
-            </Button>
+            <BackButton label={t('backButton')} />
           </div>
         </CardContent>
       </Card>

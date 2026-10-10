@@ -1,8 +1,10 @@
 import { MetadataRoute } from 'next';
-import { OFFERINGS } from '@/lib/services-catalog';
 import { RAG_PATH, RAG_SECTORS } from '@/lib/rag-page';
 import { SITE_URL } from '@/lib/site';
-import { defaultAccessMode } from '@/lib/demo-access-defaults';
+import { SITEMAP_REVALIDATE_SECONDS, fetchSitemapCatalog, openDemoSlugs } from '@/lib/sitemap-demos';
+
+// Se regenera cada hora: así sigue al catálogo de demos que edita el admin.
+export const revalidate = SITEMAP_REVALIDATE_SECONDS;
 
 // Dominio canónico (con www).
 const baseUrl = SITE_URL;
@@ -14,13 +16,7 @@ const baseUrl = SITE_URL;
  */
 const lastModified = new Date('2026-06-29');
 
-/**
- * Demos auxiliares que existen como ruta y tienen SEO propio pero no forman
- * parte del catálogo de OFFERINGS.
- */
-const AUX_DEMO_SLUGS = ['cuentas-medicas', 'sistema-experto', 'linkedin-ads'];
-
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Páginas estáticas indexables. `/pricing` se omite a propósito: redirige a
   // `/services`, y los sitemaps no deben listar URLs que redirigen.
   const staticPages: Array<{
@@ -46,16 +42,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/cookies', changeFrequency: 'yearly', priority: 0.2 },
   ];
 
-  // Demos derivadas del catálogo (deduplicadas: algunos offerings comparten demo).
-  // Solo las abiertas según la semilla del sistema de demos: las que requieren
-  // acceso o invitación muestran una pantalla de acceso (noindex) a quien no
-  // lo tiene, así que no se listan (wiki 04, §10.2).
-  const demoSlugs = Array.from(
-    new Set([
-      ...OFFERINGS.map((o) => o.demoSlug).filter(Boolean),
-      ...AUX_DEMO_SLUGS,
-    ]),
-  ).filter((slug) => defaultAccessMode(slug) === 'publico');
+  // Demos abiertas y activas según el catálogo que edita el admin (o la
+  // tabla de respaldo si el backend no responde): las que requieren acceso o
+  // invitación muestran una pantalla de acceso (noindex) a quien no lo tiene,
+  // así que no se listan (lib/sitemap-demos.ts).
+  const demoSlugs = openDemoSlugs(await fetchSitemapCatalog());
 
   const staticEntries: MetadataRoute.Sitemap = staticPages.map((p) => ({
     url: `${baseUrl}${p.path}`,

@@ -610,7 +610,7 @@ Puntos clave:
 
 1. **Filtros por estado:** Todos (con el número de la lista que estás viendo), Nuevos, Leídos y Respondidos.
 2. **Tarjeta del contacto:** nombre, estado, correo, fecha, teléfono, servicio de interés y presupuesto. Pulsa una tarjeta para ver el detalle.
-3. **Detalle del contacto:** correo, teléfono, empresa, servicio y presupuesto.
+3. **Detalle del contacto:** correo, teléfono, empresa, servicio, presupuesto y, si lo indicó, **Plazo** («¿Cuándo quieres empezar?»). Cuando la persona llega desde un plan RAG o desde «Cotizar este tier», el servicio trae el plan, o el nivel y la modalidad (p. ej. «CRM con IA — Nivel Avanzado · Comprar el software»).
 4. **Mensaje** completo.
 
 Debajo del detalle están los botones **Marcar como nuevo**, **Marcar como leído** y **Marcar como respondido**. El estado es solo una marca para el equipo: no envía nada a la persona. Responde por correo o por WhatsApp fuera del panel.

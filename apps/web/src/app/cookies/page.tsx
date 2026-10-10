@@ -30,6 +30,7 @@ export default function CookiesPage() {
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
   const [functionalEnabled, setFunctionalEnabled] = useState(false);
   const [marketingEnabled, setMarketingEnabled] = useState(false);
+  const [savedMessage, setSavedMessage] = useState<string | null>(null);
 
   // Los interruptores muestran la elección ya guardada (banner o esta página).
   useEffect(() => {
@@ -109,7 +110,8 @@ export default function CookiesPage() {
     setAnalyticsEnabled(choice.analytics);
     setMarketingEnabled(choice.marketing);
     saveCookiePreferences(choice);
-    alert(message);
+    // Confirmación en la página (antes era un alert() del navegador).
+    setSavedMessage(message);
     const revoked =
       (before?.analytics === true && !choice.analytics) ||
       (before?.marketing === true && !choice.marketing);
@@ -321,6 +323,14 @@ export default function CookiesPage() {
                   {t('preferences.savePreferences')}
                 </Button>
               </div>
+              <p
+                role="status"
+                aria-live="polite"
+                className={savedMessage ? 'mt-4 flex items-center justify-center gap-2 text-sm font-medium text-green-700 dark:text-green-400' : 'sr-only'}
+              >
+                {savedMessage ? <CheckCircleIcon className="h-5 w-5" aria-hidden="true" /> : null}
+                {savedMessage}
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -451,8 +461,8 @@ export default function CookiesPage() {
             <ClockIcon className="h-5 w-5" />
             <span className="text-sm">{t('footer.updated')}</span>
           </div>
-          <p className="text-sm text-secondary-500 dark:text-secondary-500 mb-2">
-            {t('footer.copyright')}
+          <p className="text-sm text-secondary-500 dark:text-secondary-500 mb-2" suppressHydrationWarning>
+            {t('footer.copyright', { year: new Date().getFullYear() })}
           </p>
           <div className="flex items-center justify-center gap-4 text-sm">
             <a href="/privacy" className="text-primary-600 dark:text-primary-400 hover:underline">

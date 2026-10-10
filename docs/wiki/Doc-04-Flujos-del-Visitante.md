@@ -263,7 +263,9 @@ Desde la demo, el cierre común **Ver Planes y Precios** (o el botón **Quiero e
 1. **Estás cotizando: Sistema RAG — Plan Esencial** y la etiqueta "Solicitud pre-llenada".
 2. **Servicio de interés** ya elegido: Sistema RAG.
 3. **Mensaje** ya escrito: "Hola, me interesa cotizar Sistema RAG (plan Esencial)." La persona puede cambiarlo.
-4. **Enviar mensaje.** Si el servicio sigue siendo "Sistema RAG", el lead se guarda con el servicio "Sistema RAG — Plan Esencial" aunque se edite el mensaje.
+4. **Enviar mensaje.** Si el servicio sigue siendo "Sistema RAG", el lead se guarda con el servicio "Sistema RAG — Plan Esencial" aunque se edite el mensaje, y con el plan como dato aparte (`cotizacion.plan`).
+
+Desde "Otras soluciones a medida" › **Cotizar este tier** llega igual, con el nombre de la solución y el detalle elegido (por ejemplo "CRM con IA — Nivel Profesional · Suscripción SaaS mensual"); el lead guarda la solución, el nivel y la modalidad.
 
 Lo que sigue (envío y confirmación) es el [Flujo 3](#4-flujo-3-formulario-de-contacto).
 
@@ -423,8 +425,8 @@ El formulario de `/contact` es el destino de "Agenda un piloto", de los botones 
 1. **Nombre completo** (obligatorio).
 2. **Email** (obligatorio).
 3. **Servicio de interés** (obligatorio): Sistema RAG, E-Commerce, Chatbot con IA, Desarrollo Web, Desarrollo Móvil, Integraciones API, Diseño UX/UI, Consultoría u Otro.
-4. **Presupuesto estimado** (opcional): cinco rangos.
-5. **¿Cuándo quieres empezar?** (opcional): ya, el próximo mes, en 2-3 meses o sin definir.
+4. **Presupuesto estimado** (opcional): cinco rangos en pesos colombianos sin IVA, de "Menos de COP 5.000.000" a "Más de COP 60.000.000" (coherentes con los precios publicados).
+5. **¿Cuándo quieres empezar?** (opcional): ya, el próximo mes, en 2-3 meses o sin definir. Se guarda con el contacto y el equipo lo ve en Admin › Contactos.
 6. **Cuéntanos sobre tu proyecto** (obligatorio).
 7. **Enviar mensaje.**
 
@@ -442,7 +444,7 @@ Teléfono y Empresa son opcionales. En la columna derecha, **Agendar ahora** (m�
 
 *"¡Mensaje enviado!" con la invitación a probar la demo mientras tanto.*
 
-La confirmación dice "Gracias por contactarnos. Te responderemos pronto" y ofrece **Probar la demo** (`/demo/chatbot`). A los 6 segundos el formulario vuelve a aparecer vacío. Si el envío falla, se muestra un aviso rojo arriba del formulario y los datos se conservan.
+La confirmación dice "Gracias por contactarnos. Te responderemos pronto" y ofrece **Probar la demo** (`/demo/chatbot`). A los 6 segundos el formulario vuelve a aparecer vacío. Si el envío falla, se muestra un aviso rojo arriba del formulario que dice qué pasó (faltan datos obligatorios, demasiados envíos seguidos o sin conexión con el servidor) y los datos se conservan.
 
 ### A dónde llega el lead
 
@@ -468,7 +470,7 @@ sequenceDiagram
 
 *El guardado se espera; los avisos van aparte y nunca hacen fallar el envío.*
 
-1. **Se guarda** en la colección de contactos con estado **Nuevo** y origen `contact-form`. Se guardan nombre, email, teléfono, empresa, servicio (con el plan, si vino de un plan RAG), presupuesto y mensaje.
+1. **Se guarda** en la colección de contactos con estado **Nuevo** y origen `contact-form`. Se guardan nombre, email, teléfono, empresa, servicio (con el plan, o el nivel y la modalidad, si vino de un plan RAG o de "Cotizar este tier"), presupuesto, plazo y mensaje; lo que se cotizaba queda además como identificadores en `cotizacion`.
 2. **Avisa al equipo** por correo (a la dirección configurada en `ADMIN_EMAIL`, si el servidor tiene SMTP) y por WhatsApp (al número `ADMIN_WHATSAPP_NUMBER`, si hay proveedor configurado). Si ninguno está configurado, el lead igual queda guardado.
 3. **Aparece en Admin › Contactos**, junto con los leads de la demo RAG y de las solicitudes de demo:
 
@@ -613,7 +615,7 @@ El banner no aparece en `/cookies` (esa página tiene sus propios controles) ni 
 
 Las esenciales están "Siempre Activas". Cada botón confirma con una ventana del navegador ("Todas las cookies han sido aceptadas", "Solo cookies esenciales están habilitadas" o "Preferencias guardadas correctamente"). Si el visitante **retira** un consentimiento que había dado, la página se recarga para que ninguna etiqueta siga activa.
 
-Los eventos que se miden cuando hay consentimiento están en la [sección 8](#8-qué-mide-cada-flujo). Las rutas con datos sensibles en la URL (`/auth/…`, `/reset-password`) nunca cargan etiquetas.
+Los eventos que se miden cuando hay consentimiento están en la [sección 8](#8-qué-mide-cada-flujo). Las rutas con datos sensibles en la URL (`/auth/…`, `/reset-password`, `/activar/…`) nunca cargan etiquetas.
 
 ---
 
@@ -627,7 +629,7 @@ flowchart LR
     classDef sistema fill:#e0e7ff,stroke:#4f46e5,color:#312e81
 
     A["Clic en ES/EN"]:::visitante --> B["Guarda la cookie locale por 1 año"]:::sistema
-    B --> C["Recarga la misma ruta"]:::sistema
+    B --> C["Recarga la misma URL (ruta, parámetros y ancla)"]:::sistema
     C --> D["El servidor arma la página en el otro idioma"]:::sistema
     T["Clic en la luna o el sol"]:::visitante --> U["Cambia a oscuro o claro al instante"]:::sistema
     U --> V["Lo recuerda en el navegador"]:::sistema
@@ -658,11 +660,7 @@ flowchart LR
 - **Idioma:** español por defecto. La cookie `locale` dura un año. No cambia la URL (no hay `/en`), así que los buscadores indexan la versión en español.
 - **Tema:** claro por defecto. Se guarda en el navegador y se aplica en todas las páginas, incluidas las demos.
 
-Algunas partes no se traducen al inglés:
-
-![Nosotros sigue en español con el sitio en inglés](images/doc/visitante/f6-04-nosotros-sin-traducir.jpg)
-
-*Con el sitio en inglés, `/about` sigue en español (el menú sí está en inglés).*
+Todo el sitio público está en los dos idiomas, incluidos `/about`, `/bienvenido-producthunt`, el pie de página, los títulos de las páginas de cuenta y `/forgot-password` y `/reset-password`. Al cambiar de idioma la página se recarga con la misma URL completa: se conservan los parámetros (la demo elegida, el plan en `/contact`, `?mode=upload`) y el ancla.
 
 ---
 
@@ -710,14 +708,8 @@ La referencia completa de endpoints está en [API](Doc-08-API.md) y la de colecc
 | # | Flujo | Qué pasa | Efecto |
 |---|---|---|---|
 | 1 | 5 | No hay ninguna etiqueta de medición configurada en el sitio publicado. | No aparece el banner y no se mide ningún evento; las campañas no tienen conversiones. |
-| 2 | 1 | "Prueba con tu documento" en `/rag` y las landings abre la demo en "Prueba el asistente", no en la pestaña de subida (`?mode=upload`). | Un clic de más para quien quiere subir su documento. |
-| 3 | 3 | El campo "¿Cuándo quieres empezar?" se envía, pero el servidor **no lo guarda**; además, su texto no se traduce al inglés. | Se pierde esa respuesta del visitante. |
-| 4 | 3 | Al cotizar desde "Otras soluciones" (`?service=<slug>&tier=…&modality=…`), el banner muestra el identificador técnico ("crm ia") y el nivel y la modalidad no se guardan. | El equipo no ve qué nivel eligió el visitante. |
-| 5 | 3 | **Admin › Contactos** no muestra el origen del lead (`source`), aunque la API lo devuelve. Hoy se distinguen por el texto del servicio. | Difícil filtrar los leads de la demo o de las solicitudes. |
-| 6 | 5 | La tabla de `/cookies` no coincide con lo que usa el sitio: dice `session_id`, `auth_token`, `csrf_token` y `language`, pero las cookies reales son `accessToken`, `refreshToken` y `locale`, y el tema se guarda en el navegador (no en una cookie `theme`). | La política de cookies está desactualizada. |
-| 7 | 5 | `/cookies` confirma con ventanas del navegador (`alert`) y trata al lector de "usted". | Experiencia poco pulida. |
-| 8 | 6 | Al cambiar de idioma la página se recarga **sin los parámetros de la URL**: se pierde, por ejemplo, el plan preseleccionado en `/contact?service=…&plan=…` o el modo de la demo (`?mode=upload`). | El visitante debe volver a elegir. |
-| 9 | 6 | Sin traducción al inglés: `/about`, `/bienvenido-producthunt`, parte del pie de página y los títulos SEO (el `<title>` sigue en español). | Experiencia mixta en inglés. |
+| 2 | 3 | **Admin › Contactos** no muestra el origen del lead (`source`), aunque la API lo devuelve. Hoy se distinguen por el texto del servicio. | Difícil filtrar los leads de la demo o de las solicitudes. |
+| 3 | 5 | La tabla de `/cookies` no coincide con lo que usa el sitio: dice `session_id`, `auth_token`, `csrf_token` y `language`, pero las cookies reales son `accessToken`, `refreshToken` y `locale`, y el tema se guarda en el navegador (no en una cookie `theme`). | La política de cookies está desactualizada. |
 
 ---
 

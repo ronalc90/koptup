@@ -40,6 +40,15 @@ export interface ContactFormData {
   service: string;
   budget?: string;
   message: string;
+  /** ¿Cuándo quieres empezar? (`now`, `1m`, `3m` u `open`; vacío si no respondió). */
+  timeline?: string;
+  /** Plan RAG, o nivel y modalidad del catálogo, que se estaban cotizando (lib/contact-quote.ts). */
+  quote?: {
+    service: string;
+    plan?: string;
+    tier?: string;
+    modality?: string;
+  };
 }
 
 export interface QuoteRequestData {

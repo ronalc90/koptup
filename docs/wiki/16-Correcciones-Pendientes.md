@@ -18,7 +18,7 @@ flowchart LR
     classDef sistema fill:#f1f5f9,stroke:#475569,color:#0f172a
 
     P0["P0 · Riesgo o bloqueo<br/>producción, seguridad, Ley 1581"]:::error
-    P1["P1 · Funciones rotas<br/>portal del cliente, embudo RAG, inicio de sesión"]:::decision
+    P1["P1 · Funciones rotas<br/>portal del cliente, demos, inicio de sesión"]:::decision
     P2["P2 · Panel y operación<br/>pantallas del admin, despliegue, variables"]:::visitante
     P3["P3 · SEO, contenido y limpieza<br/>títulos, textos, código sin uso"]:::sistema
     P0 --> P1 --> P2 --> P3
@@ -27,9 +27,9 @@ flowchart LR
 | Prioridad | Qué agrupa | Puntos |
 |---|---|---|
 | **P0** | Lo que impide vender hoy o es un riesgo legal o de seguridad | 8 |
-| **P1** | Funciones que el cliente o el equipo usan y no sirven, incluidas las demos | 33 |
+| **P1** | Funciones que el cliente o el equipo usan y no sirven, incluidas las demos | 25 |
 | **P2** | Detalles del panel, de la operación y de la configuración | 34 |
-| **P3** | SEO, coherencia de textos y código que sobra | 25 |
+| **P3** | SEO, coherencia de textos y código que sobra | 11 |
 
 ---
 
@@ -63,16 +63,10 @@ flowchart LR
 | 1.7 | **El inicio de `/dashboard` es una maqueta** con datos fijos. La vista "Plan SaaS" además usa voseo | [Flujos del prospecto y cliente](Doc-05-Flujos-del-Prospecto-y-Cliente.md) |
 | 1.8 | **Nada en la web crea proyectos, entregables ni notificaciones:** esas secciones del portal siempre están vacías | [Flujos del prospecto y cliente](Doc-05-Flujos-del-Prospecto-y-Cliente.md) |
 
-### Embudo RAG y páginas públicas
+### Demo RAG y LinkedIn Ads
 
 | # | Qué pasa | Detalle |
 |---|---|---|
-| 1.9 | **"Prueba con tu documento"** en `/rag`, las landings por sector y `/chatbots-ia` abre la demo del chatbot en "Prueba el asistente" y no en la pestaña de subida (`?mode=upload`) | [Páginas públicas](Doc-03-Paginas-Publicas.md) |
-| 1.10 | **`/rag/salud` enlaza la demo de cuentas médicas,** que es solo por invitación: el visitante termina en "Solicita acceso" | [Flujos de negocio › Hallazgos](Doc-14-1-Flujos-de-Negocio.md#hallazgos) |
-| 1.11 | **"Cotizar este tier"** en Otras soluciones envía el nivel y la modalidad, pero `/contact` no los lee: el banner muestra el slug y el lead llega sin ese dato | [Páginas públicas](Doc-03-Paginas-Publicas.md) |
-| 1.12 | **Cambiar de idioma borra los parámetros de la URL:** pierde la demo elegida en `/solicitar-demo`, el plan en `/contact` y `?mode=upload` | [Flujos del visitante](Doc-04-Flujos-del-Visitante.md) |
-| 1.13 | **El menú se vuelve transparente al hacer scroll** porque sus clases de fondo no existen en Tailwind 3; sobre los encabezados azules, "Solicitar demo" e "Iniciar sesión" pierden contraste | [Páginas públicas](Doc-03-Paginas-Publicas.md) |
-| 1.14 | **El campo "Plazo" del contacto se envía y se pierde,** y los errores del formulario muestran siempre el mismo mensaje | [Flujos de negocio › Hallazgos](Doc-14-1-Flujos-de-Negocio.md#hallazgos) |
 | 1.15 | **Un documento de 30 páginas o menos con mucho texto se rechaza como "supera 30 páginas"** | [Flujos técnicos › Hallazgos](Doc-14-3-Flujos-Tecnicos.md#hallazgos) |
 | 1.16 | **LinkedIn Ads muestra el cupo mensual agotado como un error genérico** del servidor | [Flujos técnicos › Hallazgos](Doc-14-3-Flujos-Tecnicos.md#hallazgos) |
 
@@ -100,12 +94,10 @@ flowchart LR
 | 1.25 | **Las tarjetas del catálogo de 20 demos prometen funciones que la demo no tiene** ("ML", "multi-país", integraciones, cumplimiento). Es el repaso de honestidad pendiente | [Guía de demos › Limitaciones comunes](Doc-07-Guia-de-Demos.md#limitaciones-comunes) |
 | 1.26 | **7 demos sin revisar** tienen botones que no hacen nada, no dicen que usan datos de ejemplo y mezclan textos en inglés | [Guía de demos](Doc-07-Guia-de-Demos.md) |
 | 1.27 | **El gestor documental es una demo abierta cuya API exige sesión:** un visitante ve "Error al cargar documentos" | [Guía: gestor documental](Guia-Demo-gestor-documentos.md) |
-| 1.28 | **La verificación del certificado del LMS** (a la que lleva el QR) pide acceso a la demo, así que un tercero no puede verificarlo | [Guía: LMS](Guia-Demo-lms.md) |
 | 1.29 | **El chatbot dice "Revisa tu conexión"** cuando lo que pasó es que se superó el límite de bots nuevos por hora y por IP | [Guía: chatbot](Guia-Demo-chatbot.md) |
 | 1.30 | **"Solicitar acceso" mal dirigido dentro de las demos de salud:** en cuentas médicas apunta a una ruta que no existe y en el motor de reglas lleva a `/contact` | [Guía: cuentas médicas](Guia-Demo-cuentas-medicas.md), [Guía: motor de reglas](Guia-Demo-sistema-experto.md) |
 | 1.31 | **"Ver Planes y Precios"** al final de las demos de otras soluciones lleva a los planes RAG | [Guía de demos › Limitaciones comunes](Doc-07-Guia-de-Demos.md#limitaciones-comunes) |
 | 1.32 | **Errores de hidratación de React** con el navegador en español en wms-logistica, automatizacion y moderacion-contenido | [Guía de demos › Limitaciones comunes](Doc-07-Guia-de-Demos.md#limitaciones-comunes) |
-| 1.33 | **Telemedicina:** la política de permisos del sitio bloquea la cámara y el micrófono, así que la prueba de cámara de la videoconsulta nunca aparece | [Guía: telemedicina](Guia-Demo-telemedicina.md) |
 | 1.34 | **La nota de "Simular ticket entrante" del helpdesk dice que el mensaje no sale del navegador,** pero "Redactar con IA" lo envía al servidor | [Guía: helpdesk](Guia-Demo-helpdesk-ia.md) |
 
 ---
@@ -160,31 +152,12 @@ flowchart LR
 
 ## P3: SEO, contenido y limpieza
 
-### SEO
-
-| # | Qué pasa | Detalle |
-|---|---|---|
-| 3.1 | `/login`, `/register`, `/forgot-password`, `/reset-password` y `/auth/callback` dicen `index, follow` y tienen como canonical el inicio (robots.txt sí las bloquea) | [SEO, analítica y legal](Doc-12-SEO-Analitica-y-Legal.md) |
-| 3.2 | La 404 hereda el título y el canonical del inicio y tiene dos metas robots contradictorias | [SEO, analítica y legal](Doc-12-SEO-Analitica-y-Legal.md) |
-| 3.3 | Todas las páginas del panel, del portal y de cuenta usan el título genérico del sitio | [Mapa del sitio](Doc-02-Mapa-del-Sitio.md) |
-| 3.4 | `/pricing` redirige con 307 (temporal) en vez de 308 | [Mapa del sitio](Doc-02-Mapa-del-Sitio.md) |
-| 3.5 | El sitemap decide qué demos listar con la tabla del código, no con el catálogo que edita el admin | [SEO, analítica y legal](Doc-12-SEO-Analitica-y-Legal.md) |
-
 ### Contenido y coherencia
 
 | # | Qué pasa | Detalle |
 |---|---|---|
 | 3.7 | **La tabla de `/cookies` lista cookies que no existen** y omite las reales; la cookie de idioma se guarda aunque se rechacen las funcionales | [SEO, analítica y legal](Doc-12-SEO-Analitica-y-Legal.md) |
-| 3.8 | **Año de fundación distinto:** 2019 en `llms.txt`, 2026 en `/about` y "metodología probada en 8+ años"; © 2025 en las páginas legales y © 2026 en el sitio | [SEO, analítica y legal](Doc-12-SEO-Analitica-y-Legal.md) |
-| 3.9 | `/about` escribe "Koptup" en el título, en vez de "KopTup" | [Páginas públicas](Doc-03-Paginas-Publicas.md) |
-| 3.10 | Dos direcciones de LinkedIn distintas: una en el pie y otra en `/contact` | [Páginas públicas](Doc-03-Paginas-Publicas.md) |
-| 3.11 | `/desarrollo-web-colombia`: "Solicitar cotización" lleva a los planes RAG | [Páginas públicas](Doc-03-Paginas-Publicas.md) |
-| 3.12 | `/contact`: los rangos de presupuesto están en USD sin decirlo, mientras los planes se publican en COP | [Páginas públicas](Doc-03-Paginas-Publicas.md) |
-| 3.13 | Las páginas legales tratan de "usted" y el resto del sitio de "tú"; `/cookies` confirma con `alert()` | [Páginas públicas](Doc-03-Paginas-Publicas.md) |
-| 3.14 | **Falta el inglés en:** `/about`, `/bienvenido-producthunt`, enlaces del pie, títulos de página, `/forgot-password`, `/reset-password`, "Nuevo pedido" y el campo "Plazo" de contacto | [Páginas públicas](Doc-03-Paginas-Publicas.md) |
-| 3.15 | Franjas a los lados de las secciones de borde a borde en navegadores con barra de desplazamiento clásica (`scrollbar-gutter: stable both-edges`) | [Páginas públicas](Doc-03-Paginas-Publicas.md) |
-| 3.16 | En el catálogo, "Probar demo" es un botón dentro de un enlace (problema de accesibilidad) | [Páginas públicas](Doc-03-Paginas-Publicas.md) |
-| 3.17 | El README no menciona que `whatsapp_click` también se mide en `/solicitar-demo` | [SEO, analítica y legal](Doc-12-SEO-Analitica-y-Legal.md) |
+| 3.14 | **Falta el inglés en** "Nuevo pedido" del portal (`/dashboard/orders/new`) | [Páginas públicas](Doc-03-Paginas-Publicas.md) |
 
 ### Código sin uso o que confunde
 

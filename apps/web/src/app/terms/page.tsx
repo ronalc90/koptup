@@ -278,8 +278,8 @@ export default function TermsPage() {
             <ClockIcon className="h-5 w-5" />
             <span className="text-sm">{t('footer.updated')}</span>
           </div>
-          <p className="text-sm text-secondary-500 dark:text-secondary-500 mb-2">
-            {t('footer.copyright')}
+          <p className="text-sm text-secondary-500 dark:text-secondary-500 mb-2" suppressHydrationWarning>
+            {t('footer.copyright', { year: new Date().getFullYear() })}
           </p>
           <div className="flex items-center justify-center gap-4 text-sm">
             <a href="/privacy" className="text-primary-600 dark:text-primary-400 hover:underline">

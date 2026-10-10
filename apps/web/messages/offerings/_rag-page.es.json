@@ -192,6 +192,11 @@
   },
   "ragSectors": {
     "casesTitle": "Casos de uso",
+    "demoGateNote": {
+      "privado": "Esta demo se abre solo con invitación: el enlace te lleva al formulario para pedirla y el equipo te contacta.",
+      "solicitud": "Esta demo requiere un acceso aprobado: el enlace te lleva al formulario para pedirlo.",
+      "publico": "Esta demo no está disponible por ahora: el enlace te lleva al formulario para pedirla y el equipo te responde."
+    },
     "ragLink": {
       "title": "¿Cómo funciona un sistema RAG?",
       "desc": "Conoce cómo la IA busca en tus documentos y cita la fuente, qué pasa con tus datos, las integraciones, los planes y las preguntas frecuentes.",
@@ -225,6 +230,8 @@
         }
       ],
       "demoLink": "Ver la demo «Sistema experto para salud»: auditoría de cuentas médicas con reglas e IA",
+      "demoInviteLink": "Pedir la demo «Sistema experto para salud» (con invitación): auditoría de cuentas médicas con reglas e IA",
+      "demoRequestLink": "Solicitar acceso a la demo «Sistema experto para salud»: auditoría de cuentas médicas con reglas e IA",
       "disclaimer": "La IA apoya a tu equipo con información citada; las decisiones clínicas y de auditoría siguen en manos de tus profesionales."
     },
     "legal": {

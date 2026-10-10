@@ -19,6 +19,7 @@ Disallow: /auth/
 Disallow: /test
 Disallow: /liquidacion
 Disallow: /activar/
+Disallow: /propuesta/
 Disallow: /demo-acceso/
 Disallow: /*?*sessionId=*
 Disallow: /*?*token=*
@@ -36,6 +37,7 @@ Disallow: /auth/
 Disallow: /test
 Disallow: /liquidacion
 Disallow: /activar/
+Disallow: /propuesta/
 Disallow: /demo-acceso/
 Disallow: /*?*sessionId=*
 Disallow: /*?*token=*

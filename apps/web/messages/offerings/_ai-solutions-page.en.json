@@ -58,17 +58,19 @@
         },
         "decisions": {
           "title": "Smarter Business Decisions",
-          "desc": "Real-time data analysis for better business decisions."
+          "desc": "AI summarizes and cross-references your data and documents so you decide with sources, not assumptions."
         },
         "advantage": {
-          "title": "Real Competitive Advantage",
-          "desc": "Companies that adopt AI today will lead their industry in the coming years."
+          "title": "Faster Answers",
+          "desc": "Your team finds the answer in seconds with the source cited, without waiting for someone to look up the document."
         }
       }
     },
     "tech": {
       "title": "AI Technologies We Implement",
-      "subtitle": "We work with the most advanced AI platforms on the market",
+      "subtitle": "The RAG demo uses the OpenAI API; we choose the other platforms with you based on your project.",
+      "inDemo": "In the RAG demo",
+      "perProject": "Depending on your project",
       "orchestration": "AI orchestration",
       "automation": "Automation"
     },

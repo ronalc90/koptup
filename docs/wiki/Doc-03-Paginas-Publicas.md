@@ -54,11 +54,12 @@ flowchart LR
     INICIO -->|"Ver planes"| PLANES
     INICIO -->|"Solicitar cotización"| CONT
     INICIO -->|"Demos destacadas"| DEMOS
-    RAG -->|"Prueba con tu documento"| CHAT
+    RAG -->|"Prueba con tu documento (?mode=upload)"| CHAT
     RAG -->|"Agenda un piloto"| CONT
     RAG -->|"Elegir plan"| CONT
     RAG --> SECT
-    SECT -->|"Prueba con tu documento"| CHAT
+    SECT -->|"Prueba con tu documento (?mode=upload)"| CHAT
+    SECT -->|"Salud: pedir la demo con invitación"| SOL
     SECT -->|"Agenda un piloto"| CONT
     SEO --> RAG
     SEO --> CONT
@@ -84,11 +85,11 @@ flowchart LR
 | `/rag/legal` | Landing de RAG para áreas legales | Buscar en contratos con IA: RAG para áreas legales \| KopTup | Sí |
 | `/rag/soporte` | Landing de RAG para soporte y manuales | Asistente IA para manuales internos y soporte \| KopTup | Sí |
 | `/services` | Planes RAG y catálogo "Otras soluciones a medida" | Precios de sistemas RAG y software a medida \| KopTup | Sí |
-| `/pricing` | Redirección | (redirige a `/services#planes-rag`) | — |
+| `/pricing` | Redirección permanente (308) | (redirige a `/services#planes-rag`) | — |
 | `/demo` | Hub con las demos y su modo de acceso | Prototipos Interactivos: Prueba Antes de Contratar \| KopTup | Sí |
 | `/solicitar-demo` | Formulario para pedir demos | Solicitar una demo guiada \| KopTup | Sí |
 | `/contact` | Formulario de contacto y cotización | Contacto: Solicita tu Cotización Gratis \| KopTup | Sí |
-| `/about` | Quiénes somos | Sobre Nosotros: Empresa de Software en Bogotá \| KopTup | Sí |
+| `/about` | Quiénes somos | Nosotros: estudio de software a medida en Bogotá \| KopTup | Sí |
 | `/chatbots-ia` | Landing SEO de chatbots RAG | Chatbots RAG para WhatsApp y web \| KopTup | Sí |
 | `/soluciones-ia` | Landing SEO de soluciones de IA | Soluciones de Inteligencia Artificial para Empresas \| KopTup | Sí |
 | `/desarrollo-web-colombia` | Landing SEO de desarrollo a medida | Desarrollo Web y Software a Medida en Colombia \| KopTup | Sí |
@@ -96,7 +97,7 @@ flowchart LR
 | `/privacy` | Política de privacidad | Política de Privacidad \| KopTup | Sí |
 | `/terms` | Términos y condiciones | Términos y Condiciones \| KopTup | Sí |
 | `/cookies` | Política de cookies y preferencias | Política de Cookies \| KopTup | Sí |
-| (cualquier ruta inexistente) | Error 404 | IA que responde con los documentos de tu empresa \| KopTup | No (`noindex`) |
+| (cualquier ruta inexistente) | Error 404 | Página no encontrada \| KopTup | No (`noindex`) |
 
 Los títulos se tomaron de la página renderizada. El detalle de descripciones, `canonical`, JSON-LD y sitemap está en [SEO, analítica y legal](Doc-12-SEO-Analitica-y-Legal.md).
 
@@ -122,6 +123,8 @@ Todas las páginas públicas comparten el **menú superior** y el **pie de pági
 
 Con sesión iniciada, los botones 5–7 se reemplazan por el **menú de la cuenta** (avatar con el nombre). Sus opciones dependen del rol y se explican en [Flujos del prospecto y cliente](Doc-05-Flujos-del-Prospecto-y-Cliente.md).
 
+Al bajar por la página (o si la página abre ya desplazada, por ejemplo con un ancla como `/services#otras-soluciones`), el menú toma un fondo casi opaco (blanco en tema claro, gris oscuro en tema oscuro) y sus textos cambian de color para mantener el contraste sobre los encabezados azules.
+
 ### 2.2 Menú en el celular
 
 ![Menú abierto en el celular](images/doc/publicas/menu-movil-abierto.jpg)
@@ -132,17 +135,17 @@ Con sesión iniciada, los botones 5–7 se reemplazan por el **menú de la cuent
 
 ![Pie de página anotado](images/doc/publicas/footer-anotado.jpg)
 
-*El pie de página es igual en todas las páginas públicas.*
+*El pie de página es igual en todas las páginas públicas, está traducido al inglés y muestra el año en curso (© 2026).*
 
-1. **Marca y redes:** descripción corta y enlaces a LinkedIn, GitHub, Instagram y X.
-2. **Servicios:** Sistemas RAG (`/rag`), Desarrollo Web a Medida (`/desarrollo-web-colombia`), Chatbots RAG (`/chatbots-ia`), Soluciones de IA (`/soluciones-ia`), E-commerce y Aplicaciones Móviles (ambos a `/services#otras-soluciones`).
-3. **Demos:** E-commerce, Chatbot IA, Dashboard, Gestión Documental, Sistema Reservas y el hub (`/demo`).
+1. **Marca y redes:** descripción corta ("Sistemas RAG y software a medida para empresas, desde Bogotá") y enlaces a LinkedIn (`linkedin.com/company/koptup`, la misma página que enlaza `/contact`) e Instagram. El perfil de X se quitó porque no existe, y el de GitHub porque `github.com/koptup` es una cuenta personal sin relación comprobable con KopTup.
+2. **Servicios:** Sistemas RAG (`/rag`), Desarrollo web a medida (`/desarrollo-web-colombia`), Chatbots RAG (`/chatbots-ia`), Soluciones de IA (`/soluciones-ia`), E-commerce y Aplicaciones Móviles (ambos a `/services#otras-soluciones`).
+3. **Demos:** Tienda en línea, Chatbot RAG, Dashboard ejecutivo, Gestor documental, Sistema de reservas y Todas las demos (`/demo`).
 4. **Empresa:** Nosotros, Planes y servicios, Contacto.
 5. **Legal:** Privacidad, Términos, Cookies.
 
 ### 2.4 Selector de idioma y tema
 
-- **Idioma:** el botón ES/EN guarda la cookie `locale` (1 año) y **recarga la página** en el otro idioma. No hay rutas `/es` ni `/en`: la misma URL sirve los dos idiomas.
+- **Idioma:** el botón ES/EN guarda la cookie `locale` (1 año) y **recarga la misma URL completa** (ruta, parámetros y ancla) en el otro idioma: se conservan, por ejemplo, la demo elegida en `/solicitar-demo?demos=…`, el plan en `/contact?service=…&plan=…` y `?mode=upload`. No hay rutas `/es` ni `/en`: la misma URL sirve los dos idiomas.
 - **Tema:** el botón de luna/sol cambia a modo oscuro o claro y lo recuerda en el navegador. Por defecto el sitio abre en tema claro.
 
 El paso a paso con capturas en inglés y en modo oscuro está en [Flujos del visitante › Flujo 6](Doc-04-Flujos-del-Visitante.md#7-flujo-6-idioma-esen-y-modo-oscuro).
@@ -186,7 +189,7 @@ Todas las páginas bajo `/demo` (el hub y cada demo) terminan con el mismo bloqu
 | 1 | Menú | Ver [§2.1](#21-menú-superior-escritorio). |
 | 2 | Hero | Etiqueta "Sistemas RAG para empresas", título **"IA que responde con los documentos de tu empresa"**, subtítulo ("Piloto con tus documentos en 2 semanas") y los dos botones principales. |
 | 3 | Datos verificables | Cuatro frases que KopTup puede respaldar: "Demo con IA real, sin registro", "Respuestas con fuente citada", "Piloto en 2 semanas" y "Equipo en Colombia". No hay cifras de clientes ni calificaciones. |
-| 4 | Soluciones para Cada Industria | Ocho demos destacadas (Chatbot RAG, Sistema experto para salud, E-Commerce, Dashboard Ejecutivo, Gestión de Proyectos, Gestor Documental, CMS Avanzado y Sistema de Reservas). Cada tarjeta abre su demo; si la demo no es abierta, muestra su etiqueta (por ejemplo, **Solo por invitación** en Sistema experto para salud). |
+| 4 | Soluciones para Cada Industria | Ocho demos destacadas (Chatbot RAG, Sistema experto para salud, E-Commerce, Dashboard Ejecutivo, Gestión de Proyectos, Gestor Documental, CMS Avanzado y Sistema de Reservas). Cada descripción dice qué hace la demo y si usa datos de ejemplo (sin "tiempo real" ni funciones que la demo no tiene). Cada tarjeta abre su demo; si la demo no es abierta, muestra su etiqueta (por ejemplo, **Solo por invitación** en Sistema experto para salud). |
 | 5 | ¿Por qué elegir KopTup? | Tres beneficios: soluciones a medida, tecnología de vanguardia y soporte continuo. Sin enlaces. |
 | 6 | Servicios Tecnológicos | Ocho servicios (e-commerce, chatbots e IA, integraciones API, software a medida, apps móviles, UX/UI, ciberseguridad, consultoría y nube) y el botón **Conocer más**. |
 | 7 | Cierre | "¿Listo para iniciar tu proyecto?" con dos botones. |
@@ -249,7 +252,7 @@ Todas las páginas bajo `/demo` (el hub y cada demo) terminan con el mismo bloqu
 
 | Botón o enlace | Lleva a |
 |---|---|
-| **Prueba con tu documento** (hero y cierre) | `/demo/chatbot` (abre en el modo "Prueba el asistente"; la pestaña "Prueba con tu documento" está a un clic) |
+| **Prueba con tu documento** (hero y cierre) | `/demo/chatbot?mode=upload`: la demo abre directamente en la pestaña "Prueba con tu documento" |
 | **Agenda un piloto** (hero y cierre) | `/contact` |
 | Ver RAG para salud / legal / soporte | `/rag/salud`, `/rag/legal`, `/rag/soporte` |
 | Lee nuestra política de privacidad | `/privacy` |
@@ -271,15 +274,15 @@ Son tres páginas cortas con la misma estructura. Sirven para los anuncios y bú
 
 ![Mapa de bloques de /rag/salud](images/doc/publicas/rag-salud-mapa.jpg)
 
-*`/rag/salud` completa: es la única de las tres con enlace a una demo.*
+*`/rag/salud` completa: es la única de las tres con enlace a una demo, que se pide "con invitación".*
 
 | # | Bloque | Qué muestra |
 |---|---|---|
 | 1 | Hero | Etiqueta del sector, título y subtítulo. |
 | 2 | Casos de uso | Tres casos numerados. En salud y legal termina con una **nota de responsabilidad** ("las decisiones clínicas / la interpretación jurídica siguen en manos de tus profesionales"). |
-| 3 | Enlace a una demo (solo salud) | En el caso "Auditoría de cuentas médicas": "Ver la demo «Sistema experto para salud»", con la etiqueta **Solo por invitación** que trae el catálogo. |
+| 3 | Enlace a una demo (solo salud) | En el caso "Auditoría de cuentas médicas". Como la demo se abre solo por invitación, el enlace dice **"Pedir la demo «Sistema experto para salud» (con invitación)"**, lleva a `/solicitar-demo?demos=cuentas-medicas` (con la demo ya elegida) y debajo explica que el equipo la habilita. Si el administrador la vuelve abierta en el catálogo, el enlace pasa a "Ver la demo…" y abre la demo; si requiere acceso, dice "Solicitar acceso…". Lleva la etiqueta de acceso que trae el catálogo. |
 | 4 | ¿Cómo funciona un sistema RAG? | Enlace **Ver sistemas RAG para empresas** → `/rag`. |
-| 5 | Cierre | "Pruébalo con tus documentos": **Prueba con tu documento** → `/demo/chatbot` y **Agenda un piloto** → `/contact`. |
+| 5 | Cierre | "Pruébalo con tus documentos": **Prueba con tu documento** → `/demo/chatbot?mode=upload` y **Agenda un piloto** → `/contact`. |
 
 | Landing | Casos de uso | Título SEO real |
 |---|---|---|
@@ -341,12 +344,12 @@ Cada clic en un botón de plan registra el evento `plan_click` (solo si el visit
 
 *Encabezado y controles del catálogo.*
 
-1. **Cómo escalamos:** horario del equipo (lunes a viernes), alcance de cumplimiento (alineado con normas, sin certificación propia) y cotización personalizada para alcances mayores.
+1. **Cómo escalamos:** horario del equipo (lunes a viernes), cumplimiento de normas (ISO 27001, SOC 2 o HIPAA) como requisito de diseño del proyecto, sin certificación propia, y cotización personalizada para alcances mayores.
 2. **Buscador** por nombre o categoría.
 3. **Modalidad:** "Comprar el software" (setup + mantenimiento opcional; te entregan el código) o "Suscripción SaaS mensual" (lo hospeda KopTup). Viene marcada la suscripción.
 4. **Moneda:** COP o USD. Debajo, la nota "Precios fijados en COP. El valor en USD es una referencia calculada con una TRM de COP 3.300 por dólar".
 5. **Filtros por categoría:** Todos, Ventas, Finanzas, Operaciones, Productividad, Plataforma IA, Seguridad, HealthTech, Educación, Comercio, Soporte, DevTools, Voz IA, Datos y Engagement.
-6. **Tarjeta de solución:** categoría, nombre, frase, descripción y el precio "Desde" del nivel Profesional (setup único y mensualidad). Botones **Ver más detalles** (abre el detalle) y **Probar demo** (con la etiqueta "Requiere acceso" o "Solo por invitación" si aplica).
+6. **Tarjeta de solución:** categoría, nombre, frase, descripción y el precio "Desde" del nivel Profesional (setup único y mensualidad). Botones **Ver más detalles** (abre el detalle) y **Probar demo** (un enlace con estilo de botón, con la etiqueta "Requiere acceso" o "Solo por invitación" si aplica).
 
 El catálogo muestra **26 soluciones**. El chatbot RAG no aparece aquí porque lo reemplazan los planes RAG de arriba. Al final hay un bloque "¿No sabes cuál elegir?" con el botón **Hablar con un experto** → `/contact`.
 
@@ -356,11 +359,13 @@ El catálogo muestra **26 soluciones**. El chatbot RAG no aparece aquí porque l
 
 El detalle permite cambiar la **modalidad** y el **nivel** (Básico, Profesional, Avanzado, Enterprise) y muestra el setup único, la mensualidad o el mantenimiento, qué incluye, los límites del nivel (usuarios, cuentas, volumen, almacenamiento), el soporte, el tiempo de implementación y los **costos que paga el cliente directamente** (nube, APIs). Termina con **Cotizar este tier** → `/contact?service=<solución>&tier=<nivel>&modality=<modalidad>` y **Probar demo** → `/demo/<demo>`.
 
-Así llega hoy a `/contact` quien pulsa **Cotizar este tier** en "CRM con IA", nivel Profesional, modalidad SaaS:
+Así llega a `/contact` quien pulsa **Cotizar este tier** en "CRM con IA", nivel Profesional, modalidad SaaS:
 
 ![Contacto prellenado desde el catálogo](images/doc/publicas/contacto-desde-catalogo.jpg)
 
-*(1) el banner muestra el identificador "crm ia"; (2) el servicio y (3) el mensaje tampoco mencionan el nivel ni la modalidad (ver [limitación 1](#16-limitaciones-conocidas)).*
+*El banner dice "CRM con IA — Nivel Profesional · Suscripción SaaS mensual", el servicio queda elegido como "CRM con IA" y el mensaje menciona el nivel y la modalidad.*
+
+`/contact` entiende `?service=` con cualquier solución del catálogo (muestra su nombre, en el idioma del visitante), `&tier=` (Básico, Profesional, Avanzado o Enterprise) y `&modality=` (Comprar el software o Suscripción SaaS mensual). Un servicio, nivel o modalidad desconocidos se ignoran: no se muestran identificadores técnicos. Al enviar, el lead guarda el texto legible en el servicio y los identificadores aparte (`Contact.cotizacion`).
 
 > Las cifras de "Otras soluciones" salen de `apps/web/src/lib/services-catalog.ts`. Son precios de referencia del catálogo; el plan comercial de cada solución está en las páginas `Producto-*` de la wiki.
 
@@ -468,14 +473,14 @@ Qué ve el visitante al abrir una demo con acceso restringido: [Flujos del visit
 |---|---|---|
 | 1 | Hero | "Hablemos de tu proyecto" y "Listos para convertir tu visión en realidad. Agenda una consulta gratuita". |
 | 2 | Banner "Estás cotizando" | Solo si se llega con `?service=`: muestra el servicio y el plan (por ejemplo "Sistema RAG — Plan Esencial") y la etiqueta "Solicitud pre-llenada". |
-| 3 | Formulario "Envíanos un Mensaje" | Nombre*, Email*, Teléfono, Empresa, Servicio de interés* (Sistema RAG, E-Commerce, Chatbot con IA, Desarrollo Web, Desarrollo Móvil, Integraciones API, Diseño UX/UI, Consultoría, Otro), Presupuesto estimado (5 rangos), ¿Cuándo quieres empezar? (4 opciones), Cuéntanos sobre tu proyecto* y **Enviar mensaje**. |
+| 3 | Formulario "Envíanos un Mensaje" | Nombre*, Email*, Teléfono, Empresa, Servicio de interés* (Sistema RAG, E-Commerce, Chatbot con IA, Desarrollo Web, Desarrollo Móvil, Integraciones API, Diseño UX/UI, Consultoría, Otro), Presupuesto estimado en pesos colombianos sin IVA (menos de COP 5.000.000; 5 a 15; 15 a 30; 30 a 60; más de COP 60.000.000, coherentes con los planes), ¿Cuándo quieres empezar? (4 opciones, se guarda con el contacto), Cuéntanos sobre tu proyecto* y **Enviar mensaje**. Si el envío falla, el aviso dice qué pasó: faltan datos, demasiados envíos seguidos o sin conexión. |
 | 4 | Datos de contacto | Email, teléfono, ubicación en Bogotá (abre Google Maps) y horario (lunes a viernes, 8 a. m. a 6 p. m.). |
-| 5 | Síguenos en redes | WhatsApp y LinkedIn. |
+| 5 | Síguenos en redes | WhatsApp y LinkedIn (`linkedin.com/company/koptup`, la misma del pie). |
 | 6 | Agendar Llamada | "Agenda una consulta gratuita de 30 minutos": **Agendar ahora** abre el programa de correo con un mensaje ya escrito. |
-| 7 | Preguntas Frecuentes | Tiempo de respuesta, garantía y trabajo con startups. |
+| 7 | Preguntas Frecuentes | Tiempo de respuesta (24 horas hábiles), garantía (de 30 a 90 días según el contrato, como dicen los términos) y cómo empezar en pequeño (piloto RAG o nivel Básico). |
 | 8 | Mapa | Mapa de Google embebido con la ubicación. |
 
-**A dónde llega el mensaje:** se guarda como contacto (origen `contact-form`), avisa al equipo por correo y WhatsApp si están configurados, y aparece en **Admin › Contactos**. Paso a paso en [Flujos del visitante › Flujo 3](Doc-04-Flujos-del-Visitante.md#4-flujo-3-formulario-de-contacto).
+**A dónde llega el mensaje:** se guarda como contacto (origen `contact-form`, con el plazo y, si venía de un plan o de "Cotizar este tier", lo que se cotizaba), avisa al equipo por correo y WhatsApp si están configurados, y aparece en **Admin › Contactos**. Paso a paso en [Flujos del visitante › Flujo 3](Doc-04-Flujos-del-Visitante.md#4-flujo-3-formulario-de-contacto).
 
 **SEO:** *Contacto: Solicita tu Cotización Gratis \| KopTup*.
 
@@ -489,29 +494,28 @@ Qué ve el visitante al abrir una demo con acceso restringido: [Flujos del visit
 
 ![Nosotros en escritorio](images/doc/publicas/nosotros-escritorio.jpg)
 
-*Hero de `/about` con foto de fondo y cuatro cifras.*
+*Hero de `/about`: la marca KopTup, qué hace el estudio y cuatro datos que se pueden comprobar en el propio sitio.*
 
-**Propósito:** presentar al equipo y su forma de trabajar, con datos verificables (cuántas demos tienen IA real y cuántas son prototipos).
+**Propósito:** presentar al equipo y su forma de trabajar **solo con datos verificables**: lo que está publicado en el sitio (demos, planes y precios) o lo que se formula como servicio a construir. No hay años de experiencia, año de fundación, cifras de clientes ni casos sin respaldo; si el dueño los aporta con su respaldo, se pueden publicar.
 
 | # | Bloque | Qué muestra |
 |---|---|---|
-| 1 | Hero | "Estudio de desarrollo a medida en Bogotá", botones **Ver las 26 demos** (`/demo`) y **Hablar con nosotros** (`/contact`), y cuatro cifras (años construyendo software, apps con IA real, prototipos, tecnologías). |
-| 2 | Koptup en números | Cinco tarjetas: 2 apps reales con IA, 24 prototipos navegables, ~25 tecnologías core, año de fundación 2026 y base en Bogotá. |
-| 3 | ¿Quiénes somos? | "Un equipo técnico, no una agencia". |
-| 4 | Equipo | Quién está detrás de la empresa. |
-| 5 | Línea de tiempo | "De idea a plataforma". |
-| 6 | Tecnologías que dominamos | Tres niveles: stack diario, familiaridad y conceptos sólidos. |
-| 7 | Capacidades de IA en producción | Qué IA está funcionando hoy. |
-| 8 | Verticales | Sectores con experiencia. |
-| 9 | Metodología y herramientas | "Metodología probada en 8+ años" y "Cómo nos coordinamos con el cliente". |
-| 10 | Proyectos entregados | Casos reales. |
-| 11 | Cierre | "¿Empezamos?" con **Ver las 26 demos** y **Hablar con nosotros**. |
+| 1 | Hero | "KopTup", qué hace el estudio, botones **Ver las 26 demos** (`/demo`) y **Hablar con nosotros** (`/contact`) y cuatro datos: demos que se pueden probar, planes RAG con precio publicado, piloto RAG de 2 semanas y equipo en Bogotá. |
+| 2 | Lo que puedes comprobar hoy | Cinco tarjetas, cada una enlaza a donde se comprueba: las demos (`/demo`), los precios publicados (`/services`), el piloto RAG (`/services#planes-rag`), la demo con tu documento (`/demo/chatbot?mode=upload`) y la base en Bogotá (`/contact`). |
+| 3 | ¿Quiénes somos? | "Un equipo técnico, no una agencia": el estudio de Ronald Cipagauta, las dos modalidades (a medida o suscripción) y el stack del sitio. |
+| 4 | Equipo | El fundador (con sus iniciales, sin foto de banco de imágenes) y la red de colaboradores. |
+| 5 | Tecnologías | "Lo que usa este sitio" (24, todas usadas en el código del repositorio; no se listan librerías instaladas que el código no usa) y "Si tu proyecto lo necesita" (se evalúan al cotizar). |
+| 6 | IA: lo que puedes probar y lo que construimos | Tres cosas que funcionan hoy en las demos (RAG con tu documento, asistentes configurables y redacción con IA, con su etiqueta de acceso) y una lista de lo que se implementa en un proyecto, con la nota "no son productos listos". |
+| 7 | Sectores con demo | Nueve sectores, cada uno con la demo que lo muestra y su etiqueta de acceso. |
+| 8 | Cómo trabajamos | Ocho pasos de un proyecto a medida; el soporte es el que defina el plan o el contrato. |
+| 9 | Cómo nos coordinamos contigo | Herramientas de reuniones, mensajes, código, documentación, tareas y archivos. |
+| 10 | Cierre | "¿Empezamos?" con **Ver las 26 demos** y **Hablar con nosotros**. |
 
-![Bloque de métricas de Nosotros](images/doc/publicas/nosotros-metricas.jpg)
+![Datos verificables de Nosotros](images/doc/publicas/nosotros-metricas.jpg)
 
-*"Koptup en números": las cifras de demos salen de la misma lista que el hub, así que no se desactualizan.*
+*"Lo que puedes comprobar hoy": cada tarjeta lleva a la página donde se comprueba el dato.*
 
-**SEO:** *Sobre Nosotros: Empresa de Software en Bogotá \| KopTup*. La página está escrita solo en español (ver [Limitaciones](#16-limitaciones-conocidas)).
+**SEO:** *Nosotros: estudio de software a medida en Bogotá \| KopTup*. La página está en español e inglés (`messages` › `aboutPage`).
 
 ---
 
@@ -527,14 +531,14 @@ Tres páginas pensadas para búsquedas en Google. Las tres llevan migas de pan, 
 
 | Bloque | Contenido |
 |---|---|
-| Hero | Título, explicación (responde con los documentos de la empresa y cita la fuente, en web y WhatsApp), **Probar la demo** (`/demo/chatbot`), **Agenda un piloto** (`/contact?service=sistema-rag&plan=piloto`), precio "Desde COP 9.900.000, o piloto de COP 3.900.000" y enlace a `/rag`. |
+| Hero | Título, explicación (responde con los documentos de la empresa y cita la fuente, en web y WhatsApp), **Prueba con tu documento** (`/demo/chatbot?mode=upload`), **Agenda un piloto** (`/contact?service=sistema-rag&plan=piloto`), precio "Desde COP 9.900.000, o piloto de COP 3.900.000" y enlace a `/rag`. |
 | Datos verificables | Las mismas cuatro frases del inicio. |
 | Qué hace un chatbot RAG | "Un chatbot que responde con tus documentos, no de memoria". |
 | Canales | Sitio web y WhatsApp. |
 | Casos de uso | Soporte, salud y legal, con enlace a cada landing por sector. |
 | Proceso | "¿Cómo implementamos tu chatbot?", con plazos alineados con los planes. |
 | Preguntas frecuentes | Mismo texto que el JSON-LD. |
-| Cierre | Probar la demo, Agenda un piloto y **Ver planes y precios** (`/services#planes-rag`). |
+| Cierre | Prueba con tu documento (`/demo/chatbot?mode=upload`), Agenda un piloto y **Ver planes y precios** (`/services#planes-rag`). |
 
 **SEO:** *Chatbots RAG para WhatsApp y web \| KopTup*.
 
@@ -544,7 +548,7 @@ Tres páginas pensadas para búsquedas en Google. Las tres llevan migas de pan, 
 
 *"Soluciones de IA para Transformar tu Empresa".*
 
-Hero con **Ver Demos de IA** (`/demo`), **Hablar con un Experto** (`/contact`) y el aviso "¿Necesitas una IA que responda con los documentos de tu empresa? Conoce los sistemas RAG" (`/rag`); cuadrícula de soluciones con los **sistemas RAG primero** (enlaces a `/rag` y `/chatbots-ia`); por qué adoptar IA; tecnologías de IA; preguntas frecuentes; cierre con **Agendar Consultoría Gratis** (`/contact`) y **Ver Demos de IA**.
+Hero con **Ver Demos de IA** (`/demo`), **Hablar con un Experto** (`/contact`) y el aviso "¿Necesitas una IA que responda con los documentos de tu empresa? Conoce los sistemas RAG" (`/rag`); cuadrícula de soluciones con los **sistemas RAG primero** (enlaces a `/rag` y `/chatbots-ia`); por qué adoptar IA; tecnologías de IA (OpenAI "En la demo RAG"; las demás marcadas "Según tu proyecto"); preguntas frecuentes; cierre con **Agendar Consultoría Gratis** (`/contact`) y **Ver Demos de IA**.
 
 **SEO:** *Soluciones de Inteligencia Artificial para Empresas \| KopTup*.
 
@@ -554,7 +558,7 @@ Hero con **Ver Demos de IA** (`/demo`), **Hablar con un Experto** (`/contact`) y
 
 *"Empresa de Desarrollo Web y Software a Medida en Colombia".*
 
-Hero con alcance geográfico, **Solicitar Cotización Gratis** (`/contact`) y **Ver Demos** (`/demo`); datos verificables; qué se puede desarrollar; por qué KopTup; cómo trabajan; tecnologías; preguntas frecuentes; cierre con **Solicitar Cotización Gratis** (`/contact`) y un segundo botón **Solicitar cotización** que lleva a `/services#planes-rag`.
+Hero ("Trabajamos de forma remota desde Bogotá, en español e inglés"), **Solicitar Cotización Gratis** (`/contact`) y **Ver Demos** (`/demo`); datos verificables; qué se puede desarrollar (sin modelos de IA que no se usan ni "tiempo real"); por qué KopTup (avances semanales y tiempos acordados en la propuesta, sin "garantizamos el resultado"); cómo trabajan; tecnologías (primero las del sitio, luego las que se definen por proyecto); preguntas frecuentes (sin lista de ciudades o países con clientes); cierre con **Solicitar Cotización Gratis** (`/contact`) y **Ver planes y precios** (`/services`).
 
 **SEO:** *Desarrollo Web y Software a Medida en Colombia \| KopTup*.
 
@@ -566,17 +570,17 @@ Hero con alcance geográfico, **Solicitar Cotización Gratis** (`/contact`) y **
 
 *Página para quien llega desde Product Hunt, en los colores de esa plataforma.*
 
-**Propósito:** recibir el tráfico de Product Hunt con una **oferta**: mencionar "PRODUCTHUNT" en el mensaje da 15 % de descuento en el primer proyecto ("Válido por 30 días desde el lanzamiento. Solo para nuevos clientes").
+**Propósito:** recibir el tráfico de Product Hunt. La oferta de lanzamiento (15 % de descuento, válida 30 días desde el lanzamiento de febrero de 2026) **ya venció** y la página lo dice; en su lugar muestra el precio publicado del piloto RAG.
 
-Bloques: bienvenida con la oferta y botones **Probar Demos Gratis →** (`/demo`) y **Solicitar Cotización** (`/contact`); "¿Qué es KopTup?"; cuatro demos destacadas (chatbot, e-commerce, dashboard, control de proyectos) y **Ver todas las demos (26 en total)**; datos verificables; cierre con **Hablar con el equipo** (`/contact`) y **Ver precios** (`/services#planes-rag`).
+Bloques: bienvenida con los precios publicados y botones **Probar las demos →** (`/demo`) y **Solicitar cotización** (`/contact`); "¿Qué es KopTup?" (sin "GPT-4 y Claude", sin "clientes en todo el mundo" ni plazos sin respaldo); cuatro demos destacadas (chatbot, tienda, tablero y proyectos, cada una aclara si usa datos de ejemplo) y **Ver todas las demos (26 en total)**; datos verificables; cierre con **Hablar con el equipo** (`/contact`) y **Ver precios** (`/services#planes-rag`).
 
-**SEO:** *Product Hunt: Software a Medida con Demos \| KopTup*, con `noindex, follow`: no aparece en Google; solo se llega por el enlace directo. Está escrita solo en español.
+**SEO:** *Product Hunt: Software a Medida con Demos \| KopTup*, con `noindex, follow`: no aparece en Google; solo se llega por el enlace directo. Está en español e inglés (`messages` › `productHuntPage`).
 
 ---
 
 ## 13. Páginas legales (`/privacy`, `/terms`, `/cookies`)
 
-Las tres tienen un encabezado azul con la fecha de actualización, secciones numeradas en tarjetas y una nota final. Su contenido legal (Ley 1581 de 2012, cookies, datos de contacto del responsable) se analiza en [SEO, analítica y legal](Doc-12-SEO-Analitica-y-Legal.md).
+Las tres tienen un encabezado azul con la fecha de actualización, secciones numeradas en tarjetas y una nota final con el año en curso (© 2026). Tratan al lector de **tú**, como el resto del sitio. En `/cookies`, al guardar las preferencias la confirmación aparece en la misma página (ya no es una ventana del navegador). Su contenido legal (Ley 1581 de 2012, cookies, datos de contacto del responsable) se analiza en [SEO, analítica y legal](Doc-12-SEO-Analitica-y-Legal.md).
 
 ![Política de privacidad](images/doc/publicas/privacidad-escritorio.jpg)
 
@@ -604,7 +608,7 @@ Las tres tienen un encabezado azul con la fecha de actualización, secciones num
 
 *Cualquier ruta que no existe muestra esta tarjeta con el menú y el pie de página.*
 
-Muestra "Página no encontrada", el título **"No encontramos lo que buscas"**, la explicación y dos botones: **Ir al inicio** (`/`) y **Volver** (página anterior). Responde con estado HTTP 404 y `noindex`. Una demo con un nombre inexistente bajo `/demo-acceso/` también termina aquí.
+Muestra "Página no encontrada", el título **"No encontramos lo que buscas"**, la explicación y dos botones: **Ir al inicio** (`/`) y **Volver** (página anterior). Responde con estado HTTP 404, título propio («Página no encontrada \| KopTup»), un solo meta `robots` (`noindex`) y sin canonical. Una demo con un nombre inexistente bajo `/demo-acceso/` también termina aquí.
 
 ---
 
@@ -616,20 +620,21 @@ Muestra "Página no encontrada", el título **"No encontramos lo que buscas"**, 
 | `/rag` | `app/rag/page.tsx` | `components/rag/RagPageContent.tsx`, `RagPlans.tsx` | `generateMetadata('rag')` + título absoluto; JSON-LD en `lib/rag-plans-jsonld.ts` y `lib/rag-page-jsonld.ts` |
 | `/rag/<sector>` | `app/rag/{salud,legal,soporte}/page.tsx` | `components/rag/RagSectorLanding.tsx` | `generateMetadata('rag-<sector>')`; datos en `lib/rag-page.ts` |
 | `/services` | `app/services/page.tsx` y `layout.tsx` | `components/offerings/RagPlansSection.tsx`, `OfferingsCatalog.tsx` | `generateMetadata('services')`; precios en `lib/rag-plans.ts` y `lib/services-catalog.ts` |
-| `/pricing` | `app/pricing/page.tsx` | Redirección | — |
+| `/pricing` | `app/pricing/page.tsx` | Redirección permanente (`permanentRedirect`, 308) | — |
 | `/demo` | `app/demo/page.tsx` y `layout.tsx` | `components/demo/demo-cards.ts`, `DemoAccessBadge.tsx`, `DemoCTA.tsx` | `generateMetadata('demo')`; catálogo vía `GET /api/demo-catalog` (`lib/demo-system.ts`) |
 | `/solicitar-demo` | `app/solicitar-demo/page.tsx` | `components/demo-request/DemoRequestForm.tsx` | `generateMetadata('solicitar-demo')` |
-| `/contact` | `app/contact/page.tsx` | (la página misma) | `generateMetadata('contact')` en `layout.tsx` |
-| `/about` | `app/about/page.tsx` | (la página misma) | `generateMetadata('about')` |
+| `/contact` | `app/contact/page.tsx` | (la página misma); la cotización de la URL la lee `lib/contact-quote.ts` | `generateMetadata('contact')` en `layout.tsx` |
+| `/about` | `app/about/page.tsx` | (la página misma; textos en `aboutPage`) | `generateMetadata('about')` |
 | Landings SEO | `app/{chatbots-ia,soluciones-ia,desarrollo-web-colombia}/` | La página de cada ruta | `generateMetadata(...)` + JSON-LD en `lib/chatbots-page-jsonld.ts`, `lib/ai-solutions-page-jsonld.ts` y el `layout.tsx` de la ruta |
-| `/bienvenido-producthunt` | `app/bienvenido-producthunt/` | La página | Metadatos propios con `robots: noindex, follow` |
+| `/bienvenido-producthunt` | `app/bienvenido-producthunt/` | La página (textos en `productHuntPage`) | Metadatos propios con `robots: noindex, follow` |
 | Legales | `app/{privacy,terms,cookies}/` | La página de cada ruta | `generateMetadata(...)` |
-| 404 | `app/not-found.tsx` | — | Hereda los del layout raíz |
+| 404 | `app/not-found.tsx` | `components/errors/BackButton.tsx` | `generateMetadata` propio: título, sin canonical, sin `robots` heredado |
 | Menú, pie y banner | `components/layout/{Navbar,Footer,ConditionalLayout}.tsx`, `components/consent/CookieBanner.tsx` | — | — |
 
 - **Textos:** `apps/web/messages/es.json` y `en.json`, más los agregados `_demos.*.json` y `_offerings.*.json` (incluyen `ragPage`, `ragSectors` y `ragPlans`).
 - **Títulos:** `lib/seo-config.ts` define el título de cada página; la plantilla es `"%s | KopTup"` y el máximo 60 caracteres (lo revisa `scripts/check-titles.mjs`).
-- **Modo de acceso de las demos:** la fuente de verdad es el catálogo del backend; `lib/demo-access-defaults.ts` es la tabla de respaldo y la usa el sitemap para listar solo las abiertas.
+- **Modo de acceso de las demos:** la fuente de verdad es el catálogo del backend; `lib/demo-access-defaults.ts` es la tabla de respaldo. El sitemap lista las demos abiertas y activas según el catálogo (`lib/sitemap-demos.ts`) y usa la tabla solo si el backend no responde.
+- **Redes sociales:** `SOCIAL_LINKS` en `lib/site.ts` (pie, `/contact` y JSON-LD).
 
 ---
 
@@ -637,20 +642,12 @@ Muestra "Página no encontrada", el título **"No encontramos lo que buscas"**, 
 
 | # | Dónde | Qué pasa | Efecto |
 |---|---|---|---|
-| 1 | `/services` › Otras soluciones › **Cotizar este tier** | El enlace envía `?service=<slug>&tier=…&modality=…`, pero `/contact` solo entiende `plan`. El banner muestra el identificador técnico (por ejemplo "crm ia") y el nivel y la modalidad elegidos se pierden. | El lead llega sin el nivel ni la modalidad que el visitante eligió. |
-| 2 | `/rag`, landings y `/chatbots-ia` › **Prueba con tu documento** | El botón abre `/demo/chatbot` en el modo "Prueba el asistente" (documentos de ejemplo), no en "Prueba con tu documento" (`?mode=upload`). | Un clic de más para subir el documento propio. |
-| 3 | `/desarrollo-web-colombia` › cierre | El botón **Solicitar cotización** lleva a `/services#planes-rag`, no a `/contact`. | El texto no coincide con el destino. |
-| 4 | `/about` y `/bienvenido-producthunt` | Están escritas directamente en español, sin traducción. | Con el sitio en inglés siguen en español. |
-| 5 | Pie de página | "Desarrollo Web a Medida", "Chatbots RAG", "Soluciones de IA", "Gestión Documental" y otros enlaces están fijos en español. | En inglés el pie mezcla idiomas. |
-| 6 | `/contact` | La pregunta "¿Cuándo quieres empezar?" y sus opciones están fijas en español; además, el backend **no guarda** ese campo (`timeline`). | La respuesta del visitante se pierde. |
-| 7 | `/contact` | Los rangos de presupuesto están en formato de dólares ("$1,000 - $5,000") sin indicar moneda, mientras los planes se publican en COP. | Puede confundir al visitante colombiano. |
-| 8 | Menú superior | Al hacer scroll el menú usa la clase `bg-white/98`, que Tailwind 3 no genera; queda transparente con desenfoque. Sobre los encabezados azules (`/services`, `/contact`, `/demo`) "Solicitar demo" e "Iniciar sesión" pierden contraste. | Botones poco legibles al bajar en esas páginas. |
-| 9 | Todo el sitio | `html` tiene `scrollbar-gutter: stable both-edges`: en navegadores con barra de desplazamiento clásica (Windows) queda una franja a cada lado de los bloques de color de borde a borde (encabezados y pie). | Detalle visual. |
-| 10 | `/about` | El título dice "Koptup" (con t minúscula) y la marca en el resto del sitio es "KopTup". También conviven "Año fundación 2026" y "Metodología probada en 8+ años". | Inconsistencia de marca y de mensaje. |
-| 11 | 404 | La página de error hereda el título del inicio, el `canonical` del inicio y un segundo `robots: index, follow` además del `noindex`. | Sin efecto en Google (responde 404), pero los metadatos se contradicen. |
-| 12 | Enlaces sociales | LinkedIn del pie apunta a `linkedin.com/company/koptup` y el de `/contact` a `linkedin.com/company/109543617`. | Conviene unificar. |
-| 13 | `/services` | Los botones "Probar demo" del catálogo son un botón dentro de un enlace. | Detalle de accesibilidad (lectores de pantalla). |
-| 14 | `/privacy`, `/terms`, `/cookies` | Tratan al lector de "usted" ("Sus Derechos", "Puede cambiar sus preferencias") y el resto del sitio de "tú". La tabla de cookies tampoco coincide con los nombres reales (ver [Flujo 5](Doc-04-Flujos-del-Visitante.md#6-flujo-5-cookies-y-analítica)). | Tono inconsistente; tabla de cookies desactualizada. |
+| 1 | `/privacy`, `/cookies` | La tabla de `/cookies` no coincide con los nombres reales de las cookies y el texto de `/privacy` debe revisarse frente a la Ley 1581 (ver [Flujo 5](Doc-04-Flujos-del-Visitante.md#6-flujo-5-cookies-y-analítica) y [SEO, analítica y legal](Doc-12-SEO-Analitica-y-Legal.md)). | Política desactualizada en esos puntos. |
+| 2 | Pie de página | El perfil de Instagram (`instagram.com/koptup`) no se pudo comprobar sin iniciar sesión; el de LinkedIn sí es la página de KopTup. El pie no enlaza GitHub: `github.com/koptup` no es de KopTup. | Falta que el dueño confirme Instagram y, si la empresa tiene una cuenta de GitHub propia, que la agregue. |
+| 3 | Capturas | La captura anotada del pie de página y las del menú son anteriores a esta ronda: todavía muestran el ícono de X y los enlaces del pie en su redacción anterior. | Detalle visual de la documentación. |
+| 4 | `/about` | Solo publica lo que se puede comprobar en el sitio: no hay año de fundación, años de experiencia, clientes, casos ni cifras, y la foto del encabezado es de un banco de imágenes (no es el equipo). | Para publicarlos, el dueño debe aportar esos datos (con permiso de los clientes para nombrarlos) y, si quiere, una foto real del equipo. |
+
+Las correcciones de esta ronda (embudo con `?mode=upload`, `/rag/salud` con invitación, "Cotizar este tier", idioma que conserva la URL, fondo del menú, presupuesto en COP, LinkedIn único, botones de `/desarrollo-web-colombia`, enlaces del catálogo, `/register` sin el plan "Agente IA de Ventas" ni precios que no están publicados, garantía de `/contact` igual a la de los términos, franjas por la barra de desplazamiento, títulos y metadatos, Nosotros y Product Hunt en inglés, páginas legales con tú y el año en curso) se describen en las secciones de arriba.
 
 ---
 

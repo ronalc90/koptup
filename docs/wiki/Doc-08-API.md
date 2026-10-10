@@ -181,9 +181,9 @@ Convenciones de las tablas: **Auth** es la política de la sección 3; `:id` es 
 
 | Método | Ruta | Auth | Para qué | Entrada → salida |
 |---|---|---|---|---|
-| POST | `/api/contact` | Pública · 5 por minuto | Formulario de `/contact`: guarda un `Contact` (origen `contact-form`) y avisa al equipo por correo o WhatsApp si están configurados | `{ name, email, service, message, phone?, company?, budget? }` → mensaje |
+| POST | `/api/contact` | Pública · 5 por minuto | Formulario de `/contact`: guarda un `Contact` (origen `contact-form`) y avisa al equipo por correo o WhatsApp si están configurados | `{ name, email, service, message, phone?, company?, budget?, timeline?, quote? }` → mensaje. `timeline`: `now`, `1m`, `3m` u `open` (se guarda como `plazo`). `quote`: `{ service, plan?, tier?, modality? }` con la cotización que el visitante venía revisando (se guarda como `cotizacion`): `service` es `sistema-rag`, una solución del catálogo o un servicio que el portal enlaza; `plan` solo va con `sistema-rag`, y `tier` y `modality` solo con una solución del catálogo. Un valor desconocido o incoherente responde 400 |
 | POST | `/api/quotes` | Pública · 5 por minuto (cupo propio) | Guarda una cotización (`Quote`). Hoy ninguna página de la web la usa | `{ name, email, service, description }` → mensaje |
-| GET | `/api/admin/contacts` | `admin`, `manager` | Bandeja de contactos del panel | `?status=new\|read\|responded` → lista con `source` (`contact-form`, `demo-rag` o `demo-request`) |
+| GET | `/api/admin/contacts` | `admin`, `manager` | Bandeja de contactos del panel | `?status=new\|read\|responded` → lista con `source` (`contact-form`, `demo-rag` o `demo-request`), `plazo` y `cotizacion` |
 | PATCH | `/api/admin/contacts/:id/status` | `admin`, `manager` | Marcar leído o respondido | `{ status }` → `{ id, status }` |
 | POST | `/api/contact/test-whatsapp`, `/api/contact/test-email` | Solo desarrollo | Probar los canales de aviso | — |
 

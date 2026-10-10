@@ -15,9 +15,10 @@ import {
   ScaleIcon,
 } from '@heroicons/react/24/outline';
 import {
-  RAG_DEMO_PATH,
   RAG_PATH,
   RAG_PILOT_CONTACT_PATH,
+  RAG_UPLOAD_DEMO_PATH,
+  demoRequestPath,
   getRagFaqValues,
   getRagSector,
   type RagSectorId,
@@ -54,7 +55,12 @@ export default function RagSectorLanding({ sectorId }: { sectorId: RagSectorId }
   const locale = useLocale();
   const sector = getRagSector(sectorId);
   // Modo de acceso real de la demo enlazada (p. ej. «Solo por invitación»).
-  const demoGate = gatedInfo(useDemoCatalog(), sector.demo ? demoSlugFromPath(sector.demo.path) : null);
+  // Si no es abierta, el enlace lleva al formulario para pedirla (con la demo
+  // ya elegida) y lo dice en su texto, en vez de abrir la pantalla de acceso.
+  const demoSlug = sector.demo ? demoSlugFromPath(sector.demo.path) : null;
+  const demoGate = gatedInfo(useDemoCatalog(), demoSlug);
+  const demoHref = demoGate && demoSlug ? demoRequestPath(demoSlug) : (sector.demo?.path ?? '');
+  const demoLinkKey = !demoGate ? 'demoLink' : demoGate.mode === 'privado' ? 'demoInviteLink' : 'demoRequestLink';
   const Icon = RAG_SECTOR_ICONS[sectorId];
   const cases = asRagCases(t.raw(`${sectorId}.cases`));
   const values = getRagFaqValues(locale);
@@ -96,13 +102,16 @@ export default function RagSectorLanding({ sectorId }: { sectorId: RagSectorId }
                   {sector.demo && sector.demo.caseIndex === i ? (
                     <div className="mt-4 flex flex-col items-start gap-2">
                       <Link
-                        href={sector.demo.path}
+                        href={demoHref}
                         className="inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
                       >
-                        {t(`${sectorId}.demoLink`)}
+                        {t(`${sectorId}.${demoLinkKey}`)}
                         <ArrowRightIcon className="h-4 w-4" aria-hidden="true" />
                       </Link>
                       {demoGate && <DemoAccessBadge mode={demoGate.mode} activo={demoGate.activo} />}
+                      {demoGate ? (
+                        <p className="text-xs text-secondary-500 dark:text-secondary-400">{t(`demoGateNote.${demoGate.mode}`)}</p>
+                      ) : null}
                     </div>
                   ) : null}
                 </CardContent>
@@ -145,7 +154,7 @@ export default function RagSectorLanding({ sectorId }: { sectorId: RagSectorId }
           <p className="text-xl text-primary-100 mb-10">{t('cta.subtitle', values)}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-white text-primary-700 hover:bg-primary-50" asChild>
-              <Link href={RAG_DEMO_PATH}>{t('cta.demo')}</Link>
+              <Link href={RAG_UPLOAD_DEMO_PATH}>{t('cta.demo')}</Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/50 text-white hover:bg-white/10" asChild>
               <Link href={RAG_PILOT_CONTACT_PATH}>{t('cta.pilot')}</Link>

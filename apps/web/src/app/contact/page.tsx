@@ -6,7 +6,8 @@ import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import { track, trackWhatsappClick } from '@/lib/analytics';
-import { RAG_SERVICE_SLUG, isRagPlanId } from '@/lib/rag-plans';
+import { parseContactQuote, quotePayload, offeringNameKey } from '@/lib/contact-quote';
+import { SOCIAL_LINKS } from '@/lib/site';
 import Button from '@/components/ui/Button';
 import Card, { CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -23,35 +24,41 @@ import {
 } from '@heroicons/react/24/outline';
 import { FaWhatsapp, FaLinkedin } from 'react-icons/fa';
 
-// TODO: extract to i18n
-const SERVICE_NAME_BY_SLUG: Record<string, string> = {
-  'chatbot-rag-ia': 'Chatbot RAG con IA',
-  'agente-ia-ventas': 'Agente IA de Ventas',
-  'desarrollo-web': 'Desarrollo web a medida',
-  'ecommerce': 'E-commerce',
-  'auditoria-cups': 'Auditoría CUPS',
-  'liquidacion': 'Liquidación de salud',
-};
-
 function ContactPageInner() {
   const t = useTranslations('contactPage');
   const tRag = useTranslations('ragPlans');
+  const tCatalog = useTranslations('offeringsCatalog');
+  const tAll = useTranslations();
   const searchParams = useSearchParams();
-  const queryService = searchParams.get('service');
-  const queryPlan = searchParams.get('plan');
-  const isRagQuote = queryService === RAG_SERVICE_SLUG;
+  // Cotización que llega por la URL (planes RAG, "Cotizar este tier" del
+  // catálogo o una demo): solo valores conocidos (lib/contact-quote.ts).
+  const quote = parseContactQuote(searchParams);
 
-  // Los planes RAG de /services#planes-rag llegan como ?service=sistema-rag&plan=<id>.
-  const cotizandoLabel = queryService
-    ? isRagQuote
+  // Nombre legible del servicio (nunca el slug).
+  const cotizandoLabel = !quote
+    ? null
+    : quote.kind === 'rag'
       ? t('services.rag')
-      : (SERVICE_NAME_BY_SLUG[queryService] || queryService.replace(/-/g, ' '))
-    : null;
-  const planLabel = queryPlan
-    ? isRagQuote && isRagPlanId(queryPlan)
-      ? tRag(`plans.${queryPlan}.name`)
-      : queryPlan
-    : null;
+      : quote.kind === 'offering'
+        ? tAll.has(offeringNameKey(quote.service))
+          ? tAll(offeringNameKey(quote.service))
+          : null
+        : t(`quote.legacyServices.${quote.service}`);
+  // Detalle elegido: el plan RAG, o el nivel y la modalidad de la solución.
+  const planLabel = quote?.kind === 'rag' && quote.plan ? tRag(`plans.${quote.plan}.name`) : null;
+  const quoteDetails = !cotizandoLabel
+    ? []
+    : quote?.kind === 'rag'
+      ? planLabel
+        ? [t('quote.plan', { plan: planLabel })]
+        : []
+      : quote?.kind === 'offering'
+        ? [
+            ...(quote.tier ? [t('quote.tier', { tier: tCatalog(`tier.${quote.tier}`) })] : []),
+            ...(quote.modality ? [tCatalog(`modality.${quote.modality}`)] : []),
+          ]
+        : [];
+  const quoteDetail = quoteDetails.join(' · ');
 
   const [formData, setFormData] = useState({
     name: '',
@@ -76,13 +83,13 @@ function ContactPageInner() {
         service: cotizandoLabel,
         message: prev.message
           ? prev.message
-          : planLabel
-            ? t('quote.messageWithPlan', { service: cotizandoLabel, plan: planLabel })
+          : quoteDetail
+            ? t('quote.messageWithDetail', { service: cotizandoLabel, detail: quoteDetail })
             : t('quote.message', { service: cotizandoLabel }),
       }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cotizandoLabel, planLabel]);
+  }, [cotizandoLabel, quoteDetail]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,12 +97,17 @@ function ContactPageInner() {
     setError('');
 
     try {
-      // Si sigue elegido el servicio que se estaba cotizando, el plan viaja con
-      // el lead aunque la persona edite el mensaje.
-      const payload =
-        cotizandoLabel && planLabel && formData.service === cotizandoLabel
-          ? { ...formData, service: `${cotizandoLabel} — ${t('quote.plan', { plan: planLabel })}` }
-          : formData;
+      // Si sigue elegido el servicio que se estaba cotizando, el plan (o el
+      // nivel y la modalidad) viajan con el lead aunque la persona edite el
+      // mensaje: en el texto del servicio y como identificadores en `quote`.
+      const keepsQuote = !!cotizandoLabel && formData.service === cotizandoLabel;
+      const payload = keepsQuote
+        ? {
+            ...formData,
+            service: quoteDetail ? `${cotizandoLabel} — ${quoteDetail}` : formData.service,
+            quote: quotePayload(quote),
+          }
+        : formData;
       await api.submitContactForm(payload);
 
       // Conversión `generate_lead` (solo envío exitoso). Sin datos personales:
@@ -103,7 +115,7 @@ function ContactPageInner() {
       track('generate_lead', {
         lead_source: 'contact_form',
         service: baseServices.includes(formData.service) ? formData.service : undefined,
-        plan_id: isRagQuote && isRagPlanId(queryPlan) ? queryPlan : undefined,
+        plan_id: quote?.kind === 'rag' && quote.plan ? quote.plan : undefined,
       });
 
       setIsSubmitted(true);
@@ -123,8 +135,17 @@ function ContactPageInner() {
         });
       }, 6000);
     } catch (err: any) {
-      console.error('Error submitting contact form:', err);
-      setError(t('form.errorSubmit'));
+      // Mensaje según lo que pasó (antes era siempre el mismo).
+      const status: number | undefined = err?.response?.status;
+      setError(
+        status === 400
+          ? t('form.errorValidation')
+          : status === 429
+            ? t('form.errorRateLimit')
+            : !err?.response
+              ? t('form.errorNetwork')
+              : t('form.errorSubmit'),
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -264,9 +285,9 @@ function ContactPageInner() {
                       </p>
                       <p className="text-base font-bold text-secondary-900 dark:text-white">
                         {cotizandoLabel}
-                        {planLabel && (
+                        {quoteDetail && (
                           <span className="text-secondary-600 dark:text-secondary-400">
-                            {' '}— {t('quote.plan', { plan: planLabel })}
+                            {' '}— {quoteDetail}
                           </span>
                         )}
                       </p>
@@ -421,10 +442,10 @@ function ContactPageInner() {
                         </div>
                       </div>
 
-                      {/* Timeline — TODO: extract to i18n */}
+                      {/* Plazo: se guarda con el contacto (Contact.plazo). */}
                       <div>
                         <label htmlFor="timeline" className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                          ¿Cuándo quieres empezar?
+                          {t('form.timeline')}
                         </label>
                         <select
                           id="timeline"
@@ -433,11 +454,12 @@ function ContactPageInner() {
                           onChange={handleChange}
                           className="w-full px-4 py-3 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                         >
-                          <option value="">Selecciona una opción</option>
-                          <option value="now">Ya, lo antes posible</option>
-                          <option value="1m">En el próximo mes</option>
-                          <option value="3m">En 2-3 meses</option>
-                          <option value="open">Sin definir, solo explorando</option>
+                          <option value="">{t('form.timelinePlaceholder')}</option>
+                          {(['now', '1m', '3m', 'open'] as const).map((value) => (
+                            <option key={value} value={value}>
+                              {t(`form.timelineOptions.${value}`)}
+                            </option>
+                          ))}
                         </select>
                       </div>
 
@@ -531,7 +553,7 @@ function ContactPageInner() {
                       <FaWhatsapp className="h-6 w-6 text-green-600 dark:text-green-400" />
                     </a>
                     <a
-                      href="https://www.linkedin.com/company/109543617"
+                      href={SOCIAL_LINKS.linkedin}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-12 h-12 bg-blue-100 dark:bg-blue-950 rounded-lg flex items-center justify-center hover:bg-blue-200 dark:hover:bg-blue-900 transition-colors"

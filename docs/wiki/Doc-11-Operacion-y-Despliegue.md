@@ -452,7 +452,7 @@ flowchart LR
 | **Unitarias del backend** | `apps/backend/src/__tests__/unit/`, `src/modules/*/__tests__/`, `src/services/__tests__/`, `src/utils/__tests__/` | 23 archivos | `npm test --workspace=apps/backend` | Nada |
 | **Integración del backend** | `apps/backend/src/__tests__/integration/` (permisos, demos, chatbot, topes de gasto, perfil) | 5 archivos | `MONGODB_URI_TEST=mongodb://127.0.0.1:27017/koptup_test REDIS_URL_TEST=redis://127.0.0.1:6379/15 npm test --workspace=apps/backend` | MongoDB y Redis **solo de pruebas** (cada archivo crea y borra su base; se borran claves de Redis) |
 | **Web** | `apps/web/src/**/*.test.ts(x)` (humo de las demos, middleware de acceso, catálogo) | 38 archivos | `npm test --workspace=apps/web` | Nada (no salen a la red) |
-| **Punta a punta** | `apps/web/e2e/*.spec.ts` | 9 archivos, en escritorio, móvil (Pixel 7) y un proyecto «catalogo» | `npm run test:e2e` con la web y el backend ya levantados | MongoDB, Redis, mock de OpenAI, backend y web compilados |
+| **Punta a punta** | `apps/web/e2e/*.spec.ts` | 10 archivos, en escritorio, móvil (Pixel 7) y un proyecto «catalogo» | `npm run test:e2e` con la web y el backend ya levantados | MongoDB, Redis, mock de OpenAI, backend y web compilados |
 
 Atajos desde la raíz: `npm test` (Jest de los dos), `npm run lint`, `npm run typecheck` y `npm run test:e2e`.
 

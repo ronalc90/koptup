@@ -25,7 +25,7 @@ const serviceSchema = {
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'E-Commerce', description: 'Tiendas online completas con pasarela de pago.' } },
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Chatbots con IA', description: 'Asistentes virtuales inteligentes.' } },
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Aplicaciones Móviles', description: 'Apps iOS y Android.' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Dashboards Ejecutivos', description: 'Análisis de datos en tiempo real.' } },
+      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Dashboards Ejecutivos', description: 'Indicadores y reportes conectados a tus datos.' } },
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Integración de Sistemas', description: 'APIs y conectores empresariales.' } },
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Diseño UX/UI', description: 'Interfaces modernas y usables.' } },
     ],

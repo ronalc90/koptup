@@ -19,8 +19,21 @@ export const RAG_PATH = '/rag';
 /** Ancla de la tabla de planes dentro de /rag (`/rag#planes-rag`). */
 export const RAG_PAGE_PLANS_ANCHOR = 'planes-rag';
 
-/** Demo del chatbot RAG ("Prueba con tu documento"). */
+/** Demo del chatbot RAG (abre en "Prueba el asistente", con documentos de ejemplo). */
 export const RAG_DEMO_PATH = '/demo/chatbot';
+
+/**
+ * Demo del chatbot RAG en la pestaña "Prueba con tu documento" (subida de un
+ * documento propio). Es el destino de los botones "Prueba con tu documento"
+ * de /rag, de las landings por sector y de /chatbots-ia; la demo lee `?mode=`
+ * al cargar (app/demo/chatbot/page.tsx).
+ */
+export const RAG_UPLOAD_DEMO_PATH = `${RAG_DEMO_PATH}?mode=upload`;
+
+/** Formulario para pedir una demo con acceso controlado, con la demo ya elegida. */
+export function demoRequestPath(slug: string): string {
+  return `/solicitar-demo?demos=${encodeURIComponent(slug)}`;
+}
 
 /** Destino de "Agenda un piloto". */
 export const RAG_PILOT_CONTACT_PATH = '/contact';
@@ -28,7 +41,10 @@ export const RAG_PILOT_CONTACT_PATH = '/contact';
 /**
  * Demo de auditoría de cuentas médicas, presentada como "Sistema experto para
  * salud" (no como caso RAG: no usa embeddings ni búsqueda vectorial). Enlazada
- * desde /rag/salud y desde las demos destacadas de la home.
+ * desde /rag/salud y desde las demos destacadas de la home. Se abre solo con
+ * invitación (modo `privado` en el catálogo): mientras no sea abierta,
+ * /rag/salud enlaza el formulario para pedirla (`demoRequestPath`) y no la
+ * pantalla de acceso.
  */
 export const MEDICAL_ACCOUNTS_DEMO_PATH = '/demo/cuentas-medicas';
 

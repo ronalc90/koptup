@@ -32,11 +32,11 @@ import {
   ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 import {
-  RAG_DEMO_PATH,
   RAG_FAQ_KEYS,
   RAG_PAGE_PLANS_ANCHOR,
   RAG_PILOT_CONTACT_PATH,
   RAG_SECTORS,
+  RAG_UPLOAD_DEMO_PATH,
   getRagFaqValues,
 } from '@/lib/rag-page';
 
@@ -133,7 +133,7 @@ export default function RagPageContent() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
-                <Link href={RAG_DEMO_PATH}>{t('hero.ctaDemo')}</Link>
+                <Link href={RAG_UPLOAD_DEMO_PATH}>{t('hero.ctaDemo')}</Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
                 <Link href={RAG_PILOT_CONTACT_PATH}>{t('hero.ctaPilot')}</Link>
@@ -410,7 +410,7 @@ export default function RagPageContent() {
           <p className="text-xl text-primary-100 mb-10">{t('cta.subtitle', values)}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-white text-primary-700 hover:bg-primary-50" asChild>
-              <Link href={RAG_DEMO_PATH}>{t('cta.demo')}</Link>
+              <Link href={RAG_UPLOAD_DEMO_PATH}>{t('cta.demo')}</Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/50 text-white hover:bg-white/10" asChild>
               <Link href={RAG_PILOT_CONTACT_PATH}>{t('cta.pilot')}</Link>

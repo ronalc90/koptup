@@ -100,6 +100,10 @@ export interface ContactLead {
   service: string;
   message: string;
   source: string;
+  /** Cuándo quiere empezar (formulario de /contact). */
+  plazo?: string | null;
+  /** Plan, nivel y modalidad que cotizaba (identificadores). */
+  cotizacion?: { servicio: string; plan?: string; nivel?: string; modalidad?: string } | null;
 }
 
 class ApiError extends Error {}

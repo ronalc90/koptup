@@ -165,14 +165,12 @@ Estas se repiten en varias demos; el detalle de cada una está en su guía. Tamb
 |---|---|
 | **La tarjeta del catálogo promete más que la demo** (por ejemplo "ML", "multi-país", integraciones o cumplimiento que la demo no tiene). La guía de cada una dice qué hace de verdad | crm-ia, helpdesk-ia, voice-ai, loyalty, erp, facturacion-electronica, hrms, lms, pos, delivery, wms-logistica, telemedicina, sistema-reservas, gestor-documentos, automatizacion, scraping, moderacion-contenido, firma-electronica, code-review-ia, linkedin-ads |
 | **"Ver Planes y Precios"** del cierre de la demo lleva a los planes RAG, no a los de esa solución | Todas las demos de "Otras soluciones" |
-| **Cotizar desde la demo** abre `/contact?service=<slug>` y el formulario muestra el slug en minúsculas ("voice ai callcenter") | voice-ai, telemedicina, code-review-ia y otras |
 | **Tres nombres distintos** para la misma demo: tarjeta del catálogo, página y catálogo del admin | helpdesk-ia, telemedicina, voice-ai, moderacion-contenido, saas-boilerplate, sistema-experto |
 | **Lo que haces vive solo en tu navegador** (`localStorage`): no se comparte con el vendedor ni entre equipos, y en algunas se pierde al recargar | Casi todas las demos con datos de ejemplo |
 | **Errores de hidratación de React** con el navegador en español, por números formateados distinto en el servidor y en el navegador | wms-logistica, automatizacion, moderacion-contenido |
 | **Botones que no hacen nada**, sin rótulo "Datos de ejemplo" o con textos en inglés | Las 7 por revisar |
 | **Límite de 30 bots nuevos por hora por IP** en el chatbot: si se supera, la demo dice "Revisa tu conexión" aunque la causa sea el límite. También afecta "Redactar con IA" del helpdesk | chatbot, helpdesk-ia |
 | **Una demo abierta cuya API exige sesión:** sin iniciar sesión muestra "Error al cargar documentos" | gestor-documentos |
-| **Páginas que deberían ser públicas y quedan detrás del acceso:** la verificación del certificado (a la que lleva el QR) pide acceso a la demo | lms |
 | **Enlaces de "Solicitar acceso" mal dirigidos** dentro de la demo: a una ruta que no existe o a `/contact` en vez de `/solicitar-demo` | cuentas-medicas, sistema-experto |
 
 Las capturas de las guías se tomaron con el mismo código de `main` en un entorno local con IA simulada: el texto de las respuestas con IA que se ve en ellas es ilustrativo ([Sobre las capturas](Doc-00-Indice.md#sobre-las-capturas)).

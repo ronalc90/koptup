@@ -64,7 +64,6 @@ export const metadata = {
     card: 'summary_large_image',
     title: HOME_TITLE,
     description: HOME_DESCRIPTION,
-    creator: '@koptup',
   },
   robots: {
     index: true,

@@ -257,7 +257,7 @@ Antes de publicar este índice se compararon las decisiones más críticas de lo
 
 Cada página de diagramas tiene su propia sección con lo que el código hace mal o de forma confusa, dibujado tal como es:
 
-- [Hallazgos de los flujos de negocio](Doc-14-1-Flujos-de-Negocio.md#hallazgos): 12 puntos (por ejemplo, una solicitud fusionada no avisa a nadie y el formulario de contacto no pide autorización de datos).
+- [Hallazgos de los flujos de negocio](Doc-14-1-Flujos-de-Negocio.md#hallazgos): 10 puntos (por ejemplo, una solicitud fusionada no avisa a nadie y el formulario de contacto no pide autorización de datos).
 - [Hallazgos de administración y operación](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#hallazgos): 14 puntos (por ejemplo, con el backend caído el panel manda al login en lugar de avisar, y `main` no exige CI en verde).
 - [Hallazgos técnicos](Doc-14-3-Flujos-Tecnicos.md#hallazgos): 8 puntos (por ejemplo, no hay plazo ni forma de suprimir datos personales y el chatbot guarda las preguntas sin vencimiento).
 

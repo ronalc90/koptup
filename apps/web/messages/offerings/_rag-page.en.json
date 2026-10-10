@@ -192,6 +192,11 @@
   },
   "ragSectors": {
     "casesTitle": "Use cases",
+    "demoGateNote": {
+      "privado": "This demo opens by invitation only: the link takes you to the form to request it and the team will get in touch.",
+      "solicitud": "This demo requires approved access: the link takes you to the form to request it.",
+      "publico": "This demo is not available right now: the link takes you to the form to request it and the team will get back to you."
+    },
     "ragLink": {
       "title": "How does a RAG system work?",
       "desc": "Learn how the AI searches your documents and cites the source, what happens to your data, the integrations, the plans and the FAQ.",
@@ -225,6 +230,8 @@
         }
       ],
       "demoLink": "See the “Healthcare expert system” demo: medical claims auditing with rules and AI",
+      "demoInviteLink": "Request the “Healthcare expert system” demo (by invitation): medical claims auditing with rules and AI",
+      "demoRequestLink": "Request access to the “Healthcare expert system” demo: medical claims auditing with rules and AI",
       "disclaimer": "The AI supports your team with cited information; clinical and audit decisions remain with your professionals."
     },
     "legal": {

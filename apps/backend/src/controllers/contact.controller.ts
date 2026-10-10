@@ -12,7 +12,7 @@ export const submitContact = asyncHandler(async (req: Request, res: Response) =>
     throw new AppError('Validation error', 400);
   }
 
-  const { name, email, phone, company, service, budget, message } = req.body;
+  const { name, email, phone, company, service, budget, message, quote, timeline } = req.body;
 
   // Guarda el Contact y notifica por WhatsApp/email (mismo canal que usa la
   // demo "Prueba con tu documento" con origen "demo-rag").
@@ -25,6 +25,15 @@ export const submitContact = asyncHandler(async (req: Request, res: Response) =>
     budget,
     message,
     source: 'contact-form',
+    plazo: timeline || undefined,
+    cotizacion: quote
+      ? {
+          servicio: quote.service,
+          ...(quote.plan ? { plan: quote.plan } : {}),
+          ...(quote.tier ? { nivel: quote.tier } : {}),
+          ...(quote.modality ? { modalidad: quote.modality } : {}),
+        }
+      : undefined,
   });
 
   res.json({

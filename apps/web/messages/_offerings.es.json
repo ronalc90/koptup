@@ -58,17 +58,19 @@
         },
         "decisions": {
           "title": "Decisiones más Inteligentes",
-          "desc": "Datos analizados en tiempo real para tomar mejores decisiones de negocio."
+          "desc": "La IA resume y cruza la información de tus datos y documentos para que decidas con fuentes, no con suposiciones."
         },
         "advantage": {
-          "title": "Ventaja Competitiva Real",
-          "desc": "Las empresas que adoptan IA hoy liderarán su industria en los próximos años."
+          "title": "Respuestas más Rápidas",
+          "desc": "Tu equipo encuentra la respuesta en segundos y con la fuente citada, sin esperar a que alguien busque el documento."
         }
       }
     },
     "tech": {
       "title": "Tecnologías de IA que Implementamos",
-      "subtitle": "Trabajamos con las plataformas de IA más avanzadas del mercado",
+      "subtitle": "La demo RAG usa la API de OpenAI; las demás plataformas las elegimos contigo según tu proyecto.",
+      "inDemo": "En la demo RAG",
+      "perProject": "Según tu proyecto",
       "orchestration": "Orquestación IA",
       "automation": "Automatización"
     },
@@ -105,7 +107,7 @@
       "badge": "Chatbots RAG",
       "title": "Chatbots RAG para WhatsApp y web",
       "subtitle": "Un chatbot que responde a tus clientes y a tu equipo con los documentos de tu empresa —manuales, políticas, catálogos, preguntas frecuentes— y cita la fuente de cada respuesta. En tu sitio web y en WhatsApp.",
-      "ctaDemo": "Probar la demo",
+      "ctaDemo": "Prueba con tu documento",
       "ctaPilot": "Agenda un piloto",
       "price": "Desde {essentialFrom}, o piloto de {pilotFrom}. Más IVA si aplica.",
       "ragLink": "Cómo funciona un chatbot con los documentos de tu empresa"
@@ -242,7 +244,7 @@
     "cta": {
       "title": "¿Quieres un chatbot que responda con tus documentos?",
       "subtitle": "Prueba la demo gratis, sin registro, o agenda un piloto de {pilotWeeks} semanas con los documentos de tu empresa.",
-      "demo": "Probar la demo",
+      "demo": "Prueba con tu documento",
       "pilot": "Agenda un piloto",
       "plans": "Ver planes y precios"
     }
@@ -256,7 +258,7 @@
     "modality": {
       "label": "Modalidad",
       "compra": "Comprar el software",
-      "compraDesc": "One-time setup + mantenimiento opcional. El código fuente queda en tu poder.",
+      "compraDesc": "Pago único de implementación y mantenimiento opcional. El código fuente queda en tu poder.",
       "saas": "Suscripción SaaS mensual",
       "saasDesc": "Lo hospedamos nosotros, pagas una mensualidad y cancelas cuando quieras."
     },
@@ -306,7 +308,7 @@
     },
     "banner": {
       "title": "Cómo escalamos",
-      "body": "Equipo basado en Colombia opera Lun–Vie 8AM–5PM. Construimos software alineado con HIPAA/SOC 2/ISO 27001 pero la certificación formal corre por cuenta del cliente. Si necesitas un alcance mayor al Enterprise, cotizamos personalizado en 48h hábiles."
+      "body": "Equipo basado en Colombia que opera Lun–Vie 8AM–5PM. Si tu proyecto debe cumplir normas como ISO 27001, SOC 2 o HIPAA, lo diseñamos con esos requisitos; la certificación formal la tramita tu empresa. Si necesitas un alcance mayor al Enterprise, cotizamos personalizado en 48h hábiles."
     },
     "supportSLA": {
       "email-24h": "Email horario laboral · 24h hábiles",
@@ -537,6 +539,11 @@
   },
   "ragSectors": {
     "casesTitle": "Casos de uso",
+    "demoGateNote": {
+      "privado": "Esta demo se abre solo con invitación: el enlace te lleva al formulario para pedirla y el equipo te contacta.",
+      "solicitud": "Esta demo requiere un acceso aprobado: el enlace te lleva al formulario para pedirlo.",
+      "publico": "Esta demo no está disponible por ahora: el enlace te lleva al formulario para pedirla y el equipo te responde."
+    },
     "ragLink": {
       "title": "¿Cómo funciona un sistema RAG?",
       "desc": "Conoce cómo la IA busca en tus documentos y cita la fuente, qué pasa con tus datos, las integraciones, los planes y las preguntas frecuentes.",
@@ -570,6 +577,8 @@
         }
       ],
       "demoLink": "Ver la demo «Sistema experto para salud»: auditoría de cuentas médicas con reglas e IA",
+      "demoInviteLink": "Pedir la demo «Sistema experto para salud» (con invitación): auditoría de cuentas médicas con reglas e IA",
+      "demoRequestLink": "Solicitar acceso a la demo «Sistema experto para salud»: auditoría de cuentas médicas con reglas e IA",
       "disclaimer": "La IA apoya a tu equipo con información citada; las decisiones clínicas y de auditoría siguen en manos de tus profesionales."
     },
     "legal": {

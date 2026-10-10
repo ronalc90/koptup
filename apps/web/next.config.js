@@ -44,6 +44,11 @@ const ANALYTICS_CSP = [USE_GOOGLE_TAG && GOOGLE_TAG_CSP, USE_LINKEDIN && LINKEDI
 const analyticsSources = (directive) =>
   [...new Set(ANALYTICS_CSP.flatMap((group) => group[directive]))].map((src) => ` ${src}`).join('');
 
+// Cámara y micrófono bloqueados en todo el sitio salvo en la demo de
+// telemedicina (ver headers()).
+const DEFAULT_PERMISSIONS_POLICY = 'camera=(), microphone=(), geolocation=(self)';
+const TELEMEDICINE_PERMISSIONS_POLICY = 'camera=(self), microphone=(self), geolocation=(self)';
+
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
@@ -105,7 +110,7 @@ const nextConfig = {
       },
       {
         key: 'Permissions-Policy',
-        value: 'camera=(), microphone=(), geolocation=(self)'
+        value: DEFAULT_PERMISSIONS_POLICY
       }
     ];
     const contentSecurityPolicy = (frameAncestors) => ({
@@ -132,6 +137,21 @@ const nextConfig = {
         // cualquier frame-ancestor.
         source: '/embed/:path*',
         headers: [...securityHeaders, contentSecurityPolicy('*')]
+      },
+      {
+        // La videoconsulta de la demo de telemedicina prueba la cámara y el
+        // micrófono del visitante (con su permiso): solo esa ruta y solo para el
+        // propio sitio. Va después de la regla general, así que la reemplaza
+        // (`:path*` incluye la propia /demo/telemedicina).
+        source: '/demo/telemedicina/:path*',
+        headers: [{ key: 'Permissions-Policy', value: TELEMEDICINE_PERMISSIONS_POLICY }]
+      },
+      {
+        // Enlaces de un solo uso y páginas de cuenta: no se indexan aunque un
+        // buscador llegue por un enlace externo (además de robots.txt y del
+        // meta robots de cada página).
+        source: '/:path(login|register|forgot-password|reset-password|auth/.*|activar/.*|propuesta/.*)',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }]
       },
       // Cache static assets aggressively
       {

@@ -294,10 +294,28 @@ function accessScreen(
   return res;
 }
 
+/**
+ * Páginas dentro de una demo con acceso controlado que son públicas: la
+ * verificación del certificado del LMS es lo que abre el código QR del
+ * certificado, y quien la consulta (un tercero) no tiene acceso a la demo. La
+ * página solo decodifica y verifica los datos que trae su propia URL.
+ */
+const PUBLIC_DEMO_SUBPATHS = new Set(['/demo/lms/verificar']);
+
+function isPublicDemoSubpath(pathname: string): boolean {
+  const normalized = pathname.length > 1 ? pathname.replace(/\/+$/, '').toLowerCase() : pathname;
+  return PUBLIC_DEMO_SUBPATHS.has(normalized);
+}
+
 async function demoGate(req: NextRequest): Promise<NextResponse> {
   const slug = req.nextUrl.pathname.split('/')[2]?.toLowerCase() ?? '';
   // Rutas que no son una demo conocida: las resuelve Next (404 si no existen).
   if (!isKnownDemoSlug(slug)) return NextResponse.next();
+  if (isPublicDemoSubpath(req.nextUrl.pathname)) {
+    const res = NextResponse.next();
+    res.headers.set('X-Robots-Tag', 'noindex');
+    return res;
+  }
 
   const entry = await catalogEntry(slug);
   if (entry.accessMode === 'publico' && entry.activo) return NextResponse.next();

@@ -6,10 +6,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import { RagPlanCard } from '@/components/rag/RagPlans';
-import { RAG_PLANS_PATH, RAG_SERVICE_SLUG, getRagPlan, isRagPlanId } from '@/lib/rag-plans';
+import { RAG_PLANS_PATH, RAG_SERVICE_SLUG, getRagPlan, isRagPlanId, ragPlanContactHref } from '@/lib/rag-plans';
 import Button from '@/components/ui/Button';
 import Card, { CardContent } from '@/components/ui/Card';
-import Badge from '@/components/ui/Badge';
 import {
   UserIcon,
   EnvelopeIcon,
@@ -23,22 +22,10 @@ import {
 } from '@heroicons/react/24/outline';
 import { FaGoogle, FaGithub } from 'react-icons/fa';
 
-// TODO: extract to i18n
-const COP_FMT = (n: number) =>
-  '$ ' + new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 }).format(n) + ' COP';
-
-// Los planes RAG no van aquí: llegan como ?plan=sistema-rag&tier=<id> y se
-// muestran con la misma tarjeta de /services#planes-rag (src/lib/rag-plans.ts).
-const PLAN_PREVIEW: Record<string, { name: string; tiers: Record<string, { label: string; price: number; bullets: string[] }> }> = {
-  'agente-ia-ventas': {
-    name: 'Agente IA de Ventas',
-    tiers: {
-      growth: { label: 'Growth', price: 1290000, bullets: ['Calificación de leads', 'Integración CRM', 'Reportes semanales'] },
-      pro: { label: 'Pro', price: 2490000, bullets: ['Multi-canal', 'A/B testing', 'Dashboard ejecutivo'] },
-    },
-  },
-};
-
+// Plan elegido: solo los planes RAG publicados (`?plan=sistema-rag&tier=<id>`),
+// con la misma tarjeta de /services#planes-rag (src/lib/rag-plans.ts). Antes
+// había aquí un "Agente IA de Ventas" con precios que no están publicados en
+// ninguna parte; se quitó.
 function RegisterPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -49,20 +36,9 @@ function RegisterPageInner() {
   const sourceParam = searchParams.get('source');
   const serviceParam = searchParams.get('service');
 
-  const planContext =
-    planSlug && PLAN_PREVIEW[planSlug]
-      ? {
-          name: PLAN_PREVIEW[planSlug].name,
-          tier: tierSlug && PLAN_PREVIEW[planSlug].tiers[tierSlug]
-            ? PLAN_PREVIEW[planSlug].tiers[tierSlug]
-            : null,
-          slug: planSlug,
-        }
-      : null;
-
   const ragPlan =
     planSlug === RAG_SERVICE_SLUG && isRagPlanId(tierSlug) ? getRagPlan(tierSlug) : null;
-  const hasPlanAside = Boolean(planContext || ragPlan);
+  const hasPlanAside = Boolean(ragPlan);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -133,7 +109,7 @@ function RegisterPageInner() {
       }
       router.push(`/dashboard?${params.toString()}`);
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || 'Error al crear la cuenta');
+      setError(err.response?.data?.message || err.message || t('errorGeneric'));
       setIsLoading(false);
     }
   };
@@ -174,9 +150,9 @@ function RegisterPageInner() {
               KopTup
             </span>
           </Link>
-          <h2 className="mt-6 text-3xl font-bold text-secondary-900 dark:text-white">
+          <h1 className="mt-6 text-3xl font-bold text-secondary-900 dark:text-white">
             {t('title')}
-          </h2>
+          </h1>
           <p className="mt-2 text-sm text-secondary-600 dark:text-secondary-400">
             {t('subtitle')}
           </p>
@@ -440,82 +416,34 @@ function RegisterPageInner() {
                 fullWidth
                 disabled={isLoading}
               >
-                {/* TODO: extract to i18n */}
-                {isLoading ? t('creating') : (hasPlanAside ? 'Crear cuenta y empezar' : t('createButton'))}
+                {isLoading ? t('creating') : (hasPlanAside ? t('createAndContinue') : t('createButton'))}
               </Button>
             </form>
           </CardContent>
         </Card>
 
-        {/* Plan summary aside */}
-        {/* TODO: extract to i18n */}
+        {/* Plan elegido (solo planes RAG publicados) */}
         {ragPlan && (
           <aside className="lg:col-span-1 space-y-3">
             <div className="flex items-center gap-2">
               <SparklesIcon className="h-5 w-5 text-primary-600 dark:text-primary-400" />
               <span className="text-xs uppercase tracking-wide font-semibold text-primary-700 dark:text-primary-300">
-                Tu plan elegido
+                {t('chosenPlan')}
               </span>
             </div>
             <RagPlanCard plan={ragPlan} showCta={false} />
             <p className="p-3 rounded-lg bg-secondary-50 dark:bg-secondary-900 text-xs text-secondary-600 dark:text-secondary-400">
-              Al crear tu cuenta podrás hacer seguimiento de tu solicitud desde tu panel.
+              {t('chosenPlanNote')}
             </p>
+            <Button variant="outline" size="sm" fullWidth asChild>
+              <Link href={ragPlanContactHref(ragPlan.id)}>{t('quotePlan')}</Link>
+            </Button>
             <Link
               href={RAG_PLANS_PATH}
               className="block text-xs text-center text-primary-600 dark:text-primary-400 hover:underline"
             >
-              Cambiar de plan
+              {t('changePlan')}
             </Link>
-          </aside>
-        )}
-        {!ragPlan && planContext && (
-          <aside className="lg:col-span-1">
-            <Card variant="bordered" className="sticky top-6 border-primary-200 dark:border-primary-800 bg-gradient-to-br from-primary-50 to-white dark:from-primary-950 dark:to-secondary-950">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <SparklesIcon className="h-5 w-5 text-primary-600 dark:text-primary-400" />
-                  <span className="text-xs uppercase tracking-wide font-semibold text-primary-700 dark:text-primary-300">
-                    Tu plan elegido
-                  </span>
-                </div>
-                <h3 className="text-xl font-bold text-secondary-900 dark:text-white mb-1">
-                  {planContext.name}
-                </h3>
-                {planContext.tier && (
-                  <Badge variant="primary" size="sm" className="mb-4">
-                    Plan {planContext.tier.label}
-                  </Badge>
-                )}
-                {planContext.tier && (
-                  <>
-                    <p className="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-1">
-                      {COP_FMT(planContext.tier.price)}
-                    </p>
-                    <p className="text-xs text-secondary-500 dark:text-secondary-400 mb-4">
-                      / mes · sin permanencia
-                    </p>
-                    <ul className="space-y-2 mb-4">
-                      {planContext.tier.bullets.map((b) => (
-                        <li key={b} className="flex items-start gap-2 text-sm text-secondary-700 dark:text-secondary-300">
-                          <CheckCircleIcon className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
-                          {b}
-                        </li>
-                      ))}
-                    </ul>
-                  </>
-                )}
-                <div className="p-3 rounded-lg bg-secondary-50 dark:bg-secondary-900 text-xs text-secondary-600 dark:text-secondary-400">
-                  Al crear tu cuenta podrás configurar este plan, integrar tus APIs y empezar a usarlo en minutos.
-                </div>
-                <Link
-                  href="/services#planes-rag"
-                  className="block mt-3 text-xs text-center text-primary-600 dark:text-primary-400 hover:underline"
-                >
-                  Cambiar de plan
-                </Link>
-              </CardContent>
-            </Card>
           </aside>
         )}
         </div>

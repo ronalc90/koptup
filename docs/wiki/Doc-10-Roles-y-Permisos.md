@@ -197,11 +197,12 @@ stateDiagram-v2
 | **Abierta** (`publico`) | Abierta | Cualquiera, sin cuenta | No hace falta | — | Sí | 18: chatbot, code-review-ia, crm-ia, helpdesk-ia, facturacion-electronica, pos, ecommerce, loyalty, control-proyectos, sistema-reservas, dashboard-ejecutivo, gestor-documentos, gestor-contenido, automatizacion, scraping, moderacion-contenido, saas-boilerplate, firma-electronica |
 | **Con solicitud** (`solicitud`) | Requiere acceso | El equipo y quien tenga un acceso vigente | Formulario "Solicitar demo" → el equipo aprueba | `admin` o `sales` | No | 8: voice-ai, erp, delivery, hrms, lms, telemedicina, wms-logistica, linkedin-ads |
 | **Solo por invitación** (`privado`) | Solo por invitación | El equipo y quien tenga una invitación vigente | "Solicitar demo personalizada" → solo un admin aprueba | Solo `admin` | No | 2: cuentas-medicas, sistema-experto |
-| **Desactivada** (`activo: false`, cualquier modo) | En mantenimiento | Solo el equipo | — | — | Según el modo | Ninguna |
+| **Desactivada** (`activo: false`, cualquier modo) | En mantenimiento | Solo el equipo | — | — | No | Ninguna |
 
 - El **administrador** cambia el modo, activa o desactiva una demo y fija su vigencia por defecto en **Admin › Catálogo de demos**. El cambio se aplica en el sitio en máximo un minuto (caché del middleware) y queda en la bitácora. El **chatbot RAG** queda siempre Abierto: es el destino de la publicidad.
 - La tabla de respaldo de la web (`lib/demo-access-defaults.ts`) y la semilla del backend tienen los mismos modos; una prueba automática verifica que coincidan.
 - Una demo con acceso controlado se sirve con `Cache-Control: private, no-store` y `X-Robots-Tag: noindex`.
+- El sitemap lista las demos Abiertas y activas según el catálogo (se regenera como mucho cada hora; ver [SEO › 2.3](Doc-12-SEO-Analitica-y-Legal.md#23-sitemap-y-robots)).
 
 ![El gerente ve el catálogo en solo lectura](images/doc/roles/manager-catalogo-solo-lectura.jpg)
 

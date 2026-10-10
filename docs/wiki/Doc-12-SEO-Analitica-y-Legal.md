@@ -64,7 +64,8 @@ flowchart LR
 ### 2.1 Títulos y descripciones
 
 - **Plantilla:** `"<título de la página> | KopTup"`, con un máximo de **60 caracteres** contando el sufijo. La única excepción es el inicio, que pone la marca primero: **«KopTup | IA que responde con los documentos de tu empresa»**.
-- **Dónde se definen:** `apps/web/src/lib/seo-config.ts` tiene el título, la descripción, la canonical y la imagen de cada página; cada `layout.tsx` o `page.tsx` las aplica con `generateMetadata('<clave>')`.
+- **Dónde se definen:** `apps/web/src/lib/seo-config.ts` tiene el título, la descripción, la canonical y la imagen de cada página; cada `layout.tsx` o `page.tsx` las aplica con `generateMetadata('<clave>')`. Las páginas privadas (cuenta, activación) usan `privatePageMetadata(título, ruta)`: título propio, `noindex, nofollow` y canonical a su propia ruta, o ninguna si la URL lleva un token.
+- **Panel y portal:** `/admin` y `/dashboard` entregan en el HTML el título del área («Panel de administración \| KopTup», «Mi portal \| KopTup»); en el navegador cada sección lo afina, por ejemplo «Solicitudes de demo · Panel \| KopTup» o «Mis demos · Mi portal \| KopTup» (`components/seo/AreaDocumentTitle.tsx`, textos en `pageTitles`).
 - **Control automático:** `node apps/web/scripts/check-titles.mjs` simula cómo Next arma cada título y falla si alguno pasa de 60 caracteres o repite la marca. Corre en CI ([Operación y despliegue › 3](Doc-11-Operacion-y-Despliegue.md#3-integración-continua-ci)).
 - No se usa la meta `keywords` (Google la ignora).
 
@@ -85,16 +86,21 @@ Títulos reales de las páginas principales (leídos del HTML que entrega el sit
 | `/demo/chatbot` | Demo RAG: prueba con tu documento \| KopTup | index, follow |
 | `/solicitar-demo` | Solicitar una demo guiada \| KopTup | index, follow |
 | `/contact` | Contacto: Solicita tu Cotización Gratis \| KopTup | index, follow |
-| `/about` | Sobre Nosotros: Empresa de Software en Bogotá \| KopTup | index, follow |
+| `/about` | Nosotros: estudio de software a medida en Bogotá \| KopTup | index, follow |
 | `/privacy`, `/terms`, `/cookies` | Política de Privacidad / Términos y Condiciones / Política de Cookies \| KopTup | index, follow |
 | `/bienvenido-producthunt` | Product Hunt: Software a Medida con Demos \| KopTup | **noindex**, follow |
 | `/demo-acceso/<demo>` | «<demo>: acceso \| KopTup» | **noindex**, nofollow |
+| `/login`, `/register` | Iniciar sesión / Crear cuenta \| KopTup | **noindex**, nofollow |
+| `/forgot-password`, `/reset-password` | Recuperar contraseña / Nueva contraseña \| KopTup | **noindex**, nofollow |
+| `/auth/callback` | Iniciando sesión \| KopTup | **noindex**, nofollow |
+| `/activar/<token>` | Activa tu acceso \| KopTup | **noindex**, nofollow (sin canonical) |
+| Página 404 | Página no encontrada \| KopTup | **noindex** (sin canonical) |
 
 ### 2.2 Dominio canónico
 
 - El dominio canónico es **`https://www.koptup.com`** (con www). Está fijo en `apps/web/src/lib/site.ts` (`SITE_URL`) y de ahí salen la canonical, `og:url`, el JSON-LD, el sitemap y los enlaces que generan las demos.
 - `https://koptup.com/` responde con una redirección permanente (308) a `https://www.koptup.com/`.
-- Cada página de contenido declara su propia canonical (por ejemplo `https://www.koptup.com/rag/salud`). `/pricing` redirige (307) a `/services#planes-rag` y su canonical es `/services`.
+- Cada página de contenido declara su propia canonical (por ejemplo `https://www.koptup.com/rag/salud`); también las páginas de cuenta. La página 404 y las rutas con un token en la URL (`/activar/<token>`) no declaran canonical. `/pricing` redirige de forma permanente (308) a `/services#planes-rag`.
 - **Idiomas:** español e inglés comparten la misma URL (el idioma va en la cookie `locale`), así que no hay `hreflang`. Google ve el español, que es el idioma por defecto.
 
 ### 2.3 Sitemap y robots
@@ -103,7 +109,7 @@ Títulos reales de las páginas principales (leídos del HTML que entrega el sit
 
 *A la izquierda, el inicio de `/sitemap.xml`; a la derecha, `/robots.txt`.*
 
-**`/sitemap.xml`** lo genera `apps/web/src/app/sitemap.ts` y tiene **34 URL**:
+**`/sitemap.xml`** lo genera `apps/web/src/app/sitemap.ts` y hoy tiene **34 URL** (16 fijas y las demos abiertas):
 
 | Grupo | URL | Prioridad |
 |---|---|---|
@@ -113,12 +119,13 @@ Títulos reales de las páginas principales (leídos del HTML que entrega el sit
 | Conversión | `/solicitar-demo`, `/contact` | 0.8 |
 | Empresa | `/about` | 0.7 |
 | Legal | `/privacy`, `/terms` (0.3) y `/cookies` (0.2) | 0.3 y 0.2 |
-| Demos | Las **18 demos abiertas** según la semilla: `/demo/chatbot`, `/demo/ecommerce`, `/demo/crm-ia`… | 0.8 |
+| Demos | Las demos **Abiertas y activas** en Admin › Catálogo de demos (hoy 18): `/demo/chatbot`, `/demo/ecommerce`, `/demo/crm-ia`… | 0.8 |
 
 - La fecha de modificación es fija (`2026-06-29`) para no marcar todo el sitio como «cambiado hoy» en cada despliegue.
-- Las demos «Con solicitud» o «Solo por invitación» **no** se listan: a quien no tiene acceso le muestran una pantalla `noindex`. Ojo: la lista sale de la **tabla de respaldo del código**, no del catálogo que edita el admin (ver [Limitaciones](#5-limitaciones-conocidas)).
+- Las demos «Con solicitud», «Solo por invitación» o desactivadas **no** se listan: a quien no tiene acceso le muestran una pantalla `noindex`.
+- La lista de demos sale del **catálogo que edita el admin** (`GET /api/demo-catalog`, `lib/sitemap-demos.ts`). El sitemap se regenera como mucho cada hora, así que un cambio de modo tarda hasta una hora en reflejarse. Si el backend no responde, usa la tabla de respaldo del código (`lib/demo-access-defaults.ts`).
 
-**`/robots.txt`** (`apps/web/public/robots.txt`) permite todo menos las zonas privadas o con datos de sesión: `/dashboard`, `/admin`, `/api/`, `/login`, `/register`, `/forgot-password`, `/reset-password`, `/auth/`, `/test`, `/liquidacion`, `/activar/`, `/demo-acceso/` y cualquier URL con `token=` o `sessionId=`. Bingbot repite esas reglas con `Crawl-delay: 5`; AhrefsBot, SemrushBot, DotBot, MJ12bot, GPTBot y CCBot están bloqueados por completo. Al final declara el sitemap con www.
+**`/robots.txt`** (`apps/web/public/robots.txt`) permite todo menos las zonas privadas o con datos de sesión: `/dashboard`, `/admin`, `/api/`, `/login`, `/register`, `/forgot-password`, `/reset-password`, `/auth/`, `/test`, `/liquidacion`, `/activar/`, `/propuesta/`, `/demo-acceso/` y cualquier URL con `token=` o `sessionId=`. Bingbot repite esas reglas con `Crawl-delay: 5`; AhrefsBot, SemrushBot, DotBot, MJ12bot, GPTBot y CCBot están bloqueados por completo. Al final declara el sitemap con www.
 
 ### 2.4 Qué no se indexa
 
@@ -126,8 +133,9 @@ Tres mecanismos, del más fuerte al más débil:
 
 | Mecanismo | Dónde | Páginas |
 |---|---|---|
-| Cabecera `X-Robots-Tag: noindex` (y `no-store`) | Middleware de la web | Todo `/admin` y `/dashboard`, y cada demo con acceso controlado (o su pantalla de acceso) |
-| Meta `robots: noindex` | Metadatos de la página | `/activar/<token>`, `/demo-acceso/<demo>`, `/bienvenido-producthunt`, `/demo/cuentas-medicas`, `/demo/sistema-experto`, `/demo/lms/verificar`, `/embed/*`, `/test` y la página 404 |
+| Cabecera `X-Robots-Tag: noindex` (y `no-store`) | Middleware de la web | Todo `/admin` y `/dashboard`, cada demo con acceso controlado (o su pantalla de acceso) y `/demo/lms/verificar` |
+| Cabecera `X-Robots-Tag: noindex, nofollow` | `next.config.js` | `/login`, `/register`, `/forgot-password`, `/reset-password`, `/auth/*`, `/activar/*` y `/propuesta/*` |
+| Meta `robots: noindex` | Metadatos de la página | Las páginas de cuenta, `/activar/<token>`, `/admin`, `/dashboard`, `/demo-acceso/<demo>`, `/bienvenido-producthunt`, `/demo/cuentas-medicas`, `/demo/sistema-experto`, `/demo/lms/verificar`, `/embed/*` y la página 404 (una sola meta `robots`) |
 | `Disallow` en `robots.txt` | `public/robots.txt` | La lista de la sección 2.3 |
 
 ### 2.5 Datos estructurados (JSON-LD)
@@ -147,7 +155,7 @@ Los buscadores leen estos bloques para entender quién es KopTup, qué vende y c
 | `/solicitar-demo`, `/contact`, `/about`, `/privacy`, `/terms`, `/cookies` | `BreadcrumbList` | `layout.tsx` de cada ruta |
 | `/demo` y `/bienvenido-producthunt` | Ninguno | — |
 
-Los precios que aparecen en el JSON-LD salen del mismo archivo que los precios visibles (`lib/rag-plans.ts`), así que no se desalinean.
+Los precios que aparecen en el JSON-LD salen del mismo archivo que los precios visibles (`lib/rag-plans.ts`), así que no se desalinean. El bloque `Organization` solo afirma lo que el sitio muestra: `areaServed` Colombia, perfiles en `sameAs` tomados de `SOCIAL_LINKS` (`lib/site.ts`, los mismos del pie de página) y preguntas frecuentes que coinciden con las páginas; no declara año de fundación, número de empleados ni países atendidos.
 
 ### 2.6 Imágenes para redes (Open Graph)
 
@@ -160,7 +168,7 @@ Twitter usa la tarjeta `summary_large_image` con la misma imagen. La imagen gene
 
 ### 2.7 Otros archivos para buscadores e IA
 
-- **`/llms.txt`**: resumen en texto de quién es KopTup y qué vende, pensado para asistentes de IA. Es un archivo fijo de `public/`: si cambia el dominio o la oferta, hay que editarlo a mano.
+- **`/llms.txt`**: resumen en texto de quién es KopTup y qué vende, pensado para asistentes de IA. Dice lo mismo que el sitio (sin año de fundación ni datos que no se puedan comprobar) y aclara que las demos usan datos de ejemplo. Es un archivo fijo de `public/`: si cambia el dominio o la oferta, hay que editarlo a mano.
 - **Verificación de Google Search Console:** dos códigos en los metadatos del layout raíz y un archivo `google….html` en `public/`.
 - **`manifest.json`** e íconos para instalar el sitio en el celular.
 
@@ -352,7 +360,7 @@ Si la misma persona vuelve a enviar el formulario con una solicitud abierta de m
 | Origen | Datos personales | Dónde quedan | Quién más los recibe |
 |---|---|---|---|
 | Solicitar demo | Nombre, empresa, cargo, email, teléfono, país, tamaño de empresa, demos, caso de uso, página de origen, referente y UTM | MongoDB: `DemoRequest` y una copia como lead en `Contact` (origen `demo-request`) | Aviso al equipo por email (`ADMIN_EMAIL`) y WhatsApp si están configurados; acuse al solicitante si hay SMTP |
-| Contacto | Nombre, email, teléfono, empresa, servicio, presupuesto y mensaje | MongoDB: `Contact` | Aviso al equipo por email y WhatsApp |
+| Contacto | Nombre, email, teléfono, empresa, servicio, presupuesto, plazo para empezar, la cotización que venía revisando (plan, nivel y modalidad) y mensaje | MongoDB: `Contact` | Aviso al equipo por email y WhatsApp |
 | Prueba con tu documento | Email y el documento | Email en `Contact` (origen `demo-rag`); el documento, solo **en memoria** y por máximo 1 hora | OpenAI recibe los fragmentos relevantes y la pregunta, no el documento completo ni el email |
 | Cuenta del prospecto | Email, nombre, empresa, teléfono y contraseña cifrada (hash) | MongoDB: `User`, sus accesos en `DemoGrant` y el enlace de activación solo como hash en `MagicLinkToken` | — |
 | Acciones del equipo | Quién hizo qué y hash de la IP | MongoDB: `AuditLog` | — |
@@ -362,7 +370,7 @@ La IP nunca se guarda en claro en MongoDB: solo su hash. Cuánto tiempo se conse
 
 ### 4.3 Páginas legales
 
-Las tres comparten diseño (encabezado azul con «Actualizado: Octubre 2026», secciones numeradas y una nota final) y sus textos viven en `apps/web/messages/es.json` y `en.json` (`privacyPage`, `termsPage`, `cookiesPage`). Las capturas de cada una completa están en [Páginas públicas › 13](Doc-03-Paginas-Publicas.md#13-páginas-legales-privacy-terms-cookies).
+Las tres comparten diseño (encabezado azul con «Actualizado: Octubre 2026», secciones numeradas y una nota final), tratan de «tú» como el resto del sitio, su pie muestra el año en curso y sus textos viven en `apps/web/messages/es.json` y `en.json` (`privacyPage`, `termsPage`, `cookiesPage`). Las capturas de cada una completa están en [Páginas públicas › 13](Doc-03-Paginas-Publicas.md#13-páginas-legales-privacy-terms-cookies).
 
 | Página | Qué dice hoy |
 |---|---|
@@ -415,12 +423,7 @@ Lo que el sitio guarda de verdad en el navegador:
 | 4 | **No hay forma de suprimir los datos de una persona** desde el panel ni por la API, ni plazos de retención | Una solicitud de borrado exige editar la base a mano |
 | 5 | **La política promete responder en 30 días hábiles**; la Ley 1581 fija 10 días hábiles para consultas y 15 para reclamos (artículos 14 y 15). El texto es una política de privacidad general (incluye derechos del RGPD europeo, como portabilidad) | Conviene que un abogado lo revise frente a la Ley 1581 y su reglamentación |
 | 6 | **La tabla de `/cookies` no coincide con las cookies reales** (sección 4.4) y `locale` se guarda aunque se rechacen las funcionales | La política describe algo distinto de lo que pasa |
-| 7 | **El sitemap no sigue el catálogo:** lista las demos abiertas según la tabla de respaldo del código (`lib/demo-access-defaults.ts`), no lo que el admin cambió | Una demo que el admin cerró sigue en el sitemap (y muestra una pantalla `noindex`); una que abrió no aparece |
-| 8 | **`/login` y `/register` heredan el título y la canonical del inicio** y no tienen `noindex` (están bloqueadas en `robots.txt`) | Metadatos poco precisos; sin efecto práctico mientras `robots.txt` las bloquee |
-| 9 | **La página 404 hereda el título y la canonical del inicio** y lleva dos metas `robots` contradictorias | Sin efecto en Google (responde 404), pero confuso |
-| 10 | **`llms.txt` dice «Año de fundación: 2019»** y `/about` dice 2026 | Mensajes distintos sobre la empresa |
-| 11 | **El pie de las páginas legales dice «© 2025»** y el del sitio «© 2026» | Detalle de consistencia |
-| 12 | **Las páginas legales tratan de «usted»** y el resto del sitio de «tú» | Tono inconsistente |
+| 7 | **El sitemap tarda hasta una hora** en reflejar un cambio de modo en Admin › Catálogo de demos | Una demo recién cerrada puede seguir listada un rato (y ya muestra una pantalla `noindex`) |
 
 ---
 
@@ -428,11 +431,12 @@ Lo que el sitio guarda de verdad en el navegador:
 
 | Tema | Archivo |
 |---|---|
-| Dominio, marca, plantilla de títulos, imagen RAG | `apps/web/src/lib/site.ts` |
+| Dominio, marca, plantilla de títulos, imagen RAG, perfiles sociales | `apps/web/src/lib/site.ts` |
 | Títulos, descripciones, canonical e imagen por página | `apps/web/src/lib/seo-config.ts` |
 | Metadatos por defecto, verificación de Google | `apps/web/src/app/layout.tsx` |
 | Control de títulos | `apps/web/scripts/check-titles.mjs` |
-| Sitemap | `apps/web/src/app/sitemap.ts` |
+| Sitemap | `apps/web/src/app/sitemap.ts`, `apps/web/src/lib/sitemap-demos.ts` |
+| Metadatos de páginas privadas y títulos del panel | `privatePageMetadata` en `lib/seo-config.ts`, `components/seo/AreaDocumentTitle.tsx` |
 | Robots, `llms.txt`, imagen fija | `apps/web/public/robots.txt`, `public/llms.txt`, `public/og-image.png` |
 | Imagen generada | `apps/web/src/app/opengraph-image.tsx` |
 | JSON-LD | `components/seo/StructuredData.tsx`, `lib/rag-plans-jsonld.ts`, `lib/rag-page-jsonld.ts`, `lib/chatbots-page-jsonld.ts`, `lib/ai-solutions-page-jsonld.ts` y los `layout.tsx` de cada ruta |

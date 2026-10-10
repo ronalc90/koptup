@@ -120,11 +120,11 @@ Todas llevan el menú y el pie de página comunes. Detalle de cada una, con capt
 | `/rag/legal` | Landing RAG para áreas legales | Público | Buscar en contratos con IA: RAG para áreas legales \| KopTup | Sí | <a href="images/doc/publicas/rag-legal-escritorio.jpg"><img src="images/doc/publicas/rag-legal-escritorio.jpg" width="120" alt="RAG legal"></a> |
 | `/rag/soporte` | Landing RAG para soporte y manuales | Público | Asistente IA para manuales internos y soporte \| KopTup | Sí | <a href="images/doc/publicas/rag-soporte-escritorio.jpg"><img src="images/doc/publicas/rag-soporte-escritorio.jpg" width="120" alt="RAG soporte"></a> |
 | `/services` | Planes RAG y "Otras soluciones a medida" | Público | Precios de sistemas RAG y software a medida \| KopTup | Sí | <a href="images/doc/publicas/services-planes-anotado.jpg"><img src="images/doc/publicas/services-planes-anotado.jpg" width="120" alt="Servicios"></a> |
-| `/pricing` | Antigua página de precios: redirige (307) a `/services#planes-rag` | Público | — | No (no está en el sitemap) | — |
+| `/pricing` | Antigua página de precios: redirige de forma permanente (308) a `/services#planes-rag` | Público | — | No (no está en el sitemap) | — |
 | `/demo` | Hub con las 28 demos y su modo de acceso | Público | Prototipos Interactivos: Prueba Antes de Contratar \| KopTup | Sí | <a href="images/doc/publicas/demo-hub-escritorio.jpg"><img src="images/doc/publicas/demo-hub-escritorio.jpg" width="120" alt="Hub de demos"></a> |
 | `/solicitar-demo` | Formulario para pedir demos | Público | Solicitar una demo guiada \| KopTup | Sí | <a href="images/doc/publicas/solicitar-demo-escritorio.jpg"><img src="images/doc/publicas/solicitar-demo-escritorio.jpg" width="120" alt="Solicitar demo"></a> |
 | `/contact` | Formulario de contacto y cotización | Público | Contacto: Solicita tu Cotización Gratis \| KopTup | Sí | <a href="images/doc/publicas/contacto-escritorio.jpg"><img src="images/doc/publicas/contacto-escritorio.jpg" width="120" alt="Contacto"></a> |
-| `/about` | Quiénes somos | Público | Sobre Nosotros: Empresa de Software en Bogotá \| KopTup | Sí | <a href="images/doc/publicas/nosotros-escritorio.jpg"><img src="images/doc/publicas/nosotros-escritorio.jpg" width="120" alt="Nosotros"></a> |
+| `/about` | Quiénes somos | Público | Nosotros: estudio de software a medida en Bogotá \| KopTup | Sí | <a href="images/doc/publicas/nosotros-escritorio.jpg"><img src="images/doc/publicas/nosotros-escritorio.jpg" width="120" alt="Nosotros"></a> |
 | `/chatbots-ia` | Landing SEO de chatbots RAG | Público | Chatbots RAG para WhatsApp y web \| KopTup | Sí | <a href="images/doc/publicas/chatbots-ia-escritorio.jpg"><img src="images/doc/publicas/chatbots-ia-escritorio.jpg" width="120" alt="Chatbots IA"></a> |
 | `/soluciones-ia` | Landing SEO de soluciones de IA | Público | Soluciones de Inteligencia Artificial para Empresas \| KopTup | Sí | <a href="images/doc/publicas/soluciones-ia-escritorio.jpg"><img src="images/doc/publicas/soluciones-ia-escritorio.jpg" width="120" alt="Soluciones IA"></a> |
 | `/desarrollo-web-colombia` | Landing SEO de software a medida | Público | Desarrollo Web y Software a Medida en Colombia \| KopTup | Sí | <a href="images/doc/publicas/desarrollo-web-colombia-escritorio.jpg"><img src="images/doc/publicas/desarrollo-web-colombia-escritorio.jpg" width="120" alt="Desarrollo web Colombia"></a> |
@@ -132,7 +132,7 @@ Todas llevan el menú y el pie de página comunes. Detalle de cada una, con capt
 | `/privacy` | Política de privacidad (Ley 1581) | Público | Política de Privacidad \| KopTup | Sí | <a href="images/doc/publicas/privacidad-escritorio.jpg"><img src="images/doc/publicas/privacidad-escritorio.jpg" width="120" alt="Privacidad"></a> |
 | `/terms` | Términos y condiciones | Público | Términos y Condiciones \| KopTup | Sí | <a href="images/doc/publicas/terminos-escritorio.jpg"><img src="images/doc/publicas/terminos-escritorio.jpg" width="120" alt="Términos"></a> |
 | `/cookies` | Política de cookies y preferencias | Público | Política de Cookies \| KopTup | Sí | <a href="images/doc/publicas/cookies-escritorio.jpg"><img src="images/doc/publicas/cookies-escritorio.jpg" width="120" alt="Cookies"></a> |
-| *(ruta inexistente)* | Página 404 con enlaces de regreso | Público | IA que responde con los documentos de tu empresa \| KopTup | No (`noindex`) | <a href="images/doc/publicas/error-404.jpg"><img src="images/doc/publicas/error-404.jpg" width="120" alt="404"></a> |
+| *(ruta inexistente)* | Página 404 con enlaces de regreso | Público | Página no encontrada \| KopTup | No (`noindex`, sin canonical) | <a href="images/doc/publicas/error-404.jpg"><img src="images/doc/publicas/error-404.jpg" width="120" alt="404"></a> |
 
 ---
 
@@ -145,7 +145,7 @@ Todas llevan el menú y el pie de página comunes. Detalle de cada una, con capt
 | `/demo/<slug>` | Cada una de las 28 demos (tabla 4.2) | Acceso a demo | El de cada demo | Solo las Abiertas | ver 4.2 |
 | `/demo-acceso/<slug>` | Pantalla "Solicita acceso", "Inicia sesión", "Venció", "En mantenimiento"… El middleware la muestra en lugar de la demo **sin cambiar la URL**; también se puede abrir directo | Público | *Nombre de la demo*: acceso \| KopTup | No (`noindex` y bloqueada en `robots.txt`) | <a href="images/doc/prospecto-cliente/demo-sin-sesion.jpg"><img src="images/doc/prospecto-cliente/demo-sin-sesion.jpg" width="120" alt="Pantalla de acceso"></a> |
 | `/demo/ecommerce/admin` | Atajo: redirige (307) a `/demo/ecommerce?view=admin` | Público | — | No | — |
-| `/demo/lms/verificar` | Verificación pública de certificados de la demo LMS (con el código del QR) | Acceso a demo (LMS: Con solicitud) | Verificar certificado \| KopTup | No | <a href="images/doc/mapa/demo-lms-verificar.jpg"><img src="images/doc/mapa/demo-lms-verificar.jpg" width="120" alt="Verificar certificado"></a> |
+| `/demo/lms/verificar` | Verificación pública de certificados de la demo LMS (con el código del QR) | Público (no exige acceso a la demo LMS) | Verificar certificado \| KopTup | No (`noindex`) | <a href="images/doc/mapa/demo-lms-verificar.jpg"><img src="images/doc/mapa/demo-lms-verificar.jpg" width="120" alt="Verificar certificado"></a> |
 | `/embed/chatbot/<botId>` | Chat público de un bot creado en "Configura el tuyo"; lo cargan el iframe y `/widget.js` en el sitio de un cliente. Es la única ruta que se puede incrustar en otros dominios | Público | Chat del asistente \| KopTup | No (`noindex`) | <a href="images/doc/demos/chatbot/10-configura-el-tuyo.jpg"><img src="images/doc/demos/chatbot/10-configura-el-tuyo.jpg" width="120" alt="Widget del chatbot"></a> |
 
 ### 4.2 Las 28 demos
@@ -189,22 +189,22 @@ El modo es el **por defecto**; el administrador lo cambia en **Admin › Catálo
 
 ## 5. Cuenta: entrar, registrarse y activar
 
-Todas están bloqueadas en `robots.txt`. Recorridos con capturas en [Flujos del prospecto y cliente](Doc-05-Flujos-del-Prospecto-y-Cliente.md).
+Todas están bloqueadas en `robots.txt`, llevan `noindex, nofollow` (en la etiqueta y en la cabecera `X-Robots-Tag`) y un canonical a su propia ruta, salvo `/activar/<token>`, que no lleva canonical para no repetir el enlace. Recorridos con capturas en [Flujos del prospecto y cliente](Doc-05-Flujos-del-Prospecto-y-Cliente.md).
 
 | Ruta | Para qué sirve | Quién entra | Título SEO | Indexable | Miniatura |
 |---|---|---|---|---|---|
-| `/login` | Iniciar sesión con email y contraseña o con Google; vuelve a la ruta de `?redirect=` | Público | IA que responde con los documentos de tu empresa \| KopTup (genérico) | No (`robots.txt`) | <a href="images/doc/prospecto-cliente/login-anotado.jpg"><img src="images/doc/prospecto-cliente/login-anotado.jpg" width="120" alt="Login"></a> |
-| `/register` | Crear una cuenta (rol `user`) con email o Google | Público | Genérico | No (`robots.txt`) | <a href="images/doc/mapa/register.jpg"><img src="images/doc/mapa/register.jpg" width="120" alt="Registro"></a> |
-| `/auth/callback` | Recibe la sesión de Google y lleva a la página de inicio del rol | Público | Genérico | No (`robots.txt`) | — |
-| `/forgot-password` | Pedir el enlace para restablecer la contraseña | Público | Genérico | No (`robots.txt`) | <a href="images/doc/prospecto-cliente/olvide-contrasena.jpg"><img src="images/doc/prospecto-cliente/olvide-contrasena.jpg" width="120" alt="Olvidé mi contraseña"></a> |
-| `/reset-password` | Poner una contraseña nueva con el enlace (1 hora) | Público con enlace | Genérico | No (`robots.txt`) | <a href="images/doc/prospecto-cliente/restablecer-contrasena.jpg"><img src="images/doc/prospecto-cliente/restablecer-contrasena.jpg" width="120" alt="Restablecer contraseña"></a> |
-| `/activar/<token>` | Activar la cuenta de un prospecto con el enlace de un solo uso (72 h) | Público con enlace | Activa tu acceso \| KopTup | No (`noindex` y `robots.txt`) | <a href="images/doc/prospecto-cliente/activar-formulario.jpg"><img src="images/doc/prospecto-cliente/activar-formulario.jpg" width="120" alt="Activar cuenta"></a> |
+| `/login` | Iniciar sesión con email y contraseña o con Google; vuelve a la ruta de `?redirect=` | Público | Iniciar sesión \| KopTup | No | <a href="images/doc/prospecto-cliente/login-anotado.jpg"><img src="images/doc/prospecto-cliente/login-anotado.jpg" width="120" alt="Login"></a> |
+| `/register` | Crear una cuenta (rol `user`) con email o Google | Público | Crear cuenta \| KopTup | No | <a href="images/doc/mapa/register.jpg"><img src="images/doc/mapa/register.jpg" width="120" alt="Registro"></a> |
+| `/auth/callback` | Recibe la sesión de Google y lleva a la página de inicio del rol | Público | Iniciando sesión \| KopTup | No | — |
+| `/forgot-password` | Pedir el enlace para restablecer la contraseña | Público | Recuperar contraseña \| KopTup | No | <a href="images/doc/prospecto-cliente/olvide-contrasena.jpg"><img src="images/doc/prospecto-cliente/olvide-contrasena.jpg" width="120" alt="Olvidé mi contraseña"></a> |
+| `/reset-password` | Poner una contraseña nueva con el enlace (1 hora) | Público con enlace | Nueva contraseña \| KopTup | No | <a href="images/doc/prospecto-cliente/restablecer-contrasena.jpg"><img src="images/doc/prospecto-cliente/restablecer-contrasena.jpg" width="120" alt="Restablecer contraseña"></a> |
+| `/activar/<token>` | Activar la cuenta de un prospecto con el enlace de un solo uso (72 h) | Público con enlace | Activa tu acceso \| KopTup | No | <a href="images/doc/prospecto-cliente/activar-formulario.jpg"><img src="images/doc/prospecto-cliente/activar-formulario.jpg" width="120" alt="Activar cuenta"></a> |
 
 ---
 
 ## 6. Portal del prospecto y del cliente (`/dashboard`)
 
-Requiere sesión. Un **prospecto** solo entra a Mis demos y Mi perfil; cualquier otra ruta del portal lo lleva a Mis demos. Todas son `noindex` y están bloqueadas en `robots.txt`, y usan el título genérico del sitio. Detalle en [Flujos del prospecto y cliente §9](Doc-05-Flujos-del-Prospecto-y-Cliente.md#9-el-portal-del-cliente-sección-por-sección).
+Requiere sesión. Un **prospecto** solo entra a Mis demos y Mi perfil; cualquier otra ruta del portal lo lleva a Mis demos. Todas son `noindex` y están bloqueadas en `robots.txt`. El título de la pestaña nombra la sección, por ejemplo "Mis demos · Mi portal \| KopTup" ("Mi portal \| KopTup" mientras carga). Detalle en [Flujos del prospecto y cliente §9](Doc-05-Flujos-del-Prospecto-y-Cliente.md#9-el-portal-del-cliente-sección-por-sección).
 
 | Ruta | Para qué sirve | Quién entra | Miniatura |
 |---|---|---|---|
@@ -225,7 +225,7 @@ Requiere sesión. Un **prospecto** solo entra a Mis demos y Mi perfil; cualquier
 
 ## 7. Panel de administración (`/admin`)
 
-Requiere un rol del equipo. Todas son `noindex`, están bloqueadas en `robots.txt` y usan el título genérico del sitio. Paso a paso en el [Manual del administrador](Doc-06-Manual-del-Administrador.md).
+Requiere un rol del equipo. Todas son `noindex` y están bloqueadas en `robots.txt`. El título de la pestaña nombra la sección, por ejemplo "Solicitudes de demo · Panel \| KopTup" ("Panel de administración \| KopTup" mientras carga). Paso a paso en el [Manual del administrador](Doc-06-Manual-del-Administrador.md).
 
 | Ruta | Para qué sirve | Quién entra | Miniatura |
 |---|---|---|---|
@@ -273,8 +273,8 @@ Viven en `apps/web/src/app/api/` y corren en Vercel. La API principal está en R
 
 | Ruta | Qué es | Origen |
 |---|---|---|
-| `/sitemap.xml` | 34 URLs: 16 páginas fijas (inicio, `/rag` y sus 3 sectores, landings, `/services`, `/demo`, formularios, `/about` y legales) y las **18 demos Abiertas** según la semilla. Fecha de modificación fija para no simular cambios en cada despliegue | `src/app/sitemap.ts` (se genera al compilar) |
-| `/robots.txt` | Permite todo menos `/dashboard`, `/admin`, `/api/`, `/login`, `/register`, `/forgot-password`, `/reset-password`, `/auth/`, `/test`, `/liquidacion`, `/activar/`, `/demo-acceso/` y URLs con `sessionId=` o `token=`. Bloquea por completo a AhrefsBot, SemrushBot, DotBot, MJ12bot, GPTBot y CCBot. Bingbot con `Crawl-delay: 5` | `public/robots.txt` |
+| `/sitemap.xml` | 16 páginas fijas (inicio, `/rag` y sus 3 sectores, landings, `/services`, `/demo`, formularios, `/about` y legales) y las **demos Abiertas y activas** según **Admin › Catálogo de demos** (hoy 18, 34 URLs en total). Lee el catálogo del backend y se regenera como mucho cada hora; si el backend no responde, usa los modos por defecto. Fecha de modificación fija para no simular cambios en cada despliegue | `src/app/sitemap.ts` y `src/lib/sitemap-demos.ts` |
+| `/robots.txt` | Permite todo menos `/dashboard`, `/admin`, `/api/`, `/login`, `/register`, `/forgot-password`, `/reset-password`, `/auth/`, `/test`, `/liquidacion`, `/activar/`, `/propuesta/`, `/demo-acceso/` y URLs con `sessionId=` o `token=`. Bloquea por completo a AhrefsBot, SemrushBot, DotBot, MJ12bot, GPTBot y CCBot. Bingbot con `Crawl-delay: 5` | `public/robots.txt` |
 | `/opengraph-image` | Imagen de 1200 × 630 que se ve al compartir el sitio en redes y chats | `src/app/opengraph-image.tsx` (se genera en el servidor) |
 | `/icon` | Ícono del sitio (32 × 32) | `src/app/icon.tsx` (se genera al compilar) |
 | `/manifest.json` | Manifiesto de la app web (nombre, colores, íconos) | `public/manifest.json` |
@@ -299,11 +299,11 @@ flowchart TD
     ROOT["app/layout.tsx: idioma, mensajes, tema, analítica con consentimiento, aviso de cookies, notificaciones"]:::sistema
     COND["ConditionalLayout: menú y pie de página"]:::sistema
     OWN["Sin menú del sitio: /dashboard y /admin traen su propio encabezado"]:::sistema
-    META["layout.tsx de metadatos: about, contact, services, solicitar-demo, legales, landings SEO, producthunt"]:::visitante
+    META["layout.tsx de metadatos: about, contact, services, solicitar-demo, legales, landings SEO, producthunt y páginas de cuenta"]:::visitante
     DEMO["demo/layout.tsx: metadatos del hub y bloque final de contacto"]:::visitante
     DSLUG["demo/slug/layout.tsx: título, descripción y canonical de cada demo"]:::visitante
-    ADM["admin/layout.tsx: noindex"]:::admin
-    DSH["dashboard/layout.tsx: noindex"]:::admin
+    ADM["admin/layout.tsx: noindex y título por sección"]:::admin
+    DSH["dashboard/layout.tsx: noindex y título por sección"]:::admin
     EMB["embed/layout.tsx: noindex, chat a pantalla completa"]:::visitante
     TST["test/layout.tsx: noindex y 404 en producción"]:::admin
 
@@ -327,7 +327,7 @@ Para agregar una página:
 
 1. Crea `apps/web/src/app/<ruta>/page.tsx` (y `layout.tsx` si necesita metadatos propios desde un componente de cliente).
 2. Define el título con la plantilla `%s | KopTup` y verifica que no pase de 60 caracteres: `npm run check-titles --workspace=apps/web` (el CI lo corre).
-3. Si es pública e indexable, agrégala a `src/app/sitemap.ts`. Si es privada, agrégala a `public/robots.txt`, pon `robots: { index: false }` y súmala al `matcher` de `src/middleware.ts` y a `lib/auth-roles.ts`.
+3. Si es pública e indexable, agrégala a `src/app/sitemap.ts` (las demos se listan solas según el catálogo). Si es privada, agrégala a `public/robots.txt`, dale sus metadatos con `privatePageMetadata()` de `lib/seo-config.ts` (`noindex` y canonical propio, o ninguno si la ruta lleva un token) y, si exige sesión, súmala al `matcher` de `src/middleware.ts` y a `lib/auth-roles.ts`.
 4. Si es una **demo**, agrega su slug a `lib/demo-access-defaults.ts` y a la semilla del backend (`data/demo-catalog.seed.ts` y `DEFAULT_DEMO_ACCESS_MODES`); una prueba verifica que coincidan con las carpetas de `app/demo/`.
 5. Agrega sus textos a `messages/es.json` y `messages/en.json` (o a `messages/demos/<slug>.<idioma>.json`).
 
@@ -335,10 +335,8 @@ Para agregar una página:
 
 ## 13. Limitaciones conocidas
 
-- **Títulos genéricos en las páginas privadas y de cuenta.** `/login`, `/register`, `/forgot-password`, `/reset-password`, `/auth/callback`, todo `/dashboard`, todo `/admin` y `/liquidacion` muestran el título por defecto del sitio en la pestaña del navegador.
-- **Señales mezcladas en las páginas de cuenta.** `/login`, `/register`, `/forgot-password` y `/reset-password` están bloqueadas en `robots.txt`, pero su etiqueta `robots` dice `index, follow` y su canonical apunta al inicio. `/liquidacion` y las demos restringidas abiertas por alguien con acceso tienen la etiqueta `index, follow`, aunque la cabecera `X-Robots-Tag: noindex` las protege.
-- **El sitemap usa los modos por defecto.** Si el administrador abre una demo Con solicitud, no aparece en el sitemap hasta que se cambie la semilla; si cierra una Abierta, sigue listada (pero ya responde con `noindex`).
-- **`/pricing` redirige con 307** (temporal) en lugar de una redirección permanente.
+- **`/liquidacion` usa el título por defecto del sitio**, y tanto ella como las demos restringidas abiertas por alguien con acceso tienen la etiqueta `index, follow`, aunque la cabecera `X-Robots-Tag: noindex` las protege.
+- **El sitemap tarda hasta una hora** en reflejar un cambio de modo en el catálogo de demos.
 - **El botón "GitHub"** de `/login` y `/register` no hace nada (solo Google está implementado).
 
 ---

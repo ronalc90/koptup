@@ -58,17 +58,19 @@
         },
         "decisions": {
           "title": "Smarter Business Decisions",
-          "desc": "Real-time data analysis for better business decisions."
+          "desc": "AI summarizes and cross-references your data and documents so you decide with sources, not assumptions."
         },
         "advantage": {
-          "title": "Real Competitive Advantage",
-          "desc": "Companies that adopt AI today will lead their industry in the coming years."
+          "title": "Faster Answers",
+          "desc": "Your team finds the answer in seconds with the source cited, without waiting for someone to look up the document."
         }
       }
     },
     "tech": {
       "title": "AI Technologies We Implement",
-      "subtitle": "We work with the most advanced AI platforms on the market",
+      "subtitle": "The RAG demo uses the OpenAI API; we choose the other platforms with you based on your project.",
+      "inDemo": "In the RAG demo",
+      "perProject": "Depending on your project",
       "orchestration": "AI orchestration",
       "automation": "Automation"
     },
@@ -105,7 +107,7 @@
       "badge": "RAG chatbots",
       "title": "RAG chatbots for WhatsApp and the web",
       "subtitle": "A chatbot that answers your customers and your team with your company's documents —manuals, policies, catalogs, FAQs— and cites the source of every answer. On your website and on WhatsApp.",
-      "ctaDemo": "Try the demo",
+      "ctaDemo": "Try it with your document",
       "ctaPilot": "Book a pilot",
       "price": "From {essentialFrom}, or a {pilotFrom} pilot. Plus VAT where applicable.",
       "ragLink": "How a chatbot built on your company documents works"
@@ -242,7 +244,7 @@
     "cta": {
       "title": "Want a chatbot that answers with your documents?",
       "subtitle": "Try the free demo, no sign-up required, or book a {pilotWeeks}-week pilot with your company's documents.",
-      "demo": "Try the demo",
+      "demo": "Try it with your document",
       "pilot": "Book a pilot",
       "plans": "See plans and pricing"
     }
@@ -306,7 +308,7 @@
     },
     "banner": {
       "title": "How we scale",
-      "body": "Colombia-based team operating Mon–Fri 8AM–5PM. We build software aligned with HIPAA/SOC 2/ISO 27001 but formal certification is the customer's responsibility. If you need more than the Enterprise tier, we provide a custom quote within 48 business hours."
+      "body": "Colombia-based team operating Mon–Fri 8AM–5PM. If your project must meet standards such as ISO 27001, SOC 2 or HIPAA, we design it with those requirements; formal certification is handled by your company. If you need more than the Enterprise tier, we provide a custom quote within 48 business hours."
     },
     "supportSLA": {
       "email-24h": "Email business hours · 24h business response",
@@ -537,6 +539,11 @@
   },
   "ragSectors": {
     "casesTitle": "Use cases",
+    "demoGateNote": {
+      "privado": "This demo opens by invitation only: the link takes you to the form to request it and the team will get in touch.",
+      "solicitud": "This demo requires approved access: the link takes you to the form to request it.",
+      "publico": "This demo is not available right now: the link takes you to the form to request it and the team will get back to you."
+    },
     "ragLink": {
       "title": "How does a RAG system work?",
       "desc": "Learn how the AI searches your documents and cites the source, what happens to your data, the integrations, the plans and the FAQ.",
@@ -570,6 +577,8 @@
         }
       ],
       "demoLink": "See the “Healthcare expert system” demo: medical claims auditing with rules and AI",
+      "demoInviteLink": "Request the “Healthcare expert system” demo (by invitation): medical claims auditing with rules and AI",
+      "demoRequestLink": "Request access to the “Healthcare expert system” demo: medical claims auditing with rules and AI",
       "disclaimer": "The AI supports your team with cited information; clinical and audit decisions remain with your professionals."
     },
     "legal": {

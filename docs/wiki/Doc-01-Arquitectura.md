@@ -512,7 +512,7 @@ Sin entrar en detalles que faciliten un ataque, estas son las capas que protegen
 
 | Capa | Dónde | Qué hace |
 |---|---|---|
-| Cabeceras de seguridad | `next.config.js` y `helmet` en la API | HSTS, `nosniff`, `Referrer-Policy`, `Permissions-Policy` y una CSP que solo abre los dominios de Google o LinkedIn si su variable existe al compilar. Todo el sitio, salvo `/embed/*`, solo se puede incrustar en el propio dominio. |
+| Cabeceras de seguridad | `next.config.js` y `helmet` en la API | HSTS, `nosniff`, `Referrer-Policy`, `Permissions-Policy` (cámara y micrófono bloqueados, salvo en `/demo/telemedicina`, que los permite solo al propio sitio) y una CSP que solo abre los dominios de Google o LinkedIn si su variable existe al compilar. Todo el sitio, salvo `/embed/*`, solo se puede incrustar en el propio dominio. |
 | CORS | `app.ts` | La API solo acepta peticiones del navegador desde `koptup.com` y `www.koptup.com` (más los orígenes de `CORS_ORIGIN`). |
 | Límites por IP | `middleware/rateLimiter.ts` y servicios | Por defecto, 100 peticiones cada 15 min en general; un contador propio para inicio de sesión (por IP y correo), registro, recuperación y restablecimiento de contraseña, activación, canje del inicio con Google y contacto, con mensajes en español (detalle en [API › Límites](Doc-08-API.md#6-límites-de-uso-y-topes-de-gasto)); 60 por minuto en el chatbot; cupos propios en la demo RAG, en LinkedIn Ads y en las funciones de IA de documentos y de salud. |
 | Topes de gasto de IA | `services/ai-budget.service.ts` | Tope mensual en dólares por función (por defecto 50 para la demo RAG y el chatbot, 20 para LinkedIn Ads y el gestor de contenido). Si Redis no responde, no se llama al modelo. |

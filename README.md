@@ -114,7 +114,7 @@ Las tres son opcionales: si una no existe, su etiqueta no se carga. Aunque exist
   | `generate_lead` | Formulario de [`/contact`](https://www.koptup.com/contact) o de [`/solicitar-demo`](https://www.koptup.com/solicitar-demo) enviado con éxito | `lead_source` (`contact_form` o `demo-request`); en contacto, `service` y `plan_id` (si viene de un plan RAG); en solicitud de demo, `demos_count` y `demo_slugs` |
   | `demo_start` | Primera pregunta en [`/demo/chatbot`](https://www.koptup.com/demo/chatbot) en cada carga de la página | `demo_mode` (`sample`: documento de ejemplo; `upload`: documento propio) |
   | `demo_upload` | Documento subido con éxito en "Prueba con tu documento" | `file_type` (`pdf`, `docx` o `txt`), `pages` |
-  | `whatsapp_click` | Clic en el botón de WhatsApp de `/contact` | `link_location` |
+  | `whatsapp_click` | Clic en un botón de WhatsApp: el de `/contact` y los de [`/solicitar-demo`](https://www.koptup.com/solicitar-demo) (en el formulario y en la confirmación) | `link_location` (`contact_page`, `solicitar_demo` o `solicitar_demo_gracias`) |
   | `plan_click` | Clic en el botón de un plan RAG (`/services#planes-rag`, `/rag` y "Agenda un piloto" de `/chatbots-ia`) o en los botones de las tarjetas de "Otras soluciones a medida" | `plan_name` (en el idioma del visitante; para agrupar usa `plan_id`), `plan_id`, `plan_group` (`planes_rag` u `otras_soluciones`), `cta` (`quote`, `details` o `demo`) y, en el detalle de una solución, `plan_tier` y `modality` |
 
 - **Conversiones de Google Ads:** el código no tiene etiquetas de conversión propias de Ads. Vincula GA4 con Google Ads, marca en GA4 como *eventos clave* los que quieras optimizar (por ejemplo `generate_lead` y `demo_upload`) e impórtalos en Google Ads como conversiones de Google Analytics 4.
@@ -230,6 +230,7 @@ npm run test:e2e       # Playwright contra un sitio ya levantado (ver "E2E en lo
 | `permissions.spec.ts` | Autorización en el servidor: un prospecto no entra a `/admin`, un visitante sin sesión no entra a `/dashboard` y una demo privada sin acceso muestra la pantalla de acceso (también con sesión). |
 | `access-mode.spec.ts` | El admin cambia el modo de acceso de una demo en Admin › Catálogo de demos y el sitio lo aplica (espera hasta 90 s por la caché de 60 s del middleware). Corre una vez, en escritorio, cuando terminan las demás (proyecto `catalogo`; si alguna falló, Playwright la marca como no ejecutada) y deja la demo como estaba. |
 | `contact.spec.ts` | El formulario de `/contact` envía el lead y queda guardado (lo lista Admin › Contactos). |
+| `public-seo.spec.ts` | Sitio público y SEO: `noindex` y canonical de las páginas de cuenta, 404, `/pricing` (308), sitemap, `robots.txt`, `llms.txt` y cabeceras; el embudo RAG ("Prueba con tu documento", caso de salud con invitación, "Cotizar este tier" con nivel, modalidad y plazo guardados en el lead); el cambio de idioma conserva la URL; menú, pie y textos verificables de `/about`, inicio y landings, en español e inglés; títulos del panel. |
 | `rag-upload.spec.ts` | `/demo/chatbot` › "Prueba con tu documento": sube un PDF de 2 páginas ([`e2e/fixtures`](apps/web/e2e/fixtures)), pregunta, ve la cita de la página y el contador de preguntas pasa de 0/10 a 1/10. |
 | `api-health.spec.ts` | `GET /health` del backend. |
 

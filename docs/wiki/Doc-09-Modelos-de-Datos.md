@@ -227,6 +227,8 @@ erDiagram
         string message
         string status "new, read, responded"
         string source "contact-form, demo-rag, demo-request"
+        string plazo "now, 1m, 3m, open"
+        object cotizacion "servicio, plan, nivel, modalidad"
         date created_at
     }
     QUOTE {
@@ -583,6 +585,8 @@ Solo se agregan registros: **no hay ninguna ruta para editar ni borrar** la bit�
 | `message` | texto | Obligatorio | Mensaje (en solicitudes, un resumen con el código y el enlace al panel) |
 | `status` | texto | `new` (por defecto), `read`, `responded` | Seguimiento en Admin › Contactos |
 | `source` | texto | `contact-form` (por defecto), `demo-rag`, `demo-request` | Canal de origen |
+| `plazo` | texto | Opcional: `now`, `1m`, `3m` u `open` | ¿Cuándo quiere empezar? (formulario de `/contact`) |
+| `cotizacion` | objeto | Opcional: `servicio` (slug), `plan` (`piloto`, `esencial`, `profesional`, `empresarial`), `nivel` (`basico`, `profesional`, `avanzado`, `enterprise`), `modalidad` (`compra`, `saas`) | Lo que venía cotizando al llegar a `/contact` desde un plan RAG o desde «Cotizar este tier». El nombre legible queda en `service` |
 | `created_at` | fecha | Automática | — |
 
 ### 4.8 Project (`projects`)

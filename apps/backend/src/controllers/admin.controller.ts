@@ -548,6 +548,9 @@ export const adminGetContacts = asyncHandler(async (req: AuthRequest, res: Respo
       company: contact.company,
       service: contact.service,
       budget: contact.budget,
+      // Cuándo quiere empezar y qué plan/nivel/modalidad cotizaba (formulario de /contact).
+      plazo: contact.plazo ?? null,
+      cotizacion: contact.cotizacion ?? null,
       message: contact.message,
       status: contact.status,
       // Origen del lead: 'contact-form' (también los antiguos, sin el campo) o 'demo-rag'.

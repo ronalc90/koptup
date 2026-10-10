@@ -12,9 +12,15 @@
     @apply border-secondary-200 dark:border-secondary-700;
   }
 
-  html {
-    /* Evita saltos al mostrar/ocultar scrollbar cuando se bloquea el scroll con modales */
-    scrollbar-gutter: stable both-edges;
+  /* Sin espacio reservado para la barra de desplazamiento: con
+     `scrollbar-gutter: stable both-edges` quedaban franjas vacías a los lados
+     de los bloques de borde a borde en navegadores con barra clásica (y en las
+     páginas cortas, sin barra). Solo mientras un modal bloquea el scroll del
+     body (overflow hidden) se reserva el espacio de la barra, para que el
+     contenido no salte al desaparecer. */
+  html:has(> body[style*='overflow: hidden']),
+  html:has(> body.overflow-hidden) {
+    scrollbar-gutter: stable;
   }
 
   body {

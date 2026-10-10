@@ -9,11 +9,11 @@ const chatbotPrice = getChatbotsPageValues('es');
 export const metadata: Metadata = {
   title: 'Desarrollo Web y Software a Medida en Colombia',
   description:
-    'Contrata a KopTup para desarrollar tu aplicación web, chatbot con IA, e-commerce o sistema empresarial. Empresa de desarrollo de software a medida con sede en Colombia, trabajamos con clientes en todo el mundo. Cotización gratis.',
+    'Contrata a KopTup para desarrollar tu aplicación web, chatbot con IA, e-commerce o sistema empresarial. Estudio de software a medida en Bogotá, Colombia. Precios publicados y cotización gratis.',
   alternates: { canonical: absoluteUrl('/desarrollo-web-colombia') },
   openGraph: {
     title: 'Empresa de Desarrollo Web a Medida | KopTup',
-    description: 'Aplicaciones web, chatbots IA, e-commerce y apps móviles a medida. Trabajamos con clientes en todo el mundo. Cotización gratis.',
+    description: 'Aplicaciones web, chatbots con IA, e-commerce y apps móviles a medida, desde Bogotá. Cotización gratis.',
     url: absoluteUrl('/desarrollo-web-colombia'),
     siteName: 'KopTup',
     images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Desarrollo Web Colombia - KopTup' }],
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Empresa de Desarrollo de Software Colombia | KopTup',
-    description: 'Desarrollo web, chatbots IA, e-commerce y apps móviles a medida. Clientes en todo el mundo. Cotización gratis.',
+    description: 'Desarrollo web, chatbots con IA, e-commerce y apps móviles a medida, desde Bogotá. Cotización gratis.',
     images: ['/og-image.png'],
   },
 };
@@ -33,7 +33,7 @@ const serviceSchema = {
   '@type': 'ProfessionalService',
   name: 'KopTup - Desarrollo de Software a Medida',
   description:
-    'Empresa de desarrollo de software a medida con sede en Bogotá, Colombia. Desarrollamos aplicaciones web, chatbots con IA, e-commerce, apps móviles, dashboards y sistemas empresariales para clientes en Colombia y todo el mundo.',
+    'Estudio de desarrollo de software a medida con sede en Bogotá, Colombia. Desarrollamos aplicaciones web, chatbots con IA, e-commerce, apps móviles, dashboards y sistemas empresariales.',
   url: SITE_URL,
   telephone: '+57-302-479-4842',
   address: {
@@ -42,14 +42,7 @@ const serviceSchema = {
     addressRegion: 'Cundinamarca',
     addressCountry: 'CO',
   },
-  areaServed: [
-    { '@type': 'Country', name: 'Colombia' },
-    { '@type': 'Country', name: 'México' },
-    { '@type': 'Country', name: 'Argentina' },
-    { '@type': 'Country', name: 'Chile' },
-    { '@type': 'Country', name: 'España' },
-    { '@type': 'Country', name: 'United States' },
-  ],
+  areaServed: { '@type': 'Country', name: 'Colombia' },
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
     name: 'Servicios de Desarrollo de Software',
@@ -80,10 +73,10 @@ const faqSchema = {
     },
     {
       '@type': 'Question',
-      name: '¿KopTup trabaja con clientes fuera de Colombia?',
+      name: '¿Trabajan con empresas de toda Colombia o solo de Bogotá?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. KopTup trabaja con clientes en cualquier parte del mundo — Colombia, México, Argentina, España, Estados Unidos y más. Todo el trabajo es 100% remoto con comunicación en español e inglés.',
+        text: 'Trabajamos de forma remota con empresas de cualquier ciudad: las reuniones son por videollamada y atendemos en español e inglés.',
       },
     },
     {
@@ -91,7 +84,7 @@ const faqSchema = {
       name: '¿KopTup puede desarrollar chatbots para WhatsApp?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Sí. Integramos chatbots con la API oficial de WhatsApp Business usando GPT-4 o Claude AI. El chatbot puede atender clientes a cualquier hora, capturar leads y transferir a agentes humanos. Desde ${chatbotPrice.essentialFrom}, o piloto de ${chatbotPrice.pilotFrom} (más IVA si aplica).`,
+        text: `Sí. Los chatbots RAG para WhatsApp se conectan con la API oficial de WhatsApp Business (desde el plan Profesional) y usan modelos de OpenAI. Responden con los documentos de tu empresa a cualquier hora y, si no encuentran la respuesta, lo dicen. Desde ${chatbotPrice.essentialFrom}, o piloto de ${chatbotPrice.pilotFrom} (más IVA si aplica).`,
       },
     },
     {
@@ -99,7 +92,7 @@ const faqSchema = {
       name: '¿Cuánto tiempo toma desarrollar una aplicación web?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un MVP puede estar listo en 4-8 semanas. Un sistema complejo con múltiples módulos puede tomar 3-6 meses. En el análisis inicial definimos tiempos exactos con compromiso de entrega.',
+        text: 'Depende del alcance. Un MVP (versión inicial funcional) puede estar listo en 4-8 semanas. Un sistema complejo con múltiples módulos puede tomar 3-6 meses. En el análisis inicial definimos tiempos exactos.',
       },
     },
   ],

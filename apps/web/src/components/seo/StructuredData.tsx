@@ -2,13 +2,15 @@
  * Structured Data Component for SEO
  * Implements Schema.org JSON-LD markup for better search engine understanding
  *
- * Regla: no publicar cifras que no podamos respaldar (ratings, reseñas,
- * número de clientes). Por eso no hay `aggregateRating`.
+ * Regla: no publicar cifras ni datos que no podamos respaldar (ratings,
+ * reseñas, número de clientes o de empleados, año de fundación, países
+ * atendidos, modelos de IA que no se usan). Por eso no hay `aggregateRating`,
+ * `foundingDate` ni `numberOfEmployees`.
  */
 
 import { DEMO_COUNT } from '@/lib/demos';
 import { RAG_PLANS, formatRagCOP, formatRagUSD, getRagPlan } from '@/lib/rag-plans';
-import { HOME_DESCRIPTION, SITE_URL, absoluteUrl } from '@/lib/site';
+import { HOME_DESCRIPTION, SITE_URL, SOCIAL_LINKS, absoluteUrl } from '@/lib/site';
 
 // Precios de los planes RAG (src/lib/rag-plans.ts) que citan el JSON-LD.
 const RAG_PILOT = getRagPlan('piloto');
@@ -42,7 +44,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
       height: 630,
     },
     description:
-      'KopTup es una empresa de desarrollo de software a medida fundada en Colombia. Desarrollamos aplicaciones web, chatbots con inteligencia artificial (GPT-4, Claude AI), e-commerce, aplicaciones móviles, dashboards ejecutivos y sistemas de automatización para empresas en Colombia y todo el mundo. Trabajamos 100% remoto con clientes en Latinoamérica, España y Estados Unidos.',
+      'KopTup es un estudio de desarrollo de software a medida en Bogotá, Colombia. Su producto principal son los sistemas RAG: IA que responde con los documentos de cada empresa y cita la fuente. También desarrolla software a medida, chatbots con IA, e-commerce y dashboards ejecutivos.',
     address: {
       '@type': 'PostalAddress',
       streetAddress: 'Av. 68 #1-63',
@@ -58,7 +60,6 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
         telephone: '+57-302-479-4842',
         email: 'ronald@koptup.com',
         availableLanguage: ['Spanish', 'English'],
-        areaServed: 'Worldwide',
       },
       {
         '@type': 'ContactPoint',
@@ -67,39 +68,21 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
         availableLanguage: ['Spanish', 'English'],
       },
     ],
-    sameAs: [
-      'https://www.linkedin.com/company/koptup',
-      'https://github.com/koptup',
-      'https://www.instagram.com/koptup',
-      'https://x.com/koptup',
-    ],
+    sameAs: Object.values(SOCIAL_LINKS),
     founder: {
       '@type': 'Person',
       name: 'Ronald Cipagauta',
-      jobTitle: 'CEO & Founder',
+      jobTitle: 'Fundador',
     },
-    foundingDate: '2019',
-    numberOfEmployees: { '@type': 'QuantitativeValue', value: 5 },
-    areaServed: [
-      { '@type': 'Country', name: 'Colombia' },
-      { '@type': 'Country', name: 'México' },
-      { '@type': 'Country', name: 'Argentina' },
-      { '@type': 'Country', name: 'Chile' },
-      { '@type': 'Country', name: 'España' },
-      { '@type': 'Country', name: 'United States' },
-    ],
+    areaServed: { '@type': 'Country', name: 'Colombia' },
     knowsAbout: [
+      'Sistemas RAG (retrieval augmented generation)',
       'Desarrollo de software a medida',
-      'Aplicaciones web con React y Next.js',
-      'Aplicaciones móviles con React Native',
-      'E-commerce y tiendas online',
-      'Chatbots con inteligencia artificial GPT-4',
-      'Chatbots con Claude AI de Anthropic',
-      'Automatización de procesos con IA',
-      'Dashboards ejecutivos y business intelligence',
-      'Integración con WhatsApp Business API',
-      'Machine Learning y análisis predictivo',
-      'Consultoría tecnológica y transformación digital',
+      'Aplicaciones web con Next.js y Node.js',
+      'Chatbots con IA para web y WhatsApp',
+      'E-commerce y tiendas en línea',
+      'Dashboards ejecutivos',
+      'Automatización de procesos',
     ],
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
@@ -230,7 +213,6 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
     logo: absoluteUrl('/logo.svg'),
     priceRange: '$$ - $$$$',
     currenciesAccepted: 'COP, USD',
-    paymentAccepted: 'Transferencia bancaria, tarjeta de crédito',
     address: {
       '@type': 'PostalAddress',
       streetAddress: 'Av. 68 #1-63',
@@ -252,14 +234,9 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
         closes: '18:00',
       },
     ],
-    sameAs: ['https://www.linkedin.com/company/koptup'],
+    sameAs: Object.values(SOCIAL_LINKS),
     hasMap: 'https://maps.google.com/?q=Av.+68+%231-63,+Bogotá,+Colombia',
-    areaServed: [
-      { '@type': 'Country', name: 'Colombia' },
-      { '@type': 'Country', name: 'México' },
-      { '@type': 'Country', name: 'Argentina' },
-      { '@type': 'Country', name: 'España' },
-    ],
+    areaServed: { '@type': 'Country', name: 'Colombia' },
   });
 
   const getSchemaByType = () => {
@@ -310,7 +287,7 @@ export function FAQStructuredData() {
         name: '¿Puedo probar el software antes de contratar?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: `Sí. Ofrecemos ${DEMO_COUNT} prototipos navegables del tipo de soluciones que construimos. Dos de ellos (chatbot RAG y generador de LinkedIn Ads) usan OpenAI real; el resto son mockups interactivos con datos simulados para que veas el flujo y la UX antes de contratarnos.`,
+          text: `Sí. En ${absoluteUrl('/demo')} hay ${DEMO_COUNT} demos navegables del tipo de soluciones que construimos. Algunas usan IA real, como el chatbot RAG; la mayoría funcionan con datos de ejemplo, y cada demo indica qué es real y qué es de ejemplo.`,
         },
       },
       {
@@ -326,7 +303,7 @@ export function FAQStructuredData() {
         name: '¿Qué tecnologías utilizan?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Utilizamos tecnologías de vanguardia: React, Next.js, TypeScript, Node.js, Python, MongoDB, PostgreSQL e inteligencia artificial (OpenAI, Claude). Todas nuestras soluciones son escalables, seguras y optimizadas para rendimiento.',
+          text: 'Este sitio y sus demos están hechos con Next.js, React, TypeScript, Node.js, MongoDB y la API de OpenAI. En cada proyecto definimos contigo el stack al cotizar.',
         },
       },
       {
@@ -334,7 +311,7 @@ export function FAQStructuredData() {
         name: '¿Ofrecen soporte después del desarrollo?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Sí. Todos nuestros planes incluyen soporte técnico post-lanzamiento. Ofrecemos mantenimiento, actualizaciones, monitoreo y soporte continuo para garantizar que tu software evolucione con tu negocio.',
+          text: 'Sí. La mensualidad de los planes RAG incluye soporte (de lunes a viernes en el plan Esencial y prioritario en el Profesional). En los proyectos a medida, el soporte después de la entrega queda definido en el contrato.',
         },
       },
     ],

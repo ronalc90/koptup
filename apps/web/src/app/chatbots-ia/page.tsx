@@ -20,7 +20,7 @@ import {
   QuestionMarkCircleIcon,
 } from '@heroicons/react/24/outline';
 import { CHATBOTS_FAQ_KEYS, CHATBOTS_USE_CASES, getChatbotsPageValues } from '@/lib/chatbots-page';
-import { RAG_DEMO_PATH, RAG_PATH, getRagSector } from '@/lib/rag-page';
+import { RAG_PATH, RAG_UPLOAD_DEMO_PATH, getRagSector } from '@/lib/rag-page';
 import { RAG_PLANS_PATH, ragPlanContactHref } from '@/lib/rag-plans';
 import { trackPlanClick } from '@/lib/analytics';
 
@@ -78,7 +78,7 @@ export default function ChatbotsIAPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-white text-purple-700 hover:bg-purple-50" asChild>
-                <Link href={RAG_DEMO_PATH}>{t('hero.ctaDemo')}</Link>
+                <Link href={RAG_UPLOAD_DEMO_PATH}>{t('hero.ctaDemo')}</Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/50 text-white hover:bg-white/10" asChild>
                 <Link href={pilotHref} onClick={trackPilotClick}>
@@ -271,7 +271,7 @@ export default function ChatbotsIAPage() {
           <p className="text-xl text-purple-100 mb-10">{t('cta.subtitle', values)}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-white text-purple-700 hover:bg-purple-50" asChild>
-              <Link href={RAG_DEMO_PATH}>{t('cta.demo')}</Link>
+              <Link href={RAG_UPLOAD_DEMO_PATH}>{t('cta.demo')}</Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/50 text-white hover:bg-white/10" asChild>
               <Link href={pilotHref} onClick={trackPilotClick}>

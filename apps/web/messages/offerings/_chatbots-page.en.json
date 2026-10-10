@@ -4,7 +4,7 @@
       "badge": "RAG chatbots",
       "title": "RAG chatbots for WhatsApp and the web",
       "subtitle": "A chatbot that answers your customers and your team with your company's documents —manuals, policies, catalogs, FAQs— and cites the source of every answer. On your website and on WhatsApp.",
-      "ctaDemo": "Try the demo",
+      "ctaDemo": "Try it with your document",
       "ctaPilot": "Book a pilot",
       "price": "From {essentialFrom}, or a {pilotFrom} pilot. Plus VAT where applicable.",
       "ragLink": "How a chatbot built on your company documents works"
@@ -141,7 +141,7 @@
     "cta": {
       "title": "Want a chatbot that answers with your documents?",
       "subtitle": "Try the free demo, no sign-up required, or book a {pilotWeeks}-week pilot with your company's documents.",
-      "demo": "Try the demo",
+      "demo": "Try it with your document",
       "pilot": "Book a pilot",
       "plans": "See plans and pricing"
     }

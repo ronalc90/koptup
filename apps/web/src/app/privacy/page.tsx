@@ -304,8 +304,8 @@ export default function PrivacyPage() {
             <ClockIcon className="h-5 w-5" />
             <span className="text-sm">{t('footer.updated')}</span>
           </div>
-          <p className="text-sm text-secondary-500 dark:text-secondary-500">
-            {t('footer.copyright')}
+          <p className="text-sm text-secondary-500 dark:text-secondary-500" suppressHydrationWarning>
+            {t('footer.copyright', { year: new Date().getFullYear() })}
           </p>
         </div>
       </section>
