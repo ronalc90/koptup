@@ -42,7 +42,8 @@
     },
     "entities": {
       "provider": "Sample provider",
-      "payer": "Sample payer"
+      "payer": "Sample payer",
+      "nit": "sample tax ID"
     },
     "states": {
       "radicada": "Filed",
@@ -99,9 +100,11 @@
         },
         "s5": {
           "title": "You decide and download",
-          "desc": "You confirm, adjust or discard each denial and download the report as CSV or PDF."
+          "desc": "You confirm, adjust or discard each denial; once you decide them all, the invoice becomes “With denials” or “Accepted”. You download the report as CSV or PDF."
         }
-      }
+      },
+      "byStateHint": "The demo works out the status from the saved decisions: “Under review” while any denial is pending; “With denials” or “Accepted” once you decide them all.",
+      "byTypeHint": "Active denials (pending, confirmed or adjusted) with their current amount. Discarded denials are not counted."
     },
     "upload": {
       "title": "Audit invoice",
@@ -165,11 +168,16 @@
         "registered": "Registered",
         "billed": "Billed",
         "denied": "Denied",
-        "toPay": "To pay"
+        "toPay": "To pay",
+        "pending": "Pending denials"
       },
       "view": "View detail",
       "deleteQuestion": "Delete invoice {number} and its denials?",
-      "deleted": "Invoice {number} deleted"
+      "deleted": "Invoice {number} deleted",
+      "stateHint": "Status follows the review: “Under review” while any denial is pending; “With denials” or “Accepted” once you decide them all. Search and filters cover every invoice in the space.",
+      "pendingDenials": "{count, plural, one {# pending denial} other {# pending denials}}",
+      "reviewClosed": "Review closed",
+      "capped": "Showing the {max} most recent invoices out of {total}."
     },
     "detail": {
       "back": "Back to invoices",
@@ -186,9 +194,10 @@
       "review": {
         "title": "Auditor decision",
         "progress": "{done} of {total} denials decided",
-        "complete": "Review complete: you decided every denial.",
+        "complete": "Review complete: you decided every denial and the invoice is now “{state}”.",
         "none": "No proposed denials: every amount is within the sample fee schedule.",
-        "flagged": "The model flagged this invoice for human review."
+        "flagged": "The model flagged this invoice for human review.",
+        "pendingHint": "Once you decide every denial, the invoice moves from “Under review” to “With denials” (or to “Accepted” if you discard them all)."
       },
       "proposal": {
         "title": "AI model proposal",
@@ -280,7 +289,7 @@
         },
         "s5": {
           "title": "Auditor decision",
-          "desc": "You confirm, adjust or discard each denial with a note. The server recalculates the totals and you can download the report as CSV or PDF."
+          "desc": "You confirm, adjust or discard each denial with a note. The server saves each decision and recalculates the totals; once you decide them all, the invoice becomes “With denials” (or “Accepted” if you discarded them all). You can download the report as CSV or PDF."
         }
       },
       "tariffTitle": "Sample fee schedule",
@@ -296,7 +305,7 @@
       "rules": {
         "r1": "Billed amount above the sample tariff: denial for the difference times the quantity (rule 202, tariff difference).",
         "r2": "Code not in the sample fee schedule: the engine proposes denying 30% of the amount. It is a provisional demo rule; in your project it is replaced by your contract's tariffs.",
-        "r3": "Rule codes (such as 202) are internal to the demo; in your project they are mapped to Colombia's current Single Manual of Returns, Denials and Responses."
+        "r3": "Rule codes (such as 202) are internal to this demo and do not match those of the “Auditor's rules engine” demo, whose rules are not applied here. In your project they are mapped to Colombia's current Single Manual of Returns, Denials and Responses."
       },
       "notIncludedTitle": "What this demo does not do (built in your project)",
       "notIncluded": {

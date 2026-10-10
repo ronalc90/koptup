@@ -27,6 +27,43 @@ const FILAS: Fila[] = [
   { codigo: '890301', descripcion: 'CONSULTA DE CONTROL O SEGUIMIENTO MEDICINA GENERAL', cantidad: 1, valorUnitario: 20000 },
 ];
 
+/** NIT ficticio del prestador de ejemplo (sin dígito de verificación). */
+export const NIT_EJEMPLO = '901234567';
+
+/** Dígito de verificación de un NIT (algoritmo de la DIAN, módulo 11). */
+export function digitoVerificacion(nit: string): number {
+  const pesos = [3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71];
+  const digitos = nit.replace(/\D/g, '').split('').reverse();
+  const suma = digitos.reduce((acc, d, i) => acc + Number(d) * pesos[i], 0);
+  const residuo = suma % 11;
+  return residuo > 1 ? 11 - residuo : residuo;
+}
+
+/** NIT con puntos y dígito de verificación: 901.234.567-7. */
+export function formatearNIT(nit: string): string {
+  return `${nit.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}-${digitoVerificacion(nit)}`;
+}
+
+/** Días antes de la fecha actual con que se emite la factura de ejemplo. */
+export const DIAS_ANTES_FACTURA = 12;
+
+/** Fecha de la factura de ejemplo (dd/mm/aaaa, hora de Colombia), unos días antes de `hoy`. */
+export function fechaFacturaEjemplo(hoy: Date = new Date()): string {
+  const [anio, mes, dia] = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Bogota',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  })
+    .format(hoy)
+    .split('-')
+    .map(Number);
+  const fecha = new Date(Date.UTC(anio, mes - 1, dia - DIAS_ANTES_FACTURA));
+  const dd = String(fecha.getUTCDate()).padStart(2, '0');
+  const mm = String(fecha.getUTCMonth() + 1).padStart(2, '0');
+  return `${dd}/${mm}/${fecha.getUTCFullYear()}`;
+}
+
 /** Miles con punto, como se escriben los valores en las facturas colombianas. */
 function miles(valor: number): string {
   return String(Math.round(valor)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
@@ -50,7 +87,7 @@ export async function generarFacturaEjemplo(): Promise<File> {
   y += 6;
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
-  doc.text('NIT 901.234.567-8 (ficticio) - Calle 10 # 20-30, Medellín, Antioquia', margen, y);
+  doc.text(`NIT ${formatearNIT(NIT_EJEMPLO)} (ficticio) - Calle 10 # 20-30, Medellín, Antioquia`, margen, y);
   y += 10;
 
   doc.setFont('helvetica', 'bold');
@@ -61,7 +98,7 @@ export async function generarFacturaEjemplo(): Promise<File> {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
   const generales = [
-    'Fecha de la factura: 14/09/2026',
+    `Fecha de la factura: ${fechaFacturaEjemplo()}`,
     'Pagador de la factura: EPS ANDINA DEMO - Contrato de ejemplo CE-2026-001',
     'Paciente: LAURA DEMO MARTÍNEZ   Documento: CC DEMO-1045237',
     'Diagnóstico principal de la factura (CIE-10): J18.9',

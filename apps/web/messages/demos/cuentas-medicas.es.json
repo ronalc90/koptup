@@ -42,7 +42,8 @@
     },
     "entities": {
       "provider": "Prestador de ejemplo",
-      "payer": "Pagador de ejemplo"
+      "payer": "Pagador de ejemplo",
+      "nit": "NIT de ejemplo"
     },
     "states": {
       "radicada": "Radicada",
@@ -99,9 +100,11 @@
         },
         "s5": {
           "title": "Tú decides y descargas",
-          "desc": "Confirmas, ajustas o descartas cada glosa y descargas el reporte en CSV o PDF."
+          "desc": "Confirmas, ajustas o descartas cada glosa; al decidirlas todas, la factura queda «Glosada» o «Aceptada». Descargas el informe en CSV o PDF."
         }
-      }
+      },
+      "byStateHint": "La demo calcula el estado con las decisiones guardadas: «En auditoría» mientras haya glosas pendientes; «Glosada» o «Aceptada» cuando las decides todas.",
+      "byTypeHint": "Glosas vigentes (pendientes, confirmadas o ajustadas) con su valor actual. No cuenta las descartadas."
     },
     "upload": {
       "title": "Auditar factura",
@@ -165,11 +168,16 @@
         "registered": "Registrada",
         "billed": "Facturado",
         "denied": "Glosado",
-        "toPay": "A pagar"
+        "toPay": "A pagar",
+        "pending": "Glosas pendientes"
       },
       "view": "Ver detalle",
       "deleteQuestion": "¿Eliminar la factura {number} y sus glosas?",
-      "deleted": "Factura {number} eliminada"
+      "deleted": "Factura {number} eliminada",
+      "stateHint": "Estado según la revisión: «En auditoría» mientras haya glosas pendientes; «Glosada» o «Aceptada» cuando las decides todas. La búsqueda y los filtros abarcan todas las facturas del espacio.",
+      "pendingDenials": "{count, plural, one {# glosa pendiente} other {# glosas pendientes}}",
+      "reviewClosed": "Revisión cerrada",
+      "capped": "Se muestran las {max} facturas más recientes de {total}."
     },
     "detail": {
       "back": "Volver a facturas",
@@ -186,9 +194,10 @@
       "review": {
         "title": "Decisión del auditor",
         "progress": "{done} de {total} glosas decididas",
-        "complete": "Revisión completa: decidiste todas las glosas.",
+        "complete": "Revisión completa: decidiste todas las glosas y la factura quedó «{state}».",
         "none": "Sin glosas propuestas: todos los valores están dentro del tarifario de ejemplo.",
-        "flagged": "El modelo marcó esta factura para revisión humana."
+        "flagged": "El modelo marcó esta factura para revisión humana.",
+        "pendingHint": "Cuando decidas todas las glosas, la factura pasa de «En auditoría» a «Glosada» (o a «Aceptada» si las descartas todas)."
       },
       "proposal": {
         "title": "Propuesta del modelo de IA",
@@ -280,7 +289,7 @@
         },
         "s5": {
           "title": "Decisión del auditor",
-          "desc": "Tú confirmas, ajustas o descartas cada glosa con una nota. El servidor recalcula los totales y puedes descargar el reporte en CSV o PDF."
+          "desc": "Tú confirmas, ajustas o descartas cada glosa con una nota. El servidor guarda cada decisión y recalcula los totales; cuando decides todas, la factura pasa a «Glosada» (o a «Aceptada» si las descartaste todas). Puedes descargar el informe en CSV o PDF."
         }
       },
       "tariffTitle": "Tarifario de ejemplo",
@@ -296,7 +305,7 @@
       "rules": {
         "r1": "Valor facturado mayor que la tarifa de ejemplo: glosa por la diferencia multiplicada por la cantidad (regla 202, diferencia de tarifa).",
         "r2": "Código que no está en el tarifario de ejemplo: el motor propone glosar el 30 % del valor. Es una regla provisional de la demo; en tu proyecto se reemplaza por las tarifas de tu convenio.",
-        "r3": "Los códigos de regla (como 202) son internos de la demo; en tu proyecto se mapean al Manual Único de Devoluciones, Glosas y Respuestas vigente."
+        "r3": "Los códigos de regla (como 202) son internos de esta demo y no coinciden con los de la demo «Motor de reglas del auditor», cuyas reglas no se aplican aquí. En tu proyecto se mapean al Manual Único de Devoluciones, Glosas y Respuestas vigente."
       },
       "notIncludedTitle": "Qué no hace esta demo (se implementa en tu proyecto)",
       "notIncluded": {

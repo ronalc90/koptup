@@ -42,6 +42,15 @@ export interface AnswerMeta {
   docsIndexed: number;
 }
 
+/** Mensajes de error de `chat.*`: cada uno dice la causa real (red, límite del servidor…). */
+export type ChatErrorKey =
+  | 'errorNetwork'
+  | 'errorGeneric'
+  | 'errorRateLimited'
+  | 'errorChatRateLimited'
+  | 'errorCapacity'
+  | 'errorUnavailable';
+
 export interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
@@ -50,8 +59,8 @@ export interface ChatMessage {
   meta?: AnswerMeta;
   /** Esperando la respuesta del backend. */
   pending?: boolean;
-  /** Clave de error de `chat.*` si la llamada falló. */
-  errorKey?: 'errorNetwork' | 'errorGeneric';
+  /** Clave de error de `chat.*` si la llamada falló (ver `errors.ts`). */
+  errorKey?: ChatErrorKey;
   /** Pregunta que originó esta respuesta (para "Volver a preguntar"). */
   question?: string;
   feedback?: 'up' | 'down';

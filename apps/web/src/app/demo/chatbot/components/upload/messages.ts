@@ -13,6 +13,7 @@ const KNOWN_ERRORS: ReadonlySet<DemoErrorCode> = new Set<DemoErrorCode>([
   'missing_file',
   'invalid_email',
   'consent_required',
+  'lead_unavailable',
   'daily_limit',
   'question_limit',
   'invalid_question',

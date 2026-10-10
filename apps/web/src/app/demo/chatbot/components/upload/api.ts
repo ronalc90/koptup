@@ -88,6 +88,7 @@ export type DemoErrorCode =
   | 'unreadable_document'
   | 'invalid_email'
   | 'consent_required'
+  | 'lead_unavailable'
   | 'invalid_request'
   | 'daily_limit'
   | 'rate_limited'

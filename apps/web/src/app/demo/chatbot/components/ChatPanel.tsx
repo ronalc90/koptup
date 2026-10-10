@@ -12,8 +12,10 @@ import {
   ExclamationTriangleIcon,
   CheckBadgeIcon,
   NoSymbolIcon,
+  CpuChipIcon,
 } from '@heroicons/react/24/outline';
 import type { ChatMessage, SourceChunk } from './data';
+import { suggestsUpload } from './errors';
 import Tooltip from './ui/Tooltip';
 
 interface ChatPanelProps {
@@ -33,6 +35,10 @@ interface ChatPanelProps {
   busy: boolean;
   /** La base de conocimiento todavía se está indexando. */
   preparing: boolean;
+  /** Cambia al modo "Prueba con tu documento" (alternativa cuando se llegó a un límite). */
+  onUseUpload: () => void;
+  /** Abre "Cómo se respondió" en pantallas sin la columna derecha. */
+  onShowPipeline: () => void;
 }
 
 /**
@@ -105,6 +111,8 @@ export default function ChatPanel({
   onRegenerate,
   busy,
   preparing,
+  onUseUpload,
+  onShowPipeline,
 }: ChatPanelProps) {
   const t = useTranslations('demoChatbot');
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -210,17 +218,30 @@ export default function ChatPanel({
                       <span className="ml-2 text-xs">{preparing ? t('chat.preparing') : t('chat.thinking')}</span>
                     </span>
                   ) : msg.errorKey ? (
-                    <div className="flex flex-wrap items-center gap-2 text-sm text-red-700 dark:text-red-300" role="alert">
-                      <ExclamationTriangleIcon className="h-4 w-4 shrink-0" aria-hidden="true" />
-                      <span>{t(`chat.${msg.errorKey}`)}</span>
-                      <button
-                        type="button"
-                        onClick={() => onRegenerate(msg.id)}
-                        disabled={busy}
-                        className="rounded-md border border-red-200 px-2 py-0.5 text-xs font-semibold hover:bg-red-50 disabled:opacity-50 dark:border-red-800 dark:hover:bg-red-950/40"
-                      >
-                        {t('chat.retry')}
-                      </button>
+                    <div className="text-sm text-red-700 dark:text-red-300" role="alert" data-error-key={msg.errorKey}>
+                      <p className="flex items-start gap-2">
+                        <ExclamationTriangleIcon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                        <span>{t(`chat.${msg.errorKey}`)}</span>
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-2 pl-6">
+                        <button
+                          type="button"
+                          onClick={() => onRegenerate(msg.id)}
+                          disabled={busy}
+                          className="rounded-md border border-red-200 px-2 py-0.5 text-xs font-semibold hover:bg-red-50 disabled:opacity-50 dark:border-red-800 dark:hover:bg-red-950/40"
+                        >
+                          {t('chat.retry')}
+                        </button>
+                        {suggestsUpload(msg.errorKey) ? (
+                          <button
+                            type="button"
+                            onClick={onUseUpload}
+                            className="rounded-md border border-red-200 px-2 py-0.5 text-xs font-semibold hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-950/40"
+                          >
+                            {t('chat.useUpload')}
+                          </button>
+                        ) : null}
+                      </div>
                     </div>
                   ) : (
                     <div className="whitespace-pre-wrap break-words">
@@ -275,7 +296,15 @@ export default function ChatPanel({
                       )}
                     </p>
                     <div className="flex items-center gap-1">
-                      <Tooltip content={t('chat.feedbackUp')} side="top">
+                      <button
+                        type="button"
+                        onClick={onShowPipeline}
+                        className="mr-1 inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10.5px] font-medium text-primary-700 hover:bg-primary-50 dark:text-primary-300 dark:hover:bg-primary-950/40 lg:hidden"
+                      >
+                        <CpuChipIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                        {t('pipeline.toggle')}
+                      </button>
+                      <Tooltip content={t('chat.feedbackUpTooltip')} side="top">
                         <button
                           type="button"
                           onClick={() => onFeedback(msg.id, 'up')}
@@ -290,7 +319,7 @@ export default function ChatPanel({
                           <HandThumbUpIcon className="h-3.5 w-3.5" />
                         </button>
                       </Tooltip>
-                      <Tooltip content={t('chat.feedbackDown')} side="top">
+                      <Tooltip content={t('chat.feedbackDownTooltip')} side="top">
                         <button
                           type="button"
                           onClick={() => onFeedback(msg.id, 'down')}

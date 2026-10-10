@@ -20,8 +20,10 @@ import {
   CLAVE_ESTADO_FACTURA,
   CLAVE_TIPO_GLOSA,
   COLOR_ESTADO_FACTURA,
+  ESTADOS_FACTURA,
   formatearCOP,
 } from '../lib/formato';
+import { cargarEspacio, type Espacio } from '../lib/espacio';
 import MensajeError from './MensajeError';
 
 interface Props {
@@ -43,6 +45,7 @@ export default function Tablero({ version, onErrorAcceso, onAuditarEjemplo, onSu
   const t = useTranslations('demoMedicalAccounts');
   const locale = useLocale();
   const [estadisticas, setEstadisticas] = useState<Estadisticas | null>(null);
+  const [espacio, setEspacio] = useState<Espacio | null>(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<'network' | 'server' | null>(null);
 
@@ -50,7 +53,11 @@ export default function Tablero({ version, onErrorAcceso, onAuditarEjemplo, onSu
     setCargando(true);
     setError(null);
     try {
-      setEstadisticas(await auditoriaAPI.obtenerEstadisticas());
+      // Totales: los calcula el servidor. Estados y glosas por tipo: salen de la
+      // revisión de cada factura (ver lib/revision.ts).
+      const [stats, datos] = await Promise.all([auditoriaAPI.obtenerEstadisticas(), cargarEspacio()]);
+      setEstadisticas(stats);
+      setEspacio(datos);
     } catch (e) {
       if (esErrorDeAcceso(e)) onErrorAcceso();
       else setError(e instanceof Error && e.message === 'network' ? 'network' : 'server');
@@ -71,6 +78,38 @@ export default function Tablero({ version, onErrorAcceso, onAuditarEjemplo, onSu
     const clave = CLAVE_TIPO_GLOSA[tipo];
     return clave ? t(`denialTypes.${clave}`) : tipo;
   };
+
+  const porEstado = (() => {
+    const grupos = new Map<string, { count: number; total: number }>();
+    espacio?.facturas.forEach(({ factura, revision }) => {
+      const g = grupos.get(revision.estado) ?? { count: 0, total: 0 };
+      g.count += 1;
+      g.total += Number(factura.valorTotal) || 0;
+      grupos.set(revision.estado, g);
+    });
+    const orden = (estado: string) => {
+      const i = ESTADOS_FACTURA.indexOf(estado);
+      return i === -1 ? ESTADOS_FACTURA.length : i;
+    };
+    return Array.from(grupos.entries())
+      .map(([estado, g]) => ({ estado, ...g }))
+      .sort((a, b) => orden(a.estado) - orden(b.estado));
+  })();
+
+  const porTipo = (() => {
+    const grupos = new Map<string, { count: number; valor: number }>();
+    espacio?.facturas.forEach(({ glosas }) => {
+      glosas
+        .filter((g) => g.estado !== 'Rechazada')
+        .forEach((g) => {
+          const actual = grupos.get(g.tipo) ?? { count: 0, valor: 0 };
+          actual.count += 1;
+          actual.valor += Number(g.valorGlosado) || 0;
+          grupos.set(g.tipo, actual);
+        });
+    });
+    return Array.from(grupos.entries()).map(([tipo, g]) => ({ tipo, ...g }));
+  })();
 
   const kpis = estadisticas
     ? [
@@ -137,11 +176,11 @@ export default function Tablero({ version, onErrorAcceso, onAuditarEjemplo, onSu
               </CardHeader>
               <CardContent>
                 <ul className="space-y-3">
-                  {estadisticas.estadoPorFactura.map((item) => (
-                    <li key={item._id} className="flex flex-wrap items-center justify-between gap-2">
+                  {porEstado.map((item) => (
+                    <li key={item.estado} className="flex flex-wrap items-center justify-between gap-2">
                       <span className="flex items-center gap-3">
-                        <span className={`rounded-full px-2.5 py-1 text-sm font-medium ${COLOR_ESTADO_FACTURA[item._id] ?? 'bg-gray-100 text-gray-800'}`}>
-                          {etiquetaEstado(item._id)}
+                        <span className={`rounded-full px-2.5 py-1 text-sm font-medium ${COLOR_ESTADO_FACTURA[item.estado] ?? 'bg-gray-100 text-gray-800'}`}>
+                          {etiquetaEstado(item.estado)}
                         </span>
                         <span className="text-sm text-gray-600 dark:text-gray-400">
                           {t('dashboard.invoicesCount', { count: item.count })}
@@ -151,6 +190,7 @@ export default function Tablero({ version, onErrorAcceso, onAuditarEjemplo, onSu
                     </li>
                   ))}
                 </ul>
+                <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">{t('dashboard.byStateHint')}</p>
               </CardContent>
             </Card>
 
@@ -159,24 +199,25 @@ export default function Tablero({ version, onErrorAcceso, onAuditarEjemplo, onSu
                 <CardTitle className="text-lg">{t('dashboard.byType')}</CardTitle>
               </CardHeader>
               <CardContent>
-                {estadisticas.glosasPorTipo.length === 0 ? (
+                {porTipo.length === 0 ? (
                   <p className="text-sm text-gray-600 dark:text-gray-400">{t('dashboard.noDenials')}</p>
                 ) : (
                   <ul className="space-y-3">
-                    {estadisticas.glosasPorTipo.map((item) => (
-                      <li key={item._id} className="flex flex-wrap items-center justify-between gap-2">
+                    {porTipo.map((item) => (
+                      <li key={item.tipo} className="flex flex-wrap items-center justify-between gap-2">
                         <span className="flex items-center gap-3">
                           <span className="h-3 w-3 rounded-full bg-orange-500" aria-hidden="true" />
-                          <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{etiquetaTipo(item._id)}</span>
+                          <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{etiquetaTipo(item.tipo)}</span>
                           <span className="text-xs text-gray-500 dark:text-gray-400">
                             {t('dashboard.denialsCount', { count: item.count })}
                           </span>
                         </span>
-                        <span className="font-semibold text-orange-600 dark:text-orange-300">{formatearCOP(item.valorTotal, locale)}</span>
+                        <span className="font-semibold text-orange-600 dark:text-orange-300">{formatearCOP(item.valor, locale)}</span>
                       </li>
                     ))}
                   </ul>
                 )}
+                <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">{t('dashboard.byTypeHint')}</p>
               </CardContent>
             </Card>
           </div>

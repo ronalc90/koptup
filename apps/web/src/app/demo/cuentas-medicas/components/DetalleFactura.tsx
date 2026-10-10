@@ -26,6 +26,8 @@ import {
   valorPropuesto,
 } from '../lib/formato';
 import { leerLectura, type LecturaGuardada } from '../lib/memoria';
+import { recordarDetalle } from '../lib/espacio';
+import { resumirRevision } from '../lib/revision';
 import { exportarDetalleCSV, exportarDetallePDF } from '../lib/reportes';
 import { tarifaDe } from '../lib/tarifarioDemo';
 import MensajeError from './MensajeError';
@@ -49,14 +51,16 @@ export default function DetalleFactura({ facturaId, onVolver, onErrorAcceso, onC
   const [eliminando, setEliminando] = useState(false);
   const [lectura, setLectura] = useState<LecturaGuardada | null>(null);
 
-  const etiquetas = { prestador: t('entities.provider'), pagador: t('entities.payer') };
+  const etiquetas = { prestador: t('entities.provider'), pagador: t('entities.payer'), nit: t('entities.nit') };
 
   const cargar = useCallback(
     async (silencioso = false) => {
       if (!silencioso) setCargando(true);
       setError(null);
       try {
-        setDetalle(await auditoriaAPI.obtenerFactura(facturaId));
+        const datos = await auditoriaAPI.obtenerFactura(facturaId);
+        recordarDetalle(datos.factura, datos.glosas ?? []);
+        setDetalle(datos);
       } catch (e) {
         if (esErrorDeAcceso(e)) onErrorAcceso();
         else if (e instanceof ApiError && e.status === 404) setError('notFound');
@@ -148,7 +152,10 @@ export default function DetalleFactura({ facturaId, onVolver, onErrorAcceso, onC
 
   const { factura, atenciones, procedimientos, glosas } = detalle;
   const atencion = atenciones[0];
-  const claveEstado = CLAVE_ESTADO_FACTURA[factura.estado];
+  // Estado según la revisión del auditor (el servidor no lo cambia al decidir glosas).
+  const revision = resumirRevision(factura, glosas);
+  const claveEstado = CLAVE_ESTADO_FACTURA[revision.estado];
+  const etiquetaEstado = claveEstado ? t(`states.${claveEstado}`) : revision.estado;
   const decididas = glosas.filter((g) => decisionDeGlosa(g, valorPropuesto(g, procedimientos)) !== 'pendiente').length;
   const conDiferencia = procedimientos.filter((p) => (p.diferenciaTarifa || 0) > 0).length;
   const nombrePaciente = [atencion?.paciente?.nombres, atencion?.paciente?.apellidos].filter(Boolean).join(' ').trim();
@@ -175,8 +182,8 @@ export default function DetalleFactura({ facturaId, onVolver, onErrorAcceso, onC
                 <h2 className="break-all text-2xl font-bold text-gray-900 dark:text-white">
                   {t('detail.title', { number: factura.numeroFactura })}
                 </h2>
-                <span className={`rounded-full px-2.5 py-1 text-sm font-medium ${COLOR_ESTADO_FACTURA[factura.estado] ?? 'bg-gray-100 text-gray-800'}`}>
-                  {claveEstado ? t(`states.${claveEstado}`) : factura.estado}
+                <span className={`rounded-full px-2.5 py-1 text-sm font-medium ${COLOR_ESTADO_FACTURA[revision.estado] ?? 'bg-gray-100 text-gray-800'}`}>
+                  {etiquetaEstado}
                 </span>
               </div>
               <p className="text-gray-700 dark:text-gray-300">
@@ -232,7 +239,7 @@ export default function DetalleFactura({ facturaId, onVolver, onErrorAcceso, onC
           <CardTitle className="text-lg">{t('detail.review.title')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {!factura.auditoriaCompletada && (
+          {!factura.auditoriaCompletada && !revision.cerrada && (
             <p className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
               {t('detail.review.flagged')}
             </p>
@@ -248,8 +255,12 @@ export default function DetalleFactura({ facturaId, onVolver, onErrorAcceso, onC
                 <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700" aria-hidden="true">
                   <div className="h-full rounded-full bg-green-500 transition-all" style={{ width: `${(decididas / glosas.length) * 100}%` }} />
                 </div>
-                {decididas === glosas.length && (
-                  <p className="mt-2 text-sm font-medium text-green-700 dark:text-green-300">{t('detail.review.complete')}</p>
+                {revision.cerrada ? (
+                  <p className="mt-2 text-sm font-medium text-green-700 dark:text-green-300" role="status">
+                    {t('detail.review.complete', { state: etiquetaEstado })}
+                  </p>
+                ) : (
+                  <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">{t('detail.review.pendingHint')}</p>
                 )}
               </div>
               <h3 className="font-semibold text-gray-900 dark:text-white">{t('denials.title', { count: glosas.length })}</h3>

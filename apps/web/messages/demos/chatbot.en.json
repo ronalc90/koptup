@@ -38,7 +38,7 @@
       "extractiveMode": "Extractive mode (no AI key)",
       "extractiveModeTooltip": "The server has no OpenAI key: the assistant shows the retrieved fragments, with their citation, without writing an answer.",
       "offline": "Server unavailable",
-      "offlineTooltip": "We could not reach the demo server. Check your connection and try again.",
+      "offlineTooltip": "We couldn't reach the demo server: it may be your connection or the server may be unavailable. Try again in a few minutes.",
       "degraded": "AI not responding: extractive mode",
       "degradedTooltip": "The server has an OpenAI key, but the last call to the provider failed. The retrieved fragments are shown, with their citation."
     },
@@ -51,10 +51,18 @@
       "subtitle": "This is all the assistant can look at. Click a document to read it in full.",
       "preparing": "Indexing the documents on the server…",
       "ready": "{count, plural, one {# document indexed} other {# documents indexed}} on the server",
-      "error": "We could not index the documents. Check your connection.",
       "retry": "Retry",
       "sections": "{count, plural, one {# section} other {# sections}}",
-      "open": "View document"
+      "open": "View document",
+      "checking": "Checking whether they are already indexed…",
+      "idle": "{count, plural, one {# sample document} other {# sample documents}}: indexed on the server with your first question.",
+      "errors": {
+        "rateLimited": "The server limits how many sample assistants can be created per hour from the same network, and that limit has been reached. Try again later or try it with your document.",
+        "capacity": "The demo has reached its assistant capacity right now. Try again later or try it with your document.",
+        "unavailable": "The chatbot is not available right now. Try again in a few minutes.",
+        "network": "We couldn't reach the demo server. Check your connection and try again.",
+        "generic": "We couldn't index the documents. Please try again."
+      }
     },
     "included": {
       "title": "What it includes today",
@@ -67,7 +75,7 @@
           "title": "Document loading",
           "summary": "Text, PDF, DOCX and TXT depending on the demo mode.",
           "items": [
-            "Here: the fictitious company’s documents are uploaded as text to the server when you pick it.",
+            "Here: the fictitious company’s documents are uploaded as text to the server with your first question, and this browser reuses them on your next visits.",
             "“Try it with your document”: PDF (with page numbers), DOCX and TXT up to 5 MB and 30 pages.",
             "“Build your own”: text files (TXT, MD or CSV) for your bot."
           ]
@@ -118,8 +126,9 @@
           "title": "Conversation history",
           "summary": "Questions, answers and sources of your bot.",
           "items": [
-            "In “Build your own” you see your bot’s conversations, how many had a source and how many were not found.",
-            "You can export them to CSV or delete them."
+            "In “Build your own” you see what people ask your bot on the direct link or through the widget on your site, how many questions had a source and how many were not found.",
+            "You can export them to CSV or delete them. Each saved question is deleted automatically after 30 days.",
+            "Questions in “Try the assistant” and in the “Build your own” preview are not saved."
           ]
         }
       }
@@ -142,16 +151,24 @@
       "regenerateTooltip": "Sends the same question to the server again and replaces this answer.",
       "feedbackUp": "Helpful answer",
       "feedbackDown": "Needs improvement",
-      "feedbackSaved": "Rating saved in this session’s metrics",
+      "feedbackSaved": "Noted in this session's metrics. Your rating is not sent to the server.",
       "generatedBy": "Written by {model} from {count, plural, one {# fragment} other {# fragments}}",
       "extractive": "Extractive mode: retrieved fragments, cited as they are",
       "providerError": "The AI provider did not respond: showing the retrieved fragments (extractive mode)",
       "notFound": "Not in the documents: the assistant does not make up an answer.",
-      "errorNetwork": "We could not reach the demo server. Please try again.",
+      "errorNetwork": "We couldn't reach the demo server. Check your connection and try again.",
       "errorGeneric": "Something went wrong while answering. Please try again.",
       "retry": "Retry",
       "citationTooltip": "Cited fragment: click to see it in full",
-      "sourceButton": "View source {n}: {name}"
+      "sourceButton": "View source {n}: {name}",
+      "feedbackRemoved": "Rating removed from this session's metrics.",
+      "feedbackUpTooltip": "Helpful answer · only counts in this session's metrics (not sent)",
+      "feedbackDownTooltip": "Needs improvement · only counts in this session's metrics (not sent)",
+      "errorRateLimited": "We couldn't prepare the assistant: the server limits how many sample assistants can be created per hour from the same network, and that limit has been reached. Try again later or try it with your document.",
+      "errorChatRateLimited": "Too many questions arrived in a row from your network and the server asked for a pause. Wait a minute and try again.",
+      "errorCapacity": "We couldn't prepare the assistant: the demo has reached its assistant capacity right now. Try again later or try it with your document.",
+      "errorUnavailable": "The chatbot is not available right now. Try again in a few minutes.",
+      "useUpload": "Try it with your document"
     },
     "pipeline": {
       "title": "How it was answered",
@@ -198,15 +215,15 @@
     },
     "stats": {
       "title": "This session’s metrics",
-      "toggle": "Show or hide this session’s metrics",
-      "hint": "Calculated from the real answers in this tab; they reset when you reload.",
+      "hint": "Calculated in your browser from the real answers in this tab; they are not sent to the server and reset when you reload.",
       "questions": "Questions",
       "withSources": "With source",
       "notFound": "Not found",
       "avgLatency": "Avg. time",
       "tokens": "Tokens",
       "cost": "Cost (USD)",
-      "feedback": "Helpful / to improve"
+      "feedback": "Helpful / to improve",
+      "summary": "{count, plural, one {# question} other {# questions}} · {withSources} with source"
     },
     "sourcePanel": {
       "title": "Cited fragment",
@@ -232,9 +249,9 @@
       "step1Title": "Pick a sample company",
       "step1Body": "At the top you switch between three fictitious companies (human resources, online store and healthcare). Each one has its own documents.",
       "step2Title": "Ask a suggested question",
-      "step2Body": "The server searches those documents and the answer comes with citations [1], [2]… to the source.",
+      "step2Body": "With your first question, the server indexes those documents, searches them and answers with citations [1], [2]… to the source.",
       "step3Title": "Open the source",
-      "step3Body": "Click a citation to see the exact fragment and the full document it came from.",
+      "step3Body": "Click a citation to see the exact fragment and the full document it came from. “How it was answered” shows the steps the server took.",
       "step4Title": "Ask something that is not there",
       "step4Body": "If the information is not in the documents, the assistant answers “I couldn’t find that information” instead of making it up.",
       "step5Title": "Try your document or build your own",
@@ -256,7 +273,9 @@
         "loadFailed": "We could not load the bot: it may no longer exist on the server.",
         "removedMissing": "The bot “{name}” no longer exists on the server and was removed from your list.",
         "newReady": "New bot ready: set it up and save it.",
-        "selected": "Bot loaded: {name}"
+        "selected": "Bot loaded: {name}",
+        "deleteAction": "Delete",
+        "cancel": "Cancel"
       },
       "actions": {
         "save": "Save bot",
@@ -360,14 +379,14 @@
       },
       "conversations": {
         "title": "Conversations",
-        "subtitle": "What people asked your bot (here, on the direct link or on your site).",
+        "subtitle": "What people ask your bot on the direct link (“Open chat”) or through the widget on your site. Each question is deleted automatically after 30 days.",
         "refresh": "Refresh",
         "export": "Export CSV",
         "clear": "Clear history",
         "clearConfirm": "Delete all conversations of this bot?",
         "cleared": "History cleared",
         "exported": "CSV downloaded",
-        "empty": "No conversations yet. Ask it something in the preview.",
+        "empty": "No saved conversations yet. Questions asked in the preview are not saved: open the bot with “Open chat” or paste it on your site and ask it something.",
         "saveFirst": "Save the bot to see its conversations.",
         "loadFailed": "We could not load the conversations.",
         "questions": "Questions",
@@ -377,7 +396,9 @@
         "assistant": "Answer",
         "sources": "Sources",
         "date": "Date",
-        "notOwner": "Only the bot owner can see its conversations: this browser does not have its token."
+        "notOwner": "Only the bot owner can see its conversations: this browser does not have its token.",
+        "clearAction": "Delete",
+        "cancel": "Cancel"
       }
     },
     "embedPage": {
@@ -393,7 +414,9 @@
       "errorNetwork": "We could not reach the server. Please try again.",
       "retry": "Retry",
       "sourceTitle": "Source [{n}] · {name}",
-      "hideSource": "Hide source"
+      "hideSource": "Hide source",
+      "errorRateLimited": "Too many questions arrived in a row and the server asked for a pause. Wait a minute and try again.",
+      "errorUnavailable": "The assistant is not available right now. Try again in a few minutes."
     },
     "ragLink": "RAG systems for companies",
     "ragLinkShort": "What is RAG?",
@@ -477,8 +500,10 @@
         "capacity": "The demo is in high demand right now. Try again in a few minutes.",
         "llm_error": "We couldn't generate the answer. Try again; this question wasn't counted.",
         "network": "We couldn't reach the server. Check your connection and try again.",
-        "generic": "Something went wrong. Try again."
+        "generic": "Something went wrong. Try again.",
+        "lead_unavailable": "We couldn't register your trial right now, so we didn't process your document. Try again in a few minutes."
       }
-    }
+    },
+    "backToCatalog": "Back to catalog"
   }
 }

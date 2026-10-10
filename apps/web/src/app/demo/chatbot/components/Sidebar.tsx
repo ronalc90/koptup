@@ -5,20 +5,31 @@ import { useTranslations } from 'next-intl';
 import {
   ArrowPathIcon,
   CheckCircleIcon,
+  CloudArrowUpIcon,
   DocumentTextIcon,
   ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
 import { INCLUDED_KEYS, type IncludedKey } from './data';
+import type { KbErrorReason } from './errors';
 import { splitParagraphs, type SampleCompany, type SampleDocument } from './sampleKnowledge';
 import InfoIcon from './ui/InfoIcon';
 
-export type KbPhase = 'preparing' | 'ready' | 'error';
+/**
+ * Estado del bot de la empresa en el servidor:
+ *  - `checking`: se comprueba si este navegador ya lo indexó (no crea nada).
+ *  - `idle`: aún no está indexado; se indexa con la primera pregunta.
+ *  - `preparing`: subiendo e indexando los documentos.
+ */
+export type KbPhase = 'checking' | 'idle' | 'preparing' | 'ready' | 'error';
 
 interface SidebarProps {
   company: SampleCompany;
   kbPhase: KbPhase;
+  kbError: KbErrorReason | null;
   docsIndexed: number;
   onRetry: () => void;
+  /** Cambia al modo "Prueba con tu documento" (alternativa si se llegó al límite). */
+  onUseUpload: () => void;
   onOpenDocument: (doc: SampleDocument) => void;
   activeIncluded: IncludedKey | null;
   onSelectIncluded: (key: IncludedKey) => void;
@@ -33,8 +44,10 @@ interface SidebarProps {
 export default function Sidebar({
   company,
   kbPhase,
+  kbError,
   docsIndexed,
   onRetry,
+  onUseUpload,
   onOpenDocument,
   activeIncluded,
   onSelectIncluded,
@@ -58,11 +71,16 @@ export default function Sidebar({
           {t('companies.sectorCity', { sector: company.sector, city: company.city })} · {t('companies.fictitious')}
         </p>
 
-        <div className="mt-2 text-[11px]" role="status">
-          {kbPhase === 'preparing' ? (
+        <div className="mt-2 text-[11px]" role="status" data-kb-phase={kbPhase}>
+          {kbPhase === 'checking' || kbPhase === 'preparing' ? (
             <span className="inline-flex items-center gap-1 text-secondary-500 dark:text-secondary-400">
               <ArrowPathIcon className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-              {t('kb.preparing')}
+              {kbPhase === 'checking' ? t('kb.checking') : t('kb.preparing')}
+            </span>
+          ) : kbPhase === 'idle' ? (
+            <span className="inline-flex items-start gap-1 text-secondary-600 dark:text-secondary-300">
+              <CloudArrowUpIcon className="mt-px h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              {t('kb.idle', { count: company.docs.length })}
             </span>
           ) : kbPhase === 'ready' ? (
             <span className="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-300">
@@ -70,17 +88,30 @@ export default function Sidebar({
               {t('kb.ready', { count: docsIndexed })}
             </span>
           ) : (
-            <span className="inline-flex flex-wrap items-center gap-1 text-red-700 dark:text-red-300">
-              <ExclamationTriangleIcon className="h-3.5 w-3.5" aria-hidden="true" />
-              {t('kb.error')}
-              <button
-                type="button"
-                onClick={onRetry}
-                className="rounded border border-red-200 px-1.5 py-0.5 font-semibold hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-950/40"
-              >
-                {t('kb.retry')}
-              </button>
-            </span>
+            <div className="rounded-md border border-red-200 bg-red-50/70 px-2 py-1.5 text-red-800 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200">
+              <p className="flex items-start gap-1">
+                <ExclamationTriangleIcon className="mt-px h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                <span>{t(`kb.errors.${kbError ?? 'generic'}`)}</span>
+              </p>
+              <div className="mt-1.5 flex flex-wrap gap-1.5 pl-[1.125rem]">
+                <button
+                  type="button"
+                  onClick={onRetry}
+                  className="rounded border border-red-300 bg-white px-1.5 py-0.5 font-semibold hover:bg-red-50 dark:border-red-800 dark:bg-transparent dark:hover:bg-red-950/40"
+                >
+                  {t('kb.retry')}
+                </button>
+                {kbError === 'rateLimited' || kbError === 'capacity' ? (
+                  <button
+                    type="button"
+                    onClick={onUseUpload}
+                    className="rounded border border-red-300 bg-white px-1.5 py-0.5 font-semibold hover:bg-red-50 dark:border-red-800 dark:bg-transparent dark:hover:bg-red-950/40"
+                  >
+                    {t('chat.useUpload')}
+                  </button>
+                ) : null}
+              </div>
+            </div>
           )}
         </div>
 
