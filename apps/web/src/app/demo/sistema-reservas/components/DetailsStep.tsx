@@ -36,6 +36,7 @@ export default function DetailsStep({
   const t = useTranslations('demoReservas.details');
   const { biz } = useReservas();
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) => setForm((s) => ({ ...s, [k]: v }));
+  const hasEmail = form.email.trim().length > 0;
 
   return (
     <form
@@ -95,9 +96,16 @@ export default function DetailsStep({
             <input type="checkbox" className="rounded border-slate-300 text-orange-600 focus:ring-orange-500" checked={form.remindWa} onChange={(e) => set('remindWa', e.target.checked)} />
             {t('remindWa')}
           </label>
-          <label className="flex items-center gap-2">
-            <input type="checkbox" className="rounded border-slate-300 text-orange-600 focus:ring-orange-500" checked={form.remindEmail} onChange={(e) => set('remindEmail', e.target.checked)} />
+          <label className={`flex items-center gap-2 ${hasEmail ? '' : 'text-slate-400 dark:text-slate-500'}`}>
+            <input
+              type="checkbox"
+              className="rounded border-slate-300 text-orange-600 focus:ring-orange-500 disabled:opacity-50"
+              checked={form.remindEmail && hasEmail}
+              disabled={!hasEmail}
+              onChange={(e) => set('remindEmail', e.target.checked)}
+            />
             {t('remindEmail')}
+            {!hasEmail && <span className="text-xs">{t('remindEmailNeeds')}</span>}
           </label>
         </div>
       </fieldset>

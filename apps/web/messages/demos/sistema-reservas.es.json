@@ -13,6 +13,7 @@
       "close": "Cerrar"
     },
     "shell": {
+      "back": "Volver a demos",
       "title": "Sistema de reservas",
       "subtitle": "Así reservan tus clientes y así ves tu agenda: disponibilidad calculada por profesional y sede, abono en línea y recordatorios por WhatsApp (simulados), agenda e indicadores del negocio.",
       "sampleBadge": "Datos de ejemplo",
@@ -164,6 +165,7 @@
       "remindTitle": "¿Cómo quieres recibir el recordatorio?",
       "remindWa": "WhatsApp",
       "remindEmail": "Correo",
+      "remindEmailNeeds": "(escribe tu correo arriba)",
       "policyTitle": "Política de cancelación:",
       "policy": "puedes cancelar o reprogramar sin costo hasta {hours} horas antes. Si cancelas después o no llegas, el abono no se reembolsa.",
       "sensitive": "Tus datos de salud son sensibles: no estás obligado a compartirlos para reservar. Aquí solo pedimos lo necesario para agendar; la historia clínica no se guarda en este sistema.",
@@ -172,7 +174,6 @@
         "name": "Escribe tu nombre completo.",
         "phone": "Escribe un celular colombiano de 10 dígitos que empiece por 3.",
         "email": "Revisa el correo: parece incompleto.",
-        "emailNeeded": "Para el recordatorio por correo necesitamos tu correo (o desmarca esa opción).",
         "consent": "Para reservar necesitas aceptar la autorización de tratamiento de datos."
       },
       "back": "Atrás",
@@ -294,7 +295,7 @@
       "cancel": "Cancelar",
       "save": "Mover a las {time}",
       "pick": "Elige una hora",
-      "done": "{code} quedó para el {date} a las {time}."
+      "done": "Listo: {code} quedó para el {date} a las {time}"
     },
     "agenda": {
       "weekOf": "Semana del {from} al {to}",
@@ -318,6 +319,7 @@
       "closedHoliday": "Festivo ({name}): el negocio no atiende.",
       "closedDay": "No hay turnos este día.",
       "offShift": "Sin turno",
+      "cancelledDay": "{n, plural, one {# cita cancelada este día:} other {# citas canceladas este día:}}",
       "clickToBook": "Clic para crear una cita a esta hora",
       "count": "{n, plural, =0 {Sin citas} one {# cita} other {# citas}}",
       "icsNote": "«Exportar .ics» descarga las citas visibles para importarlas en Google Calendar, Outlook o Apple Calendar. La sincronización automática con el calendario de tus {kind} se configura en la implementación."
@@ -482,7 +484,7 @@
       "consentNote": "Al tomar una reserva por teléfono o WhatsApp, recepción le pide al cliente la autorización de tratamiento de datos (Ley 1581 de 2012).",
       "cancel": "Cancelar",
       "save": "Guardar reserva",
-      "created": "Reserva creada para el {date} a las {time}.",
+      "created": "Listo: reserva creada para el {date} a las {time}",
       "notOffered": "Este servicio no se presta en esta sede.",
       "errors": {
         "slot": "Elige una hora libre.",

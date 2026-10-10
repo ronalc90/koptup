@@ -63,8 +63,8 @@ export default function BookingsTable({ viewAs, onOpen }: { viewAs: string; onOp
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-        <div className="relative sm:col-span-2 lg:col-span-1 xl:col-span-2">
+      <div className={`grid gap-2 sm:grid-cols-2 ${viewAs === 'all' ? 'lg:grid-cols-5' : 'lg:grid-cols-4'}`}>
+        <div className={`relative sm:col-span-2 ${viewAs === 'all' ? 'lg:col-span-5' : 'lg:col-span-4'}`}>
           <label htmlFor="tb-q" className="sr-only">
             {t('search')}
           </label>
@@ -140,7 +140,7 @@ export default function BookingsTable({ viewAs, onOpen }: { viewAs: string; onOp
         </button>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+      <div className="relative overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
         <table className="w-full min-w-[860px] text-sm">
           <thead className="bg-slate-50 dark:bg-slate-800/60 text-left text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
             <tr>
@@ -150,7 +150,9 @@ export default function BookingsTable({ viewAs, onOpen }: { viewAs: string; onOp
               <th className="px-3 py-2.5 font-semibold">{kind.one}</th>
               <th className="px-3 py-2.5 font-semibold">{t('cols.status')}</th>
               <th className="px-3 py-2.5 font-semibold">{t('cols.payment')}</th>
-              <th className="px-3 py-2.5 font-semibold sr-only">{t('cols.actions')}</th>
+              <th className="px-3 py-2.5 font-semibold">
+                <span className="sr-only">{t('cols.actions')}</span>
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800">

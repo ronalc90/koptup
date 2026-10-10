@@ -1,194 +1,240 @@
 # Guía de la demo: Sistema de Reservas
 
-> Ruta `/demo/sistema-reservas` · Modo de acceso: **Abierta** · Tipo: **datos de ejemplo** (todo corre en el navegador; no llama al servidor ni guarda nada) · Plan del producto: [Sistema de reservas y agendamiento](Producto-sistema-reservas.md)
+> Ruta `/demo/sistema-reservas` · Modo de acceso: **Abierta** · Tipo: **datos de ejemplo** (todo corre en el navegador y se guarda en ese navegador; no llama al servidor ni usa IA) · Plan del producto: [Sistema de reservas y agendamiento](Producto-sistema-reservas.md)
 
-**Resumen.** Muestra la página de reservas de un centro de salud y bienestar sin nombre (cuatro servicios con duración y precio en pesos), un asistente de cuatro pasos para agendar una cita (fecha, hora, datos y confirmación) y un **Panel de Reservas** donde el negocio filtra las citas y les cambia el estado. Está pensada para consultorios, clínicas, spas y negocios que hoy agendan por cuaderno o WhatsApp. Es un prototipo visual: la reserva que hace el visitante no llega al panel, no se envía ningún correo y, al recargar, todo vuelve al estado inicial.
+**Resumen.** Muestra las dos caras de un sistema de reservas con tres negocios ficticios de Colombia: una clínica odontológica en Bogotá, un spa en Medellín y unas canchas sintéticas en Cali. En la **Vista cliente** el visitante elige sede, servicio, profesional (o cancha), fecha y hora entre las franjas que de verdad están libres, llena sus datos con la autorización de la Ley 1581, paga un abono **simulado** y recibe la confirmación con la vista previa del WhatsApp y del correo. En la **Vista negocio** esa misma cita aparece resaltada en la agenda por profesional, y el negocio la confirma, la reprograma, marca si el cliente llegó o no, guarda notas, exporta la agenda a `.ics` o la lista a CSV y ve indicadores que se recalculan con cada cambio. Todo se guarda en el navegador del visitante durante 7 días. Está pensada para clínicas, spas, canchas y negocios con varias sedes o profesionales que hoy agendan por WhatsApp.
 
 **En esta página:** [Recorrido sugerido](#recorrido-sugerido-demo-comercial-de-5-minutos) · [Pantallas y funciones](#pantallas-y-funciones) · [Qué es real y qué es simulado](#qué-es-real-y-qué-es-simulado) · [Acceso](#acceso) · [Limitaciones conocidas](#limitaciones-conocidas)
 
 ![Vista general](images/doc/demos/sistema-reservas/00-general.jpg)
 
-*Vista pública: encabezado naranja «Reserva tu Cita en Línea», los cuatro servicios con «Reservar ahora» y, debajo, el botón «Panel de Administración».*
+*Vista cliente de la Clínica Dental Arrayán (ficticia): encabezado de la demo con «Volver a demos», el rótulo «Datos de ejemplo», el selector de negocio, el cambio entre Vista cliente y Vista negocio y, debajo, la página de reservas con las sedes y los cuatro servicios.*
 
 ```mermaid
 flowchart LR
-    P["Vista pública: 4 servicios"] -->|"Reservar ahora"| F["1. Fecha"]
-    F -->|"clic en un día"| H["2. Hora"]
-    H -->|"clic en una hora libre"| D["3. Datos"]
-    D -->|"Continuar"| C["4. Reserva confirmada"]
-    C -->|"Volver al Inicio"| P
-    P -->|"Panel de Administración"| A["Panel de Reservas"]
-    A -->|"Ver Detalles"| M["Detalle: cambiar estado"]
-    M -->|"Confirmar, Pendiente o Cancelar"| A
-    A -->|"Volver a vista pública"| P
+    P["Vista cliente: sede y servicio"] -->|"Reservar"| F["1. Profesional y fecha"]
+    F -->|"día con cupos"| H["2. Hora libre"]
+    H --> D["3. Datos y autorización"]
+    D -->|"Continuar al pago"| A["4. Abono simulado"]
+    A --> C["5. Confirmación"]
+    C -->|"Ver la cita en la agenda del negocio"| N["Vista negocio: agenda"]
+    N -->|"clic en la cita"| M["Detalle: estado, notas, reprogramar"]
+    N --> L["Reservas: filtros y CSV"]
+    N --> I["Indicadores"]
+    N --> W["Mensajes simulados"]
 ```
 
-*Las tres vistas de la demo. Todo ocurre en la misma página `/demo/sistema-reservas`; la dirección no cambia.*
+*La reserva que hace el visitante llega a la agenda del negocio. Todo ocurre en la misma página `/demo/sistema-reservas`.*
 
 ---
 
 ## Recorrido sugerido (demo comercial de 5 minutos)
 
-La demo no trae un guion propio. Este recorrido muestra las dos caras del producto: la del cliente que agenda y la del negocio que administra. Empieza con la página recién cargada (si alguien ya la usó, recarga: no guarda nada).
+La demo trae su propio recorrido en **«Cómo funciona esta demo y qué es simulado»** (se despliega con **Ver**). Para empezar desde cero, pulsa **Restablecer datos** y confirma: vuelve al ejemplo inicial con fechas alrededor de hoy.
 
 ![Recorrido de la demo](images/doc/demos/sistema-reservas/recorrido.gif)
 
-*Recorrido completo: servicio, fecha, hora, datos, confirmación, panel, detalle y cambio de estado.*
+*Recorrido completo: sede y servicio, profesional y fecha, hora, datos, abono simulado, confirmación, recordatorio, agenda, detalle e indicadores.*
 
-### Paso 1. El cliente elige un servicio
+### Paso 1. El cliente elige sede y servicio
 
-![Paso 1: servicios](images/doc/demos/sistema-reservas/01-paso1-servicios.jpg)
+![Paso 1: sede y servicios](images/doc/demos/sistema-reservas/01-paso1-servicios.jpg)
 
-*Los cuatro servicios de ejemplo; se anota Terapia Física.*
+*Vista cliente de la clínica con la Sede Cedritos elegida.*
 
-1. **Tarjeta del servicio**: nombre, descripción, duración y precio. Los servicios son fijos: Consulta Médica General (45 minutos, $50.000), Terapia Física (60 minutos, $65.000), Consulta Nutricional (30 minutos, $40.000) y Masaje Terapéutico (90 minutos, $80.000).
-2. **Reservar ahora**: abre el asistente de reserva con ese servicio.
-3. **Panel de Administración**: lleva a la vista del negocio (paso 5). No pide contraseña.
+1. **Datos de ejemplo**: rótulo fijo; al pasar el puntero explica que negocios, personas y reservas son ficticios y que lo que haces se guarda solo en ese navegador.
+2. **Negocio de ejemplo**: Odontología (Clínica Dental Arrayán, Bogotá), Estética y spa (Casa Ámbar Spa, Medellín) o Canchas sintéticas (Complejo Deportivo La Pradera, Cali). Cada uno guarda sus propias reservas.
+3. **Vista cliente / Vista negocio**: cambia entre la página que ve el cliente y el panel del negocio. Una reserva a medio hacer no se pierde al ir y volver.
+4. **Restablecer datos**: pide confirmación y vuelve al ejemplo inicial.
+5. **Sede**: cambia la dirección y los servicios que se prestan allí. Si un servicio no se presta en la sede, la tarjeta lo dice y ofrece «Ver en» la otra sede.
+6. **Tarjeta del servicio**: duración, precio en pesos, abono que pide para reservar (por ejemplo, 30 % de la limpieza dental: $ 42.000) y quién lo atiende en esa sede. **Reservar** abre el asistente.
 
-Qué decir: «Tu cliente ve tus servicios con precio y duración, y agenda solo, sin llamar».
+Qué decir: «Tu cliente ve tus servicios por sede, con precio, abono y profesional, y agenda solo».
 
-### Paso 2. Elige la fecha
+### Paso 2. Elige profesional y fecha
 
 ![Paso 2: calendario](images/doc/demos/sistema-reservas/02-paso2-fecha.jpg)
 
-*Paso «Fecha» del asistente para Terapia Física, con el calendario de octubre de 2026.*
+*Paso Fecha de la limpieza dental con Paola Gómez en octubre de 2026.*
 
-1. **Pasos**: Fecha, Hora, Datos y Confirmar. El paso actual va en naranja y los terminados llevan un chulo.
-2. **Mes anterior y siguiente**: el calendario abre en el mes actual y las flechas cambian de mes.
-3. **Mes / Semana**: dos botones de vista. «Semana» solo cambia el color del botón; el calendario sigue mostrando el mes (ver [Limitaciones](#limitaciones-conocidas)).
-4. **Día de hoy** resaltado en naranja claro.
+1. **Pasos**: Fecha, Hora, Datos, Pago y Confirmación. Debajo, un resumen con servicio, sede, profesional, fecha y precio.
+2. **Profesional**: «Primero disponible» o una persona concreta. En las canchas se elige la cancha.
+3. **Mes / Semana**: dos vistas reales del calendario (ver la vista semanal abajo). El calendario abre en el mes y la semana del primer día con cupo.
+4. **Festivo**: los festivos de Colombia (calculados con la Ley Emiliani) salen en rojo y cerrados; las canchas abren con horario de domingo.
+5. **Día con cupos**: cada día dice cuántas horas libres quedan. Los días pasados, los días sin turnos y los días llenos no se pueden elegir; «hoy» se resalta solo en su mes.
+6. **Festivos del mes**: lista de los festivos del mes que estás viendo.
 
-Un clic en cualquier día pasa de una vez al paso de la hora. Arriba, **← Volver a servicios** regresa a la vista pública.
+![Vista semanal](images/doc/demos/sistema-reservas/14-fecha-semana.jpg)
+
+*1 Vista Semana: 2 cada día con sus horas libres; un clic en una hora pasa directo a los datos.*
 
 ### Paso 3. Elige la hora
 
-![Paso 3: horas disponibles](images/doc/demos/sistema-reservas/03-paso3-hora.jpg)
+![Paso 3: horas libres](images/doc/demos/sistema-reservas/03-paso3-hora.jpg)
 
-*Horas de 8:00 a. m. a 6:00 p. m. cada media hora; las grises están ocupadas.*
+*Horas libres de Paola el jueves 15 de octubre, agrupadas en mañana y tarde.*
 
-1. **Fecha seleccionada**: la demo muestra la fecha que guarda. Siempre sale en **enero de 2024** con el número de día que elegiste (aquí «2024-01-15», aunque se eligió el 15 de octubre de 2026). Es un error de la demo; conviene no detenerse en este texto durante una presentación.
-2. **Hora ocupada**: 09:00, 10:30, 14:00 y 16:00 aparecen en gris y no se pueden elegir. Son las mismas para todos los días.
-3. **Hora libre**: un clic la elige y avanza al paso de datos.
-4. **Atrás**: vuelve al calendario.
+1. **Fecha legible y regla**: muestra la fecha completa y que el servicio dura 45 minutos más 15 de alistamiento.
+2. **Horas libres**: se calculan con el turno de la persona, la duración del servicio, el alistamiento y las citas que ya tiene. No hay cruces. El mismo día solo se ofrecen horas con al menos 60 minutos de anticipación (30 en las canchas).
+3. **Cambiar fecha**: vuelve al calendario.
 
-Qué decir: «El cliente solo ve los horarios libres; no hay dobles reservas».
+Qué decir: «El cliente solo ve horas que de verdad están libres; no hay dobles reservas».
 
-### Paso 4. Escribe sus datos y confirma
+### Paso 4. Escribe sus datos y autoriza el tratamiento
 
 ![Paso 4: datos del cliente](images/doc/demos/sistema-reservas/04-paso4-datos.jpg)
 
-*Formulario «Tus Datos» con datos ficticios: Laura Martínez, laura.martinez@ejemplo.co, +57 310 555 0142 y un comentario.*
+*Formulario con datos ficticios: Juliana Ríos, 300 555 0123 y un correo de example.com.*
 
-El formulario pide **Nombre Completo**, **Email**, **Teléfono** y **Comentarios (Opcional)**. **Atrás** vuelve a las horas y **Continuar** muestra la confirmación. La demo no valida los campos (se puede continuar con todo vacío) y no usa lo que escribas.
+1. **Celular**: obligatorio, colombiano de 10 dígitos que empieza por 3. El nombre también es obligatorio; el correo es opcional.
+2. **Recordatorio**: WhatsApp y correo; la casilla de correo se activa cuando escribes un correo.
+3. **Política de cancelación**: sin costo hasta 24 horas antes (12 en las canchas).
+4. **Datos sensibles**: en la clínica aparece el aviso de que los datos de salud no son obligatorios.
+5. **Autorización (Ley 1581 de 2012)**: obligatoria para continuar. Sin ella, o con datos incompletos, el formulario muestra el error junto a cada campo.
 
-![Paso 4: confirmación](images/doc/demos/sistema-reservas/05-paso5-confirmacion.jpg)
+### Paso 5. Paga el abono (simulado)
 
-*Pantalla «¡Reserva Confirmada!» con el resumen de la cita.*
+![Paso 5: pago simulado](images/doc/demos/sistema-reservas/05-paso5-pago.jpg)
 
-1. **Mensaje de confirmación**: «¡Reserva Confirmada! Tu cita ha sido agendada exitosamente». Aparece al instante; no se envía correo ni mensaje.
-2. **Resumen**: servicio, fecha y hora (con el año 2024 del paso 3) y duración.
-3. **Volver al Inicio**: regresa a los servicios.
+*Pago del abono del 30 % con PSE.*
 
-### Paso 5. El negocio ve sus reservas
+1. **Opciones de pago**: abono, pago total o pago en la sede. Si el servicio pide abono, «Pagar en la sede» queda deshabilitado; si no lo pide, la reserva puede quedar pendiente y pagarse en la sede.
+2. **Medio de pago**: PSE, Nequi o tarjeta, cada uno con una explicación de lo que pasaría en un proyecto real.
+3. **Aviso de simulación**: no se cobra nada ni se piden datos de tarjeta.
+4. **Pagar … (simulado)**: muestra un instante «Conectando con tu banco (simulado)…» y crea la reserva.
 
-Desde la vista pública pulsa **Panel de Administración**.
+### Paso 6. Ve la confirmación y el recordatorio
 
-![Paso 5: panel de reservas](images/doc/demos/sistema-reservas/06-paso6-panel.jpg)
+![Paso 6: confirmación](images/doc/demos/sistema-reservas/06-paso6-confirmacion.jpg)
 
-*Panel de Reservas con las cinco reservas de ejemplo.*
+*Reserva confirmada con su código y las vistas previas de los mensajes.*
 
-1. **Fecha**: Todas las fechas, Hoy, Esta semana o Este mes.
-2. **Servicio**: uno de los cuatro servicios.
-3. **Estado**: Confirmado, Pendiente o Cancelado.
-4. **Limpiar Filtros**: vuelve a «todos» en los tres filtros.
-5. **Ver Detalles**: abre la ficha de la reserva (aquí, la de Ana Martínez, pendiente).
+1. **Código de reserva** (por ejemplo, R-2454).
+2. **Resumen**: fecha y hora legibles, servicio, profesional, sede con dirección, pago simulado con su referencia `SIM-…`, saldo a pagar en la sede y estado.
+3. **Descargar .ics**: descarga de verdad un evento de calendario con aviso 24 horas antes; se abre en Google Calendar, Outlook o Apple Calendar.
+4. **Añadir a Google Calendar**: abre en otra pestaña el formulario de Google Calendar con el evento lleno, para guardarlo en la cuenta del visitante.
+5. **Ver la cita en la agenda del negocio**: pasa a la Vista negocio en el día de la cita.
+6. **Lo que recibe tu cliente**: vistas previas del WhatsApp y del correo de confirmación. **Simular el recordatorio que se envía 24 horas antes** agrega el recordatorio con los botones **Confirmar** y **Reprogramar**: Confirmar deja «Confirmada» una cita pendiente; Reprogramar abre la ventana para moverla.
 
-La tabla trae cinco reservas fijas del 30 y 31 de enero de 2024: María González, Carlos Rodríguez, Ana Martínez, Pedro López y Laura Fernández. **La reserva que acabas de hacer no aparece**: el asistente y el panel no están conectados. Para la presentación, usa el filtro **Estado** (por ejemplo, «Cancelado» deja solo a Laura Fernández); los filtros de fecha «Hoy», «Esta semana» y «Este mes» siempre dejan la tabla vacía porque las reservas son de 2024.
+También están **Reprogramar** y **Hacer otra reserva**.
 
-### Paso 6. Abre una reserva y cámbiale el estado
+### Paso 7. El negocio ve la cita en su agenda
 
-![Paso 6: detalle de la reserva](images/doc/demos/sistema-reservas/07-paso7-detalle.jpg)
+![Paso 7: agenda del negocio](images/doc/demos/sistema-reservas/07-paso7-agenda.jpg)
 
-*Ventana «Detalles de la Reserva» de Ana Martínez con una nota escrita.*
+*Agenda del jueves 15 de octubre, una columna por profesional, con la cita nueva resaltada.*
 
-1. **Cliente**: inicial, nombre, teléfono y correo. El teléfono (+57 300 123 4567) y el correo (cliente@email.com) son los mismos para todas las reservas.
-2. **Cambiar Estado**: **✓ Confirmar**, **⏳ Pendiente** y **✕ Cancelar**. El botón del estado actual queda gris. Al pulsar otro, la ventana se cierra y la tabla muestra el nuevo estado (en el GIF, Ana Martínez pasa a «Confirmado»).
-3. **Notas**: se puede escribir, pero no se guarda.
-4. **Guardar Notas**: no hace nada. Al volver a abrir la reserva, la nota está vacía.
+1. **Ver como**: Recepción (todas las agendas) o un profesional (solo su agenda). Es un filtro de la demo, no un inicio de sesión.
+2. **Nueva reserva**: para citas que llegan por teléfono, WhatsApp o en persona; solo ofrece horas libres y abre en el día que estás viendo en la agenda (o en el primer día con cupo).
+3. **Aviso de la reserva nueva**, con «Ver en la agenda» y «Abrir detalle».
+4. **Pestañas**: Agenda, Reservas, Indicadores y Mensajes.
+5. **Día / Semana**, con flechas, **Hoy** y filtro de sede.
+6. **Exportar .ics**: descarga las citas activas que estás viendo.
+7. **Cita nueva** con la marca «Nueva». Un clic en cualquier cita abre su detalle; un clic en un espacio libre dentro del turno abre «Nueva reserva» con esa hora. Las canceladas no ocupan la cuadrícula: se listan debajo.
 
-La ventana se cierra con la **X** de arriba a la derecha (la tecla Escape no la cierra).
+### Paso 8. Abre la cita y gestiónala
 
-Qué decir: «Tu equipo ve todas las citas en un solo lugar y las confirma o cancela con un clic».
+![Paso 8: detalle de la cita](images/doc/demos/sistema-reservas/08-paso8-detalle.jpg)
+
+*Detalle de la reserva de Juliana Ríos con una nota guardada.*
+
+1. **Valor, pagado en línea (simulado) y saldo**, con la referencia simulada.
+2. **Reprogramar**: abre una ventana con fecha, profesional y solo horas libres; al guardar se registra el aviso de reprogramación simulado.
+3. **Cancelar cita**. En las citas que ya empezaron (desde una hora antes) aparecen también **Llegó** y **No asistió**. La demo dice si la cancelación devuelve el abono según la política.
+4. **Enviar recordatorio (simulado)**.
+5. **Notas internas** con **Guardar notas**: se guardan y siguen ahí al reabrir o recargar.
+6. **Historial**: creación, cambios de estado, notas, mensajes y respuestas, con fecha y hora.
+7. **Eliminar reserva**, con confirmación.
+
+La ventana se cierra con la **X**, con **Cerrar**, con la tecla **Escape** o con un clic fuera; mientras está abierta, la tecla Tab no sale de ella, y al cerrarla el foco vuelve al botón que la abrió.
+
+Qué decir: «Tu equipo ve todas las citas por profesional y sede, confirma, reprograma y marca ausencias en un solo lugar». Para cerrar, en **Reservas** filtra «Anteriores», abre una cita «Llegó», cámbiala a «No asistió» y muestra cómo cambian los **Indicadores**.
 
 ---
 
 ## Pantallas y funciones
 
-### Vista pública (servicios)
+### Vista cliente
 
-Ver la [vista general](#guía-de-la-demo-sistema-de-reservas) y el [paso 1](#paso-1-el-cliente-elige-un-servicio).
+Ver la [vista general](#guía-de-la-demo-sistema-de-reservas) y los [pasos 1 a 6](#paso-1-el-cliente-elige-sede-y-servicio).
 
 | Elemento | Qué hace |
 |---|---|
-| Encabezado «Reserva tu Cita en Línea» | Texto fijo con dos sellos: «Disponibilidad 24/7» y «Confirmación Instantánea». No son botones. |
-| Tarjetas de servicio | Cuatro servicios fijos con ícono, descripción, duración y precio. |
-| **Reservar ahora** | Abre el asistente con el servicio elegido, siempre desde el paso Fecha. |
-| **Panel de Administración** | Cambia a la vista del negocio, sin inicio de sesión. |
-| Bloque azul «¿Te gustaría algo así para tu negocio?» | Es común a todas las demos: **Solicitar demo guiada** (`/solicitar-demo?demos=sistema-reservas`), **Solicitar Cotización** (`/contact`) y **Ver Planes y Precios** (`/services#planes-rag`). |
+| **Volver a demos** | Regresa al catálogo `/demo`. |
+| **Cómo funciona esta demo y qué es simulado** | Lista lo que funciona de verdad, lo simulado y un recorrido de 5 pasos. |
+| Encabezado del negocio | Nombre, especialidad, ciudad y tres beneficios; los de pago y mensajes dicen «(simulado)». |
+| Sedes y servicios | Cada negocio tiene 2 sedes. Odontología: valoración ($ 60.000), limpieza ($ 140.000, abono 30 %), blanqueamiento ($ 650.000, abono 30 %) y control de ortodoncia ($ 90.000). Spa: limpieza facial y masajes relajante y descontracturante (abono 20 %) y manicure y pedicure (sin abono). Canchas: fútbol 5 de 1 hora y de 1 h 30 min y fútbol 8 de 1 hora (abono 50 %). |
+| Pie de la página | Teléfono del negocio (ficticio, bloque 555) y política de cancelación. Debajo: «Negocios ficticios creados para la demo (NIT … de ejemplo)», con dígito de verificación válido. |
 
 ### Asistente de reserva
-
-Ver los [pasos 2 a 4](#paso-2-elige-la-fecha).
 
 ```mermaid
 stateDiagram-v2
     state "Fecha" as F
     state "Hora" as H
     state "Datos" as D
+    state "Pago" as P
     state "Confirmación" as C
-    [*] --> F: Reservar ahora
-    F --> H: clic en un día
-    H --> F: Atrás
-    H --> D: clic en hora libre
+    [*] --> F: Reservar
+    F --> H: clic en un día con cupos
+    F --> D: clic en una hora (vista Semana)
+    H --> F: Cambiar fecha
+    H --> D: clic en una hora libre
     D --> H: Atrás
-    D --> C: Continuar
-    C --> [*]: Volver al Inicio
+    D --> P: Continuar al pago (datos válidos)
+    P --> D: Atrás
+    P --> C: Pagar (simulado) o Confirmar reserva
+    P --> H: la hora se ocupó mientras llenabas los datos
+    C --> [*]: Hacer otra reserva
 ```
 
-*Pasos del asistente. «← Volver a servicios» sale del asistente desde cualquier paso.*
+*«Volver a los servicios» sale del asistente desde cualquier paso antes de la confirmación.*
 
-- **Fecha**: calendario mensual que abre en el mes actual, con flechas para cambiar de mes y el día de hoy resaltado. Se puede elegir cualquier día, también los pasados y los domingos.
-- **Hora**: 21 horarios de 08:00 a 18:00 cada 30 minutos. Cuatro salen ocupados siempre (09:00, 10:30, 14:00 y 16:00).
-- **Datos**: nombre, email, teléfono y comentarios, sin validación.
-- **Confirmación**: servicio, fecha y hora, y duración. No muestra el nombre ni el precio.
+- **Reglas de disponibilidad**: turnos partidos por profesional y sede, duración más alistamiento, festivos, reservas existentes, anticipación mínima (60 minutos; 30 en canchas) y horizonte de 60 días (45 en canchas).
+- **Estado inicial**: con abono o pago total la cita queda «Confirmada»; con pago en la sede queda «Pendiente» hasta que el cliente confirme con el recordatorio o la confirme recepción.
 
-### Panel de Reservas
+### Panel del negocio
 
-Ver los [pasos 5 y 6](#paso-5-el-negocio-ve-sus-reservas).
+| Pestaña | Qué hace |
+|---|---|
+| **Agenda** | Día (columnas por profesional, franjas fuera de turno rayadas y línea roja de la hora actual en el día de hoy) o Semana (lista por día). Filtro de sede, Hoy, flechas, Exportar .ics y clic en un espacio libre para crear una cita. |
+| **Reservas** | Buscador por cliente, celular o código; filtros de fechas (hoy, esta semana, este mes, próximas, anteriores o todas), servicio, profesional, estado y sede; orden; Limpiar filtros; **Exportar CSV** con lo filtrado; «Ver» abre el detalle; carga de 25 en 25. |
+| **Indicadores** | Ocupación de la semana, ausencias de 30 días, ingresos del mes (citas atendidas), abonos simulados del mes, citas de los próximos 7 días, ocupación por profesional, servicios más reservados y reservas por canal. Filtro por sede y nota con cómo se calcula cada uno. |
+| **Mensajes** | Recordatorios pendientes para el próximo día con citas y botón para enviarlos (simulado); historial de confirmaciones, recordatorios, reprogramaciones y cancelaciones con filtro por canal, vista previa de cada mensaje y respuesta del cliente. |
 
-- **Filtros**: fecha, servicio y estado se combinan entre sí. Si ninguna reserva coincide, la tabla dice «No se encontraron reservas con los filtros seleccionados».
-- **Tabla**: cliente (con su inicial), servicio, fecha, hora, estado con color (verde Confirmado, amarillo Pendiente, rojo Cancelado) y **Ver Detalles**.
-- **Detalle**: datos del cliente, información del servicio, cambio de estado y notas.
-- **← Volver a vista pública**: regresa a los servicios. Los filtros y los cambios de estado se mantienen mientras no recargues la página.
+![Lista de reservas](images/doc/demos/sistema-reservas/11-reservas.jpg)
 
-![Filtro de fecha sin resultados](images/doc/demos/sistema-reservas/08-filtro-hoy-vacio.jpg)
+*Reservas: 1 buscador, 2 rango de fechas (abre en «Esta semana», con fechas reales), 3 estado, 4 orden, 5 exportar CSV, 6 abrir el detalle.*
 
-*Con el filtro «Hoy» la tabla queda vacía: las cinco reservas de ejemplo son de enero de 2024.*
+![Indicadores](images/doc/demos/sistema-reservas/12-indicadores.jpg)
+
+*Indicadores calculados con las reservas: 1 ocupación de la semana, 2 ausencias, 3 abonos simulados, 4 reservas por canal.*
+
+![Mensajes](images/doc/demos/sistema-reservas/13-mensajes.jpg)
+
+*Mensajes: 1 aviso de simulación, 2 recordatorios del próximo día con citas, 3 filtro por canal, 4 vista previa.*
 
 ```mermaid
 stateDiagram-v2
-    state "Confirmado" as C
     state "Pendiente" as P
-    state "Cancelado" as X
-    P --> C: Confirmar
-    C --> P: Pendiente
-    C --> X: Cancelar
-    X --> C: Confirmar
-    P --> X: Cancelar
-    X --> P: Pendiente
+    state "Confirmada" as C
+    state "Llegó" as A
+    state "No asistió" as N
+    state "Cancelada" as X
+    P --> C: Confirmar o respuesta «Confirmar»
+    P --> X: Cancelar cita
+    C --> X: Cancelar cita
+    P --> A: Llegó (desde 1 h antes)
+    C --> A: Llegó (desde 1 h antes)
+    P --> N: No asistió
+    C --> N: No asistió
+    A --> N: Cambiar a «No asistió»
+    N --> A: Cambiar a «Llegó»
+    X --> C: Reprogramar
+    N --> C: Reprogramar
 ```
 
-*Cualquier estado puede pasar a cualquiera de los otros dos desde el detalle. Los cambios se pierden al recargar.*
+*Estados de una cita. Reprogramar una cita cancelada o con ausencia la deja «Confirmada» en la nueva hora.*
 
 ### En el celular
 
@@ -196,7 +242,7 @@ stateDiagram-v2
 
 *El asistente en un teléfono (390 px), en el paso Fecha.*
 
-Las tarjetas de servicio se apilan en una columna, el calendario ocupa todo el ancho y la tabla del panel se desplaza de lado dentro de su recuadro. La página no se desborda a lo ancho.
+Las tarjetas se apilan, el calendario ocupa todo el ancho (cada día muestra un punto de color en vez del número de cupos), los pasos muestran solo el nombre del paso actual, y la agenda del día y la tabla de reservas se desplazan de lado dentro de su recuadro. La página no se desborda a lo ancho.
 
 ---
 
@@ -204,15 +250,17 @@ Las tarjetas de servicio se apilan en una columna, el calendario ocupa todo el a
 
 | Parte | Real o simulado | Detalle |
 |---|---|---|
-| Servicios, precios, duraciones y las cinco reservas del panel | **Datos de ejemplo** | Fijos en el código de la página. Las reservas son de enero de 2024. |
-| Calendario y navegación entre meses | **Real (en el navegador)** | Muestra los meses reales, pero la fecha elegida se guarda como enero de 2024. |
-| Horas ocupadas | **Simulado** | Siempre las mismas cuatro horas, sin importar el día ni el servicio. |
-| Datos del cliente | **No se usan** | Se pueden escribir, pero no se validan, no se muestran en la confirmación ni llegan al panel. |
-| «¡Reserva Confirmada!» | **Simulado** | No se crea ninguna reserva ni se envía correo, SMS o WhatsApp. |
-| Filtros del panel y cambio de estado | **Real (en el navegador)** | Funcionan sobre las cinco reservas de ejemplo mientras la página está abierta. |
-| Teléfono y correo del cliente en el detalle | **Simulado** | Los mismos para todas las reservas. |
-| Notas | **No funciona** | «Guardar Notas» no hace nada. |
-| Dónde se guardan los cambios | **En ninguna parte** | Solo en la memoria de la página: al recargar todo vuelve al estado inicial. La demo no llama al backend ni usa IA. |
+| Negocios, sedes, profesionales, servicios, precios, clientes y reservas iniciales | **Datos de ejemplo** | Ficticios. Las reservas se generan alrededor del día en que abres la demo (tres semanas atrás y dos adelante) y son siempre iguales para la misma fecha. Teléfonos del bloque 555 y correos de `example.com`. |
+| Calendario, festivos y horas libres | **Real (en el navegador)** | Calculados con los turnos, la duración, el alistamiento, los festivos de Colombia y las reservas existentes. Fechas y horas en hora de Bogotá. |
+| Validación del formulario y autorización de datos | **Real (en el navegador)** | Nombre, celular colombiano y autorización obligatorios; el correo se valida si se escribe. |
+| La reserva en la agenda, estados, reprogramación, notas y eliminación | **Real (en el navegador)** | Lo que haces en la Vista cliente aparece en la Vista negocio y al revés. |
+| Filtros, buscador, orden e indicadores | **Real (en el navegador)** | Calculados con las reservas que hay en ese momento. Los indicadores son de **datos de ejemplo**. |
+| Archivos `.ics` y CSV | **Real** | Se descargan de verdad; el CSV abre en Excel (separador `;` en español). |
+| «Añadir a Google Calendar» | **Real** | Enlace público de Google Calendar con el evento lleno; no hay integración ni sincronización. |
+| Pagos (abono o total con PSE, Nequi o tarjeta) | **Simulado** | No se cobra nada ni se piden datos de tarjeta; la referencia `SIM-…` es inventada. Cada pantalla lo dice. |
+| Confirmaciones, recordatorios y avisos de reprogramación y cancelación por WhatsApp y correo | **Simulado** | Son vistas previas y un historial; no se envía ningún mensaje. Las respuestas «Confirmar» y «Reprogramar» las da el visitante con los botones. |
+| «Ver como» (recepción o profesional) | **Simulado** | Filtro de la agenda; no hay usuarios ni roles. |
+| Dónde se guarda | **Navegador del visitante** | `localStorage` durante 7 días; después, o con «Restablecer datos», se regenera el ejemplo. La demo no llama al backend ni usa IA. |
 
 ---
 
@@ -225,7 +273,7 @@ Las tarjetas de servicio se apilan en una columna, el calendario ocupa todo el a
 *Tarjeta «Sistema de Reservas» en el hub, vista por un visitante sin sesión.*
 
 1. Insignia **Abierta** (junto a «Calendario»).
-2. Lo que **Incluye** según la tarjeta: «Gestión de disponibilidad», «Recordatorios», «Pagos online» y «Panel de administración». Recordatorios y pagos no existen en la demo (ver la limitación 1).
+2. Lo que **Incluye** según la tarjeta: «Gestión de disponibilidad», «Recordatorios», «Pagos online» y «Panel de administración». En la demo los recordatorios y los pagos son **simulados** (ver la limitación 1).
 3. **Probar Demo** abre `/demo/sistema-reservas`.
 4. **Solicitar demo guiada** abre `/solicitar-demo?demos=sistema-reservas`.
 
@@ -249,17 +297,13 @@ flowchart LR
 
 ## Limitaciones conocidas
 
-1. **Promete más de lo que hace.** La tarjeta del hub dice «Reservas online con calendario y notificaciones» e incluye «Recordatorios» y «Pagos online»; la descripción para buscadores de la página habla de «confirmaciones automáticas», «recordatorios por email/SMS», «Integración con Google Calendar» y «Multi-usuario». Nada de eso existe en la demo: no hay notificaciones, recordatorios, pagos, integración con calendarios ni usuarios.
-2. **No dice que es una demo.** A diferencia de las demos revisadas, no tiene el rótulo «Datos de ejemplo» ni explica qué es real. El mensaje «¡Reserva Confirmada! Tu cita ha sido agendada exitosamente» puede hacer creer al visitante que de verdad pidió una cita.
-3. **La fecha guardada siempre es de enero de 2024.** Elijas el mes que elijas, la reserva queda con fecha `2024-01-<día>`, y así sale en el paso Hora y en la confirmación.
-4. **El botón «Semana» no hace nada útil**: cambia de color, pero el calendario sigue en vista de mes.
-5. **El día resaltado como «hoy» se repite en todos los meses**: la demo compara solo el número del día (si hoy es 9, se resalta el 9 de cualquier mes).
-6. **Se pueden elegir días pasados**, y las horas ocupadas son las mismas para todos los días y servicios.
-7. **El formulario de datos no valida nada** y lo escrito no se usa: no aparece en la confirmación ni en el panel.
-8. **La reserva del visitante no llega al panel.** El panel solo muestra las cinco reservas de ejemplo de 2024.
-9. **Los filtros de fecha «Hoy», «Esta semana» y «Este mes» siempre dejan la tabla vacía**, porque todas las reservas son de 2024.
-10. **«Guardar Notas» es un botón muerto**: no guarda la nota ni muestra ningún aviso.
-11. **Todas las reservas muestran el mismo teléfono y el mismo correo** en el detalle.
-12. **El panel no pide inicio de sesión** (en la demo es a propósito, pero vale aclararlo si alguien pregunta por roles o permisos).
-13. **Nada se guarda.** Los cambios de estado se pierden al recargar la página.
-14. **La ventana de detalle no se cierra con Escape**, solo con la X.
+Son de diseño (es una demo con datos de ejemplo) o dependen de textos compartidos del sitio que no están en la demo:
+
+1. **La tarjeta del hub todavía dice «Recordatorios» y «Pagos online» sin aclarar que en la demo son simulados**, y la descripción del inicio habla de «notificaciones». La página de la demo y sus metadatos ya dicen solo lo que hace; el cambio de esos textos compartidos está pendiente en el catálogo.
+2. **Pagos y mensajes son simulados.** No hay pasarela de pagos, WhatsApp Business ni correo conectados; en un proyecto real se conectan a los que elija el cliente.
+3. **No hay sincronización con calendarios.** Se exporta e importa el archivo `.ics` o se usa el enlace de Google Calendar; la sincronización automática con el calendario de cada profesional es parte de la implementación.
+4. **Lo que haces vive solo en tu navegador** (`localStorage`): no se comparte con el equipo comercial ni entre dispositivos, y a los 7 días (o con «Restablecer datos») vuelve el ejemplo con fechas nuevas.
+5. **«Ver como» no es un inicio de sesión.** El panel no pide usuario a propósito; en un proyecto real cada persona entra con su rol.
+6. **Tres negocios fijos.** No hay personalización por prospecto (logo, servicios o profesionales propios), lista de espera, paquetes ni reprogramación arrastrando la cita.
+7. **La fecha y la hora salen del reloj del equipo** convertido a hora de Bogotá; si el reloj del equipo está mal, el calendario lo refleja. El selector de fecha de «Nueva reserva» y «Reprogramar» es el del navegador y muestra la fecha en su formato.
+8. **«Ver Planes y Precios»** del bloque azul del final lleva a los planes RAG, como en las demás demos (ver [Limitaciones comunes](Doc-07-Guia-de-Demos.md#limitaciones-comunes)).
