@@ -7,6 +7,8 @@ import User from '../models/User';
 import mongoose from 'mongoose';
 import { whatsappService } from '../services/whatsapp.service';
 import { logger } from '../utils/logger';
+import { sendError } from '../utils/http-error';
+import { isStaffSession } from '../middleware/access';
 
 // Obtener todos los pedidos del usuario
 export const getOrders = async (req: AuthRequest, res: Response) => {
@@ -540,5 +542,55 @@ export const cancelOrder = async (req: AuthRequest, res: Response) => {
       success: false,
       message: 'Error al cancelar pedido',
     });
+  }
+};
+
+/**
+ * GET /api/orders/:id/attachments/:attachmentId — descarga un adjunto del
+ * pedido. Lo pueden bajar el dueño del pedido y el equipo de KopTup (rol leído
+ * de la BD). El archivo se sirve siempre como descarga (`Content-Disposition:
+ * attachment`), nunca para mostrarse en el navegador.
+ */
+export const downloadOrderAttachment = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      sendError(res, 401, 'unauthorized', 'Inicia sesión para continuar.');
+      return;
+    }
+    const order = await Order.findOne({ orderId: String(req.params.id) }).select('userId attachments').lean();
+    if (!order) {
+      sendError(res, 404, 'not_found', 'Pedido no encontrado.');
+      return;
+    }
+    const isOwner = String(order.userId) === String(userId);
+    if (!isOwner && !(await isStaffSession(req))) {
+      sendError(res, 403, 'forbidden', 'No tienes permiso para ver este pedido.');
+      return;
+    }
+    const attachment = (order.attachments ?? []).find((a: any) => String(a._id) === String(req.params.attachmentId));
+    const storedName = path.basename(String((attachment as any)?.fileUrl ?? ''));
+    if (!attachment || !storedName || storedName === '.' || storedName === '..') {
+      sendError(res, 404, 'not_found', 'Este adjunto no existe.');
+      return;
+    }
+    const dir = path.resolve('./uploads/orders');
+    const filePath = path.join(dir, storedName);
+    try {
+      await fs.access(filePath);
+    } catch {
+      // Sin volumen en Railway, los archivos subidos se borran al redesplegar.
+      sendError(res, 410, 'file_unavailable', 'El archivo ya no está disponible en el servidor. Pídele al cliente que lo vuelva a subir.');
+      return;
+    }
+    res.setHeader('Cache-Control', 'private, no-store');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    const downloadName = String((attachment as any).fileName || storedName).replace(/[\r\n"]/g, '_');
+    res.download(filePath, downloadName, (err) => {
+      if (err && !res.headersSent) sendError(res, 500, 'internal_error', 'No pudimos enviar el archivo. Intenta de nuevo.');
+    });
+  } catch (error) {
+    logger.error('Download order attachment error:', error);
+    sendError(res, 500, 'internal_error', 'No pudimos enviar el archivo. Intenta de nuevo.');
   }
 };

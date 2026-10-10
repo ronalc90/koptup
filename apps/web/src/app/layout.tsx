@@ -118,10 +118,10 @@ async function getMessages(locale: string) {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  // Read locale from cookies (set by Navbar toggleLanguage)
+  // Idioma: cookie `locale` (la fija el selector del menú); solo `es` o `en`,
+  // español por defecto. Es la misma regla que src/i18n/request.ts.
   const cookieStore = cookies();
-  const localeCookie = cookieStore.get('locale');
-  const locale = localeCookie?.value || 'es'; // Default to Spanish
+  const locale = cookieStore.get('locale')?.value === 'en' ? 'en' : 'es';
 
   const messages = await getMessages(locale);
 

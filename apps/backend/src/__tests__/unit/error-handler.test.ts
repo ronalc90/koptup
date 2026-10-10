@@ -23,9 +23,18 @@ describe('clasificación de errores del manejador global', () => {
   });
 
   it('AppError conserva su estado; un error desconocido es 500 genérico', () => {
-    expect(classifyError(new AppError('No encontrado', 404))).toMatchObject({ status: 404, message: 'No encontrado' });
+    expect(classifyError(new AppError('No encontrado', 404))).toMatchObject({ status: 404, message: 'No encontrado', code: 'not_found' });
     const unknown = classifyError(new Error('detalle interno con ruta /srv/app'));
-    expect(unknown).toMatchObject({ status: 500, message: 'Internal server error' });
+    expect(unknown).toMatchObject({ status: 500, message: 'Ocurrió un error inesperado. Intenta de nuevo.', code: 'internal_error' });
+    expect(unknown.message).not.toContain('/srv/app');
+  });
+
+  it('AppError sin código propio recibe el del estado HTTP', () => {
+    expect(classifyError(new AppError('Inicia sesión', 401))).toMatchObject({ code: 'unauthorized' });
+    expect(classifyError(new AppError('Sin permiso', 403))).toMatchObject({ code: 'forbidden' });
+    expect(classifyError(new AppError('Datos', 400))).toMatchObject({ code: 'bad_request' });
+    expect(classifyError(new AppError('Falla', 500))).toMatchObject({ code: 'internal_error' });
+    expect(classifyError(new AppError('Con código', 401, 'invalid_credentials'))).toMatchObject({ code: 'invalid_credentials' });
   });
 
   it('datos inválidos de Mongoose (validación o id mal formado) → 400', () => {

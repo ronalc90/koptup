@@ -1,8 +1,8 @@
 # Operación y despliegue
 
-> **Resumen.** El código vive en GitHub. Cada push a `main` lo despliegan **dos plataformas por su cuenta**: **Vercel** construye la web (`www.koptup.com`) y **Railway** construye la API. GitHub Actions **solo verifica** (lint, tipos, pruebas y una suite de punta a punta con Playwright) y publica esta wiki; no despliega nada.
+> **Resumen.** El código vive en GitHub. Cada push a `main` lo despliegan **dos plataformas por su cuenta**: **Vercel** construye la web (`www.koptup.com`) y **Railway** construye la API. GitHub Actions **verifica** (lint, tipos, pruebas, una suite de punta a punta con Playwright y un job de seguridad), **vigila** cada 15 minutos que la web y la API respondan y publica esta wiki; no despliega nada.
 >
-> Aquí encuentras todas las variables de entorno reales de cada servicio, cómo levantar el sistema en tu computador, cómo correr las pruebas y nueve **runbooks**: procedimientos paso a paso para cuando algo falla. **Situación actual (9 de octubre de 2026):** la web funciona, pero el backend de Railway responde «Application not found». El runbook [9.1](#91-el-backend-está-caído-situación-actual) explica cómo recuperarlo.
+> Aquí encuentras todas las variables de entorno reales de cada servicio, cómo levantar el sistema en tu computador, cómo correr las pruebas, diez **runbooks** (procedimientos paso a paso para cuando algo falla) y lo que el dueño todavía debe configurar en las plataformas. **Situación actual (9 de octubre de 2026):** la web funciona, pero el backend de Railway responde «Application not found». El runbook [9.1](#91-el-backend-está-caído-situación-actual) explica cómo recuperarlo.
 
 ## Índice
 
@@ -12,12 +12,13 @@
 4. [Variables de entorno](#4-variables-de-entorno)
 5. [Levantar todo en local, paso a paso](#5-levantar-todo-en-local-paso-a-paso)
 6. [Pruebas: unitarias, de integración y de punta a punta](#6-pruebas-unitarias-de-integración-y-de-punta-a-punta)
-7. [Salud del sistema y registros](#7-salud-del-sistema-y-registros)
+7. [Salud del sistema, monitoreo y registros](#7-salud-del-sistema-monitoreo-y-registros)
 8. [Cómo se publica esta wiki](#8-cómo-se-publica-esta-wiki)
 9. [Runbooks: qué hacer cuando algo falla](#9-runbooks-qué-hacer-cuando-algo-falla)
-10. [Limitaciones conocidas](#10-limitaciones-conocidas)
-11. [Para desarrolladores: archivos clave](#11-para-desarrolladores-archivos-clave)
-12. [Páginas relacionadas](#12-páginas-relacionadas)
+10. [Acciones pendientes del dueño](#10-acciones-pendientes-del-dueño)
+11. [Limitaciones conocidas](#11-limitaciones-conocidas)
+12. [Para desarrolladores: archivos clave](#12-para-desarrolladores-archivos-clave)
+13. [Páginas relacionadas](#13-páginas-relacionadas)
 
 ---
 
@@ -35,6 +36,7 @@ flowchart LR
     MAIN["GitHub: rama main"]:::externo
     CI["GitHub Actions: CI (solo verifica)"]:::externo
     WIKI["GitHub Actions: Publicar wiki"]:::externo
+    MON["GitHub Actions: Monitoreo cada 15 min"]:::externo
     GW["Wiki de GitHub"]:::externo
     VB["Vercel: build de apps/web (next build)"]:::externo
     RB["Railway: build de apps/backend (Nixpacks)"]:::externo
@@ -53,6 +55,8 @@ flowchart LR
     MAIN -->|"integración de Vercel"| VB --> WEB
     MAIN -->|"integración de Railway"| RB --> API
     VIS --> WEB
+    MON -->|"GET /"| WEB
+    MON -->|"GET /health"| API
     WEB -->|"NEXT_PUBLIC_API_URL"| API
     API --> DB
     API --> RD
@@ -60,11 +64,11 @@ flowchart LR
     API --> MAIL
 ```
 
-*Un merge a `main` dispara tres cosas en paralelo: CI (verifica), Vercel (web) y Railway (API). La API está en rojo porque hoy no responde.*
+*Un merge a `main` dispara tres cosas en paralelo: CI (verifica), Vercel (web) y Railway (API). Aparte, el monitoreo revisa cada 15 minutos que la web y la API respondan. La API está en rojo porque hoy no responde.*
 
 Tres ideas para quedarse:
 
-1. **CI no es una puerta.** Vercel y Railway despliegan `main` sin esperar a que CI termine, y `main` no exige CI en verde para fusionar. Una prueba en rojo **no** frena el despliegue (ver [Limitaciones](#10-limitaciones-conocidas)).
+1. **CI todavía no es una puerta.** Vercel y Railway despliegan `main` sin esperar a que CI termine, y `main` no exige CI en verde para fusionar: una prueba en rojo **no** frena el despliegue hasta que el dueño active la protección de `main` ([acciones pendientes](#10-acciones-pendientes-del-dueño)).
 2. **La web y la API se despliegan por separado.** Puedes revertir una sin tocar la otra ([runbook 9.9](#99-revertir-un-despliegue)).
 3. **Las variables `NEXT_PUBLIC_*` se fijan al compilar la web.** Cambiarlas en Vercel no tiene efecto hasta que vuelvas a desplegar.
 
@@ -75,12 +79,14 @@ Tres ideas para quedarse:
 | Pieza | Dónde corre | Cómo se despliega | Configuración en el repositorio |
 |---|---|---|---|
 | **Web** (Next.js 14) | Vercel, proyecto `koptup` (tiene los dominios `www.koptup.com` y `koptup.com`), región `iad1` | Integración de Vercel con GitHub: cada push a `main` va a producción; las demás ramas crean una vista previa | `apps/web/vercel.json` (`npm install`, `next build`) y `apps/web/.env.production` (solo URL públicas) |
-| **API** (Express) | Railway, un servicio con `apps/backend` | Integración de Railway con GitHub: build con Nixpacks (`npm install && npm run build`), arranque con `npm run start` (`node dist/index.js`) | `apps/backend/railway.json` (chequeo `GET /health/live`, 120 s, reinicio si falla hasta 10 veces) y `apps/backend/Procfile` |
+| **API** (Express) | Railway, un servicio con `apps/backend` | Integración de Railway con GitHub: build con Nixpacks (`npm install && npm run build`), arranque con `npm run start` (`node dist/index.js`) | `apps/backend/railway.json` (una instancia, chequeo `GET /health` —200 solo con MongoDB conectado—, 120 s, reinicio si falla hasta 10 veces) y `apps/backend/Procfile` |
 | **Base de datos** | MongoDB (la cadena de conexión está en Railway, nunca en el repositorio) | Fuera del repositorio | — |
 | **Caché, cupos y gasto de IA** | Redis (en Railway) | Fuera del repositorio | — |
 | **IA** | OpenAI, modelo `gpt-4o-mini` por defecto | — | — |
 | **Correo y WhatsApp** | Servidor SMTP y Twilio, WhatsApp Business o UltraMsg | — | — |
-| **CI y wiki** | GitHub Actions | Automático | `.github/workflows/ci.yml` y `.github/workflows/wiki-sync.yml` |
+| **CI, monitoreo y wiki** | GitHub Actions | Automático | `.github/workflows/ci.yml`, `.github/workflows/monitor.yml` y `.github/workflows/wiki-sync.yml` |
+
+**Archivos subidos en Railway:** los adjuntos de pedidos y los archivos de cuentas médicas se guardan en `uploads/` (en Railway, `/app/uploads`). Sin un volumen montado en esa ruta se borran en cada despliegue ([acciones pendientes](#10-acciones-pendientes-del-dueño)). Los bots del chatbot y sus conversaciones viven en MongoDB, y los registros (`logs/`) se consultan en la plataforma.
 
 `koptup.com` (sin www) responde con una redirección permanente a `https://www.koptup.com/`. Las vistas previas de Vercel (ramas distintas de `main`) están protegidas con el inicio de sesión de Vercel; los dominios propios no.
 
@@ -128,6 +134,11 @@ flowchart TD
         E4["Suite de Playwright: escritorio, móvil y catálogo"]:::sistema
         E1 --> E2 --> E3 --> E4
     end
+    subgraph J5["Job seguridad"]
+        S1["npm audit de dependencias de producción"]:::sistema
+        S2["gitleaks: archivos y commits nuevos"]:::sistema
+        S1 --> S2
+    end
     R{"¿Todo en verde?"}
     OK["Listo para revisar y fusionar"]:::sistema
     KO["Revisa los logs y el reporte de Playwright"]:::error
@@ -135,15 +146,17 @@ flowchart TD
     T --> J1
     T --> J2
     T --> J3
+    T --> J5
     B3 -->|"needs: build"| J4
     J1 --> R
     J2 --> R
     J4 --> R
+    J5 --> R
     R -->|"Sí"| OK
     R -->|"No"| KO
 ```
 
-*Cuatro jobs: tres empiezan a la vez y el de punta a punta espera los compilados del build.*
+*Cinco jobs: cuatro empiezan a la vez y el de punta a punta espera los compilados del build.*
 
 | Job | Qué verifica | Falla si… |
 |---|---|---|
@@ -152,6 +165,7 @@ flowchart TD
 | **Pruebas unitarias (web)** | Jest con jsdom: cada demo se renderiza con los textos reales en español y se prueba el middleware de acceso | Una página lanza un error, no pinta nada o usa una clave de traducción que no existe |
 | **Build** | `tsc` del backend y `next build` de la web | El código no compila |
 | **E2E (Playwright)** | Solicitud → aprobación → activación → acceso → revocación, permisos, cambio de modo desde el panel, contacto, «Prueba con tu documento» con un PDF, humo de todas las páginas y demos | Un recorrido real se rompió |
+| **Seguridad** | `npm audit` de las dependencias de producción con umbral alto (`scripts/audit-check.mjs`) y gitleaks sobre los archivos y los commits nuevos del push o del PR (`.gitleaks.toml`) | Aparece una alerta alta o crítica que nadie revisó, vence la fecha de revisión de `.github/audit-allowlist.json` o un commit trae algo con forma de secreto |
 
 Tiempos reales de la última corrida sobre `main` (8 de octubre de 2026, hora UTC; 9 minutos en total):
 
@@ -172,7 +186,9 @@ gantt
 
 *La suite de punta a punta es la parte más larga (unos 5 minutos) porque espera al build.*
 
-Los valores de entorno que usa CI (por ejemplo, los dos JWT de prueba) son ficticios y viven en el propio workflow: CI **no usa ningún secreto** de GitHub. El paso a paso con diagrama del ciclo PR → merge está en [Flujos de administración y operación › 7](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#7-despliegue).
+Los valores de entorno que usa CI (por ejemplo, los dos JWT de prueba) son ficticios y viven en el propio workflow: CI **no usa ningún secreto** de GitHub.
+
+**Job de seguridad.** Las alertas altas o críticas de dependencias que ya se revisaron y solo se corrigen con un cambio de versión mayor están en `.github/audit-allowlist.json`, con el motivo y una fecha límite de revisión (`revisarAntesDe`): el job las muestra como aviso en cada corrida y falla con cualquier alerta nueva o cuando la fecha vence. gitleaks solo revisa los commits nuevos (los del PR o los del push), no toda la historia. Para correrlo igual en tu computador: `node scripts/audit-check.mjs` y, con el binario de gitleaks instalado, `gitleaks dir . --config .gitleaks.toml` en una copia sin `node_modules`. El paso a paso con diagrama del ciclo PR → merge está en [Flujos de administración y operación › 7](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#7-despliegue).
 
 ---
 
@@ -210,13 +226,14 @@ flowchart LR
 
 | Variable | ¿Obligatoria? | Por defecto | Qué hace |
 |---|---|---|---|
-| `NEXT_PUBLIC_API_URL` | Sí en la práctica | La de `apps/web/.env.production` (la URL pública de la API en Railway); si tampoco existe, la misma URL escrita en `src/lib/backend-url.ts` | URL del backend. La usan el navegador, el middleware que protege `/admin`, `/dashboard` y las demos con acceso, y la CSP (`connect-src`). Cambiarla exige redesplegar |
+| `NEXT_PUBLIC_API_URL` | Sí en la práctica | En Vercel y en `next build`/`next start`: la de `apps/web/.env.production` (la URL pública de la API en Railway). En `next dev` y en las pruebas: `http://localhost:3001` (`src/lib/backend-url.ts`), para que un entorno de desarrollo nunca llame a producción | URL del backend. La usan el navegador, el middleware que protege `/admin`, `/dashboard` y las demos con acceso, y la CSP (`connect-src`). Cambiarla exige redesplegar |
 | `INTERNAL_API_KEY` | Opcional (solo servidor, nunca `NEXT_PUBLIC_`) | — | Clave compartida con el backend: el middleware y el proxy de LinkedIn Ads informan la IP real del visitante. Debe ser **igual** en Vercel y en Railway |
 | `NEXT_PUBLIC_GA_ID` | Opcional | — | ID de Google Analytics 4 (`G-…`). Ver [SEO, analítica y legal](Doc-12-SEO-Analitica-y-Legal.md#3-analítica) |
 | `NEXT_PUBLIC_GOOGLE_ADS_ID` | Opcional | — | Etiqueta de Google Ads (`AW-…` o solo el número) |
 | `NEXT_PUBLIC_LINKEDIN_PARTNER_ID` | Opcional | — | Partner ID numérico de LinkedIn Insight Tag |
-| `NEXT_PUBLIC_SITE_URL` | No se usa | `https://www.koptup.com` en `.env.production` | **Sin efecto:** el dominio canónico está fijo en `src/lib/site.ts` |
 | `_next_intl_trailing_slash` | Interna | `false` | La define `next.config.js` para `next-intl`. No la toques |
+
+El dominio canónico del sitio está fijo en `src/lib/site.ts`: no hay variable para cambiarlo. Si el proyecto de Vercel todavía tiene `NEXT_PUBLIC_SITE_URL`, se puede borrar (el código no la lee).
 
 ### 4.3 Backend (Railway)
 
@@ -237,7 +254,7 @@ flowchart LR
 | `FRONTEND_URL` | Recomendada: `https://www.koptup.com` | `http://localhost:3000` | Base de los enlaces que arma el backend: activación (`/activar/<token>`), Mis demos, restablecer contraseña, correos y regreso del login con Google. El generador de LinkedIn usa `https://www.koptup.com` si falta |
 | `CORS_ORIGIN` | Opcional | — | Orígenes extra, separados por coma. En producción siempre se aceptan `https://koptup.com` y `https://www.koptup.com` |
 | `TRUST_PROXY_HOPS` | Recomendada: `1` | `1` | Proxies delante de la API (Railway = 1). Define la IP real del visitante para los cupos por IP |
-| `INTERNAL_API_KEY` | Opcional (igual que en Vercel) | — | Acepta la IP real que informa la web en `X-Client-IP`. Sin ella, esas peticiones cuentan con la IP de salida de Vercel |
+| `INTERNAL_API_KEY` | Recomendada (igual que en Vercel) | — | Acepta la IP real que informa la web en `X-Client-IP`. Sin ella, esas peticiones cuentan con la IP de salida de Vercel, y el arranque lo avisa |
 | `API_URL` | Opcional | `http://localhost:3001` | URL que muestra `/api-docs` y base del enlace de descarga de facturas |
 | `API_DOCS_ENABLED` | Opcional | `false` | `/api-docs` solo existe fuera de producción o con `true`. No la actives en el entorno público |
 
@@ -247,7 +264,7 @@ flowchart LR
 |---|---|---|---|
 | `REDIS_URL` | Recomendada | `redis://localhost:6379` | Tokens de renovación, cupos compartidos, gasto mensual de IA y candado del job de vencimiento |
 | `JWT_EXPIRES_IN` | Opcional | `15m` | Vida del token de acceso |
-| `JWT_REFRESH_EXPIRES_IN` | Opcional | `7d` | Vida del token de renovación (Redis lo guarda 7 días fijos) |
+| `JWT_REFRESH_EXPIRES_IN` | Opcional | `7d` | Vida de la sesión renovable (`7d`, `12h`, `3600`…). La misma cifra firma el token y vence su copia en Redis. Máximo 7 días, lo que dura la cookie de la web: un valor mayor o inválido usa 7 días y deja un aviso al arrancar |
 | `RATE_LIMIT_WINDOW_MS` | Opcional | `900000` (15 min) | Ventana del límite general de la API |
 | `RATE_LIMIT_MAX_REQUESTS` | Opcional | `100` | Peticiones por ventana, por cuenta (con sesión) o por IP |
 | `AUTH_ME_RATE_LIMIT_MAX` | Opcional | `120` por minuto | Cupo de `GET /api/auth/me` y `GET /api/demo-access/<slug>`, que la web consulta en cada navegación protegida |
@@ -280,7 +297,7 @@ Un tope con un valor inválido o negativo deja esa función en 0, es decir, apag
 
 | Variable | ¿Obligatoria? | Por defecto | Qué hace |
 |---|---|---|---|
-| `DEMO_UPLOAD_ENABLED` | Para encenderla: `true` | `false` | Encendido explícito. Además necesita Redis conectado y `OPENAI_API_KEY` ([runbook 9.3](#93-encender-prueba-con-tu-documento)) |
+| `DEMO_UPLOAD_ENABLED` | Para encenderla: `true` | `false` | Encendido explícito. Además necesita Redis conectado y `OPENAI_API_KEY` ([runbook 9.3](#93-encender-prueba-con-tu-documento)). Si falta, el arranque avisa que la función quedó apagada (con `false` explícito no avisa) |
 | `DEMO_RAG_TTL_SECONDS` | **No la definas en Railway** | — | Solo pruebas locales: acorta la hora de vida de los documentos. Se ignora con `NODE_ENV=production` |
 
 **Sistema de demos y datos personales**
@@ -300,9 +317,9 @@ Un tope con un valor inválido o negativo deja esa función en 0, es decir, apag
 | `SMTP_HOST` | Opcional | `smtp.gmail.com` | Servidor de correo |
 | `SMTP_PORT` | Opcional | `587` | Puerto |
 | `SMTP_SECURE` | Opcional | `false` | `true` para el puerto 465 |
-| `SMTP_USER`, `SMTP_PASS` | Necesarias para enviar | — | Sin las dos **no sale ningún correo** (acuse de solicitud, aprobación con enlace, recordatorio, restablecer contraseña, avisos al equipo) |
+| `SMTP_USER`, `SMTP_PASS` | Necesarias para enviar | — | Sin las dos **no sale ningún correo** (acuse de solicitud, aprobación con enlace, recordatorio, restablecer contraseña, avisos al equipo). Son las que revisa el arranque: si falta alguna, deja el aviso `[env] SMTP_USER y SMTP_PASS: …` |
 | `EMAIL_FROM` | Opcional | `KopTup <noreply@koptup.com>` | Remitente |
-| `ADMIN_EMAIL` | Recomendada | Una dirección fija del código (avisos) | Destino de los avisos al equipo y cuenta que el arranque asegura como admin (si ya está registrada) |
+| `ADMIN_EMAIL` | Recomendada | — | Destino de los avisos al equipo por correo: sin ella **no salen** (no hay dirección fija en el código) y el arranque lo avisa. Además, el arranque le da el rol admin a esa cuenta solo si existe, está activa y **no hay ningún otro admin**; el cambio queda en la bitácora ([runbook 9.4](#94-crear-o-recuperar-el-admin)) |
 | `WHATSAPP_PROVIDER` | Opcional | `twilio` | `twilio`, `whatsapp-business` o `ultramsg` |
 | `ADMIN_WHATSAPP_NUMBER` | Para avisos por WhatsApp | — | Número que recibe los avisos. Sin él, WhatsApp queda apagado |
 | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_NUMBER` | Con `twilio` | — | Credenciales de Twilio |
@@ -379,7 +396,7 @@ flowchart LR
    docker run -d --name koptup-redis -p 6379:6379 redis:7
    ```
 
-   Redis es opcional para navegar, pero sin él la sesión no se renueva (dura 15 minutos) y las funciones de IA públicas se apagan. `docker-compose.dev.yml` también levanta los dos, pero crea MongoDB con usuario y contraseña: tendrías que ponerlos en `MONGODB_URI`.
+   O, con el compose del repositorio, `npm run docker:up` (`docker-compose.dev.yml`: los dos sin contraseña y publicados solo en `127.0.0.1`; `npm run docker:down` los detiene). Redis es opcional para navegar, pero sin él la sesión no se renueva (dura 15 minutos) y las funciones de IA públicas se apagan.
 
 3. **(Opcional) Arranca el mock de OpenAI**, si no quieres gastar en la IA real. Responde «Respuesta simulada (mock de OpenAI)…» y cita el primer fragmento que recibe:
 
@@ -409,7 +426,7 @@ flowchart LR
    NEXT_PUBLIC_API_URL=http://localhost:3001
    ```
 
-   **Importante:** sin ese archivo la web en desarrollo llama a la **API de producción** (la URL escrita como respaldo en `src/lib/backend-url.ts`). No copies `apps/web/.env.example` tal cual: también apunta a producción.
+   También sirve `cp apps/web/.env.example apps/web/.env.local`: la plantilla apunta a `http://localhost:3001`. Sin el archivo, `next dev` usa igual `http://localhost:3001`. **No pongas la URL de producción en `.env.local`**: lo que pruebes crearía cuentas, solicitudes y leads reales. La URL pública solo está en `apps/web/.env.production`, que Next carga en `next build` y `next start`.
 
 7. **Arranca la web:**
 
@@ -420,12 +437,15 @@ flowchart LR
    El script `predev` regenera los mensajes agregados de las demos antes de arrancar.
 
 8. **Crea tu cuenta admin:** regístrate en `http://localhost:3000/register` y dale el rol de una de estas dos formas:
-   - agrega `ADMIN_EMAIL=tu-correo@ejemplo.co` en `apps/backend/.env` y reinicia el backend (nodemon no se reinicia solo por cambios en `.env`), o
-   - corre el script desde `apps/backend`, pasándole la base (el script no lee `.env`):
+   - corre el script desde `apps/backend` (lee `apps/backend/.env`; una `MONGODB_URI` escrita en la terminal tiene prioridad):
 
      ```bash
-     MONGODB_URI=mongodb://localhost:27017/koptup_db npx ts-node --transpile-only src/scripts/set-admin.ts tu-correo@ejemplo.co
+     npx ts-node --transpile-only src/scripts/set-admin.ts tu-correo@ejemplo.co
      ```
+
+   - o agrega `ADMIN_EMAIL=tu-correo@ejemplo.co` en `apps/backend/.env` y reinicia el backend (nodemon no se reinicia solo por cambios en `.env`): funciona solo si en esa base **no hay ningún otro admin**.
+
+   Los dos caminos quedan en la bitácora (`user.role_change` con el origen).
 
    Cierra sesión y vuelve a entrar: el panel queda en `http://localhost:3000/admin`. El catálogo de 28 demos se siembra solo al arrancar el backend.
 
@@ -449,9 +469,9 @@ flowchart LR
 
 | Tipo | Dónde viven | Cuántas hay | Cómo se corren | Qué necesitan |
 |---|---|---|---|---|
-| **Unitarias del backend** | `apps/backend/src/__tests__/unit/`, `src/modules/*/__tests__/`, `src/services/__tests__/`, `src/utils/__tests__/` | 23 archivos | `npm test --workspace=apps/backend` | Nada |
-| **Integración del backend** | `apps/backend/src/__tests__/integration/` (permisos, demos, chatbot, topes de gasto, perfil) | 5 archivos | `MONGODB_URI_TEST=mongodb://127.0.0.1:27017/koptup_test REDIS_URL_TEST=redis://127.0.0.1:6379/15 npm test --workspace=apps/backend` | MongoDB y Redis **solo de pruebas** (cada archivo crea y borra su base; se borran claves de Redis) |
-| **Web** | `apps/web/src/**/*.test.ts(x)` (humo de las demos, middleware de acceso, catálogo) | 38 archivos | `npm test --workspace=apps/web` | Nada (no salen a la red) |
+| **Unitarias del backend** | `apps/backend/src/__tests__/unit/`, `src/services/__tests__/`, `src/utils/__tests__/` | 18 archivos | `npm test --workspace=apps/backend` | Nada |
+| **Integración del backend** | `apps/backend/src/__tests__/integration/` (permisos, demos, chatbot, topes de gasto, perfil, privacidad, operación…) | 14 archivos | `MONGODB_URI_TEST=mongodb://127.0.0.1:27017/koptup_test REDIS_URL_TEST=redis://127.0.0.1:6379/15 npm test --workspace=apps/backend` | MongoDB y Redis **solo de pruebas** (cada archivo crea y borra su base; se borran claves de Redis) |
+| **Web** | `apps/web/src/**/*.test.ts(x)` (humo de las demos, middleware de acceso, catálogo) | 43 archivos | `npm test --workspace=apps/web` | Nada (no salen a la red) |
 | **Punta a punta** | `apps/web/e2e/*.spec.ts` | 10 archivos, en escritorio, móvil (Pixel 7) y un proyecto «catalogo» | `npm run test:e2e` con la web y el backend ya levantados | MongoDB, Redis, mock de OpenAI, backend y web compilados |
 
 Atajos desde la raíz: `npm test` (Jest de los dos), `npm run lint`, `npm run typecheck` y `npm run test:e2e`.
@@ -467,14 +487,13 @@ La suite siembra sus propios datos por la API con emails en el dominio reservado
 
 ---
 
-## 7. Salud del sistema y registros
-
-No hay monitoreo automático configurado en el repositorio. Estas son las señales disponibles:
+## 7. Salud del sistema, monitoreo y registros
 
 | Señal | Dónde | Qué te dice |
 |---|---|---|
-| `GET /health/live` | Backend | `200 {"status":"alive"}` si el proceso responde. Es el chequeo que usa Railway al desplegar |
-| `GET /health` | Backend | `200 healthy` con `mongo: connected`, o `503` si MongoDB no está conectado. Úsalo para saber si la API está **lista** |
+| `GET /health` | Backend | `200 healthy` con `mongo: connected`, o `503` si MongoDB no está conectado. Es el chequeo que usa Railway al desplegar (un despliegue sin base no entra en servicio y el anterior sigue atendiendo) y el que revisa el monitoreo |
+| `GET /health/live` | Backend | `200 {"status":"alive"}` si el proceso responde, aunque no haya base. Sirve para distinguir «el proceso no arranca» de «no hay base de datos» |
+| Monitoreo (workflow **Monitoreo**) | GitHub Actions, cada 15 minutos | Si `https://www.koptup.com` y `<BACKEND_HEALTH_URL>` responden. Si algo falla tres veces seguidas en la misma corrida, la corrida queda en rojo y GitHub envía un correo |
 | `GET /api/demo-rag/status` | Backend | Si «Prueba con tu documento» está encendida y por qué no (`disabled`, `unavailable`, `budget_exhausted`) |
 | `GET /api/demo-catalog` | Backend | El catálogo de demos que ve la web; si falla, la web usa su tabla de respaldo |
 | Registros del servicio | Railway | Cada petición (método, ruta, estado, IP y navegador), los avisos `[env]` del arranque y los errores |
@@ -489,7 +508,43 @@ No hay monitoreo automático configurado en el repositorio. Estas son las señal
 3. **`budgetExhausted`:** si se alcanzó el tope del mes (nunca muestra montos).
 4. **Límites públicos:** 3 documentos por IP al día, 10 preguntas por documento, 60 minutos de vida, 5 MB y 30 páginas.
 
-Las respuestas de `/health` y del catálogo, con capturas, están en [Arquitectura](Doc-01-Arquitectura.md#41-carga-de-una-página-pública). El backend también escribe `logs/error.log` y `logs/combined.log`, pero en Railway el disco se borra con cada despliegue: confía en los registros de la plataforma.
+Las respuestas de `/health` y del catálogo, con capturas, están en [Arquitectura](Doc-01-Arquitectura.md#41-carga-de-una-página-pública).
+
+### 7.1 Monitoreo con GitHub Actions
+
+El workflow `.github/workflows/monitor.yml` corre cada 15 minutos (y a mano desde la pestaña **Actions**) el script `scripts/uptime-check.sh`:
+
+1. `GET https://www.koptup.com` debe responder 2xx o 3xx (sigue redirecciones).
+2. `GET <BACKEND_HEALTH_URL>` debe responder 200. Un 503 cuenta como caída: la API está arriba pero sin base de datos, y el sitio no puede iniciar sesiones ni guardar solicitudes.
+3. Cada URL se intenta tres veces, con 15 segundos entre intentos, para no alertar por un corte de segundos.
+
+```mermaid
+flowchart LR
+    classDef sistema fill:#e0e7ff,stroke:#4f46e5,color:#312e81
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#7f1d1d
+    classDef admin fill:#fef3c7,stroke:#d97706,color:#78350f
+    classDef decision fill:#fef3c7,stroke:#d97706,color:#0f172a
+
+    C["Cada 15 min: workflow Monitoreo"]:::sistema --> W{"¿La web responde?"}:::decision
+    W -->|"Sí"| V{"¿BACKEND_HEALTH_URL definida?"}:::decision
+    W -->|"No, 3 intentos"| F["Corrida en rojo"]:::error
+    V -->|"No"| A["Aviso en la corrida: API sin monitorear"]:::admin
+    V -->|"Sí"| H{"¿/health responde 200?"}:::decision
+    H -->|"Sí"| OK["Corrida en verde"]:::sistema
+    H -->|"No, 3 intentos"| F
+    F --> M["GitHub envía un correo"]:::admin
+```
+
+*Qué revisa cada corrida del monitoreo y cuándo avisa.*
+
+**Para que funcione** (una sola vez, ver [acciones pendientes](#10-acciones-pendientes-del-dueño)):
+
+- Crea la variable del repositorio `BACKEND_HEALTH_URL` en *Settings › Secrets and variables › Actions › Variables* con la URL pública de la API terminada en `/health`. Es una variable, no un secreto: la URL ya es pública. Sin ella el workflow solo revisa la web y deja un aviso.
+- Revisa que tu cuenta reciba los correos de Actions (*Settings › Notifications › Actions* de tu perfil): GitHub avisa de las corridas programadas fallidas a la cuenta que creó el workflow o cambió por última vez su programación (`cron`), normalmente quien fusiona este cambio en `main`.
+
+**Ten en cuenta:** los workflows programados solo corren desde `main` (empieza a funcionar cuando este archivo llegue a `main`); GitHub puede atrasar unos minutos las corridas programadas; y si el repositorio pasa 60 días sin actividad, GitHub pausa el workflow y hay que reactivarlo en *Actions › Monitoreo › Enable workflow*. Cuando llegue una alerta, sigue el [runbook 9.10](#910-el-monitoreo-avisó-una-caída).
+
+Para probar el chequeo contra tu entorno local: `scripts/uptime-check.sh http://localhost:3000 http://localhost:3001/health`. El backend también escribe `logs/error.log` y `logs/combined.log`, pero en Railway el disco se borra con cada despliegue: confía en los registros de la plataforma.
 
 ---
 
@@ -505,7 +560,7 @@ sequenceDiagram
     participant A as Actions: Publicar wiki
     participant W as Wiki de GitHub
 
-    D->>G: push con cambios en docs/wiki (main o la rama de trabajo)
+    D->>G: push con cambios en docs/wiki a main (o ejecución manual)
     G->>A: dispara el workflow (uno a la vez, sin cancelar el anterior)
     A->>W: clona el repositorio .wiki.git con GITHUB_TOKEN
     alt la wiki no está activada
@@ -530,7 +585,7 @@ Reglas para quien edita:
 - **Edita siempre en `docs/wiki/`**, nunca en la web de la wiki: la siguiente publicación borra lo que se haya cambiado allá.
 - Enlaza entre páginas con `[Texto](Nombre-Pagina.md)`; el workflow quita el `.md` al publicar. Las imágenes van en `docs/wiki/images/`.
 - Valida los diagramas Mermaid antes de subir (la wiki de GitHub los dibuja; un error de sintaxis se ve como texto).
-- El workflow se dispara con push a `main` **y** a la rama de trabajo `ccr-55ceecf7-dpc10i`, así que la wiki puede mostrar páginas que todavía no están en `main` (ver [Limitaciones](#10-limitaciones-conocidas)).
+- El workflow se dispara solo con push a `main`, así que la wiki muestra lo que ya está en `main`. Para publicar otra rama (por ejemplo, para revisar una documentación antes de fusionarla), lánzalo a mano desde *Actions › Publicar wiki › Run workflow* eligiendo esa rama: la siguiente publicación desde `main` vuelve a dejarla igual a `main`.
 
 ---
 
@@ -552,6 +607,7 @@ flowchart LR
     S7["Un correo no llega"]:::error --> R7["9.7 El correo no sale"]:::admin
     S8["Una demo dice No se pudo verificar o En mantenimiento"]:::error --> R8["9.8 Demo no disponible"]:::admin
     S9["El último despliegue rompió algo"]:::error --> R9["9.9 Revertir"]:::admin
+    S10["Llegó un correo del monitoreo"]:::error --> R10["9.10 Caída detectada"]:::admin
 ```
 
 *Busca el síntoma a la izquierda y ve al runbook de la derecha.*
@@ -579,12 +635,13 @@ flowchart LR
    3. Agrega un Redis al proyecto y copia su URL en `REDIS_URL`.
    4. Carga las variables de la [sección 4.3](#43-backend-railway). Mínimo: `NODE_ENV=production`, `MONGODB_URI`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, `FRONTEND_URL=https://www.koptup.com`, `TRUST_PROXY_HOPS=1`, `OPENAI_API_KEY` y `ADMIN_EMAIL`. Aprovecha para usar **secretos nuevos** ([9.2](#92-rotar-secretos)).
    5. Genera un dominio público para el servicio.
+   6. Monta un volumen en `/app/uploads` para que los archivos subidos no se borren en cada despliegue, y pon `<dominio>/health` en la variable `BACKEND_HEALTH_URL` del repositorio ([acciones pendientes](#10-acciones-pendientes-del-dueño)).
 4. **Si el dominio de la API cambió:** en Vercel (proyecto `koptup`, entorno *Production*) pon la nueva URL en `NEXT_PUBLIC_API_URL` y **redespliega la web** (*Deployments › ⋯ › Redeploy*). La misma variable alimenta la CSP, así que no hay que tocar código. Después actualiza también `apps/web/.env.production` en el repositorio para que no quede desalineado.
 5. **Si responde 5xx o se reinicia en bucle:** abre los registros del despliegue en Railway.
    - `Configuración incompleta: MONGODB_URI, JWT_SECRET` → falta esa variable.
    - Avisos `[env] …` → no detienen el arranque, pero dicen qué función quedó apagada.
    - Otro error al arrancar justo después de un despliegue → revierte ([9.9](#99-revertir-un-despliegue)).
-6. **Espera el chequeo de Railway:** el despliegue entra en servicio cuando `/health/live` responde antes de 120 segundos.
+6. **Espera el chequeo de Railway:** el despliegue entra en servicio cuando `/health` responde 200 (con MongoDB conectado) antes de 120 segundos. Si no lo logra, Railway marca el despliegue como fallido y deja el anterior; revisa `MONGODB_URI` y que la base acepte conexiones desde Railway.
 7. **Verifica de afuera hacia adentro:**
    1. `GET /health` → `200` con `mongo: connected`. Si da `503`, revisa `MONGODB_URI` y que la base acepte conexiones desde Railway.
    2. `GET /api/demo-catalog` → lista de 28 demos.
@@ -646,7 +703,7 @@ La función **falla cerrada**: solo se enciende si se cumplen las tres condicion
 1. Consulta `GET <URL de la API>/api/demo-rag/status` y lee `reason`.
 2. En Railway, define lo que falte: `DEMO_UPLOAD_ENABLED=true`, `REDIS_URL` (Redis del proyecto) y `OPENAI_API_KEY`. Recomendadas: `TRUST_PROXY_HOPS=1` (cupo de 3 documentos por IP al día), `MONGODB_URI` (guarda el email como lead con origen `demo-rag`) y, si quieres, `DEMO_MONTHLY_BUDGET_USD`.
 3. Redespliega la API.
-4. **Verifica:** `status` debe responder `"enabled": true` y `"reason": null` (captura de la [sección 7](#7-salud-del-sistema-y-registros)). Luego sube un PDF corto en `/demo/chatbot?mode=upload` y haz una pregunta.
+4. **Verifica:** `status` debe responder `"enabled": true` y `"reason": null` (captura de la [sección 7](#7-salud-del-sistema-monitoreo-y-registros)). Luego sube un PDF corto en `/demo/chatbot?mode=upload` y haz una pregunta.
 
 **Para apagarla**, pon `DEMO_UPLOAD_ENABLED=false` (o bórrala) y redespliega. La demo con los documentos de ejemplo sigue funcionando.
 
@@ -656,8 +713,8 @@ Hay tres vías para dar el rol `admin` y ninguna se puede hacer desde fuera del 
 
 | Vía | Cuándo usarla | Cómo |
 |---|---|---|
-| `ADMIN_EMAIL` | Primer admin o recuperar el rol | Variable en Railway; en **cada arranque** la API asegura el rol admin de esa cuenta (si ya está registrada) |
-| Script `set-admin` | Dar el rol a otra cuenta sin redesplegar | `railway run npx ts-node --transpile-only src/scripts/set-admin.ts <email>` desde `apps/backend` (Railway inyecta `MONGODB_URI`) |
+| `ADMIN_EMAIL` | Primer admin o recuperar el panel cuando no queda ningún admin | Variable en Railway; al arrancar, la API le da el rol admin a esa cuenta **solo si existe, está activa y no hay ningún otro admin**. Queda en la bitácora |
+| Script `set-admin` | Dar el rol a otra cuenta sin redesplegar | `railway run npx ts-node --transpile-only src/scripts/set-admin.ts <email>` desde `apps/backend` (Railway inyecta `MONGODB_URI`; en local el script lee `apps/backend/.env`). Queda en la bitácora |
 | Admin › Usuarios | Ya tienes un admin | Cambia el rol en el panel ([Manual del administrador › 7](Doc-06-Manual-del-Administrador.md#7-usuarios-y-roles)) |
 
 `railway run` ejecuta el comando **en tu computador** con las variables del servicio: necesitas la CLI de Railway, haber corrido `npm install` y que la base de datos acepte conexiones desde tu red.
@@ -665,16 +722,16 @@ Hay tres vías para dar el rol `admin` y ninguna se puede hacer desde fuera del 
 **Crear el primer admin**
 
 1. Registra la cuenta en `https://www.koptup.com/register` (o usa una que ya exista).
-2. Pon su email en `ADMIN_EMAIL` en Railway y redespliega. En el registro del arranque debe aparecer «Rol admin asegurado para ADMIN_EMAIL»; si dice «ADMIN_EMAIL no corresponde a ningún usuario registrado», la cuenta no existe todavía.
+2. Pon su email en `ADMIN_EMAIL` en Railway y redespliega. En el registro del arranque debe aparecer «Rol admin asignado a ADMIN_EMAIL (no había ningún admin)». Si dice «ADMIN_EMAIL no corresponde a ningún usuario registrado», la cuenta no existe todavía; si dice «ya existe otra cuenta admin», usa el script `set-admin` o el panel.
 3. Cierra sesión y vuelve a entrar: el panel decide qué mostrar con el rol guardado al iniciar sesión.
 
 **Olvidaste la contraseña**
 
 1. Usa «¿Olvidaste tu contraseña?» en `/login`. Llega un enlace que vale **1 hora** y sirve una sola vez. Necesita SMTP ([9.7](#97-el-correo-no-sale)).
-2. Si el correo no está configurado, el enlace no llega y no hay forma de verlo en el panel: registra otra cuenta y conviértela en admin con `ADMIN_EMAIL` o con el script. Desde ella puedes seguir operando.
+2. Si el correo no está configurado, el enlace no llega y no hay forma de verlo en el panel: registra otra cuenta y conviértela en admin con el script `set-admin` (`ADMIN_EMAIL` no sirve aquí, porque la cuenta vieja sigue siendo admin). Desde ella puedes seguir operando.
 3. Las cuentas creadas con Google no tienen contraseña: entra con «Continuar con Google» (requiere `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET`).
 
-**Alguien le quitó el rol a la cuenta de `ADMIN_EMAIL`:** se recupera solo en el siguiente arranque o despliegue de la API.
+**Alguien le quitó el rol a la cuenta de `ADMIN_EMAIL`:** si queda otro admin, el arranque **no** se lo devuelve (así una decisión tomada desde el panel no se deshace sola); pídeselo a ese admin o usa el script. Si no queda ningún admin, el siguiente arranque se lo devuelve y lo deja en la bitácora.
 
 ### 9.5 Cambiar el modo de una demo
 
@@ -726,11 +783,11 @@ Un valor inválido o negativo en la variable deja la función en 0, es decir, ap
    - «Se envió» → el servidor lo entregó: pide revisar spam y que el email esté bien escrito.
 2. **Configura el SMTP en Railway:** `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS` y `EMAIL_FROM`. Sin `SMTP_HOST` se usa el servidor de Gmail.
 3. **Revisa `FRONTEND_URL`:** si un correo llega con un enlace a `localhost`, falta `https://www.koptup.com`.
-4. **Avisos al equipo:** van a `ADMIN_EMAIL` y, por WhatsApp, a `ADMIN_WHATSAPP_NUMBER` con las variables del proveedor elegido.
+4. **Avisos al equipo:** van a `ADMIN_EMAIL` (sin ella no salen por correo y el log lo dice: no hay una dirección de respaldo) y, por WhatsApp, a `ADMIN_WHATSAPP_NUMBER` con las variables del proveedor elegido.
 5. **Recordatorios de vencimiento:** además del SMTP, el job debe estar encendido (`DEMO_GRANTS_JOB_ENABLED` distinto de `false`); corre cada hora y avisa 3 días antes.
 6. **Redespliega** y prueba con «¿Olvidaste tu contraseña?» usando tu cuenta.
 
-El aviso de arranque `[env] SMTP_HOST: no está definida` puede confundir: lo que decide si sale correo son `SMTP_USER` y `SMTP_PASS`.
+El arranque avisa por `SMTP_USER` y `SMTP_PASS`, que son las que deciden si sale correo; `SMTP_HOST` es opcional (sin ella se usa el servidor de Gmail).
 
 ### 9.8 Una demo muestra «No se pudo verificar» o «En mantenimiento»
 
@@ -773,7 +830,7 @@ Si la causa fue una **variable** y no el código, restáurala en Vercel y redesp
 **API (Railway)**
 
 1. En el servicio del backend › **Deployments**, elige el despliegue anterior y usa **Redeploy** (o *Rollback*).
-2. Espera el chequeo `/health/live` y verifica `GET /health`.
+2. Espera el chequeo `/health` de Railway y verifica `GET /health` desde el navegador.
 
 **Corregir `main` (definitivo)**
 
@@ -783,40 +840,66 @@ Si la causa fue una **variable** y no el código, restáurala en Vercel y redesp
 
 El diagrama de este procedimiento está en [Flujos de administración › 9.6](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#96-revertir-un-despliegue).
 
+### 9.10 El monitoreo avisó una caída
+
+**Síntoma.** Llega un correo de GitHub «Run failed: Monitoreo» o la pestaña *Actions* muestra la corrida en rojo.
+
+1. **Abre la corrida** y lee el paso «Revisar la web y la salud de la API»: dice qué URL falló y qué respondió (`000` = no hubo respuesta; `503` en `/health` = API sin base de datos; `404` con «Application not found» = Railway no tiene servicio en ese dominio).
+2. **Confirma desde tu navegador** la misma URL. Si ya responde, fue un corte breve: lanza el workflow a mano (*Run workflow*) para confirmar que vuelve a verde.
+3. **Si la web no responde:** revisa el estado del despliegue en Vercel (proyecto `koptup`) y, si el último despliegue la rompió, [revierte](#99-revertir-un-despliegue).
+4. **Si la API no responde o da 503:** sigue el [runbook 9.1](#91-el-backend-está-caído-situación-actual) desde el paso 1.
+5. **Cuando vuelva**, la siguiente corrida programada queda en verde; GitHub no envía correo de recuperación.
+
 ---
 
-## 10. Limitaciones conocidas
+## 10. Acciones pendientes del dueño
+
+Configuraciones que viven en las plataformas y no se pueden hacer desde el código. Ninguna cambia el comportamiento del sitio para los visitantes; todas reducen el riesgo de una caída o de un despliegue roto.
+
+| # | Qué hacer | Dónde | Por qué |
+|---|---|---|---|
+| 1 | **Proteger `main` con CI obligatorio:** exigir pull request y que pasen los checks «Lint y tipos», «Pruebas unitarias (backend)», «Pruebas unitarias (web)», «Build», «E2E (Playwright)» y «Seguridad (dependencias y secretos)» | GitHub › *Settings › Rules › Rulesets* (o *Branches › Branch protection rules*) sobre `main` | Hoy un merge con CI en rojo llega a producción |
+| 2 | **Que Railway espere a CI:** activar la opción «Wait for CI» (esperar los checks de GitHub antes de desplegar) | Railway › servicio del backend › *Settings* (sección del repositorio conectado) | Railway despliega cada push a `main` sin mirar CI |
+| 3 | **Dejar un solo proyecto de Vercel:** conservar `koptup` (el que tiene `www.koptup.com` y `koptup.com`), copiar a él cualquier variable que solo exista en `koptup-web` y desconectar o borrar `koptup-web` | Vercel › `koptup-web` › *Settings › Git › Disconnect* (o *Settings › General › Delete Project*) | Los dos construyen cada push a `main`: doble build y riesgo de cambiar una variable en el proyecto equivocado |
+| 4 | **Montar un volumen para los archivos subidos** en la ruta `/app/uploads` del servicio del backend | Railway › servicio del backend › *Volumes › New volume* (mount path `/app/uploads`) | Sin volumen, los adjuntos de pedidos y los archivos de cuentas médicas se borran en cada despliegue. Con volumen, un redespliegue puede dejar la API unos segundos sin servicio |
+| 5 | **Activar el monitoreo:** crear la variable `BACKEND_HEALTH_URL` con `<URL pública de la API>/health` y revisar que lleguen los correos de Actions | GitHub › *Settings › Secrets and variables › Actions › Variables*; tu perfil › *Settings › Notifications* | Sin la variable, el monitoreo solo revisa la web ([7.1](#71-monitoreo-con-github-actions)) |
+| 6 | **Definir `ADMIN_EMAIL`, `SMTP_USER`, `SMTP_PASS` e `INTERNAL_API_KEY`** en Railway (y la última también en Vercel) | Railway › *Variables*; Vercel › *Settings › Environment Variables* | Sin ellas no salen los avisos al equipo ni los correos, y los cupos por IP de las peticiones de la web cuentan con la IP de Vercel. El arranque avisa cuáles faltan |
+| 7 | **Revisar las alertas de dependencias antes del 31 de diciembre de 2026** (fecha de `.github/audit-allowlist.json`): migrar la web a una versión mayor de Next o volver a revisarlas | Repositorio | Cuando vence la fecha, el job Seguridad falla hasta que alguien las revise |
+| 8 | **Borrar `NEXT_PUBLIC_SITE_URL`** del proyecto de Vercel si existe (opcional) | Vercel › *Settings › Environment Variables* | El código no la lee: evita pensar que cambia el dominio |
+
+La rotación de las credenciales que estuvieron en el historial del repositorio y el redespliegue del backend siguen en [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md#acciones-del-dueño) y en el [runbook 9.2](#92-rotar-secretos).
+
+---
+
+## 11. Limitaciones conocidas
 
 | # | Qué pasa | Efecto |
 |---|---|---|
 | 1 | **El backend de producción no responde** («Application not found» de Railway) | Todo lo que necesita la API falla en `www.koptup.com` ([9.1](#91-el-backend-está-caído-situación-actual)) |
-| 2 | **CI no protege `main`:** GitHub no exige CI en verde y Vercel y Railway no esperan a CI | Un merge con pruebas en rojo llega a producción |
-| 3 | **Dos proyectos de Vercel construyen el mismo repositorio:** `koptup` (con los dominios) y `koptup-web` (sin dominio propio). Los dos despliegan cada push a `main` | Doble compilación y riesgo de cambiar una variable en el proyecto equivocado: el que sirve `www.koptup.com` es `koptup` |
-| 4 | **La wiki también se publica desde la rama de trabajo** `ccr-55ceecf7-dpc10i` | La wiki puede adelantarse a `main` |
-| 5 | **Sin `apps/web/.env.local`, la web en desarrollo usa la API de producción** (respaldo escrito en `src/lib/backend-url.ts`), y `apps/web/.env.example` también apunta a producción | Un desarrollador nuevo puede probar contra producción sin darse cuenta |
-| 6 | **Plantillas y guías viejas:** `.env.example` de la raíz habla de PostgreSQL; `SETUP.md` usa `MONGO_URI` (el código lee `MONGODB_URI`); `docker-compose.yml` apunta a un `apps/backend/Dockerfile` que no existe y el `Dockerfile` de la web usa Node 18 | Siguiendo esas guías el sistema no arranca. Usa esta página o el `README.md` |
-| 7 | **`.env.example` del backend y el `README.md` dicen que sin `JWT_REFRESH_SECRET` no arranca**; el código arranca con un aviso | Un despliegue sin ella parece sano y nadie puede iniciar sesión |
-| 8 | **El arranque no revisa** `DEMO_UPLOAD_ENABLED`, `INTERNAL_API_KEY`, `SMTP_USER` ni `SMTP_PASS`, y avisa por `SMTP_HOST`, que no es la que decide | Funciones apagadas sin aviso, o un aviso que no corresponde |
-| 9 | **El chequeo de Railway (`/health/live`) no mira la base** | Un despliegue sin MongoDB queda «sano» mientras `/health` responde 503 |
-| 10 | **`NEXT_PUBLIC_SITE_URL` no tiene efecto** y `JWT_REFRESH_EXPIRES_IN` mayor a 7 días tampoco (Redis guarda la renovación 7 días fijos) | Variables que parecen configurar algo y no lo hacen |
-| 11 | **Disco efímero en Railway:** el estado del chatbot (`data/chatbots`), los archivos subidos sin S3 y los `logs/` se borran en cada despliegue | Bots creados en «Configura el tuyo» y su historial se pierden al desplegar |
-| 12 | **No hay monitoreo ni alertas** configurados | Una caída se descubre a mano, como la actual |
-| 13 | **Sin forma de restablecer la contraseña de otra cuenta** desde el panel, y sin SMTP no llega el enlace de recuperación | Recuperar el acceso exige crear otra cuenta y darle el rol ([9.4](#94-crear-o-recuperar-el-admin)) |
-| 14 | **En la pantalla de una demo desactivada las dos etiquetas dicen «En mantenimiento»** (la del modo y la del estado) | Detalle visual repetido |
+| 2 | **CI no protege `main`** hasta que el dueño active la protección ([acción 1 y 2](#10-acciones-pendientes-del-dueño)) | Un merge con pruebas en rojo llega a producción |
+| 3 | **Dos proyectos de Vercel construyen el mismo repositorio** (`koptup`, con los dominios, y `koptup-web`) hasta que el dueño deje uno ([acción 3](#10-acciones-pendientes-del-dueño)) | Doble compilación y riesgo de cambiar una variable en el proyecto equivocado: el que sirve `www.koptup.com` es `koptup` |
+| 4 | **Archivos subidos en disco:** sin el volumen de Railway ([acción 4](#10-acciones-pendientes-del-dueño)), los adjuntos de pedidos y los archivos de cuentas médicas se borran en cada despliegue; los `logs/` del disco también (usa los registros de Railway) | Un archivo subido puede desaparecer después de un despliegue |
+| 5 | **Una sola instancia de la API** (`numReplicas: 1` en `railway.json`): los documentos de «Prueba con tu documento», los límites generales por IP y las cachés viven en la memoria del proceso | Para correr más de una instancia hay que pasar ese estado a Redis primero; mientras tanto, no subas las réplicas en Railway |
+| 6 | **El monitoreo depende de GitHub Actions:** corre cada 15 minutos (GitHub puede atrasarlo), solo desde `main`, y se pausa si el repositorio pasa 60 días sin actividad | Una caída puede tardar hasta unos 20 minutos en avisarse ([7.1](#71-monitoreo-con-github-actions)) |
+| 7 | **Sin forma de restablecer la contraseña de otra cuenta** desde el panel, y sin SMTP no llega el enlace de recuperación | Recuperar el acceso exige crear otra cuenta y darle el rol ([9.4](#94-crear-o-recuperar-el-admin)) |
+| 8 | **En la pantalla de una demo desactivada las dos etiquetas dicen «En mantenimiento»** (la del modo y la del estado) | Detalle visual repetido |
 
 ---
 
-## 11. Para desarrolladores: archivos clave
+## 12. Para desarrolladores: archivos clave
 
 | Tema | Archivo |
 |---|---|
 | CI | `.github/workflows/ci.yml` |
+| Seguridad (CI) | `scripts/audit-check.mjs`, `.github/audit-allowlist.json`, `.gitleaks.toml` |
+| Monitoreo | `.github/workflows/monitor.yml`, `scripts/uptime-check.sh` |
 | Publicación de la wiki | `.github/workflows/wiki-sync.yml` |
 | Despliegue de la API | `apps/backend/railway.json`, `apps/backend/Procfile`, `apps/backend/package.json` (`build`, `start`, `engines`) |
 | Despliegue de la web | `apps/web/vercel.json`, `apps/web/.env.production`, `apps/web/next.config.js` (CSP y cabeceras) |
 | Validación de variables | `apps/backend/src/config/env.ts` |
-| Arranque | `apps/backend/src/index.ts` (orden de arranque, `ADMIN_EMAIL`, semilla del catálogo, job) |
-| Salud | `apps/backend/src/app.ts` (`/health/live`, `/health`, CORS) |
+| Arranque | `apps/backend/src/index.ts` (orden de arranque, semilla del catálogo, jobs) y `apps/backend/src/services/admin-bootstrap.service.ts` (regla de `ADMIN_EMAIL`) |
+| Salud y formato de error | `apps/backend/src/app.ts` (`/health/live`, `/health`, CORS) y `apps/backend/src/utils/http-error.ts` (`{ success: false, code, message }`) |
+| Desarrollo local | `docker-compose.dev.yml` (MongoDB y Redis), `SETUP.md` |
 | URL del backend en la web | `apps/web/src/lib/backend-url.ts` |
 | Topes de IA | `apps/backend/src/services/ai-budget.service.ts` |
 | «Prueba con tu documento» | `apps/backend/src/services/demo-rag.service.ts`, `apps/backend/src/routes/demo-rag.routes.ts` |
@@ -828,7 +911,7 @@ El diagrama de este procedimiento está en [Flujos de administración › 9.6](D
 
 ---
 
-## 12. Páginas relacionadas
+## 13. Páginas relacionadas
 
 - [Arquitectura](Doc-01-Arquitectura.md): las piezas y cómo se hablan.
 - [Flujos de administración y operación](Doc-14-2-Flujos-de-Administracion-y-Operacion.md): diagramas de despliegue, publicación de la wiki y runbooks.

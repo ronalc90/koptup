@@ -35,7 +35,7 @@
 | Ruta heredada | `/demo/ecommerce/admin`: panel antiguo con pestañas Dashboard, Products, Orders y Customers. No está enlazado desde la demo | `admin/page.tsx` (1.012 líneas) |
 | Estado compartido | `CartProvider` comparte carrito y vista activa entre Tienda y Checkout. Vendedor, Operaciones y Admin no leen ese estado | `components/shared.tsx` |
 | Datos | 24 productos fijos en **USD**, con marcas de terceros y fotos de Unsplash reutilizadas en ciclo. Pedidos, envíos y devoluciones con fechas fijas de mayo de 2026 | `components/products.ts`, constantes `MOCK_ORDERS`, `SHIPMENTS`, `RETURNS` |
-| Backend | No existe módulo de e-commerce. Relacionados, en memoria y **no montados**: `apps/backend/src/modules/e-invoicing/` y `modules/pos/` | `apps/backend/src/index.ts` |
+| Backend | No existe módulo de e-commerce. Relacionados, en memoria y **no montados**: `apps/backend/src/modules/e-invoicing/` (retirado del repositorio en octubre de 2026: está en el historial de git) y `modules/pos/` | `apps/backend/src/index.ts` |
 | i18n ES/EN | `apps/web/messages/demos/ecommerce.{es,en}.json` (256 líneas c/u). El namespace `demoEcommerce2` está en uso; `demoEcommercePro` (~4 KB) no lo usa ningún componente. La ruta heredada usa `demoEcommerce` y `adminPanel` y escribe sus datos en inglés directamente en el código | `grep demoEcommercePro` solo aparece en los JSON |
 | Tests | **No tiene** carpeta `__tests__` (loyalty y delivery sí tienen smoke test) | |
 | Tamaño | 2.789 líneas: 1.777 de la demo actual (page 94, layout 22 y 7 componentes) y 1.012 de la ruta heredada | `wc -l` |

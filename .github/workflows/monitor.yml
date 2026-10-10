@@ -1,0 +1,46 @@
+# Monitoreo de disponibilidad de KopTup.
+#
+# Cada 15 minutos revisa que respondan:
+#   - la web pública: https://www.koptup.com (2xx o 3xx);
+#   - la salud de la API: GET <BACKEND_HEALTH_URL> (200; 503 = API sin base
+#     de datos). BACKEND_HEALTH_URL es una VARIABLE del repositorio (no un
+#     secreto): Settings › Secrets and variables › Actions › Variables, con la
+#     URL pública del backend terminada en /health.
+#
+# Si algo no responde tras 3 intentos, la corrida falla y GitHub envía un
+# correo a la cuenta que creó el workflow o cambió por última vez su `cron`
+# (normalmente quien lo fusiona en main; revisa Settings › Notifications ›
+# Actions de esa cuenta). Los workflows programados solo
+# corren desde la rama por defecto (main), y GitHub los pausa si el
+# repositorio pasa 60 días sin actividad: entonces hay que reactivarlo en la
+# pestaña Actions. El paso a paso está en docs/wiki/Doc-11-Operacion-y-Despliegue.md.
+name: Monitoreo
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: monitoreo
+  cancel-in-progress: false
+
+jobs:
+  disponibilidad:
+    name: Web y API responden
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts/uptime-check.sh
+          sparse-checkout-cone-mode: false
+
+      - name: Revisar la web y la salud de la API
+        env:
+          WEB_URL: https://www.koptup.com
+          BACKEND_HEALTH_URL: ${{ vars.BACKEND_HEALTH_URL }}
+        run: bash scripts/uptime-check.sh "$WEB_URL" "$BACKEND_HEALTH_URL"

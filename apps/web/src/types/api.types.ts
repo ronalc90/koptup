@@ -51,16 +51,6 @@ export interface ContactFormData {
   };
 }
 
-export interface QuoteRequestData {
-  name: string;
-  email: string;
-  phone?: string;
-  company?: string;
-  serviceType: string;
-  description: string;
-  budget?: string;
-}
-
 // ============================================================================
 // PROJECT TYPES
 // ============================================================================

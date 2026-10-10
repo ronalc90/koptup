@@ -1,0 +1,18 @@
+# Configuración de gitleaks para el job "Seguridad" de CI (.github/workflows/ci.yml).
+# Usa las reglas por defecto de gitleaks y solo excluye los valores ficticios
+# de las pruebas (contraseñas y claves de mentira que crean las propias
+# pruebas). Un secreto real nunca va en el repositorio, tampoco en una prueba.
+title = "KopTup"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Valores ficticios de las pruebas (Jest y Playwright)"
+targetRules = ["generic-api-key"]
+paths = [
+  '''^apps/backend/src/__tests__/''',
+  '''^apps/backend/src/test/''',
+  '''^apps/web/e2e/''',
+  '''^apps/web/src/(.+/)?__tests__/''',
+]

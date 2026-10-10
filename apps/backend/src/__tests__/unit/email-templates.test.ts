@@ -17,7 +17,7 @@ interface Captured {
 
 describe('plantillas de correo con datos del usuario', () => {
   const captured: Captured[] = [];
-  const prev = { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS };
+  const prev = { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS, admin: process.env.ADMIN_EMAIL };
   let templates: {
     email: typeof import('../../services/email.service');
     demo: typeof import('../../services/demo-emails.service');
@@ -28,6 +28,7 @@ describe('plantillas de correo con datos del usuario', () => {
   beforeAll(async () => {
     process.env.SMTP_USER = 'prueba@example.com';
     process.env.SMTP_PASS = 'no-es-real';
+    process.env.ADMIN_EMAIL = 'equipo@example.com';
     jest.resetModules();
     const email = await import('../../services/email.service');
     // Transporte falso: captura el mensaje en vez de enviarlo.
@@ -50,6 +51,8 @@ describe('plantillas de correo con datos del usuario', () => {
     else process.env.SMTP_USER = prev.user;
     if (prev.pass === undefined) delete process.env.SMTP_PASS;
     else process.env.SMTP_PASS = prev.pass;
+    if (prev.admin === undefined) delete process.env.ADMIN_EMAIL;
+    else process.env.ADMIN_EMAIL = prev.admin;
   });
 
   beforeEach(() => {
@@ -116,7 +119,27 @@ describe('plantillas de correo con datos del usuario', () => {
   it('avisos internos al equipo (team-notify)', async () => {
     await templates.team.notifyTeam({ asunto: `${HOSTILE_SUBJECT}${HOSTILE}`, lineas: [HOSTILE, `Correo: ${HOSTILE}`], enlace: HOSTILE_URL });
     expect(captured.length).toBeGreaterThan(0);
+    expect(captured[0].to).toBe('equipo@example.com');
     captured.forEach(expectSafe);
+  });
+
+  it('sin ADMIN_EMAIL no hay destino fijo: los avisos al equipo no salen por correo', async () => {
+    const config = (templates.email.emailService as unknown as { config: { adminEmail: string | null } }).config;
+    const saved = config.adminEmail;
+    config.adminEmail = null;
+    try {
+      expect(templates.email.emailService.getAdminEmail()).toBeNull();
+      const sent = await templates.email.emailService.sendContactNotification({ name: 'Ana', email: 'ana@example.com', service: 'RAG', message: 'Hola' });
+      expect(sent).toBe(false);
+      const result = await templates.team.notifyTeam({ asunto: 'Solicitud nueva', lineas: ['Ana pidió una demo'] });
+      expect(result.email).toBe(false);
+      // Un responsable en copia sí recibe el aviso.
+      const withCopy = await templates.team.notifyTeam({ asunto: 'Lead asignado', lineas: ['Hola'], copiaA: ['responsable@example.com'] });
+      expect(withCopy.email).toBe(true);
+      expect(captured.map((m) => m.to)).toEqual(['responsable@example.com']);
+    } finally {
+      config.adminEmail = saved;
+    }
   });
 
   it('safeHref y safeSubject', async () => {

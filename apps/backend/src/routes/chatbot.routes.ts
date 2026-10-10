@@ -31,6 +31,7 @@ import { logger } from '../utils/logger';
 import { AppError, asyncHandler } from '../middleware/errorHandler';
 import { isStaffRole, loadFreshUser, readBearer } from '../middleware/access';
 import type { AuthRequest } from '../types';
+import { errorBody, sendError } from '../utils/http-error';
 
 const router = Router();
 
@@ -193,6 +194,19 @@ function snapshot() {
   });
 }
 
+/**
+ * Errores de /bots con el formato único `{ success: false, code, message }`
+ * (utils/http-error.ts), más datos útiles cuando aplica (`field`, `max`).
+ * Ojo: el chat responde 200 con `error` (`budget_exhausted`,
+ * `llm_provider_error`) cuando contesta en modo extractivo: no es un error,
+ * es el motivo del modo.
+ */
+const BOT_NOT_FOUND_MESSAGE = 'Este bot no existe o ya fue borrado.';
+const FIELD_ERROR_MESSAGES: Record<string, string> = {
+  invalid_field: 'Revisa el campo: tiene un valor no válido.',
+  field_too_long: 'Revisa el campo: es demasiado largo.',
+};
+
 // --- Propiedad ---------------------------------------------------------------
 
 function hashOwnerToken(token: string): string {
@@ -246,29 +260,23 @@ function isOwner(bot: BotConfig, tokens: string[]): boolean {
 async function requireOwner(req: Request, res: Response): Promise<BotConfig | null> {
   const bot = botsStore.get(req.params.botId);
   if (!bot) {
-    res.status(404).json({ error: 'bot_not_found' });
+    sendError(res, 404, 'bot_not_found', BOT_NOT_FOUND_MESSAGE);
     return null;
   }
   if (!bot.ownerTokenHash) {
     const bearer = readBearer(req as AuthRequest);
     const fresh = bearer.user ? await loadFreshUser(bearer.user.id) : null;
     if (fresh && fresh !== 'db_unavailable' && isStaffRole(fresh.role)) return bot;
-    res.status(403).json({
-      error: 'legacy_bot_staff_only',
-      message: 'Este bot no tiene un propietario registrado: solo el equipo de KopTup puede administrarlo.',
-    });
+    sendError(res, 403, 'legacy_bot_staff_only', 'Este bot no tiene un propietario registrado: solo el equipo de KopTup puede administrarlo.');
     return null;
   }
   const tokens = readOwnerTokens(req);
   if (tokens.length === 0) {
-    res.status(401).json({
-      error: 'owner_token_required',
-      message: `Envía el token del propietario del bot en la cabecera ${OWNER_TOKEN_HEADER}.`,
-    });
+    sendError(res, 401, 'owner_token_required', `Envía el token del propietario del bot en la cabecera ${OWNER_TOKEN_HEADER}.`);
     return null;
   }
   if (!isOwner(bot, tokens)) {
-    res.status(403).json({ error: 'forbidden_not_owner', message: 'Este bot pertenece a otro usuario.' });
+    sendError(res, 403, 'forbidden_not_owner', 'Este bot pertenece a otro usuario.');
     return null;
   }
   return bot;
@@ -384,7 +392,7 @@ const createBotLimiter = rateLimit({
   max: parseInt(process.env.CHATBOT_CREATE_LIMIT_PER_HOUR || '30', 10) || 30,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'rate_limited', message: 'Creaste demasiados bots. Intenta de nuevo más tarde.' },
+  message: errorBody('rate_limited', 'Creaste demasiados bots en la última hora. Intenta de nuevo más tarde.'),
 });
 
 /**
@@ -401,7 +409,7 @@ router.post('/bots', createBotLimiter, asyncHandler(async (req: Request, res: Re
 
   const parsed = parseConfigPatch(body);
   if ('error' in parsed) {
-    res.status(400).json({ error: parsed.error, field: parsed.field });
+    sendError(res, 400, parsed.error, FIELD_ERROR_MESSAGES[parsed.error] ?? 'Revisa los datos del bot.', { field: parsed.field });
     return;
   }
 
@@ -418,7 +426,7 @@ router.post('/bots', createBotLimiter, asyncHandler(async (req: Request, res: Re
   }
 
   if (botsStore.size >= BOT_LIMITS.maxBots) {
-    res.status(503).json({ error: 'capacity', message: 'La demo alcanzó su capacidad de bots. Intenta más tarde.' });
+    sendError(res, 503, 'capacity', 'La demo alcanzó su capacidad de bots. Intenta más tarde.');
     return;
   }
 
@@ -481,7 +489,7 @@ router.get('/bots', (req: Request, res: Response) => {
 router.get('/bots/:botId', (req: Request, res: Response) => {
   const bot = botsStore.get(req.params.botId);
   if (!bot) {
-    res.status(404).json({ error: 'bot_not_found' });
+    sendError(res, 404, 'bot_not_found', BOT_NOT_FOUND_MESSAGE);
     return;
   }
   if (isOwner(bot, readOwnerTokens(req))) {
@@ -497,7 +505,7 @@ router.patch('/bots/:botId', asyncHandler(async (req: Request, res: Response) =>
   if (!bot) return;
   const parsed = parseConfigPatch(req.body);
   if ('error' in parsed) {
-    res.status(400).json({ error: parsed.error, field: parsed.field });
+    sendError(res, 400, parsed.error, FIELD_ERROR_MESSAGES[parsed.error] ?? 'Revisa los datos del bot.', { field: parsed.field });
     return;
   }
   Object.assign(bot, parsed.patch);
@@ -537,15 +545,15 @@ router.post('/bots/:botId/docs', asyncHandler(async (req: Request, res: Response
   if (!bot) return;
   const incoming = Array.isArray(req.body?.files) ? req.body.files : [];
   if (incoming.length === 0) {
-    res.status(400).json({ error: 'no_files' });
+    sendError(res, 400, 'no_files', 'Adjunta al menos un archivo.');
     return;
   }
   if (incoming.length > BOT_LIMITS.maxFilesPerRequest) {
-    res.status(400).json({ error: 'too_many_files', max: BOT_LIMITS.maxFilesPerRequest });
+    sendError(res, 400, 'too_many_files', `Puedes subir máximo ${BOT_LIMITS.maxFilesPerRequest} archivos a la vez.`, { max: BOT_LIMITS.maxFilesPerRequest });
     return;
   }
   if (bot.docs.length + incoming.length > BOT_LIMITS.maxDocsPerBot) {
-    res.status(400).json({ error: 'too_many_docs', max: BOT_LIMITS.maxDocsPerBot });
+    sendError(res, 400, 'too_many_docs', `Cada bot admite máximo ${BOT_LIMITS.maxDocsPerBot} documentos.`, { max: BOT_LIMITS.maxDocsPerBot });
     return;
   }
 
@@ -615,7 +623,7 @@ router.post('/bots/:botId/docs', asyncHandler(async (req: Request, res: Response
     res.status(201).json({ docs: bot.docs, added, errors });
     return;
   }
-  res.status(422).json({ error: 'no_valid_files', docs: bot.docs, added, errors });
+  sendError(res, 422, 'no_valid_files', 'No pudimos leer ninguno de los archivos.', { docs: bot.docs, added, errors });
 }));
 
 /** DELETE /bots/:botId/docs/:docId — borra metadata + chunks asociados. [dueño] */
@@ -642,15 +650,15 @@ router.post('/bots/:botId/urls', asyncHandler(async (req: Request, res: Response
   if (!bot) return;
   const urls = Array.isArray(req.body?.urls) ? req.body.urls : [];
   if (urls.length === 0) {
-    res.status(400).json({ error: 'no_urls' });
+    sendError(res, 400, 'no_urls', 'Escribe al menos una URL.');
     return;
   }
   if (urls.length > BOT_LIMITS.maxUrlsPerRequest) {
-    res.status(400).json({ error: 'too_many_urls', max: BOT_LIMITS.maxUrlsPerRequest });
+    sendError(res, 400, 'too_many_urls', `Puedes agregar máximo ${BOT_LIMITS.maxUrlsPerRequest} URL a la vez.`, { max: BOT_LIMITS.maxUrlsPerRequest });
     return;
   }
   if (bot.docs.length + urls.length > BOT_LIMITS.maxDocsPerBot) {
-    res.status(400).json({ error: 'too_many_docs', max: BOT_LIMITS.maxDocsPerBot });
+    sendError(res, 400, 'too_many_docs', `Cada bot admite máximo ${BOT_LIMITS.maxDocsPerBot} documentos.`, { max: BOT_LIMITS.maxDocsPerBot });
     return;
   }
 
@@ -796,21 +804,21 @@ router.post('/bots/:botId/chat', async (req: Request, res: Response) => {
   const botId = req.params.botId;
   const bot = botsStore.get(botId);
   if (!bot) {
-    res.status(404).json({ error: 'bot_not_found' });
+    sendError(res, 404, 'bot_not_found', BOT_NOT_FOUND_MESSAGE);
     return;
   }
   const message = typeof req.body?.message === 'string' ? req.body.message.trim() : '';
   if (!message) {
-    res.status(400).json({ error: 'empty_message' });
+    sendError(res, 400, 'empty_message', 'Escribe un mensaje.');
     return;
   }
   if (message.length > BOT_LIMITS.maxMessageChars) {
-    res.status(400).json({ error: 'message_too_long', max: BOT_LIMITS.maxMessageChars });
+    sendError(res, 400, 'message_too_long', `El mensaje supera ${BOT_LIMITS.maxMessageChars} caracteres.`, { max: BOT_LIMITS.maxMessageChars });
     return;
   }
   const history = sanitizeHistory(req.body?.history);
   if (history === 'too_long') {
-    res.status(400).json({ error: 'history_too_long', max: BOT_LIMITS.maxHistoryInput });
+    sendError(res, 400, 'history_too_long', `El historial supera ${BOT_LIMITS.maxHistoryInput} mensajes.`, { max: BOT_LIMITS.maxHistoryInput });
     return;
   }
 

@@ -11,6 +11,11 @@
 #                  la plataforma de punta a punta (solicitud → aprobación →
 #                  activación → acceso → revocación, permisos, modo de acceso
 #                  desde el panel, contacto y la demo RAG con un PDF)
+#   5. seguridad -> npm audit de las dependencias de producción (falla con
+#                  una alerta alta o crítica que no esté revisada en
+#                  .github/audit-allowlist.json; ver scripts/audit-check.mjs)
+#                  y gitleaks (secretos en los archivos y en los commits
+#                  nuevos del push o del pull request; .gitleaks.toml)
 #
 # Despliegue: este workflow NO despliega. La web la despliega la integración
 # de Vercel con GitHub y la API la despliega Railway desde main (ver README).
@@ -69,6 +74,59 @@ jobs:
 
       - name: Títulos de página
         run: npm run check-titles --workspace=apps/web
+
+  seguridad:
+    name: Seguridad (dependencias y secretos)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Historia completa: gitleaks revisa los commits nuevos del push o del PR.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Dependencias de producción (npm audit, umbral alto)
+        run: node scripts/audit-check.mjs
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+          cache: false
+
+      - name: Instalar gitleaks (versión fija, verificada por el proxy de módulos de Go)
+        run: go install github.com/zricethezav/gitleaks/v8@v8.30.1
+
+      - name: Secretos en los archivos del repositorio
+        run: |
+          "$(go env GOPATH)/bin/gitleaks" dir . --no-banner --redact --config .gitleaks.toml --exit-code 1
+
+      - name: Secretos en los commits nuevos
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          SHA: ${{ github.sha }}
+        run: |
+          case "$EVENT_NAME" in
+            pull_request) RANGE="$PR_BASE..$PR_HEAD" ;;
+            push)
+              if [ -n "$PUSH_BEFORE" ] && [ "$PUSH_BEFORE" != "0000000000000000000000000000000000000000" ]; then
+                RANGE="$PUSH_BEFORE..$SHA"
+              else
+                RANGE="-1 $SHA"
+              fi
+              ;;
+            *)
+              echo "Ejecución manual: ya se revisaron los archivos actuales."
+              exit 0
+              ;;
+          esac
+          "$(go env GOPATH)/bin/gitleaks" git . --no-banner --redact --config .gitleaks.toml --log-opts="$RANGE" --exit-code 1
 
   pruebas:
     name: Pruebas unitarias (${{ matrix.app }})

@@ -29,7 +29,7 @@
 | Demo | Existe. **Maqueta** 100 % en el navegador | `apps/web/src/app/demo/pos/page.tsx` es `'use client'`; no hay `fetch`, `axios` ni llamadas a `/api` en la carpeta |
 | Pantallas | Barra con Sucursal, Moneda, En línea/Offline y turno · Modos Restaurante / Retail / Self-checkout / Kiosko · Pestañas Venta, Mesas, Cocina (KDS), Reportes, Empleados · Panel de hardware y caja · Modales: modificadores, cobro (pago dividido, propina, 5 medios), recibo térmico (envío por correo/WhatsApp/SMS), apertura/cierre de caja | `page.tsx`, `components/PosModals.tsx` (`ModifiersModal`, `CheckoutModal`, `ReceiptModal`), `components/PosTabs.tsx` (`TablesPanel`, `KdsPanel`, `ReportsPanel`, `EmployeesPanel`) |
 | Datos | 16 productos de restaurante con precios en COP, 3 clientes de fidelización, 8 mesas, 3 órdenes de cocina, 4 empleados | `PRODUCTS`, `CUSTOMERS` en `page.tsx` |
-| Backend | Módulo en memoria `apps/backend/src/modules/pos/` (órdenes, pagos, `charge`; 189 líneas con test) **no montado** en `apps/backend/src/index.ts`; el frontend no lo usa | `pos.service.ts`, `pos.types.ts`, `pos.routes.ts` |
+| Backend | Módulo en memoria `apps/backend/src/modules/pos/` (retirado del repositorio en octubre de 2026, está en el historial de git; órdenes, pagos, `charge`; 189 líneas con test) **no montado** en `apps/backend/src/index.ts`; el frontend no lo usa | `pos.service.ts`, `pos.types.ts`, `pos.routes.ts` |
 | i18n ES/EN | `apps/web/messages/demos/pos.{es,en}.json` (249 líneas c/u, namespace `demoPos`). Productos y empleados fijos en español en `page.tsx` | |
 | Tests | 1 smoke test (`__tests__/page.test.tsx`, 11 líneas) que hoy no se ejecuta | |
 | Tamaño | 1.471 líneas (page **734** + `PosModals.tsx` 483 + `PosTabs.tsx` 254) | `wc -l` |
@@ -160,7 +160,7 @@ Sin código, desde **Admin › Solicitudes de demo › Aprobar** (o Admin › De
 - **Hardware:** impresora térmica (ESC/POS mediante un servicio local), lector de código de barras (modo teclado), cajón monedero por impresora, balanza en Avanzado.
 - **Integraciones típicas en Colombia:** datafono integrado con el adquirente o agregador del cliente, QR Bre-B / Nequi / Daviplata vía pasarela (p. ej. Wompi), Shopify / WooCommerce (inventario unificado), [ERP modular](Producto-erp-modular.md) o Siigo/Alegra (contabilidad), WhatsApp Business (recibo), [WMS](Producto-wms-logistica.md) en Avanzado.
 - **Transversal:** roles (cajero, supervisor, administrador de sede, gerente) con autorización en servidor, auditoría de anulaciones y descuentos, copias de seguridad.
-- **Base técnica:** reutilizar tipos de `apps/backend/src/modules/pos/` (PosOrder, Payment, `charge`) migrados a Mongoose con `tenantId`, sede y terminal.
+- **Base técnica:** reutilizar tipos de `apps/backend/src/modules/pos/` (retirado del repositorio en octubre de 2026, está en el historial de git; PosOrder, Payment, `charge`) migrados a Mongoose con `tenantId`, sede y terminal.
 
 **SaaS (DECISIÓN 7):** el mercado de POS en Colombia se compra mayoritariamente por suscripción, pero hoy no hay base multi-tenant ni cobro recurrente → **"SaaS: lista de espera"**. Para habilitarlo (Fase 4): core multi-tenant, registro y bloqueo remoto de terminales, sincronización sin internet con resolución de conflictos probada, cobro por sede/terminal con Wompi/PayU (COP) y Stripe (USD), aprovisionamiento automático de sedes y soporte de hardware.
 

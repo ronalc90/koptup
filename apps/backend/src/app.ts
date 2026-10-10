@@ -13,8 +13,9 @@ import compression from 'compression';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
 import swaggerUi from 'swagger-ui-express';
-import swaggerJsdoc from 'swagger-jsdoc';
 import passport from 'passport';
+import { buildSwaggerSpec } from './config/swagger';
+import { normalizeErrorResponses, sendError } from './utils/http-error';
 import { logger } from './utils/logger';
 import { CorsError, errorHandler } from './middleware/errorHandler';
 import { authMeRateLimiter, rateLimiter, chatbotRateLimiter } from './middleware/rateLimiter';
@@ -23,7 +24,6 @@ import authRoutes from './routes/auth.routes';
 import documentRoutes from './routes/document.routes';
 import chatRoutes from './routes/chat.routes';
 import contactRoutes from './routes/contact.routes';
-import quoteRoutes from './routes/quote.routes';
 import projectRoutes from './routes/project.routes';
 import ordersRoutes from './routes/orders.routes';
 import deliverablesRoutes from './routes/deliverables.routes';
@@ -115,6 +115,10 @@ export function createApp(): Express {
   );
   app.use(express.urlencoded({ extended: true, limit: JSON_LIMIT_DEFAULT }));
 
+  // Formato único de error: toda respuesta JSON 4xx/5xx sale con
+  // { success: false, code, message } (utils/http-error.ts).
+  app.use(normalizeErrorResponses);
+
   if (process.env.NODE_ENV !== 'test') {
     app.use(morgan('combined', { stream: { write: (message) => logger.info(message.trim()) } }));
   }
@@ -130,12 +134,14 @@ export function createApp(): Express {
   });
 
   // --- Salud -----------------------------------------------------------------
-  // /health/live: el proceso responde (siempre 200). Lo usa Railway como
-  // healthcheck del despliegue (railway.json).
+  // /health/live: el proceso responde (siempre 200, aunque no haya base de
+  // datos). Sirve para diagnosticar si el proceso arranca.
   app.get('/health/live', (_req: Request, res: Response) => {
     res.status(200).json({ status: 'alive', timestamp: new Date().toISOString() });
   });
-  // /health: listo para atender (MongoDB conectado). 503 si no.
+  // /health: listo para atender (MongoDB conectado). 503 si no. Es el
+  // healthcheck del despliegue en Railway (railway.json) y el que revisa el
+  // monitoreo de GitHub Actions (.github/workflows/monitor.yml).
   app.get('/health', (_req: Request, res: Response) => {
     const mongoReady = mongoose.connection.readyState === 1;
     res.status(mongoReady ? 200 : 503).json({
@@ -148,14 +154,7 @@ export function createApp(): Express {
 
   // --- Documentación de la API: solo fuera de producción o con API_DOCS_ENABLED.
   if (process.env.NODE_ENV !== 'production' || process.env.API_DOCS_ENABLED === 'true') {
-    const swaggerSpec = swaggerJsdoc({
-      definition: {
-        openapi: '3.0.0',
-        info: { title: 'KopTup API', version: '1.0.0' },
-        servers: [{ url: process.env.API_URL || `http://localhost:${process.env.PORT ?? 3001}` }],
-      },
-      apis: ['./src/routes/*.ts'],
-    });
+    const swaggerSpec = buildSwaggerSpec(process.env.API_URL || `http://localhost:${process.env.PORT ?? 3001}`);
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
   }
 
@@ -166,7 +165,6 @@ export function createApp(): Express {
   app.use('/api/documents', documentRoutes);
   app.use('/api/chat', chatRoutes);
   app.use('/api/contact', contactRoutes);
-  app.use('/api/quotes', quoteRoutes);
   app.use('/api/projects', projectRoutes);
   app.use('/api/orders', ordersRoutes);
   app.use('/api/deliverables', deliverablesRoutes);
@@ -209,7 +207,7 @@ export function createApp(): Express {
   app.use('/api/payments', paymentsRouter);
   app.use('/api/linkedin-ads', linkedinAdsRoutes);
 
-  app.use((_req: Request, res: Response) => res.status(404).json({ success: false, message: 'Endpoint not found' }));
+  app.use((_req: Request, res: Response) => sendError(res, 404, 'not_found', 'Esta ruta no existe.'));
   app.use(errorHandler);
 
   return app;

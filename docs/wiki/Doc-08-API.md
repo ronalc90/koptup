@@ -87,7 +87,7 @@ El recorrido más importante de la API es el de una demo: alguien la pide, el eq
 | **URL base** | La web la toma de su variable `NEXT_PUBLIC_API_URL` (ver [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md)). En desarrollo el backend escucha en `http://localhost:3001` (`PORT`). En esta página usamos `$API` para no repetirla |
 | **Formato** | JSON en la petición y en la respuesta (`Content-Type: application/json`), salvo las subidas de archivos (`multipart/form-data`) y las descargas de Excel |
 | **Respuesta correcta** | `{ "success": true, "data": …, "message"?: "…" }`. Las listas paginadas traen `data.items`, `data.total`, `data.page`, `data.pages` y, en el panel de demos, `data.conteos` |
-| **Respuesta de error** | `{ "success": false, "code": "…", "message": "…" }` y, según el caso, `fields`, `errores`, `motivo` o `retryAfterSec` (ver [sección 5](#5-códigos-de-error-comunes)). Algunas rutas antiguas no traen `code` |
+| **Respuesta de error** | `{ "success": false, "code": "…", "message": "…" }` y, según el caso, `fields`, `errores`, `motivo` o `retryAfterSec` (ver [sección 5](#5-códigos-de-error-comunes)). Todas las respuestas 4xx y 5xx traen `code`: las rutas antiguas que responden a mano pasan por un middleware que completa `code` (según el estado HTTP) y `message` |
 | **Sesión** | Cabecera `Authorization: Bearer <access token>`. El access token es un JWT que dura **15 minutos** (`JWT_EXPIRES_IN`); el refresh token dura **7 días** (`JWT_REFRESH_EXPIRES_IN`) y se guarda en Redis, **uno por cuenta** |
 | **Rol** | Va dentro del token, pero las rutas del equipo y las de demos **vuelven a leer el rol en MongoDB en cada petición**: si a alguien le quitan el rol, pierde el acceso de inmediato |
 | **Fechas** | ISO 8601 en UTC (`2026-10-23T07:56:09.487Z`). La web las muestra en hora de Colombia |
@@ -155,8 +155,8 @@ Convenciones de las tablas: **Auth** es la política de la sección 3; `:id` es 
 
 | Método | Ruta | Auth | Para qué | Entrada → salida |
 |---|---|---|---|---|
-| GET | `/health/live` | Pública | El proceso responde (healthcheck de Railway) | → `200 { status: "alive", timestamp }` |
-| GET | `/health` | Pública | Listo para atender (MongoDB conectado) | → `200 { status: "healthy", mongo: "connected", timestamp, uptime }` o `503 { status: "unavailable", mongo: "disconnected" }` |
+| GET | `/health/live` | Pública | El proceso responde (aunque no haya base de datos) | → `200 { status: "alive", timestamp }` |
+| GET | `/health` | Pública | Listo para atender (MongoDB conectado). Healthcheck de Railway y del monitoreo | → `200 { status: "healthy", mongo: "connected", timestamp, uptime }` o `503 { status: "unavailable", mongo: "disconnected" }` |
 | GET | `/api-docs` | Solo fuera de producción o con `API_DOCS_ENABLED=true` | Swagger UI | Página HTML |
 
 ### 4.2 Autenticación (`/api/auth`)
@@ -181,8 +181,7 @@ Convenciones de las tablas: **Auth** es la política de la sección 3; `:id` es 
 
 | Método | Ruta | Auth | Para qué | Entrada → salida |
 |---|---|---|---|---|
-| POST | `/api/contact` | Pública · 5 por minuto | Formulario de `/contact`: guarda un `Contact` (origen `contact-form`) y avisa al equipo por correo o WhatsApp si están configurados | `{ name, email, service, message, phone?, company?, budget?, timeline?, quote? }` → mensaje. `timeline`: `now`, `1m`, `3m` u `open` (se guarda como `plazo`). `quote`: `{ service, plan?, tier?, modality? }` con la cotización que el visitante venía revisando (se guarda como `cotizacion`): `service` es `sistema-rag`, una solución del catálogo o un servicio que el portal enlaza; `plan` solo va con `sistema-rag`, y `tier` y `modality` solo con una solución del catálogo. Un valor desconocido o incoherente responde 400 |
-| POST | `/api/quotes` | Pública · 5 por minuto (cupo propio) | Guarda una cotización (`Quote`). Hoy ninguna página de la web la usa | `{ name, email, service, description }` → mensaje |
+| POST | `/api/contact` | Pública · 5 por minuto | Formulario de `/contact`: guarda un `Contact` (origen `contact-form`) con la prueba de la autorización (`consentimiento`: fecha, versión de la política del servidor, hash de la IP y navegador) y avisa al equipo por correo o WhatsApp si están configurados. Si el campo trampa `website` llega lleno responde 200 sin guardar nada | `{ name, email, service, message, consentimiento: true, website?, phone?, company?, budget?, timeline?, quote? }` → mensaje. Sin `consentimiento: true` → `400 consent_required` (`fields: ["consentimiento"]`). Datos inválidos → `400 invalid_request` con `fields` y `errores` (`{ campo: mensaje }`) en español; límites: nombre 120, empresa 160, teléfono 40, servicio 300 y mensaje 5.000 caracteres. `timeline`: `now`, `1m`, `3m` u `open` (se guarda como `plazo`). `quote`: `{ service, plan?, tier?, modality? }` con la cotización que el visitante venía revisando (se guarda como `cotizacion`): `service` es `sistema-rag`, una solución del catálogo o un servicio que el portal enlaza; `plan` solo va con `sistema-rag`, y `tier` y `modality` solo con una solución del catálogo. Un valor desconocido o incoherente responde 400 |
 | GET | `/api/admin/contacts` | `admin`, `manager` | Bandeja de contactos del panel | `?status=new\|read\|responded` → lista con `source` (`contact-form`, `demo-rag` o `demo-request`), `plazo` y `cotizacion` |
 | PATCH | `/api/admin/contacts/:id/status` | `admin`, `manager` | Marcar leído o respondido | `{ status }` → `{ id, status }` |
 | POST | `/api/contact/test-whatsapp`, `/api/contact/test-email` | Solo desarrollo | Probar los canales de aviso | — |
@@ -256,6 +255,7 @@ Todas exigen sesión. Cada controlador filtra por la cuenta que llama (o permite
 | GET | `/api/orders` | Dueño | Mis pedidos | `?status=` |
 | POST | `/api/orders` | Autenticado | Crear un pedido con adjuntos (hasta 10 archivos de 20 MB) | `multipart`: `name`, `description?`, `items` (JSON `[{ name, quantity, price }]`), `projectId?`, `comments?`, `attachments[]` → `201 { id: "ORD-…", amount, status }` |
 | GET | `/api/orders/:orderId` | Dueño | Ver el pedido | → incluye `approvalStatus`, adjuntos y `editable` (si el cliente aún puede cambiarlo) |
+| GET | `/api/orders/:orderId/attachments/:attachmentId` | Dueño del pedido o equipo (`admin`, `manager`, `sales`) | Descargar un adjunto (lo usa Admin › Pedidos) | → el archivo como descarga; `404 not_found` si el adjunto no existe; `410 file_unavailable` si el archivo ya no está en el servidor (sin volumen, Railway lo borra al redesplegar) |
 | PUT | `/api/orders/:orderId` | Dueño, solo mientras el pedido está pendiente de revisión | Editar nombre, descripción y adjuntos (el estado lo cambia el equipo) | JSON o `multipart`: `name?`, `description?`, `attachments[]` (agrega), `removeAttachments` (ids a quitar) → el pedido; `403 status_team_only`, `400 invalid_fields`, `409 order_not_pending` |
 | POST | `/api/orders/:orderId/cancel` | Dueño | Cancelar, solo mientras el pedido está pendiente de revisión | `409 order_not_pending` si el equipo ya lo revisó o está en curso |
 | GET | `/api/invoices` | Dueño | Mis facturas | `?status=&startDate=&endDate=` |
@@ -304,13 +304,13 @@ Toda la ruta tiene su propio cupo: **60 peticiones por minuto por IP**. Los bots
 | POST | `/documents/:docId/questions` | Pública · 30 cada 10 min por IP; 10 por documento | Preguntar | `{ question (≤ 500) }` → respuesta con citas |
 | DELETE | `/documents/:docId` | Pública | Borrar el documento antes de la hora | → `{ deleted }` |
 
-Códigos propios: `demo_disabled`, `budget_exhausted`, `capacity` (503); `invalid_format` (415); `file_too_large` (413); `too_many_pages`, `empty_document`, `unreadable_document` (422); `daily_limit`, `question_limit`, `rate_limited` (429); `document_not_found` (404); `llm_error` (502, la pregunta no se descuenta).
+Códigos propios: `demo_disabled`, `budget_exhausted`, `capacity` (503); `invalid_format` (415); `file_too_large` (413); `too_many_pages` (más de 30 páginas), `too_much_text` (más de 400.000 caracteres aunque tenga 30 páginas o menos), `empty_document`, `unreadable_document` (422); `daily_limit`, `question_limit`, `rate_limited` (429); `document_not_found` (404); `llm_error` (502, la pregunta no se descuenta); `lead_unavailable` (503: no se pudo registrar la prueba, el documento no se procesó y el cupo del día se devuelve).
 
 ### 4.10 Generador para LinkedIn (`/api/linkedin-ads`)
 
 | Método | Ruta | Auth | Para qué | Entrada → salida |
 |---|---|---|---|---|
-| POST | `/generate` | Acceso a la demo `linkedin-ads` · 5 cada 10 min y 30 al día por cuenta (o por IP sin sesión) | Generar post, anuncio y variantes con IA | `{ demo: { titulo, path, … }, angulo, tono }` → `{ data, model, usage }`; `503 ai_unavailable` o `budget_exhausted` (la web sigue con su generador local); `502` si falla el modelo |
+| POST | `/generate` | Acceso a la demo `linkedin-ads` · 5 cada 10 min y 30 al día por cuenta (o por IP sin sesión) | Generar post, anuncio y variantes con IA | `{ demo: { titulo, path, … }, angulo, tono }` → `{ data, model, usage }`; `503 ai_not_configured` (sin clave), `budget_exhausted` (cupo del mes agotado) o `limits_unavailable` (Redis no responde: no se puede medir el cupo), con un `message` que lo explica; la web sigue con su generador local; `502 llm_error` o `invalid_output` si falla el modelo |
 
 ### 4.11 Gestor de contenido (`/api/content`)
 
@@ -378,23 +378,26 @@ En producción responden `404 Endpoint not found`, igual que una ruta que no exi
 | 400 | `invalid_json`, `invalid_data`, `bad_request` | Cuerpo que no es JSON, id mal formado o dato inválido | Mensaje genérico |
 | 400 | `token_invalid`, `token_used`, `token_replaced`, `token_expired` | Enlace de activación o de recuperación que no sirve | Pantalla de enlace inválido con la salida que corresponde |
 | 400 | `upload_limit_file_size` y similares | El archivo supera el tamaño o hay demasiados | Mensaje en el formulario |
-| 401 | (sin código) `No token provided`, `Invalid token` | Ruta con sesión llamada sin token o con uno inválido | Lleva a `/login` |
+| 401 | `unauthorized`, `invalid_token`, `session_invalid` | Ruta con sesión llamada sin token, con uno inválido o de una cuenta que ya no existe | Lleva a `/login` |
 | 401 | `TOKEN_EXPIRED` | El access token venció | Pide uno nuevo con `/api/auth/refresh` y repite |
 | 401 | `account_not_activated` | Login de una cuenta invitada que no ha usado su enlace | Explica que debe activar la cuenta |
 | 401 | `login_required` (con `motivo: sin_sesion`) | API de una demo con solicitud o privada, sin sesión | Pide iniciar sesión |
 | 403 | `demo_access_required` (con `motivo`) | Hay sesión pero no hay acceso vigente: `sin_acceso`, `expirado` o `revocado` | Pantalla `/demo-acceso/<slug>` |
 | 403 | `demo_disabled` | La demo está desactivada en el catálogo | "En mantenimiento" |
-| 403 | (sin código) `Forbidden - Insufficient permissions` | Falta el rol | — |
+| 403 | `forbidden` | Falta el rol | — |
 | 403 | `requires_admin` | `sales` intenta dar o cambiar acceso a una demo privada | Avisa que solo un admin puede |
 | 403 | `cors_forbidden` | Origen no permitido | — |
-| 404 | `not_found` o `Endpoint not found` | Registro o ruta inexistente | — |
+| 404 | `not_found` | Registro o ruta inexistente | — |
 | 409 | `already_processed`, `invalid_transition`, `grant_revoked`, `active_grant_exists`, `account_active`, `not_approved` | La acción ya se hizo o el estado no lo permite (por ejemplo, doble clic) | Refresca y muestra el estado real |
 | 413 | `payload_too_large` | Cuerpo de más de 2 MB | — |
 | 422 | `team_email`, `fixed_mode`, `unknown_demo` (400) | Email de una cuenta del equipo, intento de cerrar el chatbot RAG o demo que no existe | Mensaje en el panel |
-| 429 | `rate_limited` (o sin código) | Se agotó un cupo; a veces trae `Retry-After` y `retryAfterSec` | Pide esperar |
+| 429 | `rate_limited` | Se agotó un cupo (mensaje en español); a veces trae `Retry-After` y `retryAfterSec` | Pide esperar |
 | 500 | `internal_error` | Error no previsto. En producción no se muestran detalles internos | Mensaje genérico |
 | 503 | `service_unavailable` | MongoDB no responde y la ruta necesita leer el rol o el acceso (falla cerrada) | Página de servicio no disponible |
-| 503 | `ai_unavailable`, `budget_exhausted`, `demo_disabled` | Falta la IA, Redis no responde o se agotó el tope del mes | La demo pasa a su modo sin IA o lo explica |
+| 503 | `ai_unavailable`, `ai_not_configured`, `budget_exhausted`, `limits_unavailable`, `demo_disabled` | Falta la clave de IA, Redis no responde (no se puede medir el cupo) o se agotó el tope del mes | La demo pasa a su modo sin IA o lo explica |
+| 503 | `google_not_configured`, `storage_unavailable` | El inicio con Google no está configurado; el chatbot no tiene MongoDB | Mensaje y alternativa |
+
+Los códigos de cada módulo (chatbot, demo RAG, LinkedIn) están en su sección. Una respuesta antigua sin código propio recibe el del estado HTTP (`bad_request`, `unauthorized`, `forbidden`, `not_found`, `conflict`, `internal_error`…); en producción, un 5xx nunca devuelve detalles internos.
 
 ---
 
@@ -415,7 +418,7 @@ Los cupos marcados "memoria" se cuentan en el proceso del backend; los marcados 
 | `POST /api/auth/reset-password` · `POST /api/auth/activate` | 10 · 10 | 15 min | IP | Memoria | `RESET_PASSWORD_RATE_LIMIT_MAX`, `ACTIVATION_RATE_LIMIT_MAX` |
 | `POST /api/auth/change-password` | 5 | 15 min | Cuenta | Memoria | `CHANGE_PASSWORD_RATE_LIMIT_MAX` |
 | `POST /api/auth/google/exchange` | 20 | 1 min | IP | Memoria | — |
-| `POST /api/contact` · `POST /api/quotes` | 5 · 5 | 1 min | IP | Memoria | — |
+| `POST /api/contact` | 5 | 1 min | IP | Memoria | — |
 | `POST /api/auth/activate/check` | 20 | 1 min | IP | Memoria | — |
 | Subidas de `/api/documents/upload` y `/api/chatbot/upload` | 10 | 1 min | IP | Memoria | — |
 | Crear bots (`POST /api/chatbot/bots`) | 30 | 1 hora | IP | Memoria | `CHATBOT_CREATE_LIMIT_PER_HOUR` |
@@ -788,9 +791,9 @@ curl -s "$API/api/auditoria/estadisticas" -H "Authorization: Bearer $TOKEN"
 
 *`/health/live` dice si el proceso está vivo; `/health` dice si puede atender (MongoDB conectado).*
 
-- **`/health/live`** es el healthcheck del despliegue en Railway: responde 200 aunque MongoDB esté caído, para que el servicio no se reinicie en bucle por un problema de la base.
-- **`/health`** responde 503 mientras MongoDB no esté conectado. Si el backend arranca sin base de datos, sigue vivo y las rutas que necesitan leer roles o accesos responden `503 service_unavailable` (falla cerrada).
-- **Swagger** (`/api-docs`) existe solo fuera de producción o con `API_DOCS_ENABLED=true`. Se genera con los comentarios `@swagger` de `src/routes/*.ts`, que no cubren todas las rutas: esta página es la referencia completa.
+- **`/health/live`** responde 200 siempre que el proceso esté vivo, aunque MongoDB esté caído: sirve para diagnosticar si el proceso arranca.
+- **`/health`** responde 503 mientras MongoDB no esté conectado. Es el healthcheck del despliegue en Railway (un despliegue sin base no entra en servicio y la versión anterior sigue atendiendo) y lo revisa el monitoreo de GitHub Actions cada 15 minutos. Si el backend arranca sin base de datos, sigue vivo y las rutas que necesitan leer roles o accesos responden `503 service_unavailable` (falla cerrada).
+- **Swagger** (`/api-docs`) existe solo fuera de producción o con `API_DOCS_ENABLED=true`. Se genera con los comentarios `@swagger` de `src/routes/*.ts` y `config/swagger.ts` le agrega el esquema de sesión (`bearerAuth`), qué rutas son públicas, las de solo desarrollo (marcadas como obsoletas) y el formato de error. Los comentarios no cubren todas las rutas: esta página es la referencia completa.
 
 Qué hacer cuando el backend no responde está en [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md).
 
@@ -800,11 +803,11 @@ Qué hacer cuando el backend no responde está en [Operación y despliegue](Doc-
 
 | Qué | Dónde (en `apps/backend/src`) |
 |---|---|
-| Arranque: variables, carpetas de subida, MongoDB, admin desde `ADMIN_EMAIL`, semilla del catálogo, Passport, job de accesos | `index.ts` |
+| Arranque: variables, carpetas de subida, MongoDB, admin desde `ADMIN_EMAIL` (`services/admin-bootstrap.service.ts`), semilla del catálogo, Passport, jobs | `index.ts` |
 | Aplicación Express (middleware y montaje de rutas) | `app.ts` |
 | Políticas de autorización | `middleware/access.ts` y el inventario `routes/POLICIES.md` |
 | Sesión JWT | `middleware/auth.ts`, `controllers/auth.controller.ts` |
-| Errores y su traducción a `{ code, message }` | `middleware/errorHandler.ts` |
+| Errores y su traducción a `{ success: false, code, message }` | `middleware/errorHandler.ts` (excepciones) y `utils/http-error.ts` (`sendError` y el middleware que completa las respuestas antiguas) |
 | Cupos | `middleware/rateLimiter.ts`, `middleware/client-ip.ts`, `services/request-limits.service.ts` |
 | Topes de gasto de IA y cupos en Redis | `services/ai-budget.service.ts` |
 | Sistema de demos | `routes/demo-public.routes.ts`, `routes/admin-demos.routes.ts`, `services/demo-*.service.ts`, `services/magic-link.service.ts`, `jobs/demo-grants.job.ts`, `config/demos.ts` |
@@ -814,7 +817,7 @@ Qué hacer cuando el backend no responde está en [Operación y despliegue](Doc-
 
 1. Elige la política (sección 3) y aplícala en el archivo de rutas con los middleware de `middleware/access.ts`. Si la ruta es del equipo, usa `requireRole` (lee el rol en la base) y no solo el rol del token.
 2. Valida la entrada (en el código nuevo se usa `zod` y `zodToAppError` para devolver `fields` y `errores`).
-3. Lanza `AppError(mensaje, status, code)` en vez de responder a mano: así la respuesta tiene siempre `success`, `code` y `message`.
+3. Lanza `AppError(mensaje, status, code)` o usa `sendError(res, status, code, mensaje)` en vez de armar el JSON a mano: así la respuesta tiene siempre `success`, `code` y un `message` en español.
 4. Envuelve los controladores asíncronos con `asyncHandler`.
 5. Si llama a OpenAI desde una ruta pública, pasa por `getBudgetStatus` y `recordSpend` y agrega un cupo en Redis.
 6. Si la acción la hace el equipo, regístrala con `recordAudit`.
@@ -830,13 +833,11 @@ Qué hacer cuando el backend no responde está en [Operación y despliegue](Doc-
 | **Conversación automática de un pedido** | Al crear un pedido, la conversación con el equipo no se crea (el error se registra en el log y el pedido sí se guarda) |
 | **Pagos** | No hay pago en línea de facturas: el portal muestra los datos de transferencia que configure el equipo y el equipo registra el pago con `POST /api/invoices/:id/pay` (`admin` o `manager`). Los pagos en línea están en desarrollo (ver [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md)) |
 | **Descargar factura** | `GET /api/invoices/:id/download` devuelve un enlace a sí misma; no se genera un PDF |
-| **Adjuntos de pedidos** | Se guardan en el disco del servidor (efímero en Railway) y la API no los sirve para descargar |
+| **Adjuntos de pedidos** | Se guardan en el disco del servidor: sin un volumen en Railway se borran en cada despliegue y la descarga responde `410 file_unavailable` ([acciones pendientes del dueño](Doc-11-Operacion-y-Despliegue.md#10-acciones-pendientes-del-dueño)) |
 | **Notificaciones** | Ningún flujo las crea solo; solo existen las que se crean con `POST /api/notifications` |
 | **Cupos en memoria** | El cupo general, los de cada ruta de cuenta y el del chatbot se reinician en cada despliegue y no se comparten si hay varias instancias |
 | **Una sesión renovable por cuenta** | El refresh token es uno por cuenta: iniciar sesión en otro navegador hace que el primero no pueda renovar y deba volver a entrar a los 15 minutos |
-| **Formato de errores** | Las rutas nuevas (demos, auth, errores generales) traen `code`; varias rutas antiguas (portal, admin, chatbot) responden `{ success, message }` o `{ error }` sin código estable |
 | **Swagger incompleto** | Los comentarios `@swagger` no cubren todas las rutas |
-| **Cotizaciones** | `POST /api/quotes` existe pero ninguna página la usa y no tiene pantalla en el panel |
 
 ---
 

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import { logger } from '../utils/logger';
+import { defaultErrorCode } from '../utils/http-error';
 
 export class AppError extends Error {
   statusCode: number;
@@ -49,7 +50,8 @@ export function classifyError(err: unknown): {
     return {
       status: err.statusCode,
       message: err.message,
-      code: err instanceof CorsError ? 'cors_forbidden' : err.code ?? (err.statusCode < 500 ? 'bad_request' : 'internal_error'),
+      // Sin código propio, el del estado HTTP (401 unauthorized, 404 not_found…).
+      code: err instanceof CorsError ? 'cors_forbidden' : err.code ?? defaultErrorCode(err.statusCode),
       operational: err.isOperational,
       details: err.details,
     };
@@ -109,7 +111,7 @@ export function classifyError(err: unknown): {
     }
   }
 
-  return { status: 500, message: 'Internal server error', code: 'internal_error', operational: false };
+  return { status: 500, message: 'Ocurrió un error inesperado. Intenta de nuevo.', code: 'internal_error', operational: false };
 }
 
 export const errorHandler = (

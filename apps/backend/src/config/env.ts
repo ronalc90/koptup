@@ -5,18 +5,23 @@
  *  - En producción el servidor NO arranca si falta una variable
  *    imprescindible: MONGODB_URI o JWT_SECRET.
  *  - JWT_REFRESH_SECRET es obligatoria para iniciar sesión, pero si falta en
- *    producción solo se registra un error en el log (no se bloquea el arranque):
- *    así un despliegue sin ella no tumba el resto de la API (contacto, chatbot,
- *    demos), que es lo que pasaba antes de esta validación.
+ *    producción solo se registra un aviso en el log (no se bloquea el
+ *    arranque): así un despliegue sin ella no tumba el resto de la API
+ *    (contacto, chatbot, demos). El aviso dice que el inicio de sesión fallará.
  *  - Las opcionales que faltan o tienen un formato inválido solo generan una
  *    advertencia (la función que las usa queda deshabilitada o usa su valor
- *    por defecto).
+ *    por defecto). Los grupos (SMTP_USER + SMTP_PASS) se avisan juntos, y
+ *    DEMO_UPLOAD_ENABLED avisa si falta (con `false` explícito no avisa).
  *  - Los mensajes nombran la variable, nunca su valor.
  *
  * El resto del código sigue leyendo `process.env` directamente; este módulo
  * garantiza que lo imprescindible existe antes de abrir el puerto.
  */
 import { z } from 'zod';
+import { parseDurationSeconds } from '../utils/duration';
+
+/** Tope de JWT_REFRESH_EXPIRES_IN (igual a MAX_REFRESH_TTL_SECONDS de middleware/auth.ts). */
+const MAX_REFRESH_SECONDS = 7 * 24 * 60 * 60;
 
 /** Variables sin las cuales el backend no puede operar en producción. */
 export const REQUIRED_IN_PRODUCTION = ['MONGODB_URI', 'JWT_SECRET'] as const;
@@ -33,9 +38,22 @@ export const OPTIONAL_WITH_EFFECT: Record<string, string> = {
   OPENAI_API_KEY: 'funciones con IA (chatbot en modo extractivo, demos de IA deshabilitadas)',
   CORS_ORIGIN: 'orígenes extra permitidos por CORS (solo se aceptan koptup.com y www.koptup.com)',
   FRONTEND_URL: 'enlaces de los correos (se usa http://localhost:3000)',
-  ADMIN_EMAIL: 'asegurar el rol admin al arrancar (no se modifica ningún rol)',
-  SMTP_HOST: 'envío de correos (acuse y aprobación de demos, recordatorios); el panel muestra igual el enlace de activación',
+  ADMIN_EMAIL: 'avisos al equipo por correo apagados y el arranque no asegura ningún admin',
+  INTERNAL_API_KEY:
+    'la web no puede informar la IP real del visitante: sus peticiones del servidor (verificación de sesión, LinkedIn sin cuenta) cuentan con la IP de salida de la web',
 };
+
+/**
+ * Variables que solo sirven juntas: si falta alguna, la función se apaga.
+ * SMTP_HOST no decide nada (sin ella se usa smtp.gmail.com).
+ */
+export const OPTIONAL_GROUPS: Array<{ names: readonly string[]; effect: string }> = [
+  {
+    names: ['SMTP_USER', 'SMTP_PASS'],
+    effect:
+      'no sale ningún correo (acuse y aprobación de demos, recordatorios, restablecer contraseña, avisos al equipo); el panel muestra igual el enlace de activación',
+  },
+];
 
 const optionalNumber = (opts: { min?: number; int?: boolean } = {}) =>
   z
@@ -52,6 +70,9 @@ const optionalNumber = (opts: { min?: number; int?: boolean } = {}) =>
       },
       { message: 'debe ser un número válido' },
     );
+
+/** `true` o `false` (sin repetir el valor recibido en el mensaje). */
+const optionalBool = z.enum(['true', 'false'], { errorMap: () => ({ message: 'debe ser true o false' }) }).optional();
 
 const optionalUrl = z
   .string()
@@ -99,12 +120,30 @@ export const EnvSchema = z.object({
   ACTIVATION_RATE_LIMIT_MAX: optionalNumber({ min: 1, int: true }),
   CHANGE_PASSWORD_RATE_LIMIT_MAX: optionalNumber({ min: 1, int: true }),
   SMTP_HOST: z.string().optional(),
+  SMTP_PORT: optionalNumber({ min: 1, int: true }),
+  SMTP_SECURE: optionalBool,
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  INTERNAL_API_KEY: z.string().optional(),
+  DEMO_UPLOAD_ENABLED: z
+    .enum(['true', 'false'], { errorMap: () => ({ message: 'debe ser true o false → «Prueba con tu documento» queda apagada' }) })
+    .optional(),
+  JWT_EXPIRES_IN: z.string().optional(),
+  JWT_REFRESH_EXPIRES_IN: z
+    .string()
+    .optional()
+    .refine((v) => v === undefined || v.trim() === '' || parseDurationSeconds(v) !== null, {
+      message: 'duración inválida (usa, por ejemplo, 7d, 12h o 3600) → se usan 7 días',
+    })
+    .refine((v) => v === undefined || (parseDurationSeconds(v) ?? 0) <= MAX_REFRESH_SECONDS, {
+      message: 'mayor de 7 días → se usan 7 días (es lo que dura la cookie de sesión de la web)',
+    }),
   PRIVACY_POLICY_VERSION: z.string().max(40).optional(),
   DEMO_REQUEST_LIMIT_PER_HOUR: optionalNumber({ min: 1, int: true }),
   DEMO_REQUEST_LIMIT_PER_EMAIL_DAY: optionalNumber({ min: 1, int: true }),
-  DEMO_GRANTS_JOB_ENABLED: z.enum(['true', 'false']).optional(),
+  DEMO_GRANTS_JOB_ENABLED: optionalBool,
   DEMO_GRANTS_JOB_INTERVAL_MS: optionalNumber({ min: 60000, int: true }),
-  PROPOSALS_JOB_ENABLED: z.enum(['true', 'false']).optional(),
+  PROPOSALS_JOB_ENABLED: optionalBool,
   PROPOSALS_JOB_INTERVAL_MS: optionalNumber({ min: 60000, int: true }),
   WOMPI_ENV: z.enum(['sandbox', 'production']).optional(),
   WOMPI_PUBLIC_KEY: z.string().optional(),
@@ -181,6 +220,19 @@ export function validateEnv(source: NodeJS.ProcessEnv = process.env): EnvValidat
 
   for (const [name, effect] of Object.entries(OPTIONAL_WITH_EFFECT)) {
     if (isBlank(source[name])) warnings.push(`${name}: no está definida → ${effect}`);
+  }
+
+  for (const group of OPTIONAL_GROUPS) {
+    const missing = group.names.filter((name) => isBlank(source[name]));
+    if (missing.length > 0) {
+      warnings.push(`${missing.join(' y ')}: ${missing.length > 1 ? 'no están definidas' : 'no está definida'} → ${group.effect}`);
+    }
+  }
+
+  // «Prueba con tu documento» solo se enciende con el valor exacto `true`.
+  // (Un valor distinto de true/false ya produjo el aviso de formato.)
+  if (isBlank(source.DEMO_UPLOAD_ENABLED)) {
+    warnings.push('DEMO_UPLOAD_ENABLED: no está definida → «Prueba con tu documento» apagada (enciéndela con true)');
   }
 
   return {

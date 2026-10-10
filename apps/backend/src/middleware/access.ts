@@ -23,6 +23,7 @@ import User from '../models/User';
 import { AuthRequest } from '../types';
 import { logger } from '../utils/logger';
 import { authenticate } from './auth';
+import { sendError } from '../utils/http-error';
 
 /** Roles del equipo de KopTup con acceso a herramientas internas. */
 export const STAFF_ROLES = ['admin', 'manager', 'sales'] as const;
@@ -98,22 +99,20 @@ export async function isStaffSession(req: AuthRequest): Promise<boolean> {
 }
 
 function sendDbUnavailable(res: Response): void {
-  res.status(503).json({
-    success: false,
-    code: 'service_unavailable',
-    message: 'El servicio no está disponible en este momento. Intenta de nuevo en unos minutos.',
-  });
+  sendError(res, 503, 'service_unavailable', 'El servicio no está disponible en este momento. Intenta de nuevo en unos minutos.');
 }
 
 /**
- * Exige uno de los roles indicados, leyendo el rol vigente de la BD
- * (401 sin sesión, 403 sin el rol, 503 si la BD no responde).
+ * Exige uno de los roles indicados, leyendo el rol vigente de la BD:
+ * 401 `unauthorized` sin sesión, 401 `session_invalid` si la cuenta ya no
+ * existe, 403 `forbidden` sin el rol y 503 `service_unavailable` si la BD no
+ * responde (formato único de `utils/http-error.ts`).
  */
 export function requireRole(...roles: string[]): RequestHandler[] {
   const check: RequestHandler = async (req, res, next: NextFunction) => {
     const authReq = req as AuthRequest;
     if (!authReq.user) {
-      res.status(401).json({ success: false, message: 'Unauthorized' });
+      sendError(res, 401, 'unauthorized', 'Inicia sesión para continuar.');
       return;
     }
     const fresh = await loadFreshUser(authReq.user.id);
@@ -122,11 +121,11 @@ export function requireRole(...roles: string[]): RequestHandler[] {
       return;
     }
     if (!fresh) {
-      res.status(401).json({ success: false, message: 'Tu sesión ya no es válida. Inicia sesión de nuevo.' });
+      sendError(res, 401, 'session_invalid', 'Tu sesión ya no es válida. Inicia sesión de nuevo.');
       return;
     }
     if (!roles.includes(fresh.role)) {
-      res.status(403).json({ success: false, message: 'Forbidden - Insufficient permissions' });
+      sendError(res, 403, 'forbidden', 'Tu cuenta no tiene permiso para esta acción.');
       return;
     }
     authReq.user = { ...authReq.user, role: fresh.role, email: fresh.email, name: fresh.name };
@@ -148,7 +147,7 @@ export const requireAdmin: RequestHandler[] = requireRole('admin');
 export const devOnlyAdmin: RequestHandler[] = [
   (req, res, next) => {
     if (process.env.NODE_ENV === 'production') {
-      res.status(404).json({ success: false, message: 'Endpoint not found' });
+      sendError(res, 404, 'not_found', 'Esta ruta no existe.');
       return;
     }
     next();

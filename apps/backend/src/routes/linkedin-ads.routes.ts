@@ -10,6 +10,12 @@
  *   Falla cerrada: sin OPENAI_API_KEY o sin Redis responde 503 honesto y la web
  *   sigue mostrando el generador local.
  *
+ * Errores con el formato único `{ success: false, code, message }`:
+ *   400 invalid_request · 429 rate_limited (con Retry-After) ·
+ *   503 ai_not_configured (sin clave de OpenAI) · 503 budget_exhausted (cupo
+ *   del mes agotado) · 503 limits_unavailable (Redis caído: no se puede medir
+ *   el cupo, así que no se llama al modelo) · 502 llm_error / invalid_output.
+ *
  * La web llama a través de su ruta `/api/linkedin-ads/generate` (proxy fino).
  * IP del visitante (solo cuenta sin sesión): si la petición trae `X-Internal-Key` igual a
  * INTERNAL_API_KEY, se usa `X-Client-IP` (la IP que vio el proxy de Next); si
@@ -25,6 +31,7 @@ import {
   generateLinkedInPack,
 } from '../services/linkedin-ads.service';
 import { logger } from '../utils/logger';
+import { sendError } from '../utils/http-error';
 import { AuthRequest } from '../types';
 
 const router = Router();
@@ -35,8 +42,17 @@ export const LINKEDIN_LIMITS = {
   perDay: 30,
 } as const;
 
-function fail(res: Response, status: number, code: string, error: string, extra: Record<string, unknown> = {}) {
-  res.status(status).json({ success: false, code, error, ...extra });
+/** Mensajes de los 503: dicen qué pasó y que el generador local sigue disponible. */
+export const LINKEDIN_UNAVAILABLE_MESSAGES = {
+  ai_not_configured: 'La generación con IA no está configurada en este servidor. Usa el generador local.',
+  budget_exhausted:
+    'Alcanzamos el cupo mensual de generación con IA de esta demo; se renueva el día 1 de cada mes. Mientras tanto, usa el generador local.',
+  limits_unavailable:
+    'No pudimos verificar el cupo de uso de la IA en este momento, así que no la llamamos. Intenta de nuevo en unos minutos o usa el generador local.',
+} as const;
+
+function fail(res: Response, status: number, code: string, message: string, extra: Record<string, unknown> = {}) {
+  sendError(res, status, code, message, extra);
 }
 
 router.post('/generate', requireStaffOrDemoAccess('linkedin-ads'), async (req: Request, res: Response) => {
@@ -49,16 +65,16 @@ router.post('/generate', requireStaffOrDemoAccess('linkedin-ads'), async (req: R
   }
 
   if (!process.env.OPENAI_API_KEY) {
-    fail(res, 503, 'ai_unavailable', 'La generación con IA no está configurada en este servidor. Usa el generador local.');
+    fail(res, 503, 'ai_not_configured', LINKEDIN_UNAVAILABLE_MESSAGES.ai_not_configured);
     return;
   }
 
   const budget = await getBudgetStatus('linkedin-ads');
   if (!budget.available) {
     if (budget.reason === 'budget_exhausted') {
-      fail(res, 503, 'budget_exhausted', 'Alcanzamos el cupo mensual de generación con IA de esta demo. Usa el generador local.');
+      fail(res, 503, 'budget_exhausted', LINKEDIN_UNAVAILABLE_MESSAGES.budget_exhausted);
     } else {
-      fail(res, 503, 'ai_unavailable', 'La generación con IA no está disponible en este momento. Usa el generador local.');
+      fail(res, 503, 'limits_unavailable', LINKEDIN_UNAVAILABLE_MESSAGES.limits_unavailable);
     }
     return;
   }
@@ -74,7 +90,7 @@ router.post('/generate', requireStaffOrDemoAccess('linkedin-ads'), async (req: R
     consumeRateLimit({ scope: 'linkedin-ads:day', ip, limit: LINKEDIN_LIMITS.perDay, windowSec: 24 * 60 * 60 }),
   ]);
   if (!windowLimit || !dayLimit) {
-    fail(res, 503, 'ai_unavailable', 'La generación con IA no está disponible en este momento. Usa el generador local.');
+    fail(res, 503, 'limits_unavailable', LINKEDIN_UNAVAILABLE_MESSAGES.limits_unavailable);
     return;
   }
   if (!windowLimit.allowed || !dayLimit.allowed) {

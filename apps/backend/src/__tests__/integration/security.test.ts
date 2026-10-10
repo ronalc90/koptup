@@ -158,6 +158,42 @@ describeDb('revisión de seguridad: portal y panel (integración)', () => {
       expect((await getOrder(inProgress))?.status).toBe('in_progress');
     });
 
+    it('adjuntos: los descargan el dueño y el equipo; otra cuenta no; sin archivo responde 410', async () => {
+      const orderId = await insertOrder();
+      const add = await request(app)
+        .put(`/api/orders/${orderId}`)
+        .set(bearer(owner))
+        .attach('attachments', Buffer.from('contenido del adjunto'), 'cotizacion "final".txt');
+      expect(add.status).toBe(200);
+      const attachmentId = String(add.body.data.attachments[0].id);
+      const stored = await getOrder(orderId);
+      const filePath = path.resolve(`.${stored?.attachments[0].fileUrl}`);
+      createdFiles.push(filePath);
+      const url = `/api/orders/${orderId}/attachments/${attachmentId}`;
+
+      const mine = await request(app).get(url).set(bearer(owner)).buffer(true).parse((res, cb) => {
+        const chunks: Buffer[] = [];
+        res.on('data', (c: Buffer) => chunks.push(c));
+        res.on('end', () => cb(null, Buffer.concat(chunks)));
+      });
+      expect(mine.status).toBe(200);
+      expect(mine.headers['content-disposition']).toMatch(/^attachment; filename=/);
+      expect(mine.headers['content-disposition']).not.toMatch(/"final"/);
+      expect((mine.body as Buffer).toString()).toBe('contenido del adjunto');
+
+      expect((await request(app).get(url).set(bearer(admin))).status).toBe(200);
+      const ajeno = await request(app).get(url).set(bearer(other));
+      expect(ajeno.status).toBe(403);
+      expect(ajeno.body).toMatchObject({ success: false, code: 'forbidden' });
+      expect((await request(app).get(`/api/orders/${orderId}/attachments/000000000000000000000000`).set(bearer(owner))).body.code).toBe('not_found');
+      expect((await request(app).get(url)).status).toBe(401);
+
+      fs.rmSync(filePath, { force: true });
+      const gone = await request(app).get(url).set(bearer(owner));
+      expect(gone.status).toBe(410);
+      expect(gone.body).toMatchObject({ success: false, code: 'file_unavailable' });
+    });
+
     it('el dueño cancela su pedido pendiente; otra cuenta no puede', async () => {
       const orderId = await insertOrder();
       expect((await request(app).post(`/api/orders/${orderId}/cancel`).set(bearer(other))).status).toBe(403);
@@ -367,7 +403,7 @@ describeDb('revisión de seguridad: portal y panel (integración)', () => {
     it('un token cualquiera no lo reclama; una cuenta normal tampoco', async () => {
       const claim = await request(app).patch(`/api/chatbot/bots/${LEGACY_BOT_ID}`).set(OWNER_HEADER, 'c'.repeat(43)).send({ name: 'Mío' });
       expect(claim.status).toBe(403);
-      expect(claim.body.error).toBe('legacy_bot_staff_only');
+      expect(claim.body.code).toBe('legacy_bot_staff_only');
       expect((await request(app).patch(`/api/chatbot/bots/${LEGACY_BOT_ID}`).set(bearer(owner)).send({ name: 'Mío' })).status).toBe(403);
       const forged = { Authorization: `Bearer ${signToken({ id: other.id, email: other.email, role: 'admin' })}` };
       expect((await request(app).patch(`/api/chatbot/bots/${LEGACY_BOT_ID}`).set(forged).send({ name: 'Mío' })).status).toBe(403);

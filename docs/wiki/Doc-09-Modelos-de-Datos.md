@@ -35,7 +35,8 @@ flowchart LR
     subgraph MONGO["MongoDB: datos de negocio"]
         U["Usuarios y acceso: users, magiclinktokens, auditlogs"]:::mongo
         D["Demos: democatalogitems, demorequests, demogrants"]:::mongo
-        L["Contacto y leads: contacts, quotes"]:::mongo
+        L["Contacto y leads: contacts"]:::mongo
+        B["Chatbot: chatbot_bots, chatbot_bot_chunks, chatbot_turns"]:::mongo
         P["Proyectos y facturación: projects, orders, invoices, deliverables, conversations, messages, notifications"]:::mongo
         S["Salud: facturas, atenciones, glosas, cups, radicados y catálogos"]:::mongo
         C["Chatbot anterior y documentos: chatbots, documents"]:::mongo
@@ -88,8 +89,7 @@ Cada modelo de Mongoose se guarda en una colección. Los nombres de la tabla son
 | Demos | `DemoCatalogItem` | `democatalogitems` | Las 28 demos: modo de acceso, activa, vigencia por defecto y orden | Semilla al arrancar y Admin › Catálogo |
 | | `DemoRequest` | `demorequests` | Solicitudes "Solicitar demo" | Formulario público y panel |
 | | `DemoGrant` | `demogrants` | Accesos de una persona a una demo, con vigencia y uso | Aprobación, invitación, extender, revocar, job horario |
-| Contacto y leads | `Contact` | `contacts` | Leads del formulario de contacto, de la demo RAG y de las solicitudes de demo | `lead.service` |
-| | `Quote` | `quotes` | Cotizaciones (`POST /api/quotes`, sin uso desde la web) | API |
+| Contacto y leads | `Contact` | `contacts` | Leads del formulario de contacto, de la demo RAG y de las solicitudes de demo, con la prueba de la autorización | `lead.service` |
 | Proyectos y facturación | `Project`, `ProjectMember`, `Task`, `ActivityLog` | `projects`, `projectmembers`, `tasks`, `activitylogs` | Proyectos del portal, sus miembros, tareas y actividad | Portal |
 | | `Order` | `orders` | Pedidos del cliente con ítems, adjuntos e historial | Portal y panel |
 | | `Invoice` | `invoices` | Facturas del portal | Panel (ver [Limitaciones](#11-limitaciones-conocidas)) |
@@ -567,13 +567,13 @@ Y así los ve el prospecto en su portal (`GET /api/me/demos`, solo con los campo
 |---|---|---|
 | `actor` | id → User o `null` | Quién hizo la acción |
 | `actorEmail`, `actorRol` | texto | Copia del email y el rol en ese momento |
-| `accion` | texto | `demo_request.update`, `demo_request.approve`, `demo_request.reject`, `demo_grant.create`, `demo_grant.extend`, `demo_grant.revoke`, `demo_grant.resend_activation`, `demo_catalog.update`, `user.activate`, `user.role_change`, `user.change_password` |
+| `accion` | texto | `demo_request.update`, `demo_request.approve`, `demo_request.reject`, `demo_grant.create`, `demo_grant.extend`, `demo_grant.revoke`, `demo_grant.resend_activation`, `demo_catalog.update`, `user.activate`, `user.role_change`, `user.change_password`, `privacy.search`, `privacy.export`, `privacy.erase` (las tres sin datos personales: solo conteos y, en la supresión, una referencia) |
 | `entidad` | objeto | `{ tipo, id }`: `DemoRequest`, `DemoGrant`, `DemoCatalogItem` o `User` |
 | `detalle` | objeto libre | Lo que cambió (antes y después, demos, días, si el correo salió…) |
 | `ipHash` | texto | IP en hash |
 | `createdAt` | fecha | Cuándo |
 
-Solo se agregan registros: **no hay ninguna ruta para editar ni borrar** la bitácora.
+Solo se agregan registros: **no hay ninguna ruta para editar ni borrar** la bitácora. La única excepción es la protección de datos: al suprimir o anonimizar a una persona, el `detalle` de las entradas que la mencionan se reemplaza por `{ datosSuprimidos: true }` o `{ datosAnonimizados: true }` (se conservan la acción, la fecha y quién del equipo la hizo).
 
 ### 4.7 Contact (`contacts`)
 
@@ -928,11 +928,8 @@ Recomendaciones al cambiar un modelo:
 | **Consecutivos que no se generan** | `Deliverable.deliverableId`, `Invoice.invoiceNumber`, `Conversation.conversationId` y `Message.messageId` son obligatorios y se calculan en un `pre('save')`, pero Mongoose valida antes de ese paso: crear entregables, facturas o conversaciones falla. Comprobado en el entorno local (`POST /api/deliverables`, `POST /api/invoices`, `POST /api/messages/conversations` responden 500 con "Path … is required") |
 | **Consecutivos por conteo** | `ORD-`, `DEL-`, `FAC-`, `CONV-` y `MSG-` se calculan contando documentos: si se borra uno o se crean dos a la vez, el número puede repetirse y el índice único rechaza el segundo |
 | **Notificaciones con id como texto** | `Notification.userId` (y `Document.user_id`) guardan el id de la cuenta como texto, no como referencia |
-| **Bots del chatbot fuera de la base** | Viven en memoria y en un archivo del disco del servidor; en Railway se pierden con cada despliegue |
-| **Archivos en disco efímero** | Los archivos subidos (`uploads/`) no sobreviven a un redespliegue en Railway |
-| **Sin borrado de datos personales por API** | Solicitudes, accesos, cuentas, contactos y bitácora no tienen ruta de borrado |
-| **Migraciones antiguas** | `db/migrations/*.sql` son de una versión anterior con base SQL; MongoDB no las usa |
-| **Colecciones casi sin uso** | `quotes` (cotizaciones sin pantalla), `chatsessions` y `chatmessages` (chat de eco, solo desarrollo) existen en el código pero no reciben datos desde la web |
+| **Archivos en disco** | Los archivos subidos (`uploads/`) no sobreviven a un redespliegue en Railway hasta que el dueño monte un volumen en `/app/uploads` ([acciones pendientes](Doc-11-Operacion-y-Despliegue.md#10-acciones-pendientes-del-dueño)); mientras tanto, la descarga de un adjunto perdido responde `410 file_unavailable` |
+| **Colecciones casi sin uso** | `chatsessions` y `chatmessages` (chat de eco, solo desarrollo) existen en el código pero no reciben datos desde la web. La colección `quotes` ya no tiene modelo ni ruta (se retiró `POST /api/quotes`, que ninguna página usaba); si la base de producción la tiene, sus datos se pueden revisar o borrar a mano |
 
 ---
 

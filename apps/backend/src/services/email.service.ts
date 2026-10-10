@@ -16,7 +16,8 @@ interface EmailConfig {
     pass: string;
   };
   from: string;
-  adminEmail: string;
+  /** Destino de los avisos al equipo (ADMIN_EMAIL). Sin ella no se envían. */
+  adminEmail: string | null;
 }
 
 class EmailService {
@@ -33,7 +34,9 @@ class EmailService {
         pass: process.env.SMTP_PASS || '',
       },
       from: process.env.EMAIL_FROM || 'KopTup <noreply@koptup.com>',
-      adminEmail: process.env.ADMIN_EMAIL || 'ronald@koptup.com',
+      // Sin dirección fija en el código: sin ADMIN_EMAIL los avisos al
+      // equipo no se envían por correo (config/env.ts lo avisa al arrancar).
+      adminEmail: process.env.ADMIN_EMAIL?.trim() || null,
     };
 
     // Solo inicializar si hay credenciales configuradas
@@ -57,8 +60,8 @@ class EmailService {
     return !!(this.transporter && this.config.auth.user && this.config.auth.pass);
   }
 
-  /** Destinatario de los avisos internos (ADMIN_EMAIL). */
-  getAdminEmail(): string {
+  /** Destinatario de los avisos internos (ADMIN_EMAIL); null si no está definida. */
+  getAdminEmail(): string | null {
     return this.config.adminEmail;
   }
 
@@ -105,10 +108,14 @@ class EmailService {
       logger.warn('📧 Email not configured - skipping notification');
       return false;
     }
+    const adminEmail = this.config.adminEmail;
+    if (!adminEmail) {
+      logger.warn('📧 ADMIN_EMAIL no está definida: el aviso de contacto al equipo no se envía por correo');
+      return false;
+    }
 
     try {
-      logger.info('📧 Sending email notification...');
-      logger.info(`   To: ${this.config.adminEmail}`);
+      logger.info('📧 Sending email notification to ADMIN_EMAIL...');
 
       const htmlContent = `
 <!DOCTYPE html>
@@ -210,7 +217,7 @@ ${contactData.message}
 
       const info = await this.transporter.sendMail({
         from: this.config.from,
-        to: this.config.adminEmail,
+        to: adminEmail,
         subject: safeSubject(`🔔 Nuevo Contacto: ${contactData.name} - ${contactData.service}`),
         text: textContent,
         html: htmlContent,

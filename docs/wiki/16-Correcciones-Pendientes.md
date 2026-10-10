@@ -27,9 +27,9 @@ flowchart LR
 | Prioridad | Qué agrupa | Puntos |
 |---|---|---|
 | **P0** | Lo que impide vender hoy o es un riesgo legal o de seguridad | 8 |
-| **P1** | Funciones que el cliente o el equipo usan y no sirven, incluidas las demos | 25 |
-| **P2** | Detalles del panel, de la operación y de la configuración | 34 |
-| **P3** | SEO, coherencia de textos y código que sobra | 11 |
+| **P1** | Funciones que el cliente o el equipo usan y no sirven, incluidas las demos | 24 |
+| **P2** | Detalles del panel, de la operación y de la configuración | 23 |
+| **P3** | SEO, coherencia de textos y código que sobra | 2 |
 
 ---
 
@@ -67,8 +67,8 @@ flowchart LR
 
 | # | Qué pasa | Detalle |
 |---|---|---|
-| 1.15 | **Un documento de 30 páginas o menos con mucho texto se rechaza como "supera 30 páginas"** | [Flujos técnicos › Hallazgos](Doc-14-3-Flujos-Tecnicos.md#hallazgos) |
-| 1.16 | **LinkedIn Ads muestra el cupo mensual agotado como un error genérico** del servidor | [Flujos técnicos › Hallazgos](Doc-14-3-Flujos-Tecnicos.md#hallazgos) |
+| 1.15 | **"Prueba con tu documento" muestra un mensaje genérico para un documento con demasiado texto.** El backend ya lo rechaza con su propio código (`too_much_text`) y un mensaje claro; falta el texto en la pantalla de la demo | [Flujos técnicos › Hallazgos](Doc-14-3-Flujos-Tecnicos.md#hallazgos) |
+| 1.16 | **LinkedIn Ads muestra el cupo mensual agotado y la falta de Redis como un error genérico.** El backend ya responde `budget_exhausted` y `limits_unavailable` con mensajes claros; falta que la demo los use | [Flujos técnicos › Hallazgos](Doc-14-3-Flujos-Tecnicos.md#hallazgos) |
 
 ### Cuenta e inicio de sesión
 
@@ -83,9 +83,8 @@ flowchart LR
 
 | # | Qué pasa | Detalle |
 |---|---|---|
-| 1.22 | **Los bots de "Configura el tuyo", los adjuntos y los registros se pierden en cada despliegue** de Railway, porque el disco es efímero | [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md) |
-| 1.23 | **No hay monitoreo ni alertas:** la caída actual del backend no avisó a nadie | [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md) |
-| 1.24 | **`main` no exige CI en verde,** y Vercel y Railway despliegan sin esperarlo | [Flujos de administración › Hallazgos](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#hallazgos) |
+| 1.22 | **Los adjuntos de pedidos y los archivos de cuentas médicas se pierden en cada despliegue** de Railway hasta que el dueño monte un volumen en `/app/uploads` | [Operación y despliegue › Acciones pendientes](Doc-11-Operacion-y-Despliegue.md#10-acciones-pendientes-del-dueño) |
+| 1.24 | **`main` no exige CI en verde,** y Vercel y Railway despliegan sin esperarlo. Es configuración de GitHub y Railway (acción del dueño) | [Operación y despliegue › Acciones pendientes](Doc-11-Operacion-y-Despliegue.md#10-acciones-pendientes-del-dueño) |
 
 ### Demos
 
@@ -134,18 +133,7 @@ flowchart LR
 
 | # | Qué pasa | Detalle |
 |---|---|---|
-| 2.22 | **Dos proyectos de Vercel despliegan `main`** (`koptup`, con el dominio, y `koptup-web`): doble build y riesgo de cambiar variables en el equivocado | [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md) |
-| 2.23 | **El chequeo de salud de Railway no mira la base de datos** | [Flujos de administración › Hallazgos](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#hallazgos) |
-| 2.24 | **El arranque no avisa si faltan** `DEMO_UPLOAD_ENABLED`, `INTERNAL_API_KEY`, `SMTP_USER` o `SMTP_PASS`, y avisa por `SMTP_HOST`, que no decide si sale correo | [Flujos técnicos › Hallazgos](Doc-14-3-Flujos-Tecnicos.md#hallazgos) |
-| 2.25 | **README y `.env.example` dicen que sin `JWT_REFRESH_SECRET` el backend no arranca;** en realidad arranca y falla el inicio de sesión | [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md) |
-| 2.26 | **Sin `.env.local`, la web en desarrollo llama a la API de producción,** y `.env.example` también apunta a producción | [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md) |
-| 2.27 | **Guías y plantillas viejas:** `.env.example` de la raíz habla de PostgreSQL, `SETUP.md` usa `MONGO_URI`, `docker-compose.yml` apunta a un Dockerfile del backend que no existe y el Dockerfile de la web usa Node 18 | [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md) |
-| 2.28 | **El script `set-admin` no carga `.env`** | [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md) |
-| 2.29 | **`ADMIN_EMAIL` vuelve a dar admin en cada arranque,** y sin ella los avisos al equipo van a una dirección fija del código | [Flujos de administración › Hallazgos](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#hallazgos) |
-| 2.30 | **`NEXT_PUBLIC_SITE_URL` no la lee nadie,** y un `JWT_REFRESH_EXPIRES_IN` mayor de 7 días no tiene efecto | [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md) |
-| 2.31 | **Estado en memoria por instancia:** documentos de la demo, límites y cachés. Con más de una instancia no se comparten | [Arquitectura](Doc-01-Arquitectura.md) |
-| 2.32 | **Cuatro formatos de respuesta de error distintos** en la API | [Flujos técnicos › Hallazgos](Doc-14-3-Flujos-Tecnicos.md#hallazgos) |
-| 2.33 | **La wiki también se publica desde la rama de trabajo,** así que puede adelantarse a `main` | [Flujos de administración › Hallazgos](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#hallazgos) |
+| 2.22 | **Dos proyectos de Vercel despliegan `main`** (`koptup`, con el dominio, y `koptup-web`): doble build y riesgo de cambiar variables en el equivocado. Acción del dueño | [Operación y despliegue › Acciones pendientes](Doc-11-Operacion-y-Despliegue.md#10-acciones-pendientes-del-dueño) |
 | 2.34 | **Crear o previsualizar una regla de facturación con IA falla** en `/liquidacion`: el servicio usa un modelo de Anthropic de 2024 que ya no está disponible. Hay que pasarlo a un modelo vigente | [API](Doc-08-API.md) |
 
 ---
@@ -158,20 +146,6 @@ flowchart LR
 |---|---|---|
 | 3.7 | **La tabla de `/cookies` lista cookies que no existen** y omite las reales; la cookie de idioma se guarda aunque se rechacen las funcionales | [SEO, analítica y legal](Doc-12-SEO-Analitica-y-Legal.md) |
 | 3.14 | **Falta el inglés en** "Nuevo pedido" del portal (`/dashboard/orders/new`) | [Páginas públicas](Doc-03-Paginas-Publicas.md) |
-
-### Código sin uso o que confunde
-
-| # | Qué pasa | Detalle |
-|---|---|---|
-| 3.18 | `apps/web/middleware.ts` (en la raíz) no se ejecuta: Next usa `apps/web/src/middleware.ts` | [Arquitectura](Doc-01-Arquitectura.md) |
-| 3.19 | `src/i18n/useToggleLocale.tsx` no se usa, y nadie fija la cabecera `x-locale` que lee `i18n/request.ts` | [Arquitectura](Doc-01-Arquitectura.md) |
-| 3.20 | `apps/backend/src/modules/` (17 módulos de demos) no se monta en la app | [Arquitectura](Doc-01-Arquitectura.md) |
-| 3.23 | `packages/database/init.sql` y `db/migrations/*.sql` son de una versión con PostgreSQL | [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md) |
-| 3.24 | `POST /api/quotes` no lo llama ninguna página | [API](Doc-08-API.md#11-limitaciones-conocidas) |
-| 3.25 | Los adjuntos de pedidos se guardan, pero no hay ruta para descargarlos | [API](Doc-08-API.md#11-limitaciones-conocidas) |
-| 3.27 | El comentario del modelo `AuditLog` no incluye la acción `user.change_password` | [Modelos de datos](Doc-09-Modelos-de-Datos.md) |
-| 3.29 | `README.md` con cifras viejas | [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md) |
-| 3.30 | `/api/expert/generar-excel` falla cuando la IA no devuelve procedimientos | [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md) |
 
 ---
 

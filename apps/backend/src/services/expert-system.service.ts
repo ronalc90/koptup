@@ -27,6 +27,15 @@ import {
   CodigoGlosa,
 } from '../types/expert-system.types';
 import { logger } from '../utils/logger';
+import { AppError } from '../middleware/errorHandler';
+
+/**
+ * La IA no encontró procedimientos facturados en el documento: sin ellos no
+ * hay nada que validar ni que llevar al Excel. Responde 422 con un mensaje
+ * que dice qué revisar (antes fallaba con un 500 «not iterable»).
+ */
+export const NO_PROCEDURES_MESSAGE =
+  'No encontramos procedimientos facturados en el documento. Revisa que sea una factura de servicios de salud legible (no escaneada como imagen) e intenta de nuevo.';
 
 // ============================================================================
 // INTERFACES INTERNAS
@@ -123,6 +132,9 @@ export class SistemaExpertoService {
       // ================================================================
       logger.info('Paso 2/5: Extrayendo datos con OpenAI...');
       const datosExtraidos = await this.extraerDatosConIA(textoPDF);
+      if (datosExtraidos.procedimientos.length === 0) {
+        throw new AppError(NO_PROCEDURES_MESSAGE, 422, 'no_procedures');
+      }
 
       // ================================================================
       // PASO 3: Validar y enriquecer con BD
@@ -148,7 +160,8 @@ export class SistemaExpertoService {
       resultadoFinal.metadata.tiempoMs = tiempoTotal;
       return resultadoFinal;
     } catch (error) {
-      logger.error('Error en procesamiento experto:', error);
+      if (error instanceof AppError) logger.warn(`Procesamiento experto rechazado (${error.code}): ${error.message}`);
+      else logger.error('Error en procesamiento experto:', error);
       throw error;
     }
   }
@@ -283,7 +296,10 @@ Responde ÚNICAMENTE con JSON válido siguiendo esta estructura:
       if (datos.atencion?.fechaIngreso) datos.atencion.fechaIngreso = new Date(datos.atencion.fechaIngreso);
       if (datos.atencion?.fechaEgreso) datos.atencion.fechaEgreso = new Date(datos.atencion.fechaEgreso);
 
-      datos.procedimientos?.forEach((proc: any) => {
+      // La respuesta de la IA puede no traer el arreglo (o traer otra cosa).
+      if (!Array.isArray(datos.procedimientos)) datos.procedimientos = [];
+      datos.procedimientos = datos.procedimientos.filter((proc: unknown) => proc && typeof proc === 'object');
+      datos.procedimientos.forEach((proc: any) => {
         if (proc.fecha) proc.fecha = new Date(proc.fecha);
       });
 

@@ -130,7 +130,7 @@ koptup/
 │   │   │   │   ├── admin/           ← Panel de administración
 │   │   │   │   ├── dashboard/       ← Portal del prospecto y del cliente
 │   │   │   │   └── api/             ← Rutas API de Next (proxy de LinkedIn Ads y proxies heredados)
-│   │   │   ├── middleware.ts        ← Guardia de sesión, rol y acceso a demos (el que se ejecuta)
+│   │   │   ├── middleware.ts        ← Guardia de sesión, rol y acceso a demos
 │   │   │   ├── components/          ← Menú, pie, hub de demos, panel, portal, consentimiento, RAG…
 │   │   │   ├── lib/                 ← Cliente de la API, roles, catálogo de demos, SEO, analítica
 │   │   │   ├── i18n/                ← Configuración de next-intl (idioma por cookie)
@@ -139,7 +139,6 @@ koptup/
 │   │   ├── e2e/                     ← Suite Playwright (9 especificaciones) y mock de OpenAI
 │   │   ├── public/                  ← robots.txt, widget.js, llms.txt, íconos, manifest
 │   │   ├── scripts/                 ← merge-messages.mjs, check-titles.mjs
-│   │   ├── middleware.ts            ← Archivo heredado: NO se ejecuta (ver Limitaciones)
 │   │   ├── next.config.js           ← Cabeceras de seguridad, CSP, imágenes, next-intl
 │   │   └── vercel.json
 │   └── backend/                     ← API Express (Railway)
@@ -154,15 +153,13 @@ koptup/
 │       │   ├── jobs/                ← demo-grants.job.ts (vencimientos y recordatorios)
 │       │   ├── config/              ← env.ts (validación con zod), demos.ts, mongodb, redis, passport
 │       │   ├── data/                ← Semilla del catálogo de demos y estado del chatbot
-│       │   ├── modules/             ← 17 módulos de demos SIN montar (ver Limitaciones)
 │       │   └── __tests__/           ← Pruebas unitarias e integración (supertest)
-│       ├── railway.json             ← Build, arranque y healthcheck /health/live
+│       ├── railway.json             ← Build, arranque, una instancia y healthcheck /health
 │       └── Procfile
-├── packages/database/               ← init.sql de PostgreSQL heredado (no se usa)
 ├── docs/wiki/                       ← Esta wiki (se publica sola con wiki-sync.yml)
-├── .github/workflows/               ← ci.yml (lint, tipos, pruebas, build, e2e) y wiki-sync.yml
+├── .github/workflows/               ← ci.yml (lint, tipos, pruebas, build, e2e, seguridad), monitor.yml y wiki-sync.yml
+├── scripts/                         ← audit-check.mjs (npm audit) y uptime-check.sh (monitoreo)
 ├── docker-compose.dev.yml           ← MongoDB 7 y Redis 7 para desarrollo local
-├── docker-compose.yml               ← Compose heredado (ver Limitaciones)
 └── turbo.json, package.json         ← Workspaces y tareas de Turborepo (Node ≥ 20.9)
 ```
 
@@ -379,7 +376,7 @@ El detalle de quién entra a dónde está en [Roles y permisos](Doc-10-Roles-y-P
 
 | Dato | Dónde | Cuánto dura |
 |---|---|---|
-| Cuentas, solicitudes y accesos a demos, catálogo editable, bitácora, contactos, pedidos, facturas, entregables, mensajes, notificaciones, proyectos | **MongoDB** (ver [Modelos de datos](Doc-09-Modelos-de-Datos.md)) | Permanente |
+| Cuentas, solicitudes y accesos a demos, catálogo editable, bitácora, contactos, pedidos, facturas, entregables, mensajes, notificaciones, proyectos | **MongoDB** (ver [Modelos de datos](Doc-09-Modelos-de-Datos.md)) | Permanente; las solicitudes rechazadas y los prospectos sin actividad se anonimizan a los 24 meses, y Admin › Privacidad suprime a pedido |
 | Refresh tokens | **Redis** | 7 días |
 | Gasto de IA del mes (`demo-rag`, `chatbot`, `linkedin-ads`, `content`) | **Redis** (`<función>:spend:AAAA-MM`) | Por mes (UTC) |
 | Cupos: documentos por IP al día, solicitudes de demo por IP y por email, LinkedIn Ads | **Redis** (las solicitudes tienen respaldo en memoria) | De 10 minutos a 1 día |
@@ -448,7 +445,7 @@ flowchart TD
     X["No arranca"]:::error
     C["2. Crea las carpetas de uploads"]:::sistema
     D["3. Conecta MongoDB (si falla, sigue y /health responde 503)"]:::sistema
-    E["4. Da rol admin a ADMIN_EMAIL, si está definido"]:::sistema
+    E["4. ADMIN_EMAIL: rol admin solo si no hay ningún otro admin"]:::sistema
     F["5. Siembra las demos que falten en el catálogo (no pisa cambios del panel)"]:::sistema
     G["6. Inicializa Google OAuth si está configurado"]:::sistema
     H["7. Monta la app Express y abre el puerto"]:::sistema
@@ -459,7 +456,7 @@ flowchart TD
     B -->|"No"| C --> D --> E --> F --> G --> H --> J
 ```
 
-*Railway da por sano el despliegue cuando `GET /health/live` responde 200.*
+*Railway da por sano el despliegue cuando `GET /health` responde 200, es decir, con MongoDB conectado; si no, deja la versión anterior.*
 
 ### Tareas automáticas
 
@@ -544,10 +541,8 @@ Sin entrar en detalles que faciliten un ataque, estas son las capas que protegen
 ## 12. Limitaciones conocidas
 
 - **El backend de producción no responde** en este momento; ver [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md).
-- **Disco efímero en Railway.** Los bots creados en "Configura el tuyo" (`state.json`) y los archivos subidos a `uploads/` se pierden en cada redespliegue. Los bots de las empresas de ejemplo se vuelven a crear solos.
-- **Estado por instancia.** Los documentos de "Prueba con tu documento", los límites generales por IP y las cachés del middleware (sesión 30 s, catálogo 60 s) viven en la memoria de cada instancia. Con más de una instancia, un documento solo existe en la que lo recibió, y un cambio de rol puede tardar hasta 30 s en reflejarse en la web (la API lo aplica de inmediato).
-- **Código sin uso en `main`:** `apps/web/middleware.ts` (raíz) no se ejecuta porque Next usa `src/middleware.ts`, así que la cabecera `x-locale` que lee `i18n/request.ts` nunca llega (el idioma sale de la cookie y funciona igual); `apps/backend/src/modules/` (17 módulos de demos) no está montado en `app.ts`.
-- **Archivos heredados de otra arquitectura:** `packages/database/init.sql` y `apps/backend/src/db/migrations/*.sql` son de PostgreSQL; `docker-compose.yml` apunta a un `apps/backend/Dockerfile` que no existe. Para desarrollo local usa `docker-compose.dev.yml`.
+- **Disco efímero en Railway.** Los archivos subidos a `uploads/` (adjuntos de pedidos, cuentas médicas) se pierden en cada redespliegue hasta que se monte un volumen en `/app/uploads` ([Operación y despliegue › Acciones pendientes](Doc-11-Operacion-y-Despliegue.md#10-acciones-pendientes-del-dueño)).
+- **Una sola instancia de la API, a propósito.** Los documentos de "Prueba con tu documento", los límites generales por IP y la caché de sesión de la web (30 s) y del catálogo (60 s) viven en la memoria del proceso; por eso `railway.json` fija `numReplicas: 1`. Para escalar a varias instancias hay que pasar ese estado a Redis primero. Un cambio de rol puede tardar hasta 30 s en reflejarse en la web (la API lo aplica de inmediato).
 - **En desarrollo:** propuestas, anticipo y conversión a cliente no están en `main`; ver [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md).
 
 ---

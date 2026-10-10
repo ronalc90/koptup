@@ -34,6 +34,9 @@ export async function notifyTeam(notice: TeamNotice): Promise<TeamNoticeResult> 
     `      ${notice.lineas.map((l) => (l ? `<p>${escapeHtml(l)}</p>` : '')).join('\n      ')}
       ${notice.enlace ? `<p><a class="button" href="${safeHref(notice.enlace)}">Abrir en el panel</a></p>` : ''}`,
   );
+  if (emailService.isConfigured() && recipients.length === 0) {
+    logger.warn(`[team-notify] ADMIN_EMAIL no está definida: el aviso "${safeSubject(notice.asunto)}" no se envía por correo`);
+  }
   const email = emailService.isConfigured()
     ? (await Promise.all(recipients.map((to) => emailService.sendMail({ to, subject: safeSubject(notice.asunto), html, text }).catch(() => false)))).some(Boolean)
     : false;

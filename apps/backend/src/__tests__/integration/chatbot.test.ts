@@ -167,7 +167,7 @@ describe('chatbot: propiedad, límites e ingesta (integración)', () => {
     const claimer = 'a'.repeat(43);
     const first = await request(app).patch(`/api/chatbot/bots/${LEGACY_BOT_ID}`).set(OWNER_HEADER, claimer).send({ name: 'Reclamado' });
     expect(first.status).toBe(403);
-    expect(first.body.error).toBe('legacy_bot_staff_only');
+    expect(first.body).toMatchObject({ success: false, code: 'legacy_bot_staff_only' });
     // Tampoco por la vía de "crear con el mismo botId" ni sin token.
     expect((await request(app).post('/api/chatbot/bots').set(OWNER_HEADER, claimer).send({ botId: LEGACY_BOT_ID, name: 'Reclamado' })).status).toBe(403);
     expect((await request(app).delete(`/api/chatbot/bots/${LEGACY_BOT_ID}`)).status).toBe(403);
@@ -182,7 +182,7 @@ describe('chatbot: propiedad, límites e ingesta (integración)', () => {
   it('valida campos de configuración', async () => {
     const res = await request(app).post('/api/chatbot/bots').send({ systemPrompt: 'x'.repeat(4001) });
     expect(res.status).toBe(400);
-    expect(res.body).toMatchObject({ error: 'field_too_long', field: 'systemPrompt' });
+    expect(res.body).toMatchObject({ success: false, code: 'field_too_long', field: 'systemPrompt', message: expect.any(String) });
     expect((await request(app).post('/api/chatbot/bots').send({ color: 'red; background:url(x)' })).status).toBe(400);
   });
 

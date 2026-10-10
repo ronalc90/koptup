@@ -494,15 +494,17 @@ flowchart TD
     D2{"¿Hay un usuario con ese email?"}:::decision
     E1["Advertencia: ADMIN_EMAIL no corresponde<br/>a ningún usuario"]:::error
     E2["Advertencia en el log y el arranque sigue"]:::error
-    A4["role admin para esa cuenta<br/>(se repite en cada arranque)"]:::sistema
-    S1["Desarrollador con MONGODB_URI de la base:<br/>npx ts-node --transpile-only src/scripts/set-admin.ts EMAIL"]:::admin
+    D5{"¿La cuenta está activa y<br/>no hay ningún otro admin?"}:::decision
+    E6["Log: ya existe otro admin o la cuenta no está activada<br/>no se cambia ningún rol"]:::sistema
+    A4["role admin para esa cuenta<br/>y registro user.role_change en la bitácora<br/>(origen ADMIN_EMAIL)"]:::sistema
+    S1["Desarrollador en apps/backend<br/>(lee MONGODB_URI de .env o de railway run):<br/>npx ts-node --transpile-only src/scripts/set-admin.ts EMAIL"]:::admin
     D3{"¿Recibió un email?<br/>(argumento o ADMIN_EMAIL)"}:::decision
     E3["Muestra el uso y termina con código 1"]:::error
     S2["Conecta MongoDB y busca el usuario"]:::sistema
     D4{"¿Resultado?"}:::decision
-    E4["User not found, código 1<br/>(debe haber iniciado sesión antes)"]:::error
-    E5["Error setting admin, código 1"]:::error
-    S3["role admin, código 0"]:::sistema
+    E4["No existe la cuenta, código 1<br/>(debe registrarse o activarse antes)"]:::error
+    E5["Error o sin conexión a MongoDB, código 1"]:::error
+    S3["role admin y registro user.role_change<br/>en la bitácora (origen set-admin), código 0"]:::sistema
     R1["El backend lo trata como admin de inmediato:<br/>lee el rol de la BD en cada petición"]:::sistema
     R2["Para ver el panel debe cerrar sesión y volver a entrar<br/>(la web guarda el rol al iniciar sesión)"]:::visitante
 
@@ -512,7 +514,9 @@ flowchart TD
     D1 -->|"Sí"| D2
     D2 -->|"No"| E1
     D2 -->|"Error de BD"| E2
-    D2 -->|"Sí"| A4 --> R1
+    D2 -->|"Sí"| D5
+    D5 -->|"No"| E6
+    D5 -->|"Sí"| A4 --> R1
     D0 -->|"Script set-admin"| S1 --> D3
     D3 -->|"No"| E3
     D3 -->|"Sí"| S2 --> D4
@@ -524,9 +528,9 @@ flowchart TD
 
 ![Diagrama: Cómo una cuenta se vuelve admin](images/doc/flujos/Doc-14-2-Flujos-de-Administracion-y-Operacion-9.png)
 
-No hay correo de admin por defecto en el código para los roles: sin `ADMIN_EMAIL` el arranque no toca a nadie. Como el arranque **vuelve a aplicar** el rol cada vez, quitarle el admin a la cuenta de `ADMIN_EMAIL` desde el panel dura solo hasta el siguiente despliegue o reinicio. Ninguna de estas dos vías queda en la bitácora.
+No hay correo de admin por defecto en el código: sin `ADMIN_EMAIL` el arranque no toca a nadie. Con ella, el arranque solo da el rol si **no hay ningún otro admin** (el primer admin o la recuperación cuando no queda ninguno): si un admin le quita el rol a esa cuenta desde el panel, la decisión se respeta. Las dos vías quedan en la bitácora con su origen.
 
-**Fuente en el código:** `apps/backend/src/index.ts` (`ensureAdminFromEnv`), `apps/backend/src/scripts/set-admin.ts`, `apps/backend/src/middleware/access.ts` (`requireRole`, `loadFreshUser`), `apps/web/src/components/admin/AdminLayout.tsx`, `apps/web/e2e/global-setup.ts`.
+**Fuente en el código:** `apps/backend/src/services/admin-bootstrap.service.ts` (`ensureAdminFromEnv`), `apps/backend/src/index.ts`, `apps/backend/src/scripts/set-admin.ts`, `apps/backend/src/middleware/access.ts` (`requireRole`, `loadFreshUser`), `apps/web/src/components/admin/AdminLayout.tsx`, `apps/web/e2e/global-setup.ts`.
 
 ### 4.2 Cambiar un rol desde el panel
 
@@ -823,6 +827,7 @@ flowchart TD
     J2["Job pruebas (matriz backend y web):<br/>Jest con MongoDB 7 y Redis 7"]:::externo
     J3["Job build: tsc del backend y next build<br/>apuntando a un backend local"]:::externo
     J4["Job e2e: MongoDB, Redis, mock de OpenAI,<br/>backend y web compilados y Playwright"]:::externo
+    J5["Job seguridad: npm audit de producción<br/>(umbral alto) y gitleaks"]:::externo
     D1{"¿Todos los jobs en verde?"}:::decision
     E1["Revisa logs y el reporte de Playwright,<br/>corrige y haz push otra vez"]:::error
     E2["El push nuevo cancela la corrida en curso<br/>(concurrency)"]:::sistema
@@ -832,18 +837,20 @@ flowchart TD
     P2 --> J1
     P2 --> J2
     P2 --> J3 --> J4
+    P2 --> J5
     J1 --> D1
     J2 --> D1
     J4 --> D1
+    J5 --> D1
     D1 -->|"No"| E1 --> E2 --> P2
     D1 -->|"Sí"| P3
 ```
 
 ![Diagrama: Pull request y CI](images/doc/flujos/Doc-14-2-Flujos-de-Administracion-y-Operacion-15.png)
 
-CI **solo verifica, no despliega**. El job e2e espera al de build y usa sus compilados; recorre la plataforma de punta a punta (solicitud, aprobación, activación, acceso, revocación, permisos, modo de acceso, contacto y la demo RAG con un PDF) con datos ficticios de CI.
+CI **solo verifica, no despliega**. El job e2e espera al de build y usa sus compilados; recorre la plataforma de punta a punta (solicitud, aprobación, activación, acceso, revocación, permisos, modo de acceso, contacto y la demo RAG con un PDF) con datos ficticios de CI. El job de seguridad falla con una alerta alta o crítica de una dependencia de producción que no esté revisada en `.github/audit-allowlist.json` o con algo con forma de secreto en los archivos o en los commits nuevos.
 
-**Fuente en el código:** `.github/workflows/ci.yml`, `apps/web/e2e/global-setup.ts`, `apps/web/e2e/support/openai-mock.js`, `apps/web/playwright.config.ts`.
+**Fuente en el código:** `.github/workflows/ci.yml`, `scripts/audit-check.mjs`, `.gitleaks.toml`, `apps/web/e2e/global-setup.ts`, `apps/web/e2e/support/openai-mock.js`, `apps/web/playwright.config.ts`.
 
 ### 7.2 Merge a main y despliegue a producción
 
@@ -869,8 +876,8 @@ flowchart TD
     D2{"¿Faltan MONGODB_URI o JWT_SECRET?"}:::decision
     E2["El proceso termina: Configuración incompleta"]:::error
     R3["Conecta MongoDB (si falla, arranca igual),<br/>ADMIN_EMAIL, semilla del catálogo, puerto y job"]:::sistema
-    D3{"¿GET /health/live responde en 120 s?"}:::decision
-    E3["Despliegue fallido en Railway"]:::error
+    D3{"¿GET /health responde 200 en 120 s?<br/>(solo con MongoDB conectado)"}:::decision
+    E3["Despliegue fallido en Railway:<br/>sigue la versión anterior"]:::error
     R4["API en producción"]:::sistema
     F1["Producción: web y API con el código de main"]:::sistema
 
@@ -888,7 +895,7 @@ flowchart TD
 
 ![Diagrama: Merge a main y despliegue a producción](images/doc/flujos/Doc-14-2-Flujos-de-Administracion-y-Operacion-16.png)
 
-Vercel y Railway despliegan desde `main` por su cuenta, en paralelo y sin esperar a CI. El chequeo de Railway (`/health/live`) solo confirma que el proceso responde: un backend sin MongoDB pasa el chequeo y `/health` responde 503. **Situación actual:** el dominio del backend en Railway no tiene servicio (ver 9.1 y [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md)).
+Vercel y Railway despliegan desde `main` por su cuenta, en paralelo y sin esperar a CI (hasta que el dueño active la protección de `main` y la espera de CI: [acciones pendientes](Doc-11-Operacion-y-Despliegue.md#10-acciones-pendientes-del-dueño)). El chequeo de Railway es `/health`: un despliegue sin MongoDB no entra en servicio y la versión anterior sigue atendiendo. **Situación actual:** el dominio del backend en Railway no tiene servicio (ver 9.1 y [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md)).
 
 **Fuente en el código:** `apps/backend/railway.json`, `apps/backend/package.json` (`build`, `start`), `apps/web/vercel.json`, `apps/backend/src/index.ts`, `apps/backend/src/config/env.ts`, `apps/backend/src/app.ts` (`/health/live`, `/health`), `README.md` (sección Despliegue).
 
@@ -925,7 +932,7 @@ flowchart TD
 
     W1 --> D1
     D1 -->|"Otra rama"| W2
-    D1 -->|"main o ccr-55ceecf7-dpc10i"| W3
+    D1 -->|"main"| W3
     W0 --> W3
     W3 --> W4 --> D2
     D2 -->|"No"| E1
@@ -936,7 +943,7 @@ flowchart TD
 
 ![Diagrama: Publicación de la wiki](images/doc/flujos/Doc-14-2-Flujos-de-Administracion-y-Operacion-17.png)
 
-La fuente de la wiki vive versionada en `docs/wiki/` y el workflow la copia **completa** a la wiki de GitHub: lo que se edite directamente en la wiki se pierde en la siguiente publicación. La wiki se activó el 9 de octubre de 2026 y la primera publicación correcta salió de la rama de trabajo, no de `main` (ver Hallazgos).
+La fuente de la wiki vive versionada en `docs/wiki/` y el workflow la copia **completa** a la wiki de GitHub: lo que se edite directamente en la wiki se pierde en la siguiente publicación. Solo se publica sola desde `main`; otra rama se publica únicamente a mano, y la siguiente publicación desde `main` la vuelve a dejar igual a `main`.
 
 **Fuente en el código:** `.github/workflows/wiki-sync.yml`.
 
@@ -1245,19 +1252,12 @@ Volver a un despliegue anterior es una función de los paneles de Vercel y Railw
 Cosas del código o de la configuración que no tienen sentido o pueden confundir a quien opera el sitio. Están dibujadas tal como son.
 
 1. **Con el backend caído, el panel manda al login en lugar de avisar.** Railway responde 404 («Application not found») a todo, y el middleware de la web trata un 404 de `GET /api/auth/me` igual que una sesión inválida: redirige a `/login` en vez de mostrar la página 503 «No pudimos verificar tu sesión». Quien opera puede creer que el problema son sus credenciales. (`apps/web/src/middleware.ts`, `fetchMe`).
-2. **`main` no tiene protección de rama.** GitHub no exige CI en verde para fusionar, y Vercel y Railway despliegan desde `main` sin esperar a CI: un merge con CI en rojo llega igual a producción.
-3. **La wiki también se publica desde la rama de trabajo.** `wiki-sync.yml` se dispara con push a `main` **y** a `ccr-55ceecf7-dpc10i`; la wiki puede mostrar páginas que todavía no están en `main` (la primera publicación correcta, el 9 de octubre, salió de esa rama).
-4. **El README y el código no dicen lo mismo sobre `JWT_REFRESH_SECRET`.** El README dice que en producción el backend no arranca sin ella; `config/env.ts` solo registra el aviso y arranca (sin ella falla el inicio de sesión).
-5. **El aviso de arranque sobre el correo mira la variable equivocada.** `config/env.ts` avisa si falta `SMTP_HOST`, pero el envío depende de `SMTP_USER` y `SMTP_PASS` (sin `SMTP_HOST` usa el servidor de Gmail). Con usuario y contraseña pero sin host, el log dice que el correo está apagado y no lo está; con host pero sin usuario, no avisa y el correo sí está apagado.
-6. **Sin `ADMIN_EMAIL`, los avisos al equipo van a una dirección fija escrita en el código** (`services/email.service.ts`), no a «nadie». Para los roles, en cambio, sin `ADMIN_EMAIL` no se toca a nadie.
-7. **`ADMIN_EMAIL` vuelve a dar admin en cada arranque.** Quitarle el rol desde el panel a esa cuenta se deshace en el siguiente despliegue o reinicio. Ni esta vía ni el script `set-admin` quedan en la bitácora (solo el cambio desde el panel registra `user.role_change`).
-8. **El selector de roles de Admin › Usuarios está incompleto.** Ofrece Usuario, Developer, Manager y Admin: no hay forma de dar el rol comercial (`sales`), `prospect` ni `client` desde la interfaz, solo por API. Si un usuario ya tiene uno de esos roles, el selector no lo puede mostrar. Un manager ve el selector, pero el backend le responde 403.
-9. **Un rol nuevo no se ve en el panel hasta volver a iniciar sesión.** El panel decide qué mostrar con el rol guardado en el navegador al iniciar sesión; el servidor ya aplica el rol nuevo, pero la persona es enviada a su página anterior hasta que sale y vuelve a entrar.
-10. **La bitácora no tiene pantalla.** `GET /api/admin/audit-log` existe (solo admin), pero no hay una sección del panel para consultarla.
-11. **En Accesos, el enlace de activación nuevo no ofrece WhatsApp.** El modal se abre sin teléfono, así que solo permite copiar el enlace, aunque la persona tenga teléfono (en el detalle de la solicitud sí aparece el botón).
-12. **Se puede conceder acceso a una demo desactivada.** Ni aprobar ni invitar revisan si la demo está activa: la persona recibe el correo y al abrirla ve «En mantenimiento».
-13. **Hay dos archivos de middleware en la web.** Next usa `apps/web/src/middleware.ts` (el de la caché del catálogo); `apps/web/middleware.ts`, en la raíz, no se ejecuta y puede confundir a quien busque dónde se decide el acceso.
-14. **El chequeo de salud de Railway no mira la base.** `railway.json` usa `/health/live`, que responde 200 aunque MongoDB no esté conectado; un despliegue sin base queda «sano» para Railway mientras `/health` responde 503.
+2. **`main` no tiene protección de rama.** GitHub no exige CI en verde para fusionar, y Vercel y Railway despliegan desde `main` sin esperar a CI: un merge con CI en rojo llega igual a producción. Es una configuración de las plataformas: los pasos están en [Operación y despliegue › Acciones pendientes del dueño](Doc-11-Operacion-y-Despliegue.md#10-acciones-pendientes-del-dueño).
+3. **El selector de roles de Admin › Usuarios está incompleto.** Ofrece Usuario, Developer, Manager y Admin: no hay forma de dar el rol comercial (`sales`), `prospect` ni `client` desde la interfaz, solo por API. Si un usuario ya tiene uno de esos roles, el selector no lo puede mostrar. Un manager ve el selector, pero el backend le responde 403.
+4. **Un rol nuevo no se ve en el panel hasta volver a iniciar sesión.** El panel decide qué mostrar con el rol guardado en el navegador al iniciar sesión; el servidor ya aplica el rol nuevo, pero la persona es enviada a su página anterior hasta que sale y vuelve a entrar.
+5. **La bitácora no tiene pantalla.** `GET /api/admin/audit-log` existe (solo admin), pero no hay una sección del panel para consultarla.
+6. **En Accesos, el enlace de activación nuevo no ofrece WhatsApp.** El modal se abre sin teléfono, así que solo permite copiar el enlace, aunque la persona tenga teléfono (en el detalle de la solicitud sí aparece el botón).
+7. **Se puede conceder acceso a una demo desactivada.** Ni aprobar ni invitar revisan si la demo está activa: la persona recibe el correo y al abrirla ve «En mantenimiento».
 
 ## Páginas relacionadas
 

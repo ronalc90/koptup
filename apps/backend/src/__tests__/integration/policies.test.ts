@@ -331,7 +331,8 @@ describeDb('políticas de autorización (integración)', () => {
 
   describe('IP real detrás del proxy (trust proxy)', () => {
     it('el rate-limit estricto cuenta por la IP de X-Forwarded-For', async () => {
-      const send = (ip: string) => request(app).post('/api/quotes').set('X-Forwarded-For', ip).send({});
+      // Registro: 5 por hora e IP (los intentos inválidos también cuentan).
+      const send = (ip: string) => request(app).post('/api/auth/register').set('X-Forwarded-For', ip).send({});
       for (let i = 0; i < 5; i += 1) {
         expect((await send('198.51.100.7')).status).toBe(400);
       }

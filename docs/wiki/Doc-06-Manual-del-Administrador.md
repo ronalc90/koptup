@@ -155,14 +155,14 @@ Nadie se vuelve admin desde la web pública. Hay tres caminos, y los tres exigen
 
 | Camino | Quién lo hace | Cómo | Queda en la bitácora |
 |---|---|---|---|
-| **Variable `ADMIN_EMAIL`** | Quien administra el servidor | Se define en el backend con el correo de la cuenta. En cada arranque, esa cuenta recibe el rol admin. Sin la variable, el arranque no toca ningún rol | No |
-| **Script `set-admin`** | Un desarrollador | Desde `apps/backend`, con la conexión a la base de datos del entorno: `npx ts-node --transpile-only src/scripts/set-admin.ts <correo>` | No |
+| **Variable `ADMIN_EMAIL`** | Quien administra el servidor | Se define en el backend con el correo de la cuenta. Al arrancar, esa cuenta recibe el rol admin **solo si está activa y no hay ningún otro admin** (primer admin o recuperación). Sin la variable, el arranque no toca ningún rol | Sí (`user.role_change`, origen `ADMIN_EMAIL`) |
+| **Script `set-admin`** | Un desarrollador | Desde `apps/backend`, con la conexión a la base de datos del entorno (el script lee `apps/backend/.env`; en Railway, `railway run`): `npx ts-node --transpile-only src/scripts/set-admin.ts <correo>` | Sí (`user.role_change`, origen `set-admin`) |
 | **Admin › Usuarios** | Otro admin | Cambia el rol en el selector de la fila (ver [sección 7](#7-usuarios-y-roles)) | Sí (`user.role_change`) |
 
 Detalles que conviene saber:
 
-- `ADMIN_EMAIL` también es el correo que recibe los avisos internos de solicitudes y contactos (si el servidor tiene correo configurado).
-- Si a la cuenta de `ADMIN_EMAIL` le quitas el rol desde el panel, lo recupera en el siguiente reinicio o despliegue del backend.
+- `ADMIN_EMAIL` también es el correo que recibe los avisos internos de solicitudes, contactos y propuestas (si el servidor tiene correo configurado). Sin ella, esos avisos no salen por correo.
+- Si a la cuenta de `ADMIN_EMAIL` le quitas el rol desde el panel, el siguiente arranque no se lo devuelve mientras exista otro admin.
 - Un admin no puede quitarse a sí mismo el rol desde el panel (evita quedarse sin administradores).
 - Las credenciales nunca se escriben en esta wiki ni en el código. Las variables del servidor se explican en [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md).
 
@@ -660,7 +660,7 @@ Limitaciones de esta sección: después de cambiar el estado, la lista se actual
 3. **Nombre del pedido** con sus dos etiquetas: aprobación y estado.
 4. **Monto total** en USD (suma de los ítems).
 5. **Cliente**, fecha e identificador del pedido (`ORD-0002`).
-6. **Descripción del proyecto** que escribió el cliente. Debajo están los ítems y, si los hay, los archivos adjuntos.
+6. **Descripción del proyecto** que escribió el cliente. Debajo están los ítems y, si los hay, los archivos adjuntos: al pulsar uno se descarga con tu sesión. Si el archivo ya no está en el servidor (en Railway se borran al redesplegar si no hay un volumen montado), aparece debajo «… ya no está en el servidor: pídele al cliente que lo vuelva a subir».
 
 Debajo de cada pedido están los botones **Aprobar Pedido** y **Rechazar Pedido**. Cada acción pide confirmación en una ventana del navegador y luego muestra un aviso.
 
@@ -840,7 +840,7 @@ Qué hacer: revisa el estado del servicio del backend (su ruta `/health` debe re
 | Usuarios, Contactos, Conversaciones, Pedidos, Facturas, Entregables, Configuración | `/admin/users`, `/admin/contacts`, `/admin/conversations`, `/admin/orders`, `/admin/invoices`, `/admin/deliverables`, `/admin/settings` | `apps/web/src/app/admin/<sección>/page.tsx` |
 | Reglas de rol de la web | — | `apps/web/src/lib/auth-roles.ts` y `apps/web/src/middleware.ts` |
 
-Backend: `apps/backend/src/routes/admin-demos.routes.ts` (solicitudes, accesos, catálogo y bitácora), `routes/admin.routes.ts` y `controllers/admin.controller.ts` (operación), `services/demo-requests.service.ts`, `services/demo-grants.service.ts`, `services/demo-catalog.service.ts`, `jobs/demo-grants.job.ts`, `config/demos.ts` (permisos y tiempos), `scripts/set-admin.ts` e `index.ts` (`ensureAdminFromEnv`).
+Backend: `apps/backend/src/routes/admin-demos.routes.ts` (solicitudes, accesos, catálogo y bitácora), `routes/admin.routes.ts` y `controllers/admin.controller.ts` (operación), `services/demo-requests.service.ts`, `services/demo-grants.service.ts`, `services/demo-catalog.service.ts`, `jobs/demo-grants.job.ts`, `config/demos.ts` (permisos y tiempos), `scripts/set-admin.ts` y `services/admin-bootstrap.service.ts` (`ensureAdminFromEnv`).
 
 ### Endpoints que usa el panel
 

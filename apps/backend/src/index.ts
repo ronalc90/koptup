@@ -20,22 +20,20 @@ process.on('unhandledRejection', (reason) => {
 logger.info('index.ts arrancando');
 
 /**
- * Asegura el rol admin de ADMIN_EMAIL al arrancar. Sin ADMIN_EMAIL no se
- * modifica ningún rol (no hay correo por defecto en el código).
+ * ADMIN_EMAIL al arrancar: da el rol admin solo si la cuenta existe, está
+ * activa y no hay ningún otro admin (primer admin o recuperación), y lo deja
+ * en la bitácora. Sin ADMIN_EMAIL no se modifica ningún rol. La regla está en
+ * services/admin-bootstrap.service.ts.
  */
 async function ensureAdminFromEnv(): Promise<void> {
-  const targetEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
-  if (!targetEmail) {
-    logger.info('ADMIN_EMAIL no definido: el arranque no modifica roles.');
-    return;
-  }
   try {
-    const User = (await import('./models/User')).default;
-    const updated = await User.findOneAndUpdate({ email: targetEmail }, { $set: { role: 'admin' } }, { new: true }).lean();
-    if (updated) logger.info('Rol admin asegurado para ADMIN_EMAIL');
-    else logger.warn('ADMIN_EMAIL no corresponde a ningún usuario registrado (no se cambió ningún rol)');
+    const { ensureAdminFromEnv: ensure, ADMIN_BOOTSTRAP_MESSAGES } = await import('./services/admin-bootstrap.service');
+    const result = await ensure();
+    const message = ADMIN_BOOTSTRAP_MESSAGES[result];
+    if (result === 'no_existe' || result === 'cuenta_invitada' || result === 'hay_otro_admin') logger.warn(message);
+    else logger.info(message);
   } catch (err: any) {
-    logger.warn(`Fallo asegurando el rol admin de ADMIN_EMAIL: ${err?.message ?? err}`);
+    logger.warn(`Fallo revisando ADMIN_EMAIL: ${err?.message ?? err}`);
   }
 }
 

@@ -14,6 +14,12 @@ import { API_BASE } from '@/lib/backend-url';
  *    INTERNAL_API_KEY si está configurada en ambos lados).
  * Si el backend no responde, devuelve 503 con un mensaje honesto y la demo
  * sigue mostrando su generador local.
+ *
+ * Errores: el formato único de la API `{ success: false, code, message }`
+ * (los del backend pasan tal cual: `budget_exhausted`, `limits_unavailable`,
+ * `ai_not_configured`, `rate_limited`…). Además se agrega `error` (el mismo
+ * `message` sin punto final) porque la demo lo muestra seguido de
+ * ". Mostrando versión local…"; se puede quitar cuando la demo lea `message`.
  */
 
 export const runtime = 'nodejs';
@@ -21,6 +27,11 @@ export const dynamic = 'force-dynamic';
 
 const MAX_BODY_BYTES = 64 * 1024;
 const BACKEND_TIMEOUT_MS = 60_000;
+
+/** Respuesta de error con el formato único (y `error` para la demo). */
+function errorResponse(status: number, code: string, message: string, extra: Record<string, unknown> = {}): NextResponse {
+  return NextResponse.json({ ...extra, success: false, code, message, error: message.replace(/[.\s]+$/, '') }, { status });
+}
 
 function clientIp(req: NextRequest): string | null {
   const forwarded = req.headers.get('x-forwarded-for');
@@ -63,7 +74,7 @@ function withRenewedCookie(res: NextResponse, req: NextRequest, token: string | 
 export async function POST(req: NextRequest) {
   const raw = await req.text();
   if (raw.length > MAX_BODY_BYTES) {
-    return NextResponse.json({ error: 'La solicitud es demasiado grande.' }, { status: 413 });
+    return errorResponse(413, 'payload_too_large', 'La solicitud es demasiado grande.');
   }
 
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -97,10 +108,7 @@ export async function POST(req: NextRequest) {
       signal: AbortSignal.timeout(BACKEND_TIMEOUT_MS),
     });
   } catch {
-    return NextResponse.json(
-      { error: 'El servicio de generación con IA no está disponible en este momento. Usa el generador local.' },
-      { status: 503 },
-    );
+    return errorResponse(503, 'service_unavailable', 'El servicio de generación con IA no está disponible en este momento. Usa el generador local.');
   }
 
   const text = await upstream.text();
@@ -111,20 +119,27 @@ export async function POST(req: NextRequest) {
     json = null;
   }
   if (!json || typeof json !== 'object') {
-    return NextResponse.json(
-      { error: 'El servicio de generación con IA respondió de forma inesperada. Usa el generador local.' },
-      { status: upstream.ok ? 502 : upstream.status >= 500 ? 503 : upstream.status },
+    return errorResponse(
+      upstream.ok ? 502 : upstream.status >= 500 ? 503 : upstream.status,
+      'unexpected_response',
+      'El servicio de generación con IA respondió de forma inesperada. Usa el generador local.',
     );
   }
 
-  // Los errores del backend traen `message` o `error`; la demo muestra `error`
-  // seguido de ". Mostrando versión local…", así que va sin punto final.
   const body = json as Record<string, unknown>;
-  if (!upstream.ok) {
-    const message = typeof body.error === 'string' ? body.error : typeof body.message === 'string' ? body.message : null;
-    if (message) body.error = message.replace(/[.\s]+$/, '');
+  let res: NextResponse;
+  if (upstream.ok) {
+    res = NextResponse.json(body, { status: upstream.status });
+  } else {
+    // Errores del backend: formato único; se completa si faltara algún campo.
+    const code = typeof body.code === 'string' ? body.code : 'upstream_error';
+    const message =
+      typeof body.message === 'string' && body.message.trim()
+        ? body.message
+        : 'No pudimos generar el contenido con IA. Usa el generador local.';
+    const { success: _success, code: _code, message: _message, error: _error, ...extra } = body;
+    res = errorResponse(upstream.status, code, message, extra);
   }
-  const res = NextResponse.json(body, { status: upstream.status });
   const retryAfter = upstream.headers.get('retry-after');
   if (retryAfter) res.headers.set('Retry-After', retryAfter);
   return withRenewedCookie(res, req, renewedToken);

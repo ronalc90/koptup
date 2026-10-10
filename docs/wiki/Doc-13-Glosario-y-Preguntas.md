@@ -143,7 +143,7 @@ stateDiagram-v2
 | **Etiqueta de medición** | Código de Google Analytics 4, Google Ads o LinkedIn que mide visitas y conversiones. Hoy ninguna está configurada en producción | [SEO, analítica y legal › 3](Doc-12-SEO-Analitica-y-Legal.md#3-analítica) |
 | **Evento** | Algo que se mide cuando pasa: `generate_lead`, `demo_start`, `demo_upload`, `whatsapp_click` y `plan_click` | [SEO, analítica y legal › 3.4](Doc-12-SEO-Analitica-y-Legal.md#34-los-eventos) |
 | **Fragmento** | Pedazo de un documento (normalmente un párrafo) en que se parte al indexarlo. Es lo que se busca, lo que recibe la IA y lo que se cita | [Flujos técnicos › 3](Doc-14-3-Flujos-Tecnicos.md#3-chatbot-rag) |
-| **Health check (chequeo de salud)** | Dirección que dice si la API está viva (`/health/live`) y lista con la base conectada (`/health`) | [Operación y despliegue › 7](Doc-11-Operacion-y-Despliegue.md#7-salud-del-sistema-y-registros) |
+| **Health check (chequeo de salud)** | Dirección que dice si la API está viva (`/health/live`) y lista con la base conectada (`/health`, la que revisan Railway y el monitoreo) | [Operación y despliegue › 7](Doc-11-Operacion-y-Despliegue.md#7-salud-del-sistema-monitoreo-y-registros) |
 | **Indexar** | Dos sentidos: en el RAG, preparar un documento (partirlo y armar el índice de búsqueda); en SEO, que Google incluya una página en sus resultados | — |
 | **JSON-LD** | Datos estructurados ocultos en la página que le dicen a Google quién es KopTup, qué vende y cuáles son sus preguntas frecuentes | [SEO, analítica y legal › 2.5](Doc-12-SEO-Analitica-y-Legal.md#25-datos-estructurados-json-ld) |
 | **Job de vencimiento** | Tarea automática del backend que cada hora marca como vencidos los accesos y envía el recordatorio 3 días antes | [Flujos de administración › 6](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#6-job-de-vencimiento-y-correos) |
@@ -204,7 +204,7 @@ Hoy no: faltan los IDs de Google Analytics, Google Ads o LinkedIn en Vercel. Cua
 «Solicitar demo» y «Prueba con tu documento» exigen la autorización; la solicitud guarda la fecha y la versión de la política. Faltan cosas: el formulario de contacto no la pide, no hay forma de borrar los datos de una persona desde el panel y la política conviene revisarla con un abogado. Ver [SEO, analítica y legal › 4](Doc-12-SEO-Analitica-y-Legal.md#4-legal).
 
 **¿Quién puede entrar al panel?**
-Los roles admin, manager y sales, cada uno con lo suyo. El primer admin se crea con la variable `ADMIN_EMAIL` o con un script. Ver [Roles y permisos](Doc-10-Roles-y-Permisos.md) y [runbook 9.4](Doc-11-Operacion-y-Despliegue.md#94-crear-o-recuperar-el-admin).
+Los roles admin, manager y sales, cada uno con lo suyo. El primer admin se crea con la variable `ADMIN_EMAIL` (solo si no hay ningún otro admin) o con un script. Ver [Roles y permisos](Doc-10-Roles-y-Permisos.md) y [runbook 9.4](Doc-11-Operacion-y-Despliegue.md#94-crear-o-recuperar-el-admin).
 
 **Olvidé mi contraseña de admin.**
 Usa «¿Olvidaste tu contraseña?» en `/login` (necesita el correo configurado). Si no llega, crea otra cuenta y conviértela en admin. Ver [runbook 9.4](Doc-11-Operacion-y-Despliegue.md#94-crear-o-recuperar-el-admin).

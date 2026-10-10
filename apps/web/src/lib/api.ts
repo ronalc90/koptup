@@ -3,7 +3,6 @@ import Cookies from 'js-cookie';
 import type {
   RegisterData,
   ContactFormData,
-  QuoteRequestData,
   CreateProjectData,
   UpdateProjectData,
   CreateTaskData,
@@ -311,12 +310,6 @@ class ApiClient {
     return response.data;
   }
 
-  // Quote request
-  async requestQuote(data: QuoteRequestData) {
-    const response = await this.client.post('/api/quotes', data);
-    return response.data;
-  }
-
   // Project management endpoints
   async getDashboardStats() {
     const response = await this.client.get('/api/projects/dashboard/stats');
@@ -386,6 +379,18 @@ class ApiClient {
   async cancelOrder(id: string) {
     const response = await this.client.post(`/api/orders/${id}/cancel`);
     return response.data;
+  }
+
+  /**
+   * Descarga un adjunto de un pedido (dueño del pedido o equipo). Devuelve el
+   * archivo; un 410 significa que el archivo ya no está en el servidor.
+   */
+  async downloadOrderAttachment(orderId: string, attachmentId: string): Promise<Blob> {
+    const response = await this.client.get(
+      `/api/orders/${encodeURIComponent(orderId)}/attachments/${encodeURIComponent(attachmentId)}`,
+      { responseType: 'blob' },
+    );
+    return response.data as Blob;
   }
 
   // Deliverables endpoints

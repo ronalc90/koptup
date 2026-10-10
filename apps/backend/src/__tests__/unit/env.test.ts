@@ -51,6 +51,40 @@ describe('validación de variables de entorno (zod)', () => {
     expect(r.errors[0]).toMatch(/^MONGODB_URI/);
   });
 
+  it('avisa por SMTP_USER y SMTP_PASS (las que deciden si sale correo), no por SMTP_HOST', () => {
+    const sinCorreo = validateEnv({ NODE_ENV: 'production', ...base });
+    expect(sinCorreo.warnings.some((w) => w.startsWith('SMTP_USER y SMTP_PASS') && /no sale ningún correo/.test(w))).toBe(true);
+    expect(sinCorreo.warnings.some((w) => w.startsWith('SMTP_HOST'))).toBe(false);
+
+    const soloUsuario = validateEnv({ NODE_ENV: 'production', ...base, SMTP_USER: 'equipo@ejemplo.co' });
+    expect(soloUsuario.warnings.some((w) => w.startsWith('SMTP_PASS:') && /no sale ningún correo/.test(w))).toBe(true);
+
+    const conCorreo = validateEnv({ NODE_ENV: 'production', ...base, SMTP_USER: 'equipo@ejemplo.co', SMTP_PASS: 'clave-de-prueba' });
+    expect(conCorreo.warnings.some((w) => w.startsWith('SMTP_'))).toBe(false);
+    expect(conCorreo.warnings.join(' ')).not.toContain('clave-de-prueba');
+  });
+
+  it('avisa si faltan DEMO_UPLOAD_ENABLED, INTERNAL_API_KEY y ADMIN_EMAIL', () => {
+    const r = validateEnv({ NODE_ENV: 'production', ...base });
+    expect(r.warnings.some((w) => w.startsWith('DEMO_UPLOAD_ENABLED') && /apagada/.test(w))).toBe(true);
+    expect(r.warnings.some((w) => w.startsWith('INTERNAL_API_KEY') && /IP/.test(w))).toBe(true);
+    expect(r.warnings.some((w) => w.startsWith('ADMIN_EMAIL') && /avisos al equipo/.test(w))).toBe(true);
+
+    const apagadaAPropósito = validateEnv({ NODE_ENV: 'production', ...base, DEMO_UPLOAD_ENABLED: 'false', INTERNAL_API_KEY: 'k'.repeat(32) });
+    expect(apagadaAPropósito.warnings.some((w) => w.startsWith('DEMO_UPLOAD_ENABLED'))).toBe(false);
+    expect(apagadaAPropósito.warnings.some((w) => w.startsWith('INTERNAL_API_KEY'))).toBe(false);
+
+    const malEscrita = validateEnv({ NODE_ENV: 'production', ...base, DEMO_UPLOAD_ENABLED: 'TRUE' });
+    expect(malEscrita.warnings).toContain('DEMO_UPLOAD_ENABLED: debe ser true o false → «Prueba con tu documento» queda apagada');
+    expect(malEscrita.warnings.join(' ')).not.toContain('TRUE');
+  });
+
+  it('JWT_REFRESH_EXPIRES_IN: avisa si es inválida o mayor de 7 días', () => {
+    expect(validateEnv({ NODE_ENV: 'production', ...base, JWT_REFRESH_EXPIRES_IN: '3d' }).warnings.some((w) => w.startsWith('JWT_REFRESH_EXPIRES_IN'))).toBe(false);
+    expect(validateEnv({ NODE_ENV: 'production', ...base, JWT_REFRESH_EXPIRES_IN: 'una semana' }).warnings.some((w) => w.startsWith('JWT_REFRESH_EXPIRES_IN') && /inválida/.test(w))).toBe(true);
+    expect(validateEnv({ NODE_ENV: 'production', ...base, JWT_REFRESH_EXPIRES_IN: '30d' }).warnings.some((w) => w.startsWith('JWT_REFRESH_EXPIRES_IN') && /7 días/.test(w))).toBe(true);
+  });
+
   it('avisa si los dos secretos JWT son iguales', () => {
     const r = validateEnv({ NODE_ENV: 'production', ...base, JWT_REFRESH_SECRET: base.JWT_SECRET });
     expect(r.warnings.some((w) => w.startsWith('JWT_REFRESH_SECRET'))).toBe(true);

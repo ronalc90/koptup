@@ -698,7 +698,7 @@ flowchart TD
     EXT["Revisa la firma: %PDF-, ZIP o texto sin bytes nulos<br/>extrae el texto en máx. 20 s: PDF por página,<br/>DOCX y TXT a 3.000 caracteres por página<br/>límites: 30 páginas, 400.000 caracteres, algo de texto<br/>y menos de 200 documentos en memoria"]:::sistema
     Q5{"¿Pasa la firma<br/>y los límites?"}:::decision
     REL["Devuelve el cupo diario<br/>DECR en Redis"]:::sistema
-    E6["415 invalid_format, 422 too_many_pages,<br/>empty_document o unreadable_document<br/>o 503 capacity"]:::error
+    E6["415 invalid_format, 422 too_many_pages,<br/>too_much_text, empty_document<br/>o unreadable_document, o 503 capacity"]:::error
     MEM["Guarda en memoria fragmentos e índice BM25<br/>vence en 1 hora, 0 de 10 preguntas"]:::sistema
     LEAD["Registra el lead con origen demo-rag<br/>email y fecha de la autorización<br/>sin esperar: si falla, solo queda en el log"]:::sistema
     AV["Aviso al equipo por email y WhatsApp<br/>si están configurados"]:::aviso
@@ -1086,7 +1086,7 @@ flowchart TD
 
 ![Diagrama: Recorrido de una petición](images/doc/flujos/Doc-14-3-Flujos-Tecnicos-17.png)
 
-El orden de los middleware en `createApp`. Los límites se cuentan en la memoria de cada proceso (express-rate-limit), además de los cupos en Redis que tienen algunas rutas (solicitar demo, documentos de la demo RAG, LinkedIn). Muchas rutas responden sus propios errores sin pasar por `errorHandler` (`authenticate`, el chatbot, la demo RAG, LinkedIn), cada una con su formato (ver Hallazgos). La documentación Swagger en `/api-docs` solo existe fuera de producción o con `API_DOCS_ENABLED=true`.
+El orden de los middleware en `createApp`. Los límites se cuentan en la memoria de cada proceso (express-rate-limit), además de los cupos en Redis que tienen algunas rutas (solicitar demo, documentos de la demo RAG, LinkedIn). Todas las respuestas de error salen con el mismo formato, `{ success: false, code, message }`: las rutas que responden sus propios errores (`authenticate`, `requireRole`, el chatbot, la demo RAG, LinkedIn) usan `sendError`, `errorHandler` formatea las excepciones y el middleware `normalizeErrorResponses` completa `code` y `message` en las respuestas antiguas que se arman a mano (`utils/http-error.ts`). La web decide qué mostrar con `code`. La documentación Swagger en `/api-docs` solo existe fuera de producción o con `API_DOCS_ENABLED=true`.
 
 Fuente en el código: `apps/backend/src/app.ts` (`createApp`, `getAllowedOrigins`), `apps/backend/src/middleware/rateLimiter.ts`, `apps/backend/src/middleware/client-ip.ts` (`generalRateLimitKey`).
 
@@ -1181,12 +1181,12 @@ flowchart TD
     classDef error fill:#fee2e2,stroke:#dc2626,color:#0f172a
     classDef externo fill:#fdf4ff,stroke:#c026d3,color:#0f172a
 
-    RW["Railway al desplegar<br/>healthcheckPath /health/live, hasta 120 s"]:::externo
+    RW["Railway al desplegar<br/>healthcheckPath /health, hasta 120 s"]:::externo
     LV["GET /health/live<br/>200 con status alive y la hora<br/>siempre que el proceso responda"]:::sistema
-    Q1{"¿Respondió 200<br/>a tiempo?"}:::decision
+    Q1{"¿/health respondió 200<br/>a tiempo?"}:::decision
     OK1["El despliegue nuevo entra en servicio"]:::externo
-    F1["El despliegue nuevo falla<br/>Railway no lo pone en servicio"]:::error
-    MON["Equipo o monitoreo<br/>GET /health"]:::admin
+    F1["El despliegue nuevo falla<br/>Railway deja el anterior"]:::error
+    MON["Monitoreo de GitHub Actions cada 15 min<br/>o el equipo: GET /health"]:::admin
     Q2{"¿MongoDB conectado?<br/>readyState 1"}:::decision
     H1["200 healthy, mongo connected<br/>hora y uptime"]:::sistema
     H2["503 unavailable<br/>mongo disconnected"]:::error
@@ -1194,22 +1194,23 @@ flowchart TD
     RS["Railway lo reinicia<br/>ON_FAILURE, hasta 10 veces"]:::externo
     NT["Ninguno revisa Redis ni OpenAI<br/>ni pasa por los límites de /api"]:::sistema
 
-    RW --> LV --> Q1
+    RW --> Q2
+    Q2 -.->|"200 o 503"| Q1
     Q1 -->|Sí| OK1
     Q1 -->|No| F1
     MON --> Q2
     Q2 -->|Sí| H1
     Q2 -->|No| H2
     CR --> RS
-    RS -.->|Al volver a arrancar| LV
+    RS -.->|Al volver a arrancar| RW
     LV -.- NT
 ```
 
 ![Diagrama: Health checks](images/doc/flujos/Doc-14-3-Flujos-Tecnicos-19.png)
 
-Hay dos chequeos: `/health/live` dice «el proceso está vivo» y `/health` dice «está listo para atender» (base conectada). Railway usa el primero, así que un despliegue sin base queda en servicio (hallazgo 14 de [Flujos de administración](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#hallazgos)). Como pasan por CORS, un navegador desde un origen no permitido recibe 403; Railway y `curl` no envían `Origin` y pasan. El procedimiento ante una caída está en el [runbook 9.1](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#91-el-backend-está-caído).
+Hay dos chequeos: `/health/live` dice «el proceso está vivo» y `/health` dice «está listo para atender» (base conectada). Railway usa `/health`, así que un despliegue sin base no entra en servicio y la versión anterior sigue atendiendo; el monitoreo de GitHub Actions revisa el mismo `/health` cada 15 minutos ([Operación y despliegue › 7.1](Doc-11-Operacion-y-Despliegue.md#71-monitoreo-con-github-actions)). `/health/live` queda para diagnosticar si el proceso arranca. Como pasan por CORS, un navegador desde un origen no permitido recibe 403; Railway y `curl` no envían `Origin` y pasan. El procedimiento ante una caída está en el [runbook 9.1](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#91-el-backend-está-caído).
 
-Fuente en el código: `apps/backend/src/app.ts` (`/health/live`, `/health`), `apps/backend/railway.json`, `apps/backend/src/index.ts` (`uncaughtException`, `unhandledRejection`).
+Fuente en el código: `apps/backend/src/app.ts` (`/health/live`, `/health`), `apps/backend/railway.json`, `.github/workflows/monitor.yml`, `apps/backend/src/index.ts` (`uncaughtException`, `unhandledRejection`).
 
 ---
 
@@ -1231,9 +1232,9 @@ flowchart TD
     T{"¿Qué variable es?"}:::decision
     C1["Imprescindibles<br/>MONGODB_URI y JWT_SECRET"]:::sistema
     C2["De sesión<br/>JWT_REFRESH_SECRET"]:::sistema
-    C3["Opcionales con efecto<br/>REDIS_URL, OPENAI_API_KEY, CORS_ORIGIN,<br/>FRONTEND_URL, ADMIN_EMAIL y SMTP_HOST"]:::sistema
-    C4["Otras del esquema<br/>PORT, TRUST_PROXY_HOPS, límites de peticiones,<br/>topes de gasto, OPENAI_BASE_URL y más"]:::sistema
-    NV["No se revisa: si falta, no hay aviso<br/>p. ej. DEMO_UPLOAD_ENABLED, INTERNAL_API_KEY,<br/>SMTP_USER, GOOGLE_CLIENT_ID"]:::error
+    C3["Opcionales con efecto<br/>REDIS_URL, OPENAI_API_KEY, CORS_ORIGIN, FRONTEND_URL,<br/>ADMIN_EMAIL, INTERNAL_API_KEY, DEMO_UPLOAD_ENABLED<br/>y el par SMTP_USER + SMTP_PASS"]:::sistema
+    C4["Otras del esquema<br/>PORT, TRUST_PROXY_HOPS, límites de peticiones,<br/>topes de gasto, JWT_REFRESH_EXPIRES_IN, SMTP_PORT,<br/>OPENAI_BASE_URL y más"]:::sistema
+    NV["Fuera del esquema: si falta, no hay aviso<br/>p. ej. GOOGLE_CLIENT_ID, credenciales de WhatsApp"]:::sistema
     R1{"¿Falta o tiene<br/>formato inválido?"}:::decision
     P{"¿NODE_ENV es<br/>production?"}:::decision
     ERR["Error: Configuración incompleta<br/>el backend no abre el puerto"]:::error
@@ -1245,7 +1246,7 @@ flowchart TD
     EQ{"¿Es igual a<br/>JWT_SECRET?"}:::decision
     W3["Aviso: usa valores distintos"]:::sistema
     R3{"¿Falta?"}:::decision
-    W4["Aviso con la función que se apaga<br/>p. ej. sin REDIS_URL se apagan<br/>las funciones de IA públicas"]:::sistema
+    W4["Aviso con la función que se apaga<br/>p. ej. sin SMTP_USER o SMTP_PASS no sale ningún correo;<br/>sin REDIS_URL se apagan las funciones de IA públicas"]:::sistema
     F{"¿Formato válido?<br/>número, URL o email"}:::decision
     W5["Aviso: formato inválido<br/>la función usa su valor por defecto"]:::sistema
     OK["Sin mensaje"]:::sistema
@@ -1281,9 +1282,9 @@ flowchart TD
 
 ![Diagrama: Validación de variables de entorno](images/doc/flujos/Doc-14-3-Flujos-Tecnicos-20.png)
 
-Solo dos variables pueden impedir el arranque, y solo en producción: `MONGODB_URI` y `JWT_SECRET`. Todo lo demás genera un aviso en el log y la función afectada se apaga o usa su valor por defecto. Un tope de gasto inválido o negativo deja esa función sin presupuesto (0), lo que equivale a apagarla. La lista completa de variables está en [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md).
+Solo dos variables pueden impedir el arranque, y solo en producción: `MONGODB_URI` y `JWT_SECRET`. Todo lo demás genera un aviso en el log y la función afectada se apaga o usa su valor por defecto. `SMTP_HOST` no se avisa: es opcional (sin ella se usa Gmail); lo que decide si sale correo es el par `SMTP_USER` + `SMTP_PASS`. `DEMO_UPLOAD_ENABLED` avisa si falta, pero no si vale `false` (apagada a propósito). `JWT_REFRESH_EXPIRES_IN` avisa si es inválida o mayor de 7 días (se usan 7). Un tope de gasto inválido o negativo deja esa función sin presupuesto (0), lo que equivale a apagarla. La lista completa de variables está en [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md).
 
-Fuente en el código: `apps/backend/src/config/env.ts` (`EnvSchema`, `REQUIRED_IN_PRODUCTION`, `RECOMMENDED_IN_PRODUCTION`, `OPTIONAL_WITH_EFFECT`, `validateEnv`, `assertValidEnv`), `apps/backend/src/services/ai-budget.service.ts` (`getMonthlyBudgetUSD`).
+Fuente en el código: `apps/backend/src/config/env.ts` (`EnvSchema`, `REQUIRED_IN_PRODUCTION`, `RECOMMENDED_IN_PRODUCTION`, `OPTIONAL_WITH_EFFECT`, `OPTIONAL_GROUPS`, `validateEnv`, `assertValidEnv`), `apps/backend/src/services/ai-budget.service.ts` (`getMonthlyBudgetUSD`).
 
 ---
 
@@ -1308,8 +1309,8 @@ flowchart TD
     M["3. Conecta a MongoDB<br/>espera hasta 30 s para elegir servidor"]:::sistema
     Q2{"¿Conectó?"}:::decision
     MW["Aviso y sigue sin base<br/>/health responde 503 y las rutas<br/>que usan la base fallan o dan 503"]:::error
-    A["4. ADMIN_EMAIL: asegura el rol admin<br/>de esa cuenta si existe<br/>si falla, aviso y sigue"]:::sistema
-    C["5. Siembra las demos que falten en el catálogo<br/>no pisa los cambios del panel<br/>si falla, aviso y sigue"]:::sistema
+    A["4. ADMIN_EMAIL: rol admin solo si la cuenta<br/>existe, está activa y no hay otro admin<br/>queda en la bitácora; si falla, aviso y sigue"]:::sistema
+    C["5. Siembra las demos que falten en el catálogo<br/>y migra a MongoDB el archivo heredado del chatbot<br/>si existe; si falla, aviso y sigue"]:::sistema
     P["6. Passport: Google OAuth solo con<br/>GOOGLE_CLIENT_ID y GOOGLE_CLIENT_SECRET<br/>si falla, aviso y sigue"]:::sistema
     AP["7. createApp: middleware y rutas<br/>diagrama 6.1"]:::sistema
     L["8. Abre el puerto PORT, 3001 por defecto<br/>tiempos de espera de 15 min para PDF grandes"]:::sistema
@@ -1481,14 +1482,8 @@ Fuente en el código: `apps/backend/src/services/demo-rag.service.ts`, `apps/bac
 
 Cosas del código que no cuadran, dibujadas tal como son. No repiten las de [Flujos de negocio](Doc-14-1-Flujos-de-Negocio.md#hallazgos) ni las de [Flujos de administración](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#hallazgos).
 
-1. **No hay plazo ni forma de suprimir datos personales.** `DemoRequest`, `Contact`, `User`, `DemoGrant` y `AuditLog` no tienen vencimiento y ni el panel ni la API permiten borrarlos (solo `MagicLinkToken` y los contadores de Redis expiran solos). La política de privacidad dice que los datos se eliminan «cuando ya no necesitemos» la información, sin un plazo. Hoy una solicitud de supresión (derecho del titular en la Ley 1581) exige editar la base a mano. (diagrama 8.1, `apps/backend/src/models/`, `apps/web/messages/es.json` › `privacyPage.s5`).
-2. **El chatbot guarda las preguntas en disco sin vencimiento y sin aviso.** Cada pregunta y respuesta de «Prueba el asistente», de la vista previa y del widget insertado queda en `data/chatbots/state.json` (últimas 200 por bot). Solo «Configura el tuyo» explica que hay historial; «Prueba el asistente» no avisa nada. Contrasta con «Prueba con tu documento», que promete y cumple el borrado en 1 hora. (diagramas 3.2 y 8.2, `appendConversation` en `apps/backend/src/routes/chatbot.routes.ts`, `apps/backend/src/data/chatbot-store.ts`).
-3. **La autorización de «Prueba con tu documento» queda solo como texto.** La prueba es una línea dentro del mensaje del `Contact` con la fecha; no guarda la versión de la política ni el hash de la IP, como sí hace `DemoRequest`. Además, si guardar el lead falla, el documento se procesa igual y la prueba solo queda en el log. Por otro lado, `POST /api/demo-requests` acepta un `versionPolitica` enviado por el cliente (la web no lo envía, así que hoy se guarda la del servidor). (diagramas 4.1 y 8.2, `registerDemoLead` en `apps/backend/src/routes/demo-rag.routes.ts`, `createDemoRequest` en `apps/backend/src/services/demo-requests.service.ts`).
-4. **Las rutas que solo usan `authenticate` aplican los cambios de cuenta al vencer el token.** Documentos, pedidos, mensajes, notificaciones, proyectos, facturas y entregables aceptan el token tal cual: un cambio de rol o una cuenta borrada se aplica en esas rutas cuando vence el token de acceso (15 min), mientras que las rutas con `requireRole` y las excepciones «dueño o staff» (`isStaffSession`) leen la base en cada petición. (diagrama 2.1, `apps/backend/src/routes/POLICIES.md`).
-5. **Cuatro formatos de error distintos.** `errorHandler` y la demo RAG responden `{ success, code, message }`; `authenticate` y `requireRole`, `{ success, message }` casi siempre sin `code`; los bots del chatbot, `{ error, message }`; LinkedIn, `{ success, code, error }`. La misma situación da códigos distintos: un archivo demasiado grande es 400 `upload_limit_file_size` en las rutas con `upload.ts`, 413 `file_too_large` en la demo RAG y un error por archivo dentro de un 201 o 422 en el chatbot. Cada pantalla tiene que traducir el suyo. (diagramas 6.1 y 6.2).
-6. **LinkedIn muestra el cupo mensual agotado como un error genérico.** El backend responde 503 `budget_exhausted` con un mensaje claro, pero la demo solo distingue un 503 cuando el mensaje contiene «configur»; el visitante lee «el servidor no pudo completar la solicitud». Lo mismo pasa con el 503 por Redis caído. (diagrama 5.1, `generarConIA` en `apps/web/src/app/demo/linkedin-ads/components/PostGenerator.tsx`).
-7. **Variables que el arranque no revisa.** `DEMO_UPLOAD_ENABLED` e `INTERNAL_API_KEY` no están en `config/env.ts`: si faltan, el log no dice nada. Sin la primera, «Prueba con tu documento» queda apagada en silencio; sin la segunda (en la web y en el backend), las peticiones que hace el servidor de la web sin sesión, como LinkedIn sin cuenta, se cuentan con la IP de salida de Vercel, compartida por todos. Además, el comentario de `config/env.ts` dice que si falta `JWT_REFRESH_SECRET` en producción se registra un error, pero el código lo registra como aviso. (diagrama 7.1).
-8. **Un documento corto pero denso se rechaza como «demasiadas páginas».** «Prueba con tu documento» también corta en 400.000 caracteres de texto, pero ese corte reutiliza el código `too_many_pages`: un PDF de 30 páginas o menos con mucho texto recibe «El documento supera 30 páginas», que la persona no puede entender ni corregir. (diagrama 4.1, `ingestDocument` en `apps/backend/src/services/demo-rag.service.ts`).
+1. **Las rutas que solo usan `authenticate` aplican los cambios de cuenta al vencer el token.** Documentos, pedidos, mensajes, notificaciones, proyectos, facturas y entregables aceptan el token tal cual: un cambio de rol o una cuenta borrada se aplica en esas rutas cuando vence el token de acceso (15 min), mientras que las rutas con `requireRole` y las excepciones «dueño o staff» (`isStaffSession`) leen la base en cada petición. (diagrama 2.1, `apps/backend/src/routes/POLICIES.md`).
+2. **Las demos todavía leen sus mensajes de error a su manera.** El backend ya responde siempre `{ success: false, code, message }` con códigos propios (por ejemplo `budget_exhausted` y `limits_unavailable` en LinkedIn, `too_much_text` en «Prueba con tu documento»), pero dos pantallas de demos aún no los usan: LinkedIn solo distingue un 503 cuando el mensaje contiene «configur», así que el cupo agotado y Redis caído se ven como «el servidor no pudo completar la solicitud»; y «Prueba con tu documento» muestra el mensaje genérico para `too_much_text` porque su lista de textos no tiene esa clave. (diagramas 4.1 y 5.1, `generarConIA` en `apps/web/src/app/demo/linkedin-ads/components/PostGenerator.tsx` y `apps/web/src/app/demo/chatbot/components/upload/messages.ts`).
 
 ## Páginas relacionadas
 

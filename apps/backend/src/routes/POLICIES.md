@@ -16,8 +16,8 @@ demuestran (401/403/200 por política) están en `src/__tests__/integration/`.
 
 | Prefijo | Rutas | Política |
 |---|---|---|
-| `/health/live` | GET | Pública (siempre 200; healthcheck de Railway) |
-| `/health` | GET | Pública (503 si MongoDB no está conectado) |
+| `/health/live` | GET | Pública (siempre 200: el proceso responde) |
+| `/health` | GET | Pública (503 si MongoDB no está conectado; healthcheck de Railway y del monitoreo de GitHub Actions) |
 | `/api-docs` | Swagger | Solo fuera de producción o con `API_DOCS_ENABLED=true` |
 | `/api/auth` | `register`, `login`, `forgot-password`, `reset-password` | Pública; cada ruta con su propio límite (`middleware/rateLimiter.ts`): login por IP + email (correo normalizado) y por IP, registro por IP, recuperación por IP + email y por IP, restablecer por IP; 429 en español |
 | | `refresh`, `google`, `google/callback`, `google/exchange` | Pública (refresh exige un refresh token válido; el callback de Google no pone tokens en la URL: deja un código de un solo uso de 60 s que la web canjea con `POST google/exchange`, con límite por IP) |
@@ -25,13 +25,13 @@ demuestran (401/403/200 por política) están en `src/__tests__/integration/`.
 | | `change-password` | Autenticado + contraseña actual, límite propio por cuenta (5 cada 15 min) |
 | `/api/contact` | `POST /` | Pública con rate-limit estricto |
 | | `test-whatsapp`, `test-email` | Solo desarrollo |
-| `/api/quotes` | `POST /` | Pública con límite propio por IP (5/min) |
 | `/api/chat` | todas (chat heredado de eco) | Solo desarrollo |
 | `/api/test` | todas (diagnóstico) | Solo desarrollo |
 | `/api/documents` | todas | Autenticado + aislamiento por usuario (`user_id` de la sesión en cada consulta); `DELETE` solo del dueño, sin PIN (la confirmación la pide la interfaz) |
 | | `upload`, `search/semantic`, `:id/explain`, `:id/explain-similarity` | Además: tope `DOCUMENTS_MONTHLY_BUDGET_USD` y cupo diario por usuario `DOCUMENTS_AI_DAILY_LIMIT_PER_USER` (sin cupo, `upload` guarda el archivo sin análisis) |
 | `/api/projects` | todas | Autenticado + pertenencia al proyecto (servicio) |
 | `/api/orders` | `GET`, `POST /` | Autenticado + dueño del pedido |
+| | `GET /:id/attachments/:attachmentId` | Dueño del pedido o staff (rol leído de la BD); siempre como descarga |
 | | `PUT /:id`, `POST /:id/cancel` | Dueño, solo mientras el pedido está pendiente de revisión; `PUT` acepta solo nombre, descripción y adjuntos (el estado lo cambia el equipo en `/api/admin/orders`) |
 | `/api/deliverables` | `GET /`, `GET /:id`, `PUT /:id`, `approve`, `reject` | Autenticado + dueño o staff (rol leído de la BD) |
 | | `POST /` | `admin`, `manager`, `developer` |

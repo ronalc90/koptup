@@ -20,7 +20,6 @@
  *  | activationCheckRateLimiter       | IP               | 20 por minuto         | —                                |
  *  | changePasswordRateLimiter        | cuenta (o IP)    | 5 cada 15 min         | CHANGE_PASSWORD_RATE_LIMIT_MAX   |
  *  | oauthExchangeRateLimiter         | IP               | 20 por minuto         | —                                |
- *  | quoteRateLimiter                 | IP               | 5 por minuto          | —                                |
  *  | strictRateLimiter (contacto)     | IP               | 5 por minuto          | —                                |
  */
 import type { Request, Response } from 'express';
@@ -186,13 +185,6 @@ export const oauthExchangeRateLimiter = limiter({
 });
 
 // --- Formularios públicos -------------------------------------------------------
-
-/** POST /api/quotes: por IP. */
-export const quoteRateLimiter = limiter({
-  windowMs: MINUTE,
-  max: 5,
-  message: 'Enviaste varias solicitudes seguidas. Espera un minuto e intenta de nuevo.',
-});
 
 /** Formulario de contacto (POST /api/contact): por IP, 5 por minuto. */
 export const strictRateLimiter = limiter({

@@ -313,7 +313,7 @@ Los cambios de rol o el retiro de un acceso se aplican **de inmediato** en la AP
 
 | Rutas | Visitante | `user` / `client` | `prospect` | `developer` | `sales` | `manager` | `admin` |
 |---|---|---|---|---|---|---|---|
-| **Públicas:** `/health`, `GET /api/demo-catalog`, `GET /api/demo-access/:slug`, `POST /api/contact`, `POST /api/quotes`, `POST /api/demo-requests`, `/api/demo-rag`, crear bots y chatear en `/api/chatbot` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Públicas:** `/health`, `GET /api/demo-catalog`, `GET /api/demo-access/:slug`, `POST /api/contact`, `POST /api/demo-requests`, `/api/demo-rag`, crear bots y chatear en `/api/chatbot` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **Auth pública:** registro, login, Google, refresh, olvidé y restablecer contraseña, activar cuenta | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **Editar o borrar un bot** del chatbot (`/api/chatbot/bots/:id`, docs, URLs, conversaciones) | Solo quien tenga el token de dueño de ese bot (no depende del rol). Un bot antiguo sin dueño registrado solo lo administra el equipo (`admin`, `manager`, `sales`) | | | | | | |
 | **Sesión:** `/api/auth/me`, perfil, cambiar contraseña, logout, `GET /api/me/demos` | ❌ | 🔒 | 🔒 | 🔒 | 🔒 | 🔒 | 🔒 |
@@ -352,7 +352,7 @@ Los cambios de rol o el retiro de un acceso se aplican **de inmediato** en la AP
 |---|---|
 | `user` | Al registrarse en `/register` o entrar por primera vez con Google. |
 | `prospect` | Automático al **aprobar una solicitud** o hacer una **invitación directa** a un email sin cuenta. Si el email ya tenía cuenta, **conserva su rol** (no se le baja) y solo recibe los accesos. Un email del equipo no se puede invitar. |
-| `admin` | Desde **Admin › Usuarios** (otro admin), con el script `src/scripts/set-admin.ts` del backend o con la variable `ADMIN_EMAIL` al arrancar el backend. |
+| `admin` | Desde **Admin › Usuarios** (otro admin), con el script `src/scripts/set-admin.ts` del backend o con la variable `ADMIN_EMAIL` al arrancar el backend (solo si no hay ningún otro admin). Los tres caminos quedan en la bitácora. |
 | `manager`, `developer` | Desde **Admin › Usuarios** (solo un admin). |
 | `sales`, `client` | Solo por la API (`PATCH /api/admin/users/:id/role`, solo admin): el selector de la pantalla no ofrece estas opciones (ver Limitaciones). |
 

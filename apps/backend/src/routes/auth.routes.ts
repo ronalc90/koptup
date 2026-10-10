@@ -28,8 +28,12 @@ import {
   registerRateLimiter,
   resetPasswordRateLimiter,
 } from '../middleware/rateLimiter';
+import { sendError } from '../utils/http-error';
+import { logger } from '../utils/logger';
 
 const router = Router();
+
+const GOOGLE_NOT_CONFIGURED_MESSAGE = 'El inicio de sesión con Google no está disponible en este momento. Entra con tu correo y contraseña.';
 
 // Lazy import passport to avoid blocking
 let passportInstance: any = null;
@@ -327,11 +331,7 @@ router.get(
       const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
       if (!clientID || !clientSecret || clientID.includes('tu-google')) {
-        return res.status(503).json({
-          success: false,
-          message: 'Google OAuth is not configured on this server',
-          error: 'Google authentication is currently unavailable. Please contact the administrator or use email/password login.',
-        });
+        return sendError(res, 503, 'google_not_configured', GOOGLE_NOT_CONFIGURED_MESSAGE);
       }
 
       const passport = await getPassport();
@@ -340,11 +340,8 @@ router.get(
         session: false,
       })(req, res, next);
     } catch (error: any) {
-      return res.status(500).json({
-        success: false,
-        message: 'Internal server error',
-        error: error.message || 'Failed to initiate Google authentication',
-      });
+      logger.error(`[auth] Google OAuth: ${error?.message ?? error}`);
+      return sendError(res, 500, 'internal_error', 'No pudimos iniciar sesión con Google. Intenta de nuevo o entra con tu correo.');
     }
   }
 );
@@ -368,11 +365,7 @@ router.get(
       const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
       if (!clientID || !clientSecret || clientID.includes('tu-google')) {
-        return res.status(503).json({
-          success: false,
-          message: 'Google OAuth is not configured on this server',
-          error: 'Google authentication is currently unavailable.',
-        });
+        return sendError(res, 503, 'google_not_configured', GOOGLE_NOT_CONFIGURED_MESSAGE);
       }
 
       const passport = await getPassport();
@@ -381,11 +374,8 @@ router.get(
         failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=google_auth_failed`,
       })(req, res, next);
     } catch (error: any) {
-      return res.status(500).json({
-        success: false,
-        message: 'Internal server error',
-        error: error.message || 'Failed to complete Google authentication',
-      });
+      logger.error(`[auth] Google OAuth callback: ${error?.message ?? error}`);
+      return sendError(res, 500, 'internal_error', 'No pudimos iniciar sesión con Google. Intenta de nuevo o entra con tu correo.');
     }
   },
   googleCallback as RequestHandler

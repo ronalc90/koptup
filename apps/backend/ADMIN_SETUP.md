@@ -6,13 +6,16 @@
 
 ## Dar el rol admin a un usuario
 
-El usuario debe existir (haberse registrado o haber entrado al menos una vez).
+El usuario debe existir (haberse registrado o activado su cuenta).
 
 ### Local (desarrollo)
 
+Desde `apps/backend`. El script lee `apps/backend/.env` (dotenv); una
+`MONGODB_URI` escrita en la terminal tiene prioridad sobre la del archivo:
+
 ```bash
 cd apps/backend
-MONGODB_URI="<tu-cadena-de-conexion>" npx ts-node --transpile-only src/scripts/set-admin.ts <email>
+npx ts-node --transpile-only src/scripts/set-admin.ts <email>
 ```
 
 ### Producción (Railway)
@@ -24,15 +27,26 @@ railway run npx ts-node --transpile-only src/scripts/set-admin.ts <email>
 `railway run` inyecta las variables del servicio (incluida `MONGODB_URI`), así
 que la cadena de conexión nunca pasa por la terminal ni por el historial.
 
-### Arranque del servidor (opcional)
+El cambio queda en la bitácora (`AuditLog`, acción `user.role_change` con
+`detalle.origen: "set-admin"`).
 
-Si defines `ADMIN_EMAIL` en las variables del entorno, el backend asegura el
-rol `admin` de esa cuenta al arrancar (solo si la cuenta ya existe). Si
-`ADMIN_EMAIL` no está definida, el arranque no modifica ningún rol.
+### Arranque del servidor con `ADMIN_EMAIL` (primer admin)
+
+Si defines `ADMIN_EMAIL`, al arrancar el backend esa cuenta recibe el rol
+`admin` **solo si existe, está activa y no hay ningún otro admin** (el primer
+admin, o recuperar el panel cuando no queda ninguno). Si ya hay otro admin, el
+arranque no cambia roles: así, si un admin le quita el rol a esa cuenta desde
+el panel, la decisión se respeta. El cambio queda en la bitácora con
+`detalle.origen: "ADMIN_EMAIL"`. Sin `ADMIN_EMAIL`, el arranque no modifica
+ningún rol.
+
+`ADMIN_EMAIL` también es el destino de los avisos al equipo por correo; sin
+ella esos avisos no se envían (no hay una dirección fija en el código).
 
 ## Notas
 
-- El script falla si el usuario no existe en la base de datos.
-- Los usuarios admin entran a `/admin` en lugar de `/dashboard`.
+- El script falla (código 1) si el usuario no existe o la base no conecta.
+- Los usuarios admin entran a `/admin` en lugar de `/dashboard`; deben cerrar
+  sesión y volver a entrar para ver el panel después de recibir el rol.
 - El panel `/admin` y el portal `/dashboard` se verifican en el servidor: la
   web consulta `GET /api/auth/me` con la sesión antes de mostrar la página.
