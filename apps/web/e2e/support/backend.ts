@@ -314,6 +314,25 @@ export async function prospectWithAccess(demos: string[], prefix = 'prospecto'):
  * cualquier persona y el admin de pruebas le asigna el rol desde la API.
  * Devuelve su sesión ya con el rol.
  */
+/**
+ * Cliente del portal (rol `client`) con contraseña propia: se registra y el
+ * admin de pruebas le asigna el rol. Devuelve su sesión y su contraseña.
+ */
+export async function clientSession(prefix = 'cliente'): Promise<Session & { password: string }> {
+  const admin = await adminSession();
+  const api = await Api.open();
+  try {
+    const email = uniqueEmail(prefix);
+    const password = randomPassword();
+    await api.register('Cliente E2E', email, password);
+    const first = await api.login(email, password);
+    await api.setRole(admin.accessToken, first.user.id, 'client');
+    return { ...(await api.login(email, password)), password };
+  } finally {
+    await api.dispose();
+  }
+}
+
 export async function staffSession(role: 'manager' | 'sales' | 'developer', prefix: string = role): Promise<Session> {
   const admin = await adminSession();
   const api = await Api.open();

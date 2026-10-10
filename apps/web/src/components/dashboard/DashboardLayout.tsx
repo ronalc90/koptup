@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -21,42 +21,67 @@ import {
 import { api } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
+import { prospectCanAccess } from '@/lib/auth-roles';
+import { PANEL_COUNTS_EVENT } from '@/lib/portal';
+import { loginUrlForCurrentPage, useSessionUser, type SessionUserInfo } from '@/hooks/useSessionUser';
+import ServiceUnavailable from '@/components/errors/ServiceUnavailable';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
+}
+
+/**
+ * Usuario vigente del portal (según GET /api/auth/me). Las secciones lo leen
+ * con `usePortalUser()` desde componentes hijos del marco, que solo se pintan
+ * cuando la sesión ya se confirmó.
+ */
+const PortalUserContext = createContext<{ user: SessionUserInfo | null; reload: () => void }>({ user: null, reload: () => undefined });
+
+export function usePortalUser() {
+  return useContext(PortalUserContext);
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
   const t = useTranslations('dashboardLayout');
-  const [user, setUser] = useState<any>(null);
+  const { state, reload } = useSessionUser();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifications, setNotifications] = useState(0);
+  // Usuario vigente según el backend: si el equipo le cambia el rol (p. ej. de
+  // prospecto a cliente), el menú cambia sin volver a iniciar sesión.
+  const blockedProspect = state.status === 'ok' && state.user.role === 'prospect' && !prospectCanAccess(pathname ?? '/dashboard');
+  const user = state.status === 'ok' && !blockedProspect ? state.user : null;
 
   useEffect(() => {
-    const userData = localStorage.getItem('user');
-    if (!userData) {
-      router.push('/login');
-      return;
-    }
-    const parsed = JSON.parse(userData);
-    setUser(parsed);
-    // Un prospecto solo ve Mis demos y su perfil (sin notificaciones).
-    if (parsed?.role === 'prospect') return;
+    // Sin sesión válida: al login, conservando la página para volver.
+    if (state.status === 'unauthenticated') router.replace(loginUrlForCurrentPage());
+    else if (blockedProspect) router.replace('/dashboard/demos');
+  }, [state.status, blockedProspect, router]);
 
-    // Cargar notificaciones reales
-    const loadNotifications = async () => {
+  // Notificaciones sin leer (reales). Se refrescan al cambiar de sección, al
+  // marcarlas como leídas (evento del portal) y cada minuto.
+  const role = user?.role;
+  useEffect(() => {
+    if (!role || role === 'prospect') return;
+    let cancelled = false;
+    const load = async () => {
       try {
-        const data = await api.getNotifications(undefined, true); // type: undefined, unreadOnly: true
-        setNotifications(data?.length || 0);
-      } catch (err) {
-        // Silenciar errores de notificaciones
-        setNotifications(0);
+        const data = await api.getUnreadNotificationsCount();
+        if (!cancelled) setNotifications(Number(data?.count ?? 0));
+      } catch {
+        if (!cancelled) setNotifications(0);
       }
     };
-    loadNotifications();
-  }, [router]);
+    void load();
+    const timer = window.setInterval(load, 60_000);
+    window.addEventListener(PANEL_COUNTS_EVENT, load);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+      window.removeEventListener(PANEL_COUNTS_EVENT, load);
+    };
+  }, [role, pathname]);
 
   const handleLogout = async () => {
     await api.logout();
@@ -84,9 +109,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     return pathname?.startsWith(href);
   };
 
+  if (state.status === 'unavailable') return <ServiceUnavailable onRetry={reload} />;
+
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" aria-busy="true">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
       </div>
     );
@@ -102,6 +129,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="lg:hidden p-2 rounded-lg text-secondary-600 dark:text-secondary-400 hover:bg-secondary-100 dark:hover:bg-secondary-800"
+              aria-label={sidebarOpen ? t('closeMenu') : t('openMenu')}
             >
               {sidebarOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
             </button>
@@ -123,11 +151,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <Link
                   href="/dashboard/notifications"
                   className="relative p-2 rounded-lg text-secondary-600 dark:text-secondary-400 hover:bg-secondary-100 dark:hover:bg-secondary-800"
+                  aria-label={t('notificationsLabel', { count: notifications })}
+                  data-testid="notifications-bell"
                 >
                   <BellIcon className="h-6 w-6" />
                   {notifications > 0 && (
-                    <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                      {notifications}
+                    <span className="absolute top-1 right-1 min-w-[1rem] h-4 px-1 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                      {notifications > 99 ? '99+' : notifications}
                     </span>
                   )}
                 </Link>
@@ -158,6 +188,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   onClick={handleLogout}
                   className="p-2 rounded-lg text-secondary-600 dark:text-secondary-400 hover:bg-secondary-100 dark:hover:bg-secondary-800"
                   title={t('logout')}
+                  aria-label={t('logout')}
                 >
                   <ArrowRightOnRectangleIcon className="h-5 w-5" />
                 </button>
@@ -244,7 +275,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         )}
 
         {/* Main content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+        <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8">
+          <PortalUserContext.Provider value={{ user, reload }}>{children}</PortalUserContext.Provider>
+        </main>
       </div>
     </div>
   );

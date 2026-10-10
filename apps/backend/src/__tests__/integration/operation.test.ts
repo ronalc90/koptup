@@ -122,12 +122,13 @@ describeDbRedis('sesión y salud (integración)', () => {
     const res = await request(app).post('/api/auth/login').set('X-Forwarded-For', '198.51.100.77').send({ email, password: 'Clave-de-prueba-123' });
     expect(res.status).toBe(200);
     const { refreshToken, user } = res.body.data;
-    const decoded = jwt.decode(refreshToken) as { exp: number; iat: number };
+    const decoded = jwt.decode(refreshToken) as { exp: number; iat: number; sid: string };
     expect(decoded.exp - decoded.iat).toBe(2 * 60 * 60);
 
+    // Una sesión por dispositivo: refresh_token:<cuenta>:<sesión> (services/session.service.ts).
     const { getRedisClient } = await import('../../config/redis');
     const client = await getRedisClient();
-    const ttl = await client.ttl(`refresh_token:${user.id}`);
+    const ttl = await client.ttl(`refresh_token:${user.id}:${decoded.sid}`);
     expect(ttl).toBeGreaterThan(2 * 60 * 60 - 60);
     expect(ttl).toBeLessThanOrEqual(2 * 60 * 60);
   });

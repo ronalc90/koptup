@@ -1,409 +1,295 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
-import { api } from '@/lib/api';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
+import toast from 'react-hot-toast';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
-import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
+import Card, { CardContent } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
+import { Modal } from '@/components/admin/demos/shared';
+import { PortalEmpty, PortalError, PortalLoading } from '@/components/dashboard/PortalStates';
+import { useErrorText } from '@/hooks/useErrorText';
+import { apiRequest } from '@/lib/demo-system';
 import {
-  DocumentTextIcon,
-  ArrowDownTrayIcon,
-  EyeIcon,
-  ChatBubbleLeftIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-  ClockIcon,
-  FolderIcon,
-} from '@heroicons/react/24/outline';
+  DELIVERABLE_STATUSES,
+  downloadWithSession,
+  formatDay,
+  formatFileSize,
+  openExternal,
+  refreshPanelCounts,
+  saveBlob,
+  type DeliverableStatus,
+  type DeliverableView,
+} from '@/lib/portal';
+import { ArrowDownTrayIcon, ArrowTopRightOnSquareIcon, DocumentTextIcon, FolderIcon } from '@heroicons/react/24/outline';
 
-export default function DeliverablesPage() {
+const STATUS_BADGE: Record<DeliverableStatus, string> = {
+  pending: 'bg-secondary-100 dark:bg-secondary-800 text-secondary-700 dark:text-secondary-300',
+  in_review: 'bg-yellow-100 dark:bg-yellow-950 text-yellow-800 dark:text-yellow-300',
+  approved: 'bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300',
+  rejected: 'bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300',
+};
+
+function ReviewModal({
+  deliverable,
+  mode,
+  onClose,
+  onDone,
+}: {
+  deliverable: DeliverableView;
+  mode: 'approve' | 'reject';
+  onClose: () => void;
+  onDone: () => void;
+}) {
   const t = useTranslations('deliverablesPage');
-  const [deliverables, setDeliverables] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [filterStatus, setFilterStatus] = useState('all');
+  const errorText = useErrorText();
+  const [comments, setComments] = useState('');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    loadDeliverables();
-  }, []);
-
-  const loadDeliverables = async () => {
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (mode === 'reject' && comments.trim().length < 3) {
+      setError(t('review.commentsRequired'));
+      return;
+    }
+    setBusy(true);
+    setError('');
     try {
-      // Try to fetch from API
-      const data = await api.getDeliverables();
-      setDeliverables(data);
-    } catch (error) {
-      console.error('Failed to load deliverables from API, using fallback data:', error);
-
-      // Fallback to mock data if API fails
-      const mockDeliverables = [
-        {
-          id: 'DEL-001',
-          name: 'Mockups de diseño UI/UX',
-          description: 'Diseños completos de todas las pantallas de la aplicación',
-          project: 'Plataforma E-commerce',
-          projectId: 'PROJ-001',
-          type: 'design',
-          status: 'approved',
-          uploadDate: '2025-09-12',
-          version: '2.1',
-          fileSize: '45.2 MB',
-          format: 'Figma',
-          comments: 3,
-        },
-        {
-          id: 'DEL-002',
-          name: 'Prototipo funcional',
-          description: 'Versión beta del sistema con funcionalidades principales',
-          project: 'Plataforma E-commerce',
-          projectId: 'PROJ-001',
-          type: 'code',
-          status: 'approved',
-          uploadDate: '2025-09-28',
-          version: '1.0-beta',
-          fileSize: '128 MB',
-          format: 'ZIP',
-          comments: 5,
-        },
-        {
-          id: 'DEL-003',
-          name: 'Beta version completa',
-          description: 'Versión completa con todas las funcionalidades para testing',
-          project: 'Plataforma E-commerce',
-          projectId: 'PROJ-001',
-          type: 'code',
-          status: 'in_review',
-          uploadDate: '2025-10-15',
-          version: '1.0-rc1',
-          fileSize: '256 MB',
-          format: 'ZIP',
-          comments: 2,
-        },
-        {
-          id: 'DEL-004',
-          name: 'Documento de requisitos',
-          description: 'Especificaciones técnicas y funcionales del proyecto',
-          project: 'Portal de Clientes',
-          projectId: 'PROJ-002',
-          type: 'document',
-          status: 'approved',
-          uploadDate: '2025-10-03',
-          version: '1.0',
-          fileSize: '2.8 MB',
-          format: 'PDF',
-          comments: 1,
-        },
-        {
-          id: 'DEL-005',
-          name: 'Wireframes iniciales',
-          description: 'Bocetos de la estructura del dashboard',
-          project: 'Portal de Clientes',
-          projectId: 'PROJ-002',
-          type: 'design',
-          status: 'approved',
-          uploadDate: '2025-10-10',
-          version: '1.2',
-          fileSize: '15.7 MB',
-          format: 'Figma',
-          comments: 4,
-        },
-        {
-          id: 'DEL-006',
-          name: 'Research de usuarios',
-          description: 'Análisis de necesidades y comportamiento de usuarios',
-          project: 'App Móvil iOS/Android',
-          projectId: 'PROJ-003',
-          type: 'document',
-          status: 'in_review',
-          uploadDate: '2025-10-18',
-          version: '1.0',
-          fileSize: '8.3 MB',
-          format: 'PDF',
-          comments: 0,
-        },
-        {
-          id: 'DEL-007',
-          name: 'Documentación API',
-          description: 'Documentación completa de endpoints y modelos de datos',
-          project: 'Plataforma E-commerce',
-          projectId: 'PROJ-001',
-          type: 'document',
-          status: 'rejected',
-          uploadDate: '2025-10-05',
-          version: '0.9',
-          fileSize: '5.2 MB',
-          format: 'PDF',
-          comments: 7,
-        },
-      ];
-
-      setDeliverables(mockDeliverables);
-    } finally {
-      setLoading(false);
+      await apiRequest(`/deliverables/${encodeURIComponent(deliverable.id)}/${mode}`, {
+        method: 'POST',
+        body: comments.trim() ? { comments: comments.trim() } : {},
+      });
+      toast.success(mode === 'approve' ? t('review.approved') : t('review.rejected'));
+      onDone();
+    } catch (err) {
+      setError(errorText(err));
+      setBusy(false);
     }
   };
-
-  const downloadDeliverable = async (id: string) => {
-    try {
-      const data = await api.getDeliverableById(id);
-      const url = (data?.fileUrl || '').toString();
-      if (url) {
-        window.open(url, '_blank');
-      } else {
-        console.warn('No se recibió URL del entregable');
-      }
-    } catch (error) {
-      console.error('Error al descargar el entregable', error);
-    }
-  };
-
-  const approve = async (id: string) => {
-    try {
-      await api.approveDeliverable(id);
-      await loadDeliverables();
-    } catch (error) {
-      console.error('Error al aprobar el entregable', error);
-    }
-  };
-
-  const reject = async (id: string) => {
-    try {
-      const comments = prompt(t('rejectComments')) || t('rejectedByUser');
-      await api.rejectDeliverable(id, comments);
-      await loadDeliverables();
-    } catch (error) {
-      console.error('Error al rechazar el entregable', error);
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    const badges: Record<string, { className: string; text: string; icon: any }> = {
-      approved: {
-        className: 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300',
-        text: t('status.approved'),
-        icon: CheckCircleIcon,
-      },
-      in_review: {
-        className: 'bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300',
-        text: t('status.in_review'),
-        icon: ClockIcon,
-      },
-      rejected: {
-        className: 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300',
-        text: t('status.rejected'),
-        icon: XCircleIcon,
-      },
-    };
-    const badge = badges[status] || { className: 'bg-secondary-100', text: status, icon: DocumentTextIcon };
-    const Icon = badge.icon;
-    return (
-      <div className="flex items-center gap-2">
-        <Icon className="h-4 w-4" />
-        <Badge variant="secondary" size="sm" className={badge.className}>
-          {badge.text}
-        </Badge>
-      </div>
-    );
-  };
-
-  const getTypeIcon = (type: string) => {
-    const icons: Record<string, any> = {
-      design: '🎨',
-      code: '💻',
-      document: '📄',
-    };
-    return icons[type] || '📁';
-  };
-
-  const filteredDeliverables = filterStatus === 'all'
-    ? deliverables
-    : deliverables.filter(d => d.status === filterStatus);
-
-  const groupedByProject = filteredDeliverables.reduce((acc: any, deliverable) => {
-    const projectName = deliverable.project || '';
-    if (!acc[projectName]) {
-      acc[projectName] = [];
-    }
-    acc[projectName].push(deliverable);
-    return acc;
-  }, {});
-
-  if (loading) {
-    return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center h-96">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-        </div>
-      </DashboardLayout>
-    );
-  }
 
   return (
-    <DashboardLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">
-              {t('title')}
-            </h1>
-            <p className="text-secondary-600 dark:text-secondary-400">
-              {t('subtitle')}
-            </p>
-          </div>
+    <Modal title={mode === 'approve' ? t('review.approveTitle', { title: deliverable.title }) : t('review.rejectTitle', { title: deliverable.title })} onClose={busy ? () => undefined : onClose}>
+      <form onSubmit={submit} className="space-y-4">
+        <p className="text-sm text-secondary-700 dark:text-secondary-300">{mode === 'approve' ? t('review.approveHelp') : t('review.rejectHelp')}</p>
+        <div>
+          <label htmlFor="review-comments" className="block text-sm font-medium text-secondary-800 dark:text-secondary-200 mb-1">
+            {mode === 'approve' ? t('review.commentsOptional') : t('review.comments')}
+          </label>
+          <textarea
+            id="review-comments"
+            rows={4}
+            maxLength={2000}
+            value={comments}
+            onChange={(e) => setComments(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-950 text-secondary-900 dark:text-white"
+          />
         </div>
+        {error && (
+          <p className="text-sm text-red-600 dark:text-red-400" role="alert">
+            {error}
+          </p>
+        )}
+        <div className="flex flex-col-reverse sm:flex-row justify-end gap-2">
+          <Button type="button" variant="outline" onClick={onClose} disabled={busy}>
+            {t('review.cancel')}
+          </Button>
+          <Button type="submit" variant={mode === 'approve' ? 'primary' : 'danger'} isLoading={busy} disabled={busy}>
+            {mode === 'approve' ? t('approve') : t('reject')}
+          </Button>
+        </div>
+      </form>
+    </Modal>
+  );
+}
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card variant="bordered">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">{t('total')}</p>
-                  <p className="text-2xl font-bold text-secondary-900 dark:text-white">
-                    {deliverables.length}
-                  </p>
-                </div>
-                <FolderIcon className="h-8 w-8 text-secondary-400" />
-              </div>
-            </CardContent>
-          </Card>
+function DeliverablesContent() {
+  const t = useTranslations('deliverablesPage');
+  const tc = useTranslations('portalCommon');
+  const locale = useLocale();
+  const errorText = useErrorText();
+  const [items, setItems] = useState<DeliverableView[] | null>(null);
+  const [loadError, setLoadError] = useState('');
+  const [filter, setFilter] = useState<'all' | DeliverableStatus>('all');
+  const [review, setReview] = useState<{ d: DeliverableView; mode: 'approve' | 'reject' } | null>(null);
+  const [downloading, setDownloading] = useState<string | null>(null);
 
-          {['approved', 'in_review', 'rejected'].map(status => {
-            const count = deliverables.filter(d => d.status === status).length;
-            const label = status === 'approved' ? t('approved') : status === 'in_review' ? t('inReview') : t('rejected');
-            const color = status === 'approved' ? 'text-green-600' : status === 'in_review' ? 'text-yellow-600' : 'text-red-600';
-            return (
-              <Card key={status} variant="bordered" className="cursor-pointer" onClick={() => setFilterStatus(status)}>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">{label}</p>
-                      <p className={`text-2xl font-bold ${color}`}>{count}</p>
-                    </div>
-                  </div>
+  const load = useCallback(async () => {
+    setLoadError('');
+    try {
+      const data = await apiRequest<DeliverableView[]>('/deliverables');
+      setItems(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setItems(null);
+      setLoadError(errorText(err));
+    }
+  }, [errorText]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const download = async (d: DeliverableView) => {
+    if (d.storage === 'link') {
+      if (!openExternal(d.url)) toast.error(tc('errors.generic'));
+      return;
+    }
+    setDownloading(d.id);
+    try {
+      saveBlob(await downloadWithSession(`/deliverables/${encodeURIComponent(d.id)}/download`), d.fileName || d.id);
+    } catch (err) {
+      toast.error(errorText(err));
+    } finally {
+      setDownloading(null);
+    }
+  };
+
+  const visible = useMemo(() => (items ?? []).filter((d) => filter === 'all' || d.status === filter), [items, filter]);
+
+  // Agrupados por proyecto.
+  const groups = useMemo(() => {
+    const map = new Map<string, { name: string; list: DeliverableView[] }>();
+    for (const d of visible) {
+      const key = d.project?.id ?? 'none';
+      const name = d.project?.name ?? t('noProject');
+      if (!map.has(key)) map.set(key, { name, list: [] });
+      map.get(key)!.list.push(d);
+    }
+    return Array.from(map.values());
+  }, [visible, t]);
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">{t('title')}</h1>
+        <p className="text-secondary-600 dark:text-secondary-400">{t('subtitle')}</p>
+      </div>
+
+      {loadError ? (
+        <PortalError message={loadError} onRetry={() => void load()} />
+      ) : !items ? (
+        <PortalLoading />
+      ) : items.length === 0 ? (
+        <PortalEmpty icon={DocumentTextIcon} title={t('emptyTitle')} body={t('emptyBody')} />
+      ) : (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card variant="bordered">
+              <CardContent className="p-5 text-center">
+                <p className="text-2xl font-bold text-secondary-900 dark:text-white">{items.length}</p>
+                <p className="text-sm text-secondary-600 dark:text-secondary-400">{t('total')}</p>
+              </CardContent>
+            </Card>
+            {DELIVERABLE_STATUSES.map((s) => (
+              <Card key={s} variant="bordered">
+                <CardContent className="p-5 text-center">
+                  <p className="text-2xl font-bold text-secondary-900 dark:text-white">{items.filter((d) => d.status === s).length}</p>
+                  <p className="text-sm text-secondary-600 dark:text-secondary-400">{tc(`deliverableStatus.${s}`)}</p>
                 </CardContent>
               </Card>
-            );
-          })}
-        </div>
+            ))}
+          </div>
 
-        {/* Filter Buttons */}
-        <div className="flex gap-2">
-          <Button
-            variant={filterStatus === 'all' ? 'primary' : 'outline'}
-            size="sm"
-            onClick={() => setFilterStatus('all')}
-          >
-            {t('all')}
-          </Button>
-          <Button
-            variant={filterStatus === 'approved' ? 'primary' : 'outline'}
-            size="sm"
-            onClick={() => setFilterStatus('approved')}
-          >
-            {t('approved')}
-          </Button>
-          <Button
-            variant={filterStatus === 'in_review' ? 'primary' : 'outline'}
-            size="sm"
-            onClick={() => setFilterStatus('in_review')}
-          >
-            {t('inReview')}
-          </Button>
-          <Button
-            variant={filterStatus === 'rejected' ? 'primary' : 'outline'}
-            size="sm"
-            onClick={() => setFilterStatus('rejected')}
-          >
-            {t('rejected')}
-          </Button>
-        </div>
+          <div className="flex flex-wrap gap-2" role="group" aria-label={t('filterLabel')}>
+            {(['all', ...DELIVERABLE_STATUSES] as const).map((s) => (
+              <Button key={s} size="sm" variant={filter === s ? 'primary' : 'outline'} aria-pressed={filter === s} onClick={() => setFilter(s)}>
+                {s === 'all' ? t('all') : tc(`deliverableStatus.${s}`)}
+              </Button>
+            ))}
+          </div>
 
-        {/* Deliverables by Project */}
-        <div className="space-y-6">
-          {Object.entries(groupedByProject).map(([projectName, projectDeliverables]: [string, any]) => (
-            <Card key={projectName} variant="bordered">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <FolderIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-                  <CardTitle>{projectName}</CardTitle>
-                  <Badge variant="secondary" size="sm">
-                    {projectDeliverables.length} {t('files')}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {projectDeliverables.map((deliverable: any) => (
-                    <div
-                      key={deliverable.id}
-                      className="flex items-center gap-4 p-4 rounded-lg border border-secondary-200 dark:border-secondary-700 hover:bg-secondary-50 dark:hover:bg-secondary-900 transition-colors"
-                    >
-                      <div className="text-3xl">{getTypeIcon(deliverable.type)}</div>
-
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-1">
-                          <h4 className="font-semibold text-secondary-900 dark:text-white">
-                            {deliverable.name}
-                          </h4>
-                          {getStatusBadge(deliverable.status)}
+          {groups.length === 0 ? (
+            <Card variant="bordered">
+              <CardContent className="p-10 text-center text-secondary-600 dark:text-secondary-400">{t('noResults')}</CardContent>
+            </Card>
+          ) : (
+            groups.map((g) => (
+              <section key={g.name} className="space-y-3">
+                <h2 className="flex items-center gap-2 text-lg font-semibold text-secondary-900 dark:text-white">
+                  <FolderIcon className="h-5 w-5 text-primary-600 dark:text-primary-400" />
+                  {g.name}
+                </h2>
+                {g.list.map((d) => (
+                  <Card key={d.id} variant="bordered" data-deliverable={d.id}>
+                    <CardContent className="p-5">
+                      <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                            <h3 className="font-semibold text-secondary-900 dark:text-white break-words">{d.title}</h3>
+                            <Badge variant="secondary" size="sm" className={STATUS_BADGE[d.status]}>
+                              {tc(`deliverableStatus.${d.status}`)}
+                            </Badge>
+                            <Badge variant="outline" size="sm">
+                              {tc(`deliverableType.${d.type}`)}
+                            </Badge>
+                          </div>
+                          {d.description && <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-2 whitespace-pre-wrap">{d.description}</p>}
+                          <p className="text-xs text-secondary-500">
+                            {[
+                              d.id,
+                              t('version', { version: d.version }),
+                              formatDay(d.uploadDate, locale),
+                              d.storage === 'file' ? `${d.fileName} · ${formatFileSize(d.fileSize)}` : t('externalLink'),
+                            ].join(' · ')}
+                          </p>
+                          {d.comments && (
+                            <p className="mt-2 text-sm text-secondary-700 dark:text-secondary-300">
+                              <span className="font-medium">{t('yourComment')}</span> {d.comments}
+                            </p>
+                          )}
                         </div>
-                        <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-2">
-                          {deliverable.description}
-                        </p>
-                        <div className="flex flex-wrap items-center gap-4 text-xs text-secondary-500">
-                          <span className="font-mono">{deliverable.id}</span>
-                          <span>•</span>
-                          <span>v{deliverable.version}</span>
-                          <span>•</span>
-                          <span>{deliverable.format}</span>
-                          <span>•</span>
-                          <span>{deliverable.fileSize}</span>
-                          <span>•</span>
-                          <span>{deliverable.uploadDate}</span>
-                          {deliverable.comments > 0 && (
+                        <div className="flex flex-wrap gap-2 flex-shrink-0">
+                          <Button size="sm" variant="outline" onClick={() => void download(d)} isLoading={downloading === d.id}>
+                            {d.storage === 'link' ? <ArrowTopRightOnSquareIcon className="h-4 w-4 mr-1" /> : <ArrowDownTrayIcon className="h-4 w-4 mr-1" />}
+                            {d.storage === 'link' ? t('openLink') : t('download')}
+                          </Button>
+                          {d.status === 'in_review' && (
                             <>
-                              <span>•</span>
-                              <span className="flex items-center gap-1">
-                                <ChatBubbleLeftIcon className="h-3 w-3" />
-                                {deliverable.comments}
-                              </span>
+                              <Button size="sm" onClick={() => setReview({ d, mode: 'approve' })}>
+                                {t('approve')}
+                              </Button>
+                              <Button size="sm" variant="danger" onClick={() => setReview({ d, mode: 'reject' })}>
+                                {t('reject')}
+                              </Button>
                             </>
                           )}
                         </div>
                       </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </section>
+            ))
+          )}
+        </>
+      )}
 
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm" onClick={() => downloadDeliverable(deliverable.id)}>
-                          <EyeIcon className="h-4 w-4" />
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => downloadDeliverable(deliverable.id)}>
-                          <ArrowDownTrayIcon className="h-4 w-4" />
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          <ChatBubbleLeftIcon className="h-4 w-4" />
-                        </Button>
-                        {deliverable.status === 'in_review' && (
-                          <>
-                            <Button variant="primary" size="sm" onClick={() => approve(deliverable.id)}>
-                              {t('approve')}
-                            </Button>
-                            <Button variant="danger" size="sm" onClick={() => reject(deliverable.id)}>
-                              {t('reject')}
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
+      {review && (
+        <ReviewModal
+          deliverable={review.d}
+          mode={review.mode}
+          onClose={() => setReview(null)}
+          onDone={() => {
+            setReview(null);
+            refreshPanelCounts();
+            void load();
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+/**
+ * Portal › Entregables: los del cliente (por proyecto), con descarga, enlace
+ * externo y revisión (aprobar o pedir cambios con comentario). Sin datos de
+ * ejemplo si la API falla.
+ */
+export default function DeliverablesPage() {
+  return (
+    <DashboardLayout>
+      <DeliverablesContent />
     </DashboardLayout>
   );
 }

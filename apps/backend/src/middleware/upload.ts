@@ -78,8 +78,9 @@ const orderFileFilter = (
   if (!ALLOWED_ORDER_EXTENSIONS.includes(ext)) {
     cb(
       new AppError(
-        `Invalid file type. Allowed types: ${ALLOWED_ORDER_EXTENSIONS.join(', ')}`,
-        400
+        `El archivo "${file.originalname}" no es de un tipo permitido. Usa: ${ALLOWED_ORDER_EXTENSIONS.join(', ')}.`,
+        400,
+        'invalid_file_type',
       )
     );
     return;
@@ -101,12 +102,45 @@ const orderFileFilter = (
   ];
 
   if (!allowedMimeTypes.includes(file.mimetype)) {
-    cb(new AppError('Invalid file MIME type', 400));
+    cb(new AppError(`El archivo "${file.originalname}" no es de un tipo permitido.`, 400, 'invalid_file_type'));
     return;
   }
 
   cb(null, true);
 };
+
+// Entregables del equipo: documentos, imágenes, comprimidos y diseños.
+const ALLOWED_DELIVERABLE_EXTENSIONS = [...ALLOWED_ORDER_EXTENSIONS, 'xlsx', 'pptx', 'md', 'json', 'fig', 'sketch', 'svg', '7z'];
+const MAX_DELIVERABLE_SIZE = 50 * 1024 * 1024;
+
+const deliverableFileFilter = (
+  req: Express.Request,
+  file: Express.Multer.File,
+  cb: multer.FileFilterCallback
+) => {
+  const ext = path.extname(file.originalname).toLowerCase().substring(1);
+  if (!ALLOWED_DELIVERABLE_EXTENSIONS.includes(ext)) {
+    cb(new AppError(`El archivo no es de un tipo permitido. Usa: ${ALLOWED_DELIVERABLE_EXTENSIONS.join(', ')}.`, 400, 'invalid_file_type'));
+    return;
+  }
+  cb(null, true);
+};
+
+const deliverableStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, './uploads/deliverables/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${uuidv4()}${path.extname(file.originalname).toLowerCase()}`);
+  },
+});
+
+/** Un archivo por entregable (campo `file`), hasta 50 MB. */
+export const uploadDeliverableFile = multer({
+  storage: deliverableStorage,
+  fileFilter: deliverableFileFilter,
+  limits: { fileSize: MAX_DELIVERABLE_SIZE, files: 1 },
+});
 
 // Storage configuration
 const storage = multer.diskStorage({
@@ -160,17 +194,23 @@ export const handleUploadError = (
   next: NextFunction
 ): void => {
   if (error instanceof multer.MulterError) {
+    // Los límites dependen de la ruta (pedidos: 20 MB y 10 archivos;
+    // entregables: 50 MB y 1 archivo).
+    const isDeliverable = req.originalUrl.startsWith('/api/deliverables');
     if (error.code === 'LIMIT_FILE_SIZE') {
+      const maxMb = isDeliverable ? MAX_DELIVERABLE_SIZE / 1024 / 1024 : (MAX_FILE_SIZE * 2) / 1024 / 1024;
       res.status(400).json({
         success: false,
-        message: `File too large. Maximum size: ${MAX_FILE_SIZE / 1024 / 1024}MB`,
+        code: 'file_too_large',
+        message: `Un archivo supera el tamaño máximo (${maxMb} MB).`,
       });
       return;
     }
-    if (error.code === 'LIMIT_FILE_COUNT') {
+    if (error.code === 'LIMIT_FILE_COUNT' || error.code === 'LIMIT_UNEXPECTED_FILE') {
       res.status(400).json({
         success: false,
-        message: 'Too many files. Maximum: 5 files',
+        code: 'too_many_files',
+        message: isDeliverable ? 'Sube un solo archivo por entregable.' : 'Puedes adjuntar máximo 10 archivos.',
       });
       return;
     }

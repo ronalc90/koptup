@@ -1,10 +1,16 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { nextSequentialId } from '../utils/sequence';
+import { businessYear } from '../utils/dates';
 
 export interface IInvoice extends Document {
   invoiceNumber: string;
-  projectId: mongoose.Types.ObjectId;
+  /** Proyecto del cliente (opcional: una factura puede salir de un pedido sin proyecto). */
+  projectId?: mongoose.Types.ObjectId | null;
   orderId?: mongoose.Types.ObjectId;
+  /** Cliente dueño de la factura (la ve en su portal). Nunca el miembro del equipo que la emite. */
   userId: mongoose.Types.ObjectId;
+  /** Miembro del equipo que la emitió. */
+  createdBy?: mongoose.Types.ObjectId | null;
   status: 'draft' | 'pending' | 'paid' | 'overdue' | 'cancelled';
   issueDate: Date;
   dueDate: Date;
@@ -12,6 +18,7 @@ export interface IInvoice extends Document {
   clientInfo: {
     name: string;
     email: string;
+    company?: string;
     address?: {
       street: string;
       city: string;
@@ -56,7 +63,7 @@ const InvoiceSchema: Schema = new Schema(
     projectId: {
       type: Schema.Types.ObjectId,
       ref: 'Project',
-      required: true,
+      default: null,
       index: true,
     },
     orderId: {
@@ -68,6 +75,11 @@ const InvoiceSchema: Schema = new Schema(
       ref: 'User',
       required: true,
       index: true,
+    },
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
     },
     status: {
       type: String,
@@ -89,6 +101,7 @@ const InvoiceSchema: Schema = new Schema(
     clientInfo: {
       name: { type: String, required: true },
       email: { type: String, required: true },
+      company: { type: String },
       address: {
         street: String,
         city: String,
@@ -158,16 +171,13 @@ const InvoiceSchema: Schema = new Schema(
   }
 );
 
-// Generar invoiceNumber automáticamente
-InvoiceSchema.pre('save', async function (next) {
+// Número de factura (FAC-AAAA-0001): se asigna ANTES de validar (el campo es
+// obligatorio) con un contador atómico por año (utils/sequence.ts).
+InvoiceSchema.pre('validate', async function () {
   if (!this.invoiceNumber) {
-    const year = new Date().getFullYear();
-    const count = await mongoose.model('Invoice').countDocuments({
-      createdAt: { $gte: new Date(year, 0, 1) },
-    });
-    this.invoiceNumber = `FAC-${year}-${String(count + 1).padStart(4, '0')}`;
+    const year = businessYear((this.issueDate as Date) ?? new Date());
+    this.invoiceNumber = await nextSequentialId({ model: 'Invoice', field: 'invoiceNumber', key: `invoice:${year}`, prefix: `FAC-${year}-`, pad: 4 });
   }
-  next();
 });
 
 export default mongoose.model<IInvoice>('Invoice', InvoiceSchema);

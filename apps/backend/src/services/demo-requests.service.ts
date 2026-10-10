@@ -43,7 +43,10 @@ import {
   resendActivation,
   resolveDemosForGrant,
 } from './demo-grants.service';
-import { onDemoAccessGranted } from './leads.service';
+import { onDemoAccessGranted, upsertLead } from './leads.service';
+import LeadActivity from '../models/LeadActivity';
+import Contact from '../models/Contact';
+import { notifyTeamInBackground } from './team-notify.service';
 import { logger } from '../utils/logger';
 
 const SLUG = /^[a-z0-9-]{2,60}$/;
@@ -182,6 +185,46 @@ export interface CreateDemoRequestResult {
   done: Promise<void>;
 }
 
+/**
+ * Aviso y registro de una solicitud fusionada: bitácora (`demo_request.merge`,
+ * visible en el historial de la solicitud), actividad en el lead y aviso al
+ * equipo por correo y WhatsApp (si están configurados). Nunca lanza.
+ */
+async function onRequestMerged(
+  merged: IDemoRequest,
+  demos: string[],
+  catalog: Map<string, { nombre: string }>,
+  casoDeUso: string,
+): Promise<void> {
+  const demoNames = demos.map((d) => catalog.get(d)?.nombre ?? d);
+  try {
+    await recordAudit({
+      actor: null,
+      accion: 'demo_request.merge',
+      entidad: { tipo: 'DemoRequest', id: String(merged._id) },
+      detalle: { codigo: merged.codigo, demos, reenvios: merged.reenvios },
+    });
+    const { lead } = await upsertLead({ email: merged.email, nombre: merged.nombre, empresa: merged.empresa, telefono: merged.telefono, source: 'demo-request' });
+    await LeadActivity.create({
+      lead: lead._id,
+      tipo: 'sistema',
+      texto: `Volvió a pedir demos (${demoNames.join(', ')}): se sumaron a la solicitud ${merged.codigo}.`.slice(0, 4000),
+      meta: { solicitud: String(merged._id), demos },
+    });
+    await notifyTeamInBackground({
+      asunto: `Solicitud de demo actualizada: ${merged.codigo}`,
+      lineas: [
+        `${merged.nombre} (${merged.empresa}) volvió a enviar el formulario con una solicitud abierta.`,
+        `Demos pedidas ahora: ${demoNames.join(', ')}`,
+        `Caso de uso: ${casoDeUso}`.slice(0, 600),
+      ],
+      enlace: `${frontendUrl()}/admin/solicitudes/${String(merged._id)}`,
+    });
+  } catch (err) {
+    logger.warn(`[demo-requests] No se pudo registrar la fusión de ${merged.codigo}: ${(err as Error)?.message ?? err}`);
+  }
+}
+
 /** Crea (o fusiona) una solicitud. La entrada ya pasó el honeypot y el consentimiento. */
 export async function createDemoRequest(
   input: DemoRequestInput,
@@ -218,7 +261,12 @@ export async function createDemoRequest(
     },
     { new: true, sort: { createdAt: -1 } },
   );
-  if (merged) return { request: merged, fusionada: true, done: Promise.resolve() };
+  if (merged) {
+    // Se sumó a una solicitud abierta: el equipo recibe aviso y queda registro
+    // en la bitácora de la solicitud y en la actividad del lead.
+    const done = onRequestMerged(merged, demos, catalog, input.casoDeUso);
+    return { request: merged, fusionada: true, done };
+  }
 
   let request: IDemoRequest | null = null;
   for (let attempt = 0; attempt < 3 && !request; attempt += 1) {
@@ -499,6 +547,12 @@ export async function rejectDemoRequest(id: string, body: z.infer<typeof RejectS
   // Nunca se avisa a un spam. El motivo es interno: al solicitante solo le
   // llega el `mensaje` opcional (o un texto genérico).
   const esSpam = /^\s*spam\s*$/i.test(body.motivo);
+  // El contacto que creó la solicitud sale de Contactos (no infla "nuevos").
+  if (esSpam && doc.lead) {
+    await Contact.updateOne({ _id: doc.lead }, { $set: { descartado: { motivo: 'spam', fecha: now } } }).catch((err) =>
+      logger.warn(`[demo-requests] No se pudo descartar el contacto de ${doc.codigo}: ${(err as Error)?.message ?? err}`),
+    );
+  }
   const notificar = body.notificar === true && !esSpam;
   const email = notificar
     ? await awaitEmail(() => sendRequestRejected({ to: doc.email, nombre: doc.nombre, motivo: body.mensaje }))

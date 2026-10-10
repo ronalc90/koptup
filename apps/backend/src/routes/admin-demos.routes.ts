@@ -347,11 +347,39 @@ adminDemoCatalogRouter.patch(
 
 export const adminAuditLogRouter = Router();
 
+const DayQuery = z
+  .string()
+  .trim()
+  .regex(/^\d{4}-\d{2}-\d{2}$/)
+  .optional()
+  .transform((v) => (v ? v : undefined));
+
 const AuditQuery = PageSchema.extend({
   accion: optionalQuery(80),
+  /** Grupo de acciones (prefijo antes del punto): `demo_request`, `user`, `privacy`… */
+  categoria: optionalQuery(40),
+  /** Email (o parte) de quien hizo la acción. */
+  actor: optionalQuery(120),
   entidadTipo: optionalQuery(60),
   entidadId: optionalQuery(80),
+  /** Días `AAAA-MM-DD` (hora de Colombia), inclusive. */
+  desde: DayQuery,
+  hasta: DayQuery,
 });
+
+function escapeAuditRegex(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/** GET /api/admin/audit-log/acciones — acciones registradas (para el filtro de la pantalla). */
+adminAuditLogRouter.get(
+  '/acciones',
+  ...requireRole('admin'),
+  asyncHandler(async (_req: AuthRequest, res: Response) => {
+    const acciones = (await AuditLog.distinct('accion')) as string[];
+    res.json({ success: true, data: acciones.filter((a) => typeof a === 'string').sort() });
+  }),
+);
 
 adminAuditLogRouter.get(
   '/',
@@ -360,8 +388,16 @@ adminAuditLogRouter.get(
     const q = parse(AuditQuery, req.query);
     const filter: Record<string, unknown> = {};
     if (q.accion) filter.accion = q.accion;
+    else if (q.categoria && /^[a-z_]+$/.test(q.categoria)) filter.accion = { $regex: `^${q.categoria}\\.` };
+    if (q.actor) filter.actorEmail = { $regex: escapeAuditRegex(q.actor), $options: 'i' };
     if (q.entidadTipo) filter['entidad.tipo'] = q.entidadTipo;
     if (q.entidadId) filter['entidad.id'] = q.entidadId;
+    if (q.desde || q.hasta) {
+      const range: Record<string, Date> = {};
+      if (q.desde) range.$gte = new Date(`${q.desde}T00:00:00.000-05:00`);
+      if (q.hasta) range.$lte = new Date(`${q.hasta}T23:59:59.999-05:00`);
+      filter.createdAt = range;
+    }
     const [total, docs] = await Promise.all([
       AuditLog.countDocuments(filter),
       AuditLog.find(filter)

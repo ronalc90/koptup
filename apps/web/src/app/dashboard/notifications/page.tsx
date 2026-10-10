@@ -1,390 +1,253 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { api } from '@/lib/api';
+import { useLocale, useTranslations } from 'next-intl';
+import toast from 'react-hot-toast';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
-import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
+import Card, { CardContent } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
+import { PortalEmpty, PortalError, PortalLoading } from '@/components/dashboard/PortalStates';
+import { useErrorText } from '@/hooks/useErrorText';
+import { apiRequest } from '@/lib/demo-system';
+import { formatDateTime, refreshPanelCounts } from '@/lib/portal';
 import {
   BellIcon,
-  CheckIcon,
-  ShoppingBagIcon,
-  FolderIcon,
-  CreditCardIcon,
   ChatBubbleLeftRightIcon,
+  CheckIcon,
   Cog6ToothIcon,
+  CreditCardIcon,
+  DocumentTextIcon,
+  FolderIcon,
+  ShoppingBagIcon,
   TrashIcon,
-  XMarkIcon,
 } from '@heroicons/react/24/outline';
 
-interface Notification {
+type NotificationType = 'order' | 'project' | 'billing' | 'message' | 'deliverable' | 'system' | 'task';
+
+interface PortalNotification {
   id: string;
-  type: 'order' | 'project' | 'billing' | 'message' | 'system';
+  type: NotificationType;
   title: string;
   message: string;
   timestamp: string;
   isRead: boolean;
   actionUrl?: string;
-  metadata?: {
-    orderId?: string;
-    projectId?: string;
-    invoiceId?: string;
-    amount?: number;
-  };
+  metadata?: { evento?: string; params?: Record<string, string | number> } & Record<string, unknown>;
 }
 
-type NotificationFilter = 'all' | 'order' | 'project' | 'billing' | 'message' | 'system';
+const FILTERS: Array<'all' | NotificationType> = ['all', 'order', 'project', 'deliverable', 'billing', 'message'];
 
-export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [filteredNotifications, setFilteredNotifications] = useState<Notification[]>([]);
-  const [filter, setFilter] = useState<NotificationFilter>('all');
-  const [loading, setLoading] = useState(true);
+const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  order: ShoppingBagIcon,
+  project: FolderIcon,
+  deliverable: DocumentTextIcon,
+  billing: CreditCardIcon,
+  message: ChatBubbleLeftRightIcon,
+};
 
-  useEffect(() => {
-    loadNotifications();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+/** «Hace 5 minutos» en el idioma de la persona. */
+function relativeTime(iso: string, locale: string): string {
+  const diffMs = new Date(iso).getTime() - Date.now();
+  if (Number.isNaN(diffMs)) return '';
+  const rtf = new Intl.RelativeTimeFormat(locale === 'en' ? 'en' : 'es', { numeric: 'auto' });
+  const minutes = Math.round(diffMs / 60000);
+  if (Math.abs(minutes) < 60) return rtf.format(minutes, 'minute');
+  const hours = Math.round(minutes / 60);
+  if (Math.abs(hours) < 24) return rtf.format(hours, 'hour');
+  const days = Math.round(hours / 24);
+  if (Math.abs(days) < 30) return rtf.format(days, 'day');
+  return formatDateTime(iso, locale);
+}
 
-  useEffect(() => {
-    filterNotifications();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter, notifications]);
+function NotificationsContent() {
+  const t = useTranslations('notificationsPage');
+  const tn = useTranslations('portalNotifications');
+  const tc = useTranslations('portalCommon');
+  const locale = useLocale();
+  const errorText = useErrorText();
+  const [items, setItems] = useState<PortalNotification[] | null>(null);
+  const [loadError, setLoadError] = useState('');
+  const [filter, setFilter] = useState<'all' | NotificationType>('all');
 
-  const loadNotifications = async () => {
+  const load = useCallback(async () => {
+    setLoadError('');
     try {
-      // Fetch real notifications from API
-      const data = await api.getNotifications(filter !== 'all' ? filter : undefined, false);
-      setNotifications(data || []);
-    } catch (error) {
-      // No mock data - only show real notifications from API
-      console.error('Failed to load notifications:', error);
-      setNotifications([]);
-    } finally {
-      setLoading(false);
+      const data = await apiRequest<PortalNotification[]>('/notifications');
+      setItems(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setItems(null);
+      setLoadError(errorText(err));
     }
-  };
+  }, [errorText]);
 
-  const filterNotifications = () => {
-    if (filter === 'all') {
-      setFilteredNotifications(notifications);
-    } else {
-      setFilteredNotifications(notifications.filter(notif => notif.type === filter));
-    }
-  };
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  /** Título y texto en el idioma de la persona (el backend guarda el evento y sus datos). */
+  const render = useCallback(
+    (n: PortalNotification): { title: string; message: string } => {
+      const ev = n.metadata?.evento;
+      if (!ev || !tn.has(`${ev}.title`)) return { title: n.title, message: n.message };
+      const raw = n.metadata?.params ?? {};
+      const params: Record<string, string> = { id: '', name: '', title: '', project: '', number: '', amount: '', reason: '', status: '' };
+      for (const [k, v] of Object.entries(raw)) params[k] = String(v ?? '');
+      if (params.status) {
+        const key = ev === 'project_status' ? `projectStatus.${params.status}` : `orderStatus.${params.status}`;
+        if (tc.has(key)) params.status = tc(key);
+      }
+      return { title: tn(`${ev}.title`, params), message: tn(`${ev}.message`, params) };
+    },
+    [tn, tc],
+  );
 
   const markAsRead = async (id: string) => {
     try {
-      // Try to mark as read via API
-      await api.markNotificationAsRead(id);
-    } catch (error) {
-      // Silently continue if API is unavailable
-    } finally {
-      // Update locally regardless of API response
-      setNotifications(prev =>
-        prev.map(notif =>
-          notif.id === id ? { ...notif, isRead: true } : notif
-        )
-      );
+      await apiRequest(`/notifications/${encodeURIComponent(id)}/read`, { method: 'POST' });
+      setItems((prev) => (prev ? prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)) : prev));
+      refreshPanelCounts();
+    } catch (err) {
+      toast.error(errorText(err));
     }
   };
 
-  const markAllAsRead = async () => {
+  const markAll = async () => {
     try {
-      // Try to mark all as read via API
-      await api.markAllNotificationsAsRead();
-    } catch (error) {
-      // Silently continue if API is unavailable
-    } finally {
-      // Update locally regardless of API response
-      setNotifications(prev =>
-        prev.map(notif => ({ ...notif, isRead: true }))
-      );
+      await apiRequest('/notifications/read-all', { method: 'POST' });
+      setItems((prev) => (prev ? prev.map((n) => ({ ...n, isRead: true })) : prev));
+      refreshPanelCounts();
+    } catch (err) {
+      toast.error(errorText(err));
     }
   };
 
-  const deleteNotification = async (id: string) => {
+  const remove = async (id: string) => {
     try {
-      // Try to delete via API
-      await api.deleteNotification(id);
-    } catch (error) {
-      // Silently continue if API is unavailable
-    } finally {
-      // Remove locally regardless of API response
-      setNotifications(prev => prev.filter(notif => notif.id !== id));
+      await apiRequest(`/notifications/${encodeURIComponent(id)}`, { method: 'DELETE' });
+      setItems((prev) => (prev ? prev.filter((n) => n.id !== id) : prev));
+      refreshPanelCounts();
+    } catch (err) {
+      toast.error(errorText(err));
     }
   };
 
-  const getNotificationIcon = (type: Notification['type']) => {
-    const iconClass = "h-6 w-6";
-    switch (type) {
-      case 'order':
-        return <ShoppingBagIcon className={iconClass} />;
-      case 'project':
-        return <FolderIcon className={iconClass} />;
-      case 'billing':
-        return <CreditCardIcon className={iconClass} />;
-      case 'message':
-        return <ChatBubbleLeftRightIcon className={iconClass} />;
-      case 'system':
-        return <Cog6ToothIcon className={iconClass} />;
-      default:
-        return <BellIcon className={iconClass} />;
-    }
-  };
-
-  const getNotificationBadge = (type: Notification['type']) => {
-    const badges: Record<Notification['type'], { variant: any; text: string }> = {
-      order: { variant: 'primary', text: 'Pedido' },
-      project: { variant: 'info', text: 'Proyecto' },
-      billing: { variant: 'success', text: 'Facturación' },
-      message: { variant: 'warning', text: 'Mensaje' },
-      system: { variant: 'default', text: 'Sistema' },
-    };
-    const badge = badges[type];
-    return <Badge variant={badge.variant} size="sm">{badge.text}</Badge>;
-  };
-
-  const formatTimestamp = (timestamp: string) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
-
-    if (diffInHours < 1) {
-      const minutes = Math.floor(diffInHours * 60);
-      return `Hace ${minutes} minuto${minutes !== 1 ? 's' : ''}`;
-    } else if (diffInHours < 24) {
-      const hours = Math.floor(diffInHours);
-      return `Hace ${hours} hora${hours !== 1 ? 's' : ''}`;
-    } else {
-      const days = Math.floor(diffInHours / 24);
-      return `Hace ${days} día${days !== 1 ? 's' : ''}`;
-    }
-  };
-
-  const unreadCount = notifications.filter(n => !n.isRead).length;
-
-  const filterOptions = [
-    { value: 'all' as NotificationFilter, label: 'Todas', icon: BellIcon },
-    { value: 'order' as NotificationFilter, label: 'Pedidos', icon: ShoppingBagIcon },
-    { value: 'project' as NotificationFilter, label: 'Proyectos', icon: FolderIcon },
-    { value: 'billing' as NotificationFilter, label: 'Facturación', icon: CreditCardIcon },
-    { value: 'message' as NotificationFilter, label: 'Mensajes', icon: ChatBubbleLeftRightIcon },
-  ];
-
-  if (loading) {
-    return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center h-96">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-        </div>
-      </DashboardLayout>
-    );
-  }
+  const visible = useMemo(() => (items ?? []).filter((n) => filter === 'all' || n.type === filter), [items, filter]);
+  const unread = (items ?? []).filter((n) => !n.isRead).length;
 
   return (
-    <DashboardLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">
-              Notificaciones
-            </h1>
-            <p className="text-secondary-600 dark:text-secondary-400">
-              Mantente al tanto de todas las actualizaciones
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            {unreadCount > 0 && (
-              <Button variant="outline" onClick={markAllAsRead}>
-                <CheckIcon className="h-5 w-5 mr-2" />
-                Marcar todas como leídas
-              </Button>
-            )}
-            <Button variant="outline" asChild>
-              <Link href="/dashboard/settings">
-                <Cog6ToothIcon className="h-5 w-5 mr-2" />
-                Preferencias
-              </Link>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">{t('title')}</h1>
+          <p className="text-secondary-600 dark:text-secondary-400">{t('subtitle')}</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {unread > 0 && (
+            <Button variant="outline" onClick={() => void markAll()}>
+              <CheckIcon className="h-5 w-5 mr-2" />
+              {t('markAll')}
             </Button>
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card variant="bordered" padding="sm">
-            <div className="text-center">
-              <p className="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-1">
-                {unreadCount}
-              </p>
-              <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                Sin leer
-              </p>
-            </div>
-          </Card>
-          <Card variant="bordered" padding="sm">
-            <div className="text-center">
-              <p className="text-3xl font-bold text-secondary-900 dark:text-white mb-1">
-                {notifications.length}
-              </p>
-              <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                Total
-              </p>
-            </div>
-          </Card>
-          <Card variant="bordered" padding="sm">
-            <div className="text-center">
-              <p className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">
-                {notifications.filter(n => n.type === 'project').length}
-              </p>
-              <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                Proyectos
-              </p>
-            </div>
-          </Card>
-          <Card variant="bordered" padding="sm">
-            <div className="text-center">
-              <p className="text-3xl font-bold text-green-600 dark:text-green-400 mb-1">
-                {notifications.filter(n => n.type === 'billing').length}
-              </p>
-              <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                Facturación
-              </p>
-            </div>
-          </Card>
-        </div>
-
-        {/* Filters */}
-        <Card variant="bordered">
-          <CardContent className="p-4">
-            <div className="flex flex-wrap gap-2">
-              {filterOptions.map((option) => {
-                const Icon = option.icon;
-                return (
-                  <button
-                    key={option.value}
-                    onClick={() => setFilter(option.value)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-                      filter === option.value
-                        ? 'bg-primary-600 text-white'
-                        : 'bg-secondary-100 dark:bg-secondary-800 text-secondary-700 dark:text-secondary-300 hover:bg-secondary-200 dark:hover:bg-secondary-700'
-                    }`}
-                  >
-                    <Icon className="h-5 w-5" />
-                    <span>{option.label}</span>
-                    {option.value === 'all' && unreadCount > 0 && (
-                      <Badge variant="danger" size="sm" className="ml-1">
-                        {unreadCount}
-                      </Badge>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Notifications List */}
-        <div className="space-y-3">
-          {filteredNotifications.length === 0 ? (
-            <Card variant="bordered">
-              <CardContent className="p-12 text-center">
-                <BellIcon className="h-16 w-16 text-secondary-400 mx-auto mb-4" />
-                <p className="text-secondary-600 dark:text-secondary-400">
-                  No hay notificaciones para mostrar
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            filteredNotifications.map((notification) => (
-              <Card
-                key={notification.id}
-                variant="bordered"
-                className={`transition-all ${
-                  !notification.isRead
-                    ? 'border-l-4 border-l-primary-500 bg-primary-50/30 dark:bg-primary-950/30'
-                    : 'hover:shadow-medium'
-                }`}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-start gap-4">
-                    {/* Icon */}
-                    <div className={`p-3 rounded-lg flex-shrink-0 ${
-                      !notification.isRead
-                        ? 'bg-primary-100 dark:bg-primary-950 text-primary-600 dark:text-primary-400'
-                        : 'bg-secondary-100 dark:bg-secondary-800 text-secondary-600 dark:text-secondary-400'
-                    }`}>
-                      {getNotificationIcon(notification.type)}
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className={`font-semibold ${
-                            !notification.isRead
-                              ? 'text-secondary-900 dark:text-white'
-                              : 'text-secondary-700 dark:text-secondary-300'
-                          }`}>
-                            {notification.title}
-                          </h3>
-                          {getNotificationBadge(notification.type)}
-                          {!notification.isRead && (
-                            <Badge variant="danger" size="sm">
-                              Nueva
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                      <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-2">
-                        {notification.message}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-secondary-500">
-                          {formatTimestamp(notification.timestamp)}
-                        </span>
-                        <div className="flex items-center gap-2">
-                          {notification.actionUrl && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              asChild
-                              onClick={() => markAsRead(notification.id)}
-                            >
-                              <Link href={notification.actionUrl}>
-                                Ver detalles
-                              </Link>
-                            </Button>
-                          )}
-                          {!notification.isRead && (
-                            <button
-                              onClick={() => markAsRead(notification.id)}
-                              className="p-2 rounded-lg text-primary-600 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-950 transition-colors"
-                              title="Marcar como leída"
-                            >
-                              <CheckIcon className="h-5 w-5" />
-                            </button>
-                          )}
-                          <button
-                            onClick={() => deleteNotification(notification.id)}
-                            className="p-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950 transition-colors"
-                            title="Eliminar notificación"
-                          >
-                            <TrashIcon className="h-5 w-5" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
           )}
+          <Button variant="ghost" asChild>
+            <Link href="/dashboard/settings">
+              <Cog6ToothIcon className="h-5 w-5 mr-2" />
+              {t('preferences')}
+            </Link>
+          </Button>
         </div>
       </div>
+
+      {loadError ? (
+        <PortalError message={loadError} onRetry={() => void load()} />
+      ) : !items ? (
+        <PortalLoading />
+      ) : items.length === 0 ? (
+        <PortalEmpty icon={BellIcon} title={t('emptyTitle')} body={t('emptyBody')} />
+      ) : (
+        <>
+          <p className="text-sm text-secondary-600 dark:text-secondary-400">{t('summary', { unread, total: items.length })}</p>
+          <div className="flex flex-wrap gap-2" role="group" aria-label={t('filterLabel')}>
+            {FILTERS.map((f) => (
+              <Button key={f} size="sm" variant={filter === f ? 'primary' : 'outline'} aria-pressed={filter === f} onClick={() => setFilter(f)}>
+                {t(`filters.${f}`)}
+              </Button>
+            ))}
+          </div>
+
+          {visible.length === 0 ? (
+            <Card variant="bordered">
+              <CardContent className="p-10 text-center text-secondary-600 dark:text-secondary-400">{t('noResults')}</CardContent>
+            </Card>
+          ) : (
+            <ul className="space-y-3" data-testid="notifications-list">
+              {visible.map((n) => {
+                const Icon = ICONS[n.type] ?? BellIcon;
+                const { title, message } = render(n);
+                const href = n.actionUrl && n.actionUrl.startsWith('/') ? n.actionUrl : null;
+                return (
+                  <li key={n.id}>
+                    <Card variant="bordered" className={n.isRead ? '' : 'border-primary-300 dark:border-primary-700 bg-primary-50/40 dark:bg-primary-950/30'}>
+                      <CardContent className="p-4 sm:p-5">
+                        <div className="flex items-start gap-4">
+                          <div className="w-10 h-10 rounded-lg bg-secondary-100 dark:bg-secondary-800 flex items-center justify-center flex-shrink-0 text-secondary-700 dark:text-secondary-300">
+                            <Icon className="h-5 w-5" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-2 mb-1">
+                              <p className={`text-secondary-900 dark:text-white break-words ${n.isRead ? 'font-medium' : 'font-semibold'}`}>{title}</p>
+                              {!n.isRead && (
+                                <Badge variant="primary" size="sm">
+                                  {t('new')}
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-secondary-700 dark:text-secondary-300 whitespace-pre-wrap break-words">{message}</p>
+                            <p className="text-xs text-secondary-500 mt-1" title={formatDateTime(n.timestamp, locale)}>
+                              {relativeTime(n.timestamp, locale)}
+                            </p>
+                            <div className="flex flex-wrap gap-2 mt-3">
+                              {href && (
+                                <Button size="sm" variant="outline" asChild>
+                                  <Link href={href} onClick={() => (!n.isRead ? void markAsRead(n.id) : undefined)}>
+                                    {t('open')}
+                                  </Link>
+                                </Button>
+                              )}
+                              {!n.isRead && (
+                                <Button size="sm" variant="ghost" onClick={() => void markAsRead(n.id)}>
+                                  <CheckIcon className="h-4 w-4 mr-1" />
+                                  {t('markRead')}
+                                </Button>
+                              )}
+                              <Button size="sm" variant="ghost" onClick={() => void remove(n.id)} aria-label={t('delete')}>
+                                <TrashIcon className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Portal › Notificaciones: avisos reales (pedidos, proyectos, entregables,
+ * facturas y mensajes) en el idioma de la persona.
+ */
+export default function NotificationsPage() {
+  return (
+    <DashboardLayout>
+      <NotificationsContent />
     </DashboardLayout>
   );
 }

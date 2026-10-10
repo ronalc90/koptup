@@ -1,180 +1,180 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import AdminLayout from '@/components/admin/AdminLayout';
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import { api } from '@/lib/api';
-import Link from 'next/link';
-import {
-  ChatBubbleLeftRightIcon,
-  ClockIcon,
-  UserGroupIcon,
-} from '@heroicons/react/24/outline';
+import { Modal } from '@/components/admin/demos/shared';
+import ClientPicker from '@/components/admin/ClientPicker';
+import { apiRequest } from '@/lib/demo-system';
+import { describeError, formatDateTime, type ClientAccount } from '@/lib/portal';
+import { ChatBubbleLeftRightIcon, ClockIcon, MagnifyingGlassIcon, PlusIcon, UserGroupIcon } from '@heroicons/react/24/outline';
+
+interface ConversationRow {
+  id: string;
+  title: string;
+  projectName: string | null;
+  orderId: string | null;
+  participants: Array<{ name: string; email: string; role: string }>;
+  client: { name: string; email: string } | null;
+  lastMessage: string;
+  lastMessageTime: string;
+  teamUnread: number;
+  status: 'active' | 'archived' | 'closed';
+}
+
+const FILTERS = ['all', 'active', 'archived', 'closed'] as const;
 
 export default function AdminConversationsPage() {
-  const [conversations, setConversations] = useState<any[]>([]);
+  const t = useTranslations('adminConversations');
+  const tc = useTranslations('portalCommon');
+  const locale = useLocale();
+  const router = useRouter();
+  const [conversations, setConversations] = useState<ConversationRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [loadError, setLoadError] = useState('');
+  const [statusFilter, setStatusFilter] = useState<(typeof FILTERS)[number]>('all');
+  const [search, setSearch] = useState('');
+  const [query, setQuery] = useState('');
+  const [creating, setCreating] = useState(false);
 
-  useEffect(() => {
-    loadConversations();
-  }, [statusFilter]);
-
-  const loadConversations = async () => {
+  const load = useCallback(async () => {
+    setLoading(true);
+    setLoadError('');
     try {
-      setLoading(true);
-      const response = await api.get(`/api/admin/conversations?status=${statusFilter}`);
-      setConversations(response.data?.data || []);
-    } catch (error) {
-      console.error('Error loading conversations:', error);
+      const params = new URLSearchParams({ status: statusFilter });
+      if (query) params.set('q', query);
+      const data = await apiRequest<ConversationRow[]>(`/admin/conversations?${params}`);
+      setConversations(Array.isArray(data) ? data : []);
+    } catch (err) {
       setConversations([]);
+      setLoadError(describeError(err, locale, { network: tc('errors.network'), rateLimited: tc('errors.rateLimited'), server: tc('errors.server'), generic: tc('errors.generic') }));
     } finally {
       setLoading(false);
     }
-  };
+  }, [statusFilter, query, locale, tc]);
 
-  const getStatusBadge = (status: string) => {
-    const badges: Record<string, { variant: any; text: string }> = {
-      active: { variant: 'primary', text: 'Activa' },
-      archived: { variant: 'secondary', text: 'Archivada' },
-      closed: { variant: 'secondary', text: 'Cerrada' },
-    };
-    const badge = badges[status] || { variant: 'secondary', text: status };
-    return <Badge variant={badge.variant} size="sm">{badge.text}</Badge>;
-  };
+  useEffect(() => {
+    void load();
+  }, [load]);
 
-  const formatDate = (date: string) => {
-    if (!date) return '-';
-    const d = new Date(date);
-    const now = new Date();
-    const diff = now.getTime() - d.getTime();
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
-
-    if (minutes < 1) return 'Ahora';
-    if (minutes < 60) return `Hace ${minutes}m`;
-    if (hours < 24) return `Hace ${hours}h`;
-    if (days < 7) return `Hace ${days}d`;
-    return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
-  };
+  const statusBadge = (status: ConversationRow['status']) => (
+    <Badge variant={status === 'active' ? 'primary' : 'secondary'} size="sm">
+      {t(`status.${status}`)}
+    </Badge>
+  );
 
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">
-              Conversaciones
-            </h1>
-            <p className="text-secondary-600 dark:text-secondary-400 mt-1">
-              Visualiza y gestiona todas las conversaciones del sistema
-            </p>
+            <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">{t('title')}</h1>
+            <p className="text-secondary-600 dark:text-secondary-400 mt-1">{t('subtitle')}</p>
           </div>
+          <Button onClick={() => setCreating(true)}>
+            <PlusIcon className="h-5 w-5 mr-2" />
+            {t('newConversation')}
+          </Button>
         </div>
 
-        {/* Filters */}
         <Card variant="bordered">
-          <CardContent className="p-4">
-            <div className="flex gap-2">
-              <Button
-                variant={statusFilter === 'all' ? 'primary' : 'outline'}
-                size="sm"
-                onClick={() => setStatusFilter('all')}
-              >
-                Todas
+          <CardContent className="p-4 space-y-4">
+            <form
+              className="flex gap-2"
+              onSubmit={(e) => {
+                e.preventDefault();
+                setQuery(search.trim());
+              }}
+            >
+              <div className="relative flex-1">
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-secondary-400" />
+                <input
+                  type="search"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder={t('searchPlaceholder')}
+                  aria-label={t('searchPlaceholder')}
+                  className="w-full pl-10 pr-4 py-2 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-950 text-secondary-900 dark:text-white"
+                />
+              </div>
+              <Button type="submit" size="sm">
+                {tc('search')}
               </Button>
-              <Button
-                variant={statusFilter === 'active' ? 'primary' : 'outline'}
-                size="sm"
-                onClick={() => setStatusFilter('active')}
-              >
-                Activas
-              </Button>
-              <Button
-                variant={statusFilter === 'archived' ? 'primary' : 'outline'}
-                size="sm"
-                onClick={() => setStatusFilter('archived')}
-              >
-                Archivadas
-              </Button>
-              <Button
-                variant={statusFilter === 'closed' ? 'primary' : 'outline'}
-                size="sm"
-                onClick={() => setStatusFilter('closed')}
-              >
-                Cerradas
-              </Button>
+            </form>
+            <div className="flex gap-2 flex-wrap">
+              {FILTERS.map((f) => (
+                <Button key={f} variant={statusFilter === f ? 'primary' : 'outline'} size="sm" onClick={() => setStatusFilter(f)} aria-pressed={statusFilter === f}>
+                  {f === 'all' ? t('filterAll') : t(`filters.${f}`)}
+                </Button>
+              ))}
             </div>
           </CardContent>
         </Card>
 
-        {/* Conversations List */}
         <Card variant="bordered">
           <CardHeader>
-            <CardTitle>Todas las conversaciones ({conversations.length})</CardTitle>
+            <CardTitle>
+              {t('allConversations')} ({conversations.length})
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
               </div>
+            ) : loadError ? (
+              <div className="text-center py-12" role="alert">
+                <p className="text-red-600 dark:text-red-400 mb-4">{loadError}</p>
+                <Button variant="outline" onClick={() => void load()}>
+                  {tc('retry')}
+                </Button>
+              </div>
             ) : conversations.length === 0 ? (
               <div className="text-center py-12">
                 <ChatBubbleLeftRightIcon className="h-12 w-12 mx-auto text-secondary-400 mb-4" />
-                <p className="text-secondary-600 dark:text-secondary-400">
-                  No hay conversaciones para mostrar
-                </p>
+                <p className="text-secondary-600 dark:text-secondary-400">{query || statusFilter !== 'all' ? t('noResults') : t('noConversations')}</p>
+                {!query && statusFilter === 'all' && <p className="text-sm text-secondary-500 mt-1">{t('emptyHint')}</p>}
               </div>
             ) : (
               <div className="space-y-3">
-                {conversations.map((conversation) => (
+                {conversations.map((c) => (
                   <Link
-                    key={conversation.id}
-                    href={`/admin/conversations/${conversation.id}`}
+                    key={c.id}
+                    href={`/admin/conversations/${c.id}`}
                     className="block p-4 rounded-lg border border-secondary-200 dark:border-secondary-700 hover:bg-secondary-50 dark:hover:bg-secondary-900 transition-colors"
+                    data-conversation={c.id}
                   >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-1">
-                          <h3 className="font-semibold text-secondary-900 dark:text-white">
-                            {conversation.title}
-                          </h3>
-                          {getStatusBadge(conversation.status)}
-                          {conversation.totalUnread > 0 && (
-                            <Badge variant="primary" size="sm">
-                              {conversation.totalUnread} sin leer
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                          <h3 className="font-semibold text-secondary-900 dark:text-white break-words">{c.title}</h3>
+                          {statusBadge(c.status)}
+                          {c.teamUnread > 0 && (
+                            <Badge variant="warning" size="sm" data-testid="team-unread">
+                              {t('unreadCount', { count: c.teamUnread })}
                             </Badge>
                           )}
                         </div>
-                        {conversation.projectName && (
-                          <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                            Proyecto: {conversation.projectName}
-                          </p>
-                        )}
+                        <p className="text-sm text-secondary-600 dark:text-secondary-400">
+                          {[c.client ? `${c.client.name} · ${c.client.email}` : null, c.orderId ? t('order', { id: c.orderId }) : null, c.projectName ? t('project', { name: c.projectName }) : null]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </p>
                       </div>
-                      <div className="text-right text-sm text-secondary-500">
-                        <div className="flex items-center gap-1">
-                          <ClockIcon className="h-4 w-4" />
-                          <span>{formatDate(conversation.lastMessageTime)}</span>
-                        </div>
+                      <div className="text-sm text-secondary-500 flex items-center gap-1 flex-shrink-0">
+                        <ClockIcon className="h-4 w-4" />
+                        <span>{formatDateTime(c.lastMessageTime, locale)}</span>
                       </div>
                     </div>
-
-                    {conversation.lastMessage && (
-                      <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-2 line-clamp-2">
-                        {conversation.lastMessage}
-                      </p>
-                    )}
-
+                    {c.lastMessage && <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-2 line-clamp-2">{c.lastMessage}</p>}
                     <div className="flex items-center gap-2 text-xs text-secondary-500">
                       <UserGroupIcon className="h-4 w-4" />
-                      <span>
-                        {conversation.participants.map((p: any) => p.name).join(', ')}
-                      </span>
+                      <span>{c.participants.map((p) => p.name).join(', ')}</span>
                     </div>
                   </Link>
                 ))}
@@ -182,7 +182,70 @@ export default function AdminConversationsPage() {
             )}
           </CardContent>
         </Card>
+
+        {creating && <NewConversationModal onClose={() => setCreating(false)} onCreated={(id) => router.push(`/admin/conversations/${id}`)} />}
       </div>
     </AdminLayout>
+  );
+}
+
+function NewConversationModal({ onClose, onCreated }: { onClose: () => void; onCreated: (id: string) => void }) {
+  const t = useTranslations('adminConversations');
+  const tc = useTranslations('portalCommon');
+  const locale = useLocale();
+  const [client, setClient] = useState<ClientAccount | null>(null);
+  const [title, setTitle] = useState('');
+  const [message, setMessage] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+
+  const submit = async () => {
+    setError('');
+    if (!client) return setError(t('form.clientRequired'));
+    if (title.trim().length < 3) return setError(t('form.titleRequired'));
+    if (!message.trim()) return setError(t('form.messageRequired'));
+    setBusy(true);
+    try {
+      const res = await apiRequest<{ id: string }>('/messages/conversations', { method: 'POST', body: { clientId: client.id, title: title.trim(), message: message.trim() } });
+      onCreated(res.id);
+    } catch (err) {
+      setError(describeError(err, locale, { network: tc('errors.network'), rateLimited: tc('errors.rateLimited'), server: tc('errors.server'), generic: tc('errors.generic') }));
+      setBusy(false);
+    }
+  };
+
+  const inputCls = 'w-full px-3 py-2 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-950 text-secondary-900 dark:text-white';
+  return (
+    <Modal title={t('newConversation')} onClose={onClose} wide>
+      <div className="space-y-4">
+        <ClientPicker value={client} onChange={setClient} label={t('form.client')} />
+        <div>
+          <label htmlFor="conv-title" className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-1">
+            {t('form.title')}
+          </label>
+          <input id="conv-title" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={200} className={inputCls} />
+        </div>
+        <div>
+          <label htmlFor="conv-message" className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-1">
+            {t('form.message')}
+          </label>
+          <textarea id="conv-message" rows={4} value={message} onChange={(e) => setMessage(e.target.value)} maxLength={5000} className={inputCls} />
+          <p className="text-xs text-secondary-500 mt-1">{t('form.notifyHelp')}</p>
+        </div>
+        {error && (
+          <p role="alert" className="text-sm text-red-600 dark:text-red-400">
+            {error}
+          </p>
+        )}
+        <div className="flex flex-col-reverse sm:flex-row justify-end gap-2">
+          <Button variant="outline" onClick={onClose} disabled={busy}>
+            {tc('cancel')}
+          </Button>
+          <Button onClick={() => void submit()} isLoading={busy} disabled={busy}>
+            {t('form.submit')}
+          </Button>
+        </div>
+      </div>
+    </Modal>
   );
 }

@@ -875,7 +875,14 @@
       "successBody": "If there is an account with <strong>{email}</strong>, we sent you a link to reset your password.",
       "successHint": "Check your inbox (and spam folder) and follow the instructions. If it does not arrive in a few minutes, write to us from Contact.",
       "backToLogin": "Back to sign in",
-      "backHome": "Back to home"
+      "backHome": "Back to home",
+      "errorRateLimited": "You requested several links in a row. Wait a few minutes and try again.",
+      "errorNetwork": "We could not reach the server. Check your connection and try again.",
+      "noEmailTitle": "We cannot email you the link right now",
+      "noEmailBody": "Email sending is not active at the moment. Write to us on WhatsApp or from Contact and the team will share a link to create your new password.",
+      "noEmailWhatsapp": "Write on WhatsApp",
+      "noEmailContact": "Go to Contact",
+      "whatsappMessage": "Hi, I need to reset the password of my KopTup account ({email})."
     },
     "reset": {
       "title": "New password",
@@ -895,7 +902,16 @@
       "successTitle": "Password updated",
       "successBody": "Your password was changed. You can now sign in with it.",
       "goToLogin": "Go to sign in",
-      "backToLogin": "Back to sign in"
+      "backToLogin": "Back to sign in",
+      "errors": {
+        "token_used": "This link was already used. If you already changed your password, sign in; otherwise request a new one.",
+        "token_replaced": "This link was replaced by a newer one. Use the latest link you received.",
+        "token_expired": "This link expired (it lasts 1 hour). Request a new one.",
+        "token_invalid": "This link is not valid. Check that you copied it completely or request a new one."
+      },
+      "errorRateLimited": "Too many attempts in a row. Wait a few minutes and try again.",
+      "errorNetwork": "We could not reach the server. Check your connection and try again.",
+      "requestNew": "Request a new link"
     }
   },
   "pageTitles": {
@@ -1470,73 +1486,578 @@
     "myDemos": "My demos",
     "backToSite": "Back to site",
     "prospectTitle": "Prospect account",
-    "prospectBody": "Here you see the demos we approved for you. If you hire a project, you will also see orders, deliverables and invoices."
+    "prospectBody": "Here you see the demos we approved for you. If you hire a project, you will also see orders, deliverables and invoices.",
+    "notificationsLabel": "{count, plural, =0 {Notifications} one {Notifications: # unread} other {Notifications: # unread}}",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "dashboardPage": {
-    "loading": "Loading dashboard...",
-    "welcomeBack": "Welcome back! 👋",
-    "summaryActive": "Here's a summary of your recent activity",
-    "summaryEmpty": "Your panel is ready. Start by exploring our services.",
-    "onboarding": {
-      "title": "Start your first project",
-      "description": "Tell us your idea and we'll help make it a reality. Explore our demos to see what we can build for you.",
-      "requestQuote": "Request Quote",
-      "viewDemos": "View Demos",
-      "exploreServices": "Explore Services"
-    },
+    "loading": "Loading your portal...",
+    "welcomeTitle": "Welcome to KopTup!",
+    "welcomeTitleName": "Welcome to KopTup, {name}!",
+    "welcomeBody": "Your account is ready. From here you follow your demos, orders, projects, invoices and messages with the team.",
+    "welcomePlan": "You were interested in the {plan} RAG plan. It is not active yet: request a quote and the team will contact you.",
+    "welcomePlanCta": "Request a quote",
+    "greeting": "Hi",
+    "greetingName": "Hi, {name}",
+    "subtitle": "Here is the status of your orders, projects, invoices and messages.",
+    "writeTeam": "Write to the team",
+    "newOrder": "New order",
+    "staffNote": "Your account belongs to the KopTup team: operations (orders, invoices, clients) live in the panel.",
+    "goToPanel": "Go to the panel",
     "kpis": {
-      "activeOrders": "Active Orders",
-      "pendingConfirmation": "{count} pending confirmation",
-      "activeProjects": "Active Projects",
-      "avgProgress": "Average progress: {percent}%",
-      "pendingBalance": "Pending Balance",
-      "nextDue": "Next due: {date}",
-      "unreadMessages": "Unread Messages",
-      "totalMessages": "{count} total messages"
+      "activeOrders": "Active orders",
+      "waitingReview": "{count, plural, =0 {None waiting for review} one {# waiting for review} other {# waiting for review}}",
+      "openProjects": "Ongoing projects",
+      "toReview": "{count, plural, =0 {No deliverables to review} one {# deliverable to review} other {# deliverables to review}}",
+      "pendingBalance": "Balance due",
+      "overdue": "{count, plural, one {# overdue invoice} other {# overdue invoices}}",
+      "nextDue": "Next due date: {date}",
+      "nothingDue": "You have no invoices to pay",
+      "unreadMessages": "Unread messages",
+      "conversations": "{count, plural, =0 {No conversations} one {# conversation} other {# conversations}}",
+      "unavailable": "Could not load"
     },
-    "recentOrders": "Recent Orders",
-    "activeProjectsSection": "Active Projects",
+    "sections": {
+      "orders": "Recent orders",
+      "projects": "Projects",
+      "invoices": "Invoices to pay",
+      "messages": "Messages",
+      "demos": "My demos"
+    },
     "viewAll": "View all",
-    "nextMilestone": "Next milestone: {milestone}",
-    "progress": "Progress",
-    "deadline": "Deadline: {date}",
-    "upcomingDeadlines": "Upcoming Deadlines",
-    "quickActions": "Quick Actions",
-    "newProject": "New Project",
-    "contactSupport": "Contact Support",
-    "payInvoice": "Pay Invoice",
-    "status": {
-      "active": "Active",
-      "in_progress": "In Progress",
-      "pending": "Pending",
-      "completed": "Completed",
-      "cancelled": "Cancelled"
+    "empty": {
+      "orders": "You have no orders yet. Tell us what you need and the team will review it.",
+      "projects": "When the team creates your project, you will see its status and progress here.",
+      "invoices": "You have no invoices yet.",
+      "invoicesPaid": "You have no pending invoices.",
+      "messages": "You have no conversations with the team yet.",
+      "demos": "You have no assigned demos. You can try the open demos or request access to the others.",
+      "demosExpired": "You have no active demos right now. In My demos you can ask for more time."
     },
-    "defaults": {
-      "inProcess": "In progress",
-      "noDate": "No date"
-    }
+    "progress": "{percent}% complete",
+    "deliverablesToReview": "{count, plural, one {# deliverable to review} other {# deliverables to review}}",
+    "dueOn": "Due {date}",
+    "noMessagesYet": "No messages yet",
+    "unread": "{count, plural, one {# unread} other {# unread}}",
+    "exploreDemos": "See demos",
+    "demoDays": "{days, plural, =0 {Expires today} one {# day left} other {# days left}}",
+    "demoMaintenance": "Under maintenance",
+    "openDemo": "Open demo"
   },
   "settingsPage": {
     "title": "Settings",
-    "subtitle": "Customize your KopTup experience",
-    "notifications": "Notifications",
-    "emailNotifications": "Email notifications",
-    "emailDesc": "Receive important updates via email",
-    "pushNotifications": "Push notifications",
-    "pushDesc": "Receive real-time notifications in your browser",
-    "smsNotifications": "SMS notifications",
-    "smsDesc": "Receive important alerts via text message",
-    "languageAndAppearance": "Language & Appearance",
+    "subtitle": "Choose which notices you get by email, your language and theme.",
+    "notifications": "Email notices",
+    "emailIntro": "Choose which topics you want to get an email about, in addition to the notice inside the portal.",
+    "email": {
+      "pedidos": {
+        "title": "Orders",
+        "desc": "When the team approves, rejects or changes the status of an order."
+      },
+      "facturacion": {
+        "title": "Billing",
+        "desc": "When we issue you an invoice or record a payment."
+      },
+      "proyectos": {
+        "title": "Projects and deliverables",
+        "desc": "When a project is created, changes status or there is a deliverable to review."
+      },
+      "mensajes": {
+        "title": "Messages",
+        "desc": "When the team writes to you in a conversation."
+      }
+    },
+    "inPortalNote": "Notices inside the portal (the bell) are always shown. Emails are only sent when the server has email configured.",
+    "languageAndAppearance": "Language and appearance",
     "language": "Language",
     "theme": "Theme",
     "light": "Light",
     "dark": "Dark",
-    "auto": "Auto",
+    "auto": "Automatic",
+    "appliedNow": "Language and theme apply instantly in this browser.",
     "cancel": "Cancel",
     "save": "Save changes",
     "saving": "Saving...",
-    "toastSaved": "Settings saved successfully"
+    "toastSaved": "Preferences saved"
+  },
+  "portalCommon": {
+    "errors": {
+      "network": "We could not reach the server. Check your connection and try again.",
+      "rateLimited": "Too many attempts in a row. Wait a moment and try again.",
+      "server": "The server had a problem. Try again in a few minutes.",
+      "generic": "Something went wrong. Try again."
+    },
+    "retry": "Try again",
+    "search": "Search",
+    "cancel": "Cancel",
+    "orderStatus": {
+      "pending": "Pending",
+      "in_progress": "In progress",
+      "shipped": "Shipped",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "approvalStatus": {
+      "pending": "Awaiting approval",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "invoiceStatus": {
+      "draft": "Draft",
+      "pending": "Pending",
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "cancelled": "Voided"
+    },
+    "deliverableStatus": {
+      "pending": "Pending",
+      "in_review": "To review",
+      "approved": "Approved",
+      "rejected": "Changes requested"
+    },
+    "deliverableType": {
+      "design": "Design",
+      "code": "Code",
+      "documentation": "Documentation",
+      "prototype": "Prototype",
+      "other": "Other"
+    },
+    "projectStatus": {
+      "planning": "Planning",
+      "active": "Active",
+      "on_hold": "On hold",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "manager": "Manager",
+      "sales": "Sales",
+      "developer": "Developer",
+      "client": "Client",
+      "prospect": "Prospect",
+      "user": "User"
+    }
+  },
+  "sessionState": {
+    "unavailableTitle": "The service is not available",
+    "unavailableBody": "We could not reach the KopTup server. Your session is still open: try again in a few minutes.",
+    "retry": "Try again",
+    "backHome": "Back to home"
+  },
+  "portalNotifications": {
+    "order_status": {
+      "title": "Order {id}: {status}",
+      "message": "Your order \"{name}\" is now {status}."
+    },
+    "order_approved": {
+      "title": "Order {id} approved",
+      "message": "We approved your order \"{name}\". The team will write to you in Messages with the next steps."
+    },
+    "order_rejected": {
+      "title": "Order {id} not approved",
+      "message": "We could not approve your order \"{name}\". Reason: {reason}"
+    },
+    "deliverable_uploaded": {
+      "title": "New deliverable: {title}",
+      "message": "The team shared \"{title}\" for the project {project}. Review it and approve it or request changes."
+    },
+    "message_new": {
+      "title": "New message from the team",
+      "message": "You have a new message in \"{title}\"."
+    },
+    "project_created": {
+      "title": "New project: {name}",
+      "message": "The team created your project \"{name}\". Here you will see its progress, deliverables and invoices."
+    },
+    "project_status": {
+      "title": "Project {name}: {status}",
+      "message": "Your project \"{name}\" is now {status}."
+    },
+    "invoice_issued": {
+      "title": "New invoice {number}",
+      "message": "We issued invoice {number} for {amount}. You can view and download it in Billing."
+    },
+    "invoice_paid": {
+      "title": "Payment recorded: {number}",
+      "message": "We recorded the payment for invoice {number}. Thank you!"
+    }
+  },
+  "notificationsPage": {
+    "title": "Notifications",
+    "subtitle": "Notices about your orders, projects, deliverables, invoices and messages.",
+    "markAll": "Mark all as read",
+    "preferences": "Preferences",
+    "emptyTitle": "You have no notifications",
+    "emptyBody": "You will see notices here when the team approves an order, shares a deliverable, issues you an invoice or writes to you.",
+    "summary": "{unread, plural, =0 {All caught up} one {# unread} other {# unread}} · {total, plural, one {# in total} other {# in total}}",
+    "filterLabel": "Filter notifications",
+    "filters": {
+      "all": "All",
+      "order": "Orders",
+      "project": "Projects",
+      "deliverable": "Deliverables",
+      "billing": "Billing",
+      "message": "Messages"
+    },
+    "noResults": "No notifications of this type.",
+    "new": "New",
+    "open": "View",
+    "markRead": "Mark as read",
+    "delete": "Delete notification"
+  },
+  "newOrderPage": {
+    "title": "New order",
+    "subtitle": "Describe what you need and attach reference files. The team reviews it and replies in Messages.",
+    "back": "Back to my orders",
+    "name": "Order name",
+    "namePlaceholder": "E.g.: Company website",
+    "description": "Short description",
+    "descriptionPlaceholder": "A one or two line summary",
+    "detail": "Describe your project in detail",
+    "detailHelp": "What you need, goals, expected features, audience and key dates.",
+    "detailPlaceholder": "Example:\n- I need a website for my services company\n- With services, portfolio and contact sections\n- My clients are other companies",
+    "project": "Related project (optional)",
+    "noProject": "None",
+    "attachments": "Attachments",
+    "attachmentsHelp": "Up to {files} files of at most {size} MB each.",
+    "chooseFiles": "Click to choose files",
+    "allowedTypes": "PDF, Word, TXT, CSV, images, ZIP or RAR",
+    "removeFile": "Remove {name}",
+    "fileTooBig": "{name} is larger than {max} MB and was not added.",
+    "tooManyFiles": "You can attach at most {max} files.",
+    "items": "Order items",
+    "currency": "Currency",
+    "itemDescription": "Description",
+    "itemPlaceholder": "E.g.: Home page design",
+    "quantity": "Quantity",
+    "unitPrice": "Estimated unit price ({currency})",
+    "removeItem": "Remove item {index}",
+    "addItem": "Add item",
+    "estimatedTotal": "Estimated total",
+    "cancel": "Cancel",
+    "create": "Create order",
+    "creating": "Creating...",
+    "created": "Order {id} created. The team will review it and write to you in Messages.",
+    "note": "The team gets a notice about your order and reviews it. Prices are your estimate: the final amount goes on the invoice we issue. You can cancel it while it is awaiting approval.",
+    "errors": {
+      "nameRequired": "Enter the order name.",
+      "itemsRequired": "Add at least one item with a description.",
+      "itemsInvalid": "Check the items: quantity must be a whole number from 1 and price 0 or more.",
+      "generic": "We could not create the order. Try again."
+    }
+  },
+  "orderDetailPage": {
+    "back": "Back to my orders",
+    "notFound": "We could not find this order or it does not belong to your account.",
+    "rejectedTitle": "The team did not approve this order",
+    "date": "Date",
+    "amount": "Estimated total",
+    "tracking": "Tracking",
+    "description": "Description",
+    "detail": "Project details",
+    "items": "Items",
+    "attachments": "Attachments",
+    "downloadFile": "Download {name}",
+    "downloadError": "We could not download the file. Try again.",
+    "history": "History",
+    "invoiceIssued": "Invoice {number}",
+    "downloadInvoice": "Download PDF",
+    "viewBilling": "View billing",
+    "notEditable": "This order is already approved or in progress: if you need to change or cancel it, write to us in the order conversation.",
+    "openConversation": "Open conversation",
+    "cancel": "Cancel order",
+    "cancelTitle": "Cancel order",
+    "cancelConfirm": "Are you sure you want to cancel the order \"{name}\"? The team will be notified and this cannot be undone.",
+    "cancelYes": "Yes, cancel order",
+    "cancelNo": "No, go back",
+    "cancelled": "Order cancelled"
+  },
+  "invoicePdf": {
+    "title": "Invoice",
+    "issuer": "Issuer",
+    "client": "Client",
+    "number": "Number",
+    "issued": "Issue date",
+    "due": "Due date",
+    "paid": "Paid on",
+    "status": "Status",
+    "project": "Project",
+    "order": "Order",
+    "description": "Description",
+    "qty": "Qty",
+    "unit": "Unit price",
+    "amount": "Amount",
+    "subtotal": "Subtotal",
+    "tax": "VAT",
+    "total": "Total",
+    "notes": "Notes",
+    "terms": "Terms",
+    "disclaimer": "Document generated by the KopTup portal for tracking purposes. It does not replace the electronic sales invoice (DIAN) when one applies.",
+    "downloaded": "Invoice PDF downloaded.",
+    "error": "We could not generate the invoice PDF. Try again."
+  },
+  "adminClientPicker": {
+    "change": "Change",
+    "placeholder": "Search by name, email or company",
+    "loading": "Searching...",
+    "error": "We could not search accounts. Try again.",
+    "empty": "No client accounts match that search.",
+    "roles": {
+      "prospect": "Prospect",
+      "client": "Client"
+    }
+  },
+  "adminInvoicesPage": {
+    "title": "Invoices",
+    "subtitle": "Issue invoices to your clients, record payments and download the PDF.",
+    "newInvoice": "New invoice",
+    "searchPlaceholder": "Search by number, client or email",
+    "filterAll": "All",
+    "noResults": "No invoices match these filters.",
+    "empty": "No invoices yet",
+    "emptyHint": "Issue the first one here or from an approved order (Orders › Issue invoice).",
+    "project": "Project: {name}",
+    "order": "Order {id}",
+    "noProject": "No project",
+    "dates": "Issued {issued} · due {due}",
+    "paidOn": "Paid on {date}",
+    "downloadPdf": "Download PDF",
+    "registerPayment": "Record payment",
+    "cancelInvoice": "Void",
+    "paymentRegistered": "Payment recorded. The client was notified.",
+    "cancelReasonRequired": "Enter the reason for voiding it.",
+    "cancelled": "Invoice voided",
+    "issued": "Invoice {number} issued. The client can already see it in their portal.",
+    "registerPaymentTitle": "Record the payment of {number}",
+    "registerPaymentHelp": "Confirm that you received {amount}. The client will see the invoice as paid.",
+    "paymentMethod": "Payment method",
+    "methods": {
+      "transferencia": "Bank transfer",
+      "consignacion": "Bank deposit",
+      "tarjeta": "Card",
+      "efectivo": "Cash",
+      "otro": "Other"
+    },
+    "paymentReference": "Payment reference (optional)",
+    "cancelTitle": "Void invoice {number}",
+    "cancelHelp": "The invoice is voided and no longer counts toward the client's balance. This cannot be undone.",
+    "cancelReason": "Reason",
+    "form": {
+      "client": "Client",
+      "clientRequired": "Choose the client.",
+      "itemsRequired": "Add at least one item with a description, quantity (from 1) and amount (0 or more).",
+      "project": "Project (optional)",
+      "noProject": "No project",
+      "items": "Items",
+      "description": "Description",
+      "quantity": "Quantity",
+      "unitPrice": "Unit price",
+      "removeItem": "Remove item",
+      "addItem": "Add item",
+      "currency": "Currency",
+      "tax": "VAT",
+      "dueDate": "Due date",
+      "notes": "Notes for the client (optional)",
+      "preview": "Subtotal {subtotal} · VAT {tax} · Total {total}",
+      "submit": "Issue invoice"
+    }
+  },
+  "adminDeliverablesPage": {
+    "title": "Deliverables",
+    "subtitle": "Share files or links with your clients and follow their review.",
+    "newDeliverable": "New deliverable",
+    "filterAll": "All",
+    "noResults": "No deliverables match this filter.",
+    "empty": "No deliverables yet",
+    "emptyHint": "Upload the first one for a project: the client will see it in their portal and can approve it or request changes.",
+    "fileGone": "The file is no longer on the server: upload it again.",
+    "projectLabel": "Project: {name}",
+    "clientComment": "Client comment",
+    "externalLink": "External link",
+    "openLink": "Open link",
+    "download": "Download",
+    "waitingClient": "Waiting for the client's review",
+    "shared": "Deliverable shared. The client was notified.",
+    "form": {
+      "project": "Project",
+      "loadingProjects": "Loading projects...",
+      "noProjects": "There are no active projects. First create the client's project in Projects.",
+      "chooseProject": "Choose a project",
+      "ownerNote": "The deliverable belongs to the project's client.",
+      "title": "Title",
+      "type": "Type",
+      "description": "Description (optional)",
+      "source": "Content",
+      "modeFile": "Upload file",
+      "modeLink": "Share link",
+      "fileHint": "Up to 50 MB. PDF, documents, images, ZIP and design files.",
+      "projectRequired": "Choose the project.",
+      "titleRequired": "Enter the title.",
+      "fileRequired": "Choose the file.",
+      "linkInvalid": "Enter a valid link that starts with https://.",
+      "submit": "Share with the client"
+    }
+  },
+  "adminProjects": {
+    "title": "Projects",
+    "subtitle": "Create your clients' projects and update their status and progress.",
+    "newProject": "New project",
+    "searchPlaceholder": "Search by project, client or email",
+    "filterAll": "All",
+    "noResults": "No projects match these filters.",
+    "empty": "No projects yet",
+    "emptyHint": "Create the first one: the client will see it in their portal with a conversation to talk to the team.",
+    "noClient": "No client",
+    "progress": "Progress",
+    "budget": "Budget",
+    "dates": "Dates",
+    "counts": "{invoices, plural, one {# invoice} other {# invoices}} · {deliverables, plural, one {# deliverable} other {# deliverables}} · {orders, plural, one {# order} other {# orders}}",
+    "edit": "Edit",
+    "conversation": "Conversation",
+    "created": "Project \"{name}\" created. The client was notified.",
+    "updated": "Project updated",
+    "editTitle": "Edit {name}",
+    "form": {
+      "clientRequired": "Choose the client.",
+      "nameRequired": "Enter the project name.",
+      "clientFixed": "Client: {name}",
+      "client": "Client",
+      "prospectNote": "If the account belongs to a prospect, it becomes a client when the project is created.",
+      "name": "Name",
+      "description": "Description",
+      "budget": "Budget (optional)",
+      "currency": "Currency",
+      "status": "Status",
+      "startDate": "Start",
+      "endDate": "Estimated delivery",
+      "progress": "Progress (%)",
+      "welcome": "Welcome message (optional)",
+      "welcomePlaceholder": "Hi, we created your project. These are the next steps...",
+      "welcomeHelp": "It is posted as the first message in the project conversation.",
+      "save": "Save changes",
+      "create": "Create project"
+    }
+  },
+  "adminAudit": {
+    "title": "Audit log",
+    "subtitle": "What the team did in the panel: who, what and when.",
+    "filters": {
+      "group": "Topic",
+      "allGroups": "All topics",
+      "action": "Action",
+      "allActions": "All actions",
+      "actor": "Person",
+      "actorPlaceholder": "Email of who did it",
+      "from": "From",
+      "to": "To",
+      "apply": "Filter",
+      "clear": "Clear"
+    },
+    "groups": {
+      "demo_request": "Demo requests",
+      "demo_grant": "Demo access",
+      "demo_catalog": "Demo catalog",
+      "user": "Users",
+      "project": "Projects",
+      "invoice": "Invoices",
+      "deliverable": "Deliverables",
+      "lead": "Leads",
+      "proposal": "Proposals",
+      "proposal_request": "Proposal requests",
+      "settings": "Settings",
+      "privacy": "Privacy"
+    },
+    "actions": {
+      "demo_request": {
+        "update": "Request updated",
+        "approve": "Request approved",
+        "reject": "Request rejected",
+        "merge": "Repeated request merged into an open one"
+      },
+      "demo_grant": {
+        "create": "Access granted",
+        "extend": "Access extended",
+        "revoke": "Access revoked",
+        "resend_activation": "New activation link"
+      },
+      "demo_catalog": {
+        "update": "Catalog updated"
+      },
+      "user": {
+        "activate": "Account activated",
+        "role_change": "Role changed",
+        "reset_link": "Password link generated",
+        "change_password": "Password changed"
+      },
+      "project": {
+        "create": "Project created",
+        "update": "Project updated"
+      },
+      "invoice": {
+        "issue": "Invoice issued",
+        "payment": "Payment recorded",
+        "cancel": "Invoice voided"
+      },
+      "deliverable": {
+        "create": "Deliverable shared"
+      },
+      "lead": {
+        "create": "Lead created",
+        "assign": "Lead assigned",
+        "stage_change": "Lead stage changed",
+        "next_action": "Lead next action",
+        "migrate_contacts": "Contacts migrated to leads"
+      },
+      "proposal": {
+        "create": "Proposal created",
+        "update": "Proposal updated",
+        "delete": "Proposal deleted",
+        "duplicate": "Proposal duplicated",
+        "send": "Proposal sent",
+        "resend": "Proposal resent",
+        "accept": "Proposal accepted",
+        "reject": "Proposal rejected",
+        "convert": "Proposal converted into a project",
+        "payment_options": "Proposal payment options",
+        "payment_received": "Proposal payment received",
+        "wompi_checkout": "Online payment started"
+      },
+      "proposal_request": {
+        "create": "Proposal request received"
+      },
+      "settings": {
+        "commerce_update": "Business details updated"
+      },
+      "privacy": {
+        "search": "Personal data search",
+        "export": "Personal data export",
+        "erase": "Personal data erasure"
+      }
+    },
+    "empty": "No records match these filters.",
+    "total": "{count, plural, one {# record} other {# records}}",
+    "by": "By {email} ({role})",
+    "bySystem": "Automatic (system)",
+    "showDetail": "Show details",
+    "hideDetail": "Hide details",
+    "prev": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {pages}"
+  },
+  "adminSettings": {
+    "subtitle": "Language, theme and how the team gets notices.",
+    "appliedNow": "Language and theme apply instantly in this browser.",
+    "teamNoticesTitle": "Team notices",
+    "teamNoticesBody": "Notices about new requests, orders and messages go to the team email and WhatsApp configured on the server (environment variables). They do not depend on this screen.",
+    "accessTitle": "Your access",
+    "roleName": {
+      "admin": "Administrator",
+      "manager": "Manager"
+    },
+    "accessAdmin": "You see and manage the whole panel, including users, privacy and the audit log.",
+    "accessManager": "You manage operations (requests, access, orders, projects, invoices and deliverables) and see users without changing roles. Privacy and the audit log are for administrators only."
   },
   "adminConversations": {
     "title": "Conversations",
@@ -1548,7 +2069,8 @@
     "allConversations": "All conversations",
     "noConversations": "No conversations to display",
     "unread": "unread",
-    "project": "Project",
+    "project": "Project: {name}",
+    "order": "Order {id}",
     "loading": "Loading conversations...",
     "backToList": "Back to conversations",
     "conversationNotFound": "Conversation not found",
@@ -1559,7 +2081,43 @@
     "sending": "Sending...",
     "statusActive": "Active",
     "statusArchived": "Archived",
-    "statusClosed": "Closed"
+    "statusClosed": "Closed",
+    "newConversation": "New conversation",
+    "searchPlaceholder": "Search by subject, client or email",
+    "filters": {
+      "active": "Active",
+      "archived": "Archived",
+      "closed": "Closed"
+    },
+    "status": {
+      "active": "Active",
+      "archived": "Archived",
+      "closed": "Closed"
+    },
+    "noResults": "No conversations match these filters.",
+    "emptyHint": "Conversations are created automatically with each order and project. You can also open one with a client.",
+    "unreadCount": "{count, plural, one {# unread} other {# unread}}",
+    "form": {
+      "client": "Client",
+      "clientRequired": "Choose the client.",
+      "title": "Subject",
+      "titleRequired": "Enter the subject.",
+      "message": "First message (optional)",
+      "messageRequired": "Enter the message.",
+      "notifyHelp": "If you write a message, the client gets a notice in their portal (and by email if enabled).",
+      "submit": "Create conversation"
+    },
+    "statusChanged": "Conversation status updated",
+    "changeStatus": "Change status",
+    "roles": {
+      "admin": "Team",
+      "client": "Client",
+      "support": "Support"
+    },
+    "noMessages": "There are no messages in this conversation yet.",
+    "automatic": "Automatic",
+    "read": "Read",
+    "replyHelp": "The client gets a notice in their portal when you reply. Enter sends; Shift + Enter adds a line break."
   },
   "adminUsers": {
     "title": "Users",
@@ -1584,9 +2142,31 @@
     "roleDeveloper": "Developer",
     "roleManager": "Manager",
     "roleAdmin": "Admin",
-    "confirmRoleChange": "Are you sure you want to change this user's role to {role}?",
+    "confirmRoleChange": "Change {name}'s role from {from} to {to}? It applies the next time their panel or portal loads, without signing in again.",
     "roleUpdated": "Role updated successfully",
-    "roleUpdateError": "Error updating role"
+    "roleUpdateError": "Error updating role",
+    "subtitleReadOnly": "Check accounts and their roles. Only an administrator can change them.",
+    "tableAccount": "Account",
+    "notActivated": "Not activated",
+    "providerGoogle": "Google",
+    "providerLocal": "Email and password",
+    "changeRoleFor": "Change {name}'s role",
+    "ownRole": "You cannot change your own role",
+    "resetLink": "Password reset link",
+    "resetLinkFor": "Generate a password link for {name}",
+    "adminOnly": "Administrators only",
+    "rolesHelp": "Administrator: the whole panel. Manager: operations; sees users without changing roles and cannot open privacy or the audit log. Sales: demo requests, access and catalog. Developer: opens every demo, no panel. Client: full portal. Prospect: only their demos. User: registered account without projects.",
+    "confirmRoleTitle": "Change role",
+    "confirmRoleButton": "Change role",
+    "resetConfirm": "A single-use link will be generated so {name} ({email}) can create a new password. Previous links stop working. Share it through a trusted channel.",
+    "resetGenerate": "Generate link",
+    "resetWhatsapp": "Hi {name}, this is your link to create a new KopTup password: {url} (expires {date}).",
+    "resetHelp": "Copy it or send it on WhatsApp. It works once and expires {date}.",
+    "copied": "Link copied",
+    "copyFailed": "Could not copy: select it and copy it manually.",
+    "copy": "Copy",
+    "whatsapp": "Send on WhatsApp",
+    "noPhone": "The account has no phone: copy the link and send it another way."
   },
   "adminContacts": {
     "title": "Contacts",
@@ -1615,7 +2195,37 @@
     "statusRead": "Read",
     "statusResponded": "Responded",
     "statusUpdated": "Status updated successfully",
-    "statusUpdateError": "Error updating status"
+    "statusUpdateError": "Error updating status",
+    "searchPlaceholder": "Search by name, email, company or message",
+    "filters": {
+      "all": "All",
+      "new": "New",
+      "read": "Read",
+      "responded": "Responded",
+      "discarded": "Discarded"
+    },
+    "sourceLabel": "Source",
+    "sources": {
+      "contact-form": "Contact form",
+      "demo-request": "Demo request",
+      "demo-rag": "RAG demo"
+    },
+    "discardedHelp": "Contacts from requests rejected as spam: they do not count as new or on the home page.",
+    "status": {
+      "new": "New",
+      "read": "Read",
+      "responded": "Responded"
+    },
+    "discardedAs": "Discarded: {reason}",
+    "openRequest": "View request {code}",
+    "markAs": {
+      "new": "Mark as new",
+      "read": "Mark as read",
+      "responded": "Mark as responded"
+    },
+    "statusNote": "The status is only for the team: the person gets no notice.",
+    "privacyLink": "Delete or export their data (Privacy)",
+    "privacyAdminOnly": "To delete their data, ask an administrator to use Admin › Privacy."
   },
   "loginPage": {
     "title": "Sign In",
@@ -1643,7 +2253,11 @@
     "errorNotActivated": "Your account is not activated yet. Use the activation link we sent you or ask the KopTup team for a new one.",
     "redirectNotice": "Sign in to continue to <strong>{target}</strong>",
     "emailPlaceholder": "you@email.com",
-    "guestLink": "Continue as a guest and see the demos"
+    "guestLink": "Continue as a guest and see the demos",
+    "errorGoogleNotConfigured": "Signing in with Google is not available right now. Sign in with your email and password.",
+    "errorRateLimited": "Too many attempts in a row. Wait a few minutes and try again.",
+    "errorServer": "The server had a problem. Try again in a few minutes.",
+    "rememberHint": "If you leave it unchecked, the session ends when you close the browser or after a day without use."
   },
   "registerPage": {
     "title": "Create Account",
@@ -1685,7 +2299,11 @@
     "chosenPlanNote": "Creating an account does not purchase the plan. To purchase it, request a quote and we will send you a proposal.",
     "quotePlan": "Request a quote for this plan",
     "changePlan": "Change plan",
-    "createAndContinue": "Create account and continue"
+    "createAndContinue": "Create account and continue",
+    "errorRateLimited": "Too many attempts in a row. Wait a few minutes and try again.",
+    "errorNetwork": "We could not reach the server. Check your connection and try again.",
+    "errorServer": "The server had a problem and we could not create the account. Try again in a few minutes.",
+    "errorEmailTaken": "There is already an account with this email. Sign in or recover your password."
   },
   "aboutPage": {
     "badge": "About KopTup",
@@ -2459,6 +3077,22 @@
     "statusUpdated": "Status updated successfully",
     "statusUpdateError": "Error updating status",
     "notSpecified": "Not specified",
+    "searchPlaceholder": "Search by order, name, client or email",
+    "noResults": "No orders match these filters.",
+    "moveTo": {
+      "in_progress": "Move to In progress",
+      "shipped": "Mark as Shipped",
+      "completed": "Mark as Completed"
+    },
+    "viewInvoice": "View invoice {number}",
+    "issueInvoice": "Issue invoice",
+    "invoiceIssued": "Invoice {number} issued. The client can already see it in their portal.",
+    "rejectReasonRequired": "Enter the reason for the rejection (at least 3 characters).",
+    "rejectNotice": "The client will see this reason on their order and get a notice.",
+    "issueInvoiceHelp": "The invoice for order {id} is issued to {name}, with the order's items and amounts.",
+    "invoiceDue": "Due date",
+    "invoiceTax": "VAT",
+    "invoiceSubtotal": "Order subtotal: {amount}",
     "approvalBadge": {
       "pending": "Pending Approval",
       "approved": "Approved",
@@ -2523,75 +3157,63 @@
     }
   },
   "ordersPage": {
-    "title": "My Orders",
-    "subtitle": "Manage and track all your orders",
-    "newOrder": "New Order",
-    "searchPlaceholder": "Search by name or ID...",
-    "noOrders": "No orders found",
-    "items": "items",
-    "viewDetail": "View Detail",
-    "invoice": "Invoice",
+    "title": "My orders",
+    "subtitle": "Follow the status of your orders and their review.",
+    "newOrder": "New order",
+    "searchPlaceholder": "Search by name or number...",
+    "statusFilter": "Filter by status",
+    "noOrders": "No orders match these filters.",
+    "emptyTitle": "You have no orders yet",
+    "emptyBody": "Tell us what you need: the team reviews your order, replies in Messages and, if we approve it, issues you the invoice.",
+    "itemsCount": "{count, plural, one {# item} other {# items}}",
+    "viewDetail": "View details",
     "status": {
-      "all": "All",
-      "pending": "Pending",
-      "in_progress": "In Progress",
-      "shipped": "Shipped",
-      "completed": "Completed",
-      "cancelled": "Cancelled"
+      "all": "All statuses"
     }
   },
   "projectsPage": {
-    "title": "My Projects",
-    "subtitle": "Track the progress of all your projects",
-    "newProject": "New Project",
-    "noProjects": "You have no active projects",
-    "noProjectsDesc": "Start by requesting a new project to see its progress here",
-    "requestNewProject": "Request New Project",
+    "title": "My projects",
+    "subtitle": "The status and progress of your projects, as the team records them.",
+    "noProjects": "You have no projects yet",
+    "noProjectsDesc": "When the team creates your project, you will see its status, progress, deliverables and invoices here. If you need something new, create an order.",
+    "requestNewProject": "Create an order",
     "progress": "Progress",
-    "members": "members",
-    "manager": "Manager",
-    "team": "Team",
+    "progressNote": "Progress is updated by the KopTup team.",
+    "budget": "Budget",
+    "manager": "Lead",
     "startDate": "Start",
-    "deliveryDate": "Delivery",
-    "budgetUsed": "Budget used",
-    "remaining": "Remaining",
-    "projectPhases": "Project Phases",
-    "milestones": "Milestones",
-    "deliverables": "Deliverables",
-    "viewDeliverables": "View Deliverables",
-    "contactTeam": "Contact Team",
+    "deliveryDate": "Estimated delivery",
+    "contactTeam": "Project conversation",
     "noDescription": "No description",
     "noDate": "No date",
-    "unassigned": "Unassigned",
-    "phases": {
-      "planning": "Planning",
-      "development": "Development",
-      "qa": "QA",
-      "delivery": "Delivery"
-    },
-    "status": {
-      "planning": "Planning",
-      "active": "Active",
-      "on_hold": "On Hold",
-      "completed": "Completed",
-      "in_progress": "In Progress",
-      "pending": "Pending",
-      "approved": "Approved",
-      "in_review": "In Review"
-    }
+    "unassigned": "KopTup team",
+    "deliverablesCount": "{count, plural, one {# deliverable} other {# deliverables}}",
+    "toReview": "{count, plural, one {# to review} other {# to review}}",
+    "invoicesCount": "{count, plural, one {# invoice} other {# invoices}}"
   },
   "billingPage": {
-    "title": "Billing & Payments",
-    "subtitle": "Review your invoices and how to pay them",
-    "pending": "Pending",
-    "overdue": "Overdue",
-    "paid": "Paid",
-    "invoices": "invoices",
+    "title": "Billing and payments",
+    "subtitle": "Review your invoices, download them and see how to pay them.",
+    "invoiceCount": "{count, plural, one {# invoice} other {# invoices}}",
+    "filterLabel": "Filter invoices",
+    "filters": {
+      "all": "All",
+      "unpaid": "To pay",
+      "paid": "Paid",
+      "cancelled": "Voided"
+    },
+    "noResults": "No invoices match this filter.",
+    "emptyTitle": "You have no invoices yet",
+    "emptyBody": "When the team issues you an invoice (for example, when approving an order), it will appear here and you will get a notice.",
+    "project": "Project: {name}",
+    "order": "Order {id}",
+    "noReference": "No related project or order",
     "issued": "Issued",
-    "dueDate": "Due Date",
+    "dueDate": "Due date",
     "paidDate": "Paid",
     "details": "Details",
     "noDescription": "No description",
+    "tax": "VAT ({rate}%)",
     "downloadPdf": "Download PDF",
     "payNow": "How to pay",
     "payHide": "Hide",
@@ -2604,33 +3226,63 @@
   },
   "messagesPage": {
     "title": "Messages",
-    "subtitle": "Communicate with the KopTup team about your projects",
+    "subtitle": "Talk to the KopTup team about your orders and projects.",
     "searchPlaceholder": "Search conversations...",
-    "noConversations": "No conversations found",
+    "noConversations": "No conversations match that search.",
     "noParticipants": "No participants",
     "messagePlaceholder": "Write a message...",
-    "enterToSend": "Press Enter to send, Shift + Enter for new line",
-    "selectConversation": "Select a conversation to start",
-    "unknown": "Unknown",
-    "you": "You"
+    "enterToSend": "Enter sends; Shift + Enter adds a line break.",
+    "selectConversation": "Choose a conversation to view it.",
+    "emptyTitle": "You have no conversations yet",
+    "emptyBody": "Every order and project has its conversation with the team. You can also write to us about anything else.",
+    "noMessages": "No messages yet.",
+    "unread": "{count, plural, one {# unread} other {# unread}}",
+    "read": "Read",
+    "sent": "Sent",
+    "send": "Send",
+    "sendError": "We could not send your message. Try again.",
+    "backToList": "Back to conversations",
+    "new": {
+      "button": "Write to the team",
+      "title": "New conversation",
+      "help": "Tell us what you need. The team gets a notice and replies here.",
+      "subject": "Subject",
+      "message": "Message",
+      "titleRequired": "Enter the subject.",
+      "messageRequired": "Write your message.",
+      "cancel": "Cancel",
+      "submit": "Send",
+      "sent": "Message sent. The team will reply here."
+    }
   },
   "deliverablesPage": {
-    "title": "Deliverables & Documents",
-    "subtitle": "File and deliverables repository by project",
+    "title": "Deliverables",
+    "subtitle": "Files and links the team shares with you, by project. Review them and approve them or request changes.",
     "total": "Total",
-    "approved": "Approved",
-    "inReview": "In Review",
-    "rejected": "Rejected",
     "all": "All",
-    "files": "files",
+    "filterLabel": "Filter deliverables",
+    "noResults": "No deliverables match this filter.",
+    "emptyTitle": "You have no deliverables yet",
+    "emptyBody": "When the team shares a file or link for your project, it will appear here and you will get a notice.",
+    "noProject": "No project",
+    "version": "v{version}",
+    "externalLink": "External link",
+    "openLink": "Open link",
+    "download": "Download",
+    "yourComment": "Your comment:",
     "approve": "Approve",
-    "reject": "Reject",
-    "rejectComments": "Rejection comments",
-    "rejectedByUser": "Rejected by user",
-    "status": {
-      "approved": "Approved",
-      "in_review": "In Review",
-      "rejected": "Rejected"
+    "reject": "Request changes",
+    "review": {
+      "approveTitle": "Approve \"{title}\"",
+      "rejectTitle": "Request changes to \"{title}\"",
+      "approveHelp": "By approving it, the team knows the deliverable is ready. You can leave a comment.",
+      "rejectHelp": "Tell the team what needs to change. They will get your comment.",
+      "comments": "Comments",
+      "commentsOptional": "Comment (optional)",
+      "commentsRequired": "Write what needs to change (at least 3 characters).",
+      "cancel": "Cancel",
+      "approved": "Deliverable approved. The team was notified.",
+      "rejected": "We sent your comments to the team."
     }
   },
   "chatbotBuilder": {
@@ -3826,7 +4478,10 @@
       "manager": "Manager",
       "sales": "Sales",
       "other": "Team"
-    }
+    },
+    "projects": "Projects",
+    "auditLog": "Audit log",
+    "badgeLabel": "{count, plural, one {# pending} other {# pending}}"
   },
   "adminPrivacy": {
     "title": "Privacy: data subject rights",
@@ -3958,7 +4613,8 @@
       "demo_request": {
         "update": "Request updated",
         "approve": "Request approved",
-        "reject": "Request rejected"
+        "reject": "Request rejected",
+        "merge": "The person resubmitted the form"
       },
       "demo_grant": {
         "create": "Access granted",
@@ -3971,7 +4627,9 @@
       },
       "user": {
         "activate": "Account activated",
-        "role_change": "Role changed"
+        "role_change": "Role changed",
+        "reset_link": "Password link generated",
+        "change_password": "Password changed"
       }
     },
     "requests": {
@@ -3991,6 +4649,10 @@
       "received": "Received on {date}",
       "resubmitted": "{count, plural, one {the person resubmitted the form # time} other {the person resubmitted the form # times}}",
       "markReview": "Mark as in review",
+      "backToPending": "Back to pending",
+      "backToPendingDone": "The request is pending again.",
+      "demoInactive": "Deactivated: cannot be granted",
+      "inactiveWarning": "These demos are deactivated and cannot be granted: {demos}. Remove them or activate them in the catalog before approving.",
       "email": "Email",
       "phone": "Phone",
       "whatsapp": "WhatsApp",
@@ -4112,7 +4774,10 @@
       "inviteSubmit": "Grant access",
       "invited": "Access granted.",
       "inviteEmailError": "Enter a valid email.",
-      "inviteDemosError": "Choose at least one demo."
+      "inviteDemosError": "Choose at least one demo.",
+      "visits": "{count, plural, =0 {No visits} one {# visit} other {# visits}}",
+      "inactiveDemo": "Deactivated demo: activate it in the catalog to grant it",
+      "inactiveDemosNote": "Deactivated demos cannot be granted until you activate them in the catalog."
     },
     "catalog": {
       "title": "Demo catalog",

@@ -127,7 +127,8 @@ export default function DemoAccessGate({ slug, initialReason, initialMode, expir
               <StatusIcon className="h-9 w-9 text-amber-600 dark:text-amber-400" aria-hidden="true" />
             </div>
             <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
-              <DemoAccessBadge mode={mode} activo={reason !== 'desactivada'} />
+              {/* Desactivada: la etiqueta del motivo ya dice "En mantenimiento" (antes salía dos veces). */}
+              {reason !== 'desactivada' && <DemoAccessBadge mode={mode} />}
               {reason && (
                 <span
                   className="inline-flex items-center rounded-full bg-secondary-100 dark:bg-secondary-800 px-2.5 py-0.5 text-xs font-semibold text-secondary-700 dark:text-secondary-200"

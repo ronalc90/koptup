@@ -3,12 +3,19 @@ import fs from 'fs/promises';
 import path from 'path';
 import { AuthRequest } from '../types';
 import Order from '../models/Order';
+import Conversation from '../models/Conversation';
+import Invoice from '../models/Invoice';
+import Project from '../models/Project';
 import User from '../models/User';
 import mongoose from 'mongoose';
-import { whatsappService } from '../services/whatsapp.service';
 import { logger } from '../utils/logger';
 import { sendError } from '../utils/http-error';
 import { isStaffSession } from '../middleware/access';
+import { businessDay } from '../utils/dates';
+import { createOrderConversation } from '../services/conversations.service';
+import { effectiveInvoiceStatus } from '../services/invoices.service';
+import { notifyTeamInBackground } from '../services/team-notify.service';
+import { frontendUrl } from '../config/demos';
 
 // Obtener todos los pedidos del usuario
 export const getOrders = async (req: AuthRequest, res: Response) => {
@@ -43,8 +50,12 @@ export const getOrders = async (req: AuthRequest, res: Response) => {
       name: order.name,
       description: order.description,
       status: order.status,
-      date: order.orderDate.toISOString().split('T')[0],
+      approvalStatus: order.approvalStatus ?? 'pending',
+      // Día del pedido en Colombia (AAAA-MM-DD), sin el desfase de UTC.
+      date: businessDay(order.orderDate),
+      createdAt: order.orderDate,
       amount: order.amount,
+      currency: order.currency || 'USD',
       items: order.items.length,
       tracking: order.tracking,
       carrier: order.carrier,
@@ -100,6 +111,18 @@ export const getOrderById = async (req: AuthRequest, res: Response) => {
       return;
     }
 
+    // Conversación del pedido (identificador legible para abrirla en Mensajes).
+    const conversation = order.conversationId
+      ? await Conversation.findById(order.conversationId).select('conversationId').lean()
+      : null;
+    // Factura emitida desde este pedido (si la hay y no está anulada).
+    const invoice = await Invoice.findOne({ orderId: order._id, status: { $ne: 'cancelled' } })
+      .select('invoiceNumber status dueDate')
+      .lean();
+    // Descripción detallada que escribió el cliente al crear el pedido.
+    const ownerId = order.userId._id.toString();
+    const detail = (order.comments ?? []).find((c: any) => c.userId && String(c.userId) === ownerId)?.text ?? null;
+
     // Formatear respuesta
     const formattedOrder = {
       id: order.orderId,
@@ -109,8 +132,14 @@ export const getOrderById = async (req: AuthRequest, res: Response) => {
       approvalStatus: order.approvalStatus ?? 'pending',
       // El cliente puede editar o cancelar solo mientras está pendiente de revisión.
       editable: isPendingForClient(order),
-      date: order.orderDate.toISOString().split('T')[0],
+      date: businessDay(order.orderDate),
+      createdAt: order.orderDate,
       amount: order.amount,
+      currency: order.currency || 'USD',
+      rejectionReason: order.rejectionReason ?? null,
+      conversationId: conversation?.conversationId ?? null,
+      invoice: invoice ? { id: String(invoice._id), invoiceNumber: invoice.invoiceNumber, status: effectiveInvoiceStatus(invoice) } : null,
+      detail,
       items: order.items,
       attachments: (order.attachments ?? []).map((a: any) => ({ id: a._id, fileName: a.fileName, fileSize: a.fileSize, fileType: a.fileType })),
       tracking: order.tracking,
@@ -133,75 +162,130 @@ export const getOrderById = async (req: AuthRequest, res: Response) => {
 };
 
 // Crear nuevo pedido
+const MAX_ORDER_ITEMS = 50;
+
+interface OrderItemInput {
+  name: string;
+  description?: string;
+  quantity: number;
+  price: number;
+}
+
+/** Valida los ítems del formulario (nombre, cantidad entera y precio unitario). */
+function parseOrderItems(raw: unknown): OrderItemInput[] | null {
+  let value = raw;
+  if (typeof value === 'string') {
+    try {
+      value = JSON.parse(value);
+    } catch {
+      return null;
+    }
+  }
+  if (!Array.isArray(value) || value.length === 0 || value.length > MAX_ORDER_ITEMS) return null;
+  const items: OrderItemInput[] = [];
+  for (const it of value) {
+    const name = typeof it?.name === 'string' ? it.name.trim() : '';
+    const quantity = Number(it?.quantity);
+    const price = Number(it?.price);
+    if (!name || name.length > 200) return null;
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100000) return null;
+    if (!Number.isFinite(price) || price < 0 || price > 1_000_000_000) return null;
+    const description = typeof it?.description === 'string' && it.description.trim() ? it.description.trim().slice(0, 500) : undefined;
+    items.push({ name, quantity, price: Math.round(price * 100) / 100, ...(description ? { description } : {}) });
+  }
+  return items;
+}
+
 export const createOrder = async (req: AuthRequest, res: Response) => {
+  const files = (req as { files?: Express.Multer.File[] }).files;
   try {
     const userId = req.user?.id;
-    let { name, description, items, projectId, comments } = req.body;
-    const files = (req as any).files as Express.Multer.File[];
+    const { name, description, projectId, comments, currency } = (req.body ?? {}) as Record<string, unknown>;
 
     if (!userId) {
-      res.status(401).json({
-        success: false,
-        message: 'Usuario no autenticado',
-      });
+      await discardUploads(files);
+      sendError(res, 401, 'unauthorized', 'Inicia sesión para continuar.');
       return;
     }
 
-    // Si items viene como string (desde FormData), parsearlo
-    if (typeof items === 'string') {
-      try {
-        items = JSON.parse(items);
-      } catch (error) {
-        res.status(400).json({
-          success: false,
-          message: 'Formato de items inválido',
-        });
-        return;
-      }
+    if (typeof name !== 'string' || !name.trim() || name.trim().length > 200) {
+      await discardUploads(files);
+      sendError(res, 400, 'invalid_name', 'Escribe el nombre del pedido (máximo 200 caracteres).', { fields: ['name'] });
+      return;
     }
-
-    // Validar datos requeridos
-    if (!name || !items || !Array.isArray(items) || items.length === 0) {
-      res.status(400).json({
-        success: false,
-        message: 'Nombre e items son requeridos',
-      });
+    if (description !== undefined && (typeof description !== 'string' || description.length > 5000)) {
+      await discardUploads(files);
+      sendError(res, 400, 'invalid_description', 'La descripción puede tener máximo 5000 caracteres.', { fields: ['description'] });
+      return;
+    }
+    if (comments !== undefined && (typeof comments !== 'string' || comments.length > 5000)) {
+      await discardUploads(files);
+      sendError(res, 400, 'invalid_comments', 'La descripción detallada puede tener máximo 5000 caracteres.', { fields: ['comments'] });
+      return;
+    }
+    // Moneda de los precios estimados: COP o USD (por defecto USD, como antes).
+    if (currency !== undefined && currency !== 'COP' && currency !== 'USD') {
+      await discardUploads(files);
+      sendError(res, 400, 'invalid_currency', 'La moneda debe ser COP o USD.', { fields: ['currency'] });
+      return;
+    }
+    const orderCurrency: 'COP' | 'USD' = currency === 'COP' ? 'COP' : 'USD';
+    const items = parseOrderItems((req.body ?? {}).items);
+    if (!items) {
+      await discardUploads(files);
+      sendError(
+        res,
+        400,
+        'invalid_items',
+        `Agrega entre 1 y ${MAX_ORDER_ITEMS} ítems, cada uno con descripción, cantidad (entero desde 1) y precio unitario (0 o más).`,
+        { fields: ['items'] },
+      );
       return;
     }
 
-    // Calcular monto total
-    const amount = items.reduce((sum: number, item: any) => {
-      return sum + (item.quantity * item.price);
-    }, 0);
+    // Un proyecto solo se liga si es del mismo cliente.
+    let linkedProject: mongoose.Types.ObjectId | null = null;
+    if (typeof projectId === 'string' && mongoose.Types.ObjectId.isValid(projectId)) {
+      const project = await Project.findOne({ _id: projectId, client_id: userId }).select('_id').lean();
+      linkedProject = project ? (project._id as mongoose.Types.ObjectId) : null;
+    }
+
+    // Monto total (centavos redondeados)
+    const amount = Math.round(items.reduce((sum, item) => sum + item.quantity * item.price, 0) * 100) / 100;
 
     // Procesar archivos adjuntos
-    const attachments = files ? files.map((file) => ({
+    const attachments = (files ?? []).map((file) => ({
       fileName: file.originalname,
       fileUrl: `/uploads/orders/${file.filename}`,
       fileSize: file.size,
       fileType: file.mimetype,
       uploadedAt: new Date(),
-    })) : [];
+    }));
 
     // Obtener información del usuario
     const user = await User.findById(userId).select('name email');
 
-    // Procesar comentarios iniciales
-    const initialComments = comments ? [{
-      text: comments,
-      userId: new mongoose.Types.ObjectId(userId),
-      userName: user?.name || 'Cliente',
-      createdAt: new Date(),
-    }] : [];
+    // Descripción detallada del cliente (primer comentario del pedido)
+    const detail = typeof comments === 'string' ? comments.trim() : '';
+    const initialComments = detail
+      ? [
+          {
+            text: detail,
+            userId: new mongoose.Types.ObjectId(userId),
+            userName: user?.name || 'Cliente',
+            createdAt: new Date(),
+          },
+        ]
+      : [];
 
     // Crear pedido
     const newOrder = new Order({
-      name,
-      description: description || '',
+      name: name.trim(),
+      description: typeof description === 'string' ? description.trim() : '',
       userId,
-      projectId: projectId || null,
+      projectId: linkedProject,
       amount,
-      currency: 'USD',
+      currency: orderCurrency,
       items,
       attachments,
       comments: initialComments,
@@ -220,41 +304,34 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
 
     await newOrder.save();
 
-    // Crear conversación automática entre cliente y admin
+    // Conversación automática del pedido entre el cliente y el equipo (Mensajes).
     try {
-      const { createOrderConversation } = await import('../utils/conversationHelper');
-      const conversationId = await createOrderConversation(
-        newOrder.orderId,
-        newOrder.name,
-        new mongoose.Types.ObjectId(userId),
-        newOrder.amount,
-        newOrder.items
-      );
-
-      // Actualizar el pedido con el ID de la conversación
-      newOrder.conversationId = conversationId;
-      await newOrder.save();
+      const conversation = await createOrderConversation({
+        _id: newOrder._id as mongoose.Types.ObjectId,
+        orderId: newOrder.orderId,
+        name: newOrder.name,
+        userId: new mongoose.Types.ObjectId(userId),
+        amount: newOrder.amount,
+        currency: newOrder.currency,
+        items: newOrder.items,
+      });
+      await Order.updateOne({ _id: newOrder._id }, { $set: { conversationId: conversation._id } });
+      newOrder.conversationId = conversation._id as mongoose.Types.ObjectId;
     } catch (error) {
-      logger.error('Error creating order conversation:', error);
+      logger.error(`Error creating order conversation: ${(error as Error)?.message ?? error}`);
       // No fallar la creación del pedido si falla la conversación
     }
 
-    // Enviar notificación por WhatsApp al administrador
-    try {
-      await whatsappService.sendOrderNotification({
-        orderId: newOrder.orderId,
-        name: newOrder.name,
-        clientName: user?.name || 'Cliente',
-        clientEmail: user?.email || '',
-        amount: newOrder.amount,
-        items: newOrder.items,
-        hasAttachments: attachments.length > 0,
-      });
-      logger.info(`Order notification sent for ${newOrder.orderId}`);
-    } catch (error) {
-      logger.error('Error sending order notification:', error);
-      // No fallar la creación del pedido si falla la notificación
-    }
+    // Aviso al equipo (correo y WhatsApp, cada uno solo si está configurado).
+    notifyTeamInBackground({
+      asunto: `Nuevo pedido ${newOrder.orderId}`,
+      lineas: [
+        `${user?.name || 'Cliente'} (${user?.email || 'sin correo'}) creó el pedido "${newOrder.name}".`,
+        `Ítems: ${newOrder.items.length} · Total estimado: ${newOrder.amount.toFixed(2)} ${newOrder.currency}`,
+        attachments.length > 0 ? `Adjuntos: ${attachments.length}` : '',
+      ].filter(Boolean),
+      enlace: `${frontendUrl()}/admin/orders`,
+    });
 
     res.status(201).json({
       success: true,
@@ -264,17 +341,16 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
         description: newOrder.description,
         status: newOrder.status,
         amount: newOrder.amount,
-        date: newOrder.orderDate.toISOString().split('T')[0],
+        currency: newOrder.currency,
+        date: businessDay(newOrder.orderDate),
         attachmentsCount: attachments.length,
       },
       message: 'Pedido creado exitosamente',
     });
   } catch (error) {
+    await discardUploads(files);
     logger.error('Create order error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al crear pedido',
-    });
+    sendError(res, 500, 'internal_error', 'No pudimos crear el pedido. Intenta de nuevo.');
   }
 };
 
@@ -531,6 +607,12 @@ export const cancelOrder = async (req: AuthRequest, res: Response) => {
     });
 
     await order.save();
+
+    notifyTeamInBackground({
+      asunto: `Pedido ${order.orderId} cancelado por el cliente`,
+      lineas: [`El cliente canceló el pedido "${order.name}" antes de la revisión del equipo.`],
+      enlace: `${frontendUrl()}/admin/orders`,
+    });
 
     res.json({
       success: true,

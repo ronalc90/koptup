@@ -1,330 +1,230 @@
+/**
+ * Mensajes del portal (cliente ↔ equipo de KopTup). La lógica de las
+ * conversaciones (no leídos, avisos) está en services/conversations.service.ts.
+ *
+ *  - GET  /api/messages/conversations            las conversaciones de la cuenta
+ *  - GET  /api/messages/conversations/:id        detalle con mensajes (participante)
+ *  - POST /api/messages/conversations            equipo: abrir una conversación con un cliente
+ *  - POST /api/messages/conversations/support    cliente: escribirle al equipo (asunto y mensaje)
+ *  - POST /api/messages/conversations/:id/read   participante: marcar como leída
+ *  - POST /api/messages/send                     participante: enviar un mensaje
+ */
 import { Response } from 'express';
+import mongoose from 'mongoose';
 import { AuthRequest } from '../types';
+import { asyncHandler, AppError } from '../middleware/errorHandler';
 import Conversation from '../models/Conversation';
 import Message from '../models/Message';
 import User from '../models/User';
-import mongoose from 'mongoose';
+// Registra los modelos que usa populate().
+import '../models/Project';
+import '../models/Order';
+import { createClientConversation, postClientMessage, postStaffMessage, unreadFor } from '../services/conversations.service';
+import { isStaffRole } from '../middleware/access';
+
+function participantId(p: { userId?: unknown }): string {
+  const ref = p.userId as { _id?: unknown } | undefined;
+  return String(ref && typeof ref === 'object' && '_id' in ref ? ref._id : ref);
+}
 
 // Obtener todas las conversaciones del usuario
-export const getConversations = async (req: AuthRequest, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    const { unreadOnly } = req.query;
+export const getConversations = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const userId = String(req.user!.id);
+  const { unreadOnly } = req.query;
 
-    if (!userId) {
-      res.status(401).json({ success: false, message: 'Usuario no autenticado' });
-      return;
-    }
+  const conversations = await Conversation.find({ 'participants.userId': userId, status: { $ne: 'closed' } })
+    .populate('projectId', 'name')
+    .populate('orderId', 'name orderId')
+    .sort({ updatedAt: -1 })
+    .limit(200)
+    .lean();
 
-    // Buscar conversaciones donde el usuario es participante
-    const query: any = {
-      'participants.userId': userId,
-      status: { $ne: 'closed' },
-    };
+  // Con lean() el Map de no leídos llega como objeto plano: unreadFor lee ambos.
+  const formatted = conversations.map((conv: any) => ({
+    id: conv.conversationId,
+    title: conv.title,
+    projectName: conv.projectId?.name ?? null,
+    orderId: conv.orderId?.orderId ?? null,
+    lastMessage: conv.lastMessage?.text || '',
+    lastMessageTime: conv.lastMessage?.timestamp || conv.updatedAt,
+    unreadCount: unreadFor(conv.unreadCount, userId),
+    participants: (conv.participants ?? []).map((p: any) => p.name),
+    status: conv.status,
+  }));
 
-    const conversations = await Conversation.find(query)
-      .populate('projectId', 'name')
-      .populate('orderId', 'name orderId')
-      .sort({ updatedAt: -1 })
-      .lean();
-
-    // Formatear conversaciones
-    const formattedConversations = conversations.map((conv: any) => {
-      const userUnreadCount = conv.unreadCount ? conv.unreadCount.get(userId.toString()) || 0 : 0;
-      
-      return {
-        id: conv.conversationId,
-        title: conv.title,
-        projectId: conv.projectId?.name || null,
-        lastMessage: conv.lastMessage?.text || '',
-        lastMessageTime: conv.lastMessage?.timestamp || conv.updatedAt,
-        unreadCount: userUnreadCount,
-        participants: conv.participants.map((p: any) => p.name),
-        status: conv.status,
-      };
-    });
-
-    // Filtrar solo conversaciones con mensajes no leídos si se solicita
-    const filtered = unreadOnly === 'true'
-      ? formattedConversations.filter(c => c.unreadCount > 0)
-      : formattedConversations;
-
-    res.json({ success: true, data: filtered });
-  } catch (error) {
-    console.error('Get conversations error:', error);
-    res.status(500).json({ success: false, message: 'Error al obtener conversaciones' });
-  }
-};
+  res.json({ success: true, data: unreadOnly === 'true' ? formatted.filter((c) => c.unreadCount > 0) : formatted });
+});
 
 // Obtener conversación por ID con sus mensajes
-export const getConversationById = async (req: AuthRequest, res: Response) => {
-  try {
-    const { id } = req.params;
-    const userId = req.user?.id;
+export const getConversationById = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const userId = String(req.user!.id);
+  const conversation = await Conversation.findOne({ conversationId: String(req.params.id) })
+    .populate('projectId', 'name description')
+    .populate('orderId', 'name orderId')
+    .lean();
+  if (!conversation) throw new AppError('Conversación no encontrada', 404, 'not_found');
 
-    if (!userId) {
-      res.status(401).json({ success: false, message: 'Usuario no autenticado' });
-      return;
-    }
+  const isParticipant = conversation.participants.some((p: any) => participantId(p) === userId);
+  if (!isParticipant) throw new AppError('No tienes acceso a esta conversación', 403, 'forbidden');
 
-    const conversation = await Conversation.findOne({ conversationId: id })
-      .populate('projectId', 'name description')
-      .populate('participants.userId', 'name email')
-      .lean();
+  const messages = await Message.find({ conversationId: conversation._id }).sort({ createdAt: 1 }).limit(1000).lean();
+  const formattedMessages = messages.map((msg: any) => ({
+    id: msg.messageId,
+    senderId: msg.sender ? String(msg.sender) : null,
+    senderName: msg.senderName,
+    senderRole: msg.senderRole,
+    content: msg.content,
+    type: msg.type,
+    timestamp: msg.createdAt,
+    isOwnMessage: !!msg.sender && String(msg.sender) === userId,
+    status: (msg.readBy ?? []).some((r: any) => String(r.userId) !== String(msg.sender)) ? 'read' : 'sent',
+  }));
 
-    if (!conversation) {
-      res.status(404).json({ success: false, message: 'Conversación no encontrada' });
-      return;
-    }
-
-    // Verificar que el usuario es participante
-    const isParticipant = conversation.participants.some(
-      (p: any) => p.userId._id.toString() === userId.toString()
-    );
-
-    if (!isParticipant) {
-      res.status(403).json({ success: false, message: 'No tienes acceso a esta conversación' });
-      return;
-    }
-
-    // Obtener mensajes de la conversación
-    const messages = await Message.find({ conversationId: conversation._id })
-      .populate('sender', 'name email')
-      .sort({ createdAt: 1 })
-      .lean();
-
-    const formattedMessages = messages.map((msg: any) => ({
-      id: msg.messageId,
-      senderId: msg.sender._id,
-      senderName: msg.senderName,
-      senderRole: msg.senderRole,
-      content: msg.content,
-      type: msg.type,
-      attachment: msg.attachment,
-      timestamp: msg.createdAt,
-      isOwnMessage: msg.sender._id.toString() === userId.toString(),
-      status: msg.readBy.some((r: any) => r.userId.toString() === userId.toString()) ? 'read' : 'sent',
-    }));
-
-    res.json({
-      success: true,
-      data: {
-        conversation,
-        messages: formattedMessages,
+  res.json({
+    success: true,
+    data: {
+      conversation: {
+        id: conversation.conversationId,
+        title: conversation.title,
+        status: conversation.status,
+        projectName: (conversation.projectId as any)?.name ?? null,
+        orderId: (conversation.orderId as any)?.orderId ?? null,
+        participants: conversation.participants.map((p: any) => ({ name: p.name, role: p.role })),
       },
-    });
-  } catch (error) {
-    console.error('Get conversation by id error:', error);
-    res.status(500).json({ success: false, message: 'Error al obtener conversación' });
+      messages: formattedMessages,
+    },
+  });
+});
+
+// Enviar mensaje (participante)
+export const sendMessage = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const user = req.user!;
+  const { conversationId, content } = (req.body ?? {}) as { conversationId?: unknown; content?: unknown };
+  if (typeof conversationId !== 'string' || !conversationId) {
+    throw new AppError('Falta la conversación.', 400, 'invalid_request', { fields: ['conversationId'] });
   }
-};
+  const conversation = await Conversation.findOne({ conversationId });
+  if (!conversation) throw new AppError('Conversación no encontrada', 404, 'not_found');
+  const participant = conversation.participants.find((p) => String(p.userId) === String(user.id));
+  if (!participant) throw new AppError('No eres participante de esta conversación', 403, 'forbidden');
 
-// Enviar mensaje
-export const sendMessage = async (req: AuthRequest, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    const user = req.user;
-    const { conversationId, content, type, attachment } = req.body;
+  const fresh = await User.findById(user.id).select('name email role').lean();
+  const sender = { id: String(user.id), name: fresh?.name || user.name, email: fresh?.email || user.email };
+  // Un miembro del equipo que participa responde como equipo (avisa al cliente).
+  const message =
+    participant.role !== 'client' && fresh && isStaffRole(fresh.role)
+      ? await postStaffMessage(conversation, { id: sender.id, name: sender.name, email: sender.email, role: fresh.role }, content as string)
+      : await postClientMessage(conversation, sender, content as string);
 
-    if (!userId || !user) {
-      res.status(401).json({ success: false, message: 'Usuario no autenticado' });
-      return;
-    }
-
-    if (!conversationId || !content) {
-      res.status(400).json({ success: false, message: 'ConversationId y contenido son requeridos' });
-      return;
-    }
-
-    // Buscar conversación
-    const conversation = await Conversation.findOne({ conversationId });
-
-    if (!conversation) {
-      res.status(404).json({ success: false, message: 'Conversación no encontrada' });
-      return;
-    }
-
-    // Verificar que el usuario es participante
-    const participant = conversation.participants.find(
-      (p: any) => p.userId.toString() === userId.toString()
-    );
-
-    if (!participant) {
-      res.status(403).json({ success: false, message: 'No eres participante de esta conversación' });
-      return;
-    }
-
-    // Crear mensaje
-    const newMessage = new Message({
-      conversationId: conversation._id,
-      sender: userId,
-      senderName: user.name || user.email,
-      senderRole: participant.role,
-      content,
-      type: type || 'text',
-      attachment,
-      readBy: [{
-        userId: new mongoose.Types.ObjectId(userId),
-        readAt: new Date(),
-      }],
-    });
-
-    await newMessage.save();
-
-    // Actualizar conversación
-    conversation.lastMessage = {
-      text: content,
-      sender: new mongoose.Types.ObjectId(userId),
-      senderName: user.name || user.email,
-      timestamp: new Date(),
-    };
-
-    // Incrementar contador de no leídos para otros participantes
-    conversation.participants.forEach((p: any) => {
-      if (p.userId.toString() !== userId.toString()) {
-        const currentCount = conversation.unreadCount.get(p.userId.toString()) || 0;
-        conversation.unreadCount.set(p.userId.toString(), currentCount + 1);
-      }
-    });
-
-    await conversation.save();
-
-    res.status(201).json({
-      success: true,
-      data: {
-        id: newMessage.messageId,
-        content: newMessage.content,
-        timestamp: newMessage.createdAt,
-      },
-      message: 'Mensaje enviado exitosamente',
-    });
-  } catch (error) {
-    console.error('Send message error:', error);
-    res.status(500).json({ success: false, message: 'Error al enviar mensaje' });
-  }
-};
+  res.status(201).json({
+    success: true,
+    data: {
+      id: message.messageId,
+      senderId: String(user.id),
+      senderName: message.senderName,
+      senderRole: message.senderRole,
+      content: message.content,
+      timestamp: message.createdAt,
+      isOwnMessage: true,
+      status: 'sent',
+    },
+    message: 'Mensaje enviado exitosamente',
+  });
+});
 
 // Marcar conversación como leída
-export const markAsRead = async (req: AuthRequest, res: Response) => {
-  try {
-    const { id } = req.params;
-    const userId = req.user?.id;
+export const markAsRead = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const userId = String(req.user!.id);
+  const conversation = await Conversation.findOne({ conversationId: String(req.params.id) });
+  if (!conversation) throw new AppError('Conversación no encontrada', 404, 'not_found');
+  const isParticipant = conversation.participants.some((p) => String(p.userId) === userId);
+  if (!isParticipant) throw new AppError('No tienes acceso a esta conversación', 403, 'forbidden');
 
-    if (!userId) {
-      res.status(401).json({ success: false, message: 'Usuario no autenticado' });
-      return;
-    }
-
-    const conversation = await Conversation.findOne({ conversationId: id });
-
-    if (!conversation) {
-      res.status(404).json({ success: false, message: 'Conversación no encontrada' });
-      return;
-    }
-
-    // Solo un participante puede marcar la conversación como leída.
-    const isParticipant = conversation.participants.some(
-      (p: any) => String(p.userId?._id ?? p.userId) === userId.toString()
-    );
-    if (!isParticipant) {
-      res.status(403).json({ success: false, message: 'No tienes acceso a esta conversación' });
-      return;
-    }
-
-    // Resetear contador de no leídos
-    conversation.unreadCount.set(userId.toString(), 0);
-    await conversation.save();
-
-    // Marcar mensajes como leídos
-    await Message.updateMany(
-      {
-        conversationId: conversation._id,
-        'readBy.userId': { $ne: userId },
-      },
-      {
-        $push: {
-          readBy: {
-            userId: new mongoose.Types.ObjectId(userId),
-            readAt: new Date(),
-          },
-        },
-      }
-    );
-
-    res.json({ success: true, message: 'Conversación marcada como leída' });
-  } catch (error) {
-    console.error('Mark as read error:', error);
-    res.status(500).json({ success: false, message: 'Error al marcar como leída' });
-  }
-};
+  await Conversation.updateOne({ _id: conversation._id }, { $set: { [`unreadCount.${userId}`]: 0 } }, { timestamps: false });
+  await Message.updateMany(
+    { conversationId: conversation._id, 'readBy.userId': { $ne: new mongoose.Types.ObjectId(userId) } },
+    { $push: { readBy: { userId: new mongoose.Types.ObjectId(userId), readAt: new Date() } } },
+  );
+  res.json({ success: true, message: 'Conversación marcada como leída' });
+});
 
 // Crear nueva conversación (solo staff: la ruta exige requireStaff, con el rol
-// vigente leído de la BD).
-export const createConversation = async (req: AuthRequest, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    const user = req.user;
-    const { title, projectId, orderId, clientId } = req.body ?? {};
-
-    if (!userId || !user) {
-      res.status(401).json({ success: false, message: 'Usuario no autenticado' });
-      return;
-    }
-
-    if (!title || !clientId) {
-      res.status(400).json({ success: false, message: 'Título y clientId son requeridos' });
-      return;
-    }
-
-    if (typeof title !== 'string' || !mongoose.Types.ObjectId.isValid(String(clientId))) {
-      res.status(400).json({ success: false, message: 'Título y clientId válidos son requeridos' });
-      return;
-    }
-
-    // Buscar cliente
-    const client = await User.findById(clientId);
-    if (!client) {
-      res.status(404).json({ success: false, message: 'Cliente no encontrado' });
-      return;
-    }
-
-    // Crear conversación
-    const newConversation = new Conversation({
-      title,
-      projectId: projectId || null,
-      orderId: orderId || null,
-      participants: [
-        {
-          userId: new mongoose.Types.ObjectId(userId),
-          // Rol dentro de la conversación: admin o, para el resto del equipo, support.
-          role: user.role === 'admin' ? 'admin' : 'support',
-          name: user.name || user.email,
-          email: user.email,
-        },
-        {
-          userId: client._id,
-          role: 'client',
-          name: client.name || client.email,
-          email: client.email,
-        },
-      ],
-      status: 'active',
-      createdBy: userId,
-      unreadCount: new Map(),
-    });
-
-    await newConversation.save();
-
-    res.status(201).json({
-      success: true,
-      data: {
-        id: newConversation.conversationId,
-        title: newConversation.title,
-      },
-      message: 'Conversación creada exitosamente',
-    });
-  } catch (error) {
-    console.error('Create conversation error:', error);
-    res.status(500).json({ success: false, message: 'Error al crear conversación' });
+// vigente leído de la BD). Admite un primer mensaje.
+export const createConversation = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const user = req.user!;
+  const { title, projectId, orderId, clientId, message } = (req.body ?? {}) as Record<string, unknown>;
+  if (typeof title !== 'string' || !title.trim() || title.length > 200) {
+    throw new AppError('Escribe el asunto de la conversación (máximo 200 caracteres).', 400, 'invalid_request', { fields: ['title'] });
   }
-};
+  if (typeof clientId !== 'string' || !mongoose.Types.ObjectId.isValid(clientId)) {
+    throw new AppError('Elige el cliente de la conversación.', 400, 'invalid_request', { fields: ['clientId'] });
+  }
+  const client = await User.findById(clientId).select('role').lean();
+  if (!client) throw new AppError('Cliente no encontrado', 404, 'client_not_found');
+  if (isStaffRole(client.role) || client.role === 'developer') {
+    throw new AppError('Esa cuenta es del equipo: elige la cuenta del cliente.', 400, 'client_is_staff');
+  }
+  const conversation = await createClientConversation({
+    title,
+    clientId,
+    createdBy: user.id,
+    projectId: typeof projectId === 'string' && mongoose.Types.ObjectId.isValid(projectId) ? projectId : null,
+    orderId: typeof orderId === 'string' && mongoose.Types.ObjectId.isValid(orderId) ? orderId : null,
+    staff: { id: user.id, email: user.email, role: user.role, name: user.name },
+    firstMessage: typeof message === 'string' && message.trim() ? { from: 'staff', content: message } : null,
+  });
+  res.status(201).json({
+    success: true,
+    data: { id: conversation.conversationId, title: conversation.title },
+    message: 'Conversación creada exitosamente',
+  });
+});
+
+/** Conversaciones que un cliente puede abrir por día (evita abusos). */
+const MAX_CLIENT_CONVERSATIONS_PER_DAY = 5;
+
+/**
+ * POST /api/messages/conversations/support (cliente) — `title` y `message`.
+ * Abre una conversación del cliente con el equipo; el equipo la ve en
+ * Admin › Conversaciones como no leída y recibe el aviso (correo/WhatsApp si
+ * están configurados).
+ */
+export const openSupportConversation = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const user = req.user!;
+  const { title, message, projectId, orderId } = (req.body ?? {}) as Record<string, unknown>;
+  if (typeof title !== 'string' || !title.trim() || title.length > 200) {
+    throw new AppError('Escribe el asunto (máximo 200 caracteres).', 400, 'invalid_request', { fields: ['title'] });
+  }
+  if (typeof message !== 'string' || !message.trim()) {
+    throw new AppError('Escribe tu mensaje.', 400, 'invalid_request', { fields: ['message'] });
+  }
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const recent = await Conversation.countDocuments({ createdBy: user.id, createdAt: { $gte: since } });
+  if (recent >= MAX_CLIENT_CONVERSATIONS_PER_DAY) {
+    throw new AppError('Ya abriste varias conversaciones hoy: escribe en una de las que tienes abiertas.', 429, 'too_many_conversations');
+  }
+  // Pedido o proyecto opcionales, solo si son del mismo cliente.
+  let linkedProject: mongoose.Types.ObjectId | null = null;
+  if (typeof projectId === 'string' && mongoose.Types.ObjectId.isValid(projectId)) {
+    const project = await mongoose.model('Project').findOne({ _id: projectId, client_id: user.id }).select('_id').lean<{ _id: mongoose.Types.ObjectId }>();
+    linkedProject = project?._id ?? null;
+  }
+  let linkedOrder: mongoose.Types.ObjectId | null = null;
+  if (typeof orderId === 'string' && orderId.trim()) {
+    const order = await mongoose.model('Order').findOne({ orderId: orderId.trim(), userId: user.id }).select('_id').lean<{ _id: mongoose.Types.ObjectId }>();
+    linkedOrder = order?._id ?? null;
+  }
+  const conversation = await createClientConversation({
+    title,
+    clientId: user.id,
+    createdBy: user.id,
+    projectId: linkedProject,
+    orderId: linkedOrder,
+  });
+  await postClientMessage(conversation, { id: String(user.id), name: user.name, email: user.email }, message);
+  res.status(201).json({
+    success: true,
+    data: { id: conversation.conversationId, title: conversation.title },
+    message: 'Mensaje enviado al equipo',
+  });
+});

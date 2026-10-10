@@ -121,14 +121,13 @@ class ApiClient {
       // Limpiar localStorage
       localStorage.removeItem('user');
 
-      // Guardar la URL actual para redirigir después del login
-      const currentPath = window.location.pathname;
-      if (currentPath !== '/login' && currentPath !== '/register') {
-        sessionStorage.setItem('redirectAfterLogin', currentPath);
-      }
+      // Volver a la misma página (con sus parámetros) después del login.
+      const currentPath = `${window.location.pathname}${window.location.search}`;
+      const keepPath = window.location.pathname !== '/login' && window.location.pathname !== '/register';
+      if (keepPath) sessionStorage.setItem('redirectAfterLogin', currentPath);
 
       // Redirigir a login
-      window.location.href = '/login?session=expired';
+      window.location.href = keepPath ? `/login?session=expired&redirect=${encodeURIComponent(currentPath)}` : '/login?session=expired';
     }
   }
 
@@ -162,13 +161,24 @@ class ApiClient {
   }
 
   // Auth endpoints
-  async login(email: string, password: string) {
+  /**
+   * Inicia sesión. Con `remember`, la sesión renovable dura lo que diga el
+   * servidor (7 días por defecto) en una cookie persistente; sin él, el
+   * servidor la limita a 1 día y la cookie es de sesión (se borra al cerrar
+   * el navegador).
+   */
+  async login(email: string, password: string, remember = true) {
     try {
-      const response = await this.client.post('/api/auth/login', { email, password });
-      const { accessToken, refreshToken, user } = response.data.data;
+      const response = await this.client.post('/api/auth/login', { email, password, remember });
+      const { accessToken, refreshToken, user, expiresIn } = response.data.data;
 
       Cookies.set('accessToken', accessToken, { expires: 1/96 }); // 15 minutes
-      Cookies.set('refreshToken', refreshToken, { expires: 7 }); // 7 days
+      if (remember) {
+        const days = typeof expiresIn === 'number' && expiresIn > 0 ? expiresIn / 86400 : 7;
+        Cookies.set('refreshToken', refreshToken, { expires: days });
+      } else {
+        Cookies.set('refreshToken', refreshToken); // cookie de sesión
+      }
 
       return { user };
     } catch (error: any) {
@@ -179,6 +189,14 @@ class ApiClient {
         notActivated.code = 'account_not_activated';
         notActivated.response = { status: 401, data: error.response.data };
         throw notActivated;
+      }
+
+      // Demasiados intentos: el mensaje (en español) y el estado llegan a la página.
+      if (error.response?.status === 429) {
+        const limited: any = new Error(error.response?.data?.message || 'rate_limited');
+        limited.code = 'rate_limited';
+        limited.response = { status: 429, data: error.response.data };
+        throw limited;
       }
 
       // Crear un error completamente nuevo con mensaje amigable
@@ -195,7 +213,8 @@ class ApiClient {
 
       // Para otros errores de red
       if (error.code === 'ERR_NETWORK' || !error.response) {
-        const newError = new Error('No se pudo conectar con el servidor. Por favor verifica tu conexión a internet.');
+        const newError: any = new Error('No se pudo conectar con el servidor. Por favor verifica tu conexión a internet.');
+        newError.code = 'ERR_NETWORK';
         throw newError;
       }
 
@@ -235,6 +254,12 @@ class ApiClient {
   // Google OAuth
   getGoogleOAuthURL(): string {
     return `${API_URL}/api/auth/google`;
+  }
+
+  /** Formas de iniciar sesión que ofrece el servidor (`google` solo si está configurado). */
+  async getAuthProviders(): Promise<{ google: boolean }> {
+    const response = await this.client.get('/api/auth/providers');
+    return { google: response.data?.data?.google === true };
   }
 
   /**
@@ -446,9 +471,13 @@ class ApiClient {
     return Array.isArray(metodos) ? metodos : [];
   }
 
+  /**
+   * Datos completos de la factura para generar su PDF (solo el cliente dueño
+   * o el equipo). El PDF lo arma lib/invoice-pdf.ts.
+   */
   async downloadInvoice(id: string) {
-    const response = await this.client.get(`/api/invoices/${id}/download`);
-    return response.data;
+    const response = await this.client.get(`/api/invoices/${encodeURIComponent(id)}/download`);
+    return response.data?.data;
   }
 
   // Messages endpoints

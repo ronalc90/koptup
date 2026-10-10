@@ -14,7 +14,7 @@ import {
   EyeSlashIcon,
   ArrowRightIcon,
 } from '@heroicons/react/24/outline';
-import { FaGoogle, FaGithub } from 'react-icons/fa';
+import { FaGoogle } from 'react-icons/fa';
 import { homePathForRole } from '@/lib/auth-roles';
 
 /** true si `path` es una ruta interna del sitio (evita redirecciones abiertas). */
@@ -36,6 +36,21 @@ export default function LoginPage() {
   const [sessionExpiredMessage, setSessionExpiredMessage] = useState('');
 
   const [redirectTarget, setRedirectTarget] = useState<string | null>(null);
+  // "Continuar con Google" solo si el servidor lo tiene configurado.
+  const [googleEnabled, setGoogleEnabled] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    api
+      .getAuthProviders()
+      .then((p) => {
+        if (!cancelled) setGoogleEnabled(p.google);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Check for OAuth errors, session expiration y redirect en URL
   useEffect(() => {
@@ -51,6 +66,8 @@ export default function LoginPage() {
     // `google_auth_failed`: el inicio de sesión con Google falló o su código venció.
     if (authError === 'auth_failed' || authError === 'google_auth_failed') {
       setError(t('errorGoogle'));
+    } else if (authError === 'google_not_configured') {
+      setError(t('errorGoogleNotConfigured'));
     } else if (authError) {
       setError(t('errorGeneric'));
     }
@@ -71,7 +88,7 @@ export default function LoginPage() {
 
     try {
       // Call API login
-      const { user } = await api.login(formData.email, formData.password);
+      const { user } = await api.login(formData.email, formData.password, formData.remember);
 
       // Save user data
       if (typeof window !== 'undefined') {
@@ -91,23 +108,21 @@ export default function LoginPage() {
         router.push(homePathForRole(user?.role));
       }
     } catch (err: any) {
-      // Manejo amigable de errores
+      // Mensajes en el idioma de la página (nunca el texto técnico de axios).
+      const status = err.response?.status;
       let friendlyMessage = t('errorFields');
-
-      // Primero intentar obtener el mensaje amigable que ya viene del api.ts
       if (err.code === 'account_not_activated') {
         friendlyMessage = t('errorNotActivated');
-      } else if (err.message && !err.message.includes('Request failed with status code')) {
-        // Si el mensaje no es el mensaje técnico de axios, usarlo
-        friendlyMessage = err.message;
-      } else if (err.response?.data?.message) {
-        friendlyMessage = err.response.data.message;
-      } else if (err.response?.status === 401) {
-        friendlyMessage = t('errorCredentials');
-      } else if (err.response?.status === 404) {
-        friendlyMessage = t('errorNotFound');
-      } else if (err.code === 'ERR_NETWORK') {
+      } else if (err.code === 'rate_limited' || status === 429) {
+        friendlyMessage = t('errorRateLimited');
+      } else if (err.code === 'ERR_NETWORK' || !err.response) {
         friendlyMessage = t('errorNetwork');
+      } else if (status === 401) {
+        friendlyMessage = t('errorCredentials');
+      } else if (status >= 500) {
+        friendlyMessage = t('errorServer');
+      } else if (status === 400) {
+        friendlyMessage = t('errorFields');
       }
 
       setError(friendlyMessage);
@@ -123,12 +138,9 @@ export default function LoginPage() {
     });
   };
 
-  const handleSocialLogin = (provider: string) => {
-    if (provider === 'google') {
-      // Redirect to backend Google OAuth endpoint
-      window.location.href = api.getGoogleOAuthURL();
-    }
-    // GitHub OAuth (to be implemented)
+  const handleGoogleLogin = () => {
+    // Inicio con Google en el backend (vuelve a /auth/callback con un código de un solo uso).
+    window.location.href = api.getGoogleOAuthURL();
   };
 
   return (
@@ -191,38 +203,33 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Social Login */}
-            <div className="space-y-3 mb-6">
-              <button
-                type="button"
-                onClick={() => handleSocialLogin('google')}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-secondary-300 dark:border-secondary-700 rounded-lg text-secondary-700 dark:text-secondary-300 hover:bg-secondary-50 dark:hover:bg-secondary-800 transition-colors"
-              >
-                <FaGoogle className="h-5 w-5" />
-                <span className="font-medium">{t('socialGoogle')}</span>
-              </button>
+            {/* Google: solo si el servidor lo tiene configurado (GET /api/auth/providers). */}
+            {googleEnabled && (
+              <>
+                <div className="space-y-3 mb-6">
+                  <button
+                    type="button"
+                    onClick={handleGoogleLogin}
+                    className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-secondary-300 dark:border-secondary-700 rounded-lg text-secondary-700 dark:text-secondary-300 hover:bg-secondary-50 dark:hover:bg-secondary-800 transition-colors"
+                  >
+                    <FaGoogle className="h-5 w-5" />
+                    <span className="font-medium">{t('socialGoogle')}</span>
+                  </button>
+                </div>
 
-              <button
-                type="button"
-                onClick={() => handleSocialLogin('github')}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-secondary-300 dark:border-secondary-700 rounded-lg text-secondary-700 dark:text-secondary-300 hover:bg-secondary-50 dark:hover:bg-secondary-800 transition-colors"
-              >
-                <FaGithub className="h-5 w-5" />
-                <span className="font-medium">{t('socialGithub')}</span>
-              </button>
-            </div>
-
-            {/* Divider */}
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-secondary-300 dark:border-secondary-700" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white dark:bg-secondary-950 text-secondary-500 dark:text-secondary-500">
-                  {t('divider')}
-                </span>
-              </div>
-            </div>
+                {/* Divider */}
+                <div className="relative my-6">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-secondary-300 dark:border-secondary-700" />
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-white dark:bg-secondary-950 text-secondary-500 dark:text-secondary-500">
+                      {t('divider')}
+                    </span>
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* Login Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -291,7 +298,7 @@ export default function LoginPage() {
                     onChange={handleChange}
                     className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-secondary-300 rounded"
                   />
-                  <label htmlFor="remember" className="ml-2 block text-sm text-secondary-700 dark:text-secondary-300">
+                  <label htmlFor="remember" className="ml-2 block text-sm text-secondary-700 dark:text-secondary-300" title={t('rememberHint')}>
                     {t('remember')}
                   </label>
                 </div>

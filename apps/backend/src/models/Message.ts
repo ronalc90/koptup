@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { nextSequentialId } from '../utils/sequence';
 
 export interface IMessage extends Document {
   messageId: string;
@@ -84,13 +85,12 @@ const MessageSchema: Schema = new Schema(
 // Índice compuesto para búsquedas eficientes
 MessageSchema.index({ conversationId: 1, createdAt: -1 });
 
-// Generar messageId automáticamente
-MessageSchema.pre('save', async function (next) {
+// Identificador legible (MSG-000001): se asigna ANTES de validar con un
+// contador atómico (utils/sequence.ts).
+MessageSchema.pre('validate', async function () {
   if (!this.messageId) {
-    const count = await mongoose.model('Message').countDocuments();
-    this.messageId = `MSG-${String(count + 1).padStart(6, '0')}`;
+    this.messageId = await nextSequentialId({ model: 'Message', field: 'messageId', key: 'message', prefix: 'MSG-', pad: 6 });
   }
-  next();
 });
 
 export default mongoose.model<IMessage>('Message', MessageSchema);

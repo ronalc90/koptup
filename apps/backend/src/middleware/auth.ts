@@ -41,6 +41,7 @@ export const authenticate = async (
         email: string;
         role: string;
         name?: string;
+        sid?: string;
       };
 
       req.user = decoded;
@@ -64,6 +65,8 @@ export const generateAccessToken = (payload: {
   email: string;
   role: string;
   name?: string;
+  /** Sesión (dispositivo) a la que pertenece el token (services/session.service.ts). */
+  sid?: string;
 }): string => {
   const jwtSecret = process.env.JWT_SECRET!;
   const expiresIn: string = process.env.JWT_EXPIRES_IN || '15m';

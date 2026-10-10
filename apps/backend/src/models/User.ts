@@ -21,6 +21,23 @@ export type UserRole = (typeof USER_ROLES)[number];
 export const ACCOUNT_STATUSES = ['invitado', 'activo'] as const;
 export type AccountStatus = (typeof ACCOUNT_STATUSES)[number];
 
+/**
+ * Avisos por correo del portal que la persona quiere recibir (Portal ›
+ * Configuración). Las notificaciones dentro del portal (la campana) se crean
+ * siempre; estas casillas deciden si además sale un correo (solo si el
+ * servidor tiene correo configurado). Sin el campo, todas valen `true`.
+ */
+export const NOTIFICATION_EMAIL_CATEGORIES = ['pedidos', 'facturacion', 'proyectos', 'mensajes'] as const;
+export type NotificationEmailCategory = (typeof NOTIFICATION_EMAIL_CATEGORIES)[number];
+export type NotificationPreferences = { email: Record<NotificationEmailCategory, boolean> };
+
+export function resolveNotificationPreferences(raw: unknown): NotificationPreferences {
+  const email = (raw as { email?: Record<string, unknown> } | null | undefined)?.email ?? {};
+  const out = {} as Record<NotificationEmailCategory, boolean>;
+  for (const c of NOTIFICATION_EMAIL_CATEGORIES) out[c] = email[c] !== false;
+  return { email: out };
+}
+
 export interface IUser extends Document {
   email: string;
   password?: string;
@@ -34,6 +51,8 @@ export interface IUser extends Document {
   provider: 'local' | 'google';
   avatar?: string;
   last_login?: Date;
+  /** Avisos por correo del portal (ver NOTIFICATION_EMAIL_CATEGORIES). */
+  notificationPrefs?: Partial<NotificationPreferences> | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -88,6 +107,14 @@ const UserSchema: Schema = new Schema(
     },
     last_login: {
       type: Date,
+    },
+    notificationPrefs: {
+      email: {
+        pedidos: { type: Boolean },
+        facturacion: { type: Boolean },
+        proyectos: { type: Boolean },
+        mensajes: { type: Boolean },
+      },
     },
   },
   {

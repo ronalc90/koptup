@@ -6,6 +6,8 @@ export interface AuthRequest extends Request {
     email: string;
     role: string;
     name?: string;
+    /** Sesión (dispositivo) del token de acceso; ver services/session.service.ts. */
+    sid?: string;
   };
   /** Lo llena `requireStaffOrDemoAccess`: por qué se permitió el acceso. */
   demoAccess?: {

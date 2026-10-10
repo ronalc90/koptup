@@ -1,249 +1,204 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
-import { api } from '@/lib/api';
+import { useLocale, useTranslations } from 'next-intl';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
-import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
+import Card, { CardContent } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import {
-  MagnifyingGlassIcon,
-  FunnelIcon,
-  DocumentArrowDownIcon,
-  EyeIcon,
-} from '@heroicons/react/24/outline';
+import { PortalEmpty, PortalError, PortalLoading } from '@/components/dashboard/PortalStates';
+import { useErrorText } from '@/hooks/useErrorText';
+import { apiRequest } from '@/lib/demo-system';
+import { formatDay, formatMoney, ORDER_STATUS_BADGE, ORDER_STATUSES, type ApprovalStatus, type OrderStatus } from '@/lib/portal';
+import { EyeIcon, FunnelIcon, MagnifyingGlassIcon, PlusIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
 
-export default function OrdersPage() {
+interface OrderRow {
+  id: string;
+  name: string;
+  description: string;
+  status: OrderStatus;
+  approvalStatus: ApprovalStatus;
+  date: string;
+  amount: number;
+  currency: string;
+  items: number;
+  tracking?: string;
+}
+
+function OrdersContent() {
   const t = useTranslations('ordersPage');
-  const [orders, setOrders] = useState<any[]>([]);
-  const [filteredOrders, setFilteredOrders] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const tc = useTranslations('portalCommon');
+  const locale = useLocale();
+  const errorText = useErrorText();
+  const [orders, setOrders] = useState<OrderRow[] | null>(null);
+  const [loadError, setLoadError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | OrderStatus>('all');
 
-  useEffect(() => {
-    loadOrders();
-  }, []);
-
-  useEffect(() => {
-    filterOrders();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm, statusFilter, orders]);
-
-  const loadOrders = async () => {
+  const load = useCallback(async () => {
+    setOrders(null);
+    setLoadError('');
     try {
-      // Cargar pedidos desde la API
-      const ordersData = await api.getOrders();
-      setOrders(ordersData || []);
-    } catch (error) {
-      console.error('Failed to load orders:', error);
-      setOrders([]);
-    } finally {
-      setLoading(false);
+      const data = await apiRequest<OrderRow[]>('/orders');
+      setOrders(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setLoadError(errorText(err));
     }
-  };
+  }, [errorText]);
 
-  const filterOrders = () => {
-    let filtered = [...orders];
+  useEffect(() => {
+    void load();
+  }, [load]);
 
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(order => order.status === statusFilter);
-    }
-
-    if (searchTerm) {
-      filtered = filtered.filter(order =>
-        order.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.id.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    setFilteredOrders(filtered);
-  };
-
-  const getStatusBadge = (status: string) => {
-    const badges: Record<string, { className: string; text: string }> = {
-      pending: { className: 'bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300', text: t('status.pending') },
-      in_progress: { className: 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300', text: t('status.in_progress') },
-      shipped: { className: 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300', text: t('status.shipped') },
-      completed: { className: 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300', text: t('status.completed') },
-      cancelled: { className: 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300', text: t('status.cancelled') },
-    };
-    const badge = badges[status] || { className: 'bg-secondary-100', text: status };
-    return <Badge variant="secondary" size="sm" className={badge.className}>{badge.text}</Badge>;
-  };
-
-  const statusOptions = [
-    { value: 'all', label: t('status.all') },
-    { value: 'pending', label: t('status.pending') },
-    { value: 'in_progress', label: t('status.in_progress') },
-    { value: 'shipped', label: t('status.shipped') },
-    { value: 'completed', label: t('status.completed') },
-    { value: 'cancelled', label: t('status.cancelled') },
-  ];
-
-  if (loading) {
-    return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center h-96">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-        </div>
-      </DashboardLayout>
+  const filtered = useMemo(() => {
+    const q = searchTerm.trim().toLowerCase();
+    return (orders ?? []).filter(
+      (o) => (statusFilter === 'all' || o.status === statusFilter) && (!q || o.name.toLowerCase().includes(q) || o.id.toLowerCase().includes(q)),
     );
-  }
+  }, [orders, searchTerm, statusFilter]);
 
   return (
-    <DashboardLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">
-              {t('title')}
-            </h1>
-            <p className="text-secondary-600 dark:text-secondary-400">
-              {t('subtitle')}
-            </p>
-          </div>
-          <Button asChild>
-            <Link href="/dashboard/orders/new">{t('newOrder')}</Link>
-          </Button>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">{t('title')}</h1>
+          <p className="text-secondary-600 dark:text-secondary-400">{t('subtitle')}</p>
         </div>
+        <Button asChild>
+          <Link href="/dashboard/orders/new">
+            <PlusIcon className="h-5 w-5 mr-2" />
+            {t('newOrder')}
+          </Link>
+        </Button>
+      </div>
 
-        {/* Filters */}
-        <Card variant="bordered">
-          <CardContent className="p-4">
-            <div className="flex flex-col md:flex-row gap-4">
-              {/* Search */}
-              <div className="flex-1">
-                <div className="relative">
+      {loadError ? (
+        <PortalError message={loadError} onRetry={() => void load()} />
+      ) : !orders ? (
+        <PortalLoading />
+      ) : orders.length === 0 ? (
+        <PortalEmpty icon={ShoppingBagIcon} title={t('emptyTitle')} body={t('emptyBody')} action={{ href: '/dashboard/orders/new', label: t('newOrder') }} />
+      ) : (
+        <>
+          <Card variant="bordered">
+            <CardContent className="p-4">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <label htmlFor="orders-search" className="sr-only">
+                    {tc('search')}
+                  </label>
                   <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-secondary-400" />
                   <input
-                    type="text"
+                    id="orders-search"
+                    type="search"
                     placeholder={t('searchPlaceholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   />
                 </div>
-              </div>
-
-              {/* Status Filter */}
-              <div className="w-full md:w-48">
-                <div className="relative">
+                <div className="w-full md:w-56 relative">
+                  <label htmlFor="orders-status" className="sr-only">
+                    {t('statusFilter')}
+                  </label>
                   <FunnelIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-secondary-400" />
                   <select
+                    id="orders-status"
                     value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent appearance-none"
+                    onChange={(e) => setStatusFilter(e.target.value as 'all' | OrderStatus)}
+                    className="w-full pl-10 pr-4 py-2 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   >
-                    {statusOptions.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
+                    <option value="all">{t('status.all')}</option>
+                    {ORDER_STATUSES.map((s) => (
+                      <option key={s} value={s}>
+                        {tc(`orderStatus.${s}`)}
                       </option>
                     ))}
                   </select>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Orders List */}
-        <div className="space-y-4">
-          {filteredOrders.length === 0 ? (
-            <Card variant="bordered">
-              <CardContent className="p-12 text-center">
-                <p className="text-secondary-600 dark:text-secondary-400">
-                  {t('noOrders')}
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            filteredOrders.map((order) => (
-              <Card key={order.id} variant="bordered" className="hover:shadow-medium transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-start gap-4 mb-3">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold text-secondary-900 dark:text-white">
-                              {order.name}
-                            </h3>
-                            {getStatusBadge(order.status)}
-                          </div>
-                          <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-2">
-                            {order.description}
-                          </p>
-                          <div className="flex flex-wrap items-center gap-4 text-sm text-secondary-500">
-                            <span className="font-mono">{order.id}</span>
-                            <span>•</span>
-                            <span>{order.date}</span>
-                            <span>•</span>
-                            <span>{order.items} {t('items')}</span>
-                            {order.tracking && (
-                              <>
-                                <span>•</span>
-                                <span className="font-mono">{order.tracking}</span>
-                              </>
-                            )}
-                          </div>
+          <div className="space-y-4" data-testid="orders-list">
+            {filtered.length === 0 ? (
+              <Card variant="bordered">
+                <CardContent className="p-12 text-center">
+                  <p className="text-secondary-600 dark:text-secondary-400">{t('noOrders')}</p>
+                </CardContent>
+              </Card>
+            ) : (
+              filtered.map((order) => (
+                <Card key={order.id} variant="bordered" className="hover:shadow-medium transition-shadow" data-order-id={order.id}>
+                  <CardContent className="p-6">
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          <h2 className="text-lg font-semibold text-secondary-900 dark:text-white break-words">{order.name}</h2>
+                          <Badge variant="secondary" size="sm" className={ORDER_STATUS_BADGE[order.status]}>
+                            {tc(`orderStatus.${order.status}`)}
+                          </Badge>
+                          {order.status === 'pending' && (
+                            <Badge variant="secondary" size="sm">
+                              {tc(`approvalStatus.${order.approvalStatus}`)}
+                            </Badge>
+                          )}
+                        </div>
+                        {order.description && <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-2 line-clamp-2">{order.description}</p>}
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-secondary-500">
+                          <span className="font-mono">{order.id}</span>
+                          <span aria-hidden="true">•</span>
+                          <span>{formatDay(order.date, locale)}</span>
+                          <span aria-hidden="true">•</span>
+                          <span>{t('itemsCount', { count: order.items })}</span>
+                          {order.tracking && (
+                            <>
+                              <span aria-hidden="true">•</span>
+                              <span className="font-mono">{order.tracking}</span>
+                            </>
+                          )}
                         </div>
                       </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <div className="text-right mr-4">
-                        <p className="text-2xl font-bold text-secondary-900 dark:text-white">
-                          ${order.amount.toFixed(2)}
-                        </p>
-                      </div>
-
-                      <div className="flex gap-2">
+                      <div className="flex items-center justify-between lg:justify-end gap-4">
+                        <p className="text-2xl font-bold text-secondary-900 dark:text-white">{formatMoney(order.amount, order.currency, locale)}</p>
                         <Button variant="outline" size="sm" asChild>
-                          <Link href={`/dashboard/orders/${order.id}`}>
+                          <Link href={`/dashboard/orders/${encodeURIComponent(order.id)}`}>
                             <EyeIcon className="h-4 w-4 mr-2" />
                             {t('viewDetail')}
                           </Link>
                         </Button>
-                        {order.status === 'completed' && (
-                          <Button variant="outline" size="sm">
-                            <DocumentArrowDownIcon className="h-4 w-4 mr-2" />
-                            {t('invoice')}
-                          </Button>
-                        )}
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
 
-        {/* Summary */}
-        <Card variant="bordered">
-          <CardContent className="p-6">
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
-              {statusOptions.slice(1).map(option => {
-                const count = orders.filter(o => o.status === option.value).length;
-                return (
-                  <div key={option.value} className="text-center">
-                    <p className="text-2xl font-bold text-secondary-900 dark:text-white mb-1">
-                      {count}
-                    </p>
-                    <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                      {option.label}
-                    </p>
+          <Card variant="bordered">
+            <CardContent className="p-6">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+                {ORDER_STATUSES.map((s) => (
+                  <div key={s} className="text-center">
+                    <p className="text-2xl font-bold text-secondary-900 dark:text-white mb-1">{orders.filter((o) => o.status === s).length}</p>
+                    <p className="text-sm text-secondary-600 dark:text-secondary-400">{tc(`orderStatus.${s}`)}</p>
                   </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </>
+      )}
+    </div>
+  );
+}
+
+/** Portal › Mis pedidos (datos reales; si la API falla, error con reintento). */
+export default function OrdersPage() {
+  return (
+    <DashboardLayout>
+      <OrdersContent />
     </DashboardLayout>
   );
 }

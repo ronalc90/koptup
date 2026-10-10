@@ -30,7 +30,7 @@ import { areTrackingTagsLoaded } from '@/lib/analytics';
  * si aceptas esa categoría y si el sitio tiene configurada la etiqueta.
  */
 const COOKIE_ROWS = {
-  essential: ['accessToken', 'refreshToken', 'locale', 'cookie_preferences', 'theme', 'user', 'redirectAfterLogin', 'preferences', 'demos'],
+  essential: ['accessToken', 'refreshToken', 'locale', 'cookie_preferences', 'theme', 'user', 'redirectAfterLogin', 'demos'],
   analytics: ['_ga', '_ga_ID'],
   marketing: ['_gcl_au', '_gcl_aw', 'li_fat_id', 'bcookie', 'lidc', 'UserMatchHistory'],
 } as const;
@@ -38,7 +38,6 @@ const COOKIE_ROWS = {
 /** Nombre que se muestra de cada fila (la clave de traducción no admite algunos caracteres). */
 const ROW_NAMES: Record<string, string> = {
   _ga_ID: '_ga_<ID>',
-  preferences: 'settings, adminSettings, koptup.clientType, koptup.onboarding.dismissed',
   demos: 'koptup…, demo:…',
 };
 

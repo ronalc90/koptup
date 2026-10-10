@@ -1,8 +1,10 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { nextSequentialId } from '../utils/sequence';
 
 export interface IDeliverable extends Document {
   deliverableId: string;
   projectId: mongoose.Types.ObjectId;
+  /** Cliente dueño del proyecto (lo ve y lo aprueba en su portal). Nunca quien lo sube. */
   userId: mongoose.Types.ObjectId;
   title: string;
   description: string;
@@ -11,6 +13,13 @@ export interface IDeliverable extends Document {
   uploadDate: Date;
   approvedDate?: Date;
   rejectedDate?: Date;
+  /**
+   * `file`: archivo subido al servidor (se descarga con sesión en
+   * GET /api/deliverables/:id/download); `link`: enlace externo (https) que
+   * el equipo registra (Drive, repositorio, sitio publicado…).
+   */
+  storage?: 'file' | 'link';
+  /** Ruta interna (`/uploads/deliverables/<archivo>`) o el enlace https. */
   fileUrl: string;
   fileName: string;
   fileSize: number;
@@ -78,6 +87,11 @@ const DeliverableSchema: Schema = new Schema(
     rejectedDate: {
       type: Date,
     },
+    storage: {
+      type: String,
+      enum: ['file', 'link'],
+      default: 'file',
+    },
     fileUrl: {
       type: String,
       required: true,
@@ -128,13 +142,12 @@ const DeliverableSchema: Schema = new Schema(
   }
 );
 
-// Generar deliverableId automáticamente
-DeliverableSchema.pre('save', async function (next) {
+// Identificador legible (DEL-0001): se asigna ANTES de validar con un
+// contador atómico (utils/sequence.ts).
+DeliverableSchema.pre('validate', async function () {
   if (!this.deliverableId) {
-    const count = await mongoose.model('Deliverable').countDocuments();
-    this.deliverableId = `DEL-${String(count + 1).padStart(4, '0')}`;
+    this.deliverableId = await nextSequentialId({ model: 'Deliverable', field: 'deliverableId', key: 'deliverable', prefix: 'DEL-', pad: 4 });
   }
-  next();
 });
 
 export default mongoose.model<IDeliverable>('Deliverable', DeliverableSchema);

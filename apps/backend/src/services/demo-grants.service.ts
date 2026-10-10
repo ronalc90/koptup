@@ -88,6 +88,18 @@ export async function resolveDemosForGrant(slugs: string[], actor: StaffActor): 
   if (unknown.length > 0) {
     throw new AppError(`Estas demos no existen en el catálogo: ${unknown.join(', ')}`, 400, 'unknown_demo', { demos: unknown });
   }
+  // Una demo desactivada (en mantenimiento) no se concede: la persona recibiría
+  // el aviso y vería "En mantenimiento" al abrirla.
+  const desactivadas = unique.filter((s) => catalog.get(s)?.activo === false);
+  if (desactivadas.length > 0) {
+    const nombres = desactivadas.map((s) => catalog.get(s)?.nombre ?? s);
+    throw new AppError(
+      `Estas demos están desactivadas en el catálogo: ${nombres.join(', ')}. Actívalas en Catálogo de demos o quítalas antes de conceder el acceso.`,
+      409,
+      'demo_inactive',
+      { demos: desactivadas },
+    );
+  }
   const privadas = unique.filter((s) => catalog.get(s)?.accessMode === 'privado');
   if (privadas.length > 0 && !canManagePrivateDemos(actor.role)) {
     throw new AppError(
@@ -308,7 +320,7 @@ type GrantLike = Pick<
 
 export function grantView(g: GrantLike, entry: CatalogEntry | null, now = new Date()) {
   const estadoEfectivo = effectiveGrantState(g, now);
-  const u = g.user as { _id?: unknown; email?: string; name?: string; company?: string; role?: string; accountStatus?: string } | undefined;
+  const u = g.user as { _id?: unknown; email?: string; name?: string; company?: string; phone?: string; role?: string; accountStatus?: string } | undefined;
   const populated = u && typeof u === 'object' && 'email' in u;
   return {
     id: String(g._id),
@@ -340,6 +352,7 @@ export function grantView(g: GrantLike, entry: CatalogEntry | null, now = new Da
           email: u.email,
           name: u.name,
           company: u.company ?? null,
+          phone: u.phone ?? null,
           role: u.role,
           accountStatus: u.accountStatus ?? 'activo',
         }
@@ -382,7 +395,7 @@ export async function extendGrant(id: string, dias: number, actor: StaffActor, r
         $push: { extensiones: { dias, desde: grant.expiresAt, hasta, por: actor.id, fecha: now } },
       },
       { new: true },
-    ).populate('user', 'email name company role accountStatus');
+    ).populate('user', 'email name company phone role accountStatus');
   } catch (err) {
     if (isDuplicateKey(err)) {
       throw new AppError('Esta persona ya tiene otro acceso vigente a esta demo: extiende ese.', 409, 'active_grant_exists');
@@ -416,7 +429,7 @@ export async function revokeGrant(id: string, motivo: string | undefined, actor:
     { _id: grant._id, estado: { $ne: 'revocado' } },
     { $set: { estado: 'revocado', revocadoPor: actor.id, revocadoEn: now, motivoRevocacion: motivo } },
     { new: true },
-  ).populate('user', 'email name company role accountStatus');
+  ).populate('user', 'email name company phone role accountStatus');
   if (!updated) throw new AppError('Este acceso ya estaba revocado.', 409, 'grant_revoked');
   await recordAudit({
     actor,
@@ -467,7 +480,7 @@ export async function resendActivation(userId: string, actor: StaffActor, ctx: {
     req: ctx.req,
   });
   return {
-    user: { id: String(user._id), email: user.email, name: user.name, accountStatus: user.accountStatus },
+    user: { id: String(user._id), email: user.email, name: user.name, phone: user.phone ?? null, accountStatus: user.accountStatus },
     activationUrl: link.url,
     activationExpiresAt: link.expiresAt,
     email,
@@ -525,7 +538,7 @@ export async function listGrants(params: { estado?: string; demo?: string; q?: s
       .sort({ createdAt: -1 })
       .skip((params.page - 1) * params.limit)
       .limit(params.limit)
-      .populate('user', 'email name company role accountStatus'),
+      .populate('user', 'email name company phone role accountStatus'),
     DemoGrant.countDocuments(base),
     ...GRANT_LIST_STATES.map((st) => DemoGrant.countDocuments({ ...base, ...grantStateFilter(st, now) })),
   ]);
@@ -575,7 +588,7 @@ export async function grantsForRequest(requestId: string, userId?: string | null
   const now = new Date();
   const or: Record<string, unknown>[] = [{ request: requestId }];
   if (userId) or.push({ user: userId });
-  const docs = await DemoGrant.find({ $or: or }).sort({ createdAt: -1 }).limit(100).populate('user', 'email name company role accountStatus');
+  const docs = await DemoGrant.find({ $or: or }).sort({ createdAt: -1 }).limit(100).populate('user', 'email name company phone role accountStatus');
   const catalog = await getCatalogMap(docs.map((d) => d.demoSlug));
   return docs.map((d) => grantView(d, catalog.get(d.demoSlug) ?? null, now));
 }

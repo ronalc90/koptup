@@ -29,6 +29,7 @@ import {
   catalogMap,
   demoName,
   fetchPublicCatalog,
+  hasSessionCookie,
   parseDemoSlugsParam,
   storedUser,
 } from '@/lib/demo-system';
@@ -131,10 +132,24 @@ export default function DemoRequestForm() {
     fetchPublicCatalog(controller.signal)
       .then((items) => setCatalog(catalogMap(items)))
       .catch(() => undefined);
-    // Con sesión, se adelantan el nombre y el email.
+    // Con sesión, se adelantan el nombre y el email (y, desde la cuenta, la
+    // empresa y el teléfono: así "Pedir más tiempo" llega con todo lleno).
     const user = storedUser();
     if (user?.email || user?.name) {
       setForm((f) => ({ ...f, nombre: f.nombre || user.name || '', email: f.email || user.email || '' }));
+    }
+    if (hasSessionCookie()) {
+      apiRequest<{ name?: string; email?: string; company?: string | null; phone?: string | null }>('/auth/me', { signal: controller.signal })
+        .then((me) =>
+          setForm((f) => ({
+            ...f,
+            nombre: f.nombre || me.name || '',
+            email: f.email || me.email || '',
+            empresa: f.empresa || me.company || '',
+            telefono: f.telefono || me.phone || '',
+          })),
+        )
+        .catch(() => undefined);
     }
     return () => controller.abort();
   }, []);

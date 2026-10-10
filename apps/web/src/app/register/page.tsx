@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -20,7 +20,7 @@ import {
   CheckCircleIcon,
   SparklesIcon,
 } from '@heroicons/react/24/outline';
-import { FaGoogle, FaGithub } from 'react-icons/fa';
+import { FaGoogle } from 'react-icons/fa';
 
 // Plan elegido: solo los planes RAG publicados (`?plan=sistema-rag&tier=<id>`),
 // con la misma tarjeta de /services#planes-rag (src/lib/rag-plans.ts). Antes
@@ -87,13 +87,16 @@ function RegisterPageInner() {
       // Auto-login after successful registration
       const { user } = await api.login(formData.email, formData.password);
 
+      // Empresa y teléfono quedan en la cuenta (Mi perfil); si el formato no
+      // sirve, la persona los corrige después en su perfil.
+      const extra: Record<string, string> = {};
+      if (formData.company.trim()) extra.company = formData.company.trim();
+      if (formData.phone.trim()) extra.phone = formData.phone.trim();
+      if (Object.keys(extra).length) await api.patch('/api/auth/me', extra).catch(() => undefined);
+
       // Save user data
       if (typeof window !== 'undefined') {
-        localStorage.setItem('user', JSON.stringify({
-          ...user,
-          company: formData.company,
-          phone: formData.phone,
-        }));
+        localStorage.setItem('user', JSON.stringify(user));
       }
 
       // Redirect to dashboard con welcome flag y contexto del plan
@@ -109,7 +112,12 @@ function RegisterPageInner() {
       }
       router.push(`/dashboard?${params.toString()}`);
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || t('errorGeneric'));
+      const status = err.response?.status;
+      if (err.code === 'rate_limited' || status === 429) setError(t('errorRateLimited'));
+      else if (err.code === 'ERR_NETWORK' || !err.response) setError(t('errorNetwork'));
+      else if (status >= 500) setError(t('errorServer'));
+      else if (err.response?.data?.code === 'email_taken') setError(t('errorEmailTaken'));
+      else setError(t('errorGeneric'));
       setIsLoading(false);
     }
   };
@@ -122,13 +130,20 @@ function RegisterPageInner() {
     });
   };
 
-  const handleSocialRegister = (provider: string) => {
-    if (provider === 'google') {
-      // Redirect to backend Google OAuth endpoint
-      window.location.href = api.getGoogleOAuthURL();
-    }
-    // GitHub OAuth (to be implemented)
-  };
+  // "Continuar con Google" solo si el servidor lo tiene configurado.
+  const [googleEnabled, setGoogleEnabled] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    api
+      .getAuthProviders()
+      .then((p) => {
+        if (!cancelled) setGoogleEnabled(p.google);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const passwordRequirements = [
     { met: formData.password.length >= 8, text: t('reqLength') },
@@ -176,38 +191,35 @@ function RegisterPageInner() {
               </div>
             )}
 
-            {/* Social Register */}
-            <div className="grid grid-cols-2 gap-3 mb-6">
-              <button
-                type="button"
-                onClick={() => handleSocialRegister('google')}
-                className="flex items-center justify-center gap-2 px-4 py-3 border border-secondary-300 dark:border-secondary-700 rounded-lg text-secondary-700 dark:text-secondary-300 hover:bg-secondary-50 dark:hover:bg-secondary-800 transition-colors"
-              >
-                <FaGoogle className="h-5 w-5" />
-                <span className="font-medium">{t('socialGoogle')}</span>
-              </button>
+            {/* Google: solo si el servidor lo tiene configurado. */}
+            {googleEnabled && (
+              <>
+                <div className="mb-6">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.location.href = api.getGoogleOAuthURL();
+                    }}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-secondary-300 dark:border-secondary-700 rounded-lg text-secondary-700 dark:text-secondary-300 hover:bg-secondary-50 dark:hover:bg-secondary-800 transition-colors"
+                  >
+                    <FaGoogle className="h-5 w-5" />
+                    <span className="font-medium">{t('socialGoogle')}</span>
+                  </button>
+                </div>
 
-              <button
-                type="button"
-                onClick={() => handleSocialRegister('github')}
-                className="flex items-center justify-center gap-2 px-4 py-3 border border-secondary-300 dark:border-secondary-700 rounded-lg text-secondary-700 dark:text-secondary-300 hover:bg-secondary-50 dark:hover:bg-secondary-800 transition-colors"
-              >
-                <FaGithub className="h-5 w-5" />
-                <span className="font-medium">{t('socialGithub')}</span>
-              </button>
-            </div>
-
-            {/* Divider */}
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-secondary-300 dark:border-secondary-700" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white dark:bg-secondary-950 text-secondary-500">
-                  {t('divider')}
-                </span>
-              </div>
-            </div>
+                {/* Divider */}
+                <div className="relative my-6">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-secondary-300 dark:border-secondary-700" />
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-white dark:bg-secondary-950 text-secondary-500">
+                      {t('divider')}
+                    </span>
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* Register Form */}
             <form onSubmit={handleSubmit} className="space-y-5">

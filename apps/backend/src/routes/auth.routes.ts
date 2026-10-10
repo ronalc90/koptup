@@ -1,4 +1,4 @@
-import { Router, RequestHandler } from 'express';
+import { Router, RequestHandler, Request, Response } from 'express';
 import { body } from 'express-validator';
 import {
   login,
@@ -13,7 +13,10 @@ import {
   activateAccount,
   checkActivation,
   updateProfile,
+  updatePreferences,
   changePassword,
+  getAuthProviders,
+  isGoogleConfigured,
 } from '../controllers/auth.controller';
 import { authenticate } from '../middleware/auth';
 import {
@@ -34,6 +37,18 @@ import { logger } from '../utils/logger';
 const router = Router();
 
 const GOOGLE_NOT_CONFIGURED_MESSAGE = 'El inicio de sesión con Google no está disponible en este momento. Entra con tu correo y contraseña.';
+
+/**
+ * Google sin configurar: a un navegador (que llegó desde el botón) se le
+ * devuelve a /login con un aviso; a un cliente de la API, el JSON 503.
+ */
+function googleNotConfigured(req: Request, res: Response) {
+  if (req.accepts(['json', 'html']) === 'html') {
+    res.redirect(`${(process.env.FRONTEND_URL || 'http://localhost:3000').replace(/\/+$/, '')}/login?error=google_not_configured`);
+    return;
+  }
+  sendError(res, 503, 'google_not_configured', GOOGLE_NOT_CONFIGURED_MESSAGE);
+}
 
 // Lazy import passport to avoid blocking
 let passportInstance: any = null;
@@ -306,6 +321,18 @@ router.get('/me', authenticate, getProfile as RequestHandler);
 router.patch('/me', authenticate, updateProfile as RequestHandler);
 
 /**
+ * PATCH /api/auth/me/preferences { email: { pedidos?, facturacion?, proyectos?, mensajes? } }
+ * — avisos del portal que la persona quiere recibir por correo.
+ */
+router.patch('/me/preferences', authenticate, updatePreferences as RequestHandler);
+
+/**
+ * GET /api/auth/providers — `{ google, email }`: qué formas de iniciar sesión
+ * ofrece este servidor (la web oculta "Continuar con Google" si no está).
+ */
+router.get('/providers', getAuthProviders as RequestHandler);
+
+/**
  * POST /api/auth/change-password { currentPassword, newPassword } — cambia la
  * contraseña verificando la actual y devuelve una sesión nueva (cupo propio
  * por cuenta: changePasswordRateLimiter).
@@ -326,13 +353,8 @@ router.get(
   '/google',
   async (req, res, next) => {
     try {
-      // Check if Google OAuth is configured
-      const clientID = process.env.GOOGLE_CLIENT_ID;
-      const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-
-      if (!clientID || !clientSecret || clientID.includes('tu-google')) {
-        return sendError(res, 503, 'google_not_configured', GOOGLE_NOT_CONFIGURED_MESSAGE);
-      }
+      // Google sin configurar: aviso en /login (navegador) o 503 (API).
+      if (!isGoogleConfigured()) return googleNotConfigured(req, res);
 
       const passport = await getPassport();
       return passport.authenticate('google', {
@@ -360,13 +382,8 @@ router.get(
   '/google/callback',
   async (req, res, next) => {
     try {
-      // Check if Google OAuth is configured
-      const clientID = process.env.GOOGLE_CLIENT_ID;
-      const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-
-      if (!clientID || !clientSecret || clientID.includes('tu-google')) {
-        return sendError(res, 503, 'google_not_configured', GOOGLE_NOT_CONFIGURED_MESSAGE);
-      }
+      // Google sin configurar: aviso en /login (navegador) o 503 (API).
+      if (!isGoogleConfigured()) return googleNotConfigured(req, res);
 
       const passport = await getPassport();
       return passport.authenticate('google', {
