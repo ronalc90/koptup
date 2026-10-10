@@ -140,3 +140,21 @@ export function stableHash(s: string): number {
   }
   return h >>> 0;
 }
+
+/** Segundos Unix de una fecha local de Bogotá (UTC−5, sin horario de verano). */
+export function unixSecondsBogota(iso: string): number {
+  return Math.round((toUtc(iso) + 5 * 3600000) / 1000);
+}
+
+/** Color de texto legible (blanco o casi negro) sobre un color de fondo #rrggbb. */
+export function readableOn(hex: string): string {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return '#ffffff';
+  const n = parseInt(m[1], 16);
+  const lin = (c: number) => {
+    const v = c / 255;
+    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+  };
+  const lum = 0.2126 * lin((n >> 16) & 255) + 0.7152 * lin((n >> 8) & 255) + 0.0722 * lin(n & 255);
+  return lum > 0.2 ? '#0f172a' : '#ffffff';
+}

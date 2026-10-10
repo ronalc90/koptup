@@ -57,7 +57,7 @@ export function cufeInput(inv: Invoice, buyer: Tenant): string {
   ].join('');
 }
 
-function base32Decode(s: string): Uint8Array {
+function base32Decode(s: string): Uint8Array<ArrayBuffer> {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
   const clean = s.replace(/=+$/, '').toUpperCase();
   let bits = 0;
@@ -73,7 +73,9 @@ function base32Decode(s: string): Uint8Array {
       bits -= 8;
     }
   }
-  return new Uint8Array(out);
+  const bytes = new Uint8Array(new ArrayBuffer(out.length));
+  bytes.set(out);
+  return bytes;
 }
 
 /** Código TOTP de 6 dígitos para el instante dado (ms). */

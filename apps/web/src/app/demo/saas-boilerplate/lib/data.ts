@@ -15,7 +15,8 @@ export const TRIAL_DAYS = 14;
 export const IVA_RATE = 0.19;
 export const STORAGE_KEY = 'demo:saas-boilerplate:v1';
 export const BASE_DOMAIN = 'conjuntodemo.example';
-export const CONTACT_HREF = '/contact?service=saas-multi-tenant';
+/** Demo guiada con esta demo ya elegida (flujo real de solicitud del sitio). */
+export const CONTACT_HREF = '/solicitar-demo?demos=saas-boilerplate';
 
 /** El SaaS ficticio que vende el software (tu empresa, en tu proyecto). */
 export const VENDOR = {
@@ -136,7 +137,7 @@ const SEED_INVOICES: Invoice[] = [
 const SYS = 'sistema';
 const SEED_AUDIT: AuditEntry[] = [
   { id: 'a-1', at: '2026-10-01T07:00', actor: SYS, tenantId: 't-arrayanes', action: 'invoice.paid', params: { number: 'CD-1040' }, ip: '—' },
-  { id: 'a-2', at: '2026-10-01T08:30', actor: 'ventas@conjuntodemo.example', tenantId: 't-guayacanes', action: 'tenant.created', params: {}, ip: '203.0.113.24' },
+  { id: 'a-2', at: '2026-10-01T08:30', actor: 'ventas@conjuntodemo.example', tenantId: 't-guayacanes', action: 'tenant.created', params: { plan: 'mediano' }, ip: '203.0.113.24' },
   { id: 'a-3', at: '2026-10-02T11:05', actor: 'soporte@conjuntodemo.example', tenantId: 't-palmas', action: 'tenant.cancelled', params: {}, ip: '203.0.113.24' },
   { id: 'a-4', at: '2026-10-03T07:00', actor: SYS, tenantId: 't-oriente', action: 'invoice.paid', params: { number: 'CD-1041' }, ip: '—' },
   { id: 'a-5', at: '2026-10-05T07:00', actor: SYS, tenantId: 't-laureles', action: 'payment.failed', params: {}, ip: '—' },
@@ -180,11 +181,12 @@ export function unitsFor(tenant: Pick<Tenant, 'id' | 'slug'>, labels?: string[])
   const list = labels ?? UNIT_LABELS[tenant.id] ?? ['101', '102', '201', '202', '301', '302'];
   const h = stableHash(tenant.slug);
   return list.map((label, i) => ({
-    id: `u-${tenant.slug}-${label.toLowerCase().replace(/[^a-z0-9]+/g, '')}`,
+    id: `u-${tenant.slug}-${label.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '')}`,
     tenantId: tenant.id,
     label,
     owner: OWNERS[(h + i * 5) % OWNERS.length],
-    paid: ((h >> i) & 3) !== 0,
+    // Dos de cada seis unidades quedan pendientes (determinista por conjunto).
+    paid: (h + i) % 3 !== 0,
   }));
 }
 

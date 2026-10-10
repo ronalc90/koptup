@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import { CheckIcon, ClipboardDocumentIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import Badge from '@/components/ui/Badge';
@@ -129,7 +129,7 @@ export function Toggle({ checked, onChange, label, disabled = false }: { checked
       onClick={onChange}
       className={`relative h-5 w-10 shrink-0 rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${checked ? 'bg-primary-600' : 'bg-secondary-300 dark:bg-secondary-700'}`}
     >
-      <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${checked ? 'translate-x-5' : 'translate-x-0.5'}`} />
+      <span className={`absolute left-0 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${checked ? 'translate-x-5' : 'translate-x-0.5'}`} />
     </button>
   );
 }
@@ -146,7 +146,24 @@ export function CopyButton({ text, label }: { text: string; label: string }) {
     <button
       type="button"
       onClick={() => {
-        navigator.clipboard?.writeText(text).then(() => setDone(true)).catch(() => setDone(false));
+        const fallback = () => {
+          try {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            const ok = document.execCommand('copy');
+            ta.remove();
+            setDone(ok);
+          } catch {
+            setDone(false);
+          }
+        };
+        if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(() => setDone(true)).catch(fallback);
+        else fallback();
       }}
       className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] text-secondary-300 hover:bg-white/10 hover:text-white"
       aria-label={label}
@@ -175,22 +192,32 @@ export function CodeBlock({ code, lang }: { code: string; lang: string }) {
 
 export function Modal({ open, onClose, title, children, wide = false }: { open: boolean; onClose: () => void; title: string; children: ReactNode; wide?: boolean }) {
   const t = useTranslations('demoSaas');
+  const panel = useRef<HTMLDivElement>(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
   useEffect(() => {
     if (!open) return;
+    const previous = document.activeElement as HTMLElement | null;
+    panel.current?.focus();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') closeRef.current();
     };
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      previous?.focus?.();
+    };
+  }, [open]);
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-[120] flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4" onClick={onClose}>
       <div
+        ref={panel}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`max-h-[92vh] w-full overflow-y-auto rounded-t-2xl bg-white shadow-xl dark:bg-secondary-900 sm:rounded-2xl ${wide ? 'sm:max-w-3xl' : 'sm:max-w-lg'}`}
+        className={`max-h-[92vh] w-full overflow-y-auto rounded-t-2xl bg-white shadow-xl focus:outline-none dark:bg-secondary-900 sm:rounded-2xl ${wide ? 'sm:max-w-3xl' : 'sm:max-w-lg'}`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-secondary-200 bg-white px-4 py-3 dark:border-secondary-700 dark:bg-secondary-900">
@@ -215,7 +242,7 @@ export function Toasts() {
   const { toasts, dismissToast } = useDemo();
   if (toasts.length === 0) return null;
   return (
-    <div className="pointer-events-none fixed bottom-4 left-4 right-4 z-[70] flex flex-col items-end gap-2 sm:left-auto sm:w-96" aria-live="polite">
+    <div className="pointer-events-none fixed bottom-4 left-4 right-4 z-[130] flex flex-col items-end gap-2 sm:left-auto sm:w-96" aria-live="polite">
       {toasts.map((x) => (
         <div
           key={x.id}

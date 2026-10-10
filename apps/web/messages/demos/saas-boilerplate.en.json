@@ -1,323 +1,772 @@
 {
   "demoSaas": {
-    "pageTitle": "Multi-tenant SaaS boilerplate",
-    "pageSubtitle": "A production-ready template for B2B SaaS with enterprise auth, billing, multi-tenancy, webhooks, audit logs, feature flags, and observability built in from day one.",
-    "stack": {
-      "title": "Stack",
-      "items": ["Next.js 14", "TypeScript", "PostgreSQL + RLS", "Redis", "Stripe", "Paddle", "OpenTelemetry", "Sentry"]
+    "meta": {
+      "back": "Back to demos",
+      "title": "Multi-tenant SaaS platform",
+      "subtitle": "What your software would look like as a SaaS that bills every month: customers with isolated data, billing in Colombian pesos, an invoice for every charge, users and roles, a portal with each customer's brand and a panel to run operations and support.",
+      "caseLine": "Sample case: {product}, a fictitious software for managing residential complexes, sold by subscription. Each complex is a customer (tenant). Data as of {date}.",
+      "sampleBadge": "Sample data",
+      "sampleHint": "Companies, people, tax IDs, emails, IPs and figures are fictitious.",
+      "simBadge": "Simulation: no charges, emails or server",
+      "reset": "Reset data",
+      "resetConfirm": "Erase your changes and go back to the sample data?",
+      "resetYes": "Yes, reset",
+      "navLabel": "Demo screens"
     },
-    "tabs": {
-      "overview": "Architecture",
-      "tenancy": "Multi-tenancy",
-      "auth": "Auth",
-      "billing": "Billing",
-      "admin": "Admin panel",
-      "webhooks": "Webhooks",
-      "api": "API + Docs",
-      "audit": "Audit logs",
-      "flags": "Feature flags",
-      "i18n": "i18n",
-      "observability": "Observability",
-      "teams": "Teams"
-    },
-    "overview": {
-      "title": "Reference architecture",
-      "subtitle": "Decoupled services, per-tenant data isolation, and end-to-end observability.",
-      "nodes": {
-        "frontend": "Next.js frontend",
-        "frontendSub": "SSR + RSC + edge",
-        "api": "API gateway",
-        "apiSub": "tRPC / REST / GraphQL",
-        "auth": "Auth service",
-        "authSub": "SSO + MFA + SCIM",
-        "db": "Postgres + RLS",
-        "dbSub": "Row-level isolation",
-        "cache": "Redis",
-        "cacheSub": "Cache and rate limiting",
-        "queue": "Workers",
-        "queueSub": "BullMQ / Temporal",
-        "webhooks": "Webhook bus",
-        "webhooksSub": "Retries and DLQ",
-        "billing": "Stripe / Paddle",
-        "billingSub": "Subscriptions and usage"
+    "screens": {
+      "dashboard": {
+        "label": "Your SaaS today",
+        "title": "Your SaaS today",
+        "subtitle": "The software owner's view: this month's recurring revenue, customers by status and what needs attention."
       },
-      "highlights": {
-        "title": "Design decisions",
-        "items": [
-          "Per-tenant isolation via Postgres row-level security",
-          "Signed JWT sessions with rotating JWKS keys",
-          "Webhook queue with exponential retries and a dead letter queue",
-          "OpenTelemetry data shipped to a central collector",
-          "Feature flags evaluated at the edge for minimal latency"
-        ]
+      "onboarding": {
+        "label": "New customer",
+        "title": "New customer",
+        "subtitle": "Sign up a residential complex in 3 steps: details, subdomain and plan, and its brand. It starts with a 14-day free trial."
+      },
+      "billing": {
+        "label": "Plans and billing",
+        "title": "Plans and billing",
+        "subtitle": "Charge the month by card, PSE or Nequi (simulated), change plans with proration, open the sample invoices and follow failed payments."
+      },
+      "access": {
+        "label": "Users and access",
+        "title": "Users and access",
+        "subtitle": "Invite each complex's team, assign roles, choose how they sign in and try the second factor."
+      },
+      "portal": {
+        "label": "Customer portal",
+        "title": "Customer portal",
+        "subtitle": "What each complex sees: its brand, its data and only its data."
+      },
+      "operations": {
+        "label": "Operations and tech",
+        "title": "Operations and technical team",
+        "subtitle": "Support with a logged reason, modules per customer, audit log, signed webhooks, a test API and the architecture we propose."
       }
     },
-    "tenancy": {
-      "title": "Multi-tenancy patterns",
-      "subtitle": "Pick the isolation model that fits your customer profile and compliance needs.",
-      "patterns": {
-        "sharedDb": {
-          "name": "Shared DB + RLS",
-          "tagline": "One database, row-level isolation",
-          "pros": ["Low cost at scale", "Simple migrations", "Uniform operations"],
-          "cons": ["Risky if the tenant filter is skipped", "Index tuning matters", "Per-tenant backups are tricky"],
-          "snippet": "-- Enable RLS and per-tenant policy\nALTER TABLE invoices ENABLE ROW LEVEL SECURITY;\n\nCREATE POLICY tenant_isolation ON invoices\n  USING (tenant_id = current_setting('app.tenant_id')::uuid);\n\n-- On every request\nSET LOCAL app.tenant_id = '8f3a...';"
-        },
-        "schemaPerTenant": {
-          "name": "Schema per tenant",
-          "tagline": "One schema per customer",
-          "pros": ["Strong logical isolation", "Per-tenant backups", "Staged migrations"],
-          "cons": ["A connection per schema", "Slower migrations", "Large catalog"],
-          "snippet": "// Resolve schema per tenant\nconst client = await pool.connect();\nawait client.query(`SET search_path TO tenant_${tenantId}, public`);\n\nconst { rows } = await client.query(\n  'SELECT * FROM invoices LIMIT 50'\n);"
-        },
-        "dbPerTenant": {
-          "name": "DB per tenant",
-          "tagline": "One database per customer",
-          "pros": ["Physical isolation", "Strict compliance posture", "Independent restores"],
-          "cons": ["High operational cost", "Complex connection pooling", "Costly global schema changes"],
-          "snippet": "// Per-tenant connection router\nconst dsn = await vault.getTenantDsn(tenantId);\nconst db = getOrCreatePool(dsn);\n\nreturn db.query(\n  'SELECT * FROM invoices WHERE deleted_at IS NULL'\n);"
-        }
-      },
-      "prosLabel": "Pros",
-      "consLabel": "Trade-offs",
-      "snippetLabel": "Snippet"
+    "common": {
+      "all": "All",
+      "back": "Back",
+      "next": "Next",
+      "cancel": "Cancel",
+      "close": "Close",
+      "copy": "Copy",
+      "copied": "Copied",
+      "copyCode": "Copy code",
+      "exportCsv": "Export CSV",
+      "perMonth": "per month, before VAT",
+      "plusIvaMonth": "+ VAT per month",
+      "tenant": "Customer"
     },
-    "auth": {
-      "title": "Enterprise auth",
-      "subtitle": "SSO, MFA, social, and magic links · every flow handled by a single provider.",
-      "methods": {
-        "sso": "SSO",
-        "mfa": "MFA",
-        "social": "Social",
-        "magic": "Magic link"
+    "status": {
+      "activo": "Active",
+      "prueba": "On trial",
+      "mora": "Past due",
+      "suspendido": "Suspended",
+      "cancelado": "Cancelled"
+    },
+    "plans": {
+      "pequeno": { "name": "Small complex" },
+      "mediano": { "name": "Medium complex" },
+      "multi": { "name": "Multi-complex" },
+      "limits": "Up to {units} units · {staff} team users · {storage} GB"
+    },
+    "modules": {
+      "pagos": { "name": "Maintenance fee payments", "desc": "Residents see and pay their unit's fee." },
+      "reservas": { "name": "Common area bookings", "desc": "Party room, BBQ area, pool and court." },
+      "votaciones": { "name": "Assembly voting", "desc": "Assembly questions with one vote per unit." }
+    },
+    "methods": {
+      "tarjeta": "Card",
+      "pse": "PSE",
+      "nequi": "Nequi"
+    },
+    "usage": {
+      "units": "Units",
+      "staff": "Team users",
+      "storage": "Storage"
+    },
+    "roles": {
+      "admin": "Complex administrator",
+      "contador": "Accountant",
+      "porteria": "Front desk",
+      "residente": "Resident"
+    },
+    "roleDesc": {
+      "admin": "manages the complex and its team.",
+      "contador": "sees payments, receivables and invoices.",
+      "porteria": "logs visitors and mail.",
+      "residente": "pays, books and votes from the portal. Does not count toward the plan limit."
+    },
+    "support": {
+      "banner": "Support session in {tenant} (reason: “{reason}”). Everything you do is logged.",
+      "end": "End support session"
+    },
+    "dashboard": {
+      "newTenant": "New customer",
+      "kpi": {
+        "mrr": "Recurring revenue (before VAT)",
+        "mrrSub": "{amount} if trials convert",
+        "collected": "Collected this month",
+        "collectedSub": "{n, plural, one {# invoice} other {# invoices}}, VAT included",
+        "active": "Active customers",
+        "activeSub": "{n, plural, one {# more on free trial} other {# more on free trial}}",
+        "overdue": "Past due or suspended",
+        "overdueSub": "{amount} per month at risk",
+        "moves": "New / cancelled this month",
+        "movesSub": "Customers who joined and left this month"
       },
-      "sso": {
-        "title": "Corporate single sign-on",
-        "saml": "SAML 2.0",
-        "samlDesc": "Generic connector for Okta, Azure AD, Google Workspace, and Ping.",
-        "oidc": "OIDC",
-        "oidcDesc": "Automatic discovery, refresh tokens, and revocation.",
-        "scim": "SCIM provisioning",
-        "scimDesc": "Sync users and groups from your IdP."
+      "chartTitle": "Recurring revenue by month",
+      "chartSubtitle": "Before VAT. The current month changes with what you do in the demo.",
+      "chartNote": "May to September are fixed sample figures; October is calculated from the customers below.",
+      "listTitle": "Customers",
+      "listSubtitle": "{shown} of {total} customers",
+      "search": "Search by name, city or subdomain",
+      "filterLabel": "Filter by status",
+      "empty": "No customer matches the search.",
+      "trialLeft": "{days, plural, one {# trial day left} other {# trial days left}}",
+      "dunningStage": "Failed payment: day {day} notice",
+      "cancelledOn": "Cancelled on {date}",
+      "since": "Customer since",
+      "contact": "Contact",
+      "cols": {
+        "tenant": "Customer",
+        "subdomain": "Subdomain",
+        "city": "City",
+        "plan": "Plan",
+        "units": "Units",
+        "staff": "Team users",
+        "status": "Status",
+        "monthly": "Monthly value before VAT (COP)"
       },
-      "mfa": {
-        "title": "Required second factor",
-        "totp": "TOTP",
-        "totpDesc": "RFC 6238-compatible authenticator apps.",
-        "webauthn": "Passkeys · WebAuthn",
-        "webauthnDesc": "Hardware keys, Face ID, and Touch ID.",
-        "sms": "SMS",
-        "smsDesc": "Fallback with rate limiting and fraud detection."
+      "actions": {
+        "portal": "See their portal",
+        "billing": "Billing",
+        "access": "Users",
+        "cancel": "Cancel subscription",
+        "cancelYes": "Yes, cancel"
       },
-      "social": {
-        "title": "Social identities",
-        "items": ["Google", "GitHub", "Apple", "Microsoft"]
+      "cancelConfirm": "Cancel the subscription? The complex loses access and leaves recurring revenue.",
+      "cancelledNote": "Subscription cancelled: the complex no longer has access to its portal."
+    },
+    "onboarding": {
+      "steps": {
+        "1": "Complex details",
+        "2": "Subdomain and plan",
+        "3": "Brand"
       },
-      "magic": {
-        "title": "Passwordless access",
-        "step1": "User enters their email",
-        "step2": "Receives a signed link, valid for 10 minutes",
-        "step3": "Clicks the link · session opens with a device fingerprint"
+      "fields": {
+        "name": "Complex or building name",
+        "city": "City",
+        "nit": "Tax ID (NIT, without check digit)",
+        "email": "Administrator email",
+        "units": "Number of units (apartments or houses)",
+        "slug": "Subdomain",
+        "plan": "Plan",
+        "color": "Brand color",
+        "logo": "Logo"
       },
-      "sendCode": "Send code",
-      "verify": "Verify",
-      "codeSent": "Code sent to your device",
-      "linkSent": "Link sent to your inbox",
-      "verified": "Identity verified",
-      "providersLabel": "Continue with",
-      "email": "Email"
+      "placeholders": {
+        "name": "Conjunto Mirador del Parque",
+        "email": "admin@yourcomplex.example"
+      },
+      "dvHint": "The check digit (DV) is calculated automatically with the DIAN method.",
+      "errors": {
+        "name": "Enter the name (at least 3 characters).",
+        "nit": "The NIT must have 9 digits.",
+        "nitTaken": "There is already a customer with that NIT.",
+        "email": "Enter a valid email.",
+        "units": "Enter a number of units between 1 and 5,000.",
+        "slug_format": "Use 3 to 24 lowercase letters, numbers or hyphens, not starting or ending with a hyphen.",
+        "slug_reserved": "That subdomain is reserved.",
+        "slug_taken": "Another customer already uses that subdomain.",
+        "plan": "Choose a plan.",
+        "planUnits": "The chosen plan doesn't cover that number of units.",
+        "logoType": "Upload a PNG, JPG, WebP or SVG image.",
+        "logoSize": "The logo must be 200 KB or less."
+      },
+      "suggested": "Suggested",
+      "tooSmall": "Not enough for {units} units",
+      "trialNote": "Starts with a {days}-day free trial, until {date}, with no card required.",
+      "customColor": "Other color",
+      "uploadLogo": "Upload logo",
+      "removeLogo": "Remove logo",
+      "logoHint": "PNG, JPG, WebP or SVG up to 200 KB. It stays in your browser.",
+      "create": "Create customer",
+      "previewTitle": "Portal preview",
+      "previewName": "Your complex",
+      "previewButton": "Pay maintenance fee",
+      "effectsTitle": "When you create the customer",
+      "effects": [
+        "It appears in “Your SaaS today” with status “On trial”.",
+        "Its administrator is invited (pending in “Users and access”).",
+        "Its portal takes the logo, color and subdomain.",
+        "The sign-up is logged and generates two webhooks."
+      ],
+      "simNote": "Simulated: no subdomain is created and no invitation email is sent. Everything is saved only in your browser.",
+      "done": {
+        "title": "Done: {name} is now a customer",
+        "trial": "Free trial until {date}.",
+        "url": "Their portal: {url}",
+        "invite": "Pending invitation for {email} (no email is sent).",
+        "modules": "{n, plural, one {# module enabled} other {# modules enabled}} by their plan.",
+        "charge": "Charge the first month",
+        "portal": "See their portal",
+        "dashboard": "Go to “Your SaaS today”",
+        "another": "Sign up another"
+      }
     },
     "billing": {
-      "title": "Billing and subscriptions",
-      "subtitle": "Stripe and Paddle wired up with trials, proration, usage metering, and automated dunning.",
-      "plansTitle": "Plans",
-      "billed": "billed monthly",
-      "trial": "14-day trial",
+      "checkoutTitle": "Charge the month",
+      "checkoutSubtitle": "{period} subscription",
+      "planLine": "{plan} plan",
+      "methodLabel": "Payment method",
+      "card": {
+        "number": "Card number",
+        "hint": "Test cards: 4242 4242 4242 4242 is approved and 4000 0000 0000 0002 is declined. Only the format is checked; nothing is charged.",
+        "expiry": "Expires (MM/YY)",
+        "holder": "Name on card"
+      },
+      "pse": {
+        "person": "Payer type",
+        "juridica": "Company",
+        "natural": "Individual",
+        "bank": "Bank (fictitious)",
+        "chooseBank": "Choose the bank",
+        "email": "Payer email",
+        "bankScreen": "Bank screen (simulated)",
+        "bankText": "{bank} asks you to approve a payment of {amount} to {vendor}.",
+        "approve": "Approve payment",
+        "reject": "Decline"
+      },
+      "nequi": {
+        "phone": "Mobile number",
+        "pushTitle": "Phone notification (simulated)",
+        "pushText": "A notification would reach {phone} to approve the payment of {amount}.",
+        "accept": "Accept on the phone",
+        "reject": "Decline"
+      },
+      "errors": {
+        "card": "Invalid card number.",
+        "expiry": "Invalid or expired date (MM/YY).",
+        "cvc": "The CVC has 3 or 4 digits.",
+        "holder": "Enter the name as it appears on the card.",
+        "bank": "Choose a bank.",
+        "email": "Invalid email.",
+        "phone": "Colombian mobile number with 10 digits starting with 3."
+      },
+      "pay": "Pay {amount} with {method}",
+      "processing": "Processing payment…",
+      "approved": "Payment approved",
+      "approvedText": "Sample invoice {number} was issued; in your project it would be sent to {email}.",
+      "rejected": "Payment declined",
+      "rejectedText": "No invoice was issued and the decline was logged. Try another method or the 4242 card.",
+      "tryAgain": "Try again",
+      "upToDate": "Up to date",
+      "upToDateText": "This month is already paid (invoice {number}). The next charge is on {next}.",
+      "simNote": "Simulated: there is no payment gateway and no connection to banks, PSE or Nequi; the banks are fictitious and no money moves. In your project we connect the gateway you choose.",
+      "plansTitle": "Change plan",
+      "plansSubtitle": "Checked against current usage and prorated for the rest of the month.",
       "currentPlan": "Current plan",
-      "selectPlan": "Select",
-      "plans": {
-        "starter": {
-          "name": "Starter",
-          "price": "$29",
-          "features": ["Up to 3 users", "10k requests/month", "Email support", "30 days of audit logs"]
-        },
-        "pro": {
-          "name": "Pro",
-          "price": "$99",
-          "features": ["Up to 25 users", "100k requests/month", "SSO via SAML and OIDC", "1 year of audit logs", "Unlimited webhooks"]
-        },
-        "enterprise": {
-          "name": "Enterprise",
-          "price": "Contact us",
-          "features": ["Unlimited users", "Custom volume", "SCIM and verified domains", "99.99% SLA", "DPA and data residency"]
+      "switchTo": "Switch to this plan",
+      "change": {
+        "trial": "During the trial, moving to {plan} is free: the first charge will already use the new plan.",
+        "upgrade": "Upgrade to {plan}: {days} days of difference are charged, {amount} + VAT ({total}), on an adjustment invoice.",
+        "downgrade": "Downgrade to {plan}: {amount} in credit for {days} days, deducted from the next charge.",
+        "confirm": "Confirm change",
+        "errors": {
+          "same": "It's already on that plan.",
+          "units": "It has more units than that plan allows.",
+          "staff": "It has more team users than that plan allows.",
+          "storage": "It uses more storage than that plan allows.",
+          "status": "Plans can't change while past due, suspended or cancelled. Charge the month first."
         }
       },
-      "checkout": {
-        "title": "Mock checkout",
-        "subtitle": "Stripe Elements with 3D Secure",
-        "card": "Card",
-        "cardPlaceholder": "4242 4242 4242 4242",
-        "expiry": "MM/YY",
-        "cvc": "CVC",
-        "email": "Billing email",
-        "pay": "Pay and activate",
-        "processing": "Processing payment securely...",
-        "success": "Subscription is active"
+      "creditNote": "Credit balance: {amount}. Deducted from the next charge.",
+      "usageTitle": "Plan usage",
+      "usageSubtitle": "{plan} plan",
+      "nearLimit": "Close to the plan limit.",
+      "invoicesTitle": "Invoices for {tenant}",
+      "noInvoices": "No invoices yet.",
+      "concept": "Concept",
+      "concepts": {
+        "subscription": "Subscription",
+        "proration": "Plan change adjustment"
       },
-      "usage": {
-        "title": "Usage this cycle",
-        "subtitle": "Real-time metering with usage-based billing.",
-        "apiCalls": "API calls",
-        "storage": "Storage",
-        "seats": "Active seats",
-        "of": "of"
-      },
+      "viewInvoice": "View invoice",
       "dunning": {
-        "title": "Dunning emails",
-        "subtitle": "Automated reminders when payments fail.",
-        "items": [
-          { "day": "Day 0", "subject": "We couldn't charge your subscription" },
-          { "day": "Day 3", "subject": "Reminder · update your payment method" },
-          { "day": "Day 7", "subject": "Access will be suspended in 48h" },
-          { "day": "Day 14", "subject": "Subscription canceled" }
-        ]
+        "title": "Failed payments",
+        "subtitle": "If a charge fails: notices on days 0, 3 and 7 and suspension on day 10. Paying at any time brings the customer up to date.",
+        "empty": "No failed payments in progress.",
+        "amount": "{amount} for {period}",
+        "day": "Day {day}",
+        "steps": {
+          "0": "Failed payment notice",
+          "1": "Reminder",
+          "2": "Final notice",
+          "3": "Service suspension"
+        },
+        "sent": "Done",
+        "scheduled": "Scheduled",
+        "showMsg": "See message",
+        "hideMsg": "Hide message",
+        "emailTo": "Email to {email}",
+        "whatsapp": "WhatsApp",
+        "msgs": {
+          "0": "Hello, {tenant} team:\nWe couldn't charge the {vendor} subscription for {amount}. You can pay by card, PSE or Nequi from your portal to avoid interruptions.",
+          "1": "Hello, {tenant} team:\nYour {vendor} subscription is still pending ({amount}). If you already paid, ignore this message.",
+          "2": "Hello, {tenant} team:\nFinal notice: if we don't receive the payment of {amount}, the service will be suspended on {date}."
+        },
+        "wa": {
+          "0": "{vendor}: we couldn't charge the {tenant} subscription ({amount}). Pay from your portal.",
+          "1": "{vendor}: reminder, the {tenant} subscription is still pending ({amount}).",
+          "2": "{vendor}: final notice. If we don't receive the payment of {amount}, the {tenant} service will be suspended."
+        },
+        "advance": "Simulate days passing",
+        "collect": "Charge now",
+        "simulateLabel": "Simulate a trial ending without payment:",
+        "simulate": "Simulate failed payment",
+        "simNote": "Simulated: no email or WhatsApp is sent; here you see the text that would be sent. “Simulate days passing” moves to the next stage."
       }
     },
-    "admin": {
-      "title": "Admin panel",
-      "subtitle": "Impersonation, flags, and support tools for your internal team.",
-      "impersonation": {
-        "title": "Impersonation",
-        "subtitle": "Assume a tenant's identity to debug incidents · fully audited.",
-        "selectTenant": "Select tenant",
-        "impersonate": "Impersonate",
-        "active": "Impersonation session active",
-        "stop": "Stop",
-        "reason": "Reason · required"
+    "invoice": {
+      "modalTitle": "Invoice {number}",
+      "title": "Electronic sales invoice (sample)",
+      "notValid": "SAMPLE graphic representation: it is not a valid electronic invoice and was not sent to the DIAN.",
+      "seller": "Seller",
+      "buyer": "Buyer",
+      "number": "Number",
+      "issued": "Issued",
+      "period": "Period",
+      "method": "Payment method",
+      "description": "Description",
+      "amount": "Amount",
+      "line": "{product} subscription, {plan} plan, {period}",
+      "lineProration": "Adjustment for change to the {plan} plan, {period}",
+      "discount": "Credit applied",
+      "subtotal": "Subtotal",
+      "iva": "VAT 19%",
+      "total": "Total",
+      "cufe": "Sample CUFE (SHA-384)",
+      "cufeCalculating": "Calculating…",
+      "cufeNote": "Calculated in your browser with the formula from the DIAN technical annex, but with a fictitious technical key and test environment: it is not valid with the DIAN.",
+      "showInput": "See the input string",
+      "hideInput": "Hide the string",
+      "downloadPdf": "Download PDF",
+      "footer": "Sample document generated by the KopTup demo. It has no tax validity."
+    },
+    "tour": {
+      "title": "Guided tour",
+      "subtitle": "Five steps that check themselves off when you do them in the demo.",
+      "progress": "{done} of {total}",
+      "hide": "Hide",
+      "show": "Show tour ({done} of {total})",
+      "done": "Done",
+      "go": "Go",
+      "here": "You're on this screen",
+      "steps": {
+        "dashboard": {
+          "title": "See your SaaS today",
+          "hint": "Filter the “Past due” customers or open one's details."
+        },
+        "onboarding": {
+          "title": "Sign up a complex",
+          "hint": "Create it with its logo and plan in “New customer”."
+        },
+        "payment": {
+          "title": "Charge with PSE and open the invoice",
+          "hint": "Charge the new complex's first month with PSE and open its sample invoice."
+        },
+        "portal": {
+          "title": "Check the isolation",
+          "hint": "In the new complex's portal, try to open a resource from another complex."
+        },
+        "support": {
+          "title": "Give support with a reason",
+          "hint": "In “Operations and tech”, enter as support with a reason; it's logged."
+        }
       },
-      "flags": {
-        "title": "Per-tenant feature flags",
-        "subtitle": "Turn on beta features for specific customers."
+      "ctaTitle": "Want to see your product like this?",
+      "ctaText": "In a guided demo we review your software and show you how it would work as a SaaS.",
+      "ctaButton": "Request a guided demo"
+    },
+    "toast": {
+      "reset": "Sample data restored.",
+      "tenantCreated": "{name} was created, on a free trial.",
+      "planChanged": "Plan changed.",
+      "invited": "Pending invitation for {email}.",
+      "resent": "Invitation resent to {email} (simulated).",
+      "revoked": "Invitation revoked.",
+      "accepted": "Invitation accepted: the user is now active.",
+      "roleChanged": "Role updated.",
+      "supportEnded": "Support session ended and logged.",
+      "feePaid": "Maintenance fee payment recorded.",
+      "reserved": "Booking confirmed.",
+      "voted": "Vote recorded.",
+      "failureSimulated": "Failed payment simulated: the customer is now “Past due”.",
+      "noticePublished": "Notice published.",
+      "storageFull": "Your browser has no room to save the changes (a very large logo?). The demo keeps working, but it won't remember them after reloading."
+    },
+    "errors": {
+      "email": "Enter a valid email.",
+      "duplicate": "That email is already in this complex.",
+      "generic": "The action couldn't be completed.",
+      "lastAdmin": "At least one active administrator must remain.",
+      "pastDate": "Choose a date from today on.",
+      "required": "Fill in all the fields.",
+      "staffLimit": "The plan reached its team user limit. Upgrade the plan or invite the person as a resident.",
+      "tenantInactive": "The complex is suspended or cancelled.",
+      "zoneTaken": "That area is already booked on that day."
+    },
+    "access": {
+      "teamTitle": "{tenant} team",
+      "teamSubtitle": "{staff} of {max} team users on the {plan} plan. Residents don't count toward the limit.",
+      "memberStatus": {
+        "activo": "Active",
+        "invitado": "Pending invitation"
       },
+      "invitedAt": "invited on {date}",
+      "resentTimes": "{n, plural, one {resent # time} other {resent # times}}",
+      "resend": "Resend",
+      "revoke": "Revoke",
+      "revokeConfirm": "Revoke the invitation to {email}?",
+      "accept": "Simulate acceptance",
+      "acceptName": "Person's name",
+      "acceptPlaceholder": "Gloria Inés Pabón",
+      "acceptConfirm": "Activate",
+      "roleLabel": "Role for {email}",
+      "inviteTitle": "Invite someone",
+      "inviteEmail": "Email",
+      "invitePlaceholder": "person@yourcomplex.example",
+      "inviteRole": "Role",
+      "inviteButton": "Invite",
+      "inviteNote": "Simulated: the invitation stays pending in the list, but no email is sent. Use “Simulate acceptance” to activate it.",
+      "loginTitle": "How they sign in",
+      "loginSubtitle": "Methods this complex accepts.",
+      "settings": {
+        "password": "Email and password",
+        "google": "With Google",
+        "microsoft": "With Microsoft",
+        "mfa": "Required second factor (6-digit code)"
+      },
+      "alwaysOn": "Always on",
+      "settingsHint": "Each change is logged and applies to the sign-in test below.",
+      "testTitle": "Try signing in",
+      "testSubtitle": "Simulate how a person signs in to {url}.",
+      "testEmail": "Email",
+      "useMember": "A user of this complex",
+      "useOther": "A user of another complex",
+      "testMethod": "Method",
+      "methods": {
+        "password": "Password",
+        "google": "Google",
+        "microsoft": "Microsoft"
+      },
+      "testPassword": "Password",
+      "passwordHint": "The demo accepts any password of 8 or more characters; in your project it's checked against the user's stored, hashed password.",
+      "ssoHint": "The demo doesn't open the {method} window: it simulates that it answered with the email above.",
+      "signIn": "Sign in",
+      "mfaTitle": "Second factor",
+      "mfaText": "Enter the 6-digit code shown by the authenticator app.",
+      "mfaCode": "Code",
+      "verify": "Verify",
+      "noCrypto": "Your browser can't calculate the code here (it requires a secure connection).",
+      "okTitle": "Access granted",
+      "ok": "Signed in as {name} ({role}) at {url}.",
+      "deniedTitle": "Access denied",
+      "denied": {
+        "notMember": "That email doesn't belong to this complex. Each complex only sees its own users.",
+        "invited": "That email's invitation hasn't been accepted yet.",
+        "method": "This complex hasn't enabled signing in with {method}.",
+        "password": "The password must have at least 8 characters.",
+        "code": "Wrong or expired code.",
+        "inactive": "The complex is suspended: nobody can sign in until it pays."
+      },
+      "logged": "The attempt was logged.",
+      "again": "Try again",
+      "ssoNote": "Simulated: the Google and Microsoft methods don't open their real window or connect to those companies. The second-factor code is really calculated in your browser. In your project we connect the sign-in you choose.",
+      "authApp": "Authenticator app (simulated on this page)",
+      "secondsLeft": "Changes in {s} s",
+      "authAppHint": "The code is calculated in your browser with the TOTP standard and changes every 30 seconds. If you add the sample key {secret} to an authenticator app, you'll see the same code.",
+      "mfaOff": "This complex doesn't require a second factor. Turn it on in “How they sign in” to try it."
+    },
+    "portal": {
+      "viewAs": "View as",
+      "lockedSupport": "You're in a support session: end it to see another complex's portal.",
+      "poweredBy": "Portal by {product}",
+      "suspendedTitle": "Portal suspended",
+      "suspendedText": "The {tenant} service is suspended for non-payment. Its users would see this notice until the month is paid.",
+      "goCharge": "Go to billing",
+      "moduleOff": "Module turned off for this complex. It's turned on in “Operations and tech”.",
+      "notInPlan": "The {plan} plan doesn't include this module (available from the {min} plan).",
+      "notices": {
+        "title": "Notices",
+        "empty": "No notices.",
+        "newTitle": "Notice title",
+        "newBody": "Message",
+        "publish": "Publish notice",
+        "titleError": "The title must have at least 3 characters.",
+        "bodyError": "Write the message (at least 5 characters)."
+      },
+      "fees": {
+        "subtitle": "Sample monthly fee: {fee} per unit.",
+        "summary": "{paid} of {total} units up to date",
+        "paid": "Paid",
+        "register": "Record payment",
+        "note": "Sample of 6 units. Recording the payment doesn't move money."
+      },
+      "reservations": {
+        "zone": "Area",
+        "date": "Date",
+        "unit": "Unit",
+        "reserve": "Book",
+        "upcoming": "Upcoming bookings",
+        "empty": "No upcoming bookings."
+      },
+      "zones": {
+        "salon": "Party room",
+        "bbq": "BBQ area",
+        "piscina": "Pool",
+        "cancha": "Sports court"
+      },
+      "votes": {
+        "question": "Do you approve the special fee to waterproof the roofs?",
+        "options": {
+          "si": "Yes",
+          "no": "No",
+          "abst": "Abstain"
+        },
+        "voted": "Your vote was recorded.",
+        "note": "Sample vote with {n} votes; one vote per browser."
+      },
+      "isolation": {
+        "title": "Isolation test",
+        "subtitle": "Try to open a resource by its ID as if you were {tenant}. The query always filters by the session's complex.",
+        "input": "Resource ID (unit, notice or invoice)",
+        "open": "Open",
+        "tryOwn": "One from this complex ({id})",
+        "tryOther": "One from {tenant}",
+        "ok": "Found in this complex: {kind} {label}.",
+        "forbidden": "You don't have access to this resource: it belongs to another complex. No data is shown and the attempt was logged.",
+        "notFound": "There is no resource with that ID.",
+        "kinds": {
+          "unit": "unit",
+          "notice": "notice",
+          "invoice": "invoice"
+        },
+        "note": "The rule runs in your browser over the sample data. In your project the server applies it on every query, with automated tests that check it."
+      },
+      "seed": {
+        "ascensores": {
+          "title": "Elevator maintenance",
+          "body": "On Friday, October 9, from 8:00 a.m. to 12:00 p.m., the elevators in towers 1 and 2 will be out of service for preventive maintenance."
+        },
+        "asamblea": {
+          "title": "Special assembly meeting",
+          "body": "Saturday, October 17 at 9:00 a.m. in the party room. Single topic: special fee to waterproof the roofs. You can vote from this portal."
+        },
+        "fumigacion": {
+          "title": "Common area fumigation",
+          "body": "On Tuesday, October 13 we will fumigate basements, garbage chutes and gardens. Keep first-floor windows closed."
+        },
+        "bienvenida": {
+          "title": "Welcome to the new portal",
+          "body": "From here you can pay the maintenance fee, book the pool and receive the condominium's notices."
+        },
+        "agua": {
+          "title": "Water service interruption",
+          "body": "On Wednesday, October 14, from 8:00 a.m. to 4:00 p.m., there will be no water in the Cañahuate and Guaduales complexes while the tanks are cleaned."
+        },
+        "bienvenidaNuevo": {
+          "title": "Welcome to your portal",
+          "body": "Starting today you can pay the maintenance fee and receive the complex's notices on this portal."
+        }
+      }
+    },
+    "operations": {
       "support": {
-        "title": "Recent events",
-        "subtitle": "Auditable event stream for the selected tenant.",
-        "user": "User",
-        "event": "Event",
-        "time": "Ago"
-      }
-    },
-    "webhooks": {
-      "title": "Outbound webhooks",
-      "subtitle": "A reliable event bus with exponential retries, HMAC signatures, and a dead letter queue.",
-      "eventsTitle": "Latest deliveries",
-      "columns": {
-        "event": "Event",
+        "title": "Support with impersonation",
+        "subtitle": "Enter a customer's portal exactly as they see it. A reason is required and it's logged.",
+        "reason": "Reason (required)",
+        "reasonPlaceholder": "E.g.: the administrator reports that unit 302's payment isn't showing",
+        "reasonError": "Write the reason (at least 10 characters).",
+        "start": "Enter as support",
+        "active": "Support session active in {tenant} since {time}.",
+        "goPortal": "Go to the portal",
+        "note": "Simulated: you don't enter any real account; you see the customer's sample portal."
+      },
+      "modules": {
+        "title": "Modules per customer",
+        "subtitle": "Turn each complex's portal modules on or off. Their portal changes instantly.",
+        "requires": "Their plan doesn't include it (available from the {plan} plan).",
+        "note": "Each change is logged and generates a tenant.updated webhook."
+      },
+      "audit": {
+        "title": "Audit log",
+        "subtitle": "What happens in the demo: who, when, for which customer and from which IP (sample IPs).",
+        "platform": "Platform (no customer)",
+        "filterGroup": "Type",
+        "search": "Search",
+        "searchPlaceholder": "Email, action or text",
+        "count": "{shown} of {total} entries",
+        "empty": "No entries match those filters.",
+        "more": "Show more entries",
+        "note": "The audit log lives in your browser and is erased when you reset the data. In your project it's stored on the server and can't be edited.",
+        "on": "on",
+        "off": "off",
+        "via": {
+          "portal": "from the portal",
+          "api": "via API"
+        },
+        "groups": {
+          "tenants": "Customers and plans",
+          "billing": "Billing",
+          "members": "Users",
+          "auth": "Sign-in",
+          "support": "Support",
+          "portal": "Portal and API"
+        },
+        "cols": {
+          "when": "Date and time",
+          "actor": "Who",
+          "tenant": "Customer",
+          "code": "Code",
+          "action": "Action"
+        }
+      },
+      "webhooks": {
+        "title": "Webhooks",
+        "subtitle": "Events your SaaS would send to each customer's systems, signed with HMAC SHA-256.",
+        "filter": "Event",
+        "count": "{n, plural, one {# event} other {# events}}",
+        "empty": "No events of that type.",
+        "headers": "Headers",
+        "payload": "Body (JSON)",
+        "signatureNote": "The signature is really calculated in your browser: HMAC SHA-256 of “timestamp.body” with the sample secret.",
+        "verifyTitle": "How the webhook receiver verifies the signature",
+        "note": "Events are generated in your browser and are not sent to any server. Sample secret: {secret}."
+      },
+      "api": {
+        "title": "Test API",
+        "subtitle": "A simulated REST API over the same data. The key identifies the customer and every query filters by it.",
+        "key": "API key",
+        "useKey": "Use the key of:",
         "endpoint": "Endpoint",
-        "status": "Status",
-        "attempts": "Attempts",
-        "lastDelivery": "Last delivery"
+        "endpoints": {
+          "tenant": "Details of the customer that owns the key.",
+          "units": "The customer's units and whether they're paid up.",
+          "unit": "One unit by ID. If it belongs to another customer it returns 404, as if it didn't exist.",
+          "invoices": "The customer's invoices.",
+          "notices": "The customer's notices.",
+          "createNotice": "Publishes a notice on the customer's portal."
+        },
+        "param": "Unit ID",
+        "ownUnit": "A unit of this customer",
+        "foreignUnit": "A unit of another customer",
+        "body": "Body (JSON)",
+        "send": "Send",
+        "response": "Response",
+        "statusText": {
+          "s200": "OK.",
+          "s201": "Created: the notice now appears on the customer's portal.",
+          "s400": "The body isn't valid JSON.",
+          "s401": "Invalid key or a cancelled customer's key.",
+          "s402": "The customer is suspended for non-payment.",
+          "s404": "Not found for this customer.",
+          "s422": "The title is missing (at least 3 characters)."
+        },
+        "noResponse": "Choose an endpoint and press Send.",
+        "note": "Simulated: there is no server; the response is calculated here with the same isolation rule your API would have. The keys are samples.",
+        "sampleTitle": "Water outage on Saturday",
+        "sampleBody": "From 8:00 a.m. to 12:00 p.m. for tank maintenance."
       },
-      "status": {
-        "delivered": "Delivered",
-        "retrying": "Retrying",
-        "failed": "Failed"
-      },
-      "payloadTitle": "Example payload",
-      "signatureTitle": "HMAC SHA-256 signature",
-      "signatureDesc": "Every request includes an `X-Signature` header so you can verify it's authentic."
-    },
-    "api": {
-      "title": "API and docs",
-      "subtitle": "REST with OpenAPI 3.1, auto-generated SDKs, and Mintlify-style docs.",
-      "endpoints": "Endpoints",
-      "exampleTitle": "Example · create invoice",
-      "tryIt": "Try in sandbox",
-      "languages": {
-        "ts": "TypeScript",
-        "py": "Python",
-        "go": "Go"
+      "tech": {
+        "title": "For your technical team",
+        "subtitle": "What's real in this demo, the architecture we propose and the isolation models.",
+        "realTitle": "What's real in the demo and what gets built in your project",
+        "realCols": {
+          "part": "Part",
+          "demo": "In this demo",
+          "project": "In your project"
+        },
+        "real": [
+          { "part": "Data and state", "demo": "Sample data in your browser (localStorage).", "project": "Database in your cloud with backups." },
+          { "part": "Per-customer isolation", "demo": "Rule applied in the browser to every portal and test API query.", "project": "Mandatory server-side filter and automated tests." },
+          { "part": "Payments", "demo": "Simulated: card, PSE and Nequi with no gateway or money.", "project": "The Colombian or international payment gateway you choose." },
+          { "part": "Electronic invoicing", "demo": "Sample representation with a CUFE calculated with a fictitious key.", "project": "Issued through your authorized technology provider." },
+          { "part": "Email and WhatsApp", "demo": "Only the text is shown.", "project": "Transactional sending with your provider." },
+          { "part": "Second factor and signatures", "demo": "Real in the browser: TOTP, HMAC SHA-256 and SHA-384.", "project": "The same standards, on the server." }
+        ],
+        "archTitle": "Pieces of the proposed architecture",
+        "arch": [
+          { "name": "Web portal and panel", "desc": "Each customer's branded portal and the owner's panel." },
+          { "name": "API with a key per customer", "desc": "REST, with usage limits per plan." },
+          { "name": "Multi-tenant database", "desc": "Isolation by row, by schema or with a dedicated database." },
+          { "name": "Recurring billing", "desc": "Plans, free trial, proration and failed payments." },
+          { "name": "Invoicing", "desc": "An electronic invoice for every charge with your provider." },
+          { "name": "Scheduled jobs", "desc": "Charges, reminders and suspensions." },
+          { "name": "Audit log and webhooks", "desc": "Audit trail and signed events." },
+          { "name": "Monitoring", "desc": "Errors, metrics and operational alerts." }
+        ],
+        "isolationTitle": "Isolation models",
+        "isolationSubtitle": "Chosen according to your customers and obligations; it's not a plan upgrade.",
+        "pros": "Advantages",
+        "cons": "Trade-offs",
+        "patterns": {
+          "shared": {
+            "name": "Shared database with RLS",
+            "tagline": "One database; every row carries its customer",
+            "pros": ["Low cost at scale", "Simple migrations", "Uniform operations"],
+            "cons": ["A missing filter exposes data (hence the tests)", "Indexes designed per customer", "Restoring a single customer is harder"]
+          },
+          "schema": {
+            "name": "One schema per customer",
+            "tagline": "Same database, one schema per customer",
+            "pros": ["Strong logical isolation", "Backups per customer", "Staged migrations"],
+            "cons": ["More connections to manage", "Slower migrations", "Large catalog with many customers"]
+          },
+          "database": {
+            "name": "One database per customer",
+            "tagline": "Full physical isolation",
+            "pros": ["Physical isolation", "Strict compliance", "Independent restores"],
+            "cons": ["High operating cost", "Complex connection pooling", "Costly global schema changes"]
+          }
+        },
+        "localTitle": "Localization for Colombia",
+        "local": {
+          "money": "Pesos without decimals, plus VAT",
+          "date": "Dates and time zone",
+          "nit": "Tax ID (NIT) with check digit",
+          "payments": "Payment methods",
+          "paymentsValue": "Card, PSE and Nequi (we connect them in your project)"
+        }
       }
     },
     "audit": {
-      "title": "Per-organization audit logs",
-      "subtitle": "Immutable record of who did what, when, and from where · exportable to your SIEM.",
-      "filtersUser": "User",
-      "filtersAction": "Action",
-      "all": "All",
-      "columns": {
-        "actor": "Actor",
-        "action": "Action",
-        "resource": "Resource",
-        "ip": "IP",
-        "when": "When"
-      }
-    },
-    "flags": {
-      "title": "Feature flags and experiments",
-      "subtitle": "Gradual rollouts, attribute targeting, and native A/B testing.",
-      "flagsTitle": "Flags",
-      "experimentsTitle": "Active experiments",
-      "rollout": "rollout",
-      "variantA": "Variant A",
-      "variantB": "Variant B",
-      "conversion": "conversion"
-    },
-    "i18n": {
-      "title": "Full internationalization",
-      "subtitle": "Per-user locales, currencies, time zones, and number formats.",
-      "languageLabel": "Language",
-      "timezoneLabel": "Time zone",
-      "currencyLabel": "Currency",
-      "previewLabel": "Preview",
-      "examplePrice": "Price",
-      "exampleDate": "Today's date"
-    },
-    "observability": {
-      "title": "Observability stack",
-      "subtitle": "Traces, metrics, logs, and public uptime in a single pipeline.",
-      "sentry": "Sentry",
-      "sentryDesc": "Errors and session replay grouped by release.",
-      "otel": "OpenTelemetry",
-      "otelDesc": "Distributed traces exported to a central collector.",
-      "grafana": "Grafana",
-      "grafanaDesc": "p95/p99 latency and throughput dashboards.",
-      "status": "StatusPage",
-      "statusDesc": "Public uptime page with an audited incident history.",
-      "uptime": "Uptime · last 90 days",
-      "p95": "p95 latency",
-      "errors": "Errors · 24h"
-    },
-    "teams": {
-      "title": "Org and team management",
-      "subtitle": "RBAC roles, pending invitations, and SCIM sync with your IdP.",
-      "inviteLabel": "Invite by email",
-      "invite": "Invite",
-      "membersTitle": "Members",
-      "invitesTitle": "Pending invitations",
-      "scimTitle": "SCIM sync",
-      "scimDesc": "Connected to Okta · last sync",
-      "scimSyncedAgo": "2 minutes ago",
-      "scimStatus": "Active",
-      "roles": {
-        "owner": "Owner",
-        "admin": "Admin",
-        "member": "Member",
-        "billing": "Billing",
-        "viewer": "Viewer"
-      },
-      "columns": {
-        "user": "User",
-        "role": "Role",
-        "status": "Status",
-        "email": "Email",
-        "sentAt": "Sent",
-        "actions": "Actions"
-      },
-      "resend": "Resend",
-      "revoke": "Revoke",
-      "active": "Active",
-      "pending": "Pending"
+      "tenant_created": "Customer signed up on the {plan} plan",
+      "tenant_plan_changed": "Plan change: {from} → {to}",
+      "tenant_suspended": "Service suspended for non-payment",
+      "tenant_reactivated": "Service reactivated after payment",
+      "tenant_cancelled": "Subscription cancelled",
+      "invoice_paid": "Invoice {number} paid",
+      "payment_failed": "Automatic charge failed",
+      "payment_rejected": "Payment declined ({method})",
+      "dunning_reminder": "Day {day} payment notice",
+      "member_invited": "Invitation to {email}",
+      "member_invite_resent": "Invitation resent to {email}",
+      "member_invite_revoked": "Invitation revoked for {email}",
+      "member_joined": "{email} accepted the invitation",
+      "member_role_changed": "Role of {email}: {from} → {to}",
+      "auth_login": "Signed in with {method}",
+      "auth_login_denied": "Sign-in denied ({method})",
+      "auth_settings_changed": "{setting}: {value}",
+      "module_toggled": "Module {module}: {value}",
+      "support_impersonation_started": "Support session started. Reason: {reason}",
+      "support_impersonation_ended": "Support session ended",
+      "notice_published": "Notice published {via}: {title}",
+      "portal_access_denied": "Access denied to resource {resource} (belongs to another complex)",
+      "api_request": "{method} {path} → {status}"
     }
   }
 }

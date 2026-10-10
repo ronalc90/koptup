@@ -1,231 +1,256 @@
-# Guía de la demo: SaaS Boilerplate Multi-tenant
+# Guía de la demo: Plataforma SaaS multi-tenant
 
-> Ruta `/demo/saas-boilerplate` · Modo de acceso: **Abierta** · Tipo: **datos de ejemplo** (todo corre en el navegador; no llama al servidor) · Plan del producto: [Plataforma SaaS multi-tenant](Producto-saas-multi-tenant.md)
+> Ruta `/demo/saas-boilerplate` · Modo de acceso: **Abierta** · Tipo: **datos de ejemplo** (todo corre en el navegador y se guarda en él; no llama al servidor) · Plan del producto: [Plataforma SaaS multi-tenant](Producto-saas-multi-tenant.md)
 
-**Resumen.** Es una vitrina técnica de lo que traería una plantilla para construir un SaaS B2B multiempresa: arquitectura de referencia, tres formas de aislar los datos de cada cliente («tenant»), autenticación empresarial, planes y cobro, panel interno con impersonación, webhooks, API, registros de auditoría, feature flags, internacionalización, observabilidad y equipos, repartidos en 12 pestañas. Está pensada para fundadores, CTO y equipos de producto que evalúan arrancar un SaaS sin construir esa base desde cero. Todo son datos y código de ejemplo: no se inicia sesión, no se cobra, no se envía ningún correo y nada se guarda.
+**Resumen.** Muestra cómo se vería un software convertido en un SaaS que cobra cada mes. El caso es ficticio: **ConjuntoDemo**, un software para administrar conjuntos residenciales que se vende por suscripción; cada conjunto es un cliente («tenant») con sus datos aislados. Tiene 6 pantallas que comparten el mismo estado: lo que haces en una (dar de alta un conjunto, cobrarle, invitar a su equipo, entrar como soporte) aparece en las demás, en la bitácora, en los webhooks y en la API de prueba. Está pensada para fundadores, casas de software y equipos de TI que quieren vender su producto por suscripción. Los cobros, correos, WhatsApp y el inicio de sesión con Google o Microsoft son simulados y lo dice en pantalla; el segundo factor (TOTP), las firmas HMAC de los webhooks y el CUFE de ejemplo sí se calculan de verdad en el navegador.
 
-**En esta página:** [Recorrido sugerido](#recorrido-sugerido-demo-comercial-de-5-minutos) · [Pantallas y funciones](#pantallas-y-funciones) · [Qué es real y qué es simulado](#qué-es-real-y-qué-es-simulado) · [Acceso](#acceso) · [Limitaciones conocidas](#limitaciones-conocidas)
+**En esta página:** [Recorrido sugerido](#recorrido-sugerido-demo-comercial-de-5-minutos) · [Pantallas y funciones](#pantallas-y-funciones) · [Datos de ejemplo](#datos-de-ejemplo) · [Qué es real y qué es simulado](#qué-es-real-y-qué-es-simulado) · [Acceso](#acceso) · [Limitaciones conocidas](#limitaciones-conocidas)
 
 ![Vista general](images/doc/demos/saas-boilerplate/00-general.jpg)
 
-*Vista inicial: encabezado con las insignias SaaS, B2B y Production-ready, el stack, la barra de pestañas y la pestaña «Arquitectura».*
+*Vista inicial: «Volver a demos», las insignias «Datos de ejemplo» y «Simulación: sin cobros, correos ni servidor», el caso de ejemplo con su fecha de corte (8 oct. 2026), «Restablecer datos», el recorrido guiado de 5 pasos y el menú de 6 pantallas.*
 
 ---
 
 ## Recorrido sugerido (demo comercial de 5 minutos)
 
-La idea que vende: «todo lo que un SaaS B2B necesita antes de su primera función de negocio (aislamiento por cliente, SSO y MFA, cobro, soporte y equipo) ya está resuelto». La demo no tiene botón de restablecer: recarga la página para volver al inicio. Cada pestaña olvida lo que hiciste en ella cuando cambias a otra.
+La idea que vende: «tu software cobra solo: cada cliente con sus datos aislados, cobro en pesos con factura, soporte con trazabilidad». El **recorrido guiado** de arriba tiene 5 pasos que se marcan solos cuando el visitante los hace de verdad; al completarlos aparece el botón **Solicitar demo guiada** (abre `/solicitar-demo?demos=saas-boilerplate`). Los cambios se guardan en el navegador: al recargar siguen ahí, y **Restablecer datos** (con confirmación) vuelve a los datos de ejemplo.
 
 ![Recorrido de la demo](images/doc/demos/saas-boilerplate/recorrido.gif)
 
-*Recorrido completo en 6 pasos: arquitectura, multi-tenancy, MFA, planes y pago, impersonación e invitaciones.*
+*Recorrido en 6 cuadros: panel del dueño, alta de un conjunto, cobro con PSE, factura de ejemplo, prueba de aislamiento y soporte con motivo.*
 
-### Paso 1. La arquitectura de referencia
+### Paso 1. Tu SaaS hoy
 
-![Paso 1: arquitectura](images/doc/demos/saas-boilerplate/01-paso1-arquitectura.jpg)
+![Paso 1: panel del dueño](images/doc/demos/saas-boilerplate/01-paso1-panel.jpg)
 
-*Pestaña «Arquitectura», la que abre por defecto.*
+*Pantalla «Tu SaaS hoy» con el filtro «En mora» y la ficha de Edificio Mirador de Laureles abierta.*
 
-1. **Stack que se anuncia**: Next.js 14, TypeScript, PostgreSQL + RLS, Redis, Stripe, Paddle, OpenTelemetry y Sentry.
-2. **Barra de 12 pestañas**: Arquitectura, Multi-tenancy, Auth, Billing, Admin panel, Webhooks, API + Docs, Audit logs, Feature flags, i18n, Observability y Teams. En una pantalla de 1440 px las dos últimas quedan cortadas a la derecha: hay que deslizar la barra de lado.
-3. **Diagrama de ocho piezas**: Frontend Next.js, API Gateway, Auth Service y Redis arriba; Postgres + RLS, Workers, Webhook Bus y Stripe / Paddle abajo. Es un dibujo fijo, sin interacción.
-4. **Decisiones de diseño**: aislamiento por tenant con Row Level Security en Postgres, sesiones JWT con rotación de claves (JWKS), cola de webhooks con reintentos y dead letter queue, telemetría OpenTelemetry y feature flags evaluados en el edge.
+1. **Indicadores del mes**: ingresos recurrentes sin IVA ($1.029.000, y $1.319.000 si la prueba gratis pasa a pago), cobrado este mes con IVA ($1.047.200 en 2 facturas), clientes activos (2, más 1 en prueba), en mora o suspendidos (1, $149.000 al mes en riesgo) y altas / bajas del mes (1 / 1). Todos se recalculan con lo que hagas.
+2. **Ingresos recurrentes por mes**: mayo a septiembre son cifras fijas de ejemplo (coherentes con los clientes: $588.000 hasta agosto y $1.178.000 en septiembre, cuando entra Administraciones del Oriente); octubre se calcula en vivo.
+3. **Filtros por estado** (Todos, Activo, En prueba, En mora, Suspendido, Cancelado) y un **buscador** por nombre, ciudad o subdominio.
+4. **Exportar CSV**: descarga `clientes-2026-10.csv` con los clientes filtrados (NIT con dígito de verificación, subdominio, plan, unidades, usuarios del equipo, estado y valor mensual).
+5. **Ficha de cada cliente** (clic en la fila): NIT, plan, cliente desde, contacto, uso del plan y botones **Ver su portal**, **Cobros**, **Usuarios** y **Cancelar suscripción** (pide confirmación; el conjunto pierde el acceso y sale de los ingresos recurrentes).
 
-Qué decir: «Esta es la base que normalmente toma meses; aquí está pensada desde el día uno».
+Qué decir: «Esto es lo que ve el dueño del software cada mañana: cuánto factura, quién está en prueba y quién no ha pagado».
 
-### Paso 2. Elegir cómo se aíslan los datos de cada cliente
+### Paso 2. Alta de un conjunto
 
-![Paso 2: multi-tenancy](images/doc/demos/saas-boilerplate/02-paso2-multitenancy.jpg)
+![Paso 2: alta de un cliente](images/doc/demos/saas-boilerplate/02-paso2-alta.jpg)
 
-*Pestaña «Multi-tenancy» con el patrón «Shared DB + RLS» elegido.*
+*Asistente «Alta de un cliente», paso 2, con el subdominio sugerido y el plan recomendado para 120 unidades.*
 
-1. **Tres patrones**: un clic en cada tarjeta cambia lo de abajo.
-2. **Ventajas y Compromisos** del patrón elegido.
-3. **Snippet**: el código de ejemplo del patrón (SQL para RLS, TypeScript para los otros dos). Las líneas de comentario empiezan con un texto suelto `"text-secondary-500">` y el patrón «Schema per tenant» muestra el nombre interno del texto en lugar del código (ver la [limitación 3](#limitaciones-conocidas)).
+El asistente tiene 3 pasos con validaciones en cada uno:
 
-| Patrón | En una frase | Ventajas | Compromisos |
-|---|---|---|---|
-| Shared DB + RLS | Una base, aislamiento por fila | Costos bajos a gran escala, migraciones simples, operación uniforme | Riesgo si se omite el filtro, ajuste fino de índices, backups por tenant complejos |
-| Schema per tenant | Un schema por cliente | Aislamiento lógico fuerte, backups por tenant, migraciones por etapas | Conexiones por schema, migraciones más lentas, catálogo grande |
-| DB per tenant | Una base por cliente | Aislamiento físico, cumplimiento estricto, restauración independiente | Costo operativo alto, pool de conexiones complejo, cambios de schema globales caros |
+- **Datos del conjunto**: nombre, ciudad (16 ciudades colombianas), NIT de 9 dígitos (calcula el dígito de verificación al vuelo con el método de la DIAN y rechaza un NIT que ya tenga otro cliente), correo del administrador y número de unidades (1 a 5.000).
+1. **Subdominio**: se sugiere a partir del nombre (sin tildes ni palabras como «conjunto» o «torres») y se valida: formato, subdominios reservados (`www`, `api`, `admin`…) y ocupados.
+2. **Plan**: el que no alcanza para las unidades queda deshabilitado y se marca el **Sugerido**.
+3. **Prueba gratis** de 14 días, hasta el 22 oct. 2026, sin tarjeta.
+4. **Vista previa del portal**, que cambia con el nombre, el color y el logo.
+- **Marca**: 6 colores o uno propio y un logo (PNG, JPG, WebP o SVG de máximo 200 KB, que se queda en el navegador).
 
-Qué decir: «Elegimos el aislamiento según tus clientes: compartido para escalar barato, una base por cliente para bancos o salud».
+**Crear cliente** lo agrega «En prueba» al panel, deja invitado a su administrador, le crea 6 unidades de ejemplo y un comunicado de bienvenida, y registra la alta en la bitácora y dos webhooks (`tenant.created` y `member.invited`). No se crea ningún subdominio ni se envía el correo.
 
-### Paso 3. Autenticación empresarial (MFA)
+### Paso 3. Cobrar el primer mes con PSE y abrir la factura
 
-![Paso 3: autenticación con MFA](images/doc/demos/saas-boilerplate/03-paso3-auth-mfa.jpg)
+![Paso 3: cobro con PSE](images/doc/demos/saas-boilerplate/03-paso3-cobro-pse.jpg)
 
-*Pestaña «Auth», método MFA, después de pulsar «Verificar».*
+*«Planes y cobros» para el conjunto nuevo, en la pantalla del banco simulada de PSE.*
 
-1. **Métodos**: SSO, MFA, Social y Magic link. Cambiar de método borra lo que hayas hecho en el anterior.
-2. **Segundo factor**: TOTP (apps autenticadoras), Passkeys (WebAuthn: llaves físicas, Face ID, Touch ID) y SMS de respaldo.
-3. **Casillas del código**: vacías hasta pulsar **Verificar**; entonces se llenan solas con 4 7 2 9 0 1. No hay que escribir nada.
-4. **Identidad verificada**: el resultado simulado.
+1. **Cliente** al que se le cobra (con su estado y los días de prueba que le quedan).
+2. **Resumen del cobro**: plan, IVA del 19 % y total ($345.100 para el plan Conjunto mediano).
+3. **Medio de pago** (Tarjeta, PSE o Nequi), cada uno con sus validaciones: tarjeta con Luhn, vencimiento y CVC (la 4242 4242 4242 4242 se aprueba y la 4000 0000 0000 0002 se rechaza); PSE con tipo de persona, banco (ficticio) y correo; Nequi con celular colombiano de 10 dígitos. PSE y Nequi muestran la **pantalla del banco** o la **notificación del celular** simuladas, con **Aprobar** o **Rechazar**.
+4. **Aprobar pago** emite la factura de ejemplo y deja al cliente «Activo». Un rechazo no emite factura y queda en la bitácora.
+5. La nota «Simulado» explica que no hay pasarela ni conexión con bancos, PSE o Nequi.
 
-Los otros métodos:
+![Paso 3: factura de ejemplo](images/doc/demos/saas-boilerplate/04-paso3-factura.jpg)
 
-- **SSO**: tarjetas SAML 2.0 («Conector genérico para Okta, Azure AD, Google Workspace, Ping»), OIDC y Aprovisionamiento SCIM, y un ejemplo de código del retorno de SAML.
-- **Social**: botones Google, GitHub, Apple y Microsoft que no hacen nada.
-- **Magic link**: tres pasos (escribe tu email, recibe un enlace firmado válido por 10 minutos, haz clic y queda la sesión activa), un campo de email y **Enviar código**, que muestra «Enlace enviado a tu correo» aunque el campo esté vacío. No se envía nada.
+*Factura CD-1042 del conjunto nuevo (se abre con «Ver factura»; Escape o la X la cierran).*
 
-### Paso 4. Planes y pago simulado
+1. **Aviso de ejemplo**: no es una factura electrónica válida ni se envió a la DIAN.
+2. Vendedor (ConjuntoDemo S.A.S.) y comprador con NIT y dígito de verificación.
+3. Subtotal, IVA y total.
+4. **CUFE de ejemplo**: SHA-384 calculado en el navegador con la fórmula del anexo técnico, pero con una clave técnica ficticia y ambiente de pruebas; «Ver la cadena de entrada» muestra exactamente qué se firmó.
+5. **Descargar PDF** genera `factura-ejemplo-CD-1042.pdf` en el navegador, con el mismo aviso.
 
-![Paso 4: billing](images/doc/demos/saas-boilerplate/04-paso4-billing.jpg)
+Qué decir: «Cada cobro genera su factura; en tu proyecto la emite tu proveedor tecnológico autorizado».
 
-*Pestaña «Billing» después de pagar el plan Pro en el checkout de prueba.*
+### Paso 4. El portal del conjunto y el aislamiento
 
-1. **Plan elegido**: Pro viene marcado como «Plan actual» y con la cinta «14 días de prueba».
-2. **Seleccionar** cambia el plan elegido (y reinicia el checkout).
-3. **Checkout mock** («Stripe Elements + 3D Secure»): email de facturación, tarjeta (sugiere 4242 4242 4242 4242), MM/AA y CVC. **Pagar y activar** muestra «Procesando pago seguro...» durante 1,4 segundos y luego «Suscripción activada» con el plan y el precio. No valida los campos ni cobra nada.
-4. **Uso del ciclo actual**: API calls 78.400 de 100.000 (barra amarilla), almacenamiento 42 GB de 100 GB y 18 de 25 asientos activos. Son cifras fijas.
+![Paso 4: portal del cliente](images/doc/demos/saas-boilerplate/05-paso4-portal.jpg)
 
-| Plan | Precio | Incluye |
-|---|---|---|
-| Starter | $29 / mo | Hasta 3 usuarios, 10k requests/mes, soporte por email, audit logs 30 días |
-| Pro | $99 / mo | Hasta 25 usuarios, 100k requests/mes, SSO SAML/OIDC, audit logs 1 año, webhooks ilimitados |
-| Enterprise | Contactar / mo | Usuarios ilimitados, volumen a medida, SCIM y dominios verificados, SLA 99.99 %, DPA y residencia de datos |
+*Portal del conjunto nuevo con su color, su logo y su subdominio.*
 
-*Precios de ejemplo de la plantilla, en dólares; no son los precios de KopTup.*
+1. **Ver como**: el portal de cualquier cliente activo.
+2. **Marca** del conjunto (color, logo y subdominio); el texto se vuelve oscuro si el color es claro.
+3. **Módulos** según el plan y lo que active el dueño: comunicados (con formulario para publicar), pagos de administración (6 unidades de ejemplo; **Registrar pago** las deja al día), reservas de zonas comunes (rechaza fechas pasadas y una zona ya reservada ese día) y votación de asamblea (un voto por conjunto y navegador). Si un módulo no está en el plan o está apagado, lo dice. Un conjunto suspendido ve «Portal suspendido» con **Ir a cobrar**.
 
-Debajo está **Dunning emails**: los cuatro recordatorios ante un pago fallido (Día 0 «No pudimos cobrar tu suscripción», Día 3 «Recordatorio: actualiza tu método de pago», Día 7 «Tu acceso se suspenderá en 48 horas» y Día 14 «Suscripción cancelada»). Es una lista fija.
+![Paso 4: prueba de aislamiento](images/doc/demos/saas-boilerplate/06-paso4-aislamiento.jpg)
 
-Qué decir: «Planes, prueba gratis, cobro por uso y cobranza de pagos fallidos vienen resueltos».
+*Prueba de aislamiento: un recurso de otro conjunto se rechaza.*
 
-### Paso 5. Impersonar a un cliente para darle soporte
+1. **Identificador del recurso**: una unidad, un comunicado o una factura.
+2. Atajos con un recurso **de este conjunto** y uno **de otro conjunto**.
+3. Resultado: «Encontrado en este conjunto», «No tienes acceso a este recurso» (sin mostrar ningún dato y con registro en la bitácora) o «No existe». La regla corre en el navegador; en el proyecto la aplica el servidor en cada consulta.
 
-![Paso 5: panel de administración](images/doc/demos/saas-boilerplate/05-paso5-admin.jpg)
+### Paso 5. Soporte con motivo y bitácora
 
-*Pestaña «Admin panel» con una sesión impersonada del tenant globex y el flag custom-domain encendido.*
+![Paso 5: sesión de soporte](images/doc/demos/saas-boilerplate/07-paso5-soporte.jpg)
 
-Antes de la captura: elige el tenant (acme-corp, globex, initech o umbrella), escribe el **Motivo (obligatorio)** y pulsa **Impersonar**.
+*Sesión de soporte en Administraciones del Oriente, abierta desde «Operación y técnica».*
 
-1. **Sesión impersonada activa** con el tenant elegido y el botón **Detener**, que vuelve al formulario. Es simulada: no se entra a ninguna cuenta y el motivo no se exige de verdad.
-2. **Feature flags por tenant**: priority-support, custom-domain y sso-required, con interruptores que solo cambian de posición.
-3. **Eventos recientes**: tres eventos fijos (subscription.upgraded, webhook.retry, auth.mfa_enrolled) que no cambian con el tenant elegido.
+En **Operación y técnica › Soporte con suplantación** se elige el cliente y se escribe el **motivo** (obligatorio, mínimo 10 caracteres). **Entrar como soporte** abre su portal con:
 
-Qué decir: «Tu equipo de soporte ve lo que ve el cliente, con motivo y auditoría».
+1. Un **aviso** fijo con el cliente y el motivo.
+2. **Terminar sesión de soporte**, que también queda en la bitácora.
+3. El selector «Ver como» bloqueado mientras dure la sesión.
 
-### Paso 6. Invitar al equipo
+![Paso 5: bitácora](images/doc/demos/saas-boilerplate/08-paso5-bitacora.jpg)
 
-![Paso 6: equipo](images/doc/demos/saas-boilerplate/06-paso6-teams.jpg)
+*Bitácora filtrada por el tipo «Soporte».*
 
-*Pestaña «Teams» después de invitar a laura.martinez@ejemplo.co.*
+1. **Filtros** por cliente (o «Plataforma»), por tipo (clientes y planes, cobros, usuarios, inicio de sesión, soporte, portal y API) y **buscador**.
+2. Cada registro dice qué pasó, quién, en qué cliente, cuándo y desde qué IP (de ejemplo).
+3. **Exportar CSV** descarga `bitacora-2026-10.csv` con lo filtrado.
 
-1. **Invitar por email**: escribe un correo y pulsa **Invitar**. Acepta cualquier texto que no esté vacío.
-2. **Miembros**: Ronald Cárdenas (Owner), María Pérez (Admin), Ops Team (Member) y Finanzas (Billing), todos «Activo». El selector de rol (Owner, Admin, Member, Billing, Viewer) cambia, pero no tiene efecto en otra parte.
-3. **Invitación nueva**: aparece primera en «Invitaciones pendientes», enviada «now». **Reenviar** y **Revocar** no hacen nada.
-4. **Sincronización SCIM**: «Conectado con Okta - última sincronización hace 2 minutos», un texto fijo.
+Qué decir: «Tu equipo ve lo que ve el cliente, pero siempre con motivo y con rastro».
 
 ---
 
 ## Pantallas y funciones
 
-Las 12 pestañas son independientes. Las que tienen algo que tocar lo guardan solo mientras sigas en ellas: al cambiar de pestaña vuelven a su estado inicial.
+Las 6 pantallas comparten un solo estado guardado en el navegador (`localStorage`). En escritorio el menú va a la izquierda y se queda visible al bajar; en el celular va en una cuadrícula arriba del contenido.
 
 ```mermaid
-flowchart TB
-    subgraph I["Con interacción (se reinicia al cambiar de pestaña)"]
-        MT["Multi-tenancy: elegir patrón"]
-        AU["Auth: método, Verificar, Enviar código"]
-        BI["Billing: plan y pago simulado"]
-        AD["Admin panel: impersonar y flags"]
-        AP["API + Docs: lenguaje del ejemplo"]
-        AL["Audit logs: filtros"]
-        FF["Feature flags: interruptores"]
-        IN["i18n: idioma, huso y moneda"]
-        TE["Teams: invitar y roles"]
-    end
-    subgraph F["Solo lectura"]
-        AR["Arquitectura"]
-        WH["Webhooks"]
-        OB["Observability"]
-    end
+flowchart LR
+    A["Alta de un cliente"] --> P["Tu SaaS hoy"]
+    A --> C["Planes y cobros"]
+    A --> U["Usuarios y accesos"]
+    A --> T["Portal del cliente"]
+    C --> P
+    O["Operación y técnica"] --> T
+    C --> B[("Bitácora, webhooks y API de prueba")]
+    U --> B
+    T --> B
+    O --> B
 ```
 
-*Mapa de las pestañas. Ninguna llama al servidor.*
+*Lo que se hace en una pantalla aparece en las demás y queda en la bitácora, los webhooks y la API de prueba. Nada sale del navegador.*
 
-### Arquitectura
+### 1. Tu SaaS hoy
 
-Ver el [paso 1](#paso-1-la-arquitectura-de-referencia).
+Ver el [paso 1](#paso-1-tu-saas-hoy). El botón **Nuevo cliente** lleva al asistente.
 
-### Multi-tenancy
+### 2. Alta de un cliente
 
-Ver el [paso 2](#paso-2-elegir-cómo-se-aíslan-los-datos-de-cada-cliente).
+Ver el [paso 2](#paso-2-alta-de-un-conjunto). Al terminar ofrece **Cobrarle el primer mes**, **Ver su portal**, **Ir a «Tu SaaS hoy»** y **Dar de alta otro**.
 
-### Auth
+### 3. Planes y cobros
 
-Ver el [paso 3](#paso-3-autenticación-empresarial-mfa).
+Además del cobro y la factura del [paso 3](#paso-3-cobrar-el-primer-mes-con-pse-y-abrir-la-factura):
 
-### Billing
+- **Cambiar de plan**: valida el uso actual (unidades, usuarios del equipo y almacenamiento) y el estado (no se cambia en mora, suspendido ni cancelado). Subir de plan cobra la diferencia prorrateada del resto del mes en una **factura de ajuste** (por ejemplo, Arrayanes de Conjunto mediano a Multiconjunto: 24 días, $232.258 + IVA = $276.387); bajar deja **saldo a favor** que se descuenta del próximo cobro; durante la prueba el cambio no cuesta nada.
+- **Uso del plan** con barras que avisan cerca del límite.
+- **Facturas del cliente** con **Ver factura** en cada una.
 
-Ver el [paso 4](#paso-4-planes-y-pago-simulado).
+| Plan | Precio de ejemplo | Límites | Módulos del portal |
+|---|---|---|---|
+| Conjunto pequeño | $149.000 + IVA al mes | 80 unidades, 3 usuarios del equipo, 5 GB | Pagos de administración |
+| Conjunto mediano | $290.000 + IVA al mes | 300 unidades, 10 usuarios del equipo, 20 GB | Pagos, reservas y votaciones |
+| Multiconjunto | $590.000 + IVA al mes | 1.500 unidades, 30 usuarios del equipo, 100 GB | Pagos, reservas y votaciones |
 
-### Admin panel
+*Precios del SaaS ficticio ConjuntoDemo, no de KopTup.*
 
-Ver el [paso 5](#paso-5-impersonar-a-un-cliente-para-darle-soporte).
+![Cobros fallidos](images/doc/demos/saas-boilerplate/11-cobros-fallidos.jpg)
 
-### Webhooks
+*Cobros fallidos de Edificio Mirador de Laureles con el recordatorio del día 3 abierto.*
 
-![Webhooks](images/doc/demos/saas-boilerplate/07-webhooks.jpg)
+1. **Cobros fallidos**: avisos los días 0, 3 y 7 y suspensión el día 10, con su fecha y si ya se hizo o está programado.
+2. **Ver mensaje** muestra el correo que se enviaría…
+3. …**Simular el paso de los días** adelanta a la siguiente etapa (en el día 10 el cliente pasa a «Suspendido» y su portal y su API se bloquean); **Cobrar ahora** lleva al cobro de ese cliente, y pagar lo deja al día.
+4. **Simular cobro fallido**: hace que una prueba gratis termine sin pago y arranque el proceso.
+5. …y el WhatsApp. No se envía nada.
 
-*Últimas entregas, ejemplo de payload y verificación de la firma.*
+### 4. Usuarios y accesos
 
-- **Últimas entregas**: cinco eventos fijos con su endpoint, estado, intentos y última entrega: invoice.created, user.invited y org.created **Entregado** (1 intento), subscription.renewed **Reintentando** (3 intentos, con el ícono girando) y webhook.failed **Fallido** (5 intentos).
-- **Ejemplo de payload**: el JSON de un `invoice.created` con `tenant_id`.
-- **Firma HMAC SHA-256**: cómo verificar el encabezado `X-Signature` en Node.
+![Equipo del conjunto](images/doc/demos/saas-boilerplate/09-usuarios-equipo.jpg)
 
-### API + Docs
+*Equipo de Conjunto Arrayanes de Suba.*
 
-![API y documentación](images/doc/demos/saas-boilerplate/08-api.jpg)
+1. **Usuarios del equipo** frente al límite del plan (los residentes no cuentan).
+2. **Reenviar** una invitación pendiente (cuenta los reenvíos) y **Revocar** (pide confirmación).
+3. **Simular aceptación**: pide el nombre y deja al usuario «Activo».
+4. **Rol** de cada persona: Administrador del conjunto, Contador, Portería o Residente. Se valida que quede al menos un administrador activo y el límite del plan.
 
-*Lista de endpoints y ejemplo «crear factura» en TypeScript.*
+Debajo, **Invitar a alguien** (correo válido, sin duplicados, respeta el límite del plan y rechaza conjuntos suspendidos).
 
-Siete endpoints de ejemplo (`/v1/invoices`, `/v1/customers`, `/v1/subscriptions`, `/v1/webhooks`, `/v1/audit-logs`) y el ejemplo **crear factura** en TypeScript, Python o Go. **Probar en sandbox** no hace nada y el SDK `@saas/sdk` es ilustrativo.
+![Inicio de sesión con segundo factor](images/doc/demos/saas-boilerplate/10-usuarios-mfa.jpg)
 
-### Audit logs
+*Prueba de inicio de sesión con el segundo factor activo.*
 
-![Audit logs](images/doc/demos/saas-boilerplate/09-audit-logs.jpg)
+1. **Cómo inician sesión**: correo y contraseña (siempre), Google, Microsoft y **segundo factor obligatorio**; cada cambio queda en la bitácora.
+2. Interruptor del segundo factor.
+3. **Prueba el inicio de sesión**: correo (con atajos a un usuario del conjunto y a uno de otro conjunto), método y contraseña (la demo acepta cualquiera de 8 o más caracteres). Rechaza a quien no pertenece al conjunto, una invitación sin aceptar, un método apagado y un conjunto suspendido; si el segundo factor está activo, pide el código de 6 dígitos.
+4. **App autenticadora** simulada en la página: el código TOTP se calcula de verdad (estándar RFC 6238, cambia cada 30 s). Con la clave de ejemplo `JBSWY3DPEHPK3PXP` en una app autenticadora real se ve el mismo código. Un código errado o vencido se rechaza.
 
-*Registro filtrado por el usuario maria@acme.com.*
+Google y Microsoft no abren su ventana real: la demo simula su respuesta, y lo dice.
 
-Seis registros fijos con actor, acción, recurso, IP y hace cuánto. Se filtran por **Usuario** (ronald@acme.com, maria@acme.com, ops@acme.com, system) y por **Acción** (invoice.create, user.invite, flag.toggle, auth.login, subscription.renew, audit.export). El subtítulo dice «Exportable a SIEM», pero no hay botón de exportar.
+### 5. Portal del cliente
 
-### Feature flags
+Ver el [paso 4](#paso-4-el-portal-del-conjunto-y-el-aislamiento).
 
-![Feature flags](images/doc/demos/saas-boilerplate/10-feature-flags.jpg)
+![Portal en el celular](images/doc/demos/saas-boilerplate/16-movil.jpg)
 
-*Cuatro flags con su porcentaje de despliegue y dos experimentos A/B, con ai-assistant encendido.*
+*Portal de Conjunto Arrayanes de Suba en un teléfono (390 px).*
 
-- **Flags**: new-billing-ui (GA, 100 %), ai-assistant (beta, 35 %), export-csv (gradual, 80 %) y beta-analytics (internal, 10 %). El interruptor cambia, el porcentaje no.
-- **Experimentos activos**: checkout-v2 (A 12.4 %, B 14.8 %) y onboarding-tour (A 38.2 %, B 41.5 %), con la variante ganadora resaltada.
+### 6. Operación y técnica
 
-### i18n
+Además del soporte y la bitácora del [paso 5](#paso-5-soporte-con-motivo-y-bitácora):
 
-![Internacionalización](images/doc/demos/saas-boilerplate/11-i18n.jpg)
+- **Módulos por cliente**: interruptores de pagos, reservas y votaciones; los que el plan no incluye quedan deshabilitados con el plan desde el que están. El portal cambia al instante y cada cambio genera un webhook `tenant.updated`.
 
-*Portugués de Brasil, hora de São Paulo y reales.*
+![Webhooks](images/doc/demos/saas-boilerplate/13-webhooks.jpg)
 
-Elige **Idioma** (Español AR, English US, Português BR, Deutsch DE), **Huso horario** (Buenos Aires, Nueva York, São Paulo, Berlín, Tokio) y **Moneda** (USD, EUR, ARS, BRL). La **Vista previa** formatea de verdad, con el navegador, el precio 1299.5 y la fecha y hora actuales (por ejemplo, «R$ 1.299,50» y «sexta-feira, 9 de outubro de 2026 às 06:45»), y el código de ejemplo se actualiza con lo elegido.
+*Webhook `invoice.paid` del conjunto nuevo con su firma.*
 
-### Observability
+1. **Webhooks** generados por lo que pasa en la demo, con filtro por evento.
+2. Encabezados y cuerpo JSON de cada evento, con la firma `X-ConjuntoDemo-Signature: t=…,v1=…` (HMAC SHA-256 de «timestamp.cuerpo» con el secreto de ejemplo, calculada en el navegador). Los bloques de código tienen **Copiar**.
+3. **Cómo verifica la firma quien recibe el webhook**: ejemplo en Node.js.
 
-![Observabilidad](images/doc/demos/saas-boilerplate/12-observability.jpg)
+![API de prueba](images/doc/demos/saas-boilerplate/12-api.jpg)
 
-*Cuatro tarjetas con una mini gráfica decorativa.*
+*API de prueba: la llave de Administraciones del Oriente pide una unidad de Arrayanes y recibe 404.*
 
-Sentry (23 errores en 24 h), OpenTelemetry (12.4k spans/min), Grafana (latencia p95 de 184ms) y StatusPage (99.98 % de disponibilidad en 90 días). Son cifras fijas.
+1. **Llave de API** de ejemplo (con atajos para la de cada cliente).
+2. Ruta (`GET /v1/tenant`, `/v1/units`, `/v1/units/{id}`, `/v1/invoices`, `/v1/notices` y `POST /v1/notices`) y sus datos.
+3. **Respuesta** con su código: 200, 201 (el comunicado aparece en el portal), 400 (JSON inválido), 401 (llave inválida), 402 (cliente suspendido), 404 (no existe para ese cliente, aunque exista en otro) y 422 (falta el título). Cada llamada queda en la bitácora.
 
-### Teams
+![Para tu equipo técnico](images/doc/demos/saas-boilerplate/15-tecnico.jpg)
 
-Ver el [paso 6](#paso-6-invitar-al-equipo).
+*Sección plegable «Para tu equipo técnico».*
 
-### En el celular
+1. **Qué es real en la demo y qué se construye en tu proyecto** (tabla).
+2. **Piezas de la arquitectura propuesta**. Debajo, los **modelos de aislamiento** (base compartida con RLS, un esquema por cliente o una base por cliente) con ventajas, compromisos y un fragmento de código de cada uno, y la **localización para Colombia** (pesos sin decimales e IVA, fecha y zona horaria America/Bogota, NIT con dígito de verificación y medios de pago).
 
-![Vista móvil](images/doc/demos/saas-boilerplate/13-movil.jpg)
+### En inglés y en modo oscuro
 
-*La pestaña «Billing» en un teléfono (390 px).*
+Todos los textos existen en español (con «tú») y en inglés, y la demo se ve bien en modo claro y oscuro, en 1440 px y en 390 px.
 
-La barra de pestañas se desliza de lado y las tarjetas, tablas y bloques de código se apilan en una columna.
+---
+
+## Datos de ejemplo
+
+Fecha de corte: **8 oct. 2026**. Todo es ficticio: empresas, personas, NIT, correos (dominio reservado `.example`) e IP (rangos de documentación).
+
+| Cliente | Ciudad | NIT | Plan | Estado inicial | Unidades |
+|---|---|---|---|---|---|
+| Conjunto Arrayanes de Suba | Bogotá D.C. | 900.731.245-9 | Conjunto mediano | Activo | 240 |
+| Edificio Mirador de Laureles | Medellín | 901.118.342-0 | Conjunto pequeño | En mora (aviso del día 3 enviado) | 64 |
+| Condominio Campestre Los Guayacanes | El Retiro | 901.602.587-3 | Conjunto mediano | En prueba hasta el 15 oct. | 96 |
+| Administraciones del Oriente S.A.S. | Floridablanca | 900.984.421-4 | Multiconjunto | Activo | 1.120 |
+| Edificio Palmas del Norte | Barranquilla | 901.276.650-0 | Conjunto pequeño | Cancelado el 2 oct. | 48 |
+
+El vendedor es ConjuntoDemo S.A.S. (NIT 901.482.736-8, Bogotá). Hay 6 facturas de septiembre y octubre (CD-1036 a CD-1041), 9 registros de bitácora y 4 webhooks iniciales, 6 unidades por conjunto (2 pendientes de pago) y comunicados, reservas y votaciones coherentes con esas fechas.
 
 ---
 
@@ -233,14 +258,17 @@ La barra de pestañas se desliza de lado y las tarjetas, tablas y bloques de có
 
 | Parte | Real o simulado | Detalle |
 |---|---|---|
-| Arquitectura, patrones de multi-tenancy y fragmentos de código | **Contenido de referencia** | Texto y código de ejemplo; nada se ejecuta. |
-| SSO, MFA, inicio con redes sociales y magic link | **Simulados** | No hay inicio de sesión ni envío de códigos o enlaces. |
-| Planes, checkout y uso | **Simulados** | No hay Stripe ni Paddle; el pago se «aprueba» siempre. |
-| Impersonación, flags, roles e invitaciones | **Solo en la pantalla** | Cambian lo que ves y se pierden al cambiar de pestaña o recargar. |
-| Vista previa de i18n | **Real, en el navegador** | Usa el formateo de números y fechas del navegador (`Intl`). |
-| Webhooks, API, audit logs, experimentos y observabilidad | **Fijos** | Datos de ejemplo escritos en el código; empresas ficticias (acme, globex, initech). |
-| Servidor | **No se usa** | La página no hace ninguna petición. En el repositorio hay un módulo de backend `modules/saas-platform` con datos de ejemplo, pero no está conectado al servidor ni lo usa esta demo. |
-| Dónde se guarda | **En ningún lado** | No usa `localStorage`; recargar vuelve todo al inicio. |
+| Estado compartido entre pantallas | **Real, en el navegador** | Altas, cobros, facturas, usuarios, módulos, comunicados, reservas, votos y bitácora se guardan en `localStorage` (`demo:saas-boilerplate:v1`) y sobreviven a la recarga. |
+| Reglas de negocio | **Reales** | Prorrateo, límites del plan, etapas de cobro fallido, validaciones de NIT (DV), tarjeta (Luhn), celular y subdominio, y aislamiento por cliente en el portal y en la API de prueba. |
+| Segundo factor (TOTP), firmas de webhooks (HMAC SHA-256) y CUFE (SHA-384) | **Reales, en el navegador** | Con Web Crypto. El CUFE usa una clave técnica ficticia: no es válido ante la DIAN. |
+| Exportaciones | **Reales** | CSV de clientes y de bitácora y PDF de cada factura, generados en el navegador. |
+| Cobros (tarjeta, PSE, Nequi) | **Simulados** | Sin pasarela, sin bancos (los de la lista son ficticios) y sin dinero. |
+| Factura electrónica | **Simulada** | Representación gráfica de ejemplo; no se envía a la DIAN. |
+| Correos y WhatsApp | **Simulados** | Solo se muestra el texto que se enviaría. |
+| Inicio con Google o Microsoft | **Simulado** | No se abre su ventana ni se conecta con esas empresas. |
+| Soporte con suplantación | **Simulado** | Muestra el portal de ejemplo del cliente; no entra a ninguna cuenta. |
+| API y webhooks | **Simulados** | La API responde en el navegador; los webhooks no se envían a ningún servidor. |
+| Servidor | **No se usa** | En el repositorio hay un módulo de backend `modules/saas-platform` que no está montado ni lo usa esta demo. |
 
 ---
 
@@ -250,29 +278,25 @@ La barra de pestañas se desliza de lado y las tarjetas, tablas y bloques de có
 
 ![Tarjeta de la demo en el hub](images/doc/demos/saas-boilerplate/14-hub-tarjeta.jpg)
 
-*Tarjeta «SaaS Boilerplate Multi-tenant» en el hub, vista por un visitante sin sesión.*
+*Tarjeta del hub, vista por un visitante sin sesión. Sus textos todavía describen la versión anterior (ver la [limitación 4](#limitaciones-conocidas)).*
 
 1. Insignia **Abierta** (junto a «Platform»).
-2. Lo que **Incluye** según la tarjeta (ver la [limitación 1](#limitaciones-conocidas)).
+2. Lo que **Incluye** según la tarjeta.
 3. **Probar Demo** abre `/demo/saas-boilerplate`.
 4. **Solicitar demo guiada** abre `/solicitar-demo?demos=saas-boilerplate`.
 
-- **Cómo se solicita:** no hace falta solicitarla. Quien quiera una sesión de arquitectura o una versión con su caso usa **Solicitar demo guiada** (en la tarjeta o en el bloque azul al final de la demo, que también ofrece **Solicitar Cotización** y **Ver Planes y Precios**).
+- **Cómo se solicita:** no hace falta solicitarla. Quien quiera ver su propio producto así usa **Solicitar demo guiada** (en la tarjeta, al completar el recorrido guiado o en el bloque azul al final de la demo, que también ofrece **Solicitar Cotización** y **Ver Planes y Precios**).
 - **Cómo la controla el admin:** el modo sale del catálogo del servidor (allí se llama «Plataforma SaaS multiempresa») y se cambia en **Admin › Catálogo de demos** (`/admin/catalogo-demos`). Si se pasa a «Con solicitud» o «Solo por invitación», los visitantes verán la pantalla de acceso y los accesos se conceden en **Admin › Solicitudes de demo** y **Admin › Accesos a demos**; si se desactiva, el visitante ve que la demo está en mantenimiento y el equipo sigue entrando. Si el backend no responde, la demo sigue abierta porque así está en la tabla de respaldo. Detalle en el [Manual del administrador](Doc-06-Manual-del-Administrador.md) y en [Flujos del visitante](Doc-04-Flujos-del-Visitante.md).
 
 ---
 
 ## Limitaciones conocidas
 
-1. **Es una vitrina, no una plantilla que se entregue.** El encabezado dice «Production-ready» y «Todo listo desde el día uno», y la tarjeta del hub habla de «Auth completo» y «Billing Stripe + Paddle», pero la demo no ejecuta nada de eso: no hay backend, ni base de datos, ni pasarela de pago detrás. Tampoco tiene la insignia «Datos de ejemplo» que aclare que todo es simulado.
-2. **No tiene el botón «Volver al catálogo»** que sí tienen otras demos; para volver al hub hay que usar el menú del sitio.
-3. **Errores visibles en los bloques de código.** El resaltador de sintaxis rompe las líneas de comentario, que empiezan con el texto suelto `"text-secondary-500">` (en Multi-tenancy y en el ejemplo SAML de Auth). El patrón «Schema per tenant» muestra `demoSaas.tenancy.patterns.schemaPerTenant.snippet` en lugar del código, porque el texto contiene `${tenantId}` y la librería de traducciones lo toma como una variable (en la consola sale `FORMATTING_ERROR`). El ícono de copiar de los bloques es decorativo.
-4. **Botones que no hacen nada:** Google, GitHub, Apple y Microsoft (Auth › Social), Probar en sandbox, Reenviar y Revocar.
-5. **Sin validaciones:** Enviar código funciona con el email vacío, Pagar y activar con los campos vacíos, Impersonar sin el motivo «obligatorio», Invitar con cualquier texto y Verificar sin escribir el código.
-6. **Cada pestaña se reinicia al salir de ella:** si invitas a alguien en Teams, pasas a Billing y vuelves, la invitación desapareció; lo mismo pasa con la impersonación, el pago y los interruptores.
-7. **La barra de pestañas se esconde.** En 1440 px, Observability y Teams quedan cortadas a la derecha sin ninguna pista de que hay más; y al bajar por la página, la barra queda detrás del menú fijo del sitio, así que hay que volver arriba para cambiar de pestaña.
-8. **Mucho inglés:** las pestañas (Auth, Billing, Admin panel, Audit logs, Feature flags, Observability, Teams), «Production-ready», «/ mo», «Checkout mock», «Variant A», «now», «2h», los nombres de eventos y acciones.
-9. **Enterprise sin precio:** su tarjeta dice «Contactar / mo» y, si lo «pagas» en el checkout, la confirmación dice «Enterprise - Contactar/mo».
-10. **Detalles de datos:** la diferencia de los experimentos se muestra como «B +2.4%» cuando son puntos porcentuales (14.8 % − 12.4 %); los precios están en dólares y la vista de i18n ofrece Argentina y Brasil pero no Colombia (ni `es-CO`, ni COP, ni la hora de Bogotá).
-11. **Tres nombres para la misma demo:** «SaaS Boilerplate Multi-tenant» en el hub y en la página, «Plataforma SaaS multiempresa» en el catálogo del admin y en el formulario de solicitud, y «Plataforma SaaS multi-tenant» en el plan.
-12. **«Ver Planes y Precios»** del bloque final lleva a `/services#planes-rag`, que abre en los planes RAG.
+Quedan solo las que son por diseño o están fuera de la demo:
+
+1. **Todo vive en el navegador.** Es una demo sin servidor: los datos se guardan en `localStorage` de ese navegador (otro navegador o una ventana privada empiezan desde cero) y no hay pasarela, correo, WhatsApp, inicio de sesión real ni envío a la DIAN. Cada simulación lo dice en pantalla.
+2. **Fecha de corte fija.** Los datos están al 8 oct. 2026 y no avanzan con el calendario; la bitácora usa un reloj de la demo que avanza un minuto por acción, y «Simular el paso de los días» solo adelanta los cobros fallidos.
+3. **Simplificaciones de ejemplo.** El portal muestra 6 unidades por conjunto; la votación admite un voto por conjunto y navegador; la contraseña de la prueba de inicio de sesión no se compara con nada (cualquiera de 8 o más caracteres); el formato del campo de fecha de las reservas lo pone el navegador.
+4. **La tarjeta del hub, el catálogo y la metadata aún describen la versión anterior** («SaaS Boilerplate Multi-tenant», «Auth completo», «Billing Stripe + Paddle», «Audit logs Vanta-style», «lista para producción»). El cambio de esos textos está pedido fuera de la demo; mientras tanto la demo tiene tres nombres: el del hub, «Plataforma SaaS multi-tenant» en la página y en el plan, y «Plataforma SaaS multiempresa» en el catálogo del admin.
+5. **«Ver Planes y Precios»** del bloque final (común a todas las demos) lleva a `/services#planes-rag`, los planes RAG.
+6. **Sin personalización por prospecto.** La versión con el nombre, el logo y el sector del prospecto que propone el [plan del producto](Producto-saas-multi-tenant.md) no existe todavía.

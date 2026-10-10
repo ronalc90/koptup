@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { CheckCircleIcon, CheckIcon } from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
@@ -34,18 +34,28 @@ const EMPTY: Form = { name: '', city: CITIES[0], nit: '', email: '', units: '', 
 export default function Onboarding() {
   const t = useTranslations('demoSaas');
   const f = useFmt();
-  const { s, createTenant, go, select } = useDemo();
-  const [step, setStep] = useState(1);
-  const [form, setForm] = useState<Form>(EMPTY);
+  const { s, createTenant, go, select, draft } = useDemo();
+  const saved = draft.current as { step: number; form: Form } | null;
+  const [step, setStep] = useState(saved?.step ?? 1);
+  const [form, setForm] = useState<Form>(saved?.form ?? EMPTY);
   const [showErrors, setShowErrors] = useState(false);
   const [logoError, setLogoError] = useState<string | null>(null);
   const [created, setCreated] = useState<string | null>(null);
+
+  // Guarda el borrador para recuperarlo si cambias de pantalla antes de crear el cliente.
+  useEffect(() => {
+    draft.current = created ? null : { step, form };
+  }, [draft, step, form, created]);
 
   const units = Number(form.units);
   const nitClean = form.nit.replace(/\D/g, '');
   const errors1 = {
     name: form.name.trim().length < 3 ? t('onboarding.errors.name') : null,
-    nit: !/^\d{9}$/.test(nitClean) ? t('onboarding.errors.nit') : null,
+    nit: !/^\d{9}$/.test(nitClean)
+      ? t('onboarding.errors.nit')
+      : s.tenants.some((x) => x.nit === nitClean)
+        ? t('onboarding.errors.nitTaken')
+        : null,
     email: !isEmail(form.email) ? t('onboarding.errors.email') : null,
     units: !Number.isInteger(units) || units < 1 || units > 5000 ? t('onboarding.errors.units') : null,
   };

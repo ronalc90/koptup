@@ -4,9 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { CheckCircleIcon, ChatBubbleLeftRightIcon, EnvelopeIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
-import { useDemo } from '../lib/store';
+import { scrollToScreen, useDemo } from '../lib/store';
 import { DEMO_BANKS, DEMO_PERIOD, PLANS, VENDOR } from '../lib/data';
-import { addDays } from '../lib/format';
 import {
   canCharge, checkPlanChange, dunningDate, expiryOk, isEmail, luhnOk, mobileOk, paidCurrentPeriod, trialDaysLeft, usage, withIva, DUNNING_DAYS,
   type PlanChangeCheck,
@@ -18,6 +17,15 @@ import InvoiceModal from './InvoiceModal';
 import { FieldError, Panel, ProgressBar, ScreenHeader, SimNote, StatusBadge, TenantSelect, inputCls, selectCls } from './ui';
 
 type Phase = 'form' | 'processing' | 'bank' | 'push' | 'approved' | 'rejected';
+
+/** Próximo cobro: el mismo día del mes siguiente al último cobro del periodo (máximo el 28 para meses cortos). */
+function nextChargeDate(issuedAt?: string): string {
+  const [y, m] = DEMO_PERIOD.split('-').map(Number);
+  const day = Math.min(28, Number(issuedAt?.slice(8, 10) ?? '1') || 1);
+  const ny = m === 12 ? y + 1 : y;
+  const nm = m === 12 ? 1 : m + 1;
+  return `${ny}-${String(nm).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
 
 export default function Billing() {
   const t = useTranslations('demoSaas');
@@ -177,7 +185,7 @@ function Checkout({ tenant, onOpenInvoice }: { tenant: Tenant; onOpenInvoice: (i
       {!canCharge(s, tenant) && alreadyPaid && phase !== 'approved' ? (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-100">
           <div className="font-semibold">{t('billing.upToDate')}</div>
-          <p className="mt-0.5 text-xs">{t('billing.upToDateText', { number: lastPaid?.number ?? '', next: f.date(addDays(`${DEMO_PERIOD}-01`, 31)) })}</p>
+          <p className="mt-0.5 text-xs">{t('billing.upToDateText', { number: lastPaid?.number ?? '', next: f.date(nextChargeDate(lastPaid?.issuedAt)) })}</p>
           {lastPaid && (
             <Button size="sm" variant="outline" className="mt-2" onClick={() => onOpenInvoice(lastPaid.id)}>{t('billing.viewInvoice')}</Button>
           )}
@@ -323,27 +331,34 @@ function PlanChanger({ tenant }: { tenant: Tenant }) {
 
   return (
     <Panel title={t('billing.plansTitle')} subtitle={t('billing.plansSubtitle')}>
-      <div className="grid gap-2 sm:grid-cols-3">
+      <ul className="space-y-2">
         {PLAN_IDS.map((p) => {
           const current = tenant.plan === p;
           return (
-            <div key={p} className={`rounded-lg border p-3 ${current ? 'border-primary-500 ring-1 ring-primary-500' : 'border-secondary-200 dark:border-secondary-700'}`}>
-              <div className="text-sm font-semibold text-secondary-900 dark:text-white">{t(`plans.${p}.name`)}</div>
-              <div className="text-sm font-bold text-secondary-900 dark:text-white">{f.money(PLANS[p].price)}</div>
-              <div className="text-[11px] text-secondary-500">{t('common.plusIvaMonth')}</div>
-              <div className="mt-1 text-[11px] text-secondary-600 dark:text-secondary-400">{t('plans.limits', { units: f.num(PLANS[p].maxUnits), staff: PLANS[p].maxStaff, storage: PLANS[p].storageGb })}</div>
-              <div className="mt-1 text-[11px] text-secondary-600 dark:text-secondary-400">{PLANS[p].modules.map((m) => t(`modules.${m}.name`)).join(' · ')}</div>
+            <li
+              key={p}
+              className={`flex flex-col gap-2 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between ${current ? 'border-primary-500 ring-1 ring-primary-500' : 'border-secondary-200 dark:border-secondary-700'}`}
+            >
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-baseline gap-x-2">
+                  <span className="text-sm font-semibold text-secondary-900 dark:text-white">{t(`plans.${p}.name`)}</span>
+                  <span className="text-sm font-bold text-secondary-900 dark:text-white">{f.money(PLANS[p].price)}</span>
+                  <span className="text-[11px] text-secondary-500">{t('common.plusIvaMonth')}</span>
+                </div>
+                <div className="mt-0.5 text-[11px] text-secondary-600 dark:text-secondary-400">{t('plans.limits', { units: f.num(PLANS[p].maxUnits), staff: PLANS[p].maxStaff, storage: PLANS[p].storageGb })}</div>
+                <div className="text-[11px] text-secondary-600 dark:text-secondary-400">{PLANS[p].modules.map((m) => t(`modules.${m}.name`)).join(' · ')}</div>
+              </div>
               {current ? (
-                <span className="mt-2 inline-block text-xs font-semibold text-primary-700 dark:text-primary-300">{t('billing.currentPlan')}</span>
+                <span className="shrink-0 text-xs font-semibold text-primary-700 dark:text-primary-300">{t('billing.currentPlan')}</span>
               ) : (
-                <button type="button" onClick={() => setTarget(p)} className="mt-2 text-xs font-medium text-primary-700 hover:underline dark:text-primary-300">
+                <Button size="sm" variant="outline" className="shrink-0" onClick={() => setTarget(p)} aria-pressed={target === p}>
                   {t('billing.switchTo')}
-                </button>
+                </Button>
               )}
-            </div>
+            </li>
           );
         })}
-      </div>
+      </ul>
       {target && check && (
         <div className="mt-3 rounded-lg bg-secondary-50 p-3 text-sm dark:bg-secondary-800/60">
           {check.ok ? (
@@ -435,7 +450,7 @@ function Dunning() {
                 {d.stage < 3 && (
                   <Button size="sm" variant="outline" onClick={() => advanceDunning(d.tenantId)}>{t('billing.dunning.advance')}</Button>
                 )}
-                <Button size="sm" onClick={() => { select('billing', d.tenantId); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>{t('billing.dunning.collect')}</Button>
+                <Button size="sm" onClick={() => { select('billing', d.tenantId); scrollToScreen(); }}>{t('billing.dunning.collect')}</Button>
               </div>
             </div>
           );
