@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { BellAlertIcon, ChatBubbleLeftRightIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
-import { capitalize } from '../lib/dates';
 import { nextDayWithBookings, serviceOf } from '../lib/engine';
 import { useReservas } from '../lib/store';
 import type { MessageChannel } from '../lib/types';
@@ -45,7 +44,7 @@ export default function MessagesView({ viewAs, onOpen, onReschedule }: { viewAs:
           <div>
             <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
               <BellAlertIcon className="h-5 w-5 text-orange-600" />
-              {target ? t('dueTitle', { date: capitalize(f.date(target, 'dayMonth')) }) : t('dueNone')}
+              {target ? t('dueTitle', { date: f.date(target, 'dayMonth') }) : t('dueNone')}
             </h3>
             {target && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t('dueDetail', { n: due.length, pending: pendingReminders.length })}</p>}
           </div>

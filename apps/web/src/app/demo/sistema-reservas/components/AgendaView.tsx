@@ -18,7 +18,7 @@ export interface NewPrefill {
   locationId?: string;
 }
 
-const PX_PER_MIN = 0.9;
+const PX_PER_MIN = 1.2;
 
 export default function AgendaView({
   viewAs,
@@ -61,6 +61,7 @@ export default function AgendaView({
   const dayEnd = Math.max(19 * 60, ...columns.flatMap((c) => c.shifts.map((s) => Math.ceil(s.end / 60) * 60)));
   const hours = Array.from({ length: (dayEnd - dayStart) / 60 }, (_, i) => dayStart + i * 60);
   const holiday = holidayOn(date);
+  const cancelledToday = mode === 'day' ? visible.filter((b) => b.status === 'cancelled') : [];
 
   const shift = (n: number) => setDate(addDays(date, mode === 'day' ? n : n * 7));
   const label = mode === 'day' ? capitalize(f.date(date, 'long')) : t('weekOf', { from: f.date(weekStart, 'short'), to: f.date(addDays(weekStart, 6), 'short') });
@@ -79,29 +80,36 @@ export default function AgendaView({
     notify(t('icsDone', { n: active.length }));
   };
 
-  const card = (b: Booking, compact: boolean) => {
+  /**
+   * Tarjeta de una cita. En la cuadrícula del día muestra más o menos líneas
+   * según el alto disponible (una cita de 20 minutos solo cabe en una línea).
+   */
+  const card = (b: Booking, compact: boolean, height = 0) => {
     const svc = serviceOf(biz, b.serviceId);
     const staff = staffOf(biz, b.staffId);
     const isNew = b.id === state.lastBookingId;
+    const lines = compact ? 3 : height >= 64 ? 3 : height >= 36 ? 2 : 1;
     return (
       <button
         type="button"
+        title={`${f.time(b.start)}–${f.time(b.end)} · ${b.client.name} · ${svc ? f.l(svc.name) : ''} · ${ts(b.status)}`}
         onClick={(e) => {
           e.stopPropagation();
           onOpen(b.id);
         }}
-        className={`w-full ${compact ? '' : 'h-full'} text-left rounded-md border-l-4 px-2 py-1 text-xs shadow-sm transition hover:brightness-95 ${
+        className={`w-full ${compact ? '' : 'h-full'} text-left rounded-md border-l-4 px-2 ${lines === 1 ? 'py-0.5' : 'py-1'} text-xs leading-4 shadow-sm transition hover:brightness-95 ${
           staff ? STAFF_COLORS[staff.color].block : ''
         } ${b.status === 'cancelled' ? 'opacity-50 line-through' : ''} ${isNew ? 'ring-2 ring-orange-500 ring-offset-1 dark:ring-offset-slate-900' : ''}`}
       >
         <span className="flex items-center justify-between gap-1">
           <span className="font-semibold truncate">
             {f.time(b.start)} · {b.client.name}
+            {lines === 1 && svc ? <span className="font-normal opacity-80"> · {f.l(svc.name)}</span> : null}
           </span>
           {isNew && <span className="shrink-0 rounded bg-orange-600 px-1 text-[10px] font-bold text-white">{t('new')}</span>}
         </span>
-        <span className="block truncate opacity-80">{svc ? f.l(svc.name) : ''}</span>
-        {!compact && (
+        {lines > 1 && <span className="block truncate opacity-80">{svc ? f.l(svc.name) : ''}</span>}
+        {!compact && lines > 2 && (
           <span className={`mt-0.5 inline-block rounded-full px-1.5 text-[10px] font-semibold ${STATUS_STYLE[b.status]}`}>{ts(b.status)}</span>
         )}
         {compact && <span className="block truncate opacity-70">{staff?.name}</span>}
@@ -179,7 +187,8 @@ export default function AgendaView({
                 </div>
               </div>
               {columns.map(({ staff, shifts }) => {
-                const list = data.bookings.filter((b) => b.staffId === staff.id && b.date === date && (locationId === 'all' || b.locationId === locationId));
+                // Las canceladas no ocupan la cuadrícula (su hora puede estar tomada por otra cita): van debajo.
+                const list = data.bookings.filter((b) => b.staffId === staff.id && b.date === date && occupies(b.status) && (locationId === 'all' || b.locationId === locationId));
                 const locNames = Array.from(new Set(shifts.map((s) => biz.locations.find((l) => l.id === s.loc)?.name ?? '')));
                 return (
                   <div key={staff.id} className="flex-1 min-w-[170px] border-r last:border-r-0 border-slate-200 dark:border-slate-800">
@@ -216,15 +225,14 @@ export default function AgendaView({
                       {date === now.date && now.minutes > dayStart && now.minutes < dayEnd && (
                         <div className="pointer-events-none absolute inset-x-0 border-t-2 border-red-500 z-10" style={{ top: (now.minutes - dayStart) * PX_PER_MIN }} />
                       )}
-                      {list.map((b) => (
-                        <div
-                          key={b.id}
-                          className="absolute left-1 right-1 z-[5]"
-                          style={{ top: (b.start - dayStart) * PX_PER_MIN, height: Math.max(26, (b.end - b.start) * PX_PER_MIN - 2) }}
-                        >
-                          <div className="h-full overflow-hidden">{card(b, false)}</div>
-                        </div>
-                      ))}
+                      {list.map((b) => {
+                        const height = Math.max(22, (b.end - b.start) * PX_PER_MIN - 2);
+                        return (
+                          <div key={b.id} className="absolute left-1 right-1 z-[5]" style={{ top: (b.start - dayStart) * PX_PER_MIN, height }}>
+                            <div className="h-full overflow-hidden">{card(b, false, height)}</div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 );
@@ -258,6 +266,21 @@ export default function AgendaView({
               </div>
             );
           })}
+        </div>
+      )}
+      {mode === 'day' && cancelledToday.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <span className="text-slate-500 dark:text-slate-400">{t('cancelledDay', { n: cancelledToday.length })}</span>
+          {cancelledToday.map((b) => (
+            <button
+              key={b.id}
+              type="button"
+              onClick={() => onOpen(b.id)}
+              className="rounded-md border border-slate-200 dark:border-slate-700 px-2 py-1 text-slate-500 dark:text-slate-400 line-through hover:border-orange-400"
+            >
+              {f.time(b.start)} · {b.client.name}
+            </button>
+          ))}
         </div>
       )}
       <p className="text-xs text-slate-500 dark:text-slate-400">{t('icsNote', { kind: kind.many.toLowerCase() })}</p>

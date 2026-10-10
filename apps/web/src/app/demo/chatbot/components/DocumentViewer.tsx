@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { XMarkIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import { splitParagraphs, type SampleDocument } from './sampleKnowledge';
+import { useDialogFocus } from './ui/useDialogFocus';
 
 interface DocumentViewerProps {
   doc: SampleDocument | null;
@@ -19,16 +20,12 @@ const norm = (s: string) => s.replace(/\s+/g, ' ').trim();
 export default function DocumentViewer({ doc, companyName, highlight, onClose }: DocumentViewerProps) {
   const t = useTranslations('demoChatbot.docViewer');
   const markRef = useRef<HTMLElement | null>(null);
+  const ref = useRef<HTMLDivElement>(null);
+  useDialogFocus(!!doc, ref, onClose);
 
   useEffect(() => {
-    if (!doc) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    markRef.current?.scrollIntoView({ block: 'center' });
-    return () => window.removeEventListener('keydown', onKey);
-  }, [doc, onClose]);
+    if (doc) markRef.current?.scrollIntoView({ block: 'center' });
+  }, [doc, highlight]);
 
   if (!doc) return null;
   const target = highlight ? norm(highlight) : '';
@@ -43,6 +40,7 @@ export default function DocumentViewer({ doc, companyName, highlight, onClose }:
       onClick={onClose}
     >
       <div
+        ref={ref}
         className="flex max-h-full w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-secondary-200 bg-white shadow-2xl dark:border-secondary-700 dark:bg-secondary-900"
         onClick={(e) => e.stopPropagation()}
       >

@@ -5,11 +5,12 @@
  *
  * Tres modos:
  *  - "Prueba el asistente" (Playground): tres empresas FICTICIAS con sus
- *    documentos (`components/sampleKnowledge.ts`). Al elegir una, el navegador
- *    crea un bot real en el backend y le sube esos textos; cada pregunta va a
- *    `POST /api/chatbot/bots/:id/chat` (búsqueda BM25 top 5 → modelo de OpenAI
- *    o modo extractivo → citas). No hay respuestas prefabricadas, métricas
- *    aleatorias ni pasos simulados: todo lo que se muestra sale de la
+ *    documentos (`components/sampleKnowledge.ts`). Con la primera pregunta,
+ *    el navegador prepara un bot real en el backend con esos textos (o
+ *    reutiliza el que ya indexó: ver `components/sampleBot.ts`); cada pregunta
+ *    va a `POST /api/chatbot/bots/:id/chat` (búsqueda BM25 top 5 → modelo de
+ *    OpenAI o modo extractivo → citas). No hay respuestas prefabricadas,
+ *    métricas aleatorias ni pasos simulados: todo lo que se muestra sale de la
  *    respuesta del backend o se mide en el navegador.
  *  - "Prueba con tu documento": `components/upload/` (API /api/demo-rag).
  *  - "Configura el tuyo": `components/builder/` (bot propio, widget real y
@@ -24,6 +25,7 @@ import {
   BookOpenIcon,
   ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon,
+  CpuChipIcon,
   DocumentTextIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
@@ -40,17 +42,28 @@ import ModeToggle, { type ChatbotMode } from './components/builder/ModeToggle';
 import BuilderMode from './components/builder/BuilderMode';
 import UploadDemo from './components/upload/UploadDemo';
 import DeviceFrame, { type DeviceKind } from './components/ui/DeviceFrame';
+import Drawer from './components/ui/Drawer';
+import { useDialogFocus } from './components/ui/useDialogFocus';
 import { trackDemoStart, type DemoEventMode } from './components/demoEvents';
 import {
   BotApiError,
   chatWithBot,
+  docsCountOf,
   getBot,
   isGenerativeReply,
   isNotFoundReply,
   listModels,
+  type RemoteChatReply,
   type RemoteModelMeta,
 } from './components/builder/api';
-import { ensureSampleBot, resetSampleBot, type SampleBotState } from './components/sampleBot';
+import {
+  ensureSampleBot,
+  findSampleBot,
+  resetSampleBot,
+  sampleKeyFor,
+  type SampleBotState,
+} from './components/sampleBot';
+import { chatErrorForAsk, chatErrorForKb, kbErrorReason, type KbErrorReason } from './components/errors';
 import {
   findSampleDocument,
   getSampleCompanies,
@@ -72,6 +85,16 @@ import {
 const ONBOARDING_LS_KEY = 'koptup.demo.chatbot.tour.v2';
 const MODES: readonly ChatbotMode[] = ['playground', 'upload', 'builder'];
 const HISTORY_TURNS = 10;
+
+/** No se pudo preparar el bot de la empresa (con el motivo, para el mensaje). */
+class PrepareError extends Error {
+  readonly reason: KbErrorReason;
+
+  constructor(reason: KbErrorReason) {
+    super(reason);
+    this.reason = reason;
+  }
+}
 
 function welcomeMessage(company: SampleCompany): ChatMessage {
   return { id: `welcome-${company.key}`, role: 'assistant', content: company.welcome, welcome: true };
@@ -100,6 +123,7 @@ export default function ChatbotDemoPage() {
   const [showSidebar, setShowSidebar] = useState(true);
   const [showPipeline, setShowPipeline] = useState(true);
   const [showDrawer, setShowDrawer] = useState(false);
+  const [showPipelineDrawer, setShowPipelineDrawer] = useState(false);
   const [activeIncluded, setActiveIncluded] = useState<IncludedKey | null>(null);
   const [openChunk, setOpenChunk] = useState<SourceChunk | null>(null);
   const [viewer, setViewer] = useState<{ doc: SampleDocument; highlight: string | null } | null>(null);
@@ -112,10 +136,15 @@ export default function ChatbotDemoPage() {
   const [modelId, setModelId] = useState<string>(DEFAULT_MODEL_ID);
 
   // --- Base de conocimiento de la empresa de ejemplo ----------------------
-  const [kbPhase, setKbPhase] = useState<KbPhase>('preparing');
+  // El bot se prepara en el servidor con la primera pregunta (o "Reintentar"),
+  // no al abrir la página: así una visita que solo mira no crea bots.
+  const [kbPhase, setKbPhase] = useState<KbPhase>('checking');
+  const [kbError, setKbError] = useState<KbErrorReason | null>(null);
   const [botState, setBotState] = useState<SampleBotState | null>(null);
-  const [kbAttempt, setKbAttempt] = useState(0);
-  const botPromiseRef = useRef<Promise<SampleBotState> | null>(null);
+  /** Bots listos en esta pestaña, por empresa + idioma + versión. */
+  const botsRef = useRef(new Map<string, SampleBotState>());
+  /** Empresa que se ve ahora (para no pintar el estado de otra). */
+  const currentKeyRef = useRef('');
 
   // --- Chat --------------------------------------------------------------
   const [messages, setMessages] = useState<ChatMessage[]>(() => [welcomeMessage(getSampleCompany('rrhh', locale))]);
@@ -183,26 +212,78 @@ export default function ChatbotDemoPage() {
     };
   }, []);
 
-  // Indexa (o reutiliza) el bot de la empresa elegida en el backend (solo en este modo).
+  // Al abrir la página o cambiar de empresa: ¿este navegador ya indexó esa
+  // empresa? Solo se consulta (no se crea nada).
   const inPlayground = mode === 'playground';
   useEffect(() => {
-    if (!modeResolved || !inPlayground) return;
-    let cancelled = false;
-    setKbPhase('preparing');
-    setBotState(null);
-    const p = ensureSampleBot(company, locale);
-    botPromiseRef.current = p;
-    p.then((state) => {
-      if (cancelled) return;
-      setBotState(state);
+    if (!modeResolved || !inPlayground) return undefined;
+    const key = sampleKeyFor(company, locale);
+    currentKeyRef.current = key;
+    setKbError(null);
+    const cached = botsRef.current.get(key);
+    if (cached) {
+      setBotState(cached);
       setKbPhase('ready');
-    }).catch(() => {
-      if (!cancelled) setKbPhase('error');
-    });
+      return undefined;
+    }
+    let cancelled = false;
+    setBotState(null);
+    setKbPhase('checking');
+    findSampleBot(company, locale)
+      .then((state) => {
+        if (cancelled) return;
+        if (state) {
+          botsRef.current.set(key, state);
+          setBotState(state);
+          setKbPhase('ready');
+        } else {
+          // Si mientras tanto ya empezó a preparar (pregunta inmediata), no se pisa ese estado.
+          setKbPhase((p) => (p === 'checking' ? 'idle' : p));
+        }
+      })
+      .catch(() => {
+        // No se pudo comprobar (servidor caído o red): se intentará al preguntar.
+        if (!cancelled) setKbPhase((p) => (p === 'checking' ? 'idle' : p));
+      });
     return () => {
       cancelled = true;
     };
-  }, [company, locale, kbAttempt, inPlayground, modeResolved]);
+  }, [company, locale, inPlayground, modeResolved]);
+
+  /** Prepara el bot de la empresa (reutiliza, pide o crea e indexa). Lanza PrepareError. */
+  const prepareBot = useCallback(async (): Promise<SampleBotState> => {
+    const key = sampleKeyFor(company, locale);
+    const cached = botsRef.current.get(key);
+    if (cached) return cached;
+    const isCurrent = () => currentKeyRef.current === key;
+    if (isCurrent()) {
+      setKbError(null);
+      setKbPhase('preparing');
+    }
+    try {
+      const state = await ensureSampleBot(company, locale);
+      botsRef.current.set(key, state);
+      if (isCurrent()) {
+        setBotState(state);
+        setKbPhase('ready');
+      }
+      return state;
+    } catch (err) {
+      const reason = kbErrorReason(err);
+      if (isCurrent()) {
+        setKbError(reason);
+        setKbPhase('error');
+      }
+      throw new PrepareError(reason);
+    }
+  }, [company, locale]);
+
+  /** El servidor ya no tiene el bot completo: se olvida para volver a prepararlo. */
+  const invalidateBot = useCallback(() => {
+    botsRef.current.delete(sampleKeyFor(company, locale));
+    resetSampleBot(company, locale);
+    setBotState(null);
+  }, [company, locale]);
 
   // Recorrido de bienvenida (se guarda en localStorage al cerrarlo).
   useEffect(() => {
@@ -212,16 +293,6 @@ export default function ChatbotDemoPage() {
       /* localStorage no disponible: no mostramos el recorrido */
     }
   }, []);
-
-  // El panel lateral en móvil se cierra con Escape.
-  useEffect(() => {
-    if (!showDrawer) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setShowDrawer(false);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [showDrawer]);
 
   const dismissOnboarding = useCallback(() => {
     setShowOnboarding(false);
@@ -250,8 +321,7 @@ export default function ChatbotDemoPage() {
   const botStillIndexed = useCallback(
     async (botId: string) => {
       try {
-        const bot = await getBot(botId);
-        return (bot.docs?.length ?? 0) >= company.docs.length;
+        return docsCountOf(await getBot(botId)) >= company.docs.length;
       } catch (err) {
         return !(err instanceof BotApiError && err.status === 404);
       }
@@ -297,18 +367,23 @@ export default function ChatbotDemoPage() {
       }
 
       try {
-        let state = await (botPromiseRef.current ?? ensureSampleBot(company, locale));
+        let state = await prepareBot();
         let started = performance.now();
-        let res = await chatWithBot(state.botId, q, history, modelId);
+        let res: RemoteChatReply;
+        try {
+          res = await chatWithBot(state.botId, q, history, modelId);
+        } catch (err) {
+          if (!(err instanceof BotApiError && err.status === 404)) throw err;
+          // El servidor ya no tiene el bot (p. ej. lo borró por no usarse): se prepara otra vez.
+          invalidateBot();
+          state = await prepareBot();
+          started = performance.now();
+          res = await chatWithBot(state.botId, q, history, modelId);
+        }
         if (res.sources.length === 0 && !(await botStillIndexed(state.botId))) {
-          // El backend perdió los documentos (p. ej. se reinició): se reindexa y se repite una vez.
-          resetSampleBot(company, locale);
-          setKbPhase('preparing');
-          const p = ensureSampleBot(company, locale);
-          botPromiseRef.current = p;
-          state = await p;
-          setBotState(state);
-          setKbPhase('ready');
+          // El servidor perdió los documentos: se reindexa y se repite una vez.
+          invalidateBot();
+          state = await prepareBot();
           started = performance.now();
           res = await chatWithBot(state.botId, q, history, modelId);
         }
@@ -332,7 +407,7 @@ export default function ChatbotDemoPage() {
           costUSD: res.costUSD,
           notFound,
           citationsUsed: countCitations(res.reply, sources.length),
-          docsIndexed: state.docs.length,
+          docsIndexed: state.docsCount,
         };
         setMessages((prev) =>
           prev.map((m) =>
@@ -340,7 +415,7 @@ export default function ChatbotDemoPage() {
           ),
         );
       } catch (err) {
-        const errorKey = err instanceof BotApiError && err.status === 0 ? 'errorNetwork' : 'errorGeneric';
+        const errorKey = err instanceof PrepareError ? chatErrorForKb(err.reason) : chatErrorForAsk(err);
         setMessages((prev) =>
           prev.map((m) => (m.id === asstId ? { ...m, pending: false, errorKey, question: q } : m)),
         );
@@ -349,7 +424,7 @@ export default function ChatbotDemoPage() {
         setBusy(false);
       }
     },
-    [botStillIndexed, company, locale, markDemoStart, modelId],
+    [botStillIndexed, invalidateBot, markDemoStart, modelId, prepareBot],
   );
 
   const handleSend = useCallback(() => {
@@ -367,12 +442,13 @@ export default function ChatbotDemoPage() {
     [ask],
   );
 
+  /** Valoración útil / a mejorar: solo suma a las métricas de esta pestaña (no se envía al servidor). */
   const handleFeedback = useCallback(
     (messageId: string, value: 'up' | 'down') => {
-      setMessages((prev) =>
-        prev.map((m) => (m.id === messageId ? { ...m, feedback: m.feedback === value ? undefined : value } : m)),
-      );
-      toast.success(t('chat.feedbackSaved'), { id: 'chatbot-feedback' });
+      const current = messagesRef.current.find((m) => m.id === messageId);
+      const next = current?.feedback === value ? undefined : value;
+      setMessages((prev) => prev.map((m) => (m.id === messageId ? { ...m, feedback: next } : m)));
+      toast.success(next ? t('chat.feedbackSaved') : t('chat.feedbackRemoved'), { id: 'chatbot-feedback' });
     },
     [t],
   );
@@ -400,6 +476,8 @@ export default function ChatbotDemoPage() {
   );
 
   const closeChunk = useCallback(() => setOpenChunk(null), []);
+  const closeDrawer = useCallback(() => setShowDrawer(false), []);
+  const closePipelineDrawer = useCallback(() => setShowPipelineDrawer(false), []);
   const closeViewer = useCallback(() => setViewer(null), []);
   const closeIncluded = useCallback(() => setActiveIncluded(null), []);
 
@@ -433,12 +511,16 @@ export default function ChatbotDemoPage() {
   const isDesktop = device === 'desktop';
   const chunkDocAvailable = openChunk ? !!findSampleDocument(company, openChunk.docName) : false;
 
+  const goToUpload = useCallback(() => changeMode('upload'), [changeMode]);
+
   const sidebar = (
     <Sidebar
       company={company}
       kbPhase={kbPhase}
-      docsIndexed={botState?.docs.length ?? 0}
-      onRetry={() => setKbAttempt((n) => n + 1)}
+      kbError={kbError}
+      docsIndexed={botState?.docsCount ?? 0}
+      onRetry={() => void prepareBot().catch(() => undefined)}
+      onUseUpload={goToUpload}
       onOpenDocument={(doc) => {
         setShowDrawer(false);
         setViewer({ doc, highlight: null });
@@ -450,6 +532,10 @@ export default function ChatbotDemoPage() {
       }}
     />
   );
+
+  const pipelineMeta = lastAnswer?.pending ? null : lastAnswer?.meta ?? null;
+  const toolbarButton =
+    'items-center gap-1 rounded-md border border-secondary-200 px-2 py-1 text-[11px] font-medium text-secondary-600 transition hover:border-primary-300 hover:bg-secondary-50 hover:text-secondary-900 disabled:cursor-not-allowed disabled:opacity-50 dark:border-secondary-700 dark:text-secondary-300 dark:hover:bg-secondary-800 dark:hover:text-white';
 
   return (
     <div
@@ -487,33 +573,45 @@ export default function ChatbotDemoPage() {
 
             <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
               <div className="flex items-center justify-between gap-2 border-b border-secondary-200 bg-white/85 px-3 py-1.5 backdrop-blur dark:border-secondary-800 dark:bg-secondary-900/85">
-                <button
-                  type="button"
-                  onClick={() => setShowSidebar((v) => !v)}
-                  disabled={!isDesktop}
-                  aria-expanded={showSidebar && isDesktop}
-                  className="hidden items-center gap-1 rounded-md border border-secondary-200 px-2 py-1 text-[11px] font-medium text-secondary-600 transition hover:border-primary-300 hover:bg-secondary-50 hover:text-secondary-900 disabled:cursor-not-allowed disabled:opacity-50 dark:border-secondary-700 dark:text-secondary-300 dark:hover:bg-secondary-800 dark:hover:text-white md:inline-flex"
-                >
-                  {showSidebar ? <ChevronDoubleLeftIcon className="h-3.5 w-3.5" /> : <ChevronDoubleRightIcon className="h-3.5 w-3.5" />}
-                  <BookOpenIcon className="h-3.5 w-3.5" aria-hidden="true" />
-                  {t('kb.title')}
-                </button>
+                {isDesktop ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowSidebar((v) => !v)}
+                    aria-expanded={showSidebar}
+                    className={`hidden md:inline-flex ${toolbarButton}`}
+                  >
+                    {showSidebar ? <ChevronDoubleLeftIcon className="h-3.5 w-3.5" /> : <ChevronDoubleRightIcon className="h-3.5 w-3.5" />}
+                    <BookOpenIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                    {t('kb.title')}
+                  </button>
+                ) : null}
                 <button
                   type="button"
                   onClick={() => setShowDrawer(true)}
-                  className="inline-flex items-center gap-1 rounded-md border border-secondary-200 px-2 py-1 text-[11px] font-medium text-secondary-600 transition hover:border-primary-300 hover:bg-secondary-50 hover:text-secondary-900 dark:border-secondary-700 dark:text-secondary-300 dark:hover:bg-secondary-800 dark:hover:text-white md:hidden"
+                  aria-haspopup="dialog"
+                  className={`inline-flex ${isDesktop ? 'md:hidden' : ''} ${toolbarButton}`}
                 >
                   <DocumentTextIcon className="h-3.5 w-3.5" aria-hidden="true" />
                   {t('kb.title')}
                 </button>
+                {isDesktop ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowPipeline((v) => !v)}
+                    aria-expanded={showPipeline}
+                    className={`hidden lg:inline-flex ${toolbarButton}`}
+                  >
+                    {showPipeline ? <ChevronDoubleRightIcon className="h-3.5 w-3.5" /> : <ChevronDoubleLeftIcon className="h-3.5 w-3.5" />}
+                    {t('pipeline.toggle')}
+                  </button>
+                ) : null}
                 <button
                   type="button"
-                  onClick={() => setShowPipeline((v) => !v)}
-                  disabled={!isDesktop}
-                  aria-expanded={showPipeline && isDesktop}
-                  className="hidden items-center gap-1 rounded-md border border-secondary-200 px-2 py-1 text-[11px] font-medium text-secondary-600 transition hover:border-primary-300 hover:bg-secondary-50 hover:text-secondary-900 disabled:cursor-not-allowed disabled:opacity-50 dark:border-secondary-700 dark:text-secondary-300 dark:hover:bg-secondary-800 dark:hover:text-white lg:inline-flex"
+                  onClick={() => setShowPipelineDrawer(true)}
+                  aria-haspopup="dialog"
+                  className={`inline-flex ${isDesktop ? 'lg:hidden' : ''} ${toolbarButton}`}
                 >
-                  {showPipeline ? <ChevronDoubleRightIcon className="h-3.5 w-3.5" /> : <ChevronDoubleLeftIcon className="h-3.5 w-3.5" />}
+                  <CpuChipIcon className="h-3.5 w-3.5" aria-hidden="true" />
                   {t('pipeline.toggle')}
                 </button>
               </div>
@@ -538,6 +636,8 @@ export default function ChatbotDemoPage() {
                     onRegenerate={handleRegenerate}
                     busy={busy}
                     preparing={kbPhase === 'preparing'}
+                    onUseUpload={goToUpload}
+                    onShowPipeline={() => setShowPipelineDrawer(true)}
                   />
                 </DeviceFrame>
               </div>
@@ -545,11 +645,9 @@ export default function ChatbotDemoPage() {
 
             {showPipeline && isDesktop ? (
               <div className="hidden w-80 shrink-0 lg:flex">
-                <PipelinePanel
-                  running={!!lastAnswer?.pending}
-                  meta={lastAnswer?.pending ? null : lastAnswer?.meta ?? null}
-                  sources={lastAnswer?.sources ?? []}
-                />
+                <PipelinePanel running={!!lastAnswer?.pending} meta={pipelineMeta} sources={lastAnswer?.sources ?? []}>
+                  <StatsWidget stats={stats} />
+                </PipelinePanel>
               </div>
             ) : null}
           </div>
@@ -567,32 +665,50 @@ export default function ChatbotDemoPage() {
             onClose={closeViewer}
           />
 
-          {showDrawer ? (
-            <div className="fixed inset-0 z-[150] flex items-stretch bg-black/50 md:hidden" onClick={() => setShowDrawer(false)}>
-              <div
-                className="flex w-80 max-w-[85vw] flex-col bg-white shadow-2xl dark:bg-secondary-900"
-                onClick={(e) => e.stopPropagation()}
-                role="dialog"
-                aria-modal="true"
-                aria-label={t('kb.title')}
+          <Drawer
+            open={showDrawer}
+            side="left"
+            onClose={closeDrawer}
+            labelledBy="chatbot-docs-drawer-title"
+            className={isDesktop ? 'md:hidden' : ''}
+          >
+            <div className="flex items-center justify-between border-b border-secondary-200 px-4 py-3 dark:border-secondary-800">
+              <span id="chatbot-docs-drawer-title" className="text-sm font-bold">
+                {t('kb.title')}
+              </span>
+              <button
+                type="button"
+                onClick={closeDrawer}
+                aria-label={t('sourcePanel.close')}
+                data-autofocus
+                className="rounded p-1 hover:bg-secondary-100 dark:hover:bg-secondary-800"
               >
-                <div className="flex items-center justify-between border-b border-secondary-200 px-4 py-3 dark:border-secondary-800">
-                  <span className="text-sm font-bold">{t('kb.title')}</span>
-                  <button
-                    type="button"
-                    onClick={() => setShowDrawer(false)}
-                    aria-label={t('sourcePanel.close')}
-                    className="rounded p-1 hover:bg-secondary-100 dark:hover:bg-secondary-800"
-                  >
-                    <XMarkIcon className="h-5 w-5" />
-                  </button>
-                </div>
-                <div className="flex min-h-0 flex-1 flex-col">{sidebar}</div>
-              </div>
+                <XMarkIcon className="h-5 w-5" />
+              </button>
             </div>
-          ) : null}
+            <div className="flex min-h-0 flex-1 flex-col">{sidebar}</div>
+          </Drawer>
 
-          <StatsWidget stats={stats} />
+          <Drawer
+            open={showPipelineDrawer}
+            side="right"
+            onClose={closePipelineDrawer}
+            labelledBy="chatbot-pipeline-drawer-title"
+            className={isDesktop ? 'lg:hidden' : ''}
+          >
+            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+              <PipelinePanel
+                running={!!lastAnswer?.pending}
+                meta={pipelineMeta}
+                sources={lastAnswer?.sources ?? []}
+                onClose={closePipelineDrawer}
+                closeLabel={t('sourcePanel.close')}
+                titleId="chatbot-pipeline-drawer-title"
+              >
+                <StatsWidget stats={stats} defaultExpanded />
+              </PipelinePanel>
+            </div>
+          </Drawer>
 
           {showOnboarding ? (
             <OnboardingTour
@@ -608,7 +724,7 @@ export default function ChatbotDemoPage() {
   );
 }
 
-/** Recorrido de 5 pasos. Se guarda en localStorage para no repetirlo. */
+/** Recorrido de 5 pasos. Se guarda en localStorage para no repetirlo; Escape lo cierra. */
 function OnboardingTour({
   step,
   onNext,
@@ -621,18 +737,21 @@ function OnboardingTour({
   onDone: () => void;
 }) {
   const t = useTranslations('demoChatbot.onboarding');
+  const ref = useRef<HTMLDivElement>(null);
+  useDialogFocus(true, ref, onSkip);
   const steps = [1, 2, 3, 4, 5].map((n) => ({ title: t(`step${n}Title`), body: t(`step${n}Body`) }));
   const current = steps[Math.min(step, steps.length - 1)];
   const isLast = step >= steps.length - 1;
 
   return (
-    <div
-      className="fixed inset-0 z-[220] flex items-end justify-center bg-black/30 p-4 backdrop-blur-[2px] sm:items-center"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="onboarding-title"
-    >
-      <div className="w-full max-w-md rounded-2xl border border-secondary-200 bg-white p-6 shadow-2xl dark:border-secondary-700 dark:bg-secondary-900">
+    <div className="fixed inset-0 z-[220] flex items-end justify-center bg-black/30 p-4 backdrop-blur-[2px] sm:items-center">
+      <div
+        ref={ref}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="onboarding-title"
+        className="w-full max-w-md rounded-2xl border border-secondary-200 bg-white p-6 shadow-2xl dark:border-secondary-700 dark:bg-secondary-900"
+      >
         <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary-600 dark:text-primary-300">
           {t('title')} · {step + 1}/{steps.length}
         </p>
@@ -661,6 +780,7 @@ function OnboardingTour({
           <button
             type="button"
             onClick={isLast ? onDone : onNext}
+            data-autofocus
             className="inline-flex items-center gap-1.5 rounded-md bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-primary-700"
           >
             {isLast ? t('done') : t('next')}

@@ -123,7 +123,7 @@ export default function CrossDockKits() {
               </div>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[420px] text-sm">
+              <table className="w-full text-sm sm:min-w-[420px]">
                 <thead>
                   <tr className="border-b border-secondary-200 dark:border-secondary-700">
                     <th className={thCls}>{t('kits.component')}</th>

@@ -8,7 +8,7 @@ import { BOX_TARE, bestQuotes, boxFor, orderNetKg, orderUnits, pickedQty, produc
 import { fmtCOP, fmtNum } from '../lib/format';
 import { now, useWms } from '../lib/store';
 import type { CarrierId, Order, Shipment } from '../lib/types';
-import { Empty, Field, Modal, Panel, Pill, ProgressBar, SimNote, inputCls, selectCls, tdCls, thCls, useProductName, useT } from './ui';
+import { Empty, Field, Modal, Panel, Pill, ProgressBar, SimNote, inputCls, selectCls, tdCls, thCls, rtBody, rtHead, rtRow, rtTable, rtd, scrollIntoViewOnMobile, useProductName, useT } from './ui';
 import { useCutoffLabel } from './Orders';
 import { labelLines, labelPdf, printLabel, type LabelTexts } from './label';
 
@@ -65,7 +65,10 @@ export default function Packing() {
                   <button
                     type="button"
                     aria-pressed={o.id === selected}
-                    onClick={() => setSelected(o.id)}
+                    onClick={() => {
+                      setSelected(o.id);
+                      scrollIntoViewOnMobile('wms-pack-station');
+                    }}
                     className={`w-full rounded-xl border p-3 text-left text-sm ${o.id === selected ? 'border-stone-600 bg-stone-50 dark:bg-stone-900/30' : 'border-secondary-200 hover:border-stone-400 dark:border-secondary-700'}`}
                   >
                     <div className="flex items-center justify-between gap-2">
@@ -85,7 +88,7 @@ export default function Packing() {
           )}
         </Panel>
 
-        <div className="xl:col-span-3">
+        <div className="xl:col-span-3" id="wms-pack-station">
           {order ? (
             <PackStation key={order.id} order={order} onShipped={(sh) => setLabelFor(sh)} pm={pm} />
           ) : (
@@ -101,26 +104,28 @@ export default function Packing() {
           <p className="text-sm text-secondary-500">{t('packing.noneShipped')}</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[620px] text-sm">
-              <thead>
+            <table className={`${rtTable} sm:min-w-[620px]`}>
+              <thead className={rtHead}>
                 <tr className="border-b border-secondary-200 dark:border-secondary-700">
                   <th className={thCls}>{t('tracking.guide')}</th>
                   <th className={thCls}>{t('orders.order')}</th>
                   <th className={thCls}>{t('tracking.carrier')}</th>
                   <th className={thCls}>{t('orders.destination')}</th>
                   <th className={`${thCls} text-right`}>{t('packing.cost')}</th>
-                  <th className={thCls} />
+                  <th className={thCls}>
+                    <span className="sr-only">{t('packing.viewLabel')}</span>
+                  </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className={rtBody}>
                 {shippedToday.map((s) => (
-                  <tr key={s.id} className="border-b border-secondary-100 dark:border-secondary-800">
-                    <td className={`${tdCls} font-mono text-xs`}>{s.id}</td>
-                    <td className={`${tdCls} font-mono text-xs`}>{s.order}</td>
-                    <td className={tdCls}>{t(`carrierNames.${s.carrier}`)}</td>
-                    <td className={tdCls}>{CITY_BY_ID[s.city]?.name}</td>
-                    <td className={`${tdCls} text-right tabular-nums`}>{fmtCOP(s.cost, lang)}</td>
-                    <td className={`${tdCls} text-right`}>
+                  <tr key={s.id} className={`border-b border-secondary-100 dark:border-secondary-800 ${rtRow}`}>
+                    <td className={`${rtd} font-mono text-xs`} data-label={t('tracking.guide')}>{s.id}</td>
+                    <td className={`${rtd} font-mono text-xs`} data-label={t('orders.order')}>{s.order}</td>
+                    <td className={rtd} data-label={t('tracking.carrier')}>{t(`carrierNames.${s.carrier}`)}</td>
+                    <td className={rtd} data-label={t('orders.destination')}>{CITY_BY_ID[s.city]?.name}</td>
+                    <td className={`${rtd} text-right tabular-nums`} data-label={t('packing.cost')}>{fmtCOP(s.cost, lang)}</td>
+                    <td className={`${rtd} text-right max-sm:self-end`}>
                       <button type="button" className="text-xs font-semibold text-primary-600 hover:underline dark:text-primary-400" onClick={() => setLabelFor(s)}>
                         {t('packing.viewLabel')}
                       </button>
@@ -256,7 +261,7 @@ function PackStation({ order, onShipped, pm }: { order: Order; onShipped: (s: Sh
               {t('packing.quotes', { city: CITY_BY_ID[order.city]?.name ?? '', zone: t(`zones.${shipZone(order.wh, order.city)}`) })}
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[480px] text-sm" role="radiogroup" aria-label={t('packing.carrier')}>
+              <table className="w-full text-sm sm:min-w-[480px]" role="radiogroup" aria-label={t('packing.carrier')}>
                 <tbody>
                   {list.map((q) => (
                     <tr key={q.carrier.id} className={`border-b border-secondary-100 dark:border-secondary-800 ${q.ok ? '' : 'text-secondary-400'}`}>
@@ -271,7 +276,7 @@ function PackStation({ order, onShipped, pm }: { order: Order; onShipped: (s: Sh
                           {preferred === q.carrier.id && <Pill tone="primary">{t('carriers.preferred')}</Pill>}
                         </div>
                       </td>
-                      <td className={`${tdCls} text-right tabular-nums`}>{q.ok ? fmtCOP(q.price, lang) : '—'}</td>
+                      <td className={`${tdCls} whitespace-nowrap text-right tabular-nums`}>{q.ok ? fmtCOP(q.price, lang) : '—'}</td>
                       <td className={`${tdCls} text-right text-xs`}>{q.ok ? (q.days === 0 ? t('carriers.sameDay') : t('carriers.days', { n: q.days })) : t(`packing.reasons.${q.reason}`)}</td>
                     </tr>
                   ))}

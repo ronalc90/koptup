@@ -7,7 +7,7 @@ export default function SaasBoilerplateLayout({ children }: { children: React.Re
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: 'Inicio', url: '/' },
     { name: 'Demos', url: '/demo' },
-    { name: 'SaaS Multi-tenant Boilerplate', url: '/demo/saas-boilerplate' },
+    { name: 'Plataforma SaaS multi-tenant', url: '/demo/saas-boilerplate' },
   ]);
 
   return (

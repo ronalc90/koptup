@@ -7,7 +7,7 @@ import { addDays } from '../lib/dates';
 import { fmtCOP, fmtDate, fmtNum, fmtPct } from '../lib/format';
 import { now, useWms } from '../lib/store';
 import type { AbcClass, CountTask } from '../lib/types';
-import { Empty, Panel, Pill, SimNote, baseInputCls, tdCls, thCls, useProductName, useT } from './ui';
+import { Empty, Panel, Pill, SimNote, baseInputCls, thCls, rtBody, rtFull, rtHead, rtRow, rtTable, rtd, useProductName, useT } from './ui';
 
 const CLASS_COLOR: Record<AbcClass, string> = {
   A: 'from-emerald-600 to-emerald-700',
@@ -88,8 +88,8 @@ export default function CycleCount() {
           <Empty>{t('counts.noTasks')}</Empty>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[760px] text-sm">
-              <thead>
+            <table className={`${rtTable} sm:min-w-[760px]`}>
+              <thead className={rtHead}>
                 <tr className="border-b border-secondary-200 dark:border-secondary-700">
                   <th className={thCls}>{t('counts.task')}</th>
                   <th className={thCls}>{t('common.bin')}</th>
@@ -99,26 +99,26 @@ export default function CycleCount() {
                   <th className={thCls}>{t('counts.result')}</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className={rtBody}>
                 {tasks.map((c) => {
                   const lot = state.lots.find((l) => l.id === c.lotId);
                   const product = state.products.find((p) => p.sku === c.sku);
                   const diff = (c.counted ?? 0) - (c.system ?? 0);
                   return (
-                    <tr key={c.id} className="border-b border-secondary-100 dark:border-secondary-800">
-                      <td className={`${tdCls} font-mono text-xs`}>
+                    <tr key={c.id} className={`border-b border-secondary-100 dark:border-secondary-800 ${rtRow}`}>
+                      <td className={`${rtd} font-mono text-xs`} data-label={t('counts.task')}>
                         {c.id}
                         {c.urgent && <Pill tone="danger" className="ml-1">{t('counts.urgent')}</Pill>}
                         <div className="text-secondary-500">{t('counts.classShort', { c: cls[c.sku] ?? 'C' })}</div>
                       </td>
-                      <td className={`${tdCls} font-mono text-xs`}>{c.bin}</td>
-                      <td className={tdCls}>
+                      <td className={`${rtd} font-mono text-xs`} data-label={t('common.bin')}>{c.bin}</td>
+                      <td className={`${rtd} ${rtFull}`} data-label={t('common.product')}>
                         <div>{name(c.sku)}</div>
                         <div className="font-mono text-xs text-secondary-500">{lot ? `${t('common.lot')} ${lot.lot}` : c.sku}</div>
                       </td>
-                      <td className={`${tdCls} text-xs`}>{c.due === today ? t('common.today') : fmtDate(c.due, lang)}</td>
-                      <td className={`${tdCls} text-xs`}>{c.assignee}</td>
-                      <td className={tdCls}>
+                      <td className={`${rtd} text-xs`} data-label={t('counts.due')}>{c.due === today ? t('common.today') : fmtDate(c.due, lang)}</td>
+                      <td className={`${rtd} text-xs`} data-label={t('counts.assignee')}>{c.assignee}</td>
+                      <td className={`${rtd} ${rtFull}`} data-label={t('counts.result')}>
                         {c.status === 'scheduled' && (
                           <form
                             className="flex flex-wrap items-center gap-1.5"

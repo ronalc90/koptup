@@ -1,251 +1,885 @@
 {
   "demoAutomation": {
-    "pageTitle": "Automation platform",
-    "pageSubtitle": "Build visual workflows with triggers, native AI, sandboxed code, observability, and versioning. n8n + Zapier style, built for teams.",
-    "actions": {
-      "run": "Run workflow",
-      "running": "Running...",
-      "save": "Save",
-      "templates": "Templates",
-      "selfHosted": "Self-hosted",
-      "cloud": "Cloud",
-      "promote": "Promote to prod",
-      "openSdk": "Custom nodes SDK",
-      "close": "Close"
+    "pageTitle": "Process automation",
+    "shell": {
+      "back": "Back to demos",
+      "sampleBadge": "Sample data",
+      "sampleHint": "Fictitious company, people, documents and figures",
+      "simBadge": "Simulated connectors and AI",
+      "how": "What is real and what is simulated?",
+      "realTitle": "Real (runs in your browser)",
+      "real": [
+        "The engine runs the workflow step by step with the sample you pick: it fills {{field}} templates, evaluates conditions, looks up the sample sheets and applies the rules.",
+        "Retries with growing waits, and \"To review\" cases you can retry, approve, mark as handled or discard.",
+        "A step's JavaScript code really runs, isolated in your browser.",
+        "Add, move, duplicate and delete steps; versions; templates; export the history as CSV and import or export the workflow as JSON.",
+        "Everything is saved in this browser (localStorage) until you reset the demo."
+      ],
+      "simTitle": "Simulated",
+      "sim": [
+        "The company, its suppliers, customers, invoices and figures are fictitious.",
+        "Connectors (email, spreadsheets, accounting software, CRM, payment gateway, WhatsApp) are not connected to anything: nothing is sent or charged.",
+        "The \"AI\" uses fixed rules (XML parsing, keywords and templates); it does not call any model.",
+        "Step timings are simulated and waits are shortened.",
+        "This month's runs and savings combine a sample pace with what you run here."
+      ],
+      "tourTitle": "Suggested walkthrough",
+      "tour": [
+        "Press \"Run\" with the matching invoice and watch each step on the canvas and in Runs.",
+        "Pick invoice FE-10234 (does not match) and run it: the case lands in \"To review\".",
+        "Open \"Review cases\" and approve or discard the exception.",
+        "Change the condition's tolerance or add a step from the palette and run again.",
+        "Save a version and try another template (collections or leads)."
+      ],
+      "reset": "Reset demo",
+      "resetTitle": "Reset the demo?",
+      "resetBody": "Your workflows, versions, runs and cases are deleted and today's sample data comes back.",
+      "resetDone": "The demo is back to the sample data.",
+      "loading": "Loading the demo…"
     },
-    "header": {
-      "workflow": "Workflow",
-      "workflowName": "PRO customer onboarding",
-      "env": "Environment",
-      "envs": {
-        "dev": "dev",
-        "staging": "staging",
-        "prod": "prod"
-      },
-      "version": "v",
-      "lastRun": "Last run"
+    "common": {
+      "simulated": "Simulated",
+      "close": "Close",
+      "cancel": "Cancel",
+      "undo": "Undo"
     },
     "palette": {
-      "title": "Node palette",
-      "searchPlaceholder": "Search node...",
+      "title": "Step palette",
+      "hint": "Click to add after the selected step, or drag onto the canvas.",
+      "searchPlaceholder": "Search steps…",
+      "noResults": "No step matches.",
+      "addSr": "(add)",
+      "open": "Open the step palette",
       "categories": {
         "triggers": "Triggers",
-        "actions": "Actions",
-        "ai": "AI",
+        "ai": "AI (simulated)",
+        "apps": "Systems (simulated)",
+        "notify": "Notifications (simulated)",
         "logic": "Logic",
         "code": "Code"
-      },
-      "items": {
-        "webhook": "Webhook",
-        "schedule": "Schedule (cron)",
-        "polling": "HTTP polling",
-        "fileWatch": "File watch",
-        "emailIn": "Inbound email",
-        "dbCdc": "DB CDC",
-        "http": "HTTP Request",
-        "slack": "Slack notify",
-        "email": "Send email",
-        "sheets": "Google Sheets",
-        "stripe": "Stripe charge",
-        "salesforce": "Salesforce",
-        "llm": "LLM call",
-        "embedding": "Embedding",
-        "rag": "RAG retrieval",
-        "vision": "AI Vision",
-        "stt": "Speech to text",
-        "structured": "Structured output",
-        "filter": "Filter",
-        "switch": "Switch",
-        "loop": "Loop",
-        "merge": "Merge",
-        "wait": "Wait",
-        "subflow": "Sub-workflow",
-        "js": "JavaScript",
-        "python": "Python",
-        "transform": "Transform"
       }
+    },
+    "types": {
+      "trigger_email": {
+        "name": "Incoming email",
+        "desc": "Fires when an email reaches the mailbox (simulated).",
+        "help": "Trigger. In the demo, each sample brings an email with the electronic invoice attached (XML). In your project it connects to your real mailbox with read-only access."
+      },
+      "trigger_webhook": {
+        "name": "Web form",
+        "desc": "Fires when your site submits a form.",
+        "help": "Trigger. In the demo, the samples are contact forms already submitted. In your project, your site calls a secure workflow address."
+      },
+      "trigger_schedule": {
+        "name": "Schedule",
+        "desc": "Fires at a set time.",
+        "help": "Trigger. Runs at the chosen time and days. In the demo, each sample is one receivables customer checked by that run."
+      },
+      "trigger_chat": {
+        "name": "WhatsApp message",
+        "desc": "Fires on a customer message (simulated).",
+        "help": "Trigger. In the demo the messages are samples and there is no WhatsApp connection. In your project it uses WhatsApp Business with your company's line."
+      },
+      "ai_extract": {
+        "name": "Read invoice",
+        "desc": "Extracts tax ID, number, date, VAT and total from the XML.",
+        "help": "In the demo the data is read from the XML with fixed rules, and confidence drops if fields are missing, if the tax ID check digit does not match or if subtotal + VAT does not add up to the total. Below the minimum, the case goes to \"To review\". In your project an AI model does it."
+      },
+      "ai_classify": {
+        "name": "Classify message",
+        "desc": "Assigns a category and detects the city.",
+        "help": "In the demo it classifies by keywords: one line per category in the format \"category: word, word\". A category with no words is the fallback. It also detects the city if it appears in the text. In your project an AI model does it."
+      },
+      "ai_draft": {
+        "name": "Draft text",
+        "desc": "Writes a message with the case data.",
+        "help": "In the demo it fills the template with the data ({{field}}); if a value is missing, the step fails and says which. In your project an AI model writes from this guide."
+      },
+      "ai_rag": {
+        "name": "Ask the assistant",
+        "desc": "Answers with company policies and cites the source.",
+        "help": "In the demo it looks for the answer by keywords in four sample policies and cites the source; if nothing matches, the case goes to a person. In your project it is KopTup's RAG assistant with your documents."
+      },
+      "app_sheet": {
+        "name": "Look up spreadsheet",
+        "desc": "Finds a row by a column value.",
+        "help": "Searches one of the three sample sheets (purchase orders, receivables and customers) for the row whose column matches the value. If it is not found, the case goes to \"To review\"."
+      },
+      "app_accounting": {
+        "name": "Post to accounting software",
+        "desc": "Creates the payable or the receipt (simulated).",
+        "help": "In the demo it validates the party and the amount and generates a sequential document number, but it does not connect to any accounting software. In your project it connects to yours through its API."
+      },
+      "app_crm": {
+        "name": "Create CRM contact",
+        "desc": "Creates or updates the contact (simulated).",
+        "help": "In the demo it checks whether the email already exists in the customers sheet (then it updates it) and assigns an ID; it does not connect to any CRM."
+      },
+      "app_payment": {
+        "name": "Create payment link",
+        "desc": "Generates a payment link with a due date (simulated).",
+        "help": "In the demo the link is a sample (pagos.example) and charges nothing. In your project it connects to the payment gateway you use."
+      },
+      "app_http": {
+        "name": "HTTP call",
+        "desc": "Sends data to another app (simulated).",
+        "help": "In the demo it does not go out to the internet: it validates the address and the JSON and replies with an echo of what you would send."
+      },
+      "notify_chat": {
+        "name": "Send message",
+        "desc": "Via WhatsApp or the team chat (simulated).",
+        "help": "In the demo nothing is sent: it shows the message with the data filled in. WhatsApp requires a valid Colombian mobile number (10 digits starting with 3)."
+      },
+      "notify_email": {
+        "name": "Send email",
+        "desc": "Email to the customer or the team (simulated).",
+        "help": "In the demo no email is sent: it validates the address and shows the final text."
+      },
+      "logic_condition": {
+        "name": "Condition (if / else)",
+        "desc": "Compares two values and picks the path.",
+        "help": "Compares the value with the one in \"Against\". \"Is approximately equal to\" accepts the % difference set in the tolerance. If it fails, the case goes to \"To review\" or the workflow ends without doing anything else."
+      },
+      "logic_wait": {
+        "name": "Wait",
+        "desc": "Pauses the workflow for some minutes.",
+        "help": "In your project the workflow pauses for the given minutes. In the demo the wait is logged but skipped, so you are not kept waiting."
+      },
+      "logic_assign": {
+        "name": "Assign by rule",
+        "desc": "Picks an owner from a table.",
+        "help": "One line per rule in the format \"value = owner\". The \"* = …\" line is the default rule. Case and accents are ignored."
+      },
+      "code_js": {
+        "name": "JavaScript code",
+        "desc": "Computes something with your own code.",
+        "help": "The code really runs in your browser, isolated (no access to the page or the internet) with a 1.5-second limit. It receives \"datos\" and whatever you return goes to the next step."
+      },
+      "code_map": {
+        "name": "Map fields",
+        "desc": "Builds a new object from the data.",
+        "help": "One line per field in the format \"name = {{field}}\". Use it to shape the data the way another system expects."
+      }
+    },
+    "fields": {
+      "name": "Step name",
+      "mailbox": "Mailbox",
+      "filter": "Which emails",
+      "path": "Form path",
+      "time": "Time",
+      "days": "Days",
+      "line": "WhatsApp line",
+      "source": "Document to read",
+      "threshold": "Minimum confidence (%)",
+      "saveAs": "Save the result as",
+      "text": "Text to classify",
+      "rules": "Rules (category: words)",
+      "template": "Message template",
+      "question": "Question",
+      "sheet": "Sheet",
+      "column": "Column",
+      "value": "Value to find",
+      "document": "Document",
+      "account": "Account (Colombian PUC)",
+      "party": "Party (tax ID)",
+      "amount": "Amount",
+      "contactName": "Contact name",
+      "email": "Email",
+      "phone": "Mobile",
+      "owner": "Owner",
+      "reference": "Reference",
+      "dueDays": "Days to pay",
+      "method": "Method",
+      "url": "Address (URL)",
+      "body": "Body (JSON)",
+      "channel": "Channel",
+      "to": "To",
+      "message": "Message",
+      "subject": "Subject",
+      "left": "Value",
+      "op": "Comparison",
+      "right": "Against",
+      "tolerance": "Tolerance (%)",
+      "onFalse": "If it fails",
+      "minutes": "Minutes",
+      "by": "Based on",
+      "table": "Table (value = owner)",
+      "code": "Code",
+      "mapping": "Fields (name = value)"
+    },
+    "options": {
+      "filter": {
+        "attachments": "Only with .zip or .xml attachments",
+        "all": "All"
+      },
+      "days": {
+        "weekdays": "Monday to Friday",
+        "daily": "Every day",
+        "mondays": "Mondays only"
+      },
+      "document": {
+        "payable": "Account payable",
+        "receipt": "Cash receipt",
+        "note": "Journal entry"
+      },
+      "account": {
+        "220505": "220505 · Domestic suppliers",
+        "233595": "233595 · Other costs and expenses payable",
+        "130505": "130505 · Domestic customers"
+      },
+      "channel": {
+        "whatsapp": "WhatsApp (simulated)",
+        "team": "Team chat (simulated)"
+      },
+      "op": {
+        "eq": "is equal to",
+        "neq": "is different from",
+        "gt": "is greater than",
+        "lt": "is less than",
+        "approx": "is approximately equal to",
+        "contains": "contains",
+        "exists": "has a value"
+      },
+      "onFalse": {
+        "review": "send to review",
+        "stop": "end the workflow"
+      }
+    },
+    "sheets": {
+      "orders": {
+        "name": "Purchase orders",
+        "cols": {
+          "oc": "Order no.",
+          "nit": "Supplier tax ID",
+          "proveedor": "Supplier",
+          "total": "Total",
+          "estado": "Status"
+        }
+      },
+      "receivables": {
+        "name": "Receivables",
+        "cols": {
+          "nit": "Customer tax ID",
+          "cliente": "Customer",
+          "factura": "Invoice",
+          "saldo": "Balance",
+          "diasVencida": "Days overdue",
+          "celular": "Mobile",
+          "correo": "Email"
+        }
+      },
+      "customers": {
+        "name": "Customers",
+        "cols": {
+          "correo": "Email",
+          "nombre": "Name",
+          "ciudad": "City",
+          "comercial": "Sales rep"
+        }
+      }
+    },
+    "credentials": {
+      "mail": "facturas@ mailbox · sample access",
+      "sheet": "Spreadsheets · sample account",
+      "accounting": "Accounting software · sample token",
+      "crm": "CRM · sample token",
+      "payment": "Payment gateway · test key",
+      "messaging": "Messaging · sample account",
+      "smtp": "Outgoing email · sample account",
+      "http": "External API · sample token"
     },
     "canvas": {
-      "title": "Canvas",
-      "subtitle": "Wire nodes together. Lines show data flow.",
-      "zoomIn": "Zoom in",
-      "zoomOut": "Zoom out",
-      "fit": "Fit",
-      "runHint": "Hit Run to simulate the workflow",
-      "nodes": {
-        "trigger": "Webhook trigger",
-        "triggerDesc": "POST /hooks/onboarding",
-        "filter": "Filter",
-        "filterDesc": "plan === 'PRO'",
-        "http": "Enrich customer",
-        "httpDesc": "GET clearbit.com/api",
-        "llm": "AI summary",
-        "llmDesc": "GPT-4o · structured",
-        "transform": "Transform",
-        "transformDesc": "Map → CRM schema",
-        "slack": "Slack notify",
-        "slackDesc": "#sales-pro",
-        "subflow": "Sub-workflow",
-        "subflowDesc": "Assign CSM"
-      },
+      "title": "Workflow canvas",
       "status": {
-        "idle": "Idle",
-        "running": "Running",
-        "success": "OK",
-        "error": "Error"
-      }
+        "idle": "waiting",
+        "running": "running",
+        "success": "done",
+        "retry": "retrying",
+        "failed": "failed",
+        "review": "in review",
+        "stopped": "ended here",
+        "cancelled": "stopped"
+      },
+      "branchReview": "Else: review",
+      "branchStop": "Else: end",
+      "nodeLabel": "Step {n}: {name} ({type}), {status}",
+      "emptyHint": "Add steps from the palette: click one or drag it here."
     },
     "inspector": {
-      "title": "Configuration",
-      "empty": "Select a node on the canvas to edit.",
+      "title": "Settings",
+      "empty": "Pick a step on the canvas to configure it.",
+      "open": "Open the step settings",
+      "position": "Step {n} of {total}",
       "tabs": {
-        "params": "Params",
-        "auth": "Auth",
+        "params": "Parameters",
+        "auth": "Credential",
         "retry": "Retries",
         "test": "Test"
       },
-      "fields": {
-        "name": "Name",
-        "method": "Method",
-        "url": "URL",
-        "headers": "Headers",
-        "body": "Body",
-        "prompt": "Prompt",
-        "model": "Model",
-        "temperature": "Temperature",
-        "condition": "Condition",
-        "channel": "Channel",
-        "message": "Message"
-      },
+      "vars": "Data available at this step",
+      "varsEmpty": "Run the workflow (or use \"Test\") to see here the data that reaches this step.",
+      "triggerNote": "This is the trigger. To change it, pick another one in the palette.",
+      "moveBefore": "Before",
+      "moveAfter": "After",
+      "duplicate": "Duplicate",
+      "delete": "Delete",
+      "credential": "Credential",
+      "noCredential": "No credential",
+      "credentialRequired": "Without a credential, this step fails when it runs.",
+      "credentialNote": "These are sample names: the demo stores no secrets. In your project credentials are encrypted in your cloud's secrets manager.",
+      "noCredentialNeeded": "This step does not need credentials.",
+      "openEditor": "Open code editor",
       "retry": {
+        "intro": "If the step fails with a temporary error (for example, the system replies 429), it is tried again with a growing wait.",
         "attempts": "Retries",
-        "backoff": "Backoff",
-        "backoffOpts": {
-          "linear": "Linear",
-          "exponential": "Exponential"
-        },
-        "dlq": "Dead letter queue",
-        "alert": "Alert to"
+        "none": "No retries",
+        "base": "First wait",
+        "backoff": "Wait growth",
+        "exponential": "Exponential (doubles)",
+        "linear": "Linear (adds up)",
+        "preview": "Wait before each retry",
+        "after": "If retries run out, the run fails and the case stays in \"To review\" so you can retry it by hand."
       },
       "test": {
-        "run": "Run step",
-        "preview": "Response preview",
-        "mockOutput": "Mock output generated successfully"
+        "sample": "Sample",
+        "run": "Test this step",
+        "running": "Testing…",
+        "note": "Runs the previous steps with the sample and then this step. It is not added to the history.",
+        "blocked": "The sample did not reach this step: it stopped at \"{step}\".",
+        "input": "Input",
+        "output": "Output"
       }
     },
     "logs": {
-      "title": "Executions",
-      "subtitle": "Run history with step-by-step replay",
+      "title": "Runs",
+      "subtitle": "History of \"{name}\"",
+      "filter": "Filter by status",
+      "filterAll": "All",
+      "export": "Export CSV",
+      "none": "This workflow has no runs yet. Press \"Run\".",
+      "noneFiltered": "No runs with that status.",
+      "expand": "View details",
+      "collapse": "Hide",
       "columns": {
         "id": "ID",
         "started": "Started",
         "duration": "Duration",
         "status": "Status",
-        "trigger": "Trigger"
+        "source": "Source",
+        "version": "Version",
+        "actions": "Actions"
       },
       "statuses": {
-        "success": "Success",
+        "success": "Succeeded",
+        "retried": "Succeeded after retry",
+        "review": "In review",
         "failed": "Failed",
+        "stopped": "No action",
+        "cancelled": "Stopped"
+      },
+      "stepStatus": {
+        "success": "Done",
         "retry": "Retry",
-        "running": "Running"
+        "failed": "Failed",
+        "review": "To review",
+        "stopped": "Ended",
+        "cancelled": "Stopped"
       },
-      "expand": "View detail",
-      "collapse": "Hide",
+      "source": {
+        "manual": "Manual",
+        "trigger": "Automatic",
+        "retry": "Retry of {run}",
+        "approve": "Approval of {run}",
+        "replay": "Replay of {run}"
+      },
+      "draft": "draft",
+      "replay": "Replay with the same sample",
+      "sample": "sample: {name}",
       "step": "Step",
-      "stepDuration": "ms",
-      "viewPayload": "View payload"
-    },
-    "quotas": {
-      "title": "Plan usage",
-      "plan": "Plan",
-      "planName": "Business",
-      "executions": "Executions",
-      "tokens": "AI tokens",
-      "storage": "Storage",
-      "renewIn": "Renews in",
-      "days": "days",
-      "upgrade": "Upgrade"
-    },
-    "marketplace": {
-      "title": "Template marketplace",
-      "subtitle": "Production-ready workflows you can ship today",
-      "categories": {
-        "all": "All",
-        "sales": "Sales",
-        "ops": "Operations",
-        "ai": "AI",
-        "data": "Data",
-        "marketing": "Marketing"
+      "attempt": "attempt {n}",
+      "viewPayload": "View input and output data",
+      "hidePayload": "Hide data",
+      "waited": "Waited {time} before retrying.",
+      "csv": {
+        "id": "id",
+        "flujo": "workflow",
+        "inicio": "started",
+        "duracion_ms": "duration_ms",
+        "estado": "status",
+        "origen": "source",
+        "version": "version",
+        "pasos": "steps",
+        "resumen": "summary"
       },
-      "templates": {
-        "crm": {
-          "name": "CRM ↔ Sheets sync",
-          "desc": "Two-way sync with change detection"
-        },
-        "emailAi": {
-          "name": "AI email assistant",
-          "desc": "Classify and draft replies with an LLM"
-        },
-        "stripeAlert": {
-          "name": "Stripe → Slack alerts",
-          "desc": "Real-time alerts on failed payments"
-        },
-        "leadEnrich": {
-          "name": "Lead enrichment",
-          "desc": "Enrich leads with public data and AI"
-        },
-        "rag": {
-          "name": "RAG over docs",
-          "desc": "Embeddings + semantic search pipeline"
-        },
-        "etl": {
-          "name": "Daily ETL",
-          "desc": "Extract, transform, and load to your warehouse"
-        }
-      },
-      "use": "Use template",
-      "installs": "installs",
-      "close": "Close"
+      "fileName": "runs"
     },
-    "version": {
+    "usage": {
+      "title": "Usage and savings this month",
+      "plan": "Basic plan",
+      "runs": "Runs",
+      "savings": "Estimated savings",
+      "hours": "{hours} h",
+      "how": "How is it calculated?",
+      "hideHow": "Hide the calculation",
+      "formula": "Successful runs this month × minutes of manual work each one saves. Change the minutes to see the effect. Sample figures.",
+      "minutesFor": "Minutes per run of {name}",
+      "renew": "Resets on {date} (in {days, plural, one {# day} other {# days}})",
+      "plans": "See plans"
+    },
+    "versions": {
       "title": "Version history",
-      "current": "Current",
-      "promote": "Promote this version",
-      "commits": {
-        "c1": "feat: add AI summary node",
-        "c2": "fix: retry with exponential backoff",
-        "c3": "chore: update Slack credentials",
-        "c4": "feat: branch by customer plan",
-        "c5": "init: initial flow version"
+      "unsaved": "Unsaved changes",
+      "unsavedShort": "Unsaved",
+      "saved": "Saved as v{n}",
+      "empty": "No saved versions yet.",
+      "stepsCount": "{count, plural, one {# step} other {# steps}}",
+      "restore": "Restore",
+      "restoreAria": "Restore version v{n}",
+      "save": "Save version",
+      "nothingToSave": "No changes to save",
+      "saveTitle": "Save version",
+      "noteLabel": "What changed?",
+      "defaultNote": "Workflow changes",
+      "savedToast": "Version v{n} saved.",
+      "restoreTitle": "Restore version v{n}?",
+      "restoreBody": "The canvas goes back to how it was in that version. The history is kept.",
+      "restoreBodyDirty": "The canvas goes back to how it was in that version and unsaved changes are lost. The history is kept.",
+      "restoredToast": "Version v{n} restored. If you change something, save it as a new version."
+    },
+    "reviewCard": {
+      "title": "To review",
+      "thisFlow": "Cases in this workflow",
+      "failed24": "Failures (last 24 h)",
+      "hint": "Exceptions (something did not match) and failures (retries ran out) from all your workflows.",
+      "open": "Review cases ({count})"
+    },
+    "review": {
+      "title": "To review",
+      "subtitle": "Exceptions and failures from your workflows. Nothing is lost: here you decide what to do with each case.",
+      "discardAll": "Discard {count, plural, one {the open case} other {the # open cases}}",
+      "close": "Close",
+      "tabs": {
+        "open": "Open ({count})",
+        "closed": "Closed ({count})"
+      },
+      "emptyOpen": "No open cases.",
+      "emptyClosed": "You have not closed any cases yet.",
+      "kind": {
+        "exception": "Exception",
+        "failure": "Failure"
+      },
+      "goToFlow": "Go to the workflow",
+      "atStep": "At \"{step}\" · {run}",
+      "sample": "Sample: {name}",
+      "fixLabel": "Fill in the missing value ({path}) and retry:",
+      "fixPlaceholder": "Type the value",
+      "working": "Processing…",
+      "continue": "Approve and continue",
+      "approve": "Approve",
+      "retry": "Retry",
+      "done": "Mark as handled",
+      "discard": "Discard",
+      "stillOpen": "Still open after {run}:",
+      "status": {
+        "resolved": "Handled",
+        "discarded": "Discarded"
+      },
+      "discardAllTitle": "Discard all open cases?",
+      "discardAllBody": "{count, plural, one {The open case moves} other {The # open cases move}} to \"Closed\" as discarded. Nothing runs.",
+      "toastDone": "Case {id} marked as handled.",
+      "toastDiscarded": "Case {id} discarded.",
+      "toastDiscardedAll": "{count, plural, one {# case discarded} other {# cases discarded}}.",
+      "res": {
+        "done": "handled by hand",
+        "discarded": "discarded",
+        "approvedEnd": "approved; it was the last step",
+        "byRun": "resolved by {run}"
       }
     },
-    "alerts": {
-      "title": "Alerts & DLQ",
-      "subtitle": "Manage errors and retries",
-      "dlqCount": "Messages in DLQ",
-      "alertsActive": "Active alerts",
-      "reprocess": "Reprocess",
-      "purge": "Purge"
+    "templates": {
+      "button": "Templates",
+      "title": "Process templates",
+      "subtitle": "Sample workflows for a distributor. Using one creates a new workflow you can edit.",
+      "filter": "Filter templates",
+      "categories": {
+        "all": "All",
+        "finance": "Finance",
+        "sales": "Sales",
+        "service": "Customer service",
+        "other": "Blank"
+      },
+      "steps": "{count, plural, one {# step} other {# steps}}",
+      "desc": {
+        "invoices": "Reads the electronic invoice that arrives by email, compares it with the purchase order and posts it as an account payable. If it does not match, it goes to review.",
+        "collections": "Every morning it checks receivables, creates a payment link and sends a WhatsApp reminder to customers with overdue invoices.",
+        "leads": "Classifies messages from the site's form, assigns a sales rep by city, creates the CRM contact and replies to the customer. Complaints go to review.",
+        "assistant": "Answers WhatsApp questions with the company's policies and cites the source. What the assistant does not know goes to a person.",
+        "blank": "Start with a web form as the trigger and build the workflow from the palette."
+      },
+      "use": "Use template",
+      "created": "Workflow \"{name}\" created.",
+      "note": "All templates use sample data and simulated connectors. In your project we build them with your systems and your rules."
     },
     "code": {
-      "title": "Code editor",
-      "language": "Language",
+      "title": "Code editor · {name}",
+      "subtitle": "JavaScript that really runs in your browser, isolated and offline (up to {seconds} s).",
+      "unsaved": "Unsaved changes",
+      "close": "Close",
+      "save": "Save",
+      "run": "Run",
+      "running": "Running…",
+      "savedToast": "Code for \"{name}\" saved.",
+      "sample": "Sample input data",
+      "language": "JavaScript",
       "tabs": {
         "code": "Code",
         "input": "Input",
         "output": "Output"
       },
-      "run": "Run",
-      "save": "Save",
-      "close": "Close"
+      "help": "Use \"datos\" to read what arrived (for example, datos.factura.total) and return an object. Tab inserts two spaces.",
+      "ok": "Ran in {ms} ms.",
+      "timeout": "Stopped: it took longer than {seconds} s.",
+      "error": "Error: {error}",
+      "noOutput": "Press \"Run\" to see the result.",
+      "noInput": "The input could not be computed.",
+      "blocked": "The sample does not reach this step: it stopped at \"{step}\".",
+      "discardTitle": "Close without saving?",
+      "discardBody": "Your code changes will be lost.",
+      "discard": "Close without saving"
     },
-    "sdk": {
-      "title": "SDK · custom nodes",
-      "subtitle": "Build custom nodes in TypeScript",
-      "install": "Install",
-      "snippet": "Example snippet",
-      "docs": "View full docs",
-      "close": "Close"
+    "json": {
+      "title": "Workflow definition (JSON)",
+      "subtitle": "For technical teams: this is how the workflow is stored.",
+      "import": "Import JSON",
+      "copy": "Copy",
+      "download": "Download .json",
+      "copied": "JSON copied.",
+      "copyFailed": "Could not copy; use \"Download .json\".",
+      "intro": "You can download this workflow, edit it and import it back as a new workflow.",
+      "note": "If you need a connector that is not in the palette, we build it in your project.",
+      "imported": "Workflow \"{name}\" imported.",
+      "errors": {
+        "size": "The file is too large (200 KB max).",
+        "json": "The file is not valid JSON.",
+        "shape": "The JSON does not look like a workflow (name and steps).",
+        "count": "The workflow must have between 1 and 20 steps.",
+        "type": "Step {n} has an unknown type."
+      }
+    },
+    "flows": {
+      "label": "Workflow:",
+      "menu": "Your workflows",
+      "yours": "Your workflows ({count})",
+      "steps": "{count, plural, one {# step} other {# steps}}",
+      "rename": "Rename",
+      "renameTitle": "Rename the workflow",
+      "nameLabel": "Workflow name",
+      "duplicate": "Duplicate",
+      "duplicated": "\"{name}\" duplicated.",
+      "new": "New from template…",
+      "delete": "Delete workflow",
+      "deleteTitle": "Delete \"{name}\"?",
+      "deleteBody": "The workflow, its versions, its runs and its review cases are deleted. This cannot be undone, except with \"Reset demo\".",
+      "deleted": "\"{name}\" deleted.",
+      "copyName": "{name} (copy)",
+      "importedName": "Imported workflow"
+    },
+    "run": {
+      "sample": "Sample to run",
+      "noSamples": "No samples",
+      "stop": "Stop",
+      "button": "Run",
+      "runningSr": "Running the workflow…"
+    },
+    "footer": {
+      "lastRun": "Last run: {when} · {id} ({status})",
+      "noRuns": "This workflow has not run yet.",
+      "json": "Workflow definition (JSON)"
+    },
+    "trigger": {
+      "title": "Change the trigger?",
+      "body": "A workflow has a single trigger: \"{from}\" is replaced by \"{to}\". The samples available to run depend on the trigger.",
+      "confirm": "Change trigger"
+    },
+    "toasts": {
+      "maxSteps": "A workflow can have up to 20 steps.",
+      "stepRemoved": "\"{name}\" deleted.",
+      "noSample": "Pick a sample to run.",
+      "stepGone": "Step \"{step}\" is no longer in the workflow. Restore the version or discard the case.",
+      "waitRun": "Wait for the current run to finish.",
+      "sameTrigger": "That is already the workflow's trigger.",
+      "stepAdded": "\"{name}\" added.",
+      "triggerChanged": "The trigger is now \"{name}\"."
+    },
+    "samples": {
+      "invOk": "FE-5521 from Químicos La Sabana (matches)",
+      "invMismatch": "FE-10234 from Papeles del Valle (no match)",
+      "invRetry": "FE-889 from Envases del Caribe (429 once)",
+      "invPartial": "FE-3307 from Plásticos Altiplano (incomplete XML)",
+      "colOk": "Minimercado El Trébol (12 days overdue)",
+      "colRecent": "Droguería Santa Inés (3 days overdue)",
+      "colNoPhone": "Hotel Brisas del Lago (no mobile)",
+      "leadMde": "Catalina Restrepo, Medellín (quote)",
+      "leadBog": "Mauricio Pardo, Bogotá (monthly order)",
+      "leadComplaint": "Diana Ospina, Cali (complaint)",
+      "chatShipping": "Jorge Castaño (free shipping)",
+      "chatReturns": "Liliana Gómez (broken product)",
+      "chatUnknown": "Fabio Quintero (something we do not sell)"
+    },
+    "log": {
+      "triggerEmail": "An email arrived from {from}.",
+      "triggerWebhook": "A form arrived at {path}.",
+      "triggerSchedule": "Scheduled check at {time}.",
+      "triggerChat": "A message arrived from {from}.",
+      "extractOk": "Invoice {number} from {supplier} for {total} (confidence {conf}%).",
+      "extractLow": "Confidence {conf}%, below the {threshold}% minimum. {count, plural, one {Issue} other {Issues}}: {why}.",
+      "classifyOk": "Category \"{category}\" (confidence {conf}%); no city detected.",
+      "classifyOkCity": "Category \"{category}\", city {city} (confidence {conf}%).",
+      "draftOk": "Text ready ({chars} characters).",
+      "ragOk": "Answer found in \"{source}\".",
+      "ragNone": "The assistant did not find the answer in the policies: it goes to a person.",
+      "sheetOk": "Found the row with {column} = {value} in \"{sheet}\".",
+      "sheetNotFound": "No row with {column} = {value} in \"{sheet}\".",
+      "accountingOk": "Posted {number} for {amount} (simulated).",
+      "crmCreated": "Contact {id} created and assigned to {owner} (simulated).",
+      "crmUpdated": "The contact already existed ({id}); it was updated and assigned to {owner} (simulated).",
+      "paymentOk": "Payment link for {amount}, due in {days, plural, one {# day} other {# days}} (simulated).",
+      "httpOk": "{method} {url} replied 200 (simulated: it did not go out to the internet).",
+      "chatOk": "Message via {channel} to {to} (simulated: not sent).",
+      "emailOk": "Email to {to} (simulated: not sent).",
+      "condTrue": "Met: {left} {op} {right}.",
+      "condTrueApprox": "Met: {left} vs. {right}, {diff}% difference.",
+      "condFalse": "Not met: {left} {op} {right} → {then}.",
+      "condFalseApprox": "Not met: {left} vs. {right}, {diff}% difference → {then}.",
+      "wait": "Wait of {minutes} min (in the demo it is not actually waited).",
+      "assignOk": "Owner: {owner} (rule \"{value}\").",
+      "assignDefault": "Default owner: {owner} (no rule for \"{value}\").",
+      "jsOk": "The code ran in your browser.",
+      "mapOk": "{count, plural, one {# field built} other {# fields built}}."
+    },
+    "err": {
+      "missing": "Missing value {path}.",
+      "badSaveAs": "The name \"{name}\" cannot be used to save the result: use letters, numbers or _ with no spaces.",
+      "noCredential": "The step has no credential (\"Credential\" tab).",
+      "rateLimited": "The system replied 429: too many requests right now.",
+      "extractNothing": "The document does not look like an electronic invoice.",
+      "noCategory": "No rule matched and there is no fallback category.",
+      "emptyTemplate": "The message is empty.",
+      "badColumn": "Column \"{column}\" does not exist in that sheet.",
+      "badAmount": "The value \"{value}\" is not a number greater than zero.",
+      "badUrl": "The address \"{url}\" is not valid (it must start with https://).",
+      "badJson": "The body is not valid JSON.",
+      "badPhone": "\"{to}\" is not a valid Colombian mobile number.",
+      "badEmail": "\"{to}\" is not a valid email address.",
+      "notNumber": "To compare, both values must be numbers ({left} and {right}).",
+      "noRule": "There is no rule for \"{value}\" and no default rule (*).",
+      "emptyCode": "The code is empty.",
+      "js": "Code error: {error}",
+      "jsTimeout": "The code took longer than {error} and was stopped.",
+      "emptyMap": "There are no fields to map.",
+      "unknown": "Unknown step type.",
+      "retriesExhausted": "Failed {attempts, plural, one {on the only attempt} other {on all # attempts}}: the system did not respond.",
+      "noTrigger": "The workflow needs a trigger as its first step.",
+      "twoTriggers": "The workflow can only have one trigger."
+    },
+    "sum": {
+      "success": "Succeeded: {count, plural, one {# step} other {# steps}}.",
+      "retried": "Succeeded with {retries, plural, one {# retry} other {# retries}} ({count} steps).",
+      "review": "Sent to review at \"{step}\".",
+      "failed": "Failed at \"{step}\" and was sent to review.",
+      "stopped": "Ended at \"{step}\": the condition was not met.",
+      "cancelled": "You stopped it before \"{step}\"."
+    },
+    "fieldsInvoice": {
+      "numero": "no number",
+      "fecha": "no date",
+      "nit": "no tax ID",
+      "proveedor": "no supplier",
+      "subtotal": "no subtotal",
+      "iva": "no VAT",
+      "total": "no total"
+    },
+    "issues": {
+      "dv": "the tax ID check digit does not match",
+      "sum": "subtotal + VAT does not add up to the total"
+    },
+    "jsErrors": {
+      "notCloneable": "the result cannot be copied (return objects, text or numbers)",
+      "noWorker": "this browser cannot run isolated code",
+      "invalid": "invalid result"
+    },
+    "seed": {
+      "company": "Distribuciones Nogal Andino S.A.S.",
+      "city": "Bogotá",
+      "you": "You",
+      "authors": {
+        "ops": "Laura Méndez",
+        "it": "Julián Herrera",
+        "sales": "Andrés Camacho"
+      },
+      "approved": "Approved",
+      "emailSubject": "Electronic invoice {number} from {supplier}",
+      "templates": {
+        "invoices": {
+          "name": "Supplier invoices",
+          "steps": {
+            "trigger": "Invoices mailbox",
+            "extract": "Read invoice",
+            "lookup": "Find purchase order",
+            "check": "Does it match the order?",
+            "post": "Post account payable",
+            "notify": "Notify treasury"
+          },
+          "config": {
+            "notify": {
+              "to": "Treasury",
+              "message": "Invoice {{factura.numero}} from {{factura.proveedor}} for {{factura.total|cop}} was posted ({{registro.numero}})."
+            }
+          },
+          "versions": {
+            "v1": "First version: read the invoice from email and post it",
+            "v2": "Check against the purchase order (1% tolerance)",
+            "v3": "Notify treasury in the team chat"
+          }
+        },
+        "collections": {
+          "name": "Overdue receivables collection",
+          "steps": {
+            "trigger": "Daily receivables check",
+            "lookup": "Look up receivables",
+            "check": "Overdue more than 5 days?",
+            "link": "Create payment link",
+            "draft": "Draft reminder",
+            "send": "Send via WhatsApp"
+          },
+          "config": {
+            "draft": {
+              "template": "Hi, {{cartera.cliente}}. This is a reminder that invoice {{cartera.factura}} for {{cartera.saldo|cop}} is {{cartera.diasVencida}} days overdue. You can pay it at this link: {{pago.enlace}}. If you already paid, reply to this message with the receipt. Distribuciones Nogal Andino."
+            },
+            "send": {
+              "message": "{{borrador.texto}}"
+            }
+          },
+          "versions": {
+            "v1": "First version: reminder with payment link",
+            "v2": "Only collect what is more than 5 days overdue"
+          }
+        },
+        "leads": {
+          "name": "Website leads to the CRM",
+          "steps": {
+            "trigger": "Contact form",
+            "classify": "Classify the message",
+            "check": "Wants to buy?",
+            "assign": "Assign sales rep by city",
+            "crm": "Create CRM contact",
+            "reply": "Reply to the customer"
+          },
+          "config": {
+            "classify": {
+              "rules": "purchase: quote, price, buy, order, volume, distributor\ncomplaint: complaint, claim, incomplete, broken, damaged, delay\npayment: invoice, payment, transfer, certificate\nother:"
+            },
+            "check": {
+              "right": "purchase"
+            },
+            "assign": {
+              "table": "Medellín = Valentina Ríos\nBogotá = Andrés Camacho\nCali = Paola Giraldo\n* = Sales desk"
+            },
+            "reply": {
+              "subject": "We received your request, {{lead.nombre}}",
+              "message": "Hi, {{lead.nombre}}. Thanks for reaching out. {{asignacion.responsable}}, from our sales team, will contact you today to prepare your quote. Distribuciones Nogal Andino."
+            }
+          },
+          "versions": {
+            "v1": "First version: from the form to the CRM with an automatic reply"
+          }
+        },
+        "assistant": {
+          "name": "WhatsApp answers with the assistant",
+          "steps": {
+            "trigger": "WhatsApp message",
+            "rag": "Ask the assistant",
+            "reply": "Reply via WhatsApp"
+          },
+          "config": {
+            "reply": {
+              "message": "Hi, {{mensaje.nombre}}. {{respuesta.texto}} (Source: {{respuesta.fuente}})"
+            }
+          }
+        },
+        "blank": {
+          "name": "New workflow",
+          "steps": {
+            "trigger": "Web form"
+          }
+        }
+      },
+      "leads": {
+        "l1": {
+          "company": "Colegio Montecielo",
+          "message": "Hi, I would like a quote for 40 boxes of detergent and 60 gallons of disinfectant for the school. Do you offer volume discounts?"
+        },
+        "l2": {
+          "company": "Restaurante Fogón Sabanero",
+          "message": "Hello. I need a price for paper towels and liquid soap for three locations; it would be a monthly order."
+        },
+        "l3": {
+          "company": "Tienda La Colmena",
+          "message": "Yesterday's order arrived incomplete and two gallons were broken. I want to file a complaint."
+        }
+      },
+      "chats": {
+        "c1": "Hi, what is the minimum order for free shipping to Medellín?",
+        "c2": "Hello, a gallon arrived broken. Can I return it?",
+        "c3": "Do you sell hardware tools?"
+      },
+      "kb": [
+        {
+          "source": "Shipping policy 2026, section 2",
+          "answer": "Orders from COP 350,000 ship free in Bogotá and Medellín; in other cities shipping is quoted by weight. We deliver in 1 to 3 business days.",
+          "keywords": "shipping, delivery, minimum, free"
+        },
+        {
+          "source": "Returns policy, section 1",
+          "answer": "If a product arrives damaged or incomplete, you have 5 business days to report it with photos; we replace it at no cost or refund your money.",
+          "keywords": "return, refund, damaged, broken, exchange, warranty, incomplete"
+        },
+        {
+          "source": "Commercial terms, section 4",
+          "answer": "We offer 30-day credit to companies with two orders paid on time; apply with your tax registration (RUT) and certificate of incorporation.",
+          "keywords": "credit, terms, 30 days, financing, installments"
+        },
+        {
+          "source": "Catalog 2026, opening hours",
+          "answer": "We take orders Monday to Friday from 7:00 AM to 5:00 PM and on Saturdays until noon.",
+          "keywords": "hours, open, opening, saturday"
+        }
+      ],
+      "defaults": {
+        "ai_classify": {
+          "rules": "purchase: quote, price, buy, order, volume\ncomplaint: complaint, claim, incomplete, broken, damaged\nother:"
+        },
+        "ai_draft": {
+          "template": "Hi, {{lead.nombre}}. Thanks for reaching out; we will reply today. Distribuciones Nogal Andino."
+        },
+        "logic_assign": {
+          "table": "Medellín = Valentina Ríos\nBogotá = Andrés Camacho\n* = Sales desk"
+        },
+        "notify_chat": {
+          "to": "Treasury",
+          "message": "Workflow notice: there is a new case to review."
+        },
+        "notify_email": {
+          "subject": "Update on your request",
+          "message": "Hi, {{lead.nombre}}. This is Distribuciones Nogal Andino."
+        },
+        "code_js": {
+          "code": "// \"datos\" holds what arrived up to this step.\nconst total = Number(datos.factura?.total ?? 0);\nreturn {\n  priority: total > 3000000 ? 'high' : 'normal',\n  reviewBy: total > 3000000 ? 'today' : 'this week',\n};"
+        },
+        "code_map": {
+          "mapping": "name = {{lead.nombre}}\ncity = {{lead.ciudad}}\ncompany = {{lead.empresa}}"
+        }
+      }
     }
   }
 }

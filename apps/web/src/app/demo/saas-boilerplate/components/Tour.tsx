@@ -69,11 +69,14 @@ export default function Tour() {
                 <div className="min-w-0">
                   <div className="font-semibold text-secondary-900 dark:text-white">{t(`tour.steps.${k}.title`)}</div>
                   <p className="mt-0.5 text-secondary-600 dark:text-secondary-400">{t(`tour.steps.${k}.hint`)}</p>
-                  {!ok && (
-                    <button type="button" onClick={() => go(STEP_SCREEN[k])} className="mt-1.5 font-medium text-primary-700 hover:underline dark:text-primary-300">
-                      {t('tour.go')}
-                    </button>
-                  )}
+                  {!ok &&
+                    (s.screen === STEP_SCREEN[k] ? (
+                      <span className="mt-1.5 inline-block font-medium text-secondary-500 dark:text-secondary-400">{t('tour.here')}</span>
+                    ) : (
+                      <button type="button" onClick={() => go(STEP_SCREEN[k])} className="mt-1.5 font-medium text-primary-700 hover:underline dark:text-primary-300">
+                        {t('tour.go')}
+                      </button>
+                    ))}
                 </div>
               </div>
             </li>

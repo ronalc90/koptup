@@ -81,7 +81,6 @@ export default function BookingWizard({
     if (form.name.trim().length < 3) e.name = 'name';
     if (!normalizeMobile(form.phone)) e.phone = 'phone';
     if (form.email.trim() && !isEmail(form.email)) e.email = 'email';
-    if (form.remindEmail && !form.email.trim()) e.email = 'emailNeeded';
     if (!form.consent) e.consent = 'consent';
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -149,7 +148,7 @@ export default function BookingWizard({
           const done = step > n;
           const active = step === n;
           return (
-            <li key={s} className="flex items-center flex-1 min-w-0 gap-1 sm:gap-2" aria-current={active ? 'step' : undefined}>
+            <li key={s} className={`flex items-center min-w-0 gap-1 sm:gap-2 ${active ? 'flex-none sm:flex-1' : 'flex-1'}`} aria-current={active ? 'step' : undefined}>
               <span
                 className={`h-7 w-7 sm:h-8 sm:w-8 shrink-0 rounded-full flex items-center justify-center text-xs font-bold ${
                   done || active ? 'bg-orange-600 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300'

@@ -46,7 +46,7 @@ export default function TarjetaGlosa({ glosa, procedimiento, propuesto, maximo, 
   const [nota, setNota] = useState('');
   const [aviso, setAviso] = useState('');
 
-  const etiquetas = { prestador: t('entities.provider'), pagador: t('entities.payer') };
+  const etiquetas = { prestador: t('entities.provider'), pagador: t('entities.payer'), nit: t('entities.nit') };
   const decision = decisionDeGlosa(glosa, propuesto);
   const claveTipo = CLAVE_TIPO_GLOSA[glosa.tipo];
 
@@ -109,7 +109,7 @@ export default function TarjetaGlosa({ glosa, procedimiento, propuesto, maximo, 
           )}
           {glosa.descripcion && (
             <details className="mt-2 text-xs text-gray-600 dark:text-gray-400">
-              <summary className="cursor-pointer select-none">{t('denials.engineText')}</summary>
+              <summary className="cursor-pointer select-none rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">{t('denials.engineText')}</summary>
               <p className="mt-1 font-mono">{anonimizarTexto(glosa.descripcion, etiquetas)}</p>
             </details>
           )}

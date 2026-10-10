@@ -77,3 +77,57 @@ export function timeToMinutes(hm: string): number {
 export function dateOf(dt: ISODateTime): ISODate {
   return dt.slice(0, 10);
 }
+
+/* ---------------- Horario de la operación de ejemplo ---------------- */
+
+/** La bodega de ejemplo trabaja en dos turnos, de 6:00 a. m. a 10:00 p. m. */
+export const OP_OPEN = 6 * 60;
+export const OP_CLOSE = 22 * 60;
+
+/** Lleva una fecha-hora al horario de operación (la noche pasa al cierre anterior). */
+export function opClock(dt: ISODateTime): ISODateTime {
+  const m = minutesOf(dt);
+  if (m < OP_OPEN) return `${addDays(dateOf(dt), -1)}T${hhmm(OP_CLOSE)}`;
+  if (m > OP_CLOSE) return `${dateOf(dt)}T${hhmm(OP_CLOSE)}`;
+  return dt.slice(0, 16);
+}
+
+/** Resta minutos de operación saltando la noche (de 10:00 p. m. a 6:00 a. m.). */
+export function backOp(dt: ISODateTime, minutes: number): ISODateTime {
+  let t = opClock(dt);
+  let left = Math.max(0, Math.round(minutes));
+  for (let guard = 0; guard < 60 && left > 0; guard++) {
+    const avail = minutesOf(t) - OP_OPEN;
+    if (left <= avail) return addMinutes(t, -left);
+    left -= avail;
+    t = `${addDays(dateOf(t), -1)}T${hhmm(OP_CLOSE)}`;
+  }
+  return t;
+}
+
+/** Suma minutos de operación saltando la noche. */
+export function fwdOp(dt: ISODateTime, minutes: number): ISODateTime {
+  const m0 = minutesOf(dt);
+  let t = m0 < OP_OPEN ? `${dateOf(dt)}T${hhmm(OP_OPEN)}` : m0 > OP_CLOSE ? `${addDays(dateOf(dt), 1)}T${hhmm(OP_OPEN)}` : dt.slice(0, 16);
+  let left = Math.max(0, Math.round(minutes));
+  for (let guard = 0; guard < 60 && left > 0; guard++) {
+    const avail = OP_CLOSE - minutesOf(t);
+    if (left <= avail) return addMinutes(t, left);
+    left -= avail;
+    t = `${addDays(dateOf(t), 1)}T${hhmm(OP_OPEN)}`;
+  }
+  return t;
+}
+
+/** Minutos de reloj entre dos fechas-hora (b − a). */
+export function minutesBetween(a: ISODateTime, b: ISODateTime): number {
+  return diffDays(dateOf(a), dateOf(b)) * 1440 + minutesOf(b) - minutesOf(a);
+}
+
+/** Ajusta una fecha-hora al horario de operación del mismo día. */
+export function clampOp(dt: ISODateTime): ISODateTime {
+  const m = minutesOf(dt);
+  if (m < OP_OPEN) return `${dateOf(dt)}T${hhmm(OP_OPEN)}`;
+  if (m > OP_CLOSE) return `${dateOf(dt)}T${hhmm(OP_CLOSE)}`;
+  return dt.slice(0, 16);
+}

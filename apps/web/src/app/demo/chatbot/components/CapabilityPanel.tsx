@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { XMarkIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import type { IncludedKey } from './data';
+import { useDialogFocus } from './ui/useDialogFocus';
 
 interface CapabilityPanelProps {
   itemKey: IncludedKey | null;
@@ -13,15 +14,8 @@ interface CapabilityPanelProps {
 /** Detalle de una capacidad de "Qué incluye hoy" (solo lo que existe en el código). */
 export default function CapabilityPanel({ itemKey, onClose }: CapabilityPanelProps) {
   const t = useTranslations('demoChatbot.included');
-
-  useEffect(() => {
-    if (!itemKey) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [itemKey, onClose]);
+  const ref = useRef<HTMLDivElement>(null);
+  useDialogFocus(!!itemKey, ref, onClose);
 
   if (!itemKey) return null;
 
@@ -37,6 +31,7 @@ export default function CapabilityPanel({ itemKey, onClose }: CapabilityPanelPro
       onClick={onClose}
     >
       <div
+        ref={ref}
         className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-secondary-200 bg-white shadow-2xl dark:border-secondary-700 dark:bg-secondary-900"
         onClick={(e) => e.stopPropagation()}
       >

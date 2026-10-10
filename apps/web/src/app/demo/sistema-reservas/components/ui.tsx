@@ -119,7 +119,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const seq = useRef(0);
   const notify = useCallback((msg: string) => {
     const id = ++seq.current;
-    setItems((xs) => [...xs.slice(-2), { id, msg }]);
+    setItems((xs) => [...xs.slice(-1), { id, msg }]);
     window.setTimeout(() => setItems((xs) => xs.filter((x) => x.id !== id)), 4500);
   }, []);
   return (
@@ -159,12 +159,31 @@ export function Modal({
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
   useEffect(() => {
+    // Al cerrar, el foco vuelve al botón que abrió la ventana (si sigue en la página).
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onCloseRef.current();
+      // Tab no sale de la ventana mientras está abierta.
+      if (e.key === 'Tab' && ref.current) {
+        const items = ref.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled])');
+        if (!items.length) return;
+        const first = items[0];
+        const last = items[items.length - 1];
+        if (e.shiftKey && (document.activeElement === first || document.activeElement === ref.current)) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     };
     window.addEventListener('keydown', onKey);
     ref.current?.focus();
-    return () => window.removeEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      if (opener && opener.isConnected) opener.focus({ preventScroll: true });
+    };
   }, []);
   const width = size === 'sm' ? 'max-w-md' : size === 'lg' ? 'max-w-3xl' : 'max-w-xl';
   return createPortal(

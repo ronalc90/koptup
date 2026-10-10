@@ -7,7 +7,7 @@ export default function AutomatizacionLayout({ children }: { children: React.Rea
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: 'Inicio', url: '/' },
     { name: 'Demos', url: '/demo' },
-    { name: 'Automatización de Workflows', url: '/demo/automatizacion' },
+    { name: 'Automatización de procesos', url: '/demo/automatizacion' },
   ]);
 
   return (

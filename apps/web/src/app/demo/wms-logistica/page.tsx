@@ -1,6 +1,7 @@
 'use client';
 
-import { CubeTransparentIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
+import { ArrowLeftIcon, CubeTransparentIcon } from '@heroicons/react/24/outline';
 import { useTranslations } from 'next-intl';
 import { WmsProvider } from './lib/store';
 import Shell from './components/Shell';
@@ -10,6 +11,13 @@ export default function WmsLogisticaPage() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-gradient-to-br from-secondary-50 via-white to-primary-50 px-4 py-8 dark:from-secondary-950 dark:via-secondary-900 dark:to-secondary-950 sm:py-10">
       <div className="mx-auto max-w-7xl space-y-5">
+        <Link
+          href="/demo"
+          className="inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-secondary-600 hover:text-stone-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 dark:text-secondary-300 dark:hover:text-white"
+        >
+          <ArrowLeftIcon className="h-4 w-4" />
+          {t('back')}
+        </Link>
         <header className="rounded-2xl bg-gradient-to-br from-stone-600 to-stone-800 p-6 text-white shadow-sm sm:p-8">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="min-w-0">

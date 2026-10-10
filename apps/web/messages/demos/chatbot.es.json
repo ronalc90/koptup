@@ -38,7 +38,7 @@
       "extractiveMode": "Modo extractivo (sin clave de IA)",
       "extractiveModeTooltip": "El servidor no tiene clave de OpenAI: el asistente muestra los fragmentos encontrados, con su cita, sin redactar una respuesta.",
       "offline": "Servidor no disponible",
-      "offlineTooltip": "No pudimos conectar con el servidor de la demo. Revisa tu conexión e inténtalo de nuevo.",
+      "offlineTooltip": "No pudimos conectar con el servidor de la demo: puede ser tu conexión o que el servidor no esté disponible. Inténtalo de nuevo en unos minutos.",
       "degraded": "IA sin respuesta: modo extractivo",
       "degradedTooltip": "El servidor tiene clave de OpenAI, pero la última llamada al proveedor falló. Se muestran los fragmentos encontrados, con su cita."
     },
@@ -51,10 +51,18 @@
       "subtitle": "Esto es lo único que consulta el asistente. Haz clic en un documento para leerlo completo.",
       "preparing": "Indexando los documentos en el servidor…",
       "ready": "{count, plural, one {# documento indexado} other {# documentos indexados}} en el servidor",
-      "error": "No pudimos indexar los documentos. Revisa tu conexión.",
       "retry": "Reintentar",
       "sections": "{count, plural, one {# sección} other {# secciones}}",
-      "open": "Ver documento"
+      "open": "Ver documento",
+      "checking": "Revisando si ya están indexados…",
+      "idle": "{count, plural, one {# documento de ejemplo} other {# documentos de ejemplo}}: se indexan en el servidor con tu primera pregunta.",
+      "errors": {
+        "rateLimited": "El servidor limita cuántos asistentes de ejemplo se pueden crear por hora desde una misma red, y ese límite ya se alcanzó. Intenta de nuevo más tarde o prueba con tu documento.",
+        "capacity": "La demo llegó a su capacidad de asistentes en este momento. Intenta de nuevo más tarde o prueba con tu documento.",
+        "unavailable": "El chatbot no está disponible en este momento. Intenta de nuevo en unos minutos.",
+        "network": "No pudimos conectar con el servidor de la demo. Revisa tu conexión e inténtalo de nuevo.",
+        "generic": "No pudimos indexar los documentos. Inténtalo de nuevo."
+      }
     },
     "included": {
       "title": "Qué incluye hoy",
@@ -67,7 +75,7 @@
           "title": "Carga de documentos",
           "summary": "Texto, PDF, DOCX y TXT según el modo de la demo.",
           "items": [
-            "Aquí: los documentos de la empresa ficticia se suben como texto al servidor al elegirla.",
+            "Aquí: los documentos de la empresa ficticia se suben como texto al servidor con tu primera pregunta, y este navegador los reutiliza en tus siguientes visitas.",
             "«Prueba con tu documento»: PDF (con número de página), DOCX y TXT de hasta 5 MB y 30 páginas.",
             "«Configura el tuyo»: archivos de texto (TXT, MD o CSV) para tu bot."
           ]
@@ -118,8 +126,9 @@
           "title": "Historial de conversaciones",
           "summary": "Preguntas, respuestas y fuentes de tu bot.",
           "items": [
-            "En «Configura el tuyo» ves las conversaciones de tu bot, cuántas tuvieron fuente y cuántas no se encontraron.",
-            "Puedes exportarlas a CSV o borrarlas."
+            "En «Configura el tuyo» ves lo que le preguntan a tu bot por el enlace directo o por el widget en tu sitio, cuántas preguntas tuvieron fuente y cuántas no se encontraron.",
+            "Puedes exportarlas a CSV o borrarlas. Cada pregunta guardada se borra sola a los 30 días.",
+            "Las preguntas de «Prueba el asistente» y de la vista previa de «Configura el tuyo» no se guardan."
           ]
         }
       }
@@ -142,16 +151,24 @@
       "regenerateTooltip": "Envía otra vez la misma pregunta al servidor y reemplaza esta respuesta.",
       "feedbackUp": "Respuesta útil",
       "feedbackDown": "Respuesta a mejorar",
-      "feedbackSaved": "Valoración guardada en las métricas de esta sesión",
+      "feedbackSaved": "Anotado en las métricas de esta sesión. Tu valoración no se envía al servidor.",
       "generatedBy": "Redactada por {model} con {count, plural, one {# fragmento} other {# fragmentos}}",
       "extractive": "Modo extractivo: fragmentos encontrados, citados tal cual",
       "providerError": "El proveedor de IA no respondió: se muestran los fragmentos encontrados (modo extractivo)",
       "notFound": "No está en los documentos: el asistente no inventa una respuesta.",
-      "errorNetwork": "No pudimos conectar con el servidor de la demo. Inténtalo de nuevo.",
+      "errorNetwork": "No pudimos conectar con el servidor de la demo. Revisa tu conexión e inténtalo de nuevo.",
       "errorGeneric": "Algo salió mal al responder. Inténtalo de nuevo.",
       "retry": "Reintentar",
       "citationTooltip": "Fragmento citado: haz clic para verlo completo",
-      "sourceButton": "Ver la fuente {n}: {name}"
+      "sourceButton": "Ver la fuente {n}: {name}",
+      "feedbackRemoved": "Valoración quitada de las métricas de esta sesión.",
+      "feedbackUpTooltip": "Respuesta útil · solo suma a las métricas de esta sesión (no se envía)",
+      "feedbackDownTooltip": "Respuesta a mejorar · solo suma a las métricas de esta sesión (no se envía)",
+      "errorRateLimited": "No pudimos preparar el asistente: el servidor limita cuántos asistentes de ejemplo se pueden crear por hora desde una misma red, y ese límite ya se alcanzó. Intenta de nuevo más tarde o prueba con tu documento.",
+      "errorChatRateLimited": "Llegaron muchas preguntas seguidas desde tu red y el servidor pidió una pausa. Espera un minuto y vuelve a intentarlo.",
+      "errorCapacity": "No pudimos preparar el asistente: la demo llegó a su capacidad de asistentes en este momento. Intenta de nuevo más tarde o prueba con tu documento.",
+      "errorUnavailable": "El chatbot no está disponible en este momento. Intenta de nuevo en unos minutos.",
+      "useUpload": "Probar con tu documento"
     },
     "pipeline": {
       "title": "Cómo se respondió",
@@ -198,15 +215,15 @@
     },
     "stats": {
       "title": "Métricas de esta sesión",
-      "toggle": "Mostrar u ocultar las métricas de esta sesión",
-      "hint": "Se calculan con las respuestas reales de esta pestaña; se reinician al recargar.",
+      "hint": "Se calculan en tu navegador con las respuestas reales de esta pestaña; no se envían al servidor y se reinician al recargar.",
       "questions": "Preguntas",
       "withSources": "Con fuente",
       "notFound": "No encontré",
       "avgLatency": "Tiempo medio",
       "tokens": "Tokens",
       "cost": "Costo (USD)",
-      "feedback": "Útil / a mejorar"
+      "feedback": "Útil / a mejorar",
+      "summary": "{count, plural, one {# pregunta} other {# preguntas}} · {withSources} con fuente"
     },
     "sourcePanel": {
       "title": "Fragmento citado",
@@ -232,9 +249,9 @@
       "step1Title": "Elige una empresa de ejemplo",
       "step1Body": "Arriba cambias entre tres empresas ficticias (recursos humanos, tienda en línea y salud). Cada una tiene sus propios documentos.",
       "step2Title": "Haz una pregunta sugerida",
-      "step2Body": "El servidor busca en esos documentos y la respuesta trae citas [1], [2]… con la fuente.",
+      "step2Body": "Con tu primera pregunta, el servidor indexa esos documentos, busca en ellos y responde con citas [1], [2]… a la fuente.",
       "step3Title": "Abre la fuente",
-      "step3Body": "Haz clic en una cita para ver el fragmento exacto y el documento completo de donde salió.",
+      "step3Body": "Haz clic en una cita para ver el fragmento exacto y el documento completo de donde salió. En «Cómo se respondió» ves los pasos que hizo el servidor.",
       "step4Title": "Pregunta algo que no esté",
       "step4Body": "Si la información no está en los documentos, el asistente responde «No encontré esa información» en lugar de inventarla.",
       "step5Title": "Prueba con tu documento o configura el tuyo",
@@ -256,7 +273,9 @@
         "loadFailed": "No pudimos cargar el bot: puede que ya no exista en el servidor.",
         "removedMissing": "El bot «{name}» ya no existe en el servidor y se quitó de tu lista.",
         "newReady": "Bot nuevo listo: configúralo y guárdalo.",
-        "selected": "Bot cargado: {name}"
+        "selected": "Bot cargado: {name}",
+        "deleteAction": "Eliminar",
+        "cancel": "Cancelar"
       },
       "actions": {
         "save": "Guardar bot",
@@ -360,14 +379,14 @@
       },
       "conversations": {
         "title": "Conversaciones",
-        "subtitle": "Lo que le han preguntado a tu bot (aquí, en el enlace directo o en tu sitio).",
+        "subtitle": "Lo que le preguntan a tu bot por el enlace directo («Abrir chat») o por el widget en tu sitio. Cada pregunta se borra sola a los 30 días.",
         "refresh": "Actualizar",
         "export": "Exportar CSV",
         "clear": "Borrar historial",
         "clearConfirm": "¿Borrar todas las conversaciones de este bot?",
         "cleared": "Historial borrado",
         "exported": "CSV descargado",
-        "empty": "Todavía no hay conversaciones. Pregúntale algo en la vista previa.",
+        "empty": "Todavía no hay conversaciones guardadas. Las preguntas de la vista previa no se guardan: abre el bot con «Abrir chat» o pégalo en tu sitio y pregúntale algo.",
         "saveFirst": "Guarda el bot para ver sus conversaciones.",
         "loadFailed": "No pudimos cargar las conversaciones.",
         "questions": "Preguntas",
@@ -377,7 +396,9 @@
         "assistant": "Respuesta",
         "sources": "Fuentes",
         "date": "Fecha",
-        "notOwner": "Solo el dueño del bot puede ver sus conversaciones: este navegador no tiene su token."
+        "notOwner": "Solo el dueño del bot puede ver sus conversaciones: este navegador no tiene su token.",
+        "clearAction": "Borrar",
+        "cancel": "Cancelar"
       }
     },
     "embedPage": {
@@ -393,7 +414,9 @@
       "errorNetwork": "No pudimos conectar con el servidor. Inténtalo de nuevo.",
       "retry": "Reintentar",
       "sourceTitle": "Fuente [{n}] · {name}",
-      "hideSource": "Ocultar fuente"
+      "hideSource": "Ocultar fuente",
+      "errorRateLimited": "Llegaron muchas preguntas seguidas y el servidor pidió una pausa. Espera un minuto y vuelve a intentarlo.",
+      "errorUnavailable": "El asistente no está disponible en este momento. Intenta de nuevo en unos minutos."
     },
     "ragLink": "Sistemas RAG para empresas",
     "ragLinkShort": "¿Qué es RAG?",
@@ -477,8 +500,10 @@
         "capacity": "La demo tiene mucha demanda en este momento. Intenta de nuevo en unos minutos.",
         "llm_error": "No pudimos generar la respuesta. Intenta de nuevo; esta pregunta no se descontó.",
         "network": "No pudimos conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.",
-        "generic": "Algo salió mal. Inténtalo de nuevo."
+        "generic": "Algo salió mal. Inténtalo de nuevo.",
+        "lead_unavailable": "No pudimos registrar tu prueba en este momento, así que no procesamos tu documento. Intenta de nuevo en unos minutos."
       }
-    }
+    },
+    "backToCatalog": "Volver al catálogo"
   }
 }

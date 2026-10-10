@@ -24,7 +24,10 @@ export default function Dashboard() {
   const { state, nav, today, lang, go } = useWms();
   const k = kpis(state, nav.wh, today);
   const w = WAREHOUSE_BY_ID[nav.wh];
-  const log = state.log.filter((l) => l.wh === nav.wh).slice(0, 10);
+  const log = state.log
+    .filter((l) => l.wh === nav.wh)
+    .sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0))
+    .slice(0, 10);
   const alerts: { key: string; text: string; onClick: () => void }[] = [];
   if (k.expired) alerts.push({ key: 'expired', text: t('dashboard.alerts.expired', { n: k.expired }), onClick: () => go('stock', { focus: 'expiring' }) });
   if (k.expiring) alerts.push({ key: 'expiring', text: t('dashboard.alerts.expiring', { n: k.expiring }), onClick: () => go('stock', { focus: 'expiring' }) });

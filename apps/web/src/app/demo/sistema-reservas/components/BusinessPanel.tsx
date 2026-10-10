@@ -37,7 +37,7 @@ export default function BusinessPanel({
   onReschedule: (id: string) => void;
 }) {
   const t = useTranslations('demoReservas.panel');
-  const { biz, data, state } = useReservas();
+  const { biz, data, state, now } = useReservas();
   const f = useFmt();
   const kind = useKind(biz);
   const [viewAs, setViewAs] = useState('all');
@@ -51,7 +51,7 @@ export default function BusinessPanel({
           <p className="text-sm text-slate-500 dark:text-slate-400">{t('subtitle')}</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 sm:items-end">
-          <div className="sm:w-60">
+          <div className="sm:w-72">
             <label htmlFor="view-as" className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
               {t('viewAs')}
             </label>
@@ -64,7 +64,7 @@ export default function BusinessPanel({
               ))}
             </select>
           </div>
-          <button type="button" className={btnPrimary} onClick={() => onNew({})}>
+          <button type="button" className={btnPrimary} onClick={() => onNew(tab === 'agenda' && agendaDate > now.date ? { date: agendaDate } : {})}>
             <PlusIcon className="h-4 w-4" />
             {t('new')}
           </button>

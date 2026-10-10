@@ -95,7 +95,7 @@ export default function Carriers() {
           </div>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[480px] text-sm">
+          <table className="w-full text-sm sm:min-w-[480px]">
             <thead>
               <tr className="border-b border-secondary-200 dark:border-secondary-700">
                 <th className={thCls}>{t('tracking.carrier')}</th>
@@ -111,7 +111,7 @@ export default function Carriers() {
                     {best.cheapest === q.carrier.id && <Pill tone="success">{t('packing.cheapest')}</Pill>}{' '}
                     {best.fastest === q.carrier.id && <Pill tone="info">{t('packing.fastest')}</Pill>}
                   </td>
-                  <td className={`${tdCls} text-right tabular-nums`}>{q.ok ? fmtCOP(q.price, lang) : '—'}</td>
+                  <td className={`${tdCls} whitespace-nowrap text-right tabular-nums`}>{q.ok ? fmtCOP(q.price, lang) : '—'}</td>
                   <td className={`${tdCls} text-right text-xs`}>{q.ok ? (q.days === 0 ? t('carriers.sameDay') : t('carriers.days', { n: q.days })) : t(`packing.reasons.${q.reason}`)}</td>
                 </tr>
               ))}

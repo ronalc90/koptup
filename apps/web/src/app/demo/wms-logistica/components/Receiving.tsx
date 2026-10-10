@@ -8,7 +8,7 @@ import { binContents, emptyBins } from '../lib/engine';
 import { fmtDate, fmtDateTime, fmtNum } from '../lib/format';
 import { now, useWms } from '../lib/store';
 import type { PurchaseOrder } from '../lib/types';
-import { Empty, Field, Panel, Pill, SimNote, inputCls, selectCls, tdCls, thCls, useProductName, useT, type Tone } from './ui';
+import { Empty, Field, Panel, Pill, SimNote, inputCls, selectCls, tdCls, thCls, scrollIntoViewOnMobile, useProductName, useT, type Tone } from './ui';
 
 /** Código de un producto que no viene en ninguna OC (para mostrar el rechazo). */
 const UNKNOWN_CODE = ean13('200000999999');
@@ -69,7 +69,10 @@ export default function Receiving() {
                     <button
                       type="button"
                       aria-pressed={p.id === selected}
-                      onClick={() => setSelected(p.id)}
+                      onClick={() => {
+                        setSelected(p.id);
+                        scrollIntoViewOnMobile('wms-po-detail');
+                      }}
                       className={`w-full rounded-xl border p-3 text-left text-sm transition ${
                         p.id === selected ? 'border-stone-600 bg-stone-50 dark:bg-stone-900/30' : 'border-secondary-200 hover:border-stone-400 dark:border-secondary-700'
                       }`}
@@ -92,6 +95,7 @@ export default function Receiving() {
         </Panel>
 
         <Panel
+          id="wms-po-detail"
           className="xl:col-span-3"
           title={po ? `${po.id} · ${SUPPLIER_BY_ID[po.supplier].name}` : t('receiving.detail')}
           subtitle={po ? `NIT ${fmtNit(SUPPLIER_BY_ID[po.supplier].nit)} · ${SUPPLIER_BY_ID[po.supplier].city} · ${t('receiving.forClient', { client: CLIENT_BY_ID[po.client].name })}` : undefined}

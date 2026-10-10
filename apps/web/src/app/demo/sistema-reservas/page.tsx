@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { ArrowPathIcon, BuildingStorefrontIcon, CalendarDaysIcon, InformationCircleIcon, UserGroupIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, ArrowPathIcon, BuildingStorefrontIcon, CalendarDaysIcon, InformationCircleIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import BookingDetail from './components/BookingDetail';
 import BookingWizard from './components/BookingWizard';
 import BusinessPanel, { type PanelTab } from './components/BusinessPanel';
@@ -23,6 +24,13 @@ export default function SistemaReservasPage() {
     <ToastProvider>
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+          <Link
+            href="/demo"
+            className="mb-4 inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-orange-700 dark:hover:text-orange-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+          >
+            <ArrowLeftIcon className="h-4 w-4" />
+            {t('shell.back')}
+          </Link>
           <header className="mb-4">
             <div className="flex items-start gap-3">
               <div className="p-2 rounded-xl bg-gradient-to-br from-orange-600 to-amber-600 text-white shrink-0">
@@ -126,6 +134,8 @@ function Demo() {
   const goAgenda = (bookingId: string) => {
     const b = state.data[state.preset].bookings.find((x) => x.id === bookingId);
     if (b) setAgendaDate(b.date);
+    // La reserva ya quedó hecha: al volver a la vista cliente se ven los servicios.
+    setWizard(null);
     setTab('agenda');
     setView('business');
     top();
@@ -201,8 +211,9 @@ function Demo() {
         </div>
       </div>
 
-      {view === 'client' ? (
-        wizard ? (
+      {/* La vista cliente se oculta (no se desmonta) para no perder una reserva a medio hacer al mirar la agenda. */}
+      <div hidden={view !== 'client'}>
+        {wizard ? (
           <BookingWizard
             key={wizard.key}
             serviceId={wizard.serviceId}
@@ -223,8 +234,9 @@ function Demo() {
               top();
             }}
           />
-        )
-      ) : (
+        )}
+      </div>
+      {view === 'business' && (
         <BusinessPanel
           tab={tab}
           setTab={setTab}

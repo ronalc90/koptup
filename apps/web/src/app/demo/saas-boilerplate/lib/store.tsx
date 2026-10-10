@@ -61,14 +61,17 @@ function restore(raw: unknown): DemoState {
     tenants,
     members: (r.members as Member[]).filter((m) => isObj(m) && typeof m.id === 'string' && ROLES.includes(m.role)),
     invoices: (r.invoices as Invoice[]).filter((i) => isObj(i) && typeof i.number === 'string' && typeof i.total === 'number'),
-    dunning: r.dunning as DemoState['dunning'],
+    dunning: (r.dunning as DemoState['dunning']).filter((d) => isObj(d) && typeof d.tenantId === 'string' && typeof d.stage === 'number' && typeof d.startedAt === 'string'),
     audit: (r.audit as AuditEntry[]).filter((a) => isObj(a) && typeof a.action === 'string').slice(-300),
     webhooks: (r.webhooks as WebhookEvent[]).filter((w) => isObj(w) && typeof w.type === 'string').slice(-100),
-    notices: r.notices as DemoState['notices'],
-    units: r.units as DemoState['units'],
-    reservations: r.reservations as DemoState['reservations'],
+    notices: (r.notices as DemoState['notices']).filter((n) => isObj(n) && typeof n.id === 'string' && typeof n.tenantId === 'string' && typeof n.at === 'string'),
+    units: (r.units as DemoState['units']).filter((u) => isObj(u) && typeof u.id === 'string' && typeof u.tenantId === 'string' && typeof u.label === 'string'),
+    reservations: (r.reservations as DemoState['reservations']).filter((x) => isObj(x) && typeof x.id === 'string' && typeof x.date === 'string'),
     votes: isObj(r.votes) ? (r.votes as DemoState['votes']) : base.votes,
-    impersonation: isObj(r.impersonation) ? (r.impersonation as DemoState['impersonation']) : null,
+    impersonation:
+      isObj(r.impersonation) && tenants.some((t) => t.id === (r.impersonation as { tenantId?: unknown }).tenantId && t.status !== 'cancelado')
+        ? (r.impersonation as DemoState['impersonation'])
+        : null,
     clock: typeof r.clock === 'string' ? r.clock : base.clock,
     seq: typeof r.seq === 'number' ? r.seq : base.seq,
     invoiceSeq: typeof r.invoiceSeq === 'number' ? r.invoiceSeq : base.invoiceSeq,
@@ -82,6 +85,15 @@ function restore(raw: unknown): DemoState {
 }
 
 type Mutator = (s: DemoState) => DemoState;
+
+/** Lleva al inicio de la pantalla activa solo si quedó oculto arriba (bajo el menú fijo del sitio). */
+export function scrollToScreen() {
+  if (typeof window === 'undefined') return;
+  const el = document.getElementById('saas-screen');
+  if (!el) return;
+  const top = el.getBoundingClientRect().top;
+  if (top < 96) window.scrollTo({ top: Math.max(0, window.scrollY + top - 96), behavior: 'smooth' });
+}
 
 /** Utilidades para registrar bitácora y webhooks dentro de una mutación. */
 function logger(s: DemoState) {
@@ -131,15 +143,6 @@ function useDemoState() {
     setReady(true);
   }, []);
 
-  useEffect(() => {
-    if (!ready) return;
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
-    } catch {
-      /* sin espacio o bloqueado: la demo sigue funcionando sin guardar */
-    }
-  }, [s, ready]);
-
   const update = useCallback((fn: Mutator) => setS((prev) => fn(prev)), []);
 
   const toast = useCallback((key: string, params?: Record<string, string>, tone: Toast['tone'] = 'ok') => {
@@ -150,10 +153,24 @@ function useDemoState() {
   }, []);
   const dismissToast = useCallback((id: number) => setToasts((prev) => prev.filter((x) => x.id !== id)), []);
 
+  const warnedStorage = useRef(false);
+  useEffect(() => {
+    if (!ready) return;
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+    } catch {
+      /* sin espacio o bloqueado: la demo sigue funcionando sin guardar */
+      if (!warnedStorage.current) {
+        warnedStorage.current = true;
+        toast('toast.storageFull', undefined, 'warn');
+      }
+    }
+  }, [s, ready, toast]);
+
   const go = useCallback((screen: Screen) => {
     if (!SCREENS.includes(screen)) return;
     update((p) => ({ ...p, screen }));
-    if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToScreen();
   }, [update]);
 
   const select = useCallback((area: keyof DemoState['selected'], tenantId: string) => {
@@ -166,12 +183,16 @@ function useDemoState() {
 
   const setTourHidden = useCallback((hidden: boolean) => update((p) => ({ ...p, tourHidden: hidden })), [update]);
 
+  /** Borrador del asistente de alta: sobrevive al cambio de pantalla (no se guarda en el navegador). */
+  const draft = useRef<unknown>(null);
+
   const reset = useCallback(() => {
     try {
       window.localStorage.removeItem(STORAGE_KEY);
     } catch {
       /* nada que borrar */
     }
+    draft.current = null;
     setS(defaultState());
     toast('toast.reset');
   }, [toast]);
@@ -381,11 +402,12 @@ function useDemoState() {
   }, [update, toast]);
 
   const resend = useCallback((memberId: string) => {
-    let email = '';
+    const cur = latest.current.members.find((x) => x.id === memberId);
+    if (!cur || cur.status !== 'invitado') return;
+    const email = cur.email;
     update((p) => {
       const m = p.members.find((x) => x.id === memberId);
       if (!m || m.status !== 'invitado') return p;
-      email = m.email;
       const log = logger(p);
       log.audit('member.invite_resent', m.tenantId, { email: m.email });
       return log.apply({ ...p, members: p.members.map((x) => (x.id === memberId ? { ...x, invitedAt: log.clock, resent: (x.resent ?? 0) + 1 } : x)) });
@@ -481,7 +503,7 @@ function useDemoState() {
         tour: { ...p.tour, support: true },
       });
     });
-    if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToScreen();
   }, [update]);
 
   const endSupport = useCallback(() => {
@@ -570,7 +592,7 @@ function useDemoState() {
   }, [update]);
 
   return {
-    s, ready, toasts, toast, dismissToast, go, select, markTour, setTourHidden, reset,
+    s, ready, toasts, toast, dismissToast, go, select, markTour, setTourHidden, reset, draft,
     createTenant, changePlan, pay, logRejected, simulateFailure, advanceDunning, cancelTenant,
     invite, resend, revoke, accept, changeRole, setAuth, logLogin, toggleModule,
     startSupport, endSupport, publishNotice, payFee, reserve, vote, checkResource, logApi, markInvoiceOpened,

@@ -1,323 +1,772 @@
 {
   "demoSaas": {
-    "pageTitle": "SaaS Boilerplate Multi-tenant",
-    "pageSubtitle": "Plantilla productiva para construir SaaS B2B: auth empresarial, billing, multi-tenancy, webhooks, audit logs, feature flags y observabilidad. Todo listo desde el día uno.",
-    "stack": {
-      "title": "Stack",
-      "items": ["Next.js 14", "TypeScript", "PostgreSQL + RLS", "Redis", "Stripe", "Paddle", "OpenTelemetry", "Sentry"]
+    "meta": {
+      "back": "Volver a demos",
+      "title": "Plataforma SaaS multi-tenant",
+      "subtitle": "Así se vería tu software convertido en un SaaS que cobra cada mes: clientes con sus datos aislados, cobros en pesos, factura de cada cobro, usuarios y roles, un portal con la marca de cada cliente y un panel para operar y dar soporte.",
+      "caseLine": "Caso de ejemplo: {product}, un software ficticio para administrar conjuntos residenciales que se vende por suscripción. Cada conjunto es un cliente (tenant). Datos al {date}.",
+      "sampleBadge": "Datos de ejemplo",
+      "sampleHint": "Empresas, personas, NIT, correos, IP y cifras son ficticios.",
+      "simBadge": "Simulación: sin cobros, correos ni servidor",
+      "reset": "Restablecer datos",
+      "resetConfirm": "¿Borrar tus cambios y volver a los datos de ejemplo?",
+      "resetYes": "Sí, restablecer",
+      "navLabel": "Pantallas de la demo"
     },
-    "tabs": {
-      "overview": "Arquitectura",
-      "tenancy": "Multi-tenancy",
-      "auth": "Auth",
-      "billing": "Billing",
-      "admin": "Admin panel",
-      "webhooks": "Webhooks",
-      "api": "API + Docs",
-      "audit": "Audit logs",
-      "flags": "Feature flags",
-      "i18n": "i18n",
-      "observability": "Observability",
-      "teams": "Teams"
-    },
-    "overview": {
-      "title": "Arquitectura de referencia",
-      "subtitle": "Servicios desacoplados, datos aislados por tenant, observabilidad de extremo a extremo.",
-      "nodes": {
-        "frontend": "Frontend Next.js",
-        "frontendSub": "SSR + RSC + Edge",
-        "api": "API Gateway",
-        "apiSub": "tRPC / REST / GraphQL",
-        "auth": "Auth Service",
-        "authSub": "SSO + MFA + SCIM",
-        "db": "Postgres + RLS",
-        "dbSub": "row-level isolation",
-        "cache": "Redis",
-        "cacheSub": "cache + rate limit",
-        "queue": "Workers",
-        "queueSub": "BullMQ / Temporal",
-        "webhooks": "Webhook Bus",
-        "webhooksSub": "retries + DLQ",
-        "billing": "Stripe / Paddle",
-        "billingSub": "subscriptions + usage"
+    "screens": {
+      "dashboard": {
+        "label": "Tu SaaS hoy",
+        "title": "Tu SaaS hoy",
+        "subtitle": "La vista del dueño del software: ingresos recurrentes del mes, clientes por estado y lo que hay que atender."
       },
-      "highlights": {
-        "title": "Decisiones de diseño",
-        "items": [
-          "Aislamiento por tenant con Row Level Security en Postgres",
-          "Sesiones JWT firmadas con rotación de claves (JWKS)",
-          "Cola de webhooks con reintentos exponenciales y dead letter queue",
-          "Telemetría OpenTelemetry hacia colector central",
-          "Feature flags evaluados en edge para latencia mínima"
-        ]
+      "onboarding": {
+        "label": "Alta de un cliente",
+        "title": "Alta de un cliente",
+        "subtitle": "Da de alta un conjunto en 3 pasos: datos, subdominio y plan, y su marca. Empieza con 14 días de prueba gratis."
+      },
+      "billing": {
+        "label": "Planes y cobros",
+        "title": "Planes y cobros",
+        "subtitle": "Cobra el mes con tarjeta, PSE o Nequi (simulados), cambia de plan con prorrateo, abre las facturas de ejemplo y sigue los cobros fallidos."
+      },
+      "access": {
+        "label": "Usuarios y accesos",
+        "title": "Usuarios y accesos",
+        "subtitle": "Invita al equipo de cada conjunto, asigna roles, decide cómo inician sesión y prueba el segundo factor."
+      },
+      "portal": {
+        "label": "Portal del cliente",
+        "title": "Portal del cliente",
+        "subtitle": "Lo que ve cada conjunto: su marca, sus datos y solo sus datos."
+      },
+      "operations": {
+        "label": "Operación y técnica",
+        "title": "Operación y equipo técnico",
+        "subtitle": "Soporte con motivo registrado, módulos por cliente, bitácora, webhooks firmados, una API de prueba y la arquitectura que proponemos."
       }
     },
-    "tenancy": {
-      "title": "Patrones de multi-tenancy",
-      "subtitle": "Elige el modelo de aislamiento según el perfil de tus clientes y obligaciones de cumplimiento.",
-      "patterns": {
-        "sharedDb": {
-          "name": "Shared DB + RLS",
-          "tagline": "Una base, aislamiento por fila",
-          "pros": ["Costos bajos a gran escala", "Migraciones simples", "Operación uniforme"],
-          "cons": ["Riesgo si se omite el filtro", "Tuning fino de índices", "Backups por tenant complejos"],
-          "snippet": "-- Habilitar RLS y política por tenant\nALTER TABLE invoices ENABLE ROW LEVEL SECURITY;\n\nCREATE POLICY tenant_isolation ON invoices\n  USING (tenant_id = current_setting('app.tenant_id')::uuid);\n\n-- En cada request\nSET LOCAL app.tenant_id = '8f3a...';"
-        },
-        "schemaPerTenant": {
-          "name": "Schema per tenant",
-          "tagline": "Un schema por cliente",
-          "pros": ["Aislamiento lógico fuerte", "Backups por tenant", "Migraciones por etapas"],
-          "cons": ["Conexiones por schema", "Migraciones más lentas", "Catálogo grande"],
-          "snippet": "// Resolver schema por tenant\nconst client = await pool.connect();\nawait client.query(`SET search_path TO tenant_${tenantId}, public`);\n\nconst { rows } = await client.query(\n  'SELECT * FROM invoices LIMIT 50'\n);"
-        },
-        "dbPerTenant": {
-          "name": "DB per tenant",
-          "tagline": "Una base por cliente",
-          "pros": ["Aislamiento físico", "Cumplimiento estricto", "Restore independiente"],
-          "cons": ["Costo operativo alto", "Pool de conexiones complejo", "Cambios de schema globales caros"],
-          "snippet": "// Router de conexión por tenant\nconst dsn = await vault.getTenantDsn(tenantId);\nconst db = getOrCreatePool(dsn);\n\nreturn db.query(\n  'SELECT * FROM invoices WHERE deleted_at IS NULL'\n);"
-        }
-      },
-      "prosLabel": "Ventajas",
-      "consLabel": "Compromisos",
-      "snippetLabel": "Snippet"
+    "common": {
+      "all": "Todos",
+      "back": "Atrás",
+      "next": "Siguiente",
+      "cancel": "Cancelar",
+      "close": "Cerrar",
+      "copy": "Copiar",
+      "copied": "Copiado",
+      "copyCode": "Copiar código",
+      "exportCsv": "Exportar CSV",
+      "perMonth": "al mes, sin IVA",
+      "plusIvaMonth": "+ IVA al mes",
+      "tenant": "Cliente"
     },
-    "auth": {
-      "title": "Auth empresarial",
-      "subtitle": "SSO, MFA, social y magic links. Todo el flujo cubierto con un único provider.",
-      "methods": {
-        "sso": "SSO",
-        "mfa": "MFA",
-        "social": "Social",
-        "magic": "Magic link"
+    "status": {
+      "activo": "Activo",
+      "prueba": "En prueba",
+      "mora": "En mora",
+      "suspendido": "Suspendido",
+      "cancelado": "Cancelado"
+    },
+    "plans": {
+      "pequeno": { "name": "Conjunto pequeño" },
+      "mediano": { "name": "Conjunto mediano" },
+      "multi": { "name": "Multiconjunto" },
+      "limits": "Hasta {units} unidades · {staff} usuarios del equipo · {storage} GB"
+    },
+    "modules": {
+      "pagos": { "name": "Pagos de administración", "desc": "Los residentes ven y pagan la cuota de su unidad." },
+      "reservas": { "name": "Reservas de zonas comunes", "desc": "Salón social, zona BBQ, piscina y cancha." },
+      "votaciones": { "name": "Votaciones de asamblea", "desc": "Preguntas de asamblea con un voto por unidad." }
+    },
+    "methods": {
+      "tarjeta": "Tarjeta",
+      "pse": "PSE",
+      "nequi": "Nequi"
+    },
+    "usage": {
+      "units": "Unidades",
+      "staff": "Usuarios del equipo",
+      "storage": "Almacenamiento"
+    },
+    "roles": {
+      "admin": "Administrador del conjunto",
+      "contador": "Contador",
+      "porteria": "Portería",
+      "residente": "Residente"
+    },
+    "roleDesc": {
+      "admin": "gestiona el conjunto y su equipo.",
+      "contador": "ve pagos, cartera y facturas.",
+      "porteria": "registra visitantes y correspondencia.",
+      "residente": "paga, reserva y vota desde el portal. No cuenta en el límite del plan."
+    },
+    "support": {
+      "banner": "Sesión de soporte en {tenant} (motivo: «{reason}»). Lo que hagas queda en la bitácora.",
+      "end": "Terminar sesión de soporte"
+    },
+    "dashboard": {
+      "newTenant": "Nuevo cliente",
+      "kpi": {
+        "mrr": "Ingresos recurrentes (sin IVA)",
+        "mrrSub": "{amount} si las pruebas pasan a pago",
+        "collected": "Cobrado este mes",
+        "collectedSub": "{n, plural, one {# factura} other {# facturas}}, IVA incluido",
+        "active": "Clientes activos",
+        "activeSub": "{n, plural, one {# más en prueba gratis} other {# más en prueba gratis}}",
+        "overdue": "En mora o suspendidos",
+        "overdueSub": "{amount} al mes en riesgo",
+        "moves": "Altas / bajas del mes",
+        "movesSub": "Clientes nuevos y cancelados en el mes"
       },
-      "sso": {
-        "title": "Single Sign-On corporativo",
-        "saml": "SAML 2.0",
-        "samlDesc": "Conector genérico para Okta, Azure AD, Google Workspace, Ping.",
-        "oidc": "OIDC",
-        "oidcDesc": "Discovery automático, refresh tokens y revocación.",
-        "scim": "Aprovisionamiento SCIM",
-        "scimDesc": "Sincronización de usuarios y grupos desde el IdP."
+      "chartTitle": "Ingresos recurrentes por mes",
+      "chartSubtitle": "Antes de IVA. El mes actual cambia con lo que hagas en la demo.",
+      "chartNote": "Mayo a septiembre son cifras de ejemplo fijas; octubre se calcula con los clientes de abajo.",
+      "listTitle": "Clientes",
+      "listSubtitle": "{shown} de {total} clientes",
+      "search": "Buscar por nombre, ciudad o subdominio",
+      "filterLabel": "Filtrar por estado",
+      "empty": "Ningún cliente coincide con la búsqueda.",
+      "trialLeft": "{days, plural, one {Queda # día de prueba} other {Quedan # días de prueba}}",
+      "dunningStage": "Cobro fallido: aviso del día {day}",
+      "cancelledOn": "Cancelado el {date}",
+      "since": "Cliente desde",
+      "contact": "Contacto",
+      "cols": {
+        "tenant": "Cliente",
+        "subdomain": "Subdominio",
+        "city": "Ciudad",
+        "plan": "Plan",
+        "units": "Unidades",
+        "staff": "Usuarios del equipo",
+        "status": "Estado",
+        "monthly": "Valor mensual sin IVA (COP)"
       },
-      "mfa": {
-        "title": "Segundo factor obligatorio",
-        "totp": "TOTP",
-        "totpDesc": "Apps autenticadoras compatibles RFC 6238.",
-        "webauthn": "Passkeys (WebAuthn)",
-        "webauthnDesc": "Hardware keys, Face ID, Touch ID.",
-        "sms": "SMS",
-        "smsDesc": "Fallback con rate limiting y detección de fraude."
+      "actions": {
+        "portal": "Ver su portal",
+        "billing": "Cobros",
+        "access": "Usuarios",
+        "cancel": "Cancelar suscripción",
+        "cancelYes": "Sí, cancelar"
       },
-      "social": {
-        "title": "Identidades sociales",
-        "items": ["Google", "GitHub", "Apple", "Microsoft"]
+      "cancelConfirm": "¿Cancelar la suscripción? El conjunto pierde el acceso y sale de los ingresos recurrentes.",
+      "cancelledNote": "Suscripción cancelada: el conjunto ya no tiene acceso a su portal."
+    },
+    "onboarding": {
+      "steps": {
+        "1": "Datos del conjunto",
+        "2": "Subdominio y plan",
+        "3": "Marca"
       },
-      "magic": {
-        "title": "Acceso sin contraseña",
-        "step1": "El usuario ingresa su email",
-        "step2": "Recibe un enlace firmado válido por 10 minutos",
-        "step3": "Hace clic → sesión activa con device fingerprint"
+      "fields": {
+        "name": "Nombre del conjunto o edificio",
+        "city": "Ciudad",
+        "nit": "NIT (sin dígito de verificación)",
+        "email": "Correo del administrador",
+        "units": "Número de unidades (apartamentos o casas)",
+        "slug": "Subdominio",
+        "plan": "Plan",
+        "color": "Color de la marca",
+        "logo": "Logo"
       },
-      "sendCode": "Enviar código",
-      "verify": "Verificar",
-      "codeSent": "Código enviado al dispositivo",
-      "linkSent": "Enlace enviado a tu correo",
-      "verified": "Identidad verificada",
-      "providersLabel": "Continuar con",
-      "email": "Email"
+      "placeholders": {
+        "name": "Conjunto Mirador del Parque",
+        "email": "administracion@tuconjunto.example"
+      },
+      "dvHint": "El dígito de verificación (DV) se calcula solo, con el método de la DIAN.",
+      "errors": {
+        "name": "Escribe el nombre (mínimo 3 caracteres).",
+        "nit": "El NIT debe tener 9 dígitos.",
+        "nitTaken": "Ya hay un cliente con ese NIT.",
+        "email": "Escribe un correo válido.",
+        "units": "Escribe un número de unidades entre 1 y 5.000.",
+        "slug_format": "Usa de 3 a 24 letras minúsculas, números o guiones, sin empezar ni terminar en guion.",
+        "slug_reserved": "Ese subdominio está reservado.",
+        "slug_taken": "Ese subdominio ya lo usa otro cliente.",
+        "plan": "Elige un plan.",
+        "planUnits": "El plan elegido no alcanza para ese número de unidades.",
+        "logoType": "Sube una imagen PNG, JPG, WebP o SVG.",
+        "logoSize": "El logo debe pesar máximo 200 KB."
+      },
+      "suggested": "Sugerido",
+      "tooSmall": "No alcanza para {units} unidades",
+      "trialNote": "Empieza con {days} días de prueba gratis, hasta el {date}, sin pedir tarjeta.",
+      "customColor": "Otro color",
+      "uploadLogo": "Subir logo",
+      "removeLogo": "Quitar logo",
+      "logoHint": "PNG, JPG, WebP o SVG de máximo 200 KB. Se queda en tu navegador.",
+      "create": "Crear cliente",
+      "previewTitle": "Vista previa del portal",
+      "previewName": "Tu conjunto",
+      "previewButton": "Pagar administración",
+      "effectsTitle": "Al crear el cliente",
+      "effects": [
+        "Aparece en «Tu SaaS hoy» con estado «En prueba».",
+        "Su administrador queda invitado (pendiente en «Usuarios y accesos»).",
+        "Su portal toma el logo, el color y el subdominio.",
+        "El alta queda en la bitácora y genera dos webhooks."
+      ],
+      "simNote": "Simulado: no se crea ningún subdominio ni se envía el correo de invitación. Todo se guarda solo en tu navegador.",
+      "done": {
+        "title": "Listo: {name} ya es cliente",
+        "trial": "Prueba gratis hasta el {date}.",
+        "url": "Su portal: {url}",
+        "invite": "Invitación pendiente para {email} (no se envía ningún correo).",
+        "modules": "{n, plural, one {# módulo activo} other {# módulos activos}} según su plan.",
+        "charge": "Cobrarle el primer mes",
+        "portal": "Ver su portal",
+        "dashboard": "Ir a «Tu SaaS hoy»",
+        "another": "Dar de alta otro"
+      }
     },
     "billing": {
-      "title": "Billing y suscripciones",
-      "subtitle": "Stripe y Paddle integrados. Trials, prorrateo, usage-based metering y dunning automatizado.",
-      "plansTitle": "Planes",
-      "billed": "facturado mensualmente",
-      "trial": "14 días de prueba",
+      "checkoutTitle": "Cobrar el mes",
+      "checkoutSubtitle": "Suscripción de {period}",
+      "planLine": "Plan {plan}",
+      "methodLabel": "Medio de pago",
+      "card": {
+        "number": "Número de tarjeta",
+        "hint": "De prueba: 4242 4242 4242 4242 se aprueba y 4000 0000 0000 0002 se rechaza. Solo se valida el formato; no se cobra nada.",
+        "expiry": "Vence (MM/AA)",
+        "holder": "Nombre en la tarjeta"
+      },
+      "pse": {
+        "person": "Tipo de persona",
+        "juridica": "Jurídica",
+        "natural": "Natural",
+        "bank": "Banco (ficticio)",
+        "chooseBank": "Elige el banco",
+        "email": "Correo del pagador",
+        "bankScreen": "Pantalla del banco (simulada)",
+        "bankText": "{bank} te pide aprobar un pago de {amount} a {vendor}.",
+        "approve": "Aprobar pago",
+        "reject": "Rechazar"
+      },
+      "nequi": {
+        "phone": "Celular",
+        "pushTitle": "Notificación en el celular (simulada)",
+        "pushText": "Llegaría una notificación al {phone} para aprobar el pago de {amount}.",
+        "accept": "Aceptar en el celular",
+        "reject": "Rechazar"
+      },
+      "errors": {
+        "card": "Número de tarjeta no válido.",
+        "expiry": "Fecha no válida o vencida (MM/AA).",
+        "cvc": "El CVC tiene 3 o 4 dígitos.",
+        "holder": "Escribe el nombre como aparece en la tarjeta.",
+        "bank": "Elige un banco.",
+        "email": "Correo no válido.",
+        "phone": "Celular colombiano de 10 dígitos que empiece por 3."
+      },
+      "pay": "Pagar {amount} con {method}",
+      "processing": "Procesando pago…",
+      "approved": "Pago aprobado",
+      "approvedText": "Se emitió la factura de ejemplo {number}; en tu proyecto se enviaría a {email}.",
+      "rejected": "Pago rechazado",
+      "rejectedText": "No se emitió factura y el rechazo quedó en la bitácora. Prueba otro medio o la tarjeta 4242.",
+      "tryAgain": "Intentar de nuevo",
+      "upToDate": "Al día",
+      "upToDateText": "Este mes ya está pagado (factura {number}). El próximo cobro es el {next}.",
+      "simNote": "Simulado: no hay pasarela de pagos ni conexión con bancos, PSE o Nequi; los bancos son ficticios y no se mueve dinero. En tu proyecto conectamos la pasarela que elijas.",
+      "plansTitle": "Cambiar de plan",
+      "plansSubtitle": "Se valida contra el uso actual y se prorratea el resto del mes.",
       "currentPlan": "Plan actual",
-      "selectPlan": "Seleccionar",
-      "plans": {
-        "starter": {
-          "name": "Starter",
-          "price": "$29",
-          "features": ["Hasta 3 usuarios", "10k requests/mes", "Soporte por email", "Audit logs 30 días"]
-        },
-        "pro": {
-          "name": "Pro",
-          "price": "$99",
-          "features": ["Hasta 25 usuarios", "100k requests/mes", "SSO SAML/OIDC", "Audit logs 1 año", "Webhooks ilimitados"]
-        },
-        "enterprise": {
-          "name": "Enterprise",
-          "price": "Contactar",
-          "features": ["Usuarios ilimitados", "Volumen a medida", "SCIM + dominios verificados", "SLA 99.99%", "DPA y residencia de datos"]
+      "switchTo": "Cambiar a este plan",
+      "change": {
+        "trial": "Durante la prueba, pasar a {plan} no tiene costo: el primer cobro ya será con el plan nuevo.",
+        "upgrade": "Subir a {plan}: se cobran {days} días de diferencia, {amount} + IVA ({total}), en una factura de ajuste.",
+        "downgrade": "Bajar a {plan}: quedan {amount} a favor por {days} días, que se descuentan del próximo cobro.",
+        "confirm": "Confirmar cambio",
+        "errors": {
+          "same": "Ya está en ese plan.",
+          "units": "Tiene más unidades de las que permite ese plan.",
+          "staff": "Tiene más usuarios del equipo de los que permite ese plan.",
+          "storage": "Usa más almacenamiento del que permite ese plan.",
+          "status": "No se puede cambiar de plan en mora, suspendido o cancelado. Primero cobra el mes."
         }
       },
-      "checkout": {
-        "title": "Checkout mock",
-        "subtitle": "Stripe Elements + 3D Secure",
-        "card": "Tarjeta",
-        "cardPlaceholder": "4242 4242 4242 4242",
-        "expiry": "MM/AA",
-        "cvc": "CVC",
-        "email": "Email de facturación",
-        "pay": "Pagar y activar",
-        "processing": "Procesando pago seguro...",
-        "success": "Suscripción activada"
+      "creditNote": "Saldo a favor: {amount}. Se descuenta en el próximo cobro.",
+      "usageTitle": "Uso del plan",
+      "usageSubtitle": "Plan {plan}",
+      "nearLimit": "Cerca del límite del plan.",
+      "invoicesTitle": "Facturas de {tenant}",
+      "noInvoices": "Todavía no tiene facturas.",
+      "concept": "Concepto",
+      "concepts": {
+        "subscription": "Suscripción",
+        "proration": "Ajuste por cambio de plan"
       },
-      "usage": {
-        "title": "Uso del ciclo actual",
-        "subtitle": "Metering en tiempo real con facturación por consumo.",
-        "apiCalls": "API calls",
-        "storage": "Almacenamiento",
-        "seats": "Asientos activos",
-        "of": "de"
-      },
+      "viewInvoice": "Ver factura",
       "dunning": {
-        "title": "Dunning emails",
-        "subtitle": "Recordatorios automáticos ante fallos de pago.",
-        "items": [
-          { "day": "Día 0", "subject": "No pudimos cobrar tu suscripción" },
-          { "day": "Día 3", "subject": "Recordatorio: actualiza tu método de pago" },
-          { "day": "Día 7", "subject": "Tu acceso se suspenderá en 48 horas" },
-          { "day": "Día 14", "subject": "Suscripción cancelada" }
-        ]
+        "title": "Cobros fallidos",
+        "subtitle": "Si un cobro falla: avisos los días 0, 3 y 7 y suspensión el día 10. Pagar en cualquier momento deja al cliente al día.",
+        "empty": "No hay cobros fallidos en curso.",
+        "amount": "{amount} de {period}",
+        "day": "Día {day}",
+        "steps": {
+          "0": "Aviso de cobro fallido",
+          "1": "Recordatorio",
+          "2": "Último aviso",
+          "3": "Suspensión del servicio"
+        },
+        "sent": "Hecho",
+        "scheduled": "Programado",
+        "showMsg": "Ver mensaje",
+        "hideMsg": "Ocultar mensaje",
+        "emailTo": "Correo para {email}",
+        "whatsapp": "WhatsApp",
+        "msgs": {
+          "0": "Hola, equipo de {tenant}:\nNo pudimos cobrar la suscripción de {vendor} por {amount}. Puedes pagar con tarjeta, PSE o Nequi desde tu portal para evitar interrupciones.",
+          "1": "Hola, equipo de {tenant}:\nTu suscripción de {vendor} sigue pendiente ({amount}). Si ya pagaste, ignora este mensaje.",
+          "2": "Hola, equipo de {tenant}:\nÚltimo aviso: si no recibimos el pago de {amount}, el servicio se suspenderá el {date}."
+        },
+        "wa": {
+          "0": "{vendor}: no pudimos cobrar la suscripción de {tenant} ({amount}). Paga desde tu portal.",
+          "1": "{vendor}: recuerda que la suscripción de {tenant} sigue pendiente ({amount}).",
+          "2": "{vendor}: último aviso. Si no recibimos el pago de {amount}, el servicio de {tenant} se suspende."
+        },
+        "advance": "Simular el paso de los días",
+        "collect": "Cobrar ahora",
+        "simulateLabel": "Simula que una prueba termina sin pago:",
+        "simulate": "Simular cobro fallido",
+        "simNote": "Simulado: no se envía ningún correo ni WhatsApp; aquí ves el texto que se enviaría. «Simular el paso de los días» adelanta a la siguiente etapa."
       }
     },
-    "admin": {
-      "title": "Panel de administración",
-      "subtitle": "Impersonation, flags y herramientas de soporte para el equipo interno.",
-      "impersonation": {
-        "title": "Impersonation",
-        "subtitle": "Asume la identidad de un tenant para depurar incidentes (con auditoría).",
-        "selectTenant": "Seleccionar tenant",
-        "impersonate": "Impersonar",
-        "active": "Sesión impersonada activa",
-        "stop": "Detener",
-        "reason": "Motivo (obligatorio)"
+    "invoice": {
+      "modalTitle": "Factura {number}",
+      "title": "Factura electrónica de venta (ejemplo)",
+      "notValid": "Representación gráfica de EJEMPLO: no es una factura electrónica válida ni se envió a la DIAN.",
+      "seller": "Vendedor",
+      "buyer": "Comprador",
+      "number": "Número",
+      "issued": "Emitida",
+      "period": "Periodo",
+      "method": "Medio de pago",
+      "description": "Descripción",
+      "amount": "Valor",
+      "line": "Suscripción {product}, plan {plan}, {period}",
+      "lineProration": "Ajuste por cambio al plan {plan}, {period}",
+      "discount": "Saldo a favor aplicado",
+      "subtotal": "Subtotal",
+      "iva": "IVA 19 %",
+      "total": "Total",
+      "cufe": "CUFE de ejemplo (SHA-384)",
+      "cufeCalculating": "Calculando…",
+      "cufeNote": "Calculado en tu navegador con la fórmula del anexo técnico de la DIAN, pero con una clave técnica ficticia y ambiente de pruebas: no es válido ante la DIAN.",
+      "showInput": "Ver la cadena de entrada",
+      "hideInput": "Ocultar la cadena",
+      "downloadPdf": "Descargar PDF",
+      "footer": "Documento de ejemplo generado por la demo de KopTup. No tiene validez fiscal."
+    },
+    "tour": {
+      "title": "Recorrido guiado",
+      "subtitle": "Cinco pasos que se marcan solos cuando los haces en la demo.",
+      "progress": "{done} de {total}",
+      "hide": "Ocultar",
+      "show": "Ver recorrido ({done} de {total})",
+      "done": "Hecho",
+      "go": "Ir",
+      "here": "Estás en esta pantalla",
+      "steps": {
+        "dashboard": {
+          "title": "Mira tu SaaS hoy",
+          "hint": "Filtra los clientes «En mora» o abre la ficha de uno."
+        },
+        "onboarding": {
+          "title": "Da de alta un conjunto",
+          "hint": "Créalo con su logo y su plan en «Alta de un cliente»."
+        },
+        "payment": {
+          "title": "Cobra con PSE y abre la factura",
+          "hint": "Cóbrale el primer mes al conjunto nuevo con PSE y abre su factura de ejemplo."
+        },
+        "portal": {
+          "title": "Comprueba el aislamiento",
+          "hint": "En el portal del conjunto nuevo, intenta abrir un recurso de otro conjunto."
+        },
+        "support": {
+          "title": "Da soporte con motivo",
+          "hint": "En «Operación y técnica», entra como soporte con un motivo; queda en la bitácora."
+        }
       },
-      "flags": {
-        "title": "Feature flags por tenant",
-        "subtitle": "Activa funciones beta para clientes específicos."
+      "ctaTitle": "¿Quieres ver tu producto así?",
+      "ctaText": "En una demo guiada revisamos tu software y te mostramos cómo quedaría como SaaS.",
+      "ctaButton": "Solicitar demo guiada"
+    },
+    "toast": {
+      "reset": "Datos de ejemplo restablecidos.",
+      "tenantCreated": "{name} quedó creado, en prueba gratis.",
+      "planChanged": "Plan cambiado.",
+      "invited": "Invitación pendiente para {email}.",
+      "resent": "Invitación reenviada a {email} (simulado).",
+      "revoked": "Invitación revocada.",
+      "accepted": "Invitación aceptada: el usuario ya está activo.",
+      "roleChanged": "Rol actualizado.",
+      "supportEnded": "Sesión de soporte terminada y registrada.",
+      "feePaid": "Pago de administración registrado.",
+      "reserved": "Reserva confirmada.",
+      "voted": "Voto registrado.",
+      "failureSimulated": "Cobro fallido simulado: el cliente pasó a «En mora».",
+      "noticePublished": "Comunicado publicado.",
+      "storageFull": "Tu navegador no tiene espacio para guardar los cambios (¿un logo muy pesado?). La demo sigue funcionando, pero no los recordará al recargar."
+    },
+    "errors": {
+      "email": "Escribe un correo válido.",
+      "duplicate": "Ese correo ya está en este conjunto.",
+      "generic": "No se pudo completar la acción.",
+      "lastAdmin": "Debe quedar al menos un administrador activo.",
+      "pastDate": "Elige una fecha desde hoy.",
+      "required": "Completa todos los campos.",
+      "staffLimit": "El plan llegó al límite de usuarios del equipo. Sube de plan o invita a la persona como residente.",
+      "tenantInactive": "El conjunto está suspendido o cancelado.",
+      "zoneTaken": "Esa zona ya está reservada ese día."
+    },
+    "access": {
+      "teamTitle": "Equipo de {tenant}",
+      "teamSubtitle": "{staff} de {max} usuarios del equipo del plan {plan}. Los residentes no cuentan en el límite.",
+      "memberStatus": {
+        "activo": "Activo",
+        "invitado": "Invitación pendiente"
       },
+      "invitedAt": "invitado el {date}",
+      "resentTimes": "{n, plural, one {reenviada # vez} other {reenviada # veces}}",
+      "resend": "Reenviar",
+      "revoke": "Revocar",
+      "revokeConfirm": "¿Revocar la invitación a {email}?",
+      "accept": "Simular aceptación",
+      "acceptName": "Nombre de la persona",
+      "acceptPlaceholder": "Gloria Inés Pabón",
+      "acceptConfirm": "Activar",
+      "roleLabel": "Rol de {email}",
+      "inviteTitle": "Invitar a alguien",
+      "inviteEmail": "Correo",
+      "invitePlaceholder": "persona@tuconjunto.example",
+      "inviteRole": "Rol",
+      "inviteButton": "Invitar",
+      "inviteNote": "Simulado: la invitación queda pendiente en la lista, pero no se envía ningún correo. Usa «Simular aceptación» para activarla.",
+      "loginTitle": "Cómo inician sesión",
+      "loginSubtitle": "Métodos que acepta este conjunto.",
+      "settings": {
+        "password": "Correo y contraseña",
+        "google": "Con Google",
+        "microsoft": "Con Microsoft",
+        "mfa": "Segundo factor obligatorio (código de 6 dígitos)"
+      },
+      "alwaysOn": "Siempre activo",
+      "settingsHint": "Cada cambio queda en la bitácora y aplica a la prueba de inicio de sesión de abajo.",
+      "testTitle": "Prueba el inicio de sesión",
+      "testSubtitle": "Simula cómo entra una persona a {url}.",
+      "testEmail": "Correo",
+      "useMember": "Un usuario de este conjunto",
+      "useOther": "Un usuario de otro conjunto",
+      "testMethod": "Método",
+      "methods": {
+        "password": "Contraseña",
+        "google": "Google",
+        "microsoft": "Microsoft"
+      },
+      "testPassword": "Contraseña",
+      "passwordHint": "La demo acepta cualquier contraseña de 8 o más caracteres; en tu proyecto se compara con la que guardó el usuario, cifrada.",
+      "ssoHint": "En la demo no se abre la ventana de {method}: se simula que respondió con el correo de arriba.",
+      "signIn": "Iniciar sesión",
+      "mfaTitle": "Segundo factor",
+      "mfaText": "Escribe el código de 6 dígitos que muestra la app autenticadora.",
+      "mfaCode": "Código",
+      "verify": "Verificar",
+      "noCrypto": "Tu navegador no permite calcular el código aquí (requiere una conexión segura).",
+      "okTitle": "Acceso concedido",
+      "ok": "Sesión iniciada como {name} ({role}) en {url}.",
+      "deniedTitle": "Acceso denegado",
+      "denied": {
+        "notMember": "Ese correo no pertenece a este conjunto. Cada conjunto solo ve a sus propios usuarios.",
+        "invited": "La invitación de ese correo aún no se ha aceptado.",
+        "method": "Este conjunto no tiene activado el inicio con {method}.",
+        "password": "La contraseña debe tener al menos 8 caracteres.",
+        "code": "Código incorrecto o vencido.",
+        "inactive": "El conjunto está suspendido: nadie puede entrar hasta que pague."
+      },
+      "logged": "El intento quedó en la bitácora.",
+      "again": "Probar otra vez",
+      "ssoNote": "Simulado: los métodos Google y Microsoft no abren su ventana real ni se conectan con esas empresas. El código del segundo factor sí se calcula de verdad en tu navegador. En tu proyecto conectamos el inicio de sesión que elijas.",
+      "authApp": "App autenticadora (simulada en esta página)",
+      "secondsLeft": "Cambia en {s} s",
+      "authAppHint": "El código se calcula en tu navegador con el estándar TOTP y cambia cada 30 segundos. Si agregas la clave de ejemplo {secret} a una app autenticadora, verás el mismo código.",
+      "mfaOff": "Este conjunto no exige segundo factor. Actívalo en «Cómo inician sesión» para probarlo."
+    },
+    "portal": {
+      "viewAs": "Ver como",
+      "lockedSupport": "Estás en una sesión de soporte: termínala para ver el portal de otro conjunto.",
+      "poweredBy": "Portal con {product}",
+      "suspendedTitle": "Portal suspendido",
+      "suspendedText": "El servicio de {tenant} está suspendido por falta de pago. Sus usuarios verían este aviso hasta que se pague el mes.",
+      "goCharge": "Ir a cobrar",
+      "moduleOff": "Módulo desactivado para este conjunto. Se activa en «Operación y técnica».",
+      "notInPlan": "El plan {plan} no incluye este módulo (está desde el plan {min}).",
+      "notices": {
+        "title": "Comunicados",
+        "empty": "No hay comunicados.",
+        "newTitle": "Título del comunicado",
+        "newBody": "Mensaje",
+        "publish": "Publicar comunicado",
+        "titleError": "El título debe tener al menos 3 caracteres.",
+        "bodyError": "Escribe el mensaje (mínimo 5 caracteres)."
+      },
+      "fees": {
+        "subtitle": "Cuota mensual de ejemplo: {fee} por unidad.",
+        "summary": "{paid} de {total} unidades al día",
+        "paid": "Al día",
+        "register": "Registrar pago",
+        "note": "Muestra de 6 unidades. Registrar el pago no mueve dinero."
+      },
+      "reservations": {
+        "zone": "Zona",
+        "date": "Fecha",
+        "unit": "Unidad",
+        "reserve": "Reservar",
+        "upcoming": "Próximas reservas",
+        "empty": "No hay reservas próximas."
+      },
+      "zones": {
+        "salon": "Salón social",
+        "bbq": "Zona BBQ",
+        "piscina": "Piscina",
+        "cancha": "Cancha múltiple"
+      },
+      "votes": {
+        "question": "¿Apruebas la cuota extraordinaria para impermeabilizar las cubiertas?",
+        "options": {
+          "si": "Sí",
+          "no": "No",
+          "abst": "Me abstengo"
+        },
+        "voted": "Tu voto quedó registrado.",
+        "note": "Votación de ejemplo con {n} votos; un voto por navegador."
+      },
+      "isolation": {
+        "title": "Prueba de aislamiento",
+        "subtitle": "Intenta abrir un recurso por su identificador como si fueras {tenant}. La consulta siempre filtra por el conjunto de la sesión.",
+        "input": "Identificador del recurso (unidad, comunicado o factura)",
+        "open": "Abrir",
+        "tryOwn": "Uno de este conjunto ({id})",
+        "tryOther": "Uno de {tenant}",
+        "ok": "Encontrado en este conjunto: {kind} {label}.",
+        "forbidden": "No tienes acceso a este recurso: pertenece a otro conjunto. No se muestra ningún dato y el intento quedó en la bitácora.",
+        "notFound": "No existe ningún recurso con ese identificador.",
+        "kinds": {
+          "unit": "unidad",
+          "notice": "comunicado",
+          "invoice": "factura"
+        },
+        "note": "La regla corre en tu navegador sobre los datos de ejemplo. En tu proyecto la aplica el servidor en cada consulta, con pruebas automáticas que lo verifican."
+      },
+      "seed": {
+        "ascensores": {
+          "title": "Mantenimiento de ascensores",
+          "body": "El viernes 9 de octubre, de 8:00 a. m. a 12:00 m., los ascensores de las torres 1 y 2 estarán fuera de servicio por mantenimiento preventivo."
+        },
+        "asamblea": {
+          "title": "Convocatoria a asamblea extraordinaria",
+          "body": "Sábado 17 de octubre a las 9:00 a. m. en el salón social. Tema único: cuota extraordinaria para impermeabilizar las cubiertas. Puedes votar desde este portal."
+        },
+        "fumigacion": {
+          "title": "Fumigación de zonas comunes",
+          "body": "El martes 13 de octubre fumigaremos sótanos, shut de basuras y jardines. Mantén cerradas las ventanas del primer piso."
+        },
+        "bienvenida": {
+          "title": "Bienvenidos al nuevo portal",
+          "body": "Desde aquí pueden pagar la administración, reservar la piscina y recibir los comunicados del condominio."
+        },
+        "agua": {
+          "title": "Suspensión del servicio de agua",
+          "body": "El miércoles 14 de octubre, de 8:00 a. m. a 4:00 p. m., no habrá agua en los conjuntos Cañahuate y Guaduales por lavado de tanques."
+        },
+        "bienvenidaNuevo": {
+          "title": "Bienvenidos a su portal",
+          "body": "Desde hoy pueden pagar la administración y recibir los comunicados del conjunto en este portal."
+        }
+      }
+    },
+    "operations": {
       "support": {
-        "title": "Eventos recientes",
-        "subtitle": "Stream auditable del tenant seleccionado.",
-        "user": "Usuario",
-        "event": "Evento",
-        "time": "Hace"
-      }
-    },
-    "webhooks": {
-      "title": "Webhooks salientes",
-      "subtitle": "Bus de eventos confiable con reintentos exponenciales, firmas HMAC y dead letter queue.",
-      "eventsTitle": "Últimas entregas",
-      "columns": {
-        "event": "Evento",
-        "endpoint": "Endpoint",
-        "status": "Estado",
-        "attempts": "Intentos",
-        "lastDelivery": "Última entrega"
+        "title": "Soporte con suplantación",
+        "subtitle": "Entra al portal de un cliente tal como él lo ve. Exige un motivo y queda en la bitácora.",
+        "reason": "Motivo (obligatorio)",
+        "reasonPlaceholder": "Ej.: la administradora reporta que no ve el pago de la unidad 302",
+        "reasonError": "Escribe el motivo (mínimo 10 caracteres).",
+        "start": "Entrar como soporte",
+        "active": "Sesión de soporte activa en {tenant} desde el {time}.",
+        "goPortal": "Ir al portal",
+        "note": "Simulado: no se entra a ninguna cuenta real; ves el portal de ejemplo del cliente."
       },
-      "status": {
-        "delivered": "Entregado",
-        "retrying": "Reintentando",
-        "failed": "Fallido"
+      "modules": {
+        "title": "Módulos por cliente",
+        "subtitle": "Activa o desactiva módulos del portal de cada conjunto. Su portal cambia al instante.",
+        "requires": "Su plan no lo incluye (está desde el plan {plan}).",
+        "note": "Cada cambio queda en la bitácora y genera un webhook tenant.updated."
       },
-      "payloadTitle": "Ejemplo de payload",
-      "signatureTitle": "Firma HMAC SHA-256",
-      "signatureDesc": "Cada request incluye el header `X-Signature` para verificar autenticidad."
-    },
-    "api": {
-      "title": "API + Documentación",
-      "subtitle": "REST y OpenAPI 3.1, SDKs autogenerados y docs estilo Mintlify.",
-      "endpoints": "Endpoints",
-      "exampleTitle": "Ejemplo: crear factura",
-      "tryIt": "Probar en sandbox",
-      "languages": {
-        "ts": "TypeScript",
-        "py": "Python",
-        "go": "Go"
+      "audit": {
+        "title": "Bitácora",
+        "subtitle": "Lo que pasa en la demo: quién, cuándo, en qué cliente y desde qué IP (IP de ejemplo).",
+        "platform": "Plataforma (sin cliente)",
+        "filterGroup": "Tipo",
+        "search": "Buscar",
+        "searchPlaceholder": "Correo, acción o texto",
+        "count": "{shown} de {total} registros",
+        "empty": "No hay registros con esos filtros.",
+        "more": "Ver más registros",
+        "note": "La bitácora vive en tu navegador y se borra al restablecer los datos. En tu proyecto se guarda en el servidor y no se puede editar.",
+        "on": "activado",
+        "off": "desactivado",
+        "via": {
+          "portal": "desde el portal",
+          "api": "por API"
+        },
+        "groups": {
+          "tenants": "Clientes y planes",
+          "billing": "Cobros",
+          "members": "Usuarios",
+          "auth": "Inicio de sesión",
+          "support": "Soporte",
+          "portal": "Portal y API"
+        },
+        "cols": {
+          "when": "Fecha y hora",
+          "actor": "Quién",
+          "tenant": "Cliente",
+          "code": "Código",
+          "action": "Acción"
+        }
+      },
+      "webhooks": {
+        "title": "Webhooks",
+        "subtitle": "Eventos que tu SaaS enviaría a los sistemas de cada cliente, firmados con HMAC SHA-256.",
+        "filter": "Evento",
+        "count": "{n, plural, one {# evento} other {# eventos}}",
+        "empty": "No hay eventos de ese tipo.",
+        "headers": "Encabezados",
+        "payload": "Cuerpo (JSON)",
+        "signatureNote": "La firma se calcula de verdad en tu navegador: HMAC SHA-256 de «timestamp.cuerpo» con el secreto de ejemplo.",
+        "verifyTitle": "Cómo verifica la firma quien recibe el webhook",
+        "note": "Los eventos se generan en tu navegador y no se envían a ningún servidor. Secreto de ejemplo: {secret}."
+      },
+      "api": {
+        "title": "API de prueba",
+        "subtitle": "Una API REST simulada sobre los mismos datos. La llave identifica al cliente y cada consulta filtra por él.",
+        "key": "Llave de API",
+        "useKey": "Usar la llave de:",
+        "endpoint": "Ruta de la API",
+        "endpoints": {
+          "tenant": "Datos del cliente dueño de la llave.",
+          "units": "Unidades del cliente y si están al día.",
+          "unit": "Una unidad por su ID. Si es de otro cliente responde 404, como si no existiera.",
+          "invoices": "Facturas del cliente.",
+          "notices": "Comunicados del cliente.",
+          "createNotice": "Publica un comunicado en el portal del cliente."
+        },
+        "param": "ID de la unidad",
+        "ownUnit": "Una unidad de este cliente",
+        "foreignUnit": "Una unidad de otro cliente",
+        "body": "Cuerpo (JSON)",
+        "send": "Enviar",
+        "response": "Respuesta",
+        "statusText": {
+          "s200": "Correcto.",
+          "s201": "Creado: el comunicado ya aparece en el portal del cliente.",
+          "s400": "El cuerpo no es un JSON válido.",
+          "s401": "Llave no válida o de un cliente cancelado.",
+          "s402": "El cliente está suspendido por falta de pago.",
+          "s404": "No encontrado para este cliente.",
+          "s422": "Falta el título (mínimo 3 caracteres)."
+        },
+        "noResponse": "Elige una ruta y pulsa Enviar.",
+        "note": "Simulado: no hay servidor; la respuesta se calcula aquí con la misma regla de aislamiento que tendría tu API. Las llaves son de ejemplo.",
+        "sampleTitle": "Corte de agua el sábado",
+        "sampleBody": "De 8:00 a. m. a 12:00 m. por mantenimiento del tanque."
+      },
+      "tech": {
+        "title": "Para tu equipo técnico",
+        "subtitle": "Qué es real en esta demo, la arquitectura que proponemos y los modelos de aislamiento.",
+        "realTitle": "Qué es real en la demo y qué se construye en tu proyecto",
+        "realCols": {
+          "part": "Parte",
+          "demo": "En esta demo",
+          "project": "En tu proyecto"
+        },
+        "real": [
+          { "part": "Datos y estado", "demo": "Datos de ejemplo en tu navegador (localStorage).", "project": "Base de datos en tu nube con copias de seguridad." },
+          { "part": "Aislamiento por cliente", "demo": "Regla aplicada en el navegador a cada consulta del portal y de la API de prueba.", "project": "Filtro obligatorio en el servidor y pruebas automáticas." },
+          { "part": "Cobros", "demo": "Simulados: tarjeta, PSE y Nequi sin pasarela ni dinero.", "project": "Pasarela de pagos colombiana o internacional que elijas." },
+          { "part": "Factura electrónica", "demo": "Representación de ejemplo con CUFE calculado con clave ficticia.", "project": "Emisión con tu proveedor tecnológico autorizado." },
+          { "part": "Correos y WhatsApp", "demo": "Solo se muestra el texto.", "project": "Envío transaccional con tu proveedor." },
+          { "part": "Segundo factor y firmas", "demo": "Reales en el navegador: TOTP, HMAC SHA-256 y SHA-384.", "project": "Los mismos estándares, en el servidor." }
+        ],
+        "archTitle": "Piezas de la arquitectura propuesta",
+        "arch": [
+          { "name": "Portal y panel web", "desc": "Portal de cada cliente con su marca y panel del dueño." },
+          { "name": "API con llave por cliente", "desc": "REST, con límites de uso por plan." },
+          { "name": "Base de datos multi-tenant", "desc": "Aislamiento por fila, por esquema o con base dedicada." },
+          { "name": "Cobros recurrentes", "desc": "Planes, prueba gratis, prorrateo y cobros fallidos." },
+          { "name": "Facturación", "desc": "Factura electrónica de cada cobro con tu proveedor." },
+          { "name": "Trabajos programados", "desc": "Cobros, recordatorios y suspensiones." },
+          { "name": "Bitácora y webhooks", "desc": "Registro de auditoría y eventos firmados." },
+          { "name": "Monitoreo", "desc": "Errores, métricas y alertas de la operación." }
+        ],
+        "isolationTitle": "Modelos de aislamiento",
+        "isolationSubtitle": "Se elige según tus clientes y tus obligaciones; no es una mejora de plan.",
+        "pros": "Ventajas",
+        "cons": "Compromisos",
+        "patterns": {
+          "shared": {
+            "name": "Base compartida con RLS",
+            "tagline": "Una base; cada fila lleva su cliente",
+            "pros": ["Costo bajo a gran escala", "Migraciones simples", "Operación uniforme"],
+            "cons": ["Un filtro omitido expone datos (por eso las pruebas)", "Índices pensados por cliente", "Restaurar un solo cliente es más complejo"]
+          },
+          "schema": {
+            "name": "Un esquema por cliente",
+            "tagline": "Misma base, un esquema por cliente",
+            "pros": ["Aislamiento lógico fuerte", "Copias por cliente", "Migraciones por etapas"],
+            "cons": ["Más conexiones que administrar", "Migraciones más lentas", "Catálogo grande con muchos clientes"]
+          },
+          "database": {
+            "name": "Una base por cliente",
+            "tagline": "Aislamiento físico total",
+            "pros": ["Aislamiento físico", "Cumplimiento estricto", "Restauración independiente"],
+            "cons": ["Costo operativo alto", "Pool de conexiones complejo", "Cambios de esquema globales costosos"]
+          }
+        },
+        "localTitle": "Localización para Colombia",
+        "local": {
+          "money": "Pesos sin decimales e IVA",
+          "date": "Fechas y zona horaria",
+          "nit": "NIT con dígito de verificación",
+          "payments": "Medios de pago",
+          "paymentsValue": "Tarjeta, PSE y Nequi (los conectamos en tu proyecto)"
+        }
       }
     },
     "audit": {
-      "title": "Audit logs por organización",
-      "subtitle": "Registro inmutable de quién hizo qué, cuándo y desde dónde. Exportable a SIEM.",
-      "filtersUser": "Usuario",
-      "filtersAction": "Acción",
-      "all": "Todos",
-      "columns": {
-        "actor": "Actor",
-        "action": "Acción",
-        "resource": "Recurso",
-        "ip": "IP",
-        "when": "Fecha"
-      }
-    },
-    "flags": {
-      "title": "Feature flags y experimentos",
-      "subtitle": "Rollouts graduales, targeting por atributos y A/B testing nativo.",
-      "flagsTitle": "Flags",
-      "experimentsTitle": "Experimentos activos",
-      "rollout": "rollout",
-      "variantA": "Variant A",
-      "variantB": "Variant B",
-      "conversion": "conversión"
-    },
-    "i18n": {
-      "title": "Internacionalización completa",
-      "subtitle": "Locales, monedas, husos horarios y formatos numéricos por usuario.",
-      "languageLabel": "Idioma",
-      "timezoneLabel": "Huso horario",
-      "currencyLabel": "Moneda",
-      "previewLabel": "Vista previa",
-      "examplePrice": "Precio",
-      "exampleDate": "Fecha actual"
-    },
-    "observability": {
-      "title": "Observability stack",
-      "subtitle": "Trazas, métricas, logs y disponibilidad pública con un único pipeline.",
-      "sentry": "Sentry",
-      "sentryDesc": "Errores y session replay agrupados por release.",
-      "otel": "OpenTelemetry",
-      "otelDesc": "Trazas distribuidas exportadas al colector.",
-      "grafana": "Grafana",
-      "grafanaDesc": "Dashboards de latencia p95/p99 y throughput.",
-      "status": "StatusPage",
-      "statusDesc": "Disponibilidad pública con incidentes auditados.",
-      "uptime": "Uptime últimos 90 días",
-      "p95": "Latencia p95",
-      "errors": "Errores (24h)"
-    },
-    "teams": {
-      "title": "Organización y equipo",
-      "subtitle": "Roles RBAC, invitaciones pendientes y sincronización SCIM con tu IdP.",
-      "inviteLabel": "Invitar por email",
-      "invite": "Invitar",
-      "membersTitle": "Miembros",
-      "invitesTitle": "Invitaciones pendientes",
-      "scimTitle": "Sincronización SCIM",
-      "scimDesc": "Conectado con Okta - última sincronización",
-      "scimSyncedAgo": "hace 2 minutos",
-      "scimStatus": "Activo",
-      "roles": {
-        "owner": "Owner",
-        "admin": "Admin",
-        "member": "Member",
-        "billing": "Billing",
-        "viewer": "Viewer"
-      },
-      "columns": {
-        "user": "Usuario",
-        "role": "Rol",
-        "status": "Estado",
-        "email": "Email",
-        "sentAt": "Enviada",
-        "actions": "Acciones"
-      },
-      "resend": "Reenviar",
-      "revoke": "Revocar",
-      "active": "Activo",
-      "pending": "Pendiente"
+      "tenant_created": "Alta del cliente en el plan {plan}",
+      "tenant_plan_changed": "Cambio de plan: {from} → {to}",
+      "tenant_suspended": "Servicio suspendido por falta de pago",
+      "tenant_reactivated": "Servicio reactivado al recibir el pago",
+      "tenant_cancelled": "Suscripción cancelada",
+      "invoice_paid": "Factura {number} pagada",
+      "payment_failed": "Cobro automático fallido",
+      "payment_rejected": "Pago rechazado ({method})",
+      "dunning_reminder": "Aviso de cobro del día {day}",
+      "member_invited": "Invitación a {email}",
+      "member_invite_resent": "Invitación reenviada a {email}",
+      "member_invite_revoked": "Invitación revocada a {email}",
+      "member_joined": "{email} aceptó la invitación",
+      "member_role_changed": "Rol de {email}: {from} → {to}",
+      "auth_login": "Inicio de sesión con {method}",
+      "auth_login_denied": "Inicio de sesión rechazado ({method})",
+      "auth_settings_changed": "{setting}: {value}",
+      "module_toggled": "Módulo {module}: {value}",
+      "support_impersonation_started": "Sesión de soporte iniciada. Motivo: {reason}",
+      "support_impersonation_ended": "Sesión de soporte terminada",
+      "notice_published": "Comunicado publicado {via}: {title}",
+      "portal_access_denied": "Acceso denegado al recurso {resource} (es de otro conjunto)",
+      "api_request": "{method} {path} → {status}"
     }
   }
 }

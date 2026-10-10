@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import {
-  ArrowPathIcon, ChartBarSquareIcon, CreditCardIcon, PlusCircleIcon, UsersIcon, BuildingOffice2Icon, WrenchScrewdriverIcon, LifebuoyIcon,
+  ArrowLeftIcon, ArrowPathIcon, BeakerIcon, BuildingOffice2Icon, ChartBarSquareIcon, CreditCardIcon, InformationCircleIcon, LifebuoyIcon, PlusCircleIcon,
+  UsersIcon, WrenchScrewdriverIcon,
 } from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
 import { DemoProvider, useDemo } from './lib/store';
@@ -47,12 +49,18 @@ function Shell() {
   return (
     <div className="min-h-screen bg-secondary-50 dark:bg-secondary-950">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <Link href="/demo" className="mb-3 inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-secondary-600 hover:text-primary-600 dark:text-secondary-300 dark:hover:text-primary-400">
+          <ArrowLeftIcon className="h-4 w-4" />
+          {t('meta.back')}
+        </Link>
         <header className="mb-5 rounded-2xl bg-gradient-to-br from-slate-600 to-slate-800 p-5 text-white shadow-sm sm:p-7">
           <div className="mb-3 flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center rounded-full border border-amber-300/50 bg-amber-300/15 px-2.5 py-0.5 text-xs font-semibold text-amber-100" title={t('meta.sampleHint')}>
+            <span className="inline-flex items-center gap-1 rounded-full border border-amber-300/50 bg-amber-300/15 px-2.5 py-0.5 text-xs font-semibold text-amber-100" title={t('meta.sampleHint')}>
+              <BeakerIcon className="h-3.5 w-3.5" />
               {t('meta.sampleBadge')}
             </span>
-            <span className="inline-flex items-center rounded-full border border-white/30 px-2.5 py-0.5 text-xs font-semibold text-white/90">
+            <span className="inline-flex items-center gap-1 rounded-full border border-white/30 px-2.5 py-0.5 text-xs font-semibold text-white/90">
+              <InformationCircleIcon className="h-3.5 w-3.5" />
               {t('meta.simBadge')}
             </span>
           </div>
@@ -104,7 +112,7 @@ function Shell() {
                       type="button"
                       onClick={() => go(key)}
                       aria-current={active ? 'page' : undefined}
-                      className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${
+                      className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-secondary-950 ${
                         active
                           ? 'bg-slate-700 text-white shadow-sm'
                           : 'bg-white text-secondary-700 ring-1 ring-secondary-200 hover:bg-secondary-100 dark:bg-secondary-900 dark:text-secondary-200 dark:ring-secondary-700 dark:hover:bg-secondary-800'
@@ -120,7 +128,7 @@ function Shell() {
             </ul>
           </nav>
 
-          <main className="min-w-0 space-y-5">
+          <section id="saas-screen" aria-label={t(`screens.${s.screen}.title`)} className="min-w-0 scroll-mt-24 space-y-5">
             {support && (
               <div className="flex flex-col gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-600 dark:bg-amber-950/40 dark:text-amber-100 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex min-w-0 items-start gap-2">
@@ -138,7 +146,7 @@ function Shell() {
             {s.screen === 'access' && <Access />}
             {s.screen === 'portal' && <Portal />}
             {s.screen === 'operations' && <Operations />}
-          </main>
+          </section>
         </div>
       </div>
       <Toasts />

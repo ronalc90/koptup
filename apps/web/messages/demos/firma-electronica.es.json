@@ -1,247 +1,825 @@
 {
   "demoSign": {
-    "pageTitle": "Plataforma de Firma Electrónica",
-    "pageSubtitle": "Firma documentos legalmente vinculantes en minutos. Simple, Avanzada, Cualificada eIDAS y Ley 527 CO con audit trail criptográfico.",
-    "back": "Volver a demos",
-    "compliance": {
-      "title": "Cumplimiento normativo",
-      "eidas": "eIDAS",
-      "esign": "ESIGN Act",
-      "ueta": "UETA",
-      "ley527": "Ley 527 CO",
-      "nom151": "NOM 151 MX"
+    "shell": {
+      "back": "Volver a demos",
+      "sampleBadge": "Datos de ejemplo",
+      "sampleHint": "Empresa, personas y documentos ficticios",
+      "simBadge": "Simulación: no firma con validez legal",
+      "title": "Firma electrónica",
+      "subtitle": "Arma un sobre desde una plantilla o un PDF, define quién firma y en qué orden, firma desde la vista del firmante con código y trazo, y revisa la evidencia con su cadena de hashes.",
+      "caseLine": "Caso de ejemplo: {company} (empresa ficticia) · NIT {nit} · {city}",
+      "legalLine": "Referencia en Colombia: Ley 527 de 1999 y Decreto 2364 de 2012 (compilado en el Decreto 1074 de 2015). Esta demo no firma documentos con validez legal: muestra cómo funcionaría la plataforma que construimos para tu empresa.",
+      "loading": "Cargando la demo…",
+      "navLabel": "Secciones de la demo",
+      "reset": "Restablecer demo",
+      "resetConfirm": "¿Borrar tus cambios y volver a los datos de ejemplo?",
+      "resetYes": "Sí, restablecer",
+      "resetDone": "La demo volvió a los datos de ejemplo."
+    },
+    "common": {
+      "show": "Ver",
+      "hide": "Ocultar",
+      "cancel": "Cancelar",
+      "close": "Cerrar",
+      "copy": "Copiar",
+      "copied": "Copiado",
+      "untitled": "Sin título"
+    },
+    "how": {
+      "title": "Qué es real y qué es simulado en esta demo",
+      "realTitle": "Funciona de verdad (en tu navegador)",
+      "real": [
+        "Lo que haces se guarda en tu navegador y sigue ahí al recargar; «Restablecer demo» vuelve a los datos de ejemplo.",
+        "Los indicadores se calculan con la lista de sobres: cambian al enviar, firmar, anular o cuando un sobre vence.",
+        "La huella SHA-256 del PDF que subes o del texto de la plantilla se calcula en tu navegador; el archivo no sale de tu equipo.",
+        "Cada paso deja un evento en la evidencia, encadenado con hashes SHA-256; «Verificar integridad» recalcula la cadena.",
+        "Los CSV, el JSON del sobre y los PDF de ejemplo (certificado de evidencia y documento firmado) se generan y se descargan de verdad.",
+        "La firma se dibuja con el mouse o el dedo, se escribe o se sube como imagen, y queda en el PDF."
+      ],
+      "simTitle": "Simulado o de ejemplo",
+      "sim": [
+        "No se envía ningún correo, SMS ni WhatsApp: el código de verificación se muestra en pantalla.",
+        "La verificación de identidad con documento y selfie, la firma digital con certificado y la estampa cronológica de una entidad de certificación digital (ECD) son simuladas.",
+        "Las IP de la evidencia son de ejemplo (rangos reservados para documentación).",
+        "La empresa, las personas, los correos (.example) y los documentos son ficticios; los textos de las plantillas no fueron revisados por un abogado.",
+        "Las integraciones y la API se construyen en tu proyecto; aquí solo se describen."
+      ],
+      "tourTitle": "Recorrido sugerido (5 minutos)",
+      "tour": [
+        "En «Inicio» mira los indicadores y la lista de sobres, y abre la evidencia del contrato de trabajo completado.",
+        "Pulsa «Nuevo sobre», elige la plantilla «Contrato de trabajo a término fijo» y cambia el nombre del trabajador.",
+        "Revisa los firmantes y el orden, ubica los campos tocando la página y envía el sobre.",
+        "En «Vista del firmante» abre el documento, pide el código, escríbelo, firma con el dedo o el mouse y acepta.",
+        "En «Evidencia» verifica la cadena de hashes y descarga el certificado en PDF."
+      ]
     },
     "tabs": {
-      "dashboard": "Dashboard",
-      "create": "Crear sobre",
+      "home": "Inicio",
+      "create": "Nuevo sobre",
       "templates": "Plantillas",
-      "audit": "Audit trail",
-      "api": "API & Embed",
-      "signer": "Vista firmante",
+      "evidence": "Evidencia",
+      "signer": "Vista del firmante",
+      "developers": "Para desarrolladores",
       "integrations": "Integraciones"
     },
-    "metrics": {
-      "pending": "Documentos pendientes",
-      "signedMonth": "Firmados este mes",
-      "completion": "Tasa de completitud",
-      "avgTime": "Tiempo promedio",
-      "minutes": "min"
+    "status": {
+      "draft": "Borrador",
+      "sent": "Enviado",
+      "partial": "En curso",
+      "completed": "Completado",
+      "expired": "Vencido",
+      "voided": "Anulado"
     },
-    "documents": {
-      "title": "Documentos recientes",
-      "headers": {
-        "name": "Documento",
-        "signers": "Firmantes",
-        "type": "Tipo firma",
-        "status": "Estado",
-        "updated": "Actualizado",
-        "actions": "Acciones"
+    "roles": {
+      "signer": "Firmante",
+      "approver": "Aprobador",
+      "witness": "Testigo",
+      "cc": "Recibe copia"
+    },
+    "signerStates": {
+      "pending": "Pendiente",
+      "viewed": "Abrió el documento",
+      "signed": "Firmó",
+      "copy": "Recibe copia"
+    },
+    "channels": {
+      "email": "correo",
+      "sms": "SMS",
+      "whatsapp": "WhatsApp"
+    },
+    "auth": {
+      "emailOtp": {
+        "name": "Código por correo",
+        "help": "Llega un código de 6 dígitos al correo de quien firma (simulado)."
       },
-      "status": {
-        "sent": "Enviado",
-        "viewed": "Visto",
-        "signed": "Firmado",
-        "expired": "Vencido",
-        "draft": "Borrador"
+      "smsOtp": {
+        "name": "Código por SMS",
+        "help": "El código llega por mensaje de texto al celular (simulado)."
       },
+      "whatsappOtp": {
+        "name": "Código por WhatsApp",
+        "help": "El código llega por WhatsApp al celular (simulado)."
+      },
+      "idCheck": {
+        "name": "Verificación de identidad",
+        "help": "Foto del documento y selfie, con un proveedor aliado (simulado)."
+      }
+    },
+    "sigTypes": {
+      "electronic": {
+        "name": "Firma electrónica",
+        "help": "Código de un solo uso y evidencia del proceso."
+      },
+      "digital": {
+        "name": "Firma digital con certificado",
+        "help": "Certificado de una ECD acreditada, por integración (simulado)."
+      }
+    },
+    "fieldTypes": {
+      "signature": "Firma",
+      "initials": "Iniciales",
+      "date": "Fecha",
+      "text": "Texto",
+      "checkbox": "Casilla"
+    },
+    "actors": {
+      "you": "{company} (tú)",
+      "system": "Plataforma"
+    },
+    "home": {
+      "metrics": {
+        "pending": "Por firmar",
+        "pendingHint": "{n, plural, =0 {sin borradores} one {y # borrador} other {y # borradores}}",
+        "signedMonth": "Completados este mes",
+        "signedMonthHint": "{n, plural, one {# completado en total} other {# completados en total}}",
+        "rate": "Tasa de finalización",
+        "rateHint": "{done} de {closed} sobres cerrados",
+        "avg": "Tiempo promedio",
+        "avgHint": "Del envío a la última firma",
+        "note": "Indicadores calculados con los sobres de esta demo."
+      },
+      "listTitle": "Sobres",
+      "listSubtitle": "Documentos enviados a firma, borradores y su estado.",
+      "new": "Nuevo sobre",
+      "exportCsv": "Exportar CSV",
+      "csvName": "sobres-firma-ejemplo.csv",
+      "csvHeaders": ["ID", "Documento", "Estado", "Participantes", "Firmas", "Creado", "Enviado", "Completado", "Vence", "SHA-256 del documento"],
+      "csvDone": "{n, plural, one {Se exportó # sobre} other {Se exportaron # sobres}} a CSV.",
+      "search": "Buscar por documento, persona o ID",
+      "statusFilter": "Filtrar por estado",
+      "allStatuses": "Todos los estados ({n})",
+      "empty": "Ningún sobre coincide con la búsqueda.",
+      "updated": "actualizado el {date}",
+      "fromBulk": "envío masivo",
+      "signatures": "Firmas {p}",
+      "nextTurn": "Le toca a {names}",
+      "pendingOf": "Faltan: {names}",
+      "expires": "vence el {date}",
+      "completedOn": "Completado el {date}",
+      "expiredOn": "Venció el {date} sin completarse",
+      "draftHint": "Borrador sin enviar",
+      "voidedHint": "Anulado por el remitente",
       "actions": {
-        "view": "Ver",
-        "audit": "Audit",
+        "continue": "Continuar",
+        "delete": "Eliminar",
+        "sign": "Firmar",
         "remind": "Recordar",
-        "void": "Anular"
+        "evidence": "Evidencia",
+        "signedPdf": "PDF firmado",
+        "void": "Anular",
+        "duplicate": "Duplicar"
       },
-      "newEnvelope": "Nuevo sobre",
-      "filter": "Filtrar",
-      "search": "Buscar documento..."
+      "remindDone": "Recordatorio registrado para {names} (simulado: no se envió ningún mensaje).",
+      "duplicated": "Se copió el sobre en «Nuevo sobre» para reenviarlo.",
+      "voidTitle": "Anular sobre",
+      "voidText": "«{title}» dejará de admitir firmas. La anulación queda en la evidencia.",
+      "voidYes": "Sí, anular",
+      "voidDone": "Sobre {id} anulado.",
+      "deleteTitle": "Eliminar borrador",
+      "deleteText": "Se borrará el borrador «{title}».",
+      "deleteYes": "Sí, eliminar",
+      "deleteDone": "Borrador eliminado.",
+      "types": {
+        "title": "¿Qué tipo de firma usar?",
+        "subtitle": "Conceptos de la regulación colombiana y lo que hace esta demo con cada uno.",
+        "electronic": {
+          "name": "Firma electrónica",
+          "what": "Identifica a quien firma (por ejemplo, con un código de un solo uso) y guarda la evidencia del proceso.",
+          "demo": "En esta demo: es la que se simula de punta a punta."
+        },
+        "digital": {
+          "name": "Firma digital",
+          "what": "Usa un certificado digital emitido por una entidad de certificación digital (ECD) acreditada por ONAC.",
+          "demo": "En esta demo: se puede elegir, pero el certificado se simula. En tu proyecto se integra con la ECD que elijas."
+        },
+        "timestamp": {
+          "name": "Estampa cronológica",
+          "what": "Sello de tiempo emitido por una ECD (protocolo RFC 3161) que prueba que el documento existía en ese momento.",
+          "demo": "En esta demo: se simula al completarse el sobre."
+        },
+        "note": "Estas descripciones son orientativas y no reemplazan una asesoría jurídica. La demo no produce firmas con validez legal."
+      }
     },
     "wizard": {
-      "title": "Crear sobre de firma",
-      "subtitle": "Configura el documento, los firmantes y la seguridad en 4 pasos.",
-      "next": "Siguiente",
-      "back": "Atrás",
-      "send": "Enviar para firma",
-      "saveDraft": "Guardar borrador",
+      "title": "Nuevo sobre",
+      "titleEditing": "Editando el borrador {id}",
+      "subtitle": "Arma el sobre en 4 pasos: documento, firmantes, campos y seguridad.",
+      "stepsLabel": "Pasos del asistente",
       "steps": {
-        "upload": {
-          "label": "Documento",
-          "title": "Sube tu documento",
-          "subtitle": "Admite PDF, Word y plantillas con variables dinámicas.",
-          "drag": "Arrastra archivos aquí o haz clic para subir",
-          "types": "PDF, DOCX, DOC — hasta 25 MB",
-          "useTemplate": "Usar plantilla",
-          "uploaded": "Documento cargado",
-          "pages": "páginas",
-          "vars": "variables detectadas"
-        },
-        "signers": {
-          "label": "Firmantes",
-          "title": "Agrega firmantes",
-          "subtitle": "Define orden de firma, asigna roles y permisos.",
-          "addSigner": "Agregar firmante",
-          "name": "Nombre",
-          "email": "Email",
-          "role": "Rol",
-          "order": "Orden",
-          "modes": {
-            "parallel": "Paralelo",
-            "sequential": "Secuencial",
-            "conditional": "Condicional"
+        "document": "Documento",
+        "signers": "Firmantes",
+        "fields": "Campos",
+        "security": "Seguridad"
+      },
+      "back": "Atrás",
+      "next": "Siguiente",
+      "saveDraft": "Guardar borrador",
+      "send": "Enviar para firma",
+      "discard": "Empezar de nuevo",
+      "discardConfirm": "¿Borrar lo que llevas?",
+      "discardYes": "Sí, empezar de nuevo",
+      "discarded": "Se limpió el asistente.",
+      "sentToast": "Sobre {id} enviado (simulado): aparece en Inicio y su evidencia ya registra el envío. No se mandó ningún mensaje.",
+      "savedToast": "Borrador {id} guardado: lo encuentras en Inicio.",
+      "errors": {
+        "docRequired": "Elige una plantilla o sube un PDF.",
+        "varsRequired": "Completa los datos de la plantilla: {vars}.",
+        "titleRequired": "Escribe el asunto del sobre.",
+        "noActing": "Agrega al menos una persona que firme o apruebe.",
+        "nameInvalid": "Persona {n}: escribe el nombre completo.",
+        "emailInvalid": "Persona {n}: el correo no es válido.",
+        "emailDuplicate": "Persona {n}: ese correo ya está en otra persona del sobre.",
+        "phoneInvalid": "Persona {n}: para SMS o WhatsApp hace falta un celular colombiano de 10 dígitos que empiece por 3.",
+        "signatureMissing": "{name} necesita al menos un campo de firma.",
+        "expiryRange": "El vencimiento debe estar entre 1 y 90 días.",
+        "reminderRange": "Los recordatorios deben ser cada 1 a 30 días.",
+        "reminderBeforeExpiry": "El recordatorio debe llegar antes del vencimiento.",
+        "openComments": "Resuelve los comentarios abiertos de la negociación ({n}) antes de enviar."
+      },
+      "document": {
+        "title": "Documento",
+        "subtitle": "Usa una plantilla con variables o sube un PDF. Nada sale de tu navegador.",
+        "sourceLabel": "Origen del documento",
+        "template": "Usar una plantilla",
+        "templateHelp": "Llenas los datos y la plantilla arma el texto.",
+        "upload": "Subir un PDF",
+        "uploadHelp": "Se calcula su huella SHA-256 en tu navegador.",
+        "pickTemplate": "Plantilla",
+        "pickPlaceholder": "Elige una plantilla…",
+        "pickHelp": "También puedes crear las tuyas en",
+        "seeTemplates": "Plantillas",
+        "titleLabel": "Asunto del sobre",
+        "signersNote": "Al elegir una plantilla se proponen sus firmantes; los cambias en el paso siguiente.",
+        "preview": "Vista previa",
+        "hash": "Huella SHA-256 del texto: {hash}",
+        "noTemplate": "Elige una plantilla para ver el documento.",
+        "tooBig": "El archivo pesa {size}; el máximo es 25 MB.",
+        "notPdf": "«{name}» no es un PDF válido: solo se aceptan archivos PDF.",
+        "unreadable": "No se pudo leer el archivo.",
+        "hashing": "Calculando la huella SHA-256…",
+        "drop": "Arrastra tu PDF aquí o haz clic para elegirlo",
+        "dropHint": "Solo PDF, hasta 25 MB. El archivo no sale de tu navegador.",
+        "pages": "{n, plural, one {# página} other {# páginas}}",
+        "hashFull": "SHA-256: {hash}",
+        "notStored": "La demo no muestra el PDF ni lo guarda: conserva su nombre, su tamaño, sus páginas y su huella. En tu proyecto el PDF se ve en pantalla y los campos se ubican sobre sus páginas.",
+        "uploadNote": "En tu proyecto también se aceptan documentos de Word (se convierten a PDF) y el archivo se guarda en tu servidor."
+      },
+      "signers": {
+        "title": "Firmantes",
+        "subtitle": "Quién firma, quién aprueba y quién recibe copia, y en qué orden.",
+        "modeLabel": "Orden de firma",
+        "modes": {
+          "sequential": {
+            "name": "Secuencial",
+            "help": "Cada persona recibe el enlace cuando firma la anterior."
           },
-          "roles": {
-            "signer": "Firmante",
-            "approver": "Aprobador",
-            "viewer": "Solo lectura",
-            "witness": "Testigo"
+          "parallel": {
+            "name": "Paralelo",
+            "help": "Todos reciben el enlace al mismo tiempo."
           }
         },
-        "fields": {
-          "label": "Campos",
-          "title": "Posiciona campos en el documento",
-          "subtitle": "Arrastra los campos a la posición deseada del documento.",
-          "palette": "Paleta",
-          "types": {
-            "signature": "Firma",
-            "initials": "Iniciales",
-            "date": "Fecha",
-            "text": "Texto",
-            "checkbox": "Checkbox"
-          },
-          "preview": "Vista previa del documento",
-          "pagePlaceholder": "Página 1 de 3",
-          "dropHere": "Suelta aquí",
-          "fieldsPlaced": "campos posicionados"
+        "orderN": "Turno {n}",
+        "personN": "Persona {n}",
+        "up": "Subir a la persona {n}",
+        "down": "Bajar a la persona {n}",
+        "remove": "Quitar a la persona {n}",
+        "name": "Nombre completo",
+        "email": "Correo",
+        "phone": "Celular",
+        "channel": "Enviar por",
+        "role": "Rol",
+        "roleHelp": {
+          "signer": "Firma el documento.",
+          "approver": "Aprueba sin trazo de firma; su aprobación queda en la evidencia.",
+          "witness": "Firma como testigo.",
+          "cc": "No firma: recibe una copia cuando el sobre se completa."
         },
-        "security": {
-          "label": "Seguridad",
-          "title": "Autenticación y configuración",
-          "subtitle": "Define cómo se autentica cada firmante y los recordatorios.",
-          "authMethod": "Método de autenticación",
-          "auth": {
-            "sms": "SMS OTP",
-            "email": "Email OTP",
-            "kyc": "KYC (ID + selfie)",
-            "video": "Video grabado",
-            "biometric": "Biometría"
-          },
-          "expiry": "Expiración (días)",
-          "reminders": "Recordatorios cada",
-          "days": "días",
-          "signatureType": "Tipo de firma",
-          "redlines": "Negociación previa (redlines)",
-          "redlinesHelp": "Permite que las partes comenten y propongan cambios antes de firmar."
+        "add": "Agregar persona",
+        "max": "Máximo {n} personas por sobre en la demo.",
+        "simNote": "Los mensajes no se envían: en la demo el envío solo queda registrado en la evidencia."
+      },
+      "fields": {
+        "title": "Campos",
+        "subtitle": "Ubica dónde firma, pone iniciales o llena datos cada persona.",
+        "assignTo": "Asignar a",
+        "palette": "Campos",
+        "armedHint": "Toca la página para ubicar «{type}».",
+        "howTo": "Elige un campo y toca la página, o arrástralo con el mouse.",
+        "suggest": "Ubicar campos sugeridos",
+        "clear": "Quitar todos",
+        "page": "Página 1 · {n, plural, one {# campo} other {# campos}}",
+        "pageLabel": "Página del documento",
+        "schematic": "Vista esquemática de la primera página",
+        "dropHere": "Suelta aquí",
+        "fieldLabel": "{type} de {name}",
+        "selected": "Campo seleccionado: {type}",
+        "owner": "Lo llena",
+        "remove": "Quitar campo",
+        "keys": "Muévelo arrastrándolo o con las flechas del teclado (Mayús para saltos largos); Supr lo quita.",
+        "selectHint": "Toca un campo para moverlo, cambiar a quién le corresponde o quitarlo."
+      },
+      "security": {
+        "title": "Seguridad y envío",
+        "subtitle": "Cómo se verifica cada persona, cuándo vence el sobre y si hay negociación previa.",
+        "authLabel": "Verificación de quien firma",
+        "sigTypeLabel": "Tipo de firma",
+        "expiry": "Vence en (días)",
+        "expiryHint": "Vencería el {date}.",
+        "expiryRange": "Entre 1 y 90 días.",
+        "reminder": "Recordatorio cada (días)",
+        "reminderHint": "En el producto se envían solos; en la demo usas «Recordar» en Inicio.",
+        "timestamp": "Estampa cronológica al completar",
+        "timestampHelp": "En el producto la emite una ECD acreditada; en la demo se simula.",
+        "redlines": "Negociación previa",
+        "redlinesHelp": "Las partes comentan y proponen cambios antes de firmar; el sobre no se envía con comentarios abiertos.",
+        "summary": "Resumen",
+        "summarySigners": "{n, plural, one {# persona firma o aprueba} other {# personas firman o aprueban}} ({mode})",
+        "summaryFields": "{n, plural, one {# campo ubicado} other {# campos ubicados}}",
+        "simNote": "Al enviar, el sobre aparece en Inicio con estado «Enviado» y su evidencia; no se manda ningún correo, SMS ni WhatsApp."
+      }
+    },
+    "redlines": {
+      "title": "Negociación previa",
+      "subtitle": "Comentarios de las partes antes de enviar a firma.",
+      "accept": "Aceptar",
+      "reject": "Rechazar",
+      "undo": "Deshacer",
+      "add": "Agregar comentario",
+      "placeholder": "Escribe un comentario o un cambio propuesto…",
+      "note": "En el producto, cada parte comenta desde su enlace; aquí escribes como remitente.",
+      "status": {
+        "open": "Abierto",
+        "accepted": "Aceptado",
+        "rejected": "Rechazado"
+      },
+      "samples": {
+        "c1": {
+          "author": "Asesoría jurídica (ejemplo)",
+          "text": "Precisar en la cláusula de duración la fecha exacta de terminación."
+        },
+        "c2": {
+          "author": "Contraparte (ejemplo)",
+          "text": "Solicito incluir el horario de la jornada en el documento."
         }
       }
     },
-    "types": {
-      "title": "Tipos de firma soportados",
-      "simple": "Simple",
-      "simpleDesc": "Firma con un clic, ideal para acuerdos internos.",
-      "advanced": "Avanzada",
-      "advancedDesc": "Identificación del firmante, vinculación única y auditoría.",
-      "qualified": "Cualificada (eIDAS)",
-      "qualifiedDesc": "Certificado digital cualificado, equivalente legal a firma manuscrita en la UE.",
-      "ley527": "Ley 527 CO",
-      "ley527Desc": "Firma electrónica certificada bajo la Ley 527 de 1999 de Colombia."
-    },
-    "audit": {
-      "title": "Audit trail criptográfico",
-      "subtitle": "Historial inmutable con hash chain y timestamping RFC 3161.",
-      "documentHash": "Hash del documento",
-      "blockchainTs": "Timestamp blockchain RFC 3161",
-      "blockchainEnabled": "Activado — anclado en cadena pública",
-      "blockchainDisabled": "Desactivado",
-      "downloadCert": "Descargar certificado",
-      "timeline": "Línea de tiempo",
-      "events": {
-        "created": "Sobre creado",
-        "sent": "Enviado por email",
-        "viewed": "Documento visto",
-        "authenticated": "Firmante autenticado",
-        "signed": "Documento firmado",
-        "completed": "Sobre completado",
-        "sealed": "Sellado criptográficamente"
-      },
-      "fields": {
-        "ip": "IP",
-        "device": "Dispositivo",
-        "geo": "Ubicación",
-        "hash": "Hash"
-      },
-      "close": "Cerrar"
-    },
     "templates": {
-      "title": "Plantillas con campos dinámicos",
-      "subtitle": "Reutiliza documentos frecuentes y envía en lote desde CSV.",
+      "title": "Plantillas",
+      "subtitle": "Documentos frecuentes con variables: al usarlos, llenas los datos y la plantilla arma el texto.",
       "new": "Nueva plantilla",
-      "items": {
-        "nda": "Acuerdo de confidencialidad (NDA)",
-        "labor": "Contrato laboral",
-        "service": "Contrato de servicios",
-        "saas": "Acuerdo SaaS",
-        "consent": "Consentimiento informado",
-        "vendor": "Acuerdo de proveedor"
+      "builtinGroup": "Plantillas de ejemplo",
+      "customGroup": "Tus plantillas",
+      "deleted": "Plantilla eliminada",
+      "customDesc": "Plantilla propia con {n, plural, =0 {ninguna variable} one {# variable} other {# variables}}.",
+      "customTag": "propia",
+      "varsCount": "{n, plural, =0 {sin variables} one {# variable} other {# variables}}",
+      "usesCount": "{n, plural, =0 {sin usos en esta demo} one {usada en # sobre} other {usada en # sobres}}",
+      "use": "Usar plantilla",
+      "preview": "Vista previa",
+      "previewNote": "Vista previa con datos de ejemplo. Al usarla, los cambias en el paso «Documento».",
+      "delete": "Eliminar",
+      "inUse": "No se puede eliminar: hay sobres que la usan.",
+      "deleteTitle": "Eliminar plantilla",
+      "deleteText": "La plantilla se borrará de esta demo.",
+      "loaded": "Plantilla «{name}» cargada en «Nuevo sobre».",
+      "created": "Plantilla «{name}» creada.",
+      "newTitle": "Nueva plantilla",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Ej.: Carta de oferta laboral",
+      "bodyLabel": "Texto con variables",
+      "bodyPlaceholder": "Escribe el texto y marca entre llaves los datos que cambian en cada sobre, por ejemplo {nombre} o {cargo}.",
+      "detected": "Variables detectadas: {vars}",
+      "noVars": "Sin variables: escribe una palabra entre llaves para que cambie en cada sobre.",
+      "save": "Guardar plantilla",
+      "errors": {
+        "name": "Escribe un nombre de al menos 3 letras.",
+        "body": "El texto debe tener al menos 20 caracteres."
       },
-      "fields": "campos",
-      "uses": "usos",
-      "bulk": "Envío masivo desde CSV",
-      "bulkDesc": "Sube un CSV con los datos de los firmantes y envía cientos de sobres a la vez.",
-      "uploadCsv": "Subir CSV",
-      "previewBulk": "Vista previa lote",
-      "send": "Usar plantilla"
+      "vars": {
+        "name": "Nombre completo",
+        "idNumber": "Número de documento",
+        "position": "Cargo",
+        "salary": "Salario mensual",
+        "startDate": "Fecha de inicio",
+        "months": "Duración (meses)",
+        "city": "Ciudad",
+        "newSalary": "Nuevo salario",
+        "effectiveDate": "Vigente desde",
+        "items": "Elementos entregados",
+        "deliveryDate": "Fecha de entrega",
+        "patient": "Paciente",
+        "procedure": "Procedimiento",
+        "professional": "Profesional",
+        "provider": "IPS",
+        "landlord": "Arrendador",
+        "landlordNit": "NIT del arrendador",
+        "address": "Dirección de la bodega",
+        "rent": "Canon mensual",
+        "purpose": "Finalidad",
+        "supplier": "Proveedor",
+        "supplierNit": "NIT del proveedor",
+        "description": "Descripción",
+        "amount": "Valor total",
+        "exitDate": "Fecha de retiro"
+      },
+      "items": {
+        "employment": {
+          "name": "Contrato de trabajo a término fijo",
+          "desc": "Contrato individual con cargo, salario, duración y período de prueba.",
+          "body": "CONTRATO INDIVIDUAL DE TRABAJO A TÉRMINO FIJO\n\nEntre CORDILLERA SERVICIOS TEMPORALES S.A.S., NIT 901.537.284-9, en adelante EL EMPLEADOR, y {name}, identificado(a) con cédula de ciudadanía {idNumber}, en adelante EL TRABAJADOR, se celebra el presente contrato:\n\nPRIMERA. Objeto. EL TRABAJADOR prestará sus servicios personales como {position} en la ciudad de {city}.\n\nSEGUNDA. Duración. El contrato tiene una duración de {months} meses contados desde el {startDate}.\n\nTERCERA. Salario. EL EMPLEADOR pagará un salario mensual de {salary}, por quincenas vencidas.\n\nCUARTA. Jornada. La jornada será la máxima legal vigente, distribuida según el reglamento interno de trabajo.\n\nQUINTA. Período de prueba. Las partes pactan un período de prueba equivalente a la quinta parte del término inicial.\n\nPara constancia, las partes firman por medios electrónicos.\n\nTexto de ejemplo para esta demo; no es una minuta revisada por un abogado.",
+          "sample": {
+            "name": "Andrés Felipe Gómez",
+            "idNumber": "1.023.456.789",
+            "position": "Operario de bodega",
+            "salary": "$2.100.000",
+            "months": "6",
+            "city": "Bogotá D.C."
+          }
+        },
+        "salaryAddendum": {
+          "name": "Otrosí de salario",
+          "desc": "Modifica el salario de un contrato de trabajo vigente.",
+          "body": "OTROSÍ AL CONTRATO DE TRABAJO\n\nEntre CORDILLERA SERVICIOS TEMPORALES S.A.S., NIT 901.537.284-9, y {name}, cédula {idNumber}, quien se desempeña como {position}, acuerdan modificar el contrato de trabajo vigente así:\n\nPRIMERA. A partir del {effectiveDate}, el salario mensual será de {newSalary}.\n\nSEGUNDA. Las demás cláusulas del contrato continúan sin cambios.\n\nTexto de ejemplo para esta demo; no es una minuta revisada por un abogado.",
+          "sample": {
+            "name": "Paula Andrea Castro",
+            "idNumber": "52.874.120",
+            "position": "Auxiliar de nómina",
+            "newSalary": "$2.650.000"
+          }
+        },
+        "uniform": {
+          "name": "Acta de entrega de dotación",
+          "desc": "Constancia de los elementos de dotación y protección entregados.",
+          "body": "ACTA DE ENTREGA DE DOTACIÓN\n\nEl {deliveryDate}, CORDILLERA SERVICIOS TEMPORALES S.A.S. entrega a {name}, cédula {idNumber}, los siguientes elementos de dotación y protección personal: {items}.\n\nEl trabajador declara que los recibe en buen estado, que conoce su uso correcto y que se compromete a usarlos durante la jornada.\n\nTexto de ejemplo para esta demo; no es una minuta revisada por un abogado.",
+          "sample": {
+            "name": "Luis Fernando Mejía",
+            "idNumber": "80.112.345",
+            "items": "2 camisas, 1 pantalón, 1 par de botas de seguridad y 1 casco"
+          }
+        },
+        "medicalConsent": {
+          "name": "Consentimiento informado",
+          "desc": "Autorización del paciente para un procedimiento, como el examen médico de ingreso.",
+          "body": "CONSENTIMIENTO INFORMADO\n\nYo, {patient}, identificado(a) con documento {idNumber}, autorizo a {provider} y al profesional {professional} para realizar el procedimiento: {procedure}.\n\nDeclaro que me explicaron en qué consiste, sus beneficios, riesgos y alternativas, que pude hacer preguntas y que me las respondieron. Sé que puedo retirar este consentimiento en cualquier momento.\n\nTexto de ejemplo para esta demo; no es un formato clínico aprobado.",
+          "sample": {
+            "patient": "Diana Marcela Torres",
+            "idNumber": "1.010.234.567",
+            "procedure": "Examen médico ocupacional de ingreso",
+            "professional": "Dra. Carolina Prieto",
+            "provider": "IPS Salud Laboral del Norte"
+          }
+        },
+        "lease": {
+          "name": "Contrato de arrendamiento de bodega",
+          "desc": "Arriendo de un inmueble comercial con canon y duración.",
+          "body": "CONTRATO DE ARRENDAMIENTO DE BODEGA\n\nEntre {landlord}, NIT {landlordNit}, en adelante EL ARRENDADOR, y CORDILLERA SERVICIOS TEMPORALES S.A.S., NIT 901.537.284-9, en adelante EL ARRENDATARIO, se celebra el presente contrato:\n\nPRIMERA. Inmueble. Bodega ubicada en {address}.\n\nSEGUNDA. Canon. EL ARRENDATARIO pagará un canon mensual de {rent} dentro de los cinco primeros días de cada mes.\n\nTERCERA. Duración. {months} meses, prorrogables por acuerdo entre las partes.\n\nCUARTA. Destinación. El inmueble se usará como bodega de dotaciones y archivo.\n\nTexto de ejemplo para esta demo; no es una minuta revisada por un abogado.",
+          "sample": {
+            "landlord": "Inversiones La Sabana S.A.S.",
+            "landlordNit": "900.418.263-0",
+            "address": "Calle 13 # 68-40, bodega 7, Bogotá D.C.",
+            "rent": "$8.500.000",
+            "months": "12"
+          }
+        },
+        "dataPolicy": {
+          "name": "Autorización de tratamiento de datos",
+          "desc": "Autorización de datos personales con los derechos de la Ley 1581 de 2012.",
+          "body": "AUTORIZACIÓN PARA EL TRATAMIENTO DE DATOS PERSONALES\n\nYo, {name}, identificado(a) con cédula {idNumber}, autorizo a CORDILLERA SERVICIOS TEMPORALES S.A.S. a recolectar, almacenar y usar mis datos personales con la siguiente finalidad: {purpose}.\n\nConozco mis derechos a conocer, actualizar, rectificar y suprimir mis datos y a revocar esta autorización, en los términos de la Ley 1581 de 2012.\n\nTexto de ejemplo para esta demo; no es una minuta revisada por un abogado.",
+          "sample": {
+            "name": "Sandra Milena Ortiz",
+            "idNumber": "39.765.432",
+            "purpose": "Proceso de selección y vinculación laboral"
+          }
+        },
+        "purchaseOrder": {
+          "name": "Orden de compra",
+          "desc": "Compra a un proveedor con valor y condiciones de entrega.",
+          "body": "ORDEN DE COMPRA\n\nProveedor: {supplier}, NIT {supplierNit}.\nComprador: CORDILLERA SERVICIOS TEMPORALES S.A.S., NIT 901.537.284-9.\n\nDescripción: {description}.\nValor total: {amount}, IVA incluido.\nEntrega: en la bodega del comprador dentro de los 15 días hábiles siguientes a la aprobación.\n\nTexto de ejemplo para esta demo.",
+          "sample": {
+            "supplier": "Dotaciones del Sur S.A.S.",
+            "supplierNit": "901.662.471-4",
+            "description": "120 kits de dotación (camisa, pantalón y botas)",
+            "amount": "$14.280.000"
+          }
+        },
+        "clearance": {
+          "name": "Paz y salvo",
+          "desc": "Constancia de devolución de elementos al terminar el contrato.",
+          "body": "PAZ Y SALVO\n\nCORDILLERA SERVICIOS TEMPORALES S.A.S. certifica que {name}, cédula {idNumber}, cuyo contrato terminó el {exitDate}, devolvió la dotación y los elementos de trabajo a su cargo y no tiene obligaciones pendientes con la empresa.\n\nEl trabajador declara que recibió la liquidación de su contrato.\n\nTexto de ejemplo para esta demo; no es una minuta revisada por un abogado.",
+          "sample": {
+            "name": "Jorge Iván Peña",
+            "idNumber": "79.654.321"
+          }
+        }
+      }
     },
-    "api": {
-      "title": "API & iframe embebido",
-      "subtitle": "Integra la firma en tu producto con nuestra API REST o el componente embebido.",
-      "tabs": {
+    "bulk": {
+      "title": "Envío masivo desde CSV",
+      "subtitle": "Crea un sobre por cada fila: elige la plantilla, descarga el CSV de ejemplo o sube el tuyo y revisa la vista previa antes de enviar.",
+      "template": "Plantilla",
+      "downloadSample": "Descargar CSV de ejemplo",
+      "sampleFile": "envio-masivo-ejemplo.csv",
+      "upload": "Subir CSV",
+      "useSample": "Probar con el CSV de ejemplo",
+      "columnsHelp": "Columnas: {cols}. El celular es opcional; si viene, el enlace se envía por WhatsApp.",
+      "cols": {
+        "name": "Nombre",
+        "email": "Correo",
+        "phone": "Celular"
+      },
+      "errors": {
+        "empty": "El CSV no tiene filas de datos.",
+        "columns": "Al CSV le faltan columnas: {cols}.",
+        "truncated": "Solo se leen las primeras {n} filas.",
+        "tooBig": "El archivo pesa {size}; el máximo es {max}."
+      },
+      "summary": "{file}: {total} filas, {ok} listas y {bad} con errores.",
+      "line": "Fila",
+      "result": "Resultado",
+      "ok": "Lista para enviar",
+      "rowErrors": {
+        "name": "nombre muy corto",
+        "email": "correo inválido",
+        "duplicate": "correo repetido",
+        "phone": "celular inválido",
+        "var": "falta {name}"
+      },
+      "send": "{n, plural, one {Enviar # sobre} other {Enviar # sobres}}",
+      "sent": "{n, plural, one {Se creó y envió # sobre} other {Se crearon y enviaron # sobres}} (simulado: no salió ningún mensaje).",
+      "discard": "Descartar",
+      "simNote": "El envío es simulado: los sobres aparecen en Inicio con estado «Enviado» y su evidencia, pero no se manda ningún correo ni mensaje."
+    },
+    "evidence": {
+      "title": "Evidencia",
+      "subtitle": "Línea de tiempo de cada sobre con su cadena de hashes, verificable en tu navegador.",
+      "empty": "Todavía no hay sobres enviados.",
+      "pick": "Sobre",
+      "modalTitle": "Evidencia del sobre {id}",
+      "docHash": "Huella del documento (SHA-256)",
+      "docHashUpload": "Calculada sobre el PDF que subiste.",
+      "docHashTemplate": "Calculada sobre el texto de la plantilla con sus datos.",
+      "timestamp": "Estampa cronológica",
+      "timestampOff": "No se solicitó para este sobre.",
+      "timestampDone": "Aplicada el {date}.",
+      "timestampPending": "Se aplicará cuando firmen todos.",
+      "timestampSim": "Simulada: en el producto la emite una entidad de certificación digital (ECD) acreditada.",
+      "signers": "Participantes",
+      "comments": "Comentarios de la negociación",
+      "chainTitle": "Cadena de hashes",
+      "chainHelp": "Cada evento guarda el hash del anterior; el primero parte de la huella del documento. Si alguien cambia un evento, la cadena deja de coincidir.",
+      "verify": "Verificar integridad",
+      "tamper": "Probar una alteración",
+      "chainOk": "Cadena íntegra: {n, plural, one {# evento verificado} other {# eventos verificados}}.",
+      "chainBroken": "La cadena no coincide desde el evento {n}.",
+      "tamperResult": "Prueba: si alguien cambia la hora del evento {n} («{event}») en una copia, la verificación falla en el evento {broken}. Tu evidencia no se modificó.",
+      "timeline": "Eventos ({n})",
+      "noEvents": "Este sobre todavía no tiene eventos.",
+      "hash": "Hash",
+      "downloadCert": "Descargar certificado (PDF)",
+      "downloadSigned": "Descargar documento firmado (PDF)",
+      "simNote": "Los hashes son reales y se calculan en tu navegador. Las IP son de ejemplo, los envíos y la estampa cronológica son simulados, y los PDF llevan la marca «Ejemplo - sin validez legal».",
+      "events": {
+        "created": "Sobre creado con {signers} participantes",
+        "sent": "Enviado a {to} por {channel} (simulado)",
+        "reminder": "Recordatorio a {to} por {channel} (simulado)",
+        "viewed": "Abrió el documento",
+        "codeSent": "Código de verificación enviado a {to} por {channel} (simulado)",
+        "authenticated": "Identidad verificada: {method}",
+        "signed": "Firmó ({kind}, {sigType})",
+        "approved": "Aprobó el documento",
+        "commentsResolved": "Negociación cerrada: {accepted} cambios aceptados y {rejected} rechazados",
+        "completed": "Sobre completado: firmaron todos",
+        "sealed": "Estampa cronológica aplicada (simulada)",
+        "copySent": "Copia del documento firmado enviada a {to} por {channel} (simulado)",
+        "voided": "Sobre anulado por el remitente",
+        "expired": "Sobre vencido sin completarse"
+      }
+    },
+    "pdf": {
+      "signedDone": "Se descargó el documento firmado de ejemplo (PDF).",
+      "certDone": "Se descargó el certificado de evidencia de ejemplo (PDF).",
+      "failed": "No se pudo generar el PDF en este navegador.",
+      "envelope": "Sobre",
+      "subject": "Asunto",
+      "sender": "Remitente",
+      "status": "Estado",
+      "created": "Creado",
+      "sent": "Enviado",
+      "completed": "Completado",
+      "mode": "Orden de firma",
+      "auth": "Verificación",
+      "sigType": "Tipo de firma",
+      "timestamp": "Estampa cronológica",
+      "timestampYes": "Solicitada (simulada)",
+      "timestampNo": "No solicitada",
+      "document": "Documento",
+      "certFile": "certificado-evidencia-ejemplo",
+      "certTitle": "Certificado de evidencia (ejemplo)",
+      "note": "Generado por la demo de firma electrónica de KopTup con datos ficticios. No es un certificado real, no lo emite una entidad de certificación y no tiene validez legal.",
+      "watermark": "EJEMPLO - SIN VALIDEZ LEGAL",
+      "envelopeSection": "Datos del sobre",
+      "documentSection": "Documento",
+      "chainSection": "Cadena de evidencia",
+      "chainResult": "Verificación",
+      "lastHash": "Hash del último evento",
+      "signersSection": "Participantes",
+      "cols": {
+        "name": "Nombre",
+        "role": "Rol",
+        "contact": "Contacto",
+        "state": "Estado",
+        "when": "Fecha"
+      },
+      "eventsSection": "Eventos (hora de Colombia)",
+      "footer": "Demo de KopTup · datos de ejemplo · sin validez legal",
+      "signedFile": "documento-firmado-ejemplo",
+      "uploadNote": "El PDF original ({file}) no se modifica en esta demo: esta constancia resume las firmas y la huella del archivo.",
+      "contentSection": "Contenido",
+      "signaturesSection": "Firmas",
+      "approved": "Aprobado"
+    },
+    "signer": {
+      "title": "Vista del firmante",
+      "subtitle": "Lo que ve cada persona al abrir su enlace: lee, se verifica con un código, firma y acepta.",
+      "none": "No hay sobres esperando firma. Crea uno en «Nuevo sobre» o restablece la demo.",
+      "createOne": "Crear un sobre",
+      "pickEnvelope": "Sobre por firmar",
+      "whoSigns": "Personas del sobre (orden {mode})",
+      "yourTurn": "le toca",
+      "waiting": "espera su turno",
+      "simNote": "Simulación: aquí haces el papel de cada persona. En el producto, cada una recibe su propio enlace.",
+      "doneApproved": "{name} aprobó el documento",
+      "doneSigned": "{name} firmó el documento",
+      "yourSignature": "Firma registrada",
+      "envCompleted": "El sobre quedó completado: firmaron todos.",
+      "nextIs": "Ahora le toca a {name}.",
+      "signAs": "Firmar como {name}",
+      "receipt": "Descargar certificado (PDF)",
+      "seeEvidence": "Ver evidencia",
+      "notYourTurn": "Todavía no le toca a {name}: el sobre es secuencial y falta una firma anterior.",
+      "from": "{company} te envió un documento para firmar",
+      "viewing": "Estás viendo la pantalla de {name}",
+      "step1": "Recibe el enlace",
+      "invite": "Mensaje simulado por {channel}: «{company} te envió “{title}” para firmar. Tienes hasta el {date}.»",
+      "open": "Abrir el documento",
+      "step2": "Lee el documento",
+      "uploadedDoc": "Documento PDF: {file}. La demo no muestra el PDF; en el producto lo verías aquí antes de firmar.",
+      "yourFields": "Tus campos: {list}.",
+      "noFields": "ninguno",
+      "step3": "Verifica tu identidad",
+      "verified": "Identidad verificada ({method}).",
+      "idCheckText": "En el producto, un proveedor aliado compara la foto de tu documento con una selfie. Aquí se simula el resultado.",
+      "idCheckSimulate": "Simular verificación de identidad",
+      "sendCode": "Enviar código por {channel} a {dest}",
+      "codeShown": "Mensaje simulado por {channel}: tu código es {code}. En el producto llegaría a tu celular o correo; aquí se muestra para que puedas seguir.",
+      "codeLabel": "Código de 6 dígitos",
+      "verify": "Verificar",
+      "resend": "Enviar otro código",
+      "codeWrong": "El código no coincide. Revísalo o pide otro.",
+      "digitalNote": "Firma digital: en el producto usarías tu certificado de una ECD; aquí se simula.",
+      "step4": "Firma",
+      "step4Approve": "Aprueba",
+      "approveText": "Como aprobador, confirmas que revisaste el documento y que puede seguir su curso.",
+      "dateAuto": "La fecha se llena sola: {date}.",
+      "consent": "Acepto firmar este documento por medios electrónicos y entiendo que mi firma queda asociada a la evidencia de este proceso.",
+      "missingTitle": "Falta: {list}",
+      "missing": {
+        "verify": "verificar tu identidad",
+        "signature": "tu firma",
+        "text": "llenar {field}",
+        "checkbox": "marcar {field}",
+        "consent": "aceptar firmar por medios electrónicos"
+      },
+      "approvedToast": "{name} aprobó el documento (simulado).",
+      "signedToast": "{name} firmó el documento (simulado).",
+      "approveButton": "Aprobar documento",
+      "signButton": "Firmar documento",
+      "kinds": {
+        "draw": "trazo dibujado",
+        "type": "nombre escrito",
+        "upload": "imagen subida",
+        "approve": "aprobación"
+      },
+      "padLabel": "Forma de firmar",
+      "modes": {
+        "draw": "Dibujar",
+        "type": "Escribir",
+        "upload": "Subir imagen"
+      },
+      "drawArea": "Área para dibujar tu firma",
+      "drawDone": "Firma dibujada.",
+      "drawHint": "Dibuja tu firma con el mouse, el lápiz o el dedo.",
+      "clear": "Borrar",
+      "typeLabel": "Escribe tu nombre",
+      "uploadPick": "Elige una imagen de tu firma",
+      "uploadHint": "PNG o JPG, hasta {max}.",
+      "uploadType": "Solo se aceptan imágenes PNG o JPG.",
+      "uploadBig": "La imagen pesa {size}; el máximo es 2 MB.",
+      "uploadedAlt": "Firma subida"
+    },
+    "dev": {
+      "title": "Para desarrolladores",
+      "subtitle": "Así se crearía el sobre con una API REST y así llegaría el aviso a tu sistema. El código se arma con los datos del sobre que elijas.",
+      "pick": "Sobre",
+      "langLabel": "Lenguaje",
+      "langs": {
         "curl": "cURL",
         "ts": "TypeScript",
         "python": "Python"
       },
-      "embedTitle": "Preview signing page embebida",
-      "embedDesc": "Inyecta una pantalla limpia de firma dentro de tu app con un iframe firmado.",
-      "openDocs": "Abrir documentación",
-      "copy": "Copiar",
-      "copied": "Copiado"
-    },
-    "redlines": {
-      "title": "Negociación previa",
-      "subtitle": "Comentarios y modo sugerencia antes de firmar.",
-      "suggestMode": "Modo sugerencia",
-      "comments": "Comentarios",
-      "addComment": "Agregar comentario",
-      "accept": "Aceptar",
-      "reject": "Rechazar"
+      "createLabel": "Crear sobre (ejemplo)",
+      "downloadJson": "Descargar JSON del sobre",
+      "jsonDone": "Se descargó {id}.json.",
+      "webhookTitle": "Webhook de ejemplo",
+      "webhookHelp": "Cuando cambia el estado, tu sistema recibe el aviso «{event}» firmado con HMAC-SHA256.",
+      "webhookLabel": "Aviso que recibiría tu sistema",
+      "hmacHelp": "La firma X-Signature se calculó en tu navegador con la clave de ejemplo «{secret}»; tu servidor la recalcula para confirmar que el aviso es auténtico.",
+      "verifyLabel": "Verificación en Node.js",
+      "embedTitle": "Firma dentro de tu aplicación",
+      "embedSubtitle": "Vista previa de cómo se vería la firma embebida en tu portal o app.",
+      "embedOpen": "Abrir en la vista del firmante",
+      "embedClosed": "Este sobre ya no admite firmas.",
+      "simNote": "Ejemplo ilustrativo: la API, el webhook y las direcciones (.example) no existen todavía; se construyen en tu proyecto. Nada de esta pestaña hace llamadas a internet."
     },
     "integrations": {
-      "title": "Integraciones nativas",
-      "subtitle": "Conecta tu CRM, ATS o HRIS sin escribir código.",
+      "title": "Integraciones",
+      "subtitle": "Lo que conectamos en tu proyecto para enviar, archivar y consultar los documentos firmados.",
+      "notConnected": "No conectada en la demo",
+      "details": "Ver detalle",
+      "simNote": "Ninguna integración está conectada en esta demo: las fichas describen lo que se implementa en tu proyecto.",
+      "whatItDoes": "Qué hace",
+      "buildNote": "Se implementa en tu proyecto con tus cuentas y credenciales; los costos del proveedor (por ejemplo, los mensajes de WhatsApp) los pagas directamente.",
+      "ask": "Pedir una demo guiada",
       "items": {
-        "salesforce": "Salesforce",
-        "hubspot": "HubSpot",
-        "pipedrive": "Pipedrive",
-        "workday": "Workday",
-        "greenhouse": "Greenhouse",
-        "bamboohr": "BambooHR",
-        "slack": "Slack",
-        "googleDrive": "Google Drive"
-      },
-      "connect": "Conectar"
-    },
-    "signer": {
-      "title": "Vista del firmante",
-      "subtitle": "Pantalla limpia, sin distracciones — listo para móvil.",
-      "from": "De",
-      "subject": "Firma requerida",
-      "instructions": "Por favor revisa el documento y completa los campos resaltados.",
-      "field": "Campo requerido",
-      "signHere": "Firma aquí",
-      "typeName": "Escribe tu nombre",
-      "draw": "Dibuja",
-      "type": "Escribe",
-      "upload": "Sube imagen",
-      "agree": "Acepto los términos electrónicos y consiento firmar este documento.",
-      "continue": "Firmar y continuar",
-      "secured": "Sesión segura — cifrado TLS y vinculación al dispositivo"
+        "whatsapp": {
+          "name": "WhatsApp Business",
+          "short": "Envía el enlace de firma, el código y los recordatorios por WhatsApp.",
+          "does": [
+            "Envía el enlace de firma con una plantilla de mensaje aprobada.",
+            "Manda el código de verificación y los recordatorios.",
+            "Entrega la copia del documento firmado."
+          ],
+          "inDemo": "En la demo: el canal WhatsApp solo queda registrado en la evidencia; no se envía nada."
+        },
+        "m365": {
+          "name": "Microsoft 365 y SharePoint",
+          "short": "Archiva los documentos firmados en SharePoint o OneDrive.",
+          "does": [
+            "Guarda el PDF firmado y el certificado en la carpeta que definas.",
+            "Nombra los archivos con el ID del sobre y la fecha.",
+            "Permite iniciar un sobre desde un documento de SharePoint."
+          ],
+          "inDemo": "En la demo: los PDF de ejemplo se descargan a tu equipo."
+        },
+        "gdrive": {
+          "name": "Google Drive",
+          "short": "Archiva los documentos firmados en carpetas compartidas.",
+          "does": [
+            "Guarda el PDF firmado y el certificado en una carpeta compartida.",
+            "Organiza los archivos por tipo de documento y por mes."
+          ],
+          "inDemo": "En la demo: los PDF de ejemplo se descargan a tu equipo."
+        },
+        "hrms": {
+          "name": "HRMS de KopTup",
+          "short": "Contratos, otrosíes y paz y salvos salen del expediente del trabajador.",
+          "does": [
+            "Genera el contrato con los datos del trabajador.",
+            "Guarda el documento firmado en su expediente.",
+            "Avisa a Gestión Humana cuando falta una firma."
+          ],
+          "inDemo": "En la demo: las plantillas de RR. HH. usan variables que llenas a mano o con un CSV."
+        },
+        "docs": {
+          "name": "Gestor documental de KopTup",
+          "short": "Archivo con búsqueda, versiones y permisos para los documentos firmados.",
+          "does": [
+            "Archiva el documento junto con su evidencia.",
+            "Permite buscar por persona, tipo de documento o fecha.",
+            "Controla quién puede ver cada documento."
+          ],
+          "inDemo": "En la demo: la evidencia de cada sobre se consulta en la pestaña «Evidencia»."
+        },
+        "api": {
+          "name": "API REST y webhooks",
+          "short": "Crea sobres desde tus sistemas y recibe avisos cuando cambian.",
+          "does": [
+            "Crea sobres y consulta su estado.",
+            "Envía avisos firmados con HMAC al enviar, firmar, anular o vencer un sobre.",
+            "Entrega el documento firmado y el certificado."
+          ],
+          "inDemo": "En la demo: la pestaña «Para desarrolladores» muestra el código y el aviso con los datos del sobre."
+        },
+        "crm": {
+          "name": "CRM o ERP por API",
+          "short": "Envía contratos y órdenes de compra desde tu CRM o ERP.",
+          "does": [
+            "Toma los datos del cliente o del proveedor de tu sistema.",
+            "Actualiza el registro cuando el documento queda firmado."
+          ],
+          "inDemo": "En la demo: la orden de compra de ejemplo muestra el tipo de documento que llegaría desde un ERP."
+        }
+      }
     }
   }
 }

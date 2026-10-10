@@ -134,7 +134,7 @@ export default function Dashboard() {
         }
       >
         <div className="mb-3 flex flex-col gap-2 lg:flex-row lg:items-center">
-          <label className="relative block lg:w-72">
+          <label className="relative block lg:w-80">
             <span className="sr-only">{t('dashboard.search')}</span>
             <MagnifyingGlassIcon className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-secondary-400" />
             <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('dashboard.search')} className={`${inputCls} pl-8`} />

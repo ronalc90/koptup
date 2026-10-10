@@ -1,221 +1,249 @@
-# Guía de la demo: Plataforma de Firma Electrónica
+# Guía de la demo: Firma electrónica
 
-> Ruta `/demo/firma-electronica` · Modo de acceso: **Abierta** · Tipo: **datos de ejemplo** (maqueta interactiva en el navegador: no firma, no envía correos, no guarda nada y no llama al servidor ni a IA) · Plan del producto: [Firma electrónica](Producto-firma-electronica.md)
+> Ruta `/demo/firma-electronica` · Modo de acceso: **Abierta** · Tipo: **datos de ejemplo** (todo corre en el navegador y se guarda en ese navegador; no llama al servidor, no envía mensajes ni usa IA) · Plan del producto: [Firma electrónica](Producto-firma-electronica.md)
 
-**Resumen.** Es la maqueta de una plataforma de firma electrónica («Koptup Sign»): un tablero con seis sobres de ejemplo, un asistente de 4 pasos para armar un sobre (documento, firmantes, campos y seguridad), la línea de tiempo de auditoría de un sobre, plantillas, un ejemplo de API, la pantalla que vería quien firma e integraciones. Sirve para mostrarle a RRHH, áreas legales, IPS o inmobiliarias cómo sería el flujo de enviar un documento a firmar. Cualquier visitante la abre sin registrarse; todo lo que hagas se pierde al recargar.
+**Resumen.** Muestra cómo funcionaría una plataforma de firma electrónica para una empresa colombiana, con el caso ficticio de **Cordillera Servicios Temporales S.A.S.** (NIT 901.537.284-9, Bogotá). En **Inicio** se ven ocho sobres de ejemplo (contrato de trabajo, otrosí, acta de dotación, consentimiento informado, arrendamiento, autorización de datos, orden de compra y paz y salvo) con indicadores que se calculan con esa lista. **Nuevo sobre** arma un sobre en cuatro pasos desde una plantilla con variables o desde un PDF propio; la **Vista del firmante** recorre lo que vería cada persona: abre el enlace, recibe un código (que la demo muestra en pantalla), firma con el mouse o el dedo y acepta. Cada paso queda en la **Evidencia**, una cadena de hashes SHA-256 que se verifica de verdad en el navegador, y se descargan el certificado de evidencia y el documento firmado en PDF de ejemplo. También hay plantillas propias, envío masivo desde CSV, un ejemplo de API con webhook firmado e integraciones descritas. La demo **no firma con validez legal** y lo dice en el encabezado. Lo que hace el visitante se guarda en su navegador; **Restablecer demo** vuelve al ejemplo.
 
 **En esta página:** [Recorrido sugerido](#recorrido-sugerido-demo-comercial-de-5-minutos) · [Pantallas y funciones](#pantallas-y-funciones) · [Qué es real y qué es simulado](#qué-es-real-y-qué-es-simulado) · [Acceso](#acceso) · [Limitaciones conocidas](#limitaciones-conocidas)
 
 ![Vista general](images/doc/demos/firma-electronica/00-general.jpg)
 
-*Vista inicial: encabezado con las insignias de cumplimiento, presentación, las siete pestañas y los cuatro indicadores del tablero.*
+*Vista inicial: «Volver a demos», los rótulos «Datos de ejemplo» y «Simulación: no firma con validez legal», el caso de ejemplo con su NIT, la referencia a la Ley 527 de 1999 y al Decreto 2364 de 2012, el desplegable «Qué es real y qué es simulado», las siete pestañas y «Restablecer demo».*
 
 ---
 
 ## Recorrido sugerido (demo comercial de 5 minutos)
 
-La demo no trae un recorrido guiado propio ni un botón para restablecer: para empezar de cero, recarga la página. Este guion recorre el tablero, la auditoría de un sobre y el asistente **Crear sobre** completo, y cierra con la **Vista firmante**.
+El mismo guion está dentro de la demo, en el desplegable **Qué es real y qué es simulado en esta demo › Recorrido sugerido**. Antes de empezar conviene pulsar **Restablecer demo** para partir de los ocho sobres de ejemplo.
 
 ![Recorrido de la demo](images/doc/demos/firma-electronica/recorrido.gif)
 
-*Recorrido completo: tablero, auditoría del sobre «Acuerdo SaaS — Acme», los cuatro pasos de «Crear sobre» y la pantalla del firmante.*
+*Recorrido completo: Inicio, evidencia de un contrato firmado, los cuatro pasos de «Nuevo sobre», el sobre enviado en la lista, la firma en la vista del firmante y la evidencia del sobre completado.*
 
 ```mermaid
 flowchart LR
-    D["Dashboard"] -->|"Nuevo sobre"| P1["1 Documento"]
-    P1 -->|"Siguiente"| P2["2 Firmantes"]
-    P2 -->|"Siguiente"| P3["3 Campos"]
-    P3 -->|"Siguiente"| P4["4 Seguridad"]
-    P4 -->|"Enviar para firma"| D
-    P4 -. "Negociación previa activada" .-> N["Tarjeta de comentarios"]
-    D -->|"Audit"| A["Ventana de auditoría"]
+    I["Inicio: sobres e indicadores"] -->|"Evidencia"| E["Cadena de hashes verificada"]
+    I -->|"Nuevo sobre"| D["1 Documento: plantilla o PDF"]
+    D --> F["2 Firmantes y orden"]
+    F --> C["3 Campos por persona"]
+    C --> S["4 Seguridad y negociación"]
+    S -->|"Enviar para firma (simulado)"| I
+    I -->|"Firmar"| V["Vista del firmante: código, firma y consentimiento"]
+    V -->|"Firmar como la siguiente persona"| V
+    V -->|"Ver evidencia"| E
+    E -->|"Descargar"| P["Certificado y documento firmado en PDF de ejemplo"]
 ```
 
-*El asistente vuelve al tablero al pulsar «Enviar para firma»; el sobre no se agrega a la lista ni se envía a nadie.*
+*El sobre que se envía aparece en Inicio; cada persona firma en su turno y la evidencia suma un evento encadenado por cada paso.*
 
-### Paso 1. Muestra el tablero y los sobres de ejemplo
+### Paso 1. Muestra Inicio: indicadores y sobres
 
-La demo abre en la pestaña **Dashboard**.
+La demo abre en **Inicio**.
 
-![Paso 1: tablero](images/doc/demos/firma-electronica/01-paso1-dashboard.jpg)
+![Paso 1: Inicio](images/doc/demos/firma-electronica/01-paso1-dashboard.jpg)
 
-*Indicadores, tipos de firma y la tabla «Documentos recientes» con sus acciones.*
+*Indicadores, buscador y la lista de sobres con su estado y sus acciones.*
 
-1. **Indicadores**: Documentos pendientes (2), Firmados este mes (28), Tasa de completitud (92 %) y Tiempo promedio (8 min). Son cifras fijas de ejemplo: no cambian con lo que hagas.
-2. **Tipos de firma soportados**: Simple, Avanzada, Cualificada (eIDAS) y Ley 527 CO, con una línea de explicación. Al tocar una tarjeta queda marcada, y esa misma elección aparece en el paso 4 del asistente.
-3. **Buscar documento...**: filtra la tabla por nombre mientras escribes.
-4. **Nuevo sobre**: abre la pestaña **Crear sobre**.
-5. **Audit**: abre la auditoría del sobre (paso 2).
-6. **Recordar**: aparece en los sobres enviados, vistos o en borrador, pero no hace nada.
+1. **Indicadores**: Por firmar (3, y 1 borrador), Completados este mes, Tasa de finalización (completados sobre sobres cerrados) y Tiempo promedio (del envío a la última firma). Se calculan con la lista: cambian al enviar, firmar, anular o cuando un sobre vence.
+2. **Buscar** por documento, persona o ID, y **filtrar por estado** (Borrador, Enviado, En curso, Completado, Vencido, Anulado).
+3. **Exportar CSV**: descarga la lista filtrada (`sobres-firma-ejemplo.csv`, separada por punto y coma en español).
+4. **Estado y avance** de cada sobre: firmas hechas, a quién le toca y cuándo vence.
+5. **Acciones según el estado**: Firmar, Recordar, Evidencia y Anular en los pendientes; Continuar y Eliminar en el borrador; Evidencia y PDF firmado en los completados; Evidencia y Duplicar en los vencidos o anulados. **Recordar** deja un evento «Recordatorio … (simulado)» en la evidencia y avisa que no se envió ningún mensaje.
 
-La tabla trae seis sobres: NDA — Pharma Corp (Firmado), Contrato laboral — Diego R. (Visto), Acuerdo SaaS — Acme (Enviado), Consentimiento clínico (Firmado), Anexo proveedor logística (Vencido) y Adenda contrato servicios (Borrador), con firmantes, tipo de firma y fecha de actualización (mayo de 2026).
+Las fechas de los sobres se calculan a partir del día en que se abre la demo (hora de Colombia), así que siempre son recientes.
 
-Qué decir: «Desde aquí ves en qué va cada documento y quién falta por firmar».
+Qué decir: «Desde aquí ves en qué va cada documento, a quién le toca firmar y cuánto se demoran en firmar».
 
-### Paso 2. Abre la auditoría de un sobre
+### Paso 2. Abre la evidencia del contrato firmado
 
-En la fila **Acuerdo SaaS — Acme** pulsa **Audit**.
+En la fila **Contrato de trabajo a término fijo — Andrés Felipe Gómez** pulsa **Evidencia** y luego **Verificar integridad**.
 
-![Paso 2: auditoría del sobre](images/doc/demos/firma-electronica/02-paso2-audit-modal.jpg)
+![Paso 2: evidencia del sobre](images/doc/demos/firma-electronica/02-paso2-audit-modal.jpg)
 
-*Ventana «Audit trail criptográfico» del sobre env_003.*
+*Ventana de evidencia del sobre SOB-0001 con la cadena verificada.*
 
-1. **Documento e identificador del sobre** (`env_003`).
-2. **Hash del documento** y **Timestamp blockchain RFC 3161** («Activado — anclado en cadena pública»).
-3. **Línea de tiempo** con 7 eventos: Sobre creado, Enviado por email, Documento visto, Firmante autenticado, Documento firmado, Sobre completado y Sellado criptográficamente; cada uno con fecha y hora, ciudad, dispositivo, IP y un hash abreviado.
-4. **Descargar certificado**: no descarga nada.
+- **Huella del documento (SHA-256)**: calculada sobre el texto de la plantilla con sus datos.
+- **Estampa cronológica**: aplicada al completar el sobre, marcada como **simulada**.
+- **Participantes** con su rol, estado y hora de firma.
+- **Cadena de hashes**: **Verificar integridad** recalcula todos los hashes y dice «Cadena íntegra: N eventos verificados». **Probar una alteración** cambia la hora de un evento en una copia y muestra en qué evento falla la verificación (la evidencia real no se toca).
+- **Eventos** con fecha y hora, quién, IP de ejemplo, navegador, ciudad y hash abreviado.
+- **Descargar certificado (PDF)** y, si está completado, **Descargar documento firmado (PDF)**: ambos con la marca «EJEMPLO - SIN VALIDEZ LEGAL».
 
-La ventana se cierra con la **×** de arriba, con el botón **×** de abajo, con Escape o tocando fuera. Muestra los mismos 7 eventos para cualquier sobre (ver [Limitaciones](#limitaciones-conocidas)).
+La ventana se cierra con la **×**, con Escape o tocando fuera.
 
-Qué decir: «Cada paso queda registrado con fecha, lugar y dispositivo: es la evidencia que respalda la firma».
+Qué decir: «Cada paso queda registrado y encadenado: si alguien cambia un dato, la verificación lo detecta».
 
 ### Paso 3. Crea un sobre: el documento
 
-Cierra la ventana y pulsa **Nuevo sobre**.
+Pulsa **Nuevo sobre** (en Inicio o en la pestaña).
 
 ![Paso 3: documento](images/doc/demos/firma-electronica/03-paso3-documento.jpg)
 
-*Paso «Documento» con un PDF de ejemplo cargado.*
+*Paso «Documento» con la plantilla de contrato de trabajo y el nombre cambiado.*
 
-1. **Pasos del asistente**: Documento, Firmantes, Campos y Seguridad. El paso hecho se marca en verde.
-2. **Zona de carga**: arrastra un archivo o haz clic para elegirlo («PDF, DOCX, DOC — hasta 25 MB»).
-3. **Archivo cargado**: muestra nombre, tamaño y una barra de carga que llega a «Listo». La carga es una animación: el archivo no sale del navegador ni se lee. La zona acepta cualquier tipo y tamaño de archivo, aunque diga PDF, DOCX o DOC.
-4. **Usar plantilla**: no muestra ningún cambio.
-5. **Siguiente**: pasa al paso 2 (no exige haber cargado un documento).
+1. **Origen**: **Usar una plantilla** o **Subir un PDF**.
+2. **Plantilla**: ocho de ejemplo y las que crees en **Plantillas**.
+3. **Variables**: nombre, cédula, cargo, salario, fechas (las de ejemplo se calculan con la fecha de hoy), etc. La vista previa se arma con lo que escribas.
+4. **Huella SHA-256 del texto**: cambia con cada letra.
 
-**Guardar borrador**, en todos los pasos, no hace nada.
+Con **Subir un PDF** solo se aceptan PDF de hasta 25 MB (se revisa la firma `%PDF` del archivo, no solo la extensión); la demo calcula su huella SHA-256 y cuenta sus páginas en el navegador. El PDF no se muestra ni se guarda: quedan su nombre, tamaño, páginas y huella.
 
-### Paso 4. Agrega los firmantes y el orden
+**Siguiente** no avanza si falta el documento o una variable; **Guardar borrador** lo deja en Inicio como borrador; **Empezar de nuevo** limpia el asistente (pide confirmación).
+
+### Paso 4. Revisa los firmantes y el orden
 
 ![Paso 4: firmantes](images/doc/demos/firma-electronica/04-paso4-firmantes.jpg)
 
-*Paso «Firmantes» con un tercer firmante agregado como testigo.*
+*Paso «Firmantes» con el orden secuencial y los firmantes propuestos por la plantilla.*
 
-1. **Modo de firma**: Paralelo, Secuencial (el marcado al empezar) o Condicional. Solo cambia el botón marcado.
-2. **Firmantes de ejemplo**: Ronald G. (Firmante) y Diego R. (Aprobador), numerados en orden.
-3. **Firmante agregado**: con **Agregar firmante** aparece una fila vacía; en la prueba se escribió «Laura Martínez» y un correo `@ejemplo.co`.
-4. **Rol**: Firmante, Aprobador, Solo lectura o Testigo.
-5. **Agregar firmante**. El ícono de la papelera, a la derecha de cada fila, quita al firmante.
+1. **Orden de firma**: **Secuencial** (cada persona recibe el enlace cuando firma la anterior) o **Paralelo**.
+2. **La persona del documento firma primero**; su nombre sigue a la variable del paso 1.
+3. **Rol**: Firmante, Aprobador (aprueba sin trazo), Testigo o Recibe copia (no firma).
+4. **Agregar persona** (máximo 6). Las flechas cambian el orden y la papelera quita a la persona.
 
-Los campos de nombre y correo quedan angostos y el texto se corta (ver [Limitaciones](#limitaciones-conocidas)).
+Cada persona tiene nombre, correo, celular y canal (correo, SMS o WhatsApp). Se valida: nombre completo, correo válido y no repetido, y celular colombiano de 10 dígitos que empiece por 3 cuando el canal es SMS o WhatsApp.
 
-### Paso 5. Ubica los campos en el documento
+### Paso 5. Ubica los campos
 
 ![Paso 5: campos](images/doc/demos/firma-electronica/05-paso5-campos.jpg)
 
-*Paso «Campos»: la paleta a la izquierda y la página con los campos ubicados.*
+*Paso «Campos»: la persona a la que se asignan, la paleta y un campo de texto recién ubicado y seleccionado.*
 
-1. **Paleta**: Firma, Iniciales, Fecha, Texto y Checkbox. Arrastra uno con el mouse; mientras lo arrastras, la página dice «Suelta aquí».
-2. **Vista previa del documento** («Página 1 de 3»): trae tres campos de ejemplo (Firma, Fecha e Iniciales) y suma los que sueltes donde los sueltes. En la prueba se agregaron una Firma y un Checkbox.
-3. **Contador**: «5 campos posicionados».
+1. **Asignar a**: cada persona tiene un color y un contador de campos.
+2. **Paleta**: Firma, Iniciales, Fecha, Texto y Casilla. Se elige un campo y se **toca la página** (funciona en el celular) o se arrastra con el mouse.
+3. **El campo en la página**, con el color de su persona. Se mueve arrastrándolo (mouse o dedo) o con las flechas del teclado; Supr lo quita.
+4. **Campo seleccionado**: cambiar a quién le corresponde o **Quitar campo**.
 
-Los campos no se pueden mover ni borrar después de soltarlos, y todos quedan asignados al primer firmante sin que la pantalla lo diga.
+Al entrar al paso se proponen campos de firma y fecha para cada persona (**Ubicar campos sugeridos** los vuelve a poner; **Quitar todos** los borra). La página muestra el texto real de la plantilla; con un PDF subido es una vista esquemática. No se avanza si un firmante o testigo no tiene campo de firma.
 
-### Paso 6. Configura la seguridad y la negociación previa
+### Paso 6. Configura la seguridad y envía
 
 ![Paso 6: seguridad](images/doc/demos/firma-electronica/06-paso6-seguridad.jpg)
 
-*Paso «Seguridad» con KYC, firma Ley 527 CO y la negociación previa activada.*
+*Paso «Seguridad» con código por WhatsApp, firma electrónica y la negociación previa activada.*
 
-1. **Método de autenticación**: SMS OTP, Email OTP, KYC (ID + selfie), Video grabado o Biometría.
-2. **Tipo de firma**: Simple, Avanzada, Cualificada (eIDAS) o Ley 527 CO (la misma elección del tablero).
-3. **Expiración (días)** (14) y **Recordatorios cada (días)** (3).
-4. **Negociación previa (redlines)**: al marcarla aparece debajo la tarjeta **Negociación previa**. La casilla **Timestamp blockchain RFC 3161** cambia el texto de la pestaña **Audit trail** entre «Activado» y «Desactivado».
-5. **Enviar para firma**: vuelve al **Dashboard** y deja el asistente en el paso 1. No aparece un sobre nuevo en la tabla.
-6. **Negociación previa**: dos comentarios de ejemplo (Legal y Acme CEO) con **Aceptar** y **Rechazar**, y un cuadro para agregar uno nuevo con **+**. Al aceptar o rechazar, el comentario muestra la etiqueta en inglés «accepted» o «rejected»; los comentarios que agregas salen firmados por «You».
+1. **Verificación de quien firma**: código por correo, SMS o WhatsApp, o verificación de identidad con documento y selfie. Todas son **simuladas** y lo dicen.
+2. **Tipo de firma**: **Firma electrónica** o **Firma digital con certificado** (de una ECD acreditada, por integración; simulada).
+3. **Vence en (días)** (1 a 90, muestra la fecha) y **Recordatorio cada (días)** (antes del vencimiento).
+4. **Negociación previa**: al activarla aparecen dos comentarios de ejemplo con **Aceptar**, **Rechazar** y **Deshacer**, y un cuadro para agregar comentarios (salen como «Cordillera (tú)»). El sobre **no se envía con comentarios abiertos**.
 
-Qué decir: «Antes de firmar, las partes pueden proponer cambios; cuando todos están de acuerdo, se envía el sobre con la verificación de identidad que elijas».
+También está la casilla **Estampa cronológica al completar** (simulada) y un **Resumen**. **Enviar para firma** vuelve a Inicio con el sobre nuevo resaltado (SOB-0009), su evidencia con «Sobre creado» y «Enviado a … (simulado)», y los indicadores actualizados. Un aviso aclara que no se mandó ningún mensaje.
 
-### Paso 7. Cierra con la vista del firmante
+Qué decir: «Antes de firmar las partes pueden proponer cambios; cuando todo está resuelto, sale el sobre con la verificación que elijas».
 
-Abre la pestaña **Vista firmante** (ver [Vista firmante](#vista-firmante)): es la pantalla limpia que recibiría la persona que firma. Cierre sugerido: bajar al bloque «¿Te gustaría algo así para tu negocio?» y pulsar **Solicitar demo guiada**.
+### Paso 7. Firma como cada persona
+
+En la fila del sobre nuevo pulsa **Firmar** (o abre la pestaña **Vista del firmante**).
+
+![Paso 7: vista del firmante](images/doc/demos/firma-electronica/10-vista-firmante.jpg)
+
+*Vista del firmante: el mensaje simulado, la identidad verificada, la firma dibujada con el mouse y el consentimiento.*
+
+1. **Recibe el enlace**: el mensaje simulado por el canal de la persona; **Abrir el documento** registra «Abrió el documento».
+2. **Verifica tu identidad**: **Enviar código** muestra un código de 6 dígitos en pantalla (en el producto llegaría al celular o al correo); se escribe y se pulsa **Verificar**. Un código equivocado se rechaza. Con verificación de identidad hay un botón **Simular verificación de identidad**.
+3. **Firma**: **Dibujar** (mouse, lápiz o dedo), **Escribir** (el nombre en letra manuscrita) o **Subir imagen** (PNG o JPG de hasta 2 MB). El aprobador solo aprueba. Si la persona tiene campos de texto o casillas, hay que llenarlos.
+4. **Consentimiento**: la casilla viene **desmarcada**; **Firmar documento** se activa cuando no falta nada (debajo dice qué falta).
+
+Después de firmar aparece la confirmación con la firma, **Firmar como** la siguiente persona, **Descargar certificado (PDF)** y **Ver evidencia**. En orden secuencial, la lista de la izquierda muestra quién «espera su turno». Al firmar la última persona el sobre queda **Completado**, se aplica la estampa cronológica simulada y se ofrece **Descargar documento firmado (PDF)** con las firmas.
+
+### Paso 8. Cierra con la evidencia
+
+**Ver evidencia** abre la pestaña **Evidencia** con el sobre elegido.
+
+![Paso 8: evidencia del sobre completado](images/doc/demos/firma-electronica/08-audit-trail.jpg)
+
+*Evidencia del sobre SOB-0009 completado: estampa cronológica simulada, comentarios de la negociación, cadena íntegra y eventos.*
+
+1. **Sobre**: cualquier sobre enviado.
+2. **Estampa cronológica** aplicada (simulada).
+3. **Cadena íntegra** tras **Verificar integridad**.
+4. **Sobre completado: firmaron todos** en la línea de tiempo.
+
+Cierre sugerido: bajar al bloque «¿Te gustaría algo así para tu negocio?» y pulsar **Solicitar demo guiada**.
 
 ---
 
 ## Pantallas y funciones
 
-La demo es una sola página con un encabezado, una presentación y siete pestañas: **Dashboard**, **Crear sobre**, **Plantillas**, **Audit trail**, **API & Embed**, **Vista firmante** e **Integraciones**. Lo que cambias en una pestaña se conserva al pasar a otra, pero se pierde al recargar.
+La demo es una sola página con encabezado, el desplegable «Qué es real y qué es simulado», siete pestañas (**Inicio**, **Nuevo sobre**, **Plantillas**, **Evidencia**, **Vista del firmante**, **Para desarrolladores** e **Integraciones**) y **Restablecer demo**. Todo lo que cambias se conserva al pasar de una pestaña a otra y al recargar (en el navegador del visitante). Los datos de ejemplo se regeneran con fechas nuevas pasados 14 días o con **Restablecer demo** (pide confirmación).
 
-### Encabezado y presentación
+### Encabezado
 
 | Elemento | Qué hace |
 |---|---|
 | **Volver a demos** | Va a `/demo`. |
-| Nombre «Plataforma de Firma Electrónica · Koptup Sign» | Solo en pantallas medianas y grandes. |
-| Insignias **eIDAS**, **ESIGN Act**, **UETA**, **Ley 527 CO** y **NOM 151 MX** | Fijas, sin acción. La demo no tiene ninguna insignia de «Datos de ejemplo». |
-| Presentación | «Firma documentos legalmente vinculantes en minutos. Simple, Avanzada, Cualificada eIDAS y Ley 527 CO con audit trail criptográfico.» |
+| Rótulos **Datos de ejemplo** y **Simulación: no firma con validez legal** | Fijos; el primero explica al pasar el mouse que empresa, personas y documentos son ficticios. |
+| Caso de ejemplo | «Cordillera Servicios Temporales S.A.S. (empresa ficticia) · NIT 901.537.284-9 · Bogotá D.C.» (el dígito de verificación es correcto). |
+| Referencia legal | Ley 527 de 1999 y Decreto 2364 de 2012 (compilado en el Decreto 1074 de 2015), con la aclaración de que la demo no firma con validez legal. |
+| **Qué es real y qué es simulado en esta demo** | Desplegable con lo que funciona de verdad, lo simulado y el recorrido sugerido. |
 
-### Dashboard
+### Inicio
 
-Ver los [pasos 1 y 2](#paso-1-muestra-el-tablero-y-los-sobres-de-ejemplo). Resumen de lo que funciona:
+Ver los [pasos 1 y 2](#paso-1-muestra-inicio-indicadores-y-sobres). Debajo de la lista está **¿Qué tipo de firma usar?**: firma electrónica, firma digital y estampa cronológica, con lo que hace la demo con cada una y la nota de que no reemplaza una asesoría jurídica. **Anular** y **Eliminar** (borrador) piden confirmación; **Duplicar** copia un sobre vencido o anulado en **Nuevo sobre** para reenviarlo; **Continuar** abre el borrador en el asistente.
 
-| Elemento | Funciona | Qué pasa |
-|---|---|---|
-| Indicadores | Solo muestran | Cifras fijas. |
-| Tarjetas de tipo de firma | Sí | Marcan el tipo elegido (compartido con el paso 4). |
-| Buscar documento... | Sí | Filtra por nombre. |
-| Nuevo sobre | Sí | Abre **Crear sobre**. |
-| Audit | Sí | Abre la ventana de auditoría. |
-| Recordar | No | Sin efecto. |
+### Nuevo sobre
 
-### Crear sobre
-
-Ver los [pasos 3 a 6](#paso-3-crea-un-sobre-el-documento). **Atrás** vuelve al paso anterior (desactivado en el primero). Los firmantes, los campos y las opciones que cambias se mantienen aunque envíes el sobre o cambies de pestaña; solo se reinician al recargar.
+Ver los [pasos 3 a 6](#paso-3-crea-un-sobre-el-documento). Los pasos ya hechos se pueden volver a abrir tocando su número; **Atrás** retrocede. Lo que llevas armado se conserva aunque cambies de pestaña o recargues (salvo el PDF, del que quedan sus datos).
 
 ### Plantillas
 
 ![Plantillas](images/doc/demos/firma-electronica/07-plantillas.jpg)
 
-*Seis plantillas con sus campos y usos, y el bloque de envío masivo desde CSV.*
+*Las ocho plantillas de ejemplo y el bloque de envío masivo.*
 
-- **Plantillas con campos dinámicos**: Acuerdo de confidencialidad (NDA), Contrato laboral, Contrato de servicios, Acuerdo SaaS, Consentimiento informado y Acuerdo de proveedor, con el número de campos y de usos (cifras de ejemplo).
-- **Usar plantilla** abre **Crear sobre** en el paso en que estaba; no carga la plantilla elegida.
-- **Nueva plantilla**, **Subir CSV** y **Vista previa lote** (bloque «Envío masivo desde CSV») no hacen nada.
+1. **Nueva plantilla**: nombre y texto; las palabras entre llaves (`{nombre}`, `{cargo}`) se detectan como variables. Las plantillas propias se pueden usar y eliminar (si ningún sobre las usa).
+2. **Usar plantilla**: la carga en **Nuevo sobre** con sus datos de ejemplo y sus firmantes.
+3. **Vista previa**: el texto con los datos de ejemplo.
+4. **Envío masivo desde CSV** (abajo).
 
-### Audit trail
+Cada tarjeta dice cuántas variables tiene y en cuántos sobres de la demo se usó (cifras de la demo, no inventadas). Los textos de las plantillas son de ejemplo y lo dicen al final: no son minutas revisadas por un abogado.
 
-![Audit trail](images/doc/demos/firma-electronica/08-audit-trail.jpg)
+### Envío masivo
 
-*Auditoría de ejemplo: hash del documento, estado del sello de tiempo y los siete eventos.*
+![Envío masivo](images/doc/demos/firma-electronica/13-envio-masivo.jpg)
 
-Es la misma información de la ventana del [paso 2](#paso-2-abre-la-auditoría-de-un-sobre), en una pestaña: hash del documento, **Timestamp blockchain RFC 3161** (aquí sí refleja la casilla del paso 4: «Activado — anclado en cadena pública» o «Desactivado») y la línea de tiempo con ciudad, dispositivo, IP y hash de cada evento. **Descargar certificado** no hace nada.
+*Vista previa del CSV de ejemplo: cuatro filas listas y una con correo inválido.*
 
-### API & Embed
+1. **Plantilla** con la que se crea un sobre por fila.
+2. **Descargar CSV de ejemplo**: cinco personas ficticias con las columnas de la plantilla (la cuarta trae un correo inválido a propósito). **Subir CSV** lee un archivo (`;` o `,`, hasta 512 KB y 50 filas) y **Probar con el CSV de ejemplo** lo carga sin descargarlo.
+3. **Vista previa** con el resultado de cada fila: lista para enviar o qué falla (nombre corto, correo inválido o repetido, celular inválido, variable vacía). Si faltan columnas, lo dice.
+4. **Enviar N sobres**: crea y envía (simulado) un sobre por cada fila válida; aparecen en Inicio marcados «envío masivo». Si la fila trae celular, el canal es WhatsApp.
 
-![API y componente embebido](images/doc/demos/firma-electronica/09-api.jpg)
+### Evidencia
 
-*Ejemplo de código para crear un sobre y la vista previa de la firma embebida.*
+Ver los [pasos 2 y 8](#paso-8-cierra-con-la-evidencia). La pestaña tiene un selector con todos los sobres enviados. Los eventos posibles son: sobre creado, enviado, recordatorio, abrió el documento, código enviado, identidad verificada, firmó, aprobó, negociación cerrada, sobre completado, estampa cronológica aplicada, copia enviada, anulado y vencido. Los envíos, recordatorios, códigos y copias dicen «(simulado)».
 
-- Tres ejemplos de código para crear un sobre: **cURL**, **TypeScript** (el que abre) y **Python**. **Copiar** copia el ejemplo al portapapeles y cambia a «Copiado» por un momento.
-- **Preview signing page embebida**: un dibujo de cómo se vería la firma dentro de otra aplicación (`sign.koptup.io/embed/env_003`).
-- **Abrir documentación** y **Firmar y continuar** no hacen nada. La API, el paquete `@koptup/sign` y las direcciones de los ejemplos no existen: son ilustrativos.
+### Vista del firmante
 
-### Vista firmante
+Ver el [paso 7](#paso-7-firma-como-cada-persona). A la izquierda se elige el sobre por firmar y la persona (con su rol y si le toca, espera o ya firmó); un aviso aclara que aquí se hace el papel de cada persona y que en el producto cada una recibe su enlace. Si no hay sobres pendientes, lo dice y ofrece **Crear un sobre**.
 
-![Vista del firmante](images/doc/demos/firma-electronica/10-vista-firmante.jpg)
+### Para desarrolladores
 
-*Pantalla del firmante para el «Acuerdo SaaS — Acme», con los campos «Firma aquí» y la fecha.*
+![Para desarrolladores](images/doc/demos/firma-electronica/09-api.jpg)
 
-- Encabezado «De: Acme Corp · Firma requerida» con la insignia **TLS**, instrucciones y una página de ejemplo con los campos **Firma aquí** y la fecha `2026-05-14`.
-- **Dibuja**, **Escribe** y **Sube imagen** no hacen nada; no hay dónde dibujar ni escribir la firma.
-- La casilla «Acepto los términos electrónicos y consiento firmar este documento.» se puede marcar y desmarcar.
-- La barra inferior dice «env_003 · 3/3» y tiene **Firmar y continuar**, que no hace nada.
+*Código para crear el sobre elegido y el webhook firmado que recibiría tu sistema.*
+
+1. **Sobre**: el código se arma con los datos del sobre elegido (asunto, plantilla y variables o archivo, huella, orden, verificación, firmantes y campos).
+2. **Crear sobre (ejemplo)** en cURL, TypeScript o Python, con **Copiar**, y **Descargar JSON del sobre** (`SOB-000N.json`).
+3. **Webhook de ejemplo**: el aviso que recibiría tu sistema según el estado del sobre, con la cabecera `X-Signature` calculada de verdad con HMAC-SHA256 y una clave de ejemplo, y el código para verificarla en Node.js.
+
+Abajo, **Firma dentro de tu aplicación** muestra cómo se vería la firma embebida; **Abrir en la vista del firmante** lleva a firmar ese sobre (si ya no admite firmas, lo dice). Un aviso aclara que la API, el webhook y las direcciones `.example` no existen todavía: se construyen en el proyecto, y la pestaña no hace llamadas a internet.
 
 ### Integraciones
 
 ![Integraciones](images/doc/demos/firma-electronica/11-integraciones.jpg)
 
-*Ocho integraciones de ejemplo con su botón «Conectar».*
+*Ficha de WhatsApp Business abierta con «Ver detalle».*
 
-Salesforce, HubSpot, Pipedrive, Workday, Greenhouse, BambooHR, Slack y Google Drive. Los ocho botones **Conectar** no hacen nada.
+WhatsApp Business, Microsoft 365 y SharePoint, Google Drive, HRMS de KopTup, Gestor documental de KopTup, API REST y webhooks, y CRM o ERP por API. Cada tarjeta dice **No conectada en la demo**; **Ver detalle** abre una ficha con qué hace la integración, qué se ve de ella en la demo y la nota de que se implementa en el proyecto con las cuentas del cliente, más **Pedir una demo guiada** (`/solicitar-demo?demos=firma-electronica`).
 
 ### En el celular
 
 ![Vista móvil](images/doc/demos/firma-electronica/12-movil.jpg)
 
-*La demo en un teléfono (390 px): insignias en dos filas, presentación y pestañas con desplazamiento lateral.*
+*La demo en un teléfono (390 px): indicadores de a dos y la lista de sobres en tarjetas.*
 
-En pantallas pequeñas se oculta el nombre del encabezado, las pestañas se desplazan de lado, los indicadores quedan de a dos y la tabla de documentos se desplaza de lado (sin la columna «Actualizado»). La página no se desborda a lo ancho. Para ubicar campos en el paso 3 hay que arrastrar con el mouse, así que ese paso está pensado para escritorio.
+Las pestañas se desplazan de lado, los indicadores quedan de a dos y cada sobre se muestra como tarjeta con sus acciones debajo. Todo el recorrido se puede hacer con el dedo: los campos se ubican tocando la página y la firma se dibuja con el dedo. La página no se desborda a lo ancho, en modo claro ni oscuro.
 
 ---
 
@@ -223,22 +251,25 @@ En pantallas pequeñas se oculta el nombre del encabezado, las pestañas se desp
 
 | Parte | Real o simulado | Detalle |
 |---|---|---|
-| Sobres, firmantes, cifras, auditoría y plantillas | **Datos de ejemplo** | Fijos en el código de la página; los indicadores no cambian. |
-| Carga del documento | **Simulada** | La barra de progreso es una animación; el archivo no se lee ni se envía. |
-| Firmantes, campos, opciones de seguridad y comentarios | **Reales en la página** | Se pueden cambiar, pero no se guardan ni se envían; se pierden al recargar. |
-| Envío del sobre, correos y recordatorios | **No existen** | «Enviar para firma» solo vuelve al tablero. |
-| Autenticación (OTP, KYC, video, biometría) | **No existe** | Son opciones para elegir; no hay verificación. |
-| Firma, hash, sello de tiempo y blockchain | **No existen** | Los hash y eventos son textos de ejemplo. |
-| Certificado, API, SDK y componente embebido | **No existen** | Botones sin acción y código ilustrativo. |
-| Integraciones | **No existen** | «Conectar» no hace nada. |
-| Insignias de cumplimiento | **Decorativas** | La demo no firma ni certifica nada. El [plan del producto](Producto-firma-electronica.md) recomienda retirarlas. |
-| Backend, IA y almacenamiento | **No se usan** | La página no hace llamadas al servidor ni guarda en el navegador. |
+| Sobres, personas, empresa y textos de plantillas | **Datos de ejemplo** | Ficticios (correos `.example`, IP de rangos de documentación, NIT con dígito de verificación válido). Las fechas se calculan con el día en que se abre la demo. |
+| Lista, filtros, indicadores, borradores, anular, duplicar, recordar | **Reales en el navegador** | Se calculan y guardan en el navegador del visitante (`localStorage`). |
+| Asistente: plantillas con variables, validaciones, firmantes, orden, campos por persona | **Real en el navegador** | Ubicar, mover y quitar campos funciona con mouse, teclado y dedo. |
+| PDF subido | **Real en el navegador** | Valida que sea PDF de hasta 25 MB, calcula su SHA-256 y cuenta sus páginas; no se muestra ni sale del navegador. |
+| Huella del documento y cadena de evidencia | **Real** | SHA-256 calculado en el navegador; «Verificar integridad» recalcula toda la cadena y «Probar una alteración» demuestra que detecta cambios. |
+| Firma dibujada, escrita o subida y consentimiento | **Real en el navegador** | La firma queda como imagen en el sobre y en el PDF. |
+| Envío de enlaces, códigos, recordatorios y copias (correo, SMS, WhatsApp) | **Simulado** | No se envía nada; el código se muestra en pantalla y la evidencia dice «(simulado)». |
+| Verificación de identidad, firma digital con certificado y estampa cronológica | **Simuladas** | En el producto las hacen un proveedor aliado y una ECD acreditada. |
+| Certificado de evidencia y documento firmado | **PDF de ejemplo reales** | Se generan y descargan; llevan la marca «EJEMPLO - SIN VALIDEZ LEGAL». |
+| CSV de sobres, CSV de envío masivo y JSON del sobre | **Reales** | Se generan y descargan en el navegador. |
+| API, webhook e integraciones | **Ilustrativos** | La firma HMAC del webhook se calcula de verdad; la API y las direcciones no existen todavía. Las integraciones solo se describen. |
+| Validez legal | **No tiene** | El encabezado, el bloque de tipos de firma y los PDF lo dicen. |
+| Backend, IA y almacenamiento en servidor | **No se usan** | La página no hace llamadas al servidor. |
 
 ---
 
 ## Acceso
 
-**Cómo lo ve un visitante.** La demo es **Abierta**: en `/demo` su tarjeta («Firma Electrónica», insignias «Abierta» y «LegalTech») tiene **Probar Demo**, que abre `/demo/firma-electronica` directamente, y **Solicitar demo guiada**, que lleva a `/solicitar-demo?demos=firma-electronica`. No hay pantalla de acceso ni hace falta cuenta. Al final de la página está el bloque «¿Te gustaría algo así para tu negocio?» con **Solicitar demo guiada** (la misma solicitud, con esta demo ya elegida), **Solicitar Cotización** (`/contact`) y **Ver Planes y Precios**.
+**Cómo lo ve un visitante.** La demo es **Abierta**: en `/demo` su tarjeta tiene **Probar Demo**, que abre `/demo/firma-electronica` directamente, y **Solicitar demo guiada**, que lleva a `/solicitar-demo?demos=firma-electronica`. No hay pantalla de acceso ni hace falta cuenta. Al final de la página está el bloque «¿Te gustaría algo así para tu negocio?» con **Solicitar demo guiada** (la misma solicitud, con esta demo ya elegida), **Solicitar Cotización** (`/contact`) y **Ver Planes y Precios**.
 
 **Cómo se solicita una demo guiada y cómo la gestiona el admin.** La solicitud llega a **Admin › Solicitudes de demo** como cualquier otra (y también a Contactos). Como la demo es abierta, no hace falta conceder acceso para usarla: la solicitud sirve para agendar la presentación. Un admin puede cambiar el modo en **Admin › Catálogo de demos** (por ejemplo, a «Con solicitud»); desde ese momento el visitante sin acceso verá la pantalla de acceso en lugar de la demo. Detalle en el [Manual del administrador](Doc-06-Manual-del-Administrador.md) y en [Flujos del visitante](Doc-04-Flujos-del-Visitante.md).
 
@@ -258,16 +289,13 @@ flowchart LR
 
 ## Limitaciones conocidas
 
-1. **Muchos botones no hacen nada**: Recordar, Guardar borrador, Usar plantilla (dentro del paso 1), Nueva plantilla, Subir CSV, Vista previa lote, Descargar certificado (en la pestaña y en la ventana), Abrir documentación, Firmar y continuar (en la API y en la vista firmante), Dibuja, Escribe, Sube imagen y los ocho Conectar. Antes de una presentación conviene saber cuáles evitar.
-2. **No avisa que es una simulación.** No hay insignia de «Datos de ejemplo» ni nota que lo explique, y la página muestra eIDAS, ESIGN Act, UETA, Ley 527 CO, NOM 151 MX, «Cualificada (eIDAS)» y «anclado en cadena pública» como si fueran capacidades reales. El [plan del producto](Producto-firma-electronica.md) considera retirar estas afirmaciones una prioridad.
-3. **«Enviar para firma» no crea nada**: el sobre no aparece en la tabla y los indicadores no cambian. Tampoco hay confirmación.
-4. **La auditoría es la misma para todos los sobres**: los mismos 7 eventos del 13 de mayo de 2026, incluso en el borrador y en el vencido. La ventana siempre dice «Activado» en el sello de tiempo, aunque desactives la casilla del paso 4 (la pestaña **Audit trail** sí cambia).
-5. **Paso Firmantes**: los campos de nombre y correo quedan angostos y el texto se corta («Ronald», «ronald@…»).
-6. **Paso Campos**: los campos soltados no se pueden mover ni borrar, quedan todos asignados al primer firmante y el arrastre requiere mouse.
-7. **Negociación previa**: los estados aparecen en inglés («accepted», «rejected») y los comentarios nuevos salen como «You»; no se puede deshacer una decisión.
-8. **«Usar plantilla» no carga la plantilla**: en la pestaña **Plantillas** solo abre el asistente, y dentro del paso 1 no muestra ningún cambio.
-9. **Textos mezclados en inglés**: Dashboard, Audit trail, Audit, API & Embed, Preview signing page embebida, Checkbox, Timestamp blockchain, redlines.
-10. **Fechas de mayo de 2026** en una demo que dice «Firmados este mes».
-11. **Encabezado que se esconde**: al bajar por la página, la barra de la demo (Volver a demos e insignias) queda detrás del menú del sitio.
-12. **Nada se guarda**: al recargar la página vuelve todo al estado inicial; no hay botón para restablecer.
-13. **La tarjeta del hub promete más que la demo**: «KYC firmante: SMS OTP, email, ID+selfie, video, biometría», «Audit trail criptográfico con hash chain y RFC 3161» y «Multi-firmante con orden, condicional, paralelo + bulk send» aparecen solo como opciones o textos; nada de eso se ejecuta.
+Son de diseño (es una demo con datos de ejemplo) o dependen de textos compartidos del sitio que no están en la demo:
+
+1. **La tarjeta del hub, los metadatos y la oferta todavía prometen de más.** La tarjeta de `/demo` dice «Simple, avanzada y cualificada (eIDAS, Ley 527 CO)», «KYC firmante: … video, biometría», «blockchain timestamp» y «bulk send»; la descripción para buscadores habla de «validez legal» y «tiempo real»; la oferta del catálogo promete «eIDAS cualificada multi-país» y «KYC biométrico». La demo ya no dice nada de eso; el cambio de esos textos compartidos está pendiente en el catálogo y en la plataforma.
+2. **No hay firma con validez legal.** No hay entidad de certificación, estampa cronológica real, verificación de identidad ni envío de mensajes; todo eso es simulado y se integra en el proyecto con los proveedores que elija el cliente.
+3. **El PDF subido no se ve en pantalla.** La política de seguridad del sitio no permite mostrar dentro de la página archivos abiertos en el navegador, así que la demo calcula su huella y cuenta sus páginas, ubica los campos sobre una página esquemática y genera una constancia (no modifica el PDF original). Con plantillas, en cambio, el texto se ve completo.
+4. **Lo que haces vive solo en tu navegador** (`localStorage`): no se comparte con el equipo comercial ni entre dispositivos; a los 14 días (o con «Restablecer demo») vuelve el ejemplo con fechas nuevas. El PDF subido no se guarda.
+5. **Los recordatorios automáticos no corren solos**: el plazo se configura, pero en la demo los recordatorios se registran con **Recordar**. Los sobres sí vencen solos al pasar su fecha límite.
+6. **Se firma en una sola pantalla haciendo el papel de cada persona**; no hay enlaces individuales, correo de invitación ni rechazo del documento por parte de quien firma.
+7. **Los textos de las plantillas no fueron revisados por un abogado** y el glosario de tipos de firma es orientativo, como lo dice la demo.
+8. **«Ver Planes y Precios»** del bloque azul del final lleva a los planes RAG, como en las demás demos (ver [Limitaciones comunes](Doc-07-Guia-de-Demos.md#limitaciones-comunes)).

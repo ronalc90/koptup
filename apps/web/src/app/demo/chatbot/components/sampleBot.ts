@@ -1,101 +1,139 @@
 /**
- * sampleBot.ts — prepara en el backend el bot de una empresa de ejemplo.
+ * sampleBot.ts — bot del servidor para una empresa de ejemplo ("Prueba el asistente").
  *
- * La primera vez que eliges una empresa, el navegador crea un bot real
- * (`POST /api/chatbot/bots`) y le sube sus documentos como texto
- * (`POST /api/chatbot/bots/:id/docs`). El id del bot (y su token de dueño, si
- * el backend lo entrega) queda en localStorage para reutilizarlo en las
- * siguientes visitas. Si el bot ya no existe o le faltan documentos (p. ej.
- * el servidor se reinició sin su estado), se vuelve a crear.
+ * - `findSampleBot` NO crea nada: busca el bot que este navegador ya indexó
+ *   para esa empresa, idioma y versión de los textos (registro en
+ *   localStorage) y comprueba en el servidor que siga ahí con todos sus
+ *   documentos. Se usa al abrir la página o cambiar de empresa.
+ * - `ensureSampleBot` lo prepara cuando hace falta (con la primera pregunta o
+ *   con "Reintentar"): reutiliza el de este navegador; si el backend ofrece
+ *   bots de ejemplo compartidos (POST /sample-bots), usa el del servidor; si
+ *   no, crea uno (`kind: "sample"`) y le sube los textos.
+ *
+ * Así una visita que no pregunta nada (o un rastreador) no crea bots, y un
+ * navegador no crea otro bot cada vez que vuelve a la página.
  */
 import {
   BotApiError,
   createBot,
   deleteBot,
+  docsCountOf,
   forgetBot,
   getBot,
   listOwnedBots,
+  rememberBot,
+  requestSharedSampleBot,
   textToBase64,
   uploadBotDocs,
-  type RemoteBotDoc,
+  type UploadFilePayload,
 } from './builder/api';
 import { SAMPLE_KB_VERSION, type SampleCompany, type SampleLocale } from './sampleKnowledge';
 
 export interface SampleBotState {
   botId: string;
-  docs: RemoteBotDoc[];
+  /** Documentos indexados en el servidor. */
+  docsCount: number;
+  /** Bot de ejemplo compartido por el servidor. */
+  shared: boolean;
 }
 
 const inflight = new Map<string, Promise<SampleBotState>>();
 
-function sampleKeyFor(company: SampleCompany, locale: SampleLocale): string {
+export function sampleKeyFor(company: SampleCompany, locale: SampleLocale): string {
   return `${company.key}:${locale}:${SAMPLE_KB_VERSION}`;
 }
 
-async function createSampleBot(company: SampleCompany, locale: SampleLocale, sampleKey: string): Promise<SampleBotState> {
-  const created = await createBot(
-    {
-      name: company.name,
-      welcome: company.welcome,
-      systemPrompt: company.systemPrompt,
-      tone: 'friendly',
-      color: '#4F46E5',
-      position: 'br',
-      avatar: '💬',
-      languages: [locale],
-    },
-    { kind: 'sample', sampleKey },
-  );
-  const files = company.docs.map((d) => ({
+const BOT_STYLE = { tone: 'friendly', color: '#4F46E5', position: 'br' as const, avatar: '💬' };
+
+function sampleFiles(company: SampleCompany): UploadFilePayload[] {
+  return company.docs.map((d) => ({
     name: d.fileName,
     size: new TextEncoder().encode(d.text).length,
     mime: 'text/plain',
     contentBase64: textToBase64(d.text),
   }));
-  const uploaded = await uploadBotDocs(created.botId, files);
-  return { botId: created.botId, docs: uploaded.docs };
 }
 
-async function resolveSampleBot(company: SampleCompany, locale: SampleLocale): Promise<SampleBotState> {
+/** Olvida el registro local y, si este navegador es el dueño, borra el bot del servidor (sin esperar). */
+function discard(botId: string, ownerToken: string | null): void {
+  forgetBot(botId);
+  if (ownerToken) void deleteBot(botId, ownerToken).catch(() => undefined);
+}
+
+/**
+ * Bot ya indexado por este navegador para la empresa (sin crear nada).
+ * Devuelve null si no hay o si el servidor ya no lo tiene completo.
+ * Lanza el error si el servidor no respondió (red, 5xx).
+ */
+export async function findSampleBot(company: SampleCompany, locale: SampleLocale): Promise<SampleBotState | null> {
   const sampleKey = sampleKeyFor(company, locale);
   const prefix = `${company.key}:${locale}:`;
   const owned = listOwnedBots('sample');
 
-  // Versiones anteriores de los textos de esta empresa: se borran (best-effort).
+  // Versiones anteriores de los textos de esta empresa: se descartan.
   for (const old of owned.filter((b) => b.sampleKey?.startsWith(prefix) && b.sampleKey !== sampleKey)) {
-    forgetBot(old.botId);
-    void deleteBot(old.botId).catch(() => undefined);
+    discard(old.botId, old.ownerToken);
   }
 
   const existing = owned.find((b) => b.sampleKey === sampleKey);
-  if (existing) {
-    try {
-      const bot = await getBot(existing.botId);
-      const docs = bot.docs ?? [];
-      if (docs.length === company.docs.length) return { botId: existing.botId, docs };
-      // Le faltan documentos: se descarta y se crea otro.
+  if (!existing) return null;
+  try {
+    const bot = await getBot(existing.botId);
+    const count = docsCountOf(bot);
+    if (count >= company.docs.length) return { botId: existing.botId, docsCount: count, shared: !!existing.shared };
+    // Le faltan documentos (p. ej. el servidor perdió parte de su estado): se descarta.
+    discard(existing.botId, existing.ownerToken);
+    return null;
+  } catch (err) {
+    if (err instanceof BotApiError && err.status === 404) {
       forgetBot(existing.botId);
-      void deleteBot(existing.botId).catch(() => undefined);
-    } catch (err) {
-      if (!(err instanceof BotApiError) || err.status !== 404) throw err;
-      forgetBot(existing.botId);
+      return null;
     }
+    throw err;
   }
-  return createSampleBot(company, locale, sampleKey);
 }
 
-/** Devuelve el bot listo de la empresa (crea e indexa si hace falta). */
+async function createSampleBot(company: SampleCompany, locale: SampleLocale, sampleKey: string): Promise<SampleBotState> {
+  const config = {
+    name: company.name,
+    welcome: company.welcome,
+    systemPrompt: company.systemPrompt,
+    languages: [locale],
+    ...BOT_STYLE,
+  };
+  const files = sampleFiles(company);
+
+  const shared = await requestSharedSampleBot({ sampleKey, config, files });
+  if (shared) {
+    rememberBot(shared.botId, { name: company.name, kind: 'sample', sampleKey, shared: true, ownerToken: null });
+    return { botId: shared.botId, docsCount: shared.docs?.length ?? files.length, shared: true };
+  }
+
+  const created = await createBot(config, { kind: 'sample', sampleKey });
+  try {
+    const uploaded = await uploadBotDocs(created.botId, files);
+    return { botId: created.botId, docsCount: uploaded.docs.length, shared: false };
+  } catch (err) {
+    // Sin documentos el bot no sirve: se borra para no dejarlo a medias.
+    discard(created.botId, created.ownerToken ?? null);
+    throw err;
+  }
+}
+
+/** Devuelve el bot listo de la empresa (lo reutiliza, lo pide al servidor o lo crea e indexa). */
 export function ensureSampleBot(company: SampleCompany, locale: SampleLocale): Promise<SampleBotState> {
   const key = sampleKeyFor(company, locale);
   const pending = inflight.get(key);
   if (pending) return pending;
-  const p = resolveSampleBot(company, locale).finally(() => inflight.delete(key));
+  const p = (async () => (await findSampleBot(company, locale)) ?? createSampleBot(company, locale, key))().finally(() =>
+    inflight.delete(key),
+  );
   inflight.set(key, p);
   return p;
 }
 
-/** Olvida el bot de la empresa (p. ej. si el backend perdió sus documentos) para recrearlo. */
+/** Olvida el bot de la empresa (p. ej. si el servidor perdió sus documentos) para volver a prepararlo. */
 export function resetSampleBot(company: SampleCompany, locale: SampleLocale): void {
   const key = sampleKeyFor(company, locale);
-  for (const b of listOwnedBots('sample').filter((x) => x.sampleKey === key)) forgetBot(b.botId);
+  for (const b of listOwnedBots('sample').filter((x) => x.sampleKey === key)) discard(b.botId, b.ownerToken);
 }

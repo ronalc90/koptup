@@ -1,7 +1,9 @@
 'use client';
 
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import {
+  ArrowLeftIcon,
   BuildingOffice2Icon,
   CpuChipIcon,
   PlayCircleIcon,
@@ -125,6 +127,13 @@ export default function TopBar({
           K
         </span>
         <div className="min-w-0">
+          <Link
+            href="/demo"
+            className="mb-0.5 inline-flex items-center gap-1 rounded text-[11px] font-medium text-secondary-500 transition hover:text-primary-700 dark:text-secondary-400 dark:hover:text-primary-300"
+          >
+            <ArrowLeftIcon className="h-3 w-3" aria-hidden="true" />
+            {t('backToCatalog')}
+          </Link>
           <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
             <h1 className="text-[15px] font-bold leading-tight tracking-tight text-secondary-900 dark:text-white">
               {t('pageTitle')}
@@ -143,7 +152,7 @@ export default function TopBar({
       </div>
 
       <div className="flex min-w-0 flex-wrap items-center gap-2">
-        <Tooltip content={status.tip} side="bottom">
+        <Tooltip content={status.tip} side="bottom" align={showPlaygroundControls ? 'center' : 'end'}>
           <span
             className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ${status.cls}`}
             data-ai-status={aiStatus}

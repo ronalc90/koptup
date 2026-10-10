@@ -9,7 +9,7 @@ import { minutesOf } from '../lib/dates';
 import { fmtClock, fmtNum, fmtPct } from '../lib/format';
 import { now, useWms } from '../lib/store';
 import type { PickStrategy } from '../lib/types';
-import { Empty, Kpi, Panel, Pill, Segmented, SimNote, inputCls, baseInputCls, tdCls, thCls, useProductName, useT } from './ui';
+import { Empty, Kpi, Panel, Pill, Segmented, SimNote, inputCls, baseInputCls, thCls, rtBody, rtFull, rtHead, rtRow, rtTable, rtd, useProductName, useT } from './ui';
 
 const STRATEGIES: PickStrategy[] = ['wave', 'batch', 'zone', 'cluster'];
 const TRIP_COLORS = ['#0f766e', '#7c3aed', '#c2410c', '#2563eb', '#be185d', '#4d7c0f'];
@@ -74,7 +74,7 @@ export default function Picking() {
         subtitle={t('picking.subtitle')}
         actions={
           waves.length > 1 ? (
-            <select className={`${baseInputCls} w-56 pr-9`} value={wave.id} onChange={(e) => setWaveId(e.target.value)} aria-label={t('picking.waveSelect')}>
+            <select className={`${baseInputCls} w-full pr-9 sm:w-72`} value={wave.id} onChange={(e) => setWaveId(e.target.value)} aria-label={t('picking.waveSelect')}>
               {waves.map((w) => (
                 <option key={w.id} value={w.id}>
                   {w.id} · {fmtClock(minutesOf(w.at), lang)} · {t(`orders.waveStatus.${w.status}`)}
@@ -217,8 +217,8 @@ export default function Picking() {
 
       <Panel title={t('picking.listTitle')}>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[680px] text-sm">
-            <thead>
+          <table className={`${rtTable} sm:min-w-[680px]`}>
+            <thead className={rtHead}>
               <tr className="border-b border-secondary-200 dark:border-secondary-700">
                 <th className={thCls}>#</th>
                 <th className={thCls}>{t('picking.trip')}</th>
@@ -229,21 +229,23 @@ export default function Picking() {
                 <th className={thCls}>{t('orders.status')}</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className={rtBody}>
               {plan.tasks.map((task, i) => (
-                <tr key={task.key} className={`border-b border-secondary-100 dark:border-secondary-800 ${current?.key === task.key ? 'bg-amber-50 dark:bg-amber-900/20' : ''}`}>
-                  <td className={`${tdCls} text-secondary-500`}>{i + 1}</td>
-                  <td className={`${tdCls} text-xs`}>{task.tripLabel || '—'}</td>
-                  <td className={`${tdCls} font-mono text-xs`}>{task.bin}</td>
-                  <td className={tdCls}>
+                <tr key={task.key} className={`border-b border-secondary-100 dark:border-secondary-800 ${rtRow} ${current?.key === task.key ? 'bg-amber-50 dark:bg-amber-900/20' : ''}`}>
+                  <td className={`${rtd} text-secondary-500`} data-label="#">{i + 1}</td>
+                  <td className={`${rtd} text-xs ${task.tripLabel ? '' : 'max-sm:hidden'}`} data-label={t('picking.trip')}>
+                    {task.tripLabel || '—'}
+                  </td>
+                  <td className={`${rtd} font-mono text-xs`} data-label={t('common.bin')}>{task.bin}</td>
+                  <td className={`${rtd} ${rtFull}`} data-label={t('common.product')}>
                     {name(task.sku)}
                     <div className="font-mono text-xs text-secondary-500">
                       {task.sku} · {t('common.lot')} {task.lot}
                     </div>
                   </td>
-                  <td className={`${tdCls} text-right tabular-nums`}>{task.qty}</td>
-                  <td className={`${tdCls} text-xs`}>{label(task)}</td>
-                  <td className={tdCls}>
+                  <td className={`${rtd} text-right tabular-nums`} data-label={t('common.qty')}>{task.qty}</td>
+                  <td className={`${rtd} text-xs`} data-label={t('picking.destination')}>{label(task)}</td>
+                  <td className={rtd} data-label={t('orders.status')}>
                     {task.short ? (
                       <Pill tone="danger" className="gap-1">
                         <ExclamationTriangleIcon className="h-3.5 w-3.5" />

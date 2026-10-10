@@ -9,7 +9,7 @@ import { diffDays } from '../lib/dates';
 import { fmtDate, fmtDateTime, fmtNum } from '../lib/format';
 import { now, useWms } from '../lib/store';
 import type { ClientId, Lot, Product, WarehouseId } from '../lib/types';
-import { Empty, Field, Modal, Panel, Pill, SimNote, download, inputCls, baseInputCls, selectCls, tdCls, thCls, useProductName, useT } from './ui';
+import { Empty, Field, Modal, Panel, Pill, SimNote, download, inputCls, baseInputCls, selectCls, tdCls, thCls, rtBody, rtDetailRow, rtFull, rtHead, rtRow, rtTable, rtd, useBinLabel, useProductName, useT } from './ui';
 
 type SortKey = 'sku' | 'available' | 'expiry' | 'bins';
 
@@ -97,10 +97,12 @@ export default function Stock() {
     notify(t('stock.exported', { n: body.length }));
   };
 
+  const binLabel = useBinLabel();
   const exportKardex = (sku: string) => {
-    const moves = state.moves.filter((m) => m.wh === nav.wh && m.sku === sku);
+    // Kardex en orden cronológico (del más antiguo al más reciente).
+    const moves = state.moves.filter((m) => m.wh === nav.wh && m.sku === sku).sort((a, b) => (a.at < b.at ? -1 : a.at > b.at ? 1 : 0));
     const header = [t('csv.date'), t('csv.type'), t('csv.sku'), t('csv.lot'), t('csv.bin'), t('csv.qty'), t('csv.ref')];
-    download(`kardex-${sku}-${nav.wh}.csv`, toCsv([header, ...moves.map((m) => [m.at.replace('T', ' '), t(`moves.${m.type}`), m.sku, m.lot, m.bin, m.qty, m.ref])]));
+    download(`kardex-${sku}-${nav.wh}.csv`, toCsv([header, ...moves.map((m) => [m.at.replace('T', ' '), t(`moves.${m.type}`), m.sku, m.lot, binLabel(m.bin), m.qty, m.ref])]));
     notify(t('stock.kardexExported', { n: moves.length }));
   };
 
@@ -146,10 +148,12 @@ export default function Stock() {
           <Empty>{t('stock.noResults')}</Empty>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[820px] text-sm">
-              <thead>
+            <table className={`${rtTable} sm:min-w-[820px]`}>
+              <thead className={rtHead}>
                 <tr className="border-b border-secondary-200 dark:border-secondary-700">
-                  <th className={thCls} />
+                  <th className={thCls}>
+                    <span className="sr-only">{t('stock.toggleCol')}</span>
+                  </th>
                   {sortBtn('sku', t('common.product'))}
                   <th className={thCls}>{t('stock.client')}</th>
                   {sortBtn('available', t('stock.available'), true)}
@@ -161,20 +165,20 @@ export default function Stock() {
                   <th className={thCls}>{t('stock.class')}</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className={rtBody}>
                 {filtered.map((r) => {
                   const isOpen = open === r.p.sku;
                   const days = r.next ? diffDays(today, r.next) : null;
                   return (
                     <Fragment key={r.p.sku}>
-                      <tr className="border-b border-secondary-100 hover:bg-secondary-50 dark:border-secondary-800 dark:hover:bg-secondary-800/40">
-                        <td className={tdCls}>
+                      <tr className={`border-b border-secondary-100 hover:bg-secondary-50 dark:border-secondary-800 dark:hover:bg-secondary-800/40 ${rtRow}`}>
+                        <td className={`${tdCls} max-sm:hidden`}>
                           <button type="button" aria-expanded={isOpen} aria-label={t('stock.toggle', { sku: r.p.sku })} onClick={() => setOpen(isOpen ? null : r.p.sku)} className="rounded p-0.5 hover:bg-secondary-200 dark:hover:bg-secondary-700">
                             {isOpen ? <ChevronDownIcon className="h-4 w-4" /> : <ChevronRightIcon className="h-4 w-4" />}
                           </button>
                         </td>
-                        <td className={tdCls}>
-                          <button type="button" className="text-left" onClick={() => setOpen(isOpen ? null : r.p.sku)}>
+                        <td className={`${rtd} ${rtFull}`}>
+                          <button type="button" className="text-left" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? null : r.p.sku)}>
                             <div className="font-medium">{name(r.p.sku)}</div>
                             <div className="font-mono text-xs text-secondary-500">
                               {r.p.sku} · {r.p.barcode}
@@ -182,13 +186,13 @@ export default function Stock() {
                           </button>
                           {r.p.imported && <Pill tone="info">{t('stock.imported')}</Pill>}
                         </td>
-                        <td className={`${tdCls} text-xs`}>{CLIENT_BY_ID[r.p.client].name}</td>
-                        <td className={`${tdCls} text-right font-semibold tabular-nums`}>{fmtNum(r.available, lang)}</td>
-                        <td className={`${tdCls} text-right tabular-nums`}>{fmtNum(r.reserved, lang)}</td>
-                        <td className={`${tdCls} text-right tabular-nums ${r.quarantine ? 'text-amber-600' : ''}`}>{fmtNum(r.quarantine, lang)}</td>
-                        <td className={`${tdCls} text-right tabular-nums`}>{fmtNum(r.toPutaway, lang)}</td>
-                        <td className={`${tdCls} text-right tabular-nums`}>{r.bins}</td>
-                        <td className={tdCls}>
+                        <td className={`${rtd} ${rtFull} text-xs`} data-label={t('stock.client')}>{CLIENT_BY_ID[r.p.client].name}</td>
+                        <td className={`${rtd} text-right font-semibold tabular-nums`} data-label={t('stock.available')}>{fmtNum(r.available, lang)}</td>
+                        <td className={`${rtd} text-right tabular-nums`} data-label={t('stock.reserved')}>{fmtNum(r.reserved, lang)}</td>
+                        <td className={`${rtd} text-right tabular-nums ${r.quarantine ? 'text-amber-600' : ''}`} data-label={t('stock.blocked')}>{fmtNum(r.quarantine, lang)}</td>
+                        <td className={`${rtd} text-right tabular-nums`} data-label={t('stock.toPutaway')}>{fmtNum(r.toPutaway, lang)}</td>
+                        <td className={`${rtd} text-right tabular-nums`} data-label={t('stock.bins')}>{r.bins}</td>
+                        <td className={rtd} data-label={t('stock.nextExpiry')}>
                           {r.next ? (
                             <span className={days !== null && days < 0 ? 'text-red-600' : days !== null && days <= 30 ? 'font-semibold text-amber-600' : ''}>
                               {fmtDate(r.next, lang)}
@@ -198,13 +202,13 @@ export default function Stock() {
                           )}
                           {days !== null && days <= 30 && <div className="text-xs text-amber-600">{days < 0 ? t('stock.expired') : t('stock.inDays', { n: days })}</div>}
                         </td>
-                        <td className={tdCls}>
+                        <td className={rtd} data-label={t('stock.class')}>
                           <Pill tone={cls[r.p.sku] === 'A' ? 'success' : cls[r.p.sku] === 'B' ? 'info' : 'default'}>{cls[r.p.sku] ?? 'C'}</Pill>
                         </td>
                       </tr>
                       {isOpen && (
-                        <tr className="border-b border-secondary-200 bg-secondary-50/60 dark:border-secondary-700 dark:bg-secondary-800/30">
-                          <td colSpan={10} className="px-3 py-3">
+                        <tr className={`border-b border-secondary-200 bg-secondary-50/60 dark:border-secondary-700 dark:bg-secondary-800/30 ${rtDetailRow}`}>
+                          <td colSpan={10} className="px-3 py-3 max-sm:block">
                             <SkuDetail sku={r.p.sku} lots={r.lots} onTransfer={setTransfer} onKardex={() => exportKardex(r.p.sku)} />
                           </td>
                         </tr>
@@ -236,7 +240,11 @@ export default function Stock() {
 function SkuDetail({ sku, lots, onTransfer, onKardex }: { sku: string; lots: Lot[]; onTransfer: (l: Lot) => void; onKardex: () => void }) {
   const t = useT();
   const { state, nav, lang, today } = useWms();
-  const moves = state.moves.filter((m) => m.wh === nav.wh && m.sku === sku).slice(0, 25);
+  const binLabel = useBinLabel();
+  const moves = state.moves
+    .filter((m) => m.wh === nav.wh && m.sku === sku)
+    .sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0))
+    .slice(0, 25);
   const sorted = [...lots].sort(fefoSort);
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -298,8 +306,8 @@ function SkuDetail({ sku, lots, onTransfer, onKardex }: { sku: string; lots: Lot
           <ul className="max-h-64 space-y-1 overflow-y-auto text-xs">
             {moves.map((m) => (
               <li key={m.id} className="flex flex-wrap items-center gap-x-3 gap-y-0.5 rounded bg-white px-2 py-1 dark:bg-secondary-900">
-                <span className="w-28 shrink-0 text-secondary-500">{fmtDateTime(m.at, today, lang)}</span>
-                <span className="min-w-0 flex-1">{t(`moves.${m.type}`)} · {m.bin} · {m.ref}</span>
+                <span className="w-36 shrink-0 text-secondary-500">{fmtDateTime(m.at, today, lang)}</span>
+                <span className="min-w-0 flex-1">{t(`moves.${m.type}`)} · {binLabel(m.bin)} · {m.ref}</span>
                 <span className={`font-semibold tabular-nums ${m.qty < 0 ? 'text-red-600' : 'text-emerald-600'}`}>{m.qty > 0 ? `+${m.qty}` : m.qty}</span>
               </li>
             ))}

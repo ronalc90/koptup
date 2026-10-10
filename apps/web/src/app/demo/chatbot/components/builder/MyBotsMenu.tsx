@@ -15,6 +15,7 @@ import { ChevronDownIcon, PlusIcon, TrashIcon, CheckIcon, Squares2X2Icon } from 
 import toast from 'react-hot-toast';
 
 import { BotApiError, deleteBot, forgetBot, listOwnedBots } from './api';
+import ConfirmDialog from '../ui/ConfirmDialog';
 
 interface MyBotsMenuProps {
   currentBotId: string | null;
@@ -29,6 +30,7 @@ export default function MyBotsMenu({ currentBotId, refreshKey, onSelect, onCreat
   const t = useTranslations('demoChatbot.builder.myBots');
   const [bots, setBots] = useState<Array<{ botId: string; name: string }>>([]);
   const [open, setOpen] = useState(false);
+  const [toDelete, setToDelete] = useState<{ botId: string; name: string } | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
   const refresh = useCallback(() => {
@@ -57,7 +59,6 @@ export default function MyBotsMenu({ currentBotId, refreshKey, onSelect, onCreat
 
   const handleDelete = useCallback(
     async (botId: string, name: string) => {
-      if (!window.confirm(t('deleteConfirm', { name }))) return;
       try {
         await deleteBot(botId);
         toast.success(t('deleted', { name }));
@@ -79,6 +80,17 @@ export default function MyBotsMenu({ currentBotId, refreshKey, onSelect, onCreat
 
   return (
     <div ref={rootRef} className="relative">
+      <ConfirmDialog
+        open={!!toDelete}
+        title={t('delete')}
+        body={toDelete ? t('deleteConfirm', { name: toDelete.name }) : ''}
+        confirmLabel={t('deleteAction')}
+        cancelLabel={t('cancel')}
+        onConfirm={() => {
+          if (toDelete) void handleDelete(toDelete.botId, toDelete.name);
+        }}
+        onClose={() => setToDelete(null)}
+      />
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -129,7 +141,10 @@ export default function MyBotsMenu({ currentBotId, refreshKey, onSelect, onCreat
                       </button>
                       <button
                         type="button"
-                        onClick={() => void handleDelete(b.botId, b.name)}
+                        onClick={() => {
+                          setOpen(false);
+                          setToDelete({ botId: b.botId, name: b.name });
+                        }}
                         aria-label={`${t('delete')}: ${b.name}`}
                         className="rounded p-1 text-secondary-400 transition hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40 dark:hover:text-red-300"
                       >

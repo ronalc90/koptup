@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { addDays } from '../lib/dates';
-import { dayInfo, freeSlots, isEmail, normalizeMobile, staffForService } from '../lib/engine';
+import { dayInfo, firstOpenDay, freeSlots, isEmail, normalizeMobile, staffForService } from '../lib/engine';
 import { useReservas } from '../lib/store';
 import type { Channel, ISODate, Status } from '../lib/types';
 import type { NewPrefill } from './AgendaView';
@@ -23,7 +23,12 @@ export default function NewBookingModal({ prefill, onClose, onCreated }: { prefi
   const [serviceId, setServiceId] = useState(firstService);
   const [locationId, setLocationId] = useState(prefill.locationId ?? biz.locations[0].id);
   const [staffId, setStaffId] = useState(prefill.staffId ?? 'any');
-  const [date, setDate] = useState<ISODate>(prefill.date && prefill.date >= now.date ? prefill.date : now.date);
+  // Sin fecha propuesta: el primer día con cupo para el servicio y la sede.
+  const [date, setDate] = useState<ISODate>(() =>
+    prefill.date && prefill.date >= now.date
+      ? prefill.date
+      : (firstOpenDay(biz, data.bookings, { serviceId: firstService, staffId: prefill.staffId ?? 'any', locationId: prefill.locationId ?? biz.locations[0].id, now }) ?? now.date),
+  );
   const [start, setStart] = useState<number | null>(prefill.start ?? null);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');

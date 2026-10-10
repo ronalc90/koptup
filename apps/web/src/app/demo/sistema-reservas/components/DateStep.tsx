@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { addDays, addMonths, capitalize, daysInMonth, firstOfMonth, holidaysInMonth, startOfWeek, weekday } from '../lib/dates';
-import { dayInfo, freeSlots, staffForService, type DayKind, type Slot, type SlotQuery } from '../lib/engine';
+import { dayInfo, firstOpenDay, freeSlots, staffForService, type DayKind, type Slot, type SlotQuery } from '../lib/engine';
 import { useReservas } from '../lib/store';
 import type { ISODate } from '../lib/types';
 import { Segmented, STAFF_COLORS, useFmt, useKind } from './ui';
@@ -50,8 +50,9 @@ export default function DateStep({
   const kind = useKind(biz);
   const q: Omit<SlotQuery, 'date'> = useMemo(() => ({ serviceId, staffId, locationId, now }), [serviceId, staffId, locationId, now]);
   const [mode, setMode] = useState<'month' | 'week'>('month');
-  const [month, setMonth] = useState<ISODate>(firstOfMonth(selected ?? now.date));
-  const [week, setWeek] = useState<ISODate>(startOfWeek(selected ?? now.date));
+  // Abre en el mes y la semana del primer día con cupo (no en una semana ya llena).
+  const [month, setMonth] = useState<ISODate>(() => firstOfMonth(selected ?? firstOpenDay(biz, data.bookings, q) ?? now.date));
+  const [week, setWeek] = useState<ISODate>(() => startOfWeek(selected ?? firstOpenDay(biz, data.bookings, q) ?? now.date));
 
   const minMonth = firstOfMonth(now.date);
   const maxDate = addDays(now.date, biz.horizonDays);
@@ -59,6 +60,13 @@ export default function DateStep({
   const minWeek = startOfWeek(now.date);
   const maxWeek = startOfWeek(maxDate);
   const people = staffForService(biz, serviceId, locationId);
+
+  /** Primer día con cupo del mes que se está viendo (o su primer día si no hay ninguno). */
+  const firstOpenIn = (m: ISODate): ISODate => {
+    const from = m < now.date ? now.date : m;
+    for (let d = from; d.slice(0, 7) === m.slice(0, 7); d = addDays(d, 1)) if (dayInfo(biz, data.bookings, q, d).kind === 'open') return d;
+    return from;
+  };
 
   const monthDays = useMemo(() => {
     const lead = (weekday(month) + 6) % 7; // lunes primero
@@ -125,7 +133,7 @@ export default function DateStep({
           value={mode}
           onChange={(m) => {
             setMode(m);
-            if (m === 'week') setWeek(startOfWeek(selected ?? (month === minMonth ? now.date : month)));
+            if (m === 'week') setWeek(startOfWeek(selected ?? firstOpenIn(month)));
             else setMonth(firstOfMonth(selected ?? week));
           }}
           options={[
