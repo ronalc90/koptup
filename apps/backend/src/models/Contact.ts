@@ -34,6 +34,19 @@ export interface IContactQuote {
   modalidad?: (typeof CONTACT_QUOTE_MODALITIES)[number];
 }
 
+/**
+ * Prueba de la autorización de tratamiento de datos (Ley 1581 de 2012),
+ * igual que en DemoRequest: la versión de la política la fija el servidor
+ * (PRIVACY_POLICY_VERSION), la IP se guarda solo en hash SHA-256.
+ */
+export interface IContactConsent {
+  aceptado: boolean;
+  fecha: Date;
+  ipHash?: string;
+  userAgent?: string;
+  versionPolitica: string;
+}
+
 export interface IContact extends Document {
   name: string;
   email: string;
@@ -54,6 +67,10 @@ export interface IContact extends Document {
    * contactos anteriores al pipeline, la migración del arranque.
    */
   lead?: Types.ObjectId | null;
+  /** Autorización de datos del formulario de contacto o de "Prueba con tu documento". */
+  consentimiento?: IContactConsent | null;
+  /** Fecha en que el job de conservación quitó los datos personales (jobs/retention.job.ts). */
+  anonimizadoEn?: Date | null;
   created_at: Date;
 }
 
@@ -81,6 +98,20 @@ const ContactSchema = new Schema<IContact>({
   },
   plazo: { type: String, enum: [...CONTACT_TIMELINES] },
   lead: { type: Schema.Types.ObjectId, ref: 'Lead' },
+  consentimiento: {
+    type: new Schema<IContactConsent>(
+      {
+        aceptado: { type: Boolean, required: true },
+        fecha: { type: Date, required: true },
+        ipHash: { type: String },
+        userAgent: { type: String, maxlength: 300 },
+        versionPolitica: { type: String, required: true, maxlength: 40 },
+      },
+      { _id: false },
+    ),
+    default: undefined,
+  },
+  anonimizadoEn: { type: Date, default: null },
   created_at: { type: Date, default: Date.now },
 });
 

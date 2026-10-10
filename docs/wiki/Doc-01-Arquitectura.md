@@ -290,12 +290,12 @@ sequenceDiagram
     participant A as API Railway
     participant R as Redis
     participant O as OpenAI
-    participant F as Disco del backend
+    participant F as MongoDB
 
     V->>N: Elige una empresa de ejemplo
     alt Primera vez o el bot ya no existe
         N->>A: POST /api/chatbot/bots y POST /api/chatbot/bots/id/docs
-        A->>F: Guarda el bot, sus documentos y sus fragmentos en state.json
+        A->>F: Guarda el bot, sus documentos y sus fragmentos
     end
     V->>N: Escribe una pregunta
     N->>A: POST /api/chatbot/bots/id/chat con el mensaje, el historial y el modelo
@@ -383,7 +383,9 @@ El detalle de quién entra a dónde está en [Roles y permisos](Doc-10-Roles-y-P
 | Candado del job de accesos | **Redis** (`jobs:demo-grants:lock`) | 10 minutos |
 | Límites por IP o por cuenta (100 cada 15 min en general y un contador propio en cada ruta de cuenta y en contacto) | **Memoria** de cada instancia | La ventana del límite |
 | Documentos de "Prueba con tu documento" | **Memoria** del backend (máx. 200 a la vez) | 1 hora |
-| Bots del chatbot, sus documentos y conversaciones | **Disco** del backend (`data/chatbots/state.json`) | Hasta el próximo redespliegue en Railway (disco efímero) |
+| Bots del chatbot y sus documentos | **MongoDB** (`chatbot_bots`, `chatbot_bot_chunks`) | 12 meses sin uso (los marcados como de ejemplo, 30 días) |
+| Preguntas al widget de un bot de usuario («Prueba el asistente» y la vista previa no se guardan) | **MongoDB** (`chatbot_turns`, índice TTL) | 30 días |
+| Candado del job de conservación de datos | **Redis** (`jobs:retention:lock`) | 30 minutos |
 | Adjuntos de pedidos y archivos de cuentas médicas | **Disco** del backend (`uploads/`) | Hasta el próximo redespliegue |
 | Archivos de `/api/documents` | **AWS S3** | Permanente |
 | Lo que el visitante crea dentro de las demos (negocios del CRM, ventas del POS…) | **localStorage** del navegador | Hasta que la persona borre los datos del navegador |
@@ -530,7 +532,8 @@ Sin entrar en detalles que faciliten un ataque, estas son las capas que protegen
 | URL de la API en la web | `apps/web/src/lib/backend-url.ts` (`NEXT_PUBLIC_API_URL`) |
 | Pipeline RAG compartido | `apps/backend/src/services/rag-pipeline.ts` |
 | Demo "Prueba con tu documento" | `apps/backend/src/services/demo-rag.service.ts` y `routes/demo-rag.routes.ts` |
-| Chatbot (bots, documentos, chat) | `apps/backend/src/routes/chatbot.routes.ts` y `data/chatbot-store.ts` |
+| Chatbot (bots, documentos, chat) | `apps/backend/src/routes/chatbot.routes.ts`, `services/chatbot-store.service.ts` y `models/ChatbotBot.ts` |
+| Derechos del titular y conservación | `apps/backend/src/services/privacy.service.ts`, `services/retention.service.ts` y `jobs/retention.job.ts` |
 | Leads (contacto, demo RAG, solicitud) | `apps/backend/src/services/lead.service.ts` |
 | Job de accesos | `apps/backend/src/jobs/demo-grants.job.ts` |
 | Mensajes e idioma | `apps/web/src/app/layout.tsx`, `src/i18n/request.ts`, `scripts/merge-messages.mjs` |

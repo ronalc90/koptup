@@ -93,7 +93,7 @@ export const seoConfig: Record<string, PageSEO> = {
   privacy: {
     title: 'Política de Privacidad',
     description:
-      'Política de privacidad de KopTup. Cómo recopilamos, usamos y protegemos tu información personal. Cumplimiento con la Ley 1581 de 2012 (Colombia) y GDPR.',
+      'Política de privacidad y tratamiento de datos de KopTup: qué datos recogemos, para qué, con quién los compartimos, cuánto los guardamos y cómo ejerces tus derechos (Ley 1581 de 2012).',
     canonical: `${baseUrl}/privacy`,
   },
 

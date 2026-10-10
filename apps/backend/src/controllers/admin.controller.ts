@@ -555,6 +555,15 @@ export const adminGetContacts = asyncHandler(async (req: AuthRequest, res: Respo
       status: contact.status,
       // Origen del lead: 'contact-form' (también los antiguos, sin el campo) o 'demo-rag'.
       source: contact.source ?? 'contact-form',
+      // Prueba de la autorización de datos (Ley 1581), sin el hash de la IP.
+      consentimiento: contact.consentimiento
+        ? {
+            aceptado: contact.consentimiento.aceptado === true,
+            fecha: contact.consentimiento.fecha ?? null,
+            versionPolitica: contact.consentimiento.versionPolitica ?? null,
+          }
+        : null,
+      anonimizado: !!contact.anonimizadoEn,
       createdAt: contact.created_at,
     }));
 

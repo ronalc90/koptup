@@ -309,6 +309,9 @@ Un tope con un valor inválido o negativo deja esa función en 0, es decir, apag
 | `DEMO_REQUEST_LIMIT_PER_EMAIL_DAY` | Opcional | `3` | Solicitudes válidas por email al día |
 | `DEMO_GRANTS_JOB_ENABLED` | Opcional | `true` | Job que marca los accesos vencidos y envía el recordatorio 3 días antes. `false` lo apaga en esa instancia |
 | `DEMO_GRANTS_JOB_INTERVAL_MS` | Opcional | `3600000` (1 hora; mínimo `60000`) | Cada cuánto corre el job |
+| `DATA_RETENTION_MONTHS` | Opcional | `24` (1 a 120) | Plazo de conservación: a los cuántos meses se anonimizan las solicitudes de demo rechazadas y los prospectos sin actividad (sin cuenta ni contrato). Valor conservador: valídalo con tu asesor legal |
+| `RETENTION_JOB_ENABLED` | Opcional | `true` | Job diario de conservación (anonimiza lo vencido y borra los bots del chatbot sin uso), con candado en Redis. `false` lo apaga en esa instancia |
+| `RETENTION_JOB_INTERVAL_MS` | Opcional | `86400000` (1 día; mínimo `60000`) | Cada cuánto corre el job de conservación |
 
 **Correo y WhatsApp**
 
@@ -331,7 +334,10 @@ Un tope con un valor inválido o negativo deja esa función en 0, es decir, apag
 | Variable | ¿Obligatoria? | Por defecto | Qué hace |
 |---|---|---|---|
 | `CHATBOT_EXAMPLE_BOT_IDS` | Opcional | — | IDs (separados por coma) de los bots que todos ven en «Configura el tuyo» |
-| `CHATBOT_STATE_DIR` | Opcional | `./data/chatbots` | Carpeta del estado en disco del chatbot. En Railway el disco se borra en cada despliegue |
+| `CHATBOT_CONVERSATION_TTL_DAYS` | Opcional | `30` (1 a 365) | Días que se guarda cada pregunta al widget de un bot de usuario (las de «Prueba el asistente», la vista previa y los bots de ejemplo no se guardan) |
+| `CHATBOT_SAMPLE_BOT_RETENTION_DAYS`, `CHATBOT_BOT_RETENTION_DAYS` | Opcionales | `30` y `365` | Días sin uso tras los que el job de conservación borra un bot de ejemplo o de «Configura el tuyo» |
+| `CHATBOT_MAX_BOTS` | Opcional | `20000` | Bots que puede haber a la vez en la base |
+| `CHATBOT_STATE_DIR` | Opcional | `./data/chatbots` | Carpeta del archivo heredado `state.json`: si existe al arrancar, se migra a MongoDB una vez y se borra. Los bots ya viven en MongoDB y sobreviven a los despliegues |
 | `MAX_FILE_SIZE` | Opcional | `10485760` (10 MB) | Tamaño máximo de archivo en las rutas de carga generales |
 | `ALLOWED_FILE_TYPES` | Opcional | `pdf,docx,txt,csv` | Extensiones aceptadas en esas rutas |
 | `CUPS_IMPORT_DIR` | Opcional | `./data/imports` | Única carpeta desde la que el admin importa códigos CUPS |
@@ -903,6 +909,8 @@ La rotación de las credenciales que estuvieron en el historial del repositorio 
 | URL del backend en la web | `apps/web/src/lib/backend-url.ts` |
 | Topes de IA | `apps/backend/src/services/ai-budget.service.ts` |
 | «Prueba con tu documento» | `apps/backend/src/services/demo-rag.service.ts`, `apps/backend/src/routes/demo-rag.routes.ts` |
+| Chatbot en MongoDB | `apps/backend/src/models/ChatbotBot.ts`, `apps/backend/src/services/chatbot-store.service.ts` |
+| Privacidad y conservación de datos | `apps/backend/src/services/privacy.service.ts`, `apps/backend/src/services/retention.service.ts`, `apps/backend/src/jobs/retention.job.ts` |
 | Correo y WhatsApp | `apps/backend/src/services/email.service.ts`, `apps/backend/src/services/whatsapp.service.ts` |
 | Dar el rol admin | `apps/backend/src/scripts/set-admin.ts`, `apps/backend/ADMIN_SETUP.md` |
 | Plantillas de variables | `apps/backend/.env.example`, `apps/web/.env.example` |

@@ -17,7 +17,7 @@ flowchart LR
     classDef visitante fill:#dbeafe,stroke:#2563eb,color:#0f172a
     classDef sistema fill:#f1f5f9,stroke:#475569,color:#0f172a
 
-    P0["P0 · Riesgo o bloqueo<br/>producción, seguridad, Ley 1581"]:::error
+    P0["P0 · Riesgo o bloqueo<br/>producción, credenciales, medición"]:::error
     P1["P1 · Funciones rotas<br/>portal del cliente, demos, inicio de sesión"]:::decision
     P2["P2 · Panel y operación<br/>pantallas del admin, despliegue, variables"]:::visitante
     P3["P3 · SEO, contenido y limpieza<br/>títulos, textos, código sin uso"]:::sistema
@@ -26,10 +26,10 @@ flowchart LR
 
 | Prioridad | Qué agrupa | Puntos |
 |---|---|---|
-| **P0** | Lo que impide vender hoy o es un riesgo legal o de seguridad | 8 |
+| **P0** | Lo que impide vender hoy o es un riesgo legal o de seguridad | 3 |
 | **P1** | Funciones que el cliente o el equipo usan y no sirven, incluidas las demos | 24 |
 | **P2** | Detalles del panel, de la operación y de la configuración | 23 |
-| **P3** | SEO, coherencia de textos y código que sobra | 2 |
+| **P3** | SEO, coherencia de textos y código que sobra | 1 |
 
 ---
 
@@ -39,11 +39,6 @@ flowchart LR
 |---|---|---|---|
 | 0.1 | **El backend de producción no responde** ("Application not found" de Railway). Contacto, inicio de sesión, panel, solicitudes de demo, chatbot con IA y "Prueba con tu documento" fallan en `www.koptup.com`. Las demos "Con solicitud" muestran "No se pudo verificar" | Volver a desplegar el backend en Railway y, si cambia el dominio, actualizar `NEXT_PUBLIC_API_URL` en Vercel | [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md#acciones-del-dueño) |
 | 0.2 | **Credenciales que estuvieron en el historial del repositorio** | Rotar la contraseña de MongoDB y los secretos JWT | [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md#acciones-del-dueño) |
-| 0.4 | **No hay forma de suprimir los datos de una persona** (derecho del titular, Ley 1581). Solicitudes, contactos, cuentas, accesos y bitácora no vencen, y ni el panel ni la API permiten borrarlos | Agregar supresión desde el panel y un plazo de conservación | [Flujos técnicos › Hallazgos](Doc-14-3-Flujos-Tecnicos.md#hallazgos) |
-| 0.5 | **El formulario de contacto no pide autorización de datos** ni tiene campo trampa contra bots, a diferencia de "Solicitar demo" | Agregar la casilla y guardar la prueba de autorización | [Flujos de negocio › Hallazgos](Doc-14-1-Flujos-de-Negocio.md#hallazgos) |
-| 0.6 | **El chatbot guarda en disco las preguntas de "Prueba el asistente"** sin avisarlo y sin vencimiento | Avisar y borrar, o no guardar en la demo pública | [Flujos técnicos › Hallazgos](Doc-14-3-Flujos-Tecnicos.md#hallazgos) |
-| 0.7 | **La autorización de "Prueba con tu documento" queda solo como texto** dentro del contacto, sin versión de la política | Guardarla como en las solicitudes de demo | [Flujos técnicos › Hallazgos](Doc-14-3-Flujos-Tecnicos.md#hallazgos) |
-| 0.8 | **La política de privacidad promete responder en 30 días hábiles**, y la Ley 1581 fija 10 para consultas y 15 para reclamos. El texto es genérico | Revisión legal del texto | [SEO, analítica y legal](Doc-12-SEO-Analitica-y-Legal.md) |
 | 0.10 | **Producción no mide nada:** no hay ninguna etiqueta configurada (GA4, Google Ads, LinkedIn), así que no aparece el banner y no se registra ninguna conversión | Crear las variables en Vercel antes de pautar | [SEO, analítica y legal](Doc-12-SEO-Analitica-y-Legal.md) |
 
 ---
@@ -144,7 +139,6 @@ flowchart LR
 
 | # | Qué pasa | Detalle |
 |---|---|---|
-| 3.7 | **La tabla de `/cookies` lista cookies que no existen** y omite las reales; la cookie de idioma se guarda aunque se rechacen las funcionales | [SEO, analítica y legal](Doc-12-SEO-Analitica-y-Legal.md) |
 | 3.14 | **Falta el inglés en** "Nuevo pedido" del portal (`/dashboard/orders/new`) | [Páginas públicas](Doc-03-Paginas-Publicas.md) |
 
 ---

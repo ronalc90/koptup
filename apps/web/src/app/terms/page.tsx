@@ -51,6 +51,7 @@ export default function TermsPage() {
         { subtitle: t('s2.c1.subtitle'), text: t('s2.c1.text') },
         { subtitle: t('s2.c2.subtitle'), text: t('s2.c2.text') },
         { subtitle: t('s2.c3.subtitle'), text: t('s2.c3.text') },
+        { subtitle: t('s2.c4.subtitle'), text: t('s2.c4.text') },
       ],
     },
     {

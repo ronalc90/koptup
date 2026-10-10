@@ -473,14 +473,14 @@ Qué ve el visitante al abrir una demo con acceso restringido: [Flujos del visit
 |---|---|---|
 | 1 | Hero | "Hablemos de tu proyecto" y "Listos para convertir tu visión en realidad. Agenda una consulta gratuita". |
 | 2 | Banner "Estás cotizando" | Solo si se llega con `?service=`: muestra el servicio y el plan (por ejemplo "Sistema RAG — Plan Esencial") y la etiqueta "Solicitud pre-llenada". |
-| 3 | Formulario "Envíanos un Mensaje" | Nombre*, Email*, Teléfono, Empresa, Servicio de interés* (Sistema RAG, E-Commerce, Chatbot con IA, Desarrollo Web, Desarrollo Móvil, Integraciones API, Diseño UX/UI, Consultoría, Otro), Presupuesto estimado en pesos colombianos sin IVA (menos de COP 5.000.000; 5 a 15; 15 a 30; 30 a 60; más de COP 60.000.000, coherentes con los planes), ¿Cuándo quieres empezar? (4 opciones, se guarda con el contacto), Cuéntanos sobre tu proyecto* y **Enviar mensaje**. Si el envío falla, el aviso dice qué pasó: faltan datos, demasiados envíos seguidos o sin conexión. |
+| 3 | Formulario "Envíanos un Mensaje" | Nombre*, Email*, Teléfono, Empresa, Servicio de interés* (Sistema RAG, E-Commerce, Chatbot con IA, Desarrollo Web, Desarrollo Móvil, Integraciones API, Diseño UX/UI, Consultoría, Otro), Presupuesto estimado en pesos colombianos sin IVA (menos de COP 5.000.000; 5 a 15; 15 a 30; 30 a 60; más de COP 60.000.000, coherentes con los planes), ¿Cuándo quieres empezar? (4 opciones, se guarda con el contacto), Cuéntanos sobre tu proyecto*, la casilla obligatoria de **autorización de tratamiento de datos** (Ley 1581 de 2012, con enlace a `/privacy`) y **Enviar mensaje**. Sin la casilla marcada no se envía. Si el envío falla, el aviso dice qué pasó: demasiados envíos seguidos, sin conexión o el campo que el servidor rechazó, que queda marcado con su motivo. |
 | 4 | Datos de contacto | Email, teléfono, ubicación en Bogotá (abre Google Maps) y horario (lunes a viernes, 8 a. m. a 6 p. m.). |
 | 5 | Síguenos en redes | WhatsApp y LinkedIn (`linkedin.com/company/koptup`, la misma del pie). |
 | 6 | Agendar Llamada | "Agenda una consulta gratuita de 30 minutos": **Agendar ahora** abre el programa de correo con un mensaje ya escrito. |
 | 7 | Preguntas Frecuentes | Tiempo de respuesta (24 horas hábiles), garantía (de 30 a 90 días según el contrato, como dicen los términos) y cómo empezar en pequeño (piloto RAG o nivel Básico). |
 | 8 | Mapa | Mapa de Google embebido con la ubicación. |
 
-**A dónde llega el mensaje:** se guarda como contacto (origen `contact-form`, con el plazo y, si venía de un plan o de "Cotizar este tier", lo que se cotizaba), avisa al equipo por correo y WhatsApp si están configurados, y aparece en **Admin › Contactos**. Paso a paso en [Flujos del visitante › Flujo 3](Doc-04-Flujos-del-Visitante.md#4-flujo-3-formulario-de-contacto).
+**A dónde llega el mensaje:** se guarda como contacto (origen `contact-form`, con el plazo, la prueba de la autorización y, si venía de un plan o de "Cotizar este tier", lo que se cotizaba), avisa al equipo por correo y WhatsApp si están configurados, y aparece en **Admin › Contactos**. Paso a paso en [Flujos del visitante › Flujo 3](Doc-04-Flujos-del-Visitante.md#4-flujo-3-formulario-de-contacto).
 
 **SEO:** *Contacto: Solicita tu Cotización Gratis \| KopTup*.
 
@@ -584,13 +584,13 @@ Las tres tienen un encabezado azul con la fecha de actualización, secciones num
 
 ![Política de privacidad](images/doc/publicas/privacidad-escritorio.jpg)
 
-*`/privacy`: introducción, 10 secciones numeradas y "Sus Derechos".*
+*`/privacy`: versión de la política, responsable del tratamiento, 10 secciones numeradas y "Tus derechos".*
 
 | Página | Secciones | Título SEO real |
 |---|---|---|
-| `/privacy` | Introducción · Información que recopilamos · Cómo usamos la información · Protección · Compartir información · Retención · Sus derechos · Cookies · Transferencias internacionales · Menores · Cambios · Contacto | Política de Privacidad \| KopTup |
-| `/terms` | Bienvenido · Aceptación · Servicios · Precios y pagos · Propiedad intelectual · Confidencialidad · Plazos y entregas · Garantías · Soporte · Terminación · Ley aplicable · Acuerdo completo · Contacto | Términos y Condiciones \| KopTup |
-| `/cookies` | Qué son · Tipos de cookies (con interruptores) · Administrar preferencias · Cómo controlarlas · Cookies de terceros · Actualizaciones · Contacto | Política de Cookies \| KopTup |
+| `/privacy` | Responsable del tratamiento · Qué datos recogemos y para qué · Con quién compartimos tus datos · Cuánto tiempo los guardamos · Cómo los protegemos · Autorización y datos sensibles · Tus derechos (con los plazos de la Ley 1581) · Cookies y almacenamiento del navegador · Transferencias internacionales · Menores de edad · Cambios · Contacto | Política de Privacidad \| KopTup |
+| `/terms` | Te damos la bienvenida · Aceptación · Servicios · Precios y pagos · Propiedad intelectual · Confidencialidad · Plazos y entregas · Garantías · Soporte · Terminación · Ley aplicable · Acuerdo completo · Contacto | Términos y Condiciones \| KopTup |
+| `/cookies` | Qué son · Cookies y datos del navegador que usamos (tabla con el nombre real de cada cookie o clave, quién la pone, para qué y cuánto dura, en tres grupos: necesarias, medición y publicidad, estas dos con interruptor) · Tus preferencias · Cómo controlarlas · Cookies de terceros · Cambios · Contacto | Política de Cookies \| KopTup |
 
 ![Términos y condiciones](images/doc/publicas/terminos-escritorio.jpg)
 

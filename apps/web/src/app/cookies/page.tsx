@@ -7,7 +7,6 @@ import Card, { CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import {
   CakeIcon,
-  Cog6ToothIcon,
   ChartBarIcon,
   ShieldCheckIcon,
   ClockIcon,
@@ -24,11 +23,28 @@ import {
 } from '@/lib/cookie-consent';
 import { areTrackingTagsLoaded } from '@/lib/analytics';
 
+/**
+ * Cookies y claves de almacenamiento REALES del sitio (revisadas en el código:
+ * lib/api.ts, lib/cookie-consent.ts, next-themes, Navbar, demos y
+ * components/analytics/Analytics.tsx). Las de Google y LinkedIn solo existen
+ * si aceptas esa categoría y si el sitio tiene configurada la etiqueta.
+ */
+const COOKIE_ROWS = {
+  essential: ['accessToken', 'refreshToken', 'locale', 'cookie_preferences', 'theme', 'user', 'redirectAfterLogin', 'preferences', 'demos'],
+  analytics: ['_ga', '_ga_ID'],
+  marketing: ['_gcl_au', '_gcl_aw', 'li_fat_id', 'bcookie', 'lidc', 'UserMatchHistory'],
+} as const;
+
+/** Nombre que se muestra de cada fila (la clave de traducción no admite algunos caracteres). */
+const ROW_NAMES: Record<string, string> = {
+  _ga_ID: '_ga_<ID>',
+  preferences: 'settings, adminSettings, koptup.clientType, koptup.onboarding.dismissed',
+  demos: 'koptup…, demo:…',
+};
+
 export default function CookiesPage() {
   const t = useTranslations('cookiesPage');
-  const [essentialEnabled, setEssentialEnabled] = useState(true);
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
-  const [functionalEnabled, setFunctionalEnabled] = useState(false);
   const [marketingEnabled, setMarketingEnabled] = useState(false);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
 
@@ -36,64 +52,45 @@ export default function CookiesPage() {
   useEffect(() => {
     const saved = readCookiePreferences();
     if (!saved) return;
-    setFunctionalEnabled(saved.functional);
     setAnalyticsEnabled(saved.analytics);
     setMarketingEnabled(saved.marketing);
   }, []);
 
+  const rows = (category: keyof typeof COOKIE_ROWS) =>
+    COOKIE_ROWS[category].map((id) => ({
+      name: ROW_NAMES[id] ?? id,
+      purpose: t(`types.${category}.rows.${id}.purpose`),
+      duration: t(`types.${category}.rows.${id}.duration`),
+      type: t(`types.${category}.rows.${id}.type`),
+    }));
+
   const cookieTypes = [
     {
       icon: ShieldCheckIcon,
-      title: t('types.ct1.title'),
-      description: t('types.ct1.description'),
+      title: t('types.essential.title'),
+      description: t('types.essential.description'),
       required: true,
-      enabled: essentialEnabled,
-      setEnabled: setEssentialEnabled,
-      cookies: [
-        { name: 'session_id', purpose: t('types.ct1.ck1.purpose'), duration: t('types.ct1.ck1.duration'), type: t('types.ct1.ck1.type') },
-        { name: 'auth_token', purpose: t('types.ct1.ck2.purpose'), duration: t('types.ct1.ck2.duration'), type: t('types.ct1.ck2.type') },
-        { name: 'csrf_token', purpose: t('types.ct1.ck3.purpose'), duration: t('types.ct1.ck3.duration'), type: t('types.ct1.ck3.type') },
-        { name: 'cookie_preferences', purpose: t('types.ct1.ck4.purpose'), duration: t('types.ct1.ck4.duration'), type: t('types.ct1.ck4.type') },
-      ],
-    },
-    {
-      icon: Cog6ToothIcon,
-      title: t('types.ct2.title'),
-      description: t('types.ct2.description'),
-      required: false,
-      enabled: functionalEnabled,
-      setEnabled: setFunctionalEnabled,
-      cookies: [
-        { name: 'language', purpose: t('types.ct2.ck1.purpose'), duration: t('types.ct2.ck1.duration'), type: t('types.ct2.ck1.type') },
-        { name: 'theme', purpose: t('types.ct2.ck2.purpose'), duration: t('types.ct2.ck2.duration'), type: t('types.ct2.ck2.type') },
-        { name: 'user_preferences', purpose: t('types.ct2.ck3.purpose'), duration: t('types.ct2.ck3.duration'), type: t('types.ct2.ck3.type') },
-      ],
+      enabled: true,
+      setEnabled: (_value: boolean) => undefined,
+      cookies: rows('essential'),
     },
     {
       icon: ChartBarIcon,
-      title: t('types.ct3.title'),
-      description: t('types.ct3.description'),
+      title: t('types.analytics.title'),
+      description: t('types.analytics.description'),
       required: false,
       enabled: analyticsEnabled,
       setEnabled: setAnalyticsEnabled,
-      cookies: [
-        { name: '_ga', purpose: t('types.ct3.ck1.purpose'), duration: t('types.ct3.ck1.duration'), type: t('types.ct3.ck1.type') },
-        { name: '_ga_<ID>', purpose: t('types.ct3.ck2.purpose'), duration: t('types.ct3.ck2.duration'), type: t('types.ct3.ck2.type') },
-      ],
+      cookies: rows('analytics'),
     },
     {
       icon: MegaphoneIcon,
-      title: t('types.ct4.title'),
-      description: t('types.ct4.description'),
+      title: t('types.marketing.title'),
+      description: t('types.marketing.description'),
       required: false,
       enabled: marketingEnabled,
       setEnabled: setMarketingEnabled,
-      cookies: [
-        { name: '_gcl_au', purpose: t('types.ct4.ck1.purpose'), duration: t('types.ct4.ck1.duration'), type: t('types.ct4.ck1.type') },
-        { name: '_gcl_aw', purpose: t('types.ct4.ck2.purpose'), duration: t('types.ct4.ck2.duration'), type: t('types.ct4.ck2.type') },
-        { name: 'li_fat_id', purpose: t('types.ct4.ck3.purpose'), duration: t('types.ct4.ck3.duration'), type: t('types.ct4.ck3.type') },
-        { name: 'bcookie', purpose: t('types.ct4.ck4.purpose'), duration: t('types.ct4.ck4.duration'), type: t('types.ct4.ck4.type') },
-      ],
+      cookies: rows('marketing'),
     },
   ];
 
@@ -105,8 +102,6 @@ export default function CookiesPage() {
    */
   const persist = (choice: CookieConsentChoice, message: string) => {
     const before = readCookiePreferences();
-    setEssentialEnabled(true);
-    setFunctionalEnabled(choice.functional);
     setAnalyticsEnabled(choice.analytics);
     setMarketingEnabled(choice.marketing);
     saveCookiePreferences(choice);
@@ -120,7 +115,8 @@ export default function CookiesPage() {
 
   const handleSavePreferences = () => {
     persist(
-      { functional: functionalEnabled, analytics: analyticsEnabled, marketing: marketingEnabled },
+      // No hay cookies funcionales opcionales: la categoría se guarda apagada.
+      { functional: false, analytics: analyticsEnabled, marketing: marketingEnabled },
       t('preferences.alertSaved'),
     );
   };

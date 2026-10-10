@@ -42,6 +42,10 @@ export interface ContactFormData {
   message: string;
   /** ¿Cuándo quieres empezar? (`now`, `1m`, `3m` u `open`; vacío si no respondió). */
   timeline?: string;
+  /** Autorización de tratamiento de datos (Ley 1581): el backend la exige. */
+  consentimiento?: boolean;
+  /** Campo trampa contra bots: una persona lo deja vacío. */
+  website?: string;
   /** Plan RAG, o nivel y modalidad del catálogo, que se estaban cotizando (lib/contact-quote.ts). */
   quote?: {
     service: string;

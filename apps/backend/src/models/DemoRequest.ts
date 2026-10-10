@@ -56,6 +56,8 @@ export interface IDemoRequest extends Document {
   user?: Types.ObjectId;
   /** Lead registrado por el canal de leads (Contact, source `demo-request`). */
   lead?: Types.ObjectId;
+  /** Fecha en que el job de conservación quitó los datos personales (solicitudes rechazadas). */
+  anonimizadoEn?: Date | null;
   /** Veces que el mismo email volvió a enviar el formulario con la solicitud abierta. */
   reenvios: number;
   /** Qué avisos se enviaron de verdad (false si el canal no está configurado o falló). */
@@ -122,6 +124,7 @@ const DemoRequestSchema = new Schema<IDemoRequest>(
     user: { type: Schema.Types.ObjectId, ref: 'User' },
     lead: { type: Schema.Types.ObjectId, ref: 'Contact' },
     reenvios: { type: Number, default: 0 },
+    anonimizadoEn: { type: Date, default: null },
     notificaciones: {
       equipoEmail: { type: Boolean },
       equipoWhatsapp: { type: Boolean },

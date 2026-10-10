@@ -217,6 +217,9 @@ Estas rutas se montan **antes** de `/api/admin` para que el rol `sales` pueda ge
 | GET | `/api/admin/demo-catalog` | `admin`, `sales`, `manager` | Catálogo con vigencia por defecto y orden | → `[{ slug, nombre, nombreEn, accessMode, activo, duracionDiasPorDefecto, orden, updatedAt }]` |
 | PATCH | `/api/admin/demo-catalog/:slug` (o `PATCH /` con `slug`) | `admin` | Cambiar modo, activa, vigencia, orden o nombres | `{ accessMode?, activo?, duracionDiasPorDefecto?, orden?, nombre?, nombreEn? }` → la entrada; `422 fixed_mode` si se intenta cerrar el chatbot RAG |
 | GET | `/api/admin/audit-log` | `admin` | Bitácora de acciones del equipo (no tiene pantalla en el panel: se consulta por API o en el historial de cada solicitud) | `?accion=&entidadTipo=&entidadId=&page=&limit=` → `{ items: [{ accion, actorEmail, actorRol, entidad, detalle, fecha }], total, page, pages }` |
+| POST | `/api/admin/privacy/search` | `admin` | Derechos del titular (Ley 1581): todo lo que el sistema guarda de una persona. El email va en el cuerpo (no en la URL) | `{ email }` → `{ correosBuscados, resumen: { categoría: n }, bloqueos, datos, plazos }`. Email inválido → `400` con `fields: ["email"]` |
+| POST | `/api/admin/privacy/export` | `admin` | Lo mismo como archivo para entregar al titular | `{ email }` → JSON adjunto `datos-titular-AAAA-MM-DD.json`, sin contraseñas ni hashes de enlaces |
+| POST | `/api/admin/privacy/erase` | `admin` | Supresión irreversible | `{ email, confirmacion }` (el mismo email) → `{ referencia: "SUP-AAAA-XXXXXXXX", eliminados, anonimizados }`. `400 confirmation_mismatch`; `404 not_found` si no hay datos; `409 team_account` o `409 contractual_records` (con `bloqueos`) si no procede. Las tres rutas dejan en la bitácora `privacy.search`, `privacy.export` o `privacy.erase` sin datos personales |
 
 Las pantallas que usan estas rutas están en el [Manual del administrador](Doc-06-Manual-del-Administrador.md); por ejemplo, el enlace de activación que devuelve `approve` es el que el panel muestra para copiar o enviar por WhatsApp.
 
@@ -278,20 +281,20 @@ Todas exigen sesión. Cada controlador filtra por la cuenta que llama (o permite
 
 ### 4.8 Chatbot RAG (`/api/chatbot`)
 
-Toda la ruta tiene su propio cupo: **60 peticiones por minuto por IP**. Los bots y sus documentos **no** se guardan en MongoDB (ver [Modelos de datos](Doc-09-Modelos-de-Datos.md#7-lo-que-no-está-en-mongodb)).
+Toda la ruta tiene su propio cupo: **60 peticiones por minuto por IP**. Los bots, sus documentos y el historial se guardan en MongoDB (ver [Modelos de datos](Doc-09-Modelos-de-Datos.md)); sin base de datos, las rutas `/bots…` responden `503 storage_unavailable`.
 
 | Método | Ruta | Auth | Para qué | Entrada → salida |
 |---|---|---|---|---|
 | GET | `/models` | Pública | Modelos permitidos y si hay IA | → `{ available: [{ id, name, costInputUSDper1M, costOutputUSDper1M, enabled }], activeProvider }` |
-| POST | `/bots` | Pública · 30 bots por hora por IP | Crear un bot | `{ name?, color?, position?, avatar?, welcome?, systemPrompt?, tone?, languages? }` → `201` con el bot y `ownerToken` (**solo esta vez**) |
+| POST | `/bots` | Pública · 30 bots por hora por IP; máx. 20.000 bots (`CHATBOT_MAX_BOTS`) | Crear un bot. `kind: "sample"` marca un bot de ejemplo de una demo: nunca guarda conversaciones y se borra a los 30 días sin uso | `{ name?, color?, position?, avatar?, welcome?, systemPrompt?, tone?, languages?, kind? }` → `201` con el bot (incluye `kind`) y `ownerToken` (**solo esta vez**) |
 | GET | `/bots` | Pública | Bots del dueño (según `X-Bot-Owner-Token`) y bots de ejemplo | `?limit=&offset=` → lista resumida |
 | GET | `/bots/:botId` | Pública | Configuración (completa solo para el dueño; sin prompt ni documentos para el resto) | — |
 | PATCH / DELETE | `/bots/:botId` | Dueño del bot (un bot antiguo sin dueño registrado: solo el equipo) | Editar o borrar el bot con sus documentos y conversaciones | — |
 | POST | `/bots/:botId/docs` | Dueño del bot | Subir archivos en base64 (máx. 5 por envío, 5 MB c/u, 50 por bot) | `{ files: [{ name, mime, contentBase64 }] }` → `{ docs, added, errors }` |
 | DELETE | `/bots/:botId/docs/:docId` | Dueño del bot | Quitar un documento | — |
 | POST | `/bots/:botId/urls` | Dueño del bot | Indexar páginas web (máx. 5 por envío, 2 MB c/u) | `{ urls: [...] }` |
-| POST | `/bots/:botId/chat` | Pública (bot existente) | Preguntar. Sin IA, sin presupuesto o con error del proveedor responde en **modo extractivo** citando fragmentos | `{ message (≤ 2000), history?, model? }` → `{ reply, sources, confidence, model, tokens?, costUSD?, error? }` |
-| GET / DELETE | `/bots/:botId/conversations` | Dueño del bot | Historial (últimos 200 turnos) o borrarlo | `?limit=` |
+| POST | `/bots/:botId/chat` | Pública (bot existente) | Preguntar. Sin IA, sin presupuesto o con error del proveedor responde en **modo extractivo** citando fragmentos. Solo con `channel: "widget"` (lo envía `/embed/chatbot` fuera de la vista previa del Builder) y en un bot de usuario se guarda la pregunta en el historial, que vence a los 30 días | `{ message (≤ 2000), history?, model?, channel? }` → `{ reply, sources, confidence, model, tokens?, costUSD?, error? }` |
+| GET / DELETE | `/bots/:botId/conversations` | Dueño del bot | Historial (últimos 200 turnos vigentes) o borrarlo | `?limit=` |
 | POST | `/session`, `/upload`, `/message`; GET `/info/:sessionId`; PUT `/config`; DELETE `/messages/:sessionId`, `/documents/:sessionId` | Pública por `sessionId` | API anterior "por sesión". Ninguna página de la web la usa desde que se retiraron los proxies de Next y `/test` | Upload: hasta 10 archivos de 10 MB (PDF, TXT, CSV, DOCX), 10 por minuto |
 
 ### 4.9 Demo "Prueba con tu documento" (`/api/demo-rag`)
@@ -299,7 +302,7 @@ Toda la ruta tiene su propio cupo: **60 peticiones por minuto por IP**. Los bots
 | Método | Ruta | Auth | Para qué | Entrada → salida |
 |---|---|---|---|---|
 | GET | `/status` | Pública | ¿Está encendida? Nunca muestra montos | → `{ enabled, reason, budgetExhausted, limits }` |
-| POST | `/documents` | Pública · 10 intentos cada 10 min y 3 documentos al día por IP | Subir un PDF, DOCX o TXT (5 MB, 30 páginas) con email y autorización de datos; registra un lead (`demo-rag`) | `multipart`: `file`, `email`, `consent=true` → `201 { document, limits }` |
+| POST | `/documents` | Pública · 10 intentos cada 10 min y 3 documentos al día por IP | Subir un PDF, DOCX o TXT (5 MB, 30 páginas) con email y autorización de datos. Primero registra el lead (`demo-rag`) con la prueba de la autorización; si no se puede guardar, **no procesa el documento** | `multipart`: `file`, `email`, `consent=true` → `201 { document, limits }` |
 | GET | `/documents/:docId` | Pública | Estado del documento (preguntas usadas, vencimiento) | → `{ document }` |
 | POST | `/documents/:docId/questions` | Pública · 30 cada 10 min por IP; 10 por documento | Preguntar | `{ question (≤ 500) }` → respuesta con citas |
 | DELETE | `/documents/:docId` | Pública | Borrar el documento antes de la hora | → `{ deleted }` |

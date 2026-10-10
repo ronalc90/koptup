@@ -130,6 +130,7 @@ export type DemoErrorCode =
   | 'unreadable_document'
   | 'invalid_email'
   | 'consent_required'
+  | 'lead_unavailable'
   | 'invalid_request'
   | 'daily_limit'
   | 'rate_limited'
@@ -155,6 +156,10 @@ const ERROR_DEFS: Record<DemoErrorCode, { status: number; message: string }> = {
   unreadable_document: { status: 422, message: 'No pudimos leer el documento. Revisa que no esté dañado ni protegido con contraseña.' },
   invalid_email: { status: 400, message: 'Escribe un email válido.' },
   consent_required: { status: 400, message: 'Debes autorizar el tratamiento de tus datos personales para subir el documento.' },
+  lead_unavailable: {
+    status: 503,
+    message: 'No pudimos registrar tu prueba en este momento, así que no procesamos tu documento. Intenta de nuevo en unos minutos.',
+  },
   invalid_request: { status: 400, message: 'Solicitud inválida.' },
   daily_limit: { status: 429, message: 'Llegaste al límite de 3 documentos por día.' },
   rate_limited: { status: 429, message: 'Demasiadas solicitudes. Espera unos minutos y vuelve a intentarlo.' },

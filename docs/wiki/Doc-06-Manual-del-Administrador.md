@@ -33,6 +33,7 @@ En algunas capturas también aparecen personas de ejemplo de otras páginas de l
 6. [Catálogo de demos](#6-catálogo-de-demos)
 7. [Usuarios y roles](#7-usuarios-y-roles)
 8. [Contactos](#8-contactos)
+   - [8b. Privacidad: derechos del titular](#8b-privacidad-derechos-del-titular)
 9. [Conversaciones](#9-conversaciones)
 10. [Pedidos](#10-pedidos)
 11. [Facturas](#11-facturas)
@@ -174,6 +175,7 @@ Detalles que conviene saber:
 | Accesos a demos | Todo, incluidas demos privadas | Solo consulta | Concede, extiende y revoca (sin demos privadas) |
 | Catálogo de demos | Edita | Solo consulta | Solo consulta |
 | Inicio, Pedidos, Entregables, Facturas, Conversaciones, Usuarios, Contactos, Configuración | Sí | Sí (no puede cambiar roles) | No aparecen en su menú |
+| Privacidad (derechos del titular) | Sí | No aparece en su menú | No aparece en su menú |
 
 Cuando tu rol solo puede consultar, la pantalla lo dice abajo: «Tu rol solo puede consultar esta sección». El detalle completo de permisos está en [Roles y permisos](Doc-10-Roles-y-Permisos.md).
 
@@ -613,6 +615,8 @@ Puntos clave:
 3. **Detalle del contacto:** correo, teléfono, empresa, servicio, presupuesto y, si lo indicó, **Plazo** («¿Cuándo quieres empezar?»). Cuando la persona llega desde un plan RAG o desde «Cotizar este tier», el servicio trae el plan, o el nivel y la modalidad (p. ej. «CRM con IA — Nivel Avanzado · Comprar el software»).
 4. **Mensaje** completo.
 
+El detalle también muestra la **Autorización de datos**: «Autorizó el <fecha> (política 2026-10)» para los mensajes que llegaron con la casilla de la Ley 1581 (formulario de contacto, «Prueba con tu documento» y solicitudes de demo). Los mensajes anteriores a la casilla dicen «Sin autorización registrada».
+
 Debajo del detalle están los botones **Marcar como nuevo**, **Marcar como leído** y **Marcar como respondido**. El estado es solo una marca para el equipo: no envía nada a la persona. Responde por correo o por WhatsApp fuera del panel.
 
 Cómo reconocer el origen de cada contacto (la pantalla no lo muestra como etiqueta):
@@ -627,7 +631,44 @@ Cómo reconocer el origen de cada contacto (la pantalla no lo muestra como etiqu
 
 *Lead de Daniela Quintero: subió un PDF de 2 páginas en «Prueba con tu documento» antes de pedir su demo.*
 
-Limitaciones de esta sección: después de cambiar el estado, la lista se actualiza pero la etiqueta del detalle sigue mostrando el estado anterior hasta que vuelves a pulsar la tarjeta; no hay buscador ni forma de borrar un contacto; y el comercial (`sales`) no ve esta sección.
+Limitaciones de esta sección: después de cambiar el estado, la lista se actualiza pero la etiqueta del detalle sigue mostrando el estado anterior hasta que vuelves a pulsar la tarjeta; no hay buscador (para encontrar y borrar todo lo de una persona usa [Privacidad](#8b-privacidad-derechos-del-titular)); y el comercial (`sales`) no ve esta sección.
+
+---
+
+## 8b. Privacidad: derechos del titular
+
+`/admin/privacidad` (solo el rol **admin**) atiende lo que pide una persona sobre sus datos según la Ley 1581 de 2012: saber qué guardamos, recibirlo y que lo borremos. La ley da **10 días hábiles para responder una consulta y 15 para un reclamo** (corregir, actualizar o suprimir). Antes de entregar o borrar datos, verifica que quien lo pide es el titular (por ejemplo, que escriba desde ese mismo correo).
+
+![Admin › Privacidad con el resultado de una búsqueda, anotado](images/doc/admin/privacidad-busqueda.jpg)
+
+*Búsqueda de una persona de ejemplo que escribió por el formulario de contacto.*
+
+1. **Email de la persona.** Se busca tal como lo escribes y normalizado como en el inicio de sesión (en Gmail, sin puntos ni `+alias`).
+2. **Lo que encontró, por categoría,** con el número de registros: cuenta, mensajes de contacto, solicitudes y accesos a demos, enlaces de activación, lead y su actividad, propuestas, preguntas al chatbot que mencionan el email, notificaciones, documentos, registros del portal y entradas de la bitácora. Cada categoría se abre para ver los datos tal cual (sin contraseñas ni hashes de enlaces).
+3. **Exportar JSON:** descarga un archivo `datos-titular-AAAA-MM-DD.json` con todo, para entregárselo a la persona.
+4. **Suprimir datos:** abre la confirmación.
+
+![Confirmación de la supresión, anotada](images/doc/admin/privacidad-confirmar.jpg)
+
+*La supresión pide escribir otra vez el email.*
+
+1. **Escribe el mismo email** para confirmar.
+2. **Suprimir definitivamente** solo se habilita cuando coincide. Es irreversible: se borran la cuenta, los mensajes, las solicitudes, los accesos, el lead y su actividad, las propuestas no aceptadas, las preguntas al chatbot que contienen el email, las notificaciones y los documentos; la sesión de la persona se cierra. En la bitácora quedan las acciones del equipo, pero sin sus datos.
+
+![Supresión completada con su referencia](images/doc/admin/privacidad-suprimido.jpg)
+
+*Al terminar, el panel muestra la referencia de la supresión.*
+
+1. **Referencia** (`SUP-AAAA-XXXXXXXX`) y cuántos registros se borraron. Entrégasela a la persona como constancia: la bitácora guarda la acción `privacy.erase` con esa referencia y los conteos, sin su nombre ni su email.
+
+**Cuándo no se puede suprimir** (el panel lo explica y no borra nada):
+
+| Caso | Qué hacer |
+|---|---|
+| Es una cuenta del equipo (admin, manager, sales, developer) | Quítale primero el rol en Usuarios |
+| Tiene registros de una relación contractual: propuesta aceptada, pagada o convertida, pedidos, proyectos, facturas, entregables o conversaciones del portal | La ley permite conservar esos datos mientras exista la obligación; responde al titular explicándolo y vuelve a intentarlo cuando termine |
+
+**Lo que el sistema hace solo:** una vez al día, el job de conservación anonimiza las solicitudes de demo rechazadas y los datos de los prospectos sin actividad durante 24 meses (sin cuenta ni contrato): quita nombre, email, teléfono, empresa y mensajes, y deja la fecha, el origen y la etapa para las estadísticas. También borra los bots del chatbot sin uso. Las preguntas al chatbot vencen a los 30 días. Cada consulta, exportación y supresión queda en la bitácora sin datos personales.
 
 ---
 
@@ -838,6 +879,7 @@ Qué hacer: revisa el estado del servicio del backend (su ruta `/health` debe re
 | Catálogo | `/admin/catalogo-demos` | `apps/web/src/app/admin/catalogo-demos/page.tsx` |
 | Componentes comunes (enlace, días, modal, etiquetas) | — | `apps/web/src/components/admin/demos/shared.tsx` |
 | Usuarios, Contactos, Conversaciones, Pedidos, Facturas, Entregables, Configuración | `/admin/users`, `/admin/contacts`, `/admin/conversations`, `/admin/orders`, `/admin/invoices`, `/admin/deliverables`, `/admin/settings` | `apps/web/src/app/admin/<sección>/page.tsx` |
+| Privacidad (derechos del titular) | `/admin/privacidad` | `apps/web/src/app/admin/privacidad/page.tsx` |
 | Reglas de rol de la web | — | `apps/web/src/lib/auth-roles.ts` y `apps/web/src/middleware.ts` |
 
 Backend: `apps/backend/src/routes/admin-demos.routes.ts` (solicitudes, accesos, catálogo y bitácora), `routes/admin.routes.ts` y `controllers/admin.controller.ts` (operación), `services/demo-requests.service.ts`, `services/demo-grants.service.ts`, `services/demo-catalog.service.ts`, `jobs/demo-grants.job.ts`, `config/demos.ts` (permisos y tiempos), `scripts/set-admin.ts` y `services/admin-bootstrap.service.ts` (`ensureAdminFromEnv`).
@@ -852,6 +894,7 @@ Backend: `apps/backend/src/routes/admin-demos.routes.ts` (solicitudes, accesos, 
 | | `POST /api/admin/demo-grants` (acceso directo), `POST …/:id/extend`, `POST …/:id/revoke`, `POST …/:id/resend-activation` | admin, sales (privadas: solo admin) |
 | Catálogo | `GET /api/admin/demo-catalog` y `PATCH /api/admin/demo-catalog/:slug` | leer: admin, sales, manager; editar: admin |
 | Bitácora | `GET /api/admin/audit-log` | admin (sin pantalla) |
+| Privacidad | `POST /api/admin/privacy/search`, `POST /api/admin/privacy/export` (`{ email }`) y `POST /api/admin/privacy/erase` (`{ email, confirmacion }`) | admin |
 | Operación | `GET /api/admin/orders`, `PATCH …/:id/status`, `POST …/:id/approve`, `POST …/:id/reject`; `GET /api/admin/invoices`; `GET /api/admin/deliverables`; `GET /api/admin/conversations` y `…/:id`; `GET /api/admin/users`; `GET /api/admin/contacts` y `PATCH …/:id/status` | admin, manager |
 | Roles | `PATCH /api/admin/users/:id/role` (acepta todos los roles del modelo, también `sales`, `prospect` y `client`) | admin |
 
@@ -884,7 +927,7 @@ Comportamiento actual de `main`, comprobado en el entorno de capturas salvo dond
 5. **El contador del menú** cuenta solo «Pendiente»; la cifra del Inicio suma también «En revisión». No es un error, pero pueden no coincidir.
 6. **Usuarios:** el selector no ofrece `sales`, `prospect` ni `client`, y en esas cuentas muestra «Usuario» aunque no lo sean. Un rol nuevo se ve en el menú de la persona solo después de volver a iniciar sesión.
 7. **La bitácora no tiene pantalla:** solo se ve el historial dentro de cada solicitud.
-8. **Contactos:** la etiqueta del detalle no se actualiza al cambiar el estado; no hay buscador, ni borrado, ni etiqueta de origen.
+8. **Contactos:** la etiqueta del detalle no se actualiza al cambiar el estado; no hay buscador ni etiqueta de origen (el borrado de una persona se hace en Privacidad).
 9. **Conversaciones siempre vacías:** ni la conversación automática de un pedido ni la creación manual por API funcionan (error del servidor al guardar). Según el código, el botón de enviar del detalle de una conversación también apunta a una ruta equivocada.
 10. **Pedidos:** los estados se muestran en inglés, la fecha sale un día antes y las confirmaciones son ventanas del navegador.
 11. **Facturas y entregables:** solo listas, sin forma de crearlos desde el panel y sin mensaje cuando están vacías. Según el código, «Descargar» no abre la factura.

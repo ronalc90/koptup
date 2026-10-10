@@ -50,7 +50,6 @@ flowchart LR
 
     subgraph PROC["Memoria y disco del servidor"]
         M1["Documentos de la demo RAG (1 hora)"]:::mem
-        M2["Bots del chatbot (archivo state.json)"]:::mem
         M3["Archivos subidos (carpeta uploads)"]:::mem
     end
 
@@ -96,7 +95,8 @@ Cada modelo de Mongoose se guarda en una colección. Los nombres de la tabla son
 | | `Deliverable` | `deliverables` | Entregables por proyecto | Equipo |
 | | `Conversation`, `Message` | `conversations`, `messages` | Mensajería cliente–equipo | Portal y panel |
 | | `Notification` | `notifications` | Notificaciones del portal | `POST /api/notifications` |
-| Chatbot y documentos | `Chatbot` | `chatbots` | API anterior del chatbot "por sesión": configuración, documentos y mensajes | Vista previa del chatbot |
+| Chatbot y documentos | `ChatbotBot`, `ChatbotBotChunks`, `ChatbotTurn` | `chatbot_bots`, `chatbot_bot_chunks`, `chatbot_turns` | Bots de «Configura el tuyo» y de ejemplo (configuración, hash del token del dueño, documentos), sus fragmentos (uno por documento) y las preguntas del widget (vencen a los 30 días) | `/api/chatbot/bots` (`services/chatbot-store.service.ts`) |
+| | `Chatbot` | `chatbots` | API anterior del chatbot "por sesión": configuración, documentos y mensajes | Vista previa del chatbot |
 | | `ChatSession`, `ChatMessage` | `chatsessions`, `chatmessages` | Chat de eco antiguo (solo desarrollo) | `/api/chat` |
 | | `Document` | `documents` | Gestor de documentos con IA (texto, resumen, palabras clave, vector) | `/api/documents` |
 | Salud: auditoría | `Factura`, `Atencion`, `Procedimiento`, `Glosa`, `SoporteDocumental`, `Tarifario`, `AuditoriaSesion`, `ReglaAuditoria`, `DocumentoConocimientoConfig` | `facturas`, `atenciones`, `procedimientos`, `glosas`, `soportes_documentales`, `tarifarios`, `auditoriasesions`, `reglas_auditoria`, `documentoconocimientoconfigs` | Demo de cuentas médicas: factura, atenciones, procedimientos, glosas, soportes y sesiones de auditoría paso a paso | `/api/auditoria`, `/api/documentos-conocimiento` |
@@ -229,6 +229,8 @@ erDiagram
         string source "contact-form, demo-rag, demo-request"
         string plazo "now, 1m, 3m, open"
         object cotizacion "servicio, plan, nivel, modalidad"
+        object consentimiento "aceptado, fecha, versionPolitica, ipHash"
+        date anonimizadoEn
         date created_at
     }
     QUOTE {
@@ -245,7 +247,7 @@ erDiagram
     }
 ```
 
-*Los tres canales de leads (formulario de contacto, demo RAG y solicitud de demo) escriben en la misma colección `contacts`; `source` dice de dónde vino. La demo RAG no guarda el documento, solo el email y la autorización.*
+*Los tres canales de leads (formulario de contacto, demo RAG y solicitud de demo) escriben en la misma colección `contacts`; `source` dice de dónde vino. Los tres guardan la prueba de la autorización en `consentimiento`. La demo RAG no guarda el documento, solo el email y la autorización.*
 
 ### 3.4 Proyectos y facturación
 
@@ -318,9 +320,9 @@ erDiagram
     CHATBOT ||--o{ CHATBOT_DOCUMENT : "documents[]"
     CHATBOT ||--o{ CHATBOT_MESSAGE : "messages[]"
     USER ||--o{ DOCUMENT : "user_id"
-    BOT_STATE_JSON ||--o{ BOT_DOC : "docs"
-    BOT_STATE_JSON ||--o{ BOT_CHUNK : "chunks"
-    BOT_STATE_JSON ||--o{ BOT_TURN : "conversations"
+    CHATBOT_BOT ||--o{ BOT_DOC : "docs"
+    CHATBOT_BOT ||--o{ CHATBOT_BOT_CHUNKS : "botId"
+    CHATBOT_BOT ||--o{ CHATBOT_TURN : "botId"
     CHATBOT {
         string sessionId UK "API anterior por sesión"
         object config "título, saludo, colores"
@@ -343,27 +345,32 @@ erDiagram
         array embedding "vector"
         bool is_deleted "papelera"
     }
-    BOT_STATE_JSON {
-        string botId "kbot_..."
+    CHATBOT_BOT {
+        string botId UK "kbot_..."
         string ownerTokenHash "SHA-256"
         string systemPrompt
+        string kind "builder, sample"
+        date lastActivityAt
     }
     BOT_DOC {
         string name
         string hash
     }
-    BOT_CHUNK {
-        string text
-        string docName
+    CHATBOT_BOT_CHUNKS {
+        string botId
+        string docId "un registro por documento"
+        array chunks "id, docName, text"
     }
-    BOT_TURN {
+    CHATBOT_TURN {
+        string botId
         string role
         string content
         array sources
+        date expiresAt "índice TTL"
     }
 ```
 
-*`CHATBOT`, `DOCUMENT` y sus subdocumentos están en MongoDB. Los bots del constructor del chatbot (`BOT_STATE_JSON` y lo que cuelga de él) **no**: viven en memoria y se respaldan en un archivo JSON del servidor (ver [sección 7](#7-lo-que-no-está-en-mongodb)).*
+*Todo está en MongoDB. Los bots del constructor (`CHATBOT_BOT`) se guardaban antes en `data/chatbots/state.json`; si ese archivo existe al arrancar, se migra una vez y se borra. Solo se guardan las preguntas del widget de un bot de usuario y vencen a los 30 días (`CHATBOT_CONVERSATION_TTL_DAYS`).*
 
 ### 3.6 Salud (auditoría de cuentas médicas)
 
@@ -474,7 +481,7 @@ Al arrancar, el backend **inserta las demos que falten** (28 en la semilla) y nu
 | `tamanoEmpresa` | texto | `1-10`, `11-50`, `51-200`, `201-1000`, `1000+` | Tamaño de la empresa |
 | `demos` | lista de texto | 1 a 10 slugs del catálogo | Demos pedidas |
 | `casoDeUso` | texto | 10 a 2000 caracteres | Qué quiere resolver |
-| `consentimiento` | objeto | `aceptado`, `fecha`, `ipHash`, `userAgent`, `versionPolitica` | Prueba de la autorización (Ley 1581) |
+| `consentimiento` | objeto | `aceptado`, `fecha`, `ipHash`, `userAgent`, `versionPolitica` (siempre la del servidor, `PRIVACY_POLICY_VERSION`; la que envíe el cliente se ignora) | Prueba de la autorización (Ley 1581) |
 | `origen` | objeto | `pagina`, `referrer`, `utm.{source, medium, campaign, term, content}` | De dónde llegó |
 | `estado` | texto | `pendiente` (por defecto), `en_revision`, `aprobada`, `rechazada` | Ver [5.1](#51-solicitud-de-demo-demorequest) |
 | `motivoRechazo` | texto | Máx. 1000; interno | Por qué se rechazó |
@@ -485,6 +492,7 @@ Al arrancar, el backend **inserta las demos que falten** (28 en la semilla) y nu
 | `lead` | id → Contact | — | Lead registrado |
 | `reenvios` | número | Por defecto 0 | Veces que el mismo email volvió a enviar con la solicitud abierta |
 | `notificaciones` | objeto | `equipoEmail`, `equipoWhatsapp`, `acuseSolicitante`, `decisionSolicitante` | Qué avisos salieron de verdad |
+| `anonimizadoEn` | fecha | `null` por defecto | Cuándo el job de conservación quitó los datos personales (rechazadas o sin actividad, a los 24 meses) |
 | `createdAt`, `updatedAt` | fecha | Automáticas | — |
 
 Así se ven esos campos en el panel:
@@ -587,6 +595,8 @@ Solo se agregan registros: **no hay ninguna ruta para editar ni borrar** la bit�
 | `source` | texto | `contact-form` (por defecto), `demo-rag`, `demo-request` | Canal de origen |
 | `plazo` | texto | Opcional: `now`, `1m`, `3m` u `open` | ¿Cuándo quiere empezar? (formulario de `/contact`) |
 | `cotizacion` | objeto | Opcional: `servicio` (slug), `plan` (`piloto`, `esencial`, `profesional`, `empresarial`), `nivel` (`basico`, `profesional`, `avanzado`, `enterprise`), `modalidad` (`compra`, `saas`) | Lo que venía cotizando al llegar a `/contact` desde un plan RAG o desde «Cotizar este tier». El nombre legible queda en `service` |
+| `consentimiento` | objeto | `aceptado`, `fecha`, `ipHash`, `userAgent`, `versionPolitica` (la fija el servidor) | Prueba de la autorización (Ley 1581) del formulario de contacto, de la demo RAG o de la solicitud de demo. Los contactos anteriores a la casilla no la tienen |
+| `anonimizadoEn` | fecha | `null` por defecto | Cuándo el job de conservación quitó los datos personales |
 | `created_at` | fecha | Automática | — |
 
 ### 4.8 Project (`projects`)
@@ -832,6 +842,7 @@ stateDiagram-v2
 | `demo-rag:docs:<día de Colombia>:<hash de IP>` | Documentos subidos hoy a la demo RAG | 24 horas | La demo RAG se apaga |
 | `demo-rag:spend:AAAA-MM`, `chatbot:spend:…`, `linkedin-ads:spend:…`, `content:spend:…` | Gasto de IA del mes en USD | 62 días | Falla cerrada: no se llama al modelo |
 | `jobs:demo-grants:lock` | Candado del job de accesos | Máx. 10 minutos | El job corre igual (sus pasos no se duplican) |
+| `jobs:retention:lock` | Candado del job de conservación de datos | Máx. 30 minutos | El job corre igual (es idempotente) |
 
 ### 7.2 Memoria del proceso
 
@@ -840,13 +851,13 @@ stateDiagram-v2
 | Documentos de la demo RAG | Texto, fragmentos e índice de cada documento subido, con su contador de preguntas. Nunca van a disco ni a MongoDB | 1 hora (barrido cada minuto); máximo 200 documentos a la vez; se pierden al reiniciar |
 | Cupos de `express-rate-limit` | General, login, chatbot, subidas, creación de bots, demo RAG | Su ventana; se reinician al desplegar |
 | Contador de respaldo de "Solicitar demo" | Solo si Redis no responde | Su ventana; máximo 10.000 claves |
-| Bots del chatbot | Ver 7.3 | Mientras viva el proceso |
+| Fragmentos de los bots del chatbot | Copia en memoria por bot y versión, para no leer MongoDB en cada pregunta | Hasta que el bot cambie; máximo 200 bots |
 
 ### 7.3 Disco del servidor
 
 | Carpeta o archivo | Qué guarda | Vida |
 |---|---|---|
-| `data/chatbots/state.json` (o `CHATBOT_STATE_DIR`) | Bots del constructor del chatbot: configuración, hash del token del dueño, documentos, fragmentos y conversaciones (máx. 200 turnos por bot). Se reescribe después de cada cambio y se carga al arrancar | Hasta que el dueño los borre, **pero el disco de Railway es efímero**: se pierde en cada despliegue |
+| `data/chatbots/state.json` (o `CHATBOT_STATE_DIR`) | Archivo heredado de versiones anteriores del chatbot. Si existe al arrancar, se migra a MongoDB (sin las conversaciones ya vencidas) y se borra | Solo hasta el primer arranque |
 | `uploads/` (y `uploads/orders`, `uploads/cuentas-medicas`, `uploads/ley100`, `uploads/chatbot`, `uploads/exports`…) | Archivos subidos: documentos del gestor, adjuntos de pedidos, PDF de cuentas médicas y liquidación, Excel generados | Sin borrado automático; efímero en Railway |
 
 ---
@@ -864,20 +875,24 @@ flowchart LR
     C["Sesión renovable: 7 días"]:::medio
     D["Enlace de activación o recuperación: 72 h o 1 h, se borra 7 días después"]:::medio
     E["Gasto de IA del mes: 62 días"]:::medio
-    F["Cuentas, solicitudes, accesos, bitácora y contactos: sin borrado automático"]:::largo
-    A --> B --> C --> D --> E --> F
+    G["Preguntas al widget del chatbot: 30 días"]:::medio
+    H["Prospectos sin actividad y solicitudes rechazadas: se anonimizan a los 24 meses"]:::largo
+    F["Cuentas, accesos, bitácora y clientes: mientras exista la relación"]:::largo
+    A --> B --> C --> D --> E --> G --> H --> F
 ```
 
-*De lo más corto a lo más largo. Lo verde no se borra solo: si una persona pide que eliminen sus datos, no hay una ruta para hacerlo y se requiere intervenir directamente la base de datos (ver [SEO, analítica y legal](Doc-12-SEO-Analitica-y-Legal.md)).*
+*De lo más corto a lo más largo. Lo verde se conserva mientras exista la relación; si una persona pide que eliminen sus datos, el admin lo hace desde Admin › Privacidad (ver [Manual del administrador](Doc-06-Manual-del-Administrador.md)).*
 
 | Dato | Borrado automático | Cómo se elimina hoy |
 |---|---|---|
 | Documento de la demo RAG | Sí, a la hora | `DELETE /api/demo-rag/documents/:docId` o esperar |
 | Enlaces mágicos | Sí (TTL), 7 días después de vencer | Automático |
 | Sesión de refresco | Sí, a los 7 días | Cerrar sesión |
-| Solicitudes, accesos, cuentas, contactos | No | No hay rutas para borrarlos: un acceso se **revoca**, una solicitud se **rechaza** y quedan como registro |
-| Bitácora | No | No se puede editar ni borrar por API |
-| Bots del chatbot | No (pero se pierden al redesplegar) | `DELETE /api/chatbot/bots/:botId` |
+| Solicitudes rechazadas y prospectos sin actividad (contactos, lead, línea de tiempo, propuestas no aceptadas) | Sí: se **anonimizan** a los 24 meses (`DATA_RETENTION_MONTHS`) | Job de conservación diario, o Admin › Privacidad |
+| Cuentas, accesos, solicitudes aprobadas | No | Admin › Privacidad (`POST /api/admin/privacy/erase`), salvo cuentas del equipo o con registros contractuales |
+| Bitácora | No | No se puede editar por API; al suprimir o anonimizar a una persona se quitan sus datos del detalle |
+| Bots del chatbot | Sí: 12 meses sin uso (los marcados como de ejemplo, 30 días) | `DELETE /api/chatbot/bots/:botId` |
+| Preguntas al widget del chatbot | Sí, a los 30 días (índice TTL) | «Borrar historial» del bot, o Admin › Privacidad si contienen el email |
 | Documentos del gestor | No | Papelera y borrado definitivo en `/api/documents` |
 | Proyectos | No | `DELETE /api/projects/:id` (gerente) borra también tareas, miembros y actividad |
 
@@ -890,13 +905,14 @@ Lo que se guarda de cada persona y cómo se protege (el marco legal está en [SE
 | Dato | Dónde | Protección |
 |---|---|---|
 | Nombre, empresa, cargo, email, teléfono, país, caso de uso | `demorequests`, `contacts`, `users` | Solo lo ve el equipo en el panel |
-| Prueba de la autorización (Ley 1581) | `demorequests.consentimiento` | Fecha, versión de la política y navegador; la IP **solo en hash** |
+| Prueba de la autorización (Ley 1581) | `demorequests.consentimiento` y `contacts.consentimiento` | Fecha, versión de la política (la fija el servidor) y navegador; la IP **solo en hash** |
 | Contraseña | `users.password` | Hash bcrypt; nunca se devuelve |
 | Enlaces de activación y recuperación | `magiclinktokens` | Solo el hash; el token en claro no se guarda |
 | IP de quien hace una acción del equipo | `auditlogs.ipHash` | Solo en hash |
 | IP y email en los cupos | Claves `rl:*` y `demo-rag:docs:*` de Redis | Solo en hash y con vencimiento |
 | Documento subido a la demo RAG | Memoria del proceso | Se borra a la hora; nunca va a disco |
-| Email de la demo RAG | `contacts` (`source: demo-rag`) | Se registra como lead con la fecha de la autorización |
+| Email de la demo RAG | `contacts` (`source: demo-rag`) | Se registra como lead con la prueba de la autorización; si no se puede guardar, el documento no se procesa |
+| Preguntas al widget de un bot | `chatbot_turns` | Vencen a los 30 días; solo las ve el dueño del bot |
 
 ---
 
@@ -907,7 +923,8 @@ Lo que se guarda de cada persona y cómo se protege (el marco legal está en [SE
 | Modelos de Mongoose | `models/*.ts` (un archivo por modelo) |
 | Constantes del sistema de demos (estados, vigencias, roles por acción) | `config/demos.ts` |
 | Semilla del catálogo de demos | `data/demo-catalog.seed.ts` y `services/demo-catalog.service.ts` (`ensureCatalogSeeded`) |
-| Persistencia de los bots del chatbot | `data/chatbot-store.ts` |
+| Persistencia de los bots del chatbot | `models/ChatbotBot.ts`, `services/chatbot-store.service.ts` (migración del archivo heredado: `data/chatbot-store.ts`) |
+| Derechos del titular y conservación | `services/privacy.service.ts`, `services/retention.service.ts`, `jobs/retention.job.ts` |
 | Documentos de la demo RAG en memoria | `services/demo-rag.service.ts` |
 | Claves de Redis (gasto y cupos) | `services/ai-budget.service.ts`, `services/request-limits.service.ts`, `services/redis-lock.service.ts` |
 | Semillas de salud y de proyectos | `db/seeds/*.ts`, `scripts/seed-*.ts`, `scripts/import-medical-data.ts` |

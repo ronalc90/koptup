@@ -22,6 +22,7 @@ const TIMELINES = ['now', '1m', '3m', 'open'];
 export default function AdminContactsPage() {
   // Mismos textos del formulario de /contact para el plazo.
   const tContact = useTranslations('contactPage');
+  const tPrivacy = useTranslations('adminPrivacy');
   const [contacts, setContacts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -286,6 +287,19 @@ export default function AdminContactsPage() {
                         </p>
                       </div>
                     )}
+
+                    {/* Prueba de la autorización de datos (Ley 1581) que guardó el servidor. */}
+                    <div data-testid="contact-consent">
+                      <p className="text-xs text-secondary-500 mb-1">{tPrivacy('contactConsent.label')}</p>
+                      <p className="text-sm text-secondary-900 dark:text-white">
+                        {selectedContact.consentimiento?.aceptado
+                          ? tPrivacy('contactConsent.given', {
+                              date: formatDate(selectedContact.consentimiento.fecha),
+                              version: selectedContact.consentimiento.versionPolitica ?? '—',
+                            })
+                          : tPrivacy('contactConsent.none')}
+                      </p>
+                    </div>
 
                     <div>
                       <p className="text-xs text-secondary-500 mb-2">Mensaje</p>

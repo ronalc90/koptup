@@ -31,13 +31,12 @@ describeDbRedis('contacto con cotización (integración)', () => {
   const ip = () => `10.88.${Math.floor(n / 250)}.${(n++ % 250) + 1}`;
 
   // Campos que el formulario siempre envía (incluida la autorización de datos,
-  // si el backend la exige).
+  // que el backend exige).
   const base = (email: string) => ({
     name: 'Carolina Prueba',
     email,
     message: 'Quiero cotizar esta solución para mi empresa.',
-    consent: true,
-    acceptPrivacy: true,
+    consentimiento: true,
   });
 
   it('guarda nivel y modalidad de una solución del catálogo', async () => {

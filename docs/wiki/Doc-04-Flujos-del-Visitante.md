@@ -414,7 +414,7 @@ El formulario de `/contact` es el destino de "Agenda un piloto", de los botones 
 
 ![GIF del formulario de contacto](images/doc/visitante/f3-contacto.gif)
 
-*GIF: Carolina llena el formulario, lo envía y el lead aparece en el panel.*
+*GIF: Carolina llena el formulario, marca la autorización de datos, lo envía y ve la confirmación.*
 
 ### Paso 1. El formulario
 
@@ -428,7 +428,8 @@ El formulario de `/contact` es el destino de "Agenda un piloto", de los botones 
 4. **Presupuesto estimado** (opcional): cinco rangos en pesos colombianos sin IVA, de "Menos de COP 5.000.000" a "Más de COP 60.000.000" (coherentes con los precios publicados).
 5. **¿Cuándo quieres empezar?** (opcional): ya, el próximo mes, en 2-3 meses o sin definir. Se guarda con el contacto y el equipo lo ve en Admin › Contactos.
 6. **Cuéntanos sobre tu proyecto** (obligatorio).
-7. **Enviar mensaje.**
+7. **Autorización de tratamiento de datos** (obligatoria): "Autorizo a KopTup a tratar mis datos personales para responder este mensaje, según la Ley 1581 de 2012 y la política de privacidad", con enlace a `/privacy`. Sin marcarla, el formulario no se envía y la señala.
+8. **Enviar mensaje.**
 
 Teléfono y Empresa son opcionales. En la columna derecha, **Agendar ahora** (más abajo) abre el programa de correo del visitante con un mensaje ya escrito para pedir una llamada de 30 minutos; no pasa por el servidor.
 
@@ -436,7 +437,7 @@ Teléfono y Empresa son opcionales. En la columna derecha, **Agendar ahora** (m�
 
 ![Formulario de contacto lleno](images/doc/visitante/f3-02-formulario-lleno.jpg)
 
-*Carolina pide un asistente para sus vendedores con el catálogo de productos.*
+*Carolina pide un asistente para sus vendedores con el catálogo de productos y marca la autorización.*
 
 ### Paso 3. Confirmación
 
@@ -444,7 +445,7 @@ Teléfono y Empresa son opcionales. En la columna derecha, **Agendar ahora** (m�
 
 *"¡Mensaje enviado!" con la invitación a probar la demo mientras tanto.*
 
-La confirmación dice "Gracias por contactarnos. Te responderemos pronto" y ofrece **Probar la demo** (`/demo/chatbot`). A los 6 segundos el formulario vuelve a aparecer vacío. Si el envío falla, se muestra un aviso rojo arriba del formulario que dice qué pasó (faltan datos obligatorios, demasiados envíos seguidos o sin conexión con el servidor) y los datos se conservan.
+La confirmación dice "Gracias por contactarnos. Te responderemos pronto" y ofrece **Probar la demo** (`/demo/chatbot`). A los 6 segundos el formulario vuelve a aparecer vacío. Si el envío falla, se muestra un aviso rojo arriba del formulario que dice qué pasó (demasiados envíos seguidos, sin conexión con el servidor o "Revisa los campos marcados") y los datos se conservan. Cuando el servidor rechaza un dato, dice cuál: el campo queda marcado en rojo con su motivo (por ejemplo, "Escribe un email válido.") y recibe el foco.
 
 ### A dónde llega el lead
 
@@ -459,8 +460,8 @@ sequenceDiagram
     actor E as Equipo KopTup
     V->>W: Envía el formulario
     W->>A: POST /api/contact
-    A->>A: Valida nombre, email, servicio y mensaje
-    A->>M: Guarda el contacto, origen contact-form, estado Nuevo
+    A->>A: Revisa el campo trampa, la autorización y valida cada campo
+    A->>M: Guarda el contacto, origen contact-form, estado Nuevo<br/>con la prueba de la autorización
     A-->>W: Respuesta OK
     W-->>V: Mensaje enviado
     A--)N: Aviso al equipo, sin esperar
@@ -470,7 +471,7 @@ sequenceDiagram
 
 *El guardado se espera; los avisos van aparte y nunca hacen fallar el envío.*
 
-1. **Se guarda** en la colección de contactos con estado **Nuevo** y origen `contact-form`. Se guardan nombre, email, teléfono, empresa, servicio (con el plan, o el nivel y la modalidad, si vino de un plan RAG o de "Cotizar este tier"), presupuesto, plazo y mensaje; lo que se cotizaba queda además como identificadores en `cotizacion`.
+1. **Se guarda** en la colección de contactos con estado **Nuevo** y origen `contact-form`. Se guardan nombre, email, teléfono, empresa, servicio (con el plan, o el nivel y la modalidad, si vino de un plan RAG o de "Cotizar este tier"), presupuesto, plazo y mensaje; lo que se cotizaba queda además como identificadores en `cotizacion`. Como prueba de la autorización se guardan la fecha, la IP en hash (no la IP), el navegador y la versión de la política vigente en el servidor. Un campo oculto que las personas no ven filtra los bots: si llega lleno, el servidor responde como si nada y no guarda el mensaje.
 2. **Avisa al equipo** por correo (a la dirección configurada en `ADMIN_EMAIL`, si el servidor tiene SMTP) y por WhatsApp (al número `ADMIN_WHATSAPP_NUMBER`, si hay proveedor configurado). Si ninguno está configurado, el lead igual queda guardado.
 3. **Aparece en Admin › Contactos**, junto con los leads de la demo RAG y de las solicitudes de demo:
 
@@ -596,7 +597,7 @@ Texto: "Usamos cookies esenciales para que el sitio funcione. Si aceptas, tambi�
 
 1. **Configurar cookies** → `/cookies`.
 2. **Rechazar:** guarda "solo esenciales" y cierra el banner.
-3. **Aceptar:** activa analítica, marketing y funcionales; las etiquetas se cargan **en ese momento, sin recargar la página**. En la prueba, al aceptar el navegador pidió el script de Google Analytics.
+3. **Aceptar:** activa analítica y marketing; las etiquetas se cargan **en ese momento, sin recargar la página**. En la prueba, al aceptar el navegador pidió el script de Google Analytics.
 
 El banner no aparece en `/cookies` (esa página tiene sus propios controles) ni vuelve a aparecer una vez que se elige. La elección se guarda en el navegador (`localStorage`, clave `cookie_preferences`) con la fecha; si el navegador bloquea el almacenamiento, se respeta durante la visita.
 
@@ -604,16 +605,18 @@ El banner no aparece en `/cookies` (esa página tiene sus propios controles) ni 
 
 ![Preferencias de cookies, anotadas](images/doc/visitante/f5-03-cookies-preferencias.jpg)
 
-*Tipos de cookies con sus interruptores y los tres botones de preferencias.*
+*La tabla de cookies y datos del navegador que usa el sitio, con sus dos interruptores y los tres botones de preferencias.*
 
-1. **Cookies funcionales** (idioma y tema).
-2. **Cookies analíticas** (Google Analytics: `_ga`, `_ga_<ID>`).
-3. **Cookies de marketing** (Google Ads y LinkedIn: `_gcl_au`, `_gcl_aw`, `li_fat_id`, `bcookie`).
-4. **Aceptar Todas.**
-5. **Solo Esenciales.**
-6. **Guardar Preferencias:** guarda lo que marcaron los interruptores.
+La tabla nombra cada cookie o clave real, para qué sirve, cuánto dura y de quién es. Las **esenciales** (sesión, idioma, elección de cookies, tema, datos de las demos) están "Siempre activas".
 
-Las esenciales están "Siempre Activas". Cada botón confirma con una ventana del navegador ("Todas las cookies han sido aceptadas", "Solo cookies esenciales están habilitadas" o "Preferencias guardadas correctamente"). Si el visitante **retira** un consentimiento que había dado, la página se recarga para que ninguna etiqueta siga activa.
+1. **Analítica (opcional)** (Google Analytics: `_ga`, `_ga_<ID>`).
+2. **Publicidad (opcional)** (Google Ads y LinkedIn: `_gcl_au`, `_gcl_aw`, `li_fat_id`, `bcookie`, `lidc`, `UserMatchHistory`).
+3. **Aceptar todas.**
+4. **Solo esenciales.**
+5. **Guardar preferencias:** guarda lo que marcaron los interruptores.
+6. **Confirmación en la misma página** ("Guardamos tus preferencias.", "Aceptaste todas las cookies." o "Solo usaremos las esenciales."), sin ventanas del navegador.
+
+Si el visitante **retira** un consentimiento que había dado, la página se recarga para que ninguna etiqueta siga activa.
 
 Los eventos que se miden cuando hay consentimiento están en la [sección 8](#8-qué-mide-cada-flujo). Las rutas con datos sensibles en la URL (`/auth/…`, `/reset-password`, `/activar/…`) nunca cargan etiquetas.
 
@@ -696,7 +699,7 @@ Reglas que conviene recordar:
 
 - **Demo RAG con documento propio:** 5 MB, 30 páginas, 10 preguntas por documento, 3 documentos por conexión al día (Redis), preguntas de hasta 500 caracteres, 10 intentos de subida y 30 preguntas por conexión cada 10 minutos, vida de 1 hora en memoria. Se enciende con `DEMO_UPLOAD_ENABLED=true` y necesita Redis y la clave de OpenAI.
 - **Leads:** los tres orígenes (`contact-form`, `demo-rag`, `demo-request`) pasan por `registerLeadWithNotifications` y terminan en la colección `Contact`.
-- **Contacto:** valida `name`, `email`, `service` y `message`; 5 envíos por minuto por conexión.
+- **Contacto:** honeypot `website`, autorización obligatoria (`consentimiento: true`) y validación de cada campo con su mensaje (`{ code, message, fields, errores }` en el 400); guarda la prueba de la autorización con la versión de la política del servidor; 5 envíos por minuto por conexión.
 - **Solicitud de demo:** validación con zod, honeypot `website`, autorización obligatoria, cupos por conexión y por email, fusión con una solicitud abierta del mismo email en 30 días.
 
 La referencia completa de endpoints está en [API](Doc-08-API.md) y la de colecciones en [Modelos de datos](Doc-09-Modelos-de-Datos.md).

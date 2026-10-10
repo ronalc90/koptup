@@ -126,7 +126,7 @@ flowchart TD
     F1["Sube PDF, DOCX o TXT de hasta 5 MB y 30 páginas<br/>con su email y la autorización de datos<br/>máximo 3 documentos al día por IP"]:::visitante
     Q2{"¿Archivo, email,<br/>autorización y cupo<br/>válidos?"}:::decision
     ER2["Error con su motivo: formato, tamaño, páginas,<br/>email, autorización o límite por IP"]:::error
-    S1["Documento solo en memoria por 1 hora<br/>lead con origen demo-rag"]:::sistema
+    S1["Primero guarda el lead con origen demo-rag<br/>y la prueba de autorización; si no puede,<br/>no procesa el documento y lo dice<br/>documento solo en memoria por 1 hora"]:::sistema
     N1["Aviso al equipo por email y WhatsApp"]:::aviso
     CH["Hasta 10 preguntas con citas<br/>evento demo_upload al subir"]:::visitante
     Q3{"¿Llegó a 10 preguntas<br/>o pasó la hora?"}:::decision
@@ -306,19 +306,23 @@ flowchart TD
     IN3["Botón Solicitar cotización<br/>al cierre de cada demo"]:::visitante
     Q0{"¿Llega con ?service?"}:::decision
     PRE["Banner Estás cotizando<br/>servicio elegido y mensaje prellenado"]:::sistema
-    FM["Nombre, email, servicio y mensaje obligatorios<br/>teléfono, empresa, presupuesto y plazo opcionales"]:::visitante
-    Q1{"¿Obligatorios llenos?<br/>lo revisa el navegador"}:::decision
-    E0["El navegador marca el campo"]:::error
-    P["POST /api/contact<br/>el plan viaja dentro del servicio si sigue elegido"]:::sistema
+    FM["Nombre, email, servicio, mensaje y casilla de autorización<br/>con enlace a /privacy obligatorios<br/>teléfono, empresa, presupuesto y plazo opcionales"]:::visitante
+    Q1{"¿Obligatorios llenos<br/>y autorización marcada?"}:::decision
+    E0["El navegador o el formulario<br/>marca el campo"]:::error
+    P["POST /api/contact<br/>con la autorización y el campo trampa oculto<br/>el plan viaja dentro del servicio si sigue elegido"]:::sistema
     Q2{"¿Menos de 5 envíos<br/>por minuto por IP?"}:::decision
-    Q3{"¿Nombre, email, servicio<br/>y mensaje válidos?"}:::decision
-    SAVE["Guarda el Contact<br/>estado new, origen contact-form<br/>el plazo no se guarda"]:::sistema
+    E429["Enviaste varios mensajes seguidos:<br/>espera un minuto"]:::error
+    HP{"¿Campo trampa lleno?"}:::decision
+    BOT["Responde como si se hubiera enviado<br/>y no guarda nada"]:::sistema
+    Q3{"¿Autorización, nombre, email,<br/>servicio y mensaje válidos?"}:::decision
+    E400["El servidor dice qué campo falló<br/>el formulario lo marca: Revisa los campos marcados"]:::error
+    SAVE["Guarda el Contact: estado new, origen contact-form, plazo<br/>y prueba de autorización: fecha, IP en hash,<br/>navegador y versión de la política del servidor"]:::sistema
     Q4{"¿Se guardó en MongoDB?"}:::decision
     AV["Aviso al equipo por WhatsApp y email<br/>sin esperar, si están configurados"]:::aviso
-    ADM["El equipo lo ve en Admin: Contactos"]:::admin
+    ADM["El equipo lo ve en Admin: Contactos<br/>con el plazo y la autorización"]:::admin
     OK["Mensaje enviado + botón Probar la demo<br/>el formulario se limpia a los 6 s"]:::visitante
     GL["Evento generate_lead<br/>servicio y plan, sin datos personales"]:::externo
-    ERR["Error al enviar el mensaje:<br/>intenta de nuevo o escríbenos por WhatsApp"]:::error
+    ERR["Error al enviar el mensaje o sin conexión:<br/>intenta de nuevo o escríbenos por WhatsApp"]:::error
     WA["Botón de WhatsApp de la página<br/>evento whatsapp_click"]:::aviso
 
     IN1 --> Q0
@@ -329,9 +333,11 @@ flowchart TD
     FM --> Q1
     Q1 -->|No| E0 --> FM
     Q1 -->|Sí| P --> Q2
-    Q2 -->|No| ERR
-    Q2 -->|Sí| Q3
-    Q3 -->|No| ERR
+    Q2 -->|No| E429
+    Q2 -->|Sí| HP
+    HP -->|Sí, es un bot| BOT
+    HP -->|No| Q3
+    Q3 -->|No| E400 --> FM
     Q3 -->|Sí| SAVE --> Q4
     Q4 -->|Error| ERR
     Q4 -->|Sí| OK
@@ -342,7 +348,7 @@ flowchart TD
 
 ![Diagrama: Formulario de contacto](images/doc/flujos/Doc-14-1-Flujos-de-Negocio-5.png)
 
-El formulario de `/contact` guarda un lead y avisa al equipo; no crea cuenta ni envía acuse a la persona. Cualquier falla del servidor (límite, validación o base de datos) muestra el mismo mensaje genérico con la salida a WhatsApp.
+El formulario de `/contact` guarda un lead y avisa al equipo; no crea cuenta ni envía acuse a la persona. Sin la casilla de autorización (Ley 1581) no se envía, y el servidor la vuelve a exigir: guarda como prueba la fecha, la IP en hash, el navegador y la versión de la política que tiene configurada el servidor. Un campo oculto que una persona deja vacío filtra los bots: si llega lleno, la respuesta es la de un envío normal pero no se guarda nada. Cada falla tiene su mensaje: límite de envíos, el campo que el servidor rechazó, sin conexión o error del servidor (con la salida a WhatsApp).
 
 Fuente en el código: `apps/web/src/app/contact/page.tsx`, `apps/web/src/lib/api.ts`, `apps/backend/src/routes/contact.routes.ts`, `apps/backend/src/controllers/contact.controller.ts`, `apps/backend/src/services/lead.service.ts`, `apps/backend/src/models/Contact.ts`, `apps/backend/src/middleware/rateLimiter.ts`.
 
@@ -1093,12 +1099,9 @@ Fuente en el código: `apps/backend/src/models/DemoGrant.ts`, `apps/backend/src/
 Cosas que los diagramas muestran tal como están en el código y que conviene revisar:
 
 1. **Una solicitud fusionada no avisa a nadie.** Si el mismo email vuelve a enviar el formulario con una solicitud abierta de menos de 30 días, se suman las demos y se agrega una nota, pero no se registra un lead nuevo, no se avisa al equipo por email ni WhatsApp y no se envía acuse. El equipo solo lo ve si abre la solicitud (`createDemoRequest` en `apps/backend/src/services/demo-requests.service.ts`).
-2. **El formulario de contacto no pide autorización de datos.** A diferencia de "Solicitar demo" y "Prueba con tu documento", `/contact` guarda nombre, email y teléfono sin casilla de autorización (Ley 1581) y sin campo trampa contra bots (`apps/web/src/app/contact/page.tsx`, `apps/backend/src/routes/contact.routes.ts`).
-3. **El backend no dice qué campo falló en el contacto.** La web distingue límite de envíos, datos inválidos y falta de conexión, pero ante un 400 el backend responde solo "Validation error", así que el formulario no puede señalar el campo (`apps/backend/src/controllers/contact.controller.ts`).
-4. **Botones de inicio de sesión que no llevan a ningún lado.** El botón de GitHub no hace nada; el de Google, si el servidor no tiene Google OAuth configurado, deja a la persona en una respuesta JSON 503 del backend en lugar de volver a `/login` con un mensaje. La casilla "Recordarme" no cambia nada: las cookies duran siempre 15 min y 7 días (`apps/web/src/app/login/page.tsx`, `apps/backend/src/routes/auth.routes.ts`, `apps/web/src/lib/api.ts`).
-5. **Código de idioma sin uso.** El botón ES/EN guarda la cookie y recarga la misma URL (conserva los parámetros y el ancla), pero `apps/web/src/i18n/useToggleLocale.tsx` no se usa y nadie envía la cabecera `x-locale` que lee `apps/web/src/i18n/request.ts`.
-6. **Una sola sesión renovable por cuenta.** El token de renovación se guarda en Redis con la clave de la cuenta; iniciar sesión en un segundo navegador reemplaza el del primero, que se cierra cuando vence su token de acceso de 15 min (`issueSession` en `apps/backend/src/controllers/auth.controller.ts`).
-7. **Recuperar la contraseña sin correo configurado no tiene salida.** Sin SMTP la persona ve "te enviamos un enlace" pero no llega nada, y el panel no ofrece copiar ese enlace como sí hace con el de activación (`forgotPassword` en `apps/backend/src/controllers/auth.controller.ts`).
-8. **Mensajes de enlace menos claros al restablecer la contraseña.** El backend devuelve el motivo (usado, reemplazado o vencido), pero `/reset-password` muestra el mismo texto para todos; la activación sí los distingue.
-9. **El portal puede perder la ruta de regreso.** Si el navegador no tiene los datos del usuario guardados aunque la sesión siga viva, `DashboardLayout` manda a `/login` sin `redirect`, mientras que el filtro de la web sí lo incluye (`apps/web/src/components/dashboard/DashboardLayout.tsx`).
-10. **El panel no permite volver una solicitud a pendiente.** La API acepta pasar de "en revisión" a "pendiente", pero el panel solo ofrece "Marcar en revisión" (`apps/web/src/app/admin/solicitudes/[id]/page.tsx`).
+2. **Botones de inicio de sesión que no llevan a ningún lado.** El botón de GitHub no hace nada; el de Google, si el servidor no tiene Google OAuth configurado, deja a la persona en una respuesta JSON 503 del backend en lugar de volver a `/login` con un mensaje. La casilla "Recordarme" no cambia nada: las cookies duran siempre 15 min y 7 días (`apps/web/src/app/login/page.tsx`, `apps/backend/src/routes/auth.routes.ts`, `apps/web/src/lib/api.ts`).
+3. **Una sola sesión renovable por cuenta.** El token de renovación se guarda en Redis con la clave de la cuenta; iniciar sesión en un segundo navegador reemplaza el del primero, que se cierra cuando vence su token de acceso de 15 min (`issueSession` en `apps/backend/src/controllers/auth.controller.ts`).
+4. **Recuperar la contraseña sin correo configurado no tiene salida.** Sin SMTP la persona ve "te enviamos un enlace" pero no llega nada, y el panel no ofrece copiar ese enlace como sí hace con el de activación (`forgotPassword` en `apps/backend/src/controllers/auth.controller.ts`).
+5. **Mensajes de enlace menos claros al restablecer la contraseña.** El backend devuelve el motivo (usado, reemplazado o vencido), pero `/reset-password` muestra el mismo texto para todos; la activación sí los distingue.
+6. **El portal puede perder la ruta de regreso.** Si el navegador no tiene los datos del usuario guardados aunque la sesión siga viva, `DashboardLayout` manda a `/login` sin `redirect`, mientras que el filtro de la web sí lo incluye (`apps/web/src/components/dashboard/DashboardLayout.tsx`).
+7. **El panel no permite volver una solicitud a pendiente.** La API acepta pasar de "en revisión" a "pendiente", pero el panel solo ofrece "Marcar en revisión" (`apps/web/src/app/admin/solicitudes/[id]/page.tsx`).

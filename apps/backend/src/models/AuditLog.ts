@@ -16,6 +16,7 @@ import mongoose, { Document, Schema, Types } from 'mongoose';
  *    lead.migrate_contacts, proposal_request.create, proposal.* (create,
  *    update, duplicate, delete, accept, reject, convert, payment_options,
  *    payment_received, wompi_checkout) y settings.commerce_update.
+ *  - Datos personales: privacy.* (Admin › Privacidad).
  */
 export interface IAuditLog extends Document {
   actor?: Types.ObjectId | null;

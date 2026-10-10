@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import { track, trackWhatsappClick } from '@/lib/analytics';
 import { parseContactQuote, quotePayload, offeringNameKey } from '@/lib/contact-quote';
@@ -24,8 +24,12 @@ import {
 } from '@heroicons/react/24/outline';
 import { FaWhatsapp, FaLinkedin } from 'react-icons/fa';
 
+/** Campos del formulario que pueden traer un error del servidor (POST /api/contact). */
+const CONTACT_FIELDS = ['name', 'email', 'phone', 'company', 'service', 'budget', 'message', 'timeline', 'consentimiento', 'quote'];
+
 function ContactPageInner() {
   const t = useTranslations('contactPage');
+  const locale = useLocale();
   const tRag = useTranslations('ragPlans');
   const tCatalog = useTranslations('offeringsCatalog');
   const tAll = useTranslations();
@@ -70,6 +74,11 @@ function ContactPageInner() {
     message: '',
     timeline: '',
   });
+  // Autorización de datos (Ley 1581, obligatoria) y campo trampa contra bots:
+  // van aparte del formulario para no tocar el reinicio de los demás campos.
+  const [consent, setConsent] = useState(false);
+  const [website, setWebsite] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isScheduling, setIsScheduling] = useState(false);
@@ -93,8 +102,15 @@ function ContactPageInner() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setError('');
+    if (!consent) {
+      setFieldErrors({ consentimiento: t('form.fieldErrors.consentimiento') });
+      setError(t('form.errorCheckFields'));
+      document.getElementById('consentimiento')?.focus();
+      return;
+    }
+    setFieldErrors({});
+    setIsSubmitting(true);
 
     try {
       // Si sigue elegido el servicio que se estaba cotizando, el plan (o el
@@ -108,7 +124,7 @@ function ContactPageInner() {
             quote: quotePayload(quote),
           }
         : formData;
-      await api.submitContactForm(payload);
+      await api.submitContactForm({ ...payload, consentimiento: true, website });
 
       // Conversión `generate_lead` (solo envío exitoso). Sin datos personales:
       // el servicio solo si es una opción del formulario y el plan RAG por id.
@@ -133,19 +149,29 @@ function ContactPageInner() {
           message: '',
           timeline: '',
         });
+        setConsent(false);
       }, 6000);
     } catch (err: any) {
-      // Mensaje según lo que pasó (antes era siempre el mismo).
+      // Mensaje según lo que pasó: límite de envíos, red, o el campo que el
+      // servidor rechazó (en español se muestra su texto; en inglés, el propio).
       const status: number | undefined = err?.response?.status;
-      setError(
-        status === 400
-          ? t('form.errorValidation')
-          : status === 429
-            ? t('form.errorRateLimit')
-            : !err?.response
-              ? t('form.errorNetwork')
-              : t('form.errorSubmit'),
-      );
+      if (status === 400) {
+        const data = (err?.response?.data ?? {}) as { fields?: unknown; errores?: Record<string, string> };
+        const serverErrors = data.errores ?? {};
+        const fields = Array.isArray(data.fields) ? (data.fields as string[]) : Object.keys(serverErrors);
+        const mapped: Record<string, string> = {};
+        for (const raw of fields) {
+          const key = raw.split('.')[0];
+          if (!CONTACT_FIELDS.includes(key) || mapped[key]) continue;
+          mapped[key] = locale === 'es' && serverErrors[raw] ? serverErrors[raw] : t(`form.fieldErrors.${key}`);
+        }
+        setFieldErrors(mapped);
+        setError(Object.keys(mapped).length ? t('form.errorCheckFields') : t('form.errorValidation'));
+        const first = Object.keys(mapped)[0];
+        if (first) document.getElementById(first === 'quote' ? 'service' : first)?.focus();
+      } else {
+        setError(status === 429 ? t('form.errorRateLimit') : !err?.response ? t('form.errorNetwork') : t('form.errorSubmit'));
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -156,7 +182,18 @@ function ContactPageInner() {
       ...formData,
       [e.target.name]: e.target.value,
     });
+    if (fieldErrors[e.target.name]) setFieldErrors(({ [e.target.name]: _omit, ...rest }) => rest);
   };
+
+  /** Error del campo (validación del navegador o del servidor). */
+  const fieldError = (field: string) =>
+    fieldErrors[field] ? (
+      <p id={`${field}-error`} className="mt-1 text-sm text-red-600 dark:text-red-400">
+        {fieldErrors[field]}
+      </p>
+    ) : null;
+  const invalidProps = (field: string) =>
+    fieldErrors[field] ? { 'aria-invalid': true as const, 'aria-describedby': `${field}-error` } : {};
 
   const handleScheduleCall = () => {
     setIsScheduling(true);
@@ -332,7 +369,7 @@ function ContactPageInner() {
                     <form onSubmit={handleSubmit} className="space-y-6">
                       {/* Error Message */}
                       {error && (
-                        <div className="p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">
+                        <div role="alert" className="p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">
                           <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
                         </div>
                       )}
@@ -351,7 +388,9 @@ function ContactPageInner() {
                             onChange={handleChange}
                             className="w-full px-4 py-3 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                             placeholder={t('form.namePlaceholder')}
+                            {...invalidProps('name')}
                           />
+                          {fieldError('name')}
                         </div>
 
                         <div>
@@ -367,7 +406,9 @@ function ContactPageInner() {
                             onChange={handleChange}
                             className="w-full px-4 py-3 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                             placeholder={t('form.emailPlaceholder')}
+                            {...invalidProps('email')}
                           />
+                          {fieldError('email')}
                         </div>
 
                         <div>
@@ -382,7 +423,9 @@ function ContactPageInner() {
                             onChange={handleChange}
                             className="w-full px-4 py-3 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                             placeholder={t('form.phonePlaceholder')}
+                            {...invalidProps('phone')}
                           />
+                          {fieldError('phone')}
                         </div>
 
                         <div>
@@ -397,7 +440,9 @@ function ContactPageInner() {
                             onChange={handleChange}
                             className="w-full px-4 py-3 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                             placeholder={t('form.companyPlaceholder')}
+                            {...invalidProps('company')}
                           />
+                          {fieldError('company')}
                         </div>
 
                         <div>
@@ -419,6 +464,8 @@ function ContactPageInner() {
                               </option>
                             ))}
                           </select>
+                          {fieldError('service')}
+                          {fieldError('quote')}
                         </div>
 
                         <div>
@@ -439,6 +486,7 @@ function ContactPageInner() {
                               </option>
                             ))}
                           </select>
+                          {fieldError('budget')}
                         </div>
                       </div>
 
@@ -461,6 +509,7 @@ function ContactPageInner() {
                             </option>
                           ))}
                         </select>
+                        {fieldError('timeline')}
                       </div>
 
                       <div>
@@ -476,7 +525,44 @@ function ContactPageInner() {
                           onChange={handleChange}
                           className="w-full px-4 py-3 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                           placeholder={t('form.messagePlaceholder')}
+                          {...invalidProps('message')}
                         />
+                        {fieldError('message')}
+                      </div>
+
+                      {/* Campo trampa: invisible para las personas; si llega lleno, el backend lo descarta. */}
+                      <div className="absolute -left-[10000px] top-auto w-px h-px overflow-hidden" aria-hidden="true">
+                        <label htmlFor="website">{t('form.honeypot')}</label>
+                        <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} />
+                      </div>
+
+                      {/* Autorización de datos (Ley 1581 de 2012): obligatoria; el servidor guarda la prueba. */}
+                      <div className="p-4 rounded-lg bg-secondary-50 dark:bg-secondary-900 border border-secondary-200 dark:border-secondary-800">
+                        <label htmlFor="consentimiento" className="flex items-start gap-3 cursor-pointer">
+                          <input
+                            id="consentimiento"
+                            name="consentimiento"
+                            type="checkbox"
+                            checked={consent}
+                            onChange={(e) => {
+                              setConsent(e.target.checked);
+                              if (e.target.checked && fieldErrors.consentimiento) setFieldErrors(({ consentimiento: _omit, ...rest }) => rest);
+                            }}
+                            className="mt-1 h-4 w-4 rounded border-secondary-400 text-primary-600 focus:ring-primary-500"
+                            {...invalidProps('consentimiento')}
+                          />
+                          <span className="text-sm text-secondary-700 dark:text-secondary-300">
+                            {t.rich('form.consent', {
+                              link: (chunks) => (
+                                <Link href="/privacy" target="_blank" className="text-primary-600 dark:text-primary-400 underline font-medium">
+                                  {chunks}
+                                </Link>
+                              ),
+                            })}{' '}
+                            <span className="text-red-500">*</span>
+                          </span>
+                        </label>
+                        {fieldError('consentimiento')}
                       </div>
 
                       <Button

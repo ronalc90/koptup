@@ -12,7 +12,26 @@ import {
   clearMessages,
   clearDocuments,
 } from '../controllers/chatbot.controller';
-import { load as loadState, persist as persistState } from '../data/chatbot-store';
+import {
+  addBotDocs,
+  appendTurns,
+  clearTurns,
+  countBots,
+  countTurnsByBot,
+  createStoredBot,
+  deleteBotCascade,
+  exampleBotIds,
+  findBot,
+  getBotChunks,
+  listTurns,
+  listVisibleBots,
+  maxBots,
+  removeBotDoc,
+  touchBot,
+  updateBotConfig,
+  type StoredBot,
+} from '../services/chatbot-store.service';
+import { CHATBOT_BOT_KINDS, type ChatbotBotKind } from '../models/ChatbotBot';
 import {
   ALLOWED_MODEL_IDS,
   DEFAULT_MODEL_ID,
@@ -29,7 +48,7 @@ import { safeFetchText, SafeFetchError } from '../services/safe-fetch.service';
 import { uploadRateLimiter } from '../middleware/rateLimiter';
 import { logger } from '../utils/logger';
 import { AppError, asyncHandler } from '../middleware/errorHandler';
-import { isStaffRole, loadFreshUser, readBearer } from '../middleware/access';
+import { isDbReady, isStaffRole, loadFreshUser, readBearer } from '../middleware/access';
 import type { AuthRequest } from '../types';
 import { errorBody, sendError } from '../utils/http-error';
 
@@ -83,6 +102,14 @@ router.delete('/documents/:sessionId', clearDocuments);
 //   GET    /api/chatbot/bots/:botId/conversations → histórico            [dueño]
 //   DELETE /api/chatbot/bots/:botId/conversations → limpiar histórico    [dueño]
 //
+// ALMACENAMIENTO: MongoDB (services/chatbot-store.service.ts). Sin base de
+// datos estas rutas responden 503. Las conversaciones solo se guardan cuando
+// el chat llega del widget de un bot de usuario (`channel: "widget"`, lo
+// envía /embed/chatbot fuera de la vista previa del Builder) y vencen solas
+// (CHATBOT_CONVERSATION_TTL_DAYS, 30 días por defecto). Las de los bots de
+// ejemplo (`kind: "sample"` o CHATBOT_EXAMPLE_BOT_IDS), "Prueba el asistente"
+// y la vista previa no se guardan.
+//
 // PROPIEDAD: al crear un bot el backend devuelve `ownerToken` (solo esa vez).
 // El cliente lo guarda y lo envía en la cabecera `X-Bot-Owner-Token` en las
 // rutas marcadas [dueño]. Se guarda solo su hash SHA-256. La cabecera acepta
@@ -97,7 +124,6 @@ const MAX_OWNER_TOKENS_PER_REQUEST = 50;
 
 /** Límites de la API de bots. */
 export const BOT_LIMITS = {
-  maxBots: 5000,
   maxMessageChars: 2000,
   maxHistoryItems: 10,
   maxHistoryItemChars: 2000,
@@ -121,78 +147,9 @@ export const BOT_LIMITS = {
   },
 } as const;
 
-interface BotDocMeta {
-  id: string;
-  name: string;
-  size: number;
-  mime: string;
-  hash: string;
-  uploadedAt: string;
-}
-
-interface BotConfig {
-  botId: string;
-  name: string;
-  color: string;
-  position: 'br' | 'bl' | 'tr' | 'tl';
-  avatar: string;
-  welcome: string;
-  systemPrompt: string;
-  tone: string;
-  languages: string[];
-  createdAt: string;
-  updatedAt: string;
-  docs: BotDocMeta[];
-  /** SHA-256 del token del propietario. Nunca se devuelve al cliente. */
-  ownerTokenHash?: string;
-}
-
+type BotDocMeta = StoredBot['docs'][number];
+type BotConfig = StoredBot;
 type BotChunk = RagChunk;
-
-interface ConversationTurn {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: string;
-  sources?: Array<{ id: string; name: string; score?: number; chunk?: string }>;
-  confidence?: number;
-}
-
-const botsStore = new Map<string, BotConfig>();
-const chunksStore = new Map<string, BotChunk[]>();
-const conversationsStore = new Map<string, ConversationTurn[]>();
-const docsStore = new Map<string, BotDocMeta[]>();
-
-// --- Persistencia file-based ------------------------------------------------
-//
-// Al arrancar el módulo rehidratamos los Maps desde disco; tras cada mutación
-// importante volcamos el estado a `data/chatbots/state.json` (o
-// CHATBOT_STATE_DIR). No es una BD: es un respaldo liviano para que la demo
-// sobreviva reinicios del proceso.
-
-(function hydrateFromDisk() {
-  const initial = loadState();
-  for (const [k, v] of initial.bots) botsStore.set(k, v as BotConfig);
-  for (const [k, v] of initial.docs) docsStore.set(k, v as BotDocMeta[]);
-  for (const [k, v] of initial.chunks) chunksStore.set(k, v as BotChunk[]);
-  for (const [k, v] of initial.conversations) {
-    conversationsStore.set(k, v as ConversationTurn[]);
-  }
-  for (const [botId, bot] of botsStore) {
-    const docs = docsStore.get(botId);
-    if (docs) bot.docs = docs;
-  }
-})();
-
-function snapshot() {
-  persistState({
-    bots: [...botsStore.entries()],
-    docs: [...docsStore.entries()],
-    chunks: [...chunksStore.entries()],
-    conversations: [...conversationsStore.entries()],
-    updatedAt: new Date().toISOString(),
-  });
-}
 
 /**
  * Errores de /bots con el formato único `{ success: false, code, message }`
@@ -206,6 +163,16 @@ const FIELD_ERROR_MESSAGES: Record<string, string> = {
   invalid_field: 'Revisa el campo: tiene un valor no válido.',
   field_too_long: 'Revisa el campo: es demasiado largo.',
 };
+
+/** Sin MongoDB los bots no se pueden leer ni guardar: 503 honesto. */
+function requireStorage(_req: Request, res: Response, next: () => void): void {
+  if (isDbReady()) {
+    next();
+    return;
+  }
+  sendError(res, 503, 'storage_unavailable', 'El chatbot no está disponible en este momento. Intenta de nuevo en unos minutos.');
+}
+router.use('/bots', requireStorage);
 
 // --- Propiedad ---------------------------------------------------------------
 
@@ -234,16 +201,6 @@ function newOwnerToken(): string {
   return crypto.randomBytes(32).toString('base64url');
 }
 
-/** Bots de ejemplo públicos (visibles para todos, editables solo por su dueño). */
-function exampleBotIds(): Set<string> {
-  return new Set(
-    (process.env.CHATBOT_EXAMPLE_BOT_IDS ?? '')
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean),
-  );
-}
-
 function isOwner(bot: BotConfig, tokens: string[]): boolean {
   if (!bot.ownerTokenHash) return false;
   return tokens.some((t) => safeEqualHex(hashOwnerToken(t), bot.ownerTokenHash as string));
@@ -258,7 +215,7 @@ function isOwner(bot: BotConfig, tokens: string[]): boolean {
  *    staff leído de la BD). Nadie lo "reclama" con un token.
  */
 async function requireOwner(req: Request, res: Response): Promise<BotConfig | null> {
-  const bot = botsStore.get(req.params.botId);
+  const bot = await findBot(req.params.botId);
   if (!bot) {
     sendError(res, 404, 'bot_not_found', BOT_NOT_FOUND_MESSAGE);
     return null;
@@ -352,16 +309,24 @@ function newBotId(): string {
   return 'kbot_' + crypto.randomBytes(8).toString('hex');
 }
 
-/** Mantiene `docsStore` sincronizado con `bot.docs` (single source of truth). */
-function syncDocs(bot: BotConfig): void {
-  docsStore.set(bot.botId, bot.docs);
-}
-
-/** Vista completa para el dueño (sin el hash del token). */
-function serializeBot(bot: BotConfig): Omit<BotConfig, 'ownerTokenHash'> & { owned: true } {
-  const rest: BotConfig = { ...bot };
-  delete rest.ownerTokenHash;
-  return { ...rest, docs: [...bot.docs], owned: true };
+/** Vista completa para el dueño (sin el hash del token ni datos internos). */
+function serializeBot(bot: BotConfig) {
+  return {
+    botId: bot.botId,
+    name: bot.name,
+    color: bot.color,
+    position: bot.position,
+    avatar: bot.avatar,
+    welcome: bot.welcome,
+    systemPrompt: bot.systemPrompt,
+    tone: bot.tone,
+    languages: [...bot.languages],
+    createdAt: bot.createdAt,
+    updatedAt: bot.updatedAt,
+    docs: [...bot.docs],
+    kind: bot.kind,
+    owned: true as const,
+  };
 }
 
 /** Vista pública (widget): sin prompt del sistema ni nombres de documentos. */
@@ -413,28 +378,31 @@ router.post('/bots', createBotLimiter, asyncHandler(async (req: Request, res: Re
     return;
   }
 
-  if (requestedId && botsStore.has(requestedId)) {
+  if (requestedId && (await findBot(requestedId))) {
     req.params.botId = requestedId;
     const bot = await requireOwner(req, res);
     if (!bot) return;
-    Object.assign(bot, parsed.patch);
-    bot.updatedAt = new Date().toISOString();
-    syncDocs(bot);
-    snapshot();
-    res.status(200).json(serializeBot(bot));
+    const updated = await updateBotConfig(bot.botId, parsed.patch);
+    if (!updated) {
+      sendError(res, 404, 'bot_not_found', BOT_NOT_FOUND_MESSAGE);
+      return;
+    }
+    res.status(200).json(serializeBot(updated));
     return;
   }
 
-  if (botsStore.size >= BOT_LIMITS.maxBots) {
+  if ((await countBots()) >= maxBots()) {
     sendError(res, 503, 'capacity', 'La demo alcanzó su capacidad de bots. Intenta más tarde.');
     return;
   }
 
+  // `kind: "sample"`: bot de ejemplo de una demo (sus conversaciones nunca se guardan).
+  const kind: ChatbotBotKind =
+    typeof body.kind === 'string' && (CHATBOT_BOT_KINDS as readonly string[]).includes(body.kind) ? (body.kind as ChatbotBotKind) : 'builder';
   const provided = readOwnerTokens(req);
   const ownerToken = provided.length === 1 ? provided[0] : newOwnerToken();
-  const now = new Date().toISOString();
   const id = requestedId ?? newBotId();
-  const bot: BotConfig = {
+  const bot = await createStoredBot({
     botId: id,
     name: parsed.patch.name || 'Demo Bot',
     color: parsed.patch.color || '#4F46E5',
@@ -444,14 +412,10 @@ router.post('/bots', createBotLimiter, asyncHandler(async (req: Request, res: Re
     systemPrompt: parsed.patch.systemPrompt || 'You are a helpful enterprise assistant.',
     tone: parsed.patch.tone || 'professional',
     languages: parsed.patch.languages ?? ['es', 'en'],
-    createdAt: now,
-    updatedAt: now,
     docs: [],
     ownerTokenHash: hashOwnerToken(ownerToken),
-  };
-  botsStore.set(id, bot);
-  syncDocs(bot);
-  snapshot();
+    kind,
+  });
   res.status(201).json({ ...serializeBot(bot), ownerToken });
 }));
 
@@ -460,16 +424,18 @@ router.post('/bots', createBotLimiter, asyncHandler(async (req: Request, res: Re
  * más los bots de ejemplo públicos (CHATBOT_EXAMPLE_BOT_IDS). Sin token solo
  * devuelve los de ejemplo. Paginación opcional con `?limit` y `?offset`.
  */
-router.get('/bots', (req: Request, res: Response) => {
+router.get('/bots', asyncHandler(async (req: Request, res: Response) => {
   const limit = Math.max(1, Math.min(500, Number(req.query.limit) || 100));
   const offset = Math.max(0, Number(req.query.offset) || 0);
   const tokens = readOwnerTokens(req);
   const examples = exampleBotIds();
-  const visible = [...botsStore.values()]
+  const candidates = await listVisibleBots(tokens.map(hashOwnerToken), [...examples]);
+  const visible = candidates
     .map((b) => ({ bot: b, owned: isOwner(b, tokens) }))
-    .filter(({ bot, owned }) => owned || examples.has(bot.botId))
-    .sort((a, b) => (b.bot.updatedAt || '').localeCompare(a.bot.updatedAt || ''));
-  const slice = visible.slice(offset, offset + limit).map(({ bot: b, owned }) => ({
+    .filter(({ bot, owned }) => owned || examples.has(bot.botId));
+  const page = visible.slice(offset, offset + limit);
+  const turns = await countTurnsByBot(page.filter((p) => p.owned).map((p) => p.bot.botId));
+  const slice = page.map(({ bot: b, owned }) => ({
     botId: b.botId,
     name: b.name,
     color: b.color,
@@ -477,17 +443,17 @@ router.get('/bots', (req: Request, res: Response) => {
     createdAt: b.createdAt,
     updatedAt: b.updatedAt,
     docsCount: b.docs.length,
-    chunksCount: owned ? (chunksStore.get(b.botId) ?? []).length : undefined,
-    conversationsCount: owned ? (conversationsStore.get(b.botId) ?? []).length : 0,
+    chunksCount: owned ? b.chunksCount : undefined,
+    conversationsCount: owned ? turns.get(b.botId) ?? 0 : 0,
     owned,
     example: examples.has(b.botId),
   }));
   res.json(slice);
-});
+}));
 
 /** GET /bots/:botId — config completa para el dueño; vista pública para el resto. */
-router.get('/bots/:botId', (req: Request, res: Response) => {
-  const bot = botsStore.get(req.params.botId);
+router.get('/bots/:botId', asyncHandler(async (req: Request, res: Response) => {
+  const bot = await findBot(req.params.botId);
   if (!bot) {
     sendError(res, 404, 'bot_not_found', BOT_NOT_FOUND_MESSAGE);
     return;
@@ -497,7 +463,7 @@ router.get('/bots/:botId', (req: Request, res: Response) => {
     return;
   }
   res.json(serializePublicBot(bot));
-});
+}));
 
 /** PATCH /bots/:botId — merge parcial validado. [dueño] */
 router.patch('/bots/:botId', asyncHandler(async (req: Request, res: Response) => {
@@ -508,11 +474,12 @@ router.patch('/bots/:botId', asyncHandler(async (req: Request, res: Response) =>
     sendError(res, 400, parsed.error, FIELD_ERROR_MESSAGES[parsed.error] ?? 'Revisa los datos del bot.', { field: parsed.field });
     return;
   }
-  Object.assign(bot, parsed.patch);
-  bot.updatedAt = new Date().toISOString();
-  syncDocs(bot);
-  snapshot();
-  res.json(serializeBot(bot));
+  const updated = await updateBotConfig(bot.botId, parsed.patch);
+  if (!updated) {
+    sendError(res, 404, 'bot_not_found', BOT_NOT_FOUND_MESSAGE);
+    return;
+  }
+  res.json(serializeBot(updated));
 }));
 
 /** DELETE /bots/:botId — borra el bot, sus docs, chunks y conversaciones. [dueño] */
@@ -520,11 +487,7 @@ router.delete('/bots/:botId', asyncHandler(async (req: Request, res: Response) =
   const bot = await requireOwner(req, res);
   if (!bot) return;
   const botId = bot.botId;
-  botsStore.delete(botId);
-  docsStore.delete(botId);
-  chunksStore.delete(botId);
-  conversationsStore.delete(botId);
-  snapshot();
+  await deleteBotCascade(botId);
   res.json({ deleted: true, botId });
 }));
 
@@ -557,9 +520,9 @@ router.post('/bots/:botId/docs', asyncHandler(async (req: Request, res: Response
     return;
   }
 
-  const added: BotDocMeta[] = [];
+  const added: Array<{ meta: BotDocMeta; chunks: BotChunk[] }> = [];
   const errors: Array<{ name: string; reason: string }> = [];
-  const existingChunks = chunksStore.get(bot.botId) ?? [];
+  let chunksTotal = bot.chunksCount;
 
   for (const f of incoming) {
     const name = path.basename(String(f?.name || 'document')).slice(0, 200);
@@ -598,11 +561,11 @@ router.post('/bots/:botId/docs', asyncHandler(async (req: Request, res: Response
 
     const id = 'doc_' + crypto.randomBytes(8).toString('hex');
     const fileChunks = chunkText(text, { docId: id, docName: name });
-    if (existingChunks.length + fileChunks.length > BOT_LIMITS.maxChunksPerBot) {
+    if (chunksTotal + fileChunks.length > BOT_LIMITS.maxChunksPerBot) {
       errors.push({ name, reason: 'bot_capacity' });
       continue;
     }
-    existingChunks.push(...fileChunks);
+    chunksTotal += fileChunks.length;
     const meta: BotDocMeta = {
       id,
       name,
@@ -611,33 +574,27 @@ router.post('/bots/:botId/docs', asyncHandler(async (req: Request, res: Response
       hash: crypto.createHash('sha256').update(buffer).digest('hex').slice(0, 16),
       uploadedAt: new Date().toISOString(),
     };
-    bot.docs.push(meta);
-    added.push(meta);
+    added.push({ meta, chunks: fileChunks });
   }
 
-  chunksStore.set(bot.botId, existingChunks);
   if (added.length > 0) {
-    bot.updatedAt = new Date().toISOString();
-    syncDocs(bot);
-    snapshot();
-    res.status(201).json({ docs: bot.docs, added, errors });
+    const updated = await addBotDocs(bot.botId, added);
+    if (!updated) {
+      sendError(res, 404, 'bot_not_found', BOT_NOT_FOUND_MESSAGE);
+      return;
+    }
+    res.status(201).json({ docs: updated.docs, added: added.map((a) => a.meta), errors });
     return;
   }
-  sendError(res, 422, 'no_valid_files', 'No pudimos leer ninguno de los archivos.', { docs: bot.docs, added, errors });
+  sendError(res, 422, 'no_valid_files', 'No pudimos leer ninguno de los archivos.', { docs: bot.docs, added: [], errors });
 }));
 
 /** DELETE /bots/:botId/docs/:docId — borra metadata + chunks asociados. [dueño] */
 router.delete('/bots/:botId/docs/:docId', asyncHandler(async (req: Request, res: Response) => {
   const bot = await requireOwner(req, res);
   if (!bot) return;
-  const docId = req.params.docId;
-  bot.docs = bot.docs.filter((d) => d.id !== docId);
-  const chunks = chunksStore.get(bot.botId) ?? [];
-  chunksStore.set(bot.botId, chunks.filter((c) => c.docId !== docId));
-  bot.updatedAt = new Date().toISOString();
-  syncDocs(bot);
-  snapshot();
-  res.json({ docs: bot.docs });
+  const updated = await removeBotDoc(bot.botId, req.params.docId);
+  res.json({ docs: updated?.docs ?? [] });
 }));
 
 /**
@@ -662,9 +619,9 @@ router.post('/bots/:botId/urls', asyncHandler(async (req: Request, res: Response
     return;
   }
 
-  const added: BotDocMeta[] = [];
+  const added: Array<{ meta: BotDocMeta; chunks: BotChunk[] }> = [];
   const errors: Array<{ url: string; reason: string }> = [];
-  const existingChunks = chunksStore.get(bot.botId) ?? [];
+  let chunksTotal = bot.chunksCount;
 
   for (const rawUrl of urls) {
     const url = String(rawUrl || '').trim().slice(0, 2048);
@@ -685,11 +642,11 @@ router.post('/bots/:botId/urls', asyncHandler(async (req: Request, res: Response
       const hostname = new URL(page.finalUrl).hostname;
       const id = 'doc_' + crypto.randomBytes(8).toString('hex');
       const chunks = chunkText(text, { docId: id, docName: hostname });
-      if (existingChunks.length + chunks.length > BOT_LIMITS.maxChunksPerBot) {
+      if (chunksTotal + chunks.length > BOT_LIMITS.maxChunksPerBot) {
         errors.push({ url, reason: 'bot_capacity' });
         continue;
       }
-      existingChunks.push(...chunks);
+      chunksTotal += chunks.length;
       const meta: BotDocMeta = {
         id,
         name: hostname,
@@ -698,26 +655,18 @@ router.post('/bots/:botId/urls', asyncHandler(async (req: Request, res: Response
         hash: crypto.createHash('sha256').update(url).digest('hex').slice(0, 16),
         uploadedAt: new Date().toISOString(),
       };
-      bot.docs.push(meta);
-      added.push(meta);
+      added.push({ meta, chunks });
     } catch (err: unknown) {
       errors.push({ url, reason: err instanceof SafeFetchError ? err.reason : 'fetch_failed' });
     }
   }
-  chunksStore.set(bot.botId, existingChunks);
-  bot.updatedAt = new Date().toISOString();
-  syncDocs(bot);
-  snapshot();
-  res.json({ docs: bot.docs, added, errors });
+  const updated = added.length > 0 ? await addBotDocs(bot.botId, added) : bot;
+  if (!updated) {
+    sendError(res, 404, 'bot_not_found', BOT_NOT_FOUND_MESSAGE);
+    return;
+  }
+  res.json({ docs: updated.docs, added: added.map((a) => a.meta), errors });
 }));
-
-/** Agrega un turno a la conversación del bot. Conserva últimos 200 turnos. */
-function appendConversation(botId: string, turn: ConversationTurn): void {
-  const list = conversationsStore.get(botId) ?? [];
-  list.push(turn);
-  if (list.length > 200) list.splice(0, list.length - 200);
-  conversationsStore.set(botId, list);
-}
 
 /**
  * GET /models — modelos permitidos (la lista blanca que ofrece la demo) y si
@@ -800,9 +749,9 @@ function sanitizeHistory(raw: unknown): Array<{ role: string; content: string }>
  *   3. Sin clave, sin presupuesto o si el proveedor falla: modo extractivo
  *      (cita los fragmentos) y lo dice en la respuesta.
  */
-router.post('/bots/:botId/chat', async (req: Request, res: Response) => {
+router.post('/bots/:botId/chat', asyncHandler(async (req: Request, res: Response) => {
   const botId = req.params.botId;
-  const bot = botsStore.get(botId);
+  const bot = await findBot(botId);
   if (!bot) {
     sendError(res, 404, 'bot_not_found', BOT_NOT_FOUND_MESSAGE);
     return;
@@ -822,7 +771,11 @@ router.post('/bots/:botId/chat', async (req: Request, res: Response) => {
     return;
   }
 
-  const allChunks = chunksStore.get(botId) ?? [];
+  const allChunks = await getBotChunks(bot);
+  await touchBot(bot);
+  // Historial: solo el widget de un bot de usuario (no "Prueba el asistente",
+  // ni la vista previa del Builder, ni los bots de ejemplo).
+  const keepHistory = req.body?.channel === 'widget' && bot.kind !== 'sample' && !exampleBotIds().has(botId);
   const requestedModel = typeof req.body?.model === 'string' ? req.body.model : DEFAULT_MODEL_ID;
   const safeModel = ALLOWED_MODEL_IDS.has(requestedModel) ? requestedModel : DEFAULT_MODEL_ID;
   const timestampStart = new Date().toISOString();
@@ -830,7 +783,7 @@ router.post('/bots/:botId/chat', async (req: Request, res: Response) => {
   const retrieved = retrieve(message, allChunks, 5);
   const sources = retrieved.map((r, i) => formatSource(r, i));
 
-  function finish(payload: {
+  async function finish(payload: {
     reply: string;
     confidence: number;
     latencyMs: number;
@@ -839,21 +792,24 @@ router.post('/bots/:botId/chat', async (req: Request, res: Response) => {
     costUSD?: number;
     error?: string;
   }) {
-    appendConversation(botId, {
-      id: 'msg_' + crypto.randomBytes(6).toString('hex'),
-      role: 'user',
-      content: message,
-      timestamp: timestampStart,
-    });
-    appendConversation(botId, {
-      id: 'msg_' + crypto.randomBytes(6).toString('hex'),
-      role: 'assistant',
-      content: payload.reply,
-      timestamp: new Date().toISOString(),
-      sources: sources.map((s) => ({ id: s.id, name: s.name, score: s.score, chunk: s.chunk })),
-      confidence: payload.confidence,
-    });
-    snapshot();
+    if (keepHistory) {
+      await appendTurns(botId, [
+        {
+          id: 'msg_' + crypto.randomBytes(6).toString('hex'),
+          role: 'user',
+          content: message,
+          timestamp: timestampStart,
+        },
+        {
+          id: 'msg_' + crypto.randomBytes(6).toString('hex'),
+          role: 'assistant',
+          content: payload.reply,
+          timestamp: new Date().toISOString(),
+          sources: sources.map((s) => ({ id: s.id, name: s.name, score: s.score, chunk: s.chunk })),
+          confidence: payload.confidence,
+        },
+      ]).catch((err) => logger.error(`[chatbot] No se pudo guardar el historial: ${(err as Error)?.message ?? err}`));
+    }
     res.json({
       botId,
       reply: payload.reply,
@@ -868,14 +824,14 @@ router.post('/bots/:botId/chat', async (req: Request, res: Response) => {
     });
   }
 
-  function extractive(note: string | null, error?: string) {
+  async function extractive(note: string | null, error?: string) {
     const base =
       retrieved.length > 0
         ? composeExtractiveReply(retrieved)
         : allChunks.length === 0
           ? 'Aún no tienes documentos cargados. Sube un archivo o agrega una URL en el Builder y vuelve a preguntarme.'
           : NOT_FOUND_REPLY;
-    finish({
+    await finish({
       reply: note && retrieved.length > 0 ? `${note} ${base}` : base,
       confidence: retrieved.length > 0 ? 0.3 : 0,
       latencyMs: 50,
@@ -886,14 +842,14 @@ router.post('/bots/:botId/chat', async (req: Request, res: Response) => {
 
   // --- Sin LLM: modo extractivo puro -------------------------------------
   if (!process.env.OPENAI_API_KEY) {
-    extractive(null);
+    await extractive(null);
     return;
   }
 
   // --- Tope de gasto mensual (Redis, compartido con la infraestructura de demo-rag)
   const budget = await getBudgetStatus('chatbot');
   if (!budget.available) {
-    extractive(
+    await extractive(
       budget.reason === 'budget_exhausted'
         ? '(Modo extractivo: alcanzamos el cupo mensual de IA de esta demo.)'
         : '(Modo extractivo: la IA no está disponible en este momento.)',
@@ -928,7 +884,7 @@ router.post('/bots/:botId/chat', async (req: Request, res: Response) => {
     });
     const costUSD = estimateCostUSD(safeModel, result.promptTokens, result.completionTokens);
     await recordSpend('chatbot', costUSD);
-    finish({
+    await finish({
       reply: result.reply,
       confidence: retrieved.length > 0 ? 0.85 : 0.5,
       latencyMs: result.latencyMs,
@@ -953,7 +909,7 @@ router.post('/bots/:botId/chat', async (req: Request, res: Response) => {
         : allChunks.length === 0
           ? 'No pude generar la respuesta (error del proveedor LLM) y todavía no tienes documentos cargados.'
           : NOT_FOUND_REPLY;
-    finish({
+    await finish({
       reply: fallbackReply,
       confidence: retrieved.length > 0 ? 0.3 : 0,
       latencyMs,
@@ -961,23 +917,21 @@ router.post('/bots/:botId/chat', async (req: Request, res: Response) => {
       error: 'llm_provider_error',
     });
   }
-});
+}));
 
 /** GET /bots/:botId/conversations — últimos N turnos (default 50, máx 200). [dueño] */
 router.get('/bots/:botId/conversations', asyncHandler(async (req: Request, res: Response) => {
   const bot = await requireOwner(req, res);
   if (!bot) return;
   const limit = Math.max(1, Math.min(200, Number(req.query.limit) || 50));
-  const list = conversationsStore.get(bot.botId) ?? [];
-  res.json(list.slice(-limit));
+  res.json(await listTurns(bot.botId, limit));
 }));
 
 /** DELETE /bots/:botId/conversations — limpia el histórico del bot. [dueño] */
 router.delete('/bots/:botId/conversations', asyncHandler(async (req: Request, res: Response) => {
   const bot = await requireOwner(req, res);
   if (!bot) return;
-  conversationsStore.set(bot.botId, []);
-  snapshot();
+  await clearTurns(bot.botId);
   res.json({ cleared: true, botId: bot.botId });
 }));
 

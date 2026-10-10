@@ -50,6 +50,7 @@
    - [8.1 Solicitud de demo y cuenta](#81-solicitud-de-demo-y-cuenta)
    - [8.2 Demos con IA y navegador](#82-demos-con-ia-y-navegador)
    - [8.3 Qué se guarda, dónde y cuánto tiempo](#83-qué-se-guarda-dónde-y-cuánto-tiempo) (tabla)
+   - [8.4 Derechos del titular y plazo de conservación](#84-derechos-del-titular-y-plazo-de-conservación)
 9. [Hallazgos](#hallazgos)
 
 ---
@@ -439,7 +440,7 @@ flowchart TD
     Q1{"¿Campos de configuración<br/>válidos?"}:::decision
     E400["400 invalid_field<br/>o field_too_long"]:::error
     Q2{"¿Trae el botId de<br/>un bot existente?"}:::decision
-    Q3{"¿Hay menos de<br/>5.000 bots?"}:::decision
+    Q3{"¿Hay menos de<br/>20.000 bots?<br/>CHATBOT_MAX_BOTS"}:::decision
     E503["503 capacity"]:::error
     Q4{"¿Trae exactamente un<br/>token válido en la cabecera?"}:::decision
     REUSE["Reutiliza ese token<br/>una llave para todos los bots del navegador"]:::sistema
@@ -457,7 +458,7 @@ flowchart TD
     E403L["403 legacy_bot_staff_only"]:::error
     Q8{"¿El SHA-256 de algún token<br/>coincide? comparación de tiempo constante"}:::decision
     E403["403 forbidden_not_owner"]:::error
-    OK["Ejecuta la acción y guarda el estado<br/>data/chatbots/state.json"]:::sistema
+    OK["Ejecuta la acción y la guarda<br/>en MongoDB"]:::sistema
 
     C --> Q1
     Q1 -->|No| E400
@@ -523,7 +524,7 @@ flowchart TD
     S3["Bloques fijos de 500 caracteres"]:::sistema
     TK["Tokeniza cada fragmento para BM25<br/>minúsculas, palabras de 3 o más letras o dígitos"]:::sistema
     Q6{"¿El bot pasaría de<br/>5.000 fragmentos?"}:::decision
-    SAVE["Guarda metadatos y fragmentos<br/>en memoria y en data/chatbots/state.json"]:::sistema
+    SAVE["Guarda metadatos y fragmentos en MongoDB<br/>un registro de fragmentos por documento"]:::sistema
     Q7{"¿Se agregó al menos<br/>un archivo?"}:::decision
     R201["201 con docs, added y errors"]:::visitante
     R422["422 no_valid_files"]:::error
@@ -587,7 +588,8 @@ flowchart TD
     SP["Suma el costo al gasto del mes<br/>tokens por el precio del modelo"]:::sistema
     EX["Modo extractivo<br/>cita los fragmentos [1] a [n] recortados a 280 caracteres<br/>o «No encontré esa información»"]:::sistema
     FB["Modo extractivo con aviso<br/>cupo del mes agotado, IA no disponible<br/>o error del proveedor"]:::error
-    LOG["Guarda pregunta y respuesta en el historial del bot<br/>últimos 200 turnos, en disco"]:::sistema
+    HQ{"¿Llega del widget de un bot de usuario?<br/>channel widget, no es bot de ejemplo"}:::decision
+    LOG["Guarda pregunta y respuesta en MongoDB<br/>vencen a los 30 días, últimos 200 turnos"]:::sistema
     OUT["Respuesta con fuentes: documento, puntaje y texto<br/>confianza, modelo, latencia, tokens y costo"]:::visitante
 
     Q --> RL
@@ -601,11 +603,12 @@ flowchart TD
     K -->|Sí| B
     B -->|"No, o Redis no responde"| FB
     B -->|Sí| PR --> CX --> AI --> OK
-    OK -->|Sí| SP --> LOG
+    OK -->|Sí| SP --> HQ
     OK -->|"Error o más de 30 s"| FB
-    EX --> LOG
-    FB --> LOG
-    LOG --> OUT
+    EX --> HQ
+    FB --> HQ
+    HQ -->|Sí| LOG --> OUT
+    HQ -->|"No: Prueba el asistente, vista previa o ejemplo"| OUT
 ```
 
 ![Diagrama: Pipeline de una pregunta](images/doc/flujos/Doc-14-3-Flujos-Tecnicos-9.png)
@@ -626,7 +629,7 @@ sequenceDiagram
     box rgb(241,245,249) Sistema
         participant B as Backend
         participant R as Redis
-        participant D as Disco state.json
+        participant D as MongoDB
     end
     box rgb(253,244,255) Externo
         participant O as OpenAI
@@ -651,7 +654,9 @@ sequenceDiagram
             end
         end
     end
-    B->>D: Guarda pregunta y respuesta, últimos 200 turnos del bot
+    opt Widget de un bot de usuario
+        B->>D: Guarda pregunta y respuesta con vencimiento a 30 días, últimos 200 turnos
+    end
     B-->>N: reply, sources, confidence, model, latencyMs, tokens y costUSD
     N->>N: Muestra la respuesta, sus fuentes y los pasos del pipeline
 ```
@@ -700,7 +705,9 @@ flowchart TD
     REL["Devuelve el cupo diario<br/>DECR en Redis"]:::sistema
     E6["415 invalid_format, 422 too_many_pages,<br/>too_much_text, empty_document<br/>o unreadable_document, o 503 capacity"]:::error
     MEM["Guarda en memoria fragmentos e índice BM25<br/>vence en 1 hora, 0 de 10 preguntas"]:::sistema
-    LEAD["Registra el lead con origen demo-rag<br/>email y fecha de la autorización<br/>sin esperar: si falla, solo queda en el log"]:::sistema
+    LEAD["Registra el lead con origen demo-rag<br/>y la prueba de la autorización: fecha,<br/>versión de la política, hash de la IP"]:::sistema
+    QL{"¿Se guardó el lead?"}:::decision
+    E7["503 lead_unavailable<br/>el documento no se procesa<br/>y se devuelve el cupo"]:::error
     AV["Aviso al equipo por email y WhatsApp<br/>si están configurados"]:::aviso
     OK["201: documento listo<br/>el navegador guarda el docId en sessionStorage<br/>y registra el evento demo_upload"]:::visitante
 
@@ -716,16 +723,17 @@ flowchart TD
     Q3 -->|No| E4
     Q3 -->|Sí| Q4
     Q4 -->|"No, o Redis no responde"| E5
-    Q4 -->|Sí| EXT --> Q5
+    Q4 -->|Sí| LEAD --> QL
+    QL -->|No| E7
+    QL -->|Sí| AV
+    QL -->|Sí| EXT --> Q5
     Q5 -->|No| REL --> E6
-    Q5 -->|Sí| MEM
-    MEM --> LEAD --> AV
-    MEM --> OK
+    Q5 -->|Sí| MEM --> OK
 ```
 
 ![Diagrama: Subida del documento](images/doc/flujos/Doc-14-3-Flujos-Tecnicos-11.png)
 
-El cupo diario se reserva antes de procesar el archivo y se devuelve si el documento termina rechazado, así que un PDF dañado no le gasta un intento a la persona. El archivo original nunca se escribe en disco: se procesa desde la memoria y solo se conservan el texto partido y sus palabras. Esta ruta también cuenta en el límite general de la API (100 peticiones cada 15 min, diagrama 6.1).
+El cupo diario se reserva antes de procesar el archivo y se devuelve si el documento termina rechazado, así que un PDF dañado no le gasta un intento a la persona. El lead, con la prueba de la autorización, se guarda antes de procesar el documento: si no se puede guardar, el documento no se procesa y la persona ve que intente de nuevo en unos minutos. El archivo original nunca se escribe en disco: se procesa desde la memoria y solo se conservan el texto partido y sus palabras. Esta ruta también cuenta en el límite general de la API (100 peticiones cada 15 min, diagrama 6.1).
 
 Fuente en el código: `apps/backend/src/routes/demo-rag.routes.ts` (`POST /documents`, `parseMultipart`, `registerDemoLead`), `apps/backend/src/services/demo-rag.service.ts` (`getDemoStatus`, `assertDemoEnabled`, `detectKind`, `hasValidSignature`, `reserveDailyUpload`, `ingestDocument`, `DEMO_LIMITS`), `apps/backend/src/services/lead.service.ts`, `apps/web/src/app/demo/chatbot/components/upload/UploadForm.tsx`, `UploadDemo.tsx`.
 
@@ -817,11 +825,15 @@ sequenceDiagram
     B->>B: Encendido, formato, 5 MB, email y autorización
     B->>R: INCR y EXPIRE 24 h de demo-rag:docs, día y hash de la IP
     R-->>B: Documentos de hoy, máximo 3
+    B->>M: Contact con origen demo-rag y la prueba de la autorización
+    alt No se pudo guardar
+        B->>R: DECR del cupo diario
+        B-->>N: 503 lead_unavailable, sin procesar el documento
+    end
+    B-)A: Aviso al equipo con el email del lead
     B->>B: Firma, texto, páginas y fragmentos
     alt Documento válido
         B->>B: Fragmentos e índice en memoria por 1 hora
-        B-)M: Contact con origen demo-rag, sin esperar
-        B-)A: Aviso al equipo con el email del lead
         B-->>N: 201 con docId, páginas, 10 preguntas y expiresAt
     else Rechazado
         B->>R: DECR del cupo diario
@@ -851,7 +863,7 @@ sequenceDiagram
 
 ![Diagrama: Secuencia completa](images/doc/flujos/Doc-14-3-Flujos-Tecnicos-13.png)
 
-Todo el recorrido en el tiempo, con quién habla con quién. El lead y el aviso al equipo salen en paralelo y no frenan la respuesta. Si la persona recarga la pestaña, el navegador recupera el documento con `GET /documents/docId` usando el `docId` de `sessionStorage`, mientras siga en memoria.
+Todo el recorrido en el tiempo, con quién habla con quién. El lead se guarda antes de procesar el documento; el aviso al equipo sale en paralelo y no frena la respuesta. Si la persona recarga la pestaña, el navegador recupera el documento con `GET /documents/docId` usando el `docId` de `sessionStorage`, mientras siga en memoria.
 
 Fuente en el código: `apps/backend/src/routes/demo-rag.routes.ts`, `apps/backend/src/services/demo-rag.service.ts`, `apps/backend/src/services/ai-budget.service.ts`, `apps/backend/src/services/lead.service.ts`, `apps/web/src/app/demo/chatbot/components/upload/api.ts`, `UploadDemo.tsx` (`handleReset`).
 
@@ -1315,7 +1327,7 @@ flowchart TD
     AP["7. createApp: middleware y rutas<br/>diagrama 6.1"]:::sistema
     L["8. Abre el puerto PORT, 3001 por defecto<br/>tiempos de espera de 15 min para PDF grandes"]:::sistema
     J{"¿NODE_ENV test o<br/>DEMO_GRANTS_JOB_ENABLED=false?"}:::decision
-    J1["9. Inicia el job de vencimiento<br/>de accesos y recordatorios"]:::sistema
+    J1["9. Inicia los jobs con candado en Redis:<br/>accesos y recordatorios, propuestas<br/>y conservación de datos, diagrama 8.4"]:::sistema
     J0["Sin job en esta instancia"]:::sistema
     RD["Redis no se conecta al arrancar<br/>se conecta en la primera consulta"]:::sistema
     SG["SIGTERM o SIGINT: detiene el job,<br/>cierra el servidor y exit 0"]:::sistema
@@ -1340,7 +1352,7 @@ flowchart TD
 
 El backend prefiere arrancar degradado a no arrancar: sin base de datos abre el puerto igual (y lo dice `/health`), sin Google OAuth solo se apaga ese botón y sin Redis se apagan las funciones de IA públicas. Lo único que lo detiene es una variable imprescindible ausente en producción o un error no controlado.
 
-Fuente en el código: `apps/backend/src/index.ts` (`startServer`, `ensureAdminFromEnv`, `shutdown`), `apps/backend/src/config/mongodb.ts`, `apps/backend/src/config/redis.ts`, `apps/backend/src/config/passport.ts`, `apps/backend/src/services/demo-catalog.service.ts` (`ensureCatalogSeeded`), `apps/backend/src/jobs/demo-grants.job.ts` (`startDemoGrantsJob`), `apps/backend/railway.json`.
+Fuente en el código: `apps/backend/src/index.ts` (`startServer`, `ensureAdminFromEnv`, `shutdown`), `apps/backend/src/config/mongodb.ts`, `apps/backend/src/config/redis.ts`, `apps/backend/src/config/passport.ts`, `apps/backend/src/services/demo-catalog.service.ts` (`ensureCatalogSeeded`), `apps/backend/src/jobs/demo-grants.job.ts` (`startDemoGrantsJob`), `apps/backend/src/jobs/retention.job.ts` (`startRetentionJob`), `apps/backend/src/services/chatbot-store.service.ts` (`ensureChatbotMigrated`), `apps/backend/railway.json`.
 
 ---
 
@@ -1367,7 +1379,7 @@ flowchart TD
     NO["400 consent_required o invalid_request<br/>no guarda ningún dato"]:::error
     RL["Cupos en Redis: hash de la IP por 1 h<br/>y hash del email por 24 h, o en memoria"]:::sistema
     DR["MongoDB DemoRequest<br/>datos del formulario y la prueba de autorización:<br/>aceptado, fecha, versión de la política,<br/>hash de la IP y navegador"]:::sistema
-    CT["MongoDB Contact con origen demo-request<br/>nombre, email, teléfono, empresa, servicio<br/>y mensaje con la fecha de autorización"]:::sistema
+    CT["MongoDB Contact con origen demo-request<br/>nombre, email, teléfono, empresa, servicio<br/>y la misma prueba de autorización"]:::sistema
     NT["Email y WhatsApp al equipo con los datos del lead<br/>vía SMTP y Twilio, WhatsApp Business o UltraMsg"]:::aviso
     AK["Acuse al solicitante por email<br/>si hay SMTP"]:::aviso
     AP{"¿El equipo la aprueba?"}:::decision
@@ -1378,7 +1390,7 @@ flowchart TD
     RJ["Rechazada con motivo<br/>la solicitud se conserva"]:::error
     AU["MongoDB AuditLog<br/>acciones del equipo con hash de la IP"]:::sistema
     SES["Sesión: refresh token en Redis por 7 días<br/>cookies accessToken 15 min y refreshToken 7 días"]:::sistema
-    RET["Sin plazo de borrado: DemoRequest, Contact,<br/>User, DemoGrant y AuditLog se conservan<br/>no hay botón ni API para suprimirlos"]:::error
+    RET["Plazo de conservación: el job diario anonimiza<br/>solicitudes rechazadas y prospectos sin actividad<br/>a los 24 meses; Admin › Privacidad suprime a pedido"]:::sistema
     LG["Logs del servidor con morgan<br/>IP, ruta y navegador de cada petición<br/>retención según Railway"]:::externo
 
     F --> HP
@@ -1404,7 +1416,7 @@ flowchart TD
 
 ![Diagrama: Solicitud de demo y cuenta](images/doc/flujos/Doc-14-3-Flujos-Tecnicos-22.png)
 
-Este es el recorrido con la prueba de autorización más completa: la solicitud guarda fecha, versión de la política, hash de la IP y navegador. Si el mismo email vuelve a enviar el formulario con una solicitud abierta de menos de 30 días, se suman las demos a esa solicitud y la prueba de autorización se reemplaza por la nueva. La IP nunca se guarda en claro en MongoDB ni en Redis: solo su hash SHA-256 recortado. El formulario de `/contact` guarda un `Contact` parecido pero sin casilla de autorización (hallazgo 2 de [Flujos de negocio](Doc-14-1-Flujos-de-Negocio.md#hallazgos)).
+Este es el recorrido con la prueba de autorización más completa: la solicitud guarda fecha, versión de la política, hash de la IP y navegador. Si el mismo email vuelve a enviar el formulario con una solicitud abierta de menos de 30 días, se suman las demos a esa solicitud y la prueba de autorización se reemplaza por la nueva. La IP nunca se guarda en claro en MongoDB ni en Redis: solo su hash SHA-256 recortado. El formulario de `/contact` sigue el mismo patrón: campo trampa, casilla de autorización obligatoria y la prueba (`Contact.consentimiento`: fecha, versión de la política que fija el servidor, hash de la IP y navegador). El plazo de conservación y la supresión a pedido están en el diagrama 8.4.
 
 Fuente en el código: `apps/backend/src/routes/demo-public.routes.ts` (`POST /api/demo-requests`), `apps/backend/src/services/demo-requests.service.ts` (`createDemoRequest`), `apps/backend/src/models/DemoRequest.ts`, `Contact.ts`, `User.ts`, `DemoGrant.ts`, `MagicLinkToken.ts`, `AuditLog.ts`, `apps/backend/src/services/audit.service.ts` (`hashIp`), `apps/backend/src/services/lead.service.ts`, `apps/backend/src/controllers/auth.controller.ts` (`issueSession`).
 
@@ -1425,12 +1437,12 @@ flowchart TD
     U["Prueba con tu documento<br/>archivo, email y autorización"]:::visitante
     MEM["Memoria del backend: texto en fragmentos,<br/>índice BM25 e historial de 4 mensajes<br/>el archivo original no se guarda"]:::sistema
     B1["Se borra con lo primero que pase:<br/>1 hora, Subir otro documento<br/>o reinicio del backend"]:::sistema
-    LD["MongoDB Contact con origen demo-rag<br/>email y una línea con la fecha de autorización<br/>sin versión de la política ni hash de la IP"]:::sistema
+    LD["MongoDB Contact con origen demo-rag<br/>email y prueba de la autorización: fecha,<br/>versión de la política y hash de la IP"]:::sistema
     RC["Redis: documentos del día por hash de la IP, 24 h<br/>y contadores de límite con hash de la IP"]:::sistema
-    RET["Sin plazo de borrado del lead<br/>igual que en 8.1"]:::error
+    RET["Plazo de conservación del lead<br/>igual que en 8.1"]:::sistema
     CB["Prueba el asistente y Configura el tuyo<br/>documentos del bot y preguntas"]:::visitante
-    ST["Disco del backend: data/chatbots/state.json<br/>bots, fragmentos y últimas 200 preguntas<br/>y respuestas por bot, sin vencimiento"]:::sistema
-    B2["Se borra cuando el dueño borra el bot o el historial<br/>o con un despliegue nuevo, disco efímero"]:::sistema
+    ST["MongoDB: bots y fragmentos; preguntas solo del widget<br/>de un bot de usuario, vencen a los 30 días, máx. 200<br/>Prueba el asistente y la vista previa no se guardan"]:::sistema
+    B2["Bot sin uso: se borra a los 12 meses<br/>los de ejemplo a los 30 días<br/>o cuando el dueño lo borra"]:::sistema
     LI["Generador de LinkedIn<br/>datos de la demo elegida, sin datos personales"]:::visitante
     OA["OpenAI recibe extractos, historial reciente<br/>y la pregunta o los datos de la demo"]:::externo
     BR["Navegador: cookie_preferences y koptup.chatbot.myBots<br/>en localStorage, docId en sessionStorage<br/>y cookies de sesión"]:::visitante
@@ -1452,9 +1464,9 @@ flowchart TD
 
 ![Diagrama: Demos con IA y navegador](images/doc/flujos/Doc-14-3-Flujos-Tecnicos-23.png)
 
-El documento subido es lo único que tiene un vencimiento corto y garantizado. Las preguntas del chatbot, en cambio, quedan en el disco del backend sin vencimiento hasta que el dueño del bot las borra o hay un despliegue nuevo (ver Hallazgos). OpenAI recibe en cada llamada los extractos, el historial reciente y la pregunta (o los datos de la demo, en LinkedIn); el email y los datos de los formularios no se le envían.
+El documento subido vive como máximo una hora. Del chatbot solo se guardan las preguntas que llegan por el widget de un bot de usuario, y vencen solas a los 30 días (índice TTL de MongoDB); las de «Prueba el asistente», la vista previa y los bots de ejemplo no se guardan. OpenAI recibe en cada llamada los extractos, el historial reciente y la pregunta (o los datos de la demo, en LinkedIn); el email y los datos de los formularios no se le envían.
 
-Fuente en el código: `apps/backend/src/services/demo-rag.service.ts`, `apps/backend/src/routes/demo-rag.routes.ts` (`registerDemoLead`), `apps/backend/src/data/chatbot-store.ts`, `apps/backend/src/routes/chatbot.routes.ts` (`appendConversation`), `apps/backend/src/services/linkedin-ads.service.ts`, `apps/web/src/lib/cookie-consent.ts`, `apps/web/src/components/analytics/Analytics.tsx`, `apps/web/src/app/demo/chatbot/components/builder/api.ts`, `apps/web/src/app/demo/chatbot/components/upload/UploadDemo.tsx`.
+Fuente en el código: `apps/backend/src/services/demo-rag.service.ts`, `apps/backend/src/routes/demo-rag.routes.ts` (`registerDemoLead`), `apps/backend/src/services/chatbot-store.service.ts`, `apps/backend/src/models/ChatbotBot.ts`, `apps/backend/src/routes/chatbot.routes.ts` (`POST /bots/:botId/chat`, `keepHistory`), `apps/web/src/app/embed/chatbot/[botId]/embedChannel.ts`, `apps/backend/src/services/linkedin-ads.service.ts`, `apps/web/src/lib/cookie-consent.ts`, `apps/web/src/components/analytics/Analytics.tsx`, `apps/web/src/app/demo/chatbot/components/builder/api.ts`, `apps/web/src/app/demo/chatbot/components/upload/UploadDemo.tsx`.
 
 ---
 
@@ -1462,19 +1474,67 @@ Fuente en el código: `apps/backend/src/services/demo-rag.service.ts`, `apps/bac
 
 | Dato | Dónde | Cuánto tiempo | Cómo se borra |
 |---|---|---|---|
-| Solicitud de demo con la prueba de autorización (fecha, versión de la política, hash de la IP, navegador) | MongoDB `DemoRequest` | Sin plazo | No hay función en el panel ni en la API |
-| Lead de solicitar demo, contacto y demo RAG (nombre, email, teléfono, empresa, mensaje) | MongoDB `Contact` | Sin plazo | No hay función; solo se cambia su estado |
-| Cuenta del prospecto (email, nombre, empresa, teléfono, hash de la contraseña) | MongoDB `User` | Sin plazo | No hay función; solo se borra sola una cuenta invitada recién creada si la aprobación o la invitación fallan a medias |
-| Accesos a demos (vencimiento, visitas, último acceso) | MongoDB `DemoGrant` | Sin plazo: al vencer o revocarse cambian de estado | No hay función |
+| Solicitud de demo con la prueba de autorización (fecha, versión de la política, hash de la IP, navegador) | MongoDB `DemoRequest` | Rechazada: se anonimiza 24 meses después de la revisión. Pendiente sin actividad: 24 meses | Job de conservación (anonimiza) o Admin › Privacidad (suprime) |
+| Lead de solicitar demo, contacto y demo RAG (nombre, email, teléfono, empresa, mensaje, plazo y prueba de la autorización) | MongoDB `Contact`, `Lead`, `LeadActivity` | 24 meses sin actividad, si no es cliente ni tiene cuenta | Job de conservación (anonimiza) o Admin › Privacidad (suprime) |
+| Cuenta del prospecto (email, nombre, empresa, teléfono, hash de la contraseña) | MongoDB `User` | Mientras tenga la cuenta | Admin › Privacidad (suprime, salvo cuentas del equipo o con registros contractuales) |
+| Accesos a demos (vencimiento, visitas, último acceso) | MongoDB `DemoGrant` | Mientras exista la cuenta: al vencer o revocarse cambian de estado | Admin › Privacidad (con la cuenta) |
 | Enlace de activación o de restablecer contraseña | MongoDB `MagicLinkToken` (solo el hash) | 72 h o 1 h de vigencia | Automático, 7 días después de vencer (índice TTL) |
-| Bitácora de acciones del equipo | MongoDB `AuditLog` (hash de la IP) | Sin plazo | No hay función |
+| Bitácora de acciones del equipo | MongoDB `AuditLog` (hash de la IP) | Sin plazo (acciones del equipo) | Al suprimir o anonimizar a una persona, su detalle se reemplaza por `datosSuprimidos` o `datosAnonimizados` |
 | Sesión | Redis `refresh_token:<id>` y cookies | 7 días (Redis y `refreshToken`), 15 min (`accessToken`) | Automático, o al cerrar sesión |
 | Cupos por IP o email | Redis (hash) o memoria del proceso | De 10 min a 24 h | Automático |
 | Documento de «Prueba con tu documento» | Memoria del backend | 1 hora como máximo | Automático, botón «Subir otro documento» o reinicio |
-| Preguntas y respuestas del chatbot, bots y sus documentos | Disco del backend, `data/chatbots/state.json` | Sin vencimiento (últimas 200 por bot) | El dueño borra el bot o el historial, o un despliegue nuevo |
+| Bots del chatbot y sus documentos | MongoDB `chatbot_bots` y `chatbot_bot_chunks` | 12 meses sin uso (bots marcados como de ejemplo: 30 días) | Job de conservación, o el dueño borra el bot |
+| Preguntas y respuestas del widget de un bot de usuario | MongoDB `chatbot_turns` | 30 días (últimas 200 por bot) | Automático (índice TTL), el dueño borra el historial o Admin › Privacidad (si contienen el email) |
 | Avisos al equipo con los datos del lead | Correo (SMTP) y WhatsApp del equipo | Según esos servicios | Fuera del sistema |
 | Registros de peticiones (IP, ruta, navegador) | Logs del backend en Railway | Según Railway | Fuera del código |
 | Preferencias de cookies, tokens de dueño de los bots, `docId` | Navegador (`localStorage` y `sessionStorage`) | Hasta que la persona los borre; `sessionStorage` hasta cerrar la pestaña | En el navegador |
+
+---
+
+### 8.4 Derechos del titular y plazo de conservación
+
+```mermaid
+flowchart TD
+    classDef visitante fill:#dbeafe,stroke:#2563eb,color:#0f172a
+    classDef sistema fill:#f1f5f9,stroke:#475569,color:#0f172a
+    classDef admin fill:#f3e8ff,stroke:#9333ea,color:#0f172a
+    classDef aviso fill:#dcfce7,stroke:#16a34a,color:#0f172a
+    classDef decision fill:#fef3c7,stroke:#d97706,color:#0f172a
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#0f172a
+    classDef externo fill:#fdf4ff,stroke:#c026d3,color:#0f172a
+
+    T["El titular escribe a ronald@koptup.com<br/>consulta: 10 días hábiles; reclamo: 15"]:::visitante
+    A["Admin › Privacidad, solo rol admin<br/>POST /api/admin/privacy/search con el email"]:::admin
+    S["Busca por el email escrito y el normalizado:<br/>cuenta, contactos, solicitudes, accesos, enlaces,<br/>lead, actividad, propuestas, preguntas al chatbot,<br/>notificaciones, documentos, portal y bitácora"]:::sistema
+    X["Exportar JSON<br/>sin contraseñas ni hashes de enlaces"]:::admin
+    Q{"¿Escribe otra vez<br/>el mismo email?"}:::decision
+    E400["400 confirmation_mismatch"]:::error
+    B{"¿Cuenta del equipo o registros<br/>contractuales: propuesta aceptada o pagada,<br/>pedidos, proyectos, facturas?"}:::decision
+    E409["409: la supresión no procede<br/>se explica el motivo"]:::error
+    D["Borra los registros y quita los datos<br/>de la bitácora; cierra la sesión"]:::sistema
+    R["Constancia privacy.erase con una referencia<br/>SUP-AAAA-XXXXXXXX y conteos, sin datos personales"]:::aviso
+    J["Job de conservación diario<br/>candado jobs:retention:lock en Redis"]:::sistema
+    J1["Anonimiza solicitudes rechazadas<br/>y prospectos sin actividad: DATA_RETENTION_MONTHS, 24"]:::sistema
+    J2["Borra bots del chatbot sin uso<br/>12 meses, ejemplos 30 días"]:::sistema
+
+    T --> A --> S
+    S --> X
+    S --> Q
+    Q -->|No| E400
+    Q -->|Sí| B
+    B -->|Sí| E409
+    B -->|No| D --> R
+    J --> J1
+    J --> J2
+```
+
+![Diagrama: Derechos del titular y plazo de conservación](images/doc/flujos/Doc-14-3-Flujos-Tecnicos-24.png)
+
+*Supresión a pedido desde el panel y anonimización automática por plazo de conservación.*
+
+La supresión es irreversible y deja en la bitácora solo la acción, quién la hizo y una referencia aleatoria que el equipo le entrega al titular. No procede cuando la persona tiene una relación contractual cuyos registros la ley obliga a conservar; el panel lo explica en vez de borrar a medias. La anonimización automática conserva fechas, origen, servicio y etapa (útiles para estadísticas) y quita nombre, email, teléfono, empresa y mensajes.
+
+Fuente en el código: `apps/backend/src/services/privacy.service.ts` (`findPersonalData`, `erasureBlocks`, `erasePersonalData`), `apps/backend/src/routes/admin-privacy.routes.ts`, `apps/backend/src/services/retention.service.ts` (`applyRetention`), `apps/backend/src/jobs/retention.job.ts`, `apps/backend/src/services/chatbot-store.service.ts` (`purgeIdleBots`), `apps/web/src/app/admin/privacidad/page.tsx`.
 
 ---
 

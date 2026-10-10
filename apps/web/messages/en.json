@@ -296,161 +296,173 @@
   },
   "privacyPage": {
     "hero": {
-      "title": "Privacy Policy",
-      "subtitle": "How we collect, use and protect your personal information"
+      "title": "Privacy and data processing policy",
+      "subtitle": "What data we collect, what we use it for, who we share it with and how you exercise your rights under Colombian Law 1581 of 2012"
     },
-    "updatedBadge": "Updated: October 2026",
-    "heroClaim": "Your trust is our priority",
+    "updatedBadge": "Version 2026-10 · October 2026",
+    "heroClaim": "You can review, correct or ask us to delete your data",
     "intro": {
-      "title": "Introduction",
-      "p1": "KopTup - Tech Solutions (\"we\", \"our\" or \"the company\") is committed to protecting the privacy of our clients and users. This Privacy Policy describes how we collect, use, share and protect personal information when you use our software development, technology consulting and digital solutions services.",
-      "p2": "By using our services, you agree to the practices described in this policy. If you do not agree with this policy, please do not use our services."
+      "title": "Data controller",
+      "p1": "KopTup, located at Av. 68 #1-63, Bogotá, Colombia, is the controller of the personal data collected by this site (www.koptup.com) and its platform. For anything related to personal data, write to ronald@koptup.com or call +57 302 479 4842.",
+      "p2": "This policy explains what data we collect, what we use it for, who we share it with, how long we keep it and how you exercise your rights. When you submit a form you tick an authorization box: we store the date, the version of this policy and a hashed fingerprint of your IP address as proof of that authorization."
     },
     "s1": {
-      "title": "1. Information We Collect",
+      "title": "1. What data we collect and why",
       "c1": {
-        "subtitle": "1.1 Personal Information",
-        "text": "We collect information you provide directly to us, including: name, email address, phone number, company, billing information and any other information you choose to share with us when using our services."
+        "subtitle": "1.1 Contact form",
+        "text": "Your name and email and, if you fill them in, your phone, company, the service you are interested in, budget, when you want to start and your message. We use them to answer you, prepare a quote and follow up commercially. The team gets a notice by email and, if enabled, by WhatsApp."
       },
       "c2": {
-        "subtitle": "1.2 Usage Information",
-        "text": "We automatically collect information about your interaction with our services, including: IP address, browser type, pages visited, time spent, cookies and web analytics data."
+        "subtitle": "1.2 Demo request",
+        "text": "Your name, company, job title, email, phone, country, company size, the demos you are interested in, your use case and the page you came from (including the campaign parameters in the address). We use them to review your request, create your demo access account if we approve it and send you the request emails: the acknowledgment, the approval with the activation link and the notice before your access expires."
       },
       "c3": {
-        "subtitle": "1.3 Project Information",
-        "text": "When you hire our services, we collect information related to the project: technical requirements, documentation, shared files and communications related to development."
+        "subtitle": "1.3 \"Try it with your document\"",
+        "text": "Your email and the document you upload. The document is processed only in the server's memory and is deleted automatically one hour later. To answer your questions, the parts of the document related to each question are sent to OpenAI. Your email is recorded as a sales contact."
+      },
+      "c4": {
+        "subtitle": "1.4 Account and client portal",
+        "text": "If you create an account, or we create it when we approve a demo: name, email, password (stored only as a hash, never in plain text), company, phone and last sign-in date. If you sign in with Google, we receive your name, email and profile picture. If you are a client, we store your projects, orders, deliverables, invoices and messages with the team."
+      },
+      "c5": {
+        "subtitle": "1.5 Chatbot",
+        "text": "In \"Build your own\" we store your bot's settings, the documents or pages you load into it and the questions asked through the widget on your site or the direct link, which are deleted automatically after 30 days. Questions in \"Try the assistant\" and in the preview are not stored. To write each answer, the question and the matching passages are sent to OpenAI."
+      },
+      "c6": {
+        "subtitle": "1.6 Browsing and security",
+        "text": "When you use the site, the server logs technical data (IP address, browser, requested page and time) to operate, limit abuse and fix errors. In the team's action log and in the proof of your authorizations, the IP is kept only as a hashed fingerprint. Cookies and browser storage are explained in the Cookie policy."
       }
     },
     "s2": {
-      "title": "2. How We Use Your Information",
+      "title": "2. Who we share your data with",
       "c1": {
-        "subtitle": "2.1 Service Delivery",
-        "text": "We use your information to provide, maintain and improve our software development, technology consulting and digital solutions services."
+        "subtitle": "2.1 Hosting and databases",
+        "text": "Vercel hosts the website; Railway, the platform server; MongoDB is the database where records are stored, and Redis keeps temporary information such as sessions and usage limits. If we enable it, Amazon Web Services (S3) stores the files you upload to the document manager. They act as processors: they handle data on our behalf to provide their service."
       },
       "c2": {
-        "subtitle": "2.2 Communication",
-        "text": "To communicate with you about your projects, service updates, technical support and to answer your queries."
+        "subtitle": "2.2 Artificial intelligence",
+        "text": "OpenAI processes the text of the AI features (the chatbot, \"Try it with your document\" and the AI demos). It only receives what is needed to answer: the question, passages from the documents and the recent conversation history. We do not send it the data from the forms."
       },
       "c3": {
-        "subtitle": "2.3 Service Improvement",
-        "text": "We analyze the use of our services to improve user experience, develop new features and optimize our processes."
+        "subtitle": "2.3 Email and WhatsApp",
+        "text": "The email provider (SMTP) we use to send notices to the team and your request emails and, if enabled, the WhatsApp provider through which the team receives the notice of a new contact with your data."
       },
       "c4": {
-        "subtitle": "2.4 Marketing",
-        "text": "With your consent, we may send you information about new services, updates and special offers. You may unsubscribe at any time."
+        "subtitle": "2.4 Measurement and advertising, only if you accept them",
+        "text": "Google Analytics, Google Ads and LinkedIn receive data about your browsing only if you accept those cookies in the cookie notice or in the Cookie policy. You can withdraw that consent at any time."
+      },
+      "c5": {
+        "subtitle": "2.5 Sign in with Google",
+        "text": "If you choose to sign in with your Google account, Google confirms your identity and gives us your name, email and profile picture."
+      },
+      "c6": {
+        "subtitle": "2.6 Authorities and sale of data",
+        "text": "We only hand data over to an authority when a law or an order requires it. We do not sell, rent or transfer your personal data."
       }
     },
     "s3": {
-      "title": "3. Data Protection",
+      "title": "3. How long we keep your data",
       "c1": {
-        "subtitle": "3.1 Security Measures",
-        "text": "We implement appropriate technical and organizational security measures to protect your personal information against unauthorized access, alteration, disclosure or destruction. This includes SSL/TLS encryption, firewalls, access controls and regular security audits."
+        "subtitle": "3.1 Prospects and requests",
+        "text": "Rejected demo requests are anonymized automatically 24 months after they were rejected, and so is the data of people who have had no activity with us for 24 months (no account and no contract): name, email, phone and messages are deleted, and only statistical information remains."
       },
       "c2": {
-        "subtitle": "3.2 Limited Access",
-        "text": "Access to your personal information is limited to employees, contractors and agents who need to know this information to process it on our behalf and are subject to confidentiality obligations."
+        "subtitle": "3.2 Accounts and clients",
+        "text": "Your account data is kept while you have the account. Data from a contractual relationship (accepted proposals, payments, projects, invoices) is kept while it lasts and afterwards for as long as accounting, tax and commercial rules require."
       },
       "c3": {
-        "subtitle": "3.3 Storage",
-        "text": "Your data is stored on secure servers located in certified data centers. We use trusted cloud service providers like AWS that comply with international security standards."
+        "subtitle": "3.3 Chatbot and documents",
+        "text": "\"Try it with your document\" files: 1 hour. Questions to a bot's widget: 30 days. Bots from \"Build your own\" are deleted after 12 months without use, together with their documents and history."
+      },
+      "c4": {
+        "subtitle": "3.4 Sessions and links",
+        "text": "A signed-in session lasts at most 7 days; after that you sign in again. Activation links expire after 72 hours and password reset links after one hour."
       }
     },
     "s4": {
-      "title": "4. Sharing Information",
+      "title": "4. How we protect your data",
       "c1": {
-        "subtitle": "4.1 Service Providers",
-        "text": "We share information with external service providers who help us operate our business (hosting, analytics, payment processing), who are obligated to protect your information."
+        "subtitle": "4.1 Measures we apply",
+        "text": "Encrypted connection (HTTPS), passwords stored as hashes, admin panel access only for authorized team members according to their role, a log of the team's actions on requests and access, and submission limits against abuse."
       },
       "c2": {
-        "subtitle": "4.2 Legal Requirements",
-        "text": "We may disclose your information if required by law, a court order, or to protect our rights, property or safety."
-      },
-      "c3": {
-        "subtitle": "4.3 Business Transfers",
-        "text": "In the event of a merger, acquisition or sale of assets, your personal information may be transferred. We will notify you before your information is transferred and becomes subject to a different privacy policy."
-      },
-      "c4": {
-        "subtitle": "4.4 No Data Sale",
-        "text": "KopTup does NOT sell, rent or commercialize your personal information to third parties for advertising purposes."
+        "subtitle": "4.2 What we ask of you",
+        "text": "The demos are for testing: do not upload confidential information or other people's personal data to them. Use public or sample documents."
       }
     },
     "s5": {
-      "title": "5. Data Retention",
+      "title": "5. Authorization and sensitive data",
       "c1": {
-        "subtitle": "5.1 Retention Period",
-        "text": "We retain your personal information for as long as necessary to fulfill the purposes set out in this policy, unless the law requires or permits a longer retention period."
+        "subtitle": "5.1 Legal basis",
+        "text": "The authorization you give us by ticking the box on each form, or the need to perform the contract when you are a client. You can revoke the authorization at any time, except when the law or a current contract requires us to keep the data."
       },
       "c2": {
-        "subtitle": "5.2 Project Data",
-        "text": "Data related to projects is retained for the duration of the project and an additional period for support and warranty purposes, typically 1-3 years after completion."
-      },
-      "c3": {
-        "subtitle": "5.3 Deletion",
-        "text": "When we no longer need your information, we will securely delete it or anonymize it so that you cannot be identified."
+        "subtitle": "5.2 Sensitive data",
+        "text": "We do not ask for sensitive data (such as health data, ethnic origin or biometric data) and you are not required to provide it. If a document you upload to a demo contains it, it is processed like the rest of the document and deleted within the stated period."
       }
     },
     "rights": {
-      "title": "Your Rights",
-      "subtitle": "You have the right to control your personal information. Below are your rights:",
+      "title": "Your rights",
+      "subtitle": "As the owner of your data, Colombian Law 1581 of 2012 gives you these rights:",
       "r1": {
-        "title": "Access",
-        "description": "Request a copy of the personal information we hold about you."
+        "title": "Know and correct",
+        "description": "Know, update and rectify your data, including when it is incomplete or misleading."
       },
       "r2": {
-        "title": "Rectification",
-        "description": "Request correction of inaccurate or incomplete information."
+        "title": "Proof of authorization",
+        "description": "Request proof of the authorization you gave us (date and policy version)."
       },
       "r3": {
-        "title": "Deletion",
-        "description": "Request deletion of your personal information under certain circumstances."
+        "title": "Know how we use it",
+        "description": "Be told what data we hold about you and what we use it for."
       },
       "r4": {
-        "title": "Portability",
-        "description": "Receive your information in a structured and commonly used format."
+        "title": "Complain to the SIC",
+        "description": "File complaints with the Superintendence of Industry and Commerce after making your inquiry or claim with us."
       },
       "r5": {
-        "title": "Objection",
-        "description": "Object to the processing of your information for certain purposes."
+        "title": "Revoke and erase",
+        "description": "Revoke your authorization and ask us to delete your data, unless the law or a current contract requires us to keep it."
       },
       "r6": {
-        "title": "Restriction",
-        "description": "Request that we restrict the processing of your information."
+        "title": "Free access",
+        "description": "Access your personal data free of charge."
       },
-      "exerciseTitle": "How to Exercise Your Rights",
-      "exerciseText": "To exercise any of these rights, contact us through:",
-      "responseTime": "We will respond to your request within 30 business days."
+      "exerciseTitle": "How to exercise your rights",
+      "exerciseText": "Write to us from the email you used to contact us (or tell us how to verify that you are the data subject), with your name, what you are asking for and, for a claim, the facts and supporting documents:",
+      "responseTime": "We answer inquiries within 10 business days (extendable by 5 more business days, with notice) and claims within 15 business days (extendable by 8 more business days, with notice). If a claim is incomplete, we will ask you for what is missing within the following 5 days; if 2 months go by without it, we will consider the claim withdrawn."
     },
     "s6": {
-      "title": "6. Cookies and Similar Technologies",
-      "p1": "We use cookies and similar technologies to improve your experience, analyze the use of our services, measure the results of our ads and personalize content. Analytics and marketing cookies (Google Analytics, Google Ads and LinkedIn) are only activated with consent. Cookies are small text files stored on your device.",
-      "p2": "You can control the use of cookies through your browser settings. However, please note that disabling cookies may affect the functionality of our services.",
-      "p3": "For more information, see our",
-      "link": "Cookie Policy"
+      "title": "6. Cookies and browser storage",
+      "p1": "We use cookies and your browser's local storage to keep you signed in and remember your language, theme and cookie choice. Measurement (Google Analytics) and advertising (Google Ads and LinkedIn) cookies are only enabled if you accept them.",
+      "p2": "You can change your choice at any time from the Cookie policy or delete cookies from your browser.",
+      "p3": "To see each cookie and storage key with its purpose and duration, see the",
+      "link": "Cookie policy"
     },
     "s7": {
-      "title": "7. International Transfers",
-      "p1": "Your information may be transferred and stored on servers located outside Colombia. We take measures to ensure your information receives an adequate level of protection wherever it is processed.",
-      "p2": "By using our services, you consent to these international transfers of your information."
+      "title": "7. International transfers",
+      "p1": "Several of our providers (Vercel, Railway, OpenAI, Google and LinkedIn, among others) may store or process data outside Colombia, mainly in the United States.",
+      "p2": "The authorization you give us includes these providers processing your data on our behalf and only for the purposes of this policy."
     },
     "s8": {
-      "title": "8. Children's Privacy",
-      "p1": "Our services are not directed at individuals under 18 years of age. We do not intentionally collect personal information from minors. If we discover we have collected information from a minor without appropriate parental consent, we will delete that information immediately."
+      "title": "8. Minors",
+      "p1": "The site is aimed at businesses and is not intended for people under 18. If you wrote to us on behalf of a minor, let us know so we can erase their data."
     },
     "s9": {
-      "title": "9. Changes to this Policy",
-      "p1": "We may update this Privacy Policy periodically to reflect changes in our practices or for other operational, legal or regulatory reasons. The \"Last updated\" date at the top indicates when the policy was last reviewed.",
-      "p2": "We will notify you of material changes by posting the new policy on our website and, where appropriate, by email. We recommend reviewing this policy periodically."
+      "title": "9. Changes to this policy",
+      "p1": "If we change this policy, we publish the new version here with its date. Each authorization is stored with the version in force when you gave it, and if a change affects the purpose of the processing we will ask you for a new authorization.",
+      "p2": "Current version: 2026-10."
     },
     "s10": {
       "title": "10. Contact",
-      "text": "If you have questions, concerns or requests related to this Privacy Policy or our data handling practices, contact us:",
+      "text": "For questions about this policy or about your data, write to us:",
       "labelEmail": "Email:",
       "labelPhone": "Phone:",
       "labelAddress": "Address:"
     },
     "footer": {
-      "updated": "Last updated: October 2026",
-      "copyright": "© {year} KopTup - Tech Solutions. All rights reserved."
+      "updated": "Last updated: October 2026 (version 2026-10)",
+      "copyright": "© {year} KopTup. All rights reserved."
     }
   },
   "termsPage": {
@@ -458,7 +470,7 @@
       "title": "Terms & Conditions",
       "subtitle": "Legal framework governing the use of our services"
     },
-    "updatedBadge": "Updated: November 2025",
+    "updatedBadge": "Updated October 2026",
     "heroClaim": "Transparency and clarity in our business relationships",
     "intro": {
       "title": "Welcome to KopTup",
@@ -490,6 +502,10 @@
       "c3": {
         "subtitle": "2.3 Scope Changes",
         "text": "Any changes to the original project scope must be agreed in writing and may result in timeline and budget adjustments. Significant changes may require an addendum to the original contract."
+      },
+      "c4": {
+        "subtitle": "2.4 Demos and AI features",
+        "text": "The demos on this site use sample data and are meant for you to evaluate our solutions; they are not a production service. AI-generated answers may contain errors: review them before using them. Do not upload confidential information or other people's personal data to the demos. How we process your data is explained in the Privacy policy."
       }
     },
     "s3": {
@@ -605,158 +621,180 @@
       "labelWeb": "Website:"
     },
     "footer": {
-      "updated": "Last updated: November 2025",
-      "copyright": "© {year} KopTup - Tech Solutions. All rights reserved.",
+      "updated": "Last updated: October 2026",
+      "copyright": "© {year} KopTup. All rights reserved.",
       "linkPrivacy": "Privacy Policy",
       "linkCookies": "Cookie Policy"
     }
   },
   "cookiesPage": {
     "hero": {
-      "title": "Cookie Policy",
-      "subtitle": "Information about cookies and how we use them"
+      "title": "Cookie policy",
+      "subtitle": "Which cookies and browser data this site uses, what for and for how long"
     },
-    "updatedBadge": "Updated: October 2026",
-    "heroClaim": "Transparent preferences controlled by you",
+    "updatedBadge": "Updated October 2026",
+    "heroClaim": "Measurement and advertising cookies are only enabled if you accept them",
     "intro": {
-      "title": "What are Cookies?",
-      "p1": "Cookies are small text files stored on your device (computer, tablet or mobile) when you visit a website. Cookies allow the website to remember your actions and preferences over a period of time, so you don't have to re-enter them every time you return to the site or navigate from one page to another.",
-      "p2": "At KopTup we use cookies to improve your browsing experience, analyze the use of our site, measure the results of our ads and personalize content. This policy explains what cookies we use and why."
+      "title": "What are cookies?",
+      "p1": "Cookies are small files a site stores in your browser. Besides cookies, this site uses your browser's local storage (localStorage and sessionStorage) to remember some things without sending them to any server.",
+      "p2": "Here is the full list of what we use, checked against the site's code. Essential ones are needed for the site to work. Analytics and advertising ones are optional: they are only created if you accept them and if we have that measurement enabled."
     },
     "types": {
-      "title": "Types of Cookies We Use",
-      "subtitle": "Below are the different types of cookies we use on our website",
-      "alwaysActive": "Always Active",
+      "title": "Cookies and browser data we use",
+      "subtitle": "By category, with their purpose and duration",
+      "alwaysActive": "Always active",
       "colName": "Name",
       "colPurpose": "Purpose",
       "colDuration": "Duration",
       "colType": "Type",
-      "ct1": {
-        "title": "Essential Cookies",
-        "description": "Cookies necessary for the basic functioning of the website",
-        "ck1": {
-          "purpose": "Maintain user session",
-          "duration": "Session",
-          "type": "First party"
-        },
-        "ck2": {
-          "purpose": "Authentication and security",
-          "duration": "7 days",
-          "type": "First party"
-        },
-        "ck3": {
-          "purpose": "Protection against CSRF attacks",
-          "duration": "Session",
-          "type": "First party"
-        },
-        "ck4": {
-          "purpose": "Store cookie preferences",
-          "duration": "Until deleted",
-          "type": "First party (local storage)"
+      "essential": {
+        "title": "Essential",
+        "description": "Needed to sign in, remember your choices and make the demos work. They are not used to track you or for advertising.",
+        "rows": {
+          "accessToken": {
+            "purpose": "Keeps you signed in to the admin panel or the portal.",
+            "duration": "15 minutes (renewed while you use the site)",
+            "type": "First-party cookie"
+          },
+          "refreshToken": {
+            "purpose": "Renews your session without asking for your password again.",
+            "duration": "7 days",
+            "type": "First-party cookie"
+          },
+          "locale": {
+            "purpose": "Remembers the language you chose. Only created if you change the language.",
+            "duration": "1 year",
+            "type": "First-party cookie"
+          },
+          "cookie_preferences": {
+            "purpose": "Stores your cookie choice.",
+            "duration": "Until you delete it",
+            "type": "Local storage"
+          },
+          "theme": {
+            "purpose": "Remembers whether you prefer the light or dark theme.",
+            "duration": "Until you delete it",
+            "type": "Local storage"
+          },
+          "user": {
+            "purpose": "Your name, email and role, to display the panel or portal while you are signed in.",
+            "duration": "Until you sign out",
+            "type": "Local storage"
+          },
+          "redirectAfterLogin": {
+            "purpose": "The page you return to after signing in.",
+            "duration": "Until you close the tab",
+            "type": "Session storage"
+          },
+          "preferences": {
+            "purpose": "Portal and panel preferences, such as notices you dismissed.",
+            "duration": "Until you delete them",
+            "type": "Local storage"
+          },
+          "demos": {
+            "purpose": "Sample data and changes you make in the demos, and the owner keys of the bots you create in the chatbot.",
+            "duration": "Until you delete them",
+            "type": "Local storage"
+          }
         }
       },
-      "ct2": {
-        "title": "Functional Cookies",
-        "description": "Cookies that enhance functionality and personalization",
-        "ck1": {
-          "purpose": "Remember language preference",
-          "duration": "1 year",
-          "type": "First party"
-        },
-        "ck2": {
-          "purpose": "Remember theme (light/dark)",
-          "duration": "1 year",
-          "type": "First party"
-        },
-        "ck3": {
-          "purpose": "Store user settings",
-          "duration": "6 months",
-          "type": "First party"
+      "analytics": {
+        "title": "Analytics (optional)",
+        "description": "Google Analytics 4 tells us which pages are visited and where visits come from. Only enabled if you accept it.",
+        "rows": {
+          "_ga": {
+            "purpose": "Distinguishes visitors to count visits.",
+            "duration": "2 years",
+            "type": "Google Analytics cookie"
+          },
+          "_ga_ID": {
+            "purpose": "Stores the Google Analytics session state.",
+            "duration": "2 years",
+            "type": "Google Analytics cookie"
+          }
         }
       },
-      "ct3": {
-        "title": "Analytics Cookies",
-        "description": "Cookies that help us understand how the site is used",
-        "ck1": {
-          "purpose": "Google Analytics - Distinguish users",
-          "duration": "2 years",
-          "type": "Third party (Google)"
-        },
-        "ck2": {
-          "purpose": "Google Analytics - Persist session state",
-          "duration": "2 years",
-          "type": "Third party (Google)"
-        }
-      },
-      "ct4": {
-        "title": "Marketing Cookies",
-        "description": "Cookies that measure the results of our ads on Google Ads and LinkedIn",
-        "ck1": {
-          "purpose": "Google Ads - Attribute conversions to ads",
-          "duration": "90 days",
-          "type": "Third party (Google)"
-        },
-        "ck2": {
-          "purpose": "Google Ads - Store the ad click that brought the visitor to the site",
-          "duration": "90 days",
-          "type": "Third party (Google)"
-        },
-        "ck3": {
-          "purpose": "LinkedIn - Ad conversion tracking and retargeting",
-          "duration": "30 days",
-          "type": "Third party (LinkedIn)"
-        },
-        "ck4": {
-          "purpose": "LinkedIn - Identify the browser",
-          "duration": "1 year",
-          "type": "Third party (LinkedIn)"
+      "marketing": {
+        "title": "Advertising (optional)",
+        "description": "Google Ads and LinkedIn Insight Tag measure which ads lead to contacts or demo requests. Only enabled if you accept them.",
+        "rows": {
+          "_gcl_au": {
+            "purpose": "Measures Google ad conversions.",
+            "duration": "90 days",
+            "type": "Google Ads cookie"
+          },
+          "_gcl_aw": {
+            "purpose": "Stores the Google ad click that brought you to the site.",
+            "duration": "90 days",
+            "type": "Google Ads cookie"
+          },
+          "li_fat_id": {
+            "purpose": "Links a LinkedIn ad click to the conversion.",
+            "duration": "30 days",
+            "type": "LinkedIn cookie"
+          },
+          "bcookie": {
+            "purpose": "Identifies the browser on LinkedIn.",
+            "duration": "1 year",
+            "type": "LinkedIn cookie (linkedin.com domain)"
+          },
+          "lidc": {
+            "purpose": "Routes traffic across LinkedIn's servers.",
+            "duration": "1 day",
+            "type": "LinkedIn cookie (linkedin.com domain)"
+          },
+          "UserMatchHistory": {
+            "purpose": "Syncs the LinkedIn identifier to measure ads.",
+            "duration": "30 days",
+            "type": "LinkedIn cookie (linkedin.com domain)"
+          }
         }
       }
     },
     "preferences": {
-      "title": "Manage Cookie Preferences",
-      "subtitle": "You can change your cookie preferences at any time using the controls below",
-      "acceptAll": "Accept All",
-      "essentialOnly": "Essential Only",
-      "savePreferences": "Save Preferences",
-      "alertSaved": "Preferences saved successfully",
-      "alertAccepted": "All cookies have been accepted",
-      "alertEssential": "Only essential cookies are enabled"
+      "title": "Your preferences",
+      "subtitle": "Turn analytics and advertising on or off above and save, or pick one of the quick options. You can change your choice at any time.",
+      "acceptAll": "Accept all",
+      "essentialOnly": "Essential only",
+      "savePreferences": "Save preferences",
+      "alertSaved": "Your preferences were saved.",
+      "alertAccepted": "You accepted all cookies.",
+      "alertEssential": "We will only use essential cookies."
     },
     "control": {
-      "title": "How to Control Cookies",
-      "p1": "You can control and/or delete cookies as you wish. For more details, see",
+      "title": "How to control cookies",
+      "p1": "Besides this page, you can view and delete the site's cookies and storage from your browser settings. To learn more, visit",
       "aboutCookiesLink": "aboutcookies.org",
-      "browserTitle": "Browser Settings",
-      "browserP1": "Most web browsers allow you to control cookies through their settings. For information on how to do this in popular browsers:",
-      "browserWarning": "Please note that if you block or delete cookies, some parts of our website may not work correctly."
+      "browserTitle": "Browser settings",
+      "browserP1": "These are the guides for the most used browsers:",
+      "browserWarning": "If you delete or block essential cookies, you will be signed out and the site will forget your language and choices."
     },
     "thirdParty": {
-      "title": "Third-Party Cookies",
-      "p1": "Some of our business partners use cookies on our site (e.g., Google Analytics, Google Ads and LinkedIn), which are only activated with consent. We have no access to or control over these cookies. This cookie policy covers the use of cookies by KopTup and not the use of cookies by third parties.",
-      "googleTitle": "Google Analytics and Google Ads",
-      "googleP1": "We use Google Analytics to analyze the use of our website and Google Ads to measure the results of our ads. For more information on how Google uses data, visit",
-      "googleLink": "Google's policies",
-      "linkedinTitle": "LinkedIn Insight Tag",
-      "linkedinP1": "We use the LinkedIn Insight Tag to measure the results of our LinkedIn campaigns. More information in the",
-      "linkedinLink": "LinkedIn cookie policy"
+      "title": "Third-party cookies",
+      "p1": "Analytics and advertising cookies are created and read by Google and LinkedIn, under their own policies:",
+      "googleTitle": "Google (Analytics and Ads)",
+      "googleP1": "How Google uses data from sites that use its services:",
+      "googleLink": "policies.google.com",
+      "linkedinTitle": "LinkedIn (Insight Tag)",
+      "linkedinP1": "LinkedIn cookie policy:",
+      "linkedinLink": "linkedin.com/legal/cookie-policy"
     },
     "updates": {
-      "title": "Updates to this Policy",
-      "p1": "We may update this Cookie Policy periodically to reflect changes in the cookies we use or for other operational, legal or regulatory reasons.",
-      "p2": "We recommend that you review this page regularly to stay informed about our use of cookies and related technologies."
+      "title": "Changes to this policy",
+      "p1": "If we add or remove a cookie, we update this list and the date above.",
+      "p2": "How we process your personal data is explained in the Privacy policy."
     },
     "contact": {
       "title": "Contact",
-      "text": "If you have questions about our Cookie Policy, contact us:",
+      "text": "If you have questions about cookies or your data, write to us:",
       "labelEmail": "Email:",
       "labelPhone": "Phone:"
     },
     "footer": {
       "updated": "Last updated: October 2026",
-      "copyright": "© {year} KopTup - Tech Solutions. All rights reserved.",
-      "linkPrivacy": "Privacy Policy",
-      "linkTerms": "Terms & Conditions"
+      "copyright": "© {year} KopTup. All rights reserved.",
+      "linkPrivacy": "Privacy policy",
+      "linkTerms": "Terms and conditions"
     }
   },
   "cookieBanner": {
@@ -884,7 +922,8 @@
       "leads": "Leads",
       "propuestas": "Proposals",
       "proposals": "Proposals",
-      "auditoria": "Audit log"
+      "auditoria": "Audit log",
+      "privacidad": "Privacy"
     },
     "dashboard": {
       "default": "My portal",
@@ -2092,6 +2131,21 @@
       "errorValidation": "Check the required fields: name, a valid email, the service and the message.",
       "errorRateLimit": "You sent several messages in a row. Wait a minute and try again.",
       "errorNetwork": "We could not reach the server. Check your connection and try again, or write to us on WhatsApp.",
+      "errorCheckFields": "Check the highlighted fields.",
+      "consent": "I authorize KopTup to process my personal data to answer this message, under Colombian Law 1581 of 2012 and the <link>privacy policy</link>.",
+      "honeypot": "Do not fill in this field",
+      "fieldErrors": {
+        "name": "Enter your name (up to 120 characters).",
+        "email": "Enter a valid email.",
+        "phone": "Check the phone number (up to 40 characters).",
+        "company": "Check the company name (up to 160 characters).",
+        "service": "Choose the service you are interested in.",
+        "budget": "Choose a budget from the list.",
+        "message": "Tell us about your project (up to 5,000 characters).",
+        "timeline": "Choose when you want to start from the list.",
+        "consentimiento": "Check the authorization box to send the message.",
+        "quote": "The quote is not valid: choose the service from the list."
+      },
       "timeline": "When do you want to start?",
       "timelinePlaceholder": "Select an option",
       "timelineOptions": {
@@ -3761,6 +3815,7 @@
     "conversations": "Conversations",
     "users": "Users",
     "contacts": "Contacts",
+    "privacy": "Privacy",
     "settings": "Settings",
     "viewSite": "View site",
     "logout": "Sign out",
@@ -3771,6 +3826,81 @@
       "manager": "Manager",
       "sales": "Sales",
       "other": "Team"
+    }
+  },
+  "adminPrivacy": {
+    "title": "Privacy: data subject rights",
+    "subtitle": "Look up a person by email to see everything KopTup stores about them, hand it over as a file, or erase it (Colombian Law 1581 of 2012).",
+    "rules": {
+      "deadlines": "Legal deadlines: answer inquiries within 10 business days and claims (correct, update or erase) within 15 business days.",
+      "identity": "Before handing over or erasing data, check that the requester is the data subject (for example, that they write from that same email).",
+      "retention": "Even without a request, the system anonymizes rejected requests and inactive prospects when the retention period ends, and deletes chatbot questions when they expire."
+    },
+    "emailLabel": "Data subject's email",
+    "emailPlaceholder": "person@company.com",
+    "search": "Search",
+    "searching": "Searching…",
+    "export": "Export JSON",
+    "exporting": "Exporting…",
+    "erase": "Erase data",
+    "result": {
+      "title": "Data for {email}",
+      "total": "{count, plural, one {# record found} other {# records found}}",
+      "empty": "We found no data stored with that email.",
+      "searchedAs": "Searched as: {emails}",
+      "retention": "Current periods: anonymized after {months} months without activity; chatbot questions, {days} days.",
+      "note": "Passwords and link codes are never shown or exported: only their hashed fingerprint is stored."
+    },
+    "blocks": {
+      "team_account": "Cannot erase: this is a team account. Remove its role in Users first.",
+      "contractual_records": "Cannot erase for now: there are records of a contractual relationship that must be kept while the obligation lasts."
+    },
+    "categories": {
+      "cuentas": "Account",
+      "contactos": "Contact messages",
+      "solicitudesDemo": "Demo requests",
+      "accesosDemo": "Demo access",
+      "enlacesDeUnSoloUso": "Activation or recovery links",
+      "leads": "Lead (sales pipeline)",
+      "actividadesLead": "Lead activity",
+      "propuestas": "Proposals",
+      "conversacionesChatbot": "Chatbot questions that mention the email",
+      "notificaciones": "Notifications",
+      "documentos": "Document manager files",
+      "registroActividad": "Activity log",
+      "pedidos": "Orders",
+      "proyectos": "Projects",
+      "facturas": "Invoices",
+      "entregables": "Deliverables",
+      "conversacionesPortal": "Portal conversations",
+      "bitacora": "Team audit log"
+    },
+    "erased": {
+      "title": "Data erased",
+      "reference": "Erasure reference: {ref}. Give it to the data subject as proof; the audit log keeps it without their data.",
+      "counts": "{deleted} records deleted and {anonymized} audit log entries stripped of personal data."
+    },
+    "confirm": {
+      "title": "Erase this person's data",
+      "body": "You are about to delete everything the system stores about this person.",
+      "deletes": "Their account, messages, requests, access, lead, non-accepted proposals, chatbot questions and documents are deleted.",
+      "audit": "The audit log keeps the team's actions, without their data, plus a record with a reference.",
+      "irreversible": "This cannot be undone.",
+      "label": "Type {email} to confirm",
+      "cancel": "Cancel",
+      "submit": "Erase permanently",
+      "erasing": "Erasing…"
+    },
+    "errors": {
+      "search": "The search failed. Check the email and try again.",
+      "network": "Cannot reach the server. Try again in a few minutes.",
+      "export": "The file could not be downloaded. Try again.",
+      "erase": "The erasure could not be completed. Try again."
+    },
+    "contactConsent": {
+      "label": "Data authorization",
+      "given": "Authorized on {date} (policy {version})",
+      "none": "No authorization on record (message sent before the checkbox existed or from another source)"
     }
   },
   "adminDemos": {

@@ -53,6 +53,7 @@ import {
 import { adminLeadsRouter } from './routes/admin-leads.routes';
 import { adminProposalsRouter } from './routes/admin-proposals.routes';
 import { adminSettingsRouter } from './routes/admin-settings.routes';
+import { adminPrivacyRouter } from './routes/admin-privacy.routes';
 import { meCommerceRouter, paymentsRouter, publicProposalsRouter } from './routes/proposals-public.routes';
 import { setDemoAccessResolver } from './middleware/access';
 import { demoGrantResolver } from './services/demo-access.service';
@@ -200,6 +201,8 @@ export function createApp(): Express {
   app.use('/api/admin/leads', adminLeadsRouter);
   app.use('/api/admin/proposals', adminProposalsRouter);
   app.use('/api/admin/settings', adminSettingsRouter);
+  // Derechos del titular (Ley 1581): buscar, exportar y suprimir (solo admin).
+  app.use('/api/admin/privacy', adminPrivacyRouter);
   app.use('/api/admin', adminRoutes);
   // Propuesta pública por token, portal (Solicitar propuesta, Mis propuestas) y pagos.
   app.use('/api/proposals/public', publicProposalsRouter);

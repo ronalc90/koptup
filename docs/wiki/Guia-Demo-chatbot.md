@@ -156,7 +156,7 @@ Trae tres preguntas sugeridas («¿De qué trata el documento?», «¿Qué fecha
 
 1. **Documentos subidos**: archivos TXT, MD o CSV de hasta 2 MB (arrastrar o elegir); cada uno se puede quitar. Si el bot aún no existe, subir un archivo lo guarda primero.
 2. **Cargar documentos de ejemplo**: sube los documentos de una de las tres empresas ficticias.
-3. **Conversaciones**: lo que le han preguntado al bot (aquí, en el enlace directo o en otro sitio), con preguntas, «con fuente» y «no encontré»; «Actualizar», «Exportar CSV» y «Borrar historial» (pide confirmación).
+3. **Conversaciones**: lo que le han preguntado al bot desde el widget en otro sitio o por el enlace directo (las preguntas de la vista previa no se guardan), con preguntas, «con fuente» y «no encontré»; «Actualizar», «Exportar CSV» y «Borrar historial» (pide confirmación). Cada pregunta se borra sola a los 30 días.
 
 ### En el celular
 
@@ -223,7 +223,8 @@ sequenceDiagram
 - **La búsqueda es por palabras (BM25), no por significado.** Si la pregunta usa sinónimos que no están en el documento, puede responder «no encontré». La demo lo advierte en «Qué incluye hoy», y las preguntas sugeridas usan palabras de los documentos.
 - **Límite de creación de bots: 30 por hora por IP** (configurable). Cada navegador nuevo crea un bot por empresa e idioma. Al pasar el límite, la columna de documentos dice «No pudimos indexar los documentos. **Revisa tu conexión.**» y las preguntas fallan con «Algo salió mal al responder». El mensaje culpa a la conexión aunque la causa sea el límite. Lo vimos al recorrer la demo varias veces seguidas.
 - **La valoración útil / a mejorar no se guarda en el servidor.** El aviso «Valoración guardada en las métricas de esta sesión» es literal: se pierde al recargar.
-- **Los bots se guardan en un archivo del servidor** (`data/chatbots/state.json`). Si el servidor se reinicia sin conservar ese archivo, se pierden. Los bots de ejemplo se vuelven a crear solos. Un bot de «Configura el tuyo» desaparece de «Mis bots» con el aviso «ya no existe en el servidor».
+- **Los bots se guardan en la base de datos (MongoDB)** y sobreviven a reinicios y despliegues. Un bot sin uso se borra a los 12 meses, con sus documentos y su historial, y entonces desaparece de «Mis bots» con el aviso «ya no existe en el servidor». El servidor puede borrar antes (a los 30 días) los bots marcados como de ejemplo, pero la demo todavía no marca así los de las empresas ficticias (pendiente de la pista de demos); en todo caso se vuelven a crear solos.
+- **Qué preguntas se guardan:** solo las que llegan por el widget de un bot de usuario (en otro sitio o por el enlace directo), y se borran solas a los 30 días. Las de «Prueba el asistente» y las de la vista previa del Builder no se guardan, así que no aparecen en «Conversaciones». Los textos de la demo que explican el historial están pendientes de ajustarse a esto (pista de demos).
 - **«Mis bots» depende del navegador.** La propiedad del bot va en un token guardado en este navegador; desde otro equipo no se puede editar el bot ni ver sus conversaciones («Solo el dueño del bot puede ver sus conversaciones»).
 - **«Configura el tuyo» solo acepta TXT, MD o CSV (máx. 2 MB).** PDF y DOCX solo funcionan en «Prueba con tu documento», que tiene sus propios límites: 3 documentos al día por IP, 10 preguntas por documento, borrado a la hora, y un PDF escaneado sin texto seleccionable no sirve.
 - **En el celular no hay «Cómo se respondió» ni métricas.** Esas columnas solo aparecen en pantallas grandes.

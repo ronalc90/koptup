@@ -6,7 +6,9 @@
  * Lee la configuración pública del bot (`GET /api/chatbot/bots/:id`) y
  * conversa con `POST /api/chatbot/bots/:id/chat` (mismo pipeline que la
  * demo: búsqueda BM25 → modelo de OpenAI o modo extractivo → citas). Cada
- * cita [n] abre el fragmento usado.
+ * cita [n] abre el fragmento usado. Las preguntas del widget quedan en el
+ * historial del bot por 30 días; las de la vista previa del Builder no se
+ * guardan (embedChannel.ts).
  *
  * Se pinta como una capa fija a pantalla completa para ocupar todo el iframe.
  */
@@ -17,11 +19,11 @@ import { PaperAirplaneIcon, XMarkIcon, ExclamationTriangleIcon } from '@heroicon
 
 import {
   BotApiError,
-  chatWithBot,
   getBot,
   type RemoteBotConfig,
   type RemoteChatReplySource,
 } from '@/app/demo/chatbot/components/builder/api';
+import { chatFromEmbed, detectEmbedChannel } from './embedChannel';
 
 interface EmbedChatProps {
   botId: string | null;
@@ -107,7 +109,8 @@ export default function EmbedChat({ botId, colorOverride, widget }: EmbedChatPro
         ]);
       }
       try {
-        const res = await chatWithBot(botId, q, history);
+        // Solo el widget real guarda historial (la vista previa del Builder no).
+        const res = await chatFromEmbed(botId, q, history, detectEmbedChannel());
         setMessages((prev) =>
           prev.map((m) => (m.id === asstId ? { ...m, pending: false, content: res.reply, sources: res.sources, question: q } : m)),
         );

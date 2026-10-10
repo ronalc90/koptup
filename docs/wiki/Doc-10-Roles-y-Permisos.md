@@ -104,6 +104,7 @@ Los menús del **prospecto** (solo Mis demos y Mi perfil) y del **cliente** (por
 | `/admin/catalogo-demos` | ➜ `/login` | ➜ `/dashboard` | ➜ Mis demos | ➜ `/dashboard` | 👁 | 👁 | ✅ |
 | `/admin` (Inicio), Pedidos, Entregables, Facturas, Conversaciones, Contactos, Configuración | ➜ `/login` | ➜ `/dashboard` | ➜ Mis demos | ➜ `/dashboard` | ➜ Solicitudes | ✅ | ✅ |
 | `/admin/users` (Usuarios) | ➜ `/login` | ➜ `/dashboard` | ➜ Mis demos | ➜ `/dashboard` | ➜ Solicitudes | 👁 (no puede cambiar roles) | ✅ |
+| `/admin/privacidad` (Privacidad: buscar, exportar y suprimir los datos de una persona) | ➜ `/login` | ➜ `/dashboard` | ➜ Mis demos | ➜ `/dashboard` | ➜ Solicitudes | ➜ `/admin` | ✅ |
 | `/liquidacion` (herramienta interna) | ➜ `/login` | ➜ `/dashboard` | ➜ Mis demos | ➜ `/dashboard` | ✅ | ✅ | ✅ |
 
 *La columna `user` / `client` también vale para un prospecto que luego pasa a cliente: conserva sus accesos a demos.*
@@ -228,6 +229,7 @@ stateDiagram-v2
 | Ver usuarios | ❌ | ✅ | ✅ |
 | Cambiar el rol de un usuario | ❌ | ❌ (la API responde 403) | ✅ (no puede quitarse su propio rol) |
 | Bitácora completa del sistema (`GET /api/admin/audit-log`) | ❌ | ❌ | ✅ solo por API |
+| Buscar, exportar y suprimir los datos de una persona (Admin › Privacidad, Ley 1581) | ❌ | ❌ | ✅ |
 | Herramienta interna `/liquidacion` | ✅ | ✅ | ✅ |
 
 ![El comercial no puede aprobar una demo privada](images/doc/roles/sales-demo-privada-bloqueada.jpg)
@@ -327,7 +329,7 @@ Los cambios de rol o el retiro de un acceso se aplican **de inmediato** en la AP
 | `GET /api/admin/demo-requests`, `demo-grants` y `demo-catalog` | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
 | Acciones sobre solicitudes y accesos (aprobar, invitar, extender, retirar, notas, rechazar, reenviar enlace) | ❌ | ❌ | ❌ | ❌ | ✅ (privadas: ❌) | ❌ | ✅ |
 | `/api/admin/*` de operación: pedidos, facturas, entregables, conversaciones, usuarios, contactos | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
-| Solo admin: cambiar roles, editar el catálogo, bitácora, importar y vectorizar CUPS, reiniciar la configuración de documentos de conocimiento | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Solo admin: cambiar roles, editar el catálogo, bitácora, privacidad (`/api/admin/privacy/*`: buscar, exportar y suprimir los datos de una persona), importar y vectorizar CUPS, reiniciar la configuración de documentos de conocimiento | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 | Solo desarrollo: `/api/test`, `/api/chat`, pruebas de correo y WhatsApp | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ fuera de producción (404 en producción) |
 
 ---
@@ -341,8 +343,8 @@ Los cambios de rol o el retiro de un acceso se aplican **de inmediato** en la AP
 | **`prospect`** | Su perfil y sus accesos: demo, vencimiento, días restantes y último ingreso. | Notas internas, quién le dio el acceso, el resto del portal. |
 | **`developer`** | Lo mismo que un cliente en su portal; todas las demos aunque estén desactivadas; puede subir entregables por la API. | El panel `/admin` y las herramientas internas. |
 | **`sales`** | Solicitudes de demo (datos de contacto, caso de uso, autorización de datos, notas internas e historial); accesos de todas las personas (estado, vencimiento, visitas); catálogo en lectura; la herramienta `/liquidacion`. Por la API puede abrir un entregable o una factura concretos de cualquier cuenta. | Pedidos, facturas, entregables, conversaciones, usuarios y contactos en el panel; edición del catálogo; demos privadas. |
-| **`manager`** | Todo el panel: inicio con indicadores, pedidos, facturas, entregables, conversaciones, usuarios (nombre, email, rol, proveedor, último acceso) y contactos o leads; solicitudes, accesos y catálogo en lectura; `/liquidacion`. | No cambia roles ni edita el catálogo; no aprueba ni retira demos. |
-| **`admin`** | Todo lo anterior, con edición total: catálogo, roles, demos privadas y la bitácora completa por API. | — |
+| **`manager`** | Todo el panel: inicio con indicadores, pedidos, facturas, entregables, conversaciones, usuarios (nombre, email, rol, proveedor, último acceso) y contactos o leads; solicitudes, accesos y catálogo en lectura; `/liquidacion`. | No cambia roles ni edita el catálogo; no aprueba ni retira demos; no entra a Admin › Privacidad. |
+| **`admin`** | Todo lo anterior, con edición total: catálogo, roles, demos privadas y la bitácora completa por API. En Admin › Privacidad ve todo lo que el sistema guarda de una persona buscada por su email (sin contraseñas ni tokens), lo exporta y lo suprime. | — |
 
 ---
 
@@ -373,6 +375,7 @@ Cada cambio de rol queda en la bitácora (`user.role_change`, con el rol anterio
 | Política de cada ruta | `apps/backend/src/routes/POLICIES.md` |
 | Roles por área de la web y página de inicio de cada rol | `apps/web/src/lib/auth-roles.ts` |
 | Guardia de la web | `apps/web/src/middleware.ts` |
+| Páginas solo para admin dentro del panel (`ADMIN_ONLY_PATHS`) | `apps/web/src/lib/auth-roles.ts` |
 | Pruebas | `apps/backend/src/__tests__/integration/` (401/403/200 por política y sistema de demos) y `apps/web/e2e/permissions.spec.ts`, `access-mode.spec.ts`, `demo-access.spec.ts` |
 
 Para agregar un rol: súmalo a `USER_ROLES`, decide en qué listas de `config/demos.ts` y `middleware/access.ts` entra, actualiza `lib/auth-roles.ts` en la web (áreas y página de inicio), las etiquetas de `adminLayout.roles` en `messages/` y el selector de Admin › Usuarios, y agrega pruebas de integración.

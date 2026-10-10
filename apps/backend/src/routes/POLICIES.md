@@ -54,6 +54,7 @@ demuestran (401/403/200 por política) están en `src/__tests__/integration/`.
 | `/api/admin/demo-catalog` | `GET /` | `admin`, `sales`, `manager` |
 | | `PATCH /:slug` (o `PATCH /` con `slug`) | Admin (el chatbot RAG queda siempre público) |
 | `/api/admin/audit-log` | `GET /` | Admin |
+| `/api/admin/privacy` | `POST /search`, `POST /export`, `POST /erase` | Admin (rol de la BD); cada acción queda en la bitácora (`privacy.search`, `privacy.export`, `privacy.erase`) sin el email buscado |
 | `/api/admin` | todas las demás | `admin` o `manager` (los routers del sistema de demos se montan antes y tienen sus propios permisos) |
 | | `PATCH /users/:id/role` | Admin (valida el rol; no permite quitarse el propio rol) |
 | `/api` (cuentas.routes) | `/cuentas*`, `/ley100*`, `/process`, `/export` | Staff, ruta por ruta (el router está en la raíz `/api`); `/process` y `/cuentas/procesar-hibrido` con tope `HEALTH_MONTHLY_BUDGET_USD` |
@@ -70,7 +71,7 @@ demuestran (401/403/200 por política) están en `src/__tests__/integration/`.
 | `/api/content` | todas | Acceso a demo `gestor-contenido` (pública por defecto) + cupo por IP y `CONTENT_MONTHLY_BUDGET_USD` |
 | `/api/linkedin-ads` | `POST /generate` | Acceso a demo `linkedin-ads` + cupo por cuenta (o por IP sin sesión) en Redis y `LINKEDIN_ADS_MONTHLY_BUDGET_USD` |
 | `/api/demo-rag` | todas | Pública con cupos por IP en Redis y `DEMO_MONTHLY_BUDGET_USD` |
-| `/api/chatbot` | `GET /models`, `POST /bots`, `GET /bots`, `GET /bots/:id`, `POST /bots/:id/chat` | Pública (lista y vista completa solo para el dueño; chat solo para bots existentes; `CHATBOT_MONTHLY_BUDGET_USD`) |
+| `/api/chatbot` | `GET /models`, `POST /bots`, `GET /bots`, `GET /bots/:id`, `POST /bots/:id/chat` | Pública (lista y vista completa solo para el dueño; chat solo para bots existentes; `CHATBOT_MONTHLY_BUDGET_USD`; el chat guarda la conversación solo con `channel: 'widget'` en bots creados por usuarios, con vencimiento `CHATBOT_CONVERSATION_TTL_DAYS`; las rutas de bots responden 503 `storage_unavailable` sin MongoDB) |
 | | `PATCH/DELETE /bots/:id`, `docs`, `urls`, `conversations` | Dueño del bot (cabecera `X-Bot-Owner-Token`); un bot heredado sin dueño registrado solo lo administra el staff (sesión, rol de la BD) |
 | | `session`, `upload`, `message`, `info`, `config`, `messages`, `documents` (API heredada por sesión) | Pública por `sessionId`, con límites y el mismo tope de gasto del chatbot |
 

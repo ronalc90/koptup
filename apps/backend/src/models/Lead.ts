@@ -47,6 +47,8 @@ export interface ILead extends Document {
   /** Mensajes recibidos (Contact) ligados a este lead. */
   contactos: number;
   ultimaActividadEn: Date;
+  /** Fecha en que el job de conservación quitó los datos personales. */
+  anonimizadoEn?: Date | null;
   /**
    * Solicitud de propuesta abierta (POST /api/me/proposal-requests). Se
    * reclama con una actualización condicionada a `null`: una segunda
@@ -90,6 +92,7 @@ const LeadSchema = new Schema<ILead>(
     usuario: { type: Schema.Types.ObjectId, ref: 'User', default: null, index: true },
     contactos: { type: Number, default: 0 },
     ultimaActividadEn: { type: Date, default: Date.now },
+    anonimizadoEn: { type: Date, default: null },
     solicitudPropuesta: {
       type: new Schema(
         {

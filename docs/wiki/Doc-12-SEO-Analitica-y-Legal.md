@@ -1,6 +1,6 @@
 # SEO, analítica y legal
 
-> **Resumen.** El sitio está preparado para buscadores: cada página tiene su título con la plantilla «… | KopTup», una URL canónica en `https://www.koptup.com`, datos estructurados (JSON-LD) y una imagen para redes; `sitemap.xml` y `robots.txt` dicen qué indexar y qué no. La **analítica** (Google Analytics 4, Google Ads y LinkedIn) está programada pero **hoy no está activa en producción**: depende de tres variables de Vercel y del consentimiento del visitante. En lo **legal**, los formularios que piden datos exigen la autorización de la **Ley 1581 de 2012** y la solicitud de demo guarda la prueba con la versión de la política; hay páginas de privacidad, términos y cookies, y un banner de cookies.
+> **Resumen.** El sitio está preparado para buscadores: cada página tiene su título con la plantilla «… | KopTup», una URL canónica en `https://www.koptup.com`, datos estructurados (JSON-LD) y una imagen para redes; `sitemap.xml` y `robots.txt` dicen qué indexar y qué no. La **analítica** (Google Analytics 4, Google Ads y LinkedIn) está programada pero **hoy no está activa en producción**: depende de tres variables de Vercel y del consentimiento del visitante. En lo **legal**, los tres formularios que piden datos (contacto, solicitar demo y «Prueba con tu documento») exigen la autorización de la **Ley 1581 de 2012** y guardan la prueba con la versión de la política que fija el servidor; el admin atiende los derechos del titular en **Admin › Privacidad** (buscar, exportar y suprimir) y un job anonimiza lo vencido; hay páginas de privacidad, términos y cookies que describen lo que el sistema hace de verdad, y un banner de cookies.
 >
 > Esta página describe lo que hace el código de `main`; no es asesoría legal.
 
@@ -311,8 +311,8 @@ flowchart LR
 | Formulario | ¿Pide autorización? | ¿Es obligatoria? | Qué se guarda como prueba | Dónde |
 |---|---|---|---|---|
 | **Solicitar demo** (`/solicitar-demo`) | Sí: «Autorizo a KopTup a tratar mis datos personales para gestionar esta solicitud y contactarme sobre ella, según la Política de tratamiento de datos (Ley 1581 de 2012)» | Sí: la web no deja enviar y el backend responde `400 consent_required` sin guardar nada | `aceptado`, `fecha`, **versión de la política** (`PRIVACY_POLICY_VERSION`, hoy `2026-10`), hash de la IP y navegador | MongoDB, colección `DemoRequest` (campo `consentimiento`) |
-| **Prueba con tu documento** (`/demo/chatbot`) | Sí: «Autorizo el tratamiento de mis datos personales según la Ley 1581 de 2012 y la política de privacidad» | Sí: sin ella el backend responde `consent_required` | Una línea de texto con la fecha dentro del mensaje del lead (sin versión ni IP) | MongoDB, colección `Contact` con origen `demo-rag` |
-| **Contacto** (`/contact`) | **No** | — | Nada | MongoDB, colección `Contact` con origen `contact-form` |
+| **Prueba con tu documento** (`/demo/chatbot`) | Sí: «Autorizo el tratamiento de mis datos personales según la Ley 1581 de 2012 y la política de privacidad» | Sí: sin ella el backend responde `consent_required`. Si el lead no se puede guardar, el documento **no se procesa** (`503 lead_unavailable`) | `aceptado`, `fecha`, versión de la política, hash de la IP y navegador | MongoDB, colección `Contact` con origen `demo-rag` (campo `consentimiento`) |
+| **Contacto** (`/contact`) | Sí: «Autorizo a KopTup a tratar mis datos personales para responder este mensaje, según la Ley 1581 de 2012 y la política de privacidad», con campo trampa contra bots | Sí: la web no deja enviar y el backend responde `400 consent_required` sin guardar nada | `aceptado`, `fecha`, versión de la política, hash de la IP y navegador | MongoDB, colección `Contact` con origen `contact-form` (campo `consentimiento`); se ve en Admin › Contactos |
 | **Registro** (`/register`) y **activación** (`/activar/<token>`) | No (la activación viene de una solicitud que ya la tiene) | — | — | MongoDB, colección `User` |
 
 ![Autorización obligatoria en «Solicitar demo», anotada](images/doc/seo-legal/autorizacion-solicitar-demo.jpg)
@@ -331,12 +331,15 @@ flowchart LR
 2. **Enlace a la política de privacidad.**
 3. **Email:** «Es lo único que te pedimos».
 
-![El formulario de contacto no pide autorización, anotado](images/doc/seo-legal/contacto-sin-autorizacion.jpg)
+![Autorización obligatoria en el formulario de contacto, anotada](images/doc/seo-legal/contacto-autorizacion.jpg)
 
-*Final del formulario de `/contact`.*
+*Final del formulario de `/contact` después de pulsar «Enviar mensaje» sin marcar la casilla.*
 
-1. **Mensaje** del proyecto.
-2. **Enviar mensaje:** no hay casilla de autorización antes del botón.
+1. **Casilla de autorización**, sin marcar por defecto.
+2. **Enlace a la política de privacidad** (`/privacy`).
+3. **Error junto a la casilla:** «Marca la casilla de autorización para enviar el mensaje.» Arriba del formulario aparece «Revisa los campos marcados.»
+
+Los errores que devuelve el servidor también se muestran junto al campo que falló (por ejemplo, «El nombre es muy largo (máximo 120 caracteres).»); el límite de envíos y la falta de conexión tienen su propio mensaje.
 
 **De punta a punta**, la autorización de una solicitud de demo queda a la vista del equipo:
 
@@ -353,7 +356,7 @@ flowchart LR
 
 Si la misma persona vuelve a enviar el formulario con una solicitud abierta de menos de 30 días, las demos se suman a esa solicitud y la prueba de la autorización se reemplaza por la nueva.
 
-**Cuando publiques una política nueva:** actualiza el texto de `/privacy` (en `apps/web/messages/es.json` y `en.json`, claves `privacyPage`), cambia `PRIVACY_POLICY_VERSION` en Railway (por ejemplo `2027-01`) y redespliega los dos. Las solicitudes nuevas quedarán con la versión nueva y las viejas conservan la suya.
+**Cuando publiques una política nueva:** actualiza el texto de `/privacy` (en `apps/web/messages/es.json` y `en.json`, claves `privacyPage`, incluida la versión que muestra la página), cambia `PRIVACY_POLICY_VERSION` en Railway (por ejemplo `2027-01`) y redespliega los dos. Las autorizaciones nuevas quedarán con la versión nueva y las viejas conservan la suya. El backend siempre guarda su propia versión: la que envíe un formulario se ignora.
 
 ### 4.2 Qué datos se guardan y dónde
 
@@ -362,6 +365,7 @@ Si la misma persona vuelve a enviar el formulario con una solicitud abierta de m
 | Solicitar demo | Nombre, empresa, cargo, email, teléfono, país, tamaño de empresa, demos, caso de uso, página de origen, referente y UTM | MongoDB: `DemoRequest` y una copia como lead en `Contact` (origen `demo-request`) | Aviso al equipo por email (`ADMIN_EMAIL`) y WhatsApp si están configurados; acuse al solicitante si hay SMTP |
 | Contacto | Nombre, email, teléfono, empresa, servicio, presupuesto, plazo para empezar, la cotización que venía revisando (plan, nivel y modalidad) y mensaje | MongoDB: `Contact` | Aviso al equipo por email y WhatsApp |
 | Prueba con tu documento | Email y el documento | Email en `Contact` (origen `demo-rag`); el documento, solo **en memoria** y por máximo 1 hora | OpenAI recibe los fragmentos relevantes y la pregunta, no el documento completo ni el email |
+| Chatbot | Bots de «Configura el tuyo» con sus documentos, y las preguntas al widget de un bot de usuario | MongoDB (`chatbot_bots`, `chatbot_bot_chunks`, `chatbot_turns`); las preguntas vencen a los 30 días y las de «Prueba el asistente» y la vista previa no se guardan | OpenAI recibe la pregunta, los fragmentos y el historial reciente |
 | Cuenta del prospecto | Email, nombre, empresa, teléfono y contraseña cifrada (hash) | MongoDB: `User`, sus accesos en `DemoGrant` y el enlace de activación solo como hash en `MagicLinkToken` | — |
 | Acciones del equipo | Quién hizo qué y hash de la IP | MongoDB: `AuditLog` | — |
 | Navegación | IP, ruta y navegador de cada petición | Registros del backend en Railway | — |
@@ -370,46 +374,44 @@ La IP nunca se guarda en claro en MongoDB: solo su hash. Cuánto tiempo se conse
 
 ### 4.3 Páginas legales
 
-Las tres comparten diseño (encabezado azul con «Actualizado: Octubre 2026», secciones numeradas y una nota final), tratan de «tú» como el resto del sitio, su pie muestra el año en curso y sus textos viven en `apps/web/messages/es.json` y `en.json` (`privacyPage`, `termsPage`, `cookiesPage`). Las capturas de cada una completa están en [Páginas públicas › 13](Doc-03-Paginas-Publicas.md#13-páginas-legales-privacy-terms-cookies).
+Las tres comparten diseño (encabezado azul con la fecha, secciones numeradas y una nota final), tratan de «tú» como el resto del sitio, están en español y en inglés, su pie muestra el año en curso y sus textos viven en `apps/web/messages/es.json` y `en.json` (`privacyPage`, `termsPage`, `cookiesPage`). Describen solo lo que el sistema hace de verdad; **no las ha revisado un abogado** (es una acción pendiente del dueño, ver [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md#acciones-del-dueño)). Las capturas de cada una completa están en [Páginas públicas › 13](Doc-03-Paginas-Publicas.md#13-páginas-legales-privacy-terms-cookies).
 
 | Página | Qué dice hoy |
 |---|---|
-| `/privacy` | Responsable «KopTup - Soluciones Tecnológicas»; datos que recopila (personales, de uso y de proyectos); usos; seguridad; no venta de datos; retención «durante el tiempo necesario»; derechos (acceso, rectificación, eliminación, portabilidad, oposición, limitación) con respuesta en **30 días hábiles**; cookies; transferencias internacionales; menores; contacto (email, teléfono y dirección). Su descripción para buscadores menciona la Ley 1581 y el RGPD |
-| `/terms` | Condiciones del servicio de desarrollo a medida: aceptación, servicios, precios y pagos, propiedad intelectual, confidencialidad, plazos, garantías, soporte, terminación y ley aplicable |
-| `/cookies` | Qué son, tabla de cookies por categoría con sus interruptores, botones «Aceptar Todas», «Solo Esenciales» y «Guardar Preferencias», cómo bloquearlas en el navegador y cookies de terceros (Google y LinkedIn) |
+| `/privacy` | Versión 2026-10. Responsable (KopTup, dirección, email y teléfono); qué datos recoge cada formulario y para qué (contacto, solicitar demo, «Prueba con tu documento», cuenta y portal, chatbot, navegación); encargados reales (Vercel, Railway, MongoDB, Redis, OpenAI, el proveedor de correo SMTP, el de WhatsApp si está activo y Amazon S3 si se activa para los archivos del gestor de documentos; Google Analytics, Google Ads y LinkedIn solo con consentimiento; Google al entrar con Google); plazos de conservación (24 meses sin actividad, 30 días del chatbot, 1 hora del documento, 7 días de sesión); seguridad; base legal y datos sensibles; derechos de la Ley 1581 (incluida la queja ante la SIC); cómo ejercerlos y plazos (consultas en **10 días hábiles**, reclamos en **15**); cookies; transferencias internacionales; menores; cambios; contacto |
+| `/terms` | Condiciones del servicio de desarrollo a medida: aceptación, servicios (incluidas las demos y las funciones con IA: datos de ejemplo, la IA puede equivocarse, no subir información confidencial), precios y pagos, propiedad intelectual, confidencialidad, plazos, garantías, soporte, terminación y ley aplicable |
+| `/cookies` | Qué son; tabla con las cookies y claves del navegador **reales** por categoría (esenciales, analítica y publicidad), con interruptores para las dos opcionales; botones «Aceptar todas», «Solo esenciales» y «Guardar preferencias» con confirmación en la página; cómo controlarlas en el navegador y cookies de terceros (Google y LinkedIn) |
 
 ![Derechos del titular en /privacy, anotados](images/doc/seo-legal/privacidad-derechos.jpg)
 
-*La sección «Sus Derechos» de la política de privacidad.*
+*La sección «Tus derechos» de la política de privacidad.*
 
-1. **Los seis derechos** que la política reconoce.
-2. **Cómo ejercerlos:** escribiendo al email de contacto.
-3. **Plazo de respuesta** que promete la política: 30 días hábiles.
+1. **Los derechos de la Ley 1581**, entre ellos quejarse ante la Superintendencia de Industria y Comercio.
+2. **Cómo ejercerlos:** escribiendo al email de contacto, con lo que se pide y cómo verificar que eres el titular.
+3. **Plazos de respuesta** de la ley: 10 días hábiles para consultas y 15 para reclamos.
 
-Hoy ejercer un derecho (por ejemplo, pedir que se borren los datos) es un proceso **manual**: no hay botón ni API para suprimir los datos de una persona.
+Cuando llega una solicitud, el admin la atiende en **Admin › Privacidad**: busca a la persona por su email, le entrega sus datos en un JSON o los suprime (ver [Manual del administrador › Privacidad](Doc-06-Manual-del-Administrador.md#8b-privacidad-derechos-del-titular)).
 
 ### 4.4 Banner y cookies reales
 
-El banner y su panel de preferencias están en la [sección 3.3](#33-cuándo-cargan). La tabla de `/cookies` describe cookies con nombres que el sitio **no usa**:
+El banner y su panel de preferencias están en la [sección 3.3](#33-cuándo-cargan). La tabla de `/cookies` lista lo que el sitio guarda de verdad en el navegador (revisado en el código), en tres categorías: esenciales (siempre activas), analítica y publicidad (opcionales). No hay cookies «funcionales» opcionales: la categoría se quitó de la página y se guarda apagada.
 
-![Tabla de cookies esenciales en /cookies, anotada](images/doc/seo-legal/cookies-tabla-nombres.jpg)
+![Tabla de cookies esenciales reales en /cookies, anotada](images/doc/seo-legal/cookies-tabla-reales.jpg)
 
-*Las cookies «esenciales» que lista la página.*
+*Las esenciales que lista la página.*
 
-1. `session_id`, 2. `auth_token` y 3. `csrf_token`: no existen en el sitio.
-4. `cookie_preferences`: sí existe, pero en el almacenamiento local, no como cookie.
+1. `accessToken` y `refreshToken`: la sesión iniciada.
+2. `locale`: el idioma; solo se crea si la persona cambia el idioma (por eso es esencial: guarda una elección que ella pidió).
+3. `cookie_preferences`: la elección de cookies, en el almacenamiento local.
+4. Claves de las demos (`koptup…`, `demo:…`): datos de ejemplo y llaves de dueño de los bots del chatbot.
 
-Lo que el sitio guarda de verdad en el navegador:
+| Categoría | Nombres | Cuándo existen |
+|---|---|---|
+| Esenciales | `accessToken` (15 min), `refreshToken` (7 días), `locale` (1 año), y en el almacenamiento del navegador `cookie_preferences`, `theme`, `user`, `redirectAfterLogin` (hasta cerrar la pestaña), preferencias del panel y del portal, y las claves de las demos | Siempre que se usan esas funciones |
+| Analítica | `_ga`, `_ga_<ID>` (2 años) | Solo si la persona la acepta y si `NEXT_PUBLIC_GA_ID` está configurada (hoy no) |
+| Publicidad | `_gcl_au`, `_gcl_aw` (90 días); `li_fat_id` (30 días) y, en el dominio de LinkedIn, `bcookie` (1 año), `lidc` (1 día) y `UserMatchHistory` (30 días) | Solo si la persona la acepta y si las etiquetas de Google Ads o LinkedIn están configuradas (hoy no) |
 
-| Nombre | Tipo | Para qué | Duración | Categoría |
-|---|---|---|---|---|
-| `accessToken` | Cookie propia | Sesión iniciada | 15 minutos | Esencial |
-| `refreshToken` | Cookie propia | Renovar la sesión | 7 días | Esencial |
-| `locale` | Cookie propia | Idioma ES o EN | 1 año | Funcional (se guarda aunque se rechacen las funcionales) |
-| `theme` | Almacenamiento local | Tema claro u oscuro | Hasta que se borre | Funcional |
-| `cookie_preferences` | Almacenamiento local | La elección del banner | Hasta que se borre | Esencial |
-| Claves de las demos (por ejemplo `koptup.chatbot.myBots`, bots de los asistentes, recorrido de bienvenida) | Almacenamiento local | Recordar el estado de cada demo | Hasta que se borre | Funcional |
-| `_ga`, `_ga_<ID>`, `_gcl_au`, `_gcl_aw`, `li_fat_id`, `bcookie` | Cookies de terceros | Analítica y anuncios | Las que defina cada proveedor | Solo con consentimiento y si la etiqueta está configurada (hoy no) |
+Al guardar, la página confirma en el propio panel («Guardamos tus preferencias.»), sin ventanas emergentes del navegador.
 
 ---
 
@@ -418,11 +420,8 @@ Lo que el sitio guarda de verdad en el navegador:
 | # | Qué pasa | Efecto |
 |---|---|---|
 | 1 | **La analítica no está configurada en producción** | No hay datos de tráfico ni de conversiones, y no aparece el banner |
-| 2 | **`/contact` no pide autorización de la Ley 1581**, aunque guarda nombre, email, teléfono y mensaje | Esos leads no tienen prueba de autorización |
-| 3 | **«Prueba con tu documento» guarda la autorización solo como texto**, sin versión de la política ni hash de la IP; si guardar el lead falla, la prueba queda solo en el registro del servidor | Prueba más débil que la de «Solicitar demo» |
-| 4 | **No hay forma de suprimir los datos de una persona** desde el panel ni por la API, ni plazos de retención | Una solicitud de borrado exige editar la base a mano |
-| 5 | **La política promete responder en 30 días hábiles**; la Ley 1581 fija 10 días hábiles para consultas y 15 para reclamos (artículos 14 y 15). El texto es una política de privacidad general (incluye derechos del RGPD europeo, como portabilidad) | Conviene que un abogado lo revise frente a la Ley 1581 y su reglamentación |
-| 6 | **La tabla de `/cookies` no coincide con las cookies reales** (sección 4.4) y `locale` se guarda aunque se rechacen las funcionales | La política describe algo distinto de lo que pasa |
+| 2 | **Los textos legales no los ha revisado un abogado.** Describen lo que el sistema hace, con los plazos de la Ley 1581, pero el responsable debe validarlos (razón social y NIT del responsable, plazo de conservación de 24 meses, transferencias internacionales) | Acción del dueño ([Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md#acciones-del-dueño)) |
+| 3 | **Los contactos anteriores a la casilla de autorización no tienen prueba** guardada | Se anonimizan con el plazo de conservación si no tienen actividad, o el admin los suprime a pedido |
 | 7 | **El sitemap tarda hasta una hora** en reflejar un cambio de modo en Admin › Catálogo de demos | Una demo recién cerrada puede seguir listada un rato (y ya muestra una pantalla `noindex`) |
 
 ---
@@ -446,6 +445,10 @@ Lo que el sitio guarda de verdad en el navegador:
 | Autorización en «Solicitar demo» | `components/demo-request/DemoRequestForm.tsx`, `apps/backend/src/routes/demo-public.routes.ts`, `services/demo-requests.service.ts`, `models/DemoRequest.ts` |
 | Autorización en «Prueba con tu documento» | `app/demo/chatbot/components/upload/UploadForm.tsx`, `apps/backend/src/routes/demo-rag.routes.ts` |
 | Versión de la política | `PRIVACY_POLICY_VERSION` (`apps/backend/src/config/demos.ts`) |
+| Autorización en el formulario de contacto | `apps/web/src/app/contact/page.tsx`, `apps/backend/src/routes/contact.routes.ts`, `controllers/contact.controller.ts`, `models/Contact.ts` (`consentimiento`) |
+| Derechos del titular (buscar, exportar y suprimir) | `apps/web/src/app/admin/privacidad/page.tsx`, `apps/backend/src/routes/admin-privacy.routes.ts`, `services/privacy.service.ts` |
+| Plazo de conservación | `apps/backend/src/services/retention.service.ts`, `jobs/retention.job.ts` (`DATA_RETENTION_MONTHS`) |
+| Conversaciones del chatbot (vencimiento) | `apps/backend/src/services/chatbot-store.service.ts`, `models/ChatbotBot.ts`, `apps/web/src/app/embed/chatbot/[botId]/embedChannel.ts` |
 | Textos legales | `apps/web/messages/es.json` y `en.json` (`privacyPage`, `termsPage`, `cookiesPage`, `cookieBanner`) |
 
 ---

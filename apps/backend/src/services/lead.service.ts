@@ -13,7 +13,14 @@
  * Cada contacto se liga además a su `Lead` del pipeline comercial
  * (services/leads.service.ts), que agrupa los contactos por email.
  */
-import Contact, { DEFAULT_CONTACT_SOURCE, type ContactSource, type ContactTimeline, type IContact, type IContactQuote } from '../models/Contact';
+import Contact, {
+  DEFAULT_CONTACT_SOURCE,
+  type ContactSource,
+  type ContactTimeline,
+  type IContact,
+  type IContactConsent,
+  type IContactQuote,
+} from '../models/Contact';
 import { logger } from '../utils/logger';
 import { whatsappService } from './whatsapp.service';
 import { emailService } from './email.service';
@@ -33,6 +40,8 @@ export interface LeadInput {
   cotizacion?: IContactQuote;
   /** Cuándo quiere empezar (formulario de /contact). */
   plazo?: ContactTimeline;
+  /** Prueba de la autorización de datos (Ley 1581): versión de la política del servidor, fecha, hash de IP. */
+  consentimiento?: IContactConsent;
 }
 
 export interface LeadNotificationResult {
@@ -67,6 +76,7 @@ export async function registerLeadWithNotifications(
     source,
     ...(input.cotizacion ? { cotizacion: input.cotizacion } : {}),
     ...(input.plazo ? { plazo: input.plazo } : {}),
+    ...(input.consentimiento ? { consentimiento: input.consentimiento } : {}),
     status: 'new',
   });
 

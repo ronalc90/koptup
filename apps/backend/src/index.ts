@@ -91,6 +91,15 @@ const startServer = async () => {
       logger.warn(`Fallo migrando contactos al pipeline de leads: ${err?.message ?? err}`);
     }
 
+    // 3d. Chatbot: si quedó el archivo heredado data/chatbots/state.json, lo
+    // pasa a MongoDB una vez y lo borra del disco (idempotente).
+    try {
+      const { ensureChatbotMigrated } = await import('./services/chatbot-store.service');
+      await ensureChatbotMigrated();
+    } catch (err: any) {
+      logger.warn(`Fallo migrando el estado del chatbot a MongoDB: ${err?.message ?? err}`);
+    }
+
     // 4. Estrategias de Passport (Google OAuth si está configurado).
     try {
       const passportMod = await import('./config/passport');
@@ -114,6 +123,9 @@ const startServer = async () => {
     // Job de vencimiento de propuestas (candado en Redis).
     const { startProposalsExpiryJob, stopProposalsExpiryJob } = await import('./jobs/proposals-expiry.job');
     startProposalsExpiryJob();
+    // Plazo de conservación de datos personales (candado en Redis, una vez al día).
+    const { startRetentionJob, stopRetentionJob } = await import('./jobs/retention.job');
+    startRetentionJob();
     // Pago en línea con Wompi: solo con sus variables (sin ellas no se ofrece).
     const { readWompiConfig } = await import('./services/wompi.service');
     const wompi = readWompiConfig();
@@ -129,6 +141,7 @@ const startServer = async () => {
       logger.info(`Recibido ${signal}, cerrando...`);
       stopDemoGrantsJob();
       stopProposalsExpiryJob();
+      stopRetentionJob();
       server.close(() => {
         logger.info('Server closed');
         process.exit(0);
