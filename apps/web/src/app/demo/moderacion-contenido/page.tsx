@@ -1,342 +1,287 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import {
-  ArrowLeftIcon,
-  ChartBarIcon,
-  QueueListIcon,
-  CpuChipIcon,
   AdjustmentsHorizontalIcon,
-  HandRaisedIcon,
-  ClipboardDocumentListIcon,
-  PresentationChartLineIcon,
-  CodeBracketIcon,
+  ArrowLeftIcon,
+  ArrowPathIcon,
+  BeakerIcon,
+  ChartBarIcon,
   CheckBadgeIcon,
+  ClipboardDocumentListIcon,
+  CodeBracketIcon,
+  CpuChipIcon,
+  HandRaisedIcon,
+  InformationCircleIcon,
+  PresentationChartLineIcon,
+  QueueListIcon,
   ShieldCheckIcon,
-  HeartIcon,
-  PauseCircleIcon,
 } from '@heroicons/react/24/outline';
-
 import Button from '@/components/ui/Button';
-import Card, { CardHeader, CardTitle } from '@/components/ui/Card';
-import Badge from '@/components/ui/Badge';
-
-import {
-  QUEUE_ITEMS,
-  DEFAULT_RULES,
-  TRANSPARENCY_BY_CATEGORY,
-  TRANSPARENCY_BY_MONTH,
-  CATEGORY_COLORS,
-  VERTICAL_RULES,
-  type QueueItem,
-  type ContentType,
-  type Vertical,
-  type RuleNode,
-} from './components/mockData';
-import { BarChart, MetricCard } from './components/Atoms';
+import { ModerationProvider, useModeration } from './lib/store';
+import { PLATFORMS, TABS, type PlatformView, type TabKey } from './lib/types';
+import { focusRing, Toasts } from './components/ui';
+import Wellness from './components/Wellness';
+import DashboardTab from './components/DashboardTab';
 import QueueTab from './components/QueueTab';
-import WorkflowsTab from './components/WorkflowsTab';
-import {
-  ClassifiersTab,
-  AppealsTab,
-  AuditTab,
-  TransparencyTab,
-  MetricsTab,
-  ApiTab,
-} from './components/ReportTabs';
-
-type TabKey =
-  | 'dashboard'
-  | 'queue'
-  | 'classifiers'
-  | 'workflows'
-  | 'appeals'
-  | 'audit'
-  | 'transparency'
-  | 'api'
-  | 'metrics';
+import ClassifierTab from './components/ClassifierTab';
+import RulesTab from './components/RulesTab';
+import AppealsTab from './components/AppealsTab';
+import AuditTab from './components/AuditTab';
+import ReportTab from './components/ReportTab';
+import MetricsTab from './components/MetricsTab';
+import ApiTab from './components/ApiTab';
 
 const TAB_ICONS: Record<TabKey, typeof ChartBarIcon> = {
   dashboard: ChartBarIcon,
   queue: QueueListIcon,
-  classifiers: CpuChipIcon,
-  workflows: AdjustmentsHorizontalIcon,
+  classifier: CpuChipIcon,
+  rules: AdjustmentsHorizontalIcon,
   appeals: HandRaisedIcon,
   audit: ClipboardDocumentListIcon,
-  transparency: PresentationChartLineIcon,
-  api: CodeBracketIcon,
+  report: PresentationChartLineIcon,
   metrics: CheckBadgeIcon,
+  api: CodeBracketIcon,
 };
 
-const TABS: TabKey[] = [
-  'dashboard',
-  'queue',
-  'classifiers',
-  'workflows',
-  'appeals',
-  'audit',
-  'transparency',
-  'metrics',
-  'api',
-];
+function Header({ selector }: { selector?: ReactNode }) {
+  const t = useTranslations('demoModeration');
+  return (
+    <section className="rounded-2xl bg-gradient-to-br from-red-700 to-red-900 p-5 text-white shadow-lg sm:p-7">
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <span
+          className="inline-flex items-center gap-1 rounded-full border border-amber-300/60 bg-amber-300/15 px-2.5 py-0.5 text-xs font-semibold text-amber-100"
+          title={t('shell.sampleHint')}
+        >
+          <BeakerIcon className="h-3.5 w-3.5" aria-hidden />
+          {t('shell.sampleBadge')}
+        </span>
+        <span className="inline-flex items-center gap-1 rounded-full border border-white/40 px-2.5 py-0.5 text-xs font-semibold text-white/90" title={t('shell.rulesHint')}>
+          <InformationCircleIcon className="h-3.5 w-3.5" aria-hidden />
+          {t('shell.rulesBadge')}
+        </span>
+      </div>
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="min-w-0">
+          <h1 className="mb-2 text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl">{t('shell.title')}</h1>
+          <p className="max-w-3xl text-base text-red-50/90 sm:text-lg">{t('shell.subtitle')}</p>
+        </div>
+        {selector}
+      </div>
+    </section>
+  );
+}
+
+function PlatformSelector() {
+  const t = useTranslations('demoModeration');
+  const { s, setPlatform, views } = useModeration();
+  const pendingIn = (p: PlatformView) => views.filter((v) => v.status === 'pending' && (p === 'all' || v.platforms.includes(p))).length;
+  return (
+    <label className="block shrink-0">
+      <span className="mb-1 block text-xs font-medium uppercase tracking-wide text-red-100/90">{t('shell.platformLabel')}</span>
+      <select
+        value={s.platform}
+        onChange={(e) => setPlatform(e.target.value as PlatformView)}
+        className="w-full rounded-lg border border-white/30 bg-white/95 py-2 pl-3 pr-9 text-sm text-secondary-900 focus:outline-none focus:ring-2 focus:ring-white sm:w-80"
+      >
+        {(['all', ...PLATFORMS] as PlatformView[]).map((p) => (
+          <option key={p} value={p}>
+            {t('shell.platformOption', { name: t(`platforms.${p}`), n: pendingIn(p) })}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function HowItWorks() {
+  const t = useTranslations('demoModeration');
+  const { reset, toast } = useModeration();
+  const [confirm, setConfirm] = useState(false);
+  return (
+    <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-start">
+      <details className="group min-w-0 flex-1 rounded-lg border border-secondary-200 bg-white px-3 py-2 text-sm dark:border-secondary-800 dark:bg-secondary-900">
+        <summary className={`flex cursor-pointer list-none items-center gap-2 rounded font-medium text-secondary-800 dark:text-secondary-200 ${focusRing}`}>
+          <InformationCircleIcon className="h-4 w-4 shrink-0 text-red-700 dark:text-red-400" aria-hidden />
+          {t('how.title')}
+          <span className="ml-auto text-xs text-secondary-500 group-open:hidden">{t('common.show')}</span>
+          <span className="ml-auto hidden text-xs text-secondary-500 group-open:inline">{t('common.hide')}</span>
+        </summary>
+        <div className="mt-3 grid gap-4 text-secondary-700 dark:text-secondary-300 md:grid-cols-2">
+          <div>
+            <p className="mb-1 font-semibold text-secondary-900 dark:text-white">{t('how.realTitle')}</p>
+            <ul className="list-disc space-y-1 pl-5">
+              {(t.raw('how.real') as string[]).map((x) => (
+                <li key={x}>{x}</li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="mb-1 font-semibold text-secondary-900 dark:text-white">{t('how.simTitle')}</p>
+            <ul className="list-disc space-y-1 pl-5">
+              {(t.raw('how.sim') as string[]).map((x) => (
+                <li key={x}>{x}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="md:col-span-2">
+            <p className="mb-1 font-semibold text-secondary-900 dark:text-white">{t('how.tourTitle')}</p>
+            <ol className="list-decimal space-y-1 pl-5">
+              {(t.raw('how.tour') as string[]).map((x) => (
+                <li key={x}>{x}</li>
+              ))}
+            </ol>
+            <p className="mt-2">{t('how.project')}</p>
+          </div>
+        </div>
+      </details>
+      {!confirm ? (
+        <Button size="sm" variant="ghost" onClick={() => setConfirm(true)} className="gap-1 self-start">
+          <ArrowPathIcon className="h-4 w-4" aria-hidden />
+          {t('shell.reset')}
+        </Button>
+      ) : (
+        <div className="flex flex-wrap items-center gap-2 self-start rounded-lg border border-secondary-200 bg-white px-3 py-1.5 dark:border-secondary-800 dark:bg-secondary-900" role="alert">
+          <span className="text-xs text-secondary-700 dark:text-secondary-300">{t('shell.resetConfirm')}</span>
+          <Button
+            size="sm"
+            variant="danger"
+            onClick={() => {
+              reset();
+              setConfirm(false);
+              toast(t('shell.resetDone'), 'info');
+            }}
+          >
+            {t('shell.resetYes')}
+          </Button>
+          <Button size="sm" variant="ghost" onClick={() => setConfirm(false)}>
+            {t('common.cancel')}
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Tabs() {
+  const t = useTranslations('demoModeration');
+  const { tab, go, queue, s } = useModeration();
+  const refs = useRef<Partial<Record<TabKey, HTMLButtonElement | null>>>({});
+  useEffect(() => {
+    const el = refs.current[tab];
+    const bar = el?.closest('[data-tabbar]');
+    if (el && bar instanceof HTMLElement) {
+      const left = el.offsetLeft - bar.clientWidth / 2 + el.clientWidth / 2;
+      bar.scrollTo({ left: Math.max(0, left) });
+    }
+  }, [tab]);
+  const openAppeals = s.appeals.filter((a) => a.status === 'open').length;
+  const onKey = (e: React.KeyboardEvent, i: number) => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    e.preventDefault();
+    const next = TABS[(i + (e.key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length];
+    go(next);
+    refs.current[next]?.focus();
+  };
+  return (
+    <div data-tabbar className="relative mb-4 overflow-x-auto border-b border-secondary-200 dark:border-secondary-800">
+      <div role="tablist" aria-label={t('tabs.label')} className="flex min-w-max gap-1">
+        {TABS.map((k, i) => {
+          const Icon = TAB_ICONS[k];
+          const active = tab === k;
+          const count = k === 'queue' ? queue.length : k === 'appeals' ? openAppeals : null;
+          return (
+            <button
+              key={k}
+              ref={(el) => {
+                refs.current[k] = el;
+              }}
+              type="button"
+              role="tab"
+              id={`mod-tab-${k}`}
+              aria-selected={active}
+              aria-controls="mod-panel"
+              tabIndex={active ? 0 : -1}
+              onClick={() => go(k)}
+              onKeyDown={(e) => onKey(e, i)}
+              className={`flex items-center gap-2 whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-medium transition-colors ${focusRing} ${
+                active
+                  ? 'border-red-600 bg-red-50/60 text-red-700 dark:bg-red-950/40 dark:text-red-300'
+                  : 'border-transparent text-secondary-600 hover:text-secondary-900 dark:text-secondary-400 dark:hover:text-white'
+              }`}
+            >
+              <Icon className="h-4 w-4" aria-hidden />
+              {t(`tabs.${k}`)}
+              {count !== null && count > 0 && (
+                <span className="rounded-full bg-secondary-200 px-1.5 text-[11px] font-semibold text-secondary-700 dark:bg-secondary-700 dark:text-secondary-200">{count}</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function Shell() {
+  const t = useTranslations('demoModeration');
+  const { tab } = useModeration();
+  return (
+    <>
+      <div className="mb-5">
+        <Header selector={<PlatformSelector />} />
+      </div>
+      <HowItWorks />
+      <Wellness />
+      <Tabs />
+      <p className="mb-5 flex items-start gap-1.5 text-xs text-secondary-600 dark:text-secondary-400">
+        <ShieldCheckIcon className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+        {t('compliance')}
+      </p>
+      <div id="mod-panel" role="tabpanel" aria-labelledby={`mod-tab-${tab}`}>
+        {tab === 'dashboard' && <DashboardTab />}
+        {tab === 'queue' && <QueueTab />}
+        {tab === 'classifier' && <ClassifierTab />}
+        {tab === 'rules' && <RulesTab />}
+        {tab === 'appeals' && <AppealsTab />}
+        {tab === 'audit' && <AuditTab />}
+        {tab === 'report' && <ReportTab />}
+        {tab === 'metrics' && <MetricsTab />}
+        {tab === 'api' && <ApiTab />}
+      </div>
+      <Toasts />
+    </>
+  );
+}
 
 export default function ModeracionContenidoPage() {
   const t = useTranslations('demoModeration');
-
-  const [tab, setTab] = useState<TabKey>('dashboard');
-  const [vertical, setVertical] = useState<Vertical>('social');
-
-  // Queue state (shared with QueueTab)
-  const [items, setItems] = useState<QueueItem[]>(QUEUE_ITEMS);
-  const [typeFilter, setTypeFilter] = useState<ContentType | 'all'>('all');
-  const [selectedId, setSelectedId] = useState<string | null>(QUEUE_ITEMS[0]?.id ?? null);
-  const [revealedIds, setRevealedIds] = useState<Set<string>>(new Set());
-
-  // Workflows state (shared with WorkflowsTab)
-  const [rules, setRules] = useState<RuleNode[]>(DEFAULT_RULES);
-
-  const filteredItems = useMemo(() => {
-    const allowed = VERTICAL_RULES[vertical];
-    const order = { critical: 0, high: 1, medium: 2, low: 3 };
-    return items
-      .filter((it) => typeFilter === 'all' || it.type === typeFilter)
-      .filter((it) => allowed.includes(it.category))
-      .sort((a, b) => order[a.priority] - order[b.priority]);
-  }, [items, typeFilter, vertical]);
-
-  const selected = useMemo(
-    () => filteredItems.find((i) => i.id === selectedId) ?? filteredItems[0] ?? null,
-    [filteredItems, selectedId]
-  );
-
-  const toggleReveal = (id: string) =>
-    setRevealedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-
-  const resolveItem = (id: string) => {
-    setItems((prev) => prev.filter((i) => i.id !== id));
-    setSelectedId((prev) => (prev === id ? null : prev));
-  };
-
   return (
-    <div className="min-h-screen bg-secondary-50 dark:bg-secondary-950 py-10 px-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
-          <Link href="/demo">
-            <Button variant="ghost" className="mb-4">
-              <ArrowLeftIcon className="h-5 w-5 mr-2" />
-              {t('backToCatalog')}
-            </Button>
-          </Link>
-
-          <section className="rounded-2xl bg-gradient-to-br from-red-700 to-red-900 text-white p-6 md:p-8 shadow-lg">
-            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
-              <div>
-                <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
-                  {t('pageTitle')}
-                </h1>
-                <p className="text-lg text-red-50/90 max-w-3xl">
-                  {t('pageSubtitle')}
-                </p>
-              </div>
-
-              <div className="flex items-center gap-3 flex-wrap">
-                <div className="px-3 py-1.5 bg-white/15 text-white rounded-full text-sm font-medium backdrop-blur">
-                  {t('status')}
-                </div>
-                <div className="flex items-center gap-2">
-                  <label className="text-xs uppercase tracking-wide text-red-100/80">
-                    {t('verticals.label')}
-                  </label>
-                  <select
-                    value={vertical}
-                    onChange={(e) => setVertical(e.target.value as Vertical)}
-                    className="rounded-lg border border-white/30 bg-white/10 text-white text-sm px-3 py-1.5 backdrop-blur"
-                  >
-                    {(['social', 'gaming', 'dating', 'kids', 'finance'] as Vertical[]).map((v) => (
-                      <option key={v} value={v} className="text-secondary-900">
-                        {t(`verticals.${v}`)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-          </section>
-        </div>
-
-        {/* Wellness banner */}
-        <Card
-          variant="bordered"
-          padding="md"
-          className="mb-6 border-emerald-200 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-900/10"
+    <div className="min-h-screen bg-secondary-50 text-secondary-900 dark:bg-secondary-950 dark:text-white">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <Link
+          href="/demo"
+          className={`mb-3 inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-secondary-600 hover:text-red-700 dark:text-secondary-300 dark:hover:text-red-300 ${focusRing}`}
         >
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="flex items-start gap-3">
-              <HeartIcon className="h-6 w-6 text-emerald-600 dark:text-emerald-300 mt-0.5 shrink-0" />
-              <div>
-                <p className="font-semibold text-emerald-800 dark:text-emerald-200">
-                  {t('wellness.title')}
-                </p>
-                <p className="text-sm text-emerald-700/80 dark:text-emerald-200/80 mt-0.5">
-                  {t('wellness.message')}
-                </p>
-                <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-200">
-                    {t('wellness.nextBreak')}: 00:12:30
-                  </span>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-200">
-                    {t('wellness.categoryRotation')}: spam → hate
-                  </span>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-200">
-                    {t('wellness.blurByDefault')}: on
-                  </span>
-                </div>
+          <ArrowLeftIcon className="h-4 w-4" aria-hidden />
+          {t('shell.back')}
+        </Link>
+        <ModerationProvider
+          fallback={
+            <>
+              <div className="mb-5">
+                <Header />
               </div>
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-emerald-500 text-emerald-700 dark:text-emerald-200"
-              >
-                <PauseCircleIcon className="h-5 w-5 mr-1" />
-                {t('wellness.takeBreak')}
-              </Button>
-              <Button variant="ghost" size="sm" className="text-emerald-700 dark:text-emerald-200">
-                {t('wellness.mentalHealthCheck')}
-              </Button>
-            </div>
-          </div>
-        </Card>
-
-        {/* Tabs */}
-        <div className="mb-6 border-b border-secondary-200 dark:border-secondary-800 overflow-x-auto">
-          <div className="flex gap-1 min-w-max">
-            {TABS.map((tk) => {
-              const Icon = TAB_ICONS[tk];
-              const active = tab === tk;
-              return (
-                <button
-                  key={tk}
-                  onClick={() => setTab(tk)}
-                  className={`flex items-center gap-2 px-4 py-2.5 border-b-2 transition-colors text-sm font-medium whitespace-nowrap ${
-                    active
-                      ? 'border-red-600 text-red-700 dark:text-red-300 bg-red-50/60 dark:bg-red-950/40'
-                      : 'border-transparent text-secondary-600 dark:text-secondary-400 hover:text-secondary-900 dark:hover:text-white'
-                  }`}
-                >
-                  <Icon className="h-4 w-4" />
-                  {t(`tabs.${tk}`)}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Compliance */}
-        <div className="mb-6 flex flex-wrap items-center gap-2">
-          <span className="text-xs uppercase tracking-wide text-secondary-500 dark:text-secondary-400 mr-1">
-            {t('compliance.title')}:
-          </span>
-          {(['dsa', 'coppa', 'gdpr', 'lgpd', 'localLaws', 'auditReady'] as const).map((k) => (
-            <Badge key={k} variant="info" size="sm">
-              <ShieldCheckIcon className="h-3.5 w-3.5 mr-1" />
-              {t(`compliance.${k}`)}
-            </Badge>
-          ))}
-        </div>
-
-        {/* ----- Tab content ----- */}
-        {tab === 'dashboard' && (
-          <section>
-            <div className="mb-4">
-              <h2 className="text-xl font-semibold text-secondary-900 dark:text-white">
-                {t('dashboard.title')}
-              </h2>
-              <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                {t('dashboard.subtitle')}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <MetricCard label={t('dashboard.moderatedToday')} value="38,412" trend="+8.2%" up />
-              <MetricCard
-                label={t('dashboard.queueNow')}
-                value={`${filteredItems.length}`}
-                trend="-12"
-                up={false}
-              />
-              <MetricCard label={t('dashboard.accuracy')} value="95.4 / 91.2" trend="+0.4 pp" up />
-              <MetricCard label={t('dashboard.avgTime')} value="34s" trend="-6s" up />
-              <MetricCard label={t('dashboard.fpr')} value="1.3%" trend="-0.2 pp" up />
-              <MetricCard label={t('dashboard.autoActioned')} value="71%" trend="+3 pp" up />
-              <MetricCard label={t('dashboard.humanReviewed')} value="26%" />
-              <MetricCard label={t('dashboard.sla')} value="98.7%" trend="+0.5 pp" up />
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-4">
-              <Card variant="bordered" padding="md" className="md:col-span-2">
-                <CardHeader>
-                  <CardTitle className="text-lg">{t('transparency.byMonth')}</CardTitle>
-                </CardHeader>
-                <BarChart
-                  data={TRANSPARENCY_BY_MONTH.map((m) => ({ label: m.month, value: m.takedowns }))}
-                />
-              </Card>
-
-              <Card variant="bordered" padding="md">
-                <CardHeader>
-                  <CardTitle className="text-lg">{t('transparency.byCategory')}</CardTitle>
-                </CardHeader>
-                <div className="space-y-2">
-                  {TRANSPARENCY_BY_CATEGORY.slice(0, 6).map((c) => (
-                    <div key={c.key} className="flex items-center gap-2">
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${CATEGORY_COLORS[c.key]}`}>
-                        {t(`queue.classifications.${c.key}`)}
-                      </span>
-                      <div className="flex-1 h-1.5 rounded-full bg-secondary-100 dark:bg-secondary-800 overflow-hidden">
-                        <div className="h-full bg-primary-500" style={{ width: `${c.value * 2.8}%` }} />
-                      </div>
-                      <span className="text-xs text-secondary-600 dark:text-secondary-400 w-8 text-right">
-                        {c.value}%
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            </div>
-          </section>
-        )}
-
-        {tab === 'queue' && (
-          <QueueTab
-            items={filteredItems}
-            selected={selected}
-            selectedId={selectedId}
-            setSelectedId={setSelectedId}
-            typeFilter={typeFilter}
-            setTypeFilter={setTypeFilter}
-            revealedIds={revealedIds}
-            toggleReveal={toggleReveal}
-            resolveItem={resolveItem}
-          />
-        )}
-
-        {tab === 'classifiers' && <ClassifiersTab />}
-        {tab === 'workflows' && <WorkflowsTab rules={rules} setRules={setRules} />}
-        {tab === 'appeals' && <AppealsTab />}
-        {tab === 'audit' && <AuditTab />}
-        {tab === 'transparency' && <TransparencyTab />}
-        {tab === 'metrics' && <MetricsTab />}
-        {tab === 'api' && <ApiTab />}
+              <div role="status" className="rounded-2xl border border-secondary-200 bg-white p-10 text-center text-sm text-secondary-500 dark:border-secondary-800 dark:bg-secondary-900 dark:text-secondary-400">
+                {t('shell.loading')}
+              </div>
+            </>
+          }
+        >
+          <Shell />
+        </ModerationProvider>
       </div>
     </div>
   );
