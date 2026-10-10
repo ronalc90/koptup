@@ -23,6 +23,7 @@ import { buildState } from '../lib/seed';
 import { __test, releasePlan } from '../lib/store';
 import { routeStops } from '../components/Routes';
 import type { WmsState } from '../lib/types';
+import { backOp, diffDays, fwdOp, minutesOf, opClock, timeToMinutes } from '../lib/dates';
 
 const NOW = '2026-10-08T09:40';
 const { reducer } = __test;
@@ -80,6 +81,67 @@ describe('operación de ejemplo', () => {
     for (let i = 1; i < lots.length; i++) expect(lots[i].expiry! >= lots[i - 1].expiry!).toBe(true);
     const col = allocateFefo(s.lots, 'fun', 'NUT-COL300', 9999, s.baseDate);
     expect(col.alloc.every((a) => s.lots.find((l) => l.id === a.lotId)!.status === 'available')).toBe(true);
+  });
+});
+
+describe('fechas y horas coherentes con el momento en que abres la demo', () => {
+  const inOp = (dt: string) => minutesOf(dt) >= 6 * 60 && minutesOf(dt) <= 22 * 60;
+  it.each(['2026-10-10T03:00', '2026-10-10T06:10', '2026-10-10T09:40', '2026-10-10T13:20', '2026-10-10T21:50', '2026-10-10T23:30'])(
+    'con la hora %s nada ocurre en el futuro ni de madrugada en la bodega',
+    (now) => {
+      const s = buildState(now);
+      for (const sh of s.shipments) {
+        for (let i = 0; i < sh.events.length; i++) {
+          const e = sh.events[i];
+          expect(e.at <= now).toBe(true);
+          expect(inOp(e.at)).toBe(true);
+          if (i > 0) expect(e.at >= sh.events[i - 1].at).toBe(true);
+        }
+      }
+      for (const o of s.orders) {
+        expect(o.createdAt <= now).toBe(true);
+        for (const t of [o.pickedAt, o.shippedAt, o.deliveredAt]) {
+          if (!t) continue;
+          expect(t <= now).toBe(true);
+          expect(inOp(t)).toBe(true);
+          expect(t >= o.createdAt || o.status === 'delivered').toBe(true);
+        }
+        if (o.pickedAt && o.shippedAt) expect(o.shippedAt >= o.pickedAt).toBe(true);
+        if (o.stop) {
+          expect(o.stop.from).toBeLessThan(o.stop.to);
+          expect(o.stop.to).toBeLessThanOrEqual(22 * 60);
+        }
+      }
+      for (const w of s.waves) expect(w.at <= now && inOp(w.at)).toBe(true);
+      for (const l of s.log) expect(l.at <= now).toBe(true);
+      for (let i = 1; i < s.log.length; i++) expect(s.log[i - 1].at >= s.log[i].at).toBe(true);
+      for (const p of s.pos) if (p.closedAt) expect(p.closedAt <= now && inOp(p.closedAt)).toBe(true);
+      for (const r of s.rmas) {
+        const o = s.orders.find((x) => x.id === r.order)!;
+        expect(o.status).toBe('delivered');
+        expect(r.date >= o.deliveredAt!.slice(0, 10)).toBe(true);
+        expect(r.date <= s.baseDate).toBe(true);
+      }
+      for (const wh of ['fun', 'ita', 'baq'] as const) {
+        const start = timeToMinutes(s.routes[wh].start);
+        expect(start).toBeGreaterThanOrEqual(7 * 60);
+        expect(start).toBeLessThanOrEqual(18 * 60);
+      }
+    },
+  );
+
+  it('el retracto rechazado por plazo usa el pedido entregado hace más de 5 días hábiles', () => {
+    const s = buildState(NOW);
+    const r = s.rmas.find((x) => x.rejectReason === 'outOfTerm')!;
+    const o = s.orders.find((x) => x.id === r.order)!;
+    expect(r.reason).toBe('withdrawal');
+    expect(diffDays(o.deliveredAt!.slice(0, 10), s.baseDate)).toBeGreaterThanOrEqual(7);
+  });
+
+  it('cuenta minutos de operación saltando la noche', () => {
+    expect(backOp('2026-10-10T07:00', 90)).toBe('2026-10-09T21:30');
+    expect(fwdOp('2026-10-10T21:30', 60)).toBe('2026-10-11T06:30');
+    expect(opClock('2026-10-10T04:00')).toBe('2026-10-09T22:00');
   });
 });
 

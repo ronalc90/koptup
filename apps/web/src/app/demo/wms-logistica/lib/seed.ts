@@ -18,7 +18,23 @@ import {
   DEFAULT_TARIFFS,
   CARRIER_BY_ID,
 } from './catalog';
-import { addDays, addMinutes, dateOf, dayOfMonth, daysInMonth, minutesOf, previousMonth, type ISODate, type ISODateTime } from './dates';
+import {
+  addDays,
+  addMinutes,
+  backOp,
+  clampOp,
+  dateOf,
+  dayOfMonth,
+  daysInMonth,
+  fwdOp,
+  hhmm,
+  minutesBetween,
+  minutesOf,
+  opClock,
+  previousMonth,
+  type ISODate,
+  type ISODateTime,
+} from './dates';
 import { abcClasses, allocateFefo, boxFor, orderNetKg, productMap, quotes, shipZone, suggestBin, BOX_TARE } from './engine';
 import type {
   AbcClass,
@@ -40,7 +56,7 @@ import type {
   WmsState,
 } from './types';
 
-export const STATE_VERSION = 4;
+export const STATE_VERSION = 5;
 
 function mulberry32(a: number) {
   return () => {
@@ -61,16 +77,33 @@ export function cutoffFor(createdAt: ISODateTime, channel: Channel): ISODateTime
   return `${date}T${cut}`;
 }
 
+/** Ventanas de entrega en minutos desde la salida de la ruta. */
 const WINDOWS: [number, number][] = [
-  [480, 720],
-  [600, 840],
-  [780, 1080],
-  [480, 1080],
-  [540, 780],
+  [0, 240],
+  [60, 300],
+  [180, 480],
+  [0, 540],
+  [30, 270],
 ];
+
+/** Salida de la flota propia: la próxima media hora después del reloj de operación (entre 7:00 a. m. y 6:00 p. m.). */
+export function routeStartFor(now: ISODateTime): number {
+  const m = minutesOf(opClock(now)) + 20;
+  return Math.min(18 * 60, Math.max(7 * 60, Math.ceil(m / 30) * 30));
+}
+
+const OP_CLOSE_MIN = 22 * 60;
+
+/** Redondea una fecha-hora a múltiplos de 10 minutos (hacia abajo). */
+const round10 = (dt: ISODateTime): ISODateTime => addMinutes(dt, -(minutesOf(dt) % 10));
 
 export function buildState(now: ISODateTime): WmsState {
   const today = dateOf(now);
+  // Reloj de la operación: lo que ya pasó en la bodega ocurre dentro del horario
+  // (6:00 a. m. a 10:00 p. m.) y nunca después de la hora real.
+  const op = opClock(now);
+  const ago = (min: number) => backOp(op, min);
+  const routeStart = routeStartFor(now);
   const rnd = mulberry32(20261008);
   const ri = (a: number, b: number) => a + Math.floor(rnd() * (b - a + 1));
   const pick = <T,>(arr: T[]): T => arr[Math.floor(rnd() * arr.length)];
@@ -174,17 +207,23 @@ export function buildState(now: ISODateTime): WmsState {
         city = loc.city;
         address = `${address}, ${loc.name}`;
         const win = pick(WINDOWS);
-        stop = { x: Math.round((loc.x + (rnd() - 0.5) * 1.6) * 10) / 10, y: Math.round((loc.y + (rnd() - 0.5) * 1.6) * 10) / 10, from: win[0], to: win[1] };
+        stop = {
+          x: Math.round((loc.x + (rnd() - 0.5) * 1.6) * 10) / 10,
+          y: Math.round((loc.y + (rnd() - 0.5) * 1.6) * 10) / 10,
+          from: routeStart + win[0],
+          to: Math.min(OP_CLOSE_MIN, routeStart + win[1]),
+        };
       } else {
         city = pick(CITIES.filter((c) => c.metro !== w.metro && c.region !== 'special')).id;
       }
     }
+    // Los pedidos en línea entran a cualquier hora; lo que pasa en la bodega, dentro del horario.
     let created: ISODateTime;
     if (opts.created) created = opts.created;
     else if (kind === 'new') created = addMinutes(now, -ri(10, 230));
-    else if (kind === 'picked') created = addMinutes(now, -ri(150, 320));
-    else if (kind === 'delivered') created = at(addDays(today, -ri(3, 9)), ri(480, 900));
-    else created = addMinutes(now, -ri(260, 560));
+    else if (kind === 'picked') created = ago(ri(150, 320));
+    else if (kind === 'delivered') created = at(addDays(today, -ri(3, 9)), ri(480, 780));
+    else created = ago(ri(260, 560));
     const o: Order = {
       id: `PED-${++orderNo}`,
       wh,
@@ -223,14 +262,17 @@ export function buildState(now: ISODateTime): WmsState {
     const q = quotes(o.wh, o.city, kg).find((x) => x.carrier.id === carrierId);
     const flow: ShipStatus[] = carrierId === 'own' ? ['created', 'arrived', 'delivered'] : ['created', 'pickedUp', 'inTransit', 'outForDelivery', 'delivered'];
     const upto = status === 'exception' ? 2 : flow.indexOf(status);
+    // Eventos repartidos entre la guía y la entrega (o la hora actual), dentro del horario.
+    const end = status === 'delivered' && deliveredAt ? deliveredAt : op;
+    const span = Math.max(0, minutesBetween(shippedAt, end));
+    const steps = status === 'delivered' ? upto : upto + 1;
     const events: Shipment['events'] = [];
-    let t = shippedAt;
     for (let i = 0; i <= upto; i++) {
-      events.push({ status: flow[i], at: t });
-      t = addMinutes(t, ri(40, 180));
+      const t = i === 0 ? shippedAt : clampOp(addMinutes(shippedAt, Math.round((span * i) / Math.max(1, steps))));
+      events.push({ status: flow[i], at: i === upto && status === 'delivered' && deliveredAt ? deliveredAt : t });
     }
-    if (status === 'exception') events.push({ status: 'exception', at: addMinutes(t, -20), note: 'addressIncomplete' });
-    if (status === 'delivered' && deliveredAt) events[events.length - 1].at = deliveredAt;
+    if (status === 'exception') events.push({ status: 'exception', at: clampOp(addMinutes(shippedAt, Math.round(span * 0.9))), note: 'addressIncomplete' });
+    const t = events[events.length - 1].at;
     const s: Shipment = {
       id: `${carrier.prefix}${ri(1000000, 9999999)}`,
       order: o.id,
@@ -260,6 +302,7 @@ export function buildState(now: ISODateTime): WmsState {
   const pos: PurchaseOrder[] = [];
   const putaway: PutawayTask[] = [];
   const routes = {} as WmsState['routes'];
+  const waveDoneAgo: Partial<Record<WarehouseId, number>> = {};
 
   const plan: Record<WarehouseId, { fresh: number; picked: number; own: number; national: number; delivered: number }> = {
     fun: { fresh: 10, picked: 3, own: 9, national: 3, delivered: 6 },
@@ -272,36 +315,42 @@ export function buildState(now: ISODateTime): WmsState {
     const delivered: Order[] = [];
     for (let i = 0; i < cfg.delivered; i++) {
       const o = makeOrder(w.id, 'delivered');
-      const shippedAt = addMinutes(o.createdAt, ri(90, 240));
-      fulfill(o, addMinutes(o.createdAt, ri(40, 80)));
+      const shippedAt = fwdOp(o.createdAt, ri(60, 180));
+      fulfill(o, fwdOp(o.createdAt, ri(30, 50)));
       const localOrder = shipZone(w.id, o.city) === 'local';
       const carrier = localOrder ? 'own' : quotes(w.id, o.city, orderNetKg(o, pm) + 0.4).find((q) => q.ok)!.carrier.id;
-      ship(o, carrier, shippedAt, 'delivered', addMinutes(shippedAt, localOrder ? ri(120, 360) : ri(1440, 2880)));
+      const deliveredAt = localOrder ? fwdOp(shippedAt, ri(60, 240)) : at(addDays(dateOf(shippedAt), ri(1, 2)), ri(570, 1050));
+      ship(o, carrier, shippedAt, 'delivered', deliveredAt);
       delivered.push(o);
     }
     for (let i = 0; i < cfg.own; i++) {
-      const o = makeOrder(w.id, 'own');
-      fulfill(o, addMinutes(o.createdAt, ri(30, 60)));
-      ship(o, 'own', addMinutes(o.createdAt, ri(70, 120)), 'created');
+      const c = ri(260, 560);
+      const o = makeOrder(w.id, 'own', { created: ago(c) });
+      fulfill(o, ago(c - ri(30, 60)));
+      ship(o, 'own', ago(c - ri(70, 120)), 'created');
     }
     for (let i = 0; i < cfg.national; i++) {
-      const o = makeOrder(w.id, 'national', { channel: i === 0 ? 'wholesale' : undefined });
-      fulfill(o, addMinutes(o.createdAt, ri(30, 60)));
+      const c = ri(260, 560);
+      const o = makeOrder(w.id, 'national', { channel: i === 0 ? 'wholesale' : undefined, created: ago(c) });
+      fulfill(o, ago(c - ri(30, 60)));
       const kg = orderNetKg(o, pm) + 0.4;
       const carrier = quotes(w.id, o.city, kg).find((q) => q.ok)!.carrier.id;
       const status: ShipStatus = w.id === 'fun' && i === 2 ? 'exception' : i === 0 ? 'inTransit' : 'pickedUp';
-      ship(o, carrier, addMinutes(o.createdAt, ri(80, 140)), status);
+      ship(o, carrier, ago(c - ri(80, 140)), status);
     }
     const pickedOrders: Order[] = [];
+    const waveAgo = ri(100, 140);
     for (let i = 0; i < cfg.picked; i++) {
-      const o = makeOrder(w.id, 'picked', w.id === 'fun' && i === 0 ? { city: 'clo', channel: 'web', client: 'lir' } : {});
-      fulfill(o, addMinutes(o.createdAt, ri(40, 90)));
+      const o = makeOrder(w.id, 'picked', { ...(w.id === 'fun' && i === 0 ? { city: 'clo', channel: 'web', client: 'lir' } : {}), created: ago(ri(150, 320)) });
+      const pickedAgo = ri(30, 90);
+      waveDoneAgo[w.id] = Math.min(waveDoneAgo[w.id] ?? pickedAgo, pickedAgo);
+      fulfill(o, ago(pickedAgo));
       o.status = 'picked';
       pickedOrders.push(o);
     }
     if (pickedOrders.length) {
       const waveId = `OLA-${ri(310, 389)}`;
-      waves.push({ id: waveId, wh: w.id, at: addMinutes(now, -ri(100, 140)), orders: pickedOrders.map((o) => o.id), strategy: 'batch', status: 'done' });
+      waves.push({ id: waveId, wh: w.id, at: ago(waveAgo), orders: pickedOrders.map((o) => o.id), strategy: 'batch', status: 'done' });
       pickedOrders.forEach((o) => (o.wave = waveId));
     }
     for (let i = 0; i < cfg.fresh; i++) makeOrder(w.id, 'new');
@@ -312,7 +361,7 @@ export function buildState(now: ISODateTime): WmsState {
       .sort((a, b) => (a.shippedAt! < b.shippedAt! ? -1 : 1));
     const routePlan: string[][] = w.vehicles.map(() => []);
     own.forEach((o, i) => routePlan[i % w.vehicles.length].push(o.id));
-    routes[w.id] = { plan: routePlan, optimized: false, start: '08:00' };
+    routes[w.id] = { plan: routePlan, optimized: false, start: hhmm(routeStart) };
 
     // Devoluciones de pedidos entregados.
     const rmaSeeds: { status: Rma['status']; reason: Rma['reason']; key: string; disposition?: Rma['disposition']; reject?: string }[] =
@@ -326,12 +375,18 @@ export function buildState(now: ISODateTime): WmsState {
         : w.id === 'ita'
           ? [
               { status: 'requested', reason: 'withdrawal', key: 'c5' },
-              { status: 'rejected', reason: 'defect', key: 'c6', reject: 'outOfTerm' },
+              { status: 'rejected', reason: 'withdrawal', key: 'c6', reject: 'outOfTerm' },
             ]
           : [{ status: 'approved', reason: 'damaged', key: 'c1' }];
-    rmaSeeds.forEach((r, i) => {
-      const o = delivered[i % delivered.length];
+    // Las devoluciones salen de pedidos ya entregados: el retracto rechazado por plazo usa el
+    // pedido entregado hace más tiempo; las demás, los más recientes.
+    const byRecent = [...delivered].sort((a, b) => (a.deliveredAt! < b.deliveredAt! ? 1 : -1));
+    let nextRecent = 0;
+    rmaSeeds.forEach((r) => {
+      const o = r.reject === 'outOfTerm' ? byRecent[byRecent.length - 1] : byRecent[nextRecent++ % byRecent.length];
       const ln = o.lines[0];
+      const deliveredDay = dateOf(o.deliveredAt ?? today);
+      const asked = addDays(today, -ri(0, 2));
       rmas.push({
         id: `DEV-${++rmaNo}`,
         wh: w.id,
@@ -343,7 +398,7 @@ export function buildState(now: ISODateTime): WmsState {
         reason: r.reason,
         comments: '',
         commentsKey: r.key,
-        date: addDays(today, -ri(0, 2)),
+        date: asked < deliveredDay ? deliveredDay : asked,
         status: r.status,
         disposition: r.disposition,
         rejectReason: r.reject,
@@ -364,7 +419,8 @@ export function buildState(now: ISODateTime): WmsState {
     expiry: exp(sku),
     onTruck,
   });
-  const etaToday = (min: number) => at(today, min);
+  // Llegadas relativas al reloj de la operación: la primera OC ya está en el muelle.
+  const etaIn = (min: number) => round10(min <= 0 ? backOp(op, -min) : fwdOp(op, min));
 
   // Pedido mayorista que espera la OC cross-dock.
   const xdOrder = makeOrder('fun', 'new', {
@@ -384,7 +440,7 @@ export function buildState(now: ISODateTime): WmsState {
     city: 'vvc',
     customer: WHOLESALERS[1],
     lines: [{ sku: 'CTH-TOA70', qty: 30, alloc: [] }],
-    created: addMinutes(now, -200),
+    created: ago(200),
   });
   xdOrder2.crossDockPo = 'OC-24860';
 
@@ -394,7 +450,7 @@ export function buildState(now: ISODateTime): WmsState {
       wh: 'fun',
       supplier: 'gua',
       client: 'lir',
-      eta: etaToday(570),
+      eta: etaIn(-10),
       lines: [line('LIR-CHA400', 48, 48, 118), line('LIR-CRE250', 36, 32, 119), line('LIR-PRO120', 24, 24, 120)],
       status: 'expected',
       scans: [],
@@ -405,7 +461,7 @@ export function buildState(now: ISODateTime): WmsState {
       wh: 'fun',
       supplier: 'cal',
       client: 'cth',
-      eta: etaToday(660),
+      eta: etaIn(90),
       lines: [line('CTH-TOA70', 60, 60, 201), line('CTH-COB220', 20, 21, 202)],
       status: 'expected',
       scans: [],
@@ -416,7 +472,7 @@ export function buildState(now: ISODateTime): WmsState {
       wh: 'fun',
       supplier: 'alt',
       client: 'nut',
-      eta: etaToday(810),
+      eta: etaIn(210),
       lines: [line('NUT-VTC60', 120, 120, 311), line('NUT-OMG90', 48, 48, 312)],
       status: 'expected',
       scans: [],
@@ -428,7 +484,7 @@ export function buildState(now: ISODateTime): WmsState {
       wh: 'fun',
       supplier: 'pco',
       client: 'cth',
-      eta: addMinutes(now, -150),
+      eta: round10(ago(150)),
       lines: [
         { ...line('CTH-VAJ16', 12, 12, 87), received: 12 },
         { ...line('CTH-SAR24', 24, 24, 88), received: 24 },
@@ -436,19 +492,19 @@ export function buildState(now: ISODateTime): WmsState {
       status: 'closed',
       scans: [],
       issues: [],
-      closedAt: addMinutes(now, -80),
+      closedAt: ago(80),
     },
     {
       id: 'OC-24860',
       wh: 'fun',
       supplier: 'cal',
       client: 'cth',
-      eta: addMinutes(now, -240),
+      eta: round10(ago(240)),
       lines: [{ ...line('CTH-TOA70', 30, 30, 61), received: 30 }],
       status: 'closed',
       scans: [],
       issues: [],
-      closedAt: addMinutes(now, -170),
+      closedAt: ago(170),
       crossDockOrder: xdOrder2.id,
     },
     {
@@ -468,7 +524,7 @@ export function buildState(now: ISODateTime): WmsState {
       wh: 'ita',
       supplier: 'gua',
       client: 'lir',
-      eta: etaToday(630),
+      eta: etaIn(60),
       lines: [line('LIR-CHA400', 36, 36, 401), line('LIR-ACO400', 24, 24, 402)],
       status: 'expected',
       scans: [],
@@ -490,7 +546,7 @@ export function buildState(now: ISODateTime): WmsState {
       wh: 'baq',
       supplier: 'alt',
       client: 'nut',
-      eta: etaToday(720),
+      eta: etaIn(120),
       lines: [line('NUT-COL300', 30, 30, 501), line('NUT-PRO907', 20, 18, 502)],
       status: 'expected',
       scans: [],
@@ -546,9 +602,9 @@ export function buildState(now: ISODateTime): WmsState {
   for (const l of pos.find((p) => p.id === 'OC-24868')!.lines) {
     const s = suggestBin(partial, 'fun', l.sku);
     putaway.push({ id: nid('UB'), wh: 'fun', sku: l.sku, lot: l.lot, expiry: l.expiry, qty: l.received, ref: 'OC-24868', suggested: s.bin, rule: s.rule, quarantine: false, status: 'pending' });
-    addMove({ at: addMinutes(now, -80), wh: 'fun', sku: l.sku, lot: l.lot, bin: 'RECIBO', qty: l.received, type: 'receipt', ref: 'OC-24868' });
+    addMove({ at: ago(80), wh: 'fun', sku: l.sku, lot: l.lot, bin: 'RECIBO', qty: l.received, type: 'receipt', ref: 'OC-24868' });
   }
-  addMove({ at: addMinutes(now, -170), wh: 'fun', sku: 'CTH-TOA70', lot: lotCode(61), bin: 'MUELLE', qty: 30, type: 'crossDock', ref: 'OC-24860' });
+  addMove({ at: ago(170), wh: 'fun', sku: 'CTH-TOA70', lot: lotCode(61), bin: 'MUELLE', qty: 30, type: 'crossDock', ref: 'OC-24860' });
 
   /* ---------- Conteos cíclicos del día ---------- */
   const countPlan: Record<WarehouseId, { cls: AbcClass; n: number; due: number }[]> = {
@@ -597,10 +653,12 @@ export function buildState(now: ISODateTime): WmsState {
   partial.billing = billing;
 
   log.push(
-    { id: nid('LG'), at: addMinutes(now, -170), wh: 'fun', key: 'poClosed', params: { po: 'OC-24860' } },
-    { id: nid('LG'), at: addMinutes(now, -120), wh: 'fun', key: 'waveDone', params: { wave: waves.find((x) => x.wh === 'fun')?.id ?? '' } },
-    { id: nid('LG'), at: addMinutes(now, -80), wh: 'fun', key: 'poClosed', params: { po: 'OC-24868' } },
+    { id: nid('LG'), at: ago(80), wh: 'fun', key: 'poClosed', params: { po: 'OC-24868' } },
+    { id: nid('LG'), at: ago(waveDoneAgo.fun ?? 60), wh: 'fun', key: 'waveDone', params: { wave: waves.find((x) => x.wh === 'fun')?.id ?? '' } },
+    { id: nid('LG'), at: ago(170), wh: 'fun', key: 'poClosed', params: { po: 'OC-24860' } },
   );
+  // La actividad reciente va de la más nueva a la más antigua.
+  log.sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0));
   partial.seq = seq;
   return partial;
 }

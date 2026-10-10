@@ -22,6 +22,12 @@ export function useProductName() {
   };
 }
 
+/** Nombre visible de las zonas de paso (muelle de recibo y de despacho) que no son ubicaciones del mapa. */
+export function useBinLabel() {
+  const t = useT();
+  return (bin: string) => (bin === 'RECIBO' ? t('common.dockIn') : bin === 'MUELLE' ? t('common.dockOut') : bin);
+}
+
 export function productLabel(p: Product | undefined, name: (sku: string) => string) {
   return p ? name(p.sku) : '';
 }
@@ -222,6 +228,33 @@ export const selectCls = `${inputCls} pr-9`;
 
 export const thCls = 'px-2 py-2 text-left text-xs font-medium text-secondary-500 dark:text-secondary-400';
 export const tdCls = 'px-2 py-2 align-top';
+
+/*
+ * Tablas que en el celular (menos de 640 px) se muestran como tarjetas de dos
+ * columnas: el encabezado se oculta y cada celda muestra su rótulo (data-label)
+ * encima del valor. En pantallas grandes se ven como tabla normal.
+ */
+export const rtTable = 'w-full text-sm max-sm:block';
+export const rtHead = 'max-sm:hidden';
+export const rtBody = 'max-sm:block max-sm:space-y-2';
+export const rtRow =
+  'max-sm:grid max-sm:grid-cols-2 max-sm:gap-x-3 max-sm:rounded-xl max-sm:border max-sm:border-secondary-200 max-sm:p-2 dark:max-sm:border-secondary-700';
+export const rtd = `${tdCls} max-sm:block max-sm:min-w-0 max-sm:px-1 max-sm:py-1 max-sm:text-left max-sm:before:block max-sm:before:text-[11px] max-sm:before:font-medium max-sm:before:text-secondary-500 max-sm:before:content-[attr(data-label)] dark:max-sm:before:text-secondary-400`;
+/** Celda que ocupa todo el ancho de la tarjeta en el celular. */
+export const rtFull = 'max-sm:col-span-2';
+/** Fila de detalle (expandible) que en el celular ocupa todo el ancho. */
+export const rtDetailRow = 'max-sm:block max-sm:rounded-xl';
+
+/** En el celular y la tableta, lleva a la vista el panel de detalle que quedó debajo de la lista. */
+export function scrollIntoViewOnMobile(id: string) {
+  if (typeof window === 'undefined' || window.innerWidth >= 1280) return;
+  window.setTimeout(() => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.scrollY - 80;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }, 50);
+}
 
 export function download(filename: string, content: string | Blob, mime = 'text/csv;charset=utf-8') {
   const blob = typeof content === 'string' ? new Blob([content], { type: mime }) : content;

@@ -22,7 +22,7 @@
       "warehouses": "Bodegas",
       "whType": {
         "fun": "Multicliente",
-        "ita": "E-commerce",
+        "ita": "Comercio electrónico",
         "baq": "Distribución Caribe"
       },
       "occupancy": "Ocupación",
@@ -102,7 +102,9 @@
       "today": "Hoy",
       "units": "unidades",
       "viewTracking": "Ver seguimiento",
-      "unitsN": "{n, plural, one {# unidad} other {# unidades}}"
+      "unitsN": "{n, plural, one {# unidad} other {# unidades}}",
+      "dockIn": "Muelle de recibo",
+      "dockOut": "Muelle de despacho"
     },
     "channels": {
       "web": "Tienda en línea",
@@ -260,7 +262,7 @@
       "scanEmpty": "Aún no hay lecturas.",
       "notInPo": "No está en la OC",
       "scanResult": {
-        "ok": "OK",
+        "ok": "Correcta",
         "over": "Sobrante",
         "unknown": "Rechazada"
       },
@@ -436,7 +438,8 @@
         "number": "costo o peso inválido",
         "barcode": "código de barras inválido"
       },
-      "note": "Disponible = en buen estado, sin vencer y sin reservar para pedidos. Bloqueado = en cuarentena o vencido."
+      "note": "Disponible = en buen estado, sin vencer y sin reservar para pedidos. Bloqueado = en cuarentena o vencido.",
+      "toggleCol": "Detalle"
     },
     "counts": {
       "title": "Conteo cíclico ABC",
@@ -539,7 +542,8 @@
         "done": "Alistada"
       },
       "pickNow": "Alistar",
-      "noneDue": "Ningún pedido por liberar tiene corte hoy: todos vencen mañana"
+      "noneDue": "Ningún pedido por liberar tiene corte hoy: todos vencen mañana",
+      "inWave": "Incluir en la ola"
     },
     "picking": {
       "title": "Alistamiento (picking)",
@@ -674,7 +678,7 @@
       "isPreferred": "Preferida en esta bodega",
       "makePreferred": "Marcar como preferida",
       "preferredSet": "{name} es ahora la preferida en {wh}",
-      "note": "Transportadoras ficticias con tarifas de ejemplo en pesos. En tu proyecto se conecta por API con las transportadoras que uses (por ejemplo Servientrega, Coordinadora, Interrapidísimo, TCC, Envía o Deprisa) o con un agregador de envíos.",
+      "note": "Transportadoras ficticias con tarifas de ejemplo en pesos. En tu proyecto se conecta con las transportadoras con las que trabajas (por su API, si la ofrecen) o con un agregador de envíos.",
       "quoteTitle": "Cotizador",
       "quoteSubtitle": "Origen: {wh}",
       "destination": "Destino",
@@ -867,12 +871,12 @@
       "quarantined": "Devolución {id} enviada a cuarentena",
       "closed": "Devolución {id} cerrada",
       "seedComments": {
-        "c1": "La tapa llegó rota y el producto se regó.",
+        "c1": "Llegó con el empaque roto y el producto golpeado.",
         "c2": "Le llegó una referencia distinta a la que pidió.",
         "c3": "Se retractó de la compra dentro del plazo.",
-        "c4": "El producto falló desde el primer uso.",
-        "c5": "Cambió de opinión el mismo día de la entrega.",
-        "c6": "Lo reportó cuatro meses después de la compra."
+        "c4": "El cliente reporta un defecto de fábrica.",
+        "c5": "Cambió de opinión al recibirlo; el empaque está sin abrir.",
+        "c6": "Pidió el retracto cuando ya habían pasado más de 5 días hábiles desde la entrega."
       },
       "note": "Al recibirla, la devolución entra al kardex y al mapa (reingreso o cuarentena). La nota crédito y el reembolso los emite tu ERP o tu facturador; el WMS no factura."
     },
@@ -958,6 +962,7 @@
         "NUT-OMG90": "Omega 3 x 90 cápsulas",
         "LIR-KITBV": "Kit de bienvenida Lirio"
       }
-    }
+    },
+    "back": "Volver a demos"
   }
 }

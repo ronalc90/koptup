@@ -6,7 +6,7 @@ import { CITY_BY_ID, CLIENT_BY_ID } from '../lib/catalog';
 import { fmtDate } from '../lib/format';
 import { now, useWms } from '../lib/store';
 import type { RmaReason, RmaStatus } from '../lib/types';
-import { Empty, Field, Panel, Pill, SimNote, inputCls, baseInputCls, selectCls, tdCls, thCls, useProductName, useT, type Tone } from './ui';
+import { Empty, Field, Panel, Pill, SimNote, inputCls, baseInputCls, selectCls, thCls, rtBody, rtFull, rtHead, rtRow, rtTable, rtd, useProductName, useT, type Tone } from './ui';
 
 const REASONS: RmaReason[] = ['damaged', 'wrongItem', 'withdrawal', 'defect'];
 const REJECT = ['outOfTerm', 'used', 'noEvidence'] as const;
@@ -78,7 +78,7 @@ export default function Returns() {
                 ))}
               </select>
             </Field>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-[7rem_minmax(0,1fr)] gap-3">
               <Field label={t('returns.qty', { max: maxQty })}>
                 <input type="number" min={1} max={maxQty} className={inputCls} value={qty} onChange={(e) => setQty(Math.max(1, Math.min(maxQty, Number(e.target.value) || 1)))} />
               </Field>
@@ -117,8 +117,8 @@ export default function Returns() {
           <Empty>{t('returns.none')}</Empty>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] text-sm">
-              <thead>
+            <table className={`${rtTable} sm:min-w-[720px]`}>
+              <thead className={rtHead}>
                 <tr className="border-b border-secondary-200 dark:border-secondary-700">
                   <th className={thCls}>{t('returns.rma')}</th>
                   <th className={thCls}>{t('returns.who')}</th>
@@ -128,31 +128,31 @@ export default function Returns() {
                   <th className={thCls}>{t('returns.actions')}</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className={rtBody}>
                 {rmas.map((r) => (
-                  <tr key={r.id} className="border-b border-secondary-100 align-top dark:border-secondary-800">
-                    <td className={tdCls}>
+                  <tr key={r.id} className={`border-b border-secondary-100 align-top dark:border-secondary-800 ${rtRow}`}>
+                    <td className={rtd} data-label={t('returns.rma')}>
                       <div className="font-mono text-xs font-semibold">{r.id}</div>
                       <div className="text-xs text-secondary-500">{fmtDate(r.date, lang)}</div>
                       <div className="font-mono text-xs text-secondary-500">{r.order}</div>
                     </td>
-                    <td className={`${tdCls} text-xs`}>
+                    <td className={`${rtd} text-xs`} data-label={t('returns.who')}>
                       <div>{r.customer}</div>
                       <div className="text-secondary-500">{CLIENT_BY_ID[r.client].name}</div>
                     </td>
-                    <td className={`${tdCls} text-xs`}>
+                    <td className={`${rtd} text-xs`} data-label={t('returns.product')}>
                       {name(r.sku)} × {r.qty}
                     </td>
-                    <td className={`${tdCls} text-xs`}>
+                    <td className={`${rtd} text-xs`} data-label={t('returns.reason')}>
                       <div>{t(`returns.reasons.${r.reason}`)}</div>
                       {(r.comments || r.commentsKey) && <div className="text-secondary-500">“{r.commentsKey ? t(`returns.seedComments.${r.commentsKey}`) : r.comments}”</div>}
                     </td>
-                    <td className={tdCls}>
+                    <td className={rtd} data-label={t('orders.status')}>
                       <Pill tone={TONE[r.status]}>{t(`returns.statuses.${r.status}`)}</Pill>
                       {r.disposition && <div className="mt-1 text-xs text-secondary-500">{t(`returns.dispositions.${r.disposition}`)}</div>}
                       {r.rejectReason && <div className="mt-1 text-xs text-red-600">{t(`returns.rejectReasons.${r.rejectReason}`)}</div>}
                     </td>
-                    <td className={tdCls}>
+                    <td className={`${rtd} ${rtFull}`} data-label={r.status === 'rejected' || r.status === 'closed' ? '' : t('returns.actions')}>
                       {r.status === 'requested' && rejecting !== r.id && (
                         <div className="flex flex-wrap gap-1.5">
                           <Button

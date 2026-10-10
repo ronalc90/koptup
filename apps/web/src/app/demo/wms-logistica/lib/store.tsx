@@ -126,6 +126,11 @@ function putLot(s: WmsState, l: Omit<Lot, 'id' | 'reserved'>): Lot {
   return lot;
 }
 
+/** Consecutivo de las tareas de conteo (CC-301, CC-302…). */
+function nextCountId(s: WmsState) {
+  return `CC-${s.counts.reduce((m, c) => Math.max(m, Number(c.id.replace(/\D/g, '')) || 0), 300) + 1}`;
+}
+
 /** Un pedido queda alistado cuando todas sus asignaciones se tomaron o se reportaron como faltante. */
 function orderDone(o: Order) {
   return o.lines.every((ln) => ln.alloc.every((x) => x.picked + x.short >= x.qty));
@@ -266,7 +271,7 @@ function reducer(state: WmsState | null, a: Action): WmsState | null {
       const { ok } = releasePlan(s, a.orders, today);
       if (!ok.length) return state;
       s.seq += 1;
-      const waveId = `OLA-${400 + s.seq}`;
+      const waveId = `OLA-${s.waves.reduce((m, w) => Math.max(m, Number(w.id.replace(/\D/g, '')) || 0), 300) + 1}`;
       for (const id of ok) {
         const o = s.orders.find((x) => x.id === id)!;
         for (const ln of o.lines) {
@@ -316,7 +321,7 @@ function reducer(state: WmsState | null, a: Action): WmsState | null {
             existing.due = today;
           } else {
             s.seq += 1;
-            s.counts.unshift({ id: `CC-${s.seq}`, wh: o.wh, bin: al.bin, lotId: al.lotId, sku: ln.sku, due: today, assignee: PICKERS[s.seq % PICKERS.length], status: 'scheduled', urgent: true });
+            s.counts.unshift({ id: nextCountId(s), wh: o.wh, bin: al.bin, lotId: al.lotId, sku: ln.sku, due: today, assignee: PICKERS[s.seq % PICKERS.length], status: 'scheduled', urgent: true });
           }
           // Reasignar desde otro lote (FEFO) si hay existencias.
           const exclude = new Set(ln.alloc.filter((x) => x.short > 0).map((x) => x.lotId));
@@ -527,7 +532,7 @@ function reducer(state: WmsState | null, a: Action): WmsState | null {
         if (seen.has(l.bin)) continue;
         seen.add(l.bin);
         s.seq += 1;
-        s.counts.push({ id: `CC-${s.seq}`, wh: a.wh, bin: l.bin, lotId: l.id, sku: l.sku, due: today, assignee: PICKERS[n % PICKERS.length], status: 'scheduled' });
+        s.counts.push({ id: nextCountId(s), wh: a.wh, bin: l.bin, lotId: l.id, sku: l.sku, due: today, assignee: PICKERS[n % PICKERS.length], status: 'scheduled' });
         n += 1;
       }
       addLog(s, a.wh, a.at, 'countGenerated', { cls: a.cls, n });
@@ -577,8 +582,8 @@ function reducer(state: WmsState | null, a: Action): WmsState | null {
       return s;
     }
     case 'rma.create': {
-      s.seq += 1;
-      const id = `DEV-${1100 + s.seq}`;
+      const last = s.rmas.reduce((m, r) => Math.max(m, Number(r.id.replace(/\D/g, '')) || 0), 1040);
+      const id = `DEV-${last + 1}`;
       s.rmas.unshift({ ...a.rma, id, status: 'requested' });
       addLog(s, a.rma.wh, a.at, 'rmaCreated', { id, order: a.rma.order });
       return s;

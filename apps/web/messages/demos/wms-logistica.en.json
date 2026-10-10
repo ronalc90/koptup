@@ -102,7 +102,9 @@
       "today": "Today",
       "units": "units",
       "viewTracking": "View tracking",
-      "unitsN": "{n, plural, one {# unit} other {# units}}"
+      "unitsN": "{n, plural, one {# unit} other {# units}}",
+      "dockIn": "Receiving dock",
+      "dockOut": "Shipping dock"
     },
     "channels": {
       "web": "Online store",
@@ -260,7 +262,7 @@
       "scanEmpty": "No scans yet.",
       "notInPo": "Not in the PO",
       "scanResult": {
-        "ok": "OK",
+        "ok": "Matched",
         "over": "Over",
         "unknown": "Rejected"
       },
@@ -436,7 +438,8 @@
         "number": "invalid cost or weight",
         "barcode": "invalid barcode"
       },
-      "note": "Available = in good condition, not expired and not reserved for orders. Blocked = in quarantine or expired."
+      "note": "Available = in good condition, not expired and not reserved for orders. Blocked = in quarantine or expired.",
+      "toggleCol": "Details"
     },
     "counts": {
       "title": "ABC cycle counting",
@@ -539,7 +542,8 @@
         "done": "Picked"
       },
       "pickNow": "Pick",
-      "noneDue": "No order to release has today’s cutoff: they are all due tomorrow"
+      "noneDue": "No order to release has today’s cutoff: they are all due tomorrow",
+      "inWave": "Add to the wave"
     },
     "picking": {
       "title": "Picking",
@@ -674,7 +678,7 @@
       "isPreferred": "Preferred in this warehouse",
       "makePreferred": "Mark as preferred",
       "preferredSet": "{name} is now the preferred carrier in {wh}",
-      "note": "Fictitious carriers with sample rates in Colombian pesos. In your project we connect through APIs to the carriers you use (for example Servientrega, Coordinadora, Interrapidísimo, TCC, Envía or Deprisa) or through a shipping aggregator.",
+      "note": "Fictitious carriers with sample rates in Colombian pesos. In your project we connect to the carriers you work with (through their API, if they offer one) or to a shipping aggregator.",
       "quoteTitle": "Rate calculator",
       "quoteSubtitle": "Origin: {wh}",
       "destination": "Destination",
@@ -867,12 +871,12 @@
       "quarantined": "Return {id} sent to quarantine",
       "closed": "Return {id} closed",
       "seedComments": {
-        "c1": "The cap arrived broken and the product spilled.",
+        "c1": "It arrived with the packaging torn and the product dented.",
         "c2": "They received a different item from the one they ordered.",
         "c3": "They withdrew from the purchase within the allowed period.",
-        "c4": "The product failed on first use.",
-        "c5": "They changed their mind on the delivery day.",
-        "c6": "They reported it four months after the purchase."
+        "c4": "The customer reports a manufacturing defect.",
+        "c5": "They changed their mind on receiving it; the package is unopened.",
+        "c6": "They asked to withdraw after more than 5 business days from delivery."
       },
       "note": "When received, the return enters the stock card and the map (restock or quarantine). The credit note and the refund are issued by your ERP or invoicing system; the WMS does not invoice."
     },
@@ -958,6 +962,7 @@
         "NUT-OMG90": "Omega 3 x 90 capsules",
         "LIR-KITBV": "Lirio welcome kit"
       }
-    }
+    },
+    "back": "Back to demos"
   }
 }

@@ -4,10 +4,10 @@ import { useEffect, useState } from 'react';
 import { MagnifyingGlassIcon, ClipboardDocumentIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
 import { CITY_BY_ID, CLIENT_BY_ID } from '../lib/catalog';
-import { fmtCOP, fmtDateTime } from '../lib/format';
+import { fmtCOP, fmtDateTime, fmtNum } from '../lib/format';
 import { now, useWms } from '../lib/store';
 import type { Shipment, ShipStatus } from '../lib/types';
-import { Empty, Panel, Pill, SimNote, inputCls, tdCls, thCls, useT, type Tone } from './ui';
+import { Empty, Panel, Pill, SimNote, inputCls, thCls, rtBody, rtHead, rtRow, rtTable, rtd, scrollIntoViewOnMobile, useT, type Tone } from './ui';
 import { LabelModal } from './Packing';
 
 type Filter = 'all' | 'active' | 'delivered' | 'exception';
@@ -56,7 +56,7 @@ export default function Tracking() {
   const message =
     sh && order
       ? t('tracking.whatsapp', {
-          name: order.customer.split(' ')[0],
+          name: order.channel === 'wholesale' ? order.customer : order.customer.split(' ')[0],
           order: order.id,
           client: CLIENT_BY_ID[order.client].name,
           carrier: t(`carrierNames.${sh.carrier}`),
@@ -91,8 +91,8 @@ export default function Tracking() {
           <Empty>{t('tracking.none')}</Empty>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[620px] text-sm">
-              <thead>
+            <table className={`${rtTable} sm:min-w-[620px]`}>
+              <thead className={rtHead}>
                 <tr className="border-b border-secondary-200 dark:border-secondary-700">
                   <th className={thCls}>{t('tracking.guide')}</th>
                   <th className={thCls}>{t('orders.customer')}</th>
@@ -101,22 +101,30 @@ export default function Tracking() {
                   <th className={thCls}>{t('orders.status')}</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className={rtBody}>
                 {list.map((s) => {
                   const o = state.orders.find((x) => x.id === s.order);
                   const last = s.events[s.events.length - 1];
                   return (
-                    <tr key={s.id} className={`border-b border-secondary-100 dark:border-secondary-800 ${sh?.id === s.id ? 'bg-stone-50 dark:bg-stone-900/30' : ''}`}>
-                      <td className={tdCls}>
-                        <button type="button" className="font-mono text-xs font-semibold text-primary-700 hover:underline dark:text-primary-300" aria-pressed={sh?.id === s.id} onClick={() => setSelected(s.id)}>
+                    <tr key={s.id} className={`border-b border-secondary-100 dark:border-secondary-800 ${rtRow} ${sh?.id === s.id ? 'bg-stone-50 dark:bg-stone-900/30' : ''}`}>
+                      <td className={rtd} data-label={t('tracking.guide')}>
+                        <button
+                          type="button"
+                          className="font-mono text-xs font-semibold text-primary-700 hover:underline dark:text-primary-300"
+                          aria-pressed={sh?.id === s.id}
+                          onClick={() => {
+                            setSelected(s.id);
+                            scrollIntoViewOnMobile('wms-tracking-detail');
+                          }}
+                        >
                           {s.id}
                         </button>
                         <div className="font-mono text-xs text-secondary-500">{s.order}</div>
                       </td>
-                      <td className={`${tdCls} text-xs`}>{o?.customer}</td>
-                      <td className={`${tdCls} text-xs`}>{t(`carrierNames.${s.carrier}`)}</td>
-                      <td className={`${tdCls} text-xs`}>{CITY_BY_ID[s.city]?.name}</td>
-                      <td className={tdCls}>
+                      <td className={`${rtd} text-xs`} data-label={t('orders.customer')}>{o?.customer}</td>
+                      <td className={`${rtd} text-xs`} data-label={t('tracking.carrier')}>{t(`carrierNames.${s.carrier}`)}</td>
+                      <td className={`${rtd} text-xs`} data-label={t('orders.destination')}>{CITY_BY_ID[s.city]?.name}</td>
+                      <td className={rtd} data-label={t('orders.status')}>
                         <Pill tone={SHIP_TONE[s.status]}>{t(`tracking.statuses.${s.status}`)}</Pill>
                         <div className="text-xs text-secondary-500">{fmtDateTime(last.at, today, lang)}</div>
                       </td>
@@ -129,7 +137,7 @@ export default function Tracking() {
         )}
       </Panel>
 
-      <Panel title={sh ? t('tracking.detail', { guide: sh.id }) : t('tracking.detailEmpty')} className="xl:col-span-2">
+      <Panel id="wms-tracking-detail" title={sh ? t('tracking.detail', { guide: sh.id }) : t('tracking.detailEmpty')} className="xl:col-span-2">
         {!sh || !order ? (
           <Empty>{t('tracking.pick')}</Empty>
         ) : (
@@ -137,7 +145,7 @@ export default function Tracking() {
             <div className="text-xs text-secondary-600 dark:text-secondary-300">
               {order.id} · {order.customer} · {order.address}, {CITY_BY_ID[order.city]?.name}
               <br />
-              {t(`carrierNames.${sh.carrier}`)} · {fmtCOP(sh.cost, lang)} · {sh.weightKg} kg
+              {t(`carrierNames.${sh.carrier}`)} · {fmtCOP(sh.cost, lang)} · {fmtNum(sh.weightKg, lang, 2)} kg
             </div>
             <ol className="relative space-y-3 border-l-2 border-secondary-200 pl-4 dark:border-secondary-700">
               {sh.events.map((e, i) => (

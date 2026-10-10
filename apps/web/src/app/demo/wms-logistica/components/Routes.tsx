@@ -9,7 +9,7 @@ import { timeToMinutes } from '../lib/dates';
 import { fmtClock, fmtNum } from '../lib/format';
 import { useWms } from '../lib/store';
 import type { WarehouseId, WmsState } from '../lib/types';
-import { Empty, Field, Kpi, Panel, Pill, SimNote, inputCls, tdCls, thCls, useT } from './ui';
+import { Empty, Field, Kpi, Panel, Pill, SimNote, inputCls, thCls, rtBody, rtFull, rtHead, rtRow, rtTable, rtd, useT } from './ui';
 
 export const VEHICLE_COLORS = ['#0f766e', '#7c3aed', '#c2410c', '#2563eb'];
 
@@ -90,8 +90,8 @@ export default function RoutesView() {
             <div className="mt-4 grid grid-cols-1 gap-5 lg:grid-cols-2">
               <RouteMap plan={route.plan} stops={stops} />
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[360px] text-sm">
-                  <thead>
+                <table className={`${rtTable} sm:min-w-[360px]`}>
+                  <thead className={rtHead}>
                     <tr className="border-b border-secondary-200 dark:border-secondary-700">
                       <th className={thCls}>{t('routes.vehicle')}</th>
                       <th className={`${thCls} text-right`}>{t('routes.stopsCol')}</th>
@@ -100,19 +100,19 @@ export default function RoutesView() {
                       <th className={`${thCls} text-right`}>{t('routes.back')}</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className={rtBody}>
                     {current.routes.map((r, i) => (
-                      <tr key={r.vehicle} className="border-b border-secondary-100 dark:border-secondary-800">
-                        <td className={tdCls}>
+                      <tr key={r.vehicle} className={`border-b border-secondary-100 dark:border-secondary-800 ${rtRow}`}>
+                        <td className={`${rtd} ${rtFull} font-semibold`} data-label={t('routes.vehicle')}>
                           <span className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full" style={{ background: VEHICLE_COLORS[i % VEHICLE_COLORS.length] }} />
                           {r.vehicle}
                         </td>
-                        <td className={`${tdCls} text-right`}>{r.stops.length}</td>
-                        <td className={`${tdCls} text-right tabular-nums ${r.overCapacity ? 'font-semibold text-red-600' : ''}`}>
+                        <td className={`${rtd} text-right`} data-label={t('routes.stopsCol')}>{r.stops.length}</td>
+                        <td className={`${rtd} text-right tabular-nums ${r.overCapacity ? 'font-semibold text-red-600' : ''}`} data-label={t('routes.load')}>
                           {fmtNum(r.kg, lang, 1)}/{fmtNum(r.capacityKg, lang)} kg
                         </td>
-                        <td className={`${tdCls} text-right tabular-nums`}>{fmtNum(r.km, lang, 1)}</td>
-                        <td className={`${tdCls} text-right tabular-nums`}>{fmtClock(startMin + r.minutes, lang)}</td>
+                        <td className={`${rtd} text-right tabular-nums`} data-label="km">{fmtNum(r.km, lang, 1)}</td>
+                        <td className={`${rtd} text-right tabular-nums`} data-label={t('routes.back')}>{fmtClock(startMin + r.minutes, lang)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -127,8 +127,8 @@ export default function RoutesView() {
       {total > 0 && (
         <Panel title={t('routes.stopsTitle')} actions={<Button size="sm" variant="outline" onClick={() => go('driver')}>{t('routes.openDriver')}</Button>}>
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] text-sm">
-              <thead>
+            <table className={`${rtTable} sm:min-w-[720px]`}>
+              <thead className={rtHead}>
                 <tr className="border-b border-secondary-200 dark:border-secondary-700">
                   <th className={thCls}>{t('routes.vehicle')}</th>
                   <th className={thCls}>#</th>
@@ -139,28 +139,28 @@ export default function RoutesView() {
                   <th className={thCls}>{t('orders.status')}</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className={rtBody}>
                 {current.routes.flatMap((r) =>
                   r.stops.map((st, k) => {
                     const o = state.orders.find((x) => x.id === st.order)!;
                     const sh = state.shipments.find((s) => s.id === o.shipment);
                     const stop = stops[st.order];
                     return (
-                      <tr key={st.order} className="border-b border-secondary-100 dark:border-secondary-800">
-                        <td className={`${tdCls} text-xs`}>{r.vehicle}</td>
-                        <td className={tdCls}>{k + 1}</td>
-                        <td className={`${tdCls} font-mono text-xs`}>{o.id}</td>
-                        <td className={`${tdCls} text-xs`}>
+                      <tr key={st.order} className={`border-b border-secondary-100 dark:border-secondary-800 ${rtRow}`}>
+                        <td className={`${rtd} text-xs`} data-label={t('routes.vehicle')}>{r.vehicle}</td>
+                        <td className={rtd} data-label="#">{k + 1}</td>
+                        <td className={`${rtd} font-mono text-xs`} data-label={t('orders.order')}>{o.id}</td>
+                        <td className={`${rtd} ${rtFull} text-xs`} data-label={t('orders.destination')}>
                           {o.customer} · {o.address}, {CITY_BY_ID[o.city]?.name}
                         </td>
-                        <td className={`${tdCls} text-xs`}>
+                        <td className={`${rtd} text-xs`} data-label={t('routes.window')}>
                           {fmtClock(stop.from, lang)} – {fmtClock(stop.to, lang)}
                         </td>
-                        <td className={`${tdCls} text-xs ${st.late ? 'font-semibold text-red-600' : ''}`}>
+                        <td className={`${rtd} text-xs ${st.late ? 'font-semibold text-red-600' : ''}`} data-label={t('routes.eta')}>
                           {fmtClock(st.arrive, lang)}
                           {st.late ? ` · ${t('routes.lateTag')}` : ''}
                         </td>
-                        <td className={tdCls}>
+                        <td className={rtd} data-label={t('orders.status')}>
                           <Pill tone={sh?.status === 'delivered' ? 'success' : sh?.status === 'exception' ? 'danger' : sh?.status === 'arrived' ? 'warning' : 'default'}>
                             {!sh || sh.status === 'created' ? t('driver.pendingStatus') : t(`tracking.statuses.${sh.status}`)}
                           </Pill>

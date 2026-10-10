@@ -9,7 +9,7 @@ import { previousMonth } from '../lib/dates';
 import { fmtCOP, fmtDate, fmtMonth, fmtNum } from '../lib/format';
 import { useWms } from '../lib/store';
 import type { ClientId, Tariff } from '../lib/types';
-import { Panel, Segmented, SimNote, download, baseInputCls, tdCls, thCls, useT } from './ui';
+import { Panel, Segmented, SimNote, download, baseInputCls, tdCls, thCls, rtBody, rtFull, rtHead, rtRow, rtTable, rtd, useT } from './ui';
 
 type Period = 'prev' | 'mtd';
 const FIELD: Record<string, keyof Tariff> = { storage: 'storage', line: 'line', order: 'order', parcel: 'parcel', rma: 'rma' };
@@ -116,8 +116,8 @@ export default function Billing() {
           <span className="font-semibold">{c.name}</span> · NIT {fmtNit(c.nit)} · {periodLabel}
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[560px] text-sm">
-            <thead>
+          <table className={`${rtTable} sm:min-w-[560px]`}>
+            <thead className={rtHead}>
               <tr className="border-b border-secondary-200 dark:border-secondary-700">
                 <th className={thCls}>{t('billing.concept')}</th>
                 <th className={`${thCls} text-right`}>{t('billing.qty')}</th>
@@ -125,41 +125,41 @@ export default function Billing() {
                 <th className={`${thCls} text-right`}>{t('billing.subtotal')}</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className={rtBody}>
               {b.lines.map((l) => (
-                <tr key={l.concept} className="border-b border-secondary-100 dark:border-secondary-800">
-                  <td className={tdCls}>
+                <tr key={l.concept} className={`border-b border-secondary-100 dark:border-secondary-800 ${rtRow}`}>
+                  <td className={`${rtd} ${rtFull} font-medium`}>
                     {t(`billing.concepts.${l.concept}`)}
                     <div className="text-xs text-secondary-500">{t(`billing.conceptHint.${l.concept}`)}</div>
                   </td>
-                  <td className={`${tdCls} text-right tabular-nums`}>{fmtNum(l.qty, lang)}</td>
-                  <td className={`${tdCls} text-right`}>
+                  <td className={`${rtd} text-right tabular-nums`} data-label={t('billing.qty')}>{fmtNum(l.qty, lang)}</td>
+                  <td className={`${rtd} text-right`} data-label={t('billing.unit')}>
                     <input
                       type="number"
                       min={0}
                       step={50}
-                      className={`${baseInputCls} ml-auto w-28 text-right`}
+                      className={`${baseInputCls} w-28 text-right sm:ml-auto`}
                       value={state.tariffs[client][FIELD[l.concept]]}
                       onChange={(e) => dispatch({ type: 'tariff.set', client, field: FIELD[l.concept], value: Number(e.target.value) })}
                       aria-label={t('billing.editTariff', { concept: t(`billing.concepts.${l.concept}`) })}
                     />
                   </td>
-                  <td className={`${tdCls} text-right font-semibold tabular-nums`}>{fmtCOP(l.total, lang)}</td>
+                  <td className={`${rtd} ${rtFull} text-right font-semibold tabular-nums`} data-label={t('billing.subtotal')}>{fmtCOP(l.total, lang)}</td>
                 </tr>
               ))}
-              <tr>
+              <tr className="max-sm:flex max-sm:justify-between max-sm:px-2">
                 <td className={tdCls} colSpan={3}>
                   {t('billing.subtotal')}
                 </td>
                 <td className={`${tdCls} text-right tabular-nums`}>{fmtCOP(b.subtotal, lang)}</td>
               </tr>
-              <tr>
+              <tr className="max-sm:flex max-sm:justify-between max-sm:px-2">
                 <td className={tdCls} colSpan={3}>
                   {t('billing.iva')}
                 </td>
                 <td className={`${tdCls} text-right tabular-nums`}>{fmtCOP(iva, lang)}</td>
               </tr>
-              <tr className="bg-stone-50 dark:bg-stone-900/30">
+              <tr className="bg-stone-50 max-sm:flex max-sm:justify-between max-sm:rounded-xl max-sm:px-2 dark:bg-stone-900/30">
                 <td className={`${tdCls} font-bold`} colSpan={3}>
                   {t('billing.total')}
                 </td>
@@ -174,7 +174,7 @@ export default function Billing() {
 
       <Panel title={t('billing.summary', { period: periodLabel })}>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[480px] text-sm">
+          <table className="w-full text-sm sm:min-w-[480px]">
             <thead>
               <tr className="border-b border-secondary-200 dark:border-secondary-700">
                 <th className={thCls}>{t('billing.client')}</th>
@@ -192,8 +192,8 @@ export default function Billing() {
                         {x.name}
                       </button>
                     </td>
-                    <td className={`${tdCls} text-right tabular-nums`}>{fmtCOP(bb.subtotal, lang)}</td>
-                    <td className={`${tdCls} text-right font-semibold tabular-nums`}>{fmtCOP(bb.subtotal + Math.round(bb.subtotal * IVA), lang)}</td>
+                    <td className={`${tdCls} whitespace-nowrap text-right tabular-nums`}>{fmtCOP(bb.subtotal, lang)}</td>
+                    <td className={`${tdCls} whitespace-nowrap text-right font-semibold tabular-nums`}>{fmtCOP(bb.subtotal + Math.round(bb.subtotal * IVA), lang)}</td>
                   </tr>
                 );
               })}
