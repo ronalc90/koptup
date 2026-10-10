@@ -105,7 +105,6 @@ Los menús del **prospecto** (solo Mis demos y Mi perfil) y del **cliente** (por
 | `/admin` (Inicio), Pedidos, Entregables, Facturas, Conversaciones, Contactos, Configuración | ➜ `/login` | ➜ `/dashboard` | ➜ Mis demos | ➜ `/dashboard` | ➜ Solicitudes | ✅ | ✅ |
 | `/admin/users` (Usuarios) | ➜ `/login` | ➜ `/dashboard` | ➜ Mis demos | ➜ `/dashboard` | ➜ Solicitudes | 👁 (no puede cambiar roles) | ✅ |
 | `/liquidacion` (herramienta interna) | ➜ `/login` | ➜ `/dashboard` | ➜ Mis demos | ➜ `/dashboard` | ✅ | ✅ | ✅ |
-| `/test` (pruebas de la API) | ➜ `/login` | ➜ inicio | ➜ inicio | ➜ inicio | ➜ inicio | ➜ inicio | ✅ solo fuera de producción (404 en producción) |
 
 *La columna `user` / `client` también vale para un prospecto que luego pasa a cliente: conserva sus accesos a demos.*
 
@@ -248,7 +247,7 @@ flowchart TD
     classDef ok fill:#dcfce7,stroke:#16a34a,color:#14532d
 
     REQ["Petición del navegador"]:::sistema
-    M1{"¿Ruta /admin, /dashboard, /liquidacion, /test o /demo/slug?"}:::decision
+    M1{"¿Ruta /admin, /dashboard, /liquidacion o /demo/slug?"}:::decision
     PUB["Next sirve la página sin verificar sesión"]:::sistema
     M2{"¿Es /demo/slug?"}:::decision
     GATE["Regla de acceso a la demo (sección 4)"]:::sistema
@@ -301,7 +300,7 @@ Los guardias de la API:
 | `requireAdmin` | `admin` | Igual que `requireRole` |
 | `requireStaffOrDemoAccess(slug)` | `admin`, `manager`, `sales` directo; `developer` y el resto según la regla de la [§4](#4-cómo-se-decide-el-acceso-a-una-demo) | 401, 403 o 503 con el `motivo` |
 | `devOnlyAdmin` | `admin`, solo fuera de producción | 404 en producción |
-| `authorize(...roles)` | Compara el rol del token | Existe en `middleware/auth.ts` pero **ninguna ruta de `main` lo usa**: se reemplazó por `requireRole` |
+| `isStaffSession(req)` | En los controladores "dueño o equipo" (entregables, facturas, notificaciones): ¿la sesión es del equipo? Lee el rol **de la base de datos**, nunca el del token | Solo pasa el dueño |
 
 Los cambios de rol o el retiro de un acceso se aplican **de inmediato** en la API; en la web pueden tardar hasta 30 segundos por la caché del middleware.
 
@@ -315,12 +314,13 @@ Los cambios de rol o el retiro de un acceso se aplican **de inmediato** en la AP
 |---|---|---|---|---|---|---|---|
 | **Públicas:** `/health`, `GET /api/demo-catalog`, `GET /api/demo-access/:slug`, `POST /api/contact`, `POST /api/quotes`, `POST /api/demo-requests`, `/api/demo-rag`, crear bots y chatear en `/api/chatbot` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **Auth pública:** registro, login, Google, refresh, olvidé y restablecer contraseña, activar cuenta | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Editar o borrar un bot** del chatbot (`/api/chatbot/bots/:id`, docs, URLs, conversaciones) | Solo quien tenga el token de dueño de ese bot (no depende del rol) | | | | | | |
+| **Editar o borrar un bot** del chatbot (`/api/chatbot/bots/:id`, docs, URLs, conversaciones) | Solo quien tenga el token de dueño de ese bot (no depende del rol). Un bot antiguo sin dueño registrado solo lo administra el equipo (`admin`, `manager`, `sales`) | | | | | | |
 | **Sesión:** `/api/auth/me`, perfil, cambiar contraseña, logout, `GET /api/me/demos` | ❌ | 🔒 | 🔒 | 🔒 | 🔒 | 🔒 | 🔒 |
-| **Portal:** pedidos, proyectos, mensajes, notificaciones, `/api/documents` | ❌ | 🔒 | 🔒 | 🔒 | 🔒 | 🔒 | 🔒 |
-| **Entregables y facturas** (`/api/deliverables`, `/api/invoices`): la lista trae solo los propios; abrir, aprobar, rechazar, pagar o descargar uno concreto | ❌ | 🔒 | 🔒 | 🔒 | ✅ cualquiera por su id | ✅ cualquiera por su id | ✅ cualquiera por su id |
+| **Portal:** pedidos, proyectos, mensajes, notificaciones, `/api/documents` (un pedido se edita o cancela solo mientras está pendiente de revisión; su estado lo cambia el equipo) | ❌ | 🔒 | 🔒 | 🔒 | 🔒 | 🔒 | 🔒 |
+| **Entregables y facturas** (`/api/deliverables`, `/api/invoices`): la lista trae solo los propios; abrir, aprobar, rechazar o descargar uno concreto | ❌ | 🔒 | 🔒 | 🔒 | ✅ cualquiera por su id | ✅ cualquiera por su id | ✅ cualquiera por su id |
 | Subir un entregable (`POST /api/deliverables`) | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ | ✅ |
-| Crear una factura (`POST /api/invoices`) | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
+| Crear una factura o registrar su pago (`POST /api/invoices`, `POST /api/invoices/:id/pay`) | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
+| Crear una conversación (`POST /api/messages/conversations`) | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
 | **APIs de demos:** `/api/auditoria` y lectura de `/api/documentos-conocimiento` (cuentas-medicas), `/api/expert` y lecturas de `/api/cups` (sistema-experto), `/api/content` (gestor-contenido), `/api/linkedin-ads/generate` (linkedin-ads) | 🎟 | 🎟 | 🎟 | ✅ | ✅ | ✅ | ✅ |
 | **Herramientas internas:** `/api/liquidacion`, `/api/reglas-facturacion`, cuentas médicas internas (`/api/cuentas`, `/api/ley100`, `/api/process`, `/api/export`), configuración del sistema experto y de los documentos de conocimiento | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
 | `GET /api/admin/demo-requests`, `demo-grants` y `demo-catalog` | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |

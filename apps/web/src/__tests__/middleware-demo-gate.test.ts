@@ -174,6 +174,22 @@ describe('middleware: acceso a /demo/<slug>', () => {
     expect(calls.filter((c) => c.includes('/demo-catalog'))).toHaveLength(1);
   });
 
+  it('demo-access responde 404 (catálogo y web desalineados): falla cerrada con pantalla de acceso, no-store y noindex', async () => {
+    mockBackend((url) => {
+      if (url.endsWith('/demo-catalog')) return json(CATALOG);
+      if (url.includes('/demo-access/erp')) return json({ success: false, code: 'not_found' }, 404);
+      return json({}, 500);
+    });
+    const middleware = await loadMiddleware();
+    const res = await middleware(request('/demo/erp', { accessToken: 't' }));
+    expect(res.headers.get('x-middleware-next')).toBeNull();
+    const target = rewriteOf(res)!;
+    expect(target.pathname).toBe('/demo-acceso/erp');
+    expect(target.searchParams.get('motivo')).toBe('desactivada');
+    expect(res.headers.get('cache-control')).toBe('private, no-store');
+    expect(res.headers.get('x-robots-tag')).toBe('noindex');
+  });
+
   it('una ruta que no es una demo conocida no se toca', async () => {
     mockBackend(() => json({}, 500));
     const middleware = await loadMiddleware();

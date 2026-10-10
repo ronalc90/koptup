@@ -7,7 +7,7 @@
  * que viene del usuario se escapa.
  */
 import { emailService } from './email.service';
-import { escapeHtml } from '../utils/email-address';
+import { escapeHtml, escapeMultiline, safeHref, safeSubject, safeUrlText } from '../utils/html';
 import { frontendUrl } from '../config/demos';
 
 /** Página del portal con los accesos del prospecto. */
@@ -84,7 +84,7 @@ Tu código de solicitud es ${args.codigo}.
 Mientras tanto puedes probar las demos abiertas: ${frontendUrl()}/demo
 
 Si no hiciste esta solicitud, ignora este mensaje.`;
-  return emailService.sendMail({ to: args.to, subject: `Recibimos tu solicitud de demo (${args.codigo})`, html, text });
+  return emailService.sendMail({ to: args.to, subject: safeSubject(`Recibimos tu solicitud de demo (${args.codigo})`), html, text });
 }
 
 /**
@@ -107,10 +107,10 @@ export async function sendAccessGranted(args: {
   const loginUrl = misDemosLoginUrl();
   const accion = args.activationUrl
     ? `      <p>Activa tu cuenta y crea tu contraseña con este enlace. Es de un solo uso y vence en 72 horas:</p>
-      <p><a class="button" href="${escapeHtml(args.activationUrl)}">Activar mi acceso</a></p>
-      <p class="muted">Si el botón no funciona, copia este enlace en tu navegador:<br>${escapeHtml(args.activationUrl)}</p>`
+      <p><a class="button" href="${safeHref(args.activationUrl)}">Activar mi acceso</a></p>
+      <p class="muted">Si el botón no funciona, copia este enlace en tu navegador:<br>${safeUrlText(args.activationUrl)}</p>`
     : `      <p>Entra con tu cuenta de siempre y abre la demo desde <strong>Mis demos</strong>:</p>
-      <p><a class="button" href="${escapeHtml(loginUrl)}">Ir a Mis demos</a></p>`;
+      <p><a class="button" href="${safeHref(loginUrl)}">Ir a Mis demos</a></p>`;
   const html = layout(
     'Tu acceso a las demos de KopTup está listo',
     `      <p>Hola ${escapeHtml(args.nombre)}:</p>
@@ -118,7 +118,7 @@ export async function sendAccessGranted(args: {
       <ul>${itemsHtml}</ul>
       <p>Podrás usarlas hasta el <strong>${escapeHtml(hasta)}</strong> (${args.dias} días).</p>
 ${accion}
-      ${args.mensaje ? `<p>${escapeHtml(args.mensaje).replace(/\n/g, '<br>')}</p>` : ''}
+      ${args.mensaje ? `<p>${escapeMultiline(args.mensaje)}</p>` : ''}
       <p class="muted">Las demos usan datos de ejemplo. No cargues información confidencial ni datos personales reales.</p>`,
   );
   const text = `Hola ${args.nombre}:
@@ -131,7 +131,7 @@ Podrás usarlas hasta el ${hasta} (${args.dias} días).
 ${args.activationUrl ? `Activa tu cuenta y crea tu contraseña con este enlace (un solo uso, vence en 72 horas):\n${args.activationUrl}` : `Entra con tu cuenta de siempre: ${loginUrl}`}
 ${args.mensaje ? `\n${args.mensaje}\n` : ''}
 Las demos usan datos de ejemplo. No cargues información confidencial ni datos personales reales.`;
-  return emailService.sendMail({ to: args.to, subject: 'Tu acceso a las demos de KopTup está listo', html, text });
+  return emailService.sendMail({ to: args.to, subject: safeSubject('Tu acceso a las demos de KopTup está listo'), html, text });
 }
 
 /** Rechazo (solo si el equipo elige avisar). */
@@ -140,7 +140,7 @@ export async function sendRequestRejected(args: { to: string; nombre: string; mo
     'Sobre tu solicitud de demo en KopTup',
     `      <p>Hola ${escapeHtml(args.nombre)}:</p>
       <p>Gracias por tu interés. Por ahora no podemos habilitar la demo que pediste.</p>
-      ${args.motivo ? `<p>${escapeHtml(args.motivo).replace(/\n/g, '<br>')}</p>` : ''}
+      ${args.motivo ? `<p>${escapeMultiline(args.motivo)}</p>` : ''}
       <p>Igual puedes probar las demos abiertas: ${escapeHtml(`${frontendUrl()}/demo`)}</p>
       <p>Si tu situación cambia, responde este correo y retomamos.</p>`,
   );
@@ -150,7 +150,7 @@ Gracias por tu interés. Por ahora no podemos habilitar la demo que pediste.
 ${args.motivo ? `\n${args.motivo}\n` : ''}
 Igual puedes probar las demos abiertas: ${frontendUrl()}/demo
 Si tu situación cambia, responde este correo y retomamos.`;
-  return emailService.sendMail({ to: args.to, subject: 'Sobre tu solicitud de demo en KopTup', html, text });
+  return emailService.sendMail({ to: args.to, subject: safeSubject('Sobre tu solicitud de demo en KopTup'), html, text });
 }
 
 /**
@@ -171,7 +171,7 @@ export async function sendExpiryReminder(args: {
   const loginUrl = misDemosLoginUrl();
   const accionHtml = args.pendienteActivacion
     ? '      <p>Aún no activas tu cuenta: usa el enlace de activación que te enviamos. Si ya venció, responde este correo y te enviamos uno nuevo.</p>'
-    : `      <p><a class="button" href="${escapeHtml(loginUrl)}">Ir a Mis demos</a></p>`;
+    : `      <p><a class="button" href="${safeHref(loginUrl)}">Ir a Mis demos</a></p>`;
   const accionText = args.pendienteActivacion
     ? 'Aún no activas tu cuenta: usa el enlace de activación que te enviamos. Si ya venció, responde este correo y te enviamos uno nuevo.'
     : `Mis demos: ${loginUrl}`;
@@ -190,7 +190,7 @@ ${itemsText}
 
 Si necesitas más tiempo o quieres hablar de tu proyecto, responde este correo.
 ${accionText}`;
-  return emailService.sendMail({ to: args.to, subject: 'Tu acceso a las demos de KopTup vence pronto', html, text });
+  return emailService.sendMail({ to: args.to, subject: safeSubject('Tu acceso a las demos de KopTup vence pronto'), html, text });
 }
 
 /** Extensión de la vigencia de un acceso. */
@@ -201,11 +201,11 @@ export async function sendAccessExtended(args: { to: string; nombre: string; dem
     'Extendimos tu acceso',
     `      <p>Hola ${escapeHtml(args.nombre)}:</p>
       <p>Extendimos tu acceso a <strong>${escapeHtml(args.demo.nombre)}</strong> hasta el <strong>${escapeHtml(hasta)}</strong>.</p>
-      <p><a class="button" href="${escapeHtml(loginUrl)}">Ir a Mis demos</a></p>`,
+      <p><a class="button" href="${safeHref(loginUrl)}">Ir a Mis demos</a></p>`,
   );
   const text = `Hola ${args.nombre}:
 
 Extendimos tu acceso a ${args.demo.nombre} hasta el ${hasta}.
 Mis demos: ${loginUrl}`;
-  return emailService.sendMail({ to: args.to, subject: `Extendimos tu acceso a ${args.demo.nombre}`, html, text });
+  return emailService.sendMail({ to: args.to, subject: safeSubject(`Extendimos tu acceso a ${args.demo.nombre}`), html, text });
 }

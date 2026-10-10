@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
+import type { InvoicePaymentMethod } from '@/types/api.types';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -19,16 +20,31 @@ export default function BillingPage() {
   const t = useTranslations('billingPage');
   const [invoices, setInvoices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  // Métodos de pago reales configurados por el equipo. Sin métodos, el portal
+  // no ofrece "Cómo pagar" (el pago lo registra el equipo, nunca el cliente).
+  const [paymentMethods, setPaymentMethods] = useState<InvoicePaymentMethod[]>([]);
+  const [payingId, setPayingId] = useState<string | null>(null);
 
   useEffect(() => {
     loadInvoices();
+    api
+      .getInvoicePaymentMethods()
+      .then(setPaymentMethods)
+      .catch(() => setPaymentMethods([]));
   }, []);
 
   const loadInvoices = async () => {
     try {
       // Try to fetch from API
       const data = await api.getInvoices();
-      setInvoices(data);
+      // La API devuelve `total` y `projectName`; la vista usa `amount` y `project`.
+      setInvoices(
+        (Array.isArray(data) ? data : []).map((inv: any) => ({
+          ...inv,
+          amount: Number(inv.amount ?? inv.total ?? 0),
+          project: inv.project ?? inv.projectName,
+        })),
+      );
     } catch (error) {
       console.error('Failed to load invoices from API, using fallback data:', error);
 
@@ -87,20 +103,6 @@ export default function BillingPage() {
       }
     } catch (error) {
       console.error('Error al descargar la factura', error);
-    }
-  };
-
-  const payInvoice = async (invoice: any) => {
-    try {
-      const amount = Number(invoice.amount || 0);
-      await api.payInvoice(invoice.id, {
-        paymentMethod: 'credit_card',
-        amount,
-        notes: 'Pago rápido desde dashboard',
-      });
-      await loadInvoices();
-    } catch (error) {
-      console.error('Error al pagar la factura', error);
     }
   };
 
@@ -206,7 +208,7 @@ export default function BillingPage() {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="text-lg font-semibold text-secondary-900 dark:text-white">
-                        {invoice.id}
+                        {invoice.invoiceNumber || invoice.id}
                       </h3>
                       {getStatusBadge(invoice.status)}
                     </div>
@@ -259,13 +261,36 @@ export default function BillingPage() {
                     <DocumentArrowDownIcon className="h-4 w-4 mr-2" />
                     {t('downloadPdf')}
                   </Button>
-                  {invoice.status !== 'paid' && (
-                    <Button size="sm" onClick={() => payInvoice(invoice)}>
+                  {invoice.status !== 'paid' && paymentMethods.length > 0 && (
+                    <Button
+                      size="sm"
+                      aria-expanded={payingId === invoice.id}
+                      aria-controls={`pay-${invoice.id}`}
+                      onClick={() => setPayingId(payingId === invoice.id ? null : invoice.id)}
+                    >
                       <CreditCardIcon className="h-4 w-4 mr-2" />
-                      {t('payNow')}
+                      {payingId === invoice.id ? t('payHide') : t('payNow')}
                     </Button>
                   )}
                 </div>
+
+                {payingId === invoice.id && invoice.status !== 'paid' && paymentMethods.length > 0 && (
+                  <div
+                    id={`pay-${invoice.id}`}
+                    className="mt-4 rounded-lg border border-secondary-200 dark:border-secondary-700 bg-secondary-50 dark:bg-secondary-900 p-4 text-sm"
+                  >
+                    {paymentMethods.map((method) => (
+                      <div key={method.tipo}>
+                        <h4 className="font-semibold text-secondary-900 dark:text-white mb-2">{t('payTransferTitle')}</h4>
+                        <p className="whitespace-pre-line text-secondary-700 dark:text-secondary-300">{method.instrucciones}</p>
+                      </div>
+                    ))}
+                    <p className="mt-3 text-secondary-700 dark:text-secondary-300">
+                      {t('payReference', { number: invoice.invoiceNumber || invoice.id })}
+                    </p>
+                    <p className="mt-1 text-secondary-500 dark:text-secondary-400">{t('payConfirmNote')}</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}

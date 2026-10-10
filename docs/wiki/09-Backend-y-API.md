@@ -444,7 +444,7 @@ No existen hoy. Se crean con el sistema de demos (sección 12 de Sistema de demo
   - **API de bots** (constructor y playground de `/demo/chatbot`): crear y configurar bots, subir documentos en base64, indexar URLs, preguntar y ver conversaciones.
     - Recupera fragmentos con BM25 simplificado.
     - Si hay clave de OpenAI, genera la respuesta con cita; si no, responde en modo extractivo.
-  - **API heredada "por sesión"** (`/session`, `/upload`, `/message`, `/info`, `/config`, `/messages`, `/documents`): la usa solo la página huérfana `/demo/chatbot/preview`, a través de los proxies `apps/web/src/app/api/chatbot/*`.
+  - **API heredada "por sesión"** (`/session`, `/upload`, `/message`, `/info`, `/config`, `/messages`, `/documents`): ninguna página de la web la usa (la vista previa huérfana y los proxies `apps/web/src/app/api/chatbot/*` ya se retiraron); queda montada en el backend.
 - **Estado:**
   - Estado en memoria más un archivo JSON en disco.
   - PDF y DOCX no se interpretan en la API de bots: se tratan como texto.
@@ -655,7 +655,7 @@ Los eventos `demo_upload` y `demo_start` los emite la web con GA4, solo con cons
     - tiene referencias a un pagador real;
     - no tiene pruebas.
   - La demo `/demo/cuentas-medicas` solo usa `/auditoria/*` y `/documentos-conocimiento/*`.
-  - `/cuentas`, `/ley100`, `/process` y `/export` solo las llaman páginas internas (`/test`).
+  - `/cuentas`, `/ley100`, `/process` y `/export` no las llama ninguna página de la web (la página interna `/test` se retiró).
   - `/liquidacion` y `/reglas-facturacion` solo las llaman las páginas huérfanas `/liquidacion`.
   - Hay seeds (≈ 2.600 líneas en `db/seeds/`) y *scrapers* de catálogos oficiales (≈ 2.100 líneas) que ningún script de `package.json` ejecuta.
 - **Decisión: mover a un servicio aparte, por etapas.** Se mantiene como producto vertical ([Demo cuentas médicas](Demo-cuentas-medicas.md)).

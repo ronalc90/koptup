@@ -1,5 +1,13 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { logger } from '../utils/logger';
+import { getBudgetStatus, recordSpend } from './ai-budget.service';
+
+/**
+ * Las reglas de facturación son parte de las herramientas de salud: cada
+ * llamada respeta el tope mensual HEALTH_MONTHLY_BUDGET_USD y suma su costo
+ * (tokens que informa la API, a precio de Sonnet: USD 3 / 15 por millón).
+ */
+const SONNET_PRICE_PER_1M = { input: 3, output: 15 };
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || '',
@@ -31,6 +39,15 @@ class ReglasIAService {
     try {
       const prompt = this.construirPromptInterpretacion(descripcionNatural, tipo);
 
+      const budget = await getBudgetStatus('health');
+      if (!budget.available) {
+        throw new Error(
+          budget.reason === 'budget_exhausted'
+            ? 'Se alcanzó el tope mensual de gasto de IA de las herramientas de salud.'
+            : 'No se puede medir el gasto de IA en este momento.',
+        );
+      }
+
       const message = await anthropic.messages.create({
         model: 'claude-3-5-sonnet-20241022',
         max_tokens: 2000,
@@ -41,6 +58,12 @@ class ReglasIAService {
           },
         ],
       });
+
+      await recordSpend(
+        'health',
+        ((message.usage?.input_tokens ?? 0) / 1e6) * SONNET_PRICE_PER_1M.input +
+          ((message.usage?.output_tokens ?? 0) / 1e6) * SONNET_PRICE_PER_1M.output,
+      );
 
       const respuestaTexto = message.content[0].type === 'text' ? message.content[0].text : '';
 

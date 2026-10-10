@@ -56,7 +56,7 @@
 
 ## 1. Filtro de la web (middleware de Next)
 
-El middleware de la web (`apps/web/src/middleware.ts`) corre en el servidor de Vercel antes de mostrar `/admin`, `/dashboard`, `/liquidacion`, `/test` y cualquier `/demo/<slug>`. Es una barrera extra: el backend vuelve a autorizar cada endpoint (sección 2).
+El middleware de la web (`apps/web/src/middleware.ts`) corre en el servidor de Vercel antes de mostrar `/admin`, `/dashboard`, `/liquidacion` y cualquier `/demo/<slug>`. Es una barrera extra: el backend vuelve a autorizar cada endpoint (sección 2).
 
 ### 1.1 Áreas privadas: panel, portal y herramientas
 
@@ -70,8 +70,8 @@ flowchart TD
     classDef error fill:#fee2e2,stroke:#dc2626,color:#0f172a
     classDef externo fill:#fdf4ff,stroke:#c026d3,color:#0f172a
 
-    A["Petición a /admin, /dashboard,<br/>/liquidacion o /test"]:::visitante
-    R["Roles que exige el área<br/>/admin: admin o manager<br/>/admin/solicitudes, /accesos y /catalogo-demos: también sales<br/>/liquidacion: admin, manager o sales<br/>/test: admin · /dashboard: cualquier rol"]:::sistema
+    A["Petición a /admin, /dashboard<br/>o /liquidacion"]:::visitante
+    R["Roles que exige el área<br/>/admin: admin o manager<br/>/admin/solicitudes, /accesos y /catalogo-demos: también sales<br/>/liquidacion: admin, manager o sales<br/>/dashboard: cualquier rol"]:::sistema
     Q1{"¿Hay cookie<br/>accessToken?"}:::decision
     Q2{"¿Ese token está en la<br/>caché de 30 s de la instancia?"}:::decision
     ME["GET /api/auth/me con Bearer, máx. 5 s<br/>con X-Internal-Key y X-Client-IP si hay INTERNAL_API_KEY<br/>si responde 200, guarda la sesión 30 s"]:::sistema
@@ -142,7 +142,7 @@ flowchart TD
     RF["POST /api/auth/refresh"]:::sistema
     Q7{"¿Token nuevo?"}:::decision
     M3["motivo que dio el backend<br/>sin_acceso, expirado con su fecha,<br/>revocado o desactivada"]:::error
-    NX2["Deja pasar la página a Next<br/>sin más chequeos, ver Hallazgos"]:::sistema
+    M4["motivo desactivada<br/>el backend no conoce la demo"]:::error
     REW["Reescribe a /demo-acceso/slug<br/>con motivo, modo, vence y ruta<br/>la URL no cambia · private, no-store y noindex"]:::error
     P2["Sirve la demo<br/>Cache-Control private, no-store, noindex<br/>y cookie renovada si hubo"]:::visitante
 
@@ -160,7 +160,7 @@ flowchart TD
     Q5 -->|200 y permitido| P2
     Q5 -->|200 y denegado| M3
     Q5 -->|401 token vencido| Q6
-    Q5 -->|404| NX2
+    Q5 -->|404| M4
     Q5 -->|"Otro código, más de 5 s o sin red"| M1
     Q6 -->|Sí| RF --> Q7
     Q6 -->|No| M2
@@ -169,6 +169,7 @@ flowchart TD
     M1 --> REW
     M2 --> REW
     M3 --> REW
+    M4 --> REW
 ```
 
 ![Diagrama: Demos con acceso controlado](images/doc/flujos/Doc-14-3-Flujos-Tecnicos-2.png)
@@ -282,9 +283,9 @@ flowchart TD
 
 ![Diagrama: Sesión y rol con authenticate y requireRole](images/doc/flujos/Doc-14-3-Flujos-Tecnicos-4.png)
 
-`requireRole(...roles)` siempre corre `authenticate` primero y luego lee la cuenta de la base: si a alguien le quitan el rol o le borran la cuenta, pierde el acceso de inmediato aunque su token siga vigente. `requireStaff` es `admin`, `manager` o `sales`; `requireAdmin`, solo `admin`. Existe además `authorize(...roles)` en `middleware/auth.ts`, que confía en el rol escrito dentro del token, pero ninguna ruta lo usa (ver Hallazgos).
+`requireRole(...roles)` siempre corre `authenticate` primero y luego lee la cuenta de la base: si a alguien le quitan el rol o le borran la cuenta, pierde el acceso de inmediato aunque su token siga vigente. `requireStaff` es `admin`, `manager` o `sales`; `requireAdmin`, solo `admin`. Cuando un controlador permite «dueño o staff» (facturas, entregables, notificaciones, bots del chatbot), decide si es staff con `isStaffSession`, que también lee el rol de la base.
 
-Fuente en el código: `apps/backend/src/middleware/auth.ts` (`authenticate`, `authorize`), `apps/backend/src/middleware/access.ts` (`requireRole`, `loadFreshUser`, `devOnlyAdmin`), `apps/backend/src/routes/POLICIES.md`.
+Fuente en el código: `apps/backend/src/middleware/auth.ts` (`authenticate`), `apps/backend/src/middleware/access.ts` (`requireRole`, `loadFreshUser`, `isStaffSession`, `devOnlyAdmin`), `apps/backend/src/routes/POLICIES.md`.
 
 ---
 
@@ -452,7 +453,8 @@ flowchart TD
     Q6{"¿Quedó algún<br/>token válido?"}:::decision
     E401["401 owner_token_required"]:::error
     Q7{"¿El bot tiene hash<br/>de dueño guardado?"}:::decision
-    MIG["Migración: el bot queda a nombre<br/>del primer token y se guarda"]:::sistema
+    QS{"¿La sesión es del equipo?<br/>admin, manager o sales, rol leído de la BD"}:::decision
+    E403L["403 legacy_bot_staff_only"]:::error
     Q8{"¿El SHA-256 de algún token<br/>coincide? comparación de tiempo constante"}:::decision
     E403["403 forbidden_not_owner"]:::error
     OK["Ejecuta la acción y guarda el estado<br/>data/chatbots/state.json"]:::sistema
@@ -470,18 +472,20 @@ flowchart TD
     LS -.->|Lo envía en cada ruta de dueño| R
     R --> Q5
     Q5 -->|No| E404
-    Q5 -->|Sí| TOK --> Q6
+    Q5 -->|Sí| Q7
+    Q7 -->|No, bot antiguo| QS
+    QS -->|No| E403L
+    QS -->|Sí| OK
+    Q7 -->|Sí| TOK --> Q6
     Q6 -->|No| E401
-    Q6 -->|Sí| Q7
-    Q7 -->|No| MIG --> OK
-    Q7 -->|Sí| Q8
+    Q6 -->|Sí| Q8
     Q8 -->|No| E403
     Q8 -->|Sí| OK
 ```
 
 ![Diagrama: Propiedad de los bots del chatbot](images/doc/flujos/Doc-14-3-Flujos-Tecnicos-7.png)
 
-Los bots del chatbot no usan cuentas: la propiedad es un token aleatorio que solo conoce el navegador que creó el bot. Sin ese token, `GET /api/chatbot/bots/:id` da la vista pública (sin el prompt del sistema ni los nombres de los documentos) y `POST /api/chatbot/bots/:id/chat` responde a cualquiera, para que funcione el widget insertado en otro sitio. `GET /api/chatbot/bots` sin token solo lista los bots de ejemplo de `CHATBOT_EXAMPLE_BOT_IDS`.
+Los bots del chatbot no usan cuentas: la propiedad es un token aleatorio que solo conoce el navegador que creó el bot. Un bot antiguo, creado antes de que existiera el token de dueño, no lo tiene: solo lo administra el equipo de KopTup con su sesión. Sin ese token, `GET /api/chatbot/bots/:id` da la vista pública (sin el prompt del sistema ni los nombres de los documentos) y `POST /api/chatbot/bots/:id/chat` responde a cualquiera, para que funcione el widget insertado en otro sitio. `GET /api/chatbot/bots` sin token solo lista los bots de ejemplo de `CHATBOT_EXAMPLE_BOT_IDS`.
 
 Fuente en el código: `apps/backend/src/routes/chatbot.routes.ts` (`requireOwner`, `readOwnerTokens`, `isOwner`, `POST /bots`), `apps/backend/src/app.ts` (`BOT_OWNER_TOKEN_HEADER` en CORS), `apps/web/src/app/demo/chatbot/components/builder/api.ts`.
 
@@ -567,7 +571,7 @@ flowchart TD
 
     Q["Pregunta en Prueba el asistente,<br/>la vista previa o el widget<br/>POST /api/chatbot/bots/id/chat"]:::visitante
     RL{"¿Dentro de 60 peticiones<br/>por minuto por IP?"}:::decision
-    E429["429 Too many chatbot requests"]:::error
+    E429["429 rate_limited<br/>mensaje en español"]:::error
     Q1{"¿Existe el bot?"}:::decision
     E404["404 bot_not_found"]:::error
     Q2{"¿Mensaje de 1 a 2.000 caracteres<br/>e historial de 50 turnos o menos?"}:::decision
@@ -969,7 +973,7 @@ flowchart TD
 
     IN["Backend: POST /api/linkedin-ads/generate"]:::sistema
     G{"¿Dentro del límite general?<br/>100 peticiones cada 15 min<br/>por cuenta o por IP"}:::decision
-    E429a["429 Too many requests"]:::error
+    E429a["429 rate_limited<br/>mensaje en español"]:::error
     A{"¿Pasa requireStaffOrDemoAccess<br/>de linkedin-ads? diagrama 2.2"}:::decision
     EA["401 login_required o TOKEN_EXPIRED<br/>403 demo_access_required o demo_disabled<br/>503 si la BD no responde"]:::error
     V{"¿Cuerpo válido?<br/>zod: demo, ángulo y tono"}:::decision
@@ -1047,7 +1051,7 @@ flowchart TD
     L3["Resto de /api<br/>100 cada 15 min por cuenta, sesión o IP"]:::sistema
     HC["/health y /health/live<br/>diagrama 6.3"]:::sistema
     RQ{"¿Dentro del límite?"}:::decision
-    E429["429 Too many requests"]:::error
+    E429["429 rate_limited<br/>mensaje en español"]:::error
     R{"¿Existe la ruta?"}:::decision
     E404["404 Endpoint not found"]:::error
     PO["Política de la ruta, sección 2<br/>validación y controlador"]:::sistema
@@ -1480,13 +1484,11 @@ Cosas del código que no cuadran, dibujadas tal como son. No repiten las de [Flu
 1. **No hay plazo ni forma de suprimir datos personales.** `DemoRequest`, `Contact`, `User`, `DemoGrant` y `AuditLog` no tienen vencimiento y ni el panel ni la API permiten borrarlos (solo `MagicLinkToken` y los contadores de Redis expiran solos). La política de privacidad dice que los datos se eliminan «cuando ya no necesitemos» la información, sin un plazo. Hoy una solicitud de supresión (derecho del titular en la Ley 1581) exige editar la base a mano. (diagrama 8.1, `apps/backend/src/models/`, `apps/web/messages/es.json` › `privacyPage.s5`).
 2. **El chatbot guarda las preguntas en disco sin vencimiento y sin aviso.** Cada pregunta y respuesta de «Prueba el asistente», de la vista previa y del widget insertado queda en `data/chatbots/state.json` (últimas 200 por bot). Solo «Configura el tuyo» explica que hay historial; «Prueba el asistente» no avisa nada. Contrasta con «Prueba con tu documento», que promete y cumple el borrado en 1 hora. (diagramas 3.2 y 8.2, `appendConversation` en `apps/backend/src/routes/chatbot.routes.ts`, `apps/backend/src/data/chatbot-store.ts`).
 3. **La autorización de «Prueba con tu documento» queda solo como texto.** La prueba es una línea dentro del mensaje del `Contact` con la fecha; no guarda la versión de la política ni el hash de la IP, como sí hace `DemoRequest`. Además, si guardar el lead falla, el documento se procesa igual y la prueba solo queda en el log. Por otro lado, `POST /api/demo-requests` acepta un `versionPolitica` enviado por el cliente (la web no lo envía, así que hoy se guarda la del servidor). (diagramas 4.1 y 8.2, `registerDemoLead` en `apps/backend/src/routes/demo-rag.routes.ts`, `createDemoRequest` en `apps/backend/src/services/demo-requests.service.ts`).
-4. **El filtro de la web deja pasar una demo si el backend dice que no existe.** Si `GET /api/demo-access/<slug>` responde 404, el middleware entrega la página sin cabeceras `no-store` ni `noindex`, al revés que con cualquier otro error, que muestra la pantalla de acceso. Solo pasa si la tabla de 28 demos de la web y la semilla del backend se desalinean (por ejemplo, una demo nueva desplegada en la web antes que en el backend); las APIs de esa demo siguen protegidas por el backend. (diagrama 1.2, `demoGate` en `apps/web/src/middleware.ts`).
-5. **`authorize()` existe pero no se usa.** `apps/backend/src/middleware/auth.ts` exporta `authorize(...roles)`, que confía en el rol escrito dentro del token (puede tener hasta 15 min de atraso). Ninguna ruta lo usa: todas usan `requireRole`, que lee el rol de la base. Dejarlo invita a usarlo por error; conviene borrarlo o convertirlo en un alias de `requireRole`. (diagrama 2.1).
-6. **Las rutas que solo usan `authenticate` no miran la base.** Documentos, pedidos, mensajes, notificaciones, proyectos, facturas y entregables aceptan el token tal cual, y en facturas, entregables y notificaciones la excepción «dueño o staff» se decide con el rol escrito en el token. Un cambio de rol o una cuenta borrada tarda hasta 15 min (la vida del token de acceso) en aplicarse en esas rutas, mientras que las rutas con `requireRole` lo aplican de inmediato. (diagrama 2.1, `apps/backend/src/routes/POLICIES.md`, `isStaffRole(req.user?.role)` en `controllers/invoices.controller.ts`, `deliverables.controller.ts` y `notifications.controller.ts`).
-7. **Cuatro formatos de error distintos.** `errorHandler` y la demo RAG responden `{ success, code, message }`; `authenticate` y `requireRole`, `{ success, message }` casi siempre sin `code`; los bots del chatbot, `{ error, message }`; LinkedIn, `{ success, code, error }`; y el límite general responde en inglés («Too many requests from this IP»). La misma situación da códigos distintos: un archivo demasiado grande es 400 `upload_limit_file_size` en las rutas con `upload.ts`, 413 `file_too_large` en la demo RAG y un error por archivo dentro de un 201 o 422 en el chatbot. Cada pantalla tiene que traducir el suyo. (diagramas 6.1 y 6.2).
-8. **LinkedIn muestra el cupo mensual agotado como un error genérico.** El backend responde 503 `budget_exhausted` con un mensaje claro, pero la demo solo distingue un 503 cuando el mensaje contiene «configur»; el visitante lee «el servidor no pudo completar la solicitud». Lo mismo pasa con el 503 por Redis caído. (diagrama 5.1, `generarConIA` en `apps/web/src/app/demo/linkedin-ads/components/PostGenerator.tsx`).
-9. **Variables que el arranque no revisa.** `DEMO_UPLOAD_ENABLED` e `INTERNAL_API_KEY` no están en `config/env.ts`: si faltan, el log no dice nada. Sin la primera, «Prueba con tu documento» queda apagada en silencio; sin la segunda (en la web y en el backend), las peticiones que hace el servidor de la web sin sesión, como LinkedIn sin cuenta, se cuentan con la IP de salida de Vercel, compartida por todos. Además, el comentario de `config/env.ts` dice que si falta `JWT_REFRESH_SECRET` en producción se registra un error, pero el código lo registra como aviso. (diagrama 7.1).
-10. **Un documento corto pero denso se rechaza como «demasiadas páginas».** «Prueba con tu documento» también corta en 400.000 caracteres de texto, pero ese corte reutiliza el código `too_many_pages`: un PDF de 30 páginas o menos con mucho texto recibe «El documento supera 30 páginas», que la persona no puede entender ni corregir. (diagrama 4.1, `ingestDocument` en `apps/backend/src/services/demo-rag.service.ts`).
+4. **Las rutas que solo usan `authenticate` aplican los cambios de cuenta al vencer el token.** Documentos, pedidos, mensajes, notificaciones, proyectos, facturas y entregables aceptan el token tal cual: un cambio de rol o una cuenta borrada se aplica en esas rutas cuando vence el token de acceso (15 min), mientras que las rutas con `requireRole` y las excepciones «dueño o staff» (`isStaffSession`) leen la base en cada petición. (diagrama 2.1, `apps/backend/src/routes/POLICIES.md`).
+5. **Cuatro formatos de error distintos.** `errorHandler` y la demo RAG responden `{ success, code, message }`; `authenticate` y `requireRole`, `{ success, message }` casi siempre sin `code`; los bots del chatbot, `{ error, message }`; LinkedIn, `{ success, code, error }`. La misma situación da códigos distintos: un archivo demasiado grande es 400 `upload_limit_file_size` en las rutas con `upload.ts`, 413 `file_too_large` en la demo RAG y un error por archivo dentro de un 201 o 422 en el chatbot. Cada pantalla tiene que traducir el suyo. (diagramas 6.1 y 6.2).
+6. **LinkedIn muestra el cupo mensual agotado como un error genérico.** El backend responde 503 `budget_exhausted` con un mensaje claro, pero la demo solo distingue un 503 cuando el mensaje contiene «configur»; el visitante lee «el servidor no pudo completar la solicitud». Lo mismo pasa con el 503 por Redis caído. (diagrama 5.1, `generarConIA` en `apps/web/src/app/demo/linkedin-ads/components/PostGenerator.tsx`).
+7. **Variables que el arranque no revisa.** `DEMO_UPLOAD_ENABLED` e `INTERNAL_API_KEY` no están en `config/env.ts`: si faltan, el log no dice nada. Sin la primera, «Prueba con tu documento» queda apagada en silencio; sin la segunda (en la web y en el backend), las peticiones que hace el servidor de la web sin sesión, como LinkedIn sin cuenta, se cuentan con la IP de salida de Vercel, compartida por todos. Además, el comentario de `config/env.ts` dice que si falta `JWT_REFRESH_SECRET` en producción se registra un error, pero el código lo registra como aviso. (diagrama 7.1).
+8. **Un documento corto pero denso se rechaza como «demasiadas páginas».** «Prueba con tu documento» también corta en 400.000 caracteres de texto, pero ese corte reutiliza el código `too_many_pages`: un PDF de 30 páginas o menos con mucho texto recibe «El documento supera 30 páginas», que la persona no puede entender ni corregir. (diagrama 4.1, `ingestDocument` en `apps/backend/src/services/demo-rag.service.ts`).
 
 ## Páginas relacionadas
 

@@ -136,11 +136,10 @@ export interface InvoiceItem {
   total: number;
 }
 
-export interface PayInvoiceData {
-  paymentMethod: 'credit_card' | 'debit_card' | 'bank_transfer' | 'cash';
-  paymentReference?: string;
-  amount: number;
-  notes?: string;
+/** Método de pago configurado por el equipo (GET /api/invoices/payment-methods). */
+export interface InvoicePaymentMethod {
+  tipo: 'transferencia';
+  instrucciones: string;
 }
 
 // ============================================================================

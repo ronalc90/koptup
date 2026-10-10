@@ -249,7 +249,7 @@ Para un desarrollador, la demo usa estas rutas de la API (todas exigen sesión y
 | `POST /api/documents/search/semantic` | Búsqueda por significado. |
 | `GET /api/documents/:id/explain` · `POST /api/documents/:id/explain-similarity` | Explicar el documento · explicar una coincidencia. |
 | `PATCH /api/documents/:id` | Renombrar, mover de carpeta o marcar favorito. |
-| `DELETE /api/documents/:id` · `POST /api/documents/:id/restore` | Mover a la papelera (con PIN) · restaurar. |
+| `DELETE /api/documents/:id` · `POST /api/documents/:id/restore` | Mover a la papelera (solo el dueño del documento) · restaurar. |
 
 ```mermaid
 sequenceDiagram
@@ -305,7 +305,7 @@ flowchart LR
 1. **Ventanas que se abren detrás del panel del documento.** Las ventanas de **Procesar con OCR**, **Detectar cláusulas**, **Comparar versiones**, el PIN de **Mover a Papelera** y la insignia de cifrado se abren por debajo del panel y de su fondo oscuro: el usuario ve que «no pasa nada» o ve la ventana a medias. Hay que cerrar el panel con la **X** para usarlas. Además, el menú del sitio queda encima del encabezado de esas ventanas.
 2. **La búsqueda semántica no se puede usar bien.** Su ventana de resultados queda detrás de su propio fondo oscuro: se ve atenuada y cualquier clic la cierra, así que **¿Por qué este resultado?** no se puede pulsar.
 3. **No se pueden crear carpetas.** «Nueva Carpeta» responde bien, pero el servidor no guarda nada: una carpeta solo existe si tiene documentos y **Mover a Carpeta** solo ofrece las que ya existen. En la práctica todo queda en «General» (que además aparece dos veces en la lista). Por lo mismo, las insignias de retención de las carpetas nunca aparecen.
-4. **El PIN para borrar está mal indicado.** La ventana dice «PIN por defecto» con un número que el servidor rechaza; el aviso de error muestra el PIN correcto. La ventana también dice «Esta acción no se puede deshacer», pero el documento va a la papelera y se puede restaurar.
+4. **La ventana de borrar todavía pide un PIN.** El servidor ya no usa PIN: solo deja borrar al dueño del documento, así que cualquier número de 4 dígitos sirve. Falta cambiar esa ventana por una confirmación simple. También dice «Esta acción no se puede deshacer», pero el documento va a la papelera y se puede restaurar.
 5. **Sin sesión, el error no explica qué hacer.** El visitante ve «Error al cargar documentos» en vez de «Inicia sesión para ver y subir tus documentos» (el mensaje existe en el código pero la página no lo usa).
 6. **Papelera sin borrado definitivo.** No hay botón para eliminar para siempre y nada borra los documentos a los 30 días, aunque el aviso lo diga.
 7. **Tipos de archivo.** El selector ofrece también DOC, XLS, XLSX, PPT y PPTX, pero el servidor los rechaza y la página solo muestra «Error al subir el archivo», sin decir por qué.

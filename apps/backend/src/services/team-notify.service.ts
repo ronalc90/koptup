@@ -7,7 +7,7 @@
 import { emailService } from './email.service';
 import { whatsappService } from './whatsapp.service';
 import { emailLayout } from './demo-emails.service';
-import { escapeHtml } from '../utils/email-address';
+import { escapeHtml, safeHref, safeSubject } from '../utils/html';
 import { logger } from '../utils/logger';
 
 export interface TeamNotice {
@@ -32,10 +32,10 @@ export async function notifyTeam(notice: TeamNotice): Promise<TeamNoticeResult> 
   const html = emailLayout(
     notice.asunto,
     `      ${notice.lineas.map((l) => (l ? `<p>${escapeHtml(l)}</p>` : '')).join('\n      ')}
-      ${notice.enlace ? `<p><a class="button" href="${escapeHtml(notice.enlace)}">Abrir en el panel</a></p>` : ''}`,
+      ${notice.enlace ? `<p><a class="button" href="${safeHref(notice.enlace)}">Abrir en el panel</a></p>` : ''}`,
   );
   const email = emailService.isConfigured()
-    ? (await Promise.all(recipients.map((to) => emailService.sendMail({ to, subject: notice.asunto, html, text }).catch(() => false)))).some(Boolean)
+    ? (await Promise.all(recipients.map((to) => emailService.sendMail({ to, subject: safeSubject(notice.asunto), html, text }).catch(() => false)))).some(Boolean)
     : false;
   const whatsapp = await whatsappService.sendTeamMessage(`*${notice.asunto}*\n\n${text}`).catch((err) => {
     logger.warn(`[team-notify] WhatsApp: ${(err as Error)?.message ?? err}`);

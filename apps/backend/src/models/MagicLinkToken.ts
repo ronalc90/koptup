@@ -9,6 +9,7 @@ import { MAGIC_LINK_PURPOSES, type MagicLinkPurpose } from '../config/demos';
  *
  *  - `activacion`: cuenta `invitado` creada al aprobar una demo (72 h).
  *  - `reset`: restablecer la contraseña desde "¿Olvidaste tu contraseña?" (1 h).
+ *  - `oauth`: código con el que la web canjea la sesión de Google (60 s).
  *
  * El índice TTL borra el registro 7 días después de vencer.
  */

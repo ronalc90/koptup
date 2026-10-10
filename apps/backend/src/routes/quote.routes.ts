@@ -1,13 +1,13 @@
 import { Router, RequestHandler } from 'express';
 import { body } from 'express-validator';
 import { submitQuote } from '../controllers/quote.controller';
-import { strictRateLimiter } from '../middleware/rateLimiter';
+import { quoteRateLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
 
 router.post(
   '/',
-  strictRateLimiter,
+  quoteRateLimiter,
   [
     body('name').trim().notEmpty(),
     body('email').isEmail().normalizeEmail(),

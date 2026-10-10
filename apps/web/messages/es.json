@@ -2060,7 +2060,7 @@
   },
   "billingPage": {
     "title": "Facturación y Pagos",
-    "subtitle": "Administra tus facturas y realiza pagos",
+    "subtitle": "Revisa tus facturas y cómo pagarlas",
     "pending": "Pendiente",
     "overdue": "Vencido",
     "paid": "Pagado",
@@ -2071,7 +2071,14 @@
     "details": "Detalles",
     "noDescription": "Sin descripción",
     "downloadPdf": "Descargar PDF",
-    "payNow": "Pagar Ahora"
+    "payNow": "Cómo pagar",
+    "payHide": "Ocultar",
+    "payTransferTitle": "Paga por transferencia",
+    "payReference": "Escribe {number} como referencia del pago.",
+    "payConfirmNote": "Cuando el equipo de KopTup confirme el pago, la factura aparecerá como pagada."
+  },
+  "authCallback": {
+    "completing": "Completando el inicio de sesión…"
   },
   "messagesPage": {
     "title": "Mensajes",

@@ -73,6 +73,21 @@ export function classifyError(err: unknown): {
     };
   }
 
+  // El cliente de OpenAI de una función con tope rechazó la llamada
+  // (services/openai.service.ts: budgetedFetch): se responde 503 honesto.
+  const aiError = err as { status?: unknown; code?: unknown } | null;
+  if (aiError && typeof aiError === 'object' && aiError.status === 429 && (aiError.code === 'budget_exhausted' || aiError.code === 'ai_unavailable')) {
+    return {
+      status: 503,
+      message:
+        aiError.code === 'budget_exhausted'
+          ? 'Alcanzamos el cupo mensual de IA de esta función. Escríbenos y te ayudamos con tu caso.'
+          : 'La IA no está disponible en este momento. Intenta de nuevo en unos minutos.',
+      code: aiError.code,
+      operational: true,
+    };
+  }
+
   // Datos inválidos detectados por Mongoose (campos requeridos, ids mal
   // formados): es un error del cliente, no del servidor.
   const named = err as { name?: string } | null;

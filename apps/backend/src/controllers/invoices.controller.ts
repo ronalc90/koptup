@@ -1,10 +1,12 @@
 import { Response } from 'express';
 import { AuthRequest } from '../types';
-import { isStaffRole } from '../middleware/access';
+import { isStaffSession } from '../middleware/access';
 import Invoice from '../models/Invoice';
-import Project from '../models/Project';
-import User from '../models/User';
+// Registra los modelos que usa populate().
+import '../models/Project';
+import '../models/User';
 import mongoose from 'mongoose';
+import { getCommerceSettings } from '../services/commerce-settings.service';
 
 export const getInvoices = async (req: AuthRequest, res: Response) => {
   try {
@@ -62,6 +64,11 @@ export const getInvoiceById = async (req: AuthRequest, res: Response) => {
 
     if (!userId) {
       res.status(401).json({ success: false, message: 'Usuario no autenticado' });
+      return;
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(404).json({ success: false, message: 'Factura no encontrada' });
       return;
     }
 
@@ -146,30 +153,37 @@ export const createInvoice = async (req: AuthRequest, res: Response) => {
   }
 };
 
+/**
+ * POST /api/invoices/:id/pay — registra el pago de una factura. Solo el equipo
+ * (admin o manager, rol leído de la BD en la ruta) lo hace, después de
+ * confirmar el pago por el medio real (transferencia, enlace). El cliente no
+ * marca sus facturas como pagadas: en el portal ve los métodos de pago
+ * configurados (GET /api/invoices/payment-methods).
+ */
 export const payInvoice = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const userId = req.user?.id;
-    const { paymentMethod, transactionId } = req.body;
+    const { paymentMethod, transactionId } = req.body ?? {};
 
     if (!userId) {
       res.status(401).json({ success: false, message: 'Usuario no autenticado' });
       return;
     }
 
-    if (!paymentMethod) {
+    if (!paymentMethod || typeof paymentMethod !== 'string') {
       res.status(400).json({ success: false, message: 'Método de pago requerido' });
+      return;
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(404).json({ success: false, message: 'Factura no encontrada' });
       return;
     }
 
     const invoice = await Invoice.findById(id);
     if (!invoice) {
       res.status(404).json({ success: false, message: 'Factura no encontrada' });
-      return;
-    }
-
-    if (invoice.userId.toString() !== userId.toString() && !isStaffRole(req.user?.role)) {
-      res.status(403).json({ success: false, message: 'No tienes permiso para pagar esta factura' });
       return;
     }
 
@@ -180,21 +194,43 @@ export const payInvoice = async (req: AuthRequest, res: Response) => {
 
     invoice.status = 'paid';
     invoice.paidDate = new Date();
-    invoice.paymentMethod = paymentMethod;
-    invoice.transactionId = transactionId || `TXN-${Date.now()}`;
+    invoice.paymentMethod = paymentMethod.slice(0, 60);
+    invoice.transactionId = typeof transactionId === 'string' && transactionId.trim() ? transactionId.trim().slice(0, 120) : `TXN-${Date.now()}`;
     invoice.history.push({
       date: new Date(),
       action: 'paid',
-      description: 'Pago recibido',
+      description: 'Pago registrado por el equipo',
       amount: invoice.total,
       updatedBy: new mongoose.Types.ObjectId(userId),
     });
 
     await invoice.save();
-    res.json({ success: true, message: 'Pago procesado exitosamente' });
+    res.json({ success: true, message: 'Pago registrado' });
   } catch (error) {
     console.error('Pay invoice error:', error);
-    res.status(500).json({ success: false, message: 'Error al procesar pago' });
+    res.status(500).json({ success: false, message: 'Error al registrar el pago' });
+  }
+};
+
+/**
+ * GET /api/invoices/payment-methods — métodos de pago reales que el equipo
+ * configuró (Admin › Configuración). Hoy: las instrucciones de transferencia.
+ * Si no hay ninguno, `metodos` viene vacío y el portal no ofrece "Pagar".
+ */
+export const getInvoicePaymentMethods = async (_req: AuthRequest, res: Response) => {
+  try {
+    const settings = await getCommerceSettings();
+    const instrucciones = settings.instruccionesTransferencia.trim();
+    res.setHeader('Cache-Control', 'no-store');
+    res.json({
+      success: true,
+      data: {
+        metodos: instrucciones ? [{ tipo: 'transferencia' as const, instrucciones }] : [],
+      },
+    });
+  } catch (error) {
+    console.error('Get invoice payment methods error:', error);
+    res.status(500).json({ success: false, message: 'Error al obtener los métodos de pago' });
   }
 };
 
@@ -208,13 +244,19 @@ export const downloadInvoice = async (req: AuthRequest, res: Response) => {
       return;
     }
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(404).json({ success: false, message: 'Factura no encontrada' });
+      return;
+    }
+
     const invoice = await Invoice.findById(id);
     if (!invoice) {
       res.status(404).json({ success: false, message: 'Factura no encontrada' });
       return;
     }
 
-    if (invoice.userId.toString() !== userId.toString() && !isStaffRole(req.user?.role)) {
+    // Dueño de la factura o staff (rol vigente en la BD).
+    if (invoice.userId.toString() !== userId.toString() && !(await isStaffSession(req))) {
       res.status(403).json({ success: false, message: 'No tienes permiso para descargar esta factura' });
       return;
     }

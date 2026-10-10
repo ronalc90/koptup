@@ -1124,7 +1124,7 @@ flowchart TD
     N2["Corrígela: un valor inválido o negativo<br/>deja la función con tope 0"]:::externo
     D4{"¿Quieres subir el tope<br/>este mes?"}:::decision
     U1["Revisa el saldo y los límites de la cuenta en OpenAI"]:::externo
-    U2["Sube en Railway DEMO_, CHATBOT_, LINKEDIN_ADS_<br/>o CONTENT_MONTHLY_BUDGET_USD y redespliega"]:::externo
+    U2["Sube en Railway DEMO_, CHATBOT_, LINKEDIN_ADS_, CONTENT_,<br/>DOCUMENTS_ o HEALTH_MONTHLY_BUDGET_USD y redespliega"]:::externo
     U3["Espera al cambio de mes UTC (7 p. m. del último día,<br/>hora de Colombia): el contador arranca en cero"]:::sistema
     U4["La función vuelve a usar IA en la siguiente consulta"]:::sistema
 

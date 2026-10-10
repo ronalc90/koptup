@@ -1,6 +1,6 @@
 /**
- * magic-link.service.ts — enlaces de un solo uso (activación de cuenta y
- * restablecimiento de contraseña).
+ * magic-link.service.ts — enlaces de un solo uso (activación de cuenta,
+ * restablecimiento de contraseña y código del inicio de sesión con Google).
  *
  * - El token es aleatorio (32 bytes, base64url); en la BD solo queda su hash
  *   SHA-256 (MagicLinkToken.tokenHash).
@@ -13,6 +13,7 @@ import mongoose from 'mongoose';
 import MagicLinkToken, { type IMagicLinkToken } from '../models/MagicLinkToken';
 import {
   ACTIVATION_TOKEN_TTL_MS,
+  OAUTH_CODE_TTL_MS,
   RESET_TOKEN_TTL_MS,
   frontendUrl,
   type MagicLinkPurpose,
@@ -28,11 +29,20 @@ export function isWellFormedToken(token: unknown): token is string {
   return typeof token === 'string' && TOKEN_PATTERN.test(token);
 }
 
-/** URL de la web donde se usa el token. */
+/**
+ * URL de la web donde se usa el token. El código de Google va en el fragmento
+ * (`#code=`): el navegador no lo envía al servidor de la web ni en el Referer.
+ */
 export function magicLinkUrl(proposito: MagicLinkPurpose, token: string): string {
-  return proposito === 'activacion'
-    ? `${frontendUrl()}/activar/${token}`
-    : `${frontendUrl()}/reset-password?token=${token}`;
+  if (proposito === 'activacion') return `${frontendUrl()}/activar/${token}`;
+  if (proposito === 'oauth') return `${frontendUrl()}/auth/callback#code=${token}`;
+  return `${frontendUrl()}/reset-password?token=${token}`;
+}
+
+function ttlFor(proposito: MagicLinkPurpose): number {
+  if (proposito === 'activacion') return ACTIVATION_TOKEN_TTL_MS;
+  if (proposito === 'oauth') return OAUTH_CODE_TTL_MS;
+  return RESET_TOKEN_TTL_MS;
 }
 
 export interface IssuedMagicLink {
@@ -52,7 +62,7 @@ export async function issueMagicLink(args: {
   const now = args.now ?? new Date();
   await invalidatePendingMagicLinks(args.userId, args.proposito, now);
   const token = crypto.randomBytes(32).toString('base64url');
-  const ttl = args.proposito === 'activacion' ? ACTIVATION_TOKEN_TTL_MS : RESET_TOKEN_TTL_MS;
+  const ttl = ttlFor(args.proposito);
   const expiresAt = new Date(now.getTime() + ttl);
   const doc = await MagicLinkToken.create({
     tokenHash: hashToken(token),

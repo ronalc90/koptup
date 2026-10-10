@@ -10,6 +10,22 @@
  *  | chatbot        | CHATBOT_MONTHLY_BUDGET_USD       | 50          | chatbot:spend:YYYY-MM          |
  *  | linkedin-ads   | LINKEDIN_ADS_MONTHLY_BUDGET_USD  | 20          | linkedin-ads:spend:YYYY-MM     |
  *  | content        | CONTENT_MONTHLY_BUDGET_USD       | 20          | content:spend:YYYY-MM          |
+ *  | documents      | DOCUMENTS_MONTHLY_BUDGET_USD     | 10          | documents:spend:YYYY-MM        |
+ *  | health         | HEALTH_MONTHLY_BUDGET_USD        | 30          | health:spend:YYYY-MM           |
+ *
+ * `documents` es el gestor de documentos (/api/documents) y `health` las APIs
+ * de salud (cuentas médicas, auditoría, sistema experto, CUPS y reglas de
+ * facturación). Esas dos llaman a OpenAI con clientes ligados a su función
+ * (openai.service.ts: `getOpenAIFor`), que registran el gasto real de cada
+ * llamada y la rechazan si el tope del mes se agotó; las reglas de
+ * facturación (Anthropic, reglas-ia.service.ts) revisan el tope y suman su
+ * costo igual. Además tienen un cupo diario por usuario
+ * (`getUserDailyLimit`, ver middleware/ai-gate.ts):
+ *
+ *  | Función    | Variable                             | Por defecto |
+ *  |------------|--------------------------------------|-------------|
+ *  | documents  | DOCUMENTS_AI_DAILY_LIMIT_PER_USER    | 30          |
+ *  | health     | HEALTH_AI_DAILY_LIMIT_PER_USER       | 20          |
  *
  * - El gasto se acumula por mes UTC (como factura OpenAI) con INCRBYFLOAT y
  *   se calcula con los tokens que informa el proveedor.
@@ -22,7 +38,7 @@ import crypto from 'crypto';
 import { getRedisClient } from '../config/redis';
 import { logger } from '../utils/logger';
 
-export type BudgetFeature = 'demo-rag' | 'chatbot' | 'linkedin-ads' | 'content';
+export type BudgetFeature = 'demo-rag' | 'chatbot' | 'linkedin-ads' | 'content' | 'documents' | 'health';
 
 interface FeatureBudgetDef {
   envVar: string;
@@ -34,7 +50,29 @@ export const BUDGET_FEATURES: Readonly<Record<BudgetFeature, FeatureBudgetDef>> 
   chatbot: { envVar: 'CHATBOT_MONTHLY_BUDGET_USD', defaultUSD: 50 },
   'linkedin-ads': { envVar: 'LINKEDIN_ADS_MONTHLY_BUDGET_USD', defaultUSD: 20 },
   content: { envVar: 'CONTENT_MONTHLY_BUDGET_USD', defaultUSD: 20 },
+  documents: { envVar: 'DOCUMENTS_MONTHLY_BUDGET_USD', defaultUSD: 10 },
+  health: { envVar: 'HEALTH_MONTHLY_BUDGET_USD', defaultUSD: 30 },
 };
+
+/** Funciones con cupo diario de solicitudes con IA por usuario. */
+export type UserLimitedFeature = 'documents' | 'health';
+
+export const USER_DAILY_LIMITS: Readonly<Record<UserLimitedFeature, { envVar: string; defaultPerDay: number }>> = {
+  documents: { envVar: 'DOCUMENTS_AI_DAILY_LIMIT_PER_USER', defaultPerDay: 30 },
+  health: { envVar: 'HEALTH_AI_DAILY_LIMIT_PER_USER', defaultPerDay: 20 },
+};
+
+/**
+ * Solicitudes con IA por usuario y día (variable de entorno o valor por
+ * defecto). Un valor inválido o negativo deja la función sin cupo (0).
+ */
+export function getUserDailyLimit(feature: UserLimitedFeature): number {
+  const def = USER_DAILY_LIMITS[feature];
+  const raw = process.env[def.envVar];
+  if (raw === undefined || raw.trim() === '') return def.defaultPerDay;
+  const value = Number(raw);
+  return Number.isInteger(value) && value >= 0 ? value : 0;
+}
 
 const REDIS_OP_TIMEOUT_MS = 3000;
 const REDIS_CONNECT_TIMEOUT_MS = 7000;

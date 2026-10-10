@@ -5,7 +5,7 @@
 
 import nodemailer from 'nodemailer';
 import { logger } from '../utils/logger';
-import { escapeHtml } from '../utils/email-address';
+import { escapeHtml, escapeMultiline, safeHref, safeSubject, safeUrlText } from '../utils/html';
 
 interface EmailConfig {
   host: string;
@@ -75,7 +75,7 @@ class EmailService {
       const info = await this.transporter.sendMail({
         from: this.config.from,
         to: params.to,
-        subject: params.subject,
+        subject: safeSubject(params.subject),
         text: params.text,
         html: params.html,
       });
@@ -140,7 +140,7 @@ class EmailService {
 
       <div class="field">
         <span class="label">📧 Email:</span>
-        <div class="value"><a href="mailto:${escapeHtml(contactData.email)}">${escapeHtml(contactData.email)}</a></div>
+        <div class="value"><a href="${safeHref(`mailto:${contactData.email}`)}">${escapeHtml(contactData.email)}</a></div>
       </div>
 
       ${contactData.phone ? `
@@ -178,7 +178,7 @@ class EmailService {
 
       <div class="field">
         <span class="label">💬 Mensaje:</span>
-        <div class="value">${escapeHtml(contactData.message).replace(/\n/g, '<br>')}</div>
+        <div class="value">${escapeMultiline(contactData.message)}</div>
       </div>
 
       <div class="footer">
@@ -211,7 +211,7 @@ ${contactData.message}
       const info = await this.transporter.sendMail({
         from: this.config.from,
         to: this.config.adminEmail,
-        subject: `🔔 Nuevo Contacto: ${contactData.name} - ${contactData.service}`,
+        subject: safeSubject(`🔔 Nuevo Contacto: ${contactData.name} - ${contactData.service}`),
         text: textContent,
         html: htmlContent,
       });
@@ -270,9 +270,9 @@ ${contactData.message}
       <p>Hola ${escapeHtml(params.name)},</p>
       <p>Recibimos una solicitud para restablecer la contraseña de tu cuenta. Haz clic en el botón para crear una nueva contraseña. Este enlace expira en 1 hora.</p>
       <p style="text-align:center;">
-        <a class="button" href="${escapeHtml(params.resetUrl)}">Restablecer contraseña</a>
+        <a class="button" href="${safeHref(params.resetUrl)}">Restablecer contraseña</a>
       </p>
-      <p class="muted">Si el botón no funciona, copia y pega este enlace en tu navegador:<br>${escapeHtml(params.resetUrl)}</p>
+      <p class="muted">Si el botón no funciona, copia y pega este enlace en tu navegador:<br>${safeUrlText(params.resetUrl)}</p>
       <p>Si no solicitaste este cambio, puedes ignorar este correo: tu contraseña seguirá siendo la misma.</p>
       <div class="footer">
         <p>⏰ ${new Date().toLocaleString('es-CO', { timeZone: 'America/Bogota' })}</p>

@@ -9,7 +9,7 @@
  */
 
 import { extractTextFromPDF } from './pdf.service';
-import { getOpenAI } from './openai.service';
+import { getOpenAIFor } from './openai.service';
 import {
   searchCUPS,
   searchDiagnosticos,
@@ -157,7 +157,7 @@ export class SistemaExpertoService {
    * Extrae datos estructurados del PDF usando OpenAI
    */
   private async extraerDatosConIA(textoPDF: string): Promise<DatosExtraidosPDF> {
-    const openai = getOpenAI();
+    const openai = getOpenAIFor('health');
 
     const prompt = `Eres un experto en auditoría de cuentas médicas colombianas.
 Extrae los siguientes datos de esta factura médica:

@@ -72,12 +72,11 @@ flowchart LR
 
     subgraph INT["Internas"]
         LIQ["/liquidacion: equipo"]:::admin
-        TEST["/test: solo admin, 404 en producción"]:::admin
     end
 
     subgraph ARCH["Archivos y API de Next"]
         FILES["/sitemap.xml, /robots.txt, /opengraph-image, /icon, /manifest.json, /llms.txt, /widget.js"]:::externo
-        NAPI["/api/linkedin-ads/generate y /api/chatbot/*"]:::externo
+        NAPI["/api/linkedin-ads/generate"]:::externo
     end
 
     ROOT --> PUB
@@ -255,7 +254,6 @@ Un `sales` que escribe `/admin` llega a `/admin/solicitudes`; cualquier otro rol
 | `/liquidacion` | Liquidación de cuentas médicas: radicados, carga de archivos y resultados (herramienta del equipo, no es la demo) | `admin`, `manager`, `sales` | No (`X-Robots-Tag: noindex` y `robots.txt`) | <a href="images/doc/mapa/liquidacion.jpg"><img src="images/doc/mapa/liquidacion.jpg" width="120" alt="Liquidación"></a> |
 | `/liquidacion/<id>` | Detalle de un radicado | `admin`, `manager`, `sales` | No | — |
 | `/liquidacion/reglas` | Reglas de facturación de la herramienta | `admin`, `manager`, `sales` | No | — |
-| `/test` | Página para probar endpoints de la API a mano | `admin`, y solo fuera de producción (en producción responde 404) | No | — |
 
 ---
 
@@ -266,11 +264,6 @@ Viven en `apps/web/src/app/api/` y corren en Vercel. La API principal está en R
 | Ruta | Método | Para qué sirve | Quién la usa |
 |---|---|---|---|
 | `/api/linkedin-ads/generate` | POST | Proxy hacia `POST /api/linkedin-ads/generate` del backend: reenvía el cuerpo, la sesión (cookie → `Authorization`) y la IP del visitante. Si el backend no responde, devuelve 503 | Demo LinkedIn Ads |
-| `/api/chatbot/message` | POST | Proxy heredado de la API "por sesión" del chatbot | Solo `/test` |
-| `/api/chatbot/upload` | POST | Proxy heredado (subida de archivos por sesión) | Solo `/test` |
-| `/api/chatbot/config` | PUT | Proxy heredado (configuración por sesión) | Solo `/test` |
-| `/api/chatbot/info/<sessionId>` | GET | Proxy heredado (información de la sesión) | Solo `/test` |
-| `/api/chatbot/messages/<sessionId>` | DELETE | Proxy heredado (borrar mensajes) | Solo `/test` |
 
 `/api/` está bloqueada en `robots.txt` y el middleware no la intercepta.
 
@@ -324,7 +317,7 @@ flowchart TD
     OWN --> DSH
 ```
 
-*Todas las páginas se renderizan en el servidor en cada visita porque el layout raíz lee la cookie de idioma. El middleware actúa antes que cualquier layout en `/admin`, `/dashboard`, `/liquidacion`, `/test` y `/demo/<slug>` (ver [Arquitectura §4.2](Doc-01-Arquitectura.md#42-abrir-una-demo-con-acceso-controlado)).*
+*Todas las páginas se renderizan en el servidor en cada visita porque el layout raíz lee la cookie de idioma. El middleware actúa antes que cualquier layout en `/admin`, `/dashboard`, `/liquidacion` y `/demo/<slug>` (ver [Arquitectura §4.2](Doc-01-Arquitectura.md#42-abrir-una-demo-con-acceso-controlado)).*
 
 ---
 
@@ -346,7 +339,6 @@ Para agregar una página:
 - **Señales mezcladas en las páginas de cuenta.** `/login`, `/register`, `/forgot-password` y `/reset-password` están bloqueadas en `robots.txt`, pero su etiqueta `robots` dice `index, follow` y su canonical apunta al inicio. `/liquidacion` y las demos restringidas abiertas por alguien con acceso tienen la etiqueta `index, follow`, aunque la cabecera `X-Robots-Tag: noindex` las protege.
 - **El sitemap usa los modos por defecto.** Si el administrador abre una demo Con solicitud, no aparece en el sitemap hasta que se cambie la semilla; si cierra una Abierta, sigue listada (pero ya responde con `noindex`).
 - **`/pricing` redirige con 307** (temporal) en lugar de una redirección permanente.
-- **Rutas heredadas:** los proxies `/api/chatbot/*` solo los usa `/test`; `public/IMAGES-NEEDED.md` (nota interna) se sirve como archivo público.
 - **El botón "GitHub"** de `/login` y `/register` no hace nada (solo Google está implementado).
 
 ---

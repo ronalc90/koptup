@@ -85,6 +85,18 @@ export async function loadFreshUser(id: string): Promise<TokenUser | null | 'db_
   }
 }
 
+/**
+ * ¿La sesión es del equipo de KopTup? Lee el rol vigente de la BD (nunca el
+ * del token, que puede tener hasta 15 min de atraso). Para las comprobaciones
+ * "dueño del recurso o staff" de los controladores. Si la BD no responde,
+ * devuelve false (falla cerrada: solo el dueño pasa).
+ */
+export async function isStaffSession(req: AuthRequest): Promise<boolean> {
+  if (!req.user?.id) return false;
+  const fresh = await loadFreshUser(req.user.id);
+  return !!fresh && fresh !== 'db_unavailable' && isStaffRole(fresh.role);
+}
+
 function sendDbUnavailable(res: Response): void {
   res.status(503).json({
     success: false,

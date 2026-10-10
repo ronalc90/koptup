@@ -157,7 +157,7 @@ Puntos clave:
 
 *Inicio de sesión con correo y contraseña.*
 
-1. **Continuar con Google:** funciona solo si el servidor tiene Google configurado; la cuenta que crea es de rol `user` (cliente).
+1. **Continuar con Google:** funciona solo si el servidor tiene Google configurado; la cuenta que crea es de rol `user` (cliente). Al volver de Google, la web recibe un código de un solo uso (vence en 60 segundos) y lo canjea por la sesión; los tokens no viajan en la dirección.
 2. **Continuar con GitHub:** hoy no hace nada (ver [Limitaciones](#12-limitaciones-conocidas)).
 3. **Correo electrónico.**
 4. **Contraseña** (con ojo para mostrarla).
@@ -499,7 +499,7 @@ Igual que para el prospecto ([sección 5](#5-mis-demos-dashboarddemos)). Si el e
 
 *Detalle de `/dashboard/orders/ORD-0001`.*
 
-1. **Estado** (hoy aparece en inglés: `pending`). 2. **Ítems** con cantidad y valor. 3. **Historial** del pedido. 4. **Ver facturación** (lleva a Facturación). 5. **Cancelar pedido**: lo cancela de inmediato, sin pedir confirmación. Esta página no muestra el menú lateral; se vuelve con "Volver al listado".
+1. **Estado** (hoy aparece en inglés: `pending`). 2. **Ítems** con cantidad y valor. 3. **Historial** del pedido. 4. **Ver facturación** (lleva a Facturación). 5. **Cancelar pedido**: lo cancela de inmediato, sin pedir confirmación, y solo mientras el pedido está pendiente de revisión. Cuando el equipo ya lo revisó o lo está trabajando, el botón aparece deshabilitado con el aviso "escríbenos por Mensajes si necesitas cambiarlo o cancelarlo". El estado del pedido lo cambia solo el equipo. Esta página no muestra el menú lateral; se vuelve con "Volver al listado".
 
 ![Nuevo pedido con error](images/doc/prospecto-cliente/pedido-nuevo-error.jpg)
 
@@ -529,9 +529,13 @@ Cuando hay entregables en revisión, el cliente puede **aprobarlos** o **rechaza
 | Con la API respondiendo (real) | Si la API falla (datos de ejemplo) |
 |---|---|
 | ![Facturación vacía](images/doc/prospecto-cliente/facturacion-vacia.jpg) | ![Facturación con datos de ejemplo](images/doc/prospecto-cliente/facturacion-datos-ejemplo.jpg) |
-| *Totales Pendiente, Vencido y Pagado en $0.00 y sin facturas.* | *Tres facturas inventadas (INV-2025-045…) con (1) **Pagar ahora** y (2) **Descargar PDF**.* |
+| *Totales Pendiente, Vencido y Pagado en $0.00 y sin facturas.* | *Tres facturas inventadas (INV-2025-045…) con (1) **Descargar PDF**. Sin métodos de pago configurados (o sin API) no aparece ningún botón de pago.* |
 
-Hoy no hay facturas reales para mostrar (ver [Limitaciones](#12-limitaciones-conocidas)) y **Pagar ahora no está conectado a ninguna pasarela de pagos**: el cobro en línea está en desarrollo ([Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md)).
+Hoy no hay facturas reales para mostrar (ver [Limitaciones](#12-limitaciones-conocidas)). Cuando hay una factura pendiente y el equipo configuró los datos de transferencia (Admin › Configuración), aparece **Cómo pagar**: despliega esas instrucciones y el número de la factura como referencia. El cliente no marca la factura como pagada: el equipo registra el pago cuando lo confirma. Sin datos de pago configurados no aparece ningún botón de pago. El cobro en línea está en desarrollo ([Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md)).
+
+![Cómo pagar una factura](images/doc/prospecto-cliente/facturacion-como-pagar.jpg)
+
+*Factura de prueba con **Cómo pagar** abierto: instrucciones de transferencia (datos de ejemplo) y el número de la factura como referencia.*
 
 ### 9.7 Mensajes (`/dashboard/messages`)
 
@@ -592,7 +596,7 @@ Solo para clientes.
 | Panel (`/dashboard`) | ❌ | ❌ | ❌ Lo lleva a Mis demos | ✅ (vista de ejemplo) |
 | Mis pedidos, Proyectos, Entregables, Facturación, Mensajes | ❌ | ❌ | ❌ Lo lleva a Mis demos | ✅ (ver estado de cada uno en la sección 9) |
 | Notificaciones y Configuración | ❌ | ❌ | ❌ | ✅ |
-| Aprobar entregables / cancelar sus pedidos | ❌ | ❌ | ❌ | ✅ (solo los suyos) |
+| Aprobar entregables / cancelar sus pedidos | ❌ | ❌ | ❌ | ✅ (solo los suyos; un pedido, mientras está pendiente de revisión) |
 | Panel de administración (`/admin`) | ❌ | ❌ | ❌ | ❌ |
 
 Todas las reglas se verifican **en el servidor** (en la web antes de mostrar la página y en la API en cada consulta), no solo escondiendo botones. La matriz completa con los roles del equipo está en [Roles y permisos](Doc-10-Roles-y-Permisos.md).
@@ -627,7 +631,7 @@ Todas las reglas se verifican **en el servidor** (en la web antes de mostrar la 
 | `GET /api/orders`, `GET /api/orders/:id`, `POST /api/orders/:id/cancel` | Dueño del pedido | Mis pedidos. |
 | `GET /api/projects`, `/api/deliverables`, `/api/invoices`, `/api/messages/conversations`, `/api/notifications` | Dueño o participante | Resto del portal. |
 
-Los límites estrictos (5 por minuto y por IP) comparten contador entre registro, login, recuperación, activación y cambio de contraseña. Detalle de cada endpoint en [API](Doc-08-API.md) y de los modelos (`User.accountStatus`, `MagicLinkToken`, `DemoGrant`) en [Modelos de datos](Doc-09-Modelos-de-Datos.md).
+Cada ruta de cuenta tiene su propio límite (login por IP y correo, registro, recuperación, activación y cambio de contraseña), con un aviso en español cuando se supera. Detalle de cada endpoint en [API](Doc-08-API.md) y de los modelos (`User.accountStatus`, `MagicLinkToken`, `DemoGrant`) en [Modelos de datos](Doc-09-Modelos-de-Datos.md).
 
 ### Tiempos y reglas
 
@@ -666,12 +670,12 @@ Comportamiento actual de `main`, comprobado en el entorno de capturas:
 2. **Una sesión renovable por cuenta:** iniciar sesión en otro navegador o dispositivo hace que el anterior pida iniciar sesión otra vez en menos de 15 minutos.
 3. **Demo abierta cuando vence o se revoca el acceso:** la página ya cargada sigue funcionando hasta recargar o navegar.
 4. **Cambio de prospecto a cliente:** el servidor aplica el rol nuevo enseguida, pero el menú lateral del portal se actualiza solo después de cerrar sesión y volver a entrar. El selector de rol de Admin › Usuarios no ofrece "Cliente" ni "Prospecto" (se usa "Usuario", que funciona igual que cliente).
-5. **Inicio de sesión:** "Continuar con GitHub" no hace nada; "Recordarme" no cambia la duración de la sesión; "Continuar con Google" depende de que el servidor tenga Google configurado (si no, el navegador muestra un mensaje técnico del servidor). El aviso de demasiados intentos sale en inglés.
+5. **Inicio de sesión:** "Continuar con GitHub" no hace nada; "Recordarme" no cambia la duración de la sesión; "Continuar con Google" depende de que el servidor tenga Google configurado (si no, el navegador muestra un mensaje técnico del servidor).
 6. **Panel del cliente:** todo es de ejemplo y no depende de la cuenta (la vista "Plan SaaS" incluso usa "Acá").
 7. **Pedidos:** el formulario "Nuevo pedido" no logra enviar ("Failed to fetch"); el detalle no tiene menú lateral, muestra el estado en inglés y "Cancelar pedido" no pide confirmación.
 8. **Proyectos, entregables, facturas, mensajes y notificaciones:** ninguna pantalla los crea hoy; las facturas tampoco se pueden generar desde el panel por un error del servidor, y la conversación automática de cada pedido no se crea. Para un cliente real, esas secciones están vacías.
 9. **Datos de ejemplo disfrazados:** Entregables y Facturación muestran registros inventados si la API falla, sin avisar que no son reales; cuando están vacías no muestran un mensaje de "no hay".
-10. **Pagos:** "Pagar ahora" no está conectado a ninguna pasarela; el cobro en línea está en desarrollo.
+10. **Pagos:** no hay pago en línea de facturas. "Cómo pagar" muestra los datos de transferencia que configure el equipo, y el equipo registra el pago; el cobro en línea está en desarrollo.
 11. **Configuración:** las preferencias de notificaciones solo se guardan en el navegador.
 12. **Textos:** `/forgot-password`, `/reset-password`, "Nuevo pedido" y el aviso del login con redirección no se traducen al inglés. "Pedir más tiempo" prellena nombre y correo, pero no la empresa.
 

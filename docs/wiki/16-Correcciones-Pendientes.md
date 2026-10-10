@@ -26,10 +26,10 @@ flowchart LR
 
 | Prioridad | Qué agrupa | Puntos |
 |---|---|---|
-| **P0** | Lo que impide vender hoy o es un riesgo legal o de seguridad | 10 |
-| **P1** | Funciones que el cliente o el equipo usan y no sirven, incluidas las demos | 34 |
-| **P2** | Detalles del panel, de la operación y de la configuración | 33 |
-| **P3** | SEO, coherencia de textos y código que sobra | 30 |
+| **P0** | Lo que impide vender hoy o es un riesgo legal o de seguridad | 8 |
+| **P1** | Funciones que el cliente o el equipo usan y no sirven, incluidas las demos | 33 |
+| **P2** | Detalles del panel, de la operación y de la configuración | 34 |
+| **P3** | SEO, coherencia de textos y código que sobra | 25 |
 
 ---
 
@@ -39,13 +39,11 @@ flowchart LR
 |---|---|---|---|
 | 0.1 | **El backend de producción no responde** ("Application not found" de Railway). Contacto, inicio de sesión, panel, solicitudes de demo, chatbot con IA y "Prueba con tu documento" fallan en `www.koptup.com`. Las demos "Con solicitud" muestran "No se pudo verificar" | Volver a desplegar el backend en Railway y, si cambia el dominio, actualizar `NEXT_PUBLIC_API_URL` en Vercel | [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md#acciones-del-dueño) |
 | 0.2 | **Credenciales que estuvieron en el historial del repositorio** | Rotar la contraseña de MongoDB y los secretos JWT | [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md#acciones-del-dueño) |
-| 0.3 | **Revisión de seguridad de rutas heredadas:** quedan ajustes de autorización y de tope de gasto en rutas del portal del cliente, de documentos, del chatbot y del inicio de sesión con Google. Por ser una wiki pública, el detalle no se publica aquí | Corregir antes de volver a abrir el registro público | Equipo de desarrollo |
 | 0.4 | **No hay forma de suprimir los datos de una persona** (derecho del titular, Ley 1581). Solicitudes, contactos, cuentas, accesos y bitácora no vencen, y ni el panel ni la API permiten borrarlos | Agregar supresión desde el panel y un plazo de conservación | [Flujos técnicos › Hallazgos](Doc-14-3-Flujos-Tecnicos.md#hallazgos) |
 | 0.5 | **El formulario de contacto no pide autorización de datos** ni tiene campo trampa contra bots, a diferencia de "Solicitar demo" | Agregar la casilla y guardar la prueba de autorización | [Flujos de negocio › Hallazgos](Doc-14-1-Flujos-de-Negocio.md#hallazgos) |
 | 0.6 | **El chatbot guarda en disco las preguntas de "Prueba el asistente"** sin avisarlo y sin vencimiento | Avisar y borrar, o no guardar en la demo pública | [Flujos técnicos › Hallazgos](Doc-14-3-Flujos-Tecnicos.md#hallazgos) |
 | 0.7 | **La autorización de "Prueba con tu documento" queda solo como texto** dentro del contacto, sin versión de la política | Guardarla como en las solicitudes de demo | [Flujos técnicos › Hallazgos](Doc-14-3-Flujos-Tecnicos.md#hallazgos) |
 | 0.8 | **La política de privacidad promete responder en 30 días hábiles**, y la Ley 1581 fija 10 para consultas y 15 para reclamos. El texto es genérico | Revisión legal del texto | [SEO, analítica y legal](Doc-12-SEO-Analitica-y-Legal.md) |
-| 0.9 | **`/activar` envía su token a la analítica:** no está en la lista de rutas sin medición, como sí lo están `/auth` y `/reset-password` | Agregarla a `NO_TRACKING_PATHS` | [Flujos de negocio › Hallazgos](Doc-14-1-Flujos-de-Negocio.md#hallazgos) |
 | 0.10 | **Producción no mide nada:** no hay ninguna etiqueta configurada (GA4, Google Ads, LinkedIn), así que no aparece el banner y no se registra ninguna conversión | Crear las variables en Vercel antes de pautar | [SEO, analítica y legal](Doc-12-SEO-Analitica-y-Legal.md) |
 
 ---
@@ -82,10 +80,9 @@ flowchart LR
 
 | # | Qué pasa | Detalle |
 |---|---|---|
-| 1.17 | **El botón de GitHub no hace nada;** el de Google sin configurar deja una respuesta JSON 503; "Recordarme" no tiene efecto; el error 429 sale en inglés | [Flujos del prospecto y cliente](Doc-05-Flujos-del-Prospecto-y-Cliente.md) |
+| 1.17 | **El botón de GitHub no hace nada;** el de Google sin configurar deja una respuesta JSON 503; "Recordarme" no tiene efecto | [Flujos del prospecto y cliente](Doc-05-Flujos-del-Prospecto-y-Cliente.md) |
 | 1.18 | **Sin correo configurado, "Olvidé mi contraseña" dice que envió un enlace que no llega,** y el panel no permite copiarlo como sí hace con la activación | [Flujos de negocio › Hallazgos](Doc-14-1-Flujos-de-Negocio.md#hallazgos) |
 | 1.19 | **Una sola sesión renovable por cuenta:** iniciar sesión en otro navegador cierra la del primero cuando vence su token | [Flujos de negocio › Hallazgos](Doc-14-1-Flujos-de-Negocio.md#hallazgos) |
-| 1.20 | **Todas las rutas de cuenta comparten un único cupo** de 5 peticiones por minuto por IP (registro, inicio, recuperación, activación y cambio de contraseña) | [Flujos del prospecto y cliente](Doc-05-Flujos-del-Prospecto-y-Cliente.md) |
 | 1.21 | **Con el backend caído, el panel manda al login en vez de avisar** que el servicio no está disponible | [Flujos de administración › Hallazgos](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#hallazgos) |
 
 ### Operación que afecta al cliente
@@ -155,8 +152,9 @@ flowchart LR
 | 2.29 | **`ADMIN_EMAIL` vuelve a dar admin en cada arranque,** y sin ella los avisos al equipo van a una dirección fija del código | [Flujos de administración › Hallazgos](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#hallazgos) |
 | 2.30 | **`NEXT_PUBLIC_SITE_URL` no la lee nadie,** y un `JWT_REFRESH_EXPIRES_IN` mayor de 7 días no tiene efecto | [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md) |
 | 2.31 | **Estado en memoria por instancia:** documentos de la demo, límites y cachés. Con más de una instancia no se comparten | [Arquitectura](Doc-01-Arquitectura.md) |
-| 2.32 | **Cuatro formatos de respuesta de error distintos** en la API, y el límite general responde en inglés | [Flujos técnicos › Hallazgos](Doc-14-3-Flujos-Tecnicos.md#hallazgos) |
+| 2.32 | **Cuatro formatos de respuesta de error distintos** en la API | [Flujos técnicos › Hallazgos](Doc-14-3-Flujos-Tecnicos.md#hallazgos) |
 | 2.33 | **La wiki también se publica desde la rama de trabajo,** así que puede adelantarse a `main` | [Flujos de administración › Hallazgos](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#hallazgos) |
+| 2.34 | **Crear o previsualizar una regla de facturación con IA falla** en `/liquidacion`: el servicio usa un modelo de Anthropic de 2024 que ya no está disponible. Hay que pasarlo a un modelo vigente | [API](Doc-08-API.md) |
 
 ---
 
@@ -171,7 +169,6 @@ flowchart LR
 | 3.3 | Todas las páginas del panel, del portal y de cuenta usan el título genérico del sitio | [Mapa del sitio](Doc-02-Mapa-del-Sitio.md) |
 | 3.4 | `/pricing` redirige con 307 (temporal) en vez de 308 | [Mapa del sitio](Doc-02-Mapa-del-Sitio.md) |
 | 3.5 | El sitemap decide qué demos listar con la tabla del código, no con el catálogo que edita el admin | [SEO, analítica y legal](Doc-12-SEO-Analitica-y-Legal.md) |
-| 3.6 | `public/IMAGES-NEEDED.md`, una nota interna, se publica en `www.koptup.com/IMAGES-NEEDED.md` | [Mapa del sitio](Doc-02-Mapa-del-Sitio.md) |
 
 ### Contenido y coherencia
 
@@ -196,14 +193,10 @@ flowchart LR
 | 3.18 | `apps/web/middleware.ts` (en la raíz) no se ejecuta: Next usa `apps/web/src/middleware.ts` | [Arquitectura](Doc-01-Arquitectura.md) |
 | 3.19 | `src/i18n/useToggleLocale.tsx` no se usa, y nadie fija la cabecera `x-locale` que lee `i18n/request.ts` | [Arquitectura](Doc-01-Arquitectura.md) |
 | 3.20 | `apps/backend/src/modules/` (17 módulos de demos) no se monta en la app | [Arquitectura](Doc-01-Arquitectura.md) |
-| 3.21 | Los proxies `/api/chatbot/*` de Next y `hooks/useChatbot.ts` solo los usa `/test` | [Arquitectura](Doc-01-Arquitectura.md) |
-| 3.22 | `authorize()` del middleware de autenticación no lo usa ninguna ruta | [Flujos técnicos › Hallazgos](Doc-14-3-Flujos-Tecnicos.md#hallazgos) |
 | 3.23 | `packages/database/init.sql` y `db/migrations/*.sql` son de una versión con PostgreSQL | [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md) |
 | 3.24 | `POST /api/quotes` no lo llama ninguna página | [API](Doc-08-API.md#11-limitaciones-conocidas) |
 | 3.25 | Los adjuntos de pedidos se guardan, pero no hay ruta para descargarlos | [API](Doc-08-API.md#11-limitaciones-conocidas) |
-| 3.26 | Las anotaciones Swagger de `/api/documents` dicen "Public Demo", pero todas las rutas exigen sesión | [API](Doc-08-API.md#11-limitaciones-conocidas) |
 | 3.27 | El comentario del modelo `AuditLog` no incluye la acción `user.change_password` | [Modelos de datos](Doc-09-Modelos-de-Datos.md) |
-| 3.28 | La ruta pública `/test` sigue publicada | [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md) |
 | 3.29 | `README.md` con cifras viejas | [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md) |
 | 3.30 | `/api/expert/generar-excel` falla cuando la IA no devuelve procedimientos | [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md) |
 

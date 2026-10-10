@@ -484,7 +484,13 @@ export const activateAccount = asyncHandler(async (req: AuthRequest, res: Respon
   res.json({ success: true, message: 'Tu cuenta quedó activa.', data: session });
 });
 
-// Google OAuth callback handler
+/**
+ * Fin del inicio de sesión con Google (GET /api/auth/google/callback). Los
+ * tokens de sesión NO viajan en la URL: se emite un código de un solo uso
+ * (60 s, solo se guarda su hash) y se redirige a la web con el código en el
+ * fragmento (`/auth/callback#code=…`, que el navegador no envía al servidor
+ * ni en el Referer). La web lo canjea con POST /api/auth/google/exchange.
+ */
 export const googleCallback = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     if (!req.user) {
@@ -492,27 +498,28 @@ export const googleCallback = asyncHandler(
     }
 
     const user = req.user as any;
-
-    // Generate tokens
-    const accessToken = generateAccessToken({
-      id: user.id,
-      email: user.email,
-      role: user.role,
-      name: user.name,
-    });
-
-    const refreshToken = generateRefreshToken({
-      id: user.id,
-      email: user.email,
-    });
-
-    // Store refresh token in Redis with 7 days expiration
-    await redis.setEx(`refresh_token:${user.id}`, REFRESH_TTL_SECONDS, refreshToken);
-
-    // Redirect to frontend with tokens
-    const frontendURL = process.env.FRONTEND_URL || 'http://localhost:3000';
-    res.redirect(
-      `${frontendURL}/auth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}`
-    );
+    const link = await issueMagicLink({ userId: String(user.id ?? user._id), proposito: 'oauth' });
+    res.setHeader('Cache-Control', 'no-store');
+    res.redirect(link.url);
   }
 );
+
+/**
+ * POST /api/auth/google/exchange { code } — canjea el código de un solo uso
+ * del inicio de sesión con Google por la sesión (misma respuesta que el
+ * login). El código vence a los 60 s y sirve una sola vez.
+ */
+const OAuthCodeSchema = z.object({ code: z.string().trim().min(20).max(200) });
+
+export const googleExchange = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const parsed = OAuthCodeSchema.safeParse(req.body ?? {});
+  if (!parsed.success) throw new AppError('El inicio de sesión con Google no es válido o venció. Intenta de nuevo.', 400, 'token_invalid');
+  const consumed = await consumeMagicLink(parsed.data.code, 'oauth');
+  if (!consumed.ok) throw new AppError('El inicio de sesión con Google no es válido o venció. Intenta de nuevo.', 400, consumed.reason);
+  const user = await User.findById(consumed.doc.user);
+  if (!user) throw new AppError('El inicio de sesión con Google no es válido o venció. Intenta de nuevo.', 400, 'token_invalid');
+  const session = await issueSession(user);
+  logger.info('Google sign-in exchanged for a session');
+  res.setHeader('Cache-Control', 'no-store');
+  res.json({ success: true, message: 'Login successful', data: session });
+});

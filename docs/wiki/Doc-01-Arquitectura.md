@@ -37,7 +37,7 @@ flowchart LR
     end
 
     subgraph VERCEL["Vercel: web Next.js 14"]
-        MW["Middleware: /admin, /dashboard, /liquidacion, /test y /demo/slug"]:::sistema
+        MW["Middleware: /admin, /dashboard, /liquidacion y /demo/slug"]:::sistema
         SSR["Render en el servidor: App Router, metadatos SEO, sitemap"]:::sistema
         NAPI["Rutas API de Next: /api/linkedin-ads/generate y proxies /api/chatbot"]:::sistema
         PUB["Archivos públicos: robots.txt, widget.js, llms.txt, manifest"]:::sistema
@@ -100,7 +100,7 @@ Puntos clave para el dueño:
 | Pieza | Dónde corre | Qué hace | Si falla… |
 |---|---|---|---|
 | **Web Next.js** (`apps/web`) | Vercel, región `iad1` | Renderiza todas las páginas en el servidor (App Router), sirve las demos, el sitemap, el `robots.txt` y la imagen Open Graph. Aplica cabeceras de seguridad (CSP, HSTS). | El sitio no carga. |
-| **Middleware de Next** (`apps/web/src/middleware.ts`) | Vercel (Edge) | Antes de servir `/admin`, `/dashboard`, `/liquidacion`, `/test` y `/demo/<slug>`, pregunta a la API por la sesión y el acceso. Renueva el token si venció. | Ver la fila de la API. |
+| **Middleware de Next** (`apps/web/src/middleware.ts`) | Vercel (Edge) | Antes de servir `/admin`, `/dashboard`, `/liquidacion` y `/demo/<slug>`, pregunta a la API por la sesión y el acceso. Renueva el token si venció. | Ver la fila de la API. |
 | **API Express** (`apps/backend`) | Railway (Nixpacks, `npm run start`) | Autenticación, sistema de demos (solicitudes, accesos, catálogo), contacto, chatbot RAG, "Prueba con tu documento", panel de administración, portal del cliente y herramientas internas. Cada ruta tiene su política de autorización. | Las páginas protegidas muestran "No pudimos verificar tu sesión" (503) y las demos con acceso muestran "no disponible". Las públicas siguen. |
 | **Job de accesos a demos** | Dentro del proceso de la API | Cada hora marca como vencidos los accesos y envía el recordatorio 3 días antes (si hay SMTP). | La vigencia igual se respeta: la API compara la fecha en cada consulta. |
 | **MongoDB** | Servicio administrado (fuera de Railway) | Base de datos principal: cuentas, demos, contactos, pedidos, facturas, entregables, mensajes y datos de las herramientas médicas. | `/health` responde 503. Login, panel y demos con acceso no funcionan; las demos `publico` siguen abiertas. |
@@ -384,7 +384,7 @@ El detalle de quién entra a dónde está en [Roles y permisos](Doc-10-Roles-y-P
 | Gasto de IA del mes (`demo-rag`, `chatbot`, `linkedin-ads`, `content`) | **Redis** (`<función>:spend:AAAA-MM`) | Por mes (UTC) |
 | Cupos: documentos por IP al día, solicitudes de demo por IP y por email, LinkedIn Ads | **Redis** (las solicitudes tienen respaldo en memoria) | De 10 minutos a 1 día |
 | Candado del job de accesos | **Redis** (`jobs:demo-grants:lock`) | 10 minutos |
-| Límites generales por IP (100 cada 15 min, 5 por minuto en login, registro y contacto) | **Memoria** de cada instancia | La ventana del límite |
+| Límites por IP o por cuenta (100 cada 15 min en general y un contador propio en cada ruta de cuenta y en contacto) | **Memoria** de cada instancia | La ventana del límite |
 | Documentos de "Prueba con tu documento" | **Memoria** del backend (máx. 200 a la vez) | 1 hora |
 | Bots del chatbot, sus documentos y conversaciones | **Disco** del backend (`data/chatbots/state.json`) | Hasta el próximo redespliegue en Railway (disco efímero) |
 | Adjuntos de pedidos y archivos de cuentas médicas | **Disco** del backend (`uploads/`) | Hasta el próximo redespliegue |
@@ -514,7 +514,7 @@ Sin entrar en detalles que faciliten un ataque, estas son las capas que protegen
 |---|---|---|
 | Cabeceras de seguridad | `next.config.js` y `helmet` en la API | HSTS, `nosniff`, `Referrer-Policy`, `Permissions-Policy` y una CSP que solo abre los dominios de Google o LinkedIn si su variable existe al compilar. Todo el sitio, salvo `/embed/*`, solo se puede incrustar en el propio dominio. |
 | CORS | `app.ts` | La API solo acepta peticiones del navegador desde `koptup.com` y `www.koptup.com` (más los orígenes de `CORS_ORIGIN`). |
-| Límites por IP | `middleware/rateLimiter.ts` y servicios | Por defecto, 100 peticiones cada 15 min en general; 5 por minuto en login, registro, contacto y restablecer contraseña; 60 por minuto en el chatbot; cupos propios en la demo RAG y en LinkedIn Ads. |
+| Límites por IP | `middleware/rateLimiter.ts` y servicios | Por defecto, 100 peticiones cada 15 min en general; un contador propio para inicio de sesión (por IP y correo), registro, recuperación y restablecimiento de contraseña, activación, canje del inicio con Google y contacto, con mensajes en español (detalle en [API › Límites](Doc-08-API.md#6-límites-de-uso-y-topes-de-gasto)); 60 por minuto en el chatbot; cupos propios en la demo RAG, en LinkedIn Ads y en las funciones de IA de documentos y de salud. |
 | Topes de gasto de IA | `services/ai-budget.service.ts` | Tope mensual en dólares por función (por defecto 50 para la demo RAG y el chatbot, 20 para LinkedIn Ads y el gestor de contenido). Si Redis no responde, no se llama al modelo. |
 | Autorización | Middleware de Next, layouts del panel y del portal, y cada ruta de la API | Tres capas; la que manda es la API, que lee el rol de la base de datos en cada petición. Ver [Roles y permisos](Doc-10-Roles-y-Permisos.md). |
 | Variables de entorno | `config/env.ts` | En producción la API no arranca sin `MONGODB_URI` y `JWT_SECRET`; los mensajes nombran la variable, nunca su valor. |
@@ -546,7 +546,7 @@ Sin entrar en detalles que faciliten un ataque, estas son las capas que protegen
 - **El backend de producción no responde** en este momento; ver [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md).
 - **Disco efímero en Railway.** Los bots creados en "Configura el tuyo" (`state.json`) y los archivos subidos a `uploads/` se pierden en cada redespliegue. Los bots de las empresas de ejemplo se vuelven a crear solos.
 - **Estado por instancia.** Los documentos de "Prueba con tu documento", los límites generales por IP y las cachés del middleware (sesión 30 s, catálogo 60 s) viven en la memoria de cada instancia. Con más de una instancia, un documento solo existe en la que lo recibió, y un cambio de rol puede tardar hasta 30 s en reflejarse en la web (la API lo aplica de inmediato).
-- **Código sin uso en `main`:** `apps/web/middleware.ts` (raíz) no se ejecuta porque Next usa `src/middleware.ts`, así que la cabecera `x-locale` que lee `i18n/request.ts` nunca llega (el idioma sale de la cookie y funciona igual); `apps/backend/src/modules/` (17 módulos de demos) no está montado en `app.ts`; las rutas API de Next `/api/chatbot/*` son proxies heredados que solo usa `/test`.
+- **Código sin uso en `main`:** `apps/web/middleware.ts` (raíz) no se ejecuta porque Next usa `src/middleware.ts`, así que la cabecera `x-locale` que lee `i18n/request.ts` nunca llega (el idioma sale de la cookie y funciona igual); `apps/backend/src/modules/` (17 módulos de demos) no está montado en `app.ts`.
 - **Archivos heredados de otra arquitectura:** `packages/database/init.sql` y `apps/backend/src/db/migrations/*.sql` son de PostgreSQL; `docker-compose.yml` apunta a un `apps/backend/Dockerfile` que no existe. Para desarrollo local usa `docker-compose.dev.yml`.
 - **En desarrollo:** propuestas, anticipo y conversión a cliente no están en `main`; ver [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md).
 

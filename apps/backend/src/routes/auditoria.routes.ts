@@ -4,6 +4,7 @@ import auditoriaMedicaController from '../controllers/auditoria-medica.controlle
 import auditoriaModularController from '../controllers/auditoria-modular.controller';
 
 import { requireStaffOrDemoAccess } from '../middleware/access';
+import { aiGate } from '../middleware/ai-gate';
 
 const router = express.Router();
 
@@ -83,7 +84,8 @@ router.post('/procesar-archivos', upload.array('files', 10), auditoriaController
  *       201:
  *         description: Factura procesada y auditada exitosamente con datos reales del PDF
  */
-router.post('/procesar-facturas-pdf', upload.array('files', 10), auditoriaMedicaController.procesarFacturasPDF);
+// Llama a la IA: tope mensual HEALTH_MONTHLY_BUDGET_USD y cupo diario por usuario (middleware/ai-gate.ts).
+router.post('/procesar-facturas-pdf', upload.array('files', 10), aiGate('health'), auditoriaMedicaController.procesarFacturasPDF);
 
 /**
  * @swagger
@@ -109,7 +111,8 @@ router.post('/procesar-facturas-pdf', upload.array('files', 10), auditoriaMedica
  *       201:
  *         description: Documento procesado con sistema modular - Extracción completa de 80+ campos
  */
-router.post('/procesar-modular', upload.array('files', 10), auditoriaModularController.procesarDocumentoCompleto);
+// Llama a la IA: tope mensual HEALTH_MONTHLY_BUDGET_USD y cupo diario por usuario (middleware/ai-gate.ts).
+router.post('/procesar-modular', upload.array('files', 10), aiGate('health'), auditoriaModularController.procesarDocumentoCompleto);
 
 /**
  * @swagger
@@ -496,7 +499,8 @@ router.get('/sesion/:sesionId', auditoriaController.obtenerSesionAuditoria);
  *       400:
  *         description: Datos de entrada inválidos
  */
-router.post('/aprendizaje/feedback/:decisionId', auditoriaController.agregarFeedbackDecision);
+// Llama a la IA: tope mensual HEALTH_MONTHLY_BUDGET_USD y cupo diario por usuario (middleware/ai-gate.ts).
+router.post('/aprendizaje/feedback/:decisionId', aiGate('health'), auditoriaController.agregarFeedbackDecision);
 
 /**
  * @swagger

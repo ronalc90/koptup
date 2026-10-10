@@ -253,6 +253,11 @@ flowchart LR
 | `AUTH_ME_RATE_LIMIT_MAX` | Opcional | `120` por minuto | Cupo de `GET /api/auth/me` y `GET /api/demo-access/<slug>`, que la web consulta en cada navegación protegida |
 | `CHATBOT_RATE_LIMIT_MAX` | Opcional | `60` por minuto | Peticiones por IP a `/api/chatbot` |
 | `CHATBOT_CREATE_LIMIT_PER_HOUR` | Opcional | `30` | Bots nuevos por IP cada hora en «Configura el tuyo» |
+| `LOGIN_RATE_LIMIT_MAX`, `LOGIN_IP_RATE_LIMIT_MAX` | Opcional | `10` y `30` cada 15 min | Intentos de inicio de sesión por IP y correo, y por IP |
+| `REGISTER_RATE_LIMIT_MAX` | Opcional | `5` por hora | Registros por IP |
+| `FORGOT_PASSWORD_RATE_LIMIT_MAX` | Opcional | `3` cada 15 min | Enlaces de recuperación por IP y correo (además, 10 por IP con correos distintos) |
+| `RESET_PASSWORD_RATE_LIMIT_MAX`, `ACTIVATION_RATE_LIMIT_MAX` | Opcional | `10` cada 15 min | Intentos de restablecer la contraseña y de activar la cuenta, por IP |
+| `CHANGE_PASSWORD_RATE_LIMIT_MAX` | Opcional | `5` cada 15 min | Cambios de contraseña por cuenta |
 
 **IA y topes de gasto** (mes UTC, acumulado en Redis con los tokens que informa OpenAI)
 
@@ -265,6 +270,9 @@ flowchart LR
 | `DEMO_MONTHLY_BUDGET_USD` | Opcional | `50` | Tope de «Prueba con tu documento». Al llegar, se apaga hasta el mes siguiente |
 | `LINKEDIN_ADS_MONTHLY_BUDGET_USD` | Opcional | `20` | Tope del generador de LinkedIn Ads |
 | `CONTENT_MONTHLY_BUDGET_USD` | Opcional | `20` | Tope del asistente del gestor de contenido |
+| `DOCUMENTS_MONTHLY_BUDGET_USD` | Opcional | `10` | Tope del gestor de documentos (`/api/documents`). Al llegar, una subida se guarda sin análisis y las demás funciones con IA responden «no disponible» |
+| `HEALTH_MONTHLY_BUDGET_USD` | Opcional | `30` | Tope de las APIs de salud (cuentas médicas, auditoría, sistema experto, CUPS y reglas de facturación) |
+| `DOCUMENTS_AI_DAILY_LIMIT_PER_USER`, `HEALTH_AI_DAILY_LIMIT_PER_USER` | Opcional | `30` y `20` | Solicitudes con IA por cuenta y por día en esas dos funciones. El equipo de KopTup solo tiene el tope mensual |
 
 Un tope con un valor inválido o negativo deja esa función en 0, es decir, apagada.
 
@@ -690,6 +698,8 @@ No hace falta desplegar: el modo vive en MongoDB. Ten en cuenta que el **chatbot
 | «Prueba con tu documento» | `DEMO_MONTHLY_BUDGET_USD` | 50 USD | `demo-rag:spend:AAAA-MM` |
 | Generador de LinkedIn Ads | `LINKEDIN_ADS_MONTHLY_BUDGET_USD` | 20 USD | `linkedin-ads:spend:AAAA-MM` |
 | Gestor de contenido | `CONTENT_MONTHLY_BUDGET_USD` | 20 USD | `content:spend:AAAA-MM` |
+| Gestor de documentos | `DOCUMENTS_MONTHLY_BUDGET_USD` | 10 USD | `documents:spend:AAAA-MM` |
+| APIs de salud (cuentas médicas, auditoría, sistema experto, CUPS y reglas de facturación) | `HEALTH_MONTHLY_BUDGET_USD` | 30 USD | `health:spend:AAAA-MM` |
 
 **Pasos**
 

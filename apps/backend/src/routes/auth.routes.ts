@@ -7,6 +7,7 @@ import {
   logout,
   getProfile,
   googleCallback,
+  googleExchange,
   forgotPassword,
   resetPassword,
   activateAccount,
@@ -15,7 +16,18 @@ import {
   changePassword,
 } from '../controllers/auth.controller';
 import { authenticate } from '../middleware/auth';
-import { activationCheckRateLimiter, strictRateLimiter } from '../middleware/rateLimiter';
+import {
+  activationCheckRateLimiter,
+  activationRateLimiter,
+  changePasswordRateLimiter,
+  forgotPasswordIpRateLimiter,
+  forgotPasswordRateLimiter,
+  loginIpRateLimiter,
+  loginRateLimiter,
+  oauthExchangeRateLimiter,
+  registerRateLimiter,
+  resetPasswordRateLimiter,
+} from '../middleware/rateLimiter';
 
 const router = Router();
 
@@ -61,7 +73,7 @@ const getPassport = async () => {
  */
 router.post(
   '/register',
-  strictRateLimiter,
+  registerRateLimiter,
   [
     body('email').isEmail().normalizeEmail(),
     body('password').isLength({ min: 8 }),
@@ -98,8 +110,11 @@ router.post(
  */
 router.post(
   '/login',
-  strictRateLimiter,
+  loginIpRateLimiter,
   [body('email').isEmail().normalizeEmail(), body('password').notEmpty()],
+  // Después de normalizar el correo: las variantes de un mismo correo
+  // (mayúsculas, puntos o "+etiqueta" de Gmail) comparten el contador.
+  loginRateLimiter,
   login as RequestHandler
 );
 
@@ -152,8 +167,10 @@ router.post('/refresh', body('refreshToken').notEmpty(), refreshToken as Request
  */
 router.post(
   '/forgot-password',
-  strictRateLimiter,
+  forgotPasswordIpRateLimiter,
   [body('email').isEmail().normalizeEmail()],
+  // Por correo normalizado (ver /login).
+  forgotPasswordRateLimiter,
   forgotPassword as RequestHandler
 );
 
@@ -186,7 +203,7 @@ router.post(
  */
 router.post(
   '/reset-password',
-  strictRateLimiter,
+  resetPasswordRateLimiter,
   [body('token').trim().notEmpty(), body('password').isLength({ min: 8 })],
   resetPassword as RequestHandler
 );
@@ -240,7 +257,7 @@ router.post('/activate/check', activationCheckRateLimiter, checkActivation as Re
  *       400:
  *         description: token_invalid, token_used, token_expired o invalid_password
  */
-router.post('/activate', strictRateLimiter, activateAccount as RequestHandler);
+router.post('/activate', activationRateLimiter, activateAccount as RequestHandler);
 
 /**
  * @swagger
@@ -286,10 +303,10 @@ router.patch('/me', authenticate, updateProfile as RequestHandler);
 
 /**
  * POST /api/auth/change-password { currentPassword, newPassword } — cambia la
- * contraseña verificando la actual y devuelve una sesión nueva (rate-limit
- * estricto: 5/min por IP).
+ * contraseña verificando la actual y devuelve una sesión nueva (cupo propio
+ * por cuenta: changePasswordRateLimiter).
  */
-router.post('/change-password', strictRateLimiter, authenticate, changePassword as RequestHandler);
+router.post('/change-password', changePasswordRateLimiter, authenticate, changePassword as RequestHandler);
 
 /**
  * @swagger
@@ -340,7 +357,7 @@ router.get(
  *     summary: Google OAuth callback
  *     responses:
  *       302:
- *         description: Redirect to frontend with tokens
+ *         description: Redirect to the web with a one-time code in the URL fragment (never the tokens)
  */
 router.get(
   '/google/callback',
@@ -373,5 +390,29 @@ router.get(
   },
   googleCallback as RequestHandler
 );
+
+/**
+ * @swagger
+ * /api/auth/google/exchange:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Canjea el código de un solo uso del inicio de sesión con Google por la sesión
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [code]
+ *             properties:
+ *               code:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Misma respuesta que el login
+ *       400:
+ *         description: Código inválido, usado o vencido (60 s)
+ */
+router.post('/google/exchange', oauthExchangeRateLimiter, googleExchange as RequestHandler);
 
 export default router;

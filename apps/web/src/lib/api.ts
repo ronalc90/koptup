@@ -11,7 +11,7 @@ import type {
   CreateOrderData,
   UploadDeliverableData,
   CreateInvoiceData,
-  PayInvoiceData,
+  InvoicePaymentMethod,
 } from '@/types/api.types';
 import { BACKEND_URL as API_URL } from './backend-url';
 
@@ -238,10 +238,17 @@ class ApiClient {
     return `${API_URL}/api/auth/google`;
   }
 
-  // Handle OAuth callback (save tokens from URL params)
-  handleOAuthCallback(accessToken: string, refreshToken: string) {
+  /**
+   * Fin del inicio de sesión con Google: canjea el código de un solo uso que
+   * el backend dejó en el fragmento de /auth/callback (#code=…) por la sesión.
+   * Los tokens nunca viajan en la URL.
+   */
+  async exchangeGoogleCode(code: string) {
+    const response = await this.client.post('/api/auth/google/exchange', { code });
+    const { accessToken, refreshToken, user } = response.data.data;
     Cookies.set('accessToken', accessToken, { expires: 1/96 }); // 15 minutes
     Cookies.set('refreshToken', refreshToken, { expires: 7 }); // 7 days
+    return { user };
   }
 
   // Get current user
@@ -423,9 +430,15 @@ class ApiClient {
     return response.data.data;
   }
 
-  async payInvoice(id: string, paymentData: PayInvoiceData) {
-    const response = await this.client.post(`/api/invoices/${id}/pay`, paymentData);
-    return response.data;
+  /**
+   * Métodos de pago que el equipo configuró (Admin › Configuración). El
+   * cliente no marca sus facturas como pagadas: paga por el medio indicado y
+   * el equipo registra el pago.
+   */
+  async getInvoicePaymentMethods(): Promise<InvoicePaymentMethod[]> {
+    const response = await this.client.get('/api/invoices/payment-methods');
+    const metodos = response.data?.data?.metodos;
+    return Array.isArray(metodos) ? metodos : [];
   }
 
   async downloadInvoice(id: string) {

@@ -211,7 +211,7 @@ sequenceDiagram
         opt aceptó marketing y hay Partner ID
             W->>L: carga Insight Tag
         end
-        Note over W,G: En /auth y /reset-password nunca se cargan (la URL lleva tokens)
+        Note over W,G: En /auth, /reset-password y /activar nunca se cargan (la URL lleva tokens)
     end
 ```
 

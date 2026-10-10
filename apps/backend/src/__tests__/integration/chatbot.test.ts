@@ -163,16 +163,20 @@ describe('chatbot: propiedad, límites e ingesta (integración)', () => {
     expect(own.body.owned).toBe(true);
   });
 
-  it('migración: un bot sin token guardado queda del primer token que lo usa', async () => {
+  it('bot heredado sin dueño registrado: ningún token lo reclama (solo el equipo lo administra)', async () => {
     const claimer = 'a'.repeat(43);
     const first = await request(app).patch(`/api/chatbot/bots/${LEGACY_BOT_ID}`).set(OWNER_HEADER, claimer).send({ name: 'Reclamado' });
-    expect(first.status).toBe(200);
-    const intruder = await request(app).patch(`/api/chatbot/bots/${LEGACY_BOT_ID}`).set(OWNER_HEADER, 'b'.repeat(43)).send({ name: 'Intruso' });
-    expect(intruder.status).toBe(403);
-    // Persistido en disco: solo el hash, nunca el token.
+    expect(first.status).toBe(403);
+    expect(first.body.error).toBe('legacy_bot_staff_only');
+    // Tampoco por la vía de "crear con el mismo botId" ni sin token.
+    expect((await request(app).post('/api/chatbot/bots').set(OWNER_HEADER, claimer).send({ botId: LEGACY_BOT_ID, name: 'Reclamado' })).status).toBe(403);
+    expect((await request(app).delete(`/api/chatbot/bots/${LEGACY_BOT_ID}`)).status).toBe(403);
+    expect((await request(app).get(`/api/chatbot/bots/${LEGACY_BOT_ID}/conversations`).set(OWNER_HEADER, claimer)).status).toBe(403);
+    // Sigue sin dueño y con su nombre original.
+    const pub = await request(app).get(`/api/chatbot/bots/${LEGACY_BOT_ID}`).set(OWNER_HEADER, claimer);
+    expect(pub.body).toMatchObject({ name: 'Bot antiguo', owned: false });
     const saved = fs.readFileSync(path.join(stateDir, 'state.json'), 'utf-8');
     expect(saved).not.toContain(claimer);
-    expect(saved).toMatch(/ownerTokenHash/);
   });
 
   it('valida campos de configuración', async () => {

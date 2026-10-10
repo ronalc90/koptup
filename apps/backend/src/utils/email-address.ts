@@ -26,12 +26,5 @@ export function maskEmail(email: string): string {
   return `${visible}@${domain}`;
 }
 
-/** Escapa texto para insertarlo en HTML (correos). */
-export function escapeHtml(value: unknown): string {
-  return String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
+/** Escapa texto para insertarlo en HTML (correos). Vive en utils/html.ts. */
+export { escapeHtml } from './html';

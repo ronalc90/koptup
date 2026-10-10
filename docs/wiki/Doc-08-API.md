@@ -163,25 +163,26 @@ Convenciones de las tablas: **Auth** es la política de la sección 3; `:id` es 
 
 | Método | Ruta | Auth | Para qué | Entrada → salida |
 |---|---|---|---|---|
-| POST | `/register` | Pública · 5 por minuto | Crear una cuenta local (rol `user`) desde `/register` | `{ email, password (mín. 8), name }` → `201 { id, email, name }`; `400 User already exists` |
-| POST | `/login` | Pública · 5 por minuto | Iniciar sesión | `{ email, password }` → `{ accessToken, refreshToken, user: { id, email, name, role } }`; `401 Invalid credentials` o `account_not_activated` |
+| POST | `/register` | Pública · 5 por hora por IP | Crear una cuenta local (rol `user`) desde `/register` | `{ email, password (mín. 8), name }` → `201 { id, email, name }`; `400 User already exists` |
+| POST | `/login` | Pública · 10 cada 15 min por IP y correo, 30 por IP | Iniciar sesión | `{ email, password }` → `{ accessToken, refreshToken, user: { id, email, name, role } }`; `401 Invalid credentials` o `account_not_activated` |
 | POST | `/refresh` | Pública (exige un refresh token válido) | Pedir un access token nuevo | `{ refreshToken }` → `{ accessToken }`; `401 Invalid refresh token` |
 | POST | `/logout` | Autenticado | Cerrar sesión (borra el refresh token de Redis) | → mensaje |
 | GET | `/me` y `/profile` | Autenticado | Datos vigentes de la cuenta (la web protege `/admin` y `/dashboard` con esta ruta) | → `{ id, email, name, role, phone, company, provider, accountStatus, created_at, last_login }` |
 | PATCH | `/me` | Autenticado | Editar nombre, teléfono y empresa propios | `{ name?, phone?, company? }` (otros campos se rechazan) → la cuenta; `400 invalid_profile` |
-| POST | `/change-password` | Autenticado · 5 por minuto | Cambiar la contraseña conociendo la actual | `{ currentPassword, newPassword }` → sesión nueva; `400 wrong_password`, `invalid_password` o `no_local_password` |
-| POST | `/forgot-password` | Pública · 5 por minuto | Enviar el enlace de recuperación (1 hora) | `{ email }` → siempre el mismo mensaje, exista o no la cuenta |
-| POST | `/reset-password` | Pública · 5 por minuto | Fijar una contraseña nueva con el enlace | `{ token, password }` → mensaje; `400 token_invalid`, `token_used`, `token_replaced` o `token_expired` |
+| POST | `/change-password` | Autenticado · 5 cada 15 min por cuenta | Cambiar la contraseña conociendo la actual | `{ currentPassword, newPassword }` → sesión nueva; `400 wrong_password`, `invalid_password` o `no_local_password` |
+| POST | `/forgot-password` | Pública · 3 cada 15 min por IP y correo, 10 por IP | Enviar el enlace de recuperación (1 hora) | `{ email }` → siempre el mismo mensaje, exista o no la cuenta |
+| POST | `/reset-password` | Pública · 10 cada 15 min por IP | Fijar una contraseña nueva con el enlace | `{ token, password }` → mensaje; `400 token_invalid`, `token_used`, `token_replaced` o `token_expired` |
 | POST | `/activate/check` | Pública · 20 por minuto | Revisar el enlace de activación **sin gastarlo** | `{ token }` → `{ nombre, emailEnmascarado, expiresAt }` |
-| POST | `/activate` | Pública · 5 por minuto | Activar la cuenta invitada y fijar la contraseña | `{ token, password }` → misma respuesta que el login; `400 token_*` o `invalid_password` |
-| GET | `/google` y `/google/callback` | Pública | Entrar con Google | Redirige a Google y luego a la web con la sesión; `503` si Google no está configurado |
+| POST | `/activate` | Pública · 10 cada 15 min por IP | Activar la cuenta invitada y fijar la contraseña | `{ token, password }` → misma respuesta que el login; `400 token_*` o `invalid_password` |
+| GET | `/google` y `/google/callback` | Pública | Entrar con Google | Redirige a Google y luego a `/auth/callback` de la web con un código de un solo uso (60 s); `503` si Google no está configurado |
+| POST | `/google/exchange` | Pública · 20 por minuto | La web canjea ese código por la sesión | `{ code }` → misma respuesta que el login; `400 token_used`, `token_expired` o `token_invalid` |
 
 ### 4.3 Contacto y leads
 
 | Método | Ruta | Auth | Para qué | Entrada → salida |
 |---|---|---|---|---|
 | POST | `/api/contact` | Pública · 5 por minuto | Formulario de `/contact`: guarda un `Contact` (origen `contact-form`) y avisa al equipo por correo o WhatsApp si están configurados | `{ name, email, service, message, phone?, company?, budget? }` → mensaje |
-| POST | `/api/quotes` | Pública · 5 por minuto | Guarda una cotización (`Quote`). Hoy ninguna página de la web la usa | `{ name, email, service, description }` → mensaje |
+| POST | `/api/quotes` | Pública · 5 por minuto (cupo propio) | Guarda una cotización (`Quote`). Hoy ninguna página de la web la usa | `{ name, email, service, description }` → mensaje |
 | GET | `/api/admin/contacts` | `admin`, `manager` | Bandeja de contactos del panel | `?status=new\|read\|responded` → lista con `source` (`contact-form`, `demo-rag` o `demo-request`) |
 | PATCH | `/api/admin/contacts/:id/status` | `admin`, `manager` | Marcar leído o respondido | `{ status }` → `{ id, status }` |
 | POST | `/api/contact/test-whatsapp`, `/api/contact/test-email` | Solo desarrollo | Probar los canales de aviso | — |
@@ -227,7 +228,7 @@ Todo este router exige `admin` o `manager`, salvo el cambio de rol (solo `admin`
 | Método | Ruta | Para qué | Entrada → salida |
 |---|---|---|---|
 | GET | `/orders` | Todos los pedidos | `?status=` → lista con cliente, ítems, adjuntos y estado de aprobación |
-| PATCH | `/orders/:orderId/status` | Cambiar el estado de un pedido | `{ status: pending\|in_progress\|shipped\|completed\|cancelled }` |
+| PATCH | `/orders/:orderId/status` | Cambiar el estado de un pedido (solo el equipo cambia estados) | `{ status: pending\|in_progress\|shipped\|completed\|cancelled }`; `400` con otro valor |
 | POST | `/orders/:orderId/approve` | Aprobar un pedido | → `{ id, approvalStatus: "approved" }` |
 | POST | `/orders/:orderId/reject` | Rechazar (también lo cancela) | `{ reason? }` |
 | POST | `/orders/:orderId/invoice` | Crear la factura de un pedido (ver [Limitaciones](#11-limitaciones-conocidas)) | → `201 { id, invoiceNumber }` |
@@ -254,18 +255,20 @@ Todas exigen sesión. Cada controlador filtra por la cuenta que llama (o permite
 | POST | `/api/projects/:id/tasks`, PUT `/api/projects/tasks/:id` | Participante | Crear o editar tareas | `{ title, description?, status?, priority?, assigned_to?, due_date? … }` |
 | GET | `/api/orders` | Dueño | Mis pedidos | `?status=` |
 | POST | `/api/orders` | Autenticado | Crear un pedido con adjuntos (hasta 10 archivos de 20 MB) | `multipart`: `name`, `description?`, `items` (JSON `[{ name, quantity, price }]`), `projectId?`, `comments?`, `attachments[]` → `201 { id: "ORD-…", amount, status }` |
-| GET / PUT | `/api/orders/:orderId` | Dueño | Ver o editar nombre, descripción o estado | — |
-| POST | `/api/orders/:orderId/cancel` | Dueño | Cancelar (no si ya está completado o cancelado) | — |
+| GET | `/api/orders/:orderId` | Dueño | Ver el pedido | → incluye `approvalStatus`, adjuntos y `editable` (si el cliente aún puede cambiarlo) |
+| PUT | `/api/orders/:orderId` | Dueño, solo mientras el pedido está pendiente de revisión | Editar nombre, descripción y adjuntos (el estado lo cambia el equipo) | JSON o `multipart`: `name?`, `description?`, `attachments[]` (agrega), `removeAttachments` (ids a quitar) → el pedido; `403 status_team_only`, `400 invalid_fields`, `409 order_not_pending` |
+| POST | `/api/orders/:orderId/cancel` | Dueño | Cancelar, solo mientras el pedido está pendiente de revisión | `409 order_not_pending` si el equipo ya lo revisó o está en curso |
 | GET | `/api/invoices` | Dueño | Mis facturas | `?status=&startDate=&endDate=` |
 | POST | `/api/invoices` | `admin`, `manager` | Emitir una factura | `{ projectId, clientInfo, items, taxRate?, dueDate?, notes?, terms? }` |
 | GET | `/api/invoices/:id` | Dueño o equipo | Detalle | — |
-| POST | `/api/invoices/:id/pay` | Dueño o equipo | **Registra** el pago (no hay pasarela: ver [Limitaciones](#11-limitaciones-conocidas)) | `{ paymentMethod, transactionId? }` |
+| POST | `/api/invoices/:id/pay` | `admin`, `manager` | El equipo **registra** el pago que confirmó (transferencia, enlace); el cliente no marca sus facturas como pagadas | `{ paymentMethod, transactionId? }` |
+| GET | `/api/invoices/payment-methods` | Autenticado | Métodos de pago que el equipo configuró en Admin › Configuración (hoy, las instrucciones de transferencia). El portal muestra "Cómo pagar" solo si hay alguno | → `{ metodos: [{ tipo: "transferencia", instrucciones }] }` o `[]` |
 | GET | `/api/invoices/:id/download` | Dueño o equipo | Devuelve datos para descargar | → `{ downloadUrl, fileName, expiresIn }` |
 | GET | `/api/deliverables`, `/api/deliverables/:id` | Dueño (detalle: dueño o equipo) | Mis entregables | `?status=&projectId=` |
 | POST | `/api/deliverables` | `admin`, `manager`, `developer` | Registrar un entregable | `{ projectId, title, type, fileUrl, fileName, fileSize, description?, fileType?, metadata? }` |
 | PUT | `/api/deliverables/:id` | Dueño | Cambiar título o descripción | — |
 | POST | `/api/deliverables/:id/approve`, `/reject` | Dueño o equipo | Aprobar o rechazar (rechazar exige `comments`) | `{ comments? }` |
-| GET / POST | `/api/messages/conversations` | Participante (crear: admin) | Mis conversaciones o crear una | POST `{ title, clientId, projectId?, orderId? }` |
+| GET / POST | `/api/messages/conversations` | Participante (crear: equipo `admin`, `manager` o `sales`) | Mis conversaciones o crear una | POST `{ title, clientId, projectId?, orderId? }` |
 | GET | `/api/messages/conversations/:id` | Participante | Conversación con sus mensajes | `:id` es `CONV-…` |
 | POST | `/api/messages/conversations/:id/read` | Participante | Marcar como leída | — |
 | POST | `/api/messages/send` | Participante | Enviar un mensaje | `{ conversationId, content, type?, attachment? }` |
@@ -283,13 +286,13 @@ Toda la ruta tiene su propio cupo: **60 peticiones por minuto por IP**. Los bots
 | POST | `/bots` | Pública · 30 bots por hora por IP | Crear un bot | `{ name?, color?, position?, avatar?, welcome?, systemPrompt?, tone?, languages? }` → `201` con el bot y `ownerToken` (**solo esta vez**) |
 | GET | `/bots` | Pública | Bots del dueño (según `X-Bot-Owner-Token`) y bots de ejemplo | `?limit=&offset=` → lista resumida |
 | GET | `/bots/:botId` | Pública | Configuración (completa solo para el dueño; sin prompt ni documentos para el resto) | — |
-| PATCH / DELETE | `/bots/:botId` | Dueño del bot | Editar o borrar el bot con sus documentos y conversaciones | — |
+| PATCH / DELETE | `/bots/:botId` | Dueño del bot (un bot antiguo sin dueño registrado: solo el equipo) | Editar o borrar el bot con sus documentos y conversaciones | — |
 | POST | `/bots/:botId/docs` | Dueño del bot | Subir archivos en base64 (máx. 5 por envío, 5 MB c/u, 50 por bot) | `{ files: [{ name, mime, contentBase64 }] }` → `{ docs, added, errors }` |
 | DELETE | `/bots/:botId/docs/:docId` | Dueño del bot | Quitar un documento | — |
 | POST | `/bots/:botId/urls` | Dueño del bot | Indexar páginas web (máx. 5 por envío, 2 MB c/u) | `{ urls: [...] }` |
 | POST | `/bots/:botId/chat` | Pública (bot existente) | Preguntar. Sin IA, sin presupuesto o con error del proveedor responde en **modo extractivo** citando fragmentos | `{ message (≤ 2000), history?, model? }` → `{ reply, sources, confidence, model, tokens?, costUSD?, error? }` |
 | GET / DELETE | `/bots/:botId/conversations` | Dueño del bot | Historial (últimos 200 turnos) o borrarlo | `?limit=` |
-| POST | `/session`, `/upload`, `/message`; GET `/info/:sessionId`; PUT `/config`; DELETE `/messages/:sessionId`, `/documents/:sessionId` | Pública por `sessionId` | API anterior "por sesión" que aún usa la vista previa del chatbot | Upload: hasta 10 archivos de 10 MB (PDF, TXT, CSV, DOCX), 10 por minuto |
+| POST | `/session`, `/upload`, `/message`; GET `/info/:sessionId`; PUT `/config`; DELETE `/messages/:sessionId`, `/documents/:sessionId` | Pública por `sessionId` | API anterior "por sesión". Ninguna página de la web la usa desde que se retiraron los proxies de Next y `/test` | Upload: hasta 10 archivos de 10 MB (PDF, TXT, CSV, DOCX), 10 por minuto |
 
 ### 4.9 Demo "Prueba con tu documento" (`/api/demo-rag`)
 
@@ -323,7 +326,7 @@ Todas exigen acceso a la demo `gestor-contenido` (abierta por defecto), texto de
 
 ### 4.12 Documentos (`/api/documents`)
 
-Todas exigen sesión y cada consulta se filtra por la cuenta que llama.
+Todas exigen sesión y cada consulta se filtra por la cuenta que llama. Las que usan IA (subir, búsqueda semántica y explicaciones) tienen tope mensual `DOCUMENTS_MONTHLY_BUDGET_USD` y cupo diario por cuenta `DOCUMENTS_AI_DAILY_LIMIT_PER_USER` (ver [6.3](#63-topes-de-gasto-de-ia)); sin cupo, una subida guarda el documento sin análisis y lo dice (`ai: { analyzed: false, code }`).
 
 | Método | Ruta | Para qué | Entrada |
 |---|---|---|---|
@@ -334,12 +337,12 @@ Todas exigen sesión y cada consulta se filtra por la cuenta que llama.
 | GET | `/stats` | Estadísticas | — |
 | POST | `/:id/explain-similarity`; GET `/:id/explain` | Explicaciones con IA | — |
 | PATCH | `/:id` | Renombrar, mover, favorito | — |
-| DELETE | `/:id` | Mandar a la papelera o borrar (exige además un PIN de demostración en `?pin=`) | `?permanent=` |
+| DELETE | `/:id` | Mandar a la papelera o borrar (solo el dueño; la confirmación la pide la interfaz) | `?permanent=` |
 | POST | `/:id/restore` | Sacar de la papelera | — |
 
 ### 4.13 Salud: cuentas médicas, sistema experto y herramientas internas
 
-Estas rutas sirven a dos demos **privadas** (solo por invitación: [Cuentas médicas](Guia-Demo-cuentas-medicas.md) y [Sistema experto](Guia-Demo-sistema-experto.md)) y a la herramienta interna `/liquidacion` del equipo.
+Estas rutas sirven a dos demos **privadas** (solo por invitación: [Cuentas médicas](Guia-Demo-cuentas-medicas.md) y [Sistema experto](Guia-Demo-sistema-experto.md)) y a la herramienta interna `/liquidacion` del equipo. Las que procesan con IA (`/procesar-facturas-pdf`, `/procesar-modular`, `/aprendizaje/feedback`, `/api/expert/procesar*` y `/generar-excel`, `/api/cups/buscar-*`, `vectorizar`, `revectorizar`, `/cuentas/procesar-hibrido` y `/process`) tienen tope mensual `HEALTH_MONTHLY_BUDGET_USD` y cupo diario por cuenta `HEALTH_AI_DAILY_LIMIT_PER_USER` (el equipo solo tiene el tope mensual). La interpretación de reglas de `/api/reglas-facturacion` (solo el equipo) también cuenta contra ese tope mensual.
 
 | Prefijo | Rutas | Auth | Para qué |
 |---|---|---|---|
@@ -406,7 +409,13 @@ Los cupos marcados "memoria" se cuentan en el proceso del backend; los marcados 
 | Todo `/api` salvo los casos de abajo | 100 | 15 min | Usuario (con token válido), sesión de refresco o IP | Memoria | `RATE_LIMIT_MAX_REQUESTS`, `RATE_LIMIT_WINDOW_MS` |
 | `GET /api/auth/me` y `GET /api/demo-access/*` | 120 | 1 min | Igual que el anterior | Memoria | `AUTH_ME_RATE_LIMIT_MAX` |
 | Todo `/api/chatbot` | 60 | 1 min | IP | Memoria | `CHATBOT_RATE_LIMIT_MAX` |
-| Registro, login, recuperar y restablecer contraseña, activar, cambiar contraseña, `POST /api/contact`, `POST /api/quotes` | 5 | 1 min | IP | Memoria | — |
+| `POST /api/auth/login` | 10 · 30 | 15 min | IP y correo normalizado · IP | Memoria | `LOGIN_RATE_LIMIT_MAX`, `LOGIN_IP_RATE_LIMIT_MAX` |
+| `POST /api/auth/register` | 5 | 1 hora | IP | Memoria | `REGISTER_RATE_LIMIT_MAX` |
+| `POST /api/auth/forgot-password` | 3 · 10 | 15 min | IP y correo normalizado · IP | Memoria | `FORGOT_PASSWORD_RATE_LIMIT_MAX` |
+| `POST /api/auth/reset-password` · `POST /api/auth/activate` | 10 · 10 | 15 min | IP | Memoria | `RESET_PASSWORD_RATE_LIMIT_MAX`, `ACTIVATION_RATE_LIMIT_MAX` |
+| `POST /api/auth/change-password` | 5 | 15 min | Cuenta | Memoria | `CHANGE_PASSWORD_RATE_LIMIT_MAX` |
+| `POST /api/auth/google/exchange` | 20 | 1 min | IP | Memoria | — |
+| `POST /api/contact` · `POST /api/quotes` | 5 · 5 | 1 min | IP | Memoria | — |
 | `POST /api/auth/activate/check` | 20 | 1 min | IP | Memoria | — |
 | Subidas de `/api/documents/upload` y `/api/chatbot/upload` | 10 | 1 min | IP | Memoria | — |
 | Crear bots (`POST /api/chatbot/bots`) | 30 | 1 hora | IP | Memoria | `CHATBOT_CREATE_LIMIT_PER_HOUR` |
@@ -415,6 +424,10 @@ Los cupos marcados "memoria" se cuentan en el proceso del backend; los marcados 
 | Demo RAG: preguntar | 30 · 10 por documento | 10 min · vida del documento | IP · documento | Memoria | — |
 | `POST /api/linkedin-ads/generate` | 5 · 30 | 10 min · 24 horas | Cuenta (o IP sin sesión) | Redis (sin Redis responde 503) | — |
 | `/api/content/*` (visitantes) | 20 · 100 | 10 min · 24 horas | IP | Redis (sin Redis responde 503) | — |
+| Funciones con IA de `/api/documents` | 30 | 24 horas | Cuenta (el equipo no tiene cupo) | Redis (sin Redis responde 503) | `DOCUMENTS_AI_DAILY_LIMIT_PER_USER` |
+| Funciones con IA de las APIs de salud | 20 | 24 horas | Cuenta (el equipo no tiene cupo) | Redis (sin Redis responde 503) | `HEALTH_AI_DAILY_LIMIT_PER_USER` |
+
+Cada ruta de cuenta tiene su **propio contador**: agotar el del login no bloquea el registro, la recuperación ni la activación. Los cupos por correo cuentan el correo normalizado (mayúsculas, puntos y `+etiqueta` de Gmail no abren un contador nuevo). Todas las respuestas `429` traen `code: "rate_limited"`, un mensaje en español y la cabecera `Retry-After`.
 
 Detrás del proxy de Railway el servidor confía en un salto (`TRUST_PROXY_HOPS`, por defecto 1) para leer la IP real del visitante. Los cupos estándar se ven en las cabeceras `RateLimit-*` de cada respuesta:
 
@@ -436,7 +449,7 @@ Detrás del proxy de Railway el servidor confía en un salto (`TRUST_PROXY_HOPS`
 
 ### 6.3 Topes de gasto de IA
 
-Cuatro funciones que cualquier visitante puede usar tienen un **tope mensual en dólares**. El gasto se calcula con los tokens que informa el proveedor, se suma en Redis por mes (UTC) y la API **nunca devuelve montos**.
+Seis funciones con IA tienen un **tope mensual en dólares**. El gasto se calcula con los tokens que informa el proveedor, se suma en Redis por mes (UTC) y la API **nunca devuelve montos**.
 
 | Función | Variable | Tope por defecto | Clave en Redis | Cuando se agota |
 |---|---|---|---|---|
@@ -444,6 +457,8 @@ Cuatro funciones que cualquier visitante puede usar tienen un **tope mensual en 
 | Chatbot RAG | `CHATBOT_MONTHLY_BUDGET_USD` | USD 50 | `chatbot:spend:AAAA-MM` | Responde en modo extractivo (cita fragmentos sin IA) |
 | Generador para LinkedIn | `LINKEDIN_ADS_MONTHLY_BUDGET_USD` | USD 20 | `linkedin-ads:spend:AAAA-MM` | `503 budget_exhausted`; la web usa su generador local |
 | Gestor de contenido | `CONTENT_MONTHLY_BUDGET_USD` | USD 20 | `content:spend:AAAA-MM` | `503 budget_exhausted` |
+| Gestor de documentos (`/api/documents`) | `DOCUMENTS_MONTHLY_BUDGET_USD` | USD 10 | `documents:spend:AAAA-MM` | `503 budget_exhausted`; una subida se guarda sin análisis |
+| APIs de salud (cuentas médicas, auditoría, sistema experto, CUPS y reglas de facturación) | `HEALTH_MONTHLY_BUDGET_USD` | USD 30 | `health:spend:AAAA-MM` | `503 budget_exhausted` |
 
 ```mermaid
 flowchart LR
@@ -464,7 +479,7 @@ flowchart LR
 
 *Si no se puede medir el gasto, no se gasta: sin Redis, las funciones con IA públicas se apagan o pasan a su modo sin IA.*
 
-Un tope con valor inválido o negativo deja la función **sin presupuesto** (cero). Las demás funciones con IA (salud y documentos) no tienen tope propio: dependen de su control de acceso y del cupo general.
+Un tope con valor inválido o negativo deja la función **sin presupuesto** (cero). En documentos y salud, el cliente de OpenAI de cada función suma el costo real de cada respuesta y no llama al modelo con el tope agotado o sin Redis, aunque el servicio que lo use no pase por la ruta con cupo.
 
 ---
 
@@ -813,11 +828,11 @@ Qué hacer cuando el backend no responde está en [Operación y despliegue](Doc-
 |---|---|
 | **Crear entregables, facturas y conversaciones** | `POST /api/deliverables`, `POST /api/invoices`, `POST /api/admin/orders/:orderId/invoice` y `POST /api/messages/conversations` responden **500** en `main`: los modelos exigen el número consecutivo (`DEL-…`, `FAC-…`, `CONV-…`) antes de que se ejecute el código que lo genera. Por eso hoy no se pueden crear entregables, facturas ni conversaciones por API; el modelo de mensajes tiene el mismo patrón |
 | **Conversación automática de un pedido** | Al crear un pedido, la conversación con el equipo no se crea (el error se registra en el log y el pedido sí se guarda) |
-| **Pagos** | `POST /api/invoices/:id/pay` solo **registra** el pago con el método que se le indique: no hay pasarela. Los pagos en línea están en desarrollo (ver [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md)) |
+| **Pagos** | No hay pago en línea de facturas: el portal muestra los datos de transferencia que configure el equipo y el equipo registra el pago con `POST /api/invoices/:id/pay` (`admin` o `manager`). Los pagos en línea están en desarrollo (ver [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md)) |
 | **Descargar factura** | `GET /api/invoices/:id/download` devuelve un enlace a sí misma; no se genera un PDF |
 | **Adjuntos de pedidos** | Se guardan en el disco del servidor (efímero en Railway) y la API no los sirve para descargar |
 | **Notificaciones** | Ningún flujo las crea solo; solo existen las que se crean con `POST /api/notifications` |
-| **Cupos en memoria** | El cupo general, el de login y el del chatbot se reinician en cada despliegue y no se comparten si hay varias instancias |
+| **Cupos en memoria** | El cupo general, los de cada ruta de cuenta y el del chatbot se reinician en cada despliegue y no se comparten si hay varias instancias |
 | **Una sesión renovable por cuenta** | El refresh token es uno por cuenta: iniciar sesión en otro navegador hace que el primero no pueda renovar y deba volver a entrar a los 15 minutos |
 | **Formato de errores** | Las rutas nuevas (demos, auth, errores generales) traen `code`; varias rutas antiguas (portal, admin, chatbot) responden `{ success, message }` o `{ error }` sin código estable |
 | **Swagger incompleto** | Los comentarios `@swagger` no cubren todas las rutas |

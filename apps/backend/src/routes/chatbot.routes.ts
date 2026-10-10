@@ -28,7 +28,9 @@ import { extractTextFromBuffer, UnsupportedDocumentError } from '../services/doc
 import { safeFetchText, SafeFetchError } from '../services/safe-fetch.service';
 import { uploadRateLimiter } from '../middleware/rateLimiter';
 import { logger } from '../utils/logger';
-import { AppError } from '../middleware/errorHandler';
+import { AppError, asyncHandler } from '../middleware/errorHandler';
+import { isStaffRole, loadFreshUser, readBearer } from '../middleware/access';
+import type { AuthRequest } from '../types';
 
 const router = Router();
 
@@ -234,14 +236,27 @@ function isOwner(bot: BotConfig, tokens: string[]): boolean {
 }
 
 /**
- * Devuelve el bot si quien llama es su dueño; si no, responde 404/401/403 y
- * devuelve null. Migración: un bot sin hash guardado (creado antes del control
- * de propiedad) queda asignado al primer token que llegue.
+ * Devuelve el bot si quien llama puede administrarlo; si no, responde
+ * 404/401/403 y devuelve null.
+ *  - Bot con dueño: exige su token en `X-Bot-Owner-Token`.
+ *  - Bot heredado sin dueño registrado (creado antes del control de
+ *    propiedad): solo lo administra el equipo de KopTup (sesión con rol de
+ *    staff leído de la BD). Nadie lo "reclama" con un token.
  */
-function requireOwner(req: Request, res: Response): BotConfig | null {
+async function requireOwner(req: Request, res: Response): Promise<BotConfig | null> {
   const bot = botsStore.get(req.params.botId);
   if (!bot) {
     res.status(404).json({ error: 'bot_not_found' });
+    return null;
+  }
+  if (!bot.ownerTokenHash) {
+    const bearer = readBearer(req as AuthRequest);
+    const fresh = bearer.user ? await loadFreshUser(bearer.user.id) : null;
+    if (fresh && fresh !== 'db_unavailable' && isStaffRole(fresh.role)) return bot;
+    res.status(403).json({
+      error: 'legacy_bot_staff_only',
+      message: 'Este bot no tiene un propietario registrado: solo el equipo de KopTup puede administrarlo.',
+    });
     return null;
   }
   const tokens = readOwnerTokens(req);
@@ -251,12 +266,6 @@ function requireOwner(req: Request, res: Response): BotConfig | null {
       message: `Envía el token del propietario del bot en la cabecera ${OWNER_TOKEN_HEADER}.`,
     });
     return null;
-  }
-  if (!bot.ownerTokenHash) {
-    bot.ownerTokenHash = hashOwnerToken(tokens[0]);
-    snapshot();
-    logger.info(`[chatbot] Bot ${bot.botId} sin propietario: asignado al token de esta petición (migración).`);
-    return bot;
   }
   if (!isOwner(bot, tokens)) {
     res.status(403).json({ error: 'forbidden_not_owner', message: 'Este bot pertenece a otro usuario.' });
@@ -385,7 +394,7 @@ const createBotLimiter = rateLimit({
  * todos sus bots). Si viene `botId` de un bot existente, se trata como una
  * actualización y exige ser su dueño.
  */
-router.post('/bots', createBotLimiter, (req: Request, res: Response) => {
+router.post('/bots', createBotLimiter, asyncHandler(async (req: Request, res: Response) => {
   const body = (req.body ?? {}) as Record<string, unknown>;
   const requestedId =
     typeof body.botId === 'string' && /^[a-zA-Z0-9_-]{3,64}$/.test(body.botId) ? body.botId : null;
@@ -398,7 +407,7 @@ router.post('/bots', createBotLimiter, (req: Request, res: Response) => {
 
   if (requestedId && botsStore.has(requestedId)) {
     req.params.botId = requestedId;
-    const bot = requireOwner(req, res);
+    const bot = await requireOwner(req, res);
     if (!bot) return;
     Object.assign(bot, parsed.patch);
     bot.updatedAt = new Date().toISOString();
@@ -436,7 +445,7 @@ router.post('/bots', createBotLimiter, (req: Request, res: Response) => {
   syncDocs(bot);
   snapshot();
   res.status(201).json({ ...serializeBot(bot), ownerToken });
-});
+}));
 
 /**
  * GET /bots — bots del propietario (según los tokens de `X-Bot-Owner-Token`)
@@ -483,8 +492,8 @@ router.get('/bots/:botId', (req: Request, res: Response) => {
 });
 
 /** PATCH /bots/:botId — merge parcial validado. [dueño] */
-router.patch('/bots/:botId', (req: Request, res: Response) => {
-  const bot = requireOwner(req, res);
+router.patch('/bots/:botId', asyncHandler(async (req: Request, res: Response) => {
+  const bot = await requireOwner(req, res);
   if (!bot) return;
   const parsed = parseConfigPatch(req.body);
   if ('error' in parsed) {
@@ -496,11 +505,11 @@ router.patch('/bots/:botId', (req: Request, res: Response) => {
   syncDocs(bot);
   snapshot();
   res.json(serializeBot(bot));
-});
+}));
 
 /** DELETE /bots/:botId — borra el bot, sus docs, chunks y conversaciones. [dueño] */
-router.delete('/bots/:botId', (req: Request, res: Response) => {
-  const bot = requireOwner(req, res);
+router.delete('/bots/:botId', asyncHandler(async (req: Request, res: Response) => {
+  const bot = await requireOwner(req, res);
   if (!bot) return;
   const botId = bot.botId;
   botsStore.delete(botId);
@@ -509,7 +518,7 @@ router.delete('/bots/:botId', (req: Request, res: Response) => {
   conversationsStore.delete(botId);
   snapshot();
   res.json({ deleted: true, botId });
-});
+}));
 
 /** Tamaño decodificado de un base64 sin decodificarlo. */
 function base64DecodedBytes(b64: string): number {
@@ -523,8 +532,8 @@ function base64DecodedBytes(b64: string): number {
  * PDF (pdf-parse) y DOCX (mammoth) se parsean de verdad; texto plano se
  * decodifica. Máximo 5 archivos por petición, 5 MB cada uno y 50 por bot.
  */
-router.post('/bots/:botId/docs', async (req: Request, res: Response) => {
-  const bot = requireOwner(req, res);
+router.post('/bots/:botId/docs', asyncHandler(async (req: Request, res: Response) => {
+  const bot = await requireOwner(req, res);
   if (!bot) return;
   const incoming = Array.isArray(req.body?.files) ? req.body.files : [];
   if (incoming.length === 0) {
@@ -607,11 +616,11 @@ router.post('/bots/:botId/docs', async (req: Request, res: Response) => {
     return;
   }
   res.status(422).json({ error: 'no_valid_files', docs: bot.docs, added, errors });
-});
+}));
 
 /** DELETE /bots/:botId/docs/:docId — borra metadata + chunks asociados. [dueño] */
-router.delete('/bots/:botId/docs/:docId', (req: Request, res: Response) => {
-  const bot = requireOwner(req, res);
+router.delete('/bots/:botId/docs/:docId', asyncHandler(async (req: Request, res: Response) => {
+  const bot = await requireOwner(req, res);
   if (!bot) return;
   const docId = req.params.docId;
   bot.docs = bot.docs.filter((d) => d.id !== docId);
@@ -621,15 +630,15 @@ router.delete('/bots/:botId/docs/:docId', (req: Request, res: Response) => {
   syncDocs(bot);
   snapshot();
   res.json({ docs: bot.docs });
-});
+}));
 
 /**
  * POST /bots/:botId/urls — descarga páginas públicas, quita el HTML y las
  * indexa. [dueño] Máximo 5 URLs por petición y 2 MB por página; bloquea IPs
  * privadas, loopback y de metadatos (ver services/safe-fetch.service.ts).
  */
-router.post('/bots/:botId/urls', async (req: Request, res: Response) => {
-  const bot = requireOwner(req, res);
+router.post('/bots/:botId/urls', asyncHandler(async (req: Request, res: Response) => {
+  const bot = await requireOwner(req, res);
   if (!bot) return;
   const urls = Array.isArray(req.body?.urls) ? req.body.urls : [];
   if (urls.length === 0) {
@@ -692,7 +701,7 @@ router.post('/bots/:botId/urls', async (req: Request, res: Response) => {
   syncDocs(bot);
   snapshot();
   res.json({ docs: bot.docs, added, errors });
-});
+}));
 
 /** Agrega un turno a la conversación del bot. Conserva últimos 200 turnos. */
 function appendConversation(botId: string, turn: ConversationTurn): void {
@@ -947,21 +956,21 @@ router.post('/bots/:botId/chat', async (req: Request, res: Response) => {
 });
 
 /** GET /bots/:botId/conversations — últimos N turnos (default 50, máx 200). [dueño] */
-router.get('/bots/:botId/conversations', (req: Request, res: Response) => {
-  const bot = requireOwner(req, res);
+router.get('/bots/:botId/conversations', asyncHandler(async (req: Request, res: Response) => {
+  const bot = await requireOwner(req, res);
   if (!bot) return;
   const limit = Math.max(1, Math.min(200, Number(req.query.limit) || 50));
   const list = conversationsStore.get(bot.botId) ?? [];
   res.json(list.slice(-limit));
-});
+}));
 
 /** DELETE /bots/:botId/conversations — limpia el histórico del bot. [dueño] */
-router.delete('/bots/:botId/conversations', (req: Request, res: Response) => {
-  const bot = requireOwner(req, res);
+router.delete('/bots/:botId/conversations', asyncHandler(async (req: Request, res: Response) => {
+  const bot = await requireOwner(req, res);
   if (!bot) return;
   conversationsStore.set(bot.botId, []);
   snapshot();
   res.json({ cleared: true, botId: bot.botId });
-});
+}));
 
 export default router;

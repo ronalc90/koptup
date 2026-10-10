@@ -7,6 +7,7 @@
 
 import { DatosFacturaPDF } from './pdf-extractor.service';
 import { GlosaCalculada } from './glosa-calculator.service';
+import { createOpenAIClient } from './openai.service';
 
 interface ValidacionExpertoResult {
   glosas: GlosaCalculada[];
@@ -186,8 +187,8 @@ class ValidacionDualService {
     validacionExperto: ValidacionExpertoResult,
     apiKey: string
   ): Promise<ValidacionIAResult> {
-    const OpenAI = require('openai').default;
-    const openai = new OpenAI({ apiKey });
+    // Cliente con el tope mensual de gasto de las APIs de salud (HEALTH_MONTHLY_BUDGET_USD).
+    const openai = createOpenAIClient({ feature: 'health', apiKey });
 
     // Construir prompt detallado para análisis médico
     const prompt = `Eres un auditor médico experto especializado en el sistema de salud colombiano y específicamente en Nueva EPS.

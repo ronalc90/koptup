@@ -13,6 +13,7 @@
 
 import * as fs from 'fs';
 import OpenAI from 'openai';
+import { createOpenAIClient } from './openai.service';
 import { parsePdf } from '../utils/pdf-parse';
 
 /**
@@ -74,7 +75,8 @@ class ExtraccionEspecializadaService {
   constructor() {
     const apiKey = process.env.OPENAI_API_KEY;
     if (apiKey) {
-      this.openai = new OpenAI({ apiKey });
+      // Cliente con el tope mensual de gasto de las APIs de salud (HEALTH_MONTHLY_BUDGET_USD).
+      this.openai = createOpenAIClient({ feature: 'health', apiKey });
       console.log('✅ Servicio de Extracción Especializada inicializado');
     } else {
       console.warn('⚠️  OPENAI_API_KEY no configurada');

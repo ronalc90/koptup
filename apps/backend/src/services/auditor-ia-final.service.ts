@@ -11,6 +11,7 @@
  */
 
 import OpenAI from 'openai';
+import { createOpenAIClient } from './openai.service';
 import { DatosFacturaPDF } from './pdf-extractor.service';
 import sistemaAprendizajeService from './sistema-aprendizaje.service';
 
@@ -119,7 +120,8 @@ class AuditorIAFinalService {
   constructor() {
     const apiKey = process.env.OPENAI_API_KEY;
     if (apiKey) {
-      this.openai = new OpenAI({ apiKey });
+      // Cliente con el tope mensual de gasto de las APIs de salud (HEALTH_MONTHLY_BUDGET_USD).
+      this.openai = createOpenAIClient({ feature: 'health', apiKey });
       console.log('🤖 Auditor IA Final (GPT-4o) inicializado');
     } else {
       console.warn('⚠️  OPENAI_API_KEY no configurada - Auditor IA no disponible');

@@ -12,6 +12,7 @@
 | Pruebas: Jest en backend y web, Playwright de punta a punta y CI válido | ✅ | `README.md`, `.github/workflows/ci.yml` |
 | Dependencias: Next 14.2.35 y paquetes con vulnerabilidades actualizados | ✅ | |
 | Seguridad: autorización en el servidor, propiedad de bots del chatbot, topes de gasto de IA, secretos fuera del repo | ✅ | [Seguridad y calidad](10-Seguridad-y-Calidad.md) |
+| Revisión de seguridad aplicada en las rutas heredadas (portal del cliente, documentos, chatbot, salud, inicio de sesión y correos) | ✅ | [Roles y permisos](Doc-10-Roles-y-Permisos.md), [API](Doc-08-API.md) |
 | Sistema de solicitud y acceso a demos | ✅ | [Sistema de demos](04-Sistema-de-Demos.md) |
 | 21 demos revisadas: funcionales, sin botones muertos y con promesas verificables | ✅ | ver lista abajo |
 
@@ -39,15 +40,14 @@ chatbot, cuentas-medicas, sistema-experto, crm-ia, linkedin-ads, erp, pos, code-
 
 1. **Flujo de compra** (fases P7–P9): pipeline de leads, "Solicitar propuesta", propuestas con página pública para aceptarlas, anticipo (enlace de pago, transferencia o Wompi con claves) y conversión a proyecto y cliente. Hay avance sin revisar guardado en la rama `ccr-55ceecf7-dpc10i` (commit marcado `wip`); no está en `main`.
 2. **7 demos por revisar:** saas-boilerplate, sistema-reservas y wms-logistica (con avance guardado en el mismo commit `wip`); firma-electronica, gestor-documentos, automatizacion y moderacion-contenido (sin empezar).
-3. **Pendientes reportados por las fases:** escapar el HTML de los datos del formulario en el correo al admin; quitar la ruta pública `/test`; corregir cifras del README y el `docker-compose.yml`, que apunta a un `Dockerfile` del backend que no existe; error de `/api/expert/generar-excel` cuando la IA no devuelve procedimientos; permisos de la configuración del sistema experto para prospectos con acceso; achicar la lista de errores de hidratación conocidos.
+3. **Pendientes reportados por las fases:** corregir cifras del README y el `docker-compose.yml`, que apunta a un `Dockerfile` del backend que no existe; error de `/api/expert/generar-excel` cuando la IA no devuelve procedimientos; permisos de la configuración del sistema experto para prospectos con acceso; achicar la lista de errores de hidratación conocidos.
 4. **Repaso de honestidad en todo el sitio:** textos del catálogo de "Otras soluciones a medida" (modalidad SaaS solo donde haya base real), `/about`, `/bienvenido-producthunt`, `/desarrollo-web-colombia`.
 5. **Diseño y animaciones:** investigación de motion design, sistema de movimiento, animación protagonista que explique RAG, microinteracciones, easter eggs (paleta Ctrl+K, código Konami, mensaje en consola, 404 ingeniosa) y revisión adversarial con video y medición de fluidez.
-6. **Correcciones pendientes:** al documentar el sitio y dibujar sus diagramas contra el código y al recorrer las 28 demos aparecieron más de 200 puntos. Sin repetir y sin contar los detalles de cada demo quedan 107, ordenados de P0 a P3 en [Correcciones pendientes](16-Correcciones-Pendientes.md). Los más urgentes, además de volver a levantar el backend, son estos:
+6. **Correcciones pendientes:** al documentar el sitio y dibujar sus diagramas contra el código y al recorrer las 28 demos aparecieron más de 200 puntos. Sin repetir y sin contar los detalles de cada demo quedan 100, ordenados de P0 a P3 en [Correcciones pendientes](16-Correcciones-Pendientes.md). Los más urgentes, además de volver a levantar el backend, son estos:
    - no hay forma de suprimir datos personales, como pide la Ley 1581;
    - el formulario de contacto no pide la autorización de datos;
    - no se pueden crear facturas, entregables ni conversaciones;
-   - "Nuevo pedido" apunta a una dirección local;
-   - quedan ajustes de seguridad en rutas heredadas, que no se detallan en la wiki pública.
+   - "Nuevo pedido" apunta a una dirección local.
 7. Verificación final completa, actualización de la wiki, PR y merge.
 
 ## Acciones del dueño

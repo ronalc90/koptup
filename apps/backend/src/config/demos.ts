@@ -25,13 +25,21 @@ export type DemoGrantState = (typeof DEMO_GRANT_STATES)[number];
 /** Tamaño de la empresa del solicitante (número de personas). */
 export const COMPANY_SIZES = ['1-10', '11-50', '51-200', '201-1000', '1000+'] as const;
 
-/** Propósito de un enlace mágico. */
-export const MAGIC_LINK_PURPOSES = ['activacion', 'reset'] as const;
+/**
+ * Propósito de un enlace mágico. `oauth`: código de un solo uso con el que la
+ * web canjea (POST /api/auth/google/exchange) la sesión del inicio de sesión
+ * con Google, para que los tokens nunca viajen en la URL.
+ */
+export const MAGIC_LINK_PURPOSES = ['activacion', 'reset', 'oauth'] as const;
 export type MagicLinkPurpose = (typeof MAGIC_LINK_PURPOSES)[number];
 
-/** Vigencia del enlace de activación (72 h) y del de restablecer contraseña (1 h). */
+/**
+ * Vigencia del enlace de activación (72 h), del de restablecer contraseña
+ * (1 h) y del código de Google (60 s: la web lo canjea apenas carga).
+ */
 export const ACTIVATION_TOKEN_TTL_MS = 72 * 60 * 60 * 1000;
 export const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
+export const OAUTH_CODE_TTL_MS = 60 * 1000;
 
 /** Vigencia por defecto de un acceso y límites al aprobar o extender. */
 export const DEFAULT_GRANT_DAYS = 14;

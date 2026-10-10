@@ -374,7 +374,7 @@ flowchart TD
     F1["Hola, nombre: email enmascarado y vencimiento<br/>crea la contraseña y la confirma"]:::visitante
     Q3{"¿8 a 128 caracteres<br/>y coinciden?"}:::decision
     E3["Mensaje bajo el campo"]:::error
-    P1["POST /api/auth/activate<br/>5 por minuto por IP<br/>consumo atómico del enlace"]:::sistema
+    P1["POST /api/auth/activate<br/>10 cada 15 min por IP<br/>consumo atómico del enlace"]:::sistema
     Q4{"¿Enlace sin usar<br/>y vigente?"}:::decision
     S1["Guarda la contraseña cifrada<br/>cuenta activa y email verificado"]:::sistema
     Q5{"¿Se guardó la cuenta?"}:::decision
@@ -424,10 +424,10 @@ flowchart TD
     GG["Continuar con Google<br/>GET /api/auth/google"]:::externo
     QG{"¿Google configurado<br/>en el servidor?"}:::decision
     EG["Respuesta 503 en JSON del backend<br/>no vuelve al login"]:::error
-    CB["/auth/callback guarda la sesión<br/>una cuenta invitada queda activa"]:::sistema
+    CB["/auth/callback canjea el código de un solo uso<br/>por la sesión; una cuenta invitada queda activa"]:::sistema
     GH["Botón de GitHub: no hace nada"]:::error
     FM["Email y contraseña"]:::visitante
-    P["POST /api/auth/login<br/>5 por minuto por IP"]:::sistema
+    P["POST /api/auth/login<br/>10 cada 15 min por IP y correo"]:::sistema
     E3["Sin conexión con el servidor<br/>o demasiados intentos"]:::error
     Q1{"¿Cuenta invitada<br/>sin activar?"}:::decision
     E1["Tu cuenta aún no está activada:<br/>usa el enlace de activación"]:::error
@@ -479,7 +479,7 @@ flowchart TD
 
     R0["Petición con sesión<br/>token de acceso de 15 min"]:::visitante
     W{"¿Quién la hace?"}:::decision
-    MW["Filtro de la web en el servidor<br/>/admin, /dashboard, /liquidacion, /test<br/>y demos con acceso<br/>consulta GET /api/auth/me, caché de 30 s"]:::sistema
+    MW["Filtro de la web en el servidor<br/>/admin, /dashboard, /liquidacion<br/>y demos con acceso<br/>consulta GET /api/auth/me, caché de 30 s"]:::sistema
     ME{"¿El backend<br/>acepta el token?"}:::decision
     BR["El navegador<br/>lib/api.ts o authFetch"]:::sistema
     B401{"¿El backend respondió 401?"}:::decision
@@ -534,7 +534,7 @@ flowchart TD
 
     F0["¿Olvidaste tu contraseña? en /login"]:::visitante
     F1["/forgot-password: escribe su email"]:::visitante
-    P1["POST /api/auth/forgot-password<br/>5 por minuto por IP"]:::sistema
+    P1["POST /api/auth/forgot-password<br/>3 cada 15 min por IP y correo"]:::sistema
     Q1{"¿Email válido y<br/>dentro del límite?"}:::decision
     E1["Ocurrió un error al enviar el correo"]:::error
     Q2{"¿Existe una cuenta<br/>local con ese email?"}:::decision
@@ -603,7 +603,7 @@ flowchart TD
     RF{"¿Se pudo renovar<br/>la sesión?"}:::decision
     SC3["Pantalla con el motivo: sin acceso,<br/>vencido con su fecha, retirado o en mantenimiento"]:::error
     OPEN2["Abre la demo sin caché y sin indexar<br/>con la cookie renovada si hubo"]:::visitante
-    NX2["Deja pasar la página sin más chequeos<br/>la demo se abre, ver Hallazgos"]:::error
+    SC4["Pantalla: en mantenimiento<br/>el backend no conoce la demo"]:::error
 
     S --> Q0
     Q0 -->|No| NX
@@ -620,12 +620,12 @@ flowchart TD
     RF -->|Sí| ASK
     RF -->|No| SC2
     Q4 -->|Error o sin respuesta| SC1
-    Q4 -->|404, el backend no conoce la demo| NX2
+    Q4 -->|404, el backend no conoce la demo| SC4
 ```
 
 ![Diagrama: Entrar a una demo, el filtro de la web](images/doc/flujos/Doc-14-1-Flujos-de-Negocio-10.png)
 
-Lo que pasa en el servidor de la web antes de mostrar una demo. Las demos abiertas pasan sin consultar nada más; las de modo "con solicitud" o "solo por invitación" preguntan al backend. Toda "Pantalla" es `/demo-acceso/[slug]?motivo=...&modo=...&ruta=...` mostrada sin cambiar la URL (diagrama 7c); si solo queda la cookie de renovación, se renueva primero. Si el backend responde 404 a una de las 28 demos, la web deja pasar la página tal cual: es un desajuste entre la tabla de la web y la semilla del backend (hallazgo 4 de [Flujos técnicos](Doc-14-3-Flujos-Tecnicos.md#hallazgos)).
+Lo que pasa en el servidor de la web antes de mostrar una demo. Las demos abiertas pasan sin consultar nada más; las de modo "con solicitud" o "solo por invitación" preguntan al backend. Toda "Pantalla" es `/demo-acceso/[slug]?motivo=...&modo=...&ruta=...` mostrada sin cambiar la URL (diagrama 7c); si solo queda la cookie de renovación, se renueva primero. Si el backend responde 404 a una de las 28 demos (la tabla de la web y la semilla del backend no coinciden), la web muestra la pantalla de acceso como «en mantenimiento», también sin caché y sin indexar.
 
 Fuente en el código: `apps/web/src/middleware.ts`, `apps/web/src/lib/demo-access-defaults.ts`, `apps/backend/src/routes/demo-public.routes.ts`.
 
@@ -1099,9 +1099,8 @@ Cosas que los diagramas muestran tal como están en el código y que conviene re
 5. **Botones de inicio de sesión que no llevan a ningún lado.** El botón de GitHub no hace nada; el de Google, si el servidor no tiene Google OAuth configurado, deja a la persona en una respuesta JSON 503 del backend en lugar de volver a `/login` con un mensaje. La casilla "Recordarme" no cambia nada: las cookies duran siempre 15 min y 7 días (`apps/web/src/app/login/page.tsx`, `apps/backend/src/routes/auth.routes.ts`, `apps/web/src/lib/api.ts`).
 6. **Cambiar de idioma borra los parámetros de la URL.** El botón ES/EN recarga solo la ruta (`window.location.replace(window.location.pathname)`), así que `/solicitar-demo?demos=erp` pierde la demo elegida y `/contact?service=...&plan=...` pierde el plan. Además, `apps/web/src/i18n/useToggleLocale.tsx` no se usa y nadie envía la cabecera `x-locale` que lee `apps/web/src/i18n/request.ts`.
 7. **Una sola sesión renovable por cuenta.** El token de renovación se guarda en Redis con la clave de la cuenta; iniciar sesión en un segundo navegador reemplaza el del primero, que se cierra cuando vence su token de acceso de 15 min (`issueSession` en `apps/backend/src/controllers/auth.controller.ts`).
-8. **La página de activación no está en la lista de rutas sin medición.** `NO_TRACKING_PATHS` excluye `/auth` y `/reset-password`, pero no `/activar`, que también lleva el token en la URL. Conviene agregarla (`apps/web/src/components/analytics/Analytics.tsx`).
-9. **Recuperar la contraseña sin correo configurado no tiene salida.** Sin SMTP la persona ve "te enviamos un enlace" pero no llega nada, y el panel no ofrece copiar ese enlace como sí hace con el de activación (`forgotPassword` en `apps/backend/src/controllers/auth.controller.ts`).
-10. **Mensajes de enlace menos claros al restablecer la contraseña.** El backend devuelve el motivo (usado, reemplazado o vencido), pero `/reset-password` muestra el mismo texto para todos; la activación sí los distingue.
-11. **El portal puede perder la ruta de regreso.** Si el navegador no tiene los datos del usuario guardados aunque la sesión siga viva, `DashboardLayout` manda a `/login` sin `redirect`, mientras que el filtro de la web sí lo incluye (`apps/web/src/components/dashboard/DashboardLayout.tsx`).
-12. **La landing de salud lleva a una demo solo por invitación.** El caso de cuentas médicas de `/rag/salud` enlaza a `/demo/cuentas-medicas`, que por defecto es privada; el visitante cae en la pantalla "Solicita acceso" (`apps/web/src/lib/rag-page.ts`).
-13. **El panel no permite volver una solicitud a pendiente.** La API acepta pasar de "en revisión" a "pendiente", pero el panel solo ofrece "Marcar en revisión" (`apps/web/src/app/admin/solicitudes/[id]/page.tsx`).
+8. **Recuperar la contraseña sin correo configurado no tiene salida.** Sin SMTP la persona ve "te enviamos un enlace" pero no llega nada, y el panel no ofrece copiar ese enlace como sí hace con el de activación (`forgotPassword` en `apps/backend/src/controllers/auth.controller.ts`).
+9. **Mensajes de enlace menos claros al restablecer la contraseña.** El backend devuelve el motivo (usado, reemplazado o vencido), pero `/reset-password` muestra el mismo texto para todos; la activación sí los distingue.
+10. **El portal puede perder la ruta de regreso.** Si el navegador no tiene los datos del usuario guardados aunque la sesión siga viva, `DashboardLayout` manda a `/login` sin `redirect`, mientras que el filtro de la web sí lo incluye (`apps/web/src/components/dashboard/DashboardLayout.tsx`).
+11. **La landing de salud lleva a una demo solo por invitación.** El caso de cuentas médicas de `/rag/salud` enlaza a `/demo/cuentas-medicas`, que por defecto es privada; el visitante cae en la pantalla "Solicita acceso" (`apps/web/src/lib/rag-page.ts`).
+12. **El panel no permite volver una solicitud a pendiente.** La API acepta pasar de "en revisión" a "pendiente", pero el panel solo ofrece "Marcar en revisión" (`apps/web/src/app/admin/solicitudes/[id]/page.tsx`).

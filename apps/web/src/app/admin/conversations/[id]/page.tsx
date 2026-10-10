@@ -94,7 +94,6 @@ export default function AdminConversationDetailPage() {
       admin: 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-400',
       client: 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-400',
       support: 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-400',
-      project_manager: 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-400',
     };
     return colors[role] || 'bg-secondary-100 text-secondary-800';
   };

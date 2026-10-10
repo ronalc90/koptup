@@ -2060,7 +2060,7 @@
   },
   "billingPage": {
     "title": "Billing & Payments",
-    "subtitle": "Manage your invoices and make payments",
+    "subtitle": "Review your invoices and how to pay them",
     "pending": "Pending",
     "overdue": "Overdue",
     "paid": "Paid",
@@ -2071,7 +2071,14 @@
     "details": "Details",
     "noDescription": "No description",
     "downloadPdf": "Download PDF",
-    "payNow": "Pay Now"
+    "payNow": "How to pay",
+    "payHide": "Hide",
+    "payTransferTitle": "Pay by bank transfer",
+    "payReference": "Use {number} as the payment reference.",
+    "payConfirmNote": "Once the KopTup team confirms your payment, the invoice will show as paid."
+  },
+  "authCallback": {
+    "completing": "Completing sign-in…"
   },
   "messagesPage": {
     "title": "Messages",

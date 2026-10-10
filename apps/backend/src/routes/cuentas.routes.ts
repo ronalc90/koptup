@@ -32,6 +32,7 @@ import multer from 'multer';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { requireStaff } from '../middleware/access';
+import { aiGate } from '../middleware/ai-gate';
 import { AppError } from '../middleware/errorHandler';
 
 const router = Router();
@@ -302,7 +303,7 @@ router.patch('/cuentas/:id/files/:filename/toggle', ...staff, toggleFileEnabled 
  *                 items:
  *                   type: string
  */
-router.post('/process', ...staff, processCuentasAndGenerateExcel as RequestHandler);
+router.post('/process', ...staff, aiGate('health'), processCuentasAndGenerateExcel as RequestHandler);
 
 /**
  * @swagger
@@ -342,7 +343,8 @@ router.get('/export', ...staff, exportExcelFile as RequestHandler);
  *                 type: string
  *                 enum: [SOAT, ISS2001, ISS2004]
  */
-router.post('/cuentas/procesar-hibrido', ...staff, procesarCuentaHibrida as RequestHandler);
+// Llama a la IA: tope mensual HEALTH_MONTHLY_BUDGET_USD (middleware/ai-gate.ts).
+router.post('/cuentas/procesar-hibrido', ...staff, aiGate('health'), procesarCuentaHibrida as RequestHandler);
 
 /**
  * @swagger

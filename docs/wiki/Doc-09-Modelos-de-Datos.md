@@ -131,7 +131,7 @@ erDiagram
         ObjectId _id PK
         string tokenHash UK "SHA-256 del token"
         ObjectId user FK
-        string proposito "activacion o reset"
+        string proposito "activacion, reset u oauth"
         date expiresAt "72 h o 1 h"
         date usedAt "null si no se ha usado"
         bool invalidado "true si lo reemplazó otro"
@@ -551,7 +551,7 @@ Y así los ve el prospecto en su portal (`GET /api/me/demos`, solo con los campo
 |---|---|---|---|
 | `tokenHash` | texto | Obligatorio, único | Hash SHA-256 del token. **El token en claro nunca se guarda**: viaja en el correo o el panel lo muestra una vez |
 | `user` | id → User | Obligatorio | Cuenta |
-| `proposito` | texto | `activacion` (72 h) o `reset` (1 h) | Para qué sirve |
+| `proposito` | texto | `activacion` (72 h), `reset` (1 h) u `oauth` (60 s: código con el que la web canjea la sesión de Google) | Para qué sirve |
 | `expiresAt` | fecha | Obligatoria | Vencimiento |
 | `usedAt` | fecha | `null` mientras no se use | Uso (atómico: un solo consumo gana) |
 | `invalidado` | sí/no | Por defecto no | Se reemplazó por uno más reciente |
@@ -659,7 +659,7 @@ Solo se agregan registros: **no hay ninguna ruta para editar ni borrar** la bit�
 | `messageId` | texto | Obligatorio, único, `MSG-000001` | Código |
 | `conversationId` | id → Conversation | Obligatorio | Conversación |
 | `sender`, `senderName` | id → User, texto | Obligatorios | Quién escribe |
-| `senderRole` | texto | `admin`, `client`, `support`, `project_manager` | Rol dentro de la conversación |
+| `senderRole` | texto | `admin`, `client`, `support` | Rol dentro de la conversación |
 | `content` | texto | Obligatorio | Texto |
 | `type` | texto | `text` (por defecto), `file`, `system`, `notification` | Tipo |
 | `attachment` | objeto | `fileName`, `fileSize`, `fileUrl`, `fileType` | Adjunto |
@@ -755,7 +755,7 @@ stateDiagram-v2
     end note
 ```
 
-*`POST /api/invoices/:id/pay` registra el pago (método y referencia) sin pasarela. Hoy, además, la emisión de facturas por API falla (ver [Limitaciones](#11-limitaciones-conocidas)).*
+*`POST /api/invoices/:id/pay` (solo `admin` o `manager`) registra el pago (método y referencia) que el equipo confirmó; no hay pasarela. Hoy, además, la emisión de facturas por API falla (ver [Limitaciones](#11-limitaciones-conocidas)).*
 
 ### 5.5 Cuenta, enlace, pedido, entregable y contacto
 

@@ -12,6 +12,7 @@
 
 import * as fs from 'fs';
 import OpenAI from 'openai';
+import { createOpenAIClient } from './openai.service';
 import { parsePdf } from '../utils/pdf-parse';
 import { DatosFacturaPDF } from './pdf-extractor.service';
 
@@ -61,7 +62,8 @@ class ExtraccionDualService {
   constructor() {
     const apiKey = process.env.OPENAI_API_KEY;
     if (apiKey) {
-      this.openai = new OpenAI({ apiKey });
+      // Cliente con el tope mensual de gasto de las APIs de salud (HEALTH_MONTHLY_BUDGET_USD).
+      this.openai = createOpenAIClient({ feature: 'health', apiKey });
       console.log('✅ OpenAI GPT-4o inicializado para extracción con IA');
     } else {
       console.log('⚠️  OPENAI_API_KEY no configurada');

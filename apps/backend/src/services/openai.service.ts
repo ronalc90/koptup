@@ -1,6 +1,9 @@
 // Service for OpenAI medical data extraction
 import OpenAI from 'openai';
+import type { Fetch } from 'openai/core';
+import { fetch as sdkFetch } from 'openai/_shims/index';
 import { logger } from '../utils/logger';
+import { getBudgetStatus, recordSpend, type BudgetFeature } from './ai-budget.service';
 
 // Lazy initialization - only create when needed
 let openai: OpenAI | null = null;
@@ -8,13 +11,19 @@ let openai: OpenAI | null = null;
  * Cliente perezoso: se crea en el primer uso, no al importar el módulo. Así el
  * servidor arranca aunque falte OPENAI_API_KEY (las funciones de IA responden
  * con su error controlado en lugar de tumbar el proceso).
+ *
+ * Con `feature`, el cliente es el de esa función (ver `getOpenAIFor`).
  */
-export function lazyOpenAI(): OpenAI {
+export function lazyOpenAI(feature?: BudgetFeature): OpenAI {
   return new Proxy({} as OpenAI, {
-    get: (_target, prop) => Reflect.get(getOpenAI() as object, prop),
+    get: (_target, prop) => Reflect.get((feature ? getOpenAIFor(feature) : getOpenAI()) as object, prop),
   });
 }
 
+/**
+ * Cliente sin tope propio. Lo usan las funciones que ya registran su gasto
+ * por su cuenta (chatbot, gestor de contenido). Las demás usan `getOpenAIFor`.
+ */
 export function getOpenAI(): OpenAI {
   if (!openai) {
     if (!process.env.OPENAI_API_KEY) {
@@ -25,6 +34,107 @@ export function getOpenAI(): OpenAI {
     });
   }
   return openai;
+}
+
+// ---------------------------------------------------------------------------
+//   Clientes con tope de gasto por función
+// ---------------------------------------------------------------------------
+
+/** USD por 1M de tokens (entrada, salida) de los modelos que usa el backend. */
+const OPENAI_PRICES_PER_1M: ReadonlyArray<{ prefix: string; input: number; output: number }> = [
+  { prefix: 'gpt-4o-mini', input: 0.15, output: 0.6 },
+  { prefix: 'gpt-4o', input: 2.5, output: 10 },
+  { prefix: 'gpt-4-turbo', input: 10, output: 30 },
+  { prefix: 'gpt-4', input: 30, output: 60 },
+  { prefix: 'gpt-3.5-turbo', input: 0.5, output: 1.5 },
+  { prefix: 'text-embedding-3-small', input: 0.02, output: 0 },
+  { prefix: 'text-embedding-3-large', input: 0.13, output: 0 },
+  { prefix: 'text-embedding-ada-002', input: 0.1, output: 0 },
+];
+/** Modelo desconocido: se cobra caro (mejor detenerse antes que pasarse del tope). */
+const UNKNOWN_MODEL_PRICE = { input: 10, output: 30 };
+
+/**
+ * Costo estimado de una llamada con los tokens que informa OpenAI. El modelo
+ * de la respuesta trae fecha (`gpt-4o-2024-08-06`): se busca el prefijo más
+ * largo de la tabla.
+ */
+export function estimateOpenAICostUSD(model: string | undefined, promptTokens: number, completionTokens: number): number {
+  const id = String(model ?? '').toLowerCase();
+  const match = OPENAI_PRICES_PER_1M.filter((p) => id.startsWith(p.prefix)).sort((a, b) => b.prefix.length - a.prefix.length)[0];
+  const price = match ?? UNKNOWN_MODEL_PRICE;
+  const cost = (Math.max(0, promptTokens) / 1e6) * price.input + (Math.max(0, completionTokens) / 1e6) * price.output;
+  return Number(cost.toFixed(6));
+}
+
+/** Código del error que reciben los servicios cuando el tope no permite llamar. */
+export const AI_BUDGET_ERROR_CODES = ['budget_exhausted', 'ai_unavailable'] as const;
+
+function refusal(reason: 'budget_exhausted' | 'unavailable'): Response {
+  const code = reason === 'budget_exhausted' ? 'budget_exhausted' : 'ai_unavailable';
+  const message =
+    reason === 'budget_exhausted'
+      ? 'Se alcanzó el tope mensual de gasto de IA de esta función.'
+      : 'No se puede medir el gasto de IA en este momento (Redis no disponible).';
+  // 429 sin reintentos (x-should-retry: false): el SDK lanza RateLimitError
+  // con este código y no vuelve a intentar.
+  return new Response(JSON.stringify({ error: { message, type: code, code } }), {
+    status: 429,
+    headers: { 'content-type': 'application/json', 'x-should-retry': 'false' },
+  });
+}
+
+/**
+ * `fetch` del SDK con tope mensual: antes de cada llamada revisa el gasto del
+ * mes de la función (falla cerrada si Redis no responde) y, al leer la
+ * respuesta, suma su costo real (tokens informados por OpenAI).
+ */
+export function budgetedFetch(feature: BudgetFeature): Fetch {
+  return (async (url: any, init?: any) => {
+    const budget = await getBudgetStatus(feature);
+    if (!budget.available) {
+      logger.warn(`[ai-budget] Llamada a OpenAI de ${feature} rechazada: ${budget.reason}`);
+      return refusal(budget.reason === 'budget_exhausted' ? 'budget_exhausted' : 'unavailable') as any;
+    }
+    const res: any = await sdkFetch(url, init);
+    if (res && typeof res.json === 'function') {
+      const readJson = res.json.bind(res);
+      res.json = async () => {
+        const body = await readJson();
+        const usage = body?.usage;
+        if (usage && typeof usage === 'object') {
+          const cost = estimateOpenAICostUSD(body.model, Number(usage.prompt_tokens) || 0, Number(usage.completion_tokens) || 0);
+          await recordSpend(feature, cost);
+        }
+        return body;
+      };
+    }
+    return res;
+  }) as Fetch;
+}
+
+/** Crea un cliente de OpenAI ligado al tope de gasto de `feature`. */
+export function createOpenAIClient(opts: { feature: BudgetFeature; apiKey?: string }): OpenAI {
+  const apiKey = opts.apiKey ?? process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error('OPENAI_API_KEY not configured. Please add it to your environment variables.');
+  }
+  return new OpenAI({ apiKey, fetch: budgetedFetch(opts.feature) });
+}
+
+const featureClients = new Map<BudgetFeature, OpenAI>();
+
+/**
+ * Cliente compartido de una función con tope (`documents`, `health`): cada
+ * llamada respeta el tope mensual y suma su costo al gasto del mes.
+ */
+export function getOpenAIFor(feature: BudgetFeature): OpenAI {
+  let client = featureClients.get(feature);
+  if (!client) {
+    client = createOpenAIClient({ feature });
+    featureClients.set(feature, client);
+  }
+  return client;
 }
 
 export interface DiagnosticoInfo {
@@ -300,7 +410,8 @@ export async function extractMedicalDataFromText(
 ): Promise<MedicalDataExtraction[]> {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-      const client = getOpenAI();
+      // Extracción de cuentas médicas: tope de las APIs de salud.
+      const client = getOpenAIFor('health');
       const response = await client.chat.completions.create({
         model: process.env.OPENAI_MODEL || 'gpt-4o',
         messages: [

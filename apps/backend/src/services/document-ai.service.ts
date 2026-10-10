@@ -2,7 +2,8 @@ import { lazyOpenAI } from './openai.service';
 import { logger } from '../utils/logger';
 
 // Perezoso: no falla al importar si falta OPENAI_API_KEY.
-const openai = lazyOpenAI();
+// Cliente con el tope mensual de gasto del gestor de documentos (DOCUMENTS_MONTHLY_BUDGET_USD).
+const openai = lazyOpenAI('documents');
 
 interface DocumentAnalysis {
   tags: string[];

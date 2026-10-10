@@ -1,4 +1,6 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import fs from 'fs/promises';
+import path from 'path';
 import { AuthRequest } from '../types';
 import Order from '../models/Order';
 import User from '../models/User';
@@ -102,9 +104,13 @@ export const getOrderById = async (req: AuthRequest, res: Response) => {
       name: order.name,
       description: order.description,
       status: order.status,
+      approvalStatus: order.approvalStatus ?? 'pending',
+      // El cliente puede editar o cancelar solo mientras está pendiente de revisión.
+      editable: isPendingForClient(order),
       date: order.orderDate.toISOString().split('T')[0],
       amount: order.amount,
       items: order.items,
+      attachments: (order.attachments ?? []).map((a: any) => ({ id: a._id, fileName: a.fileName, fileSize: a.fileSize, fileType: a.fileType })),
       tracking: order.tracking,
       carrier: order.carrier,
       userId: order.userId,
@@ -270,14 +276,55 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// Actualizar pedido
+/**
+ * El cliente puede cambiar su pedido solo mientras está pendiente de revisión:
+ * estado `pending` y aprobación `pending`. Después de que el equipo lo revisa
+ * (aprobado o rechazado) o empieza a trabajarlo, los cambios se piden por
+ * mensajes y los hace el equipo desde el panel.
+ */
+function isPendingForClient(order: { status: string; approvalStatus?: string }): boolean {
+  return order.status === 'pending' && (order.approvalStatus ?? 'pending') === 'pending';
+}
+
+/** Campos que el dueño puede editar (más los archivos de `attachments`). */
+const CLIENT_EDITABLE_FIELDS = new Set(['name', 'description', 'removeAttachments']);
+const MAX_ORDER_ATTACHMENTS = 10;
+
+async function discardUploads(files: Express.Multer.File[] | undefined): Promise<void> {
+  if (!files?.length) return;
+  await Promise.all(files.map((f) => fs.unlink(f.path).catch(() => undefined)));
+}
+
+function parseIdList(raw: unknown): string[] | null {
+  if (raw === undefined || raw === null || raw === '') return [];
+  let value = raw;
+  if (typeof value === 'string') {
+    try {
+      value = JSON.parse(value);
+    } catch {
+      return null;
+    }
+  }
+  if (!Array.isArray(value) || value.length > MAX_ORDER_ATTACHMENTS || !value.every((v) => typeof v === 'string')) return null;
+  return value as string[];
+}
+
+/**
+ * PUT /api/orders/:id — el dueño edita nombre, descripción y adjuntos de su
+ * pedido mientras está pendiente de revisión (multipart: archivos nuevos en
+ * `attachments`; `removeAttachments` = ids de adjuntos a quitar). El estado,
+ * los ítems, el monto y la aprobación los cambia solo el equipo
+ * (PATCH /api/admin/orders/:id/status, approve, reject).
+ */
 export const updateOrder = async (req: AuthRequest, res: Response) => {
+  const files = (req as { files?: Express.Multer.File[] }).files;
   try {
     const { id } = req.params;
     const userId = req.user?.id;
-    const updateData = req.body;
+    const updateData = (req.body ?? {}) as Record<string, unknown>;
 
     if (!userId) {
+      await discardUploads(files);
       res.status(401).json({
         success: false,
         message: 'Usuario no autenticado',
@@ -286,9 +333,10 @@ export const updateOrder = async (req: AuthRequest, res: Response) => {
     }
 
     // Buscar pedido
-    const order = await Order.findOne({ orderId: id });
+    const order = await Order.findOne({ orderId: String(id) });
 
     if (!order) {
+      await discardUploads(files);
       res.status(404).json({
         success: false,
         message: 'Pedido no encontrado',
@@ -298,6 +346,7 @@ export const updateOrder = async (req: AuthRequest, res: Response) => {
 
     // Verificar permisos
     if (order.userId.toString() !== userId.toString()) {
+      await discardUploads(files);
       res.status(403).json({
         success: false,
         message: 'No tienes permiso para actualizar este pedido',
@@ -305,31 +354,115 @@ export const updateOrder = async (req: AuthRequest, res: Response) => {
       return;
     }
 
-    // Actualizar campos permitidos
-    if (updateData.name) order.name = updateData.name;
-    if (updateData.description) order.description = updateData.description;
-    if (updateData.status) {
-      order.status = updateData.status;
-      order.history.push({
-        date: new Date(),
-        status: updateData.status,
-        description: `Estado actualizado a ${updateData.status}`,
-        updatedBy: new mongoose.Types.ObjectId(userId),
+    if ('status' in updateData) {
+      await discardUploads(files);
+      res.status(403).json({
+        success: false,
+        code: 'status_team_only',
+        message: 'El estado del pedido lo cambia el equipo de KopTup. Si necesitas cancelarlo, usa "Cancelar pedido".',
       });
+      return;
     }
 
-    await order.save();
+    const notAllowed = Object.keys(updateData).filter((k) => !CLIENT_EDITABLE_FIELDS.has(k));
+    if (notAllowed.length > 0) {
+      await discardUploads(files);
+      res.status(400).json({
+        success: false,
+        code: 'invalid_fields',
+        message: 'Solo puedes cambiar el nombre, la descripción y los adjuntos del pedido.',
+        fields: notAllowed,
+      });
+      return;
+    }
+
+    if (!isPendingForClient(order)) {
+      await discardUploads(files);
+      res.status(409).json({
+        success: false,
+        code: 'order_not_pending',
+        message: 'Este pedido ya está en revisión o en curso: escríbenos por Mensajes para pedir cambios.',
+      });
+      return;
+    }
+
+    const { name, description } = updateData;
+    if (name !== undefined && (typeof name !== 'string' || !name.trim() || name.length > 200)) {
+      await discardUploads(files);
+      res.status(400).json({ success: false, code: 'invalid_name', message: 'Escribe un nombre válido (máximo 200 caracteres).' });
+      return;
+    }
+    if (description !== undefined && (typeof description !== 'string' || description.length > 5000)) {
+      await discardUploads(files);
+      res.status(400).json({ success: false, code: 'invalid_description', message: 'La descripción puede tener máximo 5000 caracteres.' });
+      return;
+    }
+    const removeIds = parseIdList(updateData.removeAttachments);
+    if (removeIds === null) {
+      await discardUploads(files);
+      res.status(400).json({ success: false, code: 'invalid_attachments', message: 'La lista de adjuntos a quitar no es válida.' });
+      return;
+    }
+
+    const kept = order.attachments.filter((a: any) => !removeIds.includes(String(a._id)));
+    const removed = order.attachments.filter((a: any) => removeIds.includes(String(a._id)));
+    const added = (files ?? []).map((file) => ({
+      fileName: file.originalname,
+      fileUrl: `/uploads/orders/${file.filename}`,
+      fileSize: file.size,
+      fileType: file.mimetype,
+      uploadedAt: new Date(),
+    }));
+    if (kept.length + added.length > MAX_ORDER_ATTACHMENTS) {
+      await discardUploads(files);
+      res.status(400).json({ success: false, code: 'too_many_attachments', message: `Un pedido puede tener máximo ${MAX_ORDER_ATTACHMENTS} adjuntos.` });
+      return;
+    }
+
+    const changes: string[] = [];
+    if (typeof name === 'string' && name.trim() !== order.name) {
+      order.name = name.trim();
+      changes.push('nombre');
+    }
+    if (typeof description === 'string' && description !== order.description) {
+      order.description = description;
+      changes.push('descripción');
+    }
+    if (kept.length !== order.attachments.length || added.length > 0) {
+      order.set('attachments', [...kept, ...added]);
+      changes.push('adjuntos');
+    }
+
+    if (changes.length > 0) {
+      order.history.push({
+        date: new Date(),
+        status: order.status,
+        description: `Pedido editado por el cliente (${changes.join(', ')})`,
+        updatedBy: new mongoose.Types.ObjectId(userId),
+      });
+      await order.save();
+      // Los adjuntos quitados también salen del disco (solo el nombre del
+      // archivo, dentro de la carpeta de pedidos).
+      await Promise.all(
+        removed.map((a: any) =>
+          fs.unlink(path.join('./uploads/orders', path.basename(String(a.fileUrl ?? '')))).catch(() => undefined),
+        ),
+      );
+    }
 
     res.json({
       success: true,
       data: {
         id: order.orderId,
         name: order.name,
+        description: order.description,
         status: order.status,
+        attachments: order.attachments.map((a: any) => ({ id: a._id, fileName: a.fileName, fileSize: a.fileSize, fileType: a.fileType })),
       },
-      message: 'Pedido actualizado exitosamente',
+      message: changes.length > 0 ? 'Pedido actualizado exitosamente' : 'No hubo cambios',
     });
   } catch (error) {
+    await discardUploads(files);
     console.error('Update order error:', error);
     res.status(500).json({
       success: false,
@@ -353,7 +486,7 @@ export const cancelOrder = async (req: AuthRequest, res: Response) => {
     }
 
     // Buscar pedido
-    const order = await Order.findOne({ orderId: id });
+    const order = await Order.findOne({ orderId: String(id) });
 
     if (!order) {
       res.status(404).json({
@@ -372,11 +505,16 @@ export const cancelOrder = async (req: AuthRequest, res: Response) => {
       return;
     }
 
-    // Verificar que el pedido puede ser cancelado
-    if (order.status === 'completed' || order.status === 'cancelled') {
-      res.status(400).json({
+    // El cliente cancela solo mientras el pedido está pendiente de revisión;
+    // después lo cancela el equipo (se pide por Mensajes).
+    if (!isPendingForClient(order)) {
+      res.status(409).json({
         success: false,
-        message: `No se puede cancelar un pedido con estado ${order.status}`,
+        code: 'order_not_pending',
+        message:
+          order.status === 'cancelled'
+            ? 'Este pedido ya está cancelado.'
+            : 'Este pedido ya está en revisión o en curso: escríbenos por Mensajes si necesitas cancelarlo.',
       });
       return;
     }

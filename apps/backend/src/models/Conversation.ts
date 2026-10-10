@@ -7,7 +7,7 @@ export interface IConversation extends Document {
   orderId?: mongoose.Types.ObjectId;
   participants: Array<{
     userId: mongoose.Types.ObjectId;
-    role: 'admin' | 'client' | 'support' | 'project_manager';
+    role: 'admin' | 'client' | 'support';
     name: string;
     email: string;
     avatar?: string;
@@ -51,7 +51,7 @@ const ConversationSchema: Schema = new Schema(
         userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
         role: {
           type: String,
-          enum: ['admin', 'client', 'support', 'project_manager'],
+          enum: ['admin', 'client', 'support'],
           required: true,
         },
         name: { type: String, required: true },
