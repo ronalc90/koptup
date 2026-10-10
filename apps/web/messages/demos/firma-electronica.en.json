@@ -1,247 +1,825 @@
 {
   "demoSign": {
-    "pageTitle": "Electronic signature platform",
-    "pageSubtitle": "Sign legally binding documents in minutes. Simple, advanced, and qualified signatures under eIDAS and Colombian Law 527, backed by a cryptographic audit trail.",
-    "back": "Back to demos",
-    "compliance": {
-      "title": "Regulatory compliance",
-      "eidas": "eIDAS",
-      "esign": "ESIGN Act",
-      "ueta": "UETA",
-      "ley527": "Law 527 CO",
-      "nom151": "NOM 151 MX"
+    "shell": {
+      "back": "Back to demos",
+      "sampleBadge": "Sample data",
+      "sampleHint": "Fictitious company, people and documents",
+      "simBadge": "Simulation: not legally binding",
+      "title": "E-signature",
+      "subtitle": "Build an envelope from a template or a PDF, set who signs and in what order, sign from the signer view with a code and a handwritten mark, and review the evidence with its hash chain.",
+      "caseLine": "Sample case: {company} (fictitious company) · NIT {nit} · {city}",
+      "legalLine": "Colombian reference: Law 527 of 1999 and Decree 2364 of 2012 (compiled in Decree 1074 of 2015). This demo does not sign documents with legal validity: it shows how the platform we build for your company would work.",
+      "loading": "Loading the demo…",
+      "navLabel": "Demo sections",
+      "reset": "Reset demo",
+      "resetConfirm": "Clear your changes and go back to the sample data?",
+      "resetYes": "Yes, reset",
+      "resetDone": "The demo is back to the sample data."
+    },
+    "common": {
+      "show": "Show",
+      "hide": "Hide",
+      "cancel": "Cancel",
+      "close": "Close",
+      "copy": "Copy",
+      "copied": "Copied",
+      "untitled": "Untitled"
+    },
+    "how": {
+      "title": "What is real and what is simulated in this demo",
+      "realTitle": "Really works (in your browser)",
+      "real": [
+        "What you do is saved in your browser and survives a reload; “Reset demo” goes back to the sample data.",
+        "The indicators are computed from the envelope list: they change when you send, sign or void, or when an envelope expires.",
+        "The SHA-256 fingerprint of the PDF you upload or of the template text is computed in your browser; the file never leaves your device.",
+        "Every step adds an event to the evidence, chained with SHA-256 hashes; “Verify integrity” recomputes the chain.",
+        "The CSV files, the envelope JSON and the sample PDFs (evidence certificate and signed document) are really generated and downloaded.",
+        "The signature is drawn with the mouse or a finger, typed or uploaded as an image, and it goes into the PDF."
+      ],
+      "simTitle": "Simulated or sample",
+      "sim": [
+        "No email, SMS or WhatsApp message is sent: the verification code is shown on screen.",
+        "Identity verification with ID and selfie, digital signature with a certificate and the timestamp from a digital certification authority (ECD) are simulated.",
+        "The IP addresses in the evidence are samples (ranges reserved for documentation).",
+        "The company, people, emails (.example) and documents are fictitious; the template texts were not reviewed by a lawyer.",
+        "Integrations and the API are built in your project; here they are only described."
+      ],
+      "tourTitle": "Suggested walkthrough (5 minutes)",
+      "tour": [
+        "In “Home”, look at the indicators and the envelope list, and open the evidence of the completed employment contract.",
+        "Click “New envelope”, choose the “Fixed-term employment contract” template and change the worker’s name.",
+        "Check the signers and the order, place the fields by tapping the page and send the envelope.",
+        "In “Signer view”, open the document, request the code, type it, sign with your finger or mouse and accept.",
+        "In “Evidence”, verify the hash chain and download the PDF certificate."
+      ]
     },
     "tabs": {
-      "dashboard": "Dashboard",
-      "create": "Create envelope",
+      "home": "Home",
+      "create": "New envelope",
       "templates": "Templates",
-      "audit": "Audit trail",
-      "api": "API & embed",
+      "evidence": "Evidence",
       "signer": "Signer view",
+      "developers": "For developers",
       "integrations": "Integrations"
     },
-    "metrics": {
-      "pending": "Pending documents",
-      "signedMonth": "Signed this month",
-      "completion": "Completion rate",
-      "avgTime": "Average time",
-      "minutes": "min"
+    "status": {
+      "draft": "Draft",
+      "sent": "Sent",
+      "partial": "In progress",
+      "completed": "Completed",
+      "expired": "Expired",
+      "voided": "Voided"
     },
-    "documents": {
-      "title": "Recent documents",
-      "headers": {
-        "name": "Document",
-        "signers": "Signers",
-        "type": "Signature type",
-        "status": "Status",
-        "updated": "Updated",
-        "actions": "Actions"
+    "roles": {
+      "signer": "Signer",
+      "approver": "Approver",
+      "witness": "Witness",
+      "cc": "Gets a copy"
+    },
+    "signerStates": {
+      "pending": "Pending",
+      "viewed": "Opened the document",
+      "signed": "Signed",
+      "copy": "Gets a copy"
+    },
+    "channels": {
+      "email": "email",
+      "sms": "SMS",
+      "whatsapp": "WhatsApp"
+    },
+    "auth": {
+      "emailOtp": {
+        "name": "Email code",
+        "help": "A 6-digit code reaches the signer’s email (simulated)."
       },
-      "status": {
-        "sent": "Sent",
-        "viewed": "Viewed",
-        "signed": "Signed",
-        "expired": "Expired",
-        "draft": "Draft"
+      "smsOtp": {
+        "name": "SMS code",
+        "help": "The code arrives by text message to the mobile phone (simulated)."
       },
+      "whatsappOtp": {
+        "name": "WhatsApp code",
+        "help": "The code arrives by WhatsApp to the mobile phone (simulated)."
+      },
+      "idCheck": {
+        "name": "Identity verification",
+        "help": "Photo of the ID and a selfie, with a partner provider (simulated)."
+      }
+    },
+    "sigTypes": {
+      "electronic": {
+        "name": "Electronic signature",
+        "help": "One-time code and evidence of the process."
+      },
+      "digital": {
+        "name": "Digital signature with certificate",
+        "help": "Certificate from an accredited ECD, through an integration (simulated)."
+      }
+    },
+    "fieldTypes": {
+      "signature": "Signature",
+      "initials": "Initials",
+      "date": "Date",
+      "text": "Text",
+      "checkbox": "Checkbox"
+    },
+    "actors": {
+      "you": "{company} (you)",
+      "system": "Platform"
+    },
+    "home": {
+      "metrics": {
+        "pending": "Awaiting signature",
+        "pendingHint": "{n, plural, =0 {no drafts} one {and # draft} other {and # drafts}}",
+        "signedMonth": "Completed this month",
+        "signedMonthHint": "{n, plural, one {# completed in total} other {# completed in total}}",
+        "rate": "Completion rate",
+        "rateHint": "{done} of {closed} closed envelopes",
+        "avg": "Average time",
+        "avgHint": "From sending to the last signature",
+        "note": "Indicators computed from the envelopes in this demo."
+      },
+      "listTitle": "Envelopes",
+      "listSubtitle": "Documents sent for signature, drafts and their status.",
+      "new": "New envelope",
+      "exportCsv": "Export CSV",
+      "csvName": "sample-signature-envelopes.csv",
+      "csvHeaders": ["ID", "Document", "Status", "Participants", "Signatures", "Created", "Sent", "Completed", "Expires", "Document SHA-256"],
+      "csvDone": "{n, plural, one {Exported # envelope} other {Exported # envelopes}} to CSV.",
+      "search": "Search by document, person or ID",
+      "statusFilter": "Filter by status",
+      "allStatuses": "All statuses ({n})",
+      "empty": "No envelope matches the search.",
+      "updated": "updated {date}",
+      "fromBulk": "bulk send",
+      "signatures": "Signatures {p}",
+      "nextTurn": "Next: {names}",
+      "pendingOf": "Pending: {names}",
+      "expires": "expires {date}",
+      "completedOn": "Completed on {date}",
+      "expiredOn": "Expired on {date} without completion",
+      "draftHint": "Draft not sent yet",
+      "voidedHint": "Voided by the sender",
       "actions": {
-        "view": "View",
-        "audit": "Audit",
+        "continue": "Continue",
+        "delete": "Delete",
+        "sign": "Sign",
         "remind": "Remind",
-        "void": "Void"
+        "evidence": "Evidence",
+        "signedPdf": "Signed PDF",
+        "void": "Void",
+        "duplicate": "Duplicate"
       },
-      "newEnvelope": "New envelope",
-      "filter": "Filter",
-      "search": "Search document..."
+      "remindDone": "Reminder logged for {names} (simulated: no message was sent).",
+      "duplicated": "The envelope was copied into “New envelope” so you can send it again.",
+      "voidTitle": "Void envelope",
+      "voidText": "“{title}” will stop accepting signatures. The voiding is recorded in the evidence.",
+      "voidYes": "Yes, void",
+      "voidDone": "Envelope {id} voided.",
+      "deleteTitle": "Delete draft",
+      "deleteText": "The draft “{title}” will be deleted.",
+      "deleteYes": "Yes, delete",
+      "deleteDone": "Draft deleted.",
+      "types": {
+        "title": "Which type of signature?",
+        "subtitle": "Concepts from Colombian regulation and what this demo does with each one.",
+        "electronic": {
+          "name": "Electronic signature",
+          "what": "Identifies the signer (for example, with a one-time code) and keeps the evidence of the process.",
+          "demo": "In this demo: this is the one simulated end to end."
+        },
+        "digital": {
+          "name": "Digital signature",
+          "what": "Uses a digital certificate issued by a digital certification authority (ECD) accredited by ONAC.",
+          "demo": "In this demo: you can choose it, but the certificate is simulated. In your project it is integrated with the ECD you choose."
+        },
+        "timestamp": {
+          "name": "Timestamp",
+          "what": "Time seal issued by an ECD (RFC 3161 protocol) proving the document existed at that moment.",
+          "demo": "In this demo: simulated when the envelope is completed."
+        },
+        "note": "These descriptions are for guidance and do not replace legal advice. The demo does not produce legally binding signatures."
+      }
     },
     "wizard": {
-      "title": "Create signing envelope",
-      "subtitle": "Configure document, signers, and security in 4 steps.",
-      "next": "Next",
-      "back": "Back",
-      "send": "Send for signature",
-      "saveDraft": "Save draft",
+      "title": "New envelope",
+      "titleEditing": "Editing draft {id}",
+      "subtitle": "Build the envelope in 4 steps: document, signers, fields and security.",
+      "stepsLabel": "Wizard steps",
       "steps": {
-        "upload": {
-          "label": "Document",
-          "title": "Upload your document",
-          "subtitle": "Supports PDF, Word and templates with dynamic variables.",
-          "drag": "Drag files here or click to upload",
-          "types": "PDF, DOCX, DOC — up to 25 MB",
-          "useTemplate": "Use template",
-          "uploaded": "Document uploaded",
-          "pages": "pages",
-          "vars": "variables detected"
-        },
-        "signers": {
-          "label": "Signers",
-          "title": "Add signers",
-          "subtitle": "Set signing order, assign roles and permissions.",
-          "addSigner": "Add signer",
-          "name": "Name",
-          "email": "Email",
-          "role": "Role",
-          "order": "Order",
-          "modes": {
-            "parallel": "Parallel",
-            "sequential": "Sequential",
-            "conditional": "Conditional"
+        "document": "Document",
+        "signers": "Signers",
+        "fields": "Fields",
+        "security": "Security"
+      },
+      "back": "Back",
+      "next": "Next",
+      "saveDraft": "Save draft",
+      "send": "Send for signature",
+      "discard": "Start over",
+      "discardConfirm": "Clear what you have so far?",
+      "discardYes": "Yes, start over",
+      "discarded": "The wizard was cleared.",
+      "sentToast": "Envelope {id} sent (simulated): it shows up in Home and its evidence already records the sending. No message was sent.",
+      "savedToast": "Draft {id} saved: you will find it in Home.",
+      "errors": {
+        "docRequired": "Choose a template or upload a PDF.",
+        "varsRequired": "Fill in the template data: {vars}.",
+        "titleRequired": "Write the envelope subject.",
+        "noActing": "Add at least one person who signs or approves.",
+        "nameInvalid": "Person {n}: write the full name.",
+        "emailInvalid": "Person {n}: the email is not valid.",
+        "emailDuplicate": "Person {n}: that email is already used by another person in the envelope.",
+        "phoneInvalid": "Person {n}: SMS or WhatsApp need a 10-digit Colombian mobile number starting with 3.",
+        "signatureMissing": "{name} needs at least one signature field.",
+        "expiryRange": "Expiration must be between 1 and 90 days.",
+        "reminderRange": "Reminders must be every 1 to 30 days.",
+        "reminderBeforeExpiry": "The reminder must come before the expiration.",
+        "openComments": "Resolve the open negotiation comments ({n}) before sending."
+      },
+      "document": {
+        "title": "Document",
+        "subtitle": "Use a template with variables or upload a PDF. Nothing leaves your browser.",
+        "sourceLabel": "Document source",
+        "template": "Use a template",
+        "templateHelp": "You fill in the data and the template builds the text.",
+        "upload": "Upload a PDF",
+        "uploadHelp": "Its SHA-256 fingerprint is computed in your browser.",
+        "pickTemplate": "Template",
+        "pickPlaceholder": "Choose a template…",
+        "pickHelp": "You can also create your own in",
+        "seeTemplates": "Templates",
+        "titleLabel": "Envelope subject",
+        "signersNote": "Choosing a template proposes its signers; you can change them in the next step.",
+        "preview": "Preview",
+        "hash": "SHA-256 fingerprint of the text: {hash}",
+        "noTemplate": "Choose a template to see the document.",
+        "tooBig": "The file is {size}; the maximum is 25 MB.",
+        "notPdf": "“{name}” is not a valid PDF: only PDF files are accepted.",
+        "unreadable": "The file could not be read.",
+        "hashing": "Computing the SHA-256 fingerprint…",
+        "drop": "Drag your PDF here or click to choose it",
+        "dropHint": "PDF only, up to 25 MB. The file never leaves your browser.",
+        "pages": "{n, plural, one {# page} other {# pages}}",
+        "hashFull": "SHA-256: {hash}",
+        "notStored": "The demo neither shows nor stores the PDF: it keeps its name, size, pages and fingerprint. In your project the PDF is shown on screen and fields are placed on its pages.",
+        "uploadNote": "In your project Word documents are accepted too (converted to PDF) and the file is stored on your server."
+      },
+      "signers": {
+        "title": "Signers",
+        "subtitle": "Who signs, who approves, who gets a copy, and in what order.",
+        "modeLabel": "Signing order",
+        "modes": {
+          "sequential": {
+            "name": "Sequential",
+            "help": "Each person gets the link when the previous one signs."
           },
-          "roles": {
-            "signer": "Signer",
-            "approver": "Approver",
-            "viewer": "Viewer",
-            "witness": "Witness"
+          "parallel": {
+            "name": "Parallel",
+            "help": "Everyone gets the link at the same time."
           }
         },
-        "fields": {
-          "label": "Fields",
-          "title": "Place fields on the document",
-          "subtitle": "Drag fields onto the document at the desired position.",
-          "palette": "Palette",
-          "types": {
-            "signature": "Signature",
-            "initials": "Initials",
-            "date": "Date",
-            "text": "Text",
-            "checkbox": "Checkbox"
-          },
-          "preview": "Document preview",
-          "pagePlaceholder": "Page 1 of 3",
-          "dropHere": "Drop here",
-          "fieldsPlaced": "fields placed"
+        "orderN": "Turn {n}",
+        "personN": "Person {n}",
+        "up": "Move person {n} up",
+        "down": "Move person {n} down",
+        "remove": "Remove person {n}",
+        "name": "Full name",
+        "email": "Email",
+        "phone": "Mobile",
+        "channel": "Send by",
+        "role": "Role",
+        "roleHelp": {
+          "signer": "Signs the document.",
+          "approver": "Approves without a handwritten mark; the approval is recorded in the evidence.",
+          "witness": "Signs as a witness.",
+          "cc": "Does not sign: gets a copy when the envelope is completed."
         },
-        "security": {
-          "label": "Security",
-          "title": "Authentication and settings",
-          "subtitle": "Choose how each signer authenticates and set the reminder cadence.",
-          "authMethod": "Authentication method",
-          "auth": {
-            "sms": "SMS OTP",
-            "email": "Email OTP",
-            "kyc": "KYC (ID + selfie)",
-            "video": "Recorded video",
-            "biometric": "Biometrics"
-          },
-          "expiry": "Expiration (days)",
-          "reminders": "Reminders every",
-          "days": "days",
-          "signatureType": "Signature type",
-          "redlines": "Pre-signing negotiation (redlines)",
-          "redlinesHelp": "Lets parties comment and propose changes before signing."
+        "add": "Add person",
+        "max": "Up to {n} people per envelope in the demo.",
+        "simNote": "Messages are not sent: in the demo the sending is only recorded in the evidence."
+      },
+      "fields": {
+        "title": "Fields",
+        "subtitle": "Place where each person signs, initials or fills in data.",
+        "assignTo": "Assign to",
+        "palette": "Fields",
+        "armedHint": "Tap the page to place “{type}”.",
+        "howTo": "Choose a field and tap the page, or drag it with the mouse.",
+        "suggest": "Place suggested fields",
+        "clear": "Remove all",
+        "page": "Page 1 · {n, plural, one {# field} other {# fields}}",
+        "pageLabel": "Document page",
+        "schematic": "Schematic view of the first page",
+        "dropHere": "Drop here",
+        "fieldLabel": "{type} for {name}",
+        "selected": "Selected field: {type}",
+        "owner": "Filled in by",
+        "remove": "Remove field",
+        "keys": "Move it by dragging or with the arrow keys (Shift for long steps); Delete removes it.",
+        "selectHint": "Tap a field to move it, change who it belongs to or remove it."
+      },
+      "security": {
+        "title": "Security and sending",
+        "subtitle": "How each person is verified, when the envelope expires and whether there is a prior negotiation.",
+        "authLabel": "Signer verification",
+        "sigTypeLabel": "Signature type",
+        "expiry": "Expires in (days)",
+        "expiryHint": "It would expire on {date}.",
+        "expiryRange": "Between 1 and 90 days.",
+        "reminder": "Reminder every (days)",
+        "reminderHint": "In the product they are sent automatically; in the demo you use “Remind” in Home.",
+        "timestamp": "Timestamp on completion",
+        "timestampHelp": "In the product an accredited ECD issues it; in the demo it is simulated.",
+        "redlines": "Prior negotiation",
+        "redlinesHelp": "The parties comment and propose changes before signing; the envelope is not sent with open comments.",
+        "summary": "Summary",
+        "summarySigners": "{n, plural, one {# person signs or approves} other {# people sign or approve}} ({mode})",
+        "summaryFields": "{n, plural, one {# field placed} other {# fields placed}}",
+        "simNote": "When you send it, the envelope shows up in Home as “Sent” with its evidence; no email, SMS or WhatsApp message is sent."
+      }
+    },
+    "redlines": {
+      "title": "Prior negotiation",
+      "subtitle": "Comments from the parties before sending for signature.",
+      "accept": "Accept",
+      "reject": "Reject",
+      "undo": "Undo",
+      "add": "Add comment",
+      "placeholder": "Write a comment or a proposed change…",
+      "note": "In the product, each party comments from their own link; here you write as the sender.",
+      "status": {
+        "open": "Open",
+        "accepted": "Accepted",
+        "rejected": "Rejected"
+      },
+      "samples": {
+        "c1": {
+          "author": "Legal counsel (sample)",
+          "text": "Specify the exact end date in the duration clause."
+        },
+        "c2": {
+          "author": "Counterparty (sample)",
+          "text": "Please include the working hours in the document."
         }
       }
     },
-    "types": {
-      "title": "Supported signature types",
-      "simple": "Simple",
-      "simpleDesc": "Click-to-sign, ideal for internal agreements.",
-      "advanced": "Advanced",
-      "advancedDesc": "Signer identification, unique binding, and audit trail.",
-      "qualified": "Qualified (eIDAS)",
-      "qualifiedDesc": "Qualified digital certificate — legal equivalent of a handwritten signature in the EU.",
-      "ley527": "Law 527 CO",
-      "ley527Desc": "Certified electronic signature under Colombia's Law 527 of 1999."
-    },
-    "audit": {
-      "title": "Cryptographic audit trail",
-      "subtitle": "Immutable history with a hash chain and RFC 3161 timestamping.",
-      "documentHash": "Document hash",
-      "blockchainTs": "RFC 3161 blockchain timestamp",
-      "blockchainEnabled": "Enabled — anchored on public chain",
-      "blockchainDisabled": "Disabled",
-      "downloadCert": "Download certificate",
-      "timeline": "Timeline",
-      "events": {
-        "created": "Envelope created",
-        "sent": "Sent by email",
-        "viewed": "Document viewed",
-        "authenticated": "Signer authenticated",
-        "signed": "Document signed",
-        "completed": "Envelope completed",
-        "sealed": "Cryptographically sealed"
-      },
-      "fields": {
-        "ip": "IP",
-        "device": "Device",
-        "geo": "Location",
-        "hash": "Hash"
-      },
-      "close": "Close"
-    },
     "templates": {
-      "title": "Templates with dynamic fields",
-      "subtitle": "Reuse common documents and bulk-send from CSV.",
+      "title": "Templates",
+      "subtitle": "Frequent documents with variables: when you use them, you fill in the data and the template builds the text.",
       "new": "New template",
-      "items": {
-        "nda": "Non-disclosure agreement (NDA)",
-        "labor": "Employment contract",
-        "service": "Service agreement",
-        "saas": "SaaS agreement",
-        "consent": "Informed consent",
-        "vendor": "Vendor agreement"
+      "builtinGroup": "Sample templates",
+      "customGroup": "Your templates",
+      "deleted": "Deleted template",
+      "customDesc": "Your own template with {n, plural, =0 {no variables} one {# variable} other {# variables}}.",
+      "customTag": "custom",
+      "varsCount": "{n, plural, =0 {no variables} one {# variable} other {# variables}}",
+      "usesCount": "{n, plural, =0 {not used in this demo} one {used in # envelope} other {used in # envelopes}}",
+      "use": "Use template",
+      "preview": "Preview",
+      "previewNote": "Preview with sample data. When you use it, you change them in the “Document” step.",
+      "delete": "Delete",
+      "inUse": "It cannot be deleted: some envelopes use it.",
+      "deleteTitle": "Delete template",
+      "deleteText": "The template will be removed from this demo.",
+      "loaded": "Template “{name}” loaded into “New envelope”.",
+      "created": "Template “{name}” created.",
+      "newTitle": "New template",
+      "nameLabel": "Name",
+      "namePlaceholder": "E.g.: Job offer letter",
+      "bodyLabel": "Text with variables",
+      "bodyPlaceholder": "Write the text and put the data that changes in each envelope between braces, for example {name} or {position}.",
+      "detected": "Detected variables: {vars}",
+      "noVars": "No variables: write a word between braces so it changes in each envelope.",
+      "save": "Save template",
+      "errors": {
+        "name": "Write a name with at least 3 letters.",
+        "body": "The text must have at least 20 characters."
       },
-      "fields": "fields",
-      "uses": "uses",
-      "bulk": "Bulk send from CSV",
-      "bulkDesc": "Upload a CSV with signer details and send hundreds of envelopes at once.",
-      "uploadCsv": "Upload CSV",
-      "previewBulk": "Preview batch",
-      "send": "Use template"
+      "vars": {
+        "name": "Full name",
+        "idNumber": "ID number",
+        "position": "Position",
+        "salary": "Monthly salary",
+        "startDate": "Start date",
+        "months": "Duration (months)",
+        "city": "City",
+        "newSalary": "New salary",
+        "effectiveDate": "Effective from",
+        "items": "Items delivered",
+        "deliveryDate": "Delivery date",
+        "patient": "Patient",
+        "procedure": "Procedure",
+        "professional": "Professional",
+        "provider": "Healthcare provider (IPS)",
+        "landlord": "Landlord",
+        "landlordNit": "Landlord NIT",
+        "address": "Warehouse address",
+        "rent": "Monthly rent",
+        "purpose": "Purpose",
+        "supplier": "Supplier",
+        "supplierNit": "Supplier NIT",
+        "description": "Description",
+        "amount": "Total amount",
+        "exitDate": "Exit date"
+      },
+      "items": {
+        "employment": {
+          "name": "Fixed-term employment contract",
+          "desc": "Individual contract with position, salary, duration and probation period.",
+          "body": "FIXED-TERM INDIVIDUAL EMPLOYMENT CONTRACT\n\nBetween CORDILLERA SERVICIOS TEMPORALES S.A.S., NIT 901.537.284-9, hereinafter THE EMPLOYER, and {name}, holder of citizenship ID {idNumber}, hereinafter THE EMPLOYEE, this contract is entered into:\n\nFIRST. Purpose. THE EMPLOYEE will personally provide services as {position} in the city of {city}.\n\nSECOND. Duration. The contract lasts {months} months starting on {startDate}.\n\nTHIRD. Salary. THE EMPLOYER will pay a monthly salary of {salary}, paid every two weeks in arrears.\n\nFOURTH. Working hours. Working hours will be the legal maximum in force, distributed according to the internal work rules.\n\nFIFTH. Probation period. The parties agree on a probation period equal to one fifth of the initial term.\n\nIn witness whereof, the parties sign by electronic means.\n\nSample text for this demo; not a template reviewed by a lawyer.",
+          "sample": {
+            "name": "Andrés Felipe Gómez",
+            "idNumber": "1.023.456.789",
+            "position": "Warehouse operator",
+            "salary": "COP 2,100,000",
+            "months": "6",
+            "city": "Bogotá D.C."
+          }
+        },
+        "salaryAddendum": {
+          "name": "Salary addendum",
+          "desc": "Changes the salary of an existing employment contract.",
+          "body": "ADDENDUM TO THE EMPLOYMENT CONTRACT\n\nCORDILLERA SERVICIOS TEMPORALES S.A.S., NIT 901.537.284-9, and {name}, ID {idNumber}, who works as {position}, agree to amend the current employment contract as follows:\n\nFIRST. Starting on {effectiveDate}, the monthly salary will be {newSalary}.\n\nSECOND. All other clauses of the contract remain unchanged.\n\nSample text for this demo; not a template reviewed by a lawyer.",
+          "sample": {
+            "name": "Paula Andrea Castro",
+            "idNumber": "52.874.120",
+            "position": "Payroll assistant",
+            "newSalary": "COP 2,650,000"
+          }
+        },
+        "uniform": {
+          "name": "Uniform delivery record",
+          "desc": "Record of the uniform and protective equipment delivered.",
+          "body": "UNIFORM DELIVERY RECORD\n\nOn {deliveryDate}, CORDILLERA SERVICIOS TEMPORALES S.A.S. delivers to {name}, ID {idNumber}, the following uniform and personal protective items: {items}.\n\nThe employee states that they are received in good condition, that he or she knows how to use them correctly and commits to wearing them during working hours.\n\nSample text for this demo; not a template reviewed by a lawyer.",
+          "sample": {
+            "name": "Luis Fernando Mejía",
+            "idNumber": "80.112.345",
+            "items": "2 shirts, 1 pair of trousers, 1 pair of safety boots and 1 helmet"
+          }
+        },
+        "medicalConsent": {
+          "name": "Informed consent",
+          "desc": "Patient authorization for a procedure, such as the pre-employment medical exam.",
+          "body": "INFORMED CONSENT\n\nI, {patient}, holder of ID {idNumber}, authorize {provider} and the professional {professional} to perform the procedure: {procedure}.\n\nI declare that its nature, benefits, risks and alternatives were explained to me, that I could ask questions and that they were answered. I know I can withdraw this consent at any time.\n\nSample text for this demo; not an approved clinical form.",
+          "sample": {
+            "patient": "Diana Marcela Torres",
+            "idNumber": "1.010.234.567",
+            "procedure": "Pre-employment occupational medical exam",
+            "professional": "Dr. Carolina Prieto",
+            "provider": "IPS Salud Laboral del Norte"
+          }
+        },
+        "lease": {
+          "name": "Warehouse lease agreement",
+          "desc": "Lease of a commercial property with rent and duration.",
+          "body": "WAREHOUSE LEASE AGREEMENT\n\nBetween {landlord}, NIT {landlordNit}, hereinafter THE LANDLORD, and CORDILLERA SERVICIOS TEMPORALES S.A.S., NIT 901.537.284-9, hereinafter THE TENANT, this agreement is entered into:\n\nFIRST. Property. Warehouse located at {address}.\n\nSECOND. Rent. THE TENANT will pay a monthly rent of {rent} within the first five days of each month.\n\nTHIRD. Duration. {months} months, renewable by agreement between the parties.\n\nFOURTH. Use. The property will be used as a warehouse for uniforms and records.\n\nSample text for this demo; not a template reviewed by a lawyer.",
+          "sample": {
+            "landlord": "Inversiones La Sabana S.A.S.",
+            "landlordNit": "900.418.263-0",
+            "address": "Calle 13 # 68-40, bodega 7, Bogotá D.C.",
+            "rent": "COP 8,500,000",
+            "months": "12"
+          }
+        },
+        "dataPolicy": {
+          "name": "Personal data processing authorization",
+          "desc": "Personal data authorization with the rights under Law 1581 of 2012.",
+          "body": "AUTHORIZATION FOR THE PROCESSING OF PERSONAL DATA\n\nI, {name}, holder of ID {idNumber}, authorize CORDILLERA SERVICIOS TEMPORALES S.A.S. to collect, store and use my personal data for the following purpose: {purpose}.\n\nI know my rights to access, update, correct and delete my data and to revoke this authorization, under Law 1581 of 2012.\n\nSample text for this demo; not a template reviewed by a lawyer.",
+          "sample": {
+            "name": "Sandra Milena Ortiz",
+            "idNumber": "39.765.432",
+            "purpose": "Recruitment and hiring process"
+          }
+        },
+        "purchaseOrder": {
+          "name": "Purchase order",
+          "desc": "Purchase from a supplier with amount and delivery terms.",
+          "body": "PURCHASE ORDER\n\nSupplier: {supplier}, NIT {supplierNit}.\nBuyer: CORDILLERA SERVICIOS TEMPORALES S.A.S., NIT 901.537.284-9.\n\nDescription: {description}.\nTotal amount: {amount}, VAT included.\nDelivery: at the buyer’s warehouse within 15 business days after approval.\n\nSample text for this demo.",
+          "sample": {
+            "supplier": "Dotaciones del Sur S.A.S.",
+            "supplierNit": "901.662.471-4",
+            "description": "120 uniform kits (shirt, trousers and boots)",
+            "amount": "COP 14,280,000"
+          }
+        },
+        "clearance": {
+          "name": "Clearance certificate",
+          "desc": "Record that items were returned when the contract ended.",
+          "body": "CLEARANCE CERTIFICATE\n\nCORDILLERA SERVICIOS TEMPORALES S.A.S. certifies that {name}, ID {idNumber}, whose contract ended on {exitDate}, returned the uniform and work items in his or her care and has no pending obligations with the company.\n\nThe employee states that the final settlement of the contract was received.\n\nSample text for this demo; not a template reviewed by a lawyer.",
+          "sample": {
+            "name": "Jorge Iván Peña",
+            "idNumber": "79.654.321"
+          }
+        }
+      }
     },
-    "api": {
-      "title": "API & embedded iframe",
-      "subtitle": "Embed signing in your product via our REST API or drop-in component.",
-      "tabs": {
+    "bulk": {
+      "title": "Bulk send from CSV",
+      "subtitle": "Create one envelope per row: choose the template, download the sample CSV or upload yours, and check the preview before sending.",
+      "template": "Template",
+      "downloadSample": "Download sample CSV",
+      "sampleFile": "sample-bulk-send.csv",
+      "upload": "Upload CSV",
+      "useSample": "Try the sample CSV",
+      "columnsHelp": "Columns: {cols}. The mobile number is optional; if present, the link is sent by WhatsApp.",
+      "cols": {
+        "name": "Name",
+        "email": "Email",
+        "phone": "Mobile"
+      },
+      "errors": {
+        "empty": "The CSV has no data rows.",
+        "columns": "The CSV is missing columns: {cols}.",
+        "truncated": "Only the first {n} rows are read.",
+        "tooBig": "The file is {size}; the maximum is {max}."
+      },
+      "summary": "{file}: {total} rows, {ok} ready and {bad} with errors.",
+      "line": "Row",
+      "result": "Result",
+      "ok": "Ready to send",
+      "rowErrors": {
+        "name": "name too short",
+        "email": "invalid email",
+        "duplicate": "repeated email",
+        "phone": "invalid mobile",
+        "var": "missing {name}"
+      },
+      "send": "{n, plural, one {Send # envelope} other {Send # envelopes}}",
+      "sent": "{n, plural, one {Created and sent # envelope} other {Created and sent # envelopes}} (simulated: no message went out).",
+      "discard": "Discard",
+      "simNote": "Sending is simulated: the envelopes show up in Home as “Sent” with their evidence, but no email or message is sent."
+    },
+    "evidence": {
+      "title": "Evidence",
+      "subtitle": "Timeline of each envelope with its hash chain, verifiable in your browser.",
+      "empty": "There are no sent envelopes yet.",
+      "pick": "Envelope",
+      "modalTitle": "Evidence for envelope {id}",
+      "docHash": "Document fingerprint (SHA-256)",
+      "docHashUpload": "Computed on the PDF you uploaded.",
+      "docHashTemplate": "Computed on the template text with its data.",
+      "timestamp": "Timestamp",
+      "timestampOff": "Not requested for this envelope.",
+      "timestampDone": "Applied on {date}.",
+      "timestampPending": "It will be applied when everyone has signed.",
+      "timestampSim": "Simulated: in the product an accredited digital certification authority (ECD) issues it.",
+      "signers": "Participants",
+      "comments": "Negotiation comments",
+      "chainTitle": "Hash chain",
+      "chainHelp": "Each event stores the hash of the previous one; the first starts from the document fingerprint. If someone changes an event, the chain stops matching.",
+      "verify": "Verify integrity",
+      "tamper": "Test a tampering",
+      "chainOk": "Chain intact: {n, plural, one {# event verified} other {# events verified}}.",
+      "chainBroken": "The chain does not match from event {n}.",
+      "tamperResult": "Test: if someone changes the time of event {n} (“{event}”) in a copy, verification fails at event {broken}. Your evidence was not modified.",
+      "timeline": "Events ({n})",
+      "noEvents": "This envelope has no events yet.",
+      "hash": "Hash",
+      "downloadCert": "Download certificate (PDF)",
+      "downloadSigned": "Download signed document (PDF)",
+      "simNote": "The hashes are real and computed in your browser. The IP addresses are samples, the sending and the timestamp are simulated, and the PDFs carry the mark “Sample - not legally binding”.",
+      "events": {
+        "created": "Envelope created with {signers} participants",
+        "sent": "Sent to {to} by {channel} (simulated)",
+        "reminder": "Reminder to {to} by {channel} (simulated)",
+        "viewed": "Opened the document",
+        "codeSent": "Verification code sent to {to} by {channel} (simulated)",
+        "authenticated": "Identity verified: {method}",
+        "signed": "Signed ({kind}, {sigType})",
+        "approved": "Approved the document",
+        "commentsResolved": "Negotiation closed: {accepted} changes accepted and {rejected} rejected",
+        "completed": "Envelope completed: everyone signed",
+        "sealed": "Timestamp applied (simulated)",
+        "copySent": "Copy of the signed document sent to {to} by {channel} (simulated)",
+        "voided": "Envelope voided by the sender",
+        "expired": "Envelope expired without completion"
+      }
+    },
+    "pdf": {
+      "signedDone": "The sample signed document was downloaded (PDF).",
+      "certDone": "The sample evidence certificate was downloaded (PDF).",
+      "failed": "The PDF could not be generated in this browser.",
+      "envelope": "Envelope",
+      "subject": "Subject",
+      "sender": "Sender",
+      "status": "Status",
+      "created": "Created",
+      "sent": "Sent",
+      "completed": "Completed",
+      "mode": "Signing order",
+      "auth": "Verification",
+      "sigType": "Signature type",
+      "timestamp": "Timestamp",
+      "timestampYes": "Requested (simulated)",
+      "timestampNo": "Not requested",
+      "document": "Document",
+      "certFile": "sample-evidence-certificate",
+      "certTitle": "Evidence certificate (sample)",
+      "note": "Generated by the KopTup e-signature demo with fictitious data. It is not a real certificate, it is not issued by a certification authority and it is not legally binding.",
+      "watermark": "SAMPLE - NOT LEGALLY BINDING",
+      "envelopeSection": "Envelope data",
+      "documentSection": "Document",
+      "chainSection": "Evidence chain",
+      "chainResult": "Verification",
+      "lastHash": "Hash of the last event",
+      "signersSection": "Participants",
+      "cols": {
+        "name": "Name",
+        "role": "Role",
+        "contact": "Contact",
+        "state": "Status",
+        "when": "Date"
+      },
+      "eventsSection": "Events (Colombia time)",
+      "footer": "KopTup demo · sample data · not legally binding",
+      "signedFile": "sample-signed-document",
+      "uploadNote": "The original PDF ({file}) is not modified in this demo: this record summarizes the signatures and the file fingerprint.",
+      "contentSection": "Content",
+      "signaturesSection": "Signatures",
+      "approved": "Approved"
+    },
+    "signer": {
+      "title": "Signer view",
+      "subtitle": "What each person sees when opening their link: read, verify with a code, sign and accept.",
+      "none": "There are no envelopes waiting for signature. Create one in “New envelope” or reset the demo.",
+      "createOne": "Create an envelope",
+      "pickEnvelope": "Envelope to sign",
+      "whoSigns": "People in the envelope ({mode} order)",
+      "yourTurn": "their turn",
+      "waiting": "waiting for their turn",
+      "simNote": "Simulation: here you play each person. In the product, each one gets their own link.",
+      "doneApproved": "{name} approved the document",
+      "doneSigned": "{name} signed the document",
+      "yourSignature": "Recorded signature",
+      "envCompleted": "The envelope is completed: everyone signed.",
+      "nextIs": "Now it is {name}’s turn.",
+      "signAs": "Sign as {name}",
+      "receipt": "Download certificate (PDF)",
+      "seeEvidence": "See evidence",
+      "notYourTurn": "It is not {name}’s turn yet: the envelope is sequential and an earlier signature is missing.",
+      "from": "{company} sent you a document to sign",
+      "viewing": "You are viewing {name}’s screen",
+      "step1": "Get the link",
+      "invite": "Simulated {channel} message: “{company} sent you ‘{title}’ to sign. You have until {date}.”",
+      "open": "Open the document",
+      "step2": "Read the document",
+      "uploadedDoc": "PDF document: {file}. The demo does not show the PDF; in the product you would see it here before signing.",
+      "yourFields": "Your fields: {list}.",
+      "noFields": "none",
+      "step3": "Verify your identity",
+      "verified": "Identity verified ({method}).",
+      "idCheckText": "In the product, a partner provider compares the photo of your ID with a selfie. Here the result is simulated.",
+      "idCheckSimulate": "Simulate identity verification",
+      "sendCode": "Send code by {channel} to {dest}",
+      "codeShown": "Simulated {channel} message: your code is {code}. In the product it would reach your phone or email; here it is shown so you can continue.",
+      "codeLabel": "6-digit code",
+      "verify": "Verify",
+      "resend": "Send another code",
+      "codeWrong": "The code does not match. Check it or request another one.",
+      "digitalNote": "Digital signature: in the product you would use your certificate from an ECD; here it is simulated.",
+      "step4": "Sign",
+      "step4Approve": "Approve",
+      "approveText": "As the approver, you confirm you reviewed the document and it can move forward.",
+      "dateAuto": "The date is filled in automatically: {date}.",
+      "consent": "I agree to sign this document by electronic means and understand that my signature is linked to the evidence of this process.",
+      "missingTitle": "Missing: {list}",
+      "missing": {
+        "verify": "verify your identity",
+        "signature": "your signature",
+        "text": "fill in {field}",
+        "checkbox": "check {field}",
+        "consent": "agree to sign by electronic means"
+      },
+      "approvedToast": "{name} approved the document (simulated).",
+      "signedToast": "{name} signed the document (simulated).",
+      "approveButton": "Approve document",
+      "signButton": "Sign document",
+      "kinds": {
+        "draw": "drawn mark",
+        "type": "typed name",
+        "upload": "uploaded image",
+        "approve": "approval"
+      },
+      "padLabel": "How to sign",
+      "modes": {
+        "draw": "Draw",
+        "type": "Type",
+        "upload": "Upload image"
+      },
+      "drawArea": "Area to draw your signature",
+      "drawDone": "Signature drawn.",
+      "drawHint": "Draw your signature with the mouse, a pen or your finger.",
+      "clear": "Clear",
+      "typeLabel": "Type your name",
+      "uploadPick": "Choose an image of your signature",
+      "uploadHint": "PNG or JPG, up to {max}.",
+      "uploadType": "Only PNG or JPG images are accepted.",
+      "uploadBig": "The image is {size}; the maximum is 2 MB.",
+      "uploadedAlt": "Uploaded signature"
+    },
+    "dev": {
+      "title": "For developers",
+      "subtitle": "How the envelope would be created with a REST API and how the notice would reach your system. The code is built from the data of the envelope you choose.",
+      "pick": "Envelope",
+      "langLabel": "Language",
+      "langs": {
         "curl": "cURL",
         "ts": "TypeScript",
         "python": "Python"
       },
-      "embedTitle": "Embedded signing page preview",
-      "embedDesc": "Embed a clean signing screen inside your app via signed iframe.",
-      "openDocs": "Open documentation",
-      "copy": "Copy",
-      "copied": "Copied"
-    },
-    "redlines": {
-      "title": "Pre-signing negotiation",
-      "subtitle": "Comments and suggestion mode before signing.",
-      "suggestMode": "Suggestion mode",
-      "comments": "Comments",
-      "addComment": "Add comment",
-      "accept": "Accept",
-      "reject": "Reject"
+      "createLabel": "Create envelope (sample)",
+      "downloadJson": "Download envelope JSON",
+      "jsonDone": "{id}.json was downloaded.",
+      "webhookTitle": "Sample webhook",
+      "webhookHelp": "When the status changes, your system receives the “{event}” notice signed with HMAC-SHA256.",
+      "webhookLabel": "Notice your system would receive",
+      "hmacHelp": "The X-Signature was computed in your browser with the sample key “{secret}”; your server recomputes it to confirm the notice is authentic.",
+      "verifyLabel": "Verification in Node.js",
+      "embedTitle": "Signing inside your app",
+      "embedSubtitle": "Preview of how embedded signing would look in your portal or app.",
+      "embedOpen": "Open in the signer view",
+      "embedClosed": "This envelope no longer accepts signatures.",
+      "simNote": "Illustrative example: the API, the webhook and the (.example) addresses do not exist yet; they are built in your project. Nothing in this tab calls the internet."
     },
     "integrations": {
-      "title": "Native integrations",
-      "subtitle": "Connect your CRM, ATS or HRIS without writing code.",
+      "title": "Integrations",
+      "subtitle": "What we connect in your project to send, archive and look up signed documents.",
+      "notConnected": "Not connected in the demo",
+      "details": "See details",
+      "simNote": "No integration is connected in this demo: the cards describe what is implemented in your project.",
+      "whatItDoes": "What it does",
+      "buildNote": "It is implemented in your project with your accounts and credentials; provider costs (for example, WhatsApp messages) are paid directly by you.",
+      "ask": "Request a guided demo",
       "items": {
-        "salesforce": "Salesforce",
-        "hubspot": "HubSpot",
-        "pipedrive": "Pipedrive",
-        "workday": "Workday",
-        "greenhouse": "Greenhouse",
-        "bamboohr": "BambooHR",
-        "slack": "Slack",
-        "googleDrive": "Google Drive"
-      },
-      "connect": "Connect"
-    },
-    "signer": {
-      "title": "Signer view",
-      "subtitle": "Clean, distraction-free screen — mobile ready.",
-      "from": "From",
-      "subject": "Signature required",
-      "instructions": "Please review the document and complete the highlighted fields.",
-      "field": "Required field",
-      "signHere": "Sign here",
-      "typeName": "Type your name",
-      "draw": "Draw",
-      "type": "Type",
-      "upload": "Upload image",
-      "agree": "I accept the electronic terms and consent to sign this document.",
-      "continue": "Sign and continue",
-      "secured": "Secure session — TLS encryption and device binding"
+        "whatsapp": {
+          "name": "WhatsApp Business",
+          "short": "Sends the signing link, the code and reminders by WhatsApp.",
+          "does": [
+            "Sends the signing link with an approved message template.",
+            "Sends the verification code and the reminders.",
+            "Delivers the copy of the signed document."
+          ],
+          "inDemo": "In the demo: the WhatsApp channel is only recorded in the evidence; nothing is sent."
+        },
+        "m365": {
+          "name": "Microsoft 365 and SharePoint",
+          "short": "Archives signed documents in SharePoint or OneDrive.",
+          "does": [
+            "Saves the signed PDF and the certificate in the folder you define.",
+            "Names the files with the envelope ID and the date.",
+            "Lets you start an envelope from a SharePoint document."
+          ],
+          "inDemo": "In the demo: the sample PDFs are downloaded to your device."
+        },
+        "gdrive": {
+          "name": "Google Drive",
+          "short": "Archives signed documents in shared folders.",
+          "does": [
+            "Saves the signed PDF and the certificate in a shared folder.",
+            "Organizes the files by document type and by month."
+          ],
+          "inDemo": "In the demo: the sample PDFs are downloaded to your device."
+        },
+        "hrms": {
+          "name": "KopTup HRMS",
+          "short": "Contracts, addendums and clearance certificates come from the employee record.",
+          "does": [
+            "Generates the contract with the employee’s data.",
+            "Saves the signed document in the employee record.",
+            "Alerts HR when a signature is missing."
+          ],
+          "inDemo": "In the demo: the HR templates use variables you fill in by hand or with a CSV."
+        },
+        "docs": {
+          "name": "KopTup document manager",
+          "short": "Archive with search, versions and permissions for signed documents.",
+          "does": [
+            "Archives the document together with its evidence.",
+            "Lets you search by person, document type or date.",
+            "Controls who can see each document."
+          ],
+          "inDemo": "In the demo: the evidence of each envelope is in the “Evidence” tab."
+        },
+        "api": {
+          "name": "REST API and webhooks",
+          "short": "Create envelopes from your systems and get notices when they change.",
+          "does": [
+            "Creates envelopes and checks their status.",
+            "Sends HMAC-signed notices when an envelope is sent, signed, voided or expires.",
+            "Delivers the signed document and the certificate."
+          ],
+          "inDemo": "In the demo: the “For developers” tab shows the code and the notice with the envelope data."
+        },
+        "crm": {
+          "name": "CRM or ERP via API",
+          "short": "Send contracts and purchase orders from your CRM or ERP.",
+          "does": [
+            "Takes the customer or supplier data from your system.",
+            "Updates the record when the document is signed."
+          ],
+          "inDemo": "In the demo: the sample purchase order shows the kind of document that would come from an ERP."
+        }
+      }
     }
   }
 }
