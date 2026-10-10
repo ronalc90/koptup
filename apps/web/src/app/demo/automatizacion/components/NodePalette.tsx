@@ -1,161 +1,96 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import {
-  BoltIcon,
-  ClockIcon,
-  ArrowPathIcon,
-  FolderOpenIcon,
-  EnvelopeIcon,
-  CircleStackIcon,
-  GlobeAltIcon,
-  ChatBubbleLeftEllipsisIcon,
-  TableCellsIcon,
-  CreditCardIcon,
-  BuildingOffice2Icon,
-  SparklesIcon,
-  CpuChipIcon,
-  DocumentMagnifyingGlassIcon,
-  EyeIcon,
-  MicrophoneIcon,
-  CommandLineIcon,
-  FunnelIcon,
-  ArrowsRightLeftIcon,
-  ArrowUturnLeftIcon,
-  PauseIcon,
-  Squares2X2Icon,
-  CodeBracketIcon,
-  ChevronDownIcon,
-  ChevronRightIcon,
-  MagnifyingGlassIcon,
-} from '@heroicons/react/24/outline';
+import { ChevronDownIcon, ChevronRightIcon, MagnifyingGlassIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { CATEGORIES, STEP_TYPES, TYPE_DEFS, typeKey } from '../lib/catalog';
+import { normalize } from '../lib/engine';
+import type { Category, StepType } from '../lib/types';
+import { TYPE_ICONS } from './icons';
+import { focusRing } from './ui';
 
-type CategoryKey = 'triggers' | 'actions' | 'ai' | 'logic' | 'code';
-
-interface PaletteItem {
-  id: string;
-  category: CategoryKey;
-  icon: React.ComponentType<{ className?: string }>;
-}
-
-const ITEMS: PaletteItem[] = [
-  { id: 'webhook', category: 'triggers', icon: BoltIcon },
-  { id: 'schedule', category: 'triggers', icon: ClockIcon },
-  { id: 'polling', category: 'triggers', icon: ArrowPathIcon },
-  { id: 'fileWatch', category: 'triggers', icon: FolderOpenIcon },
-  { id: 'emailIn', category: 'triggers', icon: EnvelopeIcon },
-  { id: 'dbCdc', category: 'triggers', icon: CircleStackIcon },
-
-  { id: 'http', category: 'actions', icon: GlobeAltIcon },
-  { id: 'slack', category: 'actions', icon: ChatBubbleLeftEllipsisIcon },
-  { id: 'email', category: 'actions', icon: EnvelopeIcon },
-  { id: 'sheets', category: 'actions', icon: TableCellsIcon },
-  { id: 'stripe', category: 'actions', icon: CreditCardIcon },
-  { id: 'salesforce', category: 'actions', icon: BuildingOffice2Icon },
-
-  { id: 'llm', category: 'ai', icon: SparklesIcon },
-  { id: 'embedding', category: 'ai', icon: CpuChipIcon },
-  { id: 'rag', category: 'ai', icon: DocumentMagnifyingGlassIcon },
-  { id: 'vision', category: 'ai', icon: EyeIcon },
-  { id: 'stt', category: 'ai', icon: MicrophoneIcon },
-  { id: 'structured', category: 'ai', icon: CommandLineIcon },
-
-  { id: 'filter', category: 'logic', icon: FunnelIcon },
-  { id: 'switch', category: 'logic', icon: ArrowsRightLeftIcon },
-  { id: 'loop', category: 'logic', icon: ArrowUturnLeftIcon },
-  { id: 'merge', category: 'logic', icon: Squares2X2Icon },
-  { id: 'wait', category: 'logic', icon: PauseIcon },
-  { id: 'subflow', category: 'logic', icon: Squares2X2Icon },
-
-  { id: 'js', category: 'code', icon: CodeBracketIcon },
-  { id: 'python', category: 'code', icon: CodeBracketIcon },
-  { id: 'transform', category: 'code', icon: ArrowsRightLeftIcon },
-];
-
-const CATEGORIES: CategoryKey[] = ['triggers', 'actions', 'ai', 'logic', 'code'];
+export const DRAG_NEW = 'application/x-koptup-new-step';
 
 interface Props {
-  onOpenCode: () => void;
+  onAdd: (type: StepType) => void;
+  disabled?: boolean;
 }
 
-export default function NodePalette({ onOpenCode }: Props) {
-  const t = useTranslations('demoAutomation.palette');
+export default function NodePalette({ onAdd, disabled }: Props) {
+  const t = useTranslations('demoAutomation');
   const [search, setSearch] = useState('');
-  const [expanded, setExpanded] = useState<Record<CategoryKey, boolean>>({
-    triggers: true,
-    actions: true,
-    ai: true,
-    logic: false,
-    code: false,
-  });
+  const [collapsed, setCollapsed] = useState<Record<Category, boolean>>({ triggers: false, ai: false, apps: false, notify: false, logic: false, code: false });
 
   const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return ITEMS;
-    return ITEMS.filter((i) => t(`items.${i.id}`).toLowerCase().includes(q));
+    const q = normalize(search);
+    if (!q) return STEP_TYPES;
+    return STEP_TYPES.filter((type) => normalize(`${t(`types.${typeKey(type)}.name`)} ${t(`types.${typeKey(type)}.desc`)}`).includes(q));
   }, [search, t]);
 
-  const toggle = (c: CategoryKey) =>
-    setExpanded((p) => ({ ...p, [c]: !p[c] }));
-
   return (
-    <div className="flex flex-col h-full">
-      <div className="px-3 py-2 border-b border-secondary-800">
-        <h3 className="text-xs font-semibold text-secondary-300 uppercase tracking-wider mb-2">
-          {t('title')}
-        </h3>
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="border-b border-secondary-800 px-3 py-2">
+        <h2 className="mb-1 text-xs font-semibold uppercase tracking-wider text-secondary-300">{t('palette.title')}</h2>
+        <p className="mb-2 text-[11px] leading-snug text-secondary-500">{t('palette.hint')}</p>
         <div className="relative">
-          <MagnifyingGlassIcon className="h-3.5 w-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-secondary-500" />
+          <MagnifyingGlassIcon className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-secondary-500" />
           <input
+            type="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder={t('searchPlaceholder')}
-            className="w-full pl-8 pr-2 py-1.5 text-xs bg-secondary-900 border border-secondary-800 rounded-md text-secondary-200 placeholder-secondary-600 focus:outline-none focus:ring-1 focus:ring-primary-500"
+            placeholder={t('palette.searchPlaceholder')}
+            aria-label={t('palette.searchPlaceholder')}
+            className="w-full rounded-md border border-secondary-800 bg-secondary-900 py-1.5 pl-8 pr-2 text-xs text-secondary-200 placeholder-secondary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
           />
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-2 py-2 space-y-2">
+      <div className="min-h-0 flex-1 space-y-2 overflow-y-auto px-2 py-2">
+        {filtered.length === 0 && <p className="px-2 py-4 text-center text-xs text-secondary-500">{t('palette.noResults')}</p>}
         {CATEGORIES.map((cat) => {
-          const items = filtered.filter((i) => i.category === cat);
-          if (items.length === 0 && search) return null;
-          const open = expanded[cat] || !!search;
+          const items = filtered.filter((type) => TYPE_DEFS[type].category === cat);
+          if (items.length === 0) return null;
+          const open = !collapsed[cat] || !!search;
           return (
             <div key={cat}>
               <button
-                onClick={() => toggle(cat)}
-                className="w-full flex items-center gap-1.5 px-2 py-1 text-xs font-semibold text-secondary-400 hover:text-secondary-200 uppercase tracking-wider"
+                type="button"
+                onClick={() => setCollapsed((p) => ({ ...p, [cat]: !p[cat] }))}
+                aria-expanded={open}
+                className={`flex w-full items-center gap-1.5 rounded px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-secondary-400 hover:text-secondary-200 ${focusRing}`}
               >
-                {open ? (
-                  <ChevronDownIcon className="h-3 w-3" />
-                ) : (
-                  <ChevronRightIcon className="h-3 w-3" />
-                )}
-                {t(`categories.${cat}`)}
-                <span className="ml-auto text-secondary-600 normal-case">
-                  {items.length}
-                </span>
+                {open ? <ChevronDownIcon className="h-3 w-3" /> : <ChevronRightIcon className="h-3 w-3" />}
+                <span className="truncate">{t(`palette.categories.${cat}`)}</span>
+                <span className="ml-auto normal-case text-secondary-500">{items.length}</span>
               </button>
               {open && (
-                <div className="mt-1 space-y-0.5">
-                  {items.map((it) => {
-                    const Icon = it.icon;
-                    const isCode = it.category === 'code';
+                <ul className="mt-1 space-y-0.5">
+                  {items.map((type) => {
+                    const Icon = TYPE_ICONS[type];
                     return (
-                      <button
-                        key={it.id}
-                        type="button"
-                        onClick={isCode ? onOpenCode : undefined}
-                        draggable
-                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-secondary-300 hover:bg-secondary-800 hover:text-white cursor-grab active:cursor-grabbing transition-colors"
-                      >
-                        <Icon className="h-3.5 w-3.5 text-secondary-400" />
-                        <span className="truncate">{t(`items.${it.id}`)}</span>
-                      </button>
+                      <li key={type}>
+                        <button
+                          type="button"
+                          disabled={disabled}
+                          onClick={() => onAdd(type)}
+                          draggable={!disabled}
+                          onDragStart={(e) => {
+                            e.dataTransfer.setData(DRAG_NEW, type);
+                            e.dataTransfer.setData('text/plain', type);
+                            e.dataTransfer.effectAllowed = 'copy';
+                          }}
+                          title={t(`types.${typeKey(type)}.desc`)}
+                          className={`group flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs text-secondary-300 transition-colors hover:bg-secondary-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-50 ${focusRing}`}
+                        >
+                          <Icon className="h-3.5 w-3.5 shrink-0 text-secondary-400" />
+                          <span className="min-w-0 flex-1 truncate">{t(`types.${typeKey(type)}.name`)}</span>
+                          <PlusIcon className="h-3 w-3 shrink-0 text-secondary-600 group-hover:text-primary-300" aria-hidden />
+                          <span className="sr-only">{t('palette.addSr')}</span>
+                        </button>
+                      </li>
                     );
                   })}
-                </div>
+                </ul>
               )}
             </div>
           );

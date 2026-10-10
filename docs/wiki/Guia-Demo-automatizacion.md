@@ -1,249 +1,264 @@
-# Guía de la demo: Plataforma de Automatización
+# Guía de la demo: Automatización de procesos
 
-> Ruta `/demo/automatizacion` · Modo de acceso: **Abierta** · Tipo: **datos de ejemplo** (prototipo visual: todo corre en el navegador; no llama al servidor, no ejecuta ningún flujo ni usa IA) · Plan del producto: [Automatización de procesos con IA](Producto-automatizacion-workflows.md)
+> Ruta `/demo/automatizacion` · Modo de acceso: **Abierta** · Tipo: **datos de ejemplo con motor real en el navegador** (los flujos se ejecutan de verdad paso a paso sobre eventos de ejemplo; los conectores y la «IA» son simulados; no hay servidor) · Plan del producto: [Automatización de procesos con IA](Producto-automatizacion-workflows.md)
 
-**Resumen.** Es la maqueta de un editor de flujos al estilo n8n o Zapier: un flujo de ejemplo («Onboarding cliente PRO») de siete nodos conectados, una paleta de 27 tipos de nodo, un inspector para configurar cada nodo, el historial de ejecuciones, cuotas del plan, versiones, alertas con cola de mensajes fallidos (DLQ), plantillas, un editor de código y un SDK. Sirve para mostrarle a un equipo de operaciones o de ventas **cómo se vería** automatizar un proceso con pasos de IA. El botón **Ejecutar workflow** anima el flujo y agrega una corrida al historial, pero no ejecuta nada real; muchos botones secundarios no hacen nada y la demo no lleva rótulo de «Datos de ejemplo».
+**Resumen.** Es un editor de flujos que funciona: una distribuidora ficticia («Distribuciones Nogal Andino S.A.S.», NIT 901.345.678-2) tiene tres procesos automatizados (**facturas de proveedores al software contable**, **cobranza de cartera vencida** y **leads del sitio web al CRM**) y se puede ejecutar cada uno con eventos de ejemplo, ver cada paso con sus datos de entrada y salida, editar el flujo (agregar pasos con clic o arrastrando, moverlos, borrarlos, configurarlos), resolver los casos que quedan **para revisar**, guardar y restaurar versiones, crear flujos desde plantillas, correr código JavaScript aislado y exportar el historial (CSV) o el flujo (JSON). Todo queda guardado en el navegador. La demo lo dice con los rótulos **Datos de ejemplo** y **Conectores e IA simulados** y con el desplegable **¿Qué es real y qué es simulado?**.
 
-**En esta página:** [Recorrido sugerido](#recorrido-sugerido-demo-comercial-de-5-minutos) · [Pantallas y funciones](#pantallas-y-funciones) · [Qué es real y qué es simulado](#qué-es-real-y-qué-es-simulado) · [Acceso](#acceso) · [Limitaciones conocidas](#limitaciones-conocidas)
+**En esta página:** [Recorrido sugerido](#recorrido-sugerido-demo-comercial-de-5-minutos) · [Pantallas y funciones](#pantallas-y-funciones) · [Datos de ejemplo](#datos-de-ejemplo) · [Qué es real y qué es simulado](#qué-es-real-y-qué-es-simulado) · [Acceso](#acceso) · [Limitaciones conocidas](#limitaciones-conocidas)
 
 ![Vista general](images/doc/demos/automatizacion/00-general.jpg)
 
-*Vista inicial a 1440 px: paleta de nodos a la izquierda, lienzo con el flujo en el centro, inspector del nodo «Resumen IA» a la derecha y, abajo, las tarjetas de uso, versiones y alertas y el historial de ejecuciones.*
+*Vista inicial a 1440 px: franja con «Volver a demos» y los rótulos, barra del editor, paleta de pasos a la izquierda, el flujo «Facturas de proveedores» en el lienzo, la configuración del paso elegido a la derecha y, abajo, las tarjetas de uso, versiones y casos para revisar y el historial de ejecuciones.*
 
 ---
 
 ## Recorrido sugerido (demo comercial de 5 minutos)
 
-La demo no trae guion propio ni insignia de «Datos de ejemplo», así que conviene **decirlo al empezar**: «Es una maqueta navegable; los datos, las corridas y las respuestas son de ejemplo. Lo que ven es el tipo de herramienta que montaríamos con sus sistemas». La historia que se cuenta es la de un cliente que compra el plan PRO: llega un aviso (webhook), se filtra, se enriquece con datos de la empresa, la IA lo resume, se avisa al equipo de ventas por Slack y se asigna un gerente de cuenta.
+La historia: a la distribuidora le llegan por correo las facturas electrónicas de sus proveedores. El flujo las lee, las compara con la orden de compra, las registra como cuenta por pagar y avisa a tesorería. Lo que no cuadra no se pierde: queda en **Para revisar** para que una persona decida.
 
 ![Recorrido de la demo](images/doc/demos/automatizacion/recorrido.gif)
 
-*Recorrido completo en seis cuadros: el flujo, la ejecución animada, el historial, la prueba de un nodo, las plantillas y las alertas.*
+*Recorrido completo en seis cuadros: el flujo, la ejecución, el detalle de la corrida, la excepción, la revisión del caso y el cambio de la regla.*
 
 ```mermaid
 flowchart LR
-    T["Webhook trigger (POST /hooks/onboarding)"] --> F["Filter (plan PRO)"]
-    F --> H["Enriquecer cliente (HTTP)"]
-    H --> L["Resumen IA (LLM)"]
-    L --> X["Transform (al esquema del CRM)"]
-    X --> S["Slack notify (#ventas-pro)"]
-    S --> W["Sub-workflow (Asignar CSM)"]
+    T["Correo de facturas<br/>(disparador)"] --> L["Leer factura<br/>(IA simulada)"]
+    L -->|"confianza ≥ 80 %"| B["Buscar orden de compra<br/>(hoja de ejemplo)"]
+    L -.->|"confianza baja"| R["Para revisar"]
+    B --> C{"¿Coincide con la orden?<br/>tolerancia 1 %"}
+    B -.->|"sin orden"| R
+    C -->|"sí"| P["Registrar cuenta por pagar<br/>(software contable simulado)"]
+    C -.->|"no"| R
+    P --> A["Avisar a tesorería<br/>(chat simulado)"]
+    R -->|"Aprobar y continuar"| P
 ```
 
-*Orden en que la demo anima los nodos. Ojo: en el lienzo la segunda fila se lee al revés (ver la [limitación 4](#limitaciones-conocidas)).*
+*El flujo «Facturas de proveedores» como lo ejecuta la demo. Las líneas punteadas son los casos que van a revisión.*
 
-### Paso 1. Presenta el flujo de ejemplo
+### Paso 1. Presenta el flujo
 
-Al abrir la demo ya está seleccionado el nodo **Resumen IA**. Recorre el lienzo de izquierda a derecha en la fila de arriba y de derecha a izquierda en la de abajo.
+Al abrir la demo está activo el flujo **Facturas de proveedores** y elegido el paso **Leer factura**. El lienzo se lee como una serpiente: la primera fila de izquierda a derecha, la segunda de derecha a izquierda, siempre siguiendo las flechas.
 
 ![Paso 1: el flujo de ejemplo](images/doc/demos/automatizacion/01-paso1-flujo.jpg)
 
-*El flujo «Onboarding cliente PRO» con sus siete nodos y el inspector abierto.*
+*El flujo de seis pasos con el inspector abierto en «Leer factura».*
 
-1. **Nombre del workflow**: «Plataforma de Automatización · Workflow · Onboarding cliente PRO».
-2. **Disparador**: «Webhook trigger», que recibe un `POST /hooks/onboarding`.
-3. **Nodo seleccionado**: «Resumen IA» (GPT-4o), con borde resaltado. Cada nodo muestra un punto gris mientras no se ha ejecutado.
-4. **Inspector** («Configuración»): los parámetros del nodo elegido, en cuatro pestañas.
-5. **Ejecutar workflow**: lanza la simulación del paso 2.
+1. **Flujo**: menú para cambiar entre los tres flujos de ejemplo (y los que crees), renombrar, duplicar o eliminar.
+2. **Ejemplo para ejecutar**: los eventos de ejemplo del disparador (aquí, cuatro facturas que llegan por correo).
+3. **Ejecutar**: corre el flujo con el ejemplo elegido.
+4. **Condición**: «¿Coincide con la orden?» con su rama **Si no: revisión**.
+5. **Configuración** del paso elegido, en cuatro pestañas: Parámetros, Credencial, Reintentos y Probar.
 
-Qué decir: «Cada caja es un paso; las líneas son el camino que siguen los datos».
+Qué decir: «Cada caja es un paso; la flecha es el camino de los datos. Las cajas marcadas como *Simulado* son conectores que en tu proyecto se conectan a tus sistemas».
 
-### Paso 2. Ejecuta el workflow
+### Paso 2. Ejecuta con la factura que cuadra
 
-Pulsa **Ejecutar workflow**. Los nodos se encienden uno tras otro (medio segundo cada uno, unos 3,6 segundos en total) y las líneas por las que ya pasaron los datos se pintan de azul con un punto que se mueve.
+Deja elegida **FE-5521 de Químicos La Sabana (cuadra)** y pulsa **Ejecutar**.
 
 ![Paso 2: ejecución en curso](images/doc/demos/automatizacion/02-paso2-ejecucion.jpg)
 
-*A mitad de la ejecución: tres nodos terminados y «Resumen IA» en curso.*
+*A mitad de la ejecución: los pasos terminados con ✓ y el que está en curso parpadeando.*
 
-1. **Ejecutando...**: el botón queda bloqueado hasta que termina la animación.
-2. **Paso terminado**: el punto gris cambia por una marca verde (✓).
-3. **Paso en curso**: el nodo parpadea y muestra un ícono que gira.
+1. **Ejecutar** se convierte en **Detener** mientras corre (detiene la ejecución en el paso en que vaya y la registra como «Detenida»).
+2. **Paso terminado**: marca verde y la flecha recorrida en azul.
+3. **Paso en curso**: ícono que gira.
 
-Qué decir: «Así se ve en vivo por dónde va cada caso». Es una animación: no se llama a ningún servicio.
+Al terminar aparece un aviso («run-0009: Exitosa: 6 pasos») y la corrida queda arriba del historial. El motor de verdad leyó el XML, buscó la orden OC-2026-0141 en la hoja de ejemplo, comparó $ 2.618.000 contra $ 2.618.000, generó la cuenta por pagar **CxP-2026-00414** (el consecutivo sigue a las dos facturas de ejemplo ya registradas hoy) y armó el mensaje a tesorería con esos datos. Los tiempos de cada paso son simulados.
 
 ### Paso 3. Revisa la corrida en Ejecuciones
 
-Al terminar, todos los nodos quedan con ✓ y aparece una fila nueva arriba del historial. Pulsa **Ver detalle** en esa fila.
+La corrida nueva se abre sola. Pulsa el ojo de **Leer factura**.
 
-![Paso 3: la corrida nueva en el historial](images/doc/demos/automatizacion/03-paso3-ejecuciones.jpg)
+![Paso 3: la corrida en el historial](images/doc/demos/automatizacion/03-paso3-ejecuciones.jpg)
 
-*La corrida nueva («manual run») abierta con sus siete pasos y la duración de cada uno.*
+*La corrida nueva abierta con sus pasos y los datos de entrada y salida de «Leer factura».*
 
-1. **Corrida nueva**: un identificador al azar (`run_` más cuatro caracteres), la hora de tu equipo, una duración de entre 1.600 y 2.299 ms, el estado **Exitoso** y el origen «manual run». Llega cerrada: hay que pulsar **Ver detalle**.
-2. **Contador**: pasa de «4 runs» a «5 runs» (suma una por cada ejecución).
-3. **Nodos en ✓**: quedan así hasta la siguiente ejecución, que los vuelve a poner en gris.
+1. **Corrida**: identificador consecutivo, hora (Colombia), duración (la suma de sus pasos), estado, origen (Manual, Automática, Reintento, Aprobación o Repetición) y versión del flujo.
+2. **Repetir con el mismo ejemplo**: vuelve a ejecutar el flujo actual con ese evento.
+3. **Paso**: estado, barra proporcional a su duración, milisegundos y el mensaje de lo que hizo; el ojo muestra la **entrada** y la **salida** en JSON.
+4. **Filtro por estado**: Todas, Exitosa, Exitosa con reintento, En revisión, Fallida, Sin acción y Detenida (con el conteo de cada una).
+5. **Exportar CSV**: descarga las corridas filtradas del flujo.
 
-Debajo de la fila abierta se ve cada paso con su ícono de estado, una barra proporcional a su duración y los milisegundos. Las duraciones de los pasos son al azar y no suman la duración total.
+Qué decir: «Cada ejecución deja rastro: qué entró, qué salió y cuánto tardó cada paso».
 
-### Paso 4. Prueba un nodo en el inspector
+### Paso 4. Ejecuta la factura que no cuadra
 
-Haz clic en el nodo **Enriquecer cliente**, abre la pestaña **Test** y pulsa **Ejecutar paso**.
+Elige **FE-10234 de Papeles del Valle (no cuadra)** y pulsa **Ejecutar**. Luego elige la condición y, en **Probar**, pulsa **Probar este paso** con el mismo ejemplo.
 
-![Paso 4: prueba de un nodo](images/doc/demos/automatizacion/04-paso4-inspector.jpg)
+![Paso 4: la excepción](images/doc/demos/automatizacion/04-paso4-excepcion.jpg)
 
-*El nodo «Enriquecer cliente» elegido y su respuesta de ejemplo en la pestaña Test.*
+*La factura de $ 4.284.000 contra una orden de $ 3.998.400: la condición no se cumple y el caso va a revisión.*
 
-1. **Nodo elegido**: el borde se resalta y el inspector cambia de título.
-2. **Pestañas**: Parámetros, Auth, Retries y Test (descritas en [Inspector](#inspector-del-nodo)).
-3. **Ejecutar paso**: muestra «⏳ running…» unos 0,7 segundos.
-4. **Respuesta de ejemplo**: un JSON fijo para cada tipo de nodo; para este, la empresa «Empresa SA», sector «SaaS», 142 empleados y puntaje 87.
+1. **Condición** con ícono de advertencia: ahí se detuvo la ejecución.
+2. **Rama «Si no: revisión»** resaltada.
+3. **Probar**: corre los pasos anteriores y la condición sin dejar rastro en el historial, y dice por qué no se cumple («diferencia de 7,1 %»), con la entrada y la salida del paso.
+4. **Para revisar**: el contador sube a 4 casos abiertos.
 
-Qué decir: «Cada paso se puede probar solo, sin correr todo el flujo». Si cambias de nodo, la respuesta anterior se queda en pantalla hasta que vuelvas a pulsar **Ejecutar paso** (ver las limitaciones).
+### Paso 5. Resuelve el caso en «Para revisar»
 
-### Paso 5. Muestra las plantillas
+Pulsa **Revisar casos (4)**.
 
-Pulsa **Plantillas** en la barra superior.
+![Paso 5: casos para revisar](images/doc/demos/automatizacion/05-paso5-revisar.jpg)
 
-![Paso 5: marketplace de plantillas](images/doc/demos/automatizacion/05-paso5-plantillas.jpg)
+*La ventana con las excepciones y los fallos de todos los flujos.*
 
-*Marketplace con seis flujos listos y el filtro por categoría.*
+1. **Caso**: tipo (Excepción o Fallo), flujo (el nombre lleva al flujo), paso, corrida, motivo y ejemplo.
+2. **Aprobar y continuar**: retoma el flujo desde el paso siguiente a la condición con los mismos datos; se crea una corrida nueva («Aprobación de run-0010») y el caso pasa a **Cerrados** como «resuelto con run-0011».
+3. **Marcar como atendido** (alguien lo resolvió a mano) y **Descartar**.
+4. **Dato que falta**: en el fallo de cobranza del Hotel Brisas del Lago, que no tiene celular, se escribe uno válido (por ejemplo, 3005550199) y **Reintentar** termina el envío. Con un número inválido vuelve a fallar y el caso sigue abierto.
+5. **Cerrados**: los casos resueltos o descartados, con cuándo y cómo.
 
-1. **Categorías**: Todas, Ventas, Operaciones, IA, Datos y Marketing. Filtran las tarjetas; **Marketing** queda vacía.
-2. **Plantilla**: nombre, descripción y número de instalaciones (de ejemplo).
-3. **Usar plantilla**: **no hace nada**.
+Qué decir: «La IA y las reglas hacen el trabajo repetitivo; las excepciones llegan a una persona, que decide».
 
-Para cerrar: la X, un clic fuera de la ventana o la tecla Escape.
+### Paso 6. Ajusta la regla y guarda una versión
 
-### Paso 6. Cierra con las alertas y la cola de errores
+Elige la condición, sube la **Tolerancia** a 10 y vuelve a ejecutar la factura FE-10234: ahora pasa. Guarda el cambio como versión.
 
-En la tarjeta **Alertas y DLQ** pulsa **Reprocesar**.
+![Paso 6: cambio de regla y versión](images/doc/demos/automatizacion/06-paso6-version.jpg)
 
-![Paso 6: alertas y DLQ](images/doc/demos/automatizacion/06-paso6-alertas.jpg)
+*La tolerancia en 10 %, el aviso de cambios sin guardar y el historial de versiones.*
 
-*Ventana «Alertas y DLQ» con tres mensajes fallidos de ejemplo.*
+1. **Tolerancia (%)**: el motor usa este valor en la siguiente ejecución.
+2. **Cambios sin guardar**: el flujo ya no es igual a la última versión (las corridas quedan como «borrador»).
+3. **Guardar versión**: pide una nota y crea la versión v4.
+4. **Historial de versiones**: cada versión con nota, autor y fecha; **Restaurar** devuelve el lienzo a esa versión (con confirmación).
 
-1. **Mensaje en la DLQ**: identificador, nodo donde falló y el error (tiempo de espera agotado, límite de peticiones 429 y JSON inválido).
-2. **Reprocesar** de cada mensaje: **no hace nada**.
-3. **Purgar**: **no hace nada**.
-
-Qué decir: «Lo que falla no se pierde: queda en una cola para revisarlo y reintentarlo». Se cierra con **Cerrar**, la X o un clic fuera; la tecla Escape no la cierra. Termina mostrando el bloque azul del final de la página (**Solicitar demo guiada**).
+Cierra con el bloque azul del final de la página (**Solicitar demo guiada**): «¿Qué proceso te quita más tiempo? Lo armamos con tus sistemas».
 
 ---
 
 ## Pantallas y funciones
 
-La demo es una sola pantalla de tres columnas, más cuatro ventanas emergentes (plantillas, alertas, editor de código y SDK).
+La demo es una sola pantalla con paleta, lienzo e inspector, más ventanas para casos, plantillas, código, JSON y confirmaciones. Todas se cierran con la X, con **Cancelar** o con la tecla Escape.
 
-### Barra superior
+### Franja superior y barra del editor
 
-![Entorno, modo de despliegue y tarjetas](images/doc/demos/automatizacion/07-entorno-y-tarjetas.jpg)
-
-*Con el menú de entorno abierto: solo se alcanza a ver la opción «dev»; el resto queda detrás del lienzo.*
-
-| Número | Elemento | Qué hace |
-|---|---|---|
-| 1 | **Entorno** (`dev · v3`) | Abre un menú con dev, staging y prod y **Promover a prod**. Cambiar de entorno solo cambia el color del punto (verde, ámbar o rojo) y el texto. En escritorio el menú queda **detrás del lienzo**: solo se ve «dev» y no se puede elegir otra opción con el mouse. **Promover a prod** no hace nada. La versión «v3» es fija. |
-| 2 | **Cloud / Self-hosted** | Interruptor que solo cambia su ícono y su texto. No cambia nada más. |
-| — | **Plantillas** | Abre el marketplace ([paso 5](#paso-5-muestra-las-plantillas)). |
-| — | **Ejecutar workflow** | Anima el flujo y agrega una corrida ([paso 2](#paso-2-ejecuta-el-workflow)). |
-
-### Paleta de nodos
-
-Columna izquierda con buscador y cinco categorías (Lógica y Código empiezan cerradas; un clic en el título las abre o cierra):
-
-| Categoría | Nodos |
+| Elemento | Qué hace |
 |---|---|
-| Triggers (6) | Webhook, Schedule (cron), Polling HTTP, File watch, Email entrante, DB CDC |
-| Acciones (6) | HTTP Request, Slack notify, Enviar email, Google Sheets, Stripe charge, Salesforce |
-| IA (6) | LLM call, Embedding, RAG retrieval, Visión IA, Speech to text, Structured output |
-| Lógica (6) | Filter, Switch, Loop, Merge, Wait, Sub-workflow |
-| Código (3) | JavaScript, Python, Transform |
+| **Volver a demos** | Lleva al catálogo `/demo`. |
+| **Datos de ejemplo** · **Conectores e IA simulados** | Rótulos fijos. |
+| **¿Qué es real y qué es simulado?** | Despliega tres columnas: lo real, lo simulado y el recorrido sugerido. |
+| **Restablecer demo** | Con confirmación, borra lo guardado y vuelve a los datos de ejemplo del día. |
+| **Flujo: …** | Menú con tus flujos (con su número de pasos), **Renombrar**, **Duplicar**, **Nuevo desde plantilla…** y **Eliminar flujo** (con confirmación; no deja eliminar el último). Se maneja con el teclado (flechas y Escape). |
+| **Guardado como vN / Cambios sin guardar** | Estado del flujo frente a su última versión. |
+| **Guardar versión** | Igual que en la tarjeta de versiones. |
+| **Plantillas** | Abre las [plantillas](#plantillas). |
+| **Ejemplo** + **Ejecutar** / **Detener** | Ejecuta el flujo con un evento de ejemplo del disparador. |
 
-- **Buscar nodo...** filtra por nombre y oculta las categorías sin resultados.
-- Los nodos de **Código** abren el [editor de código](#editor-de-código). **Los demás no hacen nada** al hacer clic, y aunque el cursor sugiere que se pueden arrastrar, el lienzo no acepta nodos nuevos.
+### Paleta de pasos
+
+Veinte tipos de paso en seis grupos, con buscador. **Un clic** agrega el paso después del elegido; también se puede **arrastrar** al lienzo (aparece un punto azul donde quedará). Los disparadores reemplazan al del flujo, con confirmación, porque un flujo tiene uno solo.
+
+| Grupo | Pasos | Qué hacen en la demo |
+|---|---|---|
+| Disparadores | Correo entrante, Formulario web, Programación, Mensaje de WhatsApp | Entregan el evento de ejemplo elegido (simulados). |
+| IA (simulada) | Leer factura, Clasificar mensaje, Redactar texto, Preguntar al asistente | Reglas fijas: lectura del XML con confianza calculada, clasificación por palabras clave, plantilla con datos y búsqueda en cuatro políticas de ejemplo con su fuente. |
+| Sistemas (simulados) | Buscar en hoja de cálculo, Registrar en software contable, Crear contacto en el CRM, Crear enlace de pago, Llamada HTTP | Buscan en las hojas de ejemplo o validan los datos y devuelven un resultado de ejemplo (número de documento, contacto, enlace `pagos.example`, eco HTTP). No salen del navegador. |
+| Avisos (simulados) | Enviar mensaje (WhatsApp o chat del equipo), Enviar correo | Arman el mensaje final con los datos y validan el celular o el correo; no envían nada. |
+| Lógica | Condición (si / si no), Esperar, Asignar por regla | Comparan valores (igual, distinto, mayor, menor, aproximadamente igual con tolerancia, contiene, tiene valor), registran la espera sin esperar y eligen responsable con una tabla «valor = responsable». |
+| Código | Código JavaScript, Mapear campos | Ejecutan código propio en un Worker aislado o arman un objeto con «nombre = {{campo}}». |
 
 ### Lienzo
 
-El flujo fijo de siete nodos (ver el [diagrama](#recorrido-sugerido-demo-comercial-de-5-minutos)). Cada nodo muestra nombre, detalle técnico y un estado (punto gris en espera, ícono que gira en curso, ✓ terminado). Un clic elige el nodo y lo abre en el inspector. No se pueden mover, agregar, borrar ni conectar nodos; tampoco hay zoom. Abajo a la izquierda, el texto «Pulsa Ejecutar para simular el flujo».
+- Las flechas siguen el orden de ejecución y nunca cruzan un nodo; en el celular los pasos quedan en una sola columna.
+- Cada nodo muestra nombre, número y tipo, el rótulo **Simulado** si es un conector o IA, y su estado en la última ejecución: en espera, ejecutando, listo, reintentando, falló, en revisión, terminó aquí o detenido.
+- Las condiciones muestran su rama **Si no: revisión** o **Si no: termina**, que se resalta cuando se toma.
+- Un clic elige el paso; se puede **arrastrar** un paso para cambiarlo de lugar y **Supr** lo elimina (con **Deshacer** en el aviso). El disparador no se mueve ni se borra.
 
-### Inspector del nodo
+### Inspector del paso
 
-Columna derecha («Configuración») con el nombre del nodo y cuatro pestañas. Los campos se pueden escribir, pero **no se guardan**: no hay botón de guardar y al cambiar de pestaña vuelven a su valor de ejemplo.
-
-| Pestaña | Qué muestra |
+| Pestaña | Qué tiene |
 |---|---|
-| **Parámetros** | Nombre y los campos del tipo de nodo (tabla siguiente). |
-| **Auth** | Proveedor (OAuth2, API Key, Basic o Secret manager), credencial `prod_clearbit_v2` y la nota «Credenciales cifradas (KMS). Rotación automática cada 90 días». Es igual para todos los nodos. |
-| **Retries** | Reintentos (5), backoff exponencial o lineal, cola `dlq:onboarding-failed`, a quién alertar (`@oncall-platform`) y un dibujo de esperas crecientes (1, 2, 4, 8 y 16 s). Igual para todos los nodos. |
-| **Test** | **Ejecutar paso** y la respuesta de ejemplo del nodo ([paso 4](#paso-4-prueba-un-nodo-en-el-inspector)). |
+| **Parámetros** | Qué hace el paso en la demo y en un proyecto real, su nombre y sus campos (con plantillas `{{campo}}`), los **Datos disponibles en este paso** (los que llegaron en la última ejecución) y **Antes**, **Después**, **Duplicar** y **Eliminar**. Todo cambio se guarda al instante y lo usa la siguiente ejecución. |
+| **Credencial** | Credencial de ejemplo del conector (no hay secretos). Sin credencial, el paso falla al ejecutarse. |
+| **Reintentos** | Reintentos (0 a 5), primera espera (1, 2, 5 o 10 s) y crecimiento exponencial o lineal, con el dibujo de las esperas. Si se agotan, la corrida falla y el caso queda para revisar. |
+| **Probar** | Corre el flujo hasta ese paso con un ejemplo y muestra el resultado, la entrada y la salida, sin guardar la corrida. |
 
-| Nodo | Campos en Parámetros |
-|---|---|
-| Webhook trigger | path `/hooks/onboarding`, método POST o PUT |
-| Filter | condición `$.body.plan === 'PRO'` |
-| Enriquecer cliente | método (GET, POST, PUT, DELETE), URL de un servicio de enriquecimiento de empresas, encabezado con un secreto de ejemplo (`{{secrets.CLEARBIT}}`) |
-| Resumen IA | modelo (gpt-4o, claude-sonnet-4 o llama-3.1-70b), temperatura 0.2 y el prompt «Resume al cliente … en 2 frases y recomienda siguiente acción» |
-| Transform | el mapeo de campos (`name`, `tier`, `owner_id`) |
-| Slack notify | canal `#ventas-pro` y mensaje «Nuevo cliente PRO: {{llm.summary}}» |
-| Sub-workflow | referencia `wf_assign_csm@v3` |
+![Pestaña Reintentos](images/doc/demos/automatizacion/10-inspector-retries.jpg)
 
-![Pestaña Retries](images/doc/demos/automatizacion/10-inspector-retries.jpg)
+*Reintentos de «Avisar a tesorería».*
 
-*Pestaña Retries del nodo «Enriquecer cliente».*
+1. **Reintentos**.
+2. **Primera espera**.
+3. **Crecimiento de la espera**.
+4. **Esperas** antes de cada reintento (por ejemplo, 2, 4 y 8 s).
 
-1. **Reintentos**: cuántas veces se repite el paso si falla.
-2. **Backoff**: exponencial o lineal (cuánto esperar entre intentos).
-3. **Dead letter queue**: la cola donde quedan los mensajes que fallan todas las veces.
-4. **Alertar a**: el equipo o canal que recibe el aviso.
+El ejemplo **FE-889 de Envases del Caribe** hace que el software contable responda 429 una vez: con los reintentos por defecto la corrida queda «Exitosa con reintento» y el paso muestra «Esperó 2 s antes de reintentar». Con 0 reintentos, la misma factura falla y queda para revisar.
 
-### Tarjetas de uso, versiones y alertas
+### Tarjetas de uso, versiones y casos
 
-En la [captura de la barra superior](#barra-superior):
+![Tarjetas](images/doc/demos/automatizacion/07-tarjetas.jpg)
 
-- **3 · Uso del plan** (plan «Business»): ejecuciones 42.300 de 100.000, tokens de IA 1,84 M de 5 M y almacenamiento 18 de 50 GB, «Renueva en 12 días». Son cifras fijas: no cambian al ejecutar. **Upgrade →** no hace nada.
-- **4 · Historial de versiones**: cinco commits de ejemplo (de «init: versión inicial del flujo» hace 5 días a «feat: agregar nodo de resumen IA» a las 14:02), con la versión actual marcada. **Promover esta versión** no hace nada.
-- **5 · Alertas y DLQ**: 14 mensajes en la DLQ y 3 alertas activas (fijos). **Reprocesar** abre la ventana del [paso 6](#paso-6-cierra-con-las-alertas-y-la-cola-de-errores).
+*Las tres tarjetas, con el cálculo del ahorro abierto.*
+
+1. **Uso y ahorro del mes** (plan Básico, 10.000 ejecuciones al mes, como en el catálogo): ejecuciones del mes = un ritmo de ejemplo de cada flujo por los días corridos del mes más las que ejecutes. El conteo se reinicia el día 1 y **Ver planes** lleva a `/services#otras-soluciones`.
+2. **¿Cómo se calcula?**: ahorro = ejecuciones exitosas × minutos de trabajo manual que evita cada una; los minutos se pueden cambiar por flujo.
+3. **Historial de versiones** del flujo activo, con **Restaurar** y **Guardar versión**.
+4. **Para revisar**: casos abiertos del flujo, fallos de las últimas 24 horas y **Revisar casos**.
 
 ### Ejecuciones
 
-Tabla con ID, inicio, duración, estado y origen. Trae cuatro corridas de ejemplo; la primera viene abierta:
-
-| Corrida | Inicio | Estado | Origen | Pasos |
-|---|---|---|---|---|
-| `run_8f2a` | 14:02:11 | Exitoso | webhook POST | los siete |
-| `run_8f1b` | 13:58:02 | Reintento | webhook POST | cinco; «Enriquecer cliente» aparece dos veces (reintento y éxito) |
-| `run_8f0c` | 13:45:30 | Fallido | schedule cron | tres; falla en «Enriquecer cliente» |
-| `run_8eff` | 13:20:08 | Exitoso | webhook POST | cinco |
-
-**Ver detalle** / **Ocultar** (o la flecha) abre y cierra los pasos. El ojo de cada paso **no hace nada**. Cada **Ejecutar workflow** agrega una corrida exitosa arriba ([paso 3](#paso-3-revisa-la-corrida-en-ejecuciones)). El pie de página sigue diciendo «Última ejecución: 14:02:11» aunque ejecutes el flujo.
+Descrito en el [paso 3](#paso-3-revisa-la-corrida-en-ejecuciones). Muestra solo las corridas del flujo activo; la más reciente se abre sola. En el celular se ocultan las columnas de duración, origen y versión (aparecen al abrir la corrida).
 
 ### Plantillas
 
-Ver el [paso 5](#paso-5-muestra-las-plantillas). Seis plantillas: Sync CRM ↔ Sheets, Asistente Email IA, Stripe → Slack alerts, Lead enrichment, RAG sobre docs y ETL diario, con instalaciones de ejemplo (de 2,6k a 12,4k).
+![Plantillas](images/doc/demos/automatizacion/13-plantillas.jpg)
+
+*Cinco plantillas con filtro por categoría.*
+
+1. **Categorías**: Todas, Finanzas, Ventas, Servicio al cliente y En blanco (ninguna queda vacía).
+2. **Pasos** de la plantilla.
+3. **Usar plantilla**: crea un flujo nuevo con esos pasos y lo deja activo (sin versiones ni ejecuciones). La plantilla **Respuestas por WhatsApp con el asistente** no viene cargada: úsala para mostrar el asistente que cita la fuente y la pregunta que no sabe responder, que pasa a revisión.
 
 ### Editor de código
 
-Se abre con **JavaScript**, **Python** o **Transform** de la paleta (los tres abren la misma ventana, en JavaScript).
+Se abre con **Abrir editor de código** en un paso de **Código JavaScript**.
 
 ![Editor de código](images/doc/demos/automatizacion/08-editor-codigo.jpg)
 
-*Editor de código con el ejemplo en JavaScript.*
+*El código de ejemplo ejecutado con la factura FE-5521.*
 
-1. **Lenguaje**: JavaScript o Python; cambia el código de ejemplo (una función que calcula un puntaje por registro).
-2. **Pestañas**: Código, Input (dos registros de ejemplo) y Output (los mismos registros con su puntaje). Son textos fijos: no se calcula nada.
-3. **Guardar**: no hace nada.
-4. **Ejecutar**: no hace nada.
+1. **Datos de entrada del ejemplo**: el evento con el que se calcula la entrada del paso.
+2. **Código**, **Entrada** (lo que recibe `datos`) y **Salida**.
+3. **Resultado** de la ejecución con su tiempo, o el error del código.
+4. **Guardar**: guarda el código en el paso (si cierras con cambios, pide confirmación).
+5. **Ejecutar**: corre el código de verdad en un Worker aislado, sin acceso a la página ni a internet, con un límite de 1,5 s (un ciclo infinito se corta).
 
-Se cierra con la X, un clic fuera o Escape. El código no se puede editar.
+### Definición del flujo (JSON)
 
-### SDK para nodos propios
+En el pie de la demo.
 
-**SDK custom nodes**, en el pie de la demo, abre una ventana con el comando de instalación (`npm install @platform/sdk`, un paquete de ejemplo) y un fragmento en TypeScript que define un nodo para crear contactos en un CRM. **Ver docs completas** no hace nada.
+![Definición del flujo](images/doc/demos/automatizacion/09-json.jpg)
 
-![SDK de nodos propios](images/doc/demos/automatizacion/09-sdk.jpg)
+*El flujo activo en JSON.*
 
-*Ventana «SDK · Custom Nodes».*
+1. **Importar JSON**: crea un flujo nuevo desde un archivo (máximo 200 KB, 1 a 20 pasos, tipos conocidos y un disparador al inicio); si no cumple, dice por qué.
+2. **Copiar** al portapapeles.
+3. **Descargar .json**.
 
 ### En el celular
 
 ![Vista móvil](images/doc/demos/automatizacion/11-movil.jpg)
 
-*A 390 px. Izquierda: así abre la demo, con el inspector encima de la paleta. Derecha: después de cerrar los dos paneles.*
+*A 390 px. Izquierda: así abre la demo. Derecha: la configuración de un paso después de tocarlo.*
 
-- Al cargar, la paleta y el inspector se abren **los dos a la vez**, uno encima del otro. La X de cada panel queda debajo de la barra superior del sitio y no responde; para cerrarlos hay que tocar la franja oscura a un lado del panel (primero la de la izquierda, luego la de la derecha).
-- Los botones ☰ (paleta) y el ícono de consola (inspector) de la barra de la demo los vuelven a abrir.
-- El lienzo se desplaza de lado dentro de su recuadro; las tarjetas se apilan. La página no se desborda a lo ancho.
+- La paleta y la configuración empiezan cerradas. ☰ abre la paleta y el ícono de ajustes, la configuración; tocar un paso también la abre. Ambos paneles empiezan debajo de la barra del sitio, se cierran con la X, tocando fuera o con Escape.
+- El lienzo queda en una columna y las tarjetas se apilan. No hay desbordes a lo ancho.
+
+---
+
+## Datos de ejemplo
+
+Todo es ficticio: empresas, personas, NIT (con dígito de verificación válido), correos (dominio reservado `.example`) y celulares (serie 300 555 01xx). Las fechas se arman con la fecha de hoy (las facturas son de ayer o antier; la revisión de cartera corre a las 8:00 de hoy, o de ayer si aún no son las 8:15) y nunca quedan en el futuro.
+
+| Flujo | Ejemplos | Qué pasa |
+|---|---|---|
+| **Facturas de proveedores** (correo) | FE-5521 de Químicos La Sabana; FE-10234 de Papeles del Valle; FE-889 de Envases del Caribe; FE-3307 de Plásticos Altiplano | Exitosa; excepción por diferencia de 7,1 % con la orden; exitosa con un reintento (429); revisión porque al XML le faltan la fecha y el IVA (confianza 67 %). |
+| **Cobranza de cartera vencida** (programación diaria) | Minimercado El Trébol (12 días, $ 3.450.000); Droguería Santa Inés (3 días); Hotel Brisas del Lago (sin celular) | Enlace de pago y recordatorio por WhatsApp (simulado); sin acción porque no pasa de 5 días; fallo por falta de celular, que se corrige en la revisión. |
+| **Leads del sitio web al CRM** (formulario) | Catalina Restrepo, Medellín; Mauricio Pardo, Bogotá; Diana Ospina, Cali | Compra asignada a Valentina Ríos; compra asignada a Andrés Camacho; queja que va a revisión (servicio al cliente). |
+| **Respuestas por WhatsApp con el asistente** (plantilla) | Envío gratis; producto roto; algo que no se vende | Respuesta con «Política de envíos 2026, sección 2»; respuesta con la política de devoluciones; revisión porque no hay respuesta en las políticas. |
+
+Al abrir la demo por primera vez hay ocho ejecuciones de hoy, hechas con el mismo motor, y tres casos abiertos.
 
 ---
 
@@ -251,15 +266,13 @@ Se cierra con la X, un clic fuera o Escape. El código no se puede editar.
 
 | Parte | Real o simulado | Detalle |
 |---|---|---|
-| Flujo, nodos, parámetros, credenciales, plantillas, versiones, cuotas y alertas | **Datos de ejemplo** | Escritos en el código de la página; no hay base de datos ni servidor. |
-| **Ejecutar workflow** | **Animación** | Enciende los nodos uno por uno y agrega una corrida «Exitoso» con números al azar. No llama a ningún webhook, API, modelo de IA ni a Slack. |
-| **Ejecutar paso** (Test) | **Simulado** | Devuelve un JSON fijo por tipo de nodo después de 0,7 s. |
-| «Resumen IA», modelos de IA y nodos de IA de la paleta | **Simulado** | No hay IA en la demo. |
-| Editor de código y SDK | **Textos de ejemplo** | No se edita ni se ejecuta código; el paquete del SDK es de ejemplo. |
-| Entornos, Cloud/Self-hosted y versiones | **Interacción visual** | Cambian un rótulo; no hay despliegues. |
-| Buscador de la paleta, pestañas, filtros de plantillas y abrir/cerrar corridas | **Funcionan** | Son interacciones de la interfaz. |
-| Dónde quedan tus cambios | **En ningún lado** | Al recargar vuelve todo al inicio; tampoco se guarda nada en el navegador. |
-| Marcas mostradas (Slack, Stripe, Salesforce, Google Sheets, Clearbit, HubSpot, GPT-4o, Claude, Llama) | **Solo como ejemplo** | No hay integración con ninguna. |
+| Ejecución del flujo | **Real (en el navegador)** | El motor arma los datos paso a paso, llena las plantillas, evalúa condiciones, busca en las hojas, aplica las reglas, reintenta con espera y deja casos para revisar. La duración de cada paso es simulada y las esperas se acortan. |
+| Edición del flujo, versiones, plantillas, casos, CSV y JSON | **Real** | Se guardan en este navegador (`localStorage`, una copia por idioma) hasta restablecer la demo. |
+| Código JavaScript | **Real** | Se ejecuta en un Worker aislado (sin página ni red) con límite de 1,5 s. |
+| Pasos de IA | **Simulado** | Reglas fijas; no se llama a ningún modelo. |
+| Conectores (correo, hojas, software contable, CRM, pasarela de pagos, HTTP, WhatsApp, correo saliente) | **Simulado** | No se conectan a nada; no se envía ni se cobra nada. Las credenciales son nombres de ejemplo. |
+| Uso del mes y ahorro | **Datos de ejemplo** | Ritmo de ejemplo más tus ejecuciones; los minutos por ejecución son editables. |
+| Empresa, proveedores, clientes y prospectos | **Ficticios** | Ver [Datos de ejemplo](#datos-de-ejemplo). |
 
 ---
 
@@ -295,15 +308,10 @@ flowchart LR
 
 ## Limitaciones conocidas
 
-1. **Promete más de lo que muestra.** La tarjeta del hub habla de «500+ integraciones», editor de arrastrar y soltar, nodos de «STT/TTS», «versioning git-backed» y «replay». La demo tiene 27 tipos de nodo en la paleta, no se puede arrastrar ni agregar nada, no hay TTS ni repetición de corridas, y no ejecuta nada. Conviene aclararlo al presentarla.
-2. **Sin rótulo de «Datos de ejemplo»** ni explicación de qué es simulado, a diferencia de las demos ya revisadas. Mezcla textos en inglés («Workflow», «Retries», «Upgrade», «manual run», «Storage», «running…»).
-3. **Botones que no hacen nada:** los 24 nodos de la paleta que no son de código, **Promover a prod**, **Upgrade →**, **Promover esta versión**, **Usar plantilla**, **Reprocesar** y **Purgar** dentro de la ventana de alertas, **Guardar** y **Ejecutar** del editor de código, el ojo de cada paso en Ejecuciones y **Ver docs completas** del SDK. Al pasar el mouse cambian de color, así que parecen funcionar.
-4. **El lienzo se lee al revés en la segunda fila.** Las flechas de abajo apuntan hacia la derecha (Sub-workflow → Slack notify → Transform), pero la ejecución va al revés (Transform → Slack notify → Sub-workflow); las líneas cruzan por detrás de los nodos.
-5. **El menú de entorno no se puede usar en escritorio:** queda detrás del lienzo y solo se ve «dev».
-6. **El inspector arrastra datos del nodo anterior.** Si estás en Parámetros y eliges otro nodo, el campo **Nombre** sigue mostrando el nombre del nodo anterior (por ejemplo, «Filter» en «Enriquecer cliente»), aunque el título sí cambia. En Test, la respuesta del nodo anterior queda en pantalla hasta pulsar de nuevo **Ejecutar paso**. Auth y Retries muestran lo mismo para todos los nodos (incluida la credencial del servicio de enriquecimiento en el filtro o en Slack).
-7. **Cifras que no cuadran:** la duración total de una corrida nueva no es la suma de sus pasos; la hora de la corrida nueva es la del equipo del visitante mientras las de ejemplo son fijas (14:02, 13:58…); el pie dice «Última ejecución: 14:02:11» aunque ejecutes el flujo; la corrida en «Reintento» muestra un ícono girando para siempre; las cuotas no cambian al ejecutar.
-8. **La corrida nueva llega cerrada** y la de ejemplo `run_8f2a` sigue abierta debajo; hay que pulsar **Ver detalle** para verla.
-9. **La ventana de alertas no se cierra con Escape** (las demás sí). La categoría **Marketing** de plantillas aparece vacía, sin mensaje.
-10. **En el celular** la paleta y el inspector abren a la vez encima de la demo y su X queda debajo de la barra del sitio (hay que tocar la franja oscura para cerrarlos).
-11. **No guarda nada:** al recargar se pierden las corridas y lo que hayas escrito.
-12. **Error técnico en la consola:** con el navegador en español aparecen errores de hidratación de React (#425, #418 y #423) al cargar. La causa es que el número de ejecuciones de la tarjeta «Uso del plan» se formatea con el idioma del navegador (`42.300`) y no coincide con el del servidor (`42,300`); con el navegador en inglés no aparecen. No se nota a simple vista, pero obliga a React a volver a pintar la página.
+1. **La tarjeta del hub todavía promete más que la demo** («500+ integraciones», nodos de «STT/TTS», «SDK custom», «Versioning git-backed» y «environments»). La demo tiene 20 tipos de paso con conectores simulados, solo JavaScript (sin Python ni SDK) y versiones guardadas en el navegador, sin Git ni entornos. El cambio de textos de la tarjeta y de la descripción para buscadores está pedido aparte; mientras tanto, presenta la demo con esta guía.
+2. **Conectores e IA simulados.** Nada sale del navegador: no hay correos, mensajes, cobros ni llamadas a un modelo de IA. Los tiempos de cada paso son simulados y las esperas (paso **Esperar** y reintentos) no se hacen de verdad.
+3. **Flujos lineales.** Un flujo es una secuencia de hasta 20 pasos con un solo disparador; las condiciones tienen una sola rama alterna (revisión o terminar), sin ramas en paralelo ni ciclos.
+4. **Ejemplos por disparador.** Cada disparador tiene sus eventos de ejemplo; si cambias el disparador o armas un flujo con pasos que esperan otros datos, la ejecución falla diciendo qué dato falta (es el comportamiento esperado).
+5. **Arrastrar y soltar** funciona con mouse; en pantallas táctiles los pasos se agregan con un toque y se mueven con **Antes** y **Después**.
+6. **Lo guardado vive en este navegador**, una copia por idioma, con las últimas 120 ejecuciones; a los 21 días se vuelven a armar los datos de ejemplo. Otro navegador o una ventana privada empiezan de cero.
+7. **El editor siempre se ve oscuro**, también con el sitio en modo claro (como la mayoría de editores de flujos).
