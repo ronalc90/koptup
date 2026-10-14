@@ -514,12 +514,14 @@ export function slaInfo(ticket: Ticket, clock: number): SlaInfo {
   if (pq) return { kind: 'pqrs', info: pq };
   if (ticket.status === 'pending') return { kind: 'waiting' };
   const first = firstResponseAt(ticket);
-  if (first === null) {
-    const due = ticket.createdAt + SLA_FIRST_RESPONSE[ticket.priority];
-    return { kind: 'first', due, remaining: due - clock };
-  }
-  const due = ticket.createdAt + SLA_RESOLUTION[ticket.priority];
-  return { kind: 'resolution', due, remaining: due - clock };
+  const kind = first === null ? 'first' : 'resolution';
+  // Si este plazo ya venció, se sigue midiendo desde la hora en que venció
+  // (la regla de escalamiento sube la prioridad, pero no mueve el vencimiento).
+  const breach = ticket.slaBreach && ticket.slaBreach.kind === kind ? ticket.slaBreach : null;
+  const due = breach
+    ? breach.due
+    : ticket.createdAt + (kind === 'first' ? SLA_FIRST_RESPONSE[ticket.priority] : SLA_RESOLUTION[ticket.priority]);
+  return { kind, due, remaining: due - clock };
 }
 
 /** Minutos que faltan para vencer (Infinity si no aplica SLA en minutos). */

@@ -8,7 +8,42 @@
       "breadcrumbName": "Helpdesk con IA"
     },
     "pageTitle": "Helpdesk con IA",
-    "pageSubtitle": "Mesa de ayuda omnicanal: una sola bandeja para tus canales, clasificación y asignación automáticas, borradores de respuesta con IA, SLA y PQRS en días hábiles. Pruébala: simula un ticket, respóndelo y ciérralo.",
+    "pageSubtitle": "Para equipos de servicio al cliente de tiendas en línea, proveedores de internet, cooperativas y empresas de servicios. Todos tus canales en una sola bandeja: los tickets se clasifican y se asignan solos, la IA te propone la respuesta con tu base de conocimiento y controlas el SLA y las PQRS en días hábiles.",
+    "shell": {
+      "back": "Volver al catálogo de demos",
+      "kicker": "Demo interactiva · Mesa de ayuda omnicanal",
+      "requestDemo": "Solicitar demo guiada",
+      "quote": "Cotizar para mi empresa"
+    },
+    "guide": {
+      "title": "Primeros pasos: recorre la demo en 3 minutos",
+      "progress": "{done} de {total} hechos",
+      "show": "Ver los pasos",
+      "hide": "Ocultar los pasos",
+      "done": "Hecho",
+      "steps": {
+        "incoming": {
+          "title": "Recibe un mensaje",
+          "text": "Simula un ticket por WhatsApp, correo o llamada y mira cómo se clasifica, qué macros se aplican y a quién se asigna.",
+          "action": "Simular ticket entrante"
+        },
+        "reply": {
+          "title": "Respóndelo con ayuda",
+          "text": "Inserta una respuesta de la base de conocimiento o pide un borrador con IA, revísalo y envíalo.",
+          "action": "Ir a la respuesta"
+        },
+        "resolve": {
+          "title": "Resuélvelo y mide",
+          "text": "Marca el ticket como resuelto y responde la encuesta de satisfacción como si fueras el cliente.",
+          "action": "Ir al ticket"
+        },
+        "sla": {
+          "title": "Controla SLA y PQRS",
+          "text": "Adelanta el reloj con «+15 min» para ver vencer el SLA y revisa qué PQRS están por vencer en días hábiles.",
+          "action": "Ver las PQRS"
+        }
+      }
+    },
     "sampleBadge": "Datos de ejemplo",
     "sampleBadgeHint": "Es la mesa de ayuda de tres marcas ficticias (Moda Andina, Conecta Sabana y Cooperativa Ceiba). Clientes, contactos, pedidos, montos y radicados son inventados. Fecha de referencia de los datos: jueves 8 de octubre de 2026.",
     "howItWorks": {
@@ -28,7 +63,13 @@
     },
     "clock": {
       "label": "Reloj de la demo: {date}, {time}",
-      "hint": "Reloj simulado de la demo: avanza un minuto por cada minuto real. El SLA y los términos PQRS se calculan con esta hora.",
+      "hint": "Reloj simulado de la demo: avanza un minuto por cada minuto real mientras la página está abierta, salvo que lo pauses. El SLA y los términos PQRS se calculan con esta hora.",
+      "pausedLabel": "(en pausa)",
+      "pause": "Pausar reloj",
+      "resume": "Reanudar reloj",
+      "pauseHint": "Detén el reloj de la demo para que el SLA no avance mientras explicas o lees",
+      "pausedToast": "Reloj de la demo en pausa: el SLA no avanza hasta que lo reanudes.",
+      "resumedToast": "Reloj de la demo en marcha de nuevo.",
       "advance": "+15 min",
       "advanceHint": "Adelanta el reloj de la demo 15 minutos para ver cómo vence el SLA",
       "advanced": "Adelantaste el reloj de la demo 15 minutos."
@@ -69,7 +110,7 @@
       "autoHint": "Mensajes nuevos que la respuesta automática contestó sin un agente, sobre el total evaluado en el registro."
     },
     "channels": {
-      "title": "Canales",
+      "title": "Canales (tickets activos)",
       "all": "Todos",
       "email": "Correo",
       "webchat": "Chat web",
@@ -120,7 +161,7 @@
       "search": "Buscar por ticket, cliente, asunto, radicado o texto…",
       "newTicket": "Simular ticket entrante",
       "noResults": "No hay tickets con esos filtros.",
-      "count": "{count, plural, one {# ticket} other {# tickets}}",
+      "count": "{count, plural, one {# ticket} other {# tickets}} · {active, plural, one {# activo} other {# activos}}",
       "unassigned": "Sin asignar",
       "viewLabel": "Ver",
       "views": {
@@ -161,6 +202,7 @@
       "firstIn": "1.ª respuesta en {time}",
       "resolutionIn": "Resolución en {time}",
       "breached": "SLA vencido hace {time}",
+      "breachedNow": "SLA vencido ahora",
       "waiting": "Esperando al cliente",
       "waitingHint": "Ya le respondiste al cliente; el SLA se vuelve a medir cuando responda.",
       "pqrsLeft": "{n, plural, one {Vence en # día hábil} other {Vence en # días hábiles}}",
@@ -266,17 +308,21 @@
       "title": "Borrador con IA",
       "button": "Redactar con IA",
       "again": "Generar otra vez",
-      "hint": "Llama a un modelo de IA desde nuestro servidor. Responde solo con los artículos de la base de conocimiento de esta demo y cita la fuente; revísalo antes de enviarlo.",
+      "hint": "Envía los mensajes del cliente de este ticket a nuestro servidor, que consulta un modelo de IA (no guardamos la conversación). Responde solo con los artículos de la base de conocimiento de esta demo y cita la fuente; revísalo antes de enviarlo.",
       "preparing": "Cargando la base de conocimiento en el servidor…",
       "asking": "Consultando el modelo…",
       "modeLlm": "Generado por {model} en {ms} ms · costo aprox. USD {cost}",
       "modeExtractive": "El servidor no tiene una clave de IA configurada: estos son los fragmentos más relevantes de la base de conocimiento (modo extractivo, sin modelo).",
       "modeProviderError": "El proveedor de IA no respondió: estos son los fragmentos más relevantes de la base de conocimiento (modo extractivo).",
+      "modeBudget": "Se agotó el cupo mensual de IA de esta demo: estos son los fragmentos más relevantes de la base de conocimiento (modo extractivo, sin modelo).",
+      "modeUnavailable": "La IA no está disponible en este momento: estos son los fragmentos más relevantes de la base de conocimiento (modo extractivo, sin modelo).",
       "sources": "Fuentes",
+      "sourceHint": "Ver el texto de la fuente que citó el borrador",
       "insert": "Insertar en la respuesta (sin las citas)",
       "errors": {
         "network": "No pudimos conectar con el servidor de IA. Usa las plantillas de la base de conocimiento o inténtalo de nuevo.",
-        "rateLimited": "Hay demasiadas solicitudes en este momento. Espera un minuto y vuelve a intentarlo.",
+        "rateLimited": "Enviaste muchas solicitudes seguidas. Espera un minuto y vuelve a intentarlo.",
+        "rateLimitedCreate": "El servidor limita cuántas bases de conocimiento de demo se crean desde una misma conexión y ya se alcanzó el límite. Vuelve a intentarlo más tarde (puede tardar hasta una hora) o usa las respuestas sugeridas de la base de conocimiento.",
         "server": "El servidor de IA respondió con un error. Inténtalo de nuevo en un momento."
       },
       "botName": "Helpdesk con IA (demo) · base de conocimiento",
@@ -560,7 +606,7 @@
       "city": "Ciudad",
       "message": "Mensaje del cliente",
       "messageError": "Escribe un mensaje de al menos 10 caracteres.",
-      "note": "El mensaje no sale de tu navegador: la clasificación y la asignación usan reglas de esta demo.",
+      "note": "La clasificación, las macros y la asignación se calculan en tu navegador con reglas de esta demo. Solo si después pulsas «Redactar con IA», los mensajes del cliente se envían a nuestro servidor para generar el borrador.",
       "submit": "Recibir ticket"
     },
     "toasts": {

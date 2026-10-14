@@ -16,7 +16,10 @@ import {
   dateOfDay,
   pqrsInfo,
   route,
+  slaInfo,
 } from '../components/engine';
+import { groupSources } from '../components/ai';
+import { initialState, reducer } from '../components/useHelpdeskStore';
 
 type Messages = Record<string, unknown>;
 
@@ -95,5 +98,43 @@ describe('PQRS de ejemplo', () => {
   it('el reclamo radicado el 21 de septiembre vence el 13 de octubre y está por vencer', () => {
     const t10 = SEED_TICKETS.find((t) => t.id === 'TCK-1050') as Ticket;
     expect(pqrsInfo(t10, START_CLOCK)).toMatchObject({ daysLeft: 2, state: 'dueSoon' });
+  });
+});
+
+describe('SLA vencido y escalamiento automático', () => {
+  it('sube la prioridad pero sigue midiendo el vencimiento desde el plazo original', () => {
+    // TCK-1047 llegó a las 10:12 con prioridad Media: la primera respuesta vencía a las 11:12.
+    let state = reducer(initialState(), { type: 'tick', minutes: 45 }); // 11:15
+    state = reducer(state, { type: 'slaSweep' });
+    const t7 = state.tickets.find((t) => t.id === 'TCK-1047') as Ticket;
+    expect(t7.priority).toBe('high');
+    expect(t7.slaBreach).toEqual({ kind: 'first', due: 672 });
+    expect(slaInfo(t7, state.clock)).toMatchObject({ kind: 'first', remaining: -3 });
+  });
+
+  it('el ticket de ejemplo que ya venció muestra el tiempo desde su plazo de prioridad Media', () => {
+    const t6 = SEED_TICKETS.find((t) => t.id === 'TCK-1046') as Ticket;
+    expect(slaInfo(t6, START_CLOCK)).toMatchObject({ kind: 'first', remaining: -25 });
+  });
+
+  it('el reloj en pausa no cambia con la acción de pausa y «+15 min» sigue funcionando', () => {
+    let state = reducer(initialState(), { type: 'pause', paused: true });
+    expect(state.paused).toBe(true);
+    state = reducer(state, { type: 'tick', minutes: 15 });
+    expect(state.clock).toBe(START_CLOCK + 15);
+  });
+});
+
+describe('fuentes del borrador con IA', () => {
+  it('agrupa los fragmentos del mismo artículo en una sola fuente', () => {
+    const groups = groupSources([
+      { index: 1, name: 'Pagos por PSE', chunk: 'a' },
+      { index: 2, name: 'Pagos por PSE', chunk: 'b' },
+      { index: 3, name: 'Reembolsos', chunk: 'c' },
+    ]);
+    expect(groups.map((g) => [g.name, g.items.map((i) => i.index)])).toEqual([
+      ['Pagos por PSE', [1, 2]],
+      ['Reembolsos', [3]],
+    ]);
   });
 });

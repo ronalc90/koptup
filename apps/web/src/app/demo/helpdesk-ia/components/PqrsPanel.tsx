@@ -92,7 +92,7 @@ export default function PqrsPanel({
   };
 
   return (
-    <Card variant="bordered" padding="md" className="mt-6 min-w-0">
+    <Card id="hd-pqrs-panel" variant="bordered" padding="md" className="mt-6 min-w-0 scroll-mt-24">
       <CardHeader className="mb-3">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
           <div className="min-w-0">

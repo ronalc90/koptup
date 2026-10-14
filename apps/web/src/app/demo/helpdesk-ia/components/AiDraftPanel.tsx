@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowPathIcon, ChevronRightIcon, CpuChipIcon, ExclamationTriangleIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
 import { KB_ARTICLES, type Ticket } from './data';
-import { AiError, draftReply, ensureKbBot, forgetKbBot, stripCitations, type AiDraft } from './ai';
+import { AiError, draftReply, ensureKbBot, forgetKbBot, groupSources, stripCitations, type AiDraft } from './ai';
 import { Note } from './ui';
 import type { HdText } from './useHelpdeskText';
 
@@ -22,7 +22,8 @@ export default function AiDraftPanel({ hd, ticket, customerText, onInsert }: Pro
   const [phase, setPhase] = useState<Phase>('idle');
   const [draft, setDraft] = useState<AiDraft | null>(null);
   const [error, setError] = useState<AiError['kind'] | null>(null);
-  const [openSource, setOpenSource] = useState<number | null>(null);
+  /** Artículo (nombre) cuyas citas están abiertas. */
+  const [openSource, setOpenSource] = useState<string | null>(null);
   const runRef = useRef(0);
 
   // Un borrador por ticket: al cambiar de ticket se descarta el anterior.
@@ -80,6 +81,8 @@ export default function AiDraftPanel({ hd, ticket, customerText, onInsert }: Pro
   };
 
   const busy = phase === 'preparing' || phase === 'asking';
+  const groups = useMemo(() => (draft ? groupSources(draft.sources) : []), [draft]);
+  const openGroup = groups.find((g) => g.name === openSource) ?? null;
 
   return (
     <div className="p-3 rounded-lg border border-primary-200 dark:border-primary-800 bg-primary-50/50 dark:bg-primary-950/20">
@@ -123,31 +126,43 @@ export default function AiDraftPanel({ hd, ticket, customerText, onInsert }: Pro
                 })
               : draft.providerError
                 ? t('ai.modeProviderError')
-                : t('ai.modeExtractive')}
+                : draft.budget === 'exhausted'
+                  ? t('ai.modeBudget')
+                  : draft.budget === 'unavailable'
+                    ? t('ai.modeUnavailable')
+                    : t('ai.modeExtractive')}
           </p>
           <div className="rounded-md bg-white dark:bg-secondary-900 border border-secondary-200 dark:border-secondary-700 p-2.5 text-sm text-secondary-800 dark:text-secondary-200 whitespace-pre-wrap">
             {draft.reply}
           </div>
-          {draft.sources.length > 0 && (
+          {groups.length > 0 && (
             <div>
               <p className="text-[10px] uppercase tracking-wide font-semibold text-secondary-500 mb-1">{t('ai.sources')}</p>
               <div className="flex flex-wrap gap-1.5">
-                {draft.sources.map((s) => (
+                {groups.map((g) => (
                   <button
-                    key={s.index}
+                    key={g.name}
                     type="button"
-                    onClick={() => setOpenSource(openSource === s.index ? null : s.index)}
-                    aria-expanded={openSource === s.index}
+                    onClick={() => setOpenSource(openSource === g.name ? null : g.name)}
+                    aria-expanded={openSource === g.name}
+                    title={t('ai.sourceHint')}
                     className="text-[11px] px-2 py-0.5 rounded-full border border-secondary-300 dark:border-secondary-700 text-secondary-700 dark:text-secondary-300 hover:border-primary-400"
                   >
-                    [{s.index}] {s.name}
+                    [{g.items.map((s) => s.index).join(', ')}] {g.name}
                   </button>
                 ))}
               </div>
-              {openSource !== null && (
-                <p className="mt-1.5 text-[11px] text-secondary-600 dark:text-secondary-400 bg-white dark:bg-secondary-900 border border-secondary-200 dark:border-secondary-700 rounded-md p-2 whitespace-pre-wrap">
-                  {draft.sources.find((s) => s.index === openSource)?.chunk}
-                </p>
+              {openGroup && (
+                <div className="mt-1.5 space-y-1.5">
+                  {openGroup.items.map((s) => (
+                    <p
+                      key={s.index}
+                      className="text-[11px] text-secondary-600 dark:text-secondary-400 bg-white dark:bg-secondary-900 border border-secondary-200 dark:border-secondary-700 rounded-md p-2 whitespace-pre-wrap"
+                    >
+                      <span className="font-semibold">[{s.index}]</span> {s.chunk}
+                    </p>
+                  ))}
+                </div>
               )}
             </div>
           )}

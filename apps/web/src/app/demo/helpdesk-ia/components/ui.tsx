@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useRef, type KeyboardEvent } from 'react';
 import {
   ChatBubbleBottomCenterTextIcon,
   ChatBubbleLeftEllipsisIcon,
@@ -87,6 +87,8 @@ export function Toast({ message, onDone }: { message: string | null; onDone: () 
   );
 }
 
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 export function Modal({
   title,
   subtitle,
@@ -105,6 +107,35 @@ export function Modal({
   labelId: string;
 }) {
   useModalClose(true, onClose);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
+
+  // Al abrir, el foco entra al primer control del contenido; al cerrar, vuelve a donde estaba.
+  useEffect(() => {
+    const previous = document.activeElement as HTMLElement | null;
+    const first = bodyRef.current?.querySelector<HTMLElement>(FOCUSABLE) ?? panelRef.current;
+    first?.focus();
+    return () => {
+      if (previous && document.contains(previous)) previous.focus();
+    };
+  }, []);
+
+  // El tabulador no sale de la ventana mientras está abierta.
+  const trapFocus = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== 'Tab' || !panelRef.current) return;
+    const items = Array.from(panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE)).filter((el) => el.offsetParent !== null);
+    if (items.length === 0) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  };
+
   return (
     <div
       role="dialog"
@@ -114,8 +145,11 @@ export function Modal({
       className="fixed inset-0 bg-black/60 z-[110] flex items-center justify-center p-2 sm:p-4"
     >
       <div
+        ref={panelRef}
+        tabIndex={-1}
+        onKeyDown={trapFocus}
         onClick={(e) => e.stopPropagation()}
-        className="relative bg-white dark:bg-secondary-900 rounded-2xl w-full max-w-lg max-h-[95vh] overflow-y-auto shadow-2xl"
+        className="relative bg-white dark:bg-secondary-900 rounded-2xl w-full max-w-lg max-h-[95vh] overflow-y-auto shadow-2xl focus:outline-none"
       >
         <div className="sticky top-0 z-10 bg-white dark:bg-secondary-900 border-b border-secondary-200 dark:border-secondary-800 px-4 sm:px-6 py-4 flex items-start justify-between gap-4">
           <div className="min-w-0">
@@ -133,7 +167,9 @@ export function Modal({
             <XMarkIcon className="h-5 w-5 text-secondary-600 dark:text-secondary-300" />
           </button>
         </div>
-        <div className="px-4 sm:px-6 py-4">{children}</div>
+        <div ref={bodyRef} className="px-4 sm:px-6 py-4">
+          {children}
+        </div>
         {footer && (
           <div className="sticky bottom-0 bg-white dark:bg-secondary-900 border-t border-secondary-200 dark:border-secondary-800 px-4 sm:px-6 py-3 flex flex-wrap justify-end gap-2">
             {footer}
@@ -148,6 +184,8 @@ export const inputCls =
   'w-full px-3 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500';
 export const smallInputCls =
   'w-full px-2.5 py-1.5 text-xs rounded-md border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-primary-500';
+/** Lista desplegable pequeña: deja espacio a la flecha (el plugin de formularios la dibuja a la derecha). */
+export const smallSelectCls = `${smallInputCls} pr-8`;
 export const labelCls = 'block text-xs font-medium text-secondary-700 dark:text-secondary-300 mb-1.5';
 export const sectionTitleCls =
   'text-xs font-semibold uppercase tracking-wide text-secondary-500 dark:text-secondary-400 flex items-center gap-1.5';
