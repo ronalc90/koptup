@@ -16,3 +16,11 @@ paths = [
   '''^apps/web/e2e/''',
   '''^apps/web/src/(.+/)?__tests__/''',
 ]
+
+[[allowlists]]
+description = "Nombres de claves de localStorage de las demos (no son secretos)"
+targetRules = ["generic-api-key"]
+regexTarget = "line"
+regexes = [
+  '''\bSTORAGE_KEY\s*=\s*['"][\w.:-]+['"]''',
+]
