@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { useLocale, useTranslations } from 'next-intl';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { PRESETS, type PresetId, type Role, type TaxKind } from './data';
-import { money, qtyLabel } from './engine';
+import { clockLabel, money, qtyLabel } from './engine';
 
 /** Formato de montos y cantidades según el idioma activo. */
 export function useFmt() {
@@ -14,6 +14,8 @@ export function useFmt() {
     locale,
     money: (n: number) => money(n, locale),
     qty: (q: number, byWeight?: boolean) => qtyLabel(q, byWeight, locale),
+    /** Hora «HH:MM» guardada por la demo, con el formato del idioma. */
+    clock: (hm: string) => clockLabel(hm, locale),
   };
 }
 
@@ -64,6 +66,15 @@ export const PRINT_CSS = `@media print {
 const modalStack: symbol[] = [];
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+/**
+ * Si el control que abrió la ventana ya no existe o quedó deshabilitado (por
+ * ejemplo, «Cobrar» después de cobrar o «Cerrar turno» después del cierre), el
+ * foco vuelve al campo de escaneo, al buscador o al título de la pestaña.
+ */
+const RETURN_FOCUS = ['pos-scan', 'pos-search', 'pos-panel-title'];
+const canFocus = (el: Element | null): el is HTMLElement =>
+  el instanceof HTMLElement && el.isConnected && el !== document.body && !el.matches(':disabled');
 
 /**
  * Contenedor de modal accesible: Escape cierra solo la ventana de arriba, el
@@ -122,7 +133,8 @@ export function Modal({
       window.removeEventListener('keydown', onKey);
       const i = modalStack.indexOf(id);
       if (i >= 0) modalStack.splice(i, 1);
-      if (opener && opener.isConnected) opener.focus();
+      if (canFocus(opener)) opener.focus();
+      else RETURN_FOCUS.map((x) => document.getElementById(x)).find(canFocus)?.focus({ preventScroll: true });
     };
   }, []);
 
@@ -167,6 +179,9 @@ export function Modal({
     document.body,
   );
 }
+
+/** Título de la pestaña activa: recibe el foco cuando se cierra una ventana cuyo botón ya no existe. */
+export const panelTitleProps = { id: 'pos-panel-title', tabIndex: -1 } as const;
 
 export const inputCls =
   'w-full px-3 py-2 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500';

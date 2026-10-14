@@ -142,6 +142,31 @@ export function dateTimeLabel(iso: string, locale: string) {
   }
 }
 
+/**
+ * Hora «HH:MM» (24 h, ya en hora de Colombia) con el mismo formato que
+ * `timeLabel`: «02:05 p. m.» en español y «02:05 PM» en inglés. No usa Intl.
+ */
+export function clockLabel(hm: string, locale: string) {
+  const m = /^(\d{1,2}):(\d{2})$/.exec(hm);
+  if (!m) return hm;
+  const h = Number(m[1]);
+  const h12 = String(h % 12 === 0 ? 12 : h % 12).padStart(2, '0');
+  const pm = h >= 12;
+  return locale === 'en' ? `${h12}:${m[2]}\u00a0${pm ? 'PM' : 'AM'}` : `${h12}:${m[2]}\u00a0${pm ? 'p.\u00a0m.' : 'a.\u00a0m.'}`;
+}
+
+/** Dígito de verificación de un NIT (algoritmo de la DIAN, módulo 11). */
+export function nitCheckDigit(nit: string) {
+  const w = [3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71];
+  const sum = nit
+    .replace(/\D/g, '')
+    .split('')
+    .reverse()
+    .reduce((s, d, i) => s + Number(d) * (w[i] ?? 0), 0);
+  const r = sum % 11;
+  return r < 2 ? r : 11 - r;
+}
+
 /** Formatea un NIT o cédula con puntos de miles. */
 export function docLabel(doc: string) {
   const [num, dv] = doc.split('-');

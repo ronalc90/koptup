@@ -84,6 +84,23 @@ export default function PosDemoPage() {
   const [zView, setZView] = useState<Closure | null>(null);
   const [guideOpen, setGuideOpen] = useState(true);
   const toastTimer = useRef<number | null>(null);
+  /** Pestaña elegida con un clic: la nueva se muestra desde su inicio, bajo la barra fija de la caja. */
+  const [tabPick, setTabPick] = useState(0);
+  const pickTab = (tb: Tab) => {
+    setTab(tb);
+    setTabPick((n) => n + 1);
+  };
+  useEffect(() => {
+    if (!tabPick) return;
+    const main = document.getElementById('pos-main');
+    const bar = document.getElementById('pos-toolbar');
+    if (!main || !bar) return;
+    const style = getComputedStyle(bar);
+    if (style.position !== 'sticky') return;
+    // Se mide con la posición fija de la barra (al final de la página la barra sube con su contenedor).
+    const gap = main.getBoundingClientRect().top - ((parseFloat(style.top) || 0) + bar.offsetHeight);
+    if (gap < 0) window.scrollBy({ top: gap });
+  }, [tabPick]);
 
   // Se lee después de montar para que el primer render sea igual en el servidor y en el navegador.
   useEffect(() => {
@@ -175,7 +192,8 @@ export default function PosDemoPage() {
       el?.focus({ preventScroll: true });
     };
     if (stepGo.k === 's1') window.dispatchEvent(new Event(OPEN_SCAN_EVENT));
-    else if (stepGo.k === 's2') focusOn('pos-customer-lookup');
+    // Si el ticket ya tiene cliente, no hay campo de búsqueda: se lleva la vista al ticket.
+    else if (stepGo.k === 's2') focusOn(document.getElementById('pos-customer-lookup') ? 'pos-customer-lookup' : 'pos-ticket');
     else if (stepGo.k === 's3') focusOn('pos-net');
     else document.getElementById('pos-toolbar')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, [stepGo]);
@@ -425,7 +443,7 @@ export default function PosDemoPage() {
                 key={tb}
                 type="button"
                 aria-current={activeTab === tb ? 'page' : undefined}
-                onClick={() => setTab(tb)}
+                onClick={() => pickTab(tb)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap ${
                   activeTab === tb ? 'bg-fuchsia-600 text-white' : 'text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800'
                 }`}
@@ -433,7 +451,12 @@ export default function PosDemoPage() {
                 <Icon className="h-4 w-4" />
                 {t(`tabs.${tb}`)}
                 {badge > 0 && (
-                  <span className={`text-[10px] rounded-full px-1.5 ${activeTab === tb ? 'bg-white/25' : 'bg-secondary-200 dark:bg-secondary-700'}`}>{badge}</span>
+                  <>
+                    <span aria-hidden="true" title={t(`tabs.badge.${tb === 'kds' ? 'kds' : 'tables'}`, { n: badge })} className={`text-[10px] rounded-full px-1.5 ${activeTab === tb ? 'bg-white/25' : 'bg-secondary-200 dark:bg-secondary-700'}`}>
+                      {badge}
+                    </span>
+                    <span className="sr-only">({t(`tabs.badge.${tb === 'kds' ? 'kds' : 'tables'}`, { n: badge })})</span>
+                  </>
                 )}
               </button>
             );
@@ -460,9 +483,12 @@ export default function PosDemoPage() {
             key={preset}
             store={store}
             target={target}
-            goTables={() => setTab('tables')}
+            goTables={() => pickTab('tables')}
             notify={notify}
-            onCheckout={() => setCheckoutOpen(true)}
+            onCheckout={() => {
+              setToast(null);
+              setCheckoutOpen(true);
+            }}
             onOpenShift={() => setShiftModal('open')}
             onCloseShift={() => setShiftModal('close')}
           />
@@ -472,7 +498,7 @@ export default function PosDemoPage() {
             store={store}
             onPick={(tg) => {
               setTarget(tg);
-              setTab('sale');
+              pickTab('sale');
             }}
           />
         )}

@@ -96,7 +96,11 @@
       "kds": "Cocina",
       "reports": "Reportes X/Z",
       "console": "Sedes",
-      "staff": "Empleados"
+      "staff": "Empleados",
+      "badge": {
+        "kds": "{n, plural, one {# comanda pendiente} other {# comandas pendientes}}",
+        "tables": "{n, plural, one {# mesa abierta} other {# mesas abiertas}}"
+      }
     },
     "categories": {
       "all": "Todo",
@@ -166,7 +170,7 @@
       "title": "Ticket",
       "clear": "Vaciar ticket",
       "counter": "Mostrador / para llevar",
-      "tableInfo": "Mesa {n} · {guests} pers.",
+      "tableInfo": "Mesa {n} · {guests, plural, one {# persona} other {# personas}}",
       "waiter": "Mesero/a: {name}",
       "changeTable": "Cambiar mesa",
       "seller": "Asesor/a",
@@ -288,7 +292,10 @@
         },
         "doc": "Número de documento",
         "name": "Nombre o razón social",
-        "email": "Correo para enviar la factura"
+        "email": "Correo para enviar la factura",
+        "nitFormat": "Escribe el NIT con su dígito de verificación, separado por un guion.",
+        "nitDv": "El dígito de verificación no corresponde a ese NIT: debería ser {dv}.",
+        "nitPlaceholder": "NIT con dígito de verificación"
       },
       "missing": {
         "tip": "Pregunta por la propina (puede ser «Sin propina»).",
@@ -434,7 +441,7 @@
       "refund": "Anular",
       "refundConfirm": "¿Anular con nota crédito?",
       "refundDone": "Venta {n} anulada con nota crédito",
-      "closures": "Cierres Z de esta sesión",
+      "closures": "Cierres Z de hoy en esta sede",
       "titleClosed": "Reporte Z · Turno {n} (cerrado)",
       "closedAt": "cerrado a las {time}",
       "closedHint": "Estas son las cifras del turno que cerraste. Abre la caja para empezar el turno {next}.",
@@ -502,7 +509,7 @@
       "closed": "Caja cerrada",
       "myTill": "Tu caja (esta demo)",
       "otherTills": "Otras cajas (ejemplo)",
-      "salesValue": "{n} · {amount}",
+      "salesValue": "{n, plural, one {# venta} other {# ventas}} · {amount}",
       "dayTotal": "Total del día",
       "lowStock": "{n, plural, one {# producto con existencias bajas} other {# productos con existencias bajas}}",
       "switch": "Vender en esta sede",

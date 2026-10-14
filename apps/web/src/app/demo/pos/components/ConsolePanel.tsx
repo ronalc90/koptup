@@ -8,7 +8,7 @@ import Button from '@/components/ui/Button';
 import { ArrowsRightLeftIcon, ExclamationTriangleIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 import { PRESETS } from './data';
 import type { PosStore } from './usePosStore';
-import { inputCls, selectCls, useFmt } from './ui';
+import { inputCls, panelTitleProps, selectCls, useFmt } from './ui';
 
 /** Consola central: ventas por sede, existencias de todas las sedes, traslados y precio central. */
 export function ConsolePanel({ store, notify }: { store: PosStore; notify: (m: string, tone?: 'ok' | 'error') => void }) {
@@ -66,7 +66,9 @@ export function ConsolePanel({ store, notify }: { store: PosStore; notify: (m: s
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 dark:text-white">{t('console.title', { business: p.business.name })}</h2>
+        <h2 {...panelTitleProps} className="text-xl sm:text-2xl font-bold text-secondary-900 dark:text-white focus:outline-none">
+          {t('console.title', { business: p.business.name })}
+        </h2>
         <p className="text-sm text-secondary-500">{t('console.subtitle')}</p>
       </div>
 
@@ -251,7 +253,7 @@ export function ConsolePanel({ store, notify }: { store: PosStore; notify: (m: s
               const pr = p.products.find((y) => y.id === x.productId);
               return (
                 <li key={x.id}>
-                  {x.at} · {f.qty(x.qty, pr?.byWeight)} {pr?.name} · {sedeName(x.from)} → {sedeName(x.to)}
+                  {f.clock(x.at)} · {f.qty(x.qty, pr?.byWeight)} {pr?.name} · {sedeName(x.from)} → {sedeName(x.to)}
                 </li>
               );
             })}

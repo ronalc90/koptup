@@ -3,19 +3,8 @@
  * impuestos incluidos en el precio, reportes y datos de ejemplo coherentes.
  */
 import { PRESETS } from '../components/data';
-import { buildReport, computeTotals, maxRedeemBlocks, money, pointsEarned, tierOf, type TicketLine } from '../components/engine';
+import { buildReport, clockLabel, computeTotals, maxRedeemBlocks, money, nitCheckDigit as nitDv, pointsEarned, tierOf, type TicketLine } from '../components/engine';
 import { bogotaDay, hhmm, seedState, stampTimes } from '../components/usePosStore';
-
-/** Dígito de verificación del NIT (algoritmo de la DIAN, módulo 11). */
-function nitDv(nit: string) {
-  const w = [3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71];
-  const sum = nit
-    .split('')
-    .reverse()
-    .reduce((s, d, i) => s + Number(d) * w[i], 0);
-  const r = sum % 11;
-  return r < 2 ? r : 11 - r;
-}
 
 const line = (over: Partial<TicketLine>): TicketLine => ({
   uid: 'x',
@@ -56,6 +45,28 @@ describe('Demo POS · fechas y horas', () => {
     expect(k?.createdAt).toBe(now - 9 * 60_000);
     // Lo que ya tiene hora no cambia al volver a montar.
     expect(stampTimes(s, now + 3_600_000).data.retail.shifts['lc-chapinero'].openedAt).toBe('06:00');
+  });
+
+  it('desde la apertura (6:00 a. m.) nadie aparece entrando antes de que abra la sede', () => {
+    // 6:10 a. m. en Colombia: la cajera «entró hace 4 horas», pero la sede abrió a las 6:00.
+    const early = stampTimes(seedState(), Date.UTC(2026, 9, 14, 11, 10));
+    expect(early.data.retail.shifts['lc-chapinero'].openedAt).toBe('06:00');
+    expect(early.data.retail.staff['e-r2'].since).toBe('06:00');
+    expect(early.data.restaurant.staff['e-f1'].since).toBe('06:00');
+    // 2:00 p. m.: las horas relativas ya caen después de la apertura y no cambian.
+    const later = stampTimes(seedState(), Date.UTC(2026, 9, 14, 19, 0));
+    expect(later.data.retail.shifts['lc-chapinero'].openedAt).toBe('10:00');
+    // De madrugada (antes de abrir) se mantienen relativas a la hora actual.
+    const night = stampTimes(seedState(), Date.UTC(2026, 9, 14, 7, 0)); // 2:00 a. m.
+    expect(night.data.retail.shifts['lc-chapinero'].openedAt).toBe('22:00');
+  });
+
+  it('muestra las horas guardadas con el mismo formato que las de los documentos', () => {
+    expect(clockLabel('14:05', 'es')).toBe('02:05 p. m.');
+    expect(clockLabel('00:30', 'es')).toBe('12:30 a. m.');
+    expect(clockLabel('12:00', 'en')).toBe('12:00 PM');
+    expect(clockLabel('06:00', 'en')).toBe('06:00 AM');
+    expect(clockLabel('', 'es')).toBe('');
   });
 });
 
@@ -108,6 +119,9 @@ describe('Demo POS · datos de ejemplo', () => {
       const [num, dv] = p.business.nit.replace(/\./g, '').split('-');
       expect(nitDv(num)).toBe(Number(dv));
     }
+    // Acepta el NIT con o sin puntos.
+    expect(nitDv('901482736')).toBe(8);
+    expect(nitDv('901.563.204')).toBe(1);
   });
 
   it('cada sede tiene cajero/a con hora de entrada y los códigos de barras son EAN-13 válidos', () => {

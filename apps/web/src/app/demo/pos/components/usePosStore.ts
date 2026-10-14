@@ -209,10 +209,21 @@ export function bogotaDay(ms: number) {
   return new Date(ms - 5 * 3_600_000).toISOString().slice(0, 10);
 }
 
-/** Hora de Colombia de hace `min` minutos, redondeada hacia abajo a 5 minutos. */
-function hhmmAgo(now: number, min: number) {
+/** Hora (de Colombia) a la que abren las sedes de ejemplo. */
+export const OPENING_HOUR = 6;
+
+/**
+ * Hora de Colombia de hace `min` minutos, redondeada hacia abajo a 5 minutos.
+ * Desde la apertura (6:00 a. m.) nadie aparece entrando antes de que abra la
+ * sede: a las 6:10 a. m. el turno de ejemplo abrió a las 6:00, no a las 2:00.
+ */
+function hhmmSince(now: number, min: number) {
   const step = 5 * 60_000;
-  return hhmm(new Date(Math.floor((now - min * 60_000) / step) * step));
+  const offset = 5 * 3_600_000;
+  const opening = Math.floor((now - offset) / 86_400_000) * 86_400_000 + OPENING_HOUR * 3_600_000 + offset;
+  let t = now - min * 60_000;
+  if (now >= opening && t < opening) t = opening;
+  return hhmm(new Date(Math.floor(t / step) * step));
 }
 
 const round3 = (n: number) => Math.round(n * 1000) / 1000;
@@ -326,10 +337,10 @@ export function stampTimes(s: PosState, now: number): PosState {
     const emps = PRESETS[id].employees;
     const sinceOf = (empId: string) => emps.find((e) => e.id === empId)?.sinceMin ?? 0;
     const shifts = Object.fromEntries(
-      Object.entries(d.shifts).map(([k, sh]) => [k, sh.openedAt ? sh : { ...sh, openedAt: hhmmAgo(now, sinceOf(sh.cashierId)) }]),
+      Object.entries(d.shifts).map(([k, sh]) => [k, sh.openedAt ? sh : { ...sh, openedAt: hhmmSince(now, sinceOf(sh.cashierId)) }]),
     );
     const staff = Object.fromEntries(
-      Object.entries(d.staff).map(([k, st]) => [k, st.clockedIn && !st.since ? { ...st, since: hhmmAgo(now, sinceOf(k)) } : st]),
+      Object.entries(d.staff).map(([k, st]) => [k, st.clockedIn && !st.since ? { ...st, since: hhmmSince(now, sinceOf(k)) } : st]),
     );
     return stampKds({ ...d, shifts, staff }, now);
   };

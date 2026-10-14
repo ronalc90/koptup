@@ -10,7 +10,7 @@ import { PRESETS, SELLER_COMMISSION, type Station } from './data';
 import { lineAmount } from './engine';
 import { orderKey, type KdsOrder, type PosStore } from './usePosStore';
 import { OpenTableModal } from './PosModals';
-import { employeeName, shortName, useFmt } from './ui';
+import { employeeName, panelTitleProps, shortName, useFmt } from './ui';
 
 // ---------------------------------------------------------------------------
 // Mesas
@@ -30,7 +30,9 @@ export function TablesPanel({ store, onPick }: { store: PosStore; onPick: (targe
   return (
     <div>
       <div className="mb-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 dark:text-white">{t('tables.title')}</h2>
+        <h2 {...panelTitleProps} className="text-xl sm:text-2xl font-bold text-secondary-900 dark:text-white focus:outline-none">
+          {t('tables.title')}
+        </h2>
         <p className="text-sm text-secondary-500">{t('tables.subtitle')}</p>
       </div>
       <div className="flex flex-wrap gap-3 mb-4 text-xs">
@@ -128,7 +130,9 @@ export function KdsPanel({ store, now }: { store: PosStore; now: number | null }
   return (
     <div>
       <div className="mb-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 dark:text-white">{t('kds.title')}</h2>
+        <h2 {...panelTitleProps} className="text-xl sm:text-2xl font-bold text-secondary-900 dark:text-white focus:outline-none">
+          {t('kds.title')}
+        </h2>
         <p className="text-sm text-secondary-500">{t('kds.subtitle')}</p>
       </div>
       <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -242,7 +246,9 @@ export function StaffPanel({ store, notify }: { store: PosStore; notify: (m: str
   return (
     <div className="max-w-3xl">
       <div className="mb-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 dark:text-white">{t('staff.title')}</h2>
+        <h2 {...panelTitleProps} className="text-xl sm:text-2xl font-bold text-secondary-900 dark:text-white focus:outline-none">
+          {t('staff.title')}
+        </h2>
         <p className="text-sm text-secondary-500">{t('staff.subtitle', { n: shift.number })}</p>
       </div>
       <div className="space-y-2">
@@ -261,7 +267,7 @@ export function StaffPanel({ store, notify }: { store: PosStore; notify: (m: str
                 <div className="font-semibold text-secondary-900 dark:text-white">{e.name}</div>
                 <div className="text-xs text-secondary-500">
                   {t(`staff.roles.${e.role}`)} ·{' '}
-                  {st.clockedIn ? (st.since ? t('staff.since', { time: st.since }) : t('staff.active')) : st.lastOut ? t('staff.out', { time: st.lastOut }) : t('staff.notToday')}
+                  {st.clockedIn ? (st.since ? t('staff.since', { time: f.clock(st.since) }) : t('staff.active')) : st.lastOut ? t('staff.out', { time: f.clock(st.lastOut) }) : t('staff.notToday')}
                 </div>
                 <div className="text-xs text-secondary-600 dark:text-secondary-400 mt-0.5">{metric(e.id, e.role)}</div>
               </div>

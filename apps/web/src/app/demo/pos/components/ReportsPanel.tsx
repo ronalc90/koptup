@@ -10,7 +10,7 @@ import { PRESETS, type PayMethod } from './data';
 import { buildReport, timeLabel } from './engine';
 import type { Closure, PosStore } from './usePosStore';
 import { StatusBadge } from './PosModals';
-import { Stat, employeeName, printById, useFmt } from './ui';
+import { Stat, employeeName, panelTitleProps, printById, useFmt } from './ui';
 
 export function ReportsPanel({
   store,
@@ -46,12 +46,14 @@ export function ReportsPanel({
     <div className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 dark:text-white">{title}</h2>
+          <h2 {...panelTitleProps} className="text-xl sm:text-2xl font-bold text-secondary-900 dark:text-white focus:outline-none">
+            {title}
+          </h2>
           <p className="text-sm text-secondary-500">
             {sedeObj?.name} · {t('receipt.cashier', { name: employeeName(preset, shift.cashierId) })}
             {shift.open
               ? shift.openedAt
-                ? ` · ${t('reports.openSince', { time: shift.openedAt })}`
+                ? ` · ${t('reports.openSince', { time: f.clock(shift.openedAt) })}`
                 : ''
               : ` · ${closure ? t('reports.closedAt', { time: timeLabel(closure.closedAt, f.locale) }) : t('shift.closedShort')}`}
           </p>

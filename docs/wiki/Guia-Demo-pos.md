@@ -48,7 +48,7 @@ En **Minimercado** (el negocio inicial), sede Bogotá · Chapinero, pulsa **Abri
 
 *Campo de escaneo abierto; el arroz y el café ya están en el ticket.*
 
-1. **Campo de código**: acepta un lector de código de barras real conectado como teclado (USB o Bluetooth) o un código escrito más Enter. Un código que no existe muestra «El código … no está en el catálogo». El buscador de arriba también agrega el producto si escribes un código de 8 a 14 dígitos y pulsas Enter.
+1. **Campo de código**: acepta un lector de código de barras real conectado como teclado (USB o Bluetooth) o un código escrito más Enter. Un código que no existe muestra «El código … no está en el catálogo». El buscador de arriba también agrega el producto si escribes (o escaneas) un código de 8 a 14 dígitos y pulsas Enter; si el código no existe, avisa «El código … no está en el catálogo» y deja el código escrito para corregirlo.
 2. **Códigos de ejemplo**: los cuatro primeros productos con código (arroz, lentejas, café y azúcar). Un clic equivale a escanearlos.
 3. **Líneas del ticket**: cada producto con precio unitario, tarifa de impuesto, botones − y +, y la papelera para quitarlo.
 
@@ -79,8 +79,14 @@ Pulsa **Cobrar $23.363**. En la ventana escribe `20000`, pulsa **Recibir efectiv
 1. **Total a pagar**, con lo **Recibido**, lo que **Falta** y el **Cambio**.
 2. **Medio de pago**: Efectivo, Tarjeta (datafono), QR (transferencia o billetera) o Bono de regalo. Se pueden combinar hasta cubrir el total. En efectivo aparecen botones rápidos («Exacto …» y valores redondeados) y la demo calcula el cambio. Datafono y QR esperan menos de un segundo y devuelven un código de autorización simulado. Los bonos de ejemplo son `BONO50` ($50.000) y `BONO20` ($20.000).
 3. **Pagos parciales**: cada uno con su papelera para quitarlo.
-4. **Documento para el cliente**: «Consumidor final» (documento equivalente electrónico POS) o «Pide factura electrónica» (tipo y número de documento, nombre y correo obligatorios).
+4. **Documento para el cliente**: «Consumidor final» (documento equivalente electrónico POS) o «Pide factura electrónica» (tipo y número de documento, nombre y correo obligatorios; un NIT se escribe con su dígito de verificación y la demo lo comprueba, ver abajo).
 5. **Confirmar cobro**: se activa cuando no falta nada. Registra la venta. El paso 2 queda «Hecho» con cualquier venta cobrada con dos medios de pago distintos.
+
+Si el cliente pide factura con NIT, la demo comprueba el dígito de verificación con el mismo cálculo de la DIAN (módulo 11). Sin dígito pide «Escribe el NIT con su dígito de verificación, separado por un guion»; con uno equivocado dice cuál debería ser y no deja confirmar el cobro:
+
+![Factura con NIT: dígito de verificación](images/doc/demos/pos/16-factura-nit.jpg)
+
+*Factura a un NIT de prueba con el dígito equivocado.* **1** Aviso bajo el número de documento. **2** El mismo aviso en lo que falta para cobrar; «Confirmar cobro» sigue desactivado hasta corregirlo.
 
 ### Paso 2 (cont.). El documento equivalente POS
 
@@ -93,7 +99,7 @@ Pulsa **Cobrar $23.363**. En la ventana escribe `20000`, pulsa **Recibir efectiv
 3. **Enviar al cliente (simulado)**: por WhatsApp (trae el celular del cliente) o por correo. Responde «Listo: se enviaría a … Simulado: en la demo no sale ningún mensaje».
 4. **Imprimir**: abre el diálogo de impresión del navegador solo con el recibo.
 
-Escape o **Listo** cierran la ventana y el foco vuelve al botón que la abrió.
+Escape o **Listo** cierran la ventana y el foco vuelve al botón que la abrió; si ese botón ya no está disponible (después de cobrar, **Cobrar** queda desactivado con el ticket vacío), el foco vuelve al campo de escaneo o al buscador para seguir vendiendo.
 
 Qué decir: «Cobro mixto en segundos, documento electrónico con su código y recibo por WhatsApp sin papel».
 
@@ -121,7 +127,7 @@ Qué decir: «Si se cae el internet, no se para la fila: los documentos se enví
 
 *Plano de 10 mesas más «Mostrador / para llevar»: libres en verde, ocupadas en azul (Mesa 3 y Mesa 5) y con cuenta pedida en naranja (Mesa 7).*
 
-Toca **Mesa 1**, elige mesero/a y número de personas y pulsa **Abrir mesa**: vuelves a **Venta** con el ticket de esa mesa. Toca **Bandeja paisa**: se abre la ventana de modificadores (Media porción −$8.000, Aguacate +$4.000, Huevo frito +$3.000, Chicharrón extra +$7.000, Sin cebolla) y una **Nota para cocina**. Las bebidas preparadas tienen En leche +$1.500, Sin azúcar y Sin hielo. Agrega también una Limonada de coco y pulsa **Enviar a cocina (2)**: la demo crea una comanda para cocina y otra para bar.
+Toca **Mesa 1**, elige mesero/a y número de personas y pulsa **Abrir mesa**: vuelves a **Venta** con el ticket de esa mesa («Mesa 1 · 2 personas · Mesero/a: …»). Toca **Bandeja paisa**: se abre la ventana de modificadores (Media porción −$8.000, Aguacate +$4.000, Huevo frito +$3.000, Chicharrón extra +$7.000, Sin cebolla) y una **Nota para cocina**. Las bebidas preparadas tienen En leche +$1.500, Sin azúcar y Sin hielo. Agrega también una Limonada de coco y pulsa **Enviar a cocina (2)**: la demo crea una comanda para cocina y otra para bar.
 
 Pulsa **Pre-cuenta**: la mesa queda «Cuenta pedida» y se abre la pre-cuenta para revisarla con el cliente antes de cobrar (el botón pasa a **Ver pre-cuenta**).
 
@@ -193,7 +199,7 @@ Ver la [vista general](#guía-de-la-demo-pos-para-tiendas-y-restaurantes).
 | **Sede** | Cambia la sede donde vendes («Ahora vendes en …»). El ticket vuelve al mostrador de esa sede. |
 | **En línea / Sin internet** | Interruptor simulado; muestra las ventas en cola y la sincronización. Afecta a los dos negocios. |
 | **Caja abierta · Turno N · nombre** | Estado del turno de la sede; en rojo «Caja cerrada». |
-| **Pestañas** | Minimercado: Venta, Reportes X/Z, Sedes y Empleados. Restaurante: además Mesas (con el número de mesas abiertas) y Cocina (con las comandas pendientes). |
+| **Pestañas** | Minimercado: Venta, Reportes X/Z, Sedes y Empleados. Restaurante: además Mesas (con el número de mesas abiertas) y Cocina (con las comandas pendientes; el lector de pantalla oye «Cocina (4 comandas pendientes)»). Si cambias de pestaña con la página ya abajo, la nueva se muestra desde su inicio, justo debajo de la barra de la caja. |
 
 ### Venta
 
@@ -203,7 +209,7 @@ Ver los [pasos 1 y 2](#paso-1-minimercado-escanea-y-pesa).
 - **Hora feliz** (solo restaurante): botón que aplica −20 % a la cerveza nacional.
 - **Combo** (restaurante): «Combo almuerzo: sancocho + jugo» se cobra como un ítem y se envía a cocina y a bar por separado.
 - **Periféricos**: impresora térmica, lector, datafono, balanza (solo minimercado) y cajón monedero con **Probar** o **Abrir**. Solo muestran un aviso simulado, salvo **Abrir campo** del lector, que abre el campo de escaneo (el lector real sí funciona).
-- **Caja**: turno, hora de apertura y cajero/a, base, efectivo neto de ventas, efectivo esperado y **Cerrar turno (Z)** o **Abrir caja**.
+- **Caja**: turno, hora de apertura y cajero/a, base, efectivo neto de ventas, efectivo esperado y **Cerrar turno (Z)** o **Abrir caja**. En **Abrir caja** se elige la base y el cajero/a o supervisor/a; quien no ha marcado entrada aparece como «Fuera de turno».
 - **Ticket**: en minimercado, selector **Asesor/a** (solo asesores en turno); en restaurante, mesa, personas, mesero/a y **Cambiar mesa**. **Vaciar ticket** borra las líneas.
 - **Cliente frecuente**: búsqueda por cédula o celular (prueba con 300 123 4567 o la cédula 52.384.917). Si no existe, **Registrarlo** pide nombre, cédula (5 a 10 dígitos), celular (10 dígitos que empiezan por 3) y la autorización de datos (Ley 1581 de 2012). Niveles: Bronce, Plata desde 1.500 puntos y Oro desde 5.000; se gana 1, 1,5 o 2 puntos por cada $1.000 y se canjean bloques de 500 puntos por $5.000.
 - **Restaurante**: **Enviar a cocina (N)** (solo lo que falta enviar; la línea muestra «Enviado: N»), **Pre-cuenta** / **Ver pre-cuenta** (marca la mesa como «Cuenta pedida» y abre la pre-cuenta informativa) y **Liberar mesa sin consumo**. Al cobrar pide elegir la propina (Sin propina, 5 % o 10 % sugerida, sobre la base sin impuestos).
@@ -236,7 +242,7 @@ Ver el [paso 5](#paso-5-reporte-x-cierre-z-y-sedes). Además de los totales:
 
 - **Productos más vendidos** del turno.
 - **Ventas del turno**: hora, número, POS o Factura, total y estado. **Ver** abre el documento; **Anular** pide confirmación y crea una nota crédito de ejemplo (`NC1-101`…): devuelve existencias, puntos y saldo de bonos, y la venta queda «Anulada · NC…». Con el turno cerrado solo queda **Ver**.
-- **Cierres Z de esta sesión**: lista de cierres con su diferencia y **Ver**.
+- **Cierres Z de hoy en esta sede**: lista de cierres con su diferencia y **Ver**.
 - Con la caja cerrada, el título cambia a «Reporte Z · Turno N (cerrado)» y aparecen **Ver reporte Z** y **Abrir caja**.
 
 ### Sedes
@@ -245,7 +251,7 @@ Ver el [paso 5](#paso-5-reporte-x-cierre-z-y-sedes). Además de los totales:
 
 *Consola de Mercado La Ceiba después del traslado de 5 unidades de arroz de Medellín · Laureles a Bogotá · Chapinero, con el filtro «Solo existencias bajas» activo.*
 
-- **Tarjetas por sede**: caja abierta o cerrada, «Tu caja (esta demo)» (lo que vendes aquí), «Otras cajas (ejemplo)» (cifras fijas), total del día, productos con existencias bajas y **Vender en esta sede**. Debajo, el total de la cadena.
+- **Tarjetas por sede**: caja abierta o cerrada, «Tu caja (esta demo)» (ventas y valor de lo que vendes aquí, por ejemplo «2 ventas · $38.563»), «Otras cajas (ejemplo)» (cifras fijas), total del día, productos con existencias bajas y **Vender en esta sede**. Debajo, el total de la cadena.
 - **Existencias por sede**: una columna por sede, en rojo con alerta las que están en el mínimo o por debajo, y **Solo existencias bajas**.
 - **Precio central**: el lápiz permite cambiar el precio (entre $100 y $10.000.000) para todas las sedes; aplica a los productos que agregues después y queda marcado «Cambiado».
 - **Trasladar existencias entre sedes**: producto, origen, destino y cantidad (enteros o kg). No deja trasladar sin conexión, entre la misma sede ni más de lo disponible; lo que está en un ticket abierto de la sede de origen no cuenta y el aviso dice cuánto hay disponible. Debajo queda el historial de traslados.
@@ -256,7 +262,7 @@ Ver el [paso 5](#paso-5-reporte-x-cierre-z-y-sedes). Además de los totales:
 
 *Empleados de Chapinero en el turno 12: la cajera con sus 2 ventas ($38.563), la asesora con su comisión y el supervisor.*
 
-Lista del personal de la sede con **Marcar entrada** y **Marcar salida** (hora real de Colombia) y cifras del turno: ventas cobradas por cajero/a, ventas asignadas y comisión del 1,5 % por asesor/a, mesas abiertas, cuentas cobradas y propinas por mesero/a y comandas pendientes de cocina o bar. Solo los meseros en turno pueden abrir mesas y solo los asesores en turno aparecen en el ticket. Las horas de entrada de ejemplo se calculan al abrir la demo, unas horas antes de la hora actual de Colombia, para que sean coherentes con la hora a la que la usas.
+Lista del personal de la sede con **Marcar entrada** y **Marcar salida** (hora real de Colombia) y cifras del turno: ventas cobradas por cajero/a, ventas asignadas y comisión del 1,5 % por asesor/a, mesas abiertas, cuentas cobradas y propinas por mesero/a y comandas pendientes de cocina o bar. Solo los meseros en turno pueden abrir mesas y solo los asesores en turno aparecen en el ticket. Las horas de entrada de ejemplo se calculan al abrir la demo, unas horas antes de la hora actual de Colombia, pero nunca antes de las 6:00 a. m., la hora de apertura de las sedes de ejemplo: si abres la demo a las 6:30 a. m., la cajera entró a las 6:00 a. m., no a las 2:00 a. m. Todas las horas (apertura, entradas, salidas, traslados y documentos) se muestran con el mismo formato («06:00 a. m.»).
 
 ### En el celular
 
@@ -282,7 +288,7 @@ En el teléfono el catálogo va en dos columnas y el ticket queda debajo; el bot
 | Sin internet y sincronización | **Simulados** | Es un interruptor de la demo; no corta tu conexión. |
 | Envío del recibo por WhatsApp o correo | **Simulado** | Solo muestra a dónde se enviaría. |
 | Otras cajas de cada sede | **Datos de ejemplo fijos** | Solo «Tu caja» suma lo que vendes. |
-| Horas de turnos, entradas y comandas de ejemplo | **Relativas a la hora real** | Se calculan al abrir la demo con la hora de Colombia; documentos, cierres y marcaciones usan la hora real. |
+| Horas de turnos, entradas y comandas de ejemplo | **Relativas a la hora real** | Se calculan al abrir la demo con la hora de Colombia, sin quedar antes de la apertura de las 6:00 a. m.; documentos, cierres y marcaciones usan la hora real. |
 | Dónde se guardan tus cambios | **Solo en este navegador** | `localStorage` del equipo; no llegan a un servidor ni los ven otras personas. La demo no llama al backend. Lo guardado otro día se descarta al abrirla (con el aviso «Empezó un día nuevo…»). |
 
 ---
@@ -314,8 +320,8 @@ flowchart LR
 1. **La tarjeta del catálogo todavía promete más que la demo** mientras no se cambien sus textos (son de otra pista): dice «Offline-first con CRDT sync y conflict resolution», «Multi-payment: efectivo, tarjeta, QR, wallets, BNPL, split», «facturación electrónica» y «hardware integrado». En la demo el modo sin internet es un interruptor simulado (no hay sincronización real ni manejo de conflictos), no hay pago a cuotas, los documentos son de ejemplo sin transmisión y solo el lector de código de barras funciona de verdad. Ya se propusieron textos nuevos para la tarjeta y para el producto POS retail.
 2. **Los cambios viven solo en el navegador.** Otro equipo o navegador ve los datos de ejemplo; el vendedor no ve lo que hizo el prospecto. Las «otras cajas» de cada sede son cifras fijas, también a primera hora del día.
 3. **Lo de otro día se borra.** Si vuelves a abrir la demo otro día (hora de Colombia), arranca con los datos de ejemplo de hoy y avisa «Empezó un día nuevo…».
-4. **De madrugada, los turnos de ejemplo empezaron la noche anterior.** Las horas de apertura y de entrada se calculan unas horas antes de la hora actual; si haces la demo a la 1 a. m., el turno aparece abierto desde las 9 p. m. (en la prueba, documentos de las 01:55 a. m. y turno abierto desde las 21:55).
+4. **Entre la medianoche y las 6:00 a. m., los turnos de ejemplo empezaron la noche anterior.** Antes de la hora de apertura de las sedes de ejemplo, las horas de apertura y de entrada se calculan unas horas antes de la hora actual: si haces la demo a la 1 a. m., el turno aparece abierto desde las 9 p. m. Desde las 6:00 a. m. nadie aparece entrando antes de que abra la sede.
 5. **En inglés, los nombres de productos, sedes y personas siguen en español**: son los datos de un negocio colombiano de ejemplo.
 6. **«Ver Planes y Precios»** del bloque común al final de la página lleva a los planes RAG, no a los del POS (es un componente compartido de todas las demos).
 
-Verificación: la sonda automática no encontró errores de consola (escritorio, 390 px, en-US y modo oscuro). Marca como «sin efecto» los pasos 2 y 4, «Qué es real en esta demo» y «Sedes» porque reutiliza el mismo navegador entre clics y, después de pulsar **Ocultar**, los índices de los botones cambian; se comprobó a mano que cada uno hace lo que dice.
+Verificación: la sonda automática, con los datos de ejemplo limpios en cada carga, probó cada botón visible a 1440 px y a 390 px, en claro y oscuro y con el navegador en español (es-CO) y en inglés (en-US), sin errores de consola ni de hidratación. Solo marca como «sin efecto» lo que ya estaba elegido al abrir (Minimercado, Venta, la categoría Todo y los selectores de sede y asesor), que es lo esperado. Además se recorrieron a mano los cinco pasos, la factura con NIT, la anulación, el cierre Z, los traslados, el precio central, las marcaciones, el guardado al recargar, el aviso de día nuevo y Restablecer datos, en español y en inglés.

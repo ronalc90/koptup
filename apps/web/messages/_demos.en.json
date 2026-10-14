@@ -14705,42 +14705,77 @@
   },
   "demoPos": {
     "meta": {
-      "title": "POS for retail and restaurants: interactive demo",
-      "description": "Point-of-sale demo with sample data from Colombia: sell with a barcode scanner, a scale or by table with kitchen tickets, take split payments, issue a sample electronic POS document, keep selling offline and close the till with X and Z reports. Includes a multi-store console with inventory and transfers.",
+      "title": "POS for stores and restaurants: interactive demo",
+      "description": "Point-of-sale demo with sample data from Colombia: sell with a barcode scanner and a scale or by table with kitchen tickets, take split payments, issue a sample electronic POS document, simulate selling offline and close the till with X and Z reports. Includes a multi-store console with inventory and transfers. Everything runs in your browser.",
       "breadcrumbHome": "Home",
       "breadcrumbDemos": "Demos",
-      "breadcrumbName": "POS for retail and restaurants"
+      "breadcrumbName": "POS for stores and restaurants"
     },
-    "pageTitle": "POS for retail and restaurants",
-    "pageSubtitle": "Sell with a barcode scanner and a scale, or by table with kitchen tickets. Take split payments, issue the electronic POS document, keep selling offline and close the till with a Z report. Everything works on this page.",
+    "header": {
+      "back": "Back to the demo catalog",
+      "guidedDemo": "Request a guided demo",
+      "quote": "Get a quote for your POS",
+      "kicker": "Interactive demo · For stores, grocery stores and restaurants",
+      "simBadge": "DIAN, payments and devices simulated",
+      "localBadge": "Saved only in this browser"
+    },
+    "pageTitle": "POS for stores and restaurants",
+    "pageSubtitle": "For owners and managers of grocery stores, shops and restaurants with one or more locations. Sell with a barcode scanner and a scale or by table with kitchen tickets, take split payments, issue a sample electronic POS document and close the till with X and Z reports. Start with the first steps.",
     "sampleBadge": "Sample data",
     "sampleHint": "The businesses (Mercado La Ceiba and Fogón Andino), their tax IDs, stores, addresses, employees, customers, ID numbers, phone numbers, barcodes, stock and figures are made up.",
     "howItWorks": {
       "title": "What is real in this demo",
       "real": "Everything is calculated in your browser: stock per store, taxes included in prices (19% VAT, 5% VAT, exempt or 8% consumption tax), points, change, tips, kitchen tickets, X and Z reports, cash count, commissions and the store console. Your sales and changes are saved only in this browser.",
       "scanner": "The “Scan” field accepts a real barcode scanner connected as a keyboard (USB or Bluetooth); if you don't have one, use the sample codes.",
-      "simulated": "Simulated: sending the document to the DIAN (the CUDE is computed here with SHA-384, in test mode, and never leaves your browser), the card terminal, QR payments, the scale, printer and cash drawer, and sending the receipt by WhatsApp or email. The “Offline” button is a demo switch: it does not cut your connection.",
+      "simulated": "Simulated: sending the document to the DIAN (the CUDE is computed here with SHA-384, in test mode, and never leaves your browser), the card terminal, QR payments, the scale, printer and cash drawer, and sending the receipt by WhatsApp or email. The “Offline” button is a demo switch: it does not cut your connection or store anything elsewhere.",
       "project": "In your project, the till installs as an app on a tablet or PC, stores sales on the device when the internet goes down and syncs them when it comes back, issues the electronic document through your authorized technology provider and connects to your card terminal, thermal printer, scanner, cash drawer and scale."
     },
-    "tour": {
-      "title": "Suggested walkthrough (3 minutes)",
+    "guide": {
+      "title": "First steps: suggested walkthrough (about 5 minutes)",
+      "progress": "{done} of {total} done",
+      "intro": "Each step takes you to its place in the demo and checks itself off when you do it. You go from a counter sale to closing the till.",
+      "step": "Step {n}",
+      "done": "Done",
+      "hide": "Hide",
+      "show": "Show steps",
       "steps": {
-        "1": "Retail: press “Scan”, use a sample code and weigh a per-kilo product with “Read scale”.",
-        "2": "In the ticket, look up customer 300 123 4567, redeem 500 points and take a split payment: part cash, the rest by card or QR.",
-        "3": "Turn on “Offline”, make another sale (it is queued) and reconnect to see it sync.",
-        "4": "Restaurant: open a table in “Tables”, take the order with modifiers, send it to the kitchen and move the ticket forward in “Kitchen (KDS)”.",
-        "5": "In “X/Z reports” review sales by payment method and close the shift with a cash count; in “Stores” move stock between stores."
+        "s1": {
+          "title": "Scan and weigh",
+          "text": "Grocery store: press “Scan”, use a sample code (or your scanner) and weigh a per-kilo product with “Read scale”.",
+          "go": "Open the scanner"
+        },
+        "s2": {
+          "title": "Split payment",
+          "text": "Look up customer 300 123 4567, redeem points and charge with two payment methods, for example cash and card terminal.",
+          "go": "Go to the ticket"
+        },
+        "s3": {
+          "title": "Sell offline",
+          "text": "Press “Online” to simulate an outage, make a sale (it is queued) and reconnect to watch it sync.",
+          "go": "Go to the switch"
+        },
+        "s4": {
+          "title": "Tables and kitchen",
+          "text": "Restaurant: open a table, order a dish with modifiers, send it to the kitchen and move the ticket forward in “Kitchen”.",
+          "go": "Go to Tables"
+        },
+        "s5": {
+          "title": "Close the till",
+          "text": "In “X/Z reports” review the shift by payment method and tax, then close it with a cash count: you get the Z report.",
+          "go": "Go to Reports"
+        }
       }
     },
     "reset": {
       "button": "Reset data",
       "confirm": "Delete your sales and changes in this demo?",
       "yes": "Yes, reset",
-      "done": "Sample data restored"
+      "done": "Sample data restored",
+      "hint": "Deletes your sales, closings, registered customers, prices and transfers for both businesses and goes back to the sample data."
     },
     "presets": {
       "label": "Business type",
-      "retail": "Retail · grocery",
+      "retail": "Grocery store",
       "restaurant": "Restaurant"
     },
     "toolbar": {
@@ -14762,10 +14797,14 @@
       "label": "POS sections",
       "sale": "Sale",
       "tables": "Tables",
-      "kds": "Kitchen (KDS)",
+      "kds": "Kitchen",
       "reports": "X/Z reports",
       "console": "Stores",
-      "staff": "Staff"
+      "staff": "Staff",
+      "badge": {
+        "kds": "{n, plural, one {# pending ticket} other {# pending tickets}}",
+        "tables": "{n, plural, one {# open table} other {# open tables}}"
+      }
     },
     "categories": {
       "all": "All",
@@ -14835,7 +14874,7 @@
       "title": "Ticket",
       "clear": "Empty ticket",
       "counter": "Counter / takeaway",
-      "tableInfo": "Table {n} · {guests} guests",
+      "tableInfo": "Table {n} · {guests, plural, one {# guest} other {# guests}}",
       "waiter": "Server: {name}",
       "changeTable": "Change table",
       "seller": "Sales associate",
@@ -14858,7 +14897,8 @@
       "bill": "Pre-bill",
       "billToast": "Table {n}: bill requested",
       "pay": "Charge {amount}",
-      "goToTicket": "View ticket ({n}) · {amount}"
+      "goToTicket": "View ticket ({n}) · {amount}",
+      "billAgain": "View pre-bill"
     },
     "loyalty": {
       "lookupPlaceholder": "Customer ID or mobile",
@@ -14912,7 +14952,7 @@
       "methods": {
         "cash": "Cash",
         "card": "Card (terminal)",
-        "qr": "QR (Bre-B or wallet)",
+        "qr": "QR (bank transfer or wallet)",
         "gift": "Gift card"
       },
       "methodHints": {
@@ -14956,7 +14996,10 @@
         },
         "doc": "Document number",
         "name": "Name or company name",
-        "email": "Email to send the invoice"
+        "email": "Email to send the invoice",
+        "nitFormat": "Enter the NIT with its check digit, separated by a hyphen.",
+        "nitDv": "The check digit does not match that NIT: it should be {dv}.",
+        "nitPlaceholder": "NIT with check digit"
       },
       "missing": {
         "tip": "Ask about the tip (it can be “No tip”).",
@@ -14965,6 +15008,17 @@
       },
       "confirm": "Confirm payment",
       "processing": "Recording…"
+    },
+    "bill": {
+      "title": "Pre-bill · Table {n}",
+      "subtitle": "What the table has ordered, to review with the customer before charging.",
+      "heading": "PRE-BILL",
+      "guests": "{n, plural, one {# guest} other {# guests}}",
+      "subtotal": "Total consumption",
+      "tip": "Suggested tip ({pct}%)",
+      "totalWithTip": "Total with suggested tip",
+      "tipNote": "The tip is voluntary: the customer decides whether to leave it and how much when paying.",
+      "notFiscal": "For information only: this is not an invoice or a POS document."
     },
     "receipt": {
       "titlePos": "POS equivalent document",
@@ -15038,7 +15092,7 @@
       "release": "Release table with no order"
     },
     "kds": {
-      "title": "Kitchen (KDS)",
+      "title": "Kitchen display",
       "subtitle": "This store's tickets by station, with how long they have been waiting.",
       "stations": {
         "all": "All",
@@ -15091,7 +15145,12 @@
       "refund": "Void",
       "refundConfirm": "Void with a credit note?",
       "refundDone": "Sale {n} voided with a credit note",
-      "closures": "Z closings in this session"
+      "closures": "Today's Z closings at this store",
+      "titleClosed": "Z report · Shift {n} (closed)",
+      "closedAt": "closed at {time}",
+      "closedHint": "These are the figures of the shift you closed. Open the till to start shift {next}.",
+      "printSummary": "Print summary",
+      "viewZ": "View Z report"
     },
     "shift": {
       "openTitle": "Open till",
@@ -15120,11 +15179,12 @@
     },
     "cash": {
       "title": "Till",
-      "openSince": "Shift {n} since {time} · {name}"
+      "openSince": "Shift {n} since {time} · {name}",
+      "open": "Shift {n} · {name}"
     },
     "hardware": {
       "title": "Peripherals",
-      "subtitle": "Simulated in the demo; in your project they connect to the till.",
+      "subtitle": "Simulated in the demo, except the barcode scanner: any scanner that types like a keyboard really works. In your project they all connect to the till.",
       "printer": "80 mm thermal printer",
       "scanner": "Barcode scanner",
       "terminal": "Card terminal",
@@ -15153,7 +15213,7 @@
       "closed": "Till closed",
       "myTill": "Your till (this demo)",
       "otherTills": "Other tills (sample)",
-      "salesValue": "{n} · {amount}",
+      "salesValue": "{n, plural, one {# sale} other {# sales}} · {amount}",
       "dayTotal": "Day total",
       "lowStock": "{n, plural, one {# product low on stock} other {# products low on stock}}",
       "switch": "Sell at this store",
@@ -15236,6 +15296,9 @@
       "yes": "Yes",
       "no": "No",
       "simulated": "simulated"
+    },
+    "toasts": {
+      "newDay": "A new day has started: the demo went back to today’s sample data."
     }
   },
   "demoSaas": {

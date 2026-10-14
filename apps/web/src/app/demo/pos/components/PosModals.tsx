@@ -19,7 +19,7 @@ import {
   ClockIcon,
 } from '@heroicons/react/24/outline';
 import { PRESETS, SCALE_READINGS, type Customer, type ModGroup, type PayMethod, type PresetId, type Product } from './data';
-import { dateTimeLabel, docLabel, lineAmount, phoneLabel, plainNumber, tipAmount, type Payment, type TicketLine, type Totals } from './engine';
+import { dateTimeLabel, docLabel, lineAmount, nitCheckDigit, phoneLabel, plainNumber, tipAmount, type Payment, type TicketLine, type Totals } from './engine';
 import type { Buyer, Closure, Sale } from './usePosStore';
 import { Modal, employeeName, inputCls, printById, selectCls, useFmt } from './ui';
 
@@ -252,7 +252,18 @@ export function CheckoutModal({
   }, [pending]);
 
   const buyerDigits = doc.replace(/[^0-9]/g, '');
-  const buyerValid = !wantsInvoice || (buyerDigits.length >= 5 && buyerDigits.length <= 12 && name.trim().length >= 3 && emailOk(email));
+  // El NIT se escribe con su dígito de verificación y se comprueba como lo hace la DIAN (módulo 11).
+  const nitMatch = /^(\d{6,10})-(\d)$/.exec(doc.replace(/[.\s]/g, ''));
+  const nitError =
+    !wantsInvoice || docType !== 'NIT' || !doc.trim()
+      ? null
+      : !nitMatch
+        ? t('checkout.buyer.nitFormat')
+        : nitCheckDigit(nitMatch[1]) !== Number(nitMatch[2])
+          ? t('checkout.buyer.nitDv', { dv: nitCheckDigit(nitMatch[1]) })
+          : null;
+  const buyerValid =
+    !wantsInvoice || (buyerDigits.length >= 5 && buyerDigits.length <= 12 && !nitError && name.trim().length >= 3 && emailOk(email));
 
   const add = (m: PayMethod, value: number) => {
     setError(null);
@@ -296,7 +307,8 @@ export function CheckoutModal({
   const missing: string[] = [];
   if (tipPct === null) missing.push(t('checkout.missing.tip'));
   if (pending > 0) missing.push(t('checkout.missing.pending', { amount: f.money(pending) }));
-  if (!buyerValid) missing.push(t('checkout.missing.buyer'));
+  if (nitError) missing.push(nitError);
+  else if (!buyerValid) missing.push(t('checkout.missing.buyer'));
 
   return (
     <Modal labelId="pos-checkout-title" title={t('checkout.title')} onClose={onCancel} size="lg">
@@ -471,7 +483,20 @@ export function CheckoutModal({
               <option value="NIT">{t('checkout.buyer.docTypes.NIT')}</option>
               <option value="CE">{t('checkout.buyer.docTypes.CE')}</option>
             </select>
-            <input value={doc} onChange={(e) => setDoc(e.target.value.slice(0, 15))} placeholder={t('checkout.buyer.doc')} aria-label={t('checkout.buyer.doc')} className={`${inputCls} sm:col-span-2`} />
+            <input
+              value={doc}
+              onChange={(e) => setDoc(e.target.value.slice(0, 15))}
+              placeholder={docType === 'NIT' ? t('checkout.buyer.nitPlaceholder') : t('checkout.buyer.doc')}
+              aria-label={t('checkout.buyer.doc')}
+              aria-invalid={!!nitError}
+              aria-describedby={nitError ? 'pos-nit-error' : undefined}
+              className={`${inputCls} sm:col-span-2`}
+            />
+            {nitError && (
+              <p id="pos-nit-error" className="sm:col-span-3 -mt-1 text-xs text-red-600">
+                {nitError}
+              </p>
+            )}
             <input value={name} onChange={(e) => setName(e.target.value.slice(0, 60))} placeholder={t('checkout.buyer.name')} aria-label={t('checkout.buyer.name')} className={`${inputCls} sm:col-span-3`} />
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value.slice(0, 80))} placeholder={t('checkout.buyer.email')} aria-label={t('checkout.buyer.email')} className={`${inputCls} sm:col-span-3`} />
           </div>
@@ -881,6 +906,7 @@ export function OpenShiftModal({
             {candidates.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name} · {t(`staff.roles.${c.role}`)}
+                {staffIn(c.id) ? '' : ` · ${t('staff.off')}`}
               </option>
             ))}
           </select>

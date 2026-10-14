@@ -260,13 +260,17 @@ export function SaleView({
           <div className="relative flex-1 min-w-[12rem]">
             <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-secondary-400" />
             <input
+              id="pos-search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && /^\d{8,14}$/.test(query.trim())) {
-                  scan(query.trim());
+                const code = query.trim();
+                if (e.key !== 'Enter' || !/^\d{8,14}$/.test(code)) return;
+                // Un lector que escribe en el buscador agrega el producto; un código que no existe se avisa y queda escrito.
+                if (p.products.some((x) => x.barcode === code)) {
+                  scan(code);
                   setQuery('');
-                }
+                } else notify(t('scan.notFound', { code }), 'error');
               }}
               placeholder={t(isRestaurant ? 'catalog.searchRestaurant' : 'catalog.searchRetail')}
               aria-label={t(isRestaurant ? 'catalog.searchRestaurant' : 'catalog.searchRetail')}
@@ -458,7 +462,7 @@ export function SaleView({
               {!shift.open
                 ? t('shift.closedShort')
                 : shift.openedAt
-                  ? t('cash.openSince', { n: shift.number, time: shift.openedAt, name: employeeName(preset, shift.cashierId) })
+                  ? t('cash.openSince', { n: shift.number, time: f.clock(shift.openedAt), name: employeeName(preset, shift.cashierId) })
                   : t('cash.open', { n: shift.number, name: employeeName(preset, shift.cashierId) })}
             </p>
             {shift.open && (

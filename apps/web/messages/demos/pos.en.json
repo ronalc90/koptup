@@ -96,7 +96,11 @@
       "kds": "Kitchen",
       "reports": "X/Z reports",
       "console": "Stores",
-      "staff": "Staff"
+      "staff": "Staff",
+      "badge": {
+        "kds": "{n, plural, one {# pending ticket} other {# pending tickets}}",
+        "tables": "{n, plural, one {# open table} other {# open tables}}"
+      }
     },
     "categories": {
       "all": "All",
@@ -166,7 +170,7 @@
       "title": "Ticket",
       "clear": "Empty ticket",
       "counter": "Counter / takeaway",
-      "tableInfo": "Table {n} · {guests} guests",
+      "tableInfo": "Table {n} · {guests, plural, one {# guest} other {# guests}}",
       "waiter": "Server: {name}",
       "changeTable": "Change table",
       "seller": "Sales associate",
@@ -190,7 +194,7 @@
       "billToast": "Table {n}: bill requested",
       "pay": "Charge {amount}",
       "goToTicket": "View ticket ({n}) · {amount}",
-      "billAgain": "View bill"
+      "billAgain": "View pre-bill"
     },
     "loyalty": {
       "lookupPlaceholder": "Customer ID or mobile",
@@ -288,7 +292,10 @@
         },
         "doc": "Document number",
         "name": "Name or company name",
-        "email": "Email to send the invoice"
+        "email": "Email to send the invoice",
+        "nitFormat": "Enter the NIT with its check digit, separated by a hyphen.",
+        "nitDv": "The check digit does not match that NIT: it should be {dv}.",
+        "nitPlaceholder": "NIT with check digit"
       },
       "missing": {
         "tip": "Ask about the tip (it can be “No tip”).",
@@ -299,9 +306,9 @@
       "processing": "Recording…"
     },
     "bill": {
-      "title": "Bill · Table {n}",
+      "title": "Pre-bill · Table {n}",
       "subtitle": "What the table has ordered, to review with the customer before charging.",
-      "heading": "BILL",
+      "heading": "PRE-BILL",
       "guests": "{n, plural, one {# guest} other {# guests}}",
       "subtotal": "Total consumption",
       "tip": "Suggested tip ({pct}%)",
@@ -434,7 +441,7 @@
       "refund": "Void",
       "refundConfirm": "Void with a credit note?",
       "refundDone": "Sale {n} voided with a credit note",
-      "closures": "Z closings in this session",
+      "closures": "Today's Z closings at this store",
       "titleClosed": "Z report · Shift {n} (closed)",
       "closedAt": "closed at {time}",
       "closedHint": "These are the figures of the shift you closed. Open the till to start shift {next}.",
@@ -502,7 +509,7 @@
       "closed": "Till closed",
       "myTill": "Your till (this demo)",
       "otherTills": "Other tills (sample)",
-      "salesValue": "{n} · {amount}",
+      "salesValue": "{n, plural, one {# sale} other {# sales}} · {amount}",
       "dayTotal": "Day total",
       "lowStock": "{n, plural, one {# product low on stock} other {# products low on stock}}",
       "switch": "Sell at this store",
