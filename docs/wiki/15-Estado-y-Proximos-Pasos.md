@@ -1,6 +1,6 @@
 # Estado del trabajo y próximos pasos
 
-> Corte: 10 de octubre de 2026. El trabajo se pausó otra vez a pedido del dueño y continúa el martes. Esta página resume qué está en `main`, qué avanzó en la rama de trabajo `ccr-55ceecf7-dpc10i`, qué falta y qué tiene que hacer el dueño.
+> Corte: 14 de octubre de 2026. El trabajo se pausó a pedido del dueño y continúa el martes. Esta página resume qué está en `main`, qué avanzó en la rama de trabajo `ccr-55ceecf7-dpc10i`, qué falta y qué tiene que hacer el dueño.
 
 ## Qué quedó en `main`
 
@@ -35,7 +35,7 @@ Valores iniciales: con solicitud → voice-ai, erp, delivery, hrms, lms, telemed
 
 chatbot, cuentas-medicas, sistema-experto, crm-ia, linkedin-ads, erp, pos, code-review-ia, helpdesk-ia, voice-ai, ecommerce, facturacion-electronica, hrms, loyalty, telemedicina, control-proyectos, delivery, dashboard-ejecutivo, lms, scraping, gestor-contenido.
 
-## Avance del 10 de octubre (rama `ccr-55ceecf7-dpc10i`, todavía no en `main`)
+## Avance en la rama de trabajo (`ccr-55ceecf7-dpc10i`, todavía no en `main`)
 
 Se trabajó en dos pistas en paralelo. Cada paso tiene un implementador y un revisor adversarial que lo verifica antes de hacer commit.
 
@@ -46,8 +46,10 @@ Se trabajó en dos pistas en paralelo. Cada paso tiene un implementador y un rev
 | Sitio público: embudo RAG, SEO, contenido verificable e inglés completo | ✅ Revisado y con commit |
 | Operación: variables, monitoreo programado, CI de seguridad, errores uniformes y código sin uso eliminado | ✅ Revisado y con commit |
 | Portal del cliente y panel (facturas, entregables, pedidos, mensajes, usuarios, bitácora, sesiones) | 🟡 A medias, en un commit `wip` sin revisar |
-| Las 7 demos que faltaban (saas-boilerplate, sistema-reservas, wms-logistica, firma-electronica, gestor-documentos, automatizacion, moderacion-contenido) | 🟡 Implementadas con commit; falta su revisión adversarial |
-| Corrección de las limitaciones de las otras 21 demos | 🟡 chatbot y cuentas-medicas a medias (commit `wip`); las demás sin empezar |
+| **Producto RAG (chatbot) verificado de punta a punta:** demo en sus 3 modos, "Prueba con tu documento", widget insertable, backend (bots en MongoDB, cupos, idioma), landings `/rag`, planes con textos verdaderos y pruebas (Jest backend 349/349, web 800/800, e2e del RAG en verde) | ✅ Revisado y con commit (14 de octubre) |
+| Las 28 demos funcionales, honestas y claras (implementación) | ✅ Las 28 con commit |
+| Revisión adversarial de cada demo | 🟡 9 terminadas (chatbot, hrms, crm-ia, lms, erp, facturacion-electronica, pos, delivery, voice-ai); 3 a medias en un commit `wip` (loyalty, gestor-contenido, dashboard-ejecutivo); 16 pendientes |
+| Build del backend en Railway | ✅ Arreglado (`apps/backend/railway.json` instala lo necesario para compilar); mientras llega a `main`, el comando va configurado a mano en Railway |
 
 Los commits marcados `wip` y "NO FUSIONAR" no deben ir a `main` hasta que pasen su revisión.
 
@@ -55,7 +57,7 @@ Los commits marcados `wip` y "NO FUSIONAR" no deben ir a `main` hasta que pasen 
 
 1. **Terminar y revisar el portal del cliente y el panel** (commit `wip` del 10 de octubre).
 2. **Flujo de compra** (fases P7–P9): pipeline de leads, "Solicitar propuesta", propuestas con página pública para aceptarlas, anticipo (enlace de pago, transferencia o Wompi con claves) y conversión a proyecto y cliente. El backend tiene avance sin revisar en el commit `wip` del 8 de octubre.
-3. **Demos:** revisión adversarial de las 7 demos implementadas; terminar chatbot y cuentas-medicas; corregir las limitaciones de las otras 19 según su guía; catálogo honesto (tarjetas del hub, páginas de producto y un solo nombre por demo); sonda final en las 28.
+3. **Demos:** terminar la revisión adversarial de 19 demos (telemedicina, helpdesk-ia, cuentas-medicas, sistema-experto, linkedin-ads, ecommerce, loyalty, gestor-contenido, dashboard-ejecutivo, control-proyectos, scraping, code-review-ia, sistema-reservas, saas-boilerplate, firma-electronica, wms-logistica, gestor-documentos, automatizacion, moderacion-contenido); catálogo honesto (tarjetas del hub, páginas de producto y un solo nombre por demo); sonda final en las 28.
 4. **Pendientes reportados por las fases:** permisos de la configuración del sistema experto para prospectos con acceso; achicar la lista de errores de hidratación conocidos. (Las cifras del README, el `docker-compose.yml` roto y el error de `/api/expert/generar-excel` sin procedimientos ya están corregidos en la rama de trabajo.)
 5. **Repaso de honestidad en todo el sitio:** quedan los textos del catálogo de "Otras soluciones a medida" (modalidad SaaS solo donde haya base real). `/about`, `/bienvenido-producthunt`, `/desarrollo-web-colombia`, las landings, el pie, el JSON-LD y `llms.txt` ya solo dicen lo que se puede comprobar; los datos que debe aportar el dueño están en [Páginas públicas › Limitaciones conocidas](Doc-03-Paginas-Publicas.md#16-limitaciones-conocidas).
 6. **Diseño y animaciones:** investigación de motion design, sistema de movimiento, animación protagonista que explique RAG, microinteracciones, easter eggs (paleta Ctrl+K, código Konami, mensaje en consola, 404 ingeniosa) y revisión adversarial con video y medición de fluidez.
