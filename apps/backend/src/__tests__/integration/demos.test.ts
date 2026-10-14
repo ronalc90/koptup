@@ -560,7 +560,8 @@ describeDb('sistema de demos (integración)', () => {
     it('motivo obligatorio; con notificar se envía un mensaje (no el motivo interno); spam nunca se notifica', async () => {
       const send = jest.spyOn(emailService, 'sendMail').mockResolvedValue(true);
       jest.spyOn(emailService, 'isConfigured').mockReturnValue(true);
-      jest.spyOn(emailService, 'sendContactNotification').mockResolvedValue(true);
+      jest.spyOn(emailService, 'isOwnerNoticeConfigured').mockReturnValue(true);
+      jest.spyOn(emailService, 'send').mockResolvedValue({ ok: true, configurado: true, proveedor: 'resend', id: 're_prueba' });
 
       const { doc } = await submit();
       await waitFor(async () => send.mock.calls.length >= 1); // acuse
@@ -595,7 +596,10 @@ describeDb('sistema de demos (integración)', () => {
     it('acuse al solicitante, aviso al equipo y correo de aprobación con el enlace de activación', async () => {
       const send = jest.spyOn(emailService, 'sendMail').mockResolvedValue(true);
       jest.spyOn(emailService, 'isConfigured').mockReturnValue(true);
-      const team = jest.spyOn(emailService, 'sendContactNotification').mockResolvedValue(true);
+      // Aviso al dueño (owner-notify → emailService.send con reply_to de la persona).
+      jest.spyOn(emailService, 'isOwnerNoticeConfigured').mockReturnValue(true);
+      jest.spyOn(emailService, 'getNotifyEmails').mockReturnValue(['dueno@empresa-prueba.co']);
+      const team = jest.spyOn(emailService, 'send').mockResolvedValue({ ok: true, configurado: true, proveedor: 'resend', id: 're_prueba' });
 
       const { doc } = await submit({ demos: ['lms'], nombre: 'Sofía <b>Test</b>' });
       const DemoRequest = (await import('../../models/DemoRequest')).default;
@@ -604,7 +608,14 @@ describeDb('sistema de demos (integración)', () => {
         return d?.notificaciones?.acuseSolicitante === true && d.notificaciones.equipoEmail === true ? d : null;
       });
       expect(ready.notificaciones.equipoWhatsapp).toBe(false);
-      expect(team).toHaveBeenCalledWith(expect.objectContaining({ source: 'demo-request', email: doc.email }));
+      expect(team).toHaveBeenCalledWith(
+        expect.objectContaining({ to: ['dueno@empresa-prueba.co'], replyTo: doc.email, ownerNotice: true, idempotencyKey: expect.stringMatching(/^contact-[0-9a-f]{24}-email-[0-9a-f]{16}$/) }),
+      );
+      // El Contact guarda el resultado por canal.
+      const Contact = (await import('../../models/Contact')).default;
+      const contact = await Contact.findById(ready.lead).lean();
+      expect(contact?.notificaciones?.email).toMatchObject({ estado: 'enviado', intentos: 1, idProveedor: 're_prueba' });
+      expect(contact?.notificaciones?.whatsapp?.estado).toBe('no_configurado');
       const ack = send.mock.calls.find((c) => c[0].subject.includes(doc.codigo));
       expect(ack?.[0].to).toBe(doc.email);
       // Lo que escribe el usuario se escapa en el HTML.

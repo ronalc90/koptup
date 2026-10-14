@@ -1,8 +1,9 @@
 /**
- * team-notify.service.ts — avisos internos al equipo por el canal existente
- * del formulario de contacto: email a ADMIN_EMAIL (y al responsable, si se
- * indica) y WhatsApp al número del equipo, cada uno solo si está
- * configurado. Nunca lanza: devuelve qué se envió de verdad.
+ * team-notify.service.ts — avisos internos al equipo por los mismos canales
+ * de los avisos de contacto: correo a NOTIFY_EMAIL (o ADMIN_EMAIL) y al
+ * responsable, si se indica, y WhatsApp al número del dueño con la plantilla
+ * de Meta (título = asunto; detalle = líneas y enlace), cada uno solo si
+ * está configurado. Nunca lanza: devuelve qué se envió de verdad.
  */
 import { emailService } from './email.service';
 import { whatsappService } from './whatsapp.service';
@@ -27,7 +28,7 @@ export interface TeamNoticeResult {
 }
 
 export async function notifyTeam(notice: TeamNotice): Promise<TeamNoticeResult> {
-  const recipients = [...new Set([emailService.getAdminEmail(), ...(notice.copiaA ?? [])].filter((e): e is string => !!e))];
+  const recipients = [...new Set([...emailService.getNotifyEmails(), ...(notice.copiaA ?? [])].filter((e): e is string => !!e))];
   const text = [...notice.lineas, ...(notice.enlace ? ['', notice.enlace] : [])].join('\n');
   const html = emailLayout(
     notice.asunto,
@@ -35,12 +36,13 @@ export async function notifyTeam(notice: TeamNotice): Promise<TeamNoticeResult> 
       ${notice.enlace ? `<p><a class="button" href="${safeHref(notice.enlace)}">Abrir en el panel</a></p>` : ''}`,
   );
   if (emailService.isConfigured() && recipients.length === 0) {
-    logger.warn(`[team-notify] ADMIN_EMAIL no está definida: el aviso "${safeSubject(notice.asunto)}" no se envía por correo`);
+    logger.warn(`[team-notify] NOTIFY_EMAIL (ni ADMIN_EMAIL) no está definida: el aviso "${safeSubject(notice.asunto)}" no se envía por correo`);
   }
   const email = emailService.isConfigured()
     ? (await Promise.all(recipients.map((to) => emailService.sendMail({ to, subject: safeSubject(notice.asunto), html, text }).catch(() => false)))).some(Boolean)
     : false;
-  const whatsapp = await whatsappService.sendTeamMessage(`*${notice.asunto}*\n\n${text}`).catch((err) => {
+  const detalle = [...notice.lineas.filter(Boolean), ...(notice.enlace ? [notice.enlace] : [])].join(' · ');
+  const whatsapp = await whatsappService.sendTeamMessage(notice.asunto, detalle).catch((err) => {
     logger.warn(`[team-notify] WhatsApp: ${(err as Error)?.message ?? err}`);
     return false;
   });

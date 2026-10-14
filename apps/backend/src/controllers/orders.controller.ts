@@ -239,9 +239,10 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
       // No fallar la creación del pedido si falla la conversación
     }
 
-    // Enviar notificación por WhatsApp al administrador
+    // Aviso al dueño por WhatsApp (plantilla de Meta: "Nuevo pedido <id>" y
+    // el detalle). Devuelve false sin lanzar si no está configurado o falla.
     try {
-      await whatsappService.sendOrderNotification({
+      const sent = await whatsappService.sendOrderNotification({
         orderId: newOrder.orderId,
         name: newOrder.name,
         clientName: user?.name || 'Cliente',
@@ -250,7 +251,8 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
         items: newOrder.items,
         hasAttachments: attachments.length > 0,
       });
-      logger.info(`Order notification sent for ${newOrder.orderId}`);
+      if (sent) logger.info(`Order notification sent for ${newOrder.orderId}`);
+      else logger.warn(`Order notification not sent for ${newOrder.orderId} (WhatsApp no configurado o falló)`);
     } catch (error) {
       logger.error('Error sending order notification:', error);
       // No fallar la creación del pedido si falla la notificación

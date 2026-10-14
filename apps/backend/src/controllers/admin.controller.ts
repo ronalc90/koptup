@@ -11,6 +11,7 @@ import User from '../models/User';
 import { sendOrderStatusMessage } from '../utils/conversationHelper';
 import { recordAudit } from '../services/audit.service';
 import { asyncHandler } from '../middleware/errorHandler';
+import { deliverContactNotifications, publicNotifications } from '../services/owner-notify.service';
 
 /**
  * Panel de administración. Cada controlador va envuelto en asyncHandler: si
@@ -564,6 +565,8 @@ export const adminGetContacts = asyncHandler(async (req: AuthRequest, res: Respo
           }
         : null,
       anonimizado: !!contact.anonimizadoEn,
+      // Aviso al dueño por canal (null en los contactos anteriores al registro de avisos).
+      notificaciones: publicNotifications(contact.notificaciones),
       createdAt: contact.created_at,
     }));
 
@@ -613,4 +616,56 @@ export const adminUpdateContactStatus = asyncHandler(async (req: AuthRequest, re
     console.error('Admin update contact status error:', error);
     res.status(500).json({ success: false, message: 'Error al actualizar estado' });
   }
+});
+
+/**
+ * POST /api/admin/contacts/:id/notify (solo admin): reenvía el aviso al
+ * dueño de ese contacto por los canales que no salieron (fallido, pendiente
+ * vencido o no configurado) o, con `?todos=1`, por los dos. Queda en la
+ * bitácora (`contact.notify_resend`).
+ */
+export const adminResendContactNotifications = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    res.status(404).json({ success: false, code: 'not_found', message: 'Contacto no encontrado' });
+    return;
+  }
+  const contact = await Contact.findById(id).lean();
+  if (!contact) {
+    res.status(404).json({ success: false, code: 'not_found', message: 'Contacto no encontrado' });
+    return;
+  }
+  if (contact.anonimizadoEn) {
+    res.status(409).json({ success: false, code: 'contact_anonymized', message: 'Este contacto ya fue anonimizado: no se puede reenviar el aviso.' });
+    return;
+  }
+  const todos = req.query.todos === '1' || req.query.todos === 'true';
+  const resultado = await deliverContactNotifications(String(contact._id), { modo: todos ? 'manual_todos' : 'manual' });
+  const updated = await Contact.findById(id).select('notificaciones').lean();
+
+  await recordAudit({
+    actor: req.user ? { id: req.user.id, email: req.user.email, role: req.user.role } : null,
+    accion: 'contact.notify_resend',
+    entidad: { tipo: 'Contact', id: String(contact._id) },
+    detalle: {
+      todos,
+      email: resultado.email ? { estado: resultado.email.estado, omitido: !!resultado.email.omitido } : null,
+      whatsapp: resultado.whatsapp ? { estado: resultado.whatsapp.estado, omitido: !!resultado.whatsapp.omitido } : null,
+    },
+    req,
+  });
+
+  res.json({
+    success: true,
+    data: {
+      id: contact._id,
+      notificaciones: publicNotifications(updated?.notificaciones),
+      resultado: {
+        email: resultado.email ? { enviado: resultado.email.enviado, estado: resultado.email.estado, omitido: !!resultado.email.omitido, error: resultado.email.error ?? null } : null,
+        whatsapp: resultado.whatsapp
+          ? { enviado: resultado.whatsapp.enviado, estado: resultado.whatsapp.estado, omitido: !!resultado.whatsapp.omitido, error: resultado.whatsapp.error ?? null, respaldo: resultado.whatsapp.respaldo ?? null }
+          : null,
+      },
+    },
+  });
 });

@@ -1,232 +1,60 @@
-# WhatsApp Notifications - Guía de Configuración
+# Avisos al dueño por WhatsApp (y por correo)
 
-## 📱 Descripción
+Cada vez que una persona escribe desde el sitio (formulario de [`/contact`](https://www.koptup.com/contact), «Solicitar demo» o «Prueba con tu documento»), el backend guarda el contacto y avisa al dueño por **dos canales independientes**:
 
-Este sistema envía notificaciones automáticas por WhatsApp cuando alguien envía el formulario de contacto en tu sitio web.
+- **Correo**, por la API HTTPS de **Resend** (SMTP queda solo como respaldo: Railway Free, Trial y Hobby bloquean el SMTP saliente).
+- **WhatsApp**, por la **WhatsApp Cloud API de Meta** con la plantilla aprobada `koptup_aviso`.
 
-## 🎯 Opciones Disponibles
+El resultado de cada canal queda en el contacto (**Admin › Contactos**: Enviado, Entregado, Leído, Falló con el motivo, Pendiente o No configurado), un job reintenta los que fallan y una prueba mensual automática mantiene vivos los dos canales aunque lleguen pocos mensajes.
 
-### Opción 1: Twilio (⭐ Recomendado)
+> **Guía completa, paso a paso** (Resend, Meta, Namecheap, Gmail y Railway): [Operación y despliegue › 4.5 Configurar los avisos al dueño](docs/wiki/Doc-11-Operacion-y-Despliegue.md#45-configurar-los-avisos-al-dueño-paso-a-paso).
+> Qué hacer si algo no llega: runbooks [9.7 El correo no sale](docs/wiki/Doc-11-Operacion-y-Despliegue.md#97-el-correo-no-sale) y [9.11 El WhatsApp no llega](docs/wiki/Doc-11-Operacion-y-Despliegue.md#911-el-whatsapp-no-llega).
 
-**Ventajas:**
-- ✅ Más confiable y profesional
-- ✅ Excelente documentación
-- ✅ Soporte técnico disponible
-- ✅ Fácil de configurar
+## Por qué con plantilla de Meta
 
-**Costo:** ~$0.005 por mensaje
+- Con un aviso al mes casi nunca hay una conversación abierta en las últimas 24 horas, y fuera de esa ventana Meta **solo** acepta plantillas aprobadas (un texto libre falla con el error 131047).
+- **Twilio y UltraMsg ya no se soportan:** el sandbox de Twilio vence a los 3 días y UltraMsg depende de una sesión de WhatsApp Web que se cae y no es oficial. Si `WHATSAPP_PROVIDER` vale `twilio` o `ultramsg`, el canal queda «no configurado» y el arranque lo avisa.
 
-#### Configuración Twilio
+La plantilla se crea en el Administrador de WhatsApp de Meta con estos datos exactos:
 
-1. **Crear cuenta en Twilio:**
-   - Ve a https://www.twilio.com/try-twilio
-   - Regístrate (obtienes $15 de crédito gratis)
+| Campo | Valor |
+|---|---|
+| Nombre | `koptup_aviso` |
+| Categoría | Utility (utilidad) |
+| Idioma | Spanish (`es`) |
+| Cuerpo | `Aviso de KopTup: {{1}}. Detalle: {{2}}. Revisa tu correo o el panel de KopTup para ver todo y responder.` |
 
-2. **Configurar WhatsApp Sandbox:**
-   - En el dashboard de Twilio, ve a "Messaging" > "Try it out" > "Send a WhatsApp message"
-   - Sigue las instrucciones para conectar tu número de WhatsApp
-   - Envía el mensaje de activación que te indica (ej: "join <código>")
+`{{1}}` es el título (por ejemplo «Nuevo contacto de Ana Pérez», máximo 120 caracteres) y `{{2}}` el detalle (empresa, servicio, email y un extracto del mensaje, máximo 700). El backend les quita los saltos de línea y los tabs, porque Meta los rechaza.
 
-3. **Obtener credenciales:**
-   - Account SID: En el dashboard principal
-   - Auth Token: Haz clic en "Show" en el dashboard
-   - WhatsApp Number: El número que aparece en WhatsApp Sandbox (ej: +14155238886)
+## Variables del backend (Railway)
 
-4. **Agregar al `.env`:**
-   ```bash
-   WHATSAPP_PROVIDER=twilio
-   ADMIN_WHATSAPP_NUMBER=+57300123456  # Tu número con código de país
-   TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   TWILIO_AUTH_TOKEN=your_auth_token_here
-   TWILIO_WHATSAPP_NUMBER=+14155238886  # El número de Twilio Sandbox
-   ```
+Solo nombres; los valores van en Railway, nunca en el repositorio. La explicación de cada una está en [`apps/backend/.env.example`](apps/backend/.env.example).
 
-5. **Para producción (opcional):**
-   - Solicita un número de WhatsApp Business dedicado en Twilio
-   - Requiere verificación de negocio (~1-2 semanas)
-   - Costo: ~$25/mes
+| Variable | Para qué |
+|---|---|
+| `WHATSAPP_PROVIDER` | `meta` (también acepta el valor viejo `whatsapp-business`) |
+| `WHATSAPP_API_TOKEN` | Token **permanente** de un usuario del sistema de Meta (caducidad «Nunca»), con los permisos `whatsapp_business_messaging` y `whatsapp_business_management` |
+| `WHATSAPP_PHONE_NUMBER_ID` | Identificador del número que envía (en WhatsApp › Configuración de la API) |
+| `ADMIN_WHATSAPP_NUMBER` | Tu número con indicativo, por ejemplo `+57 3XX XXX XXXX` (se toman solo los dígitos) |
+| `WHATSAPP_TEMPLATE_NAME`, `WHATSAPP_TEMPLATE_LANG` | `koptup_aviso` y `es` por defecto |
+| `WHATSAPP_GRAPH_VERSION` | `v25.0` por defecto |
+| `WHATSAPP_HELLO_WORLD_FALLBACK` | `true` por defecto: si la plantilla propia falla por un error de plantilla, envía la de ejemplo `hello_world` para que al menos suene el teléfono |
+| `WHATSAPP_APP_SECRET`, `WHATSAPP_WEBHOOK_VERIFY_TOKEN` | Opcionales: encienden el webhook firmado `/api/webhooks/whatsapp`, que confirma entregado, leído o fallido y te avisa por correo si un WhatsApp no se entregó |
+| `RESEND_API_KEY`, `EMAIL_FROM`, `NOTIFY_EMAIL` | El canal de correo (Resend, remitente y a quién le llegan los avisos) |
+| `NOTIFY_HEARTBEAT_DAYS`, `NOTIFY_JOBS_ENABLED` | Prueba mensual (cada 30 días por defecto; `0` la apaga) y reintentos (`false` los apaga) |
 
----
+Con el **número de prueba gratis** de Meta no hace falta tarjeta ni verificar el negocio, pero tu número debe estar en la lista de destinatarios verificados de ese número de prueba.
 
-### Opción 2: WhatsApp Business API (Meta)
+## Cómo probarlo
 
-**Ventajas:**
-- ✅ Gratis (hasta cierto límite)
-- ✅ Directamente con Meta/Facebook
-- ✅ Más control y personalización
+1. Despliega el backend con las variables y revisa el registro del arranque: debe decir `Avisos por WhatsApp: Meta plantilla koptup_aviso → +57 *** *** XXXX` (el número sale enmascarado).
+2. Entra con una cuenta **admin** a **Admin › Configuración › Avisos de nuevos contactos** y pulsa **Enviar aviso de prueba**. Te muestra lo que respondió Meta: «Enviado» con el id del mensaje, o el código de error de Meta con qué revisar. Se permiten 5 pruebas cada 15 minutos.
+3. Envía un mensaje real desde `/contact` y mira en **Admin › Contactos** que los dos canales digan «Enviado».
 
-**Desventajas:**
-- ❌ Configuración más compleja
-- ❌ Requiere verificación de negocio
-- ❌ Proceso puede tardar varios días
+Las rutas viejas de prueba (`POST /api/contact/test-whatsapp`, `POST /api/contact/test-email` y `GET /api/test/whatsapp`) se retiraron: solo funcionaban fuera de producción. La prueba ahora es `POST /api/admin/notifications/test` (solo admin, también en producción) y el estado de los canales, sin secretos, `GET /api/admin/notifications/status` (admin y manager).
 
-#### Configuración WhatsApp Business API
+## Para desarrolladores
 
-1. **Crear cuenta de Meta for Developers:**
-   - Ve a https://developers.facebook.com/
-   - Crea una aplicación de tipo "Business"
-
-2. **Configurar WhatsApp:**
-   - En la app, agrega el producto "WhatsApp"
-   - Verifica tu número de teléfono empresarial
-   - Obtén el Phone Number ID y Access Token
-
-3. **Agregar al `.env`:**
-   ```bash
-   WHATSAPP_PROVIDER=whatsapp-business
-   ADMIN_WHATSAPP_NUMBER=+573001234567
-   WHATSAPP_API_TOKEN=your_access_token
-   WHATSAPP_PHONE_NUMBER_ID=your_phone_number_id
-   ```
-
----
-
-### Opción 3: UltraMsg (Alternativa Simple)
-
-**Ventajas:**
-- ✅ Muy fácil de configurar (5 minutos)
-- ✅ No requiere verificación de negocio
-- ✅ Funciona con WhatsApp Web
-
-**Desventajas:**
-- ❌ Menos confiable que Twilio
-- ❌ Puede violar términos de servicio de WhatsApp
-- ❌ Solo para desarrollo/pruebas
-
-#### Configuración UltraMsg
-
-1. **Crear cuenta:**
-   - Ve a https://ultramsg.com/
-   - Regístrate (plan gratuito disponible)
-
-2. **Configurar instancia:**
-   - Crea una nueva instancia
-   - Escanea el código QR con WhatsApp
-   - Copia el Instance ID y Token
-
-3. **Agregar al `.env`:**
-   ```bash
-   WHATSAPP_PROVIDER=ultramsg
-   ADMIN_WHATSAPP_NUMBER=+573001234567
-   ULTRAMSG_INSTANCE_ID=instance12345
-   ULTRAMSG_TOKEN=your_ultramsg_token
-   ```
-
----
-
-## 🚀 Uso
-
-Una vez configurado, el sistema funcionará automáticamente:
-
-1. Usuario llena el formulario de contacto en tu web
-2. El sistema guarda el contacto en la base de datos
-3. **Automáticamente** se envía una notificación por WhatsApp con:
-   - Nombre del contacto
-   - Email
-   - Asunto
-   - Mensaje completo
-   - Fecha y hora
-
-### Mensaje que recibirás:
-
-```
-🔔 Nuevo Formulario de Contacto - KopTup
-
-👤 Nombre: Juan Pérez
-📧 Email: juan@example.com
-📋 Asunto: Consulta sobre servicios
-
-💬 Mensaje:
-Hola, estoy interesado en conocer más sobre sus servicios...
-
----
-⏰ 12/12/2025 15:30:45
-```
-
----
-
-## 🧪 Probar la Configuración
-
-### Endpoint de prueba (desarrollo):
-
-```bash
-# Enviar mensaje de prueba
-curl -X POST http://localhost:3001/api/test/whatsapp \
-  -H "Content-Type: application/json"
-```
-
-### Desde código:
-
-```typescript
-import { whatsappService } from './services/whatsapp.service';
-
-// Enviar mensaje de prueba
-await whatsappService.sendTestMessage();
-```
-
----
-
-## 📊 Comparación de Opciones
-
-| Característica | Twilio | WhatsApp Business | UltraMsg |
-|---------------|--------|-------------------|----------|
-| Confiabilidad | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
-| Facilidad | ⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐⭐ |
-| Costo | Bajo | Gratis | Muy bajo |
-| Tiempo setup | 15 min | 1-2 semanas | 5 min |
-| Producción | ✅ | ✅ | ❌ |
-
----
-
-## 🔧 Troubleshooting
-
-### "WhatsApp not configured - skipping notification"
-- Verifica que las variables de entorno estén configuradas
-- Asegúrate de que `ADMIN_WHATSAPP_NUMBER` tenga el formato correcto (+código_país + número)
-
-### Mensajes no llegan (Twilio)
-- Verifica que enviaste el mensaje "join" al Sandbox
-- Revisa los logs de Twilio en https://console.twilio.com
-- Asegúrate de que el número en `ADMIN_WHATSAPP_NUMBER` sea el que activaste
-
-### Error de autenticación
-- Verifica que las credenciales sean correctas
-- Regenera los tokens si es necesario
-- Revisa que no haya espacios extra en las variables
-
----
-
-## 📝 Variables de Entorno Completas
-
-```bash
-# Configuración general
-WHATSAPP_PROVIDER=twilio          # O 'whatsapp-business' o 'ultramsg'
-ADMIN_WHATSAPP_NUMBER=+573001234567  # TU número (con código de país)
-
-# Si usas Twilio:
-TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxx
-TWILIO_AUTH_TOKEN=xxxxxxxxxx
-TWILIO_WHATSAPP_NUMBER=+14155238886
-
-# Si usas WhatsApp Business API:
-WHATSAPP_API_TOKEN=xxxxxxxxxx
-WHATSAPP_PHONE_NUMBER_ID=xxxxxxxxxx
-
-# Si usas UltraMsg:
-ULTRAMSG_INSTANCE_ID=instance12345
-ULTRAMSG_TOKEN=xxxxxxxxxx
-```
-
----
-
-## 🎓 Recursos Adicionales
-
-- [Twilio WhatsApp Quickstart](https://www.twilio.com/docs/whatsapp/quickstart)
-- [WhatsApp Business API Docs](https://developers.facebook.com/docs/whatsapp)
-- [UltraMsg API](https://docs.ultramsg.com/)
-
----
-
-## ⚡ Siguiente Paso
-
-Para Railway (producción), agrega estas variables de entorno en el dashboard de Railway con los valores correspondientes de tu cuenta de Twilio/WhatsApp.
+- Código: `apps/backend/src/services/whatsapp.service.ts` (plantilla, errores de Meta y respaldo), `email.service.ts` (Resend y SMTP), `owner-notify.service.ts` (arma el aviso, lo envía por canal y guarda el resultado), `jobs/notify-retry.job.ts`, `jobs/notify-heartbeat.job.ts` y `routes/whatsapp-webhook.routes.ts`.
+- Pruebas: nunca uses credenciales reales. Las pruebas de Jest simulan `fetch`, y la suite e2e apunta `RESEND_API_URL` y `WHATSAPP_GRAPH_URL` al mock [`apps/web/e2e/support/notify-mock.js`](apps/web/e2e/support/notify-mock.js) (ver el [README](README.md#e2e-en-local-paso-a-paso)).
+- Diagramas del envío, los reintentos y el webhook: [Flujos técnicos › 9](docs/wiki/Doc-14-3-Flujos-Tecnicos.md#9-avisos-al-dueño-correo-y-whatsapp).

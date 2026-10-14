@@ -1,7 +1,7 @@
 /**
  * proposal-emails.service.ts — correos de las propuestas al cliente
- * (español, con "tú"). Usan el SMTP existente (email.service.ts): sin SMTP
- * no se envía nada y cada función devuelve false; el panel muestra siempre
+ * (español, con "tú"). Usan email.service.ts (Resend o SMTP de respaldo):
+ * sin correo configurado no se envía nada y cada función devuelve false; el panel muestra siempre
  * el enlace público para copiarlo o enviarlo por WhatsApp.
  */
 import { emailService } from './email.service';

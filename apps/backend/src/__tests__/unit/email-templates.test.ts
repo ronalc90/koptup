@@ -2,7 +2,7 @@
  * Plantillas de correo con datos del usuario: todo texto va escapado, los
  * enlaces solo aceptan http(s) o mailto y el asunto queda en una sola línea.
  * Se renderiza cada plantilla con datos hostiles y se captura lo que se
- * entregaría a SMTP (sin enviar nada).
+ * entregaría a SMTP (sin enviar nada; sin RESEND_API_KEY el servicio usa SMTP).
  */
 const HOSTILE = `<img src=x onerror="alert(1)">'"&</p><script>alert(2)</script>`;
 const HOSTILE_URL = 'javascript:alert(document.cookie)';
@@ -13,13 +13,15 @@ interface Captured {
   subject: string;
   html: string;
   text: string;
+  replyTo?: string;
 }
 
 describe('plantillas de correo con datos del usuario', () => {
   const captured: Captured[] = [];
-  const prev = { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS, admin: process.env.ADMIN_EMAIL };
+  const prev = { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS, admin: process.env.ADMIN_EMAIL, resend: process.env.RESEND_API_KEY, notify: process.env.NOTIFY_EMAIL };
   let templates: {
     email: typeof import('../../services/email.service');
+    owner: typeof import('../../services/owner-notify.service');
     demo: typeof import('../../services/demo-emails.service');
     proposal: typeof import('../../services/proposal-emails.service');
     team: typeof import('../../services/team-notify.service');
@@ -29,6 +31,8 @@ describe('plantillas de correo con datos del usuario', () => {
     process.env.SMTP_USER = 'prueba@example.com';
     process.env.SMTP_PASS = 'no-es-real';
     process.env.ADMIN_EMAIL = 'equipo@example.com';
+    delete process.env.RESEND_API_KEY;
+    delete process.env.NOTIFY_EMAIL;
     jest.resetModules();
     const email = await import('../../services/email.service');
     // Transporte falso: captura el mensaje en vez de enviarlo.
@@ -40,6 +44,7 @@ describe('plantillas de correo con datos del usuario', () => {
     };
     templates = {
       email,
+      owner: await import('../../services/owner-notify.service'),
       demo: await import('../../services/demo-emails.service'),
       proposal: await import('../../services/proposal-emails.service'),
       team: await import('../../services/team-notify.service'),
@@ -53,6 +58,8 @@ describe('plantillas de correo con datos del usuario', () => {
     else process.env.SMTP_PASS = prev.pass;
     if (prev.admin === undefined) delete process.env.ADMIN_EMAIL;
     else process.env.ADMIN_EMAIL = prev.admin;
+    if (prev.resend !== undefined) process.env.RESEND_API_KEY = prev.resend;
+    if (prev.notify !== undefined) process.env.NOTIFY_EMAIL = prev.notify;
   });
 
   beforeEach(() => {
@@ -71,8 +78,8 @@ describe('plantillas de correo con datos del usuario', () => {
     expect(msg!.subject).not.toMatch(/[\r\n]/);
   }
 
-  it('contacto y recuperar contraseña (email.service)', async () => {
-    await templates.email.emailService.sendContactNotification({
+  it('aviso de contacto al dueño (owner-notify) y recuperar contraseña (email.service)', async () => {
+    const notice = templates.owner.buildContactNotice({
       name: HOSTILE,
       email: `x@example.com"><script>alert(1)</script>`,
       phone: HOSTILE,
@@ -80,11 +87,20 @@ describe('plantillas de correo con datos del usuario', () => {
       service: `${HOSTILE_SUBJECT}${HOSTILE}`,
       budget: HOSTILE,
       message: `${HOSTILE}\nsegunda línea`,
-      source: HOSTILE,
+      source: 'demo-rag',
+      created_at: new Date('2026-10-14T15:00:00Z'),
     });
+    const r = await templates.owner.sendNoticeByChannel('email', notice);
+    expect(r).toMatchObject({ configurado: true, ok: true });
     expectSafe(captured[0]);
+    expect(captured[0].to).toBe('equipo@example.com');
+    expect(captured[0].replyTo).toBe(`x@example.com"><script>alert(1)</script>`);
     expect(captured[0].html).toContain('&lt;img src=x onerror=&quot;alert(1)&quot;&gt;');
     expect(captured[0].html).toContain('<br>segunda línea');
+    // Determinista: el mismo contacto produce el mismo cuerpo (Idempotency-Key de Resend).
+    expect(templates.owner.buildContactNotice({ name: 'Ana', email: 'a@b.co', service: 'RAG', message: 'Hola', created_at: new Date(0) }).html).toBe(
+      templates.owner.buildContactNotice({ name: 'Ana', email: 'a@b.co', service: 'RAG', message: 'Hola', created_at: new Date(0) }).html,
+    );
 
     await templates.email.emailService.sendPasswordResetEmail({ to: 'a@example.com', name: HOSTILE, resetUrl: HOSTILE_URL });
     expectSafe(captured[1]);
@@ -123,14 +139,17 @@ describe('plantillas de correo con datos del usuario', () => {
     captured.forEach(expectSafe);
   });
 
-  it('sin ADMIN_EMAIL no hay destino fijo: los avisos al equipo no salen por correo', async () => {
-    const config = (templates.email.emailService as unknown as { config: { adminEmail: string | null } }).config;
-    const saved = config.adminEmail;
-    config.adminEmail = null;
+  it('sin NOTIFY_EMAIL ni ADMIN_EMAIL no hay destino fijo: los avisos al dueño no salen por correo', async () => {
+    const config = (templates.email.emailService as unknown as { config: { notifyEmails: string[] } }).config;
+    const saved = config.notifyEmails;
+    config.notifyEmails = [];
     try {
       expect(templates.email.emailService.getAdminEmail()).toBeNull();
-      const sent = await templates.email.emailService.sendContactNotification({ name: 'Ana', email: 'ana@example.com', service: 'RAG', message: 'Hola' });
-      expect(sent).toBe(false);
+      expect(templates.email.emailService.isOwnerNoticeConfigured()).toBe(false);
+      const notice = templates.owner.buildContactNotice({ name: 'Ana', email: 'ana@example.com', service: 'RAG', message: 'Hola' });
+      const sent = await templates.owner.sendNoticeByChannel('email', notice);
+      expect(sent).toMatchObject({ configurado: false, ok: false });
+      expect(sent.error).toMatch(/NOTIFY_EMAIL/);
       const result = await templates.team.notifyTeam({ asunto: 'Solicitud nueva', lineas: ['Ana pidió una demo'] });
       expect(result.email).toBe(false);
       // Un responsable en copia sí recibe el aviso.
@@ -138,7 +157,7 @@ describe('plantillas de correo con datos del usuario', () => {
       expect(withCopy.email).toBe(true);
       expect(captured.map((m) => m.to)).toEqual(['responsable@example.com']);
     } finally {
-      config.adminEmail = saved;
+      config.notifyEmails = saved;
     }
   });
 

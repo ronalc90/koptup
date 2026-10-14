@@ -14,7 +14,11 @@ import {
   ClockIcon,
   CheckCircleIcon,
   EyeIcon,
+  ArrowPathIcon,
 } from '@heroicons/react/24/outline';
+import { useStaffRole } from '@/components/admin/demos/shared';
+import { ContactNotifyDetail, ContactNotifyPills, hasUndeliveredChannel, type ContactNotifications } from '@/components/admin/owner-notify';
+import { ApiError, apiRequest } from '@/lib/demo-system';
 
 /** Valores del campo "¿Cuándo quieres empezar?" de /contact (Contact.plazo). */
 const TIMELINES = ['now', '1m', '3m', 'open'];
@@ -23,11 +27,16 @@ export default function AdminContactsPage() {
   // Mismos textos del formulario de /contact para el plazo.
   const tContact = useTranslations('contactPage');
   const tPrivacy = useTranslations('adminPrivacy');
+  const tNotify = useTranslations('adminNotify.status');
+  const role = useStaffRole();
+  const isAdmin = role === 'admin';
   const [contacts, setContacts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedContact, setSelectedContact] = useState<any>(null);
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+  const [resending, setResending] = useState<string | null>(null);
+  const [resendMessage, setResendMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
   useEffect(() => {
     loadContacts();
@@ -37,7 +46,10 @@ export default function AdminContactsPage() {
     try {
       setLoading(true);
       const response = await api.get(`/api/admin/contacts?status=${statusFilter}`);
-      setContacts(response.data?.data || []);
+      const list: any[] = response.data?.data || [];
+      setContacts(list);
+      // El detalle muestra los datos recién cargados (estado, avisos).
+      setSelectedContact((prev: any) => (prev ? list.find((c) => c.id === prev.id) ?? prev : prev));
     } catch (error) {
       console.error('Error loading contacts:', error);
       setContacts([]);
@@ -51,7 +63,7 @@ export default function AdminContactsPage() {
       setUpdatingStatus(contactId);
       await api.patch(`/api/admin/contacts/${contactId}/status`, { status: newStatus });
       await loadContacts();
-      if (selectedContact?._id === contactId) {
+      if (selectedContact?.id === contactId) {
         setSelectedContact({ ...selectedContact, status: newStatus });
       }
     } catch (error) {
@@ -59,6 +71,35 @@ export default function AdminContactsPage() {
       alert('Error al actualizar estado');
     } finally {
       setUpdatingStatus(null);
+    }
+  };
+
+  /** Reenvía el aviso al dueño: los canales que no salieron o, si ya salieron todos, ambos otra vez. */
+  const handleResendNotify = async (contact: any) => {
+    const all = !hasUndeliveredChannel(contact.notificaciones);
+    setResending(contact.id);
+    setResendMessage(null);
+    try {
+      const data = await apiRequest<{ notificaciones?: ContactNotifications } & ContactNotifications>(
+        `/admin/contacts/${encodeURIComponent(contact.id)}/notify${all ? '?todos=1' : ''}`,
+        { method: 'POST', body: {} },
+      );
+      const notificaciones = data?.notificaciones ?? data;
+      if (notificaciones) {
+        setSelectedContact((prev: any) => (prev && prev.id === contact.id ? { ...prev, notificaciones } : prev));
+        setContacts((prev) => prev.map((c) => (c.id === contact.id ? { ...c, notificaciones } : c)));
+      }
+      setResendMessage({ ok: true, text: tNotify('resendDone') });
+    } catch (err) {
+      const text =
+        err instanceof ApiError && err.status === 403
+          ? tNotify('resendAdminOnly')
+          : err instanceof ApiError && err.status === 429
+            ? tNotify('resendRateLimited')
+            : tNotify('resendError', { error: err instanceof Error ? err.message : String(err) });
+      setResendMessage({ ok: false, text });
+    } finally {
+      setResending(null);
     }
   };
 
@@ -157,7 +198,12 @@ export default function AdminContactsPage() {
                     {contacts.map((contact) => (
                       <div
                         key={contact.id}
-                        onClick={() => setSelectedContact(contact)}
+                        data-testid="contact-row"
+                        data-contact-email={contact.email}
+                        onClick={() => {
+                          setSelectedContact(contact);
+                          setResendMessage(null);
+                        }}
                         className={`p-4 rounded-lg border cursor-pointer transition-colors ${
                           selectedContact?.id === contact.id
                             ? 'border-primary-500 bg-primary-50 dark:bg-primary-950'
@@ -200,6 +246,11 @@ export default function AdminContactsPage() {
                               {contact.budget}
                             </Badge>
                           )}
+                        </div>
+
+                        {/* Estado del aviso al dueño por cada canal. */}
+                        <div className="mt-2">
+                          <ContactNotifyPills notificaciones={contact.notificaciones} />
                         </div>
                       </div>
                     ))}
@@ -306,6 +357,49 @@ export default function AdminContactsPage() {
                       <p className="text-sm text-secondary-900 dark:text-white whitespace-pre-wrap">
                         {selectedContact.message}
                       </p>
+                    </div>
+
+                    {/* Aviso al dueño (correo y WhatsApp) de este contacto. */}
+                    <div className="pt-4 border-t border-secondary-200 dark:border-secondary-700 space-y-3" data-testid="contact-notify">
+                      <p className="text-xs text-secondary-500">{tNotify('label')}</p>
+                      <ContactNotifyDetail notificaciones={selectedContact.notificaciones} />
+                      {!selectedContact.anonimizado && (
+                        <div className="space-y-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            fullWidth
+                            onClick={() => void handleResendNotify(selectedContact)}
+                            disabled={!isAdmin || resending === selectedContact.id}
+                            isLoading={resending === selectedContact.id}
+                            data-testid="contact-resend-notify"
+                          >
+                            {resending !== selectedContact.id && <ArrowPathIcon className="h-4 w-4 mr-2" aria-hidden="true" />}
+                            {resending === selectedContact.id
+                              ? tNotify('resending')
+                              : hasUndeliveredChannel(selectedContact.notificaciones)
+                                ? tNotify('resend')
+                                : tNotify('resendAll')}
+                          </Button>
+                          <p className="text-xs text-secondary-500">
+                            {!isAdmin && role
+                              ? tNotify('resendAdminOnly')
+                              : hasUndeliveredChannel(selectedContact.notificaciones)
+                                ? tNotify('resendHint')
+                                : tNotify('resendAllHint')}
+                          </p>
+                          <div aria-live="polite">
+                            {resendMessage && (
+                              <p
+                                role={resendMessage.ok ? 'status' : 'alert'}
+                                className={`text-xs ${resendMessage.ok ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}
+                              >
+                                {resendMessage.text}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     <div className="pt-4 border-t border-secondary-200 dark:border-secondary-700">

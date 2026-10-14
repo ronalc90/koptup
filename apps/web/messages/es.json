@@ -352,7 +352,7 @@
       },
       "c3": {
         "subtitle": "2.3 Correo y WhatsApp",
-        "text": "El proveedor de correo (SMTP) con el que enviamos los avisos al equipo y los correos de tu solicitud, y, si está activo, el proveedor de WhatsApp con el que el equipo recibe el aviso de un nuevo contacto con tus datos."
+        "text": "Resend envía los correos de la plataforma: el aviso al equipo cuando nos escribes por un formulario (con los datos que enviaste), los correos de tu solicitud de demo y los de tu cuenta, como el cambio de contraseña. Meta, con WhatsApp Business Platform, entrega al equipo por WhatsApp el aviso de un nuevo contacto, que lleva tu nombre, tu empresa, el servicio que te interesa, tu email y un extracto de tu mensaje, y los avisos de los pedidos y de las solicitudes de propuesta que haces desde el portal de clientes (tu nombre, tu email y el monto y los ítems del pedido, o el mensaje de tu solicitud). Los dos actúan como encargados: tratan esos datos por cuenta nuestra solo para hacer el envío."
       },
       "c4": {
         "subtitle": "2.4 Medición y publicidad, solo si las aceptas",
@@ -1545,6 +1545,109 @@
     "saving": "Guardando...",
     "toastSaved": "Configuración guardada exitosamente"
   },
+  "adminNotify": {
+    "card": {
+      "title": "Avisos de nuevos contactos",
+      "subtitle": "Cuando alguien te escribe desde el sitio (formulario de contacto, solicitud de demo o «Prueba con tu documento»), el servidor te avisa por correo y por WhatsApp. Aquí ves si cada canal está listo y cómo le fue al último aviso.",
+      "loading": "Consultando el estado de los avisos…",
+      "loadError": "No pudimos consultar el estado de los avisos: {error}",
+      "retry": "Reintentar",
+      "configured": "Configurado",
+      "notConfigured": "No configurado",
+      "channels": {
+        "email": "Correo",
+        "whatsapp": "WhatsApp"
+      },
+      "provider": "Proveedor",
+      "providers": {
+        "resend": "Resend (API HTTPS)",
+        "smtp": "SMTP",
+        "meta": "Meta · WhatsApp Cloud API (plantilla)"
+      },
+      "destination": "Llega a",
+      "sender": "Remitente",
+      "template": "Plantilla",
+      "webhook": "Confirmación de entrega",
+      "webhookOnLast": "Configurada: Meta envía los estados (entregado, leído o falló). Último evento recibido: {date}.",
+      "webhookOnNoEvents": "Configurada, sin eventos aún: Meta no ha enviado ningún estado. Para recibirlos, la app de Meta debe estar en modo Live y con el campo «messages» suscrito.",
+      "webhookOff": "Sin configurar: el panel solo sabe que Meta aceptó el mensaje, no si te llegó.",
+      "lastSuccess": "Último aviso enviado",
+      "lastFailure": "Último fallo",
+      "lastError": "Último error",
+      "lastErrorRecovered": "{error} (ya se recuperó: después salió un aviso)",
+      "unsupportedProvider": "WHATSAPP_PROVIDER pide un proveedor retirado (Twilio o UltraMsg): cámbiala a meta y define las variables de Meta que falten.",
+      "never": "Ninguno todavía",
+      "missing": "Falta configurar en el servidor:",
+      "smtpWarning": "Este servidor envía el correo por SMTP. En Railway, los planes Free, Trial y Hobby bloquean el SMTP saliente: define RESEND_API_KEY para que el correo salga por la API de Resend.",
+      "heartbeat": {
+        "title": "Prueba mensual automática",
+        "on": "Cada {days} días el servidor te envía un aviso de prueba por cada canal configurado (entre las 9 a. m. y las 7 p. m., hora de Colombia), para confirmar que siguen funcionando aunque no lleguen contactos y para que Meta no archive la plantilla de WhatsApp por falta de uso.",
+        "off": "Apagada en este servidor: nadie comprueba los canales mientras no lleguen contactos. Se activa con al menos un canal configurado, NOTIFY_HEARTBEAT_DAYS mayor que 0 y NOTIFY_JOBS_ENABLED distinto de false.",
+        "last": "Última prueba",
+        "next": "Próxima prueba"
+      },
+      "test": {
+        "hint": "Envía ahora un aviso de prueba por cada canal configurado y te muestra lo que respondió cada proveedor.",
+        "button": "Enviar aviso de prueba",
+        "sending": "Enviando…",
+        "adminOnly": "Solo un admin puede enviar el aviso de prueba.",
+        "resultTitle": "Resultado de la prueba",
+        "sent": {
+          "email": "Enviado. El proveedor lo aceptó (id {id}); revisa tu bandeja de entrada y la carpeta de spam.",
+          "whatsapp": "Enviado. Meta lo aceptó (id {id}); debería llegarte a WhatsApp en unos segundos."
+        },
+        "failed": "Falló: {error}",
+        "unknownError": "error desconocido",
+        "noAnswer": "El servidor no devolvió resultado para este canal.",
+        "notConfigured": "No se intentó: el canal no está configurado.",
+        "fallback": "Tu plantilla falló y se envió la plantilla de respaldo «{name}» para que al menos sonara tu teléfono. Revisa la plantilla «{template}» en el Administrador de WhatsApp de Meta (nombre, idioma y que esté aprobada).",
+        "fallbackEmail": "Ojo: salió desde el remitente de respaldo {name} porque el dominio de tu remitente no está verificado en Resend. Ese remitente solo le llega al correo dueño de la cuenta de Resend: verifica el dominio en Resend.",
+        "error": "No se pudo enviar la prueba: {error}",
+        "rateLimited": "Hiciste varias pruebas seguidas. Espera unos minutos y vuelve a intentarlo.",
+        "forbidden": "Tu rol no permite enviar el aviso de prueba."
+      }
+    },
+    "status": {
+      "label": "Aviso del nuevo contacto",
+      "channels": {
+        "email": "Correo",
+        "whatsapp": "WhatsApp"
+      },
+      "states": {
+        "pendiente": "Pendiente",
+        "enviado": "Enviado",
+        "entregado": "Entregado",
+        "leido": "Leído",
+        "fallido": "Falló",
+        "no_configurado": "No configurado",
+        "none": "Sin registro"
+      },
+      "noneHint": "Este contacto llegó antes de que el panel guardara el resultado de los avisos.",
+      "reason": "Motivo: {error}",
+      "notConfiguredHint": "El canal no estaba configurado en el servidor cuando llegó el contacto.",
+      "pendingHint": "Se está enviando o espera su reintento automático.",
+      "sentHint": {
+        "email": "El proveedor de correo lo aceptó.",
+        "whatsapp": "Meta lo aceptó; todavía no confirma la entrega."
+      },
+      "attempts": "{count, plural, one {# intento} other {# intentos}}",
+      "lastAttempt": "último: {date}",
+      "nextAttempt": "Próximo reintento automático: {date}",
+      "fallbackUsed": {
+        "email": "Salió desde el remitente de respaldo {name} porque el dominio de tu remitente no está verificado en Resend: verifica el dominio (ese remitente solo le llega al correo dueño de la cuenta de Resend).",
+        "whatsapp": "Se envió la plantilla de respaldo «{name}» porque tu plantilla falló: revísala en el Administrador de WhatsApp de Meta."
+      },
+      "resend": "Reenviar aviso",
+      "resendAll": "Enviar el aviso otra vez",
+      "resending": "Reenviando…",
+      "resendHint": "Vuelve a intentar los canales que no salieron.",
+      "resendAllHint": "Los dos canales ya salieron: esto lo envía otra vez por ambos.",
+      "resendAdminOnly": "Solo un admin puede reenviar avisos.",
+      "resendRateLimited": "Hiciste varios reenvíos seguidos. Espera unos minutos y vuelve a intentarlo.",
+      "resendDone": "Listo: arriba ves el resultado de cada canal.",
+      "resendError": "No se pudo reenviar el aviso: {error}"
+    }
+  },
   "adminConversations": {
     "title": "Conversaciones",
     "subtitle": "Visualiza y gestiona todas las conversaciones del sistema",
@@ -1830,12 +1933,12 @@
             "note": "sesiones y contraseñas"
           },
           {
-            "name": "Nodemailer",
-            "note": "correos"
+            "name": "Resend",
+            "note": "correos (API HTTPS; Nodemailer con SMTP como respaldo)"
           },
           {
-            "name": "Twilio",
-            "note": "avisos por WhatsApp"
+            "name": "WhatsApp Cloud API (Meta)",
+            "note": "avisos por WhatsApp con plantilla"
           },
           {
             "name": "AWS S3 SDK",
@@ -4055,7 +4158,7 @@
       "internalNote": "Nota interna",
       "internalNoteHint": "(solo la ve el equipo)",
       "messageToProspect": "Mensaje para la persona",
-      "messageHint": "(va en el correo, si hay SMTP)",
+      "messageHint": "(va en el correo, si el correo está configurado)",
       "approveSummaryNew": "Se creará la cuenta de la persona (sin activar) con {count, plural, one {# acceso} other {# accesos}} de {days} días, y un enlace de activación de un solo uso que vence en 72 horas.",
       "approveSummaryExisting": "La persona ya tiene cuenta: se le {count, plural, one {agrega # acceso} other {agregan # accesos}} de {days} días.",
       "approveButton": "Aprobar y generar el enlace",
@@ -4063,7 +4166,7 @@
       "rejectReason": "Motivo",
       "rejectDetail": "Detalle del motivo (interno)",
       "notify": "Avisar a la persona por email",
-      "notifyHint": "Solo si hay SMTP. El motivo es interno: el correo lleva el mensaje de abajo o un texto genérico. Un spam nunca se avisa.",
+      "notifyHint": "Solo si el correo está configurado (Admin › Configuración). El motivo es interno: el correo lleva el mensaje de abajo o un texto genérico. Un spam nunca se avisa.",
       "rejectMessage": "Mensaje para la persona (opcional)",
       "rejectButton": "Rechazar solicitud",
       "rejected": "Solicitud rechazada.",

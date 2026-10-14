@@ -142,6 +142,14 @@ const startServer = async () => {
     // Plazo de conservación de datos personales (candado en Redis, una vez al día).
     const { startRetentionJob, stopRetentionJob } = await import('./jobs/retention.job');
     startRetentionJob();
+    // Avisos al dueño (correo y WhatsApp): una línea por canal con el destino
+    // enmascarado, reintentos cada 5 min y latido mensual (candado en Redis).
+    const { logNotifyChannels } = await import('./services/owner-notify.service');
+    logNotifyChannels({ info: (m) => logger.info(m), warn: (m) => logger.warn(m) });
+    const { startNotifyRetryJob, stopNotifyRetryJob } = await import('./jobs/notify-retry.job');
+    startNotifyRetryJob();
+    const { startNotifyHeartbeatJob, stopNotifyHeartbeatJob } = await import('./jobs/notify-heartbeat.job');
+    startNotifyHeartbeatJob();
     // Pago en línea con Wompi: solo con sus variables (sin ellas no se ofrece).
     const { readWompiConfig } = await import('./services/wompi.service');
     const wompi = readWompiConfig();
@@ -158,6 +166,8 @@ const startServer = async () => {
       stopDemoGrantsJob();
       stopProposalsExpiryJob();
       stopRetentionJob();
+      stopNotifyRetryJob();
+      stopNotifyHeartbeatJob();
       server.close(() => {
         logger.info('Server closed');
         process.exit(0);

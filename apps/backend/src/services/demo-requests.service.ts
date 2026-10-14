@@ -167,6 +167,22 @@ function leadMessage(r: IDemoRequest, demoNames: string[]): string {
   ].join('\n');
 }
 
+/** Mensaje del lead cuando la persona vuelve a enviar el formulario (solicitud fusionada). */
+function resubmitLeadMessage(r: IDemoRequest, input: DemoRequestInput, newDemoNames: string[], allDemoNames: string[]): string {
+  return [
+    `La persona volvió a enviar el formulario: se sumó a su solicitud de demo abierta ${r.codigo}.`,
+    `Demos de este envío: ${newDemoNames.join(', ')}`,
+    `Demos de la solicitud ahora: ${allDemoNames.join(', ')}`,
+    `Empresa: ${input.empresa}${input.cargo ? ` · Cargo: ${input.cargo}` : ''}`,
+    `País: ${input.pais} · Tamaño: ${input.tamanoEmpresa} personas`,
+    '',
+    `Caso de uso (nuevo envío): ${input.casoDeUso}`,
+    '',
+    `Autorizó el tratamiento de sus datos personales (Ley 1581 de 2012, política ${r.consentimiento.versionPolitica}) el ${r.consentimiento.fecha.toISOString()}.`,
+    `Revisar en el panel: ${frontendUrl()}/admin/solicitudes/${String(r._id)}`,
+  ].join('\n');
+}
+
 async function setNotification(id: mongoose.Types.ObjectId, fields: Record<string, boolean>): Promise<void> {
   const set: Record<string, boolean> = {};
   for (const [k, v] of Object.entries(fields)) set[`notificaciones.${k}`] = v;
@@ -219,7 +235,38 @@ export async function createDemoRequest(
     },
     { new: true, sort: { createdAt: -1 } },
   );
-  if (merged) return { request: merged, fusionada: true, done: Promise.resolve() };
+  if (merged) {
+    // El reenvío también avisa al dueño (puede traer demos o un caso de uso
+    // nuevos): un Contact por envío, como el formulario de contacto.
+    const fusion = merged;
+    const done = (async () => {
+      try {
+        const allCatalog = await getCatalogMap(fusion.demos);
+        const newNames = demos.map((d) => catalog.get(d)?.nombre ?? d);
+        const allNames = fusion.demos.map((d) => allCatalog.get(d)?.nombre ?? catalog.get(d)?.nombre ?? d);
+        const { notified } = await registerLeadWithNotifications({
+          name: input.nombre,
+          email,
+          phone: input.telefono,
+          company: input.empresa,
+          service: `Solicitud de demo (reenvío de ${fusion.codigo}): ${newNames.join(', ')}`.slice(0, 300),
+          message: resubmitLeadMessage(fusion, input, newNames, allNames),
+          source: 'demo-request',
+          consentimiento: {
+            aceptado: true,
+            fecha: consentimiento.fecha,
+            ipHash: consentimiento.ipHash,
+            userAgent: consentimiento.userAgent,
+            versionPolitica: consentimiento.versionPolitica,
+          },
+        });
+        await notified;
+      } catch (err) {
+        logger.error(`[demo-requests] No se pudo registrar el reenvío de ${fusion.codigo}: ${(err as Error)?.message ?? err}`);
+      }
+    })();
+    return { request: merged, fusionada: true, done };
+  }
 
   let request: IDemoRequest | null = null;
   for (let attempt = 0; attempt < 3 && !request; attempt += 1) {

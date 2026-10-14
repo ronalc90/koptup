@@ -240,8 +240,8 @@ Requiere un rol del equipo. Todas son `noindex` y están bloqueadas en `robots.t
 | `/admin/conversations` | Conversaciones con clientes | `admin`, `manager` | <a href="images/doc/admin/conversaciones-vacio.jpg"><img src="images/doc/admin/conversaciones-vacio.jpg" width="120" alt="Conversaciones"></a> |
 | `/admin/conversations/<id>` | Detalle de una conversación | `admin`, `manager` | — |
 | `/admin/users` | Usuarios y cambio de rol (solo `admin` cambia roles) | `admin`, `manager` | <a href="images/doc/admin/usuarios-anotado.jpg"><img src="images/doc/admin/usuarios-anotado.jpg" width="120" alt="Usuarios"></a> |
-| `/admin/contacts` | Contactos y leads (formulario, demo RAG, solicitudes) | `admin`, `manager` | <a href="images/doc/admin/contactos-anotado.jpg"><img src="images/doc/admin/contactos-anotado.jpg" width="120" alt="Contactos"></a> |
-| `/admin/settings` | Configuración de la cuenta: notificaciones, idioma y tema | `admin`, `manager` | <a href="images/doc/admin/configuracion-anotada.jpg"><img src="images/doc/admin/configuracion-anotada.jpg" width="120" alt="Configuración"></a> |
+| `/admin/contacts` | Contactos y leads (formulario, demo RAG, solicitudes), con el estado del aviso al dueño por correo y WhatsApp y el botón «Reenviar aviso» (solo admin) | `admin`, `manager` | <a href="images/doc/admin/contactos-anotado.jpg"><img src="images/doc/admin/contactos-anotado.jpg" width="120" alt="Contactos"></a> |
+| `/admin/settings` | Configuración: estado de los avisos de nuevos contactos (correo y WhatsApp) con el botón «Enviar aviso de prueba», idioma y tema (la miniatura es anterior a la tarjeta de avisos) | `admin`, `manager` | <a href="images/doc/admin/configuracion-anotada.jpg"><img src="images/doc/admin/configuracion-anotada.jpg" width="120" alt="Configuración"></a> |
 
 Un `sales` que escribe `/admin` llega a `/admin/solicitudes`; cualquier otro rol sin permiso vuelve a su página de inicio.
 

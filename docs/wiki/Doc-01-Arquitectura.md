@@ -57,8 +57,8 @@ flowchart LR
 
     subgraph EXT["Servicios externos de la API"]
         OAI["OpenAI"]:::externo
-        SMTP["Correo SMTP"]:::externo
-        WA["WhatsApp: Twilio u otro proveedor"]:::externo
+        SMTP["Correo: Resend (SMTP solo de respaldo)"]:::externo
+        WA["WhatsApp: Cloud API de Meta, plantilla koptup_aviso"]:::externo
         ANT["Anthropic: solo reglas de /liquidacion"]:::externo
         S3["AWS S3: solo /api/documents"]:::externo
         GOO["Google OAuth: opcional"]:::externo
@@ -102,12 +102,13 @@ Puntos clave para el dueño:
 | **Web Next.js** (`apps/web`) | Vercel, región `iad1` | Renderiza todas las páginas en el servidor (App Router), sirve las demos, el sitemap, el `robots.txt` y la imagen Open Graph. Aplica cabeceras de seguridad (CSP, HSTS). | El sitio no carga. |
 | **Middleware de Next** (`apps/web/src/middleware.ts`) | Vercel (Edge) | Antes de servir `/admin`, `/dashboard`, `/liquidacion` y `/demo/<slug>`, pregunta a la API por la sesión y el acceso. Renueva el token si venció. | Ver la fila de la API. |
 | **API Express** (`apps/backend`) | Railway (Nixpacks, `npm run start`) | Autenticación, sistema de demos (solicitudes, accesos, catálogo), contacto, chatbot RAG, "Prueba con tu documento", panel de administración, portal del cliente y herramientas internas. Cada ruta tiene su política de autorización. | Las páginas protegidas muestran "No pudimos verificar tu sesión" (503) y las demos con acceso muestran "no disponible". Las públicas siguen. |
-| **Job de accesos a demos** | Dentro del proceso de la API | Cada hora marca como vencidos los accesos y envía el recordatorio 3 días antes (si hay SMTP). | La vigencia igual se respeta: la API compara la fecha en cada consulta. |
+| **Job de accesos a demos** | Dentro del proceso de la API | Cada hora marca como vencidos los accesos y envía el recordatorio 3 días antes (si hay correo configurado). | La vigencia igual se respeta: la API compara la fecha en cada consulta. |
+| **Jobs de avisos al dueño** | Dentro del proceso de la API | Cada 5 minutos reintenta los avisos de contactos que fallaron (hasta 6 intentos en 3 días) y cada hora revisa si toca la prueba mensual por correo y WhatsApp. | Los avisos nuevos salen igual; solo se pierden los reintentos y la prueba mensual. |
 | **MongoDB** | Servicio administrado (fuera de Railway) | Base de datos principal: cuentas, demos, contactos, pedidos, facturas, entregables, mensajes y datos de las herramientas médicas. | `/health` responde 503. Login, panel y demos con acceso no funcionan; las demos `publico` siguen abiertas. |
 | **Redis** | Plugin de Railway | Refresh tokens (7 días), cupos por IP o por cuenta, gasto mensual de IA y candado del job. | No se puede iniciar sesión; las funciones de IA públicas se apagan (falla cerrada); el job corre sin candado. |
 | **OpenAI** | Externo | Respuestas del chatbot RAG, "Prueba con tu documento", LinkedIn Ads y el asistente del gestor de contenido. Modelo por defecto `gpt-4o-mini`. | El chatbot responde en **modo extractivo** (cita los fragmentos); las otras funciones de IA muestran un aviso honesto. |
-| **SMTP** | Externo | Acuse de la solicitud, aprobación con enlace de activación, recordatorios, restablecer contraseña y avisos al equipo. | Nada se rompe: el panel muestra el enlace de activación para copiarlo o enviarlo por WhatsApp. |
-| **WhatsApp** | Twilio, WhatsApp Business API o UltraMsg | Aviso al número del equipo por cada contacto, lead de la demo RAG y solicitud de demo. | El lead igual queda guardado en MongoDB. |
+| **Correo (Resend)** | Externo, por API HTTPS (`RESEND_API_KEY`); SMTP solo como respaldo, porque Railway Free, Trial y Hobby bloquean el SMTP saliente | Aviso al dueño de cada contacto, acuse de la solicitud, aprobación con enlace de activación, recordatorios y restablecer contraseña. | Nada se rompe: el panel muestra el enlace de activación para copiarlo o enviarlo por WhatsApp, y el contacto queda guardado con su aviso «Falló» o «No configurado» para reintentarlo. |
+| **WhatsApp (Meta)** | WhatsApp Cloud API con la plantilla aprobada `koptup_aviso` | Aviso al número del dueño por cada contacto, lead de la demo RAG y solicitud de demo. Meta confirma la entrega por un webhook firmado (`/api/webhooks/whatsapp`), si está configurado. | El lead igual queda guardado en MongoDB y el job reintenta el aviso. |
 | **AWS S3** | Externo | Solo para los archivos de `/api/documents` (API de documentos con sesión). | Solo afecta esa API. |
 | **Anthropic** | Externo | Solo en las reglas de facturación de la herramienta interna `/liquidacion`. | Solo afecta esa herramienta. |
 | **GitHub** | Externo | Código, CI (`.github/workflows/ci.yml`) y publicación de esta wiki (`wiki-sync.yml`). Vercel y Railway despliegan desde `main` con sus propias integraciones. | No se publica ni se despliega. |
@@ -259,20 +260,21 @@ sequenceDiagram
     participant N as Navegador en /contact
     participant A as API Railway
     participant D as MongoDB
-    participant W as WhatsApp
-    participant S as Correo SMTP
+    participant W as WhatsApp de Meta
+    participant S as Correo por Resend
 
     V->>N: Llena nombre, email, servicio y mensaje (teléfono, empresa y presupuesto opcionales)
     N->>A: POST /api/contact
     A->>A: Cupo estricto de 5 envíos por minuto por IP y validación de campos
-    A->>D: Guarda un Contact con origen contact-form y estado new
+    A->>D: Guarda un Contact con origen contact-form, estado new y los avisos pendientes
     A-->>N: success true
     N-->>V: Mensaje de confirmación
-    par Avisos al equipo, sin bloquear la respuesta
-        A->>W: Aviso al número del equipo, si está configurado
+    par Avisos al dueño, sin bloquear la respuesta
+        A->>W: Plantilla koptup_aviso al número del dueño, si está configurado
     and
-        A->>S: Correo al equipo, si hay SMTP
+        A->>S: Correo al dueño con Responder a la persona, si está configurado
     end
+    A->>D: Guarda el resultado de cada canal en notificaciones
     Note over D: El equipo lo ve en Admin, sección Contactos
 ```
 
@@ -451,7 +453,7 @@ flowchart TD
     F["5. Siembra las demos que falten en el catálogo (no pisa cambios del panel)"]:::sistema
     G["6. Inicializa Google OAuth si está configurado"]:::sistema
     H["7. Monta la app Express y abre el puerto"]:::sistema
-    J["8. Programa el job de accesos a demos"]:::sistema
+    J["8. Programa los jobs: accesos a demos, conservación<br/>y reintentos y prueba mensual de los avisos"]:::sistema
 
     A --> B
     B -->|"Sí"| X
@@ -464,9 +466,11 @@ flowchart TD
 
 | Tarea | Dónde | Cuándo | Qué hace |
 |---|---|---|---|
-| **Job de accesos a demos** (`jobs/demo-grants.job.ts`) | Proceso del backend | Cada hora (`DEMO_GRANTS_JOB_INTERVAL_MS`), la primera a los ~30 s del arranque | Marca `expirado` los accesos vencidos y envía **un** recordatorio por persona con los accesos que vencen en 3 días (solo con SMTP). Toma un candado en Redis para que con varias instancias corra una sola; `DEMO_GRANTS_JOB_ENABLED=false` lo apaga. |
+| **Job de accesos a demos** (`jobs/demo-grants.job.ts`) | Proceso del backend | Cada hora (`DEMO_GRANTS_JOB_INTERVAL_MS`), la primera a los ~30 s del arranque | Marca `expirado` los accesos vencidos y envía **un** recordatorio por persona con los accesos que vencen en 3 días (solo con correo configurado). Toma un candado en Redis para que con varias instancias corra una sola; `DEMO_GRANTS_JOB_ENABLED=false` lo apaga. |
 | **Barrido de documentos de la demo RAG** | Proceso del backend | Cada minuto | Borra de la memoria los documentos de "Prueba con tu documento" con más de 1 hora. |
 | **Semilla del catálogo de demos** | Arranque | En cada arranque | Inserta las demos que falten (idempotente). |
+| **Reintentos de avisos** (`jobs/notify-retry.job.ts`) | Proceso del backend | Cada 5 minutos, la primera ~1 min después del arranque | Reenvía los avisos al dueño que fallaron o quedaron pendientes en los contactos de los últimos 3 días (esperas de 5 min a 12 h, hasta 6 intentos), sin tocar los canales que ya salieron. Candado en Redis; `NOTIFY_JOBS_ENABLED=false` lo apaga. |
+| **Prueba mensual de avisos** (`jobs/notify-heartbeat.job.ts`) | Proceso del backend | Revisa cada hora; envía cada `NOTIFY_HEARTBEAT_DAYS` días (30), entre 9:00 y 18:59 hora de Bogotá | Aviso de prueba por correo y WhatsApp; si uno falla, avisa por el otro. Mantiene viva la plantilla de Meta. `0` o `NOTIFY_JOBS_ENABLED=false` lo apagan. |
 | **CI** (`ci.yml`) | GitHub Actions | En cada pull request y cada push a `main` | Mensajes i18n al día, lint, tipos, títulos de página, Jest (web y backend con MongoDB 7 y Redis 7), build y la suite Playwright contra la app compilada con un mock de OpenAI. **No despliega.** |
 | **Publicar la wiki** (`wiki-sync.yml`) | GitHub Actions | En cada push que cambie `docs/wiki/` | Copia `docs/wiki/` a la wiki del repositorio y quita la extensión `.md` de los enlaces. |
 | **Despliegues** | Integraciones de Vercel y Railway | En cada push a `main` | Vercel compila la web; Railway compila y arranca la API. |
@@ -497,7 +501,7 @@ Versión declarada en `package.json` y versión instalada según `package-lock.j
 | API | @anthropic-ai/sdk | `^0.70.0` | 0.70.1 | Reglas de `/liquidacion` |
 | API | jsonwebtoken · passport-google-oauth20 | `^9.0.2` · `^2.0.0` | 9.0.2 · 2.0.0 | Sesiones y Google |
 | API | helmet · express-rate-limit · zod | `^7.1.0` · `^7.1.5` · `^3.22.4` | 7.2.0 · 7.5.1 · 3.25.76 | Cabeceras, límites por IP, validación |
-| API | nodemailer · twilio | `^10.0.6` · `^5.10.7` | 10.0.16 · 5.10.7 | Correo y WhatsApp |
+| API | nodemailer | `^10.0.6` | 10.0.16 | Correo por SMTP, solo como respaldo. Resend y la WhatsApp Cloud API de Meta se llaman con `fetch` (sin SDK); la dependencia `twilio` se quitó |
 | API | multer · pdf-parse · mammoth · exceljs | `^2.4.0` · `^1.1.1` · `^1.6.0` · `^4.4.0` | multer 2.4.0 | Subidas y lectura de PDF, DOCX y Excel |
 | API | @aws-sdk/client-s3 | `^3.461.0` | 3.1147.0 | Archivos de `/api/documents` |
 | API | winston · swagger-ui-express | `^3.11.0` · `^5.0.0` | 3.18.3 | Logs y `/api-docs` (solo fuera de producción) |

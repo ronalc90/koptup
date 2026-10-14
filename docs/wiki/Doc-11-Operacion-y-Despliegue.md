@@ -2,14 +2,14 @@
 
 > **Resumen.** El código vive en GitHub. Cada push a `main` lo despliegan **dos plataformas por su cuenta**: **Vercel** construye la web (`www.koptup.com`) y **Railway** construye la API. GitHub Actions **verifica** (lint, tipos, pruebas, una suite de punta a punta con Playwright y un job de seguridad), **vigila** cada 15 minutos que la web y la API respondan y publica esta wiki; no despliega nada.
 >
-> Aquí encuentras todas las variables de entorno reales de cada servicio, cómo levantar el sistema en tu computador, cómo correr las pruebas, diez **runbooks** (procedimientos paso a paso para cuando algo falla) y lo que el dueño todavía debe configurar en las plataformas. **Situación actual (9 de octubre de 2026):** la web funciona, pero el backend de Railway responde «Application not found». El runbook [9.1](#91-el-backend-está-caído-situación-actual) explica cómo recuperarlo.
+> Aquí encuentras todas las variables de entorno reales de cada servicio, el paso a paso para que **los avisos de nuevos contactos te lleguen por correo y por WhatsApp** ([4.5](#45-configurar-los-avisos-al-dueño-paso-a-paso)), cómo levantar el sistema en tu computador, cómo correr las pruebas, once **runbooks** (procedimientos paso a paso para cuando algo falla) y lo que el dueño todavía debe configurar en las plataformas. **Situación actual (9 de octubre de 2026):** la web funciona, pero el backend de Railway responde «Application not found». El runbook [9.1](#91-el-backend-está-caído-situación-actual) explica cómo recuperarlo.
 
 ## Índice
 
 1. [El despliegue en una imagen](#1-el-despliegue-en-una-imagen)
 2. [Dónde corre cada pieza](#2-dónde-corre-cada-pieza)
 3. [Integración continua (CI)](#3-integración-continua-ci)
-4. [Variables de entorno](#4-variables-de-entorno)
+4. [Variables de entorno](#4-variables-de-entorno) (y [4.5 Configurar los avisos al dueño](#45-configurar-los-avisos-al-dueño-paso-a-paso))
 5. [Levantar todo en local, paso a paso](#5-levantar-todo-en-local-paso-a-paso)
 6. [Pruebas: unitarias, de integración y de punta a punta](#6-pruebas-unitarias-de-integración-y-de-punta-a-punta)
 7. [Salud del sistema, monitoreo y registros](#7-salud-del-sistema-monitoreo-y-registros)
@@ -45,7 +45,7 @@ flowchart LR
     DB[("MongoDB")]:::externo
     RD[("Redis")]:::externo
     OA["OpenAI"]:::externo
-    MAIL["SMTP y WhatsApp"]:::externo
+    MAIL["Resend (correo) y Meta (WhatsApp)"]:::externo
     VIS["Visitante, prospecto, equipo"]:::visitante
 
     DEV -->|"PR"| CI
@@ -83,7 +83,7 @@ Tres ideas para quedarse:
 | **Base de datos** | MongoDB (la cadena de conexión está en Railway, nunca en el repositorio) | Fuera del repositorio | — |
 | **Caché, cupos y gasto de IA** | Redis (en Railway) | Fuera del repositorio | — |
 | **IA** | OpenAI, modelo `gpt-4o-mini` por defecto | — | — |
-| **Correo y WhatsApp** | Servidor SMTP y Twilio, WhatsApp Business o UltraMsg | — | — |
+| **Correo y WhatsApp** | **Resend** (API HTTPS, dominio `koptup.com`) y **WhatsApp Cloud API de Meta** con la plantilla `koptup_aviso`. SMTP solo como respaldo (Railway Free, Trial y Hobby lo bloquean) | Se configuran en sus paneles y con variables en Railway ([4.5](#45-configurar-los-avisos-al-dueño-paso-a-paso)) | `apps/backend/.env.example` (solo nombres) |
 | **CI, monitoreo y wiki** | GitHub Actions | Automático | `.github/workflows/ci.yml`, `.github/workflows/monitor.yml` y `.github/workflows/wiki-sync.yml` |
 
 **Archivos subidos en Railway:** los adjuntos de pedidos y los archivos de cuentas médicas se guardan en `uploads/` (en Railway, `/app/uploads`). Sin un volumen montado en esa ruta se borran en cada despliegue ([acciones pendientes](#10-acciones-pendientes-del-dueño)). Los bots del chatbot y sus conversaciones viven en MongoDB, y los registros (`logs/`) se consultan en la plataforma.
@@ -128,7 +128,7 @@ flowchart TD
         B1 --> B2 --> B3
     end
     subgraph J4["Job e2e: Playwright"]
-        E1["MongoDB 7, Redis 7 y mock de OpenAI"]:::externo
+        E1["MongoDB 7, Redis 7, mock de OpenAI<br/>y mock de Resend y WhatsApp"]:::externo
         E2["Backend compilado en modo producción"]:::sistema
         E3["Web compilada con next start"]:::sistema
         E4["Suite de Playwright: escritorio, móvil y catálogo"]:::sistema
@@ -164,7 +164,7 @@ flowchart TD
 | **Pruebas unitarias (backend)** | Jest con MongoDB y Redis reales: corren también las pruebas de integración (permisos por rol, sistema de demos, chatbot, topes de gasto, perfil) | Una regla de negocio o de autorización cambió |
 | **Pruebas unitarias (web)** | Jest con jsdom: cada demo se renderiza con los textos reales en español y se prueba el middleware de acceso | Una página lanza un error, no pinta nada o usa una clave de traducción que no existe |
 | **Build** | `tsc` del backend y `next build` de la web | El código no compila |
-| **E2E (Playwright)** | Solicitud → aprobación → activación → acceso → revocación, permisos, cambio de modo desde el panel, contacto, «Prueba con tu documento» con un PDF, humo de todas las páginas y demos | Un recorrido real se rompió |
+| **E2E (Playwright)** | Solicitud → aprobación → activación → acceso → revocación, permisos, cambio de modo desde el panel, contacto con sus avisos al dueño (contra el mock de Resend y WhatsApp: nunca sale un aviso real), «Prueba con tu documento» con un PDF, humo de todas las páginas y demos | Un recorrido real se rompió |
 | **Seguridad** | `npm audit` de las dependencias de producción con umbral alto (`scripts/audit-check.mjs`) y gitleaks sobre los archivos y los commits nuevos del push o del PR (`.gitleaks.toml`) | Aparece una alerta alta o crítica que nadie revisó, vence la fecha de revisión de `.github/audit-allowlist.json` o un commit trae algo con forma de secreto |
 
 Tiempos reales de la última corrida sobre `main` (8 de octubre de 2026, hora UTC; 9 minutos en total):
@@ -214,13 +214,15 @@ flowchart LR
     R["REDIS_URL"]:::admin --> R1["IA pública apagada y la sesión no se renueva (dura 15 min)"]:::error
     O["OPENAI_API_KEY"]:::admin --> O1["Chatbot en modo extractivo; demos con IA apagadas"]:::error
     D["DEMO_UPLOAD_ENABLED distinta de true"]:::admin --> D1["Prueba con tu documento apagada"]:::error
-    S["SMTP_USER o SMTP_PASS"]:::admin --> S1["No sale ningún correo; el panel muestra el enlace para copiar"]:::sistema
+    S["RESEND_API_KEY (o el respaldo SMTP)"]:::admin --> S1["No sale ningún correo; el panel muestra el enlace para copiar"]:::sistema
+    NE["NOTIFY_EMAIL y ADMIN_EMAIL"]:::admin --> NE1["Los avisos de contactos no llegan por correo"]:::error
+    WA["WHATSAPP_API_TOKEN, WHATSAPP_PHONE_NUMBER_ID<br/>o ADMIN_WHATSAPP_NUMBER"]:::admin --> WA1["Los avisos de contactos no llegan por WhatsApp"]:::error
     F["FRONTEND_URL"]:::admin --> F1["Los enlaces de los correos apuntan a localhost"]:::error
     A["NEXT_PUBLIC_API_URL en Vercel"]:::admin --> A1["La web usa la URL de .env.production"]:::sistema
     G["NEXT_PUBLIC_GA_ID y similares"]:::admin --> G1["Sin banner de cookies y sin medición"]:::sistema
 ```
 
-*En rojo, lo que el visitante nota; en morado, lo que tiene una alternativa.*
+*En rojo, lo que el visitante o el dueño notan; en morado, lo que tiene una alternativa.*
 
 ### 4.2 Web (Vercel)
 
@@ -262,7 +264,7 @@ El dominio canónico del sitio está fijo en `src/lib/site.ts`: no hay variable 
 
 | Variable | ¿Obligatoria? | Por defecto | Qué hace |
 |---|---|---|---|
-| `REDIS_URL` | Recomendada | `redis://localhost:6379` | Tokens de renovación, cupos compartidos, gasto mensual de IA y candado del job de vencimiento |
+| `REDIS_URL` | Recomendada | `redis://localhost:6379` | Tokens de renovación, cupos compartidos, gasto mensual de IA y candados de los jobs (vencimiento, conservación y avisos) |
 | `JWT_EXPIRES_IN` | Opcional | `15m` | Vida del token de acceso |
 | `JWT_REFRESH_EXPIRES_IN` | Opcional | `7d` | Vida de la sesión renovable (`7d`, `12h`, `3600`…). La misma cifra firma el token y vence su copia en Redis. Máximo 7 días, lo que dura la cookie de la web: un valor mayor o inválido usa 7 días y deja un aviso al arrancar |
 | `RATE_LIMIT_WINDOW_MS` | Opcional | `900000` (15 min) | Ventana del límite general de la API |
@@ -320,21 +322,27 @@ Un tope con un valor inválido o negativo deja esa función en 0, es decir, apag
 |---|---|---|---|
 | `COMMERCE_ENABLED` | **No la definas en Railway** (o déjala en `false`) | `false` | Enciende el flujo de compra, que todavía no está terminado ni revisado: pipeline de leads, propuestas, portal comercial y pagos. Apagado (lo normal): sus rutas (`/api/admin/leads`, `/api/admin/proposals`, `/api/admin/settings`, `/api/proposals/public`, las de propuestas en `/api/me` y `/api/payments`) responden 404, el job de vencimiento de propuestas no corre, el arranque no liga los contactos a leads y ningún formulario ni acceso a demos escribe leads. Las variables `PROPOSALS_JOB_*` y `WOMPI_*` solo tienen efecto con este interruptor en `true` |
 
-**Correo y WhatsApp**
+**Correo y WhatsApp: avisos al dueño y correos a los prospectos**
+
+Cada contacto nuevo (formulario de `/contact`, «Solicitar demo» y «Prueba con tu documento») avisa al dueño por **correo** y por **WhatsApp**; el resultado de cada canal queda en el contacto. Railway Free, Trial y Hobby **bloquean el SMTP saliente** (puertos 25, 465 y 587): por eso el correo sale por la API HTTPS de Resend. El paso a paso para configurarlo todo está en la [sección 4.5](#45-configurar-los-avisos-al-dueño-paso-a-paso).
 
 | Variable | ¿Obligatoria? | Por defecto | Qué hace |
 |---|---|---|---|
-| `SMTP_HOST` | Opcional | `smtp.gmail.com` | Servidor de correo |
-| `SMTP_PORT` | Opcional | `587` | Puerto |
-| `SMTP_SECURE` | Opcional | `false` | `true` para el puerto 465 |
-| `SMTP_USER`, `SMTP_PASS` | Necesarias para enviar | — | Sin las dos **no sale ningún correo** (acuse de solicitud, aprobación con enlace, recordatorio, restablecer contraseña, avisos al equipo). Son las que revisa el arranque: si falta alguna, deja el aviso `[env] SMTP_USER y SMTP_PASS: …` |
-| `EMAIL_FROM` | Opcional | `KopTup <noreply@koptup.com>` | Remitente |
-| `ADMIN_EMAIL` | Recomendada | — | Destino de los avisos al equipo por correo: sin ella **no salen** (no hay dirección fija en el código) y el arranque lo avisa. Además, el arranque le da el rol admin a esa cuenta solo si existe, está activa y **no hay ningún otro admin**; el cambio queda en la bitácora ([runbook 9.4](#94-crear-o-recuperar-el-admin)) |
-| `WHATSAPP_PROVIDER` | Opcional | `twilio` | `twilio`, `whatsapp-business` o `ultramsg` |
-| `ADMIN_WHATSAPP_NUMBER` | Para avisos por WhatsApp | — | Número que recibe los avisos. Sin él, WhatsApp queda apagado |
-| `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_NUMBER` | Con `twilio` | — | Credenciales de Twilio |
-| `WHATSAPP_API_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID` | Con `whatsapp-business` | — | Credenciales de la API de WhatsApp Business |
-| `ULTRAMSG_INSTANCE_ID`, `ULTRAMSG_TOKEN` | Con `ultramsg` | — | Credenciales de UltraMsg |
+| `RESEND_API_KEY` | Necesaria para enviar correo en Railway | — | Key de Resend con permiso «Sending access». Con ella **todos** los correos salen por Resend: avisos al dueño, acuse y aprobación de demos, recordatorios, restablecer contraseña y avisos de propuestas. Sin ella ni SMTP **no sale ningún correo** y el arranque lo avisa |
+| `EMAIL_FROM` | Opcional | `KopTup <avisos@koptup.com>` | Remitente. Su dominio debe estar verificado en Resend (no hace falta un buzón). Si Resend responde que el dominio no está verificado, el aviso al dueño se reintenta una vez desde `onboarding@resend.dev`, que solo entrega al correo dueño de la cuenta de Resend |
+| `NOTIFY_EMAIL` | Recomendada | `ADMIN_EMAIL` | A quién le llegan los avisos por correo (uno o varios, separados por coma). El aviso de un contacto lleva «Responder a» con el email de la persona, así que respondes directo desde tu correo |
+| `ADMIN_EMAIL` | Recomendada | — | Destino de los avisos por correo **solo si falta `NOTIFY_EMAIL`**. Además, el arranque le da el rol admin a esa cuenta solo si existe, está activa y **no hay ningún otro admin**; el cambio queda en la bitácora ([runbook 9.4](#94-crear-o-recuperar-el-admin)) |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS` | Opcionales | `smtp.gmail.com`, `587`, `false` | Respaldo: solo se usan **sin** `RESEND_API_KEY` (desarrollo local o Railway Pro). Con SMTP y sin Resend, el arranque avisa que Railway Free, Trial y Hobby lo bloquean. Esperan 10 s para conectar y 15 s para enviar |
+| `WHATSAPP_PROVIDER` | Opcional | `meta` si hay token o id del número | Único valor soportado: `meta` (acepta el viejo `whatsapp-business`). Twilio y UltraMsg se retiraron: con `twilio` o `ultramsg` el canal queda apagado y el arranque lo avisa |
+| `WHATSAPP_API_TOKEN` | Para avisos por WhatsApp | — | Token **permanente** de un usuario del sistema de Meta (caducidad «Nunca», permisos `whatsapp_business_messaging` y `whatsapp_business_management`). El token temporal del panel de desarrolladores vence en horas |
+| `WHATSAPP_PHONE_NUMBER_ID` | Para avisos por WhatsApp | — | «Identificador del número de teléfono» que envía (WhatsApp › Configuración de la API). Es un id numérico, no el teléfono |
+| `ADMIN_WHATSAPP_NUMBER` | Para avisos por WhatsApp | — | Número que recibe los avisos, con indicativo (`57` y los 10 dígitos; se toman solo los dígitos). Con el número de prueba de Meta debe estar en su lista de destinatarios verificados |
+| `WHATSAPP_TEMPLATE_NAME`, `WHATSAPP_TEMPLATE_LANG` | Opcionales | `koptup_aviso`, `es` | Plantilla aprobada que se envía. Deben ser iguales a las de Meta |
+| `WHATSAPP_GRAPH_VERSION` | Opcional | `v25.0` | Versión de la Graph API. Meta retira cada versión unos 2 años después de publicarla: súbela antes de que venza |
+| `WHATSAPP_HELLO_WORLD_FALLBACK` | Opcional | `true` | Si la plantilla propia falla por un error de plantilla (códigos 132000, 132001, 132005, 132007, 132012, 132015, 132016 o 132018), envía la plantilla de ejemplo `hello_world` para que al menos suene el teléfono. El panel lo muestra como «respaldo». `false` lo apaga |
+| `WHATSAPP_APP_SECRET`, `WHATSAPP_WEBHOOK_VERIFY_TOKEN` | Opcionales (las dos juntas) | — | Encienden el webhook firmado `/api/webhooks/whatsapp`: Meta confirma entregado, leído o fallido y, si un aviso falla, te llega un correo de alerta. Sin las dos la ruta responde 404 y el panel solo sabe que Meta **aceptó** el mensaje |
+| `NOTIFY_HEARTBEAT_DAYS` | Opcional | `30` | Prueba mensual («latido»): cada N días, entre las 9:00 y las 18:59 hora de Bogotá, un aviso de prueba por cada canal configurado; si uno falla (o solo sale por un respaldo), avisa por el otro, y si no sale por ninguno lo reintenta al día siguiente. `0` la apaga |
+| `NOTIFY_JOBS_ENABLED` | Opcional | `true` | `false` apaga en esa instancia los reintentos (cada 5 min) y la prueba mensual. Los avisos de cada contacto nuevo siguen saliendo |
 
 **Chatbot, archivos e inicio de sesión con Google**
 
@@ -364,6 +372,156 @@ Un tope con un valor inválido o negativo deja esa función en 0, es decir, apag
 | `E2E_MONGODB_URI` o `E2E_ADMIN_EMAIL` + `E2E_ADMIN_PASSWORD` | Playwright | Cómo obtener la cuenta admin de pruebas |
 | `E2E_ALLOW_REMOTE`, `E2E_INCLUDE_KNOWN_ISSUES` | Playwright | Permitir un entorno no local desechable; exigir cero errores también en demos con problemas conocidos |
 | `OPENAI_MOCK_PORT`, `OPENAI_MOCK_HOST`, `OPENAI_MOCK_LOG` | Mock de OpenAI | Puerto (3999), host (127.0.0.1) y archivo de registro |
+| `RESEND_API_URL`, `WHATSAPP_GRAPH_URL` | Backend | Apuntan Resend y la Graph API de Meta al mock de avisos (`http://127.0.0.1:3998`), para que ninguna prueba envíe un correo o un WhatsApp real |
+| `E2E_NOTIFY_MOCK_URL`, `E2E_NOTIFY_EMAIL`, `E2E_ADMIN_WHATSAPP_NUMBER` | Playwright | Dónde está el mock de avisos y los destinos ficticios que tiene el backend; sin la primera, `owner-notify.spec.ts` se omite |
+| `NOTIFY_MOCK_PORT`, `NOTIFY_MOCK_HOST`, `NOTIFY_MOCK_LOG` | Mock de Resend y WhatsApp | Puerto (3998), host (127.0.0.1) y archivo de registro |
+
+
+### 4.5 Configurar los avisos al dueño, paso a paso
+
+**Qué consigues:** cada vez que alguien escribe desde el sitio (formulario de `/contact`, «Solicitar demo» o «Prueba con tu documento») te llega un **correo** a tu Gmail y un **WhatsApp** a tu celular, aunque pasen meses sin mensajes. Toma unos 45 minutos de trabajo; lo más largo es esperar que Meta apruebe la plantilla (de minutos a 24 horas). Los valores reales (keys, tokens, tu número completo) van **solo** en Railway: nunca en esta wiki ni en el repositorio, que son públicos.
+
+```mermaid
+flowchart LR
+    classDef visitante fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
+    classDef sistema fill:#e0e7ff,stroke:#4f46e5,color:#312e81
+    classDef admin fill:#fef3c7,stroke:#d97706,color:#78350f
+    classDef externo fill:#f1f5f9,stroke:#64748b,color:#334155
+
+    V["Persona: /contact, Solicitar demo<br/>o Prueba con tu documento"]:::visitante
+    API["Backend en Railway<br/>guarda el contacto"]:::sistema
+    RS["Resend, API HTTPS<br/>desde avisos@koptup.com"]:::externo
+    ME["Meta, WhatsApp Cloud API<br/>plantilla koptup_aviso"]:::externo
+    GM["Tu Gmail<br/>filtro Nunca enviar a spam"]:::admin
+    WA["Tu WhatsApp<br/>+57 3XX XXX XXXX"]:::admin
+    PN["Admin › Contactos<br/>estado del aviso por canal"]:::sistema
+    JOB["Job cada 5 min<br/>reintenta lo que falló"]:::sistema
+    LAT["Prueba mensual<br/>por los dos canales"]:::sistema
+
+    V --> API
+    API -->|"correo con Responder a la persona"| RS --> GM
+    API -->|"plantilla con título y detalle"| ME --> WA
+    ME -.->|"webhook opcional: entregado, leído o fallido"| API
+    API --> PN
+    JOB -.-> API
+    LAT -.-> API
+```
+
+*Los dos canales son independientes: si uno falla, el otro sale igual. El resultado de cada uno queda en el contacto.*
+
+#### Paso 1. Resend: la key para enviar correo
+
+`koptup.com` **ya está verificado en Resend** (región São Paulo): en Namecheap existen sus registros `resend._domainkey` (TXT) y `send` (MX y TXT con SPF). No los borres.
+
+1. Entra a [resend.com](https://resend.com) con la cuenta que tiene `koptup.com`. En **Domains** debe decir **Verified**.
+   - Si no encuentras esa cuenta: un dominio solo puede estar activo en una cuenta de Resend a la vez. Agrégalo en tu cuenta y sigue la opción de Resend para reclamarlo (te pide un registro TXT nuevo en Namecheap; el reclamo vence a los 7 días).
+2. **API Keys › Create API Key**: nombre `koptup-railway`, permiso **Sending access**, dominio `koptup.com`. Copia la key: empieza por `re_` y se muestra **una sola vez**.
+3. El plan Free alcanza de sobra: 3.000 correos al mes y 100 al día, y la key no vence.
+
+#### Paso 2. Meta: app, número de prueba gratis y tu número como destinatario
+
+1. En [developers.facebook.com](https://developers.facebook.com) › **Mis apps › Crear app**, elige el caso de uso de **WhatsApp** (conectar con clientes por WhatsApp) y el portafolio comercial de KopTup (o crea uno).
+2. En la app, abre **WhatsApp › Configuración de la API** (*API Setup*). Meta te da un **número de prueba gratis**. Copia el **Identificador del número de teléfono** (*Phone number ID*): va en `WHATSAPP_PHONE_NUMBER_ID`.
+3. En esa misma pantalla, en **Para** (*To*) › **Administrar la lista de números de teléfono**, agrega tu celular (`+57 3XX XXX XXXX`) y escribe el código que te llega por WhatsApp. Con el número de prueba solo se puede escribir a números verificados en esa lista (máximo 5).
+4. Opcional: pulsa **Enviar mensaje** con la plantilla `hello_world`. Si te llega, el número y el destinatario están bien.
+
+El número de prueba no pide tarjeta, SIM ni verificar el negocio, y para enviar los avisos la app puede quedarse en modo de desarrollo (solo el webhook del [paso 6](#paso-6-webhook-de-whatsapp-opcional-recomendado) pide pasarla a modo Live). Si algún día usas un número propio, Meta cobra cada plantilla de utilidad entregada (a Colombia, unos USD 0,0008 por mensaje en la tarifa vigente desde octubre de 2026) y exige un método de pago.
+
+#### Paso 3. La plantilla `koptup_aviso`
+
+Fuera de una conversación abierta en las últimas 24 horas, Meta solo entrega **plantillas aprobadas**. Con un aviso al mes esa ventana casi nunca está abierta, así que el backend siempre usa esta plantilla.
+
+1. Abre el **Administrador de WhatsApp** (*WhatsApp Manager*, en [business.facebook.com](https://business.facebook.com)) en la cuenta de WhatsApp del número de prueba › **Plantillas de mensajes › Crear plantilla**.
+2. Categoría **Utility** (Utilidad), nombre `koptup_aviso`, idioma **Spanish** (`es`).
+3. Cuerpo, copiado **exacto** (2 variables de tipo número, sin encabezado, pie ni botones):
+
+   ```text
+   Aviso de KopTup: {{1}}. Detalle: {{2}}. Revisa tu correo o el panel de KopTup para ver todo y responder.
+   ```
+
+4. Ejemplos que pide la revisión: `{{1}}` = `Nuevo contacto de Ana Pérez`; `{{2}}` = `Empresa: Ejemplo SAS · Servicio: Sistema RAG · Email: ana@ejemplo.co · Mensaje: Quiero una demo`.
+5. **Enviar** a revisión. Espera a que quede **Activa** (aprobada). Si Meta la rechaza o la pasa a otra categoría, revisa que el texto sea exactamente el de arriba.
+
+No cambies el texto ni la cantidad de variables: el backend envía siempre 2 (`{{1}}` título de hasta 120 caracteres; `{{2}}` detalle de hasta 700, con empresa, servicio, email y un extracto del mensaje, sin saltos de línea). Si la plantilla falla, el backend envía la de ejemplo `hello_world` (ya existe en la cuenta de prueba) para que al menos suene el teléfono, y el panel te dice que la plantilla necesita arreglo.
+
+#### Paso 4. Un token de Meta que no vence
+
+El token que muestra **Configuración de la API** es temporal y vence en horas. Para producción se usa el de un **usuario del sistema**:
+
+1. En [business.facebook.com](https://business.facebook.com) › **Configuración** (del negocio) › **Usuarios › Usuarios del sistema › Agregar**: nombre `koptup-avisos`, rol **Administrador**.
+2. **Asignar activos**: la **app** del paso 2 y la **cuenta de WhatsApp** del número, las dos con control total.
+3. **Generar nuevo token**: elige la app, caducidad **Nunca** y los permisos `whatsapp_business_messaging` y `whatsapp_business_management`. Copia el token (se muestra una sola vez): va en `WHATSAPP_API_TOKEN`.
+
+#### Paso 5. Las variables en Railway
+
+En Railway › servicio del backend › **Variables**:
+
+| Variable | Valor |
+|---|---|
+| `RESEND_API_KEY` | La key del paso 1 |
+| `EMAIL_FROM` | `KopTup <avisos@koptup.com>` (o no la definas: es el valor por defecto) |
+| `NOTIFY_EMAIL` | Tu Gmail (si quieres, varios separados por coma) |
+| `WHATSAPP_PROVIDER` | `meta` |
+| `WHATSAPP_API_TOKEN` | El token del paso 4 |
+| `WHATSAPP_PHONE_NUMBER_ID` | El id del paso 2 |
+| `ADMIN_WHATSAPP_NUMBER` | Tu celular con indicativo: `57` seguido de los 10 dígitos (`573XXXXXXXXX`) |
+
+Las demás (`WHATSAPP_TEMPLATE_NAME`, `WHATSAPP_TEMPLATE_LANG`, `WHATSAPP_GRAPH_VERSION`, `NOTIFY_HEARTBEAT_DAYS`…) ya tienen el valor correcto por defecto ([4.3](#43-backend-railway)). **Borra** cualquier `TWILIO_*`, `ULTRAMSG_*` o `WHATSAPP_PROVIDER=twilio` que quede de antes, y **no** definas `RESEND_API_URL` ni `WHATSAPP_GRAPH_URL` (son solo para pruebas). Guarda y despliega.
+
+Después, en **Settings** del mismo servicio, deja **apagado «Serverless»** (antes *App Sleeping*). Con el servicio dormido un formulario igual lo despierta, pero mientras duerme no corren los reintentos ni la prueba mensual, que son las que evitan que un canal se caiga sin que lo notes.
+
+En el registro del despliegue deben aparecer estas dos líneas (los destinos salen enmascarados):
+
+```text
+Avisos por correo: Resend → tu***@gmail.com
+Avisos por WhatsApp: Meta plantilla koptup_aviso → +57 *** *** XXXX
+```
+
+Si alguna dice `no configurado: falta …`, define esa variable. Los avisos `[env] …` del arranque también dicen qué falta y qué se apaga.
+
+#### Paso 6. Webhook de WhatsApp (opcional, recomendado)
+
+Sin webhook, el panel solo sabe que Meta **aceptó** el mensaje. Con él sabe si se **entregó**, se **leyó** o **falló**, y si falla te llega un correo de alerta con el código de Meta y qué revisar.
+
+0. Pasa la app a modo **Live**: en el panel de la app de Meta, **Publicar** (o el interruptor *Modo de la app: Desarrollo → En vivo*). Meta pide la URL de la política de privacidad: usa `https://www.koptup.com/privacy`. La guía oficial de webhooks de Meta lo advierte: en modo de desarrollo algunos webhooks no se envían, así que los estados (entregado, leído, fallido) podrían no llegar nunca.
+1. Inventa un texto largo al azar para la verificación, por ejemplo con `node -e "console.log(require('crypto').randomBytes(24).toString('hex'))"`: va en `WHATSAPP_WEBHOOK_VERIFY_TOKEN`.
+2. En la app de Meta › **Configuración de la app › Básica › Clave secreta de la app** (*Mostrar*): va en `WHATSAPP_APP_SECRET`.
+3. Define las dos en Railway y despliega **antes** del paso siguiente: sin ellas la ruta responde 404 y Meta no la puede verificar.
+4. En la app › **WhatsApp › Configuración › Webhook › Editar**: URL de devolución de llamada `https://<dominio de la API>/api/webhooks/whatsapp` y, como token de verificación, el mismo texto del punto 1. **Verificar y guardar**.
+5. En **Campos del webhook**, suscribe **messages** (por ahí llegan los estados de los mensajes enviados).
+
+El backend rechaza con 401 todo evento que no venga firmado con la clave secreta de la app (cabecera `X-Hub-Signature-256`) y acepta lotes de hasta 3 MB (el máximo que documenta Meta). En el panel, «Confirmación de entrega» dice **Configurada, sin eventos aún** hasta que llegue el primer estado de Meta, y desde ahí muestra la fecha del último evento recibido. Si después de **Enviar aviso de prueba** sigue sin eventos, revisa que la app esté en modo Live (punto 0) y que el campo **messages** esté suscrito.
+
+#### Paso 7. Namecheap: reenvío de `ronald@koptup.com` y DMARC
+
+`ronald@koptup.com` aparece en el sitio, pero hoy `koptup.com` no recibe correo (la raíz no tiene registro MX): lo que te escriben ahí rebota.
+
+1. Namecheap › **Domain List** › `koptup.com` › **Manage** › **Redirect Email** (*Email Forwarding*) › **Add Forwarder**: alias `ronald` → tu Gmail. Si Namecheap pide elegir el servicio de correo, en **Advanced DNS › Mail Settings** elige **Email Forwarding** (gratis): agrega los MX de la raíz.
+2. **Advanced DNS › Add New Record**: tipo **TXT Record**, host `_dmarc`, valor `v=DMARC1; p=none;`. Ayuda a que Gmail confíe en el correo que sale de `koptup.com` sin bloquear nada.
+3. No toques los registros `resend._domainkey` ni `send`.
+4. Prueba: escribe desde otra cuenta a `ronald@koptup.com`; en unos minutos debe llegar a tu Gmail.
+
+#### Paso 8. Gmail: que los avisos nunca vayan a spam
+
+1. En Gmail, en la barra de búsqueda › **Mostrar opciones de búsqueda** › **De**: `avisos@koptup.com OR onboarding@resend.dev`.
+2. **Crear filtro** › marca **Nunca enviarlo a Spam** (y, si quieres, **Marcar siempre como importante**) › **Crear filtro**.
+
+#### Paso 9. Prueba con el botón
+
+1. Entra con una cuenta **admin** a **Admin › Configuración**. En la tarjeta **Avisos de nuevos contactos**, el correo y el WhatsApp deben decir **Configurado**, con el destino enmascarado; si falta algo, la tarjeta lista las variables.
+2. Pulsa **Enviar aviso de prueba**. Por cada canal ves lo que respondió el proveedor: «Enviado» con su id, o «Falló» con el motivo (en WhatsApp, con el código de Meta y qué revisar). Revisa tu Gmail y tu WhatsApp. Puedes hacer 5 pruebas cada 15 minutos; cada una queda en la bitácora (`notifications.test`).
+3. Envía un mensaje real desde [www.koptup.com/contact](https://www.koptup.com/contact) con tu correo. En **Admin › Contactos** ese contacto debe decir «Correo: Enviado» y «WhatsApp: Enviado» (o «Entregado» y «Leído» con el webhook). En el correo, **Responder** le escribe directo a la persona.
+
+Si algo no llega: [9.7 El correo no sale](#97-el-correo-no-sale) y [9.11 El WhatsApp no llega](#911-el-whatsapp-no-llega). Las pantallas del panel están en el [Manual del administrador › 13](Doc-06-Manual-del-Administrador.md#13-configuración).
+
+#### Qué pasa después, sin que hagas nada
+
+| Mecanismo | Qué hace | Cómo se apaga |
+|---|---|---|
+| **Reintentos** | Un job revisa cada 5 minutos los contactos de los últimos 3 días con un canal fallido (o pendiente hace más de 10 minutos, por ejemplo por un reinicio) y lo reenvía, con esperas de 5 min, 15 min, 1 h, 3 h y 12 h, hasta 6 intentos. Nunca reenvía un canal que ya salió, y el correo usa la misma clave de idempotencia para que Resend no lo duplique | `NOTIFY_JOBS_ENABLED=false` |
+| **Prueba mensual** | Cada 30 días, entre las 9:00 y las 18:59 hora de Colombia, te llega «Prueba mensual: tus avisos de contactos funcionan» por cada canal. Si uno falla, te avisa por el otro con el error. Mantiene viva la plantilla (Meta archiva las que pasan 12 meses sin uso) y te confirma que todo sigue bien aunque no lleguen contactos | `NOTIFY_HEARTBEAT_DAYS=0` |
+| **Alerta del webhook** | Si Meta informa que un WhatsApp no se entregó, te llega un correo con el código y qué revisar (una vez por mensaje) y el contacto queda «Falló», listo para reintentar | Quitando las dos variables del webhook |
+| **Reenvío manual** | En **Admin › Contactos**, el admin pulsa **Reenviar aviso** en un contacto (o **Enviar el aviso otra vez** si ya salió por los dos canales) | — |
 
 ---
 
@@ -425,6 +583,8 @@ flowchart LR
 
    En `apps/backend/.env`: deja `MONGODB_URI=mongodb://localhost:27017/koptup_db` y `REDIS_URL=redis://localhost:6379`; cambia `JWT_SECRET` y `JWT_REFRESH_SECRET` por dos valores largos y distintos; para la IA, pon tu `OPENAI_API_KEY` o, con el mock, `OPENAI_BASE_URL=http://127.0.0.1:3999/v1` y cualquier clave de prueba; para «Prueba con tu documento», `DEMO_UPLOAD_ENABLED=true`.
 
+   **Avisos al dueño en local:** no pongas la key de Resend ni el token de Meta reales (cada contacto de prueba te avisaría de verdad). Sin ellos, los contactos se guardan y el panel muestra sus avisos como «No configurado». Para verlos funcionar, arranca el mock con `node apps/web/e2e/support/notify-mock.js` (puerto 3998) y apunta `RESEND_API_URL` y `WHATSAPP_GRAPH_URL` a `http://127.0.0.1:3998` con valores ficticios; la lista completa está en `SETUP.md` (sección 4). Lo que el backend «envió» se ve en `http://127.0.0.1:3998/__requests`.
+
 5. **Arranca el backend:**
 
    ```bash
@@ -482,19 +642,19 @@ flowchart LR
 
 | Tipo | Dónde viven | Cuántas hay | Cómo se corren | Qué necesitan |
 |---|---|---|---|---|
-| **Unitarias del backend** | `apps/backend/src/__tests__/unit/`, `src/services/__tests__/`, `src/utils/__tests__/` | 18 archivos | `npm test --workspace=apps/backend` | Nada |
-| **Integración del backend** | `apps/backend/src/__tests__/integration/` (permisos, demos, chatbot, topes de gasto, perfil, privacidad, operación…) | 14 archivos | `MONGODB_URI_TEST=mongodb://127.0.0.1:27017/koptup_test REDIS_URL_TEST=redis://127.0.0.1:6379/15 npm test --workspace=apps/backend` | MongoDB y Redis **solo de pruebas** (cada archivo crea y borra su base; se borran claves de Redis) |
-| **Web** | `apps/web/src/**/*.test.ts(x)` (humo de las demos, middleware de acceso, catálogo) | 43 archivos | `npm test --workspace=apps/web` | Nada (no salen a la red) |
-| **Punta a punta** | `apps/web/e2e/*.spec.ts` | 10 archivos, en escritorio, móvil (Pixel 7) y un proyecto «catalogo» | `npm run test:e2e` con la web y el backend ya levantados | MongoDB, Redis, mock de OpenAI, backend y web compilados |
+| **Unitarias del backend** | `apps/backend/src/__tests__/unit/`, `src/services/__tests__/`, `src/utils/__tests__/` | 23 archivos (incluidos Resend, WhatsApp y el armado de los avisos, con `fetch` simulado) | `npm test --workspace=apps/backend` | Nada |
+| **Integración del backend** | `apps/backend/src/__tests__/integration/` (permisos, demos, chatbot, topes de gasto, perfil, privacidad, avisos al dueño, operación…) | 19 archivos | `MONGODB_URI_TEST=mongodb://127.0.0.1:27017/koptup_test REDIS_URL_TEST=redis://127.0.0.1:6379/15 npm test --workspace=apps/backend` | MongoDB y Redis **solo de pruebas** (cada archivo crea y borra su base; se borran claves de Redis) |
+| **Web** | `apps/web/src/**/*.test.ts(x)` (humo de las demos, middleware de acceso, catálogo, tarjeta de avisos) | 70 archivos | `npm test --workspace=apps/web` | Nada (no salen a la red) |
+| **Punta a punta** | `apps/web/e2e/*.spec.ts` | 13 archivos, en escritorio, móvil (Pixel 7) y un proyecto «catalogo» | `npm run test:e2e` con la web y el backend ya levantados | MongoDB, Redis, mock de OpenAI, mock de Resend y WhatsApp, backend y web compilados |
 
 Atajos desde la raíz: `npm test` (Jest de los dos), `npm run lint`, `npm run typecheck` y `npm run test:e2e`.
 
 **Punta a punta en local, en cuatro terminales** (los valores son solo de prueba):
 
-1. MongoDB, Redis y el mock de OpenAI (paso 2 y 3 de la [sección 5](#5-levantar-todo-en-local-paso-a-paso)).
-2. Backend compilado: `npm run build --workspace=apps/backend` y luego, en `apps/backend`, `node dist/index.js` con `PORT=3001 NODE_ENV=production`, una base propia (`koptup_e2e`), los dos JWT de prueba, `CORS_ORIGIN` y `FRONTEND_URL` en `http://localhost:3000`, el mock en `OPENAI_BASE_URL`, `DEMO_UPLOAD_ENABLED=true` y `RATE_LIMIT_MAX_REQUESTS=10000` (todo sale de la misma máquina).
+1. MongoDB, Redis, el mock de OpenAI (paso 2 y 3 de la [sección 5](#5-levantar-todo-en-local-paso-a-paso)) y el mock de Resend y WhatsApp: `node apps/web/e2e/support/notify-mock.js` (puerto 3998).
+2. Backend compilado: `npm run build --workspace=apps/backend` y luego, en `apps/backend`, `node dist/index.js` con `PORT=3001 NODE_ENV=production`, una base propia (`koptup_e2e`), los dos JWT de prueba, `CORS_ORIGIN` y `FRONTEND_URL` en `http://localhost:3000`, el mock en `OPENAI_BASE_URL`, `DEMO_UPLOAD_ENABLED=true`, `RATE_LIMIT_MAX_REQUESTS=10000` (todo sale de la misma máquina) y los avisos apuntando al mock de avisos con valores ficticios (`RESEND_API_URL` y `WHATSAPP_GRAPH_URL` en `http://127.0.0.1:3998`, más `NOTIFY_JOBS_ENABLED=false`; los valores exactos están en el `README.md`). **Nunca** con las credenciales reales: cada contacto de prueba avisaría de verdad.
 3. Web compilada: `NEXT_PUBLIC_API_URL=http://localhost:3001 npm run build --workspace=apps/web` y `npx next start -p 3000` en `apps/web`.
-4. `npx playwright install chromium` (la primera vez) y `E2E_BASE_URL=http://localhost:3000 E2E_API_URL=http://localhost:3001 E2E_MONGODB_URI=mongodb://127.0.0.1:27017/koptup_e2e npm run test:e2e`.
+4. `npx playwright install chromium` (la primera vez) y `E2E_BASE_URL=http://localhost:3000 E2E_API_URL=http://localhost:3001 E2E_MONGODB_URI=mongodb://127.0.0.1:27017/koptup_e2e E2E_NOTIFY_MOCK_URL=http://127.0.0.1:3998 npm run test:e2e`.
 
 La suite siembra sus propios datos por la API con emails en el dominio reservado `.test`, crea una cuenta admin con una contraseña al azar en cada corrida y **se niega a correr** contra una web o un backend que no sean locales (salvo `E2E_ALLOW_REMOTE=1`, solo para un entorno desechable). Nunca la corras contra producción: cambia el catálogo de demos. Para correr un solo archivo: `npm run test:e2e -- e2e/demo-flow.spec.ts --project=escritorio`.
 
@@ -509,7 +669,8 @@ La suite siembra sus propios datos por la API con emails en el dominio reservado
 | Monitoreo (workflow **Monitoreo**) | GitHub Actions, cada 15 minutos | Si `https://www.koptup.com` y `<BACKEND_HEALTH_URL>` responden. Si algo falla tres veces seguidas en la misma corrida, la corrida queda en rojo y GitHub envía un correo |
 | `GET /api/demo-rag/status` | Backend | Si «Prueba con tu documento» está encendida y por qué no (`disabled`, `unavailable`, `budget_exhausted`) |
 | `GET /api/demo-catalog` | Backend | El catálogo de demos que ve la web; si falla, la web usa su tabla de respaldo |
-| Registros del servicio | Railway | Cada petición (método, ruta, estado, IP y navegador), los avisos `[env]` del arranque y los errores |
+| Registros del servicio | Railway | Cada petición (método, ruta, estado, IP y navegador), los avisos `[env]` del arranque, una línea por canal de avisos (`Avisos por correo: …`, `Avisos por WhatsApp: …`, con el destino enmascarado), cada envío o fallo de correo y WhatsApp (sin la key ni el token) y los errores |
+| **Admin › Configuración › Avisos de nuevos contactos** (`GET /api/admin/notifications/status`) | Panel (admin y manager) | Si cada canal está configurado o qué variable falta, el proveedor, el destino enmascarado, el último aviso enviado, el último fallo con su error y la próxima prueba mensual. Nunca muestra keys ni tokens |
 | Registros del despliegue | Vercel | Errores de compilación y de las funciones del servidor de la web |
 
 ![Estado de «Prueba con tu documento», anotado](images/doc/operacion/demo-rag-status.jpg)
@@ -617,10 +778,11 @@ flowchart LR
     S4["Nadie puede entrar al panel"]:::error --> R4["9.4 Crear o recuperar el admin"]:::admin
     S5["Hay que abrir o cerrar una demo"]:::error --> R5["9.5 Cambiar el modo"]:::admin
     S6["Una demo con IA habla de cupo agotado"]:::error --> R6["9.6 Presupuesto de IA"]:::admin
-    S7["Un correo no llega"]:::error --> R7["9.7 El correo no sale"]:::admin
+    S7["Un correo o un aviso por correo no llega"]:::error --> R7["9.7 El correo no sale"]:::admin
     S8["Una demo dice No se pudo verificar o En mantenimiento"]:::error --> R8["9.8 Demo no disponible"]:::admin
     S9["El último despliegue rompió algo"]:::error --> R9["9.9 Revertir"]:::admin
     S10["Llegó un correo del monitoreo"]:::error --> R10["9.10 Caída detectada"]:::admin
+    S11["El aviso por WhatsApp no llega"]:::error --> R11["9.11 El WhatsApp no llega"]:::admin
 ```
 
 *Busca el síntoma a la izquierda y ve al runbook de la derecha.*
@@ -646,7 +808,7 @@ flowchart LR
    1. *New service › GitHub repo* con este repositorio y la rama `main`.
    2. Directorio raíz `apps/backend` (ahí está `railway.json`, que define build, arranque y chequeo de salud).
    3. Agrega un Redis al proyecto y copia su URL en `REDIS_URL`.
-   4. Carga las variables de la [sección 4.3](#43-backend-railway). Mínimo: `NODE_ENV=production`, `MONGODB_URI`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, `FRONTEND_URL=https://www.koptup.com`, `TRUST_PROXY_HOPS=1`, `OPENAI_API_KEY` y `ADMIN_EMAIL`. Aprovecha para usar **secretos nuevos** ([9.2](#92-rotar-secretos)).
+   4. Carga las variables de la [sección 4.3](#43-backend-railway). Mínimo: `NODE_ENV=production`, `MONGODB_URI`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, `FRONTEND_URL=https://www.koptup.com`, `TRUST_PROXY_HOPS=1`, `OPENAI_API_KEY`, `ADMIN_EMAIL` y las de los avisos al dueño ([4.5](#45-configurar-los-avisos-al-dueño-paso-a-paso)). Aprovecha para usar **secretos nuevos** ([9.2](#92-rotar-secretos)) y deja apagado *Serverless* en *Settings*.
    5. Genera un dominio público para el servicio.
    6. Monta un volumen en `/app/uploads` para que los archivos subidos no se borren en cada despliegue, y pon `<dominio>/health` en la variable `BACKEND_HEALTH_URL` del repositorio ([acciones pendientes](#10-acciones-pendientes-del-dueño)).
 4. **Si el dominio de la API cambió:** en Vercel (proyecto `koptup`, entorno *Production*) pon la nueva URL en `NEXT_PUBLIC_API_URL` y **redespliega la web** (*Deployments › ⋯ › Redeploy*). La misma variable alimenta la CSP, así que no hay que tocar código. Después actualiza también `apps/web/.env.production` en el repositorio para que no quede desalineado.
@@ -658,7 +820,7 @@ flowchart LR
 7. **Verifica de afuera hacia adentro:**
    1. `GET /health` → `200` con `mongo: connected`. Si da `503`, revisa `MONGODB_URI` y que la base acepte conexiones desde Railway.
    2. `GET /api/demo-catalog` → lista de 28 demos.
-   3. En `www.koptup.com`: inicia sesión en `/admin`, envía una prueba desde `/contact` y abre `/demo/erp` sin sesión: debe mostrar «Solicitar acceso», no «No se pudo verificar».
+   3. En `www.koptup.com`: inicia sesión en `/admin`, envía una prueba desde `/contact` (te debe llegar el aviso por correo y WhatsApp, y en **Admin › Contactos** los dos canales deben decir «Enviado») y abre `/demo/erp` sin sesión: debe mostrar «Solicitar acceso», no «No se pudo verificar».
    4. Si el navegador muestra errores de CORS, revisa que la web use `https://www.koptup.com` o agrega su dominio en `CORS_ORIGIN`.
 
 ![«No se pudo verificar» en una demo con acceso controlado, anotada](images/doc/operacion/demo-no-se-pudo-verificar.jpg)
@@ -686,14 +848,14 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 | `JWT_SECRET` | Railway | Los tokens de acceso dejan de valer; la web los renueva sola con el de renovación. Nadie lo nota |
 | `JWT_REFRESH_SECRET` | Railway | Nadie puede renovar: todos vuelven a iniciar sesión en máximo 15 minutos |
 | `INTERNAL_API_KEY` | Vercel **y** Railway, mismo valor | Ninguno. Mientras no coincidan, los cupos por IP de esas peticiones cuentan con la IP de Vercel |
-| `SMTP_PASS`, `OPENAI_API_KEY`, credenciales de WhatsApp | Revoca la vieja en el proveedor, crea una nueva y cámbiala en Railway | Ninguno |
+| `RESEND_API_KEY`, `SMTP_PASS`, `OPENAI_API_KEY`, `WHATSAPP_API_TOKEN`, `WHATSAPP_APP_SECRET`, `WHATSAPP_WEBHOOK_VERIFY_TOKEN` | Revoca la vieja en el proveedor (Resend › *API Keys*; Meta › usuario del sistema › *Revocar tokens*; la clave secreta de la app se restablece en *Configuración de la app › Básica*), crea una nueva y cámbiala en Railway. Si cambias el verify token, escríbelo igual en el webhook de Meta | Ninguno. Mientras el token de Meta o la key de Resend no coincidan, los avisos de ese canal fallan y el job los reintenta |
 
 **Pasos**
 
 1. Cambia primero en el **proveedor** (por ejemplo, la contraseña del usuario de MongoDB o una clave nueva de OpenAI).
 2. Actualiza la variable en **Railway** (y en Vercel si es `INTERNAL_API_KEY`). Usa valores distintos para los dos JWT.
 3. **Redespliega** (Railway lo propone al guardar; Vercel exige *Redeploy*).
-4. **Verifica:** `GET /health` en `200`, inicio de sesión en `/admin`, un correo de prueba (por ejemplo, «¿Olvidaste tu contraseña?» con tu cuenta) y una pregunta en `/demo/chatbot`.
+4. **Verifica:** `GET /health` en `200`, inicio de sesión en `/admin`, **Enviar aviso de prueba** en Admin › Configuración (correo y WhatsApp) y una pregunta en `/demo/chatbot`.
 5. **Revoca la credencial vieja** en el proveedor cuando todo funcione.
 
 Los enlaces de activación pendientes **no** se afectan: se guardan como un hash en MongoDB y no dependen de los JWT. GitHub Actions no usa secretos propios (la wiki se publica con el `GITHUB_TOKEN` automático).
@@ -740,7 +902,7 @@ Hay tres vías para dar el rol `admin` y ninguna se puede hacer desde fuera del 
 
 **Olvidaste la contraseña**
 
-1. Usa «¿Olvidaste tu contraseña?» en `/login`. Llega un enlace que vale **1 hora** y sirve una sola vez. Necesita SMTP ([9.7](#97-el-correo-no-sale)).
+1. Usa «¿Olvidaste tu contraseña?» en `/login`. Llega un enlace que vale **1 hora** y sirve una sola vez. Necesita correo configurado ([9.7](#97-el-correo-no-sale)).
 2. Si el correo no está configurado, el enlace no llega y no hay forma de verlo en el panel: registra otra cuenta y conviértela en admin con el script `set-admin` (`ADMIN_EMAIL` no sirve aquí, porque la cuenta vieja sigue siendo admin). Desde ella puedes seguir operando.
 3. Las cuentas creadas con Google no tienen contraseña: entra con «Continuar con Google» (requiere `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET`).
 
@@ -784,23 +946,49 @@ Un valor inválido o negativo en la variable deja la función en 0, es decir, ap
 
 ### 9.7 El correo no sale
 
-**Síntoma.** A un prospecto no le llega el acuse, la aprobación con su enlace, el recordatorio de vencimiento o el enlace para restablecer la contraseña; o al equipo no le llegan los avisos de solicitudes y contactos.
+**Síntoma.** No te llega el aviso de un contacto nuevo por correo, o a un prospecto no le llega el acuse, la aprobación con su enlace, el recordatorio de vencimiento o el enlace para restablecer la contraseña.
 
-**Mientras tanto** el negocio sigue: cada aprobación o acceso concedido muestra el enlace de activación para **copiarlo** o **enviarlo por WhatsApp** ([Manual del administrador › 4.4](Doc-06-Manual-del-Administrador.md#44-copiar-el-enlace-y-enviarlo-por-whatsapp)). Ninguna acción del panel falla por el correo.
+**Causa más común.** El backend intenta enviar por **SMTP** desde Railway Free, Trial o Hobby: esos planes **bloquean el SMTP saliente** (puertos 25, 465 y 587), la conexión se queda colgada hasta el tiempo de espera y el correo no sale. La solución es `RESEND_API_KEY`: con ella todo el correo sale por la API HTTPS de Resend, que Railway no bloquea.
+
+**Mientras tanto** el negocio sigue: el contacto queda guardado en **Admin › Contactos** (con el aviso por WhatsApp, si está configurado), y cada aprobación o acceso concedido muestra el enlace de activación para **copiarlo** o **enviarlo por WhatsApp** ([Manual del administrador › 4.4](Doc-06-Manual-del-Administrador.md#44-copiar-el-enlace-y-enviarlo-por-whatsapp)). Ninguna acción del panel falla por el correo.
+
+```mermaid
+flowchart TD
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#7f1d1d
+    classDef admin fill:#fef3c7,stroke:#d97706,color:#78350f
+    classDef sistema fill:#e0e7ff,stroke:#4f46e5,color:#312e81
+
+    Q["No llega un correo"]:::error --> C{"Admin › Configuración:<br/>¿Correo configurado?"}
+    C -->|"No: falta RESEND_API_KEY<br/>o NOTIFY_EMAIL"| F1["Define lo que falta en Railway<br/>y redespliega (4.5, pasos 1 y 5)"]:::admin
+    C -->|"Sí, pero el proveedor es SMTP"| F2["Railway Hobby bloquea SMTP:<br/>define RESEND_API_KEY"]:::admin
+    C -->|"Sí, con Resend"| T["Enviar aviso de prueba"]:::sistema
+    T --> R{"¿Qué responde el correo?"}
+    R -->|"Falló: Resend 401 o 403"| F3["Key revocada o sin permiso:<br/>crea otra con Sending access"]:::admin
+    R -->|"Falló: dominio no verificado"| F4["Revisa koptup.com en Resend › Domains<br/>y los registros DNS de Resend"]:::admin
+    R -->|"Falló: sin respuesta o 5xx"| F5["Falla temporal: el job reintenta<br/>cada 5 min, hasta 6 intentos"]:::sistema
+    R -->|"Enviado con id"| G{"¿Está en tu bandeja?"}
+    G -->|"No"| F6["Busca en spam y crea el filtro<br/>de Gmail (4.5, paso 8)"]:::admin
+    G -->|"Sí"| OK["El canal funciona: revisa el<br/>contacto en Admin › Contactos"]:::sistema
+```
 
 **Pasos**
 
-1. **Mira qué dice el panel junto al enlace** (estado del correo en el detalle de la solicitud o del acceso):
-   - «No está configurado» → faltan `SMTP_USER` o `SMTP_PASS`.
-   - «No se pudo enviar» → busca `Email … error` en los registros de Railway: si es de autenticación, revisa usuario y contraseña de aplicación; si es de conexión, `SMTP_HOST`, `SMTP_PORT` y `SMTP_SECURE` (465 con `true`, 587 con `false`).
-   - «Se envió» → el servidor lo entregó: pide revisar spam y que el email esté bien escrito.
-2. **Configura el SMTP en Railway:** `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS` y `EMAIL_FROM`. Sin `SMTP_HOST` se usa el servidor de Gmail.
-3. **Revisa `FRONTEND_URL`:** si un correo llega con un enlace a `localhost`, falta `https://www.koptup.com`.
-4. **Avisos al equipo:** van a `ADMIN_EMAIL` (sin ella no salen por correo y el log lo dice: no hay una dirección de respaldo) y, por WhatsApp, a `ADMIN_WHATSAPP_NUMBER` con las variables del proveedor elegido.
-5. **Recordatorios de vencimiento:** además del SMTP, el job debe estar encendido (`DEMO_GRANTS_JOB_ENABLED` distinto de `false`); corre cada hora y avisa 3 días antes.
-6. **Redespliega** y prueba con «¿Olvidaste tu contraseña?» usando tu cuenta.
+1. **Mira la tarjeta** en **Admin › Configuración › Avisos de nuevos contactos** (admin y manager):
+   - «No configurado» con la lista de lo que falta → define `RESEND_API_KEY` y `NOTIFY_EMAIL` (o `ADMIN_EMAIL`) en Railway ([4.5, pasos 1 y 5](#45-configurar-los-avisos-al-dueño-paso-a-paso)).
+   - Proveedor **SMTP** con la advertencia de Railway → define `RESEND_API_KEY`; SMTP queda como respaldo solo sin ella.
+   - «Último error» → el motivo del último fallo, sin la key y con los correos enmascarados.
+2. **Pulsa «Enviar aviso de prueba»** (solo admin) y lee el resultado del correo:
+   - `Resend 401` o `Resend 403` (key inválida, revocada o sin permiso) → crea una key nueva con **Sending access** y cámbiala en Railway.
+   - `403` que menciona el dominio o la verificación → `koptup.com` no está verificado en esa cuenta de Resend. El aviso al dueño se reintenta solo desde `onboarding@resend.dev`, que **solo** entrega al correo dueño de la cuenta de Resend (el panel lo marca como respaldo). Revisa **Domains** en Resend y no borres los registros `resend._domainkey` ni `send` de Namecheap.
+   - `422` (validación) → revisa el formato de `EMAIL_FROM` (`Nombre <correo@koptup.com>`) y de `NOTIFY_EMAIL`.
+   - `429` o `5xx` o «sin respuesta en 15 s» → falla temporal: el backend ya reintentó una vez y el job lo vuelve a intentar.
+   - «Enviado» con un id → Resend lo aceptó. Si no está en tu bandeja, busca en spam y crea el filtro de Gmail ([4.5, paso 8](#45-configurar-los-avisos-al-dueño-paso-a-paso)); en Resend › **Emails** ves si se entregó o rebotó.
+3. **Mira el contacto** en **Admin › Contactos**: el detalle dice por canal el estado, el motivo del fallo, los intentos y el próximo reintento automático. **Reenviar aviso** (admin) lo intenta otra vez.
+4. **En los registros de Railway** busca `Correo "` (cada envío dice `enviado por resend a ro***@…` o `falló por resend: …`) y los avisos `[env] RESEND_API_KEY …` del arranque.
+5. **Revisa `FRONTEND_URL`:** si un correo llega con un enlace a `localhost`, falta `https://www.koptup.com`.
+6. **Recordatorios de vencimiento:** además del correo, el job debe estar encendido (`DEMO_GRANTS_JOB_ENABLED` distinto de `false`); corre cada hora y avisa 3 días antes.
 
-El arranque avisa por `SMTP_USER` y `SMTP_PASS`, que son las que deciden si sale correo; `SMTP_HOST` es opcional (sin ella se usa el servidor de Gmail).
+Para un prospecto, el detalle de la solicitud o del acceso dice junto al enlace si el correo «Se envió», «No está configurado» o «No se pudo enviar». La versión en diagrama de decisión, con los demás correos, está en [Flujos de administración › 9.2](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#92-el-correo-no-sale).
 
 ### 9.8 Una demo muestra «No se pudo verificar» o «En mantenimiento»
 
@@ -863,6 +1051,58 @@ El diagrama de este procedimiento está en [Flujos de administración › 9.6](D
 4. **Si la API no responde o da 503:** sigue el [runbook 9.1](#91-el-backend-está-caído-situación-actual) desde el paso 1.
 5. **Cuando vuelva**, la siguiente corrida programada queda en verde; GitHub no envía correo de recuperación.
 
+
+### 9.11 El WhatsApp no llega
+
+**Síntoma.** Llega el correo de un contacto nuevo, pero no el WhatsApp; o **Admin › Contactos** muestra «WhatsApp: Falló» o «No configurado».
+
+**Por qué pasa casi siempre.** El aviso se envía con la plantilla `koptup_aviso` de la WhatsApp Cloud API de Meta. Falla si falta una variable, si el token venció (el temporal del panel dura horas), si la plantilla no está aprobada o no coincide (nombre, idioma, 2 variables) o si tu número no está en la lista de destinatarios del número de prueba. Twilio y UltraMsg ya no se soportan: si `WHATSAPP_PROVIDER` vale `twilio` o `ultramsg`, el canal queda apagado.
+
+```mermaid
+flowchart TD
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#7f1d1d
+    classDef admin fill:#fef3c7,stroke:#d97706,color:#78350f
+    classDef sistema fill:#e0e7ff,stroke:#4f46e5,color:#312e81
+
+    Q["No llega el WhatsApp"]:::error --> C{"Admin › Configuración:<br/>¿WhatsApp configurado?"}
+    C -->|"No: falta una variable<br/>o WHATSAPP_PROVIDER no es meta"| F1["Define token, id del número y<br/>ADMIN_WHATSAPP_NUMBER (4.5, paso 5)"]:::admin
+    C -->|"Sí"| T["Enviar aviso de prueba"]:::sistema
+    T --> R{"¿Qué responde WhatsApp?"}
+    R -->|"Falló: código 190"| F2["Token vencido: genera el de<br/>usuario del sistema, caducidad Nunca"]:::admin
+    R -->|"Falló: código 131030"| F3["Agrega y verifica tu número<br/>en la lista del número de prueba"]:::admin
+    R -->|"Falló: código 132xxx"| F4["Revisa la plantilla koptup_aviso:<br/>aprobada, idioma es, texto exacto"]:::admin
+    R -->|"Enviado con respaldo hello_world"| F4
+    R -->|"Enviado"| W{"¿Te llegó al celular?"}
+    W -->|"No"| F5["Activa el webhook para saber<br/>si Meta lo entregó (4.5, paso 6)"]:::admin
+    W -->|"Sí"| OK["El canal funciona"]:::sistema
+```
+
+**Pasos**
+
+1. **Mira la tarjeta** en **Admin › Configuración › Avisos de nuevos contactos**: si WhatsApp dice «No configurado», la lista dice qué variable falta (`WHATSAPP_API_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID` o `ADMIN_WHATSAPP_NUMBER`; o `WHATSAPP_PROVIDER` si pide un proveedor retirado). El registro del arranque dice lo mismo en la línea `Avisos por WhatsApp: …`.
+2. **Pulsa «Enviar aviso de prueba»** (solo admin). Si falla, el resultado trae el código de Meta y qué revisar:
+
+   | Código de Meta | Qué significa | Qué hacer |
+   |---|---|---|
+   | `190` | El token venció o es inválido | Genera el token del usuario del sistema con caducidad **Nunca** ([4.5, paso 4](#45-configurar-los-avisos-al-dueño-paso-a-paso)) y cámbialo en Railway |
+   | `10` o `200` | La app no tiene el permiso | Al generar el token, marca `whatsapp_business_messaging` y `whatsapp_business_management`, y asigna la app y la cuenta de WhatsApp al usuario del sistema |
+   | `100` | Parámetro inválido | Revisa `WHATSAPP_PHONE_NUMBER_ID` (es el id, no el teléfono) |
+   | `131030` | Tu número no está en la lista de destinatarios permitidos del número de prueba | Agrégalo y verifícalo en **WhatsApp › Configuración de la API › Para** ([4.5, paso 2](#45-configurar-los-avisos-al-dueño-paso-a-paso)) |
+   | `131026` | El número no puede recibir el mensaje | Revisa que `ADMIN_WHATSAPP_NUMBER` tenga el indicativo (`57…`) y que ese número tenga WhatsApp |
+   | `132001` | La plantilla no existe en ese idioma o aún no está aprobada | Revisa en el Administrador de WhatsApp que `koptup_aviso` esté **Activa** en Spanish (`es`), igual que `WHATSAPP_TEMPLATE_NAME` y `WHATSAPP_TEMPLATE_LANG` |
+   | `132000`, `132012` | La cantidad o el formato de las variables no coincide | El cuerpo debe tener exactamente `{{1}}` y `{{2}}` ([4.5, paso 3](#45-configurar-los-avisos-al-dueño-paso-a-paso)) |
+   | `132015`, `132016` | La plantilla está pausada o deshabilitada | Revísala en el Administrador de WhatsApp o crea una nueva con el mismo texto |
+   | `132018` | Una variable trae saltos de línea, tabs o más de 4 espacios seguidos | El backend ya los limpia (también los espacios Unicode como el de no separación); si aparece, revisa que el despliegue tenga el código actual |
+   | `133010` | El número que envía no está registrado en la Cloud API | Usa el número de prueba de **Configuración de la API** o registra el tuyo |
+   | `131047` | Pasaron más de 24 h y se intentó enviar sin plantilla | No debería pasar: el backend siempre usa la plantilla. Revisa que el despliegue tenga el código actual |
+
+3. **«Enviado» con respaldo `hello_world`:** tu plantilla falló por un error de plantilla y, para que al menos sonara el teléfono, se envió la de ejemplo de Meta (en inglés, sin los datos del contacto). El aviso cuenta como enviado y no se reintenta: arregla la plantilla con el código que muestra el panel. La prueba mensual automática no lo da por bueno: si solo sale el respaldo, te llega además un correo «Falla en tus avisos por WhatsApp» con el error de la plantilla (y, al revés, un WhatsApp si el correo solo salió desde `onboarding@resend.dev`).
+4. **«Enviado» pero no te llegó:** sin webhook, «Enviado» solo significa que Meta **aceptó** el mensaje. Configura el webhook ([4.5, paso 6](#45-configurar-los-avisos-al-dueño-paso-a-paso)): el contacto pasará a «Entregado», «Leído» o «Falló» con el código, y si falla te llega un correo de alerta.
+5. **Después de meses sin usarla**, Meta archiva una plantilla que pasa 12 meses sin envíos. La prueba mensual automática (`NOTIFY_HEARTBEAT_DAYS`, 30 por defecto) la mantiene activa: no la apagues.
+6. **Versión de la API:** `WHATSAPP_GRAPH_VERSION` usa `v25.0`. Meta retira cada versión unos 2 años después de publicarla; antes de que venza, súbela en Railway y prueba con el botón.
+
+Mientras tanto, el contacto está guardado en **Admin › Contactos** y el aviso por correo sale aparte. Cuando arregles la causa, pulsa **Reenviar aviso** en el contacto (solo admin) o espera el reintento automático (cada 5 minutos, hasta 6 intentos en los primeros 3 días).
+
 ---
 
 ## 10. Acciones pendientes del dueño
@@ -876,7 +1116,7 @@ Configuraciones que viven en las plataformas y no se pueden hacer desde el códi
 | 3 | **Dejar un solo proyecto de Vercel:** conservar `koptup` (el que tiene `www.koptup.com` y `koptup.com`), copiar a él cualquier variable que solo exista en `koptup-web` y desconectar o borrar `koptup-web` | Vercel › `koptup-web` › *Settings › Git › Disconnect* (o *Settings › General › Delete Project*) | Los dos construyen cada push a `main`: doble build y riesgo de cambiar una variable en el proyecto equivocado |
 | 4 | **Montar un volumen para los archivos subidos** en la ruta `/app/uploads` del servicio del backend | Railway › servicio del backend › *Volumes › New volume* (mount path `/app/uploads`) | Sin volumen, los adjuntos de pedidos y los archivos de cuentas médicas se borran en cada despliegue. Con volumen, un redespliegue puede dejar la API unos segundos sin servicio |
 | 5 | **Activar el monitoreo:** crear la variable `BACKEND_HEALTH_URL` con `<URL pública de la API>/health` y revisar que lleguen los correos de Actions | GitHub › *Settings › Secrets and variables › Actions › Variables*; tu perfil › *Settings › Notifications* | Sin la variable, el monitoreo solo revisa la web ([7.1](#71-monitoreo-con-github-actions)) |
-| 6 | **Definir `ADMIN_EMAIL`, `SMTP_USER`, `SMTP_PASS` e `INTERNAL_API_KEY`** en Railway (y la última también en Vercel) | Railway › *Variables*; Vercel › *Settings › Environment Variables* | Sin ellas no salen los avisos al equipo ni los correos, y los cupos por IP de las peticiones de la web cuentan con la IP de Vercel. El arranque avisa cuáles faltan |
+| 6 | **Configurar los avisos al dueño** (Resend, plantilla y token de Meta, variables en Railway, reenvío de `ronald@koptup.com`, DMARC, filtro de Gmail, *Serverless* apagado) y **definir `ADMIN_EMAIL` e `INTERNAL_API_KEY`** (la última también en Vercel) | Paso a paso en [4.5](#45-configurar-los-avisos-al-dueño-paso-a-paso) | Sin ellas no llegan los avisos de nuevos contactos ni los correos a los prospectos, y los cupos por IP de las peticiones de la web cuentan con la IP de Vercel. El arranque avisa cuáles faltan y Admin › Configuración lo muestra |
 | 7 | **Revisar las alertas de dependencias antes del 31 de diciembre de 2026** (fecha de `.github/audit-allowlist.json`): migrar la web a una versión mayor de Next o volver a revisarlas | Repositorio | Cuando vence la fecha, el job Seguridad falla hasta que alguien las revise |
 | 8 | **Borrar `NEXT_PUBLIC_SITE_URL`** del proyecto de Vercel si existe (opcional) | Vercel › *Settings › Environment Variables* | El código no la lee: evita pensar que cambia el dominio |
 
@@ -894,8 +1134,13 @@ La rotación de las credenciales que estuvieron en el historial del repositorio 
 | 4 | **Archivos subidos en disco:** sin el volumen de Railway ([acción 4](#10-acciones-pendientes-del-dueño)), los adjuntos de pedidos y los archivos de cuentas médicas se borran en cada despliegue; los `logs/` del disco también (usa los registros de Railway) | Un archivo subido puede desaparecer después de un despliegue |
 | 5 | **Una sola instancia de la API** (`numReplicas: 1` en `railway.json`): los documentos de «Prueba con tu documento», los límites generales por IP y las cachés viven en la memoria del proceso | Para correr más de una instancia hay que pasar ese estado a Redis primero; mientras tanto, no subas las réplicas en Railway |
 | 6 | **El monitoreo depende de GitHub Actions:** corre cada 15 minutos (GitHub puede atrasarlo), solo desde `main`, y se pausa si el repositorio pasa 60 días sin actividad | Una caída puede tardar hasta unos 20 minutos en avisarse ([7.1](#71-monitoreo-con-github-actions)) |
-| 7 | **Sin forma de restablecer la contraseña de otra cuenta** desde el panel, y sin SMTP no llega el enlace de recuperación | Recuperar el acceso exige crear otra cuenta y darle el rol ([9.4](#94-crear-o-recuperar-el-admin)) |
+| 7 | **Sin forma de restablecer la contraseña de otra cuenta** desde el panel, y sin correo configurado no llega el enlace de recuperación | Recuperar el acceso exige crear otra cuenta y darle el rol ([9.4](#94-crear-o-recuperar-el-admin)) |
 | 8 | **En la pantalla de una demo desactivada las dos etiquetas dicen «En mantenimiento»** (la del modo y la del estado) | Detalle visual repetido |
+| 9 | **Sin el webhook de WhatsApp, «Enviado» solo significa que Meta aceptó el mensaje**, no que te llegó ([4.5, paso 6](#45-configurar-los-avisos-al-dueño-paso-a-paso)) | Un WhatsApp rechazado después por Meta no se ve en el panel ni se reintenta |
+| 10 | **Un aviso de WhatsApp que salió con el respaldo `hello_world` cuenta como enviado** y no se reintenta | El teléfono suena con un mensaje genérico en inglés; el panel muestra el error de la plantilla para que la arregles |
+| 11 | **La alerta por correo de un WhatsApp fallido se recuerda en memoria** (los últimos 200 mensajes) | Si el backend se reinicia y Meta repite el evento, la alerta puede llegar dos veces |
+| 12 | **Con «Serverless» encendido en Railway**, el servicio se duerme sin tráfico | Los avisos de un contacto nuevo salen igual (el formulario lo despierta), pero los reintentos y la prueba mensual no corren mientras duerme |
+| 13 | **El número de prueba de Meta solo escribe a números verificados** en su lista (máximo 5) | Para avisar a otro número hay que agregarlo y verificarlo, o registrar un número propio (con método de pago) |
 
 ---
 
@@ -918,11 +1163,11 @@ La rotación de las credenciales que estuvieron en el historial del repositorio 
 | «Prueba con tu documento» | `apps/backend/src/services/demo-rag.service.ts`, `apps/backend/src/routes/demo-rag.routes.ts` |
 | Chatbot en MongoDB | `apps/backend/src/models/ChatbotBot.ts`, `apps/backend/src/services/chatbot-store.service.ts` |
 | Privacidad y conservación de datos | `apps/backend/src/services/privacy.service.ts`, `apps/backend/src/services/retention.service.ts`, `apps/backend/src/jobs/retention.job.ts` |
-| Correo y WhatsApp | `apps/backend/src/services/email.service.ts`, `apps/backend/src/services/whatsapp.service.ts` |
+| Correo y WhatsApp (avisos al dueño) | `apps/backend/src/services/email.service.ts` (Resend y SMTP), `apps/backend/src/services/whatsapp.service.ts` (plantilla de Meta), `apps/backend/src/services/owner-notify.service.ts` (arma el aviso, lo envía y guarda el resultado), `apps/backend/src/jobs/notify-retry.job.ts`, `apps/backend/src/jobs/notify-heartbeat.job.ts`, `apps/backend/src/routes/admin-notifications.routes.ts`, `apps/backend/src/routes/whatsapp-webhook.routes.ts`; en la web, `apps/web/src/components/admin/OwnerNotificationsCard.tsx` y `owner-notify.tsx` |
 | Dar el rol admin | `apps/backend/src/scripts/set-admin.ts`, `apps/backend/ADMIN_SETUP.md` |
 | Plantillas de variables | `apps/backend/.env.example`, `apps/web/.env.example` |
 | Pruebas | `apps/backend/jest.config.js`, `apps/web/jest.config.js`, `apps/web/playwright.config.ts`, `apps/web/e2e/` |
-| Mock de OpenAI | `apps/web/e2e/support/openai-mock.js` |
+| Mocks de OpenAI y de Resend + WhatsApp | `apps/web/e2e/support/openai-mock.js`, `apps/web/e2e/support/notify-mock.js` |
 
 ---
 

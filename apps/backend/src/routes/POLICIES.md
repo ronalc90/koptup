@@ -12,7 +12,7 @@ demuestran (401/403/200 por política) están en `src/__tests__/integration/`.
 | Staff | `requireStaff` | `admin`, `manager`, `sales` (rol leído de la BD en cada petición) |
 | Admin | `requireAdmin` | `admin` (rol leído de la BD) |
 | Acceso a demo | `requireStaffOrDemoAccess(slug)` | Staff (admin, manager, sales; `developer` vía el resolvedor), o quien tenga un `DemoGrant` vigente de esa demo; las demos en modo `publico` (catálogo editable) quedan abiertas |
-| Solo desarrollo | `devOnlyAdmin` | 404 en producción; admin en desarrollo |
+| Solo desarrollo | `devOnlyAdmin` | 404 en producción; admin en desarrollo (hoy solo el chat heredado `/api/chat`; las rutas viejas de prueba de WhatsApp y correo se retiraron: la prueba vive en `POST /api/admin/notifications/test`) |
 
 | Prefijo | Rutas | Política |
 |---|---|---|
@@ -23,10 +23,9 @@ demuestran (401/403/200 por política) están en `src/__tests__/integration/`.
 | | `refresh`, `google`, `google/callback`, `google/exchange` | Pública (refresh exige un refresh token válido; el callback de Google no pone tokens en la URL: deja un código de un solo uso de 60 s que la web canjea con `POST google/exchange`, con límite por IP) |
 | | `me`, `profile`, `logout`, `PATCH me` (nombre, teléfono y empresa propios) | Autenticado |
 | | `change-password` | Autenticado + contraseña actual, límite propio por cuenta (5 cada 15 min) |
-| `/api/contact` | `POST /` | Pública con rate-limit estricto |
-| | `test-whatsapp`, `test-email` | Solo desarrollo |
+| `/api/contact` | `POST /` | Pública con rate-limit estricto; guarda el contacto y avisa al dueño por correo y WhatsApp sin bloquear la respuesta (`Contact.notificaciones`) |
+| `/api/webhooks/whatsapp` | `GET /` (verificación de Meta), `POST /` (estados) | Pública con límite propio por IP (600/min); solo existe con `WHATSAPP_WEBHOOK_VERIFY_TOKEN` y `WHATSAPP_APP_SECRET` (si no, 404). `GET` exige `hub.verify_token`; `POST` exige `X-Hub-Signature-256` válida sobre el cuerpo crudo (401 si no). Montado antes del parser JSON global |
 | `/api/chat` | todas (chat heredado de eco) | Solo desarrollo |
-| `/api/test` | todas (diagnóstico) | Solo desarrollo |
 | `/api/documents` | todas | Autenticado + aislamiento por usuario (`user_id` de la sesión en cada consulta); `DELETE` solo del dueño, sin PIN (la confirmación la pide la interfaz) |
 | | `upload`, `search/semantic`, `:id/explain`, `:id/explain-similarity` | Además: tope `DOCUMENTS_MONTHLY_BUDGET_USD` y cupo diario por usuario `DOCUMENTS_AI_DAILY_LIMIT_PER_USER` (sin cupo, `upload` guarda el archivo sin análisis) |
 | `/api/projects` | todas | Autenticado + pertenencia al proyecto (servicio) |
@@ -54,9 +53,12 @@ demuestran (401/403/200 por política) están en `src/__tests__/integration/`.
 | `/api/admin/demo-catalog` | `GET /` | `admin`, `sales`, `manager` |
 | | `PATCH /:slug` (o `PATCH /` con `slug`) | Admin (el chatbot RAG queda siempre público) |
 | `/api/admin/audit-log` | `GET /` | Admin |
+| `/api/admin/notifications` | `GET /status` (estado de los avisos al dueño, sin secretos y con destinos enmascarados) | `admin` o `manager` (no depende de `COMMERCE_ENABLED`) |
+| | `POST /test` (aviso de prueba real por correo y WhatsApp) | Admin; 5 cada 15 min por cuenta; queda en la bitácora (`notifications.test`) |
 | `/api/admin/privacy` | `POST /search`, `POST /export`, `POST /erase` | Admin (rol de la BD); cada acción queda en la bitácora (`privacy.search`, `privacy.export`, `privacy.erase`) sin el email buscado |
 | `/api/admin` | todas las demás | `admin` o `manager` (los routers del sistema de demos se montan antes y tienen sus propios permisos) |
 | | `PATCH /users/:id/role` | Admin (valida el rol; no permite quitarse el propio rol) |
+| | `POST /contacts/:id/notify` (reenviar el aviso al dueño; `?todos=1` reenvía también los canales ya enviados) | Admin; 10 cada 15 min por cuenta; queda en la bitácora (`contact.notify_resend`) |
 | `/api` (cuentas.routes) | `/cuentas*`, `/ley100*`, `/process`, `/export` | Staff, ruta por ruta (el router está en la raíz `/api`); `/process` y `/cuentas/procesar-hibrido` con tope `HEALTH_MONTHLY_BUDGET_USD` |
 | `/api/auditoria` | todas | Acceso a demo `cuentas-medicas`; `procesar-facturas-pdf`, `procesar-modular` y `aprendizaje/feedback` con tope `HEALTH_MONTHLY_BUDGET_USD` y cupo diario por usuario `HEALTH_AI_DAILY_LIMIT_PER_USER` |
 | `/api/documentos-conocimiento` | `GET config`, `config/inicializar` | Acceso a demo `cuentas-medicas` |

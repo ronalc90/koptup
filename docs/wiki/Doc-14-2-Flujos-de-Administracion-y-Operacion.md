@@ -1,6 +1,6 @@
 # Flujos de administración y operación
 
-> **Resumen.** Estos son los diagramas de todo lo que hace el **equipo de KopTup** para operar el sitio: procesar solicitudes de demo, gestionar accesos, cambiar el modo de una demo, dar roles, el job que vence los accesos, el camino de un cambio de código hasta producción, la publicación de esta wiki y seis **procedimientos ante fallas** (runbooks). Cada caja corresponde a algo que el código de `main` hace de verdad; los caminos de error y de bloqueo también están dibujados.
+> **Resumen.** Estos son los diagramas de todo lo que hace el **equipo de KopTup** para operar el sitio: procesar solicitudes de demo, gestionar accesos, cambiar el modo de una demo, dar roles, el job que vence los accesos, el camino de un cambio de código hasta producción, la publicación de esta wiki y siete **procedimientos ante fallas** (runbooks). Cada caja corresponde a algo que el código de `main` hace de verdad; los caminos de error y de bloqueo también están dibujados.
 >
 > **Para quién:** el dueño y el equipo comercial (secciones 1 a 6) y quien opera o despliega el sitio (secciones 7 a 9). Las pantallas, con capturas, están en el [Manual del administrador](Doc-06-Manual-del-Administrador.md); las variables y comandos, en [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md). El índice de todos los diagramas está en [Diagramas de flujo](Doc-14-Diagramas-de-Flujo.md).
 
@@ -48,6 +48,7 @@
    - [9.4 Se agotó el presupuesto de IA](#94-se-agotó-el-presupuesto-de-ia)
    - [9.5 Rotar secretos](#95-rotar-secretos)
    - [9.6 Revertir un despliegue](#96-revertir-un-despliegue)
+   - [9.7 El WhatsApp no llega](#97-el-whatsapp-no-llega)
 10. [Hallazgos](#hallazgos)
 
 ---
@@ -128,7 +129,7 @@ flowchart TD
     classDef externo fill:#fdf4ff,stroke:#c026d3,color:#0f172a
 
     B1["Respuesta de la aprobación:<br/>enlace y estado del correo"]:::sistema
-    D1{"¿SMTP configurado en el backend?"}:::decision
+    D1{"¿Correo configurado en el backend?<br/>Resend o SMTP"}:::decision
     B2["Espera el envío hasta 15 s"]:::sistema
     D2{"¿Resultado del correo?"}:::decision
     N1["También se envió por email"]:::aviso
@@ -169,7 +170,7 @@ flowchart TD
 
 ![Diagrama: Compartir el enlace de activación y hacer seguimiento](images/doc/flujos/Doc-14-2-Flujos-de-Administracion-y-Operacion-2.png)
 
-El enlace **siempre** se muestra en el panel, haya o no correo: así la aprobación nunca depende del SMTP. El botón de WhatsApp no envía nada por sí solo: abre WhatsApp con el texto listo (los celulares colombianos de 10 dígitos que empiezan por 3 reciben el prefijo 57). Si la persona ya tenía cuenta activa, el panel muestra el enlace de inicio de sesión en lugar del de activación.
+El enlace **siempre** se muestra en el panel, haya o no correo: así la aprobación nunca depende del proveedor de correo. El botón de WhatsApp no envía nada por sí solo: abre WhatsApp con el texto listo (los celulares colombianos de 10 dígitos que empiezan por 3 reciben el prefijo 57). Si la persona ya tenía cuenta activa, el panel muestra el enlace de inicio de sesión en lugar del de activación.
 
 **Fuente en el código:** `apps/web/src/components/admin/demos/shared.tsx` (`ActivationLinkPanel`), `apps/web/src/lib/demo-system.ts` (`whatsappNumber`, `whatsappLink`), `apps/backend/src/services/demo-grants.service.ts` (`awaitEmail`, `resendActivation`), `apps/backend/src/services/magic-link.service.ts`, `apps/backend/src/config/demos.ts`.
 
@@ -196,7 +197,7 @@ flowchart TD
     E1["409 already_processed"]:::error
     S2["Estado rechazada, motivo y revisor guardados"]:::sistema
     D4{"¿Avisar y no es spam?"}:::decision
-    D5{"¿SMTP configurado?"}:::decision
+    D5{"¿Correo configurado?"}:::decision
     N1["Correo: Sobre tu solicitud de demo en KopTup<br/>(con tu mensaje o un texto genérico)"]:::aviso
     S3["No se envía nada"]:::sistema
     S4["Bitácora: demo_request.reject"]:::sistema
@@ -252,7 +253,7 @@ flowchart TD
     D3{"¿La persona ya tiene otro acceso<br/>vigente a la misma demo?"}:::decision
     E2["409 active_grant_exists: extiende ese"]:::error
     X3["Nueva fecha = vencimiento futuro (o ahora) + días<br/>estado activo, recordatorio reiniciado"]:::sistema
-    N1["Correo: Extendimos tu acceso a DEMO<br/>(si hay SMTP)"]:::aviso
+    N1["Correo: Extendimos tu acceso a DEMO<br/>(si hay correo configurado)"]:::aviso
     X4["Bitácora: demo_grant.extend"]:::sistema
     V1["Motivo opcional (interno)"]:::admin
     V2["POST /api/admin/demo-grants/ID/revoke"]:::sistema
@@ -308,7 +309,7 @@ flowchart TD
     S2["Vincula la cuenta existente"]:::sistema
     S3["Crea cuenta prospect invitado"]:::sistema
     S4["Crea o extiende un acceso por demo"]:::sistema
-    S5["Enlace de activación si la cuenta no tiene<br/>contraseña y correo si hay SMTP"]:::sistema
+    S5["Enlace de activación si la cuenta no tiene<br/>contraseña y correo si está configurado"]:::sistema
     B1["Panel: enlace para copiar o enviar por<br/>WhatsApp al teléfono escrito"]:::aviso
     S6["Bitácora: demo_grant.create"]:::sistema
 
@@ -356,7 +357,7 @@ sequenceDiagram
     API-->>P: 403 demo_access_required, motivo revocado
     alt Si luego el equipo concede un acceso nuevo
         A->>API: POST /api/admin/demo-grants
-        API-->>P: Correo Tu acceso está listo (si hay SMTP)
+        API-->>P: Correo Tu acceso está listo (si hay correo configurado)
         P->>MW: Abre /demo/linkedin-ads
         MW->>API: GET /api/demo-access/linkedin-ads
         API-->>MW: allowed true, reason grant
@@ -725,7 +726,7 @@ flowchart TD
     J6["Otra instancia lo tiene: salta"]:::sistema
     J7["Redis no responde: corre sin candado<br/>(los pasos son idempotentes)"]:::error
     J8["Paso 1: accesos activos con fecha vencida<br/>pasan a expirado"]:::sistema
-    D4{"¿SMTP configurado?"}:::decision
+    D4{"¿Correo configurado?"}:::decision
     J9["No envía ni marca recordatorios"]:::error
     J10["Paso 2: activos que vencen en 3 días o menos<br/>y sin recordatorio (máx. 500)"]:::sistema
     J11["Reclama cada uno: recordatorioEnviadoEn = ahora"]:::sistema
@@ -780,7 +781,7 @@ flowchart LR
     M7["Revocar o vencimiento"]:::admin
     D1{"¿La cuenta tiene accesos vigentes?"}:::decision
     C1["Acuse: Recibimos tu solicitud de demo (código)"]:::aviso
-    C2["Aviso al equipo por email (ADMIN_EMAIL)<br/>y por WhatsApp (si está configurado)"]:::aviso
+    C2["Aviso al dueño por correo (NOTIFY_EMAIL)<br/>y por WhatsApp (plantilla de Meta)"]:::aviso
     C3["Tu acceso a las demos de KopTup está listo<br/>(con el enlace si falta activar)"]:::aviso
     C4["Extendimos tu acceso a DEMO"]:::aviso
     C5["Sobre tu solicitud de demo en KopTup"]:::aviso
@@ -801,9 +802,9 @@ flowchart LR
 
 ![Diagrama: Qué correo sale en cada momento](images/doc/flujos/Doc-14-2-Flujos-de-Administracion-y-Operacion-14.png)
 
-Todos los correos al prospecto salen por el SMTP del backend: sin `SMTP_USER` y `SMTP_PASS` no sale ninguno y el panel lo dice. Los avisos al equipo de una solicitud nueva usan el mismo canal que el formulario de contacto (email y, si hay proveedor configurado, WhatsApp automático).
+Todos los correos al prospecto salen por el proveedor de correo del backend: Resend por API HTTPS con `RESEND_API_KEY` (SMTP solo como respaldo, porque Railway Free, Trial y Hobby lo bloquean). Sin correo no sale ninguno y el panel lo dice. El aviso al dueño de una solicitud nueva es el mismo del formulario de contacto: correo a `NOTIFY_EMAIL` (o `ADMIN_EMAIL`) y WhatsApp con la plantilla `koptup_aviso`, cada uno con su estado en el contacto y reintentos automáticos ([Flujos técnicos › 9](Doc-14-3-Flujos-Tecnicos.md#9-avisos-al-dueño-correo-y-whatsapp)).
 
-**Fuente en el código:** `apps/backend/src/services/demo-emails.service.ts`, `apps/backend/src/services/email.service.ts`, `apps/backend/src/services/lead.service.ts`, `apps/backend/src/services/whatsapp.service.ts`, `apps/backend/src/services/demo-requests.service.ts`, `apps/backend/src/services/demo-grants.service.ts`.
+**Fuente en el código:** `apps/backend/src/services/demo-emails.service.ts`, `apps/backend/src/services/email.service.ts`, `apps/backend/src/services/lead.service.ts`, `apps/backend/src/services/owner-notify.service.ts`, `apps/backend/src/services/whatsapp.service.ts`, `apps/backend/src/services/demo-requests.service.ts`, `apps/backend/src/services/demo-grants.service.ts`.
 
 ---
 
@@ -1020,41 +1021,51 @@ flowchart TD
 
     Q0["Síntoma: un correo no llega"]:::error
     D0{"¿Qué correo falta?"}:::decision
-    F1["Avisos al equipo: van a ADMIN_EMAIL.<br/>WhatsApp: ADMIN_WHATSAPP_NUMBER<br/>y las variables del proveedor"]:::externo
-    F2["Recordatorios: revisa SMTP,<br/>DEMO_GRANTS_JOB_ENABLED<br/>y el log demo-grants-job"]:::externo
+    P0["Admin › Configuración ›<br/>Avisos de nuevos contactos"]:::admin
+    D1{"¿Qué dice la tarjeta<br/>del correo?"}:::decision
+    A1["No configurado: falta RESEND_API_KEY<br/>o NOTIFY_EMAIL"]:::error
+    A2["Define las variables en Railway<br/>(Operación y despliegue 4.5)"]:::externo
+    S1["Proveedor SMTP: Railway Free, Trial<br/>y Hobby bloquean el SMTP saliente"]:::error
+    T1["Enviar aviso de prueba"]:::admin
+    D2{"¿Resultado del correo?"}:::decision
+    B1["Resend 401 o 403: key revocada<br/>o sin permiso de envío"]:::error
+    B2["Crea otra key con Sending access<br/>y cámbiala en Railway"]:::externo
+    B3["Dominio no verificado: revisa<br/>koptup.com en Resend y su DNS"]:::externo
+    B4["Sin respuesta o 5xx: el job<br/>reintenta cada 5 min"]:::aviso
+    G1["Enviado: busca en spam y crea<br/>el filtro de Gmail"]:::admin
+    F2["Recordatorios: revisa el correo,<br/>DEMO_GRANTS_JOB_ENABLED<br/>y el log demo-grants-job"]:::externo
     Q1["Mientras tanto: copia el enlace<br/>o envíalo por WhatsApp"]:::aviso
-    D1{"¿Qué dice el panel<br/>junto al enlace?"}:::decision
-    A1["Faltan SMTP_USER<br/>o SMTP_PASS"]:::error
-    A2["Define SMTP_HOST, SMTP_PORT,<br/>SMTP_SECURE, SMTP_USER,<br/>SMTP_PASS y EMAIL_FROM"]:::externo
-    B1["Busca Email ... error<br/>en los logs de Railway"]:::externo
-    D2{"¿Tipo de error?"}:::decision
-    B2["Revisa usuario y<br/>contraseña de aplicación"]:::externo
-    B3["Revisa host, puerto<br/>y SMTP_SECURE"]:::externo
-    C1["El SMTP tardó más de 15 s:<br/>mira luego el bloque Avisos"]:::aviso
-    D3{"¿El enlace apunta<br/>a localhost?"}:::decision
+    D3{"¿Qué dice el panel<br/>junto al enlace?"}:::decision
+    C1["El correo tardó más de 15 s:<br/>mira luego el bloque Avisos"]:::aviso
+    D4{"¿El enlace apunta<br/>a localhost?"}:::decision
     C2["Define FRONTEND_URL<br/>con la URL pública"]:::externo
     C3["Pide revisar spam<br/>y el email escrito"]:::admin
     A3["Redespliega en Railway: la<br/>configuración se lee al arrancar"]:::externo
 
     Q0 --> D0
-    D0 -->|"Avisos al equipo"| F1 --> A3
+    D0 -->|"Aviso de un contacto"| P0 --> D1
     D0 -->|"Recordatorios"| F2 --> A3
-    D0 -->|"Al prospecto"| Q1 --> D1
-    D1 -->|"No está configurado"| A1 --> A2 --> A3
-    D1 -->|"No se pudo enviar"| B1 --> D2
-    D2 -->|"Autenticación"| B2 --> A3
-    D2 -->|"Conexión"| B3 --> A3
-    D1 -->|"Se sigue enviando"| C1
-    D1 -->|"Se envió"| D3
-    D3 -->|"Sí"| C2 --> A3
-    D3 -->|"No"| C3
+    D0 -->|"Al prospecto"| Q1 --> D3
+    D1 -->|"No configurado"| A1 --> A2 --> A3
+    D1 -->|"Proveedor SMTP"| S1 --> A2
+    D1 -->|"Configurado con Resend"| T1 --> D2
+    D2 -->|"401 o 403"| B1 --> B2 --> A3
+    D2 -->|"Dominio no verificado"| B3
+    D2 -->|"Sin respuesta o 5xx"| B4
+    D2 -->|"Enviado"| G1
+    D3 -->|"No está configurado"| P0
+    D3 -->|"No se pudo enviar"| T1
+    D3 -->|"Se sigue enviando"| C1
+    D3 -->|"Se envió"| D4
+    D4 -->|"Sí"| C2 --> A3
+    D4 -->|"No"| C3
 ```
 
 ![Diagrama: El correo no sale](images/doc/flujos/Doc-14-2-Flujos-de-Administracion-y-Operacion-19.png)
 
-El backend crea el transporte de correo solo si tiene usuario y contraseña SMTP; el servidor por defecto, si falta `SMTP_HOST`, es el de Gmail. Ninguna acción del panel falla por el correo: aprobar, invitar y extender responden igual y muestran el enlace.
+Con `RESEND_API_KEY` todo el correo del backend sale por la API HTTPS de Resend; sin ella, por SMTP si hay usuario y contraseña (el servidor por defecto, si falta `SMTP_HOST`, es el de Gmail), algo que en Railway Free, Trial y Hobby no funciona porque bloquean los puertos SMTP. Si Resend rechaza el remitente porque el dominio no está verificado, el aviso al dueño se reintenta una vez desde `onboarding@resend.dev`. Ninguna acción del panel falla por el correo: aprobar, invitar y extender responden igual y muestran el enlace. El procedimiento con texto y los códigos de error está en [Operación y despliegue › 9.7](Doc-11-Operacion-y-Despliegue.md#97-el-correo-no-sale).
 
-**Fuente en el código:** `apps/backend/src/services/email.service.ts` (`isConfigured`, `sendMail`), `apps/backend/src/services/demo-grants.service.ts` (`awaitEmail`, `EMAIL_WAIT_MS`), `apps/backend/src/services/whatsapp.service.ts`, `apps/backend/src/jobs/demo-grants.job.ts`, `apps/backend/src/config/demos.ts` (`frontendUrl`), `apps/web/src/components/admin/demos/shared.tsx`.
+**Fuente en el código:** `apps/backend/src/services/email.service.ts` (`getProvider`, `send`, `sendViaResend`), `apps/backend/src/services/owner-notify.service.ts` (`getNotificationStatus`, `sendOwnerTestNotice`), `apps/backend/src/services/demo-grants.service.ts` (`awaitEmail`, `EMAIL_WAIT_MS`), `apps/backend/src/jobs/demo-grants.job.ts`, `apps/backend/src/jobs/notify-retry.job.ts`, `apps/backend/src/config/demos.ts` (`frontendUrl`), `apps/web/src/components/admin/demos/shared.tsx`, `apps/web/src/components/admin/OwnerNotificationsCard.tsx`.
 
 ### 9.3 Una demo sigue bloqueada
 
@@ -1176,12 +1187,12 @@ flowchart TD
     J4["Las sesiones no se pueden renovar: todos<br/>vuelven a iniciar sesión (máx. 15 min)"]:::visitante
     K1["INTERNAL_API_KEY: el mismo valor nuevo<br/>en Vercel y en Railway"]:::externo
     K2["Redespliega también la web"]:::externo
-    P1["SMTP, OpenAI o WhatsApp: revoca la clave<br/>en el proveedor y crea una nueva"]:::externo
+    P1["Resend, OpenAI o Meta (WhatsApp): revoca la clave<br/>o el token en el proveedor y crea uno nuevo"]:::externo
     P2["Actualiza la variable en Railway"]:::externo
     R1["Redespliegue del backend en Railway"]:::externo
     D2{"¿GET /health responde 200?"}:::decision
     R2["Revisa el valor nuevo en los logs (ver 9.1)"]:::error
-    R3["Prueba el login en /admin y un correo"]:::admin
+    R3["Prueba el login en /admin y Enviar aviso de prueba"]:::admin
     R4["Rotación terminada"]:::sistema
 
     K0 --> D1
@@ -1244,6 +1255,55 @@ flowchart TD
 Volver a un despliegue anterior es una función de los paneles de Vercel y Railway (no está en el repositorio) y sirve para salir del paso en minutos; la reversión definitiva es un `git revert` en `main`, porque las dos plataformas despliegan desde ahí. El catálogo de demos y los demás datos viven en MongoDB y no cambian al revertir el código.
 
 **Fuente en el código:** `.github/workflows/ci.yml` (CI no despliega), `apps/backend/railway.json`, `apps/web/vercel.json`, `apps/backend/src/index.ts` (la semilla del catálogo solo inserta lo que falta), `README.md` (sección Despliegue).
+
+
+### 9.7 El WhatsApp no llega
+
+```mermaid
+flowchart TD
+    classDef visitante fill:#dbeafe,stroke:#2563eb,color:#0f172a
+    classDef sistema fill:#f1f5f9,stroke:#475569,color:#0f172a
+    classDef admin fill:#f3e8ff,stroke:#9333ea,color:#0f172a
+    classDef aviso fill:#dcfce7,stroke:#16a34a,color:#0f172a
+    classDef decision fill:#fef3c7,stroke:#d97706,color:#0f172a
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#0f172a
+    classDef externo fill:#fdf4ff,stroke:#c026d3,color:#0f172a
+
+    W0["Síntoma: el aviso de un contacto<br/>no llega por WhatsApp"]:::error
+    P0["Admin › Configuración ›<br/>Avisos de nuevos contactos"]:::admin
+    D1{"¿WhatsApp configurado?"}:::decision
+    A1["Falta WHATSAPP_API_TOKEN,<br/>WHATSAPP_PHONE_NUMBER_ID<br/>o ADMIN_WHATSAPP_NUMBER"]:::error
+    A2["WHATSAPP_PROVIDER pide twilio o ultramsg:<br/>ya no se soportan, usa meta"]:::error
+    A3["Define las variables en Railway<br/>y redespliega"]:::externo
+    T1["Enviar aviso de prueba"]:::admin
+    D2{"¿Código de Meta?"}:::decision
+    E1["190: token vencido<br/>usa el de usuario del sistema"]:::externo
+    E2["131030: tu número no está en la<br/>lista del número de prueba"]:::externo
+    E3["132xxx: plantilla koptup_aviso<br/>no aprobada o distinta"]:::externo
+    E4["Respaldo hello_world: sonó el teléfono<br/>pero la plantilla falló"]:::aviso
+    D3{"¿Enviado y te llegó?"}:::decision
+    H1["Sin webhook el panel solo sabe<br/>que Meta lo aceptó"]:::sistema
+    H2["Activa el webhook: verás entregado,<br/>leído o fallido y una alerta por correo"]:::externo
+    OK["Canal funcionando. Si había<br/>contactos fallidos, Reenviar aviso"]:::aviso
+
+    W0 --> P0 --> D1
+    D1 -->|"No"| A1 --> A3
+    D1 -->|"No, proveedor retirado"| A2 --> A3
+    D1 -->|"Sí"| T1 --> D2
+    D2 -->|"190"| E1 --> A3
+    D2 -->|"131030"| E2
+    D2 -->|"132000 a 132016"| E3
+    D2 -->|"Ninguno, salió con respaldo"| E4 --> E3
+    D2 -->|"Ninguno, Enviado"| D3
+    D3 -->|"No llegó"| H1 --> H2
+    D3 -->|"Sí"| OK
+```
+
+![Diagrama: El WhatsApp no llega](images/doc/flujos/Doc-14-2-Flujos-de-Administracion-y-Operacion-24.png)
+
+El aviso por WhatsApp siempre usa la plantilla aprobada `koptup_aviso` de la WhatsApp Cloud API de Meta: con un aviso al mes casi nunca hay una conversación abierta, y fuera de ella Meta solo acepta plantillas. Si la plantilla falla por un error de plantilla, el backend envía la de ejemplo `hello_world` para que al menos suene el teléfono; ese aviso cuenta como enviado y el panel guarda el error para que la arregles. Lo que falla por otras causas se reintenta solo cada 5 minutos, hasta 6 veces en los primeros 3 días. La tabla completa de códigos de Meta y qué hacer con cada uno está en [Operación y despliegue › 9.11](Doc-11-Operacion-y-Despliegue.md#911-el-whatsapp-no-llega).
+
+**Fuente en el código:** `apps/backend/src/services/whatsapp.service.ts` (`sendTemplate`, `describeMetaError`, `TEMPLATE_ERROR_CODES`, `getStatus`), `apps/backend/src/services/owner-notify.service.ts` (`sendOwnerTestNotice`, `processWhatsAppStatuses`), `apps/backend/src/routes/whatsapp-webhook.routes.ts`, `apps/backend/src/config/env.ts` (`notifyWarnings`), `apps/web/src/components/admin/OwnerNotificationsCard.tsx`.
 
 ---
 

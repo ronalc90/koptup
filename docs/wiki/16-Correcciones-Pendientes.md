@@ -26,7 +26,7 @@ flowchart LR
 
 | Prioridad | Qué agrupa | Puntos |
 |---|---|---|
-| **P0** | Lo que impide vender hoy o es un riesgo legal o de seguridad | 3 |
+| **P0** | Lo que impide vender hoy o es un riesgo legal o de seguridad | 4 |
 | **P1** | Funciones que el cliente o el equipo usan y no sirven, incluidas las demos | 19 |
 | **P2** | Detalles del panel, de la operación y de la configuración | 22 |
 | **P3** | SEO, coherencia de textos y código que sobra | 1 |
@@ -40,6 +40,7 @@ flowchart LR
 | 0.1 | **El backend de producción no responde** ("Application not found" de Railway). Contacto, inicio de sesión, panel, solicitudes de demo, chatbot con IA y "Prueba con tu documento" fallan en `www.koptup.com`. Las demos "Con solicitud" muestran "No se pudo verificar" | Volver a desplegar el backend en Railway y, si cambia el dominio, actualizar `NEXT_PUBLIC_API_URL` en Vercel | [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md#acciones-del-dueño) |
 | 0.2 | **Credenciales que estuvieron en el historial del repositorio** | Rotar la contraseña de MongoDB y los secretos JWT | [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md#acciones-del-dueño) |
 | 0.10 | **Producción no mide nada:** no hay ninguna etiqueta configurada (GA4, Google Ads, LinkedIn), así que no aparece el banner y no se registra ninguna conversión | Crear las variables en Vercel antes de pautar | [SEO, analítica y legal](Doc-12-SEO-Analitica-y-Legal.md) |
+| 0.11 | **Los avisos de nuevos contactos no llegan en producción hasta configurarlos.** El código ya envía el correo por Resend y el WhatsApp con la plantilla de Meta (con reintentos y prueba mensual), pero Railway necesita la key de Resend, el token y el número de Meta, y Meta la plantilla `koptup_aviso` aprobada | Seguir el paso a paso y probar con **Enviar aviso de prueba** en Admin › Configuración | [Operación y despliegue › 4.5](Doc-11-Operacion-y-Despliegue.md#45-configurar-los-avisos-al-dueño-paso-a-paso) |
 
 ---
 
@@ -105,10 +106,10 @@ flowchart LR
 | 2.6 | **Se puede conceder acceso a una demo desactivada:** la persona recibe el correo y ve "En mantenimiento" | [Flujos de administración › Hallazgos](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#hallazgos) |
 | 2.7 | **Contadores distintos para lo mismo:** el menú cuenta solo "pendiente", el inicio suma "en revisión" y el menú no se refresca al aprobar | [Manual del administrador](Doc-06-Manual-del-Administrador.md) |
 | 2.8 | **Cada solicitud de demo, incluido el spam, crea además un contacto,** así que "Contactos sin leer" sale inflado | [Manual del administrador](Doc-06-Manual-del-Administrador.md) |
-| 2.9 | **Contactos:** el detalle no refleja el nuevo estado al marcarlo, no muestra el origen del lead y no tiene buscador ni borrado | [Manual del administrador](Doc-06-Manual-del-Administrador.md) |
+| 2.9 | **Contactos:** no muestra el origen del lead como etiqueta y no tiene buscador ni borrado (el borrado se hace en Privacidad); los textos anteriores a los avisos siguen solo en español | [Manual del administrador](Doc-06-Manual-del-Administrador.md#8-contactos) |
 | 2.10 | **Pedidos:** la fecha aparece un día antes en Colombia, los estados salen en inglés y se usan `confirm()` y `alert()` del navegador | [Manual del administrador](Doc-06-Manual-del-Administrador.md) |
 | 2.11 | **Facturas y Entregables** no tienen estado vacío, tienen filtros en inglés y no hay pantalla para crear registros | [Manual del administrador](Doc-06-Manual-del-Administrador.md) |
-| 2.12 | **Configuración del admin y del cliente:** las preferencias solo se guardan en el navegador y no tienen efecto, y "Cancelar" no hace nada | [Manual del administrador](Doc-06-Manual-del-Administrador.md) |
+| 2.12 | **Configuración del admin y del cliente:** en el admin, la tarjeta de avisos ya es real, pero "Guardar cambios" solo guarda idioma y tema en el navegador, "Cancelar" no hace nada y la información del administrador es texto fijo (le dice "acceso completo" también a un manager); en el portal del cliente, las preferencias de notificaciones siguen siendo solo visuales | [Manual del administrador](Doc-06-Manual-del-Administrador.md#13-configuración) |
 | 2.13 | **La bitácora de auditoría no tiene pantalla** (solo API) | [Flujos de administración › Hallazgos](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#hallazgos) |
 | 2.14 | **El panel no permite volver una solicitud a "pendiente",** aunque la API lo acepta | [Flujos de negocio › Hallazgos](Doc-14-1-Flujos-de-Negocio.md#hallazgos) |
 | 2.15 | **Una solicitud que se fusiona con otra abierta no avisa a nadie** ni registra lead | [Flujos de negocio › Hallazgos](Doc-14-1-Flujos-de-Negocio.md#hallazgos) |

@@ -40,7 +40,6 @@ import notificationsRoutes from './routes/notifications.routes';
 import documentoConocimientoConfigRoutes from './routes/documentoConocimientoConfig.routes';
 import reglasFacturacionRoutes from './routes/reglas-facturacion.routes';
 import liquidacionRoutes from './routes/liquidacion.routes';
-import testRoutes from './routes/test.routes';
 import adminRoutes from './routes/admin.routes';
 import linkedinAdsRoutes from './routes/linkedin-ads.routes';
 import { demoAccessRouter, demoCatalogRouter, demoRequestsRouter, meRouter } from './routes/demo-public.routes';
@@ -54,6 +53,8 @@ import { adminLeadsRouter } from './routes/admin-leads.routes';
 import { adminProposalsRouter } from './routes/admin-proposals.routes';
 import { adminSettingsRouter } from './routes/admin-settings.routes';
 import { adminPrivacyRouter } from './routes/admin-privacy.routes';
+import { adminNotificationsRouter } from './routes/admin-notifications.routes';
+import { createWhatsAppWebhookRouter } from './routes/whatsapp-webhook.routes';
 import { meCommerceRouter, paymentsRouter, publicProposalsRouter } from './routes/proposals-public.routes';
 import { setDemoAccessResolver } from './middleware/access';
 import { isCommerceEnabled } from './config/commerce';
@@ -109,6 +110,11 @@ export function createApp(): Express {
     }),
   );
   app.use(compression());
+
+  // Webhook de estados de WhatsApp (Meta): ANTES del parser JSON global,
+  // porque la firma X-Hub-Signature-256 se calcula sobre el cuerpo crudo.
+  // Tiene su propio límite por IP (no pasa por el general de /api).
+  app.use('/api/webhooks/whatsapp', createWhatsAppWebhookRouter());
 
   const jsonDefault = express.json({ limit: JSON_LIMIT_DEFAULT });
   const jsonChatbotDocs = express.json({ limit: JSON_LIMIT_CHATBOT_DOCS });
@@ -185,7 +191,6 @@ export function createApp(): Express {
   app.use('/api/documentos-conocimiento', documentoConocimientoConfigRoutes);
   app.use('/api/reglas-facturacion', reglasFacturacionRoutes);
   app.use('/api/liquidacion', liquidacionRoutes);
-  app.use('/api/test', testRoutes);
   // Sistema de demos (wiki 04). Las rutas del equipo van ANTES de /api/admin:
   // admin.routes exige admin o manager en todo su router y `sales` también
   // gestiona solicitudes y accesos (permisos por ruta en admin-demos.routes).
@@ -209,6 +214,8 @@ export function createApp(): Express {
   }
   // Derechos del titular (Ley 1581): buscar, exportar y suprimir (solo admin).
   app.use('/api/admin/privacy', adminPrivacyRouter);
+  // Avisos al dueño (estado y prueba): no dependen del flujo de compra.
+  app.use('/api/admin/notifications', adminNotificationsRouter);
   app.use('/api/admin', adminRoutes);
   // Propuesta pública por token, portal (Solicitar propuesta, Mis propuestas) y pagos.
   if (commerceEnabled) {

@@ -75,7 +75,7 @@ test.describe('/solicitar-demo', () => {
 
     await page.fill('#nombre', 'Prueba E2E');
     await page.fill('#empresa', 'Empresa E2E');
-    // Dominio reservado .test: el acuse (si hay SMTP) nunca llega a un buzón real.
+    // Dominio reservado .test: el acuse (si hay correo configurado; en CI va al mock de Resend) nunca llega a un buzón real.
     await page.fill('#email', uniqueEmail(`solicitud-${testInfo.project.name}`));
     await page.selectOption('#pais', 'Colombia');
     await page.getByRole('radio', { name: '11-50 personas' }).click();
