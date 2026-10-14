@@ -27,9 +27,8 @@ export default function Customers() {
   const t = useTranslations(`${NS}.customers`);
   const fmt = useFmt();
   const labels = useLabels();
-  const { ctx, period, dataset, openCustomer, notify, company } = useDashboard();
+  const { ctx, period, dataset, openCustomer, notify, company, segment, setSegment } = useDashboard();
   const [q, setQ] = useState('');
-  const [segment, setSegment] = useState<'all' | Segment>('all');
   const [city, setCity] = useState('all');
   const [sort, setSort] = useState<SortKey>('sales');
   const [dir, setDir] = useState<'desc' | 'asc'>('desc');
@@ -98,11 +97,11 @@ export default function Customers() {
   );
 
   return (
-    <section className={`${card} overflow-hidden`} aria-labelledby="cust-title">
+    <section className={`${card} overflow-hidden scroll-mt-72 md:scroll-mt-56`} aria-labelledby="cust-title" id="cust-section">
       <div className="p-5 sm:p-6 border-b border-slate-200 dark:border-slate-800">
         <SectionTitle
           title={<span id="cust-title">{t('title')}</span>}
-          subtitle={t('subtitle', { period: fmt.period(period), drop: fmt.num(ctx.params.thresholds.riskDrop) })}
+          subtitle={t('subtitle', { period: fmt.period(period), drop: fmt.param(ctx.params.thresholds.riskDrop) })}
           actions={
             <button type="button" className={btn.small} onClick={exportCsv} disabled={!list.length}>
               <ArrowDownTrayIcon className="w-4 h-4" aria-hidden="true" />
@@ -250,7 +249,7 @@ export default function Customers() {
         </>
       )}
       <div className="p-5 sm:p-6 pt-0 sm:pt-0">
-        <Note>{t('segmentNote', { drop: fmt.num(ctx.params.thresholds.riskDrop) })}</Note>
+        <Note>{t('segmentNote', { drop: fmt.param(ctx.params.thresholds.riskDrop) })}</Note>
       </div>
     </section>
   );
@@ -324,7 +323,7 @@ export function CustomerModal() {
       {stat && (
         <div className="mb-2 flex items-center gap-2">
           <SegmentBadge segment={stat.segment} />
-          <span className="text-xs text-slate-500 dark:text-slate-400">{t(`segmentWhy.${stat.segment}`, { drop: fmt.num(ctx.params.thresholds.riskDrop) })}</span>
+          <span className="text-xs text-slate-500 dark:text-slate-400">{t(`segmentWhy.${stat.segment}`, { drop: fmt.param(ctx.params.thresholds.riskDrop) })}</span>
         </div>
       )}
       <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100 mt-4 mb-2">{t('last12')}</h3>

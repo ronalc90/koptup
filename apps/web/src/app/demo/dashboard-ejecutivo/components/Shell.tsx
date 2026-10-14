@@ -25,12 +25,13 @@ import Alerts from './Alerts';
 import Ask from './Ask';
 import Customers, { CustomerModal, InvoiceModal } from './Customers';
 import Finance from './Finance';
+import Intro from './Intro';
 import { useNarrative } from './narrative';
 import Overview from './Overview';
 import { useReportPdf } from './report';
 import SettingsView from './SettingsView';
 import Sources from './Sources';
-import { NS, SeverityBadge, Toasts, useFmt } from './ui';
+import { NS, SeverityBadge, Toasts, useDialogFocus, useFmt } from './ui';
 
 const ICONS: Record<ViewId, typeof HomeIcon> = {
   resumen: HomeIcon,
@@ -242,7 +243,7 @@ function Search() {
 
 function Bell() {
   const t = useTranslations(`${NS}.bell`);
-  const { alerts, setView } = useDashboard();
+  const { alerts, setView, setSegment } = useDashboard();
   const { alertTitle } = useNarrative();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -291,6 +292,7 @@ function Bell() {
                     type="button"
                     className="w-full text-left p-3 hover:bg-slate-50 dark:hover:bg-slate-700"
                     onClick={() => {
+                      if (a.kind === 'customersRisk') setSegment('riesgo');
                       setView(a.view);
                       setOpen(false);
                     }}
@@ -327,11 +329,13 @@ export default function Shell() {
   const tn = useTranslations(`${NS}.nav`);
   const ts = useTranslations(`${NS}.sectors`);
   const fmt = useFmt();
-  const { view, periods, period, setPeriodKey, company, dataset, setUpload } = useDashboard();
+  const { view, periods, period, setPeriodKey, company, dataset, setUpload, scrollTarget, clearScrollTarget } = useDashboard();
   const { download, busy } = useReportPdf();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const mobileRef = useRef<HTMLDivElement>(null);
   const sample = dataset.source === 'sample';
+  useDialogFocus(mobileRef, mobileOpen);
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -345,138 +349,163 @@ export default function Shell() {
     };
   }, [mobileOpen]);
 
-  return (
-    <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-      <aside
-        id="exec-sidebar"
-        data-testid="exec-sidebar"
-        className={`hidden md:block shrink-0 bg-gradient-to-b from-slate-900 to-slate-800 text-white transition-[width] duration-300 ${collapsed ? 'w-20' : 'w-64'}`}
-      >
-        <div className="sticky top-20 max-h-[calc(100vh-5rem)] overflow-y-auto p-4 flex flex-col gap-6">
-          <div className={`flex items-center ${collapsed ? 'flex-col gap-3' : 'justify-between gap-2'}`}>
-            <Brand collapsed={collapsed} />
-            <button
-              type="button"
-              onClick={() => setCollapsed((c) => !c)}
-              aria-label={collapsed ? t('expand') : t('collapse')}
-              aria-expanded={!collapsed}
-              aria-controls="exec-sidebar"
-              data-testid="exec-sidebar-toggle"
-              className="p-2 hover:bg-slate-700 rounded-lg transition-colors shrink-0"
-            >
-              {collapsed ? <ChevronDoubleRightIcon className="w-5 h-5" /> : <ChevronDoubleLeftIcon className="w-5 h-5" />}
-            </button>
-          </div>
-          <Nav collapsed={collapsed} />
-          {!collapsed && (
-            <p className="text-[11px] text-slate-300 border-t border-slate-700 pt-4">{sample ? t('sidebarSample') : t('sidebarUpload')}</p>
-          )}
-        </div>
-      </aside>
+  // Al cambiar de sección desde los primeros pasos o un aviso, baja hasta el bloque indicado.
+  useEffect(() => {
+    if (!scrollTarget) return;
+    const id = window.setTimeout(() => {
+      document.getElementById(scrollTarget)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      clearScrollTarget();
+    }, 80);
+    return () => window.clearTimeout(id);
+  }, [scrollTarget, view, clearScrollTarget]);
 
-      {mobileOpen && (
-        <>
-          <div className="fixed inset-0 top-16 bg-slate-900/50 backdrop-blur-sm z-[60] md:hidden" aria-hidden="true" onClick={() => setMobileOpen(false)} />
-          <div
-            id="exec-mobile-menu"
-            role="dialog"
-            aria-modal="true"
-            aria-label={tn('label')}
-            className="fixed left-0 top-16 bottom-0 w-72 max-w-[85vw] z-[61] md:hidden bg-gradient-to-b from-slate-900 to-slate-800 text-white p-4 overflow-y-auto flex flex-col gap-6"
-          >
-            <div className="flex items-center justify-between gap-2">
-              <Brand collapsed={false} />
-              <button type="button" onClick={() => setMobileOpen(false)} aria-label={t('closeMenu')} className="p-2 hover:bg-slate-700 rounded-lg">
-                <XMarkIcon className="w-5 h-5" />
+  const companyLine = sample ? (
+    <>
+      <strong className="text-slate-800 dark:text-slate-100">{company.name}</strong> · {t('nit', { nit: formatNit(company.nit) })} · {ts(`${dataset.sector}.name`)}
+    </>
+  ) : null;
+
+  return (
+    <div className="bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+      <Intro onPdf={download} />
+      <div className="min-h-screen flex">
+        <aside
+          id="exec-sidebar"
+          data-testid="exec-sidebar"
+          className={`hidden md:block shrink-0 bg-gradient-to-b from-slate-900 to-slate-800 text-white transition-[width] duration-300 ${collapsed ? 'w-20' : 'w-64'}`}
+        >
+          <div className="sticky top-20 max-h-[calc(100vh-5rem)] overflow-y-auto p-4 flex flex-col gap-6">
+            <div className={`flex items-center ${collapsed ? 'flex-col gap-3' : 'justify-between gap-2'}`}>
+              <Brand collapsed={collapsed} />
+              <button
+                type="button"
+                onClick={() => setCollapsed((c) => !c)}
+                aria-label={collapsed ? t('expand') : t('collapse')}
+                aria-expanded={!collapsed}
+                aria-controls="exec-sidebar"
+                data-testid="exec-sidebar-toggle"
+                className="p-2 hover:bg-slate-700 rounded-lg transition-colors shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              >
+                {collapsed ? <ChevronDoubleRightIcon className="w-5 h-5" /> : <ChevronDoubleLeftIcon className="w-5 h-5" />}
               </button>
             </div>
-            <Nav collapsed={false} onNavigate={() => setMobileOpen(false)} />
-            <p className="text-[11px] text-slate-300 border-t border-slate-700 pt-4">{sample ? t('sidebarSample') : t('sidebarUpload')}</p>
+            <Nav collapsed={collapsed} />
+            {!collapsed && <p className="text-[11px] text-slate-300 border-t border-slate-700 pt-4">{sample ? t('sidebarSample') : t('sidebarUpload')}</p>}
           </div>
-        </>
-      )}
+        </aside>
 
-      <div className="flex-1 min-w-0">
-        <header className="bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 sticky top-16 md:top-20 z-40">
-          <div className="px-4 sm:px-6 pt-3 pb-2 flex items-center gap-2 sm:gap-3">
-            <button
-              type="button"
-              onClick={() => setMobileOpen(true)}
-              aria-label={t('openMenu')}
-              aria-controls="exec-mobile-menu"
-              aria-expanded={mobileOpen}
-              className="md:hidden p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700"
-              data-testid="exec-mobile-hamburger"
+        {mobileOpen && (
+          <>
+            <div className="fixed inset-0 top-16 bg-slate-900/50 backdrop-blur-sm z-[60] md:hidden" aria-hidden="true" onClick={() => setMobileOpen(false)} />
+            <div
+              ref={mobileRef}
+              id="exec-mobile-menu"
+              role="dialog"
+              aria-modal="true"
+              aria-label={tn('label')}
+              tabIndex={-1}
+              className="fixed left-0 top-16 bottom-0 w-72 max-w-[85vw] z-[61] md:hidden bg-gradient-to-b from-slate-900 to-slate-800 text-white p-4 overflow-y-auto flex flex-col gap-6 outline-none"
             >
-              <Bars3Icon className="w-6 h-6 text-slate-700 dark:text-slate-300" />
-            </button>
-            <Search />
-            <Bell />
-            <button type="button" onClick={download} disabled={busy} className="inline-flex items-center gap-1.5 p-2.5 sm:px-3 sm:py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-semibold hover:from-purple-700 hover:to-blue-700 disabled:opacity-60" aria-label={t('pdf')} data-testid="exec-pdf">
-              <DocumentArrowDownIcon className="w-5 h-5" aria-hidden="true" />
-              <span className="hidden lg:inline">{busy ? t('pdfBusy') : t('pdf')}</span>
-            </button>
-          </div>
-          <div className="px-4 sm:px-6 pb-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-slate-600 dark:text-slate-300">
-            <label htmlFor="exec-period" className="sr-only">
-              {t('period')}
-            </label>
-            <select
-              id="exec-period"
-              value={period.key}
-              onChange={(e) => setPeriodKey(e.target.value)}
-              className="pl-3 pr-9 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              data-testid="exec-month-select"
-            >
-              {(['month', 'quarter', 'year'] as const).map((kind) => (
-                <optgroup key={kind} label={t(`periodKinds.${kind}`)}>
-                  {periods
-                    .filter((p) => p.kind === kind)
-                    .map((p) => (
-                      <option key={p.key} value={p.key}>
-                        {fmt.period(p)}
-                      </option>
-                    ))}
-                </optgroup>
-              ))}
-            </select>
-            <span
-              className="inline-flex items-center px-2.5 py-0.5 rounded-full font-semibold bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200 border border-amber-200 dark:border-amber-900"
-              title={sample ? t('sampleHint') : t('uploadHint')}
-              data-testid="exec-sample-badge"
-            >
-              {sample ? t('sampleBadge') : t('uploadBadge')}
-            </span>
-            {sample ? (
-              <span className="min-w-0">
-                <strong className="text-slate-800 dark:text-slate-100">{company.name}</strong> · {t('nit', { nit: formatNit(company.nit) })} · {ts(`${dataset.sector}.name`)}
-              </span>
-            ) : (
-              <span className="min-w-0">
-                <strong className="text-slate-800 dark:text-slate-100">{dataset.fileName}</strong>{' '}
-                <button type="button" className="ml-1 font-semibold text-purple-700 dark:text-purple-300 hover:underline" onClick={() => setUpload(null)}>
-                  {t('backToSample')}
+              <div className="flex items-center justify-between gap-2">
+                <Brand collapsed={false} />
+                <button type="button" onClick={() => setMobileOpen(false)} aria-label={t('closeMenu')} className="p-2 hover:bg-slate-700 rounded-lg">
+                  <XMarkIcon className="w-5 h-5" />
                 </button>
-              </span>
-            )}
-            <span>{t('cutoff', { date: fmt.date(dataset.cutoff) })}</span>
-            <span>{t('currency')}</span>
-          </div>
-        </header>
+              </div>
+              <Nav collapsed={false} onNavigate={() => setMobileOpen(false)} />
+              <p className="text-[11px] text-slate-300 border-t border-slate-700 pt-4">{sample ? t('sidebarSample') : t('sidebarUpload')}</p>
+            </div>
+          </>
+        )}
 
-        <main className="p-4 sm:p-6">
-          <div className="mb-5">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{tn(view)}</h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400">{t(`intro.${view}`, { period: fmt.periodIn(period) })}</p>
+        <div className="flex-1 min-w-0">
+          <header className="bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 sticky top-16 md:top-20 z-40" data-testid="exec-toolbar">
+            <div className="px-4 sm:px-6 pt-3 pb-2 flex items-center gap-2 sm:gap-3">
+              <button
+                type="button"
+                onClick={() => setMobileOpen(true)}
+                aria-label={t('openMenu')}
+                aria-controls="exec-mobile-menu"
+                aria-expanded={mobileOpen}
+                className="md:hidden inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-sm font-semibold text-slate-800 dark:text-slate-100 shrink-0"
+                data-testid="exec-mobile-hamburger"
+              >
+                <Bars3Icon className="w-5 h-5 text-slate-700 dark:text-slate-300" aria-hidden="true" />
+                <span>{t('sections')}</span>
+              </button>
+              <Search />
+              <Bell />
+              <button type="button" onClick={download} disabled={busy} className="inline-flex items-center gap-1.5 p-2.5 sm:px-3 sm:py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-semibold hover:from-purple-700 hover:to-blue-700 disabled:opacity-60 shrink-0" aria-label={t('pdf')} data-testid="exec-pdf">
+                <DocumentArrowDownIcon className="w-5 h-5" aria-hidden="true" />
+                <span className="hidden lg:inline">{busy ? t('pdfBusy') : t('pdf')}</span>
+              </button>
+            </div>
+            <div className="px-4 sm:px-6 pb-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-slate-600 dark:text-slate-300">
+              <label htmlFor="exec-period" className="sr-only">
+                {t('period')}
+              </label>
+              <select
+                id="exec-period"
+                value={period.key}
+                onChange={(e) => setPeriodKey(e.target.value)}
+                className="pl-3 pr-9 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                data-testid="exec-month-select"
+              >
+                {(['month', 'quarter', 'year'] as const).map((kind) => (
+                  <optgroup key={kind} label={t(`periodKinds.${kind}`)}>
+                    {periods
+                      .filter((p) => p.kind === kind)
+                      .map((p) => (
+                        <option key={p.key} value={p.key}>
+                          {fmt.period(p)}
+                        </option>
+                      ))}
+                  </optgroup>
+                ))}
+              </select>
+              <span
+                className="inline-flex items-center px-2.5 py-0.5 rounded-full font-semibold bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200 border border-amber-200 dark:border-amber-900"
+                title={sample ? t('sampleHint') : t('uploadHint')}
+                data-testid="exec-sample-badge"
+              >
+                {sample ? t('sampleBadge') : t('uploadBadge')}
+              </span>
+              {sample ? (
+                <span className="min-w-0 hidden md:inline">{companyLine}</span>
+              ) : (
+                <span className="min-w-0">
+                  <strong className="text-slate-800 dark:text-slate-100 break-all">{dataset.fileName}</strong>{' '}
+                  <button type="button" className="ml-1 font-semibold text-purple-700 dark:text-purple-300 hover:underline" onClick={() => setUpload(null)}>
+                    {t('backToSample')}
+                  </button>
+                </span>
+              )}
+              <span>{t('cutoff', { date: fmt.date(dataset.cutoff) })}</span>
+              <span className="hidden md:inline">{t('currency')}</span>
+            </div>
+          </header>
+
+          <div className="p-4 sm:p-6" id="exec-content">
+            <div className="mb-5">
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white" data-testid="exec-view-title">
+                {tn(view)}
+              </h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400">{t(`intro.${view}`, { period: fmt.periodIn(period) })}</p>
+              <p className="md:hidden mt-1 text-xs text-slate-500 dark:text-slate-400">
+                {companyLine}
+                {companyLine ? ' · ' : ''}
+                {t('currency')}
+              </p>
+            </div>
+            {view === 'resumen' && <Overview />}
+            {view === 'finanzas' && <Finance />}
+            {view === 'clientes' && <Customers />}
+            {view === 'preguntas' && <Ask />}
+            {view === 'alertas' && <Alerts />}
+            {view === 'fuentes' && <Sources />}
+            {view === 'configuracion' && <SettingsView />}
           </div>
-          {view === 'resumen' && <Overview />}
-          {view === 'finanzas' && <Finance />}
-          {view === 'clientes' && <Customers />}
-          {view === 'preguntas' && <Ask />}
-          {view === 'alertas' && <Alerts />}
-          {view === 'fuentes' && <Sources />}
-          {view === 'configuracion' && <SettingsView />}
-        </main>
+        </div>
       </div>
       <CustomerModal />
       <InvoiceModal />

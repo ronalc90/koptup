@@ -23,8 +23,8 @@ export interface CustomerSeed {
   pay: PayBehavior;
   /** Variación anual propia frente a la tendencia del sector (−0,3 = compra 30 % menos cada año). */
   trend: number;
-  /** Primer mes de compra (clientes nuevos). */
-  since?: MonthKey;
+  /** Clientes nuevos: meses antes del mes de corte en que hicieron su primera compra (5 = cinco meses antes del corte). */
+  since?: number;
 }
 
 export interface LineSeed {
@@ -37,8 +37,8 @@ export interface LineSeed {
 export interface Shock {
   city?: string;
   line?: string;
-  from: MonthKey;
-  to: MonthKey;
+  /** Se aplica a los últimos N meses hasta el mes de corte (2 = el mes de corte y el anterior). */
+  lastMonths: number;
   /** Multiplicador de ventas. */
   sales?: number;
   /** Puntos de margen que se suman (negativo = cae). */
@@ -47,7 +47,7 @@ export interface Shock {
 
 export interface ExpenseSeed {
   id: string;
-  /** Valor mensual de 2025 (fijo). */
+  /** Valor mensual del año anterior al del corte (fijo). */
   monthly?: number;
   /** Proporción de las ventas (gasto variable). */
   variable?: number;
@@ -57,12 +57,14 @@ export interface ExpenseSeed {
 
 export interface Preset {
   id: SectorId;
+  /** Semilla del generador de datos de ejemplo (la misma semilla da siempre las mismas cifras). */
+  seed: string;
   company: CompanyProfile;
   cities: string[];
   lines: LineSeed[];
   sellers: string[];
   customers: CustomerSeed[];
-  /** Ventas promedio mensuales de 2025 (COP). */
+  /** Ventas promedio mensuales de hace un año (COP). */
   monthlyBase: number;
   /** Estacionalidad enero–diciembre. */
   season: number[];
@@ -84,13 +86,20 @@ export interface Preset {
   iva: { salesShare: number; purchasesShare: number } | null;
 }
 
-/** Primer mes con datos y fecha de corte de los datos de ejemplo. */
-export const SAMPLE_FROM: MonthKey = '2025-01';
-export const SAMPLE_TO: MonthKey = '2026-09';
-export const SAMPLE_CUTOFF = '2026-09-30';
+/**
+ * Meses de historia de los datos de ejemplo: los 12 meses que se pueden elegir
+ * en el selector de período más los 12 anteriores para compararlos con el año
+ * anterior. Terminan en el mes de corte, que es el último mes cerrado (ver
+ * `lastClosedMonth`), así las fechas siempre son coherentes con hoy.
+ */
+export const SAMPLE_MONTHS = 24;
+
+/** Mes de corte de referencia para las pruebas y la guía (corte del 30 de septiembre de 2026). */
+export const REFERENCE_ANCHOR: MonthKey = '2026-09';
 
 const comercio: Preset = {
   id: 'comercio',
+  seed: 'koptup-bi-comercio-563',
   company: { name: 'Distribuidora Cumbre Andina S.A.S.', nit: '901457832', city: 'Bogotá' },
   cities: ['Bogotá', 'Medellín', 'Cali', 'Barranquilla'],
   lines: [
@@ -116,8 +125,8 @@ const comercio: Preset = {
     { name: 'Cafeterías Escolares Alegría', city: 'Bogotá', seller: 0, size: 3, lines: { lacteos: 0.6, granos: 0.4 }, term: 30, pay: 'puntual', trend: 0 },
     { name: 'Droguerías Botica Central', city: 'Cali', seller: 2, size: 3, lines: { aseo: 0.9, granos: 0.1 }, term: 30, pay: 'puntual', trend: -0.2 },
     { name: 'Mercaplaza del Río', city: 'Medellín', seller: 1, size: 4, term: 45, pay: 'lento', trend: 0.03 },
-    { name: 'Mercados Frescos del Llano', city: 'Bogotá', seller: 4, size: 4, term: 30, pay: 'puntual', trend: 0, since: '2026-04' },
-    { name: 'Tiendas de Conveniencia Punto Express', city: 'Medellín', seller: 1, size: 2, term: 30, pay: 'puntual', trend: 0, since: '2026-07' },
+    { name: 'Mercados Frescos del Llano', city: 'Bogotá', seller: 4, size: 4, term: 30, pay: 'puntual', trend: 0, since: 5 },
+    { name: 'Tiendas de Conveniencia Punto Express', city: 'Medellín', seller: 1, size: 2, term: 30, pay: 'puntual', trend: 0, since: 2 },
   ],
   monthlyBase: 1_700_000_000,
   season: [0.88, 0.9, 0.97, 0.95, 1.0, 0.98, 1.02, 1.0, 0.99, 1.03, 1.08, 1.2],
@@ -127,8 +136,8 @@ const comercio: Preset = {
   invoicePrefix: 'FE',
   invoiceStart: 18_240,
   shocks: [
-    { city: 'Cali', from: '2026-08', to: '2026-09', sales: 0.72 },
-    { line: 'lacteos', from: '2026-08', to: '2026-09', margin: -0.032 },
+    { city: 'Cali', lastMonths: 2, sales: 0.72 },
+    { line: 'lacteos', lastMonths: 2, margin: -0.032 },
   ],
   expenses: [
     { id: 'nomina', monthly: 262_000_000, growth: 0.07 },
@@ -139,13 +148,14 @@ const comercio: Preset = {
     { id: 'servicios', monthly: 9_000_000, growth: 0.05 },
     { id: 'otros', monthly: 15_000_000, growth: 0.05 },
   ],
-  cashStart: 420_000_000,
+  cashStart: 500_000_000,
   supplierDays: 45,
   iva: { salesShare: 0.55, purchasesShare: 0.55 },
 };
 
 const salud: Preset = {
   id: 'salud',
+  seed: 'koptup-bi-salud-78',
   company: { name: 'Clínica Ambulatoria Brisas del Río S.A.S.', nit: '900874215', city: 'Bogotá' },
   cities: ['Usaquén', 'Kennedy', 'Chía', 'Soacha'],
   lines: [
@@ -167,7 +177,7 @@ const salud: Preset = {
     { name: 'Fondo de Empleados Docentes del Sur', city: { Kennedy: 0.6, Soacha: 0.4 }, seller: 1, size: 2, lines: { consulta: 0.6, laboratorio: 0.4 }, term: 30, pay: 'puntual', trend: -0.3 },
     { name: 'Convenio de Salud Pública Municipal', city: { Soacha: 0.7, Chía: 0.3 }, seller: 0, size: 3, lines: { consulta: 0.6, laboratorio: 0.4 }, term: 60, pay: 'lento', trend: 0 },
     { name: 'Cooperativa Médica Sabana', city: { Chía: 0.7, Usaquén: 0.3 }, seller: 2, size: 3, term: 45, pay: 'lento', trend: 0 },
-    { name: 'Póliza Colectiva Constructora Peñas Blancas', city: { Kennedy: 1 }, seller: 1, size: 2, lines: { consulta: 0.5, laboratorio: 0.3, imagenes: 0.2 }, term: 30, pay: 'puntual', trend: 0, since: '2026-05' },
+    { name: 'Póliza Colectiva Constructora Peñas Blancas', city: { Kennedy: 1 }, seller: 1, size: 2, lines: { consulta: 0.5, laboratorio: 0.3, imagenes: 0.2 }, term: 30, pay: 'puntual', trend: 0, since: 4 },
   ],
   monthlyBase: 720_000_000,
   season: [0.92, 0.97, 1.02, 0.98, 1.03, 0.97, 0.95, 1.02, 1.03, 1.04, 1.02, 0.86],
@@ -177,8 +187,8 @@ const salud: Preset = {
   invoicePrefix: 'FEV',
   invoiceStart: 52_310,
   shocks: [
-    { city: 'Soacha', from: '2026-08', to: '2026-09', sales: 0.75 },
-    { line: 'cirugia', from: '2026-08', to: '2026-09', margin: -0.04 },
+    { city: 'Soacha', lastMonths: 2, sales: 0.75 },
+    { line: 'cirugia', lastMonths: 2, margin: -0.04 },
   ],
   expenses: [
     { id: 'nomina', monthly: 96_000_000, growth: 0.07 },
@@ -195,6 +205,7 @@ const salud: Preset = {
 
 const servicios: Preset = {
   id: 'servicios',
+  seed: 'koptup-bi-servicios-40',
   company: { name: 'Meridiano Consultores Asociados S.A.S.', nit: '901236548', city: 'Bogotá' },
   cities: ['Bogotá', 'Medellín', 'Bucaramanga', 'Pereira'],
   lines: [
@@ -216,8 +227,8 @@ const servicios: Preset = {
     { name: 'Comercializadora Textil Arrayanes', city: 'Medellín', seller: 1, size: 5, term: 30, pay: 'puntual', trend: 0.06 },
     { name: 'Ferretería Industrial El Yunque', city: 'Bucaramanga', seller: 2, size: 4, term: 30, pay: 'moroso', trend: -0.1 },
     { name: 'Grupo Inmobiliario Cerros Orientales', city: 'Bogotá', seller: 0, size: 6, term: 45, pay: 'puntual', trend: 0.04 },
-    { name: 'Laboratorios Naturales Guayacán', city: 'Bogotá', seller: 0, size: 4, term: 30, pay: 'puntual', trend: 0, since: '2026-03' },
-    { name: 'Cooperativa de Ahorro Futuro Solidario', city: 'Bucaramanga', seller: 2, size: 3, term: 30, pay: 'puntual', trend: 0, since: '2026-06' },
+    { name: 'Laboratorios Naturales Guayacán', city: 'Bogotá', seller: 0, size: 4, term: 30, pay: 'puntual', trend: 0, since: 6 },
+    { name: 'Cooperativa de Ahorro Futuro Solidario', city: 'Bucaramanga', seller: 2, size: 3, term: 30, pay: 'puntual', trend: 0, since: 3 },
   ],
   monthlyBase: 390_000_000,
   season: [0.78, 0.95, 1.06, 1.03, 1.05, 1.0, 0.98, 1.04, 1.06, 1.07, 1.05, 0.93],
@@ -227,8 +238,8 @@ const servicios: Preset = {
   invoicePrefix: 'SETP',
   invoiceStart: 7_120,
   shocks: [
-    { city: 'Medellín', from: '2026-08', to: '2026-09', sales: 0.78 },
-    { line: 'outsourcing', from: '2026-08', to: '2026-09', margin: -0.045 },
+    { city: 'Medellín', lastMonths: 2, sales: 0.78 },
+    { line: 'outsourcing', lastMonths: 2, margin: -0.045 },
   ],
   expenses: [
     { id: 'nomina', monthly: 52_000_000, growth: 0.07 },
@@ -254,9 +265,14 @@ export function nitDv(nit: string): number {
   return r >= 2 ? 11 - r : r;
 }
 
-/** `901457832` → `901.457.832-1`. Si ya trae guion o no son 9 dígitos, se deja como está. */
+/**
+ * `901457832` → `901.457.832-1` (el dígito de verificación se calcula). Si ya
+ * trae el dígito (`901457832-1`) se respeta; si no son 9 dígitos, se deja como está.
+ */
 export function formatNit(nit: string): string {
   const clean = nit.trim();
-  if (!/^\d{9}$/.test(clean)) return clean;
-  return `${clean.slice(0, 3)}.${clean.slice(3, 6)}.${clean.slice(6)}-${nitDv(clean)}`;
+  const m = /^(\d{9})(?:-(\d))?$/.exec(clean);
+  if (!m) return clean;
+  const base = m[1];
+  return `${base.slice(0, 3)}.${base.slice(3, 6)}.${base.slice(6)}-${m[2] ?? nitDv(base)}`;
 }

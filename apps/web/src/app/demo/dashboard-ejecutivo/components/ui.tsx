@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, type ReactNode, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocale, useTranslations } from 'next-intl';
 import {
@@ -28,9 +28,13 @@ export function useFmt() {
       loc,
       names,
       num: (n: number, d = 0) => F.num(n, loc, d),
+      /** Parámetro configurable (meta, umbral): sin decimales si es entero ("5"), con uno si no ("1,5"). */
+      param: (n: number) => F.num(n, loc, Number.isInteger(n) ? 0 : 1),
       money: (n: number) => F.money(n, loc),
       moneyM: (n: number, d?: number) => F.moneyM(n, loc, d),
       pct: (r: number, d = 1) => F.pct(r, loc, d),
+      /** Cumplimiento de meta: sin decimales, salvo cerca del 100 % (99,9 % no se redondea a "100 %"). */
+      compliance: (r: number) => F.pct(r, loc, Math.abs(r - 1) < 0.005 ? 1 : 0),
       signedPct: (r: number, d = 1) => F.signedPct(r, loc, d),
       signedPts: (r: number) => F.signedPts(r, loc),
       date: (d: ISODate) => F.formatDate(d, loc, names),
@@ -38,6 +42,8 @@ export function useFmt() {
       month: (m: MonthKey, short = false) => F.formatMonth(m, names, short),
       /** Mes con mayúscula inicial (títulos, filas de tabla): "Sep 2026". */
       monthTitle: (m: MonthKey, short = false) => F.capitalize(F.formatMonth(m, names, short)),
+      /** Mes dentro de una frase: "septiembre de 2026". */
+      monthIn: (m: MonthKey) => t('monthYear', { month: names.long[Number(m.slice(5, 7)) - 1], year: Number(m.slice(0, 4)) }),
       /** Período para selectores y títulos: "Septiembre 2026". */
       period: (p: Period) => F.periodLabel(p, names, { quarter: t('quarterPrefix'), ytd: t('ytd') }),
       /** Período dentro de una frase: "septiembre de 2026". */
@@ -122,6 +128,42 @@ export function SeverityBadge({ severity }: { severity: Severity }) {
   );
 }
 
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"])';
+
+/**
+ * Foco de una ventana: al abrir lo lleva adentro, Tab y Mayús+Tab no salen de
+ * ella mientras sea la de arriba, y al cerrar vuelve al control que la abrió.
+ */
+export function useDialogFocus(ref: RefObject<HTMLElement>, active = true) {
+  useEffect(() => {
+    if (!active) return;
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    ref.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      const el = ref.current;
+      if (e.key !== 'Tab' || !el) return;
+      const open = document.querySelectorAll('[data-bi-modal]');
+      if (open.length && open[open.length - 1] !== el) return;
+      const items = Array.from(el.querySelectorAll<HTMLElement>(FOCUSABLE)).filter((x) => x.offsetParent !== null);
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === el)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      if (opener && document.contains(opener)) opener.focus();
+    };
+  }, [ref, active]);
+}
+
 export function Modal({
   title,
   subtitle,
@@ -143,8 +185,8 @@ export function Modal({
   const ref = useRef<HTMLDivElement>(null);
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
+  useDialogFocus(ref);
   useEffect(() => {
-    ref.current?.focus();
     // Escape cierra solo el modal de arriba (puede haber una factura abierta sobre un cliente).
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;

@@ -54,6 +54,8 @@ export default function Finance() {
   const aging = ctx.aging;
   const cash = ctx.cash;
   const floor = ctx.params.thresholds.cashFloor * 1e6;
+  /** Celda del detalle semanal: guion si la semana no tiene ese movimiento. */
+  const cell = (v: number, out = false) => (Math.abs(v) < 50_000 ? '—' : `${out ? '−' : ''}${fmt.moneyM(v)}`);
 
   const exportReceivables = () => {
     if (!aging) return;
@@ -71,7 +73,7 @@ export default function Finance() {
   return (
     <div className="space-y-6">
       <section className={`${card} p-5 sm:p-6`} aria-labelledby="fin-pnl">
-        <SectionTitle title={<span id="fin-pnl">{t('pnl.title')}</span>} subtitle={t('pnl.subtitle', { period: fmt.period(period), goal: fmt.num(ctx.params.goalGrowth, 1) })} />
+        <SectionTitle title={<span id="fin-pnl">{t('pnl.title')}</span>} subtitle={t('pnl.subtitle', { period: fmt.period(period), goal: fmt.param(ctx.params.goalGrowth) })} />
         <div className="overflow-x-auto -mx-2 sm:-mx-1">
           <table className="w-full text-xs sm:text-sm">
             <thead>
@@ -169,7 +171,7 @@ export default function Finance() {
       )}
 
       {cash && (
-        <section className={`${card} p-5 sm:p-6`} aria-labelledby="fin-cash">
+        <section className={`${card} p-5 sm:p-6 scroll-mt-72 md:scroll-mt-56`} aria-labelledby="fin-cash" id="fin-cash-section">
           <SectionTitle
             title={
               <span id="fin-cash" className="inline-flex items-center gap-2">
@@ -186,15 +188,18 @@ export default function Finance() {
           />
           <dl className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
             {[
-              { k: 'today', v: fmt.moneyM(cash.start), s: fmt.date(dataset.cutoff) },
-              { k: 'min', v: fmt.moneyM(cash.min.balance), s: t('cash.weekOf', { date: fmt.date(cash.min.start) }) },
-              { k: 'week8', v: fmt.moneyM(cash.weeks[7].balance), s: t('cash.weekOf', { date: fmt.date(cash.weeks[7].start) }) },
-              { k: 'week13', v: fmt.moneyM(cash.weeks[12].balance), s: t('cash.weekOf', { date: fmt.date(cash.weeks[12].start) }) },
+              { k: 'today', v: cash.start, s: fmt.date(dataset.cutoff) },
+              { k: 'min', v: cash.min.balance, s: t('cash.weekOf', { date: fmt.date(cash.min.start) }) },
+              { k: 'week8', v: cash.weeks[7].balance, s: t('cash.weekOf', { date: fmt.date(cash.weeks[7].start) }) },
+              { k: 'week13', v: cash.weeks[12].balance, s: t('cash.weekOf', { date: fmt.date(cash.weeks[12].start) }) },
             ].map((x) => (
-              <div key={x.k} className="rounded-xl bg-slate-50 dark:bg-slate-800/60 p-3">
+              <div key={x.k} className="rounded-xl bg-slate-50 dark:bg-slate-800/60 p-3" data-testid={`exec-cash-${x.k}`}>
                 <dt className="text-xs text-slate-500 dark:text-slate-400">{t(`cash.kpi.${x.k}`)}</dt>
-                <dd className="text-lg font-bold text-slate-900 dark:text-white">{x.v}</dd>
-                <dd className="text-[11px] text-slate-500 dark:text-slate-400">{x.s}</dd>
+                <dd className={`text-lg font-bold ${x.v < floor ? 'text-red-700 dark:text-red-400' : 'text-slate-900 dark:text-white'}`}>{fmt.moneyM(x.v)}</dd>
+                <dd className="text-[11px] text-slate-500 dark:text-slate-400">
+                  {x.s}
+                  {x.v < floor && <span className="block font-semibold text-red-700 dark:text-red-400">{t('cash.belowFloor')}</span>}
+                </dd>
               </div>
             ))}
           </dl>
@@ -258,12 +263,12 @@ export default function Finance() {
                   {cash.weeks.map((w) => (
                     <tr key={w.n} className={`border-b border-slate-100 dark:border-slate-800 ${w.n === cash.min.n ? 'bg-amber-50 dark:bg-amber-950/30' : ''}`}>
                       <td className="py-1.5 whitespace-nowrap">{t('cash.weekRange', { n: w.n, start: fmt.date(w.start), end: fmt.date(w.end) })}</td>
-                      <td className="py-1.5 px-2 text-right">{fmt.moneyM(w.collections)}</td>
-                      <td className="py-1.5 px-2 text-right">{fmt.moneyM(w.newSales)}</td>
-                      <td className="py-1.5 px-2 text-right">−{fmt.moneyM(w.suppliers)}</td>
-                      <td className="py-1.5 px-2 text-right">−{fmt.moneyM(w.payroll)}</td>
-                      <td className="py-1.5 px-2 text-right">−{fmt.moneyM(w.rent + w.other)}</td>
-                      <td className="py-1.5 px-2 text-right">{w.tax ? `−${fmt.moneyM(w.tax)}` : '—'}</td>
+                      <td className="py-1.5 px-2 text-right">{cell(w.collections)}</td>
+                      <td className="py-1.5 px-2 text-right">{cell(w.newSales)}</td>
+                      <td className="py-1.5 px-2 text-right">{cell(w.suppliers, true)}</td>
+                      <td className="py-1.5 px-2 text-right">{cell(w.payroll, true)}</td>
+                      <td className="py-1.5 px-2 text-right">{cell(w.rent + w.other, true)}</td>
+                      <td className="py-1.5 px-2 text-right">{cell(w.tax, true)}</td>
                       <td className={`py-1.5 pl-2 text-right font-semibold ${w.balance < floor ? 'text-red-700 dark:text-red-400' : ''}`}>{fmt.moneyM(w.balance)}</td>
                     </tr>
                   ))}

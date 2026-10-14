@@ -50,11 +50,17 @@ export function useNarrative() {
         case 'overdue90':
           return t('alerts.items.overdue90.text', { before: fmt.moneyM(v.before), now: fmt.moneyM(v.now), growth: fmt.signedPct(v.growth) });
         case 'cashFloor':
-          return t('alerts.items.cashFloor.text', { start: fmt.date(a.labels.start), end: fmt.date(a.labels.end), balance: fmt.moneyM(v.balance), floor: fmt.moneyM(v.floor) });
+          return t(v.todayBelow ? 'alerts.items.cashFloor.textToday' : 'alerts.items.cashFloor.text', {
+            start: fmt.date(a.labels.start),
+            end: fmt.date(a.labels.end),
+            balance: fmt.moneyM(v.balance),
+            floor: fmt.moneyM(v.floor),
+            today: fmt.moneyM(v.today),
+          });
         case 'customersRisk':
-          return t('alerts.items.customersRisk.text', { count: v.count, names: a.labels.names, lost: fmt.moneyM(v.lost), drop: fmt.num(ctx.params.thresholds.riskDrop) });
+          return t('alerts.items.customersRisk.text', { count: v.count, names: a.labels.names, lost: fmt.moneyM(v.lost), drop: fmt.param(ctx.params.thresholds.riskDrop) });
         case 'forecastGoal':
-          return t('alerts.items.forecastGoal.text', { range: range(a.labels.from, a.labels.to), value: fmt.moneyM(v.value), compliance: fmt.pct(v.compliance, 0) });
+          return t('alerts.items.forecastGoal.text', { range: range(a.labels.from, a.labels.to), value: fmt.moneyM(v.value), compliance: fmt.compliance(v.compliance) });
         default:
           return '';
       }
@@ -74,7 +80,7 @@ export function useNarrative() {
             budget: fmt.moneyM(v.budget),
             city: f.labels.city,
             cityDiff: fmt.moneyM(Math.abs(v.cityDiff)),
-            cityCompliance: fmt.pct(v.cityCompliance, 0),
+            cityCompliance: fmt.compliance(v.cityCompliance),
           });
         case 'margin':
           return t('findings.margin', {
@@ -86,14 +92,14 @@ export function useNarrative() {
             lineMargin: fmt.pct(v.lineMargin),
           });
         case 'overdue':
-          return t('findings.overdue', { over90: fmt.moneyM(v.over90), count: v.count, share: fmt.pct(v.share, 0), names: f.labels.names });
+          return t(v.share > 0.995 ? 'findings.overdueAll' : 'findings.overdue', { over90: fmt.moneyM(v.over90), count: v.count, share: fmt.pct(v.share, 0), names: f.labels.names });
         case 'forecast':
           return t(v.hasBudget ? 'findings.forecast' : 'findings.forecastNoBudget', {
             range: range(f.labels.from, f.labels.to),
             value: fmt.moneyM(v.value),
             low: fmt.moneyM(v.low),
             high: fmt.moneyM(v.high),
-            compliance: fmt.pct(v.compliance, 0),
+            compliance: fmt.compliance(v.compliance),
           });
         default:
           return '';
@@ -110,7 +116,7 @@ export function useNarrative() {
     const lines: string[] = [t('weekly.title', { company: company.name })];
     lines.push(
       k.compliance !== null
-        ? t('weekly.sales', { period: periodName, sales: fmt.moneyM(k.sales), compliance: fmt.pct(k.compliance, 0) })
+        ? t('weekly.sales', { period: periodName, sales: fmt.moneyM(k.sales), compliance: fmt.compliance(k.compliance) })
         : t('weekly.salesNoGoal', { period: periodName, sales: fmt.moneyM(k.sales) }),
     );
     if (k.margin !== null) lines.push(k.marginPrev !== null ? t('weekly.margin', { margin: fmt.pct(k.margin), delta: fmt.signedPts(k.margin - k.marginPrev) }) : t('weekly.marginNoPrev', { margin: fmt.pct(k.margin) }));

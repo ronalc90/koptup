@@ -3,11 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { formatNit, PRESETS } from '../lib/presets';
+import { formatNit, nitDv, PRESETS } from '../lib/presets';
 import { useDashboard } from '../lib/store';
 import { SECTORS, type Recipient, type SectorId, type Settings, type Thresholds } from '../lib/types';
+import { ResetDialog } from './Intro';
 import { useNarrative } from './narrative';
-import { btn, card, inputCls, labelCls, Modal, Note, NS, SectionTitle, selectCls, useFmt } from './ui';
+import { btn, card, inputCls, labelCls, Note, NS, SectionTitle, selectCls, useFmt } from './ui';
 
 const THRESHOLD_KEYS: (keyof Thresholds)[] = ['goalGap', 'marginDrop', 'overdueGrowth', 'riskDrop', 'cashFloor'];
 
@@ -15,7 +16,7 @@ export default function SettingsView() {
   const t = useTranslations(`${NS}.settings`);
   const ts = useTranslations(`${NS}.sectors`);
   const fmt = useFmt();
-  const { settings, saveSettings, resetAll, notify, dataset } = useDashboard();
+  const { settings, saveSettings, notify, dataset } = useDashboard();
   const { recipientName } = useNarrative();
   const [draft, setDraft] = useState<Settings>(settings);
   const [confirmReset, setConfirmReset] = useState(false);
@@ -34,7 +35,13 @@ export default function SettingsView() {
     const errs: string[] = [];
     const c = s.companies[s.sector] ?? PRESETS[s.sector].company;
     if (!c.name.trim()) errs.push(t('errors.name'));
-    if (c.nit.trim() && !/^\d{6,10}(-\d)?$/.test(c.nit.replace(/\./g, '').trim())) errs.push(t('errors.nit'));
+    const nit = c.nit.replace(/\./g, '').trim();
+    if (nit && !/^\d{6,10}(-\d)?$/.test(nit)) errs.push(t('errors.nit'));
+    else if (/^\d{6,10}-\d$/.test(nit)) {
+      // Si escribieron el dígito de verificación, debe ser el que calcula la DIAN.
+      const [base, dv] = nit.split('-');
+      if (Number(dv) !== nitDv(base)) errs.push(t('errors.nitDv', { nit: base, dv: nitDv(base) }));
+    }
     const g = s.goals[s.sector];
     if (!Number.isFinite(g) || g < -50 || g > 100) errs.push(t('errors.goal'));
     for (const k of THRESHOLD_KEYS) {
@@ -241,36 +248,15 @@ export default function SettingsView() {
           </button>
         </div>
       </div>
-      <Note>{t('storageNote', { goal: fmt.num(settings.goals[settings.sector], 1) })}</Note>
+      <Note>{t('storageNote', { goal: fmt.param(settings.goals[settings.sector]) })}</Note>
 
       {confirmReset && (
-        <Modal
-          title={t('resetTitle')}
-          onClose={() => setConfirmReset(false)}
-          size="sm"
-          labelId="set-reset-title"
-          footer={
-            <>
-              <button type="button" className={btn.outline} onClick={() => setConfirmReset(false)}>
-                {t('cancel')}
-              </button>
-              <button
-                type="button"
-                className={btn.danger}
-                onClick={() => {
-                  resetAll();
-                  setConfirmReset(false);
-                  setErrors([]);
-                  notify(t('resetDone'));
-                }}
-              >
-                {t('resetConfirm')}
-              </button>
-            </>
-          }
-        >
-          <p className="text-sm text-slate-700 dark:text-slate-300">{t('resetText')}</p>
-        </Modal>
+        <ResetDialog
+          onClose={() => {
+            setConfirmReset(false);
+            setErrors([]);
+          }}
+        />
       )}
     </div>
   );

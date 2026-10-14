@@ -48,7 +48,7 @@
       "resumen": "Resumen",
       "finanzas": "Finanzas",
       "clientes": "Clientes",
-      "preguntas": "Pregúntale a tus datos",
+      "preguntas": "Preguntas guiadas",
       "alertas": "Alertas",
       "fuentes": "Fuentes de datos",
       "configuracion": "Configuración"
@@ -57,8 +57,8 @@
       "product": "Tablero ejecutivo",
       "expand": "Expandir menú lateral",
       "collapse": "Contraer menú lateral",
-      "openMenu": "Abrir menú",
-      "closeMenu": "Cerrar menú",
+      "openMenu": "Abrir las secciones del tablero",
+      "closeMenu": "Cerrar las secciones",
       "sidebarSample": "Datos de ejemplo: la empresa, los clientes, el NIT y las cifras son ficticios y se generan en tu navegador.",
       "sidebarUpload": "Estás viendo los datos de tu archivo. No salen de tu navegador; al recargar vuelves a los datos de ejemplo.",
       "pdf": "Informe PDF",
@@ -81,11 +81,12 @@
         "resumen": "Indicadores de {period} frente a la meta y al mismo período del año anterior.",
         "finanzas": "Estado de resultados de {period}, cartera por edades y flujo de caja proyectado.",
         "clientes": "Ventas, margen, cartera y segmento de cada cliente en {period}.",
-        "preguntas": "Preguntas guiadas que se responden con las cifras del tablero.",
+        "preguntas": "Respuestas calculadas con las cifras de {period}, con la fórmula de cada una.",
         "alertas": "Desvíos detectados con reglas y vista previa del resumen semanal.",
         "fuentes": "De dónde salen los datos y cómo probar el tablero con tu propio archivo.",
         "configuracion": "Empresa, meta de ventas, umbrales de alertas y destinatarios del resumen."
-      }
+      },
+      "sections": "Secciones"
     },
     "search": {
       "label": "Buscar en el tablero",
@@ -140,7 +141,7 @@
         "lines": {
           "consultoria": "Consultoría de gestión",
           "auditoria": "Auditoría y revisoría fiscal",
-          "outsourcing": "Outsourcing contable y de nómina",
+          "outsourcing": "Tercerización contable y de nómina",
           "capacitacion": "Capacitación empresarial"
         }
       },
@@ -186,7 +187,7 @@
         "note": "Clientes distintos con al menos una factura en el período"
       },
       "ticket": {
-        "title": "Ticket promedio",
+        "title": "Venta promedio por factura",
         "note": "{count, plural, one {Ventas ÷ # factura} other {Ventas ÷ # facturas}}"
       },
       "yoy": "{pct} frente al año anterior",
@@ -208,15 +209,15 @@
       "month": "Mes"
     },
     "overview": {
-      "salesTitle": "Ventas {year}: real, meta y proyección",
-      "salesSubtitle": "Meta = mismo mes de {prev} + {goal} %. Proyección: {method}, banda del 80 %. No usa IA.",
-      "salesSubtitleNoForecast": "Meta = mismo mes de {prev} + {goal} %. No hay meses suficientes para proyectar.",
+      "salesTitle": "Ventas de {from} a {to}: real, meta y proyección",
+      "salesSubtitle": "Meta = mismo mes del año anterior + {goal} %. Proyección: {method}, banda del 80 %. No usa IA.",
+      "salesSubtitleNoForecast": "Meta = mismo mes del año anterior + {goal} %. La proyección aparece cuando eliges el último mes con datos.",
       "method": {
         "seasonal": "mismo mes del año anterior × crecimiento de los últimos 3 meses",
         "trend": "tendencia lineal de los últimos meses"
       },
       "cityTitle": "Ventas por {dim} frente a la meta",
-      "citySubtitle": "Verde: cumple la meta · ámbar: hasta 5 % por debajo · rojo: más de 5 % por debajo.",
+      "citySubtitle": "Verde: cumple la meta · ámbar: hasta {gap} % por debajo · rojo: más de {gap} % por debajo (umbral de Configuración).",
       "linesTitle": "Ventas por línea de negocio",
       "linesSubtitle": "Participación en las ventas del período y margen bruto de cada línea.",
       "marginShort": "margen {pct}",
@@ -246,7 +247,8 @@
       "margin": "El margen bruto es {margin} frente a {prev} en el mismo período del año anterior ({delta}). La línea que más cambió es {line}: pasó de {linePrev} a {lineMargin}.",
       "overdue": "La cartera vencida a más de 90 días suma {over90}. {count, plural, one {Un cliente concentra} other {# clientes concentran}} el {share}: {names}.",
       "forecast": "Al ritmo actual, {range} cerraría en {value} (rango del 80 %: {low} a {high}), el {compliance} de la meta.",
-      "forecastNoBudget": "Al ritmo actual, {range} cerraría en {value} (rango del 80 %: {low} a {high})."
+      "forecastNoBudget": "Al ritmo actual, {range} cerraría en {value} (rango del 80 %: {low} a {high}).",
+      "overdueAll": "La cartera vencida a más de 90 días suma {over90} y está toda en {count, plural, one {un cliente} other {# clientes}}: {names}."
     },
     "finance": {
       "uploadTitle": "Finanzas con tu archivo",
@@ -315,7 +317,7 @@
         "legendMin": "Semana de menor caja",
         "legendBelow": "Bajo la caja mínima",
         "legendFloor": "Caja mínima ({floor})",
-        "legendMarkers": "IVA = pago de IVA bimestral · P = prima de servicios",
+        "legendMarkers": "IVA = pago de IVA bimestral · P = prima de servicios (junio y diciembre)",
         "markerTax": "IVA",
         "markerBonus": "P",
         "weekRange": "Semana {n}: {start} a {end}",
@@ -329,8 +331,9 @@
         "rentOther": "Arriendo y otros",
         "tax": "IVA",
         "balance": "Saldo",
-        "method": "Cómo se calcula: la cartera abierta se cobra en su vencimiento más el atraso promedio de cada cliente (lo que ya superó ese atraso se reparte en las 4 semanas siguientes y lo vencido a más de 180 días, {excluded}, no se proyecta); las ventas proyectadas se cobran según el plazo y el atraso de cada cliente (en promedio {days} días); proveedores a {supplierDays} días; nómina quincenal, prima de servicios en diciembre, arriendo el día 5 y demás gastos repartidos en el mes.",
-        "taxNote": "El IVA bimestral se calcula como 19 % de las ventas gravadas menos el IVA de las compras gravadas. La fecha de pago ({date}) es de ejemplo: la real depende del último dígito del NIT en el calendario de la DIAN."
+        "method": "Cómo se calcula: la cartera abierta se cobra en su vencimiento más el atraso promedio de cada cliente (lo que ya superó ese atraso se reparte en las 4 semanas siguientes y lo vencido a más de 180 días, {excluded}, no se proyecta); las ventas proyectadas se cobran según el plazo y el atraso de cada cliente (en promedio {days} días); proveedores a {supplierDays} días; nómina quincenal, prima de servicios en junio y diciembre, arriendo el día 5 y demás gastos repartidos en el mes.",
+        "taxNote": "El IVA bimestral se calcula como 19 % de las ventas gravadas menos el IVA de las compras gravadas. La fecha de pago ({date}) es de ejemplo: la real depende del último dígito del NIT en el calendario de la DIAN.",
+        "belowFloor": "Bajo la caja mínima"
       },
       "moves": {
         "title": "Movimientos relevantes",
@@ -346,8 +349,8 @@
       }
     },
     "customers": {
-      "title": "Ranking de clientes",
-      "subtitle": "{period}. «En riesgo»: compra {drop} % o menos que en el mismo período del año anterior.",
+      "title": "Clientes del período",
+      "subtitle": "{period}. «En riesgo»: sus compras cayeron {drop} % o más frente al mismo período del año anterior.",
       "export": "Exportar CSV",
       "exported": "{file} descargado ({count, plural, one {# fila} other {# filas}})",
       "all": "Todos ({count})",
@@ -378,7 +381,7 @@
         "segment": "Segmento"
       },
       "noPrev": "Sin datos",
-      "segmentNote": "Segmentos calculados con reglas: «Nuevo» = primera compra en los últimos 180 días; «En riesgo» = compra {drop} % o menos que hace un año; «Recurrente» = el resto. El umbral se cambia en Configuración.",
+      "segmentNote": "Segmentos calculados con reglas: «Nuevo» = primera compra en los últimos 180 días; «En riesgo» = sus compras cayeron {drop} % o más frente al mismo período del año anterior; «Recurrente» = el resto. El umbral se cambia en Configuración.",
       "csv": {
         "customer": "Cliente",
         "seller": "Vendedor",
@@ -409,7 +412,7 @@
         "segmentWhy": {
           "nuevo": "Primera compra hace menos de 180 días.",
           "recurrente": "Compra de forma estable frente al año anterior.",
-          "riesgo": "Compra {drop} % o menos que en el mismo período del año anterior."
+          "riesgo": "Sus compras cayeron {drop} % o más frente al mismo período del año anterior."
         },
         "last12": "Ventas de los últimos 12 meses",
         "openTitle": "Facturas pendientes al {date}",
@@ -440,7 +443,7 @@
       }
     },
     "ask": {
-      "title": "Preguntas guiadas",
+      "title": "Elige o escribe tu pregunta",
       "subtitle": "Elige una pregunta o escríbela. Las respuestas se calculan con las cifras de {period}.",
       "q": {
         "customersDown": "¿Qué clientes compran menos que el año pasado?",
@@ -489,7 +492,7 @@
       "subtitle": "Se evalúan con reglas cada vez que cambias el período, los datos o los umbrales.",
       "editThresholds": "Editar umbrales",
       "empty": "No hay alertas con los umbrales actuales.",
-      "rules": "Reglas: ventas o ciudad más de {goalGap} % bajo la meta · línea con margen {marginDrop} pts menor al del año anterior · cartera > 90 días que sube más de {overdueGrowth} % frente al cierre anterior · caja proyectada bajo {cashFloor} · clientes que compran {riskDrop} % o menos que hace un año · proyección bajo la meta.",
+      "rules": "Reglas: ventas o ciudad más de {goalGap} % bajo la meta · línea con margen {marginDrop} pts menor al del año anterior · cartera > 90 días que sube más de {overdueGrowth} % frente al cierre anterior · caja al corte o proyectada bajo {cashFloor} · clientes cuyas compras cayeron {riskDrop} % o más frente al año anterior · proyección bajo la meta.",
       "severity": {
         "critical": "Crítica",
         "warning": "Atención",
@@ -519,11 +522,12 @@
         },
         "cashFloor": {
           "title": "Caja proyectada bajo el mínimo",
-          "text": "En la semana del {start} al {end} la caja proyectada baja a {balance}, por debajo del mínimo de {floor}."
+          "text": "En la semana del {start} al {end} la caja proyectada baja a {balance}, por debajo del mínimo de {floor}.",
+          "textToday": "La caja al corte ({today}) ya está por debajo del mínimo de {floor}. En las próximas 13 semanas el punto más bajo es {balance}, en la semana del {start} al {end}."
         },
         "customersRisk": {
           "title": "{count, plural, one {# cliente en riesgo} other {# clientes en riesgo}}",
-          "text": "Compran {drop} % o menos que en el mismo período del año anterior: {names}{count, plural, one {} =2 {} =3 {} other { y otros}}. Entre todos son {lost} menos."
+          "text": "Sus compras cayeron {drop} % o más frente al mismo período del año anterior: {names}{count, plural, one {} =2 {} =3 {} other { y otros}}. Entre todos son {lost} menos."
         },
         "forecastGoal": {
           "title": "La proyección queda bajo la meta",
@@ -542,7 +546,7 @@
       "noAlerts": "Sin alertas activas",
       "forecast": "Proyección {range}: {value}",
       "link": "Ver tablero: {link}",
-      "linkPlaceholder": "Ver tablero: enlace a tu tablero",
+      "linkPlaceholder": "Ver tablero: (enlace a esta demo)",
       "previewTitle": "Resumen del lunes (vista previa)",
       "previewSubtitle": "Así llegaría el resumen semanal por WhatsApp o correo, con las cifras del período elegido.",
       "channel": "Canal",
@@ -692,8 +696,8 @@
         "goalGap": "Alerta si las ventas (o una ciudad) quedan más abajo de la meta.",
         "marginDrop": "Alerta si una línea pierde estos puntos frente al año anterior.",
         "overdueGrowth": "Alerta si la cartera > 90 días sube más frente al cierre anterior.",
-        "riskDrop": "Clientes que compran este porcentaje o menos que hace un año.",
-        "cashFloor": "Alerta si alguna semana del flujo de caja queda por debajo (millones de pesos)."
+        "riskDrop": "Marca «en riesgo» al cliente cuyas compras caen este porcentaje o más frente al año anterior.",
+        "cashFloor": "Alerta si la caja al corte o alguna semana del flujo de caja queda por debajo (millones de pesos)."
       },
       "recipientsTitle": "Destinatarios del resumen del lunes",
       "recipientsSubtitle": "Se usan en la vista previa del resumen semanal (Alertas).",
@@ -721,7 +725,7 @@
       "saved": "Configuración guardada en este navegador",
       "storageNote": "Se guarda solo en este navegador (localStorage); nadie más la ve. Meta actual del sector: {goal} %.",
       "resetTitle": "¿Restablecer la demo?",
-      "resetText": "Vuelves a los datos de ejemplo, a la empresa ficticia, a las metas y umbrales por defecto y al último mes con datos. Si cargaste un archivo, se descarta.",
+      "resetText": "Vuelves a los datos de ejemplo, a la empresa ficticia, a las metas y umbrales por defecto, al último mes con datos y a los primeros pasos sin marcar. Si cargaste un archivo, se descarta.",
       "resetConfirm": "Sí, restablecer",
       "resetDone": "Demo restablecida",
       "cancel": "Cancelar",
@@ -732,7 +736,8 @@
         "goal": "La meta debe estar entre −50 % y 100 %.",
         "threshold": "Revisa el valor de «{field}».",
         "email": "El correo de {name} no es válido.",
-        "phone": "El celular de {name} debe tener al menos 10 dígitos."
+        "phone": "El celular de {name} debe tener al menos 10 dígitos.",
+        "nitDv": "El dígito de verificación no corresponde: para el NIT {nit} es {dv}."
       }
     },
     "report": {
@@ -747,7 +752,7 @@
       "topCustomers": "Principales clientes",
       "aging": "Cartera por edades al {date}",
       "cash": "Flujo de caja a 13 semanas desde el {date}",
-      "cashNote": "Caja al corte: {start}. Punto más bajo: {min} en la semana del {week}.",
+      "cashNote": "Caja al corte: {start}. Punto más bajo de las 13 semanas: {min}, en la semana del {week}. Caja mínima: {floor}.",
       "alerts": "Alertas",
       "method": "Cómo se calcularon las cifras",
       "methodGoal": "Meta = ventas de los mismos meses del año anterior + {goal} %.",
@@ -766,10 +771,71 @@
       "yoy": "Vs. año anterior",
       "overdue": "Saldo vencido",
       "amount": "Valor",
-      "footer": "Demo de tablero ejecutivo de Koptup · datos de ejemplo",
+      "footer": "Demo de tablero ejecutivo de KopTup · datos de ejemplo",
       "page": "Página {n} de {total}",
       "done": "Informe descargado: {file}",
       "error": "No se pudo generar el PDF. Intenta de nuevo."
+    },
+    "intro": {
+      "back": "Volver al catálogo de demos",
+      "sampleBadge": "Datos de ejemplo",
+      "sampleHint": "La empresa, los clientes, el NIT y las cifras son ficticios y se calculan en tu navegador.",
+      "title": "Tablero ejecutivo para gerencia",
+      "subtitle": "Ventas frente a la meta, margen, cartera, flujo de caja y alertas de una empresa colombiana en una sola pantalla, con un informe PDF listo para la junta.",
+      "audience": "Para gerentes generales, gerentes financieros y dueños de empresas que hoy arman sus informes a mano en Excel. Empieza por los primeros pasos de abajo o pruébalo con un CSV de tus ventas.",
+      "requestDemo": "Solicitar demo guiada",
+      "quote": "Cotizar tu tablero",
+      "tryCsv": "Probar con tu CSV",
+      "reset": "Restablecer demo",
+      "cutoffNote": "Corte de los datos: último mes cerrado ({month}). Cada mes los datos de ejemplo se corren solos.",
+      "how": {
+        "title": "Cómo funciona esta demo",
+        "show": "Ver",
+        "hide": "Ocultar",
+        "data": "Todas las cifras salen de las mismas facturas de ejemplo y se calculan en tu navegador: lo que ves en Resumen, Finanzas, Clientes, las alertas y el PDF siempre cuadra.",
+        "dates": "El corte es el último mes cerrado ({month}); puedes revisar cualquiera de los últimos 12 meses, sus trimestres o el año a la fecha.",
+        "noAi": "Sin IA en esta demo: el resumen y las alertas se arman con reglas, la proyección es estadística y las preguntas son guiadas. En tu proyecto, un modelo de IA puede redactar el resumen y responder preguntas libres.",
+        "simulated": "El resumen del lunes es una vista previa: no se envía nada solo. Los conectores (Siigo, SAP Business One, HubSpot y otros) se configuran en tu proyecto; aquí no hay conexiones.",
+        "storage": "Tu configuración se guarda solo en este navegador. El CSV que cargues no sale de él y se descarta al recargar."
+      }
+    },
+    "guide": {
+      "title": "Primeros pasos",
+      "subtitle": "Cinco pasos de un minuto para ver lo que hace el tablero. Se marcan solos cuando los haces.",
+      "progress": "{done} de {total} hechos",
+      "hide": "Ocultar",
+      "show": "Mostrar",
+      "done": "Hecho",
+      "steps": {
+        "period": {
+          "title": "Cambia el período",
+          "text": "Elige otro mes, un trimestre o el año a la fecha: indicadores, alertas y PDF se recalculan.",
+          "action": "Elegir período"
+        },
+        "finance": {
+          "title": "Mira la caja de 13 semanas",
+          "text": "Descubre en qué semana la caja queda más baja y qué pagos la explican.",
+          "action": "Abrir Finanzas"
+        },
+        "customer": {
+          "title": "Abre un cliente en riesgo",
+          "text": "Clientes cuyas compras cayeron frente al año anterior, con lo que te deben.",
+          "action": "Ver clientes en riesgo"
+        },
+        "ask": {
+          "title": "Haz una pregunta guiada",
+          "text": "Por ejemplo, qué ciudad va más lejos de la meta; la respuesta muestra cómo se calculó.",
+          "action": "Ir a las preguntas"
+        },
+        "pdf": {
+          "title": "Descarga el informe PDF",
+          "text": "Dos páginas con las cifras del período, listas para enviar a tu junta.",
+          "action": "Descargar PDF"
+        }
+      },
+      "finished": "¡Listo! Ya viste lo principal. ¿Quieres verlo con los datos de tu empresa?",
+      "finishedDemo": "Solicitar demo guiada",
+      "finishedQuote": "Cotizar tu tablero"
     }
   }
 }
