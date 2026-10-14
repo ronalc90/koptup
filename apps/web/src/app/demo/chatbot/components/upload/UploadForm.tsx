@@ -246,7 +246,7 @@ export default function UploadForm({ limits, notice, onUploaded, onUnavailable, 
         </button>
         {error === 'daily_limit' ? (
           <Link
-            href="/contact"
+            href="/solicitar-demo?demos=chatbot"
             className="text-xs font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
           >
             {t('cta.schedule')}

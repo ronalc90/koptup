@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+import { formatInteger, formatUsd } from './data';
 import { ChartBarIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 
 export interface SessionStats {
@@ -26,15 +27,16 @@ const pct = (part: number, total: number) => (total > 0 ? `${Math.round((part / 
  */
 export default function StatsWidget({ stats, defaultExpanded = false }: { stats: SessionStats; defaultExpanded?: boolean }) {
   const t = useTranslations('demoChatbot.stats');
+  const locale = useLocale() === 'en' ? 'en' : 'es';
   const [expanded, setExpanded] = useState(defaultExpanded);
 
   const cells = [
     { key: 'questions', label: t('questions'), value: String(stats.questions) },
     { key: 'withSources', label: t('withSources'), value: pct(stats.withSources, stats.questions) },
     { key: 'notFound', label: t('notFound'), value: pct(stats.notFound, stats.questions) },
-    { key: 'avgLatency', label: t('avgLatency'), value: stats.questions > 0 ? `${stats.avgLatencyMs} ms` : '—' },
-    { key: 'tokens', label: t('tokens'), value: String(stats.tokens) },
-    { key: 'cost', label: t('cost'), value: `$${stats.costUSD.toFixed(5)}` },
+    { key: 'avgLatency', label: t('avgLatency'), value: stats.questions > 0 ? `${formatInteger(stats.avgLatencyMs, locale)} ms` : '—' },
+    { key: 'tokens', label: t('tokens'), value: formatInteger(stats.tokens, locale) },
+    { key: 'cost', label: t('cost'), value: formatUsd(stats.costUSD, locale) },
     { key: 'feedback', label: t('feedback'), value: `${stats.feedbackUp} / ${stats.feedbackDown}` },
   ];
 

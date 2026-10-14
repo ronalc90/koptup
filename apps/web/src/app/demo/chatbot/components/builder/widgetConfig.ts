@@ -27,9 +27,14 @@ export const TONE_CHOICES: readonly BuilderToneKey[] = ['professional', 'friendl
 
 export const POSITIONS: readonly WidgetCornerPosition[] = ['br', 'bl', 'tr', 'tl'];
 
-/** Formatos que la ruta de bots del backend sabe leer (texto plano). */
-export const TEXT_EXTENSIONS: readonly string[] = ['.txt', '.md', '.csv'];
-export const MAX_TEXT_FILE_BYTES = 2 * 1024 * 1024;
+/**
+ * Formatos que lee la ruta de documentos de bots del backend
+ * (`POST /api/chatbot/bots/:id/docs`: texto plano, PDF con pdf-parse y DOCX
+ * con mammoth). 2 MB por archivo y 5 por envío para no pasar el límite del
+ * cuerpo de esa ruta (15 MB en base64).
+ */
+export const DOC_EXTENSIONS: readonly string[] = ['.txt', '.md', '.csv', '.pdf', '.docx'];
+export const MAX_DOC_FILE_BYTES = 2 * 1024 * 1024;
 export const MAX_FILES_PER_UPLOAD = 5;
 
 const HEX = /^#[0-9a-f]{6}$/i;

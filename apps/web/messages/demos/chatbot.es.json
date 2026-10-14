@@ -1,7 +1,7 @@
 {
   "demoChatbot": {
     "pageTitle": "Demo RAG: IA que responde con documentos",
-    "pageSubtitle": "Busca en los documentos cargados, responde con un modelo de OpenAI y cita la fuente. Si la respuesta no está, te lo dice.",
+    "pageSubtitle": "Para empresas que quieren un asistente que responda con sus propios documentos (políticas, manuales, contratos). Busca en ellos, responde con IA y cita la fuente; si la respuesta no está, te lo dice.",
     "sampleDataBadge": "Datos de ejemplo",
     "sampleDataTooltip": "Las empresas y sus documentos son ficticios. Las respuestas sí las genera el servidor real de la demo.",
     "modes": {
@@ -11,7 +11,7 @@
       "upload": "Prueba con tu documento",
       "uploadHint": "Sube tu PDF, DOCX o TXT y pregúntale: cada respuesta cita la fuente",
       "builder": "Configura el tuyo",
-      "builderHint": "Crea tu bot, súbele textos y llévalo a tu sitio con el código"
+      "builderHint": "Crea tu bot, súbele documentos y llévalo a tu sitio con el código"
     },
     "topBar": {
       "company": "Empresa de ejemplo",
@@ -27,7 +27,8 @@
         "switchToDesktop": "Ver en escritorio",
         "switchToMobile": "Ver en un teléfono",
         "mobileFrameLabel": "Así se ve en un teléfono"
-      }
+      },
+      "showTour": "Ver recorrido"
     },
     "models": {
       "providerRequires": "requiere clave de API",
@@ -55,9 +56,9 @@
       "sections": "{count, plural, one {# sección} other {# secciones}}",
       "open": "Ver documento",
       "checking": "Revisando si ya están indexados…",
-      "idle": "{count, plural, one {# documento de ejemplo} other {# documentos de ejemplo}}: se indexan en el servidor con tu primera pregunta.",
+      "idle": "{count, plural, one {# documento de ejemplo} other {# documentos de ejemplo}}: se preparan en el servidor con tu primera pregunta.",
       "errors": {
-        "rateLimited": "El servidor limita cuántos asistentes de ejemplo se pueden crear por hora desde una misma red, y ese límite ya se alcanzó. Intenta de nuevo más tarde o prueba con tu documento.",
+        "rateLimited": "Desde tu red se crearon muchos asistentes en la última hora y el servidor pausó la creación de nuevos. Intenta de nuevo más tarde (el límite se renueva cada hora) o prueba con tu documento.",
         "capacity": "La demo llegó a su capacidad de asistentes en este momento. Intenta de nuevo más tarde o prueba con tu documento.",
         "unavailable": "El chatbot no está disponible en este momento. Intenta de nuevo en unos minutos.",
         "network": "No pudimos conectar con el servidor de la demo. Revisa tu conexión e inténtalo de nuevo.",
@@ -75,9 +76,9 @@
           "title": "Carga de documentos",
           "summary": "Texto, PDF, DOCX y TXT según el modo de la demo.",
           "items": [
-            "Aquí: los documentos de la empresa ficticia se suben como texto al servidor con tu primera pregunta, y este navegador los reutiliza en tus siguientes visitas.",
+            "Aquí: con la primera pregunta, los documentos de la empresa ficticia se envían como texto al servidor, que los indexa una sola vez y reutiliza ese índice con todos los visitantes.",
             "«Prueba con tu documento»: PDF (con número de página), DOCX y TXT de hasta 5 MB y 30 páginas.",
-            "«Configura el tuyo»: archivos de texto (TXT, MD o CSV) para tu bot."
+            "«Configura el tuyo»: TXT, MD, CSV, PDF o DOCX de hasta 2 MB para tu bot."
           ]
         },
         "chunking": {
@@ -131,7 +132,10 @@
             "Las preguntas de «Prueba el asistente» y de la vista previa de «Configura el tuyo» no se guardan."
           ]
         }
-      }
+      },
+      "ctaTitle": "¿Lo quieres con los documentos de tu empresa?",
+      "ctaBody": "Te mostramos la demo con tu caso en una sesión guiada y te proponemos el plan que encaja.",
+      "ctaButton": "Solicitar demo guiada"
     },
     "chat": {
       "title": "Conversación",
@@ -164,11 +168,12 @@
       "feedbackRemoved": "Valoración quitada de las métricas de esta sesión.",
       "feedbackUpTooltip": "Respuesta útil · solo suma a las métricas de esta sesión (no se envía)",
       "feedbackDownTooltip": "Respuesta a mejorar · solo suma a las métricas de esta sesión (no se envía)",
-      "errorRateLimited": "No pudimos preparar el asistente: el servidor limita cuántos asistentes de ejemplo se pueden crear por hora desde una misma red, y ese límite ya se alcanzó. Intenta de nuevo más tarde o prueba con tu documento.",
+      "errorRateLimited": "No pudimos preparar el asistente: desde tu red se crearon muchos asistentes en la última hora y el servidor pausó la creación de nuevos. Intenta de nuevo más tarde (el límite se renueva cada hora) o prueba con tu documento.",
       "errorChatRateLimited": "Llegaron muchas preguntas seguidas desde tu red y el servidor pidió una pausa. Espera un minuto y vuelve a intentarlo.",
       "errorCapacity": "No pudimos preparar el asistente: la demo llegó a su capacidad de asistentes en este momento. Intenta de nuevo más tarde o prueba con tu documento.",
       "errorUnavailable": "El chatbot no está disponible en este momento. Intenta de nuevo en unos minutos.",
-      "useUpload": "Probar con tu documento"
+      "useUpload": "Probar con tu documento",
+      "privacyNote": "Las preguntas de este modo no se guardan: el servidor las usa solo para buscar y responder."
     },
     "pipeline": {
       "title": "Cómo se respondió",
@@ -208,7 +213,7 @@
         "latencyHint": "Medido en tu navegador: desde que envías la pregunta hasta que llega la respuesta.",
         "tokens": "Tokens",
         "tokensHint": "Tokens de entrada y salida que reportó OpenAI. En modo extractivo no hay tokens.",
-        "cost": "Costo estimado",
+        "cost": "Costo (USD)",
         "costHint": "Estimación del servidor en USD con el precio público del modelo.",
         "notAvailable": "—"
       }
@@ -259,11 +264,11 @@
     },
     "builder": {
       "title": "Configura tu asistente",
-      "subtitle": "Crea tu bot, súbele documentos de texto, pruébalo aquí y llévalo a tu sitio con el código para insertar.",
+      "subtitle": "Crea tu bot, súbele tus documentos, pruébalo aquí y llévalo a tu sitio con el código para insertar.",
       "configTitle": "Configuración",
       "myBots": {
         "label": "Mis bots",
-        "title": "Bots guardados en este navegador",
+        "title": "Tus bots en este navegador",
         "empty": "Aún no tienes bots guardados. Configura uno y toca «Guardar bot».",
         "create": "Nuevo bot",
         "delete": "Eliminar bot",
@@ -275,7 +280,8 @@
         "newReady": "Bot nuevo listo: configúralo y guárdalo.",
         "selected": "Bot cargado: {name}",
         "deleteAction": "Eliminar",
-        "cancel": "Cancelar"
+        "cancel": "Cancelar",
+        "hint": "Se guardan en el servidor. Este navegador tiene la llave para editarlos, por eso desde otro equipo no aparecen aquí."
       },
       "actions": {
         "save": "Guardar bot",
@@ -287,7 +293,11 @@
         "copyLink": "Copiar enlace del chat",
         "linkCopied": "Enlace copiado: {url}",
         "copyFailed": "No pudimos copiar el enlace: {url}",
-        "openChat": "Abrir chat"
+        "openChat": "Abrir chat",
+        "saveRateLimited": "No pudimos guardar el bot: desde tu red se crearon muchos bots en la última hora y el servidor pausó la creación de nuevos. Intenta de nuevo más tarde (el límite se renueva cada hora).",
+        "saveCapacity": "No pudimos guardar el bot: la demo llegó a su capacidad de bots en este momento. Intenta de nuevo más tarde.",
+        "saveUnavailable": "No pudimos guardar el bot: el chatbot no está disponible en este momento. Intenta de nuevo en unos minutos.",
+        "saveNetwork": "No pudimos conectar con el servidor de la demo. Revisa tu conexión e inténtalo de nuevo."
       },
       "sections": {
         "identity": "Identidad",
@@ -326,20 +336,22 @@
       "toneLine": "Tono de las respuestas: {tone}.",
       "knowledge": {
         "drop": "Arrastra archivos o haz clic para elegirlos",
-        "hint": "TXT, MD o CSV · máx. 2 MB por archivo",
-        "pdfHint": "¿PDF o DOCX? Pruébalos en «Prueba con tu documento».",
+        "hint": "TXT, MD, CSV, PDF o DOCX · máx. 2 MB por archivo",
+        "pdfHint": "De los PDF se lee el texto seleccionable (un PDF escaneado no sirve). Las citas muestran el documento y el fragmento; para citar la página, usa «Prueba con tu documento».",
         "uploading": "Subiendo archivos…",
-        "empty": "Aún no hay documentos. Sube archivos de texto o carga los de una empresa de ejemplo.",
+        "empty": "Aún no hay documentos. Sube tus archivos o carga los de una empresa de ejemplo.",
         "remove": "Quitar documento",
         "uploaded": "{count, plural, one {# archivo subido} other {# archivos subidos}}",
         "uploadFailed": "No pudimos subir los archivos",
         "removed": "Documento eliminado",
         "removeFailed": "No pudimos eliminar el documento",
-        "unsupported": "{name}: formato no soportado aquí (usa TXT, MD o CSV)",
+        "unsupported": "{name}: formato no soportado (usa TXT, MD, CSV, PDF o DOCX)",
         "tooBig": "{name}: pesa más de 2 MB",
         "loadSample": "Cargar documentos de ejemplo",
         "loadSampleOf": "Documentos de {company}",
-        "sampleLoaded": "Documentos de ejemplo cargados"
+        "sampleLoaded": "Documentos de ejemplo cargados",
+        "unreadable": "{name}: no pudimos leer su texto. Si es un PDF escaneado, usa uno con texto seleccionable.",
+        "noneReadable": "No pudimos leer el texto de los archivos. Si son PDF escaneados, usa versiones con texto seleccionable."
       },
       "preview": {
         "title": "Vista previa",
@@ -399,7 +411,8 @@
         "notOwner": "Solo el dueño del bot puede ver sus conversaciones: este navegador no tiene su token.",
         "clearAction": "Borrar",
         "cancel": "Cancelar"
-      }
+      },
+      "storageNote": "Tu bot y sus documentos se guardan en el servidor; un bot sin uso durante 12 meses se borra. Lo que le pregunten por «Abrir chat» o por el widget en tu sitio queda en «Conversaciones» y se borra solo a los 30 días; las preguntas de la vista previa no se guardan."
     },
     "embedPage": {
       "loading": "Cargando el asistente…",

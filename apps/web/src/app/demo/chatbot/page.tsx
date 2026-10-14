@@ -294,6 +294,13 @@ export default function ChatbotDemoPage() {
     }
   }, []);
 
+  /** "Ver recorrido": vuelve a mostrar el recorrido desde el primer paso (en "Prueba el asistente"). */
+  const reopenOnboarding = useCallback(() => {
+    if (mode !== 'playground') changeMode('playground');
+    setOnboardingStep(0);
+    setShowOnboarding(true);
+  }, [changeMode, mode]);
+
   const dismissOnboarding = useCallback(() => {
     setShowOnboarding(false);
     try {
@@ -540,7 +547,9 @@ export default function ChatbotDemoPage() {
   return (
     <div
       className={`flex flex-col bg-secondary-50 text-secondary-900 dark:bg-secondary-950 dark:text-secondary-100 ${
-        mode === 'playground' ? 'h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)]' : 'min-h-[calc(100vh-4rem)] md:min-h-[calc(100vh-5rem)]'
+        // Escritorio y tableta: la demo ocupa la pantalla y cada columna tiene su scroll.
+        // Celular: la página fluye y la conversación ocupa casi toda la pantalla (ver abajo).
+        mode === 'playground' ? 'min-h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] md:min-h-0' : 'min-h-[calc(100vh-4rem)] md:min-h-[calc(100vh-5rem)]'
       }`}
     >
       <TopBar
@@ -556,6 +565,7 @@ export default function ChatbotDemoPage() {
         askDisabled={busy}
         device={device}
         onDeviceChange={setDevice}
+        onShowTour={reopenOnboarding}
       />
 
       <ModeToggle mode={mode} onChange={changeMode} />
@@ -566,7 +576,7 @@ export default function ChatbotDemoPage() {
         <UploadDemo onUseSample={() => changeMode('playground')} onQuestion={markUploadQuestion} />
       ) : (
         <>
-          <div className="flex min-h-0 flex-1 overflow-hidden">
+          <div className="flex h-[85svh] min-h-[440px] overflow-hidden md:h-auto md:min-h-0 md:flex-1">
             {showSidebar && isDesktop ? (
               <div className="hidden w-72 shrink-0 flex-col overflow-hidden md:flex">{sidebar}</div>
             ) : null}

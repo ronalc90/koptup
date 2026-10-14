@@ -46,6 +46,12 @@ export interface IChatbotBot extends Document {
   chunksCount: number;
   ownerTokenHash?: string | null;
   kind: ChatbotBotKind;
+  /**
+   * Solo bots de ejemplo COMPARTIDOS (POST /api/chatbot/sample-bots): huella
+   * SHA-256 de su configuración y sus textos. Los visitantes que piden el mismo
+   * contenido reutilizan este bot en lugar de crear uno cada uno.
+   */
+  sampleHash?: string | null;
   /** Última vez que se usó o editó (el job de conservación borra los inactivos). */
   lastActivityAt: Date;
   createdAt: Date;
@@ -79,10 +85,13 @@ const ChatbotBotSchema = new Schema<IChatbotBot>(
     chunksCount: { type: Number, default: 0 },
     ownerTokenHash: { type: String, default: null, index: true },
     kind: { type: String, enum: [...CHATBOT_BOT_KINDS], default: 'builder' },
+    sampleHash: { type: String, maxlength: 64 },
     lastActivityAt: { type: Date, default: Date.now, index: true },
   },
   { timestamps: true, collection: 'chatbot_bots' },
 );
+// Un solo bot compartido por contenido (solo los que tienen huella).
+ChatbotBotSchema.index({ sampleHash: 1 }, { unique: true, partialFilterExpression: { sampleHash: { $type: 'string' } } });
 
 export const ChatbotBot = mongoose.model<IChatbotBot>('ChatbotBot', ChatbotBotSchema);
 

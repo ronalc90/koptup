@@ -108,9 +108,10 @@ export default function MyBotsMenu({ currentBotId, refreshKey, onSelect, onCreat
 
       {open ? (
         <div className="absolute left-0 z-30 mt-2 w-72 max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-secondary-200 bg-white shadow-xl dark:border-secondary-700 dark:bg-secondary-900 sm:left-auto sm:right-0">
-          <p className="border-b border-secondary-100 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-secondary-500 dark:border-secondary-800 dark:text-secondary-400">
-            {t('title')}
-          </p>
+          <div className="border-b border-secondary-100 px-3 py-2 dark:border-secondary-800">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-secondary-500 dark:text-secondary-400">{t('title')}</p>
+            <p className="mt-0.5 text-[10.5px] leading-snug text-secondary-500 dark:text-secondary-400">{t('hint')}</p>
+          </div>
           <div className="max-h-72 overflow-y-auto">
             {bots.length === 0 ? (
               <p className="px-3 py-4 text-center text-[11px] italic text-secondary-500 dark:text-secondary-400">{t('empty')}</p>

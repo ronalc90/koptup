@@ -335,7 +335,7 @@ export interface UploadFilePayload {
 export async function uploadBotDocs(
   botId: string,
   files: UploadFilePayload[],
-): Promise<{ docs: RemoteBotDoc[]; added: RemoteBotDoc[] }> {
+): Promise<{ docs: RemoteBotDoc[]; added: RemoteBotDoc[]; errors?: Array<{ name: string; reason: string }> }> {
   return jsonFetch(`${botUrl(botId)}/docs`, {
     method: 'POST',
     headers: ownerHeaders(botId),
@@ -362,14 +362,36 @@ export async function chatWithBot(
   });
 }
 
-/** Lo anuncia GET /models (`sharedSampleBots: true`); mientras no, no se llama a /sample-bots. */
-let sharedSampleBotsAvailable = false;
+/**
+ * ¿El backend ofrece POST /sample-bots? Lo anuncia GET /models
+ * (`sharedSampleBots: true`). `null` = todavía no se sabe.
+ */
+let sharedSampleBotsAvailable: boolean | null = null;
+let modelsRequest: Promise<RemoteModelsResponse> | null = null;
 
 /** Modelos de OpenAI soportados y si hay clave configurada (`enabled`). */
 export async function listModels(): Promise<RemoteModelsResponse> {
-  const data = await jsonFetch<RemoteModelsResponse>(`${API_BASE}/models`);
-  sharedSampleBotsAvailable = data.sharedSampleBots === true;
-  return data;
+  const request = jsonFetch<RemoteModelsResponse>(`${API_BASE}/models`);
+  modelsRequest = request;
+  try {
+    const data = await request;
+    sharedSampleBotsAvailable = data.sharedSampleBots === true;
+    return data;
+  } catch (err) {
+    if (modelsRequest === request) modelsRequest = null;
+    throw err;
+  }
+}
+
+/** Espera la respuesta de GET /models (o la pide) para saber si hay bots de ejemplo compartidos. */
+async function sharedSampleBotsSupported(): Promise<boolean> {
+  if (sharedSampleBotsAvailable !== null) return sharedSampleBotsAvailable;
+  try {
+    await (modelsRequest ?? listModels());
+  } catch {
+    return false;
+  }
+  return sharedSampleBotsAvailable === true;
 }
 
 export interface SharedSampleBotRequest {
@@ -391,7 +413,7 @@ export interface SharedSampleBotResponse {
  * el suyo. Devuelve null si el backend no ofrece la ruta (se crea uno propio).
  */
 export async function requestSharedSampleBot(payload: SharedSampleBotRequest): Promise<SharedSampleBotResponse | null> {
-  if (!sharedSampleBotsAvailable) return null;
+  if (!(await sharedSampleBotsSupported())) return null;
   try {
     const res = await jsonFetch<SharedSampleBotResponse>(`${API_BASE}/sample-bots`, {
       method: 'POST',

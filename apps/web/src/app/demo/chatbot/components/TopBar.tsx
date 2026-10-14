@@ -14,6 +14,7 @@ import {
   ArrowPathIcon,
   NoSymbolIcon,
   BeakerIcon,
+  QuestionMarkCircleIcon,
 } from '@heroicons/react/24/outline';
 import { FALLBACK_MODELS } from './data';
 import type { SampleCompany, SampleCompanyKey } from './sampleKnowledge';
@@ -39,6 +40,8 @@ interface TopBarProps {
   askDisabled: boolean;
   device: DeviceKind;
   onDeviceChange: (d: DeviceKind) => void;
+  /** Vuelve a abrir el recorrido de bienvenida. */
+  onShowTour: () => void;
 }
 
 const fieldClass =
@@ -65,9 +68,13 @@ export default function TopBar({
   askDisabled,
   device,
   onDeviceChange,
+  onShowTour,
 }: TopBarProps) {
   const t = useTranslations('demoChatbot');
 
+  // Mientras se consulta el servidor (o si no responde) se muestran los tres
+  // modelos sin marcas: "requiere clave de API" solo cuando el servidor dice
+  // que no tiene clave (modo extractivo).
   const modelOptions: RemoteModelMeta[] =
     models.length > 0
       ? models
@@ -75,10 +82,12 @@ export default function TopBar({
           id: m.id,
           name: m.name,
           provider: 'openai' as const,
-          enabled: false,
+          enabled: true,
+          recommended: m.id === 'gpt-4o-mini',
           costInputUSDper1M: 0,
           costOutputUSDper1M: 0,
         }));
+  const noKey = aiStatus === 'extractive';
 
   const status = (() => {
     switch (aiStatus) {
@@ -144,6 +153,14 @@ export default function TopBar({
                 {t('sampleDataBadge')}
               </span>
             </Tooltip>
+            <button
+              type="button"
+              onClick={onShowTour}
+              className="inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold text-primary-700 transition hover:bg-primary-50 dark:text-primary-300 dark:hover:bg-primary-950/40"
+            >
+              <QuestionMarkCircleIcon className="h-3.5 w-3.5" aria-hidden="true" />
+              {t('topBar.showTour')}
+            </button>
           </div>
           <p className="mt-0.5 hidden max-w-2xl text-[11px] leading-snug text-secondary-500 dark:text-secondary-400 sm:block">
             {t('pageSubtitle')}
@@ -198,10 +215,10 @@ export default function TopBar({
                   aria-label={t('topBar.model')}
                 >
                   {modelOptions.map((m) => (
-                    <option key={m.id} value={m.id} disabled={!m.enabled}>
+                    <option key={m.id} value={m.id} disabled={noKey && !m.enabled}>
                       {m.name}
                       {m.recommended ? ` (${t('models.recommended')})` : ''}
-                      {!m.enabled ? ` · ${t('models.providerRequires')}` : ''}
+                      {noKey && !m.enabled ? ` · ${t('models.providerRequires')}` : ''}
                     </option>
                   ))}
                 </select>

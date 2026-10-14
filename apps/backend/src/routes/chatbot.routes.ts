@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import path from 'path';
 import crypto from 'crypto';
@@ -15,6 +15,7 @@ import {
 import {
   addBotDocs,
   appendTurns,
+  claimSampleHash,
   clearTurns,
   countBots,
   countTurnsByBot,
@@ -22,6 +23,7 @@ import {
   deleteBotCascade,
   exampleBotIds,
   findBot,
+  findBotBySampleHash,
   getBotChunks,
   listTurns,
   listVisibleBots,
@@ -99,6 +101,7 @@ router.delete('/documents/:sessionId', clearDocuments);
 //   DELETE /api/chatbot/bots/:botId/docs/:id  → eliminar doc + chunks    [dueño]
 //   POST   /api/chatbot/bots/:botId/urls      → indexar páginas web      [dueño]
 //   POST   /api/chatbot/bots/:botId/chat      → preguntar (público, bot existente)
+//   POST   /api/chatbot/sample-bots           → bot de ejemplo compartido (público)
 //   GET    /api/chatbot/bots/:botId/conversations → histórico            [dueño]
 //   DELETE /api/chatbot/bots/:botId/conversations → limpiar histórico    [dueño]
 //
@@ -173,6 +176,7 @@ function requireStorage(_req: Request, res: Response, next: () => void): void {
   sendError(res, 503, 'storage_unavailable', 'El chatbot no está disponible en este momento. Intenta de nuevo en unos minutos.');
 }
 router.use('/bots', requireStorage);
+router.use('/sample-bots', requireStorage);
 
 // --- Propiedad ---------------------------------------------------------------
 
@@ -680,8 +684,175 @@ router.get('/models', (_req: Request, res: Response) => {
       enabled: hasOpenAI,
     })),
     activeProvider: hasOpenAI ? 'openai' : null,
+    // POST /sample-bots existe: "Prueba el asistente" reutiliza un bot por empresa de ejemplo.
+    sharedSampleBots: true,
   });
 });
+
+// --- Bots de ejemplo compartidos -------------------------------------------
+
+/**
+ * Límites de POST /sample-bots: solo textos cortos (los documentos ficticios
+ * de las demos), nunca PDF ni archivos grandes.
+ */
+const SAMPLE_BOT_LIMITS = {
+  maxFiles: 5,
+  maxFileBytes: 256 * 1024,
+  mimes: new Set(['text/plain', 'text/markdown', 'text/csv']),
+  sampleKey: /^[A-Za-z0-9:._-]{1,64}$/,
+} as const;
+
+interface SampleBotRequest {
+  hash: string;
+  patch: ConfigPatch;
+  files: Array<{ name: string; mime: string; buffer: Buffer }>;
+}
+
+/** Valida el cuerpo y calcula la huella del contenido (config + textos). */
+function parseSampleBotRequest(body: unknown): SampleBotRequest | { code: string; message: string; field?: string } {
+  const b = (body && typeof body === 'object' ? body : {}) as Record<string, unknown>;
+  const sampleKey = typeof b.sampleKey === 'string' ? b.sampleKey : '';
+  if (!SAMPLE_BOT_LIMITS.sampleKey.test(sampleKey)) return { code: 'invalid_field', message: FIELD_ERROR_MESSAGES.invalid_field, field: 'sampleKey' };
+  const parsed = parseConfigPatch(b.config);
+  if ('error' in parsed) return { code: parsed.error, message: FIELD_ERROR_MESSAGES[parsed.error] ?? 'Revisa los datos del bot.', field: parsed.field };
+  if (!parsed.patch.name?.trim()) return { code: 'invalid_field', message: FIELD_ERROR_MESSAGES.invalid_field, field: 'name' };
+  const incoming = Array.isArray(b.files) ? b.files : [];
+  if (incoming.length === 0 || incoming.length > SAMPLE_BOT_LIMITS.maxFiles) {
+    return { code: 'invalid_field', message: `Envía entre 1 y ${SAMPLE_BOT_LIMITS.maxFiles} documentos de texto.`, field: 'files' };
+  }
+  const files: SampleBotRequest['files'] = [];
+  for (const f of incoming) {
+    const name = path.basename(String((f as any)?.name || '')).slice(0, 200);
+    const mime = String((f as any)?.mime || '').toLowerCase();
+    const b64 = typeof (f as any)?.contentBase64 === 'string' ? (f as any).contentBase64 : '';
+    if (!name || !SAMPLE_BOT_LIMITS.mimes.has(mime) || !b64 || base64DecodedBytes(b64) > SAMPLE_BOT_LIMITS.maxFileBytes) {
+      return { code: 'invalid_field', message: 'Los bots de ejemplo solo admiten textos cortos (TXT, MD o CSV de hasta 256 KB).', field: 'files' };
+    }
+    const buffer = Buffer.from(b64, 'base64');
+    if (buffer.length === 0 || buffer.length > SAMPLE_BOT_LIMITS.maxFileBytes) {
+      return { code: 'invalid_field', message: 'Los bots de ejemplo solo admiten textos cortos (TXT, MD o CSV de hasta 256 KB).', field: 'files' };
+    }
+    files.push({ name, mime, buffer });
+  }
+  const hash = crypto
+    .createHash('sha256')
+    .update(
+      JSON.stringify({
+        v: 1,
+        sampleKey,
+        config: parsed.patch,
+        files: files.map((f) => [f.name, f.mime, crypto.createHash('sha256').update(f.buffer).digest('hex')]),
+      }),
+    )
+    .digest('hex');
+  return { hash, patch: parsed.patch, files };
+}
+
+function sharedSampleReply(bot: BotConfig) {
+  return { botId: bot.botId, docs: [...bot.docs], docsCount: bot.docs.length, shared: true as const };
+}
+
+/**
+ * POST /sample-bots — bot de ejemplo COMPARTIDO de "Prueba el asistente".
+ * Recibe la configuración y los textos ficticios de una empresa de ejemplo y
+ * devuelve el bot del servidor que tiene EXACTAMENTE ese contenido (la clave
+ * es la huella SHA-256 de config + textos, así nadie puede cambiar el bot que
+ * ven los demás). Si no existe, lo crea e indexa una sola vez (cuenta en el
+ * límite de creación de bots); los siguientes visitantes lo reutilizan sin
+ * crear nada. El bot no tiene dueño (nadie lo edita ni lo borra desde la web),
+ * es `kind: "sample"` (sus conversaciones no se guardan) y el job de
+ * conservación lo borra tras 30 días sin uso; se vuelve a crear solo.
+ */
+router.post(
+  '/sample-bots',
+  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const parsed = parseSampleBotRequest(req.body);
+    if (!('hash' in parsed)) {
+      sendError(res, 400, parsed.code, parsed.message, parsed.field ? { field: parsed.field } : undefined);
+      return;
+    }
+    const existing = await findBotBySampleHash(parsed.hash);
+    if (existing && existing.docs.length === parsed.files.length) {
+      await touchBot(existing);
+      res.json(sharedSampleReply(existing));
+      return;
+    }
+    res.locals.sampleBot = parsed;
+    next();
+  }),
+  createBotLimiter,
+  asyncHandler(async (_req: Request, res: Response) => {
+    const input = res.locals.sampleBot as SampleBotRequest;
+    if ((await countBots()) >= maxBots()) {
+      sendError(res, 503, 'capacity', 'La demo alcanzó su capacidad de bots. Intenta más tarde.');
+      return;
+    }
+    const bot = await createStoredBot({
+      botId: newBotId(),
+      name: input.patch.name || 'Demo Bot',
+      color: input.patch.color || '#4F46E5',
+      position: input.patch.position || 'br',
+      avatar: input.patch.avatar || '💬',
+      welcome: input.patch.welcome || '¡Hola! ¿En qué puedo ayudarte hoy?',
+      systemPrompt: input.patch.systemPrompt || '',
+      tone: input.patch.tone || 'friendly',
+      languages: input.patch.languages ?? ['es'],
+      docs: [],
+      ownerTokenHash: null,
+      kind: 'sample',
+    });
+
+    const added: Array<{ meta: BotDocMeta; chunks: BotChunk[] }> = [];
+    for (const f of input.files) {
+      let text = '';
+      try {
+        const extracted = await extractTextFromBuffer(f.buffer, { name: f.name, mime: f.mime });
+        // Solo texto plano: un PDF o DOCX disfrazado de texto se rechaza.
+        text = extracted.kind === 'text' ? extracted.text.slice(0, BOT_LIMITS.maxTextCharsPerDoc) : '';
+      } catch {
+        text = '';
+      }
+      if (!text.trim()) {
+        await deleteBotCascade(bot.botId);
+        sendError(res, 422, 'no_valid_files', 'No pudimos leer uno de los documentos de ejemplo.', { name: f.name });
+        return;
+      }
+      const id = 'doc_' + crypto.randomBytes(8).toString('hex');
+      added.push({
+        meta: {
+          id,
+          name: f.name,
+          size: f.buffer.length,
+          mime: f.mime,
+          hash: crypto.createHash('sha256').update(f.buffer).digest('hex').slice(0, 16),
+          uploadedAt: new Date().toISOString(),
+        },
+        chunks: chunkText(text, { docId: id, docName: f.name }),
+      });
+    }
+    const indexed = await addBotDocs(bot.botId, added);
+    if (!indexed) {
+      sendError(res, 503, 'storage_unavailable', 'El chatbot no está disponible en este momento. Intenta de nuevo en unos minutos.');
+      return;
+    }
+
+    // Una vez indexado se publica. Si otra petición publicó el mismo contenido
+    // primero (o había uno incompleto), queda uno solo.
+    const stale = await findBotBySampleHash(input.hash);
+    if (stale && stale.docs.length !== input.files.length) await deleteBotCascade(stale.botId);
+    if (!(await claimSampleHash(bot.botId, input.hash))) {
+      await deleteBotCascade(bot.botId);
+      const winner = await findBotBySampleHash(input.hash);
+      if (!winner) {
+        sendError(res, 503, 'storage_unavailable', 'El chatbot no está disponible en este momento. Intenta de nuevo en unos minutos.');
+        return;
+      }
+      res.json(sharedSampleReply(winner));
+      return;
+    }
+    res.status(201).json(sharedSampleReply(indexed));
+  }),
+);
 
 /**
  * Respuesta cuando los documentos no contienen la información. Es la frase

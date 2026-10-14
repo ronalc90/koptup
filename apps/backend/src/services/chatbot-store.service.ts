@@ -79,6 +79,8 @@ export interface StoredBot {
   chunksCount: number;
   ownerTokenHash?: string | null;
   kind: ChatbotBotKind;
+  /** Huella del contenido de un bot de ejemplo compartido (POST /sample-bots). */
+  sampleHash?: string | null;
   lastActivityAt: Date;
   createdAt: string;
   updatedAt: string;
@@ -114,6 +116,7 @@ function toStoredBot(doc: any): StoredBot {
     chunksCount: doc.chunksCount ?? 0,
     ownerTokenHash: doc.ownerTokenHash ?? null,
     kind: doc.kind === 'sample' ? 'sample' : 'builder',
+    sampleHash: typeof doc.sampleHash === 'string' ? doc.sampleHash : null,
     lastActivityAt: doc.lastActivityAt instanceof Date ? doc.lastActivityAt : new Date(doc.lastActivityAt ?? Date.now()),
     createdAt: toIso(doc.createdAt),
     updatedAt: toIso(doc.updatedAt),
@@ -281,6 +284,27 @@ export async function createStoredBot(input: Omit<StoredBot, 'createdAt' | 'upda
   await ensureChatbotMigrated();
   const doc = await ChatbotBot.create({ ...input, chunksCount: 0, lastActivityAt: new Date() });
   return toStoredBot(doc.toObject());
+}
+
+/** Bot de ejemplo compartido con esa huella de contenido (POST /sample-bots). */
+export async function findBotBySampleHash(sampleHash: string): Promise<StoredBot | null> {
+  await ensureChatbotMigrated();
+  const doc = await ChatbotBot.findOne({ sampleHash }).lean();
+  return doc ? toStoredBot(doc) : null;
+}
+
+/**
+ * Publica un bot de ejemplo ya indexado como el compartido de esa huella.
+ * Devuelve false si otra petición publicó uno primero (índice único).
+ */
+export async function claimSampleHash(botId: string, sampleHash: string): Promise<boolean> {
+  try {
+    const res = await ChatbotBot.updateOne({ botId }, { $set: { sampleHash } }, { timestamps: false });
+    return res.matchedCount === 1;
+  } catch (err) {
+    if ((err as { code?: number })?.code === 11000) return false;
+    throw err;
+  }
 }
 
 export async function updateBotConfig(botId: string, patch: BotConfigPatch): Promise<StoredBot | null> {

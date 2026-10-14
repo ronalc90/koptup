@@ -388,7 +388,7 @@ export default function DocumentChat({ doc, limits, onReset, onUnavailable, onQu
               <p className="mt-0.5 text-xs">{t('chat.limitReachedBody')}</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <Link
-                  href="/contact"
+                  href="/solicitar-demo?demos=chatbot"
                   className="inline-flex items-center gap-1.5 rounded-md bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-primary-700"
                 >
                   {t('cta.schedule')}

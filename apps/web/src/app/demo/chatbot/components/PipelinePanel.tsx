@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   CheckCircleIcon,
   ClockIcon,
@@ -15,7 +15,7 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import type { ComponentType, ReactNode, SVGProps } from 'react';
-import type { AnswerMeta, SourceChunk } from './data';
+import { formatDecimal, formatInteger, formatUsd, type AnswerMeta, type SourceChunk } from './data';
 import Tooltip from './ui/Tooltip';
 
 interface PipelinePanelProps {
@@ -51,6 +51,7 @@ interface StepView {
  */
 export default function PipelinePanel({ running, meta, sources, children, onClose, closeLabel, titleId }: PipelinePanelProps) {
   const t = useTranslations('demoChatbot.pipeline');
+  const locale = useLocale() === 'en' ? 'en' : 'es';
 
   const steps: StepView[] = [];
   if (meta) {
@@ -67,7 +68,7 @@ export default function PipelinePanel({ running, meta, sources, children, onClos
       title: t('steps.search.title'),
       detail:
         sources.length > 0
-          ? t('steps.search.detail', { count: sources.length, score: bestScore.toFixed(3) })
+          ? t('steps.search.detail', { count: sources.length, score: formatDecimal(bestScore, 3, locale) })
           : t('steps.search.none'),
       state: sources.length > 0 ? 'done' : 'warn',
       Icon: MagnifyingGlassIcon,
@@ -84,7 +85,7 @@ export default function PipelinePanel({ running, meta, sources, children, onClos
       key: 'model',
       title: t('steps.model.title'),
       detail: usedModel
-        ? t('steps.model.detail', { model: meta.model, latency: meta.backendLatencyMs ?? 0 })
+        ? t('steps.model.detail', { model: meta.model, latency: formatInteger(meta.backendLatencyMs ?? 0, locale) })
         : meta.providerError
           ? t('steps.model.error')
           : t('steps.model.extractive'),
@@ -174,7 +175,7 @@ export default function PipelinePanel({ running, meta, sources, children, onClos
               {t('totals.latency')}
             </div>
             <div className="font-mono text-sm font-bold text-secondary-900 dark:text-white">
-              {meta && !running ? `${meta.clientLatencyMs} ms` : t('totals.notAvailable')}
+              {meta && !running ? `${formatInteger(meta.clientLatencyMs, locale)} ms` : t('totals.notAvailable')}
             </div>
           </div>
         </Tooltip>
@@ -185,7 +186,7 @@ export default function PipelinePanel({ running, meta, sources, children, onClos
               {t('totals.tokens')}
             </div>
             <div className="font-mono text-sm font-bold text-secondary-900 dark:text-white">
-              {typeof tokens === 'number' && !running ? tokens : t('totals.notAvailable')}
+              {typeof tokens === 'number' && !running ? formatInteger(tokens, locale) : t('totals.notAvailable')}
             </div>
           </div>
         </Tooltip>
@@ -196,7 +197,7 @@ export default function PipelinePanel({ running, meta, sources, children, onClos
               {t('totals.cost')}
             </div>
             <div className="font-mono text-sm font-bold text-secondary-900 dark:text-white">
-              {typeof cost === 'number' && !running ? `$${cost.toFixed(5)}` : t('totals.notAvailable')}
+              {typeof cost === 'number' && !running ? formatUsd(cost, locale) : t('totals.notAvailable')}
             </div>
           </div>
         </Tooltip>

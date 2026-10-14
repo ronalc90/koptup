@@ -6,7 +6,7 @@
  * Todo es real:
  *  - Guardar crea o actualiza el bot en el backend (`POST`/`PATCH /api/chatbot/bots`),
  *    con el token de dueño si el backend lo entrega (ver `api.ts`).
- *  - Los documentos de texto se suben a `POST /api/chatbot/bots/:id/docs` y se
+ *  - Los documentos (TXT, MD, CSV, PDF o DOCX) se suben a `POST /api/chatbot/bots/:id/docs` y se
  *    pueden borrar.
  *  - La vista previa usa el widget real (`/widget.js` + `/embed/chatbot/<id>`).
  *  - El código para insertar solo ofrece lo que funciona (script e iframe).
@@ -40,17 +40,33 @@ import {
   type RemoteBotDoc,
 } from './api';
 import {
+  DOC_EXTENSIONS,
+  MAX_DOC_FILE_BYTES,
   MAX_FILES_PER_UPLOAD,
-  MAX_TEXT_FILE_BYTES,
-  TEXT_EXTENSIONS,
   composeSystemPrompt,
   fromRemote,
   sameConfig,
   type BuilderWidgetConfig,
 } from './widgetConfig';
 import { getSampleCompanies, getSampleCompany, type SampleCompanyKey, type SampleLocale } from '../sampleKnowledge';
+import { kbErrorReason, type KbErrorReason } from '../errors';
 
-const MIME_BY_EXT: Record<string, string> = { '.txt': 'text/plain', '.md': 'text/markdown', '.csv': 'text/csv' };
+/** Mensaje de "Guardar bot" según la causa real (límite de creación, capacidad, servidor o red). */
+const SAVE_ERROR_KEY: Record<KbErrorReason, string> = {
+  rateLimited: 'actions.saveRateLimited',
+  capacity: 'actions.saveCapacity',
+  unavailable: 'actions.saveUnavailable',
+  network: 'actions.saveNetwork',
+  generic: 'actions.saveFailed',
+};
+
+const MIME_BY_EXT: Record<string, string> = {
+  '.txt': 'text/plain',
+  '.md': 'text/markdown',
+  '.csv': 'text/csv',
+  '.pdf': 'application/pdf',
+  '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+};
 
 function extOf(name: string): string {
   const i = name.lastIndexOf('.');
@@ -178,7 +194,7 @@ export default function BuilderMode() {
       return remote.botId;
     } catch (err) {
       if (err instanceof BotApiError && (err.status === 401 || err.status === 403)) toast.error(t('actions.notOwner'));
-      else toast.error(t('actions.saveFailed'));
+      else toast.error(t(SAVE_ERROR_KEY[kbErrorReason(err)]), { duration: 6000 });
       return null;
     } finally {
       setSaving(false);
@@ -189,8 +205,8 @@ export default function BuilderMode() {
     async (files: File[]) => {
       const valid: File[] = [];
       for (const f of files.slice(0, MAX_FILES_PER_UPLOAD)) {
-        if (!TEXT_EXTENSIONS.includes(extOf(f.name))) toast.error(t('knowledge.unsupported', { name: f.name }));
-        else if (f.size > MAX_TEXT_FILE_BYTES) toast.error(t('knowledge.tooBig', { name: f.name }));
+        if (!DOC_EXTENSIONS.includes(extOf(f.name))) toast.error(t('knowledge.unsupported', { name: f.name }));
+        else if (f.size > MAX_DOC_FILE_BYTES) toast.error(t('knowledge.tooBig', { name: f.name }));
         else valid.push(f);
       }
       if (valid.length === 0) return;
@@ -208,9 +224,12 @@ export default function BuilderMode() {
         );
         const result = await uploadBotDocs(id, payload);
         setDocs(result.docs);
-        toast.success(t('knowledge.uploaded', { count: valid.length }));
+        // El servidor indexa los que pudo leer y dice cuáles no (p. ej. un PDF escaneado).
+        for (const e of result.errors ?? []) toast.error(t('knowledge.unreadable', { name: e.name }));
+        if (result.added.length > 0) toast.success(t('knowledge.uploaded', { count: result.added.length }));
       } catch (err) {
         if (err instanceof BotApiError && (err.status === 401 || err.status === 403)) toast.error(t('actions.notOwner'));
+        else if (err instanceof BotApiError && err.code === 'no_valid_files') toast.error(t('knowledge.noneReadable'));
         else toast.error(t('knowledge.uploadFailed'));
       } finally {
         setUploading(false);
@@ -300,6 +319,7 @@ export default function BuilderMode() {
         <div className="min-w-0">
           <h2 className="text-base font-bold text-secondary-900 dark:text-white">{t('title')}</h2>
           <p className="text-xs text-secondary-500 dark:text-secondary-400">{t('subtitle')}</p>
+          <p className="mt-1 max-w-3xl text-[11px] leading-snug text-secondary-500 dark:text-secondary-400">{t('storageNote')}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <MyBotsMenu

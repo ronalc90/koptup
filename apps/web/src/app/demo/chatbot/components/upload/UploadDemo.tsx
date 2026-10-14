@@ -129,7 +129,9 @@ export default function UploadDemo({ onUseSample, onQuestion }: UploadDemoProps)
 
   if (view.kind === 'chat') {
     return (
-      <div className="flex h-[80vh] min-h-[420px] flex-col overflow-hidden md:h-auto md:min-h-0 md:flex-1">
+      // Altura acotada (celular y escritorio): el contador y la caja de preguntas
+      // quedan siempre a la vista y solo se desplaza la conversación.
+      <div className="flex h-[80svh] min-h-[420px] flex-col overflow-hidden md:h-[calc(100vh-17rem)] md:min-h-[480px]">
         <DocumentChat
           key={view.doc.docId}
           doc={view.doc}
@@ -208,7 +210,7 @@ export default function UploadDemo({ onUseSample, onQuestion }: UploadDemoProps)
   );
 }
 
-/** Demo apagada o sin presupuesto: aviso + "Agenda una demo con nosotros" → /contact. */
+/** Demo apagada o sin presupuesto: aviso + "Agenda una demo con nosotros" → /solicitar-demo (demo guiada). */
 function UnavailableCard({ reason, onUseSample }: { reason: DemoDisabledReason; onUseSample: () => void }) {
   const t = useTranslations('demoChatbot.uploadDemo');
   const budget = reason === 'budget_exhausted';
@@ -227,7 +229,7 @@ function UnavailableCard({ reason, onUseSample }: { reason: DemoDisabledReason; 
       </div>
       <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         <Link
-          href="/contact"
+          href="/solicitar-demo?demos=chatbot"
           className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700"
         >
           <CalendarDaysIcon className="h-4 w-4" aria-hidden="true" />

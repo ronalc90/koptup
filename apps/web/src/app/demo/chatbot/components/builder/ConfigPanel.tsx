@@ -11,7 +11,7 @@ import { ArrowUpTrayIcon, DocumentIcon, TrashIcon, SparklesIcon } from '@heroico
 
 import type { RemoteBotDoc } from './api';
 import type { BuilderToneKey, BuilderWidgetConfig, WidgetCornerPosition } from './widgetConfig';
-import { AVATAR_CHOICES, POSITIONS, TONE_CHOICES, TEXT_EXTENSIONS, formatBytes } from './widgetConfig';
+import { AVATAR_CHOICES, POSITIONS, TONE_CHOICES, DOC_EXTENSIONS, formatBytes } from './widgetConfig';
 import type { SampleCompany, SampleCompanyKey } from '../sampleKnowledge';
 
 interface ConfigPanelProps {
@@ -225,7 +225,7 @@ export default function ConfigPanel({
             ref={fileInputRef}
             type="file"
             multiple
-            accept={TEXT_EXTENSIONS.join(',')}
+            accept={DOC_EXTENSIONS.join(',')}
             className="hidden"
             onChange={(e) => {
               if (e.target.files && e.target.files.length > 0) {

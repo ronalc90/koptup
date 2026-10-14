@@ -38,7 +38,7 @@ export function demoErrorText(t: UploadDemoTranslator, code: DemoErrorCode, limi
   });
 }
 
-/** Errores que significan "la demo no está disponible": se muestra la tarjeta con el CTA a /contact. */
+/** Errores que significan "la demo no está disponible": se muestra la tarjeta con el CTA a la demo guiada. */
 export function unavailableReasonFor(code: DemoErrorCode): 'budget_exhausted' | 'disabled' | null {
   if (code === 'budget_exhausted') return 'budget_exhausted';
   if (code === 'demo_disabled') return 'disabled';

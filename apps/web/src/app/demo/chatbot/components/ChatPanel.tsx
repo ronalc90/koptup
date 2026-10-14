@@ -388,6 +388,7 @@ export default function ChatPanel({
             <span className="hidden sm:inline">{t('chat.send')}</span>
           </button>
         </div>
+        <p className="mt-1.5 text-[10.5px] leading-snug text-secondary-500 dark:text-secondary-400">{t('chat.privacyNote')}</p>
       </footer>
     </section>
   );
