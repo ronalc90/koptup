@@ -124,6 +124,7 @@ stateDiagram-v2
 | **Admin, manager, sales** | Los roles del **equipo**. El admin puede todo; manager y sales tienen permisos parciales. Los tres ven todas las demos | [Roles y permisos](Doc-10-Roles-y-Permisos.md) |
 | **API** | Las direcciones `/api/...` del backend que usa la web. Todas exigen la autorización que corresponde | [API](Doc-08-API.md) |
 | **Autorización de datos (Ley 1581)** | Casilla obligatoria con la que la persona permite tratar sus datos personales. En «Solicitar demo» se guarda con la fecha y la versión de la política | [SEO, analítica y legal › 4](Doc-12-SEO-Analitica-y-Legal.md#4-legal) |
+| **Aviso al dueño** | Correo y WhatsApp que te llegan cada vez que alguien escribe desde el sitio (formulario de contacto, «Solicitar demo» o «Prueba con tu documento»). Cada contacto guarda cómo le fue a cada canal: Enviado, Entregado, Leído, Falló, Pendiente o No configurado | [Manual del administrador › 8.1](Doc-06-Manual-del-Administrador.md#81-el-aviso-que-te-llegó-de-cada-contacto) |
 | **Backend** | El servidor (Express, en Railway) que guarda los datos, decide los permisos y llama a la IA | [Arquitectura](Doc-01-Arquitectura.md) |
 | **Banner de cookies** | Aviso de la primera visita para aceptar o rechazar cookies de analítica y marketing. Solo aparece si hay alguna etiqueta de medición configurada | [SEO, analítica y legal › 3](Doc-12-SEO-Analitica-y-Legal.md#3-analítica) |
 | **Bitácora** | Registro de las acciones del equipo (aprobar, rechazar, extender, cambiar un rol o el catálogo). Se consulta por la API; no tiene pantalla | [Roles y permisos](Doc-10-Roles-y-Permisos.md) |
@@ -147,6 +148,7 @@ stateDiagram-v2
 | **Indexar** | Dos sentidos: en el RAG, preparar un documento (partirlo y armar el índice de búsqueda); en SEO, que Google incluya una página en sus resultados | — |
 | **JSON-LD** | Datos estructurados ocultos en la página que le dicen a Google quién es KopTup, qué vende y cuáles son sus preguntas frecuentes | [SEO, analítica y legal › 2.5](Doc-12-SEO-Analitica-y-Legal.md#25-datos-estructurados-json-ld) |
 | **Job de vencimiento** | Tarea automática del backend que cada hora marca como vencidos los accesos y envía el recordatorio 3 días antes | [Flujos de administración › 6](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#6-job-de-vencimiento-y-correos) |
+| **Latido (prueba mensual)** | Aviso de prueba que el servidor te envía solo, cada 30 días, por correo y por WhatsApp, para confirmar que los dos canales siguen funcionando aunque no lleguen contactos y para que Meta no archive la plantilla | [Operación y despliegue › 4.5](Doc-11-Operacion-y-Despliegue.md#45-configurar-los-avisos-al-dueño-paso-a-paso) |
 | **Lead** | Registro de un posible cliente. Llega del formulario de contacto, de «Solicitar demo» o de «Prueba con tu documento», y se ve en Admin › Contactos | [Manual del administrador › 8](Doc-06-Manual-del-Administrador.md#8-contactos) |
 | **Middleware** | Filtro de la web que corre antes de mostrar una página: revisa la sesión, el rol y el acceso a las demos | [Flujos técnicos › 1](Doc-14-3-Flujos-Tecnicos.md#1-filtro-de-la-web-middleware-de-next) |
 | **Mock de OpenAI** | Servidor de prueba que imita a OpenAI sin costo. Lo usan CI y el entorno local; responde «Respuesta simulada (mock de OpenAI)…» | [Operación y despliegue › 5](Doc-11-Operacion-y-Despliegue.md#5-levantar-todo-en-local-paso-a-paso) |
@@ -154,22 +156,26 @@ stateDiagram-v2
 | **Modo de demo** | Quién puede abrir una demo: **Abierta** (`publico`, cualquiera), **Con solicitud** o «Requiere acceso» (`solicitud`, con un acceso vigente) y **Solo por invitación** (`privado`, acceso que solo da un admin). El equipo ve todas | [Roles y permisos › 5](Doc-10-Roles-y-Permisos.md#5-modos-de-acceso-de-las-demos) |
 | **Modo extractivo** | Cuando no hay IA disponible (sin clave o sin presupuesto), el chatbot responde con los fragmentos encontrados, sin redactar, y lo dice | [Operación y despliegue › 9.6](Doc-11-Operacion-y-Despliegue.md#96-se-agotó-el-presupuesto-de-ia) |
 | **MongoDB** | La base de datos donde se guardan cuentas, solicitudes, accesos, leads y el catálogo | [Modelos de datos](Doc-09-Modelos-de-Datos.md) |
+| **Plantilla de WhatsApp** | Mensaje con texto fijo y espacios para datos (`{{1}}`, `{{2}}`) que Meta revisa y aprueba. Es la única forma de escribirle a alguien que no te ha escrito en las últimas 24 horas. La de KopTup se llama `koptup_aviso` | [Operación y despliegue › 4.5](Doc-11-Operacion-y-Despliegue.md#45-configurar-los-avisos-al-dueño-paso-a-paso) |
 | **Presupuesto de IA** | Tope mensual en dólares de lo que puede gastar en OpenAI cada función (chatbot y «Prueba con tu documento» 50; LinkedIn y gestor de contenido 20). Al llegar, la función se apaga o pasa a modo extractivo hasta el mes siguiente | [Operación y despliegue › 9.6](Doc-11-Operacion-y-Despliegue.md#96-se-agotó-el-presupuesto-de-ia) |
 | **Prospecto** | Rol `prospect`: persona a la que el equipo le aprobó al menos una demo y activó su cuenta. Solo ve Mis demos y su perfil | [Flujos del prospecto y cliente](Doc-05-Flujos-del-Prospecto-y-Cliente.md) |
 | **«Prueba con tu documento»** | Modo de la demo RAG en el que el visitante sube su propio PDF, DOCX o TXT (hasta 5 MB y 30 páginas) y hace hasta 10 preguntas. El documento se borra a la hora | [Flujos del visitante › Flujo 1](Doc-04-Flujos-del-Visitante.md#2-flujo-1-embudo-rag-de-la-demo-al-plan) |
 | **RAG** | *Retrieval-Augmented Generation*, generación con recuperación: antes de responder, la IA **busca** en los documentos de la empresa y responde **solo** con lo que encontró, citando la fuente. Si no lo encuentra, lo dice | [Reposicionamiento RAG](13-Reposicionamiento-RAG.md) |
 | **Railway** | Plataforma donde corre el backend | [Operación y despliegue › 2](Doc-11-Operacion-y-Despliegue.md#2-dónde-corre-cada-pieza) |
 | **Redis** | Almacén rápido que guarda las sesiones de renovación, los cupos y el gasto de IA del mes | [Arquitectura](Doc-01-Arquitectura.md) |
+| **Resend** | Servicio con el que el backend envía los correos por su API (HTTPS). Se usa porque Railway, en su plan Hobby, bloquea el SMTP. El dominio `koptup.com` está verificado allí | [Operación y despliegue › 4.5](Doc-11-Operacion-y-Despliegue.md#45-configurar-los-avisos-al-dueño-paso-a-paso) |
 | **Rol** | El tipo de cuenta: `user`, `client`, `prospect`, `developer`, `sales`, `manager` o `admin`. Decide qué páginas y acciones tiene cada persona | [Roles y permisos](Doc-10-Roles-y-Permisos.md) |
 | **Runbook** | Procedimiento paso a paso para resolver una falla | [Operación y despliegue › 9](Doc-11-Operacion-y-Despliegue.md#9-runbooks-qué-hacer-cuando-algo-falla) |
 | **Semilla** | Datos iniciales que el sistema crea solo; por ejemplo, las 28 demos del catálogo al arrancar (sin pisar lo que cambió el admin) | [Flujos técnicos › 7.2](Doc-14-3-Flujos-Tecnicos.md#72-secuencia-de-arranque) |
 | **Sesión** | Estar con la sesión iniciada. Usa dos tokens: uno de acceso (15 minutos) y otro de renovación (7 días) | [Flujos del prospecto y cliente › 3](Doc-05-Flujos-del-Prospecto-y-Cliente.md#3-iniciar-sesión-login) |
 | **Sitemap** | Lista de páginas que el sitio le entrega a Google (`/sitemap.xml`: las páginas públicas y las demos abiertas del catálogo; hoy 34 direcciones) | [SEO, analítica y legal › 2.3](Doc-12-SEO-Analitica-y-Legal.md#23-sitemap-y-robots) |
-| **SMTP** | El servidor de correo con el que el backend envía los emails. Sin él no sale ningún correo y el panel muestra el enlace para copiarlo | [Operación y despliegue › 9.7](Doc-11-Operacion-y-Despliegue.md#97-el-correo-no-sale) |
+| **SMTP** | La forma clásica de enviar correo desde un servidor. En KopTup es solo un respaldo: Railway Free, Trial y Hobby lo bloquean, así que el correo sale por Resend. Sin ninguno de los dos no sale ningún correo y el panel muestra el enlace para copiarlo | [Operación y despliegue › 9.7](Doc-11-Operacion-y-Despliegue.md#97-el-correo-no-sale) |
 | **Solicitud de demo** | Lo que envía alguien desde `/solicitar-demo`: sus datos, las demos que le interesan y su autorización. Tiene un código (por ejemplo `DR-2026-7V6XMN`) y pasa por pendiente, en revisión, aprobada o rechazada | [Manual del administrador › 4](Doc-06-Manual-del-Administrador.md#4-solicitudes-de-demo) |
 | **Variable de entorno** | Ajuste que se configura en Vercel o Railway sin tocar el código (claves, URL, topes). Los secretos solo viven ahí | [Operación y despliegue › 4](Doc-11-Operacion-y-Despliegue.md#4-variables-de-entorno) |
 | **Vercel** | Plataforma donde corre la web `www.koptup.com` | [Operación y despliegue › 2](Doc-11-Operacion-y-Despliegue.md#2-dónde-corre-cada-pieza) |
 | **Visitante** | Cualquier persona que navega sin iniciar sesión | [Flujos del visitante](Doc-04-Flujos-del-Visitante.md) |
+| **Webhook** | Dirección del backend a la que otro servicio avisa cuando pasa algo. Meta usa la de WhatsApp (`/api/webhooks/whatsapp`) para decir si un aviso se entregó, se leyó o falló; cada aviso de Meta viene firmado y el backend rechaza los que no lo están | [API › 4.15](Doc-08-API.md#415-avisos-al-dueño-estado-prueba-reenvío-y-webhook-de-whatsapp) |
+| **WhatsApp Cloud API** | La API oficial de Meta para enviar WhatsApp desde un sistema. KopTup la usa para los avisos al dueño con un número de prueba gratis y la plantilla `koptup_aviso` | [Operación y despliegue › 4.5](Doc-11-Operacion-y-Despliegue.md#45-configurar-los-avisos-al-dueño-paso-a-paso) |
 | **Widget** | El botón de chat que un cliente puede pegar en su propio sitio con el bot creado en «Configura el tuyo» | [Guía de la demo del chatbot](Guia-Demo-chatbot.md) |
 
 ---
@@ -180,13 +186,16 @@ stateDiagram-v2
 Porque el backend de Railway no responde («Application not found»): la web carga, pero todo lo que guarda o consulta datos falla. Recuperarlo es el [runbook 9.1](Doc-11-Operacion-y-Despliegue.md#91-el-backend-está-caído-situación-actual).
 
 **¿Cómo sé que alguien pidió una demo?**
-Aparece en **Admin › Solicitudes de demo**. Si el correo y WhatsApp están configurados, además te llega un aviso. Ver [Manual del administrador › 4](Doc-06-Manual-del-Administrador.md#4-solicitudes-de-demo).
+Aparece en **Admin › Solicitudes de demo** y en **Contactos**. Si el correo y el WhatsApp están configurados, además te llega un aviso por cada canal. Ver [Manual del administrador › 4](Doc-06-Manual-del-Administrador.md#4-solicitudes-de-demo).
+
+**¿Por qué no me llegaban los avisos de contacto, y cómo sé que ahora llegan?**
+El correo salía por SMTP, que Railway bloquea en el plan Hobby, y el WhatsApp usaba el sandbox de Twilio (vence a los 3 días) o texto libre, que Meta rechaza fuera de las 24 horas. Ahora el correo sale por Resend y el WhatsApp con una plantilla aprobada de Meta, y cada contacto guarda si su aviso salió. Configúralo con [Operación y despliegue › 4.5](Doc-11-Operacion-y-Despliegue.md#45-configurar-los-avisos-al-dueño-paso-a-paso) y pruébalo con **Enviar aviso de prueba** en **Admin › Configuración**; además, cada mes te llega una prueba automática.
 
 **¿Cómo le doy acceso a alguien?**
 Apruebas su solicitud o, sin solicitud, usas **Conceder acceso** en Admin › Accesos a demos. El sistema crea la cuenta y un enlace de activación que puedes copiar o mandar por WhatsApp. Ver [Manual del administrador › 4.3](Doc-06-Manual-del-Administrador.md#43-aprobar-elegir-demos-días-y-nota).
 
 **¿Qué pasa si el correo no llega?**
-Nada se bloquea: el panel siempre muestra el enlace para que lo envíes por otro medio. Para arreglar el correo, [runbook 9.7](Doc-11-Operacion-y-Despliegue.md#97-el-correo-no-sale).
+Nada se bloquea: el panel siempre muestra el enlace para que lo envíes por otro medio, y los contactos quedan guardados aunque no te llegue su aviso. Para arreglar el correo, [runbook 9.7](Doc-11-Operacion-y-Despliegue.md#97-el-correo-no-sale); para el WhatsApp, [runbook 9.11](Doc-11-Operacion-y-Despliegue.md#911-el-whatsapp-no-llega).
 
 **¿Cómo abro o cierro una demo al público?**
 En **Admin › Catálogo de demos** eliges Abierta, Requiere acceso o Solo por invitación, o la apagas. Se aplica en máximo un minuto. Ver [runbook 9.5](Doc-11-Operacion-y-Despliegue.md#95-cambiar-el-modo-de-una-demo).

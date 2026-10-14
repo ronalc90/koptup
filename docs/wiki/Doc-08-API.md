@@ -113,6 +113,7 @@ Cada ruta declara **una** de estas políticas. El inventario completo vive en el
 | **Acceso a demo** | Equipo (`admin`, `manager`, `sales`, `developer`) o quien tenga un acceso vigente a esa demo; las demos en modo `publico` quedan abiertas | 401 `login_required`, 403 `demo_access_required` o `demo_disabled`, 503 si MongoDB no responde |
 | **Dueño del bot** | Quien presente el token del bot en `X-Bot-Owner-Token` | 401 `owner_token_required` o 403 `forbidden_not_owner` |
 | **Solo desarrollo** | Admin, y solo fuera de producción | 404 en producción |
+| **Webhook firmado** | Meta, con la cabecera `X-Hub-Signature-256` (HMAC-SHA256 del cuerpo crudo con la clave secreta de la app) | 401 `invalid_signature`; 404 si el webhook no está configurado |
 
 La política **Acceso a demo** es la que conecta la API con el sistema de demos. Así decide el servidor:
 
@@ -181,10 +182,12 @@ Convenciones de las tablas: **Auth** es la política de la sección 3; `:id` es 
 
 | Método | Ruta | Auth | Para qué | Entrada → salida |
 |---|---|---|---|---|
-| POST | `/api/contact` | Pública · 5 por minuto | Formulario de `/contact`: guarda un `Contact` (origen `contact-form`) con la prueba de la autorización (`consentimiento`: fecha, versión de la política del servidor, hash de la IP y navegador) y avisa al equipo por correo o WhatsApp si están configurados. Si el campo trampa `website` llega lleno responde 200 sin guardar nada | `{ name, email, service, message, consentimiento: true, website?, phone?, company?, budget?, timeline?, quote? }` → mensaje. Sin `consentimiento: true` → `400 consent_required` (`fields: ["consentimiento"]`). Datos inválidos → `400 invalid_request` con `fields` y `errores` (`{ campo: mensaje }`) en español; límites: nombre 120, empresa 160, teléfono 40, servicio 300 y mensaje 5.000 caracteres. `timeline`: `now`, `1m`, `3m` u `open` (se guarda como `plazo`). `quote`: `{ service, plan?, tier?, modality? }` con la cotización que el visitante venía revisando (se guarda como `cotizacion`): `service` es `sistema-rag`, una solución del catálogo o un servicio que el portal enlaza; `plan` solo va con `sistema-rag`, y `tier` y `modality` solo con una solución del catálogo. Un valor desconocido o incoherente responde 400 |
-| GET | `/api/admin/contacts` | `admin`, `manager` | Bandeja de contactos del panel | `?status=new\|read\|responded` → lista con `source` (`contact-form`, `demo-rag` o `demo-request`), `plazo` y `cotizacion` |
+| POST | `/api/contact` | Pública · 5 por minuto | Formulario de `/contact`: guarda un `Contact` (origen `contact-form`) con la prueba de la autorización (`consentimiento`: fecha, versión de la política del servidor, hash de la IP y navegador) y avisa al dueño por correo y por WhatsApp **sin esperar** a los proveedores (el resultado por canal queda en `Contact.notificaciones`; ver [4.15](#415-avisos-al-dueño-estado-prueba-reenvío-y-webhook-de-whatsapp)). Si el campo trampa `website` llega lleno responde 200 sin guardar nada | `{ name, email, service, message, consentimiento: true, website?, phone?, company?, budget?, timeline?, quote? }` → mensaje. Sin `consentimiento: true` → `400 consent_required` (`fields: ["consentimiento"]`). Datos inválidos → `400 invalid_request` con `fields` y `errores` (`{ campo: mensaje }`) en español; límites: nombre 120, empresa 160, teléfono 40, servicio 300 y mensaje 5.000 caracteres. `timeline`: `now`, `1m`, `3m` u `open` (se guarda como `plazo`). `quote`: `{ service, plan?, tier?, modality? }` con la cotización que el visitante venía revisando (se guarda como `cotizacion`): `service` es `sistema-rag`, una solución del catálogo o un servicio que el portal enlaza; `plan` solo va con `sistema-rag`, y `tier` y `modality` solo con una solución del catálogo. Un valor desconocido o incoherente responde 400 |
+| GET | `/api/admin/contacts` | `admin`, `manager` | Bandeja de contactos del panel | `?status=new\|read\|responded` → lista con `source` (`contact-form`, `demo-rag` o `demo-request`), `plazo`, `cotizacion` y `notificaciones` (`{ email, whatsapp }` con `estado`, `intentos`, `ultimoIntento`, `proximoIntento`, `error` y `respaldo`; `null` en los contactos anteriores al registro de avisos) |
 | PATCH | `/api/admin/contacts/:id/status` | `admin`, `manager` | Marcar leído o respondido | `{ status }` → `{ id, status }` |
-| POST | `/api/contact/test-whatsapp`, `/api/contact/test-email` | Solo desarrollo | Probar los canales de aviso | — |
+| POST | `/api/admin/contacts/:id/notify` | `admin` · 10 cada 15 min por cuenta | Reenviar el aviso al dueño de ese contacto: los canales que no salieron (fallido, pendiente vencido o no configurado) o, con `?todos=1`, los dos. Queda en la bitácora (`contact.notify_resend`) | → `{ id, notificaciones, resultado: { email, whatsapp } }` (cada uno con `enviado`, `estado`, `omitido`, `error` y, en WhatsApp, `respaldo`); `404 not_found`; `409 contact_anonymized`; `429 rate_limited` |
+
+Las rutas de prueba `POST /api/contact/test-whatsapp` y `/api/contact/test-email` **se retiraron** (solo existían fuera de producción y responden 404): la prueba de los avisos es `POST /api/admin/notifications/test` ([4.15](#415-avisos-al-dueño-estado-prueba-reenvío-y-webhook-de-whatsapp)).
 
 ### 4.4 Demos: lo público y el portal
 
@@ -239,7 +242,7 @@ Todo este router exige `admin` o `manager`, salvo el cambio de rol (solo `admin`
 | GET | `/conversations` y `/conversations/:id` | Conversaciones y su detalle | `?status=` |
 | GET | `/users` | Usuarios | `?role=&search=` → `{ id, name, email, role, provider, lastLogin, createdAt }` |
 | PATCH | `/users/:id/role` | Cambiar el rol (**solo admin**; nadie puede quitarse su propio rol de admin) | `{ role }` → `{ id, email, role }`; queda en la bitácora |
-| GET | `/contacts` y PATCH `/contacts/:id/status` | Ver [4.3](#43-contacto-y-leads) | |
+| GET | `/contacts`, PATCH `/contacts/:id/status` y POST `/contacts/:id/notify` (solo admin) | Ver [4.3](#43-contacto-y-leads) | |
 
 En estas rutas `:orderId` es el código del pedido (`ORD-0001`), no el `_id`.
 
@@ -364,9 +367,56 @@ Estas rutas sirven a dos demos **privadas** (solo por invitación: [Cuentas méd
 | Prefijo | Auth | Qué es |
 |---|---|---|
 | `/api/chat` (`/session`, `/message`, `/history/:sessionId`) | Solo desarrollo | Chat de eco antiguo |
-| `/api/test` (`/whatsapp`, `/whatsapp/status`) | Solo desarrollo | Diagnóstico de WhatsApp |
 
-En producción responden `404 Endpoint not found`, igual que una ruta que no existe.
+En producción responde `404 Endpoint not found`, igual que una ruta que no existe. El diagnóstico de WhatsApp que vivía en `/api/test` (`/whatsapp`, `/whatsapp/status`) se retiró: lo reemplazan `GET /api/admin/notifications/status` y `POST /api/admin/notifications/test` ([4.15](#415-avisos-al-dueño-estado-prueba-reenvío-y-webhook-de-whatsapp)), que también funcionan en producción.
+
+
+### 4.15 Avisos al dueño: estado, prueba, reenvío y webhook de WhatsApp
+
+Cada contacto nuevo (`POST /api/contact`, `POST /api/demo-requests` y la subida de «Prueba con tu documento») avisa al dueño por **correo** (Resend por API HTTPS; SMTP solo como respaldo) y por **WhatsApp** (WhatsApp Cloud API de Meta con la plantilla `koptup_aviso`). El envío no frena la respuesta del formulario. Estas rutas no dependen de `COMMERCE_ENABLED`; las de `/api/admin/notifications` se montan antes de `/api/admin`. El recorrido completo está en el [diagrama 7.7](#77-aviso-al-dueño-de-un-contacto-nuevo) y la configuración en [Operación y despliegue › 4.5](Doc-11-Operacion-y-Despliegue.md#45-configurar-los-avisos-al-dueño-paso-a-paso).
+
+| Método | Ruta | Auth | Para qué | Entrada → salida |
+|---|---|---|---|---|
+| GET | `/api/admin/notifications/status` | `admin`, `manager` | Estado de los dos canales para la tarjeta de Admin › Configuración. **Nunca** devuelve keys ni tokens; los destinos salen enmascarados | → `{ email: { proveedor: "resend"\|"smtp"\|null, configurado, destino, remitente, ultimoExito, ultimoFallo, ultimoError, faltan }, whatsapp: { proveedor: "meta"\|null, configurado, destino, plantilla, webhook, ultimoExito, ultimoFallo, ultimoError, faltan }, latido: { activo, cadaDias, ultimo, proximo } }` |
+| POST | `/api/admin/notifications/test` | `admin` · 5 cada 15 min por cuenta | Envía **de verdad** un aviso de prueba por cada canal configurado. Queda en la bitácora (`notifications.test`) | → `{ email: { configurado, enviado, id?, error? }, whatsapp: { configurado, enviado, id?, error?, respaldo? } }`; `429 rate_limited` |
+| POST | `/api/admin/contacts/:id/notify` | `admin` · 10 cada 15 min por cuenta | Reenviar el aviso de un contacto (ver [4.3](#43-contacto-y-leads)) | `?todos=1` reenvía también los canales ya enviados |
+| GET | `/api/webhooks/whatsapp` | Pública · 600 por minuto por IP | Verificación del webhook por Meta | `?hub.mode=subscribe&hub.verify_token=…&hub.challenge=…` → `200` con el `challenge` en texto si el token coincide (comparación en tiempo constante); si no, `403 forbidden` |
+| POST | `/api/webhooks/whatsapp` | Webhook firmado · 600 por minuto por IP | Estados de los mensajes enviados (`entry[].changes[].value.statuses[]`) | Cuerpo crudo de hasta 1 MB con `X-Hub-Signature-256` → `200 { success: true }` de inmediato y procesa después; `401 invalid_signature`; `400 invalid_json` |
+
+Las dos rutas del webhook responden `404 not_found` mientras falte `WHATSAPP_WEBHOOK_VERIFY_TOKEN` o `WHATSAPP_APP_SECRET`. Se montan **antes** del parser JSON global porque la firma se calcula sobre el cuerpo crudo, y no pasan por el límite general de `/api`.
+
+**Estados de `Contact.notificaciones.<canal>.estado`:**
+
+| Estado | Cuándo | Qué sigue |
+|---|---|---|
+| `pendiente` | Recién creado (el envío queda «reclamado» 10 minutos) o en curso | Si pasan 10 minutos sin resolverse (por ejemplo, un reinicio a mitad del envío), el job de reintentos lo retoma |
+| `enviado` | El proveedor lo aceptó: Resend devolvió un `id` o Meta un `wamid` (se guarda en `idProveedor`). También si salió con un respaldo (`respaldo`: `onboarding@resend.dev` o `hello_world`) | Nada. En WhatsApp, el webhook lo puede pasar a `entregado`, `leido` o `fallido` |
+| `entregado`, `leido` | Solo WhatsApp, confirmado por el webhook | Un estado nunca retrocede (un `delivered` tardío no pisa un `read`) |
+| `fallido` | El proveedor lo rechazó, no respondió en 15 s o Meta informó `failed` por el webhook. `error` guarda el motivo (máximo 300 caracteres, sin secretos y con los correos enmascarados) | El job lo reintenta con `proximoIntento`: esperas de 5 min, 15 min, 1 h, 3 h y 12 h, hasta 6 intentos, solo en contactos de los últimos 3 días |
+| `no_configurado` | Faltaban las variables de ese canal cuando llegó el contacto (`error` dice cuáles) | El reenvío manual lo intenta si ya se configuró |
+
+Forma de la respuesta de `GET /api/admin/notifications/status` (valores de ejemplo, no de producción):
+
+```json
+{
+  "success": true,
+  "data": {
+    "email": {
+      "proveedor": "resend", "configurado": true, "destino": "du***@ejemplo.co",
+      "remitente": "KopTup <avisos@koptup.com>",
+      "ultimoExito": "2026-10-14T15:02:11.000Z", "ultimoFallo": null, "ultimoError": null, "faltan": []
+    },
+    "whatsapp": {
+      "proveedor": "meta", "configurado": true, "destino": "+57 *** *** 1234",
+      "plantilla": "koptup_aviso", "webhook": false,
+      "ultimoExito": "2026-10-14T15:02:12.000Z", "ultimoFallo": null, "ultimoError": null, "faltan": []
+    },
+    "latido": { "activo": true, "cadaDias": 30, "ultimo": "2026-10-14T15:00:03.000Z", "proximo": "2026-11-13T15:00:03.000Z" }
+  }
+}
+```
+
+Con un canal sin configurar, `configurado` es `false` y `faltan` lista las variables (por ejemplo `["RESEND_API_KEY"]` o `["WHATSAPP_API_TOKEN", "ADMIN_WHATSAPP_NUMBER"]`). Si `WHATSAPP_PROVIDER` pide un proveedor retirado (`twilio`, `ultramsg`), `proveedor` es `null` y `faltan` es `["WHATSAPP_PROVIDER"]`.
 
 ---
 
@@ -387,6 +437,7 @@ En producción responden `404 Endpoint not found`, igual que una ruta que no exi
 | 401 | `TOKEN_EXPIRED` | El access token venció | Pide uno nuevo con `/api/auth/refresh` y repite |
 | 401 | `account_not_activated` | Login de una cuenta invitada que no ha usado su enlace | Explica que debe activar la cuenta |
 | 401 | `login_required` (con `motivo: sin_sesion`) | API de una demo con solicitud o privada, sin sesión | Pide iniciar sesión |
+| 401 | `invalid_signature` | Evento del webhook de WhatsApp sin firma `X-Hub-Signature-256` válida | — (lo recibe Meta) |
 | 403 | `demo_access_required` (con `motivo`) | Hay sesión pero no hay acceso vigente: `sin_acceso`, `expirado` o `revocado` | Pantalla `/demo-acceso/<slug>` |
 | 403 | `demo_disabled` | La demo está desactivada en el catálogo | "En mantenimiento" |
 | 403 | `forbidden` | Falta el rol | — |
@@ -394,6 +445,7 @@ En producción responden `404 Endpoint not found`, igual que una ruta que no exi
 | 403 | `cors_forbidden` | Origen no permitido | — |
 | 404 | `not_found` | Registro o ruta inexistente | — |
 | 409 | `already_processed`, `invalid_transition`, `grant_revoked`, `active_grant_exists`, `account_active`, `not_approved` | La acción ya se hizo o el estado no lo permite (por ejemplo, doble clic) | Refresca y muestra el estado real |
+| 409 | `contact_anonymized` | Reenviar el aviso de un contacto que ya se anonimizó | El botón no aparece en esos contactos |
 | 413 | `payload_too_large` | Cuerpo de más de 2 MB | — |
 | 422 | `team_email`, `fixed_mode`, `unknown_demo` (400) | Email de una cuenta del equipo, intento de cerrar el chatbot RAG o demo que no existe | Mensaje en el panel |
 | 429 | `rate_limited` | Se agotó un cupo (mensaje en español); a veces trae `Retry-After` y `retryAfterSec` | Pide esperar |
@@ -425,6 +477,8 @@ Los cupos marcados "memoria" se cuentan en el proceso del backend; los marcados 
 | `POST /api/auth/change-password` | 5 | 15 min | Cuenta | Memoria | `CHANGE_PASSWORD_RATE_LIMIT_MAX` |
 | `POST /api/auth/google/exchange` | 20 | 1 min | IP | Memoria | — |
 | `POST /api/contact` | 5 | 1 min | IP | Memoria | — |
+| `POST /api/admin/notifications/test` (aviso de prueba real) | 5 | 15 min | Cuenta | Memoria | — |
+| `/api/webhooks/whatsapp` (no pasa por el límite general) | 600 | 1 min | IP | Memoria | — |
 | `POST /api/auth/activate/check` | 20 | 1 min | IP | Memoria | — |
 | Subidas de `/api/documents/upload` | 10 | 1 min | IP | Memoria | — |
 | Crear bots (`POST /api/chatbot/bots`) | 30 | 1 hora | IP | Memoria | `CHATBOT_CREATE_LIMIT_PER_HOUR` |
@@ -494,7 +548,7 @@ Un tope con valor inválido o negativo deja la función **sin presupuesto** (cer
 
 ## 7. Flujos clave paso a paso
 
-Los cuatro diagramas siguientes cubren el recorrido completo **solicitud → aprobación → activación → acceso**. El mismo recorrido, visto por el usuario, está en [Flujos del prospecto y cliente](Doc-05-Flujos-del-Prospecto-y-Cliente.md).
+Los cuatro diagramas siguientes cubren el recorrido completo **solicitud → aprobación → activación → acceso**. El mismo recorrido, visto por el usuario, está en [Flujos del prospecto y cliente](Doc-05-Flujos-del-Prospecto-y-Cliente.md). El 7.7 muestra el aviso al dueño de un contacto nuevo, con sus reintentos y el webhook de WhatsApp.
 
 ### 7.1 Solicitud pública
 
@@ -506,6 +560,7 @@ sequenceDiagram
     participant A as API
     participant R as Redis
     participant M as MongoDB
+    actor D as Dueño
     V->>W: Llena Solicitar demo y autoriza sus datos
     W->>A: POST /api/demo-requests
     alt Campo trampa lleno (bot)
@@ -527,7 +582,8 @@ sequenceDiagram
                 A->>M: Crea DemoRequest pendiente con la prueba del consentimiento
                 A-->>W: 201 codigo y estado pendiente
                 A->>M: Registra el lead en Contact (demo-request)
-                A-->>V: Acuse por correo (si hay SMTP)
+                A-->>V: Acuse por correo (si hay correo configurado)
+                A--)D: Aviso al dueño por correo y WhatsApp, sin esperar
             end
         end
     end
@@ -554,7 +610,7 @@ sequenceDiagram
             A->>M: Vincula la cuenta del email o crea una prospect invitada
             A->>M: Crea un DemoGrant por demo (o extiende el vigente)
             A->>M: Emite el enlace de activación (72 h, solo se guarda su hash)
-            A->>S: Correo con el enlace si hay SMTP (espera hasta 15 s)
+            A->>S: Correo con el enlace si hay correo configurado (espera hasta 15 s)
             A->>M: Registra demo_request.approve en la bitácora
             A-->>E: 200 con activationUrl, accesos y si el correo salió
         end
@@ -646,7 +702,7 @@ sequenceDiagram
         J-->>J: Salta esta corrida
     else Lo toma (o Redis no responde)
         J->>M: Marca expirado los accesos activos con expiresAt pasado
-        opt Hay SMTP
+        opt Hay correo configurado
             J->>M: Reclama los que vencen en 3 días sin recordatorio
             J->>S: Un recordatorio por persona
         end
@@ -655,6 +711,57 @@ sequenceDiagram
 ```
 
 *Corre cada hora (`DEMO_GRANTS_JOB_INTERVAL_MS`), la primera vez unos 30 segundos después de arrancar; `DEMO_GRANTS_JOB_ENABLED=false` lo apaga. La vigencia real no depende de él: la API compara la fecha en cada petición.*
+
+
+### 7.7 Aviso al dueño de un contacto nuevo
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor V as Visitante
+    participant A as API
+    participant M as MongoDB
+    participant RS as Resend
+    participant ME as Meta WhatsApp
+    actor D as Dueño
+    V->>A: POST /api/contact (o Solicitar demo, o Prueba con tu documento)
+    A->>M: Crea el Contact con cada canal pendiente o no_configurado
+    A-->>V: 200 sin esperar los avisos
+    par Correo
+        A->>RS: POST /emails con Idempotency-Key contact-id-email-hash del cuerpo y reply_to
+        alt 2xx con id
+            RS-->>A: id del correo
+            A->>M: email enviado con idProveedor
+            RS--)D: Correo a NOTIFY_EMAIL
+        else Error o sin respuesta en 15 s
+            A->>M: email fallido con error y proximoIntento
+        end
+    and WhatsApp
+        A->>ME: POST /v25.0/id-del-número/messages con la plantilla koptup_aviso
+        alt 2xx con wamid
+            ME-->>A: wamid
+            A->>M: whatsapp enviado con idProveedor
+            ME--)D: WhatsApp al número del dueño
+        else Error de plantilla 132xxx
+            A->>ME: Plantilla de respaldo hello_world
+            A->>M: whatsapp enviado con respaldo hello_world y el error
+        else Otro error
+            A->>M: whatsapp fallido con el código de Meta
+        end
+    end
+    loop Cada 5 min, contactos de los últimos 3 días
+        A->>M: Reclama los canales fallidos con proximoIntento vencido
+        A->>RS: Reintento (misma Idempotency-Key si el cuerpo no cambió)
+        A->>ME: Reintento de la plantilla
+    end
+    opt Webhook configurado
+        ME->>A: POST /api/webhooks/whatsapp firmado
+        A->>M: Busca por wamid y pasa a entregado, leido o fallido
+        A--)D: Si falló, correo de alerta con el código de Meta
+    end
+```
+
+*El formulario responde sin esperar a los proveedores. Cada canal se envía y se guarda por separado; un reintento nunca toca un canal que ya salió. Antes de cada intento, el backend «reclama» el canal con una actualización condicionada, así que dos procesos nunca envían el mismo aviso a la vez. Una vez al mes, el job del latido manda un aviso de prueba por los dos canales.*
 
 ---
 
@@ -817,6 +924,7 @@ Qué hacer cuando el backend no responde está en [Operación y despliegue](Doc-
 | Cupos | `middleware/rateLimiter.ts`, `middleware/client-ip.ts`, `services/request-limits.service.ts` |
 | Topes de gasto de IA y cupos en Redis | `services/ai-budget.service.ts` |
 | Sistema de demos | `routes/demo-public.routes.ts`, `routes/admin-demos.routes.ts`, `services/demo-*.service.ts`, `services/magic-link.service.ts`, `jobs/demo-grants.job.ts`, `config/demos.ts` |
+| Avisos al dueño (correo y WhatsApp) | `services/owner-notify.service.ts`, `services/email.service.ts` (Resend y SMTP), `services/whatsapp.service.ts` (plantilla de Meta), `routes/admin-notifications.routes.ts`, `routes/whatsapp-webhook.routes.ts` (montado en `app.ts` antes del parser JSON), `jobs/notify-retry.job.ts`, `jobs/notify-heartbeat.job.ts`, `models/Contact.ts` (`notificaciones`) |
 | Pruebas de la API (401/403/200 por política, flujo de demos) | `__tests__/integration/` con supertest |
 
 **Checklist para agregar una ruta:**
@@ -844,6 +952,7 @@ Qué hacer cuando el backend no responde está en [Operación y despliegue](Doc-
 | **Cupos en memoria** | El cupo general, los de cada ruta de cuenta y el del chatbot se reinician en cada despliegue y no se comparten si hay varias instancias |
 | **Una sesión renovable por cuenta** | El refresh token es uno por cuenta: iniciar sesión en otro navegador hace que el primero no pueda renovar y deba volver a entrar a los 15 minutos |
 | **Swagger incompleto** | Los comentarios `@swagger` no cubren todas las rutas |
+| **Avisos por WhatsApp sin webhook** | Sin `WHATSAPP_APP_SECRET` y `WHATSAPP_WEBHOOK_VERIFY_TOKEN`, el estado queda en `enviado` (Meta aceptó el mensaje) y nunca pasa a `entregado`, `leido` ni `fallido` |
 
 ---
 

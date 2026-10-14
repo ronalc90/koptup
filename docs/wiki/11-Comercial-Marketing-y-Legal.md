@@ -48,8 +48,8 @@ La evidencia es de la rama `main`. Cuando la rama `rag-reposicionamiento` ya cor
 | Idioma | El inglés se elige por cookie y no hay rutas `/en`. Por eso no se declara `hreflang` y el inglés no se indexa | `middleware.ts` líneas 3–8; `app/layout.tsx` líneas 80–83 |
 | Analítica | Ni GA4 ni ninguna otra herramienta. La rama RAG la especifica (GA4, Google Ads y LinkedIn Insight con banner), pero aún no está implementada. La CSP solo permite scripts propios | `apps/web/package.json` (no hay dependencias de analítica); `next.config.js` línea 79 |
 | Agenda | "Agendar llamada" abre un `mailto:` | `app/contact/page.tsx` líneas 112–121 |
-| WhatsApp | Se usa solo para avisos internos (Twilio, WhatsApp Business API o UltraMsg, según variables de entorno). No hay número comercial publicado ni reglas de atención | `backend/src/services/whatsapp.service.ts` líneas 1–24 |
-| Email | Transporte SMTP con un buzón genérico por defecto. No hay proveedor transaccional, ni subdominio de envíos, ni baja de comunicaciones, ni secuencias | `backend/src/services/email.service.ts` línea 27 |
+| WhatsApp | Se usa solo para avisos internos al dueño (WhatsApp Cloud API de Meta con la plantilla aprobada `koptup_aviso`). No hay reglas de atención | `backend/src/services/whatsapp.service.ts` |
+| Email | Correo por la API de Resend (SMTP solo como respaldo), remitente por defecto `avisos@koptup.com`. No hay baja de comunicaciones ni secuencias | `backend/src/services/email.service.ts` |
 | CRM | No existe. `Contact` es un buzón con estados `new / read / responded`, sin fuente, sin UTM, sin consentimiento y sin responsable | `backend/src/models/Contact.ts` líneas 3–13 |
 | Propuestas | `Quote` guarda nombre, email, servicio, descripción y `pending / contacted / completed`. No hay plantilla de propuesta | `backend/src/models/Quote.ts` líneas 3–10 |
 | Precios | Catálogo en COP con `TRM_FALLBACK = 4000` y descuentos por ciclo (10 % semestral, 20 % anual) que no se pueden cobrar porque no hay cobro recurrente. Los planes RAG viven en `lib/rag-plans.ts` en la rama | `lib/services-catalog.ts` líneas 116 y 171–175 |

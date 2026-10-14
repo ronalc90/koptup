@@ -230,6 +230,8 @@ stateDiagram-v2
 | Cambiar el rol de un usuario | ❌ | ❌ (la API responde 403) | ✅ (no puede quitarse su propio rol) |
 | Bitácora completa del sistema (`GET /api/admin/audit-log`) | ❌ | ❌ | ✅ solo por API |
 | Buscar, exportar y suprimir los datos de una persona (Admin › Privacidad, Ley 1581) | ❌ | ❌ | ✅ |
+| Ver el estado de los avisos de nuevos contactos (Admin › Configuración) y el aviso de cada contacto | ❌ | ✅ | ✅ |
+| Enviar el aviso de prueba y reenviar el aviso de un contacto | ❌ | ❌ (lo ve desactivado) | ✅ |
 | Herramienta interna `/liquidacion` | ✅ | ✅ | ✅ |
 
 ![El comercial no puede aprobar una demo privada](images/doc/roles/sales-demo-privada-bloqueada.jpg)
@@ -328,9 +330,10 @@ Los cambios de rol o el retiro de un acceso se aplican **de inmediato** en la AP
 | **Herramientas internas:** `/api/liquidacion`, `/api/reglas-facturacion`, cuentas médicas internas (`/api/cuentas`, `/api/ley100`, `/api/process`, `/api/export`), configuración del sistema experto y de los documentos de conocimiento | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
 | `GET /api/admin/demo-requests`, `demo-grants` y `demo-catalog` | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
 | Acciones sobre solicitudes y accesos (aprobar, invitar, extender, retirar, notas, rechazar, reenviar enlace) | ❌ | ❌ | ❌ | ❌ | ✅ (privadas: ❌) | ❌ | ✅ |
-| `/api/admin/*` de operación: pedidos, facturas, entregables, conversaciones, usuarios, contactos | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
-| Solo admin: cambiar roles, editar el catálogo, bitácora, privacidad (`/api/admin/privacy/*`: buscar, exportar y suprimir los datos de una persona), importar y vectorizar CUPS, reiniciar la configuración de documentos de conocimiento | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Solo desarrollo: `/api/test`, `/api/chat`, pruebas de correo y WhatsApp | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ fuera de producción (404 en producción) |
+| `/api/admin/*` de operación: pedidos, facturas, entregables, conversaciones, usuarios, contactos, y el estado de los avisos al dueño (`GET /api/admin/notifications/status`) | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
+| Solo admin: cambiar roles, editar el catálogo, bitácora, privacidad (`/api/admin/privacy/*`: buscar, exportar y suprimir los datos de una persona), aviso de prueba (`POST /api/admin/notifications/test`, 5 cada 15 min) y reenviar el aviso de un contacto (`POST /api/admin/contacts/:id/notify`), importar y vectorizar CUPS, reiniciar la configuración de documentos de conocimiento | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Solo desarrollo: `/api/chat` (las rutas de prueba de correo y WhatsApp y `/api/test` se retiraron) | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ fuera de producción (404 en producción) |
+| Webhook de WhatsApp (`/api/webhooks/whatsapp`): no depende del rol, solo acepta eventos firmados por Meta (`X-Hub-Signature-256`) y existe solo si está configurado | — | — | — | — | — | — | — |
 
 ---
 

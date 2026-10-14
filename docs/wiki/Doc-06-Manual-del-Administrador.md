@@ -162,7 +162,7 @@ Nadie se vuelve admin desde la web pública. Hay tres caminos, y los tres exigen
 
 Detalles que conviene saber:
 
-- `ADMIN_EMAIL` también es el correo que recibe los avisos internos de solicitudes, contactos y propuestas (las propuestas, solo con `COMMERCE_ENABLED=true`), si el servidor tiene correo configurado. Sin ella, esos avisos no salen por correo.
+- Los avisos internos de contactos, solicitudes y propuestas (las propuestas, solo con `COMMERCE_ENABLED=true`) llegan por correo a `NOTIFY_EMAIL`; si esa variable no existe, a `ADMIN_EMAIL`. Su estado se ve en [Configuración](#13-configuración).
 - Si a la cuenta de `ADMIN_EMAIL` le quitas el rol desde el panel, el siguiente arranque no se lo devuelve mientras exista otro admin.
 - Un admin no puede quitarse a sí mismo el rol desde el panel (evita quedarse sin administradores).
 - Las credenciales nunca se escriben en esta wiki ni en el código. Las variables del servidor se explican en [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md).
@@ -248,7 +248,7 @@ Si una persona vuelve a enviar el formulario con el mismo correo mientras su sol
 5. **Página de origen:** desde qué página envió el formulario, de qué sitio venía y las etiquetas de campaña (`utm_…`) si las había. Sirve para saber qué anuncio o qué demo la trajo.
 6. **Caso de uso y demos pedidas**, con lo que la persona escribió.
 7. **Autorización de datos:** fecha y versión de la política que aceptó (Ley 1581 de 2012). Sin esta autorización el formulario no se puede enviar.
-8. **Avisos:** si salió el aviso al equipo por correo y por WhatsApp, el acuse a la persona y el correo con la decisión. «No enviado» casi siempre significa que el servidor no tiene ese canal configurado.
+8. **Avisos:** si salió el aviso al equipo por correo y por WhatsApp, el acuse a la persona y el correo con la decisión. «No enviado» significa que ese canal no está configurado en el servidor (revísalo en [Configuración](#13-configuración)) o que el último intento falló. El aviso al equipo se actualiza solo: cuando un reintento automático o «Reenviar aviso» lo envían, pasa a «Enviado». El detalle por canal del aviso al dueño, con el motivo si falló y el botón para reenviarlo, está en el contacto que la solicitud crea en [Contactos](#8-contactos). Si la persona vuelve a enviar el formulario con una solicitud abierta, las demos se suman a la misma solicitud y además llega un aviso nuevo (con su propio contacto) que dice que es un reenvío.
 9. **Notas internas:** solo las ve el equipo. Escribe y pulsa «Agregar nota»; queda con tu correo y la fecha.
 10. **Historial:** las acciones del equipo sobre esta solicitud (en revisión, aprobada, rechazada, enlace nuevo).
 11. **Panel de decisión** con dos pestañas: **Aprobar** y **Rechazar**. Solo aparece mientras la solicitud está pendiente o en revisión.
@@ -631,7 +631,17 @@ Cómo reconocer el origen de cada contacto (la pantalla no lo muestra como etiqu
 
 *Lead de Daniela Quintero: subió un PDF de 2 páginas en «Prueba con tu documento» antes de pedir su demo.*
 
-Limitaciones de esta sección: después de cambiar el estado, la lista se actualiza pero la etiqueta del detalle sigue mostrando el estado anterior hasta que vuelves a pulsar la tarjeta; no hay buscador (para encontrar y borrar todo lo de una persona usa [Privacidad](#8b-privacidad-derechos-del-titular)); y el comercial (`sales`) no ve esta sección.
+### 8.1 El aviso que te llegó de cada contacto
+
+Cada contacto nuevo te avisa por **correo** y por **WhatsApp** (cómo se configura: [Operación y despliegue › 4.5](Doc-11-Operacion-y-Despliegue.md#45-configurar-los-avisos-al-dueño-paso-a-paso)). El panel guarda cómo le fue a cada canal:
+
+- **En la lista**, cada tarjeta lleva dos etiquetas: «Correo: …» y «WhatsApp: …». Verde: **Enviado** (el proveedor lo aceptó), **Entregado** o **Leído** (solo WhatsApp, si está el webhook). Ámbar: **Pendiente** (se está enviando o espera su reintento). Rojo: **Falló** (pasa el puntero por encima para ver el motivo). Gris: **No configurado** (al servidor le faltaban las variables de ese canal cuando llegó el contacto). Los contactos que llegaron antes de esta función dicen **Sin registro**.
+- **En el detalle**, bajo «Aviso del nuevo contacto», cada canal muestra su estado y, según el caso, el **motivo** del fallo (por ejemplo, el código de Meta y qué revisar), los **intentos** con la fecha del último, el **próximo reintento automático** y si se usó un **respaldo** (`hello_world` en WhatsApp u `onboarding@resend.dev` en correo).
+- **Reenviar aviso** (solo admin) vuelve a intentar los canales que no salieron. Si los dos ya salieron, el botón dice **Enviar el aviso otra vez** y los manda de nuevo por ambos. Un manager ve el botón desactivado. No aparece en contactos anonimizados. Cada reenvío queda en la bitácora (`contact.notify_resend`).
+
+Lo que falla se reintenta solo, sin que hagas nada: cada 5 minutos, con esperas crecientes (5 min, 15 min, 1 h, 3 h y 12 h), hasta 6 intentos en los primeros 3 días. Un canal que ya salió nunca se reenvía solo.
+
+Limitaciones de esta sección: no hay buscador (para encontrar y borrar todo lo de una persona usa [Privacidad](#8b-privacidad-derechos-del-titular)); la pantalla no muestra el origen del contacto como etiqueta; y el comercial (`sales`) no ve esta sección. Los textos anteriores a los avisos (filtros, estados, fechas) siguen solo en español.
 
 ---
 
@@ -745,17 +755,26 @@ Limitaciones: la fecha del pedido se muestra un día antes en Colombia (el pedid
 
 ## 13. Configuración
 
-![Configuración anotada](images/doc/admin/configuracion-anotada.jpg)
+`/admin/settings` (admin y manager). La captura de esta pantalla todavía es la anterior a la tarjeta de avisos, así que aquí se describe con texto.
 
-*Configuración del panel.*
+**Avisos de nuevos contactos** (la primera tarjeta, con datos reales del servidor):
 
-1. **Notificaciones** por correo, push y SMS: **solo visuales**. Al guardar, las casillas se recuerdan en tu navegador, pero no cambian ningún envío del servidor.
-2. **Idioma:** **funciona**. Cambia entre español e inglés para todo el sitio y recarga la página.
-3. **Tema:** **funciona**. Claro, oscuro o automático (según el sistema), al instante.
-4. **Información del Administrador:** texto fijo. Dice «acceso completo» aunque tu rol sea manager, y no menciona las secciones comerciales.
-5. **Guardar cambios** guarda las casillas de notificaciones en tu navegador y muestra «Configuración guardada exitosamente». **Cancelar** no hace nada.
+1. **Correo** y **WhatsApp**, cada uno con su estado: **Configurado** o **No configurado**. Si falta algo, dice «Falta configurar en el servidor:» con el nombre de las variables (por ejemplo `RESEND_API_KEY` o `WHATSAPP_API_TOKEN`).
+2. **Proveedor** («Resend (API HTTPS)», «SMTP» o «Meta · WhatsApp Cloud API (plantilla)») y **Llega a**: el destino enmascarado (`ro***@gmail.com`, `+57 *** *** XXXX`). Nunca muestra claves ni tokens.
+3. **Remitente** del correo y, en WhatsApp, la **Plantilla** (`koptup_aviso`) y la **Confirmación de entrega**: «Activa» si el webhook de Meta está configurado; si no, el panel solo sabe que Meta aceptó el mensaje, no si te llegó.
+4. **Último aviso enviado**, **Último fallo** y **Último error** de cada canal.
+5. Si el correo sale por **SMTP**, una advertencia: Railway Free, Trial y Hobby bloquean el SMTP saliente, así que hay que definir `RESEND_API_KEY`.
+6. **Prueba mensual automática:** si está activa, cada cuántos días se envía (30 por defecto, entre las 9 a. m. y las 7 p. m. hora de Colombia), cuándo fue la última y cuándo es la próxima. Sirve para confirmar que los dos canales siguen funcionando aunque no lleguen contactos y para que Meta no archive la plantilla por falta de uso.
+7. **Enviar aviso de prueba** (solo admin; un manager lo ve desactivado con la explicación): envía ya un aviso de prueba por cada canal configurado y muestra lo que respondió cada proveedor: «Enviado» con su id (revisa tu bandeja, también spam, y tu WhatsApp), «Falló» con el motivo, «No se intentó» si el canal no está configurado, o el aviso de que tu plantilla falló y salió la de respaldo `hello_world`. Al terminar, la tarjeta se actualiza. Se permiten 5 pruebas cada 15 minutos y cada una queda en la bitácora.
 
-Los avisos reales al equipo (correo y WhatsApp) se configuran en el servidor, no aquí: ver [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md).
+**El resto de la página:**
+
+- **Idioma:** **funciona**. Cambia entre español e inglés para todo el sitio y recarga la página.
+- **Tema:** **funciona**. Claro, oscuro o automático (según el sistema), al instante.
+- **Información del Administrador:** texto fijo en español. Dice «acceso completo» aunque tu rol sea manager, y no menciona las secciones comerciales ni Privacidad.
+- **Guardar cambios** guarda idioma y tema en tu navegador (no hace falta: ya se aplican solos) y muestra «Configuración guardada exitosamente». **Cancelar** no hace nada.
+
+Las variables de los avisos se configuran en el servidor (Railway), no aquí: ver [Operación y despliegue › 4.5](Doc-11-Operacion-y-Despliegue.md#45-configurar-los-avisos-al-dueño-paso-a-paso).
 
 ---
 
@@ -781,6 +800,7 @@ Una lista para revisar cada mañana (unos 10 a 15 minutos). La versión en diagr
 **Contactos y pedidos** (admin y manager)
 
 - [ ] Abre **Contactos › Nuevos**, responde por correo o WhatsApp y marca **Respondido**.
+- [ ] Si un contacto dice «Correo: Falló» o «WhatsApp: Falló», lee el motivo en el detalle; cuando lo arregles, pulsa **Reenviar aviso** (o espera el reintento automático).
 - [ ] Revisa los **leads de la demo RAG** («Lead de la demo RAG»): ya probaron el producto con su propio documento.
 - [ ] Revisa **Pedidos › Pendientes** y apruébalos o recházalos.
 
@@ -788,6 +808,10 @@ Una lista para revisar cada mañana (unos 10 a 15 minutos). La versión en diagr
 
 - [ ] Revisa el **Catálogo**: modo de cada demo, demos desactivadas y vigencias por defecto.
 - [ ] Revisa **Usuarios**: que solo el equipo tenga roles de equipo.
+
+**Una vez al mes** (admin)
+
+- [ ] Confirma que te llegó la «Prueba mensual: tus avisos de contactos funcionan» por correo y por WhatsApp. Si no, abre **Configuración › Avisos de nuevos contactos**, mira el último error y pulsa **Enviar aviso de prueba**.
 
 ---
 
@@ -828,7 +852,7 @@ flowchart TD
 - **Síntoma:** el panel dice «El email no está configurado en el servidor» o «El correo no se pudo enviar», o en **Avisos** aparece «No enviado».
 - **Qué hacer ya:** usa **Copiar** o **Enviar por WhatsApp** en el panel verde. El enlace sirve igual, venga por correo o por WhatsApp.
 - **Si ya cerraste la página** y no copiaste el enlace: en la solicitud, pulsa **Generar enlace de activación nuevo** (o **Enlace de activación** en Accesos). Los anteriores dejan de servir.
-- **Para arreglarlo de fondo:** el servidor necesita las variables de correo (`SMTP_*`). Sin ellas no salen acuses, aprobaciones, recordatorios ni enlaces de recuperación de contraseña. Ver [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md) y el procedimiento [El correo no sale](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#92-el-correo-no-sale).
+- **Para arreglarlo de fondo:** el servidor necesita `RESEND_API_KEY` (en Railway Free, Trial y Hobby el SMTP está bloqueado). Sin correo no salen acuses, aprobaciones, recordatorios, enlaces de recuperación de contraseña ni tus avisos de contactos por correo. **Configuración › Avisos de nuevos contactos** te dice qué falta. Ver [Operación y despliegue › 9.7](Doc-11-Operacion-y-Despliegue.md#97-el-correo-no-sale) y el procedimiento [El correo no sale](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#92-el-correo-no-sale).
 
 ### 15.2 El prospecto no puede entrar
 
@@ -864,6 +888,16 @@ Mientras tanto, las demos **abiertas** siguen cargando para los visitantes (la w
 
 Qué hacer: revisa el estado del servicio del backend (su ruta `/health` debe responder «healthy») y sigue el procedimiento [El backend está caído](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#91-el-backend-está-caído). La situación actual de producción está en [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md).
 
+
+### 15.5 No me llegan los avisos de nuevos contactos
+
+1. Abre **Configuración › Avisos de nuevos contactos**. Si un canal dice **No configurado**, la tarjeta lista las variables que faltan en el servidor: pásale esa lista a quien administra Railway ([Operación y despliegue › 4.5](Doc-11-Operacion-y-Despliegue.md#45-configurar-los-avisos-al-dueño-paso-a-paso)).
+2. Pulsa **Enviar aviso de prueba**. Lee el resultado de cada canal: si «Falló», el motivo dice qué revisar (en WhatsApp, con el código de Meta). Si «Enviado» pero no lo ves, busca el correo en spam y crea el filtro de Gmail; en WhatsApp, revisa que tu número esté verificado en el número de prueba de Meta.
+3. En **Contactos**, el detalle de cada contacto dice qué pasó con su aviso y cuándo es el próximo reintento. Cuando arregles la causa, pulsa **Reenviar aviso**.
+4. Mientras tanto no pierdes nada: todos los contactos quedan guardados en **Contactos** aunque ningún aviso salga.
+
+Procedimientos completos: [El correo no sale](Doc-11-Operacion-y-Despliegue.md#97-el-correo-no-sale) y [El WhatsApp no llega](Doc-11-Operacion-y-Despliegue.md#911-el-whatsapp-no-llega).
+
 ---
 
 ## 16. Para desarrolladores
@@ -879,10 +913,11 @@ Qué hacer: revisa el estado del servicio del backend (su ruta `/health` debe re
 | Catálogo | `/admin/catalogo-demos` | `apps/web/src/app/admin/catalogo-demos/page.tsx` |
 | Componentes comunes (enlace, días, modal, etiquetas) | — | `apps/web/src/components/admin/demos/shared.tsx` |
 | Usuarios, Contactos, Conversaciones, Pedidos, Facturas, Entregables, Configuración | `/admin/users`, `/admin/contacts`, `/admin/conversations`, `/admin/orders`, `/admin/invoices`, `/admin/deliverables`, `/admin/settings` | `apps/web/src/app/admin/<sección>/page.tsx` |
+| Tarjeta «Avisos de nuevos contactos» y estado del aviso en Contactos | `/admin/settings` y `/admin/contacts` | `apps/web/src/components/admin/OwnerNotificationsCard.tsx` y `apps/web/src/components/admin/owner-notify.tsx` (textos en `messages/*.json`, `adminNotify`) |
 | Privacidad (derechos del titular) | `/admin/privacidad` | `apps/web/src/app/admin/privacidad/page.tsx` |
 | Reglas de rol de la web | — | `apps/web/src/lib/auth-roles.ts` y `apps/web/src/middleware.ts` |
 
-Backend: `apps/backend/src/routes/admin-demos.routes.ts` (solicitudes, accesos, catálogo y bitácora), `routes/admin.routes.ts` y `controllers/admin.controller.ts` (operación), `services/demo-requests.service.ts`, `services/demo-grants.service.ts`, `services/demo-catalog.service.ts`, `jobs/demo-grants.job.ts`, `config/demos.ts` (permisos y tiempos), `scripts/set-admin.ts` y `services/admin-bootstrap.service.ts` (`ensureAdminFromEnv`).
+Backend: `apps/backend/src/routes/admin-demos.routes.ts` (solicitudes, accesos, catálogo y bitácora), `routes/admin.routes.ts` y `controllers/admin.controller.ts` (operación y reenvío de avisos), `routes/admin-notifications.routes.ts` y `services/owner-notify.service.ts` (avisos al dueño), `services/demo-requests.service.ts`, `services/demo-grants.service.ts`, `services/demo-catalog.service.ts`, `jobs/demo-grants.job.ts`, `config/demos.ts` (permisos y tiempos), `scripts/set-admin.ts` y `services/admin-bootstrap.service.ts` (`ensureAdminFromEnv`).
 
 ### Endpoints que usa el panel
 
@@ -895,7 +930,9 @@ Backend: `apps/backend/src/routes/admin-demos.routes.ts` (solicitudes, accesos, 
 | Catálogo | `GET /api/admin/demo-catalog` y `PATCH /api/admin/demo-catalog/:slug` | leer: admin, sales, manager; editar: admin |
 | Bitácora | `GET /api/admin/audit-log` | admin (sin pantalla) |
 | Privacidad | `POST /api/admin/privacy/search`, `POST /api/admin/privacy/export` (`{ email }`) y `POST /api/admin/privacy/erase` (`{ email, confirmacion }`) | admin |
-| Operación | `GET /api/admin/orders`, `PATCH …/:id/status`, `POST …/:id/approve`, `POST …/:id/reject`; `GET /api/admin/invoices`; `GET /api/admin/deliverables`; `GET /api/admin/conversations` y `…/:id`; `GET /api/admin/users`; `GET /api/admin/contacts` y `PATCH …/:id/status` | admin, manager |
+| Operación | `GET /api/admin/orders`, `PATCH …/:id/status`, `POST …/:id/approve`, `POST …/:id/reject`; `GET /api/admin/invoices`; `GET /api/admin/deliverables`; `GET /api/admin/conversations` y `…/:id`; `GET /api/admin/users`; `GET /api/admin/contacts` (con `notificaciones`) y `PATCH …/:id/status` | admin, manager |
+| Avisos al dueño | `GET /api/admin/notifications/status` | admin, manager |
+| | `POST /api/admin/notifications/test` (5 cada 15 min) y `POST /api/admin/contacts/:id/notify` (10 cada 15 min; `?todos=1` para reenviar también lo que ya salió) | admin |
 | Roles | `PATCH /api/admin/users/:id/role` (acepta todos los roles del modelo, también `sales`, `prospect` y `client`) | admin |
 
 El detalle de cada ruta está en [API](Doc-08-API.md) y los modelos (`DemoRequest`, `DemoGrant`, `DemoCatalogItem`, `AuditLog`, `Contact`) en [Modelos de datos](Doc-09-Modelos-de-Datos.md).
@@ -927,13 +964,14 @@ Comportamiento actual de `main`, comprobado en el entorno de capturas salvo dond
 5. **El contador del menú** cuenta solo «Pendiente»; la cifra del Inicio suma también «En revisión». No es un error, pero pueden no coincidir.
 6. **Usuarios:** el selector no ofrece `sales`, `prospect` ni `client`, y en esas cuentas muestra «Usuario» aunque no lo sean. Un rol nuevo se ve en el menú de la persona solo después de volver a iniciar sesión.
 7. **La bitácora no tiene pantalla:** solo se ve el historial dentro de cada solicitud.
-8. **Contactos:** la etiqueta del detalle no se actualiza al cambiar el estado; no hay buscador ni etiqueta de origen (el borrado de una persona se hace en Privacidad).
+8. **Contactos:** no hay buscador ni etiqueta de origen (el borrado de una persona se hace en Privacidad), y los textos anteriores a los avisos (filtros, estados, fechas) solo están en español.
 9. **Conversaciones siempre vacías:** ni la conversación automática de un pedido ni la creación manual por API funcionan (error del servidor al guardar). Según el código, el botón de enviar del detalle de una conversación también apunta a una ruta equivocada.
 10. **Pedidos:** los estados se muestran en inglés, la fecha sale un día antes y las confirmaciones son ventanas del navegador.
 11. **Facturas y entregables:** solo listas, sin forma de crearlos desde el panel y sin mensaje cuando están vacías. Según el código, «Descargar» no abre la factura.
-12. **Configuración:** las notificaciones son solo visuales (se guardan en el navegador) y la información del administrador es texto fijo.
+12. **Configuración:** la tarjeta de avisos es real, pero «Guardar cambios» solo guarda idioma y tema en tu navegador, «Cancelar» no hace nada y la información del administrador es texto fijo (le dice «acceso completo» también a un manager).
 13. **Se puede conceder acceso a una demo desactivada** (la persona verá «En mantenimiento»).
 14. **Propuestas, anticipo y conversión a cliente** están en desarrollo: ver [Estado y próximos pasos](15-Estado-y-Proximos-Pasos.md).
+15. **Avisos por WhatsApp sin webhook:** «Enviado» solo significa que Meta aceptó el mensaje; sin el webhook el panel no sabe si te llegó.
 
 ---
 

@@ -58,7 +58,7 @@ Catálogo filtrable por categoría: **<https://www.koptup.com/demo>**
 Cada demo tiene un modo de acceso que el administrador cambia en **Admin › Catálogo de demos** (`/admin/catalogo-demos`): **Abierta** (cualquiera la abre), **Requiere acceso** (solo con un acceso aprobado) o **Solo por invitación**. El modo inicial de cada una está en [`apps/web/src/lib/demo-access-defaults.ts`](apps/web/src/lib/demo-access-defaults.ts) (igual a la semilla del backend).
 
 1. El visitante pide la demo en [`/solicitar-demo`](https://www.koptup.com/solicitar-demo) (también desde el cierre de cada demo, las tarjetas de `/demo` y la pantalla de acceso). La solicitud exige la autorización de datos (Ley 1581 de 2012) y tiene honeypot y cupos por IP y por email.
-2. El equipo la revisa en **Admin › Solicitudes de demo** (`/admin/solicitudes`): aprueba (elige demos, días y nota) o rechaza (motivo). Al aprobar se crea la cuenta del prospecto y un enlace de activación de un solo uso (72 h) que el panel muestra para **copiar** o **enviar por WhatsApp**; si el servidor tiene SMTP, también se envía por email.
+2. El equipo la revisa en **Admin › Solicitudes de demo** (`/admin/solicitudes`): aprueba (elige demos, días y nota) o rechaza (motivo). Al aprobar se crea la cuenta del prospecto y un enlace de activación de un solo uso (72 h) que el panel muestra para **copiar** o **enviar por WhatsApp**; si el servidor tiene correo configurado (Resend o SMTP), también se envía por email.
 3. El prospecto crea su contraseña en `/activar/<token>` y entra a **Mis demos** (`/dashboard/demos`), con los días que le quedan.
 4. Al abrir `/demo/<slug>`, el middleware de Next ([`apps/web/src/middleware.ts`](apps/web/src/middleware.ts)) pregunta al backend (`GET /api/demo-access/<slug>`) con la sesión; sin acceso muestra la pantalla "Solicita acceso" (`/demo-acceso/<slug>`, sin indexar). Si el backend no responde, las demos abiertas siguen abiertas y las demás no se abren.
 5. En **Admin › Accesos a demos** (`/admin/accesos`) el equipo extiende, revoca (la demo deja de abrirse desde su siguiente carga; las APIs de las demos con backend real lo verifican en cada llamada) o concede acceso directo por email.
@@ -69,7 +69,7 @@ Tecnologías que realmente usamos en este repo:
 
 **Frontend:** Next.js 14 (App Router) · React 18 · TypeScript · TailwindCSS · next-intl (ES/EN) · next-themes · Framer Motion · React Hook Form + Zod · SWR · Axios · Recharts · date-fns
 
-**Backend:** Node.js 20.9+ · Express · TypeScript · Mongoose (MongoDB 7) · Redis (sesiones, cupos y topes de gasto de IA) · OpenAI SDK · Zod · JWT · bcryptjs · Multer · Helmet · Nodemailer · Swagger (OpenAPI 3, solo fuera de producción)
+**Backend:** Node.js 20.9+ · Express · TypeScript · Mongoose (MongoDB 7) · Redis (sesiones, cupos y topes de gasto de IA) · OpenAI SDK · Zod · JWT · bcryptjs · Multer · Helmet · Resend (correo por API HTTPS; Nodemailer solo como respaldo SMTP) · WhatsApp Cloud API de Meta (avisos al dueño con plantilla) · Swagger (OpenAPI 3, solo fuera de producción)
 
 **Datos e infraestructura:** MongoDB · Redis · AWS S3 (opcional, documentos del portal) · Vercel (web) · Railway (API, con Nixpacks)
 
@@ -144,12 +144,12 @@ La subida de documentos en `/demo/chatbot` (`/api/demo-rag`) queda **apagada** h
 | `REDIS_URL` | obligatoria para la demo | Redis de Railway (plugin Redis). Guarda el límite de 3 documentos por IP al día y el contador de gasto. |
 | `MONGODB_URI` | obligatoria para la demo | Base de datos donde se guardan los leads: los del formulario de contacto y el email de la demo (origen `demo-rag`) con la prueba de la autorización. Si no se puede guardar el lead, el documento no se procesa (`503 lead_unavailable`). |
 | `TRUST_PROXY_HOPS` | `1` en Railway | Cantidad de proxies delante del backend; define la IP real del visitante para los límites por IP. |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM`, `ADMIN_EMAIL`, `WHATSAPP_PROVIDER` y las de su proveedor | las que ya usa el formulario de contacto | Avisos por email y WhatsApp de cada lead (mismo canal que el formulario de contacto). |
+| `RESEND_API_KEY`, `NOTIFY_EMAIL` y las de WhatsApp | las de [avisos al dueño](#backend-railway-avisos-al-dueño-correo-y-whatsapp) | Aviso al dueño por correo y WhatsApp de cada lead (el mismo del formulario de contacto). |
 | `DEMO_RAG_TTL_SECONDS` | **no la definas en Railway** | Solo para pruebas locales: baja el tiempo de vida de 1 hora de los documentos. Se ignora con `NODE_ENV=production`. |
 
 ### Backend (Railway): seguridad y topes de IA
 
-Al arrancar, el backend valida sus variables con zod (`apps/backend/src/config/env.ts`): en producción **no arranca** si falta `MONGODB_URI` o `JWT_SECRET`. Sin `JWT_REFRESH_SECRET` **sí arranca**, pero nadie puede iniciar sesión: el log lo avisa. Las opcionales que faltan dejan un aviso `[env] …` que dice qué función queda apagada (por ejemplo `SMTP_USER` y `SMTP_PASS`, que son las que deciden si sale correo, `DEMO_UPLOAD_ENABLED`, `INTERNAL_API_KEY` y `ADMIN_EMAIL`). La lista completa, con su efecto, está en [`apps/backend/.env.example`](apps/backend/.env.example) y en [Operación y despliegue](docs/wiki/Doc-11-Operacion-y-Despliegue.md#4-variables-de-entorno).
+Al arrancar, el backend valida sus variables con zod (`apps/backend/src/config/env.ts`): en producción **no arranca** si falta `MONGODB_URI` o `JWT_SECRET`. Sin `JWT_REFRESH_SECRET` **sí arranca**, pero nadie puede iniciar sesión: el log lo avisa. Las opcionales que faltan dejan un aviso `[env] …` que dice qué función queda apagada (por ejemplo `RESEND_API_KEY`, que decide si sale correo, las de WhatsApp, `DEMO_UPLOAD_ENABLED`, `INTERNAL_API_KEY` y `ADMIN_EMAIL`). La lista completa, con su efecto, está en [`apps/backend/.env.example`](apps/backend/.env.example) y en [Operación y despliegue](docs/wiki/Doc-11-Operacion-y-Despliegue.md#4-variables-de-entorno).
 
 | Variable | Valor | Qué hace |
 |---|---|---|
@@ -162,7 +162,7 @@ Al arrancar, el backend valida sus variables con zod (`apps/backend/src/config/e
 | `HEALTH_MONTHLY_BUDGET_USD` | por defecto `30` | Tope mensual de las APIs de salud (cuentas médicas, auditoría, sistema experto, CUPS y reglas de facturación). |
 | `DOCUMENTS_AI_DAILY_LIMIT_PER_USER`, `HEALTH_AI_DAILY_LIMIT_PER_USER` | por defecto `30` y `20` | Solicitudes con IA por cuenta y por día en esas dos funciones (429 al pasarlo). El equipo de KopTup solo tiene el tope mensual. |
 | `INTERNAL_API_KEY` | opcional, igual en Vercel y Railway | Permite que la web (middleware de `/admin`, `/dashboard` y `/demo/<slug>`, proxy de LinkedIn Ads) informe la IP real del visitante para los límites por IP (sin ella, esas peticiones cuentan por la IP de salida de Vercel). |
-| `ADMIN_EMAIL` | recomendada | Destino de los avisos al equipo por correo (sin ella no salen y el log lo avisa; no hay dirección fija en el código). Además, al arrancar da el rol admin a esa cuenta **solo si existe, está activa y no hay ningún otro admin** (primer admin o recuperación), y lo deja en la bitácora. Si ya hay otro admin no cambia roles: usa Admin › Usuarios o `src/scripts/set-admin.ts`. |
+| `ADMIN_EMAIL` | recomendada | Destino de los avisos por correo **solo si falta `NOTIFY_EMAIL`** (no hay dirección fija en el código). Además, al arrancar da el rol admin a esa cuenta **solo si existe, está activa y no hay ningún otro admin** (primer admin o recuperación), y lo deja en la bitácora. Si ya hay otro admin no cambia roles: usa Admin › Usuarios o `src/scripts/set-admin.ts`. |
 | `API_DOCS_ENABLED` | `false` en producción | `/api-docs` solo existe fuera de producción o con este valor en `true`. |
 | `RATE_LIMIT_WINDOW_MS`, `RATE_LIMIT_MAX_REQUESTS` | por defecto 15 min y `100` | Límite general de la API, por cuenta (con sesión) o por IP. |
 | `AUTH_ME_RATE_LIMIT_MAX` | por defecto `120` por minuto | Cupo propio de `GET /api/auth/me` y `GET /api/demo-access/<slug>`, que el middleware de la web consulta en cada navegación del panel, del portal y de las demos con acceso. |
@@ -185,13 +185,36 @@ El modo de acceso de cada demo (abierta, requiere acceso o solo por invitación)
 | Variable | Valor | Qué hace |
 |---|---|---|
 | `FRONTEND_URL` | URL pública de la web (`https://www.koptup.com`) | Base de los enlaces que arma el backend: activación (`/activar/<token>`), Mis demos, restablecer contraseña y los correos. Sin ella usa `http://localhost:3000`. |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM` | opcionales | Acuse a quien pide la demo, correo de aprobación con el enlace de activación y recordatorio 3 días antes de que venza el acceso. El correo sale solo si están `SMTP_USER` y `SMTP_PASS` (sin `SMTP_HOST` se usa Gmail). Sin ellas no se envía ningún correo y el panel muestra siempre el enlace para copiarlo o enviarlo por WhatsApp. |
-| `ADMIN_EMAIL`, `WHATSAPP_PROVIDER` y las de su proveedor | opcionales | Aviso al equipo de cada solicitud nueva, por el mismo canal del formulario de contacto. |
+| `RESEND_API_KEY`, `EMAIL_FROM` (o el respaldo `SMTP_*`) | recomendadas | Acuse a quien pide la demo, correo de aprobación con el enlace de activación y recordatorio 3 días antes de que venza el acceso. Sin correo no se envía ninguno y el panel muestra siempre el enlace para copiarlo o enviarlo por WhatsApp. Ver [avisos al dueño](#backend-railway-avisos-al-dueño-correo-y-whatsapp). |
+| `NOTIFY_EMAIL` y las de WhatsApp | recomendadas | Aviso al dueño de cada solicitud nueva, el mismo del formulario de contacto. |
 | `PRIVACY_POLICY_VERSION` | por defecto `2026-10` | Versión de la política de tratamiento de datos que se guarda con cada autorización (Ley 1581). Cámbiala cuando publiques una política nueva. |
 | `DEMO_REQUEST_LIMIT_PER_HOUR` | por defecto `5` | Solicitudes válidas por IP cada hora en `/solicitar-demo` (las que tienen errores de formulario no cuentan). |
 | `DEMO_REQUEST_LIMIT_PER_EMAIL_DAY` | por defecto `3` | Solicitudes válidas por email al día. |
-| `DEMO_GRANTS_JOB_ENABLED` | por defecto `true` | Job que marca como vencidos los accesos que pasaron su fecha y envía el recordatorio (si hay SMTP). Usa un candado en Redis para que, con varias instancias, corra una sola. `false` lo apaga en esa instancia. |
+| `DEMO_GRANTS_JOB_ENABLED` | por defecto `true` | Job que marca como vencidos los accesos que pasaron su fecha y envía el recordatorio (si hay correo configurado). Usa un candado en Redis para que, con varias instancias, corra una sola. `false` lo apaga en esa instancia. |
 | `DEMO_GRANTS_JOB_INTERVAL_MS` | por defecto `3600000` (1 hora; mínimo `60000`) | Cada cuánto corre ese job. |
+
+### Backend (Railway): avisos al dueño (correo y WhatsApp)
+
+Cada contacto nuevo (formulario de `/contact`, «Solicitar demo» y «Prueba con tu documento») avisa al dueño por **correo** (API HTTPS de Resend) y por **WhatsApp** (WhatsApp Cloud API de Meta con la plantilla aprobada `koptup_aviso`). Los avisos salen sin frenar la respuesta del formulario; el resultado de cada canal queda en el contacto (Admin › Contactos), un job reintenta los que fallan y una prueba mensual mantiene vivos los dos canales aunque lleguen pocos mensajes. **Railway Free, Trial y Hobby bloquean el SMTP saliente**, así que en esos planes el correo solo sale con `RESEND_API_KEY`. Twilio y UltraMsg ya no se soportan.
+
+| Variable | Valor | Qué hace |
+|---|---|---|
+| `RESEND_API_KEY` | key de Resend con permiso «Sending access» | Con ella **todos** los correos del backend salen por Resend (avisos, demos, propuestas, restablecer contraseña). Sin ella ni SMTP no sale ningún correo. |
+| `EMAIL_FROM` | por defecto `KopTup <avisos@koptup.com>` | Remitente; su dominio debe estar verificado en Resend. Si Resend dice que no lo está, el aviso al dueño se reintenta desde `onboarding@resend.dev`. |
+| `NOTIFY_EMAIL` | uno o varios correos separados por coma | A quién le llegan los avisos por correo (con «Responder a» = el email de quien escribió). Si falta se usa `ADMIN_EMAIL`. |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS` | opcionales | Respaldo, solo sin `RESEND_API_KEY` (desarrollo local o Railway Pro). |
+| `WHATSAPP_PROVIDER` | `meta` | Proveedor de WhatsApp (acepta el valor viejo `whatsapp-business`; `twilio` o `ultramsg` dejan el canal apagado). |
+| `WHATSAPP_API_TOKEN` | token permanente de un usuario del sistema de Meta | Permisos `whatsapp_business_messaging` y `whatsapp_business_management`, caducidad «Nunca». |
+| `WHATSAPP_PHONE_NUMBER_ID` | id numérico | Identificador del número que envía (Meta › WhatsApp › Configuración de la API). |
+| `ADMIN_WHATSAPP_NUMBER` | tu número con indicativo | Recibe los avisos. Con el número de prueba gratis de Meta, debe estar en su lista de destinatarios verificados. |
+| `WHATSAPP_TEMPLATE_NAME`, `WHATSAPP_TEMPLATE_LANG`, `WHATSAPP_GRAPH_VERSION` | por defecto `koptup_aviso`, `es` y `v25.0` | Plantilla y versión de la API de Meta. |
+| `WHATSAPP_HELLO_WORLD_FALLBACK` | por defecto `true` | Si la plantilla propia falla por un error de plantilla, envía `hello_world` para que al menos suene el teléfono. |
+| `WHATSAPP_APP_SECRET`, `WHATSAPP_WEBHOOK_VERIFY_TOKEN` | opcionales (las dos) | Encienden el webhook firmado `/api/webhooks/whatsapp` (entregado, leído o fallido, y correo de alerta si Meta no entrega un aviso). Sin ellas responde 404. |
+| `NOTIFY_HEARTBEAT_DAYS` | por defecto `30` (`0` la apaga) | Prueba mensual automática por cada canal, entre las 9:00 y las 18:59 hora de Bogotá. |
+| `NOTIFY_JOBS_ENABLED` | por defecto `true` | `false` apaga los reintentos (cada 5 min, hasta 6 intentos en 3 días) y la prueba mensual en esa instancia. |
+| `RESEND_API_URL`, `WHATSAPP_GRAPH_URL` | **no las definas en Railway** | Solo pruebas locales y CI: apuntan al mock de Resend y WhatsApp. |
+
+Para comprobarlo después de desplegar: el registro del arranque dice una línea por canal con el destino enmascarado (`Avisos por correo: Resend → ro***@gmail.com`), y **Admin › Configuración › Avisos de nuevos contactos** muestra el estado de cada canal y tiene el botón **Enviar aviso de prueba** (solo admin). Paso a paso completo (Resend, plantilla y token de Meta, reenvío de correo en Namecheap, filtro de Gmail, Railway sin Serverless): [Operación y despliegue › 4.5](docs/wiki/Doc-11-Operacion-y-Despliegue.md#45-configurar-los-avisos-al-dueño-paso-a-paso).
 
 ## Estructura del repo
 
@@ -242,6 +265,7 @@ npm run test:e2e       # Playwright contra un sitio ya levantado (ver "E2E en lo
 | `permissions.spec.ts` | Autorización en el servidor: un prospecto no entra a `/admin`, un visitante sin sesión no entra a `/dashboard` y una demo privada sin acceso muestra la pantalla de acceso (también con sesión). |
 | `access-mode.spec.ts` | El admin cambia el modo de acceso de una demo en Admin › Catálogo de demos y el sitio lo aplica (espera hasta 90 s por la caché de 60 s del middleware). Corre una vez, en escritorio, cuando terminan las demás (proyecto `catalogo`; si alguna falló, Playwright la marca como no ejecutada) y deja la demo como estaba. |
 | `contact.spec.ts` | El formulario de `/contact` envía el lead y queda guardado (lo lista Admin › Contactos). |
+| `owner-notify.spec.ts` | Avisos al dueño de un nuevo contacto, contra el mock de Resend y WhatsApp: enviar `/contact` produce 1 correo para `NOTIFY_EMAIL` con `reply_to` = el email de la persona y 1 plantilla `koptup_aviso` con 2 parámetros sin saltos de línea; Admin › Contactos muestra "Enviado" en ambos canales; Admin › Configuración muestra los dos canales configurados y "Enviar aviso de prueba" sale por los dos. Corre solo en escritorio y necesita `E2E_NOTIFY_MOCK_URL`. |
 | `public-seo.spec.ts` | Sitio público y SEO: `noindex` y canonical de las páginas de cuenta, 404, `/pricing` (308), sitemap, `robots.txt`, `llms.txt` y cabeceras; el embudo RAG ("Prueba con tu documento", caso de salud con invitación, "Cotizar este tier" con nivel, modalidad y plazo guardados en el lead); el cambio de idioma conserva la URL; menú, pie y textos verificables de `/about`, inicio y landings, en español e inglés; títulos del panel. |
 | `rag-upload.spec.ts` | `/demo/chatbot` › "Prueba con tu documento": sube un PDF de 2 páginas ([`e2e/fixtures`](apps/web/e2e/fixtures)), pregunta, ve la cita de la página y el contador de preguntas pasa de 0/10 a 1/10. |
 | `embed-chatbot.spec.ts` | `/embed/chatbot/<id>` (el chat de `widget.js` y del iframe): solo el chat, sin menú, pie ni banner de cookies; responde con la fuente y canal `widget`; un 429 pide esperar y un 503 dice que el asistente no está disponible. |
@@ -258,17 +282,21 @@ Las pruebas de la plataforma siembran sus datos por la API del backend ([`e2e/su
 | `E2E_ALLOW_REMOTE` | Con `E2E_API_URL`, la corrida se niega a empezar si la web o el backend no son locales (`localhost`, `127.0.0.1`), porque siembra datos y cambia el catálogo. `1` lo permite, solo para un entorno de pruebas desechable (nunca producción). |
 | `E2E_INCLUDE_KNOWN_ISSUES` | `1` para exigir cero errores de consola también en las demos de la lista de problemas conocidos. |
 | `OPENAI_MOCK_PORT`, `OPENAI_MOCK_HOST`, `OPENAI_MOCK_LOG` | Puerto (3999), host (127.0.0.1) y archivo de registro opcional del mock de OpenAI. |
+| `E2E_NOTIFY_MOCK_URL` | URL del mock de Resend y WhatsApp (en CI, `http://127.0.0.1:3998`). Sin ella, `owner-notify.spec.ts` se omite con el motivo. |
+| `E2E_NOTIFY_EMAIL`, `E2E_ADMIN_WHATSAPP_NUMBER` | Los destinos ficticios que tiene el backend en `NOTIFY_EMAIL` y `ADMIN_WHATSAPP_NUMBER` (por defecto `dueno@e2e.koptup.test` y `573000000000`). |
+| `NOTIFY_MOCK_PORT`, `NOTIFY_MOCK_HOST`, `NOTIFY_MOCK_LOG` | Puerto (3998), host (127.0.0.1) y archivo de registro opcional del mock de Resend y WhatsApp. |
 
 #### E2E en local, paso a paso
 
-Igual que el job de CI: MongoDB 7, Redis 7, el mock de OpenAI ([`apps/web/e2e/support/openai-mock.js`](apps/web/e2e/support/openai-mock.js), sin clave ni costo: responde "Respuesta simulada (mock de OpenAI)…" y cita el primer extracto que recibe), el backend y la web compilados.
+Igual que el job de CI: MongoDB 7, Redis 7, el mock de OpenAI ([`apps/web/e2e/support/openai-mock.js`](apps/web/e2e/support/openai-mock.js), sin clave ni costo: responde "Respuesta simulada (mock de OpenAI)…" y cita el primer extracto que recibe), el mock de Resend y WhatsApp ([`apps/web/e2e/support/notify-mock.js`](apps/web/e2e/support/notify-mock.js): recibe los avisos al dueño como lo harían Resend y la WhatsApp Cloud API de Meta, valida los parámetros de la plantilla como Meta y guarda cada llamada para que las pruebas la revisen en `GET /__requests?kind=email|whatsapp&q=<texto>`; `DELETE /__requests` las borra), el backend y la web compilados. Así ninguna corrida envía un correo ni un WhatsApp real.
 
 ```bash
 # 0. MongoDB y Redis (o instalados en esos puertos)
 npm run docker:up                                        # docker-compose.dev.yml
 
-# 1. Mock de OpenAI (terminal A)
-node apps/web/e2e/support/openai-mock.js                 # http://127.0.0.1:3999/v1
+# 1. Mocks de OpenAI y de Resend + WhatsApp (terminal A)
+node apps/web/e2e/support/openai-mock.js &               # http://127.0.0.1:3999/v1
+node apps/web/e2e/support/notify-mock.js                 # http://127.0.0.1:3998
 
 # 2. Backend compilado (terminal B). Los valores son solo para pruebas locales.
 npm run build --workspace=apps/backend
@@ -278,6 +306,11 @@ cd apps/backend && PORT=3001 NODE_ENV=production \
   CORS_ORIGIN=http://localhost:3000 FRONTEND_URL=http://localhost:3000 \
   OPENAI_BASE_URL=http://127.0.0.1:3999/v1 OPENAI_API_KEY=sk-test-mock \
   DEMO_UPLOAD_ENABLED=true RATE_LIMIT_MAX_REQUESTS=10000 \
+  RESEND_API_KEY=re_solo_local_no_es_clave RESEND_API_URL=http://127.0.0.1:3998 \
+  NOTIFY_EMAIL=dueno@e2e.koptup.test ADMIN_WHATSAPP_NUMBER=573000000000 \
+  WHATSAPP_PROVIDER=meta WHATSAPP_API_TOKEN=solo-local-no-es-token \
+  WHATSAPP_PHONE_NUMBER_ID=100000000000001 WHATSAPP_GRAPH_URL=http://127.0.0.1:3998 \
+  NOTIFY_JOBS_ENABLED=false \
   node dist/index.js
 
 # 3. Web compilada apuntando a ese backend (terminal C)
@@ -287,13 +320,16 @@ cd apps/web && npx next start -p 3000
 # 4. Playwright (terminal D)
 npx playwright install chromium                          # solo la primera vez
 E2E_BASE_URL=http://localhost:3000 E2E_API_URL=http://localhost:3001 \
-  E2E_MONGODB_URI=mongodb://127.0.0.1:27017/koptup_e2e npm run test:e2e
+  E2E_MONGODB_URI=mongodb://127.0.0.1:27017/koptup_e2e \
+  E2E_NOTIFY_MOCK_URL=http://127.0.0.1:3998 npm run test:e2e
 
 # Un archivo o un proyecto:
 #   npm run test:e2e -- e2e/demo-flow.spec.ts --project=escritorio
 # El proyecto "catalogo" depende de los otros dos; para correr solo su prueba:
 #   npm run test:e2e -- e2e/access-mode.spec.ts --project=catalogo --no-deps
 ```
+
+Los avisos al dueño apuntan siempre al mock (`RESEND_API_URL` y `WHATSAPP_GRAPH_URL`) con clave, token y destinos ficticios: nunca corras la suite con las credenciales reales, porque cada contacto de prueba mandaría un aviso de verdad. `NOTIFY_JOBS_ENABLED=false` apaga los reintentos y la prueba mensual en segundo plano para que el mock solo reciba los avisos que provocan las pruebas.
 
 `RATE_LIMIT_MAX_REQUESTS` alto es necesario porque todas las páginas y demos salen de la misma máquina; los cupos por IP de login, contacto, solicitudes y la demo RAG no se tocan (cada visitante de prueba usa su propia IP). La suite completa tarda unos 4 a 5 minutos con 2 workers (minuto y medio es la prueba del proyecto `catalogo`, que espera dos veces la caché del middleware).
 
@@ -306,7 +342,7 @@ El workflow [`ci.yml`](.github/workflows/ci.yml) corre en cada pull request y en
 | Lint y tipos | Verifica que los mensajes i18n agregados estén al día, ESLint, `tsc` y el formato de los títulos de página |
 | Pruebas unitarias | Jest del backend (con MongoDB y Redis, así que también corren las de integración) y de la web |
 | Build | `tsc` del backend y `next build` de la web (apuntando a un backend local, nunca al de producción) |
-| E2E | Levanta MongoDB 7, Redis 7, el mock de OpenAI versionado, el backend (`DEMO_UPLOAD_ENABLED=true`) y la web compilados (`next start`) y corre toda la suite de Playwright, incluido el flujo de solicitud → aprobación → activación → acceso → revocación |
+| E2E | Levanta MongoDB 7, Redis 7, el mock de OpenAI versionado, el mock de Resend y WhatsApp, el backend (`DEMO_UPLOAD_ENABLED=true` y los avisos al dueño apuntando a ese mock) y la web compilados (`next start`) y corre toda la suite de Playwright, incluido el flujo de solicitud → aprobación → activación → acceso → revocación |
 | Seguridad | `npm audit` de las dependencias de producción (falla con una alerta alta o crítica que no esté revisada en [`.github/audit-allowlist.json`](.github/audit-allowlist.json), con fecha de revisión) y gitleaks (secretos en los archivos y en los commits nuevos; [`.gitleaks.toml`](.gitleaks.toml)) |
 
 El workflow [`monitor.yml`](.github/workflows/monitor.yml) revisa cada 15 minutos que `https://www.koptup.com` y la salud de la API respondan; la URL de la API va en la variable del repositorio `BACKEND_HEALTH_URL`. Si algo cae, la corrida falla y GitHub avisa por correo (ver [Operación y despliegue › 7](docs/wiki/Doc-11-Operacion-y-Despliegue.md#7-salud-del-sistema-monitoreo-y-registros)).
@@ -334,7 +370,9 @@ GitHub Actions **no despliega**: el workflow de CI solo verifica. El despliegue 
 
 Las variables de cada entorno se configuran en esas plataformas (ver [Variables de entorno](#variables-de-entorno)). Los secretos nunca van en el repositorio: el único archivo de entorno versionado, `apps/web/.env.production`, solo tiene la URL pública de la API.
 
-No hay imágenes de Docker para desplegar: `docker-compose.dev.yml` solo levanta MongoDB y Redis para desarrollo. Lo que falta configurar en las plataformas (proteger `main` con CI obligatorio, dejar un solo proyecto de Vercel, el volumen de Railway para archivos subidos y la variable del monitoreo) está en [Operación y despliegue](docs/wiki/Doc-11-Operacion-y-Despliegue.md#10-acciones-pendientes-del-dueño).
+No hay imágenes de Docker para desplegar: `docker-compose.dev.yml` solo levanta MongoDB y Redis para desarrollo. Lo que falta configurar en las plataformas (proteger `main` con CI obligatorio, dejar un solo proyecto de Vercel, el volumen de Railway para archivos subidos, la variable del monitoreo y los avisos al dueño por correo y WhatsApp) está en [Operación y despliegue](docs/wiki/Doc-11-Operacion-y-Despliegue.md#10-acciones-pendientes-del-dueño).
+
+En Railway deja **apagado «Serverless»** (antes «App Sleeping») en el servicio del backend: si el servicio se duerme por falta de tráfico, no corren los reintentos de los avisos ni la prueba mensual.
 
 ## Documentación y plan de producto
 

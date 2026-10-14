@@ -81,7 +81,7 @@ Lo que existe hoy en `main` (producción) para pedir, dar y medir el acceso a la
 | Roles | `User.role` acepta `user`, `admin`, `manager` y `developer`. No existen `sales`, `prospect` ni `client` | `apps/backend/src/models/User.ts` |
 | Panel de administración | Usuarios, contactos, conversaciones, entregables, facturas, pedidos y configuración. Nada de solicitudes, accesos, leads ni catálogo de demos | [Panel de administración](05-Panel-de-Administracion.md), sección 2 |
 | Portal | `/dashboard` pensado para clientes con proyecto. No tiene "Mis demos" | [Portal del cliente](06-Portal-del-Cliente.md) |
-| Avisos internos | El formulario de contacto ya avisa al equipo por email y por WhatsApp (Twilio). Es la base que reutiliza el outbox de la sección 11 | `apps/backend/src/controllers/contact.controller.ts` |
+| Avisos internos | Cada contacto nuevo avisa al dueño por correo (Resend) y por WhatsApp (plantilla de la Cloud API de Meta), con el estado por canal en el contacto y reintentos automáticos. Es la base que reutiliza el outbox de la sección 11 | `apps/backend/src/services/owner-notify.service.ts` |
 | Medición | Sin analítica en producción. El banner de cookies, GA4, Google Ads, LinkedIn Insight y sus 5 eventos están hechos en la rama `rag-reposicionamiento` (pendiente de merge), todavía sin IDs reales | [Reposicionamiento RAG](13-Reposicionamiento-RAG.md) |
 | Demo RAG | `/demo/chatbot` es pública. "Prueba con tu documento" está hecho en la rama `rag-reposicionamiento` (pendiente de merge): la API `/api/demo-rag` registra el email como lead `demo-rag` con el mismo servicio del formulario de contacto (`services/lead.service.ts`, `Contact.source`). Queda apagado hasta configurarlo en Railway | [Sistemas RAG](Producto-chatbot-rag-ia.md) |
 

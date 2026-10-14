@@ -183,6 +183,8 @@ El detalle técnico es la **tarea 4 de [Backend y API](09-Backend-y-API.md)**: m
 - **Herramientas internas** (salud, liquidación, reglas): solo para staff hasta que se consoliden ([Backend y API](09-Backend-y-API.md), sección "Integración con el sistema de demos").
 - **Roles:** ningún proceso automático (arranque, semillas, scripts) cambia roles. Los cambios de rol pasan por `PATCH /api/admin/users/:id/role` o por `scripts/set-admin.ts`, y siempre dejan registro en `AuditLog`.
 - **Webhooks:** firma verificada e idempotencia (`WebhookEvent`, tarea 23 de Backend y API).
+  - **Hecho para WhatsApp en la rama `ccr-55ceecf7-dpc10i` (pendiente de merge):** `GET` y `POST /api/webhooks/whatsapp` solo existen si están `WHATSAPP_WEBHOOK_VERIFY_TOKEN` y `WHATSAPP_APP_SECRET` (si no, 404). `GET` compara el `hub.verify_token` en tiempo constante. `POST` exige `X-Hub-Signature-256` = HMAC-SHA256 del **cuerpo crudo** con la clave secreta de la app, comparado con `timingSafeEqual`; sin firma válida responde 401 y no procesa nada. La ruta se monta antes del parser JSON global (la firma se calcula sobre los bytes exactos), acepta hasta 1 MB, tiene su propio límite de 600 peticiones por minuto por IP y responde 200 antes de procesar. La idempotencia sale del propio estado: se actualiza por `wamid` y un estado nunca retrocede; la alerta por correo de un fallo se envía una vez por `wamid` (memoria del proceso, sin tabla `WebhookEvent`). Pruebas en `apps/backend/src/__tests__/integration/owner-notify.test.ts`.
+  - **Secretos de los avisos:** la key de Resend, el token de Meta y la clave secreta de la app nunca salen en respuestas ni en registros: los errores de los proveedores se limpian (se quita la key o el token, se enmascaran los correos y se recortan a 300 caracteres) y los destinos se muestran enmascarados (`ro***@gmail.com`, `+57 *** *** XXXX`). `GET /api/admin/notifications/status` no devuelve ningún secreto.
 
 #### 1.3 Secretos, credenciales y cuentas (tarea 1)
 
@@ -195,7 +197,7 @@ El detalle técnico es la **tarea 4 de [Backend y API](09-Backend-y-API.md)**: m
 | IA | `OPENAI_API_KEY`, `ANTHROPIC_API_KEY` | Railway y Vercel | **Una clave por entorno y por función** (chatbot, contenido, salud, LinkedIn Ads), para poder cortar una sin afectar las demás |
 | Almacenamiento | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` | Railway | Usuario IAM con permisos solo sobre su bucket |
 | OAuth | `GOOGLE_CLIENT_SECRET` | Railway | Regenerar el secreto del cliente OAuth |
-| Mensajería | `SMTP_*`, `TWILIO_*`, `WHATSAPP_API_TOKEN`, `ULTRAMSG_*` | Railway | Regenerar. Revocar los de proveedores que se retiran |
+| Mensajería | `RESEND_API_KEY`, `SMTP_*` (respaldo), `WHATSAPP_API_TOKEN`, `WHATSAPP_APP_SECRET`, `WHATSAPP_WEBHOOK_VERIFY_TOKEN`; retirados en la rama `ccr-55ceecf7-dpc10i` (pendiente de merge): `TWILIO_*` y `ULTRAMSG_*` | Railway | Regenerar en el proveedor (Resend › API Keys; Meta › usuario del sistema; clave secreta de la app). Revocar las de Twilio y UltraMsg y borrarlas de Railway |
 | Heredadas | `PINECONE_*`, claves internas antiguas, `SEED_*_PASSWORD` | Railway | Revocar: sus usos se eliminan ([Backend y API](09-Backend-y-API.md), sección 15) |
 | Nuevas (Fase 1) | `DEMO_PASS_SECRET`, `INTERNAL_API_KEY`, `TURNSTILE_SECRET_KEY`, `SENTRY_DSN` | Vercel y Railway | Nacen distintas por entorno y nunca pasan por el repositorio |
 | CI/CD | Token de subida de Sentry, token de omisión de la protección de Vercel para e2e | GitHub (secretos de entorno) | Permisos mínimos y caducidad |
@@ -211,7 +213,7 @@ El detalle técnico es la **tarea 4 de [Backend y API](09-Backend-y-API.md)**: m
 7. Registrar la fecha de rotación de cada grupo y repetir cada 12 meses, o de inmediato si sale alguien del equipo.
 
 **Cuentas de plataforma:**
-- **2FA obligatorio** en GitHub, Vercel, Railway, MongoDB Atlas, OpenAI, Anthropic, AWS, Google Cloud, Twilio/Meta, el proveedor de email, Sentry y el registrador del dominio y DNS.
+- **2FA obligatorio** en GitHub, Vercel, Railway, MongoDB Atlas, OpenAI, Anthropic, AWS, Google Cloud, Meta (WhatsApp), Resend (correo), Sentry y el registrador del dominio y DNS.
 - Una cuenta por persona: nunca compartida.
 - Un procedimiento de alta y baja de miembros del equipo en el runbook.
 

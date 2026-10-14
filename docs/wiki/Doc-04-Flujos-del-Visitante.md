@@ -280,7 +280,7 @@ sequenceDiagram
     participant R as Redis
     participant O as OpenAI
     participant M as MongoDB
-    actor E as Equipo KopTup
+    actor E as Dueño de KopTup
     V->>W: Abre Prueba con tu documento
     W->>A: GET /api/demo-rag/status
     A->>R: Revisa el gasto del mes
@@ -290,7 +290,7 @@ sequenceDiagram
     A->>R: Reserva 1 de los 3 documentos del día de esa conexión
     A->>A: Lee el texto en memoria y lo parte por páginas
     A->>M: Guarda el lead con origen demo-rag
-    A-->>E: Aviso por correo o WhatsApp si están configurados
+    A--)E: Aviso al dueño por correo y WhatsApp, sin esperar
     A-->>W: Documento listo con 10 preguntas y 1 hora de vida
     V->>W: Escribe una pregunta
     W->>A: POST /api/demo-rag/documents/id/questions
@@ -400,7 +400,7 @@ Si la persona ya tenía una solicitud abierta con el mismo email en los últimos
 
 - **Admin › Solicitudes de demo:** la solicitud queda **pendiente** para que el equipo la apruebe, la rechace o la marque como spam. Ver [Manual del administrador](Doc-06-Manual-del-Administrador.md).
 - **Admin › Contactos:** también se registra como contacto con origen `demo-request` y servicio "Solicitud de demo: ERP modular".
-- **Avisos:** correo y WhatsApp al equipo si están configurados, y un acuse por correo al solicitante con su código (si el servidor tiene correo).
+- **Avisos:** correo y WhatsApp al dueño (el mismo aviso del formulario de contacto, con su estado por canal en Admin › Contactos) y un acuse por correo al solicitante con su código, si el servidor tiene correo configurado.
 
 **Cupos:** 5 solicitudes válidas por hora desde la misma conexión y 3 por email al día (configurables con `DEMO_REQUEST_LIMIT_PER_HOUR` y `DEMO_REQUEST_LIMIT_PER_EMAIL_DAY`). Si se superan, el formulario muestra "Recibimos varias solicitudes desde tu conexión o con este email. Intenta de nuevo más tarde o escríbenos por WhatsApp".
 
@@ -456,23 +456,28 @@ sequenceDiagram
     participant W as Web /contact
     participant A as API KopTup
     participant M as MongoDB
-    participant N as Correo y WhatsApp
-    actor E as Equipo KopTup
+    participant N as Resend y Meta WhatsApp
+    actor E as Dueño de KopTup
     V->>W: Envía el formulario
     W->>A: POST /api/contact
     A->>A: Revisa el campo trampa, la autorización y valida cada campo
-    A->>M: Guarda el contacto, origen contact-form, estado Nuevo<br/>con la prueba de la autorización
+    A->>M: Guarda el contacto, origen contact-form, estado Nuevo<br/>con la prueba de la autorización y los avisos pendientes
     A-->>W: Respuesta OK
     W-->>V: Mensaje enviado
-    A--)N: Aviso al equipo, sin esperar
-    N--)E: Correo a ADMIN_EMAIL y WhatsApp a ADMIN_WHATSAPP_NUMBER
+    A--)N: Aviso por correo y por WhatsApp, sin esperar
+    N--)E: Correo a NOTIFY_EMAIL con Responder a la persona<br/>y WhatsApp con la plantilla koptup_aviso
+    A->>M: Guarda el resultado de cada canal<br/>y, si falló, el job lo reintenta
     E->>A: Revisa Admin, Contactos y cambia el estado
 ```
 
-*El guardado se espera; los avisos van aparte y nunca hacen fallar el envío.*
+*El guardado se espera; los avisos van aparte y nunca hacen fallar el envío. Cada canal se envía y se registra por separado.*
 
 1. **Se guarda** en la colección de contactos con estado **Nuevo** y origen `contact-form`. Se guardan nombre, email, teléfono, empresa, servicio (con el plan, o el nivel y la modalidad, si vino de un plan RAG o de "Cotizar este tier"), presupuesto, plazo y mensaje; lo que se cotizaba queda además como identificadores en `cotizacion`. Como prueba de la autorización se guardan la fecha, la IP en hash (no la IP), el navegador y la versión de la política vigente en el servidor. Un campo oculto que las personas no ven filtra los bots: si llega lleno, el servidor responde como si nada y no guarda el mensaje.
-2. **Avisa al equipo** por correo (a la dirección configurada en `ADMIN_EMAIL`, si el servidor tiene SMTP) y por WhatsApp (al número `ADMIN_WHATSAPP_NUMBER`, si hay proveedor configurado). Si ninguno está configurado, el lead igual queda guardado.
+2. **Avisa al dueño** por dos canales independientes, sin hacer esperar a la persona:
+   - **Correo** por Resend a `NOTIFY_EMAIL` (o `ADMIN_EMAIL`), con asunto «🔔 Nuevo contacto: <nombre> - <servicio>», todos los datos y el mensaje completo. Su «Responder a» es el email de la persona, así que respondes directo desde tu correo.
+   - **WhatsApp** a `ADMIN_WHATSAPP_NUMBER` con la plantilla aprobada `koptup_aviso`: «Aviso de KopTup: Nuevo contacto de <nombre>. Detalle: Empresa · Servicio · Email · un extracto del mensaje. Revisa tu correo o el panel de KopTup…».
+
+   El resultado de cada canal (Enviado, Falló con el motivo, No configurado…) queda en el contacto, y lo que falla se reintenta solo cada 5 minutos (hasta 6 intentos en los primeros 3 días). Si ningún canal está configurado, el lead igual queda guardado. La configuración está en [Operación y despliegue › 4.5](Doc-11-Operacion-y-Despliegue.md#45-configurar-los-avisos-al-dueño-paso-a-paso).
 3. **Aparece en Admin › Contactos**, junto con los leads de la demo RAG y de las solicitudes de demo:
 
 ![Admin, Contactos: los tres tipos de lead](images/doc/visitante/f3-04-admin-contactos.jpg)
@@ -484,7 +489,7 @@ sequenceDiagram
 3. **Demo RAG** (Laura): nombre "Lead de la demo RAG" y servicio "Demo RAG: prueba con tu documento".
 4. **Solicitudes de demo**, con el contador de pendientes: ahí se aprueba la de Andrés.
 
-El equipo marca cada contacto como **Nuevo**, **Leído** o **Respondido**. El manejo completo está en el [Manual del administrador](Doc-06-Manual-del-Administrador.md).
+El equipo marca cada contacto como **Nuevo**, **Leído** o **Respondido**, y cada tarjeta muestra el estado del aviso por canal («Correo: Enviado», «WhatsApp: Enviado»…). El manejo completo está en el [Manual del administrador](Doc-06-Manual-del-Administrador.md#8-contactos).
 
 **Límite:** 5 envíos por minuto desde la misma conexión.
 

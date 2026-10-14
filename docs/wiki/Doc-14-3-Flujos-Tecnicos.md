@@ -11,7 +11,7 @@
 | Azul | Visitante, prospecto o cliente | Abrir una demo, hacer una pregunta, recibir la respuesta |
 | Gris | Sistema: web, backend, base de datos o Redis | Middleware de Next, `requireRole`, guardar en MongoDB |
 | Morado | Equipo de KopTup (admin o comercial) | Aprobar una solicitud, revisar `/health` |
-| Verde | Aviso: email, WhatsApp o notificación | Aviso al equipo de un lead nuevo |
+| Verde | Aviso: email, WhatsApp o notificación | Aviso al dueño de un lead nuevo |
 | Ámbar (rombo) | Decisión del código | ¿El token es válido? |
 | Rojo | Error, bloqueo o camino degradado | 401, 403, 429, 503, pantalla de acceso |
 | Fucsia | Servicio externo | OpenAI, Railway, Google |
@@ -51,7 +51,10 @@
    - [8.2 Demos con IA y navegador](#82-demos-con-ia-y-navegador)
    - [8.3 Qué se guarda, dónde y cuánto tiempo](#83-qué-se-guarda-dónde-y-cuánto-tiempo) (tabla)
    - [8.4 Derechos del titular y plazo de conservación](#84-derechos-del-titular-y-plazo-de-conservación)
-9. [Hallazgos](#hallazgos)
+9. **Avisos al dueño (correo y WhatsApp)**
+   - [9.1 Envío, registro y reintentos](#91-envío-registro-y-reintentos)
+   - [9.2 Webhook de WhatsApp y prueba mensual](#92-webhook-de-whatsapp-y-prueba-mensual) (diagrama de secuencia)
+10. [Hallazgos](#hallazgos)
 
 ---
 
@@ -708,7 +711,7 @@ flowchart TD
     LEAD["Registra el lead con origen demo-rag<br/>y la prueba de la autorización: fecha,<br/>versión de la política, hash de la IP"]:::sistema
     QL{"¿Se guardó el lead?"}:::decision
     E7["503 lead_unavailable<br/>el documento no se procesa<br/>y se devuelve el cupo"]:::error
-    AV["Aviso al equipo por email y WhatsApp<br/>si están configurados"]:::aviso
+    AV["Aviso al dueño por correo y WhatsApp<br/>sin esperar, diagrama 9.1"]:::aviso
     OK["201: documento listo<br/>el navegador guarda el docId en sessionStorage<br/>y registra el evento demo_upload"]:::visitante
 
     ST --> Q0
@@ -812,7 +815,7 @@ sequenceDiagram
         participant M as MongoDB
     end
     box rgb(220,252,231) Avisos
-        participant A as Email y WhatsApp
+        participant A as Resend y Meta WhatsApp
     end
     box rgb(253,244,255) Externo
         participant O as OpenAI
@@ -830,7 +833,7 @@ sequenceDiagram
         B->>R: DECR del cupo diario
         B-->>N: 503 lead_unavailable, sin procesar el documento
     end
-    B-)A: Aviso al equipo con el email del lead
+    B-)A: Aviso al dueño con el email del lead
     B->>B: Firma, texto, páginas y fragmentos
     alt Documento válido
         B->>B: Fragmentos e índice en memoria por 1 hora
@@ -863,7 +866,7 @@ sequenceDiagram
 
 ![Diagrama: Secuencia completa](images/doc/flujos/Doc-14-3-Flujos-Tecnicos-13.png)
 
-Todo el recorrido en el tiempo, con quién habla con quién. El lead se guarda antes de procesar el documento; el aviso al equipo sale en paralelo y no frena la respuesta. Si la persona recarga la pestaña, el navegador recupera el documento con `GET /documents/docId` usando el `docId` de `sessionStorage`, mientras siga en memoria.
+Todo el recorrido en el tiempo, con quién habla con quién. El lead se guarda antes de procesar el documento; el aviso al dueño sale en paralelo y no frena la respuesta. Si la persona recarga la pestaña, el navegador recupera el documento con `GET /documents/docId` usando el `docId` de `sessionStorage`, mientras siga en memoria.
 
 Fuente en el código: `apps/backend/src/routes/demo-rag.routes.ts`, `apps/backend/src/services/demo-rag.service.ts`, `apps/backend/src/services/ai-budget.service.ts`, `apps/backend/src/services/lead.service.ts`, `apps/web/src/app/demo/chatbot/components/upload/api.ts`, `UploadDemo.tsx` (`handleReset`).
 
@@ -1244,9 +1247,9 @@ flowchart TD
     T{"¿Qué variable es?"}:::decision
     C1["Imprescindibles<br/>MONGODB_URI y JWT_SECRET"]:::sistema
     C2["De sesión<br/>JWT_REFRESH_SECRET"]:::sistema
-    C3["Opcionales con efecto<br/>REDIS_URL, OPENAI_API_KEY, CORS_ORIGIN, FRONTEND_URL,<br/>ADMIN_EMAIL, INTERNAL_API_KEY, DEMO_UPLOAD_ENABLED<br/>y el par SMTP_USER + SMTP_PASS"]:::sistema
-    C4["Otras del esquema<br/>PORT, TRUST_PROXY_HOPS, límites de peticiones,<br/>topes de gasto, JWT_REFRESH_EXPIRES_IN, SMTP_PORT,<br/>OPENAI_BASE_URL y más"]:::sistema
-    NV["Fuera del esquema: si falta, no hay aviso<br/>p. ej. GOOGLE_CLIENT_ID, credenciales de WhatsApp"]:::sistema
+    C3["Opcionales con efecto<br/>REDIS_URL, OPENAI_API_KEY, CORS_ORIGIN, FRONTEND_URL,<br/>ADMIN_EMAIL, INTERNAL_API_KEY, DEMO_UPLOAD_ENABLED,<br/>avisos: RESEND_API_KEY o SMTP, NOTIFY_EMAIL,<br/>WhatsApp de Meta y su webhook"]:::sistema
+    C4["Otras del esquema<br/>PORT, TRUST_PROXY_HOPS, límites de peticiones,<br/>topes de gasto, JWT_REFRESH_EXPIRES_IN, SMTP_PORT,<br/>WHATSAPP_GRAPH_VERSION, NOTIFY_HEARTBEAT_DAYS,<br/>OPENAI_BASE_URL y más"]:::sistema
+    NV["Fuera del esquema: si falta, no hay aviso<br/>p. ej. GOOGLE_CLIENT_ID o las de AWS S3"]:::sistema
     R1{"¿Falta o tiene<br/>formato inválido?"}:::decision
     P{"¿NODE_ENV es<br/>production?"}:::decision
     ERR["Error: Configuración incompleta<br/>el backend no abre el puerto"]:::error
@@ -1258,7 +1261,7 @@ flowchart TD
     EQ{"¿Es igual a<br/>JWT_SECRET?"}:::decision
     W3["Aviso: usa valores distintos"]:::sistema
     R3{"¿Falta?"}:::decision
-    W4["Aviso con la función que se apaga<br/>p. ej. sin SMTP_USER o SMTP_PASS no sale ningún correo;<br/>sin REDIS_URL se apagan las funciones de IA públicas"]:::sistema
+    W4["Aviso con la función que se apaga<br/>p. ej. sin RESEND_API_KEY ni SMTP no sale ningún correo,<br/>SMTP sin Resend no sale en Railway Hobby,<br/>sin REDIS_URL se apagan las funciones de IA públicas"]:::sistema
     F{"¿Formato válido?<br/>número, URL o email"}:::decision
     W5["Aviso: formato inválido<br/>la función usa su valor por defecto"]:::sistema
     OK["Sin mensaje"]:::sistema
@@ -1294,9 +1297,9 @@ flowchart TD
 
 ![Diagrama: Validación de variables de entorno](images/doc/flujos/Doc-14-3-Flujos-Tecnicos-20.png)
 
-Solo dos variables pueden impedir el arranque, y solo en producción: `MONGODB_URI` y `JWT_SECRET`. Todo lo demás genera un aviso en el log y la función afectada se apaga o usa su valor por defecto. `SMTP_HOST` no se avisa: es opcional (sin ella se usa Gmail); lo que decide si sale correo es el par `SMTP_USER` + `SMTP_PASS`. `DEMO_UPLOAD_ENABLED` avisa si falta, pero no si vale `false` (apagada a propósito). `JWT_REFRESH_EXPIRES_IN` avisa si es inválida o mayor de 7 días (se usan 7). Un tope de gasto inválido o negativo deja esa función sin presupuesto (0), lo que equivale a apagarla. La lista completa de variables está en [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md).
+Solo dos variables pueden impedir el arranque, y solo en producción: `MONGODB_URI` y `JWT_SECRET`. Todo lo demás genera un aviso en el log y la función afectada se apaga o usa su valor por defecto. Lo que decide si sale correo es `RESEND_API_KEY` (o, sin ella, el par `SMTP_USER` + `SMTP_PASS`): sin ninguno, el aviso dice que no sale ningún correo; con SMTP y sin Resend, avisa que Railway Free, Trial y Hobby bloquean el SMTP. `SMTP_HOST` no se avisa (sin ella se usa Gmail), y el par SMTP solo se avisa si está a medias. Los avisos al dueño tienen su propia revisión (`notifyWarnings`): falta de destino (`NOTIFY_EMAIL` ni `ADMIN_EMAIL`), proveedor de WhatsApp retirado (Twilio o UltraMsg), variables de Meta incompletas, webhook sin configurar y `NOTIFY_JOBS_ENABLED=false`. `DEMO_UPLOAD_ENABLED` avisa si falta, pero no si vale `false` (apagada a propósito). `JWT_REFRESH_EXPIRES_IN` avisa si es inválida o mayor de 7 días (se usan 7). Un tope de gasto inválido o negativo deja esa función sin presupuesto (0), lo que equivale a apagarla. La lista completa de variables está en [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md).
 
-Fuente en el código: `apps/backend/src/config/env.ts` (`EnvSchema`, `REQUIRED_IN_PRODUCTION`, `RECOMMENDED_IN_PRODUCTION`, `OPTIONAL_WITH_EFFECT`, `OPTIONAL_GROUPS`, `validateEnv`, `assertValidEnv`), `apps/backend/src/services/ai-budget.service.ts` (`getMonthlyBudgetUSD`).
+Fuente en el código: `apps/backend/src/config/env.ts` (`EnvSchema`, `REQUIRED_IN_PRODUCTION`, `RECOMMENDED_IN_PRODUCTION`, `OPTIONAL_WITH_EFFECT`, `OPTIONAL_GROUPS`, `notifyWarnings`, `validateEnv`, `assertValidEnv`), `apps/backend/src/services/ai-budget.service.ts` (`getMonthlyBudgetUSD`).
 
 ---
 
@@ -1325,12 +1328,12 @@ flowchart TD
     C["5. Siembra las demos que falten en el catálogo<br/>y migra a MongoDB el archivo heredado del chatbot<br/>si existe; si falla, aviso y sigue"]:::sistema
     P["6. Passport: Google OAuth solo con<br/>GOOGLE_CLIENT_ID y GOOGLE_CLIENT_SECRET<br/>si falla, aviso y sigue"]:::sistema
     AP["7. createApp: middleware y rutas<br/>diagrama 6.1"]:::sistema
-    L["8. Abre el puerto PORT, 3001 por defecto<br/>tiempos de espera de 15 min para PDF grandes"]:::sistema
+    L["8. Abre el puerto PORT, 3001 por defecto<br/>tiempos de espera de 15 min para PDF grandes<br/>y escribe una línea por canal de avisos<br/>con el destino enmascarado"]:::sistema
     J{"¿NODE_ENV test o<br/>DEMO_GRANTS_JOB_ENABLED=false?"}:::decision
-    J1["9. Inicia los jobs con candado en Redis:<br/>accesos y recordatorios, conservación de datos<br/>y, solo con COMMERCE_ENABLED=true, propuestas<br/>diagrama 8.4"]:::sistema
+    J1["9. Inicia los jobs con candado en Redis:<br/>accesos y recordatorios, conservación de datos,<br/>reintentos y prueba mensual de los avisos<br/>(salvo NOTIFY_JOBS_ENABLED=false)<br/>y, solo con COMMERCE_ENABLED=true, propuestas<br/>diagramas 8.4 y 9.1"]:::sistema
     J0["Sin job en esta instancia"]:::sistema
     RD["Redis no se conecta al arrancar<br/>se conecta en la primera consulta"]:::sistema
-    SG["SIGTERM o SIGINT: detiene el job,<br/>cierra el servidor y exit 0"]:::sistema
+    SG["SIGTERM o SIGINT: detiene los jobs,<br/>cierra el servidor y exit 0"]:::sistema
     CR["uncaughtException o unhandledRejection<br/>log y exit 1"]:::error
 
     S --> E --> Q1
@@ -1352,7 +1355,7 @@ flowchart TD
 
 El backend prefiere arrancar degradado a no arrancar: sin base de datos abre el puerto igual (y lo dice `/health`), sin Google OAuth solo se apaga ese botón y sin Redis se apagan las funciones de IA públicas. Lo único que lo detiene es una variable imprescindible ausente en producción o un error no controlado.
 
-Fuente en el código: `apps/backend/src/index.ts` (`startServer`, `ensureAdminFromEnv`, `shutdown`), `apps/backend/src/config/mongodb.ts`, `apps/backend/src/config/redis.ts`, `apps/backend/src/config/passport.ts`, `apps/backend/src/services/demo-catalog.service.ts` (`ensureCatalogSeeded`), `apps/backend/src/jobs/demo-grants.job.ts` (`startDemoGrantsJob`), `apps/backend/src/jobs/retention.job.ts` (`startRetentionJob`), `apps/backend/src/services/chatbot-store.service.ts` (`ensureChatbotMigrated`), `apps/backend/railway.json`.
+Fuente en el código: `apps/backend/src/index.ts` (`startServer`, `ensureAdminFromEnv`, `shutdown`), `apps/backend/src/config/mongodb.ts`, `apps/backend/src/config/redis.ts`, `apps/backend/src/config/passport.ts`, `apps/backend/src/services/demo-catalog.service.ts` (`ensureCatalogSeeded`), `apps/backend/src/jobs/demo-grants.job.ts` (`startDemoGrantsJob`), `apps/backend/src/jobs/retention.job.ts` (`startRetentionJob`), `apps/backend/src/jobs/notify-retry.job.ts` y `notify-heartbeat.job.ts`, `apps/backend/src/services/owner-notify.service.ts` (`logNotifyChannels`), `apps/backend/src/services/chatbot-store.service.ts` (`ensureChatbotMigrated`), `apps/backend/railway.json`.
 
 ---
 
@@ -1380,8 +1383,8 @@ flowchart TD
     RL["Cupos en Redis: hash de la IP por 1 h<br/>y hash del email por 24 h, o en memoria"]:::sistema
     DR["MongoDB DemoRequest<br/>datos del formulario y la prueba de autorización:<br/>aceptado, fecha, versión de la política,<br/>hash de la IP y navegador"]:::sistema
     CT["MongoDB Contact con origen demo-request<br/>nombre, email, teléfono, empresa, servicio<br/>y la misma prueba de autorización"]:::sistema
-    NT["Email y WhatsApp al equipo con los datos del lead<br/>vía SMTP y Twilio, WhatsApp Business o UltraMsg"]:::aviso
-    AK["Acuse al solicitante por email<br/>si hay SMTP"]:::aviso
+    NT["Correo y WhatsApp al dueño con los datos del lead<br/>por Resend y Meta, que actúan como encargados<br/>resultado por canal en Contact.notificaciones"]:::aviso
+    AK["Acuse al solicitante por email<br/>si hay correo configurado"]:::aviso
     AP{"¿El equipo la aprueba?"}:::decision
     US["MongoDB User con rol prospect<br/>email, nombre, empresa y teléfono<br/>contraseña con hash al activar"]:::sistema
     GR["MongoDB DemoGrant por demo<br/>vencimiento, visitas y último acceso"]:::sistema
@@ -1485,7 +1488,8 @@ Fuente en el código: `apps/backend/src/services/demo-rag.service.ts`, `apps/bac
 | Documento de «Prueba con tu documento» | Memoria del backend | 1 hora como máximo | Automático, botón «Subir otro documento» o reinicio |
 | Bots del chatbot y sus documentos | MongoDB `chatbot_bots` y `chatbot_bot_chunks` | 12 meses sin uso (bots marcados como de ejemplo: 30 días) | Job de conservación, o el dueño borra el bot |
 | Preguntas y respuestas del widget de un bot de usuario | MongoDB `chatbot_turns` | 30 días (últimas 200 por bot) | Automático (índice TTL), el dueño borra el historial o Admin › Privacidad (si contienen el email) |
-| Avisos al equipo con los datos del lead | Correo (SMTP) y WhatsApp del equipo | Según esos servicios | Fuera del sistema |
+| Avisos al dueño con los datos del lead (el WhatsApp lleva nombre, empresa, servicio, email y un extracto del mensaje) | Correo del dueño (enviado por Resend) y su WhatsApp (enviado por Meta, WhatsApp Business Platform) | Según esos servicios | Fuera del sistema |
+| Estado del aviso de cada contacto (estado, intentos, error sin secretos, id del proveedor) y salud de los canales | MongoDB `Contact.notificaciones` y `AppSetting` `avisos.estado` (sin datos personales: los correos del error van enmascarados) | Lo mismo que el contacto | Se borra con el contacto en Admin › Privacidad; si el job de conservación anonimiza el contacto, el estado del aviso se queda |
 | Registros de peticiones (IP, ruta, navegador) | Logs del backend en Railway | Según Railway | Fuera del código |
 | Preferencias de cookies, tokens de dueño de los bots, `docId` | Navegador (`localStorage` y `sessionStorage`) | Hasta que la persona los borre; `sessionStorage` hasta cerrar la pestaña | En el navegador |
 
@@ -1538,12 +1542,140 @@ Fuente en el código: `apps/backend/src/services/privacy.service.ts` (`findPerso
 
 ---
 
+
+## 9. Avisos al dueño (correo y WhatsApp)
+
+Cada contacto nuevo (formulario de `/contact`, «Solicitar demo» y «Prueba con tu documento») avisa al dueño por dos canales independientes: **correo** por la API HTTPS de Resend (SMTP solo como respaldo) y **WhatsApp** por la WhatsApp Cloud API de Meta con la plantilla aprobada `koptup_aviso`. El resultado de cada canal queda en `Contact.notificaciones`, la salud de cada canal en `AppSetting` `avisos.estado`, y dos jobs se encargan de que un canal no se caiga sin que nadie lo note. La configuración está en [Operación y despliegue › 4.5](Doc-11-Operacion-y-Despliegue.md#45-configurar-los-avisos-al-dueño-paso-a-paso).
+
+### 9.1 Envío, registro y reintentos
+
+```mermaid
+flowchart TD
+    classDef visitante fill:#dbeafe,stroke:#2563eb,color:#0f172a
+    classDef sistema fill:#f1f5f9,stroke:#475569,color:#0f172a
+    classDef admin fill:#f3e8ff,stroke:#9333ea,color:#0f172a
+    classDef aviso fill:#dcfce7,stroke:#16a34a,color:#0f172a
+    classDef decision fill:#fef3c7,stroke:#d97706,color:#0f172a
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#0f172a
+    classDef externo fill:#fdf4ff,stroke:#c026d3,color:#0f172a
+
+    IN["Contacto nuevo<br/>formulario, Solicitar demo o Prueba con tu documento"]:::visitante
+    CR["Contact.create con notificaciones:<br/>canal configurado en pendiente, reclamado 10 min<br/>o no_configurado con lo que falta"]:::sistema
+    RS["Responde al formulario<br/>sin esperar a los proveedores"]:::visitante
+    AR["Arma el aviso con la hora de creación:<br/>asunto, html y texto del correo,<br/>título y detalle de la plantilla"]:::sistema
+    EM["Resend POST /emails<br/>Idempotency-Key contact-id-email, reply_to<br/>15 s, 1 reintento ante 429, 5xx o red"]:::externo
+    QE{"¿2xx con id?"}:::decision
+    Q403{"¿403 por dominio<br/>no verificado?"}:::decision
+    OB["Reintento desde onboarding@resend.dev<br/>solo llega al dueño de la cuenta de Resend"]:::externo
+    WA["Meta POST /v25.0/id-del-número/messages<br/>plantilla koptup_aviso, 2 parámetros<br/>sin saltos de línea, 120 y 700 caracteres"]:::externo
+    QW{"¿2xx con wamid?"}:::decision
+    Q132{"¿Error de plantilla 132xxx<br/>y respaldo activo?"}:::decision
+    HW["Plantilla hello_world en_US<br/>para que al menos suene el teléfono"]:::externo
+    OK["enviado con idProveedor<br/>y respaldo si se usó"]:::aviso
+    KO["fallido con el error limpio<br/>y proximoIntento"]:::error
+    H["AppSetting avisos.estado:<br/>último éxito, último fallo y último error"]:::sistema
+    J["Job cada 5 min con candado en Redis:<br/>contactos de los últimos 3 días,<br/>fallido o pendiente vencido, menos de 6 intentos"]:::sistema
+    CL{"¿Reclama el canal con una<br/>actualización condicionada?"}:::decision
+    SK["Otro proceso lo tiene<br/>o ya salió: no reenvía"]:::sistema
+    MX["6 intentos: ya no se reintenta<br/>queda el botón Reenviar aviso"]:::admin
+
+    IN --> CR --> RS
+    CR --> AR
+    AR -->|"correo"| EM --> QE
+    QE -->|"Sí"| OK
+    QE -->|"No"| Q403
+    Q403 -->|"Sí"| OB
+    OB -->|"2xx con id"| OK
+    OB -->|"también falla"| KO
+    Q403 -->|"No"| KO
+    AR -->|"WhatsApp"| WA --> QW
+    QW -->|"Sí"| OK
+    QW -->|"No"| Q132
+    Q132 -->|"Sí"| HW --> OK
+    Q132 -->|"No"| KO
+    OK --> H
+    KO --> H
+    KO -->|"esperas de 5 min, 15 min, 1 h, 3 h y 12 h"| J --> CL
+    CL -->|"Sí"| AR
+    CL -->|"No"| SK
+    J -.->|"intentos agotados"| MX
+```
+
+![Diagrama: Envío, registro y reintentos](images/doc/flujos/Doc-14-3-Flujos-Tecnicos-25.png)
+
+El aviso se arma igual en cada intento (usa la hora en que se creó el contacto), así que un reintento envía el mismo correo con la misma `Idempotency-Key` y Resend no lo duplica; el reenvío manual con `?todos=1` usa otra key a propósito. Cada canal se reclama con una actualización condicionada en MongoDB antes de enviarse: dos corridas del job, o el job y un reenvío manual, nunca envían el mismo canal a la vez, y un canal `enviado`, `entregado` o `leido` no se vuelve a enviar solo. Un contacto que quedó `pendiente` por un reinicio a mitad del envío se retoma cuando vence su reclamo de 10 minutos. Los errores se guardan sin la key ni el token, con los correos enmascarados y en máximo 300 caracteres. Sin Redis, el job corre igual: el reclamo por canal evita duplicados.
+
+Fuente en el código: `apps/backend/src/services/lead.service.ts` (`registerLeadWithNotifications`), `apps/backend/src/services/owner-notify.service.ts` (`initialNotifications`, `buildContactNotice`, `deliverContactNotifications`, `claimChannel`, `nextRetryAt`, `recordChannelHealth`), `apps/backend/src/services/email.service.ts` (`sendViaResend`, `resendWithRetry`), `apps/backend/src/services/whatsapp.service.ts` (`sendTemplate`, `sanitizeTemplateParam`, `TEMPLATE_ERROR_CODES`), `apps/backend/src/jobs/notify-retry.job.ts`, `apps/backend/src/models/Contact.ts`.
+
+---
+
+### 9.2 Webhook de WhatsApp y prueba mensual
+
+```mermaid
+sequenceDiagram
+    autonumber
+    box rgb(253,244,255) Externo
+        participant ME as Meta
+        participant RS as Resend
+    end
+    box rgb(241,245,249) Sistema
+        participant B as Backend
+        participant M as MongoDB
+        participant J as Job del latido
+    end
+    box rgb(219,234,254) Dueño
+        actor D as Dueño
+    end
+    ME->>B: GET /api/webhooks/whatsapp con hub.mode, hub.verify_token y hub.challenge
+    alt Token igual a WHATSAPP_WEBHOOK_VERIFY_TOKEN
+        B-->>ME: 200 con el challenge
+    else Token distinto
+        B-->>ME: 403 forbidden
+    end
+    ME->>B: POST con los estados y la cabecera X-Hub-Signature-256
+    alt Firma HMAC-SHA256 del cuerpo crudo inválida
+        B-->>ME: 401 invalid_signature
+    else Firma válida
+        B-->>ME: 200 de inmediato
+        B->>M: delivered pasa a entregado y read a leido, sin retroceder
+        opt Estado failed
+            B->>M: fallido con el código de Meta y proximoIntento
+            B->>M: AppSetting avisos.estado con el último fallo
+            B->>RS: Correo de alerta con el código y qué revisar, una vez por wamid
+            RS--)D: WhatsApp no entregó un aviso de KopTup
+        end
+    end
+    loop Cada hora
+        J->>M: Si pasaron 30 días y son entre las 9:00 y las 18:59 en Bogotá, reclama latido.ultimo
+        opt Le toca
+            J->>RS: Prueba mensual por correo
+            J->>ME: Prueba mensual con la plantilla
+            opt Falló el WhatsApp y el correo está configurado
+                J->>RS: Alerta por correo con el error de Meta y qué revisar
+            end
+            opt Falló el correo y el WhatsApp está configurado
+                J->>ME: Alerta por WhatsApp con el error del correo
+            end
+        end
+    end
+```
+
+![Diagrama: Webhook de WhatsApp y prueba mensual](images/doc/flujos/Doc-14-3-Flujos-Tecnicos-26.png)
+
+El webhook solo existe con `WHATSAPP_WEBHOOK_VERIFY_TOKEN` y `WHATSAPP_APP_SECRET` (si no, responde 404). Se monta antes del parser JSON global para poder verificar la firma sobre el cuerpo crudo, con comparación en tiempo constante, y tiene su propio límite de 600 peticiones por minuto por IP. Responde 200 antes de procesar, porque Meta reintenta los eventos que no reciben respuesta rápida. Un `failed` de un aviso de prueba o del latido no toca ningún contacto, pero sí la salud del canal y la alerta. La prueba mensual (`NOTIFY_HEARTBEAT_DAYS`, 30 por defecto; `0` la apaga) guarda su fecha en MongoDB y la reclama con una actualización condicionada: con varias instancias o tras un reinicio se envía una sola vez. Mantiene viva la plantilla, que Meta archiva tras 12 meses sin uso. Si en el latido falla un canal, avisa por el otro. `NOTIFY_JOBS_ENABLED=false` apaga los dos jobs; ninguno corre en `NODE_ENV=test`.
+
+Fuente en el código: `apps/backend/src/routes/whatsapp-webhook.routes.ts`, `apps/backend/src/services/whatsapp.service.ts` (`verifyMetaSignature`, `describeMetaError`), `apps/backend/src/services/owner-notify.service.ts` (`processWhatsAppStatuses`, `sendOwnerTestNotice`, `isWithinHeartbeatWindow`, `nextHeartbeatAt`), `apps/backend/src/jobs/notify-heartbeat.job.ts`, `apps/backend/src/app.ts`.
+
+---
+
 ## Hallazgos
 
 Cosas del código que no cuadran, dibujadas tal como son. No repiten las de [Flujos de negocio](Doc-14-1-Flujos-de-Negocio.md#hallazgos) ni las de [Flujos de administración](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#hallazgos).
 
 1. **Las rutas que solo usan `authenticate` aplican los cambios de cuenta al vencer el token.** Documentos, pedidos, mensajes, notificaciones, proyectos, facturas y entregables aceptan el token tal cual: un cambio de rol o una cuenta borrada se aplica en esas rutas cuando vence el token de acceso (15 min), mientras que las rutas con `requireRole` y las excepciones «dueño o staff» (`isStaffSession`) leen la base en cada petición. (diagrama 2.1, `apps/backend/src/routes/POLICIES.md`).
 2. **LinkedIn Ads todavía lee sus mensajes de error a su manera.** El backend ya responde siempre `{ success: false, code, message }` con códigos propios (por ejemplo `budget_exhausted` y `limits_unavailable`), pero la demo solo distingue un 503 cuando el mensaje contiene «configur», así que el cupo agotado y Redis caído se ven como «el servidor no pudo completar la solicitud». («Prueba con tu documento» ya muestra su propio texto para `too_much_text`.) (diagrama 4.1, `generarConIA` en `apps/web/src/app/demo/linkedin-ads/components/PostGenerator.tsx`).
+3. **Un aviso de WhatsApp que salió con el respaldo `hello_world` cuenta como `enviado` y no se reintenta.** El teléfono suena con el mensaje de ejemplo de Meta (en inglés y sin los datos del contacto) y el error de la plantilla queda en `notificaciones.whatsapp.error` y en `avisos.estado`: alguien tiene que leerlo en el panel para arreglar la plantilla (diagrama 9.1, `sendTemplate` en `apps/backend/src/services/whatsapp.service.ts`).
+4. **La alerta por un WhatsApp fallido se recuerda solo en memoria.** El backend guarda los últimos 200 `wamid` ya alertados en un arreglo del proceso: si se reinicia y Meta vuelve a enviar el mismo `failed`, la alerta por correo llega otra vez (diagrama 9.2, `sendFailureAlert` en `apps/backend/src/services/owner-notify.service.ts`).
 
 ## Páginas relacionadas
 

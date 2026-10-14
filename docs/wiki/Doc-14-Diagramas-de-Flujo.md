@@ -74,13 +74,14 @@ flowchart TD
     A6["Admin 6.1 y 6.2<br/>Job de vencimiento y correos"]:::aviso
     N9["Negocio 9 y 10<br/>Cookies, idioma y tema"]:::visitante
     T8["Técnico 8.1 a 8.3<br/>Datos personales"]:::sistema
+    T9["Técnico 9.1 y 9.2<br/>Avisos al dueño por correo y WhatsApp"]:::aviso
 
     subgraph OPS["Operación del sitio"]
         direction LR
         A7["Admin 7.1 a 8.1<br/>CI, despliegue y wiki"]:::externo
         T7["Técnico 7.1 y 7.2<br/>Arranque del backend"]:::sistema
         T6["Técnico 6.1 a 6.3<br/>Errores y salud"]:::sistema
-        A9["Admin 9.1 a 9.6<br/>Runbooks ante fallas"]:::admin
+        A9["Admin 9.1 a 9.7<br/>Runbooks ante fallas"]:::admin
     end
 
     N1 --> DA
@@ -90,6 +91,8 @@ flowchart TD
     N1 -->|"Cotiza"| N4
     T3 -->|"Lead demo-rag"| A5
     N4 -->|"Lead en Contactos"| A5
+    N4 -->|"Aviso al dueño"| T9
+    T9 -.->|"Estado del aviso por canal"| A5
     N3 -->|"Solicitud y aviso al equipo"| A1
     N3 -.->|"Datos con autorización"| T8
     N9 -.->|"Etiquetas con consentimiento"| T8
@@ -160,7 +163,7 @@ Página completa: [Flujos de negocio y del cliente](Doc-14-1-Flujos-de-Negocio.m
 
 ## Flujos de administración y operación
 
-Página completa: [Flujos de administración y operación](Doc-14-2-Flujos-de-Administracion-y-Operacion.md). Lo que hace el equipo en el panel, el job que vence los accesos, el camino de un cambio hasta producción y seis procedimientos ante fallas.
+Página completa: [Flujos de administración y operación](Doc-14-2-Flujos-de-Administracion-y-Operacion.md). Lo que hace el equipo en el panel, el job que vence los accesos, el camino de un cambio hasta producción y siete procedimientos ante fallas.
 
 | Miniatura | Diagrama | Para qué sirve | Quién lo usa |
 |---|---|---|---|
@@ -182,17 +185,18 @@ Página completa: [Flujos de administración y operación](Doc-14-2-Flujos-de-Ad
 | [![7.2 Merge a main y despliegue a producción](images/doc/flujos/Doc-14-2-Flujos-de-Administracion-y-Operacion-16.png)](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#72-merge-a-main-y-despliegue-a-producción) | [7.2 Merge a main y despliegue a producción](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#72-merge-a-main-y-despliegue-a-producción)<br/>*Flujo* | Cómo Vercel y Railway despliegan `main` en paralelo y qué hace fallar un despliegue. | Desarrollador, dueño o admin |
 | [![8.1 Publicación de la wiki](images/doc/flujos/Doc-14-2-Flujos-de-Administracion-y-Operacion-17.png)](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#81-publicación-de-la-wiki) | [8.1 Publicación de la wiki](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#81-publicación-de-la-wiki)<br/>*Flujo* | Cómo `docs/wiki` llega a la wiki de GitHub. | Desarrollador |
 | [![9.1 El backend está caído](images/doc/flujos/Doc-14-2-Flujos-de-Administracion-y-Operacion-18.png)](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#91-el-backend-está-caído) | [9.1 El backend está caído](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#91-el-backend-está-caído)<br/>*Runbook* | Procedimiento: diagnosticar con `/health/live` y `/health` y restablecer el servicio. | Desarrollador, dueño o admin |
-| [![9.2 El correo no sale](images/doc/flujos/Doc-14-2-Flujos-de-Administracion-y-Operacion-19.png)](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#92-el-correo-no-sale) | [9.2 El correo no sale](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#92-el-correo-no-sale)<br/>*Runbook* | Procedimiento: revisar SMTP, avisos al equipo, recordatorios y enlaces que apuntan a localhost. | Desarrollador, dueño o admin |
+| [![9.2 El correo no sale](images/doc/flujos/Doc-14-2-Flujos-de-Administracion-y-Operacion-19.png)](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#92-el-correo-no-sale) | [9.2 El correo no sale](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#92-el-correo-no-sale)<br/>*Runbook* | Procedimiento: revisar la tarjeta de avisos, Resend (o el SMTP bloqueado en Railway Hobby), el aviso de prueba, los recordatorios y los enlaces que apuntan a localhost. | Desarrollador, dueño o admin |
 | [![9.3 Una demo sigue bloqueada](images/doc/flujos/Doc-14-2-Flujos-de-Administracion-y-Operacion-20.png)](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#93-una-demo-sigue-bloqueada) | [9.3 Una demo sigue bloqueada](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#93-una-demo-sigue-bloqueada)<br/>*Runbook* | Procedimiento: qué hacer según el estado que ve el prospecto en la pantalla de acceso. | Dueño o admin |
 | [![9.4 Se agotó el presupuesto de IA](images/doc/flujos/Doc-14-2-Flujos-de-Administracion-y-Operacion-21.png)](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#94-se-agotó-el-presupuesto-de-ia) | [9.4 Se agotó el presupuesto de IA](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#94-se-agotó-el-presupuesto-de-ia)<br/>*Runbook* | Procedimiento: el cupo mensual de IA de cada función y cómo subirlo o esperar el cambio de mes. | Dueño o admin, desarrollador |
 | [![9.5 Rotar secretos](images/doc/flujos/Doc-14-2-Flujos-de-Administracion-y-Operacion-22.png)](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#95-rotar-secretos) | [9.5 Rotar secretos](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#95-rotar-secretos)<br/>*Runbook* | Procedimiento: cambiar las claves de MongoDB, JWT, `INTERNAL_API_KEY` y proveedores sin romper el sitio. | Desarrollador |
 | [![9.6 Revertir un despliegue](images/doc/flujos/Doc-14-2-Flujos-de-Administracion-y-Operacion-23.png)](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#96-revertir-un-despliegue) | [9.6 Revertir un despliegue](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#96-revertir-un-despliegue)<br/>*Runbook* | Procedimiento: volver a la versión anterior en Vercel o Railway y revertir `main`. | Desarrollador |
+| [![9.7 El WhatsApp no llega](images/doc/flujos/Doc-14-2-Flujos-de-Administracion-y-Operacion-24.png)](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#97-el-whatsapp-no-llega) | [9.7 El WhatsApp no llega](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#97-el-whatsapp-no-llega)<br/>*Runbook* | Procedimiento: variables de Meta, aviso de prueba, códigos de error (token, destinatario, plantilla), respaldo `hello_world` y webhook. | Dueño o admin, desarrollador |
 
 ---
 
 ## Flujos técnicos
 
-Página completa: [Flujos técnicos](Doc-14-3-Flujos-Tecnicos.md). Las reglas exactas del código: middleware, autorización, chatbot RAG, LinkedIn, errores, arranque y datos personales. La misma página tiene, además, una tabla de qué datos se guardan, dónde y cuánto tiempo (sección 8.3).
+Página completa: [Flujos técnicos](Doc-14-3-Flujos-Tecnicos.md). Las reglas exactas del código: middleware, autorización, chatbot RAG, LinkedIn, errores, arranque, datos personales y avisos al dueño por correo y WhatsApp. La misma página tiene, además, una tabla de qué datos se guardan, dónde y cuánto tiempo (sección 8.3).
 
 | Miniatura | Diagrama | Para qué sirve | Quién lo usa |
 |---|---|---|---|
@@ -219,6 +223,8 @@ Página completa: [Flujos técnicos](Doc-14-3-Flujos-Tecnicos.md). Las reglas ex
 | [![7.2 Secuencia de arranque](images/doc/flujos/Doc-14-3-Flujos-Tecnicos-21.png)](Doc-14-3-Flujos-Tecnicos.md#72-secuencia-de-arranque) | [7.2 Secuencia de arranque](Doc-14-3-Flujos-Tecnicos.md#72-secuencia-de-arranque)<br/>*Flujo* | Los pasos del arranque del backend y cómo arranca degradado si algo falta. | Desarrollador |
 | [![8.1 Solicitud de demo y cuenta](images/doc/flujos/Doc-14-3-Flujos-Tecnicos-22.png)](Doc-14-3-Flujos-Tecnicos.md#81-solicitud-de-demo-y-cuenta) | [8.1 Solicitud de demo y cuenta](Doc-14-3-Flujos-Tecnicos.md#81-solicitud-de-demo-y-cuenta)<br/>*Flujo* | Qué datos personales se guardan al pedir una demo, con qué autorización y dónde. | Dueño o admin, desarrollador |
 | [![8.2 Demos con IA y navegador](images/doc/flujos/Doc-14-3-Flujos-Tecnicos-23.png)](Doc-14-3-Flujos-Tecnicos.md#82-demos-con-ia-y-navegador) | [8.2 Demos con IA y navegador](Doc-14-3-Flujos-Tecnicos.md#82-demos-con-ia-y-navegador)<br/>*Flujo* | Qué datos quedan en memoria, disco, navegador y OpenAI al usar las demos con IA. | Dueño o admin, desarrollador |
+| [![9.1 Envío, registro y reintentos](images/doc/flujos/Doc-14-3-Flujos-Tecnicos-25.png)](Doc-14-3-Flujos-Tecnicos.md#91-envío-registro-y-reintentos) | [9.1 Envío, registro y reintentos](Doc-14-3-Flujos-Tecnicos.md#91-envío-registro-y-reintentos)<br/>*Flujo* | Cómo sale el aviso al dueño de cada contacto por Resend y por la plantilla de Meta, qué queda en `Contact.notificaciones` y cómo el job reintenta sin duplicar. | Desarrollador, dueño o admin |
+| [![9.2 Webhook de WhatsApp y prueba mensual](images/doc/flujos/Doc-14-3-Flujos-Tecnicos-26.png)](Doc-14-3-Flujos-Tecnicos.md#92-webhook-de-whatsapp-y-prueba-mensual) | [9.2 Webhook de WhatsApp y prueba mensual](Doc-14-3-Flujos-Tecnicos.md#92-webhook-de-whatsapp-y-prueba-mensual)<br/>*Secuencia* | La verificación y la firma del webhook de Meta, los estados entregado, leído y fallido, la alerta por correo y el latido mensual. | Desarrollador |
 
 ---
 
@@ -259,7 +265,7 @@ Cada página de diagramas tiene su propia sección con lo que el código hace ma
 
 - [Hallazgos de los flujos de negocio](Doc-14-1-Flujos-de-Negocio.md#hallazgos): 7 puntos (por ejemplo, una solicitud fusionada no avisa a nadie y el botón de GitHub del inicio de sesión no hace nada).
 - [Hallazgos de administración y operación](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#hallazgos): 7 puntos (por ejemplo, con el backend caído el panel manda al login en lugar de avisar, y `main` no exige CI en verde).
-- [Hallazgos técnicos](Doc-14-3-Flujos-Tecnicos.md#hallazgos): 2 puntos (por ejemplo, dos pantallas de demos todavía no leen los códigos de error del backend).
+- [Hallazgos técnicos](Doc-14-3-Flujos-Tecnicos.md#hallazgos): 4 puntos (por ejemplo, un aviso de WhatsApp que salió con la plantilla de respaldo cuenta como enviado y no se reintenta).
 
 La verificación de esta página corrigió dos diagramas y dejó un hallazgo nuevo:
 

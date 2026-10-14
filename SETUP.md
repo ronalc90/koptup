@@ -51,6 +51,27 @@ En `apps/backend/.env`, lo mínimo:
 | `OPENAI_API_KEY` | Tu clave, o con el mock: `OPENAI_BASE_URL=http://127.0.0.1:3999/v1` y cualquier clave de prueba |
 | `DEMO_UPLOAD_ENABLED` | `true` si quieres probar «Prueba con tu documento» (necesita Redis y la clave de OpenAI) |
 
+**Avisos al dueño (opcional).** Sin correo ni WhatsApp configurados, cada contacto se guarda igual y el panel muestra sus avisos como «No configurado». Para verlos funcionar **sin enviar nada real**, arranca el mock de Resend y WhatsApp y apunta el backend a él con valores ficticios:
+
+```bash
+node apps/web/e2e/support/notify-mock.js        # http://127.0.0.1:3998
+```
+
+```bash
+# en apps/backend/.env (valores de prueba, nunca los reales)
+RESEND_API_KEY=re_solo_local_no_es_clave
+RESEND_API_URL=http://127.0.0.1:3998
+NOTIFY_EMAIL=dueno@e2e.koptup.test
+WHATSAPP_PROVIDER=meta
+WHATSAPP_API_TOKEN=solo-local-no-es-token
+WHATSAPP_PHONE_NUMBER_ID=100000000000001
+WHATSAPP_GRAPH_URL=http://127.0.0.1:3998
+ADMIN_WHATSAPP_NUMBER=573000000000
+NOTIFY_JOBS_ENABLED=false
+```
+
+Lo que el backend «envió» se ve en `http://127.0.0.1:3998/__requests` (con `?kind=email` o `?kind=whatsapp`). `NOTIFY_JOBS_ENABLED=false` apaga los reintentos y la prueba mensual en segundo plano.
+
 Arranca:
 
 ```bash
@@ -106,4 +127,5 @@ La suite de punta a punta (Playwright) está explicada en el [README](README.md#
 | El inicio de sesión falla con un error del servidor | Falta `JWT_REFRESH_SECRET` (el log del arranque lo avisa) |
 | La sesión dura solo 15 minutos | Redis no está conectado (`REDIS_URL`): sin él la sesión no se renueva |
 | «Prueba con tu documento» no está disponible | `GET http://localhost:3001/api/demo-rag/status` dice el motivo (`disabled`, `unavailable` o `budget_exhausted`) |
-| No llega ningún correo | Faltan `SMTP_USER` y `SMTP_PASS`; el panel muestra igual los enlaces de activación para copiarlos |
+| No llega ningún correo | No hay proveedor de correo: define `RESEND_API_KEY` (o, solo en local, `SMTP_USER` y `SMTP_PASS`). El panel muestra igual los enlaces de activación para copiarlos. Para probar sin enviar correos reales, apunta `RESEND_API_URL` al mock `apps/web/e2e/support/notify-mock.js` (ver el [README](README.md#e2e-en-local-paso-a-paso)) |
+| No llegan los avisos de nuevos contactos | **Admin › Configuración › Avisos de nuevos contactos** dice qué falta en cada canal (correo y WhatsApp) y tiene el botón «Enviar aviso de prueba». En local no pongas las credenciales reales: cada contacto de prueba avisaría de verdad. Guía completa en [Operación y despliegue › 4.5](docs/wiki/Doc-11-Operacion-y-Despliegue.md#45-configurar-los-avisos-al-dueño-paso-a-paso) |

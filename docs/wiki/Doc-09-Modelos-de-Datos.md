@@ -229,6 +229,7 @@ erDiagram
         string plazo "now, 1m, 3m, open"
         object cotizacion "servicio, plan, nivel, modalidad"
         object consentimiento "aceptado, fecha, versionPolitica, ipHash"
+        object notificaciones "email y whatsapp: estado, intentos, error"
         date anonimizadoEn
         date created_at
     }
@@ -581,7 +582,10 @@ Solo se agregan registros: **no hay ninguna ruta para editar ni borrar** la bit�
 | `cotizacion` | objeto | Opcional: `servicio` (slug), `plan` (`piloto`, `esencial`, `profesional`, `empresarial`), `nivel` (`basico`, `profesional`, `avanzado`, `enterprise`), `modalidad` (`compra`, `saas`) | Lo que venía cotizando al llegar a `/contact` desde un plan RAG o desde «Cotizar este tier». El nombre legible queda en `service` |
 | `consentimiento` | objeto | `aceptado`, `fecha`, `ipHash`, `userAgent`, `versionPolitica` (la fija el servidor) | Prueba de la autorización (Ley 1581) del formulario de contacto, de la demo RAG o de la solicitud de demo. Los contactos anteriores a la casilla no la tienen |
 | `anonimizadoEn` | fecha | `null` por defecto | Cuándo el job de conservación quitó los datos personales |
+| `notificaciones` | objeto | `email` y `whatsapp`, cada uno con `estado` (`pendiente`, `enviado`, `entregado`, `leido`, `fallido`, `no_configurado`), `intentos`, `ultimoIntento`, `proximoIntento`, `error` (máx. 300, sin secretos y con los correos enmascarados), `idProveedor` (id de Resend o `wamid` de WhatsApp) y `respaldo` (`onboarding@resend.dev` o `hello_world`). No existe en los contactos anteriores al registro de avisos | Resultado del aviso al dueño por cada canal; lo escribe `services/owner-notify.service.ts` y lo reintenta `jobs/notify-retry.job.ts` ([API › 4.15](Doc-08-API.md#415-avisos-al-dueño-estado-prueba-reenvío-y-webhook-de-whatsapp)). Índices por `estado` y `proximoIntento` de cada canal (job de reintentos) y por `notificaciones.whatsapp.idProveedor` (webhook de WhatsApp) |
 | `created_at` | fecha | Automática | — |
+
+La salud de los dos canales (último éxito, último fallo y último error, y la fecha de la última prueba mensual) se guarda en `AppSetting` con la clave `avisos.estado`.
 
 ### 4.8 Project (`projects`)
 
@@ -781,6 +785,7 @@ stateDiagram-v2
 | `Order.approvalStatus` | `pending` → `approved` o `rejected` | El equipo (`approve`, `reject`) |
 | `Deliverable.status` | `pending` → `approved` o `rejected` | El cliente dueño o el equipo; `in_review` existe pero ninguna ruta lo asigna |
 | `Contact.status` | `new` → `read` → `responded` | El equipo en Admin › Contactos |
+| `Contact.notificaciones.<canal>.estado` | `pendiente` → `enviado` → `entregado` → `leido` (los dos últimos, solo WhatsApp con webhook); `pendiente` o `enviado` → `fallido` → reintento; `no_configurado` | El backend al enviar, el job de reintentos, el webhook de Meta (nunca retrocede) y el admin con «Reenviar aviso» |
 | `Conversation.status` | `active`, `archived`, `closed` | No hay ruta que lo cambie |
 | `Factura.estado` (salud) | `Radicada`, `En Auditoría`, `Auditada`, `Glosada`, `Aceptada`, `Pagada`, `Rechazada` | Motor de auditoría de la demo |
 | `Radicado.estado` (liquidación) | `pendiente`, `en_proceso`, `validado`, `liquidado`, `con_glosas`, `finalizado`, `rechazado` | Herramienta interna `/liquidacion` |

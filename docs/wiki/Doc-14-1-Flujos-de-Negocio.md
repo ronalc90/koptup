@@ -252,8 +252,8 @@ flowchart TD
     NEW["Crea la solicitud pendiente DR-AAAA-XXXXXX<br/>datos, consentimiento con fecha, IP en hash,<br/>navegador, versión de la política y origen"]:::sistema
     R201["Responde 201 con el código y el estado"]:::sistema
     LEAD["Registra el lead Contact<br/>origen demo-request"]:::sistema
-    AVT["Aviso al equipo<br/>email a ADMIN_EMAIL y WhatsApp"]:::aviso
-    ACK["Acuse al solicitante por email<br/>solo si hay SMTP"]:::aviso
+    AVT["Aviso al dueño<br/>correo a NOTIFY_EMAIL y WhatsApp"]:::aviso
+    ACK["Acuse al solicitante por email<br/>solo si hay correo configurado"]:::aviso
     FLAG["Guarda qué avisos salieron de verdad<br/>campo notificaciones"]:::sistema
     E429["429 con tiempo de espera"]:::error
     E400a["400 consent_required"]:::error
@@ -546,7 +546,7 @@ flowchart TD
     Q2{"¿Existe una cuenta<br/>local con ese email?"}:::decision
     NO["No hace nada<br/>email desconocido o cuenta de Google"]:::sistema
     T1["Emite un enlace de 1 hora<br/>anula los anteriores, guarda solo el hash"]:::sistema
-    Q3{"¿Hay correo SMTP configurado?"}:::decision
+    Q3{"¿Hay correo configurado?<br/>Resend o SMTP"}:::decision
     M1["Correo con /reset-password?token=..."]:::aviso
     M0["No se envía nada"]:::error
     G1["Siempre la misma respuesta:<br/>si existe una cuenta, te enviamos un enlace"]:::visitante
@@ -945,7 +945,7 @@ sequenceDiagram
     participant B as Backend API
     participant DB as MongoDB
     participant R as Redis
-    participant M as Correo SMTP
+    participant M as Correo (Resend)
     participant WA as WhatsApp
     actor E as Equipo admin o sales
 
@@ -956,9 +956,9 @@ sequenceDiagram
     B-->>W: 201 con el código DR-AAAA-XXXXXX
     W-->>P: Recibimos tu solicitud
     par Avisos en segundo plano
-        B->>M: Aviso al equipo y acuse al solicitante
+        B->>M: Aviso al dueño y acuse al solicitante
     and
-        B->>WA: Aviso al equipo
+        B->>WA: Aviso al dueño con la plantilla de Meta
     end
     E->>W: Admin, Solicitudes de demo, revisa y anota
     W->>B: PATCH en revisión o nota
@@ -967,7 +967,7 @@ sequenceDiagram
     B->>DB: Marca aprobada solo si sigue abierta
     B->>DB: Crea la cuenta prospect y un acceso por demo
     B->>DB: Guarda el hash del enlace de activación de 72 h
-    opt Hay SMTP
+    opt Hay correo configurado
         B->>M: Correo de acceso con el enlace, espera hasta 15 s
         M-->>P: Correo con el enlace
     end
@@ -991,7 +991,7 @@ sequenceDiagram
     B->>DB: Busca el acceso vigente y registra la visita
     B-->>W: Permitido y días restantes
     W-->>P: Muestra la demo
-    Note over B,M: Cada hora, un trabajo marca los accesos vencidos y envía el recordatorio 3 días antes, solo con SMTP
+    Note over B,M: Cada hora, un trabajo marca los accesos vencidos y envía el recordatorio 3 días antes, solo con correo configurado
 ```
 
 ![Diagrama: Recorrido completo, de la solicitud al acceso](images/doc/flujos/Doc-14-1-Flujos-de-Negocio-16.png)
@@ -1077,7 +1077,7 @@ stateDiagram-v2
 
     note right of activo
         Vigencia por defecto 14 días, entre 1 y 365.
-        Recordatorio por correo 3 días antes, solo con SMTP.
+        Recordatorio por correo 3 días antes, solo con correo configurado.
         Un solo acceso activo por persona y demo.
     end note
     note right of expirado
@@ -1101,7 +1101,7 @@ Cosas que los diagramas muestran tal como están en el código y que conviene re
 1. **Una solicitud fusionada no avisa a nadie.** Si el mismo email vuelve a enviar el formulario con una solicitud abierta de menos de 30 días, se suman las demos y se agrega una nota, pero no se registra un lead nuevo, no se avisa al equipo por email ni WhatsApp y no se envía acuse. El equipo solo lo ve si abre la solicitud (`createDemoRequest` en `apps/backend/src/services/demo-requests.service.ts`).
 2. **Botones de inicio de sesión que no llevan a ningún lado.** El botón de GitHub no hace nada; el de Google, si el servidor no tiene Google OAuth configurado, deja a la persona en una respuesta JSON 503 del backend en lugar de volver a `/login` con un mensaje. La casilla "Recordarme" no cambia nada: las cookies duran siempre 15 min y 7 días (`apps/web/src/app/login/page.tsx`, `apps/backend/src/routes/auth.routes.ts`, `apps/web/src/lib/api.ts`).
 3. **Una sola sesión renovable por cuenta.** El token de renovación se guarda en Redis con la clave de la cuenta; iniciar sesión en un segundo navegador reemplaza el del primero, que se cierra cuando vence su token de acceso de 15 min (`issueSession` en `apps/backend/src/controllers/auth.controller.ts`).
-4. **Recuperar la contraseña sin correo configurado no tiene salida.** Sin SMTP la persona ve "te enviamos un enlace" pero no llega nada, y el panel no ofrece copiar ese enlace como sí hace con el de activación (`forgotPassword` en `apps/backend/src/controllers/auth.controller.ts`).
+4. **Recuperar la contraseña sin correo configurado no tiene salida.** Sin correo configurado la persona ve "te enviamos un enlace" pero no llega nada, y el panel no ofrece copiar ese enlace como sí hace con el de activación (`forgotPassword` en `apps/backend/src/controllers/auth.controller.ts`).
 5. **Mensajes de enlace menos claros al restablecer la contraseña.** El backend devuelve el motivo (usado, reemplazado o vencido), pero `/reset-password` muestra el mismo texto para todos; la activación sí los distingue.
 6. **El portal puede perder la ruta de regreso.** Si el navegador no tiene los datos del usuario guardados aunque la sesión siga viva, `DashboardLayout` manda a `/login` sin `redirect`, mientras que el filtro de la web sí lo incluye (`apps/web/src/components/dashboard/DashboardLayout.tsx`).
 7. **El panel no permite volver una solicitud a pendiente.** La API acepta pasar de "en revisión" a "pendiente", pero el panel solo ofrece "Marcar en revisión" (`apps/web/src/app/admin/solicitudes/[id]/page.tsx`).
