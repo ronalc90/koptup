@@ -41,6 +41,7 @@ export function useCreateReorderPo() {
 export default function InventoryModule() {
   const t = useTranslations('demoErp.inventory');
   const tc = useTranslations('demoErp.common');
+  const tf = useTranslations('demoErp.files');
   const tw = useTranslations('demoErp.warehouses');
   const { computed, filters, goTo, locale, workDate, openMonthLabel } = useErp();
   const f = useFmt();
@@ -88,7 +89,7 @@ export default function InventoryModule() {
   const exportCsv = () => {
     const head = [t('cols.sku'), t('cols.item'), t('cols.warehouse'), t('cols.stock'), t('cols.reorder'), t('cols.unitCost'), t('cols.value'), t('cols.status'), tc('currency')];
     const data = rows.map((x) => [x.sku, f.item(x.sku), tw(x.wh), x.qty, x.reorder, csvMoney(x.unit, filters.currency), csvMoney(x.value, filters.currency), t(`status.${x.status}`), filters.currency]);
-    downloadCsv(`inventario-${r.end}-${method}.csv`, [head, ...data], locale);
+    downloadCsv(`${tf('inventory')}-${r.end}-${tf(method === 'avg' ? 'inventoryAvg' : 'inventoryFifo')}.csv`, [head, ...data], locale);
     toast.success(tc('csvDone', { n: data.length }));
   };
 

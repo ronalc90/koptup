@@ -38,6 +38,7 @@ export function useShortages() {
 export default function SalesModule() {
   const t = useTranslations('demoErp.sales');
   const tc = useTranslations('demoErp.common');
+  const tf = useTranslations('demoErp.files');
   const { workDate: WORK_DATE, state, computed, filters, locale } = useErp();
   const f = useFmt();
   const [view, setView] = useState<View>('all');
@@ -87,7 +88,7 @@ export default function SalesModule() {
         filters.currency,
       ];
     });
-    downloadCsv(`ventas-${periodSlug(r)}.csv`, [head, ...data], locale);
+    downloadCsv(`${tf('sales')}-${periodSlug(r)}.csv`, [head, ...data], locale);
     toast.success(tc('csvDone', { n: data.length }));
   };
 
@@ -554,7 +555,7 @@ function QuoteForm({ onClose }: { onClose: () => void }) {
                 <input className={inputCls} inputMode="numeric" value={l.qty} placeholder="0" onChange={(e) => setLines((ls) => ls.map((x, j) => (j === i ? { ...x, qty: e.target.value.replace(/[^\d]/g, '') } : x)))} aria-label={t('form.qty')} />
               </label>
               <div className="col-span-5 sm:col-span-3 text-[11px] text-secondary-600 dark:text-secondary-400 pb-2">
-                {f.money(it.price)} {it.vat ? `+ IVA ${it.vat} %` : `· ${t('lines.excluded')}`}
+                {f.money(it.price)} {it.vat ? t('form.plusVat', { vat: it.vat }) : `· ${t('lines.excluded')}`}
                 {have !== null && <span className="block">{t('form.available', { qty: f.qty(have) })}</span>}
               </div>
               <div className="col-span-2 sm:col-span-1 pb-1 text-right">

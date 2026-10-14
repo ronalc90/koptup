@@ -5,6 +5,7 @@ import {
   BanknotesIcon,
   BookOpenIcon,
   CubeIcon,
+  MagnifyingGlassIcon,
   ReceiptPercentIcon,
   ShoppingBagIcon,
   UserGroupIcon,
@@ -48,7 +49,7 @@ export default function ErpDemoPage() {
 
 function ErpDemo() {
   const t = useTranslations('demoErp');
-  const { module, goTo } = useErp();
+  const { module, goTo, filters, setFilters } = useErp();
 
   return (
     <>
@@ -85,6 +86,16 @@ function ErpDemo() {
             })}
           </div>
         </nav>
+
+        {filters.search.trim() && (
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 px-3 py-2 text-xs text-amber-900 dark:text-amber-200">
+            <MagnifyingGlassIcon className="w-4 h-4 shrink-0" aria-hidden="true" />
+            <span className="min-w-0 break-words">{t('topbar.filtering', { q: filters.search.trim() })}</span>
+            <button onClick={() => setFilters({ search: '' })} className="font-semibold underline rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+              {t('topbar.clearSearch')}
+            </button>
+          </div>
+        )}
 
         <section id="erp-panel" role="tabpanel" aria-labelledby={`erp-tab-${module}`}>
           {module === 'sales' && <SalesModule />}

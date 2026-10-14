@@ -125,7 +125,7 @@ function reducer(state: ErpState, a: Action): ErpState {
     }
     case 'toOrder': {
       const { n, counters } = bump(state, 'PED');
-      return { ...state, counters, sales: state.sales.map((s) => (s.id === a.id && s.status === 'quote' ? { ...s, status: 'order', orderNo: `PED-${pad(n)}`, orderDate: WORK_DATE, user: true } : s)) };
+      return { ...state, counters, sales: state.sales.map((s) => (s.id === a.id && s.status === 'quote' ? { ...s, status: 'order', orderNo: `PED-${pad(n)}`, orderDate: WORK_DATE, user: true, userOrdered: true } : s)) };
     }
     case 'invoice': {
       const sale = state.sales.find((s) => s.id === a.id);

@@ -105,6 +105,14 @@ export const plainSelectCls = selectCls;
 /** Ventanas abiertas, de la de abajo a la de arriba: Escape cierra solo la de arriba. */
 const modalStack: string[] = [];
 
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+/** Visible en pantalla (los campos de archivo ocultos no reciben el foco). */
+function isVisible(el: HTMLElement) {
+  const check = (el as HTMLElement & { checkVisibility?: () => boolean }).checkVisibility;
+  return typeof check === 'function' ? check.call(el) : window.getComputedStyle(el).display !== 'none';
+}
+
 export function Modal({
   title,
   subtitle,
@@ -131,9 +139,31 @@ export function Modal({
     modalStack.push(id);
     ref.current?.focus();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && modalStack[modalStack.length - 1] === id) {
+      if (modalStack[modalStack.length - 1] !== id) return;
+      if (e.key === 'Escape') {
         e.stopPropagation();
         closeRef.current();
+        return;
+      }
+      // Tab y Mayús+Tab no salen de la ventana de arriba
+      if (e.key === 'Tab' && ref.current) {
+        const items = Array.from(ref.current.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(isVisible);
+        if (!items.length) {
+          e.preventDefault();
+          ref.current.focus();
+          return;
+        }
+        const first = items[0];
+        const last = items[items.length - 1];
+        const active = document.activeElement as HTMLElement | null;
+        const inside = !!active && ref.current.contains(active);
+        if (e.shiftKey && (!inside || active === first || active === ref.current)) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && (!inside || active === last)) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     };
     window.addEventListener('keydown', onKey);
@@ -142,6 +172,8 @@ export function Modal({
       const i = modalStack.lastIndexOf(id);
       if (i >= 0) modalStack.splice(i, 1);
       if (opener && document.contains(opener)) opener.focus();
+      // Si el control que la abrió ya no existe (p. ej. «Facturar» cambió a «Registrar pago»), el foco va a la pestaña del módulo abierto
+      else if (!modalStack.length) document.querySelector<HTMLElement>('#erp-modules [role="tab"][aria-selected="true"]')?.focus();
     };
   }, [id]);
   return (
@@ -243,7 +275,7 @@ export function SubTabs<T extends string>({ value, onChange, tabs, label }: { va
           onChange,
         )
       }
-      className="flex gap-1 bg-secondary-100 dark:bg-secondary-800 p-1 rounded-lg w-full sm:w-auto overflow-x-auto"
+      className="flex flex-wrap sm:flex-nowrap gap-1 bg-secondary-100 dark:bg-secondary-800 p-1 rounded-lg w-full sm:w-auto sm:overflow-x-auto"
     >
       {tabs.map((tb) => (
         <button

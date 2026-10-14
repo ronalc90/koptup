@@ -21,6 +21,8 @@ type View = 'pending' | 'approved' | 'received' | 'all';
 export default function PurchasesModule() {
   const t = useTranslations('demoErp.purchases');
   const tc = useTranslations('demoErp.common');
+  const tf = useTranslations('demoErp.files');
+  const tw = useTranslations('demoErp.warehouses');
   const { workDate: WORK_DATE, state, computed, filters, locale } = useErp();
   const f = useFmt();
   // Si llegas desde un enlace con búsqueda (p. ej. «OC en curso»), se muestran todas las OC
@@ -57,9 +59,9 @@ export default function PurchasesModule() {
     const data = list.map((p) => {
       const a = poAmounts(p);
       const s = SUPPLIER_BY_ID[p.supplierId];
-      return [p.no, t(`status.${p.status}`), s.name, fmtNit(s.nit), p.date, p.warehouse, csvMoney(a.subtotal, filters.currency), csvMoney(a.vat, filters.currency), csvMoney(a.total, filters.currency), csvMoney(a.withholding, filters.currency), csvMoney(a.payable, filters.currency), csvMoney(poOpenAt(p, computed, WORK_DATE), filters.currency), filters.currency];
+      return [p.no, t(`status.${p.status}`), s.name, fmtNit(s.nit), p.date, tw(p.warehouse), csvMoney(a.subtotal, filters.currency), csvMoney(a.vat, filters.currency), csvMoney(a.total, filters.currency), csvMoney(a.withholding, filters.currency), csvMoney(a.payable, filters.currency), csvMoney(poOpenAt(p, computed, WORK_DATE), filters.currency), filters.currency];
     });
-    downloadCsv(`compras-${periodSlug(r)}.csv`, [head, ...data], locale);
+    downloadCsv(`${tf('purchases')}-${periodSlug(r)}.csv`, [head, ...data], locale);
     toast.success(tc('csvDone', { n: data.length }));
   };
 
@@ -177,15 +179,15 @@ function PoCard({ po, onDetail, onReceive, onReject }: { po: PurchaseOrder; onDe
           {po.status === 'received' && open > 0 && <p className="text-[11px] text-secondary-500">{t('openAmount', { amount: f.money(open), due: f.date(poDueDate(po)) })}</p>}
         </div>
       </div>
-      <ol className="flex items-center gap-1 sm:gap-2 mb-3 overflow-x-auto" aria-label={t('flow.aria')}>
+      <ol className="flex flex-wrap sm:flex-nowrap items-center gap-x-3 gap-y-1.5 sm:gap-2 mb-3" aria-label={t('flow.aria')}>
         {steps.map((s, i) => {
           const current = po.status !== 'rejected' && i === firstPending;
           return (
-            <li key={s.label} className="flex items-center gap-1.5 flex-1 min-w-0">
+            <li key={s.label} className="flex items-center gap-1.5 sm:flex-1 sm:min-w-0">
               <span className={`w-6 h-6 shrink-0 rounded-full flex items-center justify-center text-[11px] font-bold ${s.done ? 'bg-emerald-500 text-white' : current ? 'bg-amber-400 text-white' : 'bg-secondary-200 dark:bg-secondary-700 text-secondary-500'}`}>
                 {s.done ? <CheckCircleIcon className="w-4 h-4" /> : i + 1}
               </span>
-              <span className="text-[11px] text-secondary-700 dark:text-secondary-300 truncate">{s.label}</span>
+              <span className="text-[11px] text-secondary-700 dark:text-secondary-300 whitespace-nowrap sm:truncate">{s.label}</span>
               {i < steps.length - 1 && <span className={`hidden sm:block flex-1 h-0.5 min-w-[8px] ${s.done ? 'bg-emerald-500' : 'bg-secondary-200 dark:bg-secondary-700'}`} />}
             </li>
           );
@@ -234,7 +236,7 @@ function PoDetail({ id, onClose }: { id: string; onClose: () => void }) {
   const pays = state.payments.filter((p) => p.poId === po.id);
   const entries = [...(computed.entriesBySource[po.id] || []), ...pays.flatMap((p) => computed.entriesBySource[p.id] || [])];
   return (
-    <Modal wide title={`${t('detail.title')} ${po.no}`} subtitle={`${s.name} · NIT ${fmtNit(s.nit)} · ${tw(po.warehouse)}`} onClose={onClose} footer={<button className={btn.outline} onClick={onClose}>{tc('close')}</button>}>
+    <Modal wide title={`${t('detail.title')} ${po.no}`} subtitle={`${s.name} · ${t('detail.nit', { nit: fmtNit(s.nit) })} · ${tw(po.warehouse)}`} onClose={onClose} footer={<button className={btn.outline} onClick={onClose}>{tc('close')}</button>}>
       <div className="overflow-x-auto">
         <table className="w-full text-xs min-w-[480px]">
           <thead>
@@ -304,6 +306,7 @@ function PoDetail({ id, onClose }: { id: string; onClose: () => void }) {
 function ReceiveForm({ id, onClose }: { id: string; onClose: () => void }) {
   const t = useTranslations('demoErp.purchases');
   const tc = useTranslations('demoErp.common');
+  const tf = useTranslations('demoErp.files');
   const tw = useTranslations('demoErp.warehouses');
   const { workDate: WORK_DATE, state, dispatch, ensureOpenPeriod } = useErp();
   const f = useFmt();
@@ -341,7 +344,7 @@ function ReceiveForm({ id, onClose }: { id: string; onClose: () => void }) {
   };
 
   const download = () => {
-    downloadText(`factura-${s.nit}-${invoiceNo || 'ejemplo'}.xml`, buildSampleXml(po, invoiceNo || suggestedSupplierInvoice(po), WORK_DATE), 'application/xml');
+    downloadText(`${tf('supplierInvoice')}-${s.nit}-${invoiceNo || tf('sampleSuffix')}.xml`, buildSampleXml(po, invoiceNo || suggestedSupplierInvoice(po), WORK_DATE), 'application/xml');
   };
 
   const save = () => {

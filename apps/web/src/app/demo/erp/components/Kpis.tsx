@@ -85,6 +85,8 @@ export default function Kpis() {
         const flat = k.delta === null || Math.abs(k.delta) < 0.05;
         const tone: Tone = flat || k.upIsGood === null ? 'neutral' : up === k.upIsGood ? 'good' : 'bad';
         const toneCls = tone === 'good' ? 'text-green-600 dark:text-green-400' : tone === 'bad' ? 'text-red-600 dark:text-red-400' : 'text-secondary-500 dark:text-secondary-400';
+        // Para lectores de pantalla: la variación con su valor y el período con el que se compara
+        const deltaAria = k.delta === null ? '' : t(flat ? 'deltaFlat' : up ? 'deltaUp' : 'deltaDown', { value: `${f.dec(Math.abs(k.delta), 1)}${k.isPp ? ' pp' : '%'}`, period: prevLabel });
         return (
           <button key={k.key} onClick={() => goTo(k.module, undefined, true)} className="text-left" title={k.full ? `${t(k.key)}: ${k.full}` : undefined}>
             <Card variant="bordered" padding="sm" className="h-full hover:shadow-medium hover:border-primary-300 dark:hover:border-primary-700 transition-all">
@@ -93,9 +95,12 @@ export default function Kpis() {
                   <k.icon className="w-5 h-5 text-white" />
                 </div>
                 {k.delta !== null && (
-                  <span className={`text-xs font-semibold flex items-center gap-0.5 ${toneCls}`} aria-label={t(up ? 'deltaUp' : 'deltaDown')}>
-                    {!flat && (up ? <ArrowUpRightIcon className="w-3.5 h-3.5" /> : <ArrowDownRightIcon className="w-3.5 h-3.5" />)}
-                    {flat ? `${f.dec(0, 1)}${k.isPp ? ' pp' : '%'}` : k.isPp ? `${up ? '+' : ''}${f.dec(k.delta!, 1)} pp` : `${up ? '+' : ''}${f.dec(k.delta!, 1)}%`}
+                  <span className={`text-xs font-semibold flex items-center gap-0.5 ${toneCls}`}>
+                    <span aria-hidden="true" className="flex items-center gap-0.5">
+                      {!flat && (up ? <ArrowUpRightIcon className="w-3.5 h-3.5" /> : <ArrowDownRightIcon className="w-3.5 h-3.5" />)}
+                      {flat ? `${f.dec(0, 1)}${k.isPp ? ' pp' : '%'}` : k.isPp ? `${up ? '+' : ''}${f.dec(k.delta!, 1)} pp` : `${up ? '+' : ''}${f.dec(k.delta!, 1)}%`}
+                    </span>
+                    <span className="sr-only">{deltaAria}</span>
                   </span>
                 )}
               </div>

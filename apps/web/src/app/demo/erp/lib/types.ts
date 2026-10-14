@@ -48,7 +48,6 @@ export interface Customer {
   city: string;
   warehouse: WarehouseId;
   termDays: number;
-  phone: string;
   /** Comportamiento de pago para generar la historia. */
   payer: 'punctual' | 'late' | 'slow';
   companies: CompanyId[];
@@ -103,6 +102,8 @@ export interface SaleDoc {
   dian?: 'sending' | 'accepted';
   creditNote?: { no: string; date: string; seq: number };
   user?: boolean;
+  /** Tú convertiste la cotización en pedido (paso 1 del recorrido). */
+  userOrdered?: boolean;
 }
 
 export type PayMethod = 'pse' | 'transfer' | 'deposit';

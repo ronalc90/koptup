@@ -33,6 +33,7 @@
       "search": "Search",
       "searchPlaceholder": "Invoice, customer, SKU…",
       "clearSearch": "Clear search",
+      "filtering": "Filtering by “{q}” in every module.",
       "resultsIn": "Matches in:",
       "viewing": "Showing {from} to {to}",
       "workDate": "Open period: {month} · new transactions are dated {date}",
@@ -89,8 +90,9 @@
       "arOverdue": "Over 60 days: {value}",
       "vs": "vs. {period}",
       "ytdNote": "Year to date",
-      "deltaUp": "Up from the previous period",
-      "deltaDown": "Down from the previous period"
+      "deltaUp": "Up {value} vs. {period}",
+      "deltaDown": "Down {value} vs. {period}",
+      "deltaFlat": "No change vs. {period}"
     },
     "flow": {
       "title": "End-to-end walkthrough",
@@ -308,6 +310,7 @@
         "item": "Product or service",
         "qty": "Quantity",
         "available": "Available: {qty}",
+        "plusVat": "+ VAT {vat}%",
         "removeLine": "Remove line",
         "addLine": "Add line",
         "totals": "Subtotal {subtotal} · VAT {vat} · Total {total}",
@@ -499,6 +502,7 @@
       },
       "detail": {
         "title": "Purchase order",
+        "nit": "Tax ID (NIT) {nit}",
         "item": "Product",
         "qty": "Qty",
         "cost": "Cost",
@@ -592,6 +596,7 @@
         "company": "Company",
         "account": "Account",
         "description": "Description / party",
+        "descriptionCsv": "Description",
         "third": "Party",
         "debit": "Debit",
         "credit": "Credit"
@@ -740,6 +745,7 @@
           "all": "All"
         },
         "nonePending": "There are no pending lines to reconcile in this period.",
+        "none": "No statement lines in this view for the period.",
         "note": "Demo statement lines are sample data. In your project you import your bank's Excel or CSV statements; a direct connection depends on each bank.",
         "imported": "imported",
         "matchedByYou": "Reconciled by you with {doc}",
@@ -936,6 +942,19 @@
       "sample": "Sample data: Surtidora Montevera S.A.S. and Montevera Logística S.A.S. are fictitious companies; customers, suppliers, people, tax IDs and figures are made up.",
       "integrations": "DIAN validation (e-invoice and electronic payroll), bank statements and WhatsApp reminders are simulated in the demo. In your project they connect to an authorized technology provider, your bank's statements, and WhatsApp Business or email.",
       "storage": "What you do here is saved only in this browser, and you can reset it at any time."
+    },
+    "files": {
+      "sales": "sales",
+      "inventory": "inventory",
+      "inventoryAvg": "weighted-average",
+      "inventoryFifo": "fifo",
+      "purchases": "purchases",
+      "journal": "journal",
+      "trial": "trial-balance",
+      "receivables": "receivables",
+      "bankSample": "sample-bank-statement",
+      "supplierInvoice": "supplier-invoice",
+      "sampleSuffix": "sample"
     }
   }
 }

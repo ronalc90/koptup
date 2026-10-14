@@ -16,7 +16,7 @@ La demo siempre trabaja sobre el **cierre del mes anterior a hoy** (hora de Colo
 
 ## Recorrido sugerido (demo comercial de 5 minutos)
 
-En los primeros segundos el encabezado dice qué es («Demo interactiva · ERP para pymes»), **para quién** es y **por dónde empezar**. El guion sigue el panel **Recorrido de punta a punta**: cada paso se marca en verde solo cuando lo haces de verdad. **Empezar el recorrido** abre el panel y lleva la vista hasta él. Empieza con los datos de ejemplo limpios (si alguien ya usó la demo en ese navegador, pulsa **Restablecer datos de ejemplo** debajo de los filtros).
+En los primeros segundos el encabezado dice qué es («Demo interactiva · ERP para pymes»), **para quién** es y **por dónde empezar**. El guion sigue el panel **Recorrido de punta a punta**: cada paso se marca en verde solo cuando lo haces de verdad. **Empezar el recorrido** abre el panel y lleva la vista hasta él; cada paso del panel abre su módulo completo (si había una búsqueda escrita, la borra). Empieza con los datos de ejemplo limpios (si alguien ya usó la demo en ese navegador, pulsa **Restablecer datos de ejemplo** debajo de los filtros).
 
 ![Recorrido de la demo](images/doc/demos/erp/recorrido.gif)
 
@@ -52,7 +52,9 @@ flowchart LR
 1. **Convertir en pedido** en la fila de la cotización `COT-2367` (Autoservicio Laureles S.A.S., Medellín). El documento pasa a `PED-2067` con la marca **TUYA**.
 2. **Facturar** aparece en las filas que ya son pedido (por ejemplo `PED-2066`). Abre la ventana del documento.
 3. **Nueva cotización**: crea una cotización propia (empresa, cliente, bodega y productos).
-4. **Exportar CSV**: descarga los documentos visibles (`ventas-2026-09.csv`; con «Últimos 3 meses», `ventas-2026-07_2026-09.csv`).
+4. **Exportar CSV**: descarga los documentos visibles (`ventas-2026-09.csv`; con «Últimos 3 meses», `ventas-2026-07_2026-09.csv`; en inglés, `sales-2026-09.csv`).
+
+El paso 1 del recorrido se marca cuando facturas un pedido que tú convertiste desde una cotización (facturar el pedido de ejemplo `PED-2066` no lo marca).
 
 Qué decir: «Todo arranca en la cotización. Nada se digita dos veces: el pedido y la factura heredan los datos».
 
@@ -70,7 +72,7 @@ En la fila del pedido nuevo pulsa **Facturar** y, en la ventana, otra vez **Fact
 4. **Registrar pago**: registra un recaudo (PSE, transferencia o consignación) que debita Bancos y acredita Clientes.
 5. **Nota crédito (devolución total)**: anula la factura completa; la mercancía vuelve a la bodega y se reversan ingreso, IVA y costo. Solo aparece si la factura no tiene pagos.
 
-Escape cierra la ventana y el foco vuelve al botón que la abrió. Qué decir: «Un clic y pasan cuatro cosas: factura electrónica, inventario, contabilidad y cartera».
+Escape cierra la ventana. Mientras está abierta, Tab y Mayús+Tab no salen de ella; al cerrarla, el foco vuelve al botón que la abrió (si ese botón ya no existe, como **Facturar** después de facturar, va a la pestaña del módulo). Qué decir: «Un clic y pasan cuatro cosas: factura electrónica, inventario, contabilidad y cartera».
 
 ### Paso 3. Inventario: crea la orden de compra desde una alerta
 
@@ -93,18 +95,19 @@ Pulsa **Ya hay una OC en curso: OC-0180** en la alerta: la demo abre Compras y e
 
 ![Paso 4: aprobación de la orden](images/doc/demos/erp/05-paso3-compras.jpg)
 
-*La orden creada desde la alerta, con su flujo de aprobación de dos niveles.*
+*La orden creada desde la alerta, con su flujo de aprobación de dos niveles y el aviso de la búsqueda activa.*
 
 1. **DESDE ALERTA DE REORDEN**: el origen de la orden (también puede ser «CREADA POR TI» o «DESDE MRP»).
 2. **Flujo**: Jefe de compras → Gerencia → Recepción → Pago. Gerencia solo aparece si el total con IVA es de $ 20.000.000 o más (aquí $ 24.605.630).
 3. **Aprobar como Jefe de compras** (y luego **Aprobar como Gerencia**). En la demo tú apruebas todos los niveles; el panel «Cómo funciona» lo dice.
 4. **Rechazar**: pide un motivo obligatorio.
+5. **Filtrando por «OC-0180» en todos los módulos**: el aviso de la búsqueda activa, con **Borrar búsqueda**. La búsqueda filtra todos los módulos hasta que la borras.
 
-Con la orden aprobada, ve a **Por recibir**, pulsa **Recibir mercancía**, opcionalmente carga el XML de ejemplo para compararlo con la orden (ver la ventana en [Compras](#compras)) y confirma **Recibir y causar factura**: entra la mercancía a la bodega y nace la cuenta por pagar.
+Con la orden aprobada, ve a **Por recibir**, pulsa **Recibir mercancía**, opcionalmente carga el XML de ejemplo para compararlo con la orden (ver la ventana en [Compras](#compras)) y confirma **Recibir y causar factura**: entra la mercancía a la bodega y nace la cuenta por pagar. El paso 3 del recorrido se marca cuando recibes una orden que tú creaste (desde una alerta, el MRP o **Nueva orden de compra**); recibir una orden de ejemplo no lo marca.
 
 ### Paso 5. Tesorería: concilia un pago del extracto
 
-Abre **Tesorería y cartera** y baja a **Conciliación bancaria**. En la captura se escribió `SMV-4141` en el buscador para dejar solo ese movimiento.
+Pulsa el paso 4 del recorrido (**Tesorería**): abre **Tesorería y cartera** y borra la búsqueda `OC-0180` que venía del paso anterior. Baja a **Conciliación bancaria**. En la captura se escribió `SMV-4141` en el buscador para dejar solo ese movimiento (encima del módulo queda el aviso «Filtrando por «SMV-4141»…»).
 
 ![Paso 5: conciliación bancaria](images/doc/demos/erp/06-paso4-conciliacion.jpg)
 
@@ -151,13 +154,13 @@ Ver la [vista general](#guía-de-la-demo-erp-modular). El encabezado se desplaza
 | **Empresa** | Grupo Montevera (consolidado), Surtidora Montevera S.A.S. o Montevera Logística S.A.S. Logística no tiene inventario, compras ni producción: esos módulos lo dicen y piden elegir otra empresa. |
 | **Moneda** | COP o USD. En USD todo se convierte con una TRM fija de ejemplo de $ 4.000 y la línea de abajo lo avisa. |
 | **Período** | El mes abierto (por ejemplo «Septiembre 2026»), los dos meses anteriores, «Últimos 3 meses» y «Año corrido». La línea de abajo dice qué fechas estás viendo («Viendo del 1 sep 2026 al 30 sep 2026»). Los meses anteriores son de consulta: si haces una operación desde ellos, la demo cambia sola al mes abierto y lo avisa. |
-| **Buscar** | Factura, cliente, SKU, OC, comprobante… Filtra el módulo abierto y muestra «Coincidencias en» con el conteo por módulo; cada etiqueta lleva a ese módulo. Tiene un solo botón para borrar, y Escape también borra. |
+| **Buscar** | Factura, cliente, SKU, OC, comprobante… Filtra todos los módulos y muestra «Coincidencias en» con el conteo por módulo; cada etiqueta lleva a ese módulo. Mientras hay una búsqueda, encima del módulo aparece «Filtrando por «…» en todos los módulos» con **Borrar búsqueda**, y las listas vacías dicen «No hay resultados para tu búsqueda en este período». Tiene un solo botón para borrar, y Escape también borra. |
 | **Período abierto** | Recuerda que las operaciones nuevas quedan con la fecha de cierre (30 sep 2026 en la prueba) y que tus cambios se guardan solo en este navegador. |
 | **Restablecer datos de ejemplo** | Aparece cuando cambiaste algo. Pide confirmación y vuelve a los datos originales. |
 | **Indicadores** | Ventas netas, Margen bruto, EBITDA, Caja y bancos, Cartera (CxC, con lo vencido a más de 60 días) y Cuentas por pagar, con la variación frente al mes anterior (o a los tres meses anteriores). Cada tarjeta lleva a su módulo. |
-| **Recorrido de punta a punta** | Los 5 pasos del guion; se marcan solos y cada uno lleva a su módulo. Se puede plegar. |
+| **Recorrido de punta a punta** | Los 5 pasos del guion; se marcan solos cuando haces exactamente lo que dice cada uno, y cada uno lleva a su módulo (y borra la búsqueda). Se puede plegar. |
 
-Las pestañas de módulos y las internas se recorren con las flechas, Inicio y Fin. En las ventanas, Escape cierra solo la de arriba (por ejemplo, la confirmación de la nota crédito sin cerrar la factura) y el foco vuelve al control que la abrió.
+Las pestañas de módulos y las internas se recorren con las flechas, Inicio y Fin. En las ventanas, Tab y Mayús+Tab no salen de la ventana de arriba, Escape cierra solo esa (por ejemplo, la confirmación de la nota crédito sin cerrar la factura) y el foco vuelve al control que la abrió. Las variaciones de los indicadores se leen completas con lector de pantalla («Subió 7,6% frente a agosto de 2026»).
 
 ### Ventas
 
@@ -176,11 +179,11 @@ Ver los [pasos 1 y 2](#paso-1-ventas-convierte-una-cotización-en-pedido).
 *Kardex de `ARR-5K` con todas las bodegas: ventas, compras, costo unitario y saldo.*
 
 - **Filtros** por bodega y tipo (mercancía, producto terminado, materia prima y empaque) y **Valoración** promedio ponderado o PEPS, con el valor total de ambos métodos.
-- **Tabla** por SKU y bodega: existencias, punto de reorden, costo unitario, valor y estado (OK, Bajo reorden, Agotado). 15 filas y **Ver más**.
+- **Tabla** por SKU y bodega: existencias, punto de reorden, costo unitario, valor y estado (Normal, Bajo reorden, Agotado). 15 filas y **Ver más**.
 - **Kardex** (clic en el SKU): movimientos del período, del más reciente al más antiguo, con filtro por bodega. Con «Todas las bodegas» no muestra los traslados.
 - **Trasladar entre bodegas**: producto, origen, destino y cantidad (valida el disponible). No genera asiento; sí aparece en el kardex.
 - **Alertas de reorden**: **Crear OC por N**, **Ya hay una OC en curso**, **Programar producción** (producto terminado en Bogotá) o **Trasladar desde Bogotá**. En los meses anteriores las acciones se ocultan y la tarjeta dice en qué mes se habilitan.
-- **Exportar CSV**.
+- **Exportar CSV** (`inventario-AAAA-MM-DD-promedio-ponderado.csv` o `…-peps.csv`, según la valoración elegida).
 
 ### Compras
 
@@ -189,13 +192,14 @@ Ver los [pasos 1 y 2](#paso-1-ventas-convierte-una-cotización-en-pedido).
 *Ventana «Recibir OC-0180» con el XML de ejemplo cargado: todos los campos coinciden con la orden.*
 
 1. **Cargar XML**: lee en tu navegador la factura del proveedor (estructura UBL 2.1 simplificada, hasta 2 MB) y completa el número de factura.
-2. **Descargar XML de ejemplo**: genera un XML que coincide con la orden, útil para la demo en vivo.
+2. **Descargar XML de ejemplo**: genera un XML que coincide con la orden, útil para la demo en vivo (`factura-proveedor-<NIT>-<número>.xml`).
 3. **Comparación**: NIT del proveedor, orden de compra, subtotal, IVA y total, cada uno con «Coincide» o «Diferente». Si algo no coincide, el botón de recibir se desactiva.
 4. **Recibir y causar factura**: entra la mercancía (actualiza el costo promedio) y se genera el asiento de compra con IVA descontable, retención en la fuente del 2,5 % (tarifa de ejemplo) y cuenta por pagar.
 
 Además:
 
-- **Vistas** Por aprobar, Por recibir, Recibidas y Todas, y el panel **Cómo funciona** con las reglas.
+- **Vistas** Por aprobar, Por recibir, Recibidas y Todas, y el panel **Cómo funciona** con las reglas. En el celular las pestañas pasan a dos líneas y el flujo de cada orden muestra los nombres completos.
+- **Exportar CSV** (`compras-AAAA-MM.csv`), con la bodega por su nombre.
 - **Nueva orden de compra**: proveedor, bodega de destino y productos de ese proveedor con su costo promedio. Muestra cuántos niveles de aprobación necesitará. Las materias primas y empaques solo se reciben en Bogotá (planta).
 - **Pagar $ …**: en las recibidas, registra el comprobante de egreso (CE) por el neto por pagar.
 - **Ver detalle**: líneas, totales, historial (creada, aprobada, recibida, pagada) y **Ver asiento**.
@@ -225,7 +229,7 @@ stateDiagram-v2
 
 *Estados financieros del mes abierto, calculados con los mismos asientos del libro diario.*
 
-- **Libro diario (PUC)**: asientos por partida doble de cada operación, con totales. Clic en un comprobante abre su detalle (cuentas, tercero, débitos = créditos, origen) y **Ver el documento en <módulo>**. **Exportar CSV** (`libro-diario-AAAA-MM.csv`).
+- **Libro diario (PUC)**: asientos por partida doble de cada operación, con totales. Clic en un comprobante abre su detalle (cuentas, tercero, débitos = créditos, origen) y **Ver el documento en <módulo>**. **Exportar CSV** (`libro-diario-AAAA-MM.csv`; el balance de prueba, `balance-de-prueba-AAAA-MM.csv`).
 - **Asiento manual**: empresa, descripción y de 2 a 8 líneas; cada línea con débito o crédito, no ambos; débitos y créditos deben ser iguales. Queda con la fecha de cierre del mes abierto y afecta al instante el balance y los estados.
 - **Balance de prueba**: saldo inicial, débitos, créditos y saldo final por cuenta, con la marca «Cuadra».
 - **Estados financieros**: estado de resultados (con provisión estimada de renta del 35 % y EBITDA) y estado de situación financiera con la marca «Activo = Pasivo + Patrimonio».
@@ -239,9 +243,9 @@ stateDiagram-v2
 
 - **Flujo de caja**: entradas y salidas de caja y bancos por mes, y neto del período («Año corrido» muestra los meses del año).
 - **Cartera por edades** y **Cuentas por pagar por edades**: sin vencer, 1–30, 31–60, 61–90 y más de 90 días.
-- **Cartera por cliente**: facturas, saldo, vencido y vencido a más de 60 días; **Ver facturas** despliega el detalle y **Recordatorio** arma un mensaje de cobro con las facturas vencidas para **Copiar mensaje**. No envía nada: «Simulado: la demo no envía nada».
+- **Cartera por cliente**: facturas, saldo, vencido y vencido a más de 60 días; **Ver facturas** despliega el detalle y **Recordatorio** arma un mensaje de cobro con las facturas vencidas para **Copiar mensaje**. No envía nada: «Simulado: la demo no envía nada». **Exportar CSV** (`cartera-AAAA-MM-DD.csv`).
 - **Conciliación bancaria**: Pendientes, Conciliados y Todos; sugerencias por reglas para recaudos, comisiones bancarias, 4x1000 y consignaciones por identificar (ver el [paso 5](#paso-5-tesorería-concilia-un-pago-del-extracto)).
-- **Importar extracto (CSV)**: columnas fecha, descripción y valor (separador `;` o `,`, hasta 1 MB, fechas entre el inicio de la historia y la fecha de cierre). Muestra una vista previa y tiene **Descargar CSV de ejemplo**. El archivo se lee en el navegador.
+- **Importar extracto (CSV)**: columnas fecha, descripción y valor (separador `;` o `,`, hasta 1 MB, fechas entre el inicio de la historia y la fecha de cierre). Muestra una vista previa y tiene **Descargar CSV de ejemplo** (`extracto-ejemplo-surtidora-montevera.csv`). El archivo se lee en el navegador.
 
 ### Talento humano
 
@@ -271,7 +275,9 @@ stateDiagram-v2
 
 *La demo en un teléfono (390 px): encabezado con volver, demo guiada y cotización, «Para quién», «Por dónde empezar» y los filtros apilados.*
 
-En el teléfono los filtros se apilan, los indicadores van de dos en dos, las pestañas de módulos se desplazan de lado y las tablas anchas también. La página no se desborda a lo ancho.
+En el teléfono los filtros se apilan, los indicadores van de dos en dos, las pestañas de módulos se desplazan de lado y las tablas anchas también; las pestañas internas (Todos, Cotizaciones…) pasan a dos líneas si no caben. La página no se desborda a lo ancho.
+
+En inglés, los archivos descargados también tienen nombres en inglés (`sales-…`, `inventory-…-weighted-average.csv`, `purchases-…`, `journal-…`, `trial-balance-…`, `receivables-…`, `sample-bank-statement-…`, `supplier-invoice-…`).
 
 ---
 
@@ -288,7 +294,7 @@ En el teléfono los filtros se apilan, los indicadores van de dos en dos, las pe
 | XML del proveedor | **Real (simplificado)** | Se lee y compara en el navegador; estructura UBL 2.1 simplificada. |
 | Aprobaciones por rol | **Simuladas** | Tú apruebas todos los niveles. |
 | Dónde se guardan tus cambios | **Solo en este navegador** | `localStorage` del equipo; no llegan a un servidor ni los ven otras personas. |
-| Exportaciones CSV | **Real** | Se generan en el navegador con lo que ves. |
+| Exportaciones CSV | **Real** | Se generan en el navegador con lo que ves; el nombre del archivo sigue el idioma de la página. |
 
 ---
 
@@ -331,5 +337,4 @@ flowchart LR
 4. **DIAN, bancos y WhatsApp simulados**, y las aprobaciones no dependen de roles (tú apruebas todos los niveles).
 5. **Nota crédito solo total.** No hay devoluciones parciales, y no se ofrece si la factura ya tiene pagos.
 6. **Nómina con factor de ejemplo** (salario × 1,52), sin liquidación por persona; Montevera Logística no tiene inventario, compras ni producción.
-7. **Nombres de archivo en español.** Los CSV y XML descargados se llaman igual en inglés (`ventas-…`, `libro-diario-…`).
-8. **«Ver Planes y Precios»** del cierre común de las demos lleva a los planes RAG, no a los del ERP (el botón **Cotizar tu ERP** del encabezado sí abre la cotización del ERP).
+7. **«Ver Planes y Precios»** del cierre común de las demos lleva a los planes RAG, no a los del ERP (el botón **Cotizar tu ERP** del encabezado sí abre la cotización del ERP).

@@ -61,6 +61,7 @@ function useAccountName() {
 function Journal() {
   const t = useTranslations('demoErp.accounting');
   const tc = useTranslations('demoErp.common');
+  const tf = useTranslations('demoErp.files');
   const { computed, filters, locale, state, dispatch } = useErp();
   const f = useFmt();
   const descOf = useEntryDesc();
@@ -88,9 +89,9 @@ function Journal() {
   const totals = list.reduce((a, e) => ({ d: a.d + e.lines.reduce((s, l) => s + l.debit, 0), c: a.c + e.lines.reduce((s, l) => s + l.credit, 0) }), { d: 0, c: 0 });
 
   const exportCsv = () => {
-    const head = [t('cols.date'), t('cols.entry'), t('cols.company'), t('cols.account'), t('cols.description'), t('cols.third'), t('cols.debit'), t('cols.credit'), tc('currency')];
+    const head = [t('cols.date'), t('cols.entry'), t('cols.company'), t('cols.account'), t('cols.descriptionCsv'), t('cols.third'), t('cols.debit'), t('cols.credit'), tc('currency')];
     const data = list.flatMap((e) => e.lines.map((l) => [e.date, e.no, COMPANIES[e.company].name, acc(l.account), descOf(e), l.third || '', csvMoney(l.debit, filters.currency), csvMoney(l.credit, filters.currency), filters.currency]));
-    downloadCsv(`libro-diario-${periodSlug(r)}.csv`, [head, ...data], locale);
+    downloadCsv(`${tf('journal')}-${periodSlug(r)}.csv`, [head, ...data], locale);
     toast.success(tc('csvDone', { n: data.length }));
   };
 
@@ -346,6 +347,7 @@ function ManualEntryForm({ onClose }: { onClose: () => void }) {
 function TrialBalance() {
   const t = useTranslations('demoErp.accounting');
   const tc = useTranslations('demoErp.common');
+  const tf = useTranslations('demoErp.files');
   const { computed, filters, locale } = useErp();
   const f = useFmt();
   const acc = useAccountName();
@@ -357,7 +359,7 @@ function TrialBalance() {
   const exportCsv = () => {
     const head = [t('cols.account'), t('trial.opening'), t('cols.debit'), t('cols.credit'), t('trial.closing'), tc('currency')];
     const data = rows.map((x) => [acc(x.account), csvMoney(x.opening, filters.currency), csvMoney(x.debit, filters.currency), csvMoney(x.credit, filters.currency), csvMoney(x.closing, filters.currency), filters.currency]);
-    downloadCsv(`balance-de-prueba-${periodSlug(r)}.csv`, [head, ...data], locale);
+    downloadCsv(`${tf('trial')}-${periodSlug(r)}.csv`, [head, ...data], locale);
     toast.success(tc('csvDone', { n: data.length }));
   };
   return (

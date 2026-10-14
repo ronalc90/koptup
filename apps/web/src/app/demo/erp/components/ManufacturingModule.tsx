@@ -17,6 +17,7 @@ import { Empty, FieldLabel, Modal, MoreButton, Note, SectionHeader, btn, inputCl
 
 export default function ManufacturingModule() {
   const t = useTranslations('demoErp.manufacturing');
+  const tc = useTranslations('demoErp.common');
   const { state, computed, filters, dispatch, ensureOpenPeriod } = useErp();
   const f = useFmt();
   const [bomSku, setBomSku] = useState(BOMS[0].sku);
@@ -137,7 +138,7 @@ export default function ManufacturingModule() {
           </button>
         </SectionHeader>
         {orders.length === 0 ? (
-          <Empty>{t('orders.empty')}</Empty>
+          <Empty>{filters.search.trim() ? tc('noResults') : t('orders.empty')}</Empty>
         ) : (
           <div className="space-y-3">
             {pager.visible.map((o) => {

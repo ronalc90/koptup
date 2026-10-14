@@ -26,10 +26,13 @@ export default function FlowGuide() {
     return () => window.removeEventListener(START_TOUR_EVENT, onStart);
   }, []);
 
+  // Cada paso exige exactamente lo que dice su texto
   const steps: { id: string; module: ModuleId; done: boolean }[] = [
-    { id: 'invoice', module: 'sales', done: state.sales.some((s) => s.user && s.status === 'invoiced') },
+    // Una cotización que tú convertiste en pedido y facturaste (facturar un pedido de ejemplo no cuenta)
+    { id: 'invoice', module: 'sales', done: state.sales.some((s) => s.userOrdered && s.status === 'invoiced') },
     { id: 'reorder', module: 'inventory', done: state.pos.some((p) => p.user && (p.origin === 'reorder' || p.origin === 'mrp')) },
-    { id: 'approve', module: 'purchases', done: state.pos.some((p) => p.user && p.status === 'received') },
+    // Tu OC (creada por ti, desde una alerta o el MRP), aprobada y recibida
+    { id: 'approve', module: 'purchases', done: state.pos.some((p) => p.origin !== 'seed' && p.status === 'received') },
     { id: 'reconcile', module: 'finance', done: state.bank.some((b) => b.match?.by === 'user') },
     { id: 'ledger', module: 'accounting', done: !!state.seenOwnEntry },
   ];
@@ -54,7 +57,8 @@ export default function FlowGuide() {
             {steps.map((s, i) => (
               <li key={s.id}>
                 <button
-                  onClick={() => goTo(s.module, undefined, true)}
+                  // Un paso del recorrido muestra el módulo completo: borra la búsqueda que hubiera quedado
+                  onClick={() => goTo(s.module, '', true)}
                   className={`w-full h-full text-left p-3 rounded-lg border transition-colors ${
                     s.done
                       ? 'border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30'

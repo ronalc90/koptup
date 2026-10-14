@@ -33,6 +33,7 @@
       "search": "Buscar",
       "searchPlaceholder": "Factura, cliente, SKU…",
       "clearSearch": "Borrar búsqueda",
+      "filtering": "Filtrando por «{q}» en todos los módulos.",
       "resultsIn": "Coincidencias en:",
       "viewing": "Viendo del {from} al {to}",
       "workDate": "Período abierto: {month} · las operaciones nuevas quedan con fecha {date}",
@@ -89,8 +90,9 @@
       "arOverdue": "Vencida > 60 días: {value}",
       "vs": "vs. {period}",
       "ytdNote": "Acumulado del año",
-      "deltaUp": "Subió frente al período anterior",
-      "deltaDown": "Bajó frente al período anterior"
+      "deltaUp": "Subió {value} frente a {period}",
+      "deltaDown": "Bajó {value} frente a {period}",
+      "deltaFlat": "Sin cambio frente a {period}"
     },
     "flow": {
       "title": "Recorrido de punta a punta",
@@ -308,6 +310,7 @@
         "item": "Producto o servicio",
         "qty": "Cantidad",
         "available": "Disponible: {qty}",
+        "plusVat": "+ IVA {vat} %",
         "removeLine": "Quitar línea",
         "addLine": "Agregar línea",
         "totals": "Subtotal {subtotal} · IVA {vat} · Total {total}",
@@ -350,7 +353,7 @@
         "status": "Estado"
       },
       "status": {
-        "ok": "OK",
+        "ok": "Normal",
         "low": "Bajo reorden",
         "out": "Agotado"
       },
@@ -499,6 +502,7 @@
       },
       "detail": {
         "title": "Orden de compra",
+        "nit": "NIT {nit}",
         "item": "Producto",
         "qty": "Cant.",
         "cost": "Costo",
@@ -592,6 +596,7 @@
         "company": "Empresa",
         "account": "Cuenta",
         "description": "Descripción / tercero",
+        "descriptionCsv": "Descripción",
         "third": "Tercero",
         "debit": "Débito",
         "credit": "Crédito"
@@ -740,6 +745,7 @@
           "all": "Todos"
         },
         "nonePending": "No hay movimientos pendientes por conciliar en este período.",
+        "none": "No hay movimientos en esta vista para el período.",
         "note": "Los movimientos de la demo son de ejemplo. En tu proyecto se importan los extractos en Excel o CSV de tu banco; la conexión directa depende de cada banco.",
         "imported": "importado",
         "matchedByYou": "Conciliado por ti con {doc}",
@@ -936,6 +942,19 @@
       "sample": "Datos de ejemplo: Surtidora Montevera S.A.S. y Montevera Logística S.A.S. son empresas ficticias; clientes, proveedores, personas, NIT y cifras son inventados.",
       "integrations": "La validación de la DIAN (factura y nómina electrónica), los extractos bancarios y los recordatorios por WhatsApp están simulados en la demo. En tu proyecto se conectan a un proveedor tecnológico autorizado, a los extractos de tu banco y a WhatsApp Business o correo.",
       "storage": "Lo que haces aquí se guarda solo en este navegador y puedes restablecerlo cuando quieras."
+    },
+    "files": {
+      "sales": "ventas",
+      "inventory": "inventario",
+      "inventoryAvg": "promedio-ponderado",
+      "inventoryFifo": "peps",
+      "purchases": "compras",
+      "journal": "libro-diario",
+      "trial": "balance-de-prueba",
+      "receivables": "cartera",
+      "bankSample": "extracto-ejemplo",
+      "supplierInvoice": "factura-proveedor",
+      "sampleSuffix": "ejemplo"
     }
   }
 }

@@ -105,6 +105,7 @@ function AgingCard({ kind, items, cutoff }: { kind: 'ar' | 'ap'; items: OpenItem
 function ArCustomers({ items, cutoff }: { items: OpenItem[]; cutoff: string }) {
   const t = useTranslations('demoErp.finance');
   const tc = useTranslations('demoErp.common');
+  const tf = useTranslations('demoErp.files');
   const { filters, locale, goTo } = useErp();
   const f = useFmt();
   const [reminder, setReminder] = useState<string | null>(null);
@@ -129,7 +130,7 @@ function ArCustomers({ items, cutoff }: { items: OpenItem[]; cutoff: string }) {
   const exportCsv = () => {
     const head = [t('ar.customer'), t('ar.company'), t('ar.doc'), t('ar.date'), t('ar.due'), t('ar.days'), t('ar.open'), tc('currency')];
     const data = items.map((x) => [CUSTOMER_BY_ID[x.thirdId].name, COMPANIES[x.company].name, x.doc, x.date, x.due, Math.max(0, x.daysOverdue), csvMoney(x.open, filters.currency), filters.currency]);
-    downloadCsv(`cartera-${cutoff}.csv`, [head, ...data], locale);
+    downloadCsv(`${tf('receivables')}-${cutoff}.csv`, [head, ...data], locale);
     toast.success(tc('csvDone', { n: data.length }));
   };
   const rem = reminder ? byCustomer.find((x) => x.id === reminder) : null;
@@ -142,7 +143,7 @@ function ArCustomers({ items, cutoff }: { items: OpenItem[]; cutoff: string }) {
         </button>
       </SectionHeader>
       {byCustomer.length === 0 ? (
-        <Empty>{t('ar.empty')}</Empty>
+        <Empty>{filters.search.trim() ? tc('noResults') : t('ar.empty')}</Empty>
       ) : (
         <div className="overflow-x-auto -mx-6 px-6">
           <table className="w-full text-sm min-w-[680px]">
@@ -242,7 +243,7 @@ function ReminderModal({ row, onClose }: { row: { id: string; items: OpenItem[];
   return (
     <Modal
       title={t('reminder.title')}
-      subtitle={`${c.name} · ${c.phone}`}
+      subtitle={`${c.name} · ${c.city}`}
       onClose={onClose}
       footer={
         <>
@@ -375,7 +376,7 @@ function Reconciliation() {
         />
       </div>
       {lines.length === 0 ? (
-        <Empty>{view === 'pending' ? t('recon.nonePending') : tc('noResults')}</Empty>
+        <Empty>{filters.search.trim() ? tc('noResults') : view === 'pending' ? t('recon.nonePending') : t('recon.none')}</Empty>
       ) : (
         <div className="space-y-2">
           {pager.visible.map((b) => (
@@ -472,6 +473,7 @@ function parseDate(raw: string) {
 function ImportBank({ onClose }: { onClose: () => void }) {
   const t = useTranslations('demoErp.finance');
   const tc = useTranslations('demoErp.common');
+  const tf = useTranslations('demoErp.files');
   const { workDate: WORK_DATE, state, computed, dispatch, filters, locale, ensureOpenPeriod } = useErp();
   const [company, setCompany] = useState<CompanyId>(filters.company === 'log' ? 'log' : 'com');
   const [preview, setPreview] = useState<{ date: string; desc: string; amount: number }[] | null>(null);
@@ -483,14 +485,14 @@ function ImportBank({ onClose }: { onClose: () => void }) {
   const sample = () => {
     const open = state.sales.filter((s) => s.company === company && s.status === 'invoiced' && !s.creditNote && saleOpenAt(s, computed, WORK_DATE) > 0).slice(-2);
     const sep = locale === 'es' ? ';' : ',';
-    const rows = [['fecha', 'descripcion', 'valor'].join(sep)];
+    const rows = [[t('import.date'), t('import.desc'), t('import.amount')].join(sep)];
     open.forEach((s, i) => {
       const c = CUSTOMER_BY_ID[s.customerId];
       const desc = i === 0 ? `PSE ${norm(c.name).toUpperCase().replace(' S.A.S.', '')} REF ${s.invoiceNo}` : `TRANSF ${norm(c.name).toUpperCase().replace(' S.A.S.', '')}`;
       rows.push([WORK_DATE, desc, String(saleOpenAt(s, computed, WORK_DATE))].join(sep));
     });
     rows.push([addDays(WORK_DATE, -1), 'COMISION TRANSFERENCIA INTERBANCARIA', '-8900'].join(sep));
-    downloadText(`extracto-ejemplo-${company}.csv`, '﻿' + rows.join('\r\n'), 'text/csv;charset=utf-8');
+    downloadText(`${tf('bankSample')}-${company === 'com' ? 'surtidora-montevera' : 'montevera-logistica'}.csv`, '﻿' + rows.join('\r\n'), 'text/csv;charset=utf-8');
   };
 
   const onFile = async (file?: File) => {
