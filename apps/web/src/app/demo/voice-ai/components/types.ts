@@ -10,6 +10,26 @@ export type Phase = 'idle' | 'playing' | 'paused' | 'transferred' | 'ended';
 
 /** Resultado de una llamada en el registro. */
 export type CallResult = 'resolved' | 'transferred' | 'abandoned' | 'voicemail' | 'noAnswer';
+export const CALL_RESULTS: CallResult[] = ['resolved', 'transferred', 'abandoned', 'voicemail', 'noAnswer'];
+export const SENTIMENTS: Sentiment[] = ['positive', 'neutral', 'negative'];
+
+/**
+ * Motivos que la demo sabe mostrar (claves de demoVoice.intents). «none»: la
+ * llamada terminó (colgada o transferida) antes de que se detectara el motivo.
+ */
+export const INTENT_KEYS: string[] = [
+  'cardDeclined',
+  'travelNotice',
+  'confirmAppointment',
+  'rescheduleAppointment',
+  'paymentReminder',
+  'paymentAgreement',
+  'orderStatus',
+  'damagedProduct',
+  'balanceInquiry',
+  'billingClaim',
+  'none',
+];
 
 export type FnKey =
   | 'verifyCustomer'
@@ -53,8 +73,10 @@ export interface FnCall {
   key: FnKey;
   /** Sistema con el que se conectaría en un proyecto real (clave de demoVoice.systems). */
   system: string;
-  /** Argumentos de ejemplo (se muestran como JSON). */
+  /** Argumentos de ejemplo (se muestran como JSON en la versión en español). */
   args: Record<string, string | number | boolean>;
+  /** Los mismos argumentos con nombres y valores en inglés (versión en inglés del sitio). */
+  argsEn: Record<string, string | number | boolean>;
 }
 
 export interface Scenario {

@@ -128,7 +128,8 @@
       "orderStatus": "Order status",
       "damagedProduct": "Damaged product (warranty)",
       "balanceInquiry": "Balance inquiry",
-      "billingClaim": "Billing complaint"
+      "billingClaim": "Billing complaint",
+      "none": "No reason detected"
     },
     "flow": {
       "title": "Call flow",
@@ -209,7 +210,7 @@
         "desc": "Registers the payment agreement"
       },
       "createPaymentLink": {
-        "name": "generar_enlace_pago",
+        "name": "create_payment_link",
         "desc": "Creates a payment link for the first installment"
       },
       "getOrder": {
@@ -450,7 +451,8 @@
         "added": "You added {name} to the campaign.",
         "errorName": "Type a name.",
         "errorNumber": "Type a 10-digit Colombian mobile (3xx) or landline (60x) number.",
-        "errorWhen": "Pick a valid date and time."
+        "errorWhen": "Pick a valid date and time.",
+        "full": "The demo allows up to {max} contacts: remove one to add another."
       }
     },
     "dates": {
@@ -660,7 +662,8 @@
             "title": "Travel notice: validity and countries",
             "body": "A notice covers up to 90 days and several countries. It can be changed or cancelled in the app or by phone."
           }
-        }
+        },
+        "file": "banking"
       },
       "salud": {
         "name": "Healthcare: confirm or reschedule an appointment",
@@ -715,7 +718,8 @@
             "title": "Preparing for the internal medicine appointment",
             "body": "Arrive 15 minutes early with an ID document and test results from the last 6 months."
           }
-        }
+        },
+        "file": "healthcare"
       },
       "cobranza": {
         "name": "Preventive collections: payment agreement",
@@ -771,7 +775,8 @@
             "title": "Contact hours for collections",
             "body": "Only call Monday to Friday 7:00 to 19:00 and Saturdays 8:00 to 15:00; never on Sundays or public holidays. Respect the do-not-call list."
           }
-        }
+        },
+        "file": "collections"
       },
       "pedido": {
         "name": "Order: status and damaged product",
@@ -824,7 +829,8 @@
             "title": "Orders with several packages",
             "body": "An order may arrive in several packages from different warehouses; each package has its own tracking."
           }
-        }
+        },
+        "file": "order"
       }
     },
     "howItWorks": {

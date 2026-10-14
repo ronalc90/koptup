@@ -333,7 +333,11 @@ export function ActionsPanel({ v }: { v: CallView }) {
                 <div className="mt-2 space-y-1.5 text-[11px]">
                   <div className="text-slate-400">{t('actions.request')}</div>
                   <pre className="overflow-x-auto rounded-md bg-slate-950/70 border border-slate-800 p-2 font-mono text-slate-200 whitespace-pre-wrap break-all">
-                    {JSON.stringify({ [t('actions.jsonFn')]: t(`fns.${fn.key}.name`), [t('actions.jsonArgs')]: fn.args }, null, 2)}
+                    {JSON.stringify(
+                      { [t('actions.jsonFn')]: t(`fns.${fn.key}.name`), [t('actions.jsonArgs')]: v.locale === 'en' ? fn.argsEn : fn.args },
+                      null,
+                      2,
+                    )}
                   </pre>
                   <div className="text-slate-400">{t('actions.response')}</div>
                   <p className="rounded-md bg-slate-950/70 border border-slate-800 p-2 text-slate-200">

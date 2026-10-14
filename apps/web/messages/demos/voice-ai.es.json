@@ -128,7 +128,8 @@
       "orderStatus": "Estado de pedido",
       "damagedProduct": "Producto dañado (garantía)",
       "balanceInquiry": "Consulta de saldo",
-      "billingClaim": "Reclamo por cobro"
+      "billingClaim": "Reclamo por cobro",
+      "none": "Sin motivo detectado"
     },
     "flow": {
       "title": "Flujo de la llamada",
@@ -450,7 +451,8 @@
         "added": "Agregaste a {name} a la campaña.",
         "errorName": "Escribe un nombre.",
         "errorNumber": "Escribe un celular (3xx) o un fijo (60x) de 10 dígitos.",
-        "errorWhen": "Elige una fecha y una hora válidas."
+        "errorWhen": "Elige una fecha y una hora válidas.",
+        "full": "La demo admite hasta {max} contactos: quita alguno para agregar otro."
       }
     },
     "dates": {
@@ -660,7 +662,8 @@
             "title": "Aviso de viaje: vigencia y países",
             "body": "El aviso cubre hasta 90 días y varios países. Se puede modificar o cancelar desde la app o por teléfono."
           }
-        }
+        },
+        "file": "banca"
       },
       "salud": {
         "name": "Salud: confirmar o reprogramar una cita",
@@ -715,7 +718,8 @@
             "title": "Preparación para la cita de medicina interna",
             "body": "Llegar 15 minutos antes con el documento de identidad y los exámenes de los últimos 6 meses."
           }
-        }
+        },
+        "file": "salud"
       },
       "cobranza": {
         "name": "Cobranza preventiva: acuerdo de pago",
@@ -771,7 +775,8 @@
             "title": "Horarios de contacto en cobranza",
             "body": "Llama solo de lunes a viernes de 7:00 a 19:00 y los sábados de 8:00 a 15:00; nunca domingos ni festivos. Respeta la lista de exclusión."
           }
-        }
+        },
+        "file": "cobranza"
       },
       "pedido": {
         "name": "Pedido: estado y producto dañado",
@@ -824,7 +829,8 @@
             "title": "Pedidos con varios paquetes",
             "body": "Un pedido puede llegar en varios paquetes desde bodegas distintas; cada paquete tiene su propio seguimiento."
           }
-        }
+        },
+        "file": "pedido"
       }
     },
     "howItWorks": {

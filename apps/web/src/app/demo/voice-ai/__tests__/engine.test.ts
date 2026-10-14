@@ -20,8 +20,12 @@ import {
   toCsv,
   weekStart,
 } from '../components/engine';
-import { CAMPAIGN_CONTACTS, SAMPLE_CALLS, SCENARIOS, getScenario, scriptSeconds } from '../components/scenarios';
+import { CAMPAIGN_CONTACTS, SAMPLE_CALLS, SCENARIOS, SCENARIO_IDS, getScenario, scriptSeconds } from '../components/scenarios';
+import { isCallRow } from '../components/storage';
+import { INTENT_KEYS } from '../components/types';
 import type { CampaignContact } from '../components/types';
+import esMessages from '../../../../../messages/demos/voice-ai.es.json';
+import enMessages from '../../../../../messages/demos/voice-ai.en.json';
 
 describe('ventana de contacto en cobranza', () => {
   it('calcula el día de la semana sin depender de la zona horaria', () => {
@@ -224,5 +228,62 @@ describe('línea de tiempo y estados del guion', () => {
     expect(sentimentTrend(['negative', 'neutral', 'positive'])).toBe('improving');
     expect(sentimentTrend(['positive', 'negative'])).toBe('declining');
     expect(sentimentTrend(['neutral'])).toBe('stable');
+  });
+});
+
+describe('textos, idiomas y datos guardados', () => {
+  const es = esMessages.demoVoice;
+  const en = enMessages.demoVoice;
+
+  it('cada acción trae su solicitud en inglés con los mismos campos y sin palabras en español', () => {
+    SCENARIOS.forEach((s) =>
+      s.fns.forEach((f) => {
+        expect(f.argsEn).toBeDefined();
+        expect(Object.keys(f.argsEn ?? {})).toHaveLength(Object.keys(f.args).length);
+        const json = JSON.stringify(f.argsEn);
+        expect(json).not.toMatch(/documento|canal|"voz"|tarjeta|desde|hasta|pais|motivo|resultado|intencion|paciente|estado|especialidad|fecha|franja|cita|sede|plantilla|telefono|credito|cuota|valor|vence|moneda|pedido|tipo|prioridad|cola|resumen|correo/);
+      }),
+    );
+  });
+
+  it('los nombres de las funciones están en el idioma de cada versión', () => {
+    (Object.keys(es.fns) as (keyof typeof es.fns)[]).forEach((k) => {
+      expect(en.fns[k].name).toMatch(/^[a-z_]+$/);
+      expect(en.fns[k].name).not.toBe(es.fns[k].name);
+    });
+  });
+
+  it('todos los motivos del guion y del registro existen en ambos idiomas', () => {
+    const used = new Set([
+      ...SAMPLE_CALLS.map((r) => r.intent),
+      ...SCENARIOS.flatMap((s) => s.turns.map((tn) => tn.intent).filter((x): x is string => !!x)),
+      'none',
+    ]);
+    used.forEach((k) => expect(INTENT_KEYS).toContain(k));
+    INTENT_KEYS.forEach((k) => {
+      expect(es.intents).toHaveProperty(k);
+      expect(en.intents).toHaveProperty(k);
+    });
+  });
+
+  it('cada escenario tiene nombre de archivo en ambos idiomas', () => {
+    SCENARIO_IDS.forEach((id) => {
+      expect(es.scenarios[id].file).toMatch(/^[a-z-]+$/);
+      expect(en.scenarios[id].file).toMatch(/^[a-z-]+$/);
+    });
+    expect(en.scenarios.banca.file).toBe('banking');
+  });
+
+  it('solo se cargan del navegador las pruebas con valores conocidos', () => {
+    const ok = { id: 'mine-1', time: '10:05', date: '2026-10-14', number: '+57 310 *** 4821', direction: 'inbound', intent: 'none', durationSec: 3, result: 'abandoned', sentiment: 'neutral', csat: null, scenario: 'banca', mine: true };
+    expect(isCallRow(ok)).toBe(true);
+    expect(isCallRow({ ...ok, intent: 'inventado' })).toBe(false);
+    expect(isCallRow({ ...ok, result: 'otro' })).toBe(false);
+    expect(isCallRow({ ...ok, sentiment: 'feliz' })).toBe(false);
+    expect(isCallRow({ ...ok, scenario: 'otro' })).toBe(false);
+    expect(isCallRow({ ...ok, csat: undefined })).toBe(false);
+    expect(isCallRow({ ...ok, durationSec: -1 })).toBe(false);
+    expect(isCallRow({ ...ok, date: 'ayer' })).toBe(false);
+    expect(isCallRow(null)).toBe(false);
   });
 });

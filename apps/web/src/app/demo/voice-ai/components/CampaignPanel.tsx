@@ -178,7 +178,7 @@ export default function CampaignPanel({
 
   const addContact = (e: FormEvent) => {
     e.preventDefault();
-    if (running) return;
+    if (running || contacts.length >= MAX_CONTACTS) return;
     const name = form.name.trim().slice(0, 40);
     if (!name) {
       setFormError(t('campaign.form.errorName'));
@@ -354,6 +354,11 @@ export default function CampaignPanel({
             {formError && (
               <p role="alert" className="mt-2 text-[11px] text-rose-300">
                 {formError}
+              </p>
+            )}
+            {contacts.length >= MAX_CONTACTS && (
+              <p className="mt-2 text-[11px] text-amber-200" data-testid="voice-campaign-full">
+                {t('campaign.form.full', { max: MAX_CONTACTS })}
               </p>
             )}
             <button

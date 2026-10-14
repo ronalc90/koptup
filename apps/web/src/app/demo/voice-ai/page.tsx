@@ -44,6 +44,7 @@ import {
   buildTimeline, callClock, checkContactWindow, downloadText, fnStatuses, sentimentTrend,
 } from './components/engine';
 import { formatWhen } from './components/format';
+import { isCallRow } from './components/storage';
 import { useSpeech } from './components/useSpeech';
 import type { CallResult, CallRow, Phase, ScenarioId, Sentiment } from './components/types';
 import { fmtTime } from './components/types';
@@ -68,23 +69,6 @@ interface Saved {
   voiceOn?: boolean;
   guide?: Partial<GuideFlags>;
   guideOpen?: boolean;
-}
-
-/** Fila de «Tu prueba» guardada en el navegador con la forma esperada. */
-function isCallRow(x: unknown): x is CallRow {
-  if (!x || typeof x !== 'object') return false;
-  const r = x as Record<string, unknown>;
-  return (
-    typeof r.id === 'string' &&
-    typeof r.time === 'string' &&
-    typeof r.number === 'string' &&
-    (r.direction === 'inbound' || r.direction === 'outbound') &&
-    typeof r.intent === 'string' &&
-    typeof r.durationSec === 'number' &&
-    typeof r.result === 'string' &&
-    typeof r.sentiment === 'string' &&
-    (r.scenario === undefined || SCENARIOS.some((sc) => sc.id === r.scenario))
-  );
 }
 
 /** Fecha (AAAA-MM-DD) y hora (HH:MM) actuales en Bogotá, sin depender del idioma del navegador. */
@@ -184,10 +168,18 @@ export default function VoiceAIPage() {
   const onCampaignFinished = useCallback(() => markStep('campaign'), [markStep]);
 
   // Desplazamiento a una sección después de que se pinta (p. ej. el resumen al saltar al final).
+  // El foco del teclado va al título de esa sección para seguir desde ahí con Tab.
   useEffect(() => {
     if (!scrollTarget) return;
     const el = scrollTarget === 'call' ? callCardRef.current : scrollTarget === 'summary' ? summaryRef.current : campaignRef.current;
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const heading = el.querySelector('h2');
+      if (heading) {
+        heading.setAttribute('tabindex', '-1');
+        heading.focus({ preventScroll: true });
+      }
+    }
     setScrollTarget(null);
   }, [scrollTarget]);
 
@@ -286,7 +278,8 @@ export default function VoiceAIPage() {
     if ((phase !== 'ended' && phase !== 'transferred') || recordedRef.current || cursor < 0) return;
     recordedRef.current = true;
     const played = scenario.turns.slice(0, cursor + 1);
-    const intentTurn = [...played].reverse().find((x) => x.intent) ?? scenario.turns.find((x) => x.intent);
+    // Solo el motivo que alcanzó a detectarse: si se colgó antes, la fila dice «Sin motivo detectado».
+    const intentTurn = [...played].reverse().find((x) => x.intent);
     const lastCustomer = [...played].reverse().find((x) => x.speaker === 'customer');
     const result: CallResult = endReason === 'transferred' ? 'transferred' : endReason === 'hungup' ? 'abandoned' : 'resolved';
     const { date, time } = nowInBogota();
@@ -296,7 +289,7 @@ export default function VoiceAIPage() {
       ...(date ? { date } : {}),
       number: scenario.number,
       direction: scenario.direction,
-      intent: intentTurn?.intent ?? 'orderStatus',
+      intent: intentTurn?.intent ?? 'none',
       durationSec: Math.round(callClock(at, durations, cursor, elapsedRef.current)),
       result,
       sentiment: lastCustomer?.sentiment ?? 'neutral',
@@ -478,7 +471,8 @@ export default function VoiceAIPage() {
     if (phase === 'ended' && endReason === 'hungup') lines.push('', t('transcript.hungUp'));
     return lines.join('\n');
   };
-  const downloadTranscript = () => downloadText(t('transcript.fileName', { scenario: scenario.id }), transcriptText(), 'text/plain');
+  const downloadTranscript = () =>
+    downloadText(t('transcript.fileName', { scenario: t(`scenarios.${scenario.id}.file`) }), transcriptText(), 'text/plain');
 
   const summaryText = () => {
     const result = endReason === 'transferred' ? 'transferred' : endReason === 'hungup' ? 'abandoned' : 'resolved';
