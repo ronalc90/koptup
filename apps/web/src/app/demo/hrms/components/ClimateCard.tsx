@@ -58,7 +58,7 @@ export default function ClimateCard() {
           <div className="flex items-end justify-between gap-3">
             <div>
               <p className="text-xs text-secondary-500">{t(`questions.${last.question}`)}</p>
-              <p className="text-3xl font-bold text-emerald-600">{enps(last) > 0 ? '+' : ''}{enps(last)}</p>
+              <p className={`text-3xl font-bold ${enps(last) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>{enps(last) > 0 ? '+' : ''}{enps(last)}</p>
             </div>
             <p className="text-xs text-secondary-500 text-right">
               {t('participation', { n: responses(last), total: last.invited, pct: f.num((responses(last) / last.invited) * 100) })}

@@ -371,7 +371,8 @@
         "past": "The start date cannot be earlier than today.",
         "days": "Enter between 1 and 30 days.",
         "apprentice": "Apprentices have no vacation balance in this demo.",
-        "balance": "Exceeds the available balance ({n} days)."
+        "balance": "Exceeds the available balance ({n} days).",
+        "overlap": "There is already an approved or pending absence that overlaps those dates."
       },
       "submit": "Send request",
       "submitSick": "Record sick leave",
@@ -480,6 +481,7 @@
       "noEnd": "No end date",
       "tenure": "Tenure",
       "tenureValue": "{y} years and {m} months",
+      "tenureFuture": "Starts on {date}",
       "probation": "Probation period",
       "probationUntil": "Until {date}",
       "probationDone": "Completed",
@@ -677,7 +679,7 @@
         "deregister": "Social security deregistration (filing change)"
       },
       "activate": "Activate employee",
-      "activated": "{name} now appears in the directory and in payroll",
+      "activated": "{name} now appears in the directory and joins payroll from their start date ({date})",
       "activateHint": "{n, plural, one {# task left} other {# tasks left}}",
       "lastDay": "last day {date}",
       "closedOut": "Exited",
@@ -691,9 +693,10 @@
         "vacation": "Unused vacation",
         "vacDays": "{n} business days",
         "indemnity": "Indemnity",
+        "indemnityDays": "{n} days of salary",
         "title": "Estimated final settlement",
         "total": "Total to pay",
-        "note": "Simplified sample calculation (360-day year; severance and bonus include the transport allowance). Indemnity only applies to dismissal without just cause on a permanent contract."
+        "note": "Simplified sample calculation (360-day year; severance and service bonus include the transport allowance). Indemnity applies to dismissal without just cause (art. 64 of the Colombian Labor Code): on a permanent contract, 30 days of salary for the first year and 20 for each additional year (20 and 15 from 10 minimum wages); on a fixed-term contract, the salary for the rest of the term; on a contract for a specific job, at least 15 days."
       },
       "finish": "Complete offboarding",
       "closedToast": "{name}'s offboarding completed: removed from the directory and counted in turnover"
@@ -1062,6 +1065,7 @@
         "approved": "Approved",
         "rejected": "Rejected"
       },
+      "rejectedBecause": "Reason: {reason}",
       "requestsHint": "Your manager approves or rejects from the HR view (Home or Vacation and leave).",
       "earned": "Earnings",
       "deductions": "Deductions",
@@ -1088,7 +1092,7 @@
       "back": "Back",
       "close": "Close app",
       "title": "Employee app",
-      "footer": "Sample view of the employee web app (works on a phone without installing anything)."
+      "footer": "Sample view of the employee app. In your project it is a web app that opens on a phone without installing anything."
     },
     "assistant": {
       "persona": "You are the HR assistant of Alimentos Valdeora S.A.S., a fictitious company in a demo. You answer employees in English, in at most 4 clear sentences. Use only the sample internal rules and policy documents and mention the article or item that applies. If the answer is not in the documents, say so and suggest writing to HR.",

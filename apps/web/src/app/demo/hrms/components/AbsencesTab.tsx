@@ -12,7 +12,7 @@ import { active, onLeave, vacationBalance } from '../lib/selectors';
 import type { LeaveStatus, LeaveType } from '../lib/types';
 import LeaveForm from './LeaveForm';
 import LeaveItem from './LeaveItem';
-import { Empty, Modal, Pager, SectionTitle, TabIntro, btn, inputCls, usePager, useFmt, usePos } from './ui';
+import { Empty, Modal, Pager, SectionTitle, TabIntro, btn, inputCls, normText, usePager, useFmt, usePos } from './ui';
 
 const cap = (x: string) => x.charAt(0).toUpperCase() + x.slice(1);
 
@@ -192,7 +192,7 @@ function Balances() {
       active(state)
         .filter((e) => e.contract !== 'apprentice')
         .map((e) => ({ e, b: vacationBalance(state, e) }))
-        .filter(({ e }) => !q.trim() || e.name.toLowerCase().includes(q.trim().toLowerCase()))
+        .filter(({ e }) => !q.trim() || normText(e.name).includes(normText(q.trim())))
         .sort((a, b) => b.b.balance - a.b.balance),
     [state, q],
   );
@@ -203,7 +203,7 @@ function Balances() {
   const exportCsv = () => {
     download(
       `saldos-vacaciones-${state.baseDate}.csv`,
-      csv([[t('name'), t('position'), t('accrued'), t('taken'), t('balance'), t('pending')], ...rows.map(({ e, b }) => [e.name, pos(e), b.accrued.toFixed(1), b.taken.toFixed(1), b.balance.toFixed(1), b.pending])]),
+      csv([[t('name'), t('position'), t('accrued'), t('taken'), t('balance'), t('pending')], ...rows.map(({ e, b }) => [e.name, pos(e), f.csvDec(b.accrued), f.csvDec(b.taken), f.csvDec(b.balance), b.pending])]),
     );
     toast.success(t('exported', { n: rows.length }));
   };

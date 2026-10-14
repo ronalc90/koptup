@@ -1,26 +1,28 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { AssistantError, ask, ensurePolicyBot, forgetPolicyBot, type AssistantAnswer } from '../lib/assistant';
 import { policyDocs } from '../lib/policies';
 import { useHr } from '../lib/store';
 
-interface Msg {
+export interface Msg {
   role: 'user' | 'assistant';
   content: string;
   answer?: AssistantAnswer;
   error?: boolean;
 }
 
-/** Chat del colaborador con el asistente de políticas (IA real vía backend, con citas). */
-export default function Assistant() {
+/**
+ * Chat del colaborador con el asistente de políticas (IA real vía backend, con citas).
+ * La conversación la guarda la app (`msgs`), así no se pierde al volver al menú.
+ */
+export default function Assistant({ msgs, setMsgs }: { msgs: Msg[]; setMsgs: Dispatch<SetStateAction<Msg[]>> }) {
   const t = useTranslations('demoHrms.assistant');
   const locale = useLocale();
   const lang = locale === 'en' ? 'en' : 'es';
   const { dispatch } = useHr();
-  const [msgs, setMsgs] = useState<Msg[]>([]);
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);

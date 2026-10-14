@@ -146,6 +146,13 @@ export function businessDaysBetween(from: ISODate, to: ISODate): number {
   return n;
 }
 
+/** La misma fecha si es hábil; si no, el siguiente día hábil (un sábado pasa al lunes hábil). */
+export function firstBusinessDay(iso: ISODate): ISODate {
+  let d = iso;
+  while (!isBusinessDay(d)) d = addDays(d, 1);
+  return d;
+}
+
 export function nextBusinessDay(iso: ISODate): ISODate {
   let d = addDays(iso, 1);
   while (!isBusinessDay(d)) d = addDays(d, 1);

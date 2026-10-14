@@ -143,7 +143,14 @@ export function reducer(s: HrState | null, a: Action): HrState | null {
       if (p.kind === 'in') {
         const info = POSITIONS[p.positionId];
         const id = `E${String(s.employees.length + 1).padStart(3, '0')}`;
-        const manager = s.employees.find((e) => e.positionId === 'supervisor' && e.site === p.site) ?? s.employees.find((e) => e.positionId === 'plantDirector');
+        // Jefe inmediato: el mismo de quienes ya tienen ese cargo (en la misma sede si hay); si nadie lo
+        // tiene, el supervisor de la sede o la dirección de planta.
+        const peers = s.employees.filter((e) => e.status !== 'retired' && e.positionId === p.positionId && e.managerId);
+        const peer = peers.find((e) => e.site === p.site) ?? peers[0];
+        const manager =
+          (peer && s.employees.find((e) => e.id === peer.managerId && e.status !== 'retired')) ??
+          s.employees.find((e) => e.positionId === 'supervisor' && e.site === p.site && e.status !== 'retired') ??
+          s.employees.find((e) => e.positionId === 'plantDirector');
         const cand = s.candidates.find((c) => c.id === p.candidateId);
         const n = s.employees.length + 1;
         const emp: Employee = {
@@ -186,6 +193,8 @@ export function reducer(s: HrState | null, a: Action): HrState | null {
         seq,
         processes,
         employees: s.employees.map((x) => (x.id === e.id ? { ...x, status: 'retired' } : x)),
+        // Las solicitudes que seguían pendientes se cancelan; las aprobadas y rechazadas quedan en el historial.
+        leaves: s.leaves.filter((l) => !(l.employeeId === e.id && l.status === 'pending')),
         exits: [{ id: xid, name: e.name, positionId: e.positionId, date: p.lastDay < s.baseDate ? p.lastDay : s.baseDate, reason: p.reason }, ...s.exits],
         reviews: s.reviews.filter((r) => r.employeeId !== e.id),
       };

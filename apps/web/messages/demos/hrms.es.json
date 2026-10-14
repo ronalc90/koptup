@@ -371,7 +371,8 @@
         "past": "La fecha de inicio no puede ser anterior a hoy.",
         "days": "Ingresa entre 1 y 30 días.",
         "apprentice": "Los aprendices no tienen saldo de vacaciones en esta demo.",
-        "balance": "Supera el saldo disponible ({n} días)."
+        "balance": "Supera el saldo disponible ({n} días).",
+        "overlap": "Ya hay una ausencia aprobada o pendiente que se cruza con esas fechas."
       },
       "submit": "Enviar solicitud",
       "submitSick": "Registrar incapacidad",
@@ -480,6 +481,7 @@
       "noEnd": "Sin fecha de terminación",
       "tenure": "Antigüedad",
       "tenureValue": "{y} años y {m} meses",
+      "tenureFuture": "Ingresa el {date}",
       "probation": "Periodo de prueba",
       "probationUntil": "Hasta el {date}",
       "probationDone": "Superado",
@@ -677,7 +679,7 @@
         "deregister": "Retiro de seguridad social (novedad en la planilla)"
       },
       "activate": "Activar colaborador",
-      "activated": "{name} ya aparece en el directorio y en la nómina",
+      "activated": "{name} ya aparece en el directorio; entra a la nómina desde su fecha de ingreso ({date})",
       "activateHint": "{n, plural, one {Falta # tarea} other {Faltan # tareas}}",
       "lastDay": "último día {date}",
       "closedOut": "Retirado",
@@ -691,9 +693,10 @@
         "vacation": "Vacaciones no disfrutadas",
         "vacDays": "{n} días hábiles",
         "indemnity": "Indemnización",
+        "indemnityDays": "{n} días de salario",
         "title": "Liquidación estimada",
         "total": "Total a pagar",
-        "note": "Cálculo simplificado de ejemplo (año de 360 días; cesantías y prima con auxilio de transporte). La indemnización solo aplica al despido sin justa causa en contrato indefinido."
+        "note": "Cálculo simplificado de ejemplo (año de 360 días; cesantías y prima con auxilio de transporte). La indemnización aplica al despido sin justa causa (art. 64 del C.S.T.): en contrato indefinido, 30 días de salario por el primer año y 20 por cada año adicional (20 y 15 desde 10 salarios mínimos); a término fijo, los salarios del tiempo que falta del plazo; por obra o labor, mínimo 15 días."
       },
       "finish": "Finalizar retiro",
       "closedToast": "Retiro de {name} finalizado: salió del directorio y cuenta en la rotación"
@@ -1062,6 +1065,7 @@
         "approved": "Aprobada",
         "rejected": "Rechazada"
       },
+      "rejectedBecause": "Motivo: {reason}",
       "requestsHint": "Tu jefe aprueba o rechaza desde la vista de Gestión Humana (Inicio o Vacaciones y ausencias).",
       "earned": "Devengado",
       "deductions": "Deducciones",
@@ -1088,7 +1092,7 @@
       "back": "Volver",
       "close": "Cerrar app",
       "title": "App del colaborador",
-      "footer": "Vista de ejemplo de la app web del colaborador (funciona en el celular sin instalar nada)."
+      "footer": "Vista de ejemplo de la app del colaborador. En tu proyecto es una app web que se abre en el celular sin instalar nada."
     },
     "assistant": {
       "persona": "Eres el asistente de Gestión Humana de Alimentos Valdeora S.A.S., una empresa ficticia de una demo. Respondes a los colaboradores en español de Colombia, tuteando, en máximo 4 frases claras. Usa solo los documentos del reglamento y las políticas de ejemplo y menciona el artículo o el punto que aplica. Si la respuesta no está en los documentos, dilo y sugiere escribir a Gestión Humana.",

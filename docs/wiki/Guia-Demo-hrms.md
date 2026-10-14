@@ -79,7 +79,7 @@ Pulsa **Abrir la app** en el paso 1 del recorrido (o **Ver app del colaborador**
 3. **Días hábiles**: en la prueba, 3. La app dice «Del 29 de oct de 2026 al 3 de nov de 2026; regresa el 4 de nov de 2026» (el lunes 2 de noviembre es festivo y no cuenta) y recuerda que se cuentan días de lunes a viernes sin festivos de Colombia.
 4. **Enviar solicitud**: avisa «Solicitud de Camila Rojas Parra enviada para aprobación» y pasa a **Mis solicitudes**, donde aparece como **Pendiente**. La app se cierra con la X o con Escape, y el foco vuelve al botón que la abrió.
 
-La app no deja enviar si la fecha es anterior a hoy, si los días no están entre 1 y 30 o si superan el saldo disponible (que ya descuenta las solicitudes pendientes).
+La app no deja enviar si la fecha es anterior a hoy, si los días no están entre 1 y 30, si superan el saldo disponible (que ya descuenta las solicitudes pendientes) o si se cruzan con otra ausencia aprobada o pendiente («Ya hay una ausencia aprobada o pendiente que se cruza con esas fechas»). Si eliges un sábado, un domingo o un festivo, las vacaciones empiezan el siguiente día hábil: desde el sábado 31 de octubre de 2026, por ejemplo, la app dice «Del 3 de nov de 2026 al 4 de nov de 2026; regresa el 5 de nov de 2026» (el lunes 2 es festivo). La misma validación aplica cuando Gestión Humana registra una ausencia.
 
 ### Paso 3. Gestión Humana aprueba la solicitud
 
@@ -92,8 +92,12 @@ Cierra la app y pulsa **Ir a Vacaciones** en el paso 2 del recorrido (o la pesta
 1. **Pendientes (6)**: filtros por estado (pendientes, aprobadas, rechazadas, todas) y por tipo de ausencia.
 2. **La solicitud**: tipo y días, fechas, «· desde la app» y «Saldo actual 12 → 9 días si se aprueba».
 3. **Aprobar**: avisa «Vacaciones de Camila Rojas Parra aprobadas. Nuevo saldo: 9 días hábiles». El saldo, el calendario y la app de Camila se actualizan.
-4. **Rechazar**: pide un motivo (temporada alta de producción, cruce con otras ausencias, saldo insuficiente u otro). «El colaborador verá el motivo en su app y su saldo no cambia».
+4. **Rechazar**: pide un motivo (temporada alta de producción, cruce con otras ausencias, saldo insuficiente u otro). «El colaborador verá el motivo en su app y su saldo no cambia»: en **Mis solicitudes** la solicitud aparece como **Rechazada** con «Motivo: Temporada alta de producción».
 5. **Registrar ausencia**: Gestión Humana registra vacaciones, permisos, licencias no remuneradas o incapacidades (estas quedan aprobadas de inmediato).
+
+![Motivo del rechazo en la app](images/doc/demos/hrms/17-app-motivo-rechazo.jpg)
+
+*Mis solicitudes en la app de Camila: la solicitud rechazada con su motivo (1) y la aprobada (2).*
 
 Qué decir: «Nadie llena un formato en papel: el colaborador pide desde el celular y el jefe aprueba con un clic, con el saldo a la vista».
 
@@ -123,7 +127,7 @@ Baja a **Ingresos y retiros**: aparece el proceso de ingreso de Diego.
 2. **Avance**: porcentaje de tareas hechas (50 % en la captura).
 3. **Contrato firmado**: la primera tarea dice «Enviar contrato a firma electrónica»; al marcarla avisa «Contrato de … firmado electrónicamente (simulado)» y la insignia pasa a «Contrato firmado».
 4. **Tareas pendientes**: afiliaciones a ARL («obligatoria antes del primer día de trabajo»), EPS, pensión y caja, examen médico de ingreso, dotación y elementos de protección e inducción SG-SST. Cada clic marca o desmarca.
-5. **Activar colaborador**: se habilita con las 8 tareas; avisa «… ya aparece en el directorio y en la nómina». En **Personas** el total pasa a 187, y en **Formación** recibe los cursos obligatorios de su cargo (a Diego, analista de costos, le llegan inducción SG-SST, prevención del acoso laboral, SAGRILAFT y protección de datos: la inducción pasa a contar 187 personas). Entra en la nómina desde la quincena en la que ingresa.
+5. **Activar colaborador**: se habilita con las 8 tareas; avisa «Diego González Moreno ya aparece en el directorio; entra a la nómina desde su fecha de ingreso (28 de oct de 2026)». En **Personas** el total pasa a 187; su perfil dice «Antigüedad: Ingresa el 28 de oct de 2026» y su jefe inmediato es el mismo de quienes ya tienen su cargo (para el analista de costos, Ricardo Salazar Pineda, director financiero). En **Formación** recibe los cursos obligatorios de su cargo (a Diego le llegan inducción SG-SST, prevención del acoso laboral, SAGRILAFT y protección de datos: la inducción pasa a contar 187 personas). Entra en la nómina desde la quincena en la que ingresa.
 
 Qué decir: «Del candidato al primer día sin hojas de cálculo: el puntaje es explicable y el ingreso tiene su lista de chequeo legal».
 
@@ -140,7 +144,7 @@ Pulsa **Ir a Nómina** en el paso 4 del recorrido (o la pestaña **Nómina**). L
 3. **Totales**: devengado ($ 262,2 M), deducciones ($ 21,3 M), neto ($ 240,8 M), aportes del empleador ($ 44,7 M), provisiones ($ 55,1 M) y **costo total de la quincena** ($ 361,9 M).
 4. **Novedades**: buscador por nombre o cédula, colaborador (solo quienes trabajan en esa quincena y no son aprendices), tipo (hora extra diurna o nocturna, recargo nocturno, recargo dominical o festivo, o comisión en pesos) y cantidad. El valor usa el valor hora (salario ÷ 210). Al liquidar, el formulario se bloquea hasta volver a borrador.
 
-Debajo están el **Resumen por concepto** (con la comprobación «devengado − deducciones = neto»), el **Detalle por colaborador** (con buscador, **Desprendible** en PDF cuando la quincena está liquidada y exportación CSV) y el **Asiento contable de la quincena** con cuentas del PUC («Débitos = créditos: el asiento cuadra»; en la prueba, sumas iguales de $ 361.929.933), que se descarga en CSV.
+Debajo están el **Resumen por concepto** (con la comprobación «devengado − deducciones = neto»), el **Detalle por colaborador** (con buscador por nombre o cédula, sin importar tildes, **Desprendible** en PDF cuando la quincena está liquidada y exportación CSV) y el **Asiento contable de la quincena** con cuentas del PUC («Débitos = créditos: el asiento cuadra»; en la prueba, sumas iguales de $ 361.929.933), que se descarga en CSV.
 
 **Siguiente quincena.** Ya pagada, la quincena muestra **Abrir la siguiente quincena** y explica cuál es. Al pulsarlo avisa «Se abrió la 2.ª quincena de octubre de 2026 (del 16 al 31): empieza sin novedades», vuelve a **Novedades** y suma la pagada a **Quincenas pagadas en la demo** («186 colaboradores · neto $ 240.832.219 · costo total $ 361.929.933»). La nueva quincena tiene 187 colaboradores: Diego entra con los días que trabaja desde su ingreso. Así el ciclo se puede repetir sin restablecer los datos; de la 2.ª quincena se pasa a la 1.ª del mes siguiente.
 
@@ -234,7 +238,7 @@ Ver el [paso 1](#paso-1-inicio-indicadores-y-alertas-de-cumplimiento). Además:
 Ver el [paso 3](#paso-3-gestión-humana-aprueba-la-solicitud). Además de las solicitudes:
 
 - **Calendario** mensual con el número de personas ausentes por día y los festivos nacionales en rojo (por ejemplo, el 12 de octubre de 2026). Al elegir un día lista quién está ausente, por qué y hasta cuándo. Se navega mes a mes.
-- **Saldos de vacaciones**: causados, tomados y saldo por persona, de mayor a menor, con buscador, paginación y CSV. Regla: «15 días hábiles por año de servicio, proporcionales desde la fecha de ingreso. Saldo = causados − tomados». Los aprendices no acumulan vacaciones en la demo.
+- **Saldos de vacaciones**: causados, tomados y saldo por persona, de mayor a menor, con buscador (sin importar tildes: «garcia» encuentra «García»), paginación y CSV (con coma decimal en español, como la espera Excel en Colombia). Regla: «15 días hábiles por año de servicio, proporcionales desde la fecha de ingreso. Saldo = causados − tomados». Los aprendices no acumulan vacaciones en la demo.
 
 ### Selección
 
@@ -246,7 +250,11 @@ Ver el [paso 4](#paso-4-selección-contratar-desde-la-oferta). Además:
 
 *Vista de descartados (1): el candidato (2) y su botón para devolverlo al proceso (3).*
 - Si una vacante ya tiene todos sus cupos, no deja contratar más: «Esta vacante ya tiene todos sus cupos cubiertos».
-- **Ingresos y retiros** alterna entre **Ingresos** y **Retiros** y tiene **Ver procesos cerrados**. Un retiro trae su lista de chequeo (carta o preaviso, liquidación aprobada, paz y salvo, examen de egreso, **Generar certificado laboral (PDF)** y retiro de seguridad social) y la **Liquidación estimada**: salario y auxilio pendientes, cesantías, intereses, prima proporcional, vacaciones no disfrutadas e indemnización (solo para despido sin justa causa en contrato indefinido), con la nota «Cálculo simplificado de ejemplo». **Finalizar retiro** saca a la persona del directorio y la suma a la rotación.
+- **Ingresos y retiros** alterna entre **Ingresos** y **Retiros** y tiene **Ver procesos cerrados**. Un retiro trae su lista de chequeo (carta o preaviso, liquidación aprobada, paz y salvo, examen de egreso, **Generar certificado laboral (PDF)** y retiro de seguridad social) y la **Liquidación estimada**: salario y auxilio pendientes, cesantías, intereses, prima proporcional, vacaciones no disfrutadas e indemnización, con la nota «Cálculo simplificado de ejemplo». La indemnización solo aparece en el despido sin justa causa y depende del contrato (art. 64 del C.S.T.): en contrato indefinido, 30 días de salario por el primer año y 20 por cada año adicional (20 y 15 desde 10 salarios mínimos); a término fijo, los salarios del tiempo que falta del plazo; por obra o labor, mínimo 15 días; el contrato de aprendizaje no tiene. Debajo del valor dice cuántos días de salario paga. **Finalizar retiro** saca a la persona del directorio, la suma a la rotación y cancela las solicitudes de ausencia que tenía pendientes (las aprobadas y rechazadas quedan en su historial).
+
+![Liquidación de un despido sin justa causa a término fijo](images/doc/demos/hrms/18-retiro-indemnizacion.jpg)
+
+*Retiro de Adriana Gaitán Ospina, auxiliar de bodega con contrato a término fijo hasta el 8 de febrero de 2027, despedida sin justa causa con último día el 29 de octubre de 2026 (1): la indemnización paga los 102 días que faltan del plazo, $ 6.392.000 (2), dentro de un total de $ 10.537.062 (3); la nota explica la regla por tipo de contrato (4).*
 
 ### Desempeño
 
@@ -289,16 +297,16 @@ Ver el [paso 5](#paso-5-nómina-novedades-liquidación-aprobación-y-pago), con 
 
 ### App del colaborador
 
-Se abre con **Ver app del colaborador** (o desde los pasos 1 y 5 del recorrido, que la abren directo en **Solicitar vacaciones** o en el asistente) y se cierra con la X o con Escape; el foco vuelve al botón que la abrió. Es la vista de Camila Rojas Parra.
+Se abre con **Ver app del colaborador** (o desde los pasos 1 y 5 del recorrido, que la abren directo en **Solicitar vacaciones** o en el asistente) y se cierra con la X o con Escape; el foco vuelve al botón que la abrió. Es la vista de Camila Rojas Parra. Abajo dice: «Vista de ejemplo de la app del colaborador. En tu proyecto es una app web que se abre en el celular sin instalar nada».
 
 | Opción | Qué hace |
 |---|---|
 | **Solicitar vacaciones** | Saldo (causados, tomados, disponibles) y formulario en días hábiles (ver el [paso 2](#paso-2-app-del-colaborador-pedir-vacaciones-desde-el-celular)). |
-| **Mis solicitudes** | Sus solicitudes con estado Pendiente, Aprobada o Rechazada. |
+| **Mis solicitudes** | Sus solicitudes con estado Pendiente, Aprobada o Rechazada; las rechazadas muestran el motivo («Motivo: …»). |
 | **Mi desprendible** | Última quincena pagada (la actual si ya se pagó, o la última del historial) y **Descargar PDF**. |
 | **Mi certificado laboral** | Con o sin salario, en PDF. La pantalla aclara que en la demo es un documento de ejemplo, sin validez. |
 | **Mis cursos** | Sus cursos con estado y vencimiento; «Se toma en la plataforma de formación». |
-| **Pregúntale a Gestión Humana** | Asistente con IA (ver el [paso 6](#paso-6-el-colaborador-ve-su-desprendible-y-le-pregunta-al-asistente)). |
+| **Pregúntale a Gestión Humana** | Asistente con IA (ver el [paso 6](#paso-6-el-colaborador-ve-su-desprendible-y-le-pregunta-al-asistente)). La conversación se conserva al volver al menú o cerrar la app mientras la página siga abierta. |
 | **Mis datos** | Cédula, cargo, sede, ingreso, EPS, fondo y cuenta de nómina enmascarada. «Los cambios de datos se solicitan a Gestión Humana». |
 
 ```mermaid
@@ -383,13 +391,18 @@ flowchart LR
 
 ## Limitaciones conocidas
 
-La sonda automática hizo clic en todos los controles visibles de la vista inicial (escritorio, 390 px e inglés) y ninguno quedó sin efecto, sin errores de consola ni de hidratación. Los flujos principales (pedir y aprobar vacaciones, contratar y activar, descartar y devolver, buscar y agregar novedades, liquidar, aprobar, pagar y abrir la siguiente quincena, desprendible, asistente, teclado en las pestañas y restablecer) se recorrieron con Playwright. Lo que sí conviene saber:
+La sonda automática hizo clic en todos los controles visibles de la vista inicial (escritorio y 390 px, en español y en inglés, en claro y en oscuro) y ninguno quedó sin efecto, sin errores de consola ni de hidratación de la demo. Los flujos principales (pedir, aprobar y rechazar vacaciones, contratar y activar, descartar y devolver, registrar un retiro con su liquidación, buscar y agregar novedades, liquidar, aprobar, pagar y abrir la siguiente quincena, desprendible, asistente, teclado en las pestañas, Escape en diálogos y restablecer) se recorrieron con Playwright.
 
-1. **La vista previa todavía promete más de lo que hace la demo.** La tarjeta del hub y la pantalla de acceso usan el texto del catálogo: «ATS con scoring CV IA y screening calls automáticas», «Payroll multi-país con compliance laboral (CO, MX, AR)» y «AI: retención predicha, eNPS y salary benchmarks». La demo trabaja solo con Colombia, el puntaje de candidatos es por reglas («No es IA»), no hace llamadas de preselección y no predice retención ni compara salarios. La IA está solo en el asistente de políticas. El texto nuevo de la tarjeta (y el nombre «Gestión Humana y Nómina (HRMS)» para el catálogo del admin) está propuesto a la pista de plataforma.
-2. **Los cambios viven solo en el navegador**, por 7 días. Si el prospecto cambia de equipo o de navegador, o borra los datos del sitio, vuelve a los datos de ejemplo. No hay espacio compartido con el vendedor.
+**Revisión del 14 de octubre de 2026.** Una revisión de comprador exigente encontró y corrigió: la antigüedad de quien aún no ingresa salía en negativo («-1 años»); quien se contrataba quedaba con la directora de planta como jefe aunque fuera de otra área; el despido sin justa causa de un contrato a término fijo daba indemnización de $ 0 (y la nota decía que solo aplicaba al indefinido); se podían pedir dos veces las mismas fechas; unas vacaciones pedidas desde un sábado quedaban registradas desde el sábado; la pantalla decía que el colaborador veía el motivo del rechazo en su app, pero la app no lo mostraba; la conversación con el asistente se borraba al volver al menú; el aviso de activación decía que la persona ya estaba «en la nómina» aunque entra desde su fecha de ingreso; las solicitudes pendientes de alguien retirado seguían esperando aprobación; los buscadores de saldos y del detalle de nómina no encontraban nombres sin tildes, y los CSV en español usaban punto decimal.
+
+Lo que sí conviene saber:
+
+1. **La vista previa todavía promete más de lo que hace la demo.** La tarjeta del hub y la pantalla de acceso usan el texto del catálogo: «ATS con scoring CV IA y screening calls automáticas», «Payroll multi-país con compliance laboral (CO, MX, AR)» y «AI: retención predicha, eNPS y salary benchmarks». La demo trabaja solo con Colombia, el puntaje de candidatos es por reglas («No es IA»), no hace llamadas de preselección y no predice retención ni compara salarios. La IA está solo en el asistente de políticas. El texto nuevo de la tarjeta, del plan del producto y el nombre «Gestión Humana y Nómina (HRMS)» para el catálogo del admin están propuestos a la pista de plataforma.
+2. **Los cambios viven solo en el navegador**, por 7 días. Si el prospecto cambia de equipo o de navegador, o borra los datos del sitio, vuelve a los datos de ejemplo. No hay espacio compartido con el vendedor. La conversación con el asistente se borra al recargar la página.
 3. **La siguiente quincena se puede abrir antes de tiempo.** Para repetir el ciclo, la demo deja abrir la quincena siguiente apenas se paga la actual, aunque en la vida real se liquida cerca de su fecha de pago. El historial guarda los totales pagados, no el detalle por persona; el desprendible de la app se recalcula con las novedades de esa quincena. Las **obligaciones del mes** (nómina electrónica y planilla de aportes) siguen siendo las del mes anterior a la fecha de los datos.
 4. **DIAN, planilla de aportes, banco, firma electrónica y mensajes simulados**, como lo dicen las pantallas.
 5. **Las aprobaciones no dependen de roles**: quien usa la demo aprueba como jefe y como Gestión Humana a la vez (el recorrido lo dice). La app del colaborador es siempre la de Camila Rojas Parra.
-6. **El enlace «Ver la demo de plataforma de formación»** lleva a `/demo/lms`, que tiene su propio acceso: un prospecto con acceso solo a esta demo verá ahí la pantalla «Requiere acceso» (la demo lo advierte debajo del plan de formación).
-7. **Un colaborador nuevo no entra en el ciclo de desempeño en curso** (ingresó después de que empezó) ni en las obligaciones del mes anterior.
-8. **Límites del asistente**: comparte el tope de gasto mensual y los límites del chatbot del sitio. Si el servidor está ocupado o en mantenimiento, la app lo dice y se puede volver a preguntar.
+6. **La liquidación de retiro es una estimación simplificada**: usa el salario básico (sin promedio de horas extra ni comisiones), no descuenta préstamos ni anticipos y, en el contrato por obra o labor, paga el mínimo de 15 días porque la demo no conoce la fecha de fin de la obra. Así lo dice la nota de la pantalla.
+7. **El enlace «Ver la demo de plataforma de formación»** lleva a `/demo/lms`, que tiene su propio acceso: un prospecto con acceso solo a esta demo verá ahí la pantalla «Requiere acceso» (la demo lo advierte debajo del plan de formación). En **Formación** el avance de cada curso viene en los datos de ejemplo: los cursos se toman en la plataforma de formación, no se marcan como hechos desde esta demo.
+8. **Un colaborador nuevo no entra en el ciclo de desempeño en curso** (ingresó después de que empezó) ni en las obligaciones del mes anterior.
+9. **Límites del asistente**: comparte el tope de gasto mensual y los límites del chatbot del sitio. Si el servidor está ocupado o en mantenimiento, la app lo dice y se puede volver a preguntar.

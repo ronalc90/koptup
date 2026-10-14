@@ -13,7 +13,7 @@ import type { RunStatus } from '../lib/types';
 import FilingsCard from './FilingsCard';
 import { Benefits, Novelties } from './PayrollParts';
 import { useDocuments } from './useDocuments';
-import { Empty, Pager, SectionTitle, Stat, TabIntro, btn, inputCls, usePager, useFmt, usePos } from './ui';
+import { Empty, Pager, SectionTitle, Stat, TabIntro, btn, inputCls, normText, usePager, useFmt, usePos } from './ui';
 
 const STEPS: RunStatus[] = ['draft', 'liquidated', 'approved', 'paid'];
 
@@ -40,7 +40,11 @@ export default function PayrollTab() {
   const tot = useMemo(() => totals(lines), [lines]);
   const entry = useMemo(() => journal(tot), [tot]);
   const [q, setQ] = useState('');
-  const filtered = lines.filter((l) => !q.trim() || byId.get(l.employeeId)!.name.toLowerCase().includes(q.trim().toLowerCase()));
+  const filtered = lines.filter((l) => {
+    const needle = normText(q.trim());
+    const e = byId.get(l.employeeId)!;
+    return !needle || normText(e.name).includes(needle) || e.docId.includes(needle);
+  });
   const pager = usePager(filtered, 10);
   const { setPage } = pager;
   useEffect(() => setPage(1), [q, setPage]);

@@ -167,6 +167,11 @@ export function upcomingBirthdays(state: HrState, days = 14): { e: Employee; dat
   return out;
 }
 
+/** ¿La persona ya tiene una ausencia aprobada o pendiente que se cruza con esas fechas? */
+export function overlappingLeave(state: HrState, employeeId: string, from: ISODate, to: ISODate): boolean {
+  return state.leaves.some((l) => l.employeeId === employeeId && l.status !== 'rejected' && l.from <= to && l.to >= from);
+}
+
 export function evaluated(e: Employee) {
   return POSITIONS[e.positionId].evaluated;
 }

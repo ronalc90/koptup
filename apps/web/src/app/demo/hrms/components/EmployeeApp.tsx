@@ -27,7 +27,7 @@ import LeaveForm from './LeaveForm';
 import { statusVariant } from './LeaveItem';
 import { usePeriodLabel } from './PayrollTab';
 import { useDocuments } from './useDocuments';
-import Assistant from './Assistant';
+import Assistant, { type Msg } from './Assistant';
 import { btn, useFmt, usePos } from './ui';
 
 type Screen = AppScreen;
@@ -50,12 +50,15 @@ export default function EmployeeApp() {
   const tl = useTranslations('demoHrms.leaveTypes');
   const tc = useTranslations('demoHrms.courses');
   const tlc = useTranslations('demoHrms.learning');
+  const tr = useTranslations('demoHrms.rejectReasons');
   const { state, appOpen, appScreen, openApp } = useHr();
   const f = useFmt();
   const docs = useDocuments();
   const label = usePeriodLabel();
   const [screen, setScreen] = useState<Screen>('menu');
   const [withSalary, setWithSalary] = useState(true);
+  // Conversación con el asistente: vive mientras la página está abierta (no se borra al volver al menú).
+  const [chat, setChat] = useState<Msg[]>([]);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -138,6 +141,9 @@ export default function EmployeeApp() {
                 <Badge variant={statusVariant(l.status)} size="sm">{t(`status.${l.status}`)}</Badge>
               </div>
               <p className="text-secondary-500 mt-1">{f.date(l.from)} → {f.date(l.to)}</p>
+              {l.status === 'rejected' && l.rejectReason && (
+                <p className="text-red-700 dark:text-red-300 mt-1">{t('rejectedBecause', { reason: tr(l.rejectReason as 'peak' | 'overlap' | 'balance' | 'other') })}</p>
+              )}
             </div>
           ))}
           <p className="text-[10px] text-secondary-500">{t('requestsHint')}</p>
@@ -186,7 +192,7 @@ export default function EmployeeApp() {
     } else if (screen === 'assistant') {
       body = (
         <div className="p-3 h-full">
-          <Assistant />
+          <Assistant msgs={chat} setMsgs={setChat} />
         </div>
       );
     } else if (screen === 'profile') {
