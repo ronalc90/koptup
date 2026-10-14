@@ -253,24 +253,36 @@ describeDb('políticas de autorización (integración)', () => {
   });
 
   describe('rutas de prueba', () => {
-    it('en desarrollo: 401 anónimo, 403 usuario, 200 admin', async () => {
-      expect((await request(app).get('/api/test/whatsapp/status')).status).toBe(401);
-      expect((await request(app).get('/api/test/whatsapp/status').set(bearer(user))).status).toBe(403);
-      expect((await request(app).get('/api/test/whatsapp/status').set(bearer(admin))).status).toBe(200);
-      expect((await request(app).post('/api/contact/test-email').set(bearer(user))).status).toBe(403);
+    it('en desarrollo: el chat heredado es solo admin; las pruebas viejas de avisos ya no existen', async () => {
       expect((await request(app).post('/api/chat/session').set(bearer(user))).status).toBe(403);
+      // Reemplazadas por /api/admin/notifications/test (también en producción).
+      expect((await request(app).get('/api/test/whatsapp/status').set(bearer(admin))).status).toBe(404);
+      expect((await request(app).get('/api/test/whatsapp').set(bearer(admin))).status).toBe(404);
+      expect((await request(app).post('/api/contact/test-email').set(bearer(admin))).status).toBe(404);
+      expect((await request(app).post('/api/contact/test-whatsapp').set(bearer(admin))).status).toBe(404);
     });
 
     it('en producción: 404 incluso para admin', async () => {
       const prev = process.env.NODE_ENV;
       process.env.NODE_ENV = 'production';
       try {
-        expect((await request(app).get('/api/test/whatsapp/status').set(bearer(admin))).status).toBe(404);
-        expect((await request(app).post('/api/contact/test-whatsapp').set(bearer(admin))).status).toBe(404);
         expect((await request(app).post('/api/chat/message').set(bearer(admin))).status).toBe(404);
       } finally {
         process.env.NODE_ENV = prev;
       }
+    });
+  });
+
+  describe('avisos al dueño (panel)', () => {
+    it('estado: admin y manager; prueba y reenvío: solo admin', async () => {
+      expect((await request(app).get('/api/admin/notifications/status')).status).toBe(401);
+      expect((await request(app).get('/api/admin/notifications/status').set(bearer(user))).status).toBe(403);
+      expect((await request(app).get('/api/admin/notifications/status').set(bearer(manager))).status).toBe(200);
+      expect((await request(app).get('/api/admin/notifications/status').set(bearer(admin))).status).toBe(200);
+      expect((await request(app).post('/api/admin/notifications/test')).status).toBe(401);
+      expect((await request(app).post('/api/admin/notifications/test').set(bearer(manager))).status).toBe(403);
+      expect((await request(app).post('/api/admin/contacts/000000000000000000000000/notify').set(bearer(manager))).status).toBe(403);
+      expect((await request(app).post('/api/admin/contacts/000000000000000000000000/notify').set(bearer(admin))).status).toBe(404);
     });
   });
 

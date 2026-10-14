@@ -47,6 +47,38 @@ export interface IContactConsent {
   versionPolitica: string;
 }
 
+/**
+ * Estado del aviso al dueño por un canal (correo o WhatsApp), lo escribe
+ * services/owner-notify.service.ts:
+ *  - `pendiente`: aún no se intenta (o el intento está en curso);
+ *  - `enviado`: el proveedor lo aceptó (Resend devolvió id, Meta un wamid);
+ *  - `entregado` / `leido`: confirmado por el webhook de WhatsApp;
+ *  - `fallido`: el proveedor lo rechazó (el job de reintentos lo vuelve a
+ *    intentar hasta 6 veces en los primeros 3 días);
+ *  - `no_configurado`: faltan las variables de ese canal.
+ */
+export const NOTIFY_STATES = ['pendiente', 'enviado', 'entregado', 'leido', 'fallido', 'no_configurado'] as const;
+export type NotifyState = (typeof NOTIFY_STATES)[number];
+
+export interface IContactNotifyChannel {
+  estado: NotifyState;
+  intentos: number;
+  ultimoIntento?: Date | null;
+  /** Cuándo puede volver a intentarlo el job de reintentos (null: no se reintenta). */
+  proximoIntento?: Date | null;
+  /** Motivo del último fallo (máx. 300, sin secretos, correos enmascarados). */
+  error?: string | null;
+  /** Id del proveedor: id de Resend o wamid de WhatsApp. */
+  idProveedor?: string | null;
+  /** Respaldo usado (`onboarding@resend.dev` o `hello_world`). */
+  respaldo?: string | null;
+}
+
+export interface IContactNotifications {
+  email: IContactNotifyChannel;
+  whatsapp: IContactNotifyChannel;
+}
+
 export interface IContact extends Document {
   name: string;
   email: string;
@@ -71,8 +103,23 @@ export interface IContact extends Document {
   consentimiento?: IContactConsent | null;
   /** Fecha en que el job de conservación quitó los datos personales (jobs/retention.job.ts). */
   anonimizadoEn?: Date | null;
+  /** Resultado del aviso al dueño por canal (contactos desde oct-2026; los anteriores no lo tienen). */
+  notificaciones?: IContactNotifications | null;
   created_at: Date;
 }
+
+const NotifyChannelSchema = new Schema<IContactNotifyChannel>(
+  {
+    estado: { type: String, enum: [...NOTIFY_STATES], required: true },
+    intentos: { type: Number, default: 0, min: 0 },
+    ultimoIntento: { type: Date, default: null },
+    proximoIntento: { type: Date, default: null },
+    error: { type: String, maxlength: 300, default: null },
+    idProveedor: { type: String, maxlength: 200, default: null },
+    respaldo: { type: String, maxlength: 60, default: null },
+  },
+  { _id: false },
+);
 
 const ContactSchema = new Schema<IContact>({
   name: { type: String, required: true },
@@ -112,9 +159,23 @@ const ContactSchema = new Schema<IContact>({
     default: undefined,
   },
   anonimizadoEn: { type: Date, default: null },
+  notificaciones: {
+    type: new Schema<IContactNotifications>(
+      {
+        email: { type: NotifyChannelSchema, required: true },
+        whatsapp: { type: NotifyChannelSchema, required: true },
+      },
+      { _id: false },
+    ),
+    default: undefined,
+  },
   created_at: { type: Date, default: Date.now },
 });
 
 ContactSchema.index({ lead: 1, created_at: -1 });
+// Job de reintentos de avisos (jobs/notify-retry.job.ts) y webhook de WhatsApp (por wamid).
+ContactSchema.index({ 'notificaciones.email.estado': 1, 'notificaciones.email.proximoIntento': 1 });
+ContactSchema.index({ 'notificaciones.whatsapp.estado': 1, 'notificaciones.whatsapp.proximoIntento': 1 });
+ContactSchema.index({ 'notificaciones.whatsapp.idProveedor': 1 }, { sparse: true });
 
 export default mongoose.model<IContact>('Contact', ContactSchema);

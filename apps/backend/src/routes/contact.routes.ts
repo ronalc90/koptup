@@ -1,8 +1,7 @@
 import { Router, RequestHandler } from 'express';
 import { body } from 'express-validator';
-import { submitContact, testWhatsApp, testEmail } from '../controllers/contact.controller';
+import { submitContact } from '../controllers/contact.controller';
 import { strictRateLimiter } from '../middleware/rateLimiter';
-import { devOnlyAdmin } from '../middleware/access';
 import { CONTACT_QUOTE_MODALITIES, CONTACT_QUOTE_PLANS, CONTACT_QUOTE_TIERS, CONTACT_TIMELINES } from '../models/Contact';
 import { PRICING_DATA } from '../data/pricing.data';
 
@@ -71,8 +70,7 @@ router.post(
   submitContact as RequestHandler
 );
 
-// Endpoints de prueba: no existen en producción; en desarrollo, solo admin.
-router.post('/test-whatsapp', ...devOnlyAdmin, testWhatsApp as RequestHandler);
-router.post('/test-email', ...devOnlyAdmin, testEmail as RequestHandler);
+// La prueba de los avisos ya no vive aquí: POST /api/admin/notifications/test
+// (solo admin, también en producción; routes/admin-notifications.routes.ts).
 
 export default router;

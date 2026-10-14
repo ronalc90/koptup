@@ -21,6 +21,8 @@
  *  | changePasswordRateLimiter        | cuenta (o IP)    | 5 cada 15 min         | CHANGE_PASSWORD_RATE_LIMIT_MAX   |
  *  | oauthExchangeRateLimiter         | IP               | 20 por minuto         | —                                |
  *  | strictRateLimiter (contacto)     | IP               | 5 por minuto          | —                                |
+ *  | notifyTestRateLimiter (avisos)   | cuenta (o IP)    | 5 cada 15 min         | —                                |
+ *  | notifyResendRateLimiter (avisos) | cuenta (o IP)    | 10 cada 15 min        | —                                |
  *  | chatbotRateLimiter (sin /models) | IP               | 180 por minuto        | CHATBOT_API_RATE_LIMIT_MAX       |
  *  | chatbotQuestionRateLimiter       | IP               | 60 por minuto         | CHATBOT_RATE_LIMIT_MAX           |
  */
@@ -193,6 +195,29 @@ export const strictRateLimiter = limiter({
   windowMs: MINUTE,
   max: 5,
   message: 'Enviaste varias solicitudes seguidas. Espera un minuto e intenta de nuevo.',
+});
+
+/**
+ * Aviso de prueba del panel (POST /api/admin/notifications/test): cada
+ * prueba envía un correo y un WhatsApp reales al dueño. Por cuenta, 5 cada 15 min.
+ */
+export const notifyTestRateLimiter = limiter({
+  windowMs: 15 * MINUTE,
+  max: 5,
+  keyGenerator: accountKey,
+  message: 'Ya enviaste varias pruebas seguidas. Espera unos minutos e intenta de nuevo.',
+});
+
+/**
+ * Reenvío manual del aviso de un contacto (POST /api/admin/contacts/:id/notify):
+ * cada reenvío puede mandar un correo y un WhatsApp reales (con costo en
+ * Meta). Por cuenta, 10 cada 15 min.
+ */
+export const notifyResendRateLimiter = limiter({
+  windowMs: 15 * MINUTE,
+  max: 10,
+  keyGenerator: accountKey,
+  message: 'Ya reenviaste varios avisos seguidos. Espera unos minutos e intenta de nuevo.',
 });
 
 export const uploadRateLimiter = limiter({

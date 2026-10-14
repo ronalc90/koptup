@@ -10,8 +10,13 @@
  *    (contacto, chatbot, demos). El aviso dice que el inicio de sesión fallará.
  *  - Las opcionales que faltan o tienen un formato inválido solo generan una
  *    advertencia (la función que las usa queda deshabilitada o usa su valor
- *    por defecto). Los grupos (SMTP_USER + SMTP_PASS) se avisan juntos, y
- *    DEMO_UPLOAD_ENABLED avisa si falta (con `false` explícito no avisa).
+ *    por defecto). DEMO_UPLOAD_ENABLED avisa si falta (con `false` explícito
+ *    no avisa).
+ *  - Avisos al dueño (`notifyWarnings`): correo (RESEND_API_KEY; SMTP solo
+ *    como respaldo, y se advierte que Railway Free/Trial/Hobby lo bloquea),
+ *    destino (NOTIFY_EMAIL o ADMIN_EMAIL), WhatsApp (Meta: token, id del
+ *    número y número del dueño; Twilio y UltraMsg ya no se soportan) y el
+ *    webhook de estados.
  *  - Los mensajes nombran la variable, nunca su valor.
  *
  * El resto del código sigue leyendo `process.env` directamente; este módulo
@@ -19,6 +24,7 @@
  */
 import { z } from 'zod';
 import { parseDurationSeconds } from '../utils/duration';
+import { isLoopbackUrl } from '../utils/provider-url';
 
 /** Tope de JWT_REFRESH_EXPIRES_IN (igual a MAX_REFRESH_TTL_SECONDS de middleware/auth.ts). */
 const MAX_REFRESH_SECONDS = 7 * 24 * 60 * 60;
@@ -38,20 +44,21 @@ export const OPTIONAL_WITH_EFFECT: Record<string, string> = {
   OPENAI_API_KEY: 'funciones con IA (chatbot en modo extractivo, demos de IA deshabilitadas)',
   CORS_ORIGIN: 'orígenes extra permitidos por CORS (solo se aceptan koptup.com y www.koptup.com)',
   FRONTEND_URL: 'enlaces de los correos (se usa http://localhost:3000)',
-  ADMIN_EMAIL: 'avisos al equipo por correo apagados y el arranque no asegura ningún admin',
+  ADMIN_EMAIL: 'el arranque no asegura ningún admin (y, sin NOTIFY_EMAIL, los avisos de nuevos contactos no tienen destino de correo)',
   INTERNAL_API_KEY:
     'la web no puede informar la IP real del visitante: sus peticiones del servidor (verificación de sesión, LinkedIn sin cuenta) cuentan con la IP de salida de la web',
 };
 
 /**
- * Variables que solo sirven juntas: si falta alguna, la función se apaga.
- * SMTP_HOST no decide nada (sin ella se usa smtp.gmail.com).
+ * Variables que solo sirven juntas: si falta alguna (y otra sí está), la
+ * función se apaga. SMTP_HOST no decide nada (sin ella se usa
+ * smtp.gmail.com). Sin ninguna de las dos no se avisa aquí: el correo sale
+ * por Resend (ver `notifyWarnings`).
  */
 export const OPTIONAL_GROUPS: Array<{ names: readonly string[]; effect: string }> = [
   {
     names: ['SMTP_USER', 'SMTP_PASS'],
-    effect:
-      'no sale ningún correo (acuse y aprobación de demos, recordatorios, restablecer contraseña, avisos al equipo); el panel muestra igual el enlace de activación',
+    effect: 'el respaldo SMTP queda apagado (con RESEND_API_KEY no hace falta)',
   },
 ];
 
@@ -86,6 +93,29 @@ const optionalEmail = z
   .optional()
   .refine((v) => v === undefined || v.trim() === '' || z.string().email().safeParse(v.trim()).success, {
     message: 'debe ser un email válido',
+  });
+
+/** Uno o varios correos separados por coma. */
+const optionalEmailList = z
+  .string()
+  .optional()
+  .refine(
+    (v) =>
+      v === undefined ||
+      v.trim() === '' ||
+      v
+        .split(',')
+        .map((e) => e.trim())
+        .every((e) => e !== '' && z.string().email().safeParse(e).success),
+    { message: 'debe ser uno o varios emails válidos separados por coma → los avisos al dueño no salen por correo' },
+  );
+
+/** Número de WhatsApp con indicativo (se toman solo los dígitos: 8 a 15). */
+const optionalPhone = z
+  .string()
+  .optional()
+  .refine((v) => v === undefined || v.trim() === '' || /^\d{8,15}$/.test(v.replace(/[\s+()-]/g, '')), {
+    message: 'debe ser un número con indicativo, p. ej. 573001234567 → avisos por WhatsApp apagados',
   });
 
 export const EnvSchema = z.object({
@@ -124,6 +154,33 @@ export const EnvSchema = z.object({
   SMTP_SECURE: optionalBool,
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
+  // Avisos al dueño (services/owner-notify.service.ts).
+  RESEND_API_KEY: z.string().optional(),
+  RESEND_API_URL: optionalUrl,
+  EMAIL_FROM: z.string().max(200).optional(),
+  NOTIFY_EMAIL: optionalEmailList,
+  WHATSAPP_PROVIDER: z.string().optional(),
+  WHATSAPP_API_TOKEN: z.string().optional(),
+  WHATSAPP_PHONE_NUMBER_ID: z
+    .string()
+    .optional()
+    .refine((v) => v === undefined || v.trim() === '' || /^\d+$/.test(v.trim()), { message: 'debe ser el id numérico del número en Meta → avisos por WhatsApp apagados' }),
+  ADMIN_WHATSAPP_NUMBER: optionalPhone,
+  WHATSAPP_TEMPLATE_NAME: z
+    .string()
+    .optional()
+    .refine((v) => v === undefined || v.trim() === '' || /^[a-z0-9_]{1,512}$/.test(v.trim()), { message: 'solo minúsculas, números y _ (como en WhatsApp Manager)' }),
+  WHATSAPP_TEMPLATE_LANG: z.string().max(10).optional(),
+  WHATSAPP_GRAPH_VERSION: z
+    .string()
+    .optional()
+    .refine((v) => v === undefined || v.trim() === '' || /^v\d+\.\d+$/.test(v.trim()), { message: 'debe tener la forma v25.0 → se usa v25.0' }),
+  WHATSAPP_GRAPH_URL: optionalUrl,
+  WHATSAPP_HELLO_WORLD_FALLBACK: optionalBool,
+  WHATSAPP_APP_SECRET: z.string().optional(),
+  WHATSAPP_WEBHOOK_VERIFY_TOKEN: z.string().optional(),
+  NOTIFY_HEARTBEAT_DAYS: optionalNumber({ min: 0, int: true }),
+  NOTIFY_JOBS_ENABLED: optionalBool,
   INTERNAL_API_KEY: z.string().optional(),
   DEMO_UPLOAD_ENABLED: z
     .enum(['true', 'false'], { errorMap: () => ({ message: 'debe ser true o false → «Prueba con tu documento» queda apagada' }) })
@@ -232,10 +289,12 @@ export function validateEnv(source: NodeJS.ProcessEnv = process.env): EnvValidat
 
   for (const group of OPTIONAL_GROUPS) {
     const missing = group.names.filter((name) => isBlank(source[name]));
-    if (missing.length > 0) {
+    if (missing.length > 0 && missing.length < group.names.length) {
       warnings.push(`${missing.join(' y ')}: ${missing.length > 1 ? 'no están definidas' : 'no está definida'} → ${group.effect}`);
     }
   }
+
+  warnings.push(...notifyWarnings(source));
 
   // «Prueba con tu documento» solo se enciende con el valor exacto `true`.
   // (Un valor distinto de true/false ya produjo el aviso de formato.)
@@ -249,6 +308,68 @@ export function validateEnv(source: NodeJS.ProcessEnv = process.env): EnvValidat
     errors,
     warnings,
   };
+}
+
+/**
+ * Avisos sobre los canales de aviso al dueño (correo y WhatsApp). Nombran
+ * las variables y su efecto, nunca sus valores.
+ */
+export function notifyWarnings(source: NodeJS.ProcessEnv): string[] {
+  const warnings: string[] = [];
+  const resend = !isBlank(source.RESEND_API_KEY);
+  const smtp = !isBlank(source.SMTP_USER) && !isBlank(source.SMTP_PASS);
+
+  if (!resend && !smtp) {
+    warnings.push(
+      'RESEND_API_KEY: no está definida → no sale ningún correo (avisos de nuevos contactos, acuse y aprobación de demos, recordatorios, restablecer contraseña); el panel muestra igual el enlace de activación',
+    );
+  } else if (!resend && smtp) {
+    warnings.push(
+      'SMTP_USER y SMTP_PASS sin RESEND_API_KEY: el correo sale por SMTP, que Railway bloquea en los planes Free, Trial y Hobby (solo funciona en Pro) → define RESEND_API_KEY',
+    );
+  }
+  if (isBlank(source.NOTIFY_EMAIL) && isBlank(source.ADMIN_EMAIL)) {
+    warnings.push('NOTIFY_EMAIL: no está definida (ni ADMIN_EMAIL) → los avisos de nuevos contactos no salen por correo');
+  }
+
+  // URL de proveedores solo para pruebas (reciben la key de Resend o el token de Meta).
+  for (const name of ['RESEND_API_URL', 'WHATSAPP_GRAPH_URL']) {
+    const value = source[name]?.trim();
+    if (!value) continue;
+    const target = name === 'RESEND_API_URL' ? 'api.resend.com' : 'graph.facebook.com';
+    if (source.NODE_ENV === 'production' && !isLoopbackUrl(value)) {
+      warnings.push(`${name}: definida con un host que no es esta máquina → se ignora en producción y se usa ${target} (solo es para pruebas con un mock local)`);
+    } else {
+      warnings.push(`${name}: definida → los avisos no van a ${target} sino a un servidor de pruebas (bórrala fuera de las pruebas)`);
+    }
+  }
+
+  const provider = source.WHATSAPP_PROVIDER?.trim().toLowerCase() ?? '';
+  if (provider !== '' && provider !== 'meta' && provider !== 'whatsapp-business') {
+    const missingMeta = ['WHATSAPP_API_TOKEN', 'WHATSAPP_PHONE_NUMBER_ID', 'ADMIN_WHATSAPP_NUMBER'].filter((name) => isBlank(source[name]));
+    warnings.push(
+      'WHATSAPP_PROVIDER: proveedor no soportado (Twilio y UltraMsg se retiraron; cámbiala a meta: WhatsApp Cloud API con plantilla)' +
+        `${missingMeta.length ? `; además faltan ${missingMeta.join(', ')}` : ''} → avisos por WhatsApp apagados`,
+    );
+  } else {
+    const waVars = ['WHATSAPP_API_TOKEN', 'WHATSAPP_PHONE_NUMBER_ID', 'ADMIN_WHATSAPP_NUMBER'];
+    const missing = waVars.filter((name) => isBlank(source[name]));
+    if (missing.length > 0) {
+      warnings.push(`${missing.join(', ')}: ${missing.length > 1 ? 'no están definidas' : 'no está definida'} → avisos por WhatsApp apagados`);
+    } else {
+      const webhookVars = ['WHATSAPP_APP_SECRET', 'WHATSAPP_WEBHOOK_VERIFY_TOKEN'];
+      const missingWebhook = webhookVars.filter((name) => isBlank(source[name]));
+      if (missingWebhook.length > 0) {
+        warnings.push(
+          `${missingWebhook.join(' y ')}: ${missingWebhook.length > 1 ? 'no están definidas' : 'no está definida'} → webhook de WhatsApp apagado (sin confirmación de entrega ni alerta si Meta no entrega un aviso)`,
+        );
+      }
+    }
+  }
+  if (source.NOTIFY_JOBS_ENABLED?.trim() === 'false') {
+    warnings.push('NOTIFY_JOBS_ENABLED: false → sin reintentos de avisos ni latido mensual en esta instancia');
+  }
+  return warnings;
 }
 
 /**

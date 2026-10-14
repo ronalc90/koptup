@@ -2,7 +2,7 @@
  * html.ts — helpers para armar HTML de correos con datos del usuario.
  *
  * Toda plantilla de correo (services/*-emails.service.ts, email.service.ts,
- * team-notify.service.ts) inserta texto con `escapeHtml` y enlaces con
+ * team-notify.service.ts, owner-notify.service.ts) inserta texto con `escapeHtml` y enlaces con
  * `safeHref`. La prueba src/__tests__/unit/email-templates.test.ts renderiza
  * cada plantilla con datos hostiles y verifica que no quede marcado sin
  * escapar ni enlaces `javascript:`.

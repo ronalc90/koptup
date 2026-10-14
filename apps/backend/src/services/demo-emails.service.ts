@@ -1,8 +1,8 @@
 /**
  * demo-emails.service.ts — correos del sistema de demos (español, con "tú").
  *
- * Todos se envían con el SMTP existente (email.service.ts). Sin SMTP
- * configurado no se envía nada y cada función devuelve false: el panel lo
+ * Todos se envían con email.service.ts (Resend por API HTTPS o SMTP de
+ * respaldo). Sin correo configurado no se envía nada y cada función devuelve false: el panel lo
  * muestra y el admin comparte el enlace por otro medio (WhatsApp). Todo texto
  * que viene del usuario se escapa.
  */

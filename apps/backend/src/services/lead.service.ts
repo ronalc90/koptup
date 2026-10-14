@@ -2,8 +2,11 @@
  * lead.service.ts — canal único para registrar leads.
  *
  * Es la lógica que antes vivía en `contact.controller.submitContact`: guarda el
- * `Contact` en MongoDB y dispara (sin bloquear) las notificaciones por WhatsApp
- * y email al equipo. La usan:
+ * `Contact` en MongoDB con el estado de los avisos al dueño en `pendiente`
+ * (o `no_configurado` si falta el canal) y dispara (sin bloquear la respuesta)
+ * los avisos por correo y WhatsApp de services/owner-notify.service.ts, que
+ * guardan el resultado por canal en `Contact.notificaciones`; si un canal
+ * falla, jobs/notify-retry.job.ts lo reintenta. La usan:
  *   - el formulario de /contact (`source: 'contact-form'`, por defecto),
  *   - la demo "Prueba con tu documento" (`source: 'demo-rag'`), y
  *   - el formulario "Solicitar demo" (`source: 'demo-request'`).
@@ -23,8 +26,7 @@ import Contact, {
   type IContactQuote,
 } from '../models/Contact';
 import { logger } from '../utils/logger';
-import { whatsappService } from './whatsapp.service';
-import { emailService } from './email.service';
+import { deliverContactNotifications, initialNotifications } from './owner-notify.service';
 import { isCommerceEnabled } from '../config/commerce';
 import { syncLeadFromContactSafe } from './leads.service';
 
@@ -47,16 +49,17 @@ export interface LeadInput {
 }
 
 export interface LeadNotificationResult {
-  /** true si el aviso por WhatsApp al equipo se envió (false si no está configurado o falló). */
+  /** true si el aviso por WhatsApp al dueño se envió (false si no está configurado o falló). */
   whatsapp: boolean;
-  /** true si el aviso por email al equipo se envió (false si no está configurado o falló). */
+  /** true si el aviso por email al dueño se envió (false si no está configurado o falló). */
   email: boolean;
 }
 
 /**
- * Guarda el lead y dispara los avisos al equipo sin esperarlos. `notified`
+ * Guarda el lead y dispara los avisos al dueño sin esperarlos. `notified`
  * se resuelve (nunca se rechaza) cuando terminan, con lo que de verdad se
- * envió; la solicitud de demo lo guarda para que el panel lo muestre.
+ * envió (el detalle por canal queda en `Contact.notificaciones`); la
+ * solicitud de demo lo guarda para que el panel lo muestre.
  */
 export async function registerLeadWithNotifications(
   input: LeadInput,
@@ -66,7 +69,9 @@ export async function registerLeadWithNotifications(
 
   logger.info(`📝 Registrando lead (origen: ${source})`);
 
-  // Guardar en base de datos
+  // Guardar en base de datos (con los avisos ya "reclamados" por 10 min: si el
+  // proceso se reinicia a mitad del envío, el job de reintentos los retoma).
+  const now = new Date();
   const contact = await Contact.create({
     name,
     email,
@@ -79,7 +84,9 @@ export async function registerLeadWithNotifications(
     ...(input.cotizacion ? { cotizacion: input.cotizacion } : {}),
     ...(input.plazo ? { plazo: input.plazo } : {}),
     ...(input.consentimiento ? { consentimiento: input.consentimiento } : {}),
+    notificaciones: initialNotifications(now),
     status: 'new',
+    created_at: now,
   });
 
   logger.info(`✅ Contact saved to database with ID: ${contact._id}`);
@@ -88,18 +95,13 @@ export async function registerLeadWithNotifications(
   // su Lead (uno por email). Nunca hace fallar el registro del contacto.
   if (isCommerceEnabled()) await syncLeadFromContactSafe(contact);
 
-  const notification = { name, email, phone, company, service, budget, message, source };
-
-  // Avisos al equipo (no bloqueantes: nunca hacen fallar la petición).
-  const whatsapp = whatsappService.sendContactNotification(notification).catch((err) => {
-    logger.error(`❌ Failed to send WhatsApp notification: ${err?.message ?? err}`);
-    return false;
-  });
-  const emailSent = emailService.sendContactNotification(notification).catch((err) => {
-    logger.error(`❌ Failed to send Email notification: ${err?.message ?? err}`);
-    return false;
-  });
-  const notified = Promise.all([whatsapp, emailSent]).then(([w, e]) => ({ whatsapp: w === true, email: e === true }));
+  // Avisos al dueño (no bloqueantes: nunca hacen fallar la petición).
+  const notified = deliverContactNotifications(contact, { modo: 'inicial', now })
+    .then((r) => ({ whatsapp: r.whatsapp?.enviado === true, email: r.email?.enviado === true }))
+    .catch((err) => {
+      logger.error(`❌ Avisos del contacto ${String(contact._id)}: ${(err as Error)?.message ?? err}`);
+      return { whatsapp: false, email: false };
+    });
 
   return { contact, notified };
 }

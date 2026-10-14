@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { requireAdmin, requireRole } from '../middleware/access';
+import { notifyResendRateLimiter } from '../middleware/rateLimiter';
 import {
   adminGetOrders,
   adminUpdateOrderStatus,
@@ -14,6 +15,7 @@ import {
   adminUpdateUserRole,
   adminGetContacts,
   adminUpdateContactStatus,
+  adminResendContactNotifications,
 } from '../controllers/admin.controller';
 
 const router = Router();
@@ -46,5 +48,8 @@ router.patch('/users/:id/role', ...requireAdmin, adminUpdateUserRole);
 // Contacts
 router.get('/contacts', adminGetContacts);
 router.patch('/contacts/:id/status', adminUpdateContactStatus);
+// Reenviar el aviso al dueño de un contacto (correo y WhatsApp): solo admin,
+// 10 cada 15 min por cuenta (cada reenvío manda mensajes reales).
+router.post('/contacts/:id/notify', ...requireAdmin, notifyResendRateLimiter, adminResendContactNotifications);
 
 export default router;
