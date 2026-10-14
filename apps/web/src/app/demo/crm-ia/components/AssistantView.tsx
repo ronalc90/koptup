@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowPathIcon,
   BoltIcon,
@@ -11,8 +11,9 @@ import {
 } from '@heroicons/react/24/outline';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
+import { AiError, AiErrorCode, improveDraft } from './ai';
 import { ActivityEvent, Deal, isOpen, temperatureOf } from './crm';
-import { Note, PlanBadge, SectionHeader, inputCls, labelCls } from './ui';
+import { Note, PlanBadge, SectionHeader, inputCls, labelCls, linkCls, selectCls } from './ui';
 import { CrmText, useCrmText } from './useCrmText';
 
 type DraftChannel = 'email' | 'whatsapp';
@@ -112,14 +113,34 @@ export default function AssistantView({ deals, events, initialDealId, onSent }: 
   const [draft, setDraft] = useState<Draft | null>(null);
   const [copyState, setCopyState] = useState<'idle' | 'ok' | 'error'>('idle');
   const [quick, setQuick] = useState<QuickId | null>(null);
+  // «Mejorar con IA»: llamada real al modelo. aiPrev guarda el texto anterior para «Deshacer».
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiError, setAiError] = useState<AiErrorCode | null>(null);
+  const [aiPrev, setAiPrev] = useState<string | null>(null);
+  const aiRequest = useRef(0);
+  useEffect(
+    () => () => {
+      // Al salir de la pestaña se descarta la respuesta que esté en camino.
+      aiRequest.current += 1;
+    },
+    [],
+  );
 
   if (!deal) return null;
+
+  const resetAi = () => {
+    aiRequest.current += 1;
+    setAiBusy(false);
+    setAiError(null);
+    setAiPrev(null);
+  };
 
   const selectDeal = (id: string) => {
     const d = deals.find((x) => x.id === id);
     setDealId(id);
     setDraft(null);
     setQuick(null);
+    resetAi();
     if (d) {
       setChannel(d.channel === 'email' ? 'email' : 'whatsapp');
       setObjective(suggestedObjective(d));
@@ -130,6 +151,32 @@ export default function AssistantView({ deals, events, initialDealId, onSent }: 
     setVariant(nextVariant);
     setDraft(buildDraft(tx, deal, { channel, objective, tone, context, variant: nextVariant }));
     setCopyState('idle');
+    resetAi();
+  };
+
+  const improveWithAi = async () => {
+    if (!draft || !draft.body.trim() || aiBusy) return;
+    const id = ++aiRequest.current;
+    const before = draft.body;
+    setAiBusy(true);
+    setAiError(null);
+    try {
+      const improved = await improveDraft(before);
+      if (aiRequest.current !== id) return;
+      setDraft((d) => (d ? { ...d, body: improved } : d));
+      setAiPrev(before);
+    } catch (e) {
+      if (aiRequest.current !== id) return;
+      setAiError(e instanceof AiError ? e.code : 'server');
+    } finally {
+      if (aiRequest.current === id) setAiBusy(false);
+    }
+  };
+
+  const undoAi = () => {
+    if (aiPrev === null) return;
+    setDraft((d) => (d ? { ...d, body: aiPrev } : d));
+    setAiPrev(null);
   };
 
   const copy = async () => {
@@ -193,7 +240,7 @@ export default function AssistantView({ deals, events, initialDealId, onSent }: 
         factor: lowerFirst(tx.factorLabel(deal, strong)),
       }),
       t('assistant.quickOut.prepLast', { ago: tx.ago(deal.lastContact), channel: t(`channels.${deal.channel}`) }),
-      t('assistant.quickOut.prepPending', { action: tx.nextAction(deal) || t('newDeal.defaultNextAction') }),
+      t('assistant.quickOut.prepPending', { action: lowerFirst(tx.nextAction(deal) || t('newDeal.defaultNextAction')) }),
     ];
     if (!deal.budgetConfirmed) lines.push(t('assistant.quickOut.askBudget'));
     if (!deal.decisionMaker) lines.push(t('assistant.quickOut.askDecision'));
@@ -217,7 +264,7 @@ export default function AssistantView({ deals, events, initialDealId, onSent }: 
               <label htmlFor="crm-as-contact" className={labelCls}>
                 {t('assistant.contact')}
               </label>
-              <select id="crm-as-contact" value={deal.id} onChange={(e) => selectDeal(e.target.value)} className={inputCls}>
+              <select id="crm-as-contact" value={deal.id} onChange={(e) => selectDeal(e.target.value)} className={selectCls}>
                 {selectable.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.contactName} · {d.company} ({t(`stages.${d.stage}`)})
@@ -231,7 +278,7 @@ export default function AssistantView({ deals, events, initialDealId, onSent }: 
                 <label htmlFor="crm-as-channel" className={labelCls}>
                   {t('assistant.channel')}
                 </label>
-                <select id="crm-as-channel" value={channel} onChange={(e) => setChannel(e.target.value as DraftChannel)} className={inputCls}>
+                <select id="crm-as-channel" value={channel} onChange={(e) => setChannel(e.target.value as DraftChannel)} className={selectCls}>
                   <option value="whatsapp">{t('channels.whatsapp')}</option>
                   <option value="email">{t('channels.email')}</option>
                 </select>
@@ -240,7 +287,7 @@ export default function AssistantView({ deals, events, initialDealId, onSent }: 
                 <label htmlFor="crm-as-objective" className={labelCls}>
                   {t('assistant.objective')}
                 </label>
-                <select id="crm-as-objective" value={objective} onChange={(e) => setObjective(e.target.value as Objective)} className={inputCls}>
+                <select id="crm-as-objective" value={objective} onChange={(e) => setObjective(e.target.value as Objective)} className={selectCls}>
                   {OBJECTIVES.map((o) => (
                     <option key={o} value={o}>
                       {t(`assistant.objectives.${o}`)}
@@ -252,7 +299,7 @@ export default function AssistantView({ deals, events, initialDealId, onSent }: 
                 <label htmlFor="crm-as-tone" className={labelCls}>
                   {t('assistant.tone')}
                 </label>
-                <select id="crm-as-tone" value={tone} onChange={(e) => setTone(e.target.value as Tone)} className={inputCls}>
+                <select id="crm-as-tone" value={tone} onChange={(e) => setTone(e.target.value as Tone)} className={selectCls}>
                   {TONES.map((tn) => (
                     <option key={tn} value={tn}>
                       {t(`assistant.tones.${tn}`)}
@@ -296,6 +343,18 @@ export default function AssistantView({ deals, events, initialDealId, onSent }: 
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={improveWithAi}
+                      isLoading={aiBusy}
+                      disabled={aiBusy || !draft.body.trim()}
+                      className="gap-1.5"
+                      title={t('assistant.ai.hint')}
+                    >
+                      {!aiBusy && <SparklesIcon className="h-4 w-4" aria-hidden="true" />}
+                      {aiBusy ? t('assistant.ai.working') : t('assistant.ai.button')}
+                    </Button>
                     <Button size="sm" variant="ghost" onClick={copy} className="gap-1.5">
                       {copyState === 'ok' ? (
                         <CheckCircleIcon className="h-4 w-4 text-green-600" aria-hidden="true" />
@@ -304,13 +363,27 @@ export default function AssistantView({ deals, events, initialDealId, onSent }: 
                       )}
                       {copyState === 'ok' ? t('assistant.copied') : t('assistant.copy')}
                     </Button>
-                    <Button size="sm" variant="ghost" onClick={() => generate(variant + 1)} className="gap-1.5">
+                    <Button size="sm" variant="ghost" onClick={() => generate(variant + 1)} disabled={aiBusy} className="gap-1.5">
                       <ArrowPathIcon className="h-4 w-4" aria-hidden="true" />
                       {t('assistant.regenerate')}
                     </Button>
                   </div>
                 </div>
                 {copyState === 'error' && <p className="text-xs text-red-600 mb-2">{t('assistant.copyError')}</p>}
+                {aiError && (
+                  <p role="alert" className="text-xs text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-lg px-3 py-2 mb-2">
+                    {t(`assistant.ai.errors.${aiError}`)}
+                  </p>
+                )}
+                {aiPrev !== null && (
+                  <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-primary-800 dark:text-primary-200 bg-primary-50 dark:bg-primary-950/40 border border-primary-200 dark:border-primary-800 rounded-lg px-3 py-2 mb-2" aria-live="polite">
+                    <SparklesIcon className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                    <span className="flex-1 min-w-[12rem]">{t('assistant.ai.applied')}</span>
+                    <button type="button" onClick={undoAi} className={linkCls}>
+                      {t('assistant.ai.undo')}
+                    </button>
+                  </p>
+                )}
                 {draft.channel === 'email' && (
                   <div className="mb-2">
                     <label htmlFor="crm-as-subject" className={labelCls}>
@@ -331,12 +404,14 @@ export default function AssistantView({ deals, events, initialDealId, onSent }: 
                   id="crm-as-body"
                   value={draft.body}
                   onChange={(e) => setDraft({ ...draft, body: e.target.value })}
+                  readOnly={aiBusy}
+                  aria-busy={aiBusy}
                   rows={draft.channel === 'email' ? 12 : 6}
                   className={`${inputCls} font-sans leading-relaxed`}
                 />
                 <div className="flex flex-wrap items-center justify-between gap-2 mt-3">
                   <span className="text-xs text-secondary-500">{t('assistant.chars', { count: draft.body.length })}</span>
-                  <Button size="sm" onClick={send} className="gap-1.5">
+                  <Button size="sm" onClick={send} disabled={aiBusy} className="gap-1.5">
                     <PaperAirplaneIcon className="h-4 w-4" aria-hidden="true" />
                     {t('assistant.send')}
                   </Button>

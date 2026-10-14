@@ -34,7 +34,7 @@ import {
 } from './crm';
 import { TEMP_VARIANT } from './ContactsView';
 import DealForm, { DealFormResult } from './DealForm';
-import { Avatar, Modal, inputCls, labelCls, tabKeyDown } from './ui';
+import { Avatar, Modal, capitalize, inputCls, labelCls, selectCls, tabKeyDown } from './ui';
 import type { DealPatch } from './useCrmStore';
 import { CrmText, useCrmText } from './useCrmText';
 
@@ -190,6 +190,8 @@ export default function Customer360Modal({ deal, events, onClose, onMove, onLog,
     try {
       await downloadQuotePdf(tx, deal);
       notify(t('customer360.files.downloaded'));
+    } catch {
+      notify(t('customer360.files.error'));
     } finally {
       setPdfBusy(false);
     }
@@ -339,7 +341,7 @@ export default function Customer360Modal({ deal, events, onClose, onMove, onLog,
               <label htmlFor="crm-log-type" className="sr-only">
                 {t('customer360.logType')}
               </label>
-              <select id="crm-log-type" value={logType} onChange={(e) => setLogType(e.target.value as LogType)} className={`${inputCls} sm:w-40`}>
+              <select id="crm-log-type" value={logType} onChange={(e) => setLogType(e.target.value as LogType)} className={`${selectCls} sm:w-40`}>
                 {LOG_TYPES.map((lt) => (
                   <option key={lt} value={lt}>
                     {t(`customer360.logTypes.${lt}`)}
@@ -411,9 +413,9 @@ export default function Customer360Modal({ deal, events, onClose, onMove, onLog,
                         : tx.date(deal.closeDate),
                     ],
                     ['created', tx.date(deal.createdAt)],
-                    ['source', t(`sources.${deal.source}`)],
+                    ['source', capitalize(t(`sources.${deal.source}`))],
                     ['channel', t(`channels.${deal.channel}`)],
-                    ['size', t(`sizes.${deal.size}`)],
+                    ['size', capitalize(t(`sizes.${deal.size}`))],
                     ['budget', t(deal.budgetConfirmed ? 'common.yes' : 'common.no')],
                     ['decision', t(deal.decisionMaker ? 'common.yes' : 'common.no')],
                     ['nextAction', tx.nextAction(deal) || '—'],
@@ -443,7 +445,7 @@ export default function Customer360Modal({ deal, events, onClose, onMove, onLog,
                     id="crm-360-stage"
                     value={deal.stage}
                     onChange={(e) => onMove(deal.id, e.target.value as StageId)}
-                    className={inputCls}
+                    className={selectCls}
                   >
                     {ALL_STAGES.map((s) => (
                       <option key={s} value={s}>

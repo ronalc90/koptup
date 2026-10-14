@@ -39,8 +39,9 @@ export function useCrmText() {
 
   const dataText = (d: Deal, field: 'role' | 'title' | 'nextAction') => {
     if (field === 'nextAction' && d.nextActionAuto) return t(`nextActionAuto.${d.nextActionAuto}`);
+    // Un texto propio, aunque esté vacío (p. ej. un cargo borrado al editar), reemplaza al de ejemplo.
     const own = d[field];
-    if (own) return own;
+    if (own !== undefined) return own;
     return d.i18n ? t(`data.deals.${d.id}.${field}`) : '';
   };
 
@@ -117,7 +118,7 @@ export function useCrmText() {
     title: (d: Deal) => dataText(d, 'title'),
     nextAction: (d: Deal) => dataText(d, 'nextAction'),
     ownerName: (d: Deal) => OWNERS[d.owner]?.name ?? '',
-    pct: (n: number) => (locale === 'en' ? `${n}%` : `${n} %`),
+    pct: (n: number) => (locale === 'en' ? `${n}%` : `${n}\u00a0%`),
     money: (v: number) => formatCOP(v, locale),
     moneyShort: (v: number) => formatCOPShort(v, locale),
     date: (iso: string) => formatDate(iso, months, locale),

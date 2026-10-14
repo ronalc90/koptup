@@ -1,8 +1,8 @@
 # Guía de la demo: CRM con IA
 
-> Ruta `/demo/crm-ia` · Modo de acceso: **Abierta** · Tipo: **datos de ejemplo** (todo corre en el navegador; no llama al servidor ni a un modelo de IA) · Plan del producto: [CRM con IA](Producto-crm-ia.md)
+> Ruta `/demo/crm-ia` · Modo de acceso: **Abierta** · Tipo: **datos de ejemplo** con una función de **IA real** (todo corre en el navegador, salvo «Mejorar con IA» del asistente, que llama al backend) · Plan del producto: [CRM con IA](Producto-crm-ia.md)
 
-**Resumen.** Es el CRM de una empresa de logística ficticia (Logística Quindara S.A.S.) con 20 negocios de ejemplo (13 abiertos, 4 ganados y 3 perdidos) repartidos entre tres vendedores. Responde a «a quién llamar hoy, qué decirle y cuánto vas a facturar»: un embudo que se arrastra, un puntaje de cada contacto explicado factor por factor, el pronóstico en pesos frente a la meta del mes y del trimestre, borradores de WhatsApp y correo, análisis de llamadas de ejemplo y una secuencia de seguimiento. Está pensada para gerentes comerciales y equipos de venta B2B en Colombia que hoy llevan sus clientes en Excel y WhatsApp. El puntaje sale de reglas y los borradores de plantillas (la demo lo dice en el encabezado); los cambios se guardan solo en el navegador de quien la usa. Al entrar, un **recorrido sugerido de 5 pasos** dice por dónde empezar y se marca solo a medida que lo haces.
+**Resumen.** Es el CRM de una empresa de logística ficticia (Logística Quindara S.A.S.) con 20 negocios de ejemplo (13 abiertos, 4 ganados y 3 perdidos) repartidos entre tres vendedores. Responde a «a quién llamar hoy, qué decirle y cuánto vas a facturar»: un embudo que se arrastra, un puntaje de cada contacto explicado factor por factor, el pronóstico en pesos frente a la meta del mes y del trimestre, borradores de WhatsApp y correo, análisis de llamadas de ejemplo y una secuencia de seguimiento. Está pensada para gerentes comerciales y equipos de venta B2B en Colombia que hoy llevan sus clientes en Excel y WhatsApp. El puntaje sale de reglas y los borradores de plantillas (la demo lo dice en el encabezado); el botón **Mejorar con IA** del asistente sí envía el borrador a un modelo de lenguaje real a través del backend de KopTup, con tope de gasto y cupo por conexión. Los cambios se guardan solo en el navegador de quien la usa. Al entrar, un **recorrido sugerido de 5 pasos** dice por dónde empezar y se marca solo a medida que lo haces.
 
 **En esta página:** [Recorrido sugerido](#recorrido-sugerido-demo-comercial-de-5-minutos) · [Pantallas y funciones](#pantallas-y-funciones) · [Qué es real y qué es simulado](#qué-es-real-y-qué-es-simulado) · [Acceso](#acceso) · [Limitaciones conocidas](#limitaciones-conocidas)
 
@@ -11,7 +11,7 @@
 *Lo primero que ve cualquier visitante: el encabezado con qué es, para quién y las salidas, y debajo el recorrido sugerido y las métricas.*
 
 1. **Volver al catálogo de demos** (`/demo`).
-2. **Datos de ejemplo**: al pasar el mouse dice que la empresa, las personas, los NIT, los correos, los teléfonos y las cifras son inventados. Debajo del título, una línea dice para quién es y que el puntaje sale de reglas y los borradores de plantillas («en tu proyecto, de un modelo de IA»).
+2. **Datos de ejemplo**: al pasar el mouse dice que la empresa, las personas, los NIT, los correos, los teléfonos y las cifras son inventados. Debajo del título, una línea dice para quién es y que el puntaje sale de reglas y los borradores de plantillas, que se pueden pulir con un modelo de IA real desde el asistente.
 3. **Solicitar demo guiada** (`/solicitar-demo?demos=crm-ia`, con esta demo ya elegida) y **Cotizar tu CRM** (`/contact?service=crm-ia`, con «CRM con IA» prellenado).
 4. **Restablecer datos** (pide confirmación en una ventana), la empresa de ejemplo y la fecha de los datos: «Datos al 14 oct 2026 (hoy)».
 5. **Qué es real en esta demo**: desplegable con lo que se calcula de verdad, cómo funcionan las fechas, lo simulado y lo que cambia en un proyecto.
@@ -65,16 +65,17 @@ Qué decir: «El puntaje no es una caja negra: el vendedor ve por qué un client
 
 ![Paso 3: asistente de redacción](images/doc/demos/crm-ia/03-paso3-asistente.jpg)
 
-*Asistente de redacción con un borrador de WhatsApp de cierre en tono Cercano y la respuesta a la objeción de precio.*
+*Asistente de redacción con un borrador de WhatsApp de cierre en tono Cercano, el botón «Mejorar con IA» y la respuesta a la objeción de precio.*
 
 1. **Contacto**: llega elegido desde la ficha; se puede cambiar.
 2. **Canal, objetivo y tono**: WhatsApp o Correo; Primer contacto, Seguimiento, Enviar propuesta, Reactivar o Cierre; Profesional, Cercano, Directo o Consultivo. Al elegir un contacto, la demo propone su canal y un objetivo según la etapa (aquí, Cierre).
-3. **Contexto (opcional)**: una frase que el borrador incluye («pidió pagar en dos cuotas»).
+3. **Contexto (opcional)**: una frase que el borrador incluye («necesitan arrancar antes de la temporada alta» queda como «Tuve en cuenta lo que me comentaste: …»).
 4. **Borrador editable** con «Versión 1 de 6»: usa el nombre, el negocio, el valor y el vendedor. **Otra versión** recorre 6 redacciones distintas por objetivo (3 cuerpos × 2 cierres) y vuelve a la primera. También tiene **Copiar** y el contador de caracteres; en correo agrega el asunto.
-5. **Registrar como enviado (simulado)**: no envía nada; deja el mensaje en el historial con la fecha de hoy y cuenta como contacto reciente (sube el puntaje). Marca el paso 3 del recorrido.
-6. **Acciones rápidas**: Resumir historial, Sugerir próximo paso, Responder la objeción de precio (fases, anticipo del 30 %, costo de no resolverlo) y Preparar la próxima llamada.
+5. **Mejorar con IA**: es la parte con **IA real**. Envía el texto del borrador al backend de KopTup (`POST /api/content/improve`, el mismo servicio del gestor de contenido), que lo reescribe con un modelo de lenguaje y lo devuelve en el mismo cuadro. Mientras trabaja dice «Mejorando…»; al terminar aparece «Redacción mejorada por un modelo de IA real. Revísala antes de usarla.» con **Deshacer**, que recupera el texto de la plantilla. «Otra versión» o cambiar de contacto descartan la mejora. Si el servidor no responde, no tiene clave del modelo, se agotó el cupo mensual o se llegó al límite por conexión, muestra un aviso en rojo y el borrador de plantilla queda intacto.
+6. **Registrar como enviado (simulado)**: no envía nada; deja el mensaje en el historial con la fecha de hoy y cuenta como contacto reciente (sube el puntaje). Marca el paso 3 del recorrido.
+7. **Acciones rápidas**: Resumir historial, Sugerir próximo paso, Responder la objeción de precio (fases, anticipo del 30 %, costo de no resolverlo) y Preparar la próxima llamada. Son reglas sobre los datos del contacto, no IA.
 
-Qué decir, con honestidad: «Aquí el borrador sale de plantillas; en tu proyecto lo redacta un modelo de IA con el historial del cliente». La nota gris de la pestaña lo dice.
+Qué decir, con honestidad: «El borrador sale de plantillas y "Mejorar con IA" lo pule con un modelo de lenguaje real; en tu proyecto el modelo lo redacta desde cero con el historial del cliente». La nota gris de la pestaña lo dice.
 
 ### Paso 4. Gana el negocio y revisa el pronóstico
 
@@ -150,11 +151,12 @@ flowchart LR
     E["Embudo"] -- "mover, crear" --> S
     H["Ficha del cliente"] -- "actividad, etapa, editar, eliminar" --> S
     A["Asistente"] -- "registrar como enviado" --> S
+    A -- "Mejorar con IA" --> IA["Backend de KopTup: modelo de lenguaje (con tope de gasto)"]
     Q["Secuencias"] -- "inscribir, ejecutar paso" --> S
     L["Llamadas"] -- "compromisos hechos" --> S
 ```
 
-*De dónde sale cada número: no hay servidor; todo se recalcula en el navegador.*
+*De dónde sale cada número: todo se recalcula en el navegador; solo «Mejorar con IA» sale al servidor.*
 
 ### Encabezado y métricas
 
@@ -206,7 +208,7 @@ La ficha y las demás ventanas se cierran con **Escape** (si hay una ventana enc
 
 ### Asistente de redacción
 
-Ver el [paso 3](#paso-3-redacta-y-registra-un-whatsapp). Lleva la insignia **Plan Avanzado**: la redacción de mensajes está incluida desde ese plan del producto.
+Ver el [paso 3](#paso-3-redacta-y-registra-un-whatsapp). Lleva la insignia **Plan Avanzado**: la redacción de mensajes está incluida desde ese plan del producto. **Mejorar con IA** envía como máximo 2.000 caracteres del borrador y nada más (ni el historial ni los datos del CRM); por eso la nota pide no escribir datos personales reales en el contexto.
 
 ### Pronóstico
 
@@ -252,14 +254,15 @@ Las pestañas del CRM y las de la ficha se recorren con las flechas, Inicio y Fi
 |---|---|---|
 | Embudo, ficha, contactos, secuencias | **Funciona de verdad, en el navegador** | Crear, mover, editar y eliminar negocios funciona; se guarda en `localStorage` de ese navegador (clave `koptup-demo-crm-ia:v1`). |
 | Puntaje, probabilidad, métricas, pronóstico, alertas y recomendaciones | **Reglas de ejemplo** | Cálculos fijos y explicables en el navegador; no hay modelo de IA ni aprendizaje con histórico. |
-| Borradores y acciones rápidas | **Plantillas** | Combinan objetivo × tono × canal (6 redacciones por objetivo) con los datos del contacto; no se llama a un modelo de IA. |
+| Borradores y acciones rápidas | **Plantillas y reglas** | Combinan objetivo × tono × canal (6 redacciones por objetivo) con los datos del contacto. |
+| Mejorar con IA | **IA real** | El backend de KopTup reescribe el borrador con un modelo de lenguaje; tiene tope de gasto mensual y cupo por conexión, y sin servidor o sin cupo muestra un aviso honesto. |
 | Envíos de WhatsApp y correo, pasos de la secuencia | **Simulados** | Solo quedan en el historial; no sale ningún mensaje. |
 | Llamadas | **Datos de ejemplo** | Transcripciones, temas y tono escritos a mano; el tiempo de habla sí se calcula con la transcripción. |
 | Cotización en PDF y CSV de contactos | **Real, con datos ficticios** | Se generan en el navegador con los datos actuales. |
 | Validación del NIT | **Real** | Formato y dígito de verificación con el algoritmo de la DIAN; no se consulta el RUT ni el RUES. |
 | Fechas | **Reales (hoy en Colombia)** | Los datos de ejemplo se corren a la fecha de hoy. |
 | Empresas, personas, NIT, correos y teléfonos | **Ficticios** | NIT con dígito de verificación válido, correos con dominio `.example` y teléfonos de la serie +57 300 000 0xxx. |
-| Servidor | **No se usa** | La demo no hace llamadas a la API; funciona aunque el backend no responda. |
+| Servidor | **Solo para «Mejorar con IA»** | Además de la verificación de acceso común a todas las demos, la única llamada es la del botón «Mejorar con IA». Todo lo demás funciona aunque el backend no responda. |
 
 ---
 
@@ -285,5 +288,7 @@ Las pestañas del CRM y las de la ficha se recorren con las flechas, Inicio y Fi
 1. **La tarjeta del hub todavía promete más que la demo.** Dice «Lead scoring ML y propensity to buy», «AI email composer» y «Conversation intelligence (grabación, sentiment, action items)»; dentro, el puntaje es de reglas, los borradores son plantillas y las llamadas son de ejemplo. La demo lo dice en su encabezado y en las notas grises de cada pestaña. El texto nuevo de la tarjeta (honesto y en español) está pedido a la pista del catálogo.
 2. **Los cambios viven solo en ese navegador.** Otra persona (o tú en otro equipo o en una ventana privada) ve los datos de ejemplo. No hay forma de compartir el estado del CRM con el vendedor.
 3. **La foto del CRM se mueve entera con los días.** Si vuelves otro día, todo se corre a la fecha de hoy, también lo que registraste: una actividad registrada ayer aparece hoy con la fecha de hoy. Es lo que permite que los datos de ejemplo no se vuelvan viejos.
-4. **«Ver Planes y Precios»** del bloque azul común del final lleva a `/services#planes-rag` (planes RAG) y no a los planes del CRM; la demo ofrece arriba **Cotizar tu CRM** con el producto ya elegido. El cambio del bloque común está pedido a la pista de plataforma.
+4. **El bloque azul común del final no conoce el producto.** «Ver Planes y Precios» lleva a `/services#planes-rag` (planes RAG) y «Solicitar Cotización» a `/contact` sin el CRM elegido; la demo ofrece arriba y al cerrar el recorrido **Cotizar tu CRM** con el producto ya elegido. El cambio del bloque común está pedido a la pista de plataforma.
 5. **El origen del negocio no se edita** después de crearlo (es un dato histórico de cómo llegó el contacto).
+6. **«Mejorar con IA» usa el acceso y el cupo del gestor de contenido.** Llama al mismo servicio de la demo `/demo/gestor-contenido`: si esa demo pasa a «Con solicitud» o «Solo por invitación», o se agota su cupo mensual, el botón muestra que la IA no está disponible y quedan los borradores de plantilla. Un acceso y un cupo propios del CRM están pedidos a la pista de plataforma.
+7. **La IA solo pule el borrador.** El puntaje, las recomendaciones, el pronóstico y las acciones rápidas siguen siendo reglas explicables; no hay un modelo entrenado con histórico ni redacción desde cero con el historial del cliente (eso es lo que se construye en el proyecto).

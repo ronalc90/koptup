@@ -22,7 +22,7 @@ import {
   temperatureOf,
   toCsv,
 } from './crm';
-import { Avatar, SectionHeader, inputCls } from './ui';
+import { Avatar, SectionHeader, inputCls, selectCls } from './ui';
 import { useCrmText } from './useCrmText';
 
 export const TEMP_VARIANT: Record<Temperature, 'danger' | 'warning' | 'info'> = {
@@ -136,7 +136,7 @@ export default function ContactsView({ deals, onOpen, notify }: Props) {
             value={owner}
             onChange={(e) => setOwner(e.target.value as 'all' | OwnerId)}
             aria-label={t('pipeline.ownerFilter')}
-            className={`${inputCls} lg:w-48`}
+            className={`${selectCls} lg:w-48`}
           >
             <option value="all">{t('pipeline.allOwners')}</option>
             {OWNER_IDS.map((id) => (
@@ -149,7 +149,7 @@ export default function ContactsView({ deals, onOpen, notify }: Props) {
             value={sort}
             onChange={(e) => setSort(e.target.value as SortId)}
             aria-label={t('contacts.sortLabel')}
-            className={`${inputCls} lg:w-48`}
+            className={`${selectCls} lg:w-48`}
           >
             {(['score', 'value', 'lastContact', 'name'] as const).map((s) => (
               <option key={s} value={s}>

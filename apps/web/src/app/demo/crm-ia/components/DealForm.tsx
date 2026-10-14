@@ -14,7 +14,7 @@ import {
   StageId,
   checkNit,
 } from './crm';
-import { inputCls, labelCls } from './ui';
+import { capitalize, inputCls, labelCls, selectCls } from './ui';
 import { useCrmText } from './useCrmText';
 
 /** Valores del formulario de negocio (crear o editar). */
@@ -160,7 +160,7 @@ export default function DealForm({ formId, mode, initial, closeDateLocked, onSub
         <label htmlFor={id('city')} className={labelCls}>
           {t('newDeal.fields.city')}
         </label>
-        <select id={id('city')} value={form.city} onChange={(e) => set('city', e.target.value)} className={inputCls}>
+        <select id={id('city')} value={form.city} onChange={(e) => set('city', e.target.value)} className={selectCls}>
           {(CITIES.includes(form.city) ? CITIES : [form.city, ...CITIES]).map((c) => (
             <option key={c} value={c}>
               {c}
@@ -234,7 +234,7 @@ export default function DealForm({ formId, mode, initial, closeDateLocked, onSub
           <label htmlFor={id('stage')} className={labelCls}>
             {t('newDeal.fields.stage')}
           </label>
-          <select id={id('stage')} value={form.stage} onChange={(e) => set('stage', e.target.value as StageId)} className={inputCls}>
+          <select id={id('stage')} value={form.stage} onChange={(e) => set('stage', e.target.value as StageId)} className={selectCls}>
             {OPEN_STAGES.map((s) => (
               <option key={s} value={s}>
                 {t(`stages.${s}`)}
@@ -247,7 +247,7 @@ export default function DealForm({ formId, mode, initial, closeDateLocked, onSub
         <label htmlFor={id('owner')} className={labelCls}>
           {t('newDeal.fields.owner')}
         </label>
-        <select id={id('owner')} value={form.owner} onChange={(e) => set('owner', e.target.value as OwnerId)} className={inputCls}>
+        <select id={id('owner')} value={form.owner} onChange={(e) => set('owner', e.target.value as OwnerId)} className={selectCls}>
           {OWNER_IDS.map((o) => (
             <option key={o} value={o}>
               {OWNERS[o].name}
@@ -259,7 +259,7 @@ export default function DealForm({ formId, mode, initial, closeDateLocked, onSub
         <label htmlFor={id('channel')} className={labelCls}>
           {t('newDeal.fields.channel')}
         </label>
-        <select id={id('channel')} value={form.channel} onChange={(e) => set('channel', e.target.value as ChannelId)} className={inputCls}>
+        <select id={id('channel')} value={form.channel} onChange={(e) => set('channel', e.target.value as ChannelId)} className={selectCls}>
           {(['whatsapp', 'email', 'call'] as const).map((c) => (
             <option key={c} value={c}>
               {t(`channels.${c}`)}
@@ -272,10 +272,10 @@ export default function DealForm({ formId, mode, initial, closeDateLocked, onSub
           <label htmlFor={id('source')} className={labelCls}>
             {t('newDeal.fields.source')}
           </label>
-          <select id={id('source')} value={form.source} onChange={(e) => set('source', e.target.value as SourceId)} className={inputCls}>
+          <select id={id('source')} value={form.source} onChange={(e) => set('source', e.target.value as SourceId)} className={selectCls}>
             {(['web', 'referral', 'fair', 'inbound', 'import'] as const).map((s) => (
               <option key={s} value={s}>
-                {t(`sources.${s}`)}
+                {capitalize(t(`sources.${s}`))}
               </option>
             ))}
           </select>
@@ -285,10 +285,10 @@ export default function DealForm({ formId, mode, initial, closeDateLocked, onSub
         <label htmlFor={id('size')} className={labelCls}>
           {t('newDeal.fields.size')}
         </label>
-        <select id={id('size')} value={form.size} onChange={(e) => set('size', e.target.value as SizeId)} className={inputCls}>
+        <select id={id('size')} value={form.size} onChange={(e) => set('size', e.target.value as SizeId)} className={selectCls}>
           {(['small', 'medium', 'large'] as const).map((s) => (
             <option key={s} value={s}>
-              {t(`sizes.${s}`)}
+              {capitalize(t(`sizes.${s}`))}
             </option>
           ))}
         </select>

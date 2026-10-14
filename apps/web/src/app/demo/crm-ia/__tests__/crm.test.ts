@@ -9,6 +9,8 @@ import {
   checkNit,
   computeMetrics,
   forecastFor,
+  formatCOP,
+  formatCOPShort,
   nitCheckDigit,
   periodRange,
   scoreOf,
@@ -17,6 +19,7 @@ import {
   trendMonths,
 } from '../components/crm';
 import { SEED_DEALS } from '../components/data';
+import { classifyAiError } from '../components/ai';
 import { guideProgress } from '../components/GettingStarted';
 import { alignTo, moveDealIn, parseStored, seedState, shiftState, updateDealIn } from '../components/useCrmStore';
 
@@ -155,5 +158,31 @@ describe('recorrido sugerido', () => {
     const moved = moveDealIn(s, 'd4', 'proposal');
     const p = guideProgress(moved.events, { opened: true, forecast: true });
     expect(p).toEqual({ move: true, open: true, draft: false, forecast: true, sequence: false });
+  });
+});
+
+describe('revisión: textos propios, formato y errores de la IA', () => {
+  it('borrar el cargo de un contacto de ejemplo lo deja vacío (no vuelve el de ejemplo)', () => {
+    const s = updateDealIn(seedState(), 'd2', { role: '' });
+    const d = s.deals.find((x) => x.id === 'd2');
+    expect(d?.role).toBe('');
+    expect(s.events[s.events.length - 1].params).toEqual({ fields: 'role' });
+  });
+
+  it('el signo de pesos y la cifra van unidos por un espacio duro', () => {
+    expect(formatCOP(186_000_000, 'es')).toBe('$ 186.000.000');
+    expect(formatCOP(186_000_000, 'en')).toBe('COP 186,000,000');
+    expect(formatCOPShort(186_000_000, 'es')).toBe('$186 M');
+  });
+
+  it('clasifica los errores del backend de IA para mostrar un mensaje honesto', () => {
+    expect(classifyAiError(429, { code: 'rate_limited' })).toBe('rateLimited');
+    expect(classifyAiError(503, { code: 'budget_exhausted' })).toBe('budget');
+    expect(classifyAiError(503, { code: 'ai_unavailable', message: 'La IA no está configurada en este servidor' })).toBe('notConfigured');
+    expect(classifyAiError(503, { code: 'ai_unavailable', message: 'Intenta de nuevo' })).toBe('unavailable');
+    expect(classifyAiError(403, { code: 'demo_access_required' })).toBe('access');
+    expect(classifyAiError(401, null)).toBe('access');
+    expect(classifyAiError(400, { code: 'content_too_long' })).toBe('invalid');
+    expect(classifyAiError(500, null)).toBe('server');
   });
 });

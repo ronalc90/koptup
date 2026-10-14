@@ -209,6 +209,12 @@ export function tabKeyDown<T extends string>(
 export const inputCls =
   'w-full px-3 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-60';
 
+/** Primera letra en mayúscula (rótulos que en las frases van en minúscula, como el origen o el tamaño). */
+export const capitalize = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+
+/** Lista desplegable: deja espacio a la flecha para que el texto largo no quede debajo de ella. */
+export const selectCls = `${inputCls} pr-9 truncate`;
+
 /** Enlace con apariencia de texto que muestra el foco al navegar con teclado. */
 export const linkCls =
   'text-primary-700 dark:text-primary-300 underline underline-offset-2 hover:no-underline rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500';

@@ -19,7 +19,7 @@ import {
   daysBetween,
   isOpen,
 } from './crm';
-import { Note, SectionHeader, inputCls } from './ui';
+import { Note, SectionHeader, selectCls } from './ui';
 import { useCrmText } from './useCrmText';
 
 const CHANNEL_META: Record<SequenceChannel, { icon: typeof EnvelopeIcon; color: string }> = {
@@ -142,7 +142,7 @@ export default function SequencesView({ deals, enrollments, onEnroll, onRunStep,
             <label htmlFor="crm-seq-enroll" className="sr-only">
               {t('sequences.enrollLabel')}
             </label>
-            <select id="crm-seq-enroll" value={toEnroll} onChange={(e) => setToEnroll(e.target.value)} className={inputCls} disabled={candidates.length === 0}>
+            <select id="crm-seq-enroll" value={toEnroll} onChange={(e) => setToEnroll(e.target.value)} className={selectCls} disabled={candidates.length === 0}>
               <option value="">{candidates.length ? t('sequences.enrollPlaceholder') : t('sequences.noneToEnroll')}</option>
               {candidates.map((d) => (
                 <option key={d.id} value={d.id}>

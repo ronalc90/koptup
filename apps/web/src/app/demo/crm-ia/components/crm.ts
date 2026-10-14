@@ -189,7 +189,8 @@ function group(intStr: string, sep: string): string {
 
 export function formatCOP(value: number, locale: string): string {
   const n = Math.round(value);
-  return locale === 'en' ? `COP ${group(String(n), ',')}` : `$ ${group(String(n), '.')}`;
+  // Espacio duro: el signo y la cifra no se separan al partir la línea.
+  return locale === 'en' ? `COP\u00a0${group(String(n), ',')}` : `$\u00a0${group(String(n), '.')}`;
 }
 
 /** Valor abreviado en millones: "$186 M" / "COP 186M". */
@@ -202,7 +203,7 @@ export function formatCOPShort(value: number, locale: string): string {
     txt = (Math.round(millions * 10) / 10).toFixed(1);
     if (locale !== 'en') txt = txt.replace('.', ',');
   }
-  return locale === 'en' ? `COP ${txt}M` : `$${txt} M`;
+  return locale === 'en' ? `COP\u00a0${txt}M` : `$${txt}\u00a0M`;
 }
 
 export function initials(name: string): string {

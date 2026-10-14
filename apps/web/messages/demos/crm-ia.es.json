@@ -2,7 +2,7 @@
   "demoCrm": {
     "meta": {
       "title": "CRM con IA: demo de embudo de ventas y pronóstico",
-      "description": "Demo interactiva de un CRM para equipos comerciales en Colombia, con datos de ejemplo: embudo con arrastrar y soltar, puntaje de cada contacto explicado, pronóstico en pesos frente a la meta, secuencias de seguimiento y borradores de correo y WhatsApp hechos con plantillas.",
+      "description": "Demo interactiva de un CRM para equipos comerciales en Colombia, con datos de ejemplo: embudo con arrastrar y soltar, puntaje de cada contacto explicado, pronóstico en pesos frente a la meta, secuencias de seguimiento y borradores de correo y WhatsApp hechos con plantillas que puedes mejorar con un modelo de IA.",
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos",
       "breadcrumbName": "CRM con IA"
@@ -17,7 +17,7 @@
       "hide": "Ocultar",
       "real": "Todo se calcula en tu navegador con los datos de ejemplo: puntaje de cada contacto, probabilidad de cierre, métricas, pronóstico y alertas. Puedes crear, mover, editar y eliminar negocios, exportar los contactos en CSV y descargar la cotización en PDF; los cambios se guardan solo en este navegador.",
       "dates": "La fecha de corte es hoy (hora de Colombia). Si vuelves otro día, las fechas de los datos y de lo que registraste se corren para que «ayer», «hace 3 días» y el periodo del pronóstico sigan teniendo sentido.",
-      "simulated": "Los envíos de WhatsApp y correo, los pasos de las secuencias y el análisis de llamadas son simulados: no sale ningún mensaje ni se graba nada. Los borradores salen de plantillas y el puntaje de reglas; aquí no se llama a un modelo de IA.",
+      "simulated": "Los envíos de WhatsApp y correo, los pasos de las secuencias y el análisis de llamadas son simulados: no sale ningún mensaje ni se graba nada. El puntaje sale de reglas y los borradores de plantillas. La única llamada a un modelo de IA es «Mejorar con IA» en el asistente: envía el borrador al servidor de KopTup y devuelve una redacción nueva (con cupo de uso).",
       "project": "En tu proyecto, el puntaje y los borradores los genera un modelo de IA con tu histórico de ventas, y el CRM se conecta a tu WhatsApp Business, tu correo y tu telefonía."
     },
     "reset": {
@@ -235,6 +235,7 @@
         "quoteHint": "Se genera en tu navegador con los datos actuales de este negocio.",
         "download": "Descargar PDF",
         "downloaded": "Descargaste la cotización de ejemplo.",
+        "error": "No pudimos generar el PDF en este navegador. Inténtalo de nuevo.",
         "noQuote": "Todavía no hay cotización: se genera cuando el negocio llega a «Propuesta enviada».",
         "lost": "El negocio se perdió: su cotización ya no está vigente."
       },
@@ -344,7 +345,7 @@
     "assistant": {
       "title": "Asistente de redacción",
       "subtitle": "Arma un borrador de correo o WhatsApp con los datos del contacto, edítalo, cópialo y regístralo en el historial.",
-      "simulatedNote": "En esta demo los borradores salen de plantillas (objetivo × tono × canal, con 6 redacciones por objetivo) con los datos del contacto y tu contexto; no se llama a un modelo de IA y no se envía nada. En tu proyecto los redacta un modelo de IA con el historial del cliente.",
+      "simulatedNote": "Los borradores salen de plantillas (objetivo × tono × canal, con 6 redacciones por objetivo) con los datos del contacto y tu contexto. «Mejorar con IA» sí es real: envía el borrador al servidor de KopTup, que lo reescribe con un modelo de lenguaje (con cupo de uso; no escribas datos personales reales). Aquí no se envía ningún mensaje al cliente. En tu proyecto, el modelo redacta desde cero con el historial del cliente.",
       "contact": "Contacto",
       "channel": "Canal",
       "objective": "Objetivo",
@@ -363,7 +364,7 @@
         "consultative": "Consultivo"
       },
       "context": "Contexto (opcional)",
-      "contextPlaceholder": "Ej.: pidió pagar en dos cuotas",
+      "contextPlaceholder": "Ej.: necesitan arrancar antes de la temporada alta",
       "generate": "Generar borrador",
       "generateAgain": "Generar de nuevo con estas opciones",
       "empty": "Elige el contacto, el canal, el objetivo y el tono, y genera el borrador.",
@@ -410,9 +411,9 @@
         },
         "body": {
           "intro": {
-            "a": "Soy {owner}, de {seller}. Trabajamos con empresas de {city} en {title} y creo que podemos ayudarle a {company} a tener sus despachos más organizados.",
-            "b": "Te escribe {owner}, de {seller}. Creo que a {company} le puede servir lo que hacemos en {title} y me gustaría contarte cómo funciona.",
-            "c": "Mi nombre es {owner} y trabajo en {seller}. Vi que {company} despacha desde {city} y quería contarte cómo ayudamos a empresas parecidas con {title}."
+            "a": "Soy {owner}, de {seller}, y trabajo con empresas de {city} en proyectos como «{title}». Creo que podemos ayudarle a {company} a tener sus despachos más organizados.",
+            "b": "Te escribe {owner}, de {seller}: creo que a {company} le puede servir lo que hacemos en proyectos como «{title}» y me gustaría contarte cómo funciona.",
+            "c": "Mi nombre es {owner} y trabajo en {seller}; vi que {company} despacha desde {city} y quería contarte cómo ayudamos a empresas parecidas con proyectos como «{title}»."
           },
           "followUp": {
             "a": "Te escribo para dar seguimiento a «{title}». Quedamos en que el siguiente paso era {nextAction}.",
@@ -478,7 +479,25 @@
         "signature": "{owner}\nEquipo comercial · {seller}",
         "whatsappSign": "{owner} · {seller}"
       },
-      "version": "Versión {n} de {total}"
+      "version": "Versión {n} de {total}",
+      "ai": {
+        "button": "Mejorar con IA",
+        "working": "Mejorando…",
+        "hint": "Envía este borrador al servidor de KopTup, que lo reescribe con un modelo de lenguaje real.",
+        "applied": "Redacción mejorada por un modelo de IA real. Revísala antes de usarla.",
+        "undo": "Deshacer",
+        "errors": {
+          "network": "No pudimos conectar con el servidor de IA. El borrador de plantilla sigue aquí y el resto de la demo funciona igual.",
+          "timeout": "La IA tardó demasiado en responder. Inténtalo de nuevo en un momento.",
+          "notConfigured": "La IA no está configurada en este servidor en este momento. El borrador de plantilla sigue funcionando; si quieres verla, pide una demo guiada.",
+          "unavailable": "La IA no está disponible en este momento. Inténtalo de nuevo en unos minutos; el resto de la demo sigue funcionando.",
+          "budget": "Alcanzamos el cupo mensual de IA de las demos. El borrador de plantilla sigue funcionando; si quieres verla, te la mostramos en una demo guiada.",
+          "rateLimited": "Llegaste al límite de solicitudes de IA por ahora. Espera unos minutos y vuelve a intentarlo.",
+          "access": "La IA de redacción no está abierta a visitantes en este momento. El borrador de plantilla sigue funcionando; si quieres verla, pide una demo guiada.",
+          "invalid": "El servidor no aceptó este borrador (vacío o demasiado largo). Acórtalo y vuelve a intentarlo.",
+          "server": "El servicio de IA respondió con un error. Inténtalo de nuevo en un momento."
+        }
+      }
     },
     "calls": {
       "title": "Análisis de llamadas",
@@ -689,7 +708,7 @@
     },
     "header": {
       "back": "Volver al catálogo de demos",
-      "audience": "Para gerentes comerciales y equipos de venta B2B en Colombia que hoy llevan sus clientes en Excel y WhatsApp. Funciona en tu navegador con datos de ejemplo: el puntaje sale de reglas y los borradores de plantillas (en tu proyecto, de un modelo de IA). Empieza por el recorrido de abajo.",
+      "audience": "Para gerentes comerciales y equipos de venta B2B en Colombia que hoy llevan sus clientes en Excel y WhatsApp. Funciona en tu navegador con datos de ejemplo: el puntaje sale de reglas y los borradores de plantillas, que puedes pulir con un modelo de IA real desde el asistente. Empieza por el recorrido de abajo.",
       "requestDemo": "Solicitar demo guiada",
       "quote": "Cotizar tu CRM",
       "company": "Empresa de ejemplo: {name}",
@@ -715,7 +734,7 @@
         },
         "draft": {
           "title": "Redacta y registra un WhatsApp",
-          "text": "Arma el borrador con los datos del contacto y regístralo como enviado (simulado).",
+          "text": "Arma el borrador con los datos del contacto, mejóralo con IA si quieres y regístralo como enviado (simulado).",
           "action": "Abrir el asistente"
         },
         "forecast": {

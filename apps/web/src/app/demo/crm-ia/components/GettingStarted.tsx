@@ -140,13 +140,13 @@ export default function GettingStarted({ events, flags, onAction }: Props) {
               <p className="text-sm text-secondary-800 dark:text-secondary-100 flex-1 min-w-[12rem]">{t('guide.finished')}</p>
               <Link
                 href={REQUEST_DEMO_HREF}
-                className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold border border-indigo-600 text-indigo-700 dark:text-indigo-200 hover:bg-indigo-100 dark:hover:bg-indigo-900/40"
+                className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold border border-indigo-600 text-indigo-700 dark:text-indigo-200 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
               >
                 {t('guide.finishedDemo')}
               </Link>
               <Link
                 href={QUOTE_HREF}
-                className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700"
+                className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
               >
                 {t('guide.finishedQuote')}
               </Link>

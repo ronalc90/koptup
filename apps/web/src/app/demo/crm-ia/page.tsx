@@ -31,7 +31,7 @@ import NewDealModal from './components/NewDealModal';
 import PipelineBoard from './components/PipelineBoard';
 import SequencesView from './components/SequencesView';
 import { LostReason, StageId, computeMetrics, isOpen } from './components/crm';
-import { Modal, Toast, inputCls, labelCls, tabKeyDown } from './components/ui';
+import { Modal, Toast, labelCls, selectCls, tabKeyDown } from './components/ui';
 import { CrmStore, useCrmStore } from './components/useCrmStore';
 import { CrmRefContext, useCrmText } from './components/useCrmText';
 
@@ -432,7 +432,7 @@ function CrmDemo({ store }: { store: CrmStore }) {
             id="crm-lost-reason"
             value={lostReason}
             onChange={(e) => setLostReason(e.target.value as LostReason)}
-            className={inputCls}
+            className={selectCls}
           >
             {LOST_REASONS.map((r) => (
               <option key={r} value={r}>

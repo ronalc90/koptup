@@ -14,7 +14,7 @@ import {
   isOpen,
   temperatureOf,
 } from './crm';
-import { SectionHeader, inputCls } from './ui';
+import { SectionHeader, selectCls } from './ui';
 import { useCrmText } from './useCrmText';
 
 const TEMP_DOT = { hot: 'bg-red-500', warm: 'bg-yellow-500', cold: 'bg-blue-400' } as const;
@@ -78,7 +78,7 @@ export default function PipelineBoard({ deals, onOpen, onMove, onNew }: Props) {
               id="crm-owner-filter"
               value={owner}
               onChange={(e) => setOwner(e.target.value as 'all' | OwnerId)}
-              className={`${inputCls} pr-8 sm:w-auto`}
+              className={`${selectCls} sm:w-auto`}
             >
               <option value="all">{t('pipeline.allOwners')}</option>
               {OWNER_IDS.map((id) => (
