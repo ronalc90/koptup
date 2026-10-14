@@ -1,12 +1,13 @@
 /**
  * Llamadas al backend del motor (`/api/expert/*` y `/api/cups/*`).
  *
- * Todas envían el token de sesión (cookie `accessToken`) como `Bearer` y
- * traducen 401/403/429 a errores tipados para mostrar un mensaje claro.
+ * Todas envían la sesión (`authFetch`: agrega el `Bearer` y lo renueva si el
+ * token de 15 minutos venció) y traducen 401/403/429 a errores tipados para
+ * mostrar un mensaje claro.
  */
 
-import Cookies from 'js-cookie';
 import { API_BASE } from '@/lib/backend-url';
+import { authFetch } from '@/lib/auth-token';
 import type { ManualTarifario } from './datos-ejemplo';
 
 export type TipoErrorApi = 'sin-sesion' | 'sin-acceso' | 'limite' | 'sin-conexion' | 'servidor';
@@ -25,12 +26,11 @@ export class ErrorApi extends Error {
 async function llamar<T>(ruta: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
   if (init.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
-  const token = Cookies.get('accessToken');
-  if (token) headers.set('Authorization', `Bearer ${token}`);
+  headers.set('Accept', 'application/json');
 
   let res: Response;
   try {
-    res = await fetch(`${API_BASE}${ruta}`, { ...init, headers, cache: 'no-store' });
+    res = await authFetch(`${API_BASE}${ruta}`, { ...init, headers, cache: 'no-store' });
   } catch {
     throw new ErrorApi('sin-conexion', 0);
   }

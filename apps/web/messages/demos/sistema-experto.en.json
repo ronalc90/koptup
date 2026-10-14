@@ -1,15 +1,28 @@
 {
   "demoExpertSystem": {
     "meta": {
-      "title": "Rules engine for medical claims auditing",
-      "description": "Private demo of the auditor's rules engine: enable claim-denial rules, adjust the tariff tolerance, simulate their effect on a sample batch of invoices and search CUPS codes.",
+      "title": "Medical audit expert system",
+      "description": "Private demo of the medical audit expert system: turn claim-denial rules on or off, adjust the tariff tolerance, simulate their effect on 12 sample invoices before saving and search CUPS codes.",
       "breadcrumbHome": "Home",
       "breadcrumbDemos": "Demos",
-      "breadcrumbName": "Auditor's rules engine"
+      "breadcrumbName": "Medical audit expert system"
     },
-    "back": "Back to Medical claims auditing",
-    "title": "Auditor's rules engine",
-    "subtitle": "Configure claim-denial rules, simulate their effect on a sample batch of invoices before saving them, and search CUPS codes.",
+    "back": "Back to demos",
+    "title": "Medical audit expert system",
+    "subtitle": "It is the rules engine that proposes claim denials when auditing medical claims: turn rules on or off, adjust the tariff tolerance and see their effect on a sample batch of invoices before saving.",
+    "audience": "For medical-claims audit coordinators at payers (EPS), audit firms and healthcare providers (IPS). Start with the three steps below.",
+    "start": {
+      "title": "How to start",
+      "progress": "{hechos} of {total} steps",
+      "done": "Done: you saw how the result changes before saving.",
+      "stepDone": "(done)",
+      "simuladorTitle": "See the denials it proposes",
+      "simuladorText": "The simulator applies the 8 rules to 12 sample invoices and explains each denial.",
+      "cambioTitle": "Change a rule or the tolerance",
+      "cambioText": "In Rules, turn a rule off or move the tariff tolerance.",
+      "efectoTitle": "Compare before saving",
+      "efectoText": "Go back to the simulator: you will see which denials appear or disappear and how much money they move."
+    },
     "sampleBadge": "Sample data",
     "sampleBadgeHint": "The invoices, patients, providers, agreement and tariffs in this demo are fictitious.",
     "status": {
@@ -40,7 +53,7 @@
       "login": "Sign in",
       "sin-accesoTitle": "Your account does not have access to this demo",
       "sin-accesoText": "This is a private demo: the KopTup team grants access. Meanwhile you can use the simulator and the sample-catalog search.",
-      "request": "Request access",
+      "request": "Request access to this demo",
       "limiteTitle": "The demo server received too many requests",
       "limiteText": "Wait a few minutes and try again. The simulator and the sample-catalog search keep working in your browser.",
       "sin-conexionTitle": "We could not reach the demo server",
@@ -122,33 +135,30 @@
     },
     "summary": {
       "title": "Engine overview",
-      "subtitle": "Figures returned by the demo server right now.",
+      "subtitle": "Figures the demo server returns right now.",
       "updatedAt": "Updated at {hora}",
       "refresh": "Refresh",
       "refreshing": "Refreshing…",
       "loading": "Querying the server…",
       "noData": "No server data",
-      "accounts": "Medical claims on the server",
-      "accountsProcessed": "{procesadas} processed by the engine ({porcentaje}%)",
       "catalog": "Server CUPS catalog",
       "catalogActive": "{activos} active codes",
-      "vectorized": "Codes with embeddings",
+      "vectorized": "Vectorized codes",
       "vectorizedDetail": "{hechos} of {total} ({porcentaje}%)",
       "vectorizedEmpty": "No catalog loaded",
       "rulesActive": "Active rules on the server",
       "rulesActiveDetail": "of {total} engine rules",
-      "emptyCatalog": "The server CUPS catalog is empty. In your project it is loaded from the current official table; meanwhile, code search uses the sample catalog.",
-      "emptyAccounts": "There are no medical claims on the demo server yet.",
+      "emptyCatalog": "The demo server CUPS catalog is empty, so semantic search is unavailable and code search uses the sample catalog. In your project the current official CUPS table is loaded.",
       "byCategory": "Server catalog by category",
       "services": "Engine services",
       "serviceRules": "Rules engine",
       "serviceRulesOk": "{activas} of {total} rules active",
       "serviceRulesUnknown": "Could not read the configuration",
       "serviceSemantic": "Semantic search on the server",
-      "serviceSemanticOk": "{total} codes with embeddings",
-      "serviceSemanticOff": "Unavailable: the catalog has no codes with embeddings",
+      "serviceSemanticOk": "{total} vectorized codes",
+      "serviceSemanticOff": "Unavailable: the server catalog has no vectorized codes",
       "serviceSample": "Sample catalog",
-      "serviceSampleText": "{total} codes, text search in your browser",
+      "serviceSampleText": "{total} codes, keyword search in your browser",
       "available": "Available",
       "unavailable": "Unavailable",
       "batchTitle": "Sample batch",
@@ -156,17 +166,19 @@
       "batchPoint1": "{ips} fictitious providers and a sample payer.",
       "batchPoint2": "At least one planted error for each of the {reglas} engine rules.",
       "batchPoint3": "{pactadas} services with an agreed price; the rest are priced with the tariff manual.",
-      "batchCta": "Open the simulator"
+      "batchCta": "Open the simulator",
+      "tolerance": "Saved tariff tolerance",
+      "toleranceDetail": "Default fee schedule: {manual}"
     },
     "search": {
       "title": "Search CUPS codes",
       "subtitle": "Describe the procedure the way your team would and find its code.",
       "sourceLabel": "Where to search",
       "sourceSample": "Sample catalog",
-      "sourceSampleHint": "Text search in your browser ({total} codes)",
+      "sourceSampleHint": "Keyword search in your browser ({total} codes)",
       "sourceServer": "Server catalog",
-      "sourceServerHint": "Semantic search with embeddings ({total} codes)",
-      "sourceServerOff": "Unavailable: the server catalog has no codes with embeddings.",
+      "sourceServerHint": "Semantic search by meaning, with vectors ({total} codes)",
+      "sourceServerOff": "Semantic search (by meaning) uses the server catalog and turns on when that catalog has vectorized codes; today it has none.",
       "inputLabel": "Procedure to search",
       "placeholder": "E.g. chest x-ray",
       "button": "Search",
@@ -196,7 +208,9 @@
         "limite": "The server received too many requests. Wait a few minutes or use the sample catalog.",
         "sin-conexion": "There is no connection to the demo server.",
         "servidor": "The server returned an error. Try again or use the sample catalog."
-      }
+      },
+      "sourceServerUnknown": "Semantic search in the server catalog is unavailable because there is no connection to the server.",
+      "sourceOnlySample": "You search by keywords in a sample catalog of {total} CUPS codes, right here in your browser."
     },
     "rules": {
       "title": "Engine rules",
@@ -226,8 +240,10 @@
         "servidor": "Not saved: the server returned an error."
       },
       "storageTitle": "Where it is saved",
-      "storageText": "In this demo, the engine server keeps a single in-memory configuration, shared by everyone using the demo, which goes back to the defaults when the server restarts. In your project it is saved per client and per agreement, with change history.",
-      "codesNote": "Codes 101, 102… are the engine's internal numbering. In your project they are mapped to the codes of the current claim-denial manual."
+      "storageText": "Your draft (what you edit here) is kept in this browser until you save or discard it. What is saved lives on the demo server: a single in-memory, shared configuration that goes back to the defaults when the server restarts. In your project it is saved per client and per agreement, with a change history.",
+      "codesNote": "Codes 101, 102… are this engine’s internal numbering (they do not match those in the “Healthcare expert system” demo). In your project they are mapped to the codes of the current claim-denial manual.",
+      "teamOnly": "Only the KopTup team can save to the server, because it is a single configuration shared by everyone using the demo. You can test all your changes in the simulator; your draft is kept in this browser.",
+      "sharedNote": "What you save applies to everyone using this demo."
     },
     "simulator": {
       "title": "Simulator on the sample batch",
@@ -296,21 +312,29 @@
         "s5Text": "In your project, the auditor accepts, adjusts or discards each denial before sending it to the provider."
       },
       "aiTitle": "What AI does and does not do",
-      "ai1": "Does: extract data from documents (in your project) and search codes by meaning with embeddings (on the server, when the catalog has vectorized codes).",
+      "ai1": "Does: extract data from documents (in your project) and search codes by meaning with semantic vectors (on the server, when its catalog has vectorized codes).",
       "ai2": "Does not: decide denials. Rules are explicit, auditable conditions.",
       "ai3": "Does not: file or send denials without human review.",
       "realTitle": "What is real in this demo",
-      "realSummary": "Real figures returned by the demo server: claims, catalog, vectorization and active rules.",
-      "realRules": "Read from and saved on the demo server (shared in-memory configuration, reset when it restarts).",
+      "realSummary": "Real figures returned by the demo server: active rules, saved tolerance, CUPS catalog and vectorized codes.",
+      "realRules": "Read from the demo server, and only the KopTup team saves them there (shared in-memory configuration that resets when the server restarts). Your draft is kept in this browser.",
       "realSimulator": "Runs in your browser on 12 sample invoices with the configuration you are editing.",
-      "realSearch": "Sample catalog with text search in your browser; server catalog with semantic search when it has vectorized codes.",
+      "realSearch": "Sample catalog of 22 codes with keyword search in your browser. The server semantic search (by meaning, with vectors) only appears when its catalog has vectorized codes.",
       "realCodes": "The engine's internal numbering (101, 102…). In your project it is mapped to the current claim-denial manual.",
       "rowCodes": "Rule codes",
       "projectTitle": "In your project",
       "project1": "Configuration per client and per agreement, persistent and with change history.",
       "project2": "Current official CUPS and ICD-10 catalogs, with their version date.",
       "project3": "Additional rules agreed with your audit team, tested before they are enabled.",
-      "project4": "Integration with your claims filing and denial-response workflow."
+      "project4": "Integration with your claims filing and denial-response workflow.",
+      "rowReading": "AI invoice reading",
+      "realReading": "Not in this demo: the sample batch is already structured. It is shown in “Healthcare expert system”, another private demo.",
+      "otherTitle": "Want to see AI invoice reading?",
+      "otherText": "Invoice data extraction and invoice-by-invoice auditing are in “Healthcare expert system”, another private KopTup demo.",
+      "otherNeedsInvite": "That demo requires its own invitation: access to this one does not include it.",
+      "otherHasAccess": "Your account already has access to that demo.",
+      "otherOpen": "Open Healthcare expert system",
+      "otherRequest": "Request an invitation to that demo"
     }
   }
 }
