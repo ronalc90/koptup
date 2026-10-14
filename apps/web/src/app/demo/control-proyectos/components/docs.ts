@@ -3,7 +3,7 @@
 import { useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
-import { downloadBlob, memberById, milestoneStats, slugify, type WeeklyReport } from '../lib/engine';
+import { downloadBlob, invoiceAmount, ivaOf, memberById, milestoneStats, slugify, type WeeklyReport } from '../lib/engine';
 import { makePdf, type PdfDoc } from '../lib/pdf';
 import { formatNit } from '../lib/seed';
 import { uploadedFiles, useDemo } from '../lib/store';
@@ -182,7 +182,7 @@ export function useDocs() {
         lines.push(...r.upcoming.slice(0, 4).map((x) => `- ${f.date(x.due, 'short')}: ${x.title}`));
       }
       if (r.overdue.length) lines.push(t('waOverdue', { count: r.overdue.length }));
-      lines.push('', t('waBye', { company: ws.company.name }));
+      lines.push('', t('waBye', { company: ws.company.name.replace(/\.$/, '') }));
       return lines.join('\n');
     },
     [t, th, f, ws.company.name],
@@ -191,7 +191,12 @@ export function useDocs() {
   const downloadInvoice = useCallback(
     async (m: Milestone) => {
       const project = ws.projects.find((p) => p.id === m.projectId)!;
-      const iva = Math.round(m.billing * 0.19);
+      const amount = invoiceAmount(m);
+      const iva = ivaOf(amount);
+      const concept =
+        m.invoice?.basis === 'progress'
+          ? t('invoiceConceptProgress', { milestone: m.name, pct: m.closedProgress ?? 100 })
+          : t('invoiceConcept', { milestone: m.name });
       await makePdf({
         ...head(),
         filename: `${t('invoiceFile')}-${m.invoice?.number ?? 'borrador'}.pdf`,
@@ -209,9 +214,9 @@ export function useDocs() {
             table: {
               head: [t('concept'), t('value')],
               rows: [
-                [t('invoiceConcept', { milestone: m.name }), f.money(m.billing)],
+                [concept, f.money(amount)],
                 [t('iva'), f.money(iva)],
-                [t('total'), f.money(m.billing + iva)],
+                [t('total'), f.money(amount + iva)],
               ],
               bold: [2],
             },

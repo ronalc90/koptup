@@ -16,16 +16,32 @@ export function parseISO(iso: ISODate): Date {
   return new Date(Date.UTC(y, m - 1, d));
 }
 
-/** Fecha local del navegador. Se llama solo en efectos o manejadores del cliente. */
-export function localToday(): ISODate {
-  const now = new Date();
-  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+/** Las empresas de ejemplo son colombianas: "hoy" y "ahora" son los de Colombia, desde cualquier país. */
+export const DEMO_TIME_ZONE = 'America/Bogota';
+
+/** Fecha y hora de Colombia de un instante como 'AAAA-MM-DDTHH:mm' (sin depender de la zona del navegador). */
+export function bogotaDateTime(at: Date): ISODateTime {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: DEMO_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(at);
+  const get = (type: Intl.DateTimeFormatPartTypes) => parts.find((p) => p.type === type)?.value ?? '00';
+  return `${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}`;
 }
 
-/** Fecha y hora local del navegador. Solo en manejadores del cliente. */
+/** Fecha de hoy en Colombia. Se llama solo en efectos o manejadores del cliente (nunca en el primer render). */
+export function localToday(): ISODate {
+  return bogotaDateTime(new Date()).slice(0, 10);
+}
+
+/** Fecha y hora de ahora en Colombia. Solo en manejadores del cliente. */
 export function localNow(): ISODateTime {
-  const now = new Date();
-  return `${localToday()}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  return bogotaDateTime(new Date());
 }
 
 export function addDays(iso: ISODate, n: number): ISODate {

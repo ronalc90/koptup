@@ -18,7 +18,7 @@ export default function NewProjectModal({ onClose }: { onClose: () => void }) {
   const tColor = useTranslations('demoProjectsPro.colors');
   const { ws, state, today, act, setSection, setView } = useDemo();
   const [tpl, setTpl] = useState<Template | 'blank' | null>(null);
-  const [form, setForm] = useState({ name: '', client: '', contact: '', city: ws.company.city, color: COLORS[0] as string, budget: '' });
+  const [form, setForm] = useState({ name: '', client: '', contact: '', city: ws.company.city, color: COLORS[0] as string, budget: '', contract: '' });
   const templates = TEMPLATES[state.sector];
 
   const choose = (x: Template | 'blank') => {
@@ -30,10 +30,18 @@ export default function NewProjectModal({ onClose }: { onClose: () => void }) {
     if (!tpl || !form.name.trim() || !form.client.trim()) return;
     const roleMember = (role: string) => ws.members.find((m) => m.role === role)?.id ?? me(ws).id;
     const budget = Number(form.budget.replace(/[^\d]/g, '')) || 0;
+    const contract = Number(form.contract.replace(/[^\d]/g, '')) || 0;
     const ms =
       tpl === 'blank'
-        ? [{ name: t('blankMilestone'), kind: 'milestone' as const, start: today, end: workday(today, 30), budget, billing: 0 }]
-        : tpl.ms.map((m) => ({ name: m.name, kind: m.kind ?? ('milestone' as const), start: workday(today, m.s), end: workday(today, m.e), budget: tpl.ms.length ? Math.round(budget / tpl.ms.length) : 0, billing: 0 }));
+        ? [{ name: t('blankMilestone'), kind: 'milestone' as const, start: today, end: workday(today, 30), budget, billing: contract }]
+        : tpl.ms.map((m) => ({
+            name: m.name,
+            kind: m.kind ?? ('milestone' as const),
+            start: workday(today, m.s),
+            end: workday(today, m.e),
+            budget: tpl.ms.length ? Math.round(budget / tpl.ms.length) : 0,
+            billing: tpl.ms.length ? Math.round(contract / tpl.ms.length) : 0,
+          }));
     const tasks =
       tpl === 'blank'
         ? []
@@ -152,6 +160,12 @@ export default function NewProjectModal({ onClose }: { onClose: () => void }) {
               {t('budget')}
             </label>
             <input id="gp-np-budget" inputMode="numeric" className={inputCls} value={form.budget} onChange={(e) => setForm({ ...form, budget: e.target.value })} placeholder="45.000.000" />
+          </div>
+          <div>
+            <label htmlFor="gp-np-contract" className={labelCls}>
+              {t('contract')}
+            </label>
+            <input id="gp-np-contract" inputMode="numeric" className={inputCls} value={form.contract} onChange={(e) => setForm({ ...form, contract: e.target.value })} placeholder="60.000.000" />
           </div>
           <fieldset className="sm:col-span-2">
             <legend className={labelCls}>{t('color')}</legend>

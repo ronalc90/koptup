@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import {
   CalendarDaysIcon,
   ChartBarIcon,
+  CheckCircleIcon,
   Cog6ToothIcon,
   DocumentTextIcon,
   EyeIcon,
@@ -21,7 +23,8 @@ import { StarIcon as StarSolid } from '@heroicons/react/24/solid';
 import { diffDays } from '../lib/dates';
 import { applyFilters, burndown, filtersActive, projectMilestones, projectStats } from '../lib/engine';
 import { useDemo } from '../lib/store';
-import { EMPTY_FILTERS, VIEWS, type Priority, type StatusId, type ViewId } from '../lib/types';
+import { EMPTY_FILTERS, VIEWS, type GuideStep, type Priority, type StatusId, type ViewId } from '../lib/types';
+import { GUIDED_DEMO_HREF, QUOTE_HREF } from './Intro';
 import MonthCalendar from './MonthCalendar';
 import KanbanView from './KanbanView';
 import TaskList from './TaskList';
@@ -39,8 +42,6 @@ const VIEW_ICON: Record<ViewId, typeof ViewColumnsIcon> = {
   timeline: PresentationChartLineIcon,
   reports: ChartBarIcon,
 };
-
-const GUIDE_KEY = 'koptup.gestion-proyectos.guide-hidden';
 
 export default function ProjectWorkspace() {
   const t = useTranslations('demoProjectsPro.header');
@@ -134,7 +135,17 @@ function ViewTabs({ view, onChange }: { view: ViewId; onChange: (v: ViewId) => v
               type="button"
               role="tab"
               aria-selected={selected}
+              tabIndex={selected ? 0 : -1}
+              data-view={id}
               onClick={() => onChange(id)}
+              onKeyDown={(e) => {
+                const i = VIEWS.indexOf(id);
+                const next = e.key === 'ArrowRight' ? VIEWS[(i + 1) % VIEWS.length] : e.key === 'ArrowLeft' ? VIEWS[(i + VIEWS.length - 1) % VIEWS.length] : e.key === 'Home' ? VIEWS[0] : e.key === 'End' ? VIEWS[VIEWS.length - 1] : null;
+                if (!next) return;
+                e.preventDefault();
+                onChange(next);
+                (e.currentTarget.parentElement?.querySelector(`[data-view="${next}"]`) as HTMLElement | null)?.focus();
+              }}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg whitespace-nowrap transition-all ${
                 selected ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
@@ -337,17 +348,9 @@ function MilestoneStrip() {
 
 function Guide({ onWeekly }: { onWeekly: () => void }) {
   const t = useTranslations('demoProjectsPro.guide');
-  const { setSection, setClientMode, setView } = useDemo();
-  const [hidden, setHidden] = useState(true);
-  useEffect(() => {
-    try {
-      setHidden(window.localStorage.getItem(GUIDE_KEY) === '1');
-    } catch {
-      setHidden(false);
-    }
-  }, []);
-  if (hidden) return null;
-  const steps: { key: string; action: () => void }[] = [
+  const { setSection, setClientMode, setView, guideHidden, setGuideHidden, guideDone } = useDemo();
+  if (guideHidden) return null;
+  const steps: { key: GuideStep; action: () => void }[] = [
     { key: 'portfolio', action: () => setSection('portfolio') },
     {
       key: 'move',
@@ -367,39 +370,51 @@ function Guide({ onWeekly }: { onWeekly: () => void }) {
     { key: 'reports', action: () => setView('reports') },
     { key: 'weekly', action: onWeekly },
   ];
+  const done = steps.filter((s) => guideDone.includes(s.key)).length;
   return (
-    <div className="px-4 sm:px-6 py-3 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+    <section id="gp-guide" tabIndex={-1} aria-labelledby="gp-guide-title" className="px-4 sm:px-6 py-3 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 outline-none">
       <div className="flex items-start justify-between gap-3">
-        <p className="text-sm font-semibold text-slate-900 dark:text-white">{t('title')}</p>
-        <button
-          type="button"
-          className={btn.link}
-          onClick={() => {
-            setHidden(true);
-            try {
-              window.localStorage.setItem(GUIDE_KEY, '1');
-            } catch {
-              /* sin almacenamiento: se oculta solo en esta visita */
-            }
-          }}
-        >
+        <h2 id="gp-guide-title" className="text-sm font-semibold text-slate-900 dark:text-white">
+          {t('title')} <span className="ml-1 text-xs font-medium text-teal-700 dark:text-teal-300">{t('progress', { done, total: steps.length })}</span>
+        </h2>
+        <button type="button" className={btn.link} onClick={() => setGuideHidden(true)}>
           {t('hide')}
         </button>
       </div>
-      <ol className="mt-2 grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
-        {steps.map((s, i) => (
-          <li key={s.key}>
-            <button
-              type="button"
-              onClick={s.action}
-              className="w-full h-full text-left rounded-lg border border-slate-200 dark:border-slate-700 p-2.5 hover:border-teal-400 dark:hover:border-teal-600 transition-colors"
-            >
-              <span className="text-[11px] font-bold text-teal-700 dark:text-teal-300">{t('step', { n: i + 1 })}</span>
-              <span className="block text-xs text-slate-700 dark:text-slate-200 mt-0.5">{t(s.key)}</span>
-            </button>
-          </li>
-        ))}
+      <ol className="mt-2 flex gap-2 overflow-x-auto snap-x pb-1 -mx-1 px-1 sm:mx-0 sm:px-0 sm:pb-0 sm:overflow-visible sm:grid sm:grid-cols-2 xl:grid-cols-5">
+        {steps.map((s, i) => {
+          const ok = guideDone.includes(s.key);
+          return (
+            <li key={s.key} className="shrink-0 w-56 snap-start sm:w-auto">
+              <button
+                type="button"
+                onClick={s.action}
+                className={`relative w-full h-full text-left rounded-lg border p-2.5 transition-colors ${ok ? 'border-emerald-300 bg-emerald-50/70 dark:border-emerald-800 dark:bg-emerald-950/30' : 'border-slate-200 dark:border-slate-700 hover:border-teal-400 dark:hover:border-teal-600'}`}
+              >
+                <span className={`flex items-center gap-1 text-[11px] font-bold ${ok ? 'text-emerald-700 dark:text-emerald-300' : 'text-teal-700 dark:text-teal-300'}`}>
+                  {ok && <CheckCircleIcon className="w-3.5 h-3.5" aria-hidden="true" />}
+                  {t('step', { n: i + 1 })}
+                  {ok && <span className="sr-only">{t('doneSr')}</span>}
+                </span>
+                <span className="block text-xs text-slate-700 dark:text-slate-200 mt-0.5">{t(s.key)}</span>
+              </button>
+            </li>
+          );
+        })}
       </ol>
-    </div>
+      {done === steps.length && (
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 px-3 py-2">
+          <p className="text-sm text-emerald-900 dark:text-emerald-100">{t('allDone')}</p>
+          <div className="flex flex-wrap gap-2">
+            <Link href={GUIDED_DEMO_HREF} className={btn.primary}>
+              {t('allDoneGuided')}
+            </Link>
+            <Link href={QUOTE_HREF} className={btn.outline}>
+              {t('allDoneQuote')}
+            </Link>
+          </div>
+        </div>
+      )}
+    </section>
   );
 }

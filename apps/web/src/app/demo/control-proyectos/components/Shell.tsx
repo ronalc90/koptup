@@ -20,24 +20,15 @@ import { SECTORS, type SectorId } from '../lib/types';
 import NewProjectModal from './NewProjectModal';
 import { HealthDot, Modal, btn } from './ui';
 
-/** Franja superior: rótulo de datos de ejemplo, empresa ficticia, sector y restablecer. */
+/** Franja de datos: empresa ficticia del sector, selector de sector y restablecer. */
 export function SampleBar() {
   const t = useTranslations('demoProjectsPro.bar');
   const tSector = useTranslations('demoProjectsPro.sector');
   const { state, ws, act, reset } = useDemo();
   const [confirm, setConfirm] = useState(false);
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 sm:px-6 py-3 bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 text-xs">
-      <div className="min-w-0 basis-full lg:basis-auto lg:flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <h1 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">{t('title')}</h1>
-          <span title={t('sampleHint')} className="inline-flex items-center px-2.5 py-0.5 rounded-full font-semibold bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200 border border-amber-200 dark:border-amber-900">
-            {t('sample')}
-          </span>
-        </div>
-        <p className="text-slate-600 dark:text-slate-300 mt-0.5">{t('subtitle')}</p>
-        <p className="text-slate-500 dark:text-slate-400 mt-0.5">{t('company', { name: ws.company.name, nit: formatNit(ws.company.nit), city: ws.company.city })}</p>
-      </div>
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 sm:px-6 py-2.5 bg-amber-50/70 dark:bg-amber-950/20 border-b border-amber-200/70 dark:border-amber-900/50 text-xs">
+      <p className="min-w-0 basis-full sm:basis-auto sm:flex-1 text-slate-700 dark:text-slate-300">{t('company', { name: ws.company.name, nit: formatNit(ws.company.nit), city: ws.company.city })}</p>
       <div className="flex flex-wrap items-center gap-2">
         <label htmlFor="gp-sector" className="font-semibold text-slate-600 dark:text-slate-300">
           {t('sector')}
@@ -231,7 +222,7 @@ export function MobileNav() {
           <PlusIcon className="w-5 h-5" />
         </button>
       </div>
-      <div className="flex gap-2 overflow-x-auto pb-0.5">
+      <div className="flex flex-wrap gap-2">
         <button type="button" className={pill(section === 'portfolio')} onClick={() => setSection('portfolio')}>
           <ChartPieIcon className="w-4 h-4" />
           {t('portfolio')}

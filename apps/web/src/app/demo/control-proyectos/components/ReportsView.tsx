@@ -9,8 +9,11 @@ import {
   burndown,
   downloadBlob,
   hoursByMember,
+  invoiceAmount,
+  ivaOf,
   memberById,
   nextInvoiceNumber,
+  progressAmount,
   projectStats,
   slugify,
   toCSV,
@@ -18,7 +21,7 @@ import {
   type MilestoneStats,
 } from '../lib/engine';
 import { useDemo } from '../lib/store';
-import { STATUSES, type Milestone } from '../lib/types';
+import { STATUSES, type InvoiceBasis, type Milestone } from '../lib/types';
 import { useDocs } from './docs';
 import { Bar, Initials, Modal, STATUS_BAR, SectionTitle, Stat, btn, card, inputCls, labelCls, useFmt, useStatusLabel, selectCls } from './ui';
 
@@ -45,7 +48,7 @@ export default function ReportsView() {
         const task = ws.tasks.find((x) => x.id === e.taskId)!;
         return [e.date, memberById(ws, e.memberId)?.name ?? '', task.title, ws.milestones.find((m) => m.id === task.milestoneId)?.name ?? '', e.hours, Math.round(e.hours * (rate.get(e.memberId) ?? 0)), e.note];
       });
-    downloadBlob(toCSV([[t('csvDate'), t('csvWho'), t('csvTask'), t('csvMilestone'), t('csvHours'), t('csvCost'), t('csvNote')], ...rows]), `${t('hoursFile')}-${slugify(project.name)}.csv`, 'text/csv;charset=utf-8');
+    downloadBlob(toCSV([[t('csvDate'), t('csvWho'), t('csvTask'), t('csvMilestone'), t('csvHours'), t('csvCost'), t('csvNote')], ...rows], f.locale === 'en' ? '.' : ','), `${t('hoursFile')}-${slugify(project.name)}.csv`, 'text/csv;charset=utf-8');
   };
 
   const maxStatus = Math.max(1, ...STATUSES.map((s) => stats.tasks.filter((x) => x.status === s).length));
@@ -152,9 +155,13 @@ function MilestoneRow({ m, onBill }: { m: MilestoneStats; onBill: () => void }) 
   const f = useFmt();
   const { downloadInvoice } = useDocs();
   const ms = m.milestone;
-  const state = ms.invoice ? 'invoiced' : m.complete || ms.closed ? 'complete' : m.late ? 'late' : 'open';
+  const closedSprint = !!ms.closed && ms.kind === 'sprint';
+  const state = ms.invoice ? 'invoiced' : closedSprint ? 'closed' : m.complete || ms.closed ? 'complete' : m.late ? 'late' : 'open';
+  // En un sprint cerrado lo pendiente pasó al siguiente: se muestra el avance que tenía al cerrarlo.
+  const shownProgress = closedSprint && ms.closedProgress !== undefined ? ms.closedProgress : m.progress;
   const stateCls = {
     invoiced: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200',
+    closed: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200',
     complete: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200',
     late: 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200',
     open: 'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-200',
@@ -173,10 +180,10 @@ function MilestoneRow({ m, onBill }: { m: MilestoneStats; onBill: () => void }) 
       <div className="grid sm:grid-cols-2 gap-3 mt-2">
         <div>
           <div className="flex justify-between text-[11px] text-slate-600 dark:text-slate-300 mb-0.5">
-            <span>{t('progress')}</span>
-            <span className="font-semibold">{m.progress}%</span>
+            <span>{closedSprint && ms.closedProgress !== undefined ? t('progressAtClose') : t('progress')}</span>
+            <span className="font-semibold">{shownProgress}%</span>
           </div>
-          <Bar value={m.progress} />
+          <Bar value={shownProgress} />
         </div>
         <div>
           <div className="flex justify-between text-[11px] text-slate-600 dark:text-slate-300 mb-0.5">
@@ -187,12 +194,17 @@ function MilestoneRow({ m, onBill }: { m: MilestoneStats; onBill: () => void }) 
         </div>
       </div>
       <div className="flex flex-wrap items-center justify-between gap-2 mt-2 text-xs">
-        <span className="text-slate-600 dark:text-slate-300">{t('billing', { value: f.money(ms.billing) })}</span>
+        <span className="text-slate-600 dark:text-slate-300">
+          {ms.invoice ? t('invoiced', { value: f.money(invoiceAmount(ms)) }) : t('billing', { value: f.money(ms.billing) })}
+          {ms.invoice?.basis === 'progress' && ` · ${t('invoicedByProgress', { pct: ms.closedProgress ?? 100 })}`}
+        </span>
         {ms.invoice ? (
           <button type="button" className={btn.small} onClick={() => downloadInvoice(ms)}>
             <DocumentTextIcon className="w-3.5 h-3.5" />
             {t('downloadInvoice')}
           </button>
+        ) : (m.complete || ms.closed) && ms.billing <= 0 ? (
+          <span className="text-amber-700 dark:text-amber-300">{t('noBillingValue')}</span>
         ) : m.complete || ms.closed ? (
           <button type="button" className={btn.small} onClick={onBill}>
             <BanknotesIcon className="w-3.5 h-3.5" />
@@ -223,8 +235,9 @@ function BurndownCard({ m }: { m: Milestone }) {
       .map((v, i) => (v === null ? null : `${X(i).toFixed(1)},${Y(v).toFixed(1)}`))
       .filter(Boolean)
       .join(' ');
-  const yTicks = [0, 0.5, 1].map((p) => Math.round(max * p));
-  const xTicks = [0, Math.floor(n / 2), n];
+  // Sin repetir marcas (un hito sin horas o de un solo día daría 0, 1, 1).
+  const yTicks = [...new Set([0, 0.5, 1].map((p) => Math.round(max * p)))];
+  const xTicks = [...new Set([0, Math.floor(n / 2), n])];
   const todayIdx = bd.days.indexOf(today);
   return (
     <section className={`${card} p-4`}>
@@ -284,11 +297,11 @@ function Expenses() {
       ) : (
         <ul className="divide-y divide-slate-100 dark:divide-slate-800 text-sm mb-3">
           {(showAll ? list : list.slice(0, 5)).map((x) => (
-            <li key={x.id} className="flex flex-wrap items-center gap-x-3 gap-y-0.5 py-2">
+            <li key={x.id} className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 py-2">
               <span className="text-xs text-slate-500 w-16 shrink-0">{f.date(x.date, 'short')}</span>
-              <span className="flex-1 min-w-0 text-slate-800 dark:text-slate-100">{x.concept}</span>
-              <span className="text-xs text-slate-500">{ws.milestones.find((m) => m.id === x.milestoneId)?.name}</span>
-              <span className="font-semibold text-slate-900 dark:text-white whitespace-nowrap">{f.money(x.amount)}</span>
+              <span className="flex-1 min-w-[10rem] text-slate-800 dark:text-slate-100">{x.concept}</span>
+              <span className="text-xs text-slate-500 ml-[4.75rem] sm:ml-0">{ws.milestones.find((m) => m.id === x.milestoneId)?.name}</span>
+              <span className="font-semibold text-slate-900 dark:text-white whitespace-nowrap ml-auto sm:ml-0">{f.money(x.amount)}</span>
             </li>
           ))}
         </ul>
@@ -350,8 +363,12 @@ function BillingModal({ milestone, onClose }: { milestone: Milestone; onClose: (
   const { downloadInvoice } = useDocs();
   const project = ws.projects.find((p) => p.id === milestone.projectId)!;
   const number = nextInvoiceNumber(ws);
-  const iva = Math.round(milestone.billing * 0.19);
   const live = ws.milestones.find((m) => m.id === milestone.id) ?? milestone;
+  // Un sprint que se cerró con trabajo pendiente se puede cobrar completo (valor pactado) o por lo terminado.
+  const partial = !!live.closed && live.closedProgress !== undefined && live.closedProgress < 100;
+  const [basis, setBasis] = useState<InvoiceBasis>('agreed');
+  const amount = live.invoice ? invoiceAmount(live) : basis === 'progress' ? progressAmount(live) : live.billing;
+  const iva = ivaOf(amount);
   return (
     <Modal
       title={live.invoice ? t('doneTitle', { number: live.invoice.number }) : t('title')}
@@ -377,8 +394,9 @@ function BillingModal({ milestone, onClose }: { milestone: Milestone; onClose: (
             <button
               type="button"
               className={btn.primary}
+              disabled={!(amount > 0)}
               onClick={() => {
-                act({ type: 'milestone.invoice', id: milestone.id, number });
+                act({ type: 'milestone.invoice', id: milestone.id, number, amount, basis });
                 toast.success(t('done', { number }));
               }}
             >
@@ -388,17 +406,39 @@ function BillingModal({ milestone, onClose }: { milestone: Milestone; onClose: (
         )
       }
     >
+      {partial && !live.invoice && (
+        <fieldset className="mb-4 rounded-lg border border-slate-200 dark:border-slate-700 p-3">
+          <legend className="px-1 text-xs font-semibold text-slate-700 dark:text-slate-200">{t('basisTitle')}</legend>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">{t('basisHint', { pct: live.closedProgress ?? 0 })}</p>
+          <div className="space-y-1.5 text-sm text-slate-800 dark:text-slate-100">
+            <label className="flex items-start gap-2">
+              <input type="radio" name="gp-basis" className="mt-0.5 text-teal-600" checked={basis === 'agreed'} onChange={() => setBasis('agreed')} />
+              <span>{t('basisAgreed', { value: f.money(live.billing) })}</span>
+            </label>
+            <label className="flex items-start gap-2">
+              <input type="radio" name="gp-basis" className="mt-0.5 text-teal-600" checked={basis === 'progress'} onChange={() => setBasis('progress')} />
+              <span>{t('basisProgress', { pct: live.closedProgress ?? 0, value: f.money(progressAmount(live)) })}</span>
+            </label>
+          </div>
+        </fieldset>
+      )}
       <dl className="grid grid-cols-2 gap-y-2 text-sm">
         <dt className="text-slate-500">{t('client')}</dt>
         <dd className="text-right text-slate-900 dark:text-white">{project.client}</dd>
         <dt className="text-slate-500">{t('concept')}</dt>
-        <dd className="text-right text-slate-900 dark:text-white">{t('conceptValue', { name: milestone.name })}</dd>
+        <dd className="text-right text-slate-900 dark:text-white">
+          {(live.invoice ? live.invoice.basis : basis) === 'progress'
+            ? t('conceptProgress', { name: milestone.name, pct: live.closedProgress ?? 100 })
+            : live.closed && live.kind === 'sprint'
+              ? t('conceptSprint', { name: milestone.name })
+              : t('conceptValue', { name: milestone.name })}
+        </dd>
         <dt className="text-slate-500">{t('subtotal')}</dt>
-        <dd className="text-right text-slate-900 dark:text-white">{f.money(milestone.billing)}</dd>
+        <dd className="text-right text-slate-900 dark:text-white">{f.money(amount)}</dd>
         <dt className="text-slate-500">{t('iva')}</dt>
         <dd className="text-right text-slate-900 dark:text-white">{f.money(iva)}</dd>
         <dt className="font-semibold text-slate-700 dark:text-slate-200">{t('total')}</dt>
-        <dd className="text-right font-bold text-slate-900 dark:text-white">{f.money(milestone.billing + iva)}</dd>
+        <dd className="text-right font-bold text-slate-900 dark:text-white">{f.money(amount + iva)}</dd>
       </dl>
       <div className="mt-4 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 p-3 text-xs text-amber-900 dark:text-amber-200 space-y-1">
         <p className="font-semibold">{t('simulatedTitle')}</p>

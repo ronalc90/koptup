@@ -15,15 +15,15 @@ import {
   TrashIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
-import useModalClose from '@/hooks/useModalClose';
 import { localToday } from '../lib/dates';
 import { blockers, checklistProgress, dependsOnTransitively, isOverdue, loggedHours, me, memberById } from '../lib/engine';
 import type { TaskPatch } from '../lib/reducer';
 import { MENTION_RE } from '../lib/seed';
-import { uploadedFiles, useDemo } from '../lib/store';
+import { removeFile, saveFile } from '../lib/files';
+import { useDemo } from '../lib/store';
 import { PRIORITIES, STATUSES, type Priority, type StatusId, type Task } from '../lib/types';
 import { useDocs, useHistoryText } from './docs';
-import { Bar, Initials, Modal, STATUS_DOT, btn, inputCls, labelCls, useFmt, useStatusLabel, selectCls } from './ui';
+import { Bar, Initials, Modal, STATUS_DOT, btn, inputCls, labelCls, useDialog, useFmt, useStatusLabel, selectCls } from './ui';
 
 const MAX_UPLOAD = 10 * 1024 * 1024;
 
@@ -45,13 +45,12 @@ function Drawer({ task, onClose }: { task: Task; onClose: () => void }) {
   const { ws, state, today, act } = useDemo();
   const label = useStatusLabel();
   const [confirmDel, setConfirmDel] = useState(false);
-  useModalClose(!confirmDel, onClose);
   const [title, setTitle] = useState(task.title);
   const [desc, setDesc] = useState(task.description);
   useEffect(() => setTitle(task.title), [task.title]);
   useEffect(() => setDesc(task.description), [task.description]);
   const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => ref.current?.focus(), []);
+  useDialog(ref, onClose);
 
   const project = ws.projects.find((p) => p.id === task.projectId)!;
   const milestones = ws.milestones.filter((m) => m.projectId === task.projectId);
@@ -554,9 +553,11 @@ function Attachments({ task }: { task: Task }) {
                 return;
               }
               const id = `up-${task.id}-${file.name}-${file.size}-${file.lastModified}`;
-              uploadedFiles.set(id, file);
-              act({ type: 'attach.add', taskId: task.id, id, name: file.name, size: file.size });
-              toast.success(t('attached', { name: file.name }));
+              void saveFile(id, file).then((saved) => {
+                act({ type: 'attach.add', taskId: task.id, id, name: file.name, size: file.size });
+                if (saved) toast.success(t('attached', { name: file.name }));
+                else toast(t('attachedSessionOnly', { name: file.name }));
+              });
             }}
           />
         </>
@@ -596,7 +597,7 @@ function Attachments({ task }: { task: Task }) {
                   className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700"
                   aria-label={t('removeAttachment', { name: a.name })}
                   onClick={() => {
-                    uploadedFiles.delete(a.id);
+                    void removeFile(a.id);
                     act({ type: 'attach.remove', taskId: task.id, id: a.id });
                   }}
                 >

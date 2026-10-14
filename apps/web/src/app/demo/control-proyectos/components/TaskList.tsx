@@ -61,7 +61,7 @@ export default function TaskList({ tasks }: { tasks: Task[] }) {
       loggedHours(ws, x.id),
       x.clientVisible ? t('yes') : t('no'),
     ]);
-    downloadBlob(toCSV([head, ...body]), `${t('filePrefix')}-${slugify(project.name)}.csv`, 'text/csv;charset=utf-8');
+    downloadBlob(toCSV([head, ...body], f.locale === 'en' ? '.' : ','), `${t('filePrefix')}-${slugify(project.name)}.csv`, 'text/csv;charset=utf-8');
   };
 
   const Th = ({ k, children, className = '' }: { k: SortKey; children: ReactNode; className?: string }) => (

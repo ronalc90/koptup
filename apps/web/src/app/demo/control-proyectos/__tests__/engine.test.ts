@@ -3,8 +3,8 @@
  * la demo, los ids nunca se repiten y las acciones del portal del cliente y
  * las automatizaciones cambian el tablero del equipo.
  */
-import { addDays } from '../lib/dates';
-import { burndown, isOverdue, projectStats } from '../lib/engine';
+import { addDays, bogotaDateTime } from '../lib/dates';
+import { burndown, invoiceAmount, isOverdue, progressAmount, projectStats, toCSV } from '../lib/engine';
 import { reducer, type Action } from '../lib/reducer';
 import { buildState, nitDv } from '../lib/seed';
 import type { AppState, SectorId, Task } from '../lib/types';
@@ -155,9 +155,73 @@ describe('Gestión de proyectos · acciones', () => {
   it('facturar un hito usa el siguiente número de prefactura y registra el aviso', () => {
     let s = buildState(BASE, 'agencia');
     const ms = s.workspaces.agencia.milestones.find((m) => m.name === 'Identidad visual')!;
-    s = run(s, { type: 'milestone.invoice', id: ms.id, number: 'PF-0022', ...stamp });
+    s = run(s, { type: 'milestone.invoice', id: ms.id, number: 'PF-0022', amount: ms.billing, basis: 'agreed', ...stamp });
     const after = s.workspaces.agencia;
-    expect(after.milestones.find((m) => m.id === ms.id)?.invoice).toEqual({ number: 'PF-0022', on: BASE });
+    expect(after.milestones.find((m) => m.id === ms.id)?.invoice).toEqual({ number: 'PF-0022', on: BASE, amount: ms.billing, basis: 'agreed' });
     expect(after.outbox[0].key).toBe('invoice');
+  });
+
+  it('no se factura un hito por $ 0', () => {
+    const s = buildState(BASE, 'agencia');
+    const ms = s.workspaces.agencia.milestones.find((m) => m.name === 'Identidad visual')!;
+    const same = run(s, { type: 'milestone.invoice', id: ms.id, number: 'PF-0022', amount: 0, basis: 'agreed', ...stamp });
+    expect(same.workspaces.agencia.milestones.find((m) => m.id === ms.id)?.invoice).toBeUndefined();
+  });
+
+  it('cerrar un sprint guarda su avance y permite facturar por lo terminado', () => {
+    let s = buildState(BASE, 'software');
+    const ws = s.workspaces.software;
+    const sprint8 = ws.milestones.find((m) => m.name === 'Sprint 8')!;
+    const tasks8 = ws.tasks.filter((t) => t.milestoneId === sprint8.id);
+    const total = tasks8.reduce((a, t) => a + t.estimate, 0);
+    const done = tasks8.filter((t) => t.status === 'done').reduce((a, t) => a + t.estimate, 0);
+    const pct = Math.round((done / total) * 100);
+    expect(pct).toBeLessThan(100);
+    s = run(s, { type: 'sprint.close', id: sprint8.id, nextName: 'Sprint 11', ...stamp });
+    const closed = s.workspaces.software.milestones.find((m) => m.id === sprint8.id)!;
+    expect(closed.closedProgress).toBe(pct);
+    expect(progressAmount(closed)).toBe(Math.round((closed.billing * pct) / 100));
+    s = run(s, { type: 'milestone.invoice', id: closed.id, number: 'PF-0099', amount: progressAmount(closed), basis: 'progress', ...stamp });
+    const billed = s.workspaces.software.milestones.find((m) => m.id === sprint8.id)!;
+    expect(invoiceAmount(billed)).toBe(progressAmount(closed));
+    expect(billed.invoice?.basis).toBe('progress');
+  });
+
+  it('editar el costo por hora de una persona recalcula el costo ejecutado', () => {
+    let s = buildState(BASE);
+    const ws = s.workspaces.construccion;
+    const julian = ws.members.find((m) => m.name === 'Julián Ospina')!;
+    const before = projectStats(ws, ws.projects[0], BASE).cost;
+    const hours = ws.time.filter((e) => e.memberId === julian.id && ws.tasks.find((t) => t.id === e.taskId)?.projectId === ws.projects[0].id).reduce((a, e) => a + e.hours, 0);
+    expect(hours).toBeGreaterThan(0);
+    s = run(s, { type: 'member.update', id: julian.id, patch: { rate: julian.rate + 10000, capacity: 40 } });
+    const after = s.workspaces.construccion;
+    expect(after.members.find((m) => m.id === julian.id)).toMatchObject({ rate: julian.rate + 10000, capacity: 40 });
+    expect(projectStats(after, after.projects[0], BASE).cost).toBeCloseTo(before + hours * 10000, 0);
+    // Valores inválidos no cambian nada
+    const same = run(s, { type: 'member.update', id: julian.id, patch: { capacity: 0 } });
+    expect(same).toBe(s);
+  });
+});
+
+describe('Gestión de proyectos · exportaciones y fechas', () => {
+  it('el CSV usa coma decimal y no deja pasar fórmulas', () => {
+    const csv = toCSV([
+      ['Tarea', 'Horas'],
+      ['=HYPERLINK("x")', 1.5],
+      ['-2+3', 2],
+      ['Normal; con punto y coma', 3],
+    ]);
+    const lines = csv.replace('\uFEFF', '').split('\r\n');
+    expect(lines[1]).toBe(`"'=HYPERLINK(""x"")";1,5`);
+    expect(lines[2]).toBe("'-2+3;2");
+    expect(lines[3]).toBe('"Normal; con punto y coma";3');
+    expect(toCSV([[1.5]], '.')).toContain('1.5');
+  });
+
+  it('"hoy" es la fecha de Colombia aunque el navegador esté en otra zona', () => {
+    // 14 oct 2026 02:30 UTC = 13 oct 2026 21:30 en Bogotá
+    expect(bogotaDateTime(new Date(Date.UTC(2026, 9, 14, 2, 30)))).toBe('2026-10-13T21:30');
+    expect(bogotaDateTime(new Date(Date.UTC(2026, 9, 14, 15, 5)))).toBe('2026-10-14T10:05');
   });
 });

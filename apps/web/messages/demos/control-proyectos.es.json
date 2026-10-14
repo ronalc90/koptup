@@ -8,6 +8,19 @@
       "breadcrumbDemos": "Demos",
       "loading": "Cargando la demo…"
     },
+    "intro": {
+      "back": "Volver al catálogo de demos",
+      "guidedDemo": "Solicitar demo guiada",
+      "quote": "Cotizar tu sistema de proyectos",
+      "kicker": "Demo interactiva · Para empresas que trabajan por proyectos",
+      "simBadge": "Avisos, facturación y pagos simulados",
+      "localBadge": "Se guarda solo en este navegador",
+      "forWhomLabel": "Para quién:",
+      "forWhom": "constructoras, agencias, casas de software y oficinas de proyectos que hoy reportan el avance por correo, WhatsApp y Excel, y quieren que su cliente vea el avance y apruebe sin llamadas.",
+      "startLabel": "Por dónde empezar:",
+      "start": "sigue los 5 pasos de «Prueba esto en 2 minutos»; se marcan solos a medida que los haces. Puedes cambiar de sector (construcción, agencia o software) arriba del tablero.",
+      "startCta": "Ver los 5 pasos"
+    },
     "common": {
       "close": "Cerrar"
     },
@@ -147,7 +160,12 @@
       "move": "Lleva una tarea a la columna de revisión del cliente (arrástrala o usa el menú ⋮): se le avisa (simulado).",
       "client": "Abre la vista del cliente y aprueba un entregable o pide cambios.",
       "reports": "Revisa en Reportes las horas, el presupuesto por hito y la carga del equipo.",
-      "weekly": "Genera el informe semanal en PDF y el mensaje para WhatsApp."
+      "weekly": "Abre el informe semanal: descárgalo en PDF y copia el mensaje para WhatsApp.",
+      "progress": "{done} de {total} hechos",
+      "doneSr": "(hecho)",
+      "allDone": "¡Listo! Ya viste lo principal: portafolio, aprobación del cliente, reportes e informe semanal. ¿Lo quieres con tus proyectos, tu marca y tus integraciones?",
+      "allDoneGuided": "Solicitar demo guiada",
+      "allDoneQuote": "Cotizar"
     },
     "kanban": {
       "hint": "Arrastra las tarjetas entre columnas o usa el menú ⋮ de cada tarjeta (sirve en celular). Haz clic en el título para ver el detalle.",
@@ -235,7 +253,8 @@
       "state": {
         "complete": "Terminado",
         "late": "Vencido",
-        "open": "En curso"
+        "open": "En curso",
+        "closed": "Sprint cerrado"
       },
       "progress": "Avance",
       "spent": "Ejecutado: {cost} de {budget}",
@@ -276,7 +295,11 @@
       "csvHours": "Horas",
       "csvCost": "Costo (COP)",
       "csvNote": "Nota",
-      "hoursFile": "horas"
+      "hoursFile": "horas",
+      "invoiced": "Facturado: {value} + IVA",
+      "invoicedByProgress": "por lo terminado ({pct} %)",
+      "noBillingValue": "Define el valor a facturar en Configurar proyecto › Hitos y presupuesto",
+      "progressAtClose": "Avance al cerrarlo"
     },
     "billing": {
       "title": "Facturar hito",
@@ -294,7 +317,13 @@
       "total": "Total",
       "simulatedTitle": "Simulado en la demo",
       "simulatedBody": "Aquí se genera una prefactura de ejemplo y se registra el aviso al cliente. En tu proyecto se conecta con tu programa de facturación electrónica (por ejemplo, Siigo o Alegra) y con tu pasarela de pagos (por ejemplo, Wompi o PayU) para enviar el enlace de pago.",
-      "sentNote": "Se registró el aviso a {who} (simulado)."
+      "sentNote": "Se registró el aviso a {who} (simulado).",
+      "basisTitle": "¿Cuánto facturar de este sprint?",
+      "basisHint": "El sprint se cerró con el {pct} % del trabajo terminado (por horas estimadas); lo pendiente pasó al siguiente sprint.",
+      "basisAgreed": "Valor pactado del sprint: {value}",
+      "basisProgress": "Proporcional a lo terminado ({pct} %): {value}",
+      "conceptSprint": "Sprint cerrado: {name}",
+      "conceptProgress": "{name}: trabajo terminado ({pct} % del sprint)"
     },
     "weekly": {
       "title": "Informe semanal: {project}",
@@ -322,7 +351,8 @@
       "email": "Correo a {who}",
       "whatsapp": "WhatsApp",
       "simulated": "Simulado en la demo: no sale ningún mensaje. En tu proyecto se envía por correo y por WhatsApp Business (con plantillas aprobadas por Meta), por ejemplo cada lunes.",
-      "history": "Envíos registrados"
+      "history": "Envíos registrados",
+      "introClient": "Así recibes el informe de {company}: se calcula con el avance del proyecto en este momento."
     },
     "outbox": {
       "channel": {
@@ -423,12 +453,12 @@
       "mentionSent": "{names} recibirá un aviso (simulado en la demo)",
       "attachments": "Adjuntos ({count})",
       "attach": "Adjuntar archivo",
-      "attachHint": "Los documentos de ejemplo se generan en PDF al descargarlos. Lo que adjuntes queda solo en tu navegador durante esta sesión.",
+      "attachHint": "Los documentos de ejemplo se generan en PDF al descargarlos. Lo que adjuntes (hasta 10 MB) se guarda solo en este navegador: no se sube a ningún servidor.",
       "fileTooBig": "El archivo supera 10 MB.",
       "attached": "Adjuntaste {name}",
       "noAttachments": "Sin adjuntos.",
       "sampleDoc": "PDF de ejemplo · se genera al descargar",
-      "uploadedDoc": "Subido por ti · {size} KB · solo en esta sesión",
+      "uploadedDoc": "Subido por ti · {size} KB · guardado en este navegador",
       "download": "Descargar",
       "removeAttachment": "Quitar {name}",
       "history": "Historial",
@@ -440,7 +470,8 @@
       "deleteTitle": "¿Eliminar la tarea?",
       "deleteBody": "Se elimina «{task}» con sus horas registradas. No se puede deshacer.",
       "cancel": "Cancelar",
-      "deleteConfirm": "Eliminar"
+      "deleteConfirm": "Eliminar",
+      "attachedSessionOnly": "Adjuntaste {name}, pero este navegador no permite guardarlo: desaparece al recargar."
     },
     "history": {
       "automation": "Automatización",
@@ -595,15 +626,18 @@
       "closed": "cerrado",
       "milestoneSaved": "Hito actualizado",
       "moneyPreview": "Presupuesto: {budget} · A facturar: {billing}",
-      "teamHint": "Personas del espacio de trabajo con su costo por hora (para el presupuesto ejecutado) y su capacidad semanal (para la carga del equipo).",
+      "teamHint": "Personas del espacio de trabajo. Cambia el costo por hora (se usa en el presupuesto ejecutado) y la capacidad semanal (se usa en la carga del equipo): los reportes se recalculan al guardar.",
       "you": "Tú",
-      "rate": "{rate} por hora",
-      "capacity": "{hours} h por semana",
       "plan": {
         "pro": "Plan Profesional",
         "enterprise": "Plan Enterprise",
         "custom": "A cotizar"
-      }
+      },
+      "rateLabel": "Costo por hora (COP)",
+      "capacityLabel": "Horas por semana",
+      "memberSaved": "Datos de {name} actualizados",
+      "memberPreview": "{rate} por hora · {hours} h por semana",
+      "capacityInvalid": "Escribe entre 1 y 80 horas por semana."
     },
     "integrations": {
       "intro": "Estas conexiones no están activas en la demo. Se configuran en tu implementación según el plan y el alcance que cotices.",
@@ -660,9 +694,10 @@
       "city": "Ciudad",
       "budget": "Presupuesto total (COP, opcional)",
       "color": "Color",
-      "datesNote": "Las fechas de las tareas se calculan desde hoy en días hábiles. El presupuesto se reparte por igual entre los hitos.",
+      "datesNote": "Las fechas de las tareas se calculan desde hoy en días hábiles. El presupuesto y el valor del contrato se reparten por igual entre los hitos (lo puedes ajustar en Configurar proyecto).",
       "created": "Proyecto «{name}» creado con {count, plural, =0 {ninguna tarea} one {# tarea} other {# tareas}}",
-      "blankMilestone": "Fase 1"
+      "blankMilestone": "Fase 1",
+      "contract": "Valor del contrato antes de IVA (COP, opcional)"
     },
     "templates": {
       "remodelacion": {
@@ -793,7 +828,7 @@
         "fotos": "Registro fotográfico"
       },
       "footer": "Generado en el navegador por la demo de gestión de proyectos. Empresas, clientes, NIT y personas ficticios.",
-      "uploadGone": "El archivo ya no está disponible: los adjuntos se guardan solo durante la sesión en que los subes.",
+      "uploadGone": "El archivo ya no está disponible en este navegador (se borraron los datos del sitio o se adjuntó en otro equipo).",
       "weeklyFile": "informe-semanal",
       "weeklyTitle": "Informe semanal: {project}",
       "weeklyPeriod": "Del {from} al {to} · Cliente: {client}",
@@ -826,11 +861,12 @@
       "value": "Valor",
       "invoiceConcept": "Hito terminado: {milestone}",
       "iva": "IVA 19 %",
-      "invoiceNote": "Documento de ejemplo sin validez fiscal. En tu implementación, la factura electrónica la emite tu programa de facturación (por ejemplo, Siigo o Alegra) y el cobro se hace con tu pasarela de pagos."
+      "invoiceNote": "Documento de ejemplo sin validez fiscal. En tu implementación, la factura electrónica la emite tu programa de facturación (por ejemplo, Siigo o Alegra) y el cobro se hace con tu pasarela de pagos.",
+      "invoiceConceptProgress": "{milestone}: trabajo terminado ({pct} % del sprint)"
     },
     "footer": {
-      "sample": "Datos de ejemplo: empresas, clientes, NIT, personas y cifras son ficticios. Las fechas se calculan desde el día en que abres la demo.",
-      "storage": "Tus cambios se guardan solo en este navegador (7 días). Nada se envía a un servidor.",
+      "sample": "Datos de ejemplo: empresas, clientes, NIT, personas y cifras son ficticios. Las fechas se calculan desde el día en que abres la demo, con la fecha y la hora de Colombia.",
+      "storage": "Tus cambios y los archivos que adjuntes se guardan solo en este navegador (7 días). Nada se envía a un servidor y nadie más los ve.",
       "integrations": "Los avisos por correo y WhatsApp, la facturación y los pagos son simulados; en tu proyecto se conectan a tus servicios.",
       "ai": "Esta demo no usa inteligencia artificial: los indicadores salen de reglas visibles sobre los datos."
     }

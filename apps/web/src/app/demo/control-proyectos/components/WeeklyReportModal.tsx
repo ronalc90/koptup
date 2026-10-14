@@ -1,19 +1,23 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import { ArrowDownTrayIcon, ClipboardDocumentIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { weeklyReport } from '../lib/engine';
 import { useDemo } from '../lib/store';
 import { useDocs } from './docs';
-import { HealthBadge, Modal, btn, useFmt } from './ui';
+import { HealthBadge, Modal, btn, copyText, useFmt } from './ui';
 
-export default function WeeklyReportModal({ onClose }: { onClose: () => void }) {
+/**
+ * Informe semanal del proyecto abierto. El equipo lo descarga, copia el mensaje
+ * y registra el envío (simulado); en la vista del cliente solo se lee y descarga.
+ */
+export default function WeeklyReportModal({ onClose, audience = 'team' }: { onClose: () => void; audience?: 'team' | 'client' }) {
   const t = useTranslations('demoProjectsPro.weekly');
   const tOut = useTranslations('demoProjectsPro.outbox');
   const f = useFmt();
-  const { ws, today, act } = useDemo();
+  const { ws, today, act, markStep } = useDemo();
   const project = ws.projects.find((p) => p.id === ws.currentProjectId) ?? ws.projects[0];
   const r = useMemo(() => weeklyReport(ws, project, today), [ws, project, today]);
   const { downloadWeekly, weeklyText } = useDocs();
@@ -22,14 +26,29 @@ export default function WeeklyReportModal({ onClose }: { onClose: () => void }) 
   const [wa, setWa] = useState(true);
   const [busy, setBusy] = useState(false);
   const sent = ws.outbox.filter((o) => o.projectId === project.id).slice(0, 6);
+  const preview = useRef<HTMLPreElement>(null);
+  const team = audience === 'team';
+
+  // Abrir el informe completa el paso 5 de la guía.
+  useEffect(() => {
+    if (team) markStep('weekly');
+  }, [team, markStep]);
 
   const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(text);
+    if (await copyText(text)) {
       toast.success(t('copied'));
-    } catch {
-      toast.error(t('copyFailed'));
+      return;
     }
+    // Sin portapapeles: se deja el texto seleccionado para copiarlo a mano.
+    const el = preview.current;
+    const sel = window.getSelection();
+    if (el && sel) {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+    toast.error(t('copyFailed'));
   };
 
   const List = ({ title, items, empty }: { title: string; items: { id: string; text: string; tone?: 'red' }[]; empty: string }) => (
@@ -78,23 +97,25 @@ export default function WeeklyReportModal({ onClose }: { onClose: () => void }) 
             <ClipboardDocumentIcon className="w-4 h-4" />
             {t('copy')}
           </button>
-          <button
-            type="button"
-            className={btn.primary}
-            disabled={!email && !wa}
-            onClick={() => {
-              const channels = [...(email ? (['email'] as const) : []), ...(wa ? (['whatsapp'] as const) : [])];
-              act({ type: 'outbox.weekly', projectId: project.id, channels });
-              toast.success(t('sentToast', { who: project.clientContact }));
-            }}
-          >
-            <PaperAirplaneIcon className="w-4 h-4" />
-            {t('send')}
-          </button>
+          {team && (
+            <button
+              type="button"
+              className={btn.primary}
+              disabled={!email && !wa}
+              onClick={() => {
+                const channels = [...(email ? (['email'] as const) : []), ...(wa ? (['whatsapp'] as const) : [])];
+                act({ type: 'outbox.weekly', projectId: project.id, channels });
+                toast.success(t('sentToast', { who: project.clientContact }));
+              }}
+            >
+              <PaperAirplaneIcon className="w-4 h-4" />
+              {t('send')}
+            </button>
+          )}
         </>
       }
     >
-      <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">{t('intro')}</p>
+      <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">{team ? t('intro') : t('introClient', { company: ws.company.name })}</p>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
         <div className="rounded-lg bg-slate-50 dark:bg-slate-800 p-3">
           <p className="text-[11px] text-slate-500">{t('progress')}</p>
@@ -124,9 +145,10 @@ export default function WeeklyReportModal({ onClose }: { onClose: () => void }) 
 
       <div className="mt-5">
         <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1">{t('waPreview')}</h3>
-        <pre className="whitespace-pre-wrap text-xs bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 rounded-lg p-3 text-slate-800 dark:text-slate-100 font-sans">{text}</pre>
+        <pre ref={preview} className="whitespace-pre-wrap text-xs bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 rounded-lg p-3 text-slate-800 dark:text-slate-100 font-sans">{text}</pre>
       </div>
 
+      {team && (
       <fieldset className="mt-4">
         <legend className="text-sm font-bold text-slate-900 dark:text-white mb-1">{t('channels')}</legend>
         <div className="flex flex-wrap gap-4 text-sm text-slate-700 dark:text-slate-200">
@@ -141,8 +163,9 @@ export default function WeeklyReportModal({ onClose }: { onClose: () => void }) 
         </div>
         <p className="text-[11px] text-amber-800 dark:text-amber-300 mt-1.5">{t('simulated')}</p>
       </fieldset>
+      )}
 
-      {sent.length > 0 && (
+      {team && sent.length > 0 && (
         <div className="mt-4">
           <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1">{t('history')}</h3>
           <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-0.5">

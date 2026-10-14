@@ -217,7 +217,7 @@ export default function ClientPortal() {
           )}
         </section>
       </div>
-      {weekly && <WeeklyReportModal onClose={() => setWeekly(false)} />}
+      {weekly && <WeeklyReportModal audience="client" onClose={() => setWeekly(false)} />}
     </div>
   );
 }
