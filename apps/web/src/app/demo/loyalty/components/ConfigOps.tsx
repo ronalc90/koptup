@@ -20,6 +20,7 @@ import {
   CAMPAIGN_CHANNELS,
   CLUB,
   FRAUD_RULES,
+  SAMPLE_ALERT_DAYS,
   SEDES,
   SEGMENTS,
   type AllyCategory,
@@ -29,13 +30,17 @@ import {
   type FraudAlert,
   type Segment,
 } from './data';
-import { audienceFor, balanceOf, ley2300Check } from './engine';
+import { addDays, nextDays, weekdayOf } from './dates';
+import { audienceFor, balanceOf, firstSendDate, ley2300Check } from './engine';
 import { useSessionYearPoints } from './ConfigProgram';
 import { useLoyalty } from './store';
 import { Field, Modal, SampleTag, SectionTitle, inputCls, selectCls, useFmt, useToast } from './ui';
 
 const digits = (s: string) => s.replace(/\D/g, '');
-const DAYS = [1, 2, 3, 4, 5, 6, 0];
+/** Días que ofrece el formulario para programar un envío (desde mañana). */
+const SEND_DAYS_AHEAD = 14;
+/** Segmentos de Resultados con un mensaje sugerido propio. */
+const SEGMENT_TEMPLATES: Segment[] = ['vip', 'atRisk', 'nearTier', 'dormant'];
 
 /* -------------------------------- Campañas -------------------------------- */
 
@@ -43,27 +48,37 @@ export function CampaignsConfig({ prefillSegment, onPrefillUsed }: { prefillSegm
   const t = useTranslations('demoLoyalty');
   const f = useFmt();
   const notify = useToast();
-  const { state, activeMember, addCampaign, setCampaignStatus } = useLoyalty();
+  const { state, today, activeMember, addCampaign, setCampaignStatus } = useLoyalty();
   const extra = useSessionYearPoints();
   const th = state.rules.thresholds;
+  const sendDates = nextDays(today, SEND_DAYS_AHEAD);
 
   const [name, setName] = useState('');
   const [segment, setSegment] = useState<Segment>('silverGold');
   const [channel, setChannel] = useState<CampaignChannel>('whatsapp');
-  const [day, setDay] = useState(6);
+  const [date, setDate] = useState(() => firstSendDate(sendDates));
   const [time, setTime] = useState('10:00');
   const [message, setMessage] = useState(() => t('config.campaigns.defaultMessage', { club: CLUB.club }));
 
+  // Desde Resultados › Segmentos sugeridos: nombre y mensaje con la acción sugerida para ese segmento.
   useEffect(() => {
     if (prefillSegment) {
       setSegment(prefillSegment);
-      setName(t(`segments.${prefillSegment}`));
+      if (SEGMENT_TEMPLATES.includes(prefillSegment)) {
+        setName(t(`config.campaigns.fromSegment.${prefillSegment}.name`));
+        setMessage(t(`config.campaigns.fromSegment.${prefillSegment}.message`, { club: CLUB.club }));
+      } else {
+        setName(t(`segments.${prefillSegment}`));
+      }
+      setChannel('whatsapp');
       onPrefillUsed();
-      document.getElementById('ly-new-campaign')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const card = document.getElementById('ly-new-campaign');
+      card?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.getElementById('cp-name')?.focus({ preventScroll: true });
     }
   }, [prefillSegment, onPrefillUsed, t]);
 
-  const check = ley2300Check(day, time);
+  const check = ley2300Check(date, time);
   const audience = audienceFor(segment, channel, th, extra);
   const preview = message
     .replace(/\{nombre\}|\{name\}/g, activeMember.name.split(' ')[0])
@@ -74,11 +89,23 @@ export function CampaignsConfig({ prefillSegment, onPrefillUsed }: { prefillSegm
 
   const save = (e: FormEvent) => {
     e.preventDefault();
-    if (check !== 'ok' || !name.trim()) return;
-    addCampaign({ name: name.trim(), message, segment, channel, day, time, status: 'scheduled' });
-    notify(t('config.campaigns.saved', { n: f.num(audience) }));
+    if (!check.ok || !name.trim()) return;
+    addCampaign({ name: name.trim(), message, segment, channel, date, time, status: 'scheduled' });
+    notify(t('config.campaigns.saved', { n: f.num(audience), date: f.date(date), time }));
     setName('');
   };
+
+  const schedule = (c: Campaign) =>
+    c.date
+      ? t('config.campaigns.once', { date: f.dayLabel(c.date, weekdayOf(c.date)), time: c.time })
+      : c.daily
+        ? t('config.campaigns.daily', { time: c.time })
+        : t('config.campaigns.weekly', { day: f.weekdayPlural(c.day ?? 1), time: c.time });
+  const legalText = !check.ok
+    ? check.reason === 'holiday'
+      ? t('config.campaigns.legal.holiday', { date: f.date(date), name: t(`holidays.${check.holiday}`) })
+      : t(`config.campaigns.legal.${check.reason}`)
+    : t('config.campaigns.legalOk');
 
   const statusVariant: Record<CampaignStatus, 'success' | 'info' | 'default' | 'warning'> = { active: 'success', scheduled: 'info', paused: 'warning', draft: 'default' };
 
@@ -101,13 +128,20 @@ export function CampaignsConfig({ prefillSegment, onPrefillUsed }: { prefillSegm
             <tbody>
               {state.campaigns.map((c) => (
                 <tr key={c.id} className="border-b border-secondary-100 dark:border-secondary-800/50">
-                  <td className="py-3 pr-2 font-medium text-secondary-900 dark:text-white">{campaignName(c)}</td>
+                  <td className="py-3 pr-2 font-medium text-secondary-900 dark:text-white">
+                    {campaignName(c)}
+                    {c.session && (
+                      <Badge size="sm" variant="primary" className="ml-2">
+                        {t('config.campaigns.yours')}
+                      </Badge>
+                    )}
+                  </td>
                   <td className="py-3 pr-2 text-secondary-600 dark:text-secondary-300">
                     {f.num(audienceFor(c.segment, c.channel, th, extra))}
                     <span className="block text-[11px] text-secondary-500">{t(`segments.${c.segment}`)}</span>
                   </td>
                   <td className="py-3 pr-2 text-secondary-600 dark:text-secondary-300">
-                    {c.daily ? t('config.campaigns.daily', { time: c.time }) : t('config.campaigns.weekly', { day: f.weekday(c.day), time: c.time })}
+                    {schedule(c)}
                   </td>
                   <td className="py-3 pr-2">
                     <span className="px-2 py-0.5 text-xs rounded-full bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200">{t(`config.campaigns.channels.${c.channel}`)}</span>
@@ -121,6 +155,7 @@ export function CampaignsConfig({ prefillSegment, onPrefillUsed }: { prefillSegm
                     <Button
                       size="sm"
                       variant="ghost"
+                      aria-label={`${c.status === 'active' || c.status === 'scheduled' ? t('config.campaigns.pause') : t('config.campaigns.resume')}: ${campaignName(c)}`}
                       onClick={() => {
                         const next: CampaignStatus = c.status === 'active' || c.status === 'scheduled' ? 'paused' : 'scheduled';
                         setCampaignStatus(c.id, next);
@@ -142,7 +177,7 @@ export function CampaignsConfig({ prefillSegment, onPrefillUsed }: { prefillSegm
         <SectionTitle icon={PlusIcon} title={t('config.campaigns.newTitle')} subtitle={t('config.campaigns.newSubtitle')} />
         <form onSubmit={save} className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-3">
-            <Field label={t('config.campaigns.name')} htmlFor="cp-name">
+            <Field label={t('config.campaigns.name')} htmlFor="cp-name" hint={name.trim() ? undefined : t('config.campaigns.nameHint')}>
               <input id="cp-name" value={name} maxLength={70} onChange={(e) => setName(e.target.value)} className={inputCls} placeholder={t('config.campaigns.namePh')} />
             </Field>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -165,12 +200,16 @@ export function CampaignsConfig({ prefillSegment, onPrefillUsed }: { prefillSegm
                 </select>
               </Field>
               <Field label={t('config.campaigns.day')} htmlFor="cp-day">
-                <select id="cp-day" value={day} onChange={(e) => setDay(Number(e.target.value))} className={selectCls}>
-                  {DAYS.map((d) => (
-                    <option key={d} value={d}>
-                      {f.weekday(d)}
-                    </option>
-                  ))}
+                <select id="cp-day" value={date} onChange={(e) => setDate(e.target.value)} className={selectCls}>
+                  {sendDates.map((d) => {
+                    const c = ley2300Check(d, '10:00');
+                    return (
+                      <option key={d} value={d}>
+                        {f.dayLabel(d, weekdayOf(d))}
+                        {!c.ok && c.reason === 'holiday' ? ` (${t('config.campaigns.holidayTag')})` : ''}
+                      </option>
+                    );
+                  })}
                 </select>
               </Field>
               <Field label={t('config.campaigns.time')} htmlFor="cp-time">
@@ -179,9 +218,9 @@ export function CampaignsConfig({ prefillSegment, onPrefillUsed }: { prefillSegm
             </div>
             <div
               role="status"
-              className={`rounded-lg p-3 text-xs ${check === 'ok' ? 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-200' : 'bg-red-50 text-red-800 dark:bg-red-950/30 dark:text-red-200'}`}
+              className={`rounded-lg p-3 text-xs ${check.ok ? 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-200' : 'bg-red-50 text-red-800 dark:bg-red-950/30 dark:text-red-200'}`}
             >
-              {check === 'ok' ? t('config.campaigns.legalOk') : t(`config.campaigns.legal.${check}`)}
+              {legalText}
               <span className="block mt-1 opacity-80">{t('config.campaigns.legalRule')}</span>
             </div>
             <p className="text-sm text-secondary-700 dark:text-secondary-300">
@@ -193,13 +232,15 @@ export function CampaignsConfig({ prefillSegment, onPrefillUsed }: { prefillSegm
               <textarea id="cp-msg" rows={4} maxLength={320} value={message} onChange={(e) => setMessage(e.target.value)} className={inputCls} />
             </Field>
             <div>
-              <p className="text-xs font-medium text-secondary-600 dark:text-secondary-300 mb-1">{t('config.campaigns.preview')}</p>
+              <p className="text-xs font-medium text-secondary-600 dark:text-secondary-300 mb-1">
+                {t('config.campaigns.preview', { name: activeMember.name.split(' ')[0] })}
+              </p>
               <div className="max-w-sm rounded-2xl rounded-tl-sm bg-[#dcf8c6] dark:bg-emerald-900/60 text-secondary-900 dark:text-emerald-50 px-3 py-2 text-sm shadow-sm whitespace-pre-wrap">
                 {preview}
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button type="submit" size="sm" disabled={check !== 'ok' || !name.trim()}>
+              <Button type="submit" size="sm" disabled={!check.ok || !name.trim()}>
                 {t('config.campaigns.save')}
               </Button>
               <Button type="button" size="sm" variant="outline" onClick={() => notify(t('config.campaigns.testSent', { channel: t(`config.campaigns.channels.${channel}`) }))}>
@@ -348,6 +389,8 @@ export function FraudConfig() {
   const notify = useToast();
   const { state, setAlertStatus } = useLoyalty();
   const [review, setReview] = useState<FraudAlert | null>(null);
+  /** Fecha de cada evento de las alertas de ejemplo (días antes de la fecha de anclaje). */
+  const sampleDate = (alertId: string, i: number) => f.date(addDays(state.anchor, -(SAMPLE_ALERT_DAYS[alertId]?.[i] ?? 1)));
   const sevVariant = { high: 'danger', medium: 'warning', low: 'info' } as const;
   const memberName = (a: FraudAlert) => a.memberLabel ?? state.members.find((m) => m.id === a.memberId)?.name ?? '';
 
@@ -411,7 +454,7 @@ export function FraudConfig() {
                 })
               : [0, 1, 2].map((i) => (
                   <li key={i} className="font-mono text-xs">
-                    {t(`config.fraud.samples.${review.id}.events.${i}`)}
+                    {t(`config.fraud.samples.${review.id}.events.${i}`, { date: sampleDate(review.id, i) })}
                   </li>
                 ))}
           </ul>

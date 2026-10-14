@@ -7,8 +7,6 @@
 import {
   ANALYTICS,
   CHANNEL_OPT_IN,
-  DEMO_MONTH,
-  DEMO_YEAR,
   INACTIVITY_HISTOGRAM,
   POINTS_HISTOGRAM,
   POINTS_HISTOGRAM_STEP,
@@ -23,6 +21,9 @@ import {
   type Segment,
   type TierKey,
 } from './data';
+import { addDays, holidayOf, monthDay, monthKeyAgo, monthKeyOf, partsOf, weekdayOf, type HolidayKey } from './dates';
+
+export { weekdayOf };
 
 /* -------------------------------- Formato -------------------------------- */
 
@@ -71,19 +72,6 @@ export function cedulaLabel(c: string) {
   return group(Number(c.replace(/\D/g, '') || 0), '.');
 }
 
-/** Día de la semana (0 = domingo) de una fecha ISO, sin depender de la zona horaria. */
-export function weekdayOf(iso: string) {
-  const [y, m, d] = iso.split('-').map(Number);
-  return new Date(Date.UTC(y, m - 1, d)).getUTCDay();
-}
-
-export function monthOf(iso: string) {
-  return Number(iso.slice(5, 7));
-}
-
-export function yearOf(iso: string) {
-  return Number(iso.slice(0, 4));
-}
 
 /* --------------------------------- Puntos --------------------------------- */
 
@@ -234,33 +222,38 @@ function reversedIds(txs: LedgerTx[]) {
   return new Set(txs.filter((tx) => tx.kind === 'reversal' && tx.saleId).map((tx) => tx.saleId as string));
 }
 
-/** Puntos de compras del año (los que cuentan para el nivel). */
-export function yearPoints(ledger: LedgerTx[], memberId: string, year = DEMO_YEAR) {
+/** Primer día que cuenta para el nivel: los últimos 12 meses terminando hoy (del 15 oct 2025 al 14 oct 2026). */
+export function tierWindowStart(today: string) {
+  return addDays(monthDay(today, 12, partsOf(today).d), 1);
+}
+
+/** Puntos de compras de los últimos 12 meses (los que cuentan para el nivel). */
+export function tierPoints(ledger: LedgerTx[], memberId: string, today: string) {
+  const from = tierWindowStart(today);
   const txs = memberLedger(ledger, memberId);
   const rev = reversedIds(txs);
   return txs
-    .filter((tx) => (tx.kind === 'earn' || tx.kind === 'summary') && yearOf(tx.date) === year)
+    .filter((tx) => (tx.kind === 'earn' || tx.kind === 'summary') && tx.date >= from && tx.date <= today)
     .filter((tx) => !(tx.saleId && rev.has(tx.saleId)))
     .reduce((s, tx) => s + tx.points, 0);
 }
 
-/** Compras vigentes (no reversadas) del miembro en un mes. */
-export function purchasesInMonth(ledger: LedgerTx[], memberId: string, month = DEMO_MONTH, channels?: ChannelKey[]) {
+/** Compras vigentes (no reversadas) del miembro en un mes (AAAA-MM). */
+export function purchasesInMonth(ledger: LedgerTx[], memberId: string, monthKey: string, channels?: ChannelKey[]) {
   const txs = memberLedger(ledger, memberId);
   const rev = reversedIds(txs);
   return txs.filter(
     (tx) =>
       tx.kind === 'earn' &&
-      yearOf(tx.date) === DEMO_YEAR &&
-      monthOf(tx.date) === month &&
+      monthKeyOf(tx.date) === monthKey &&
       !(tx.saleId && rev.has(tx.saleId)) &&
       (!channels || (tx.channel && channels.includes(tx.channel))),
   );
 }
 
 /** Puntos de compras del mes (para el ranking). */
-export function monthPoints(ledger: LedgerTx[], memberId: string, month = DEMO_MONTH) {
-  return purchasesInMonth(ledger, memberId, month).reduce((s, tx) => s + tx.points, 0);
+export function monthPoints(ledger: LedgerTx[], memberId: string, monthKey: string) {
+  return purchasesInMonth(ledger, memberId, monthKey).reduce((s, tx) => s + tx.points, 0);
 }
 
 /** Amigos referidos: los de antes de la demo más los inscritos en la demo con su celular. */
@@ -276,7 +269,7 @@ export function referralPoints(ledger: LedgerTx[], memberId: string) {
     .reduce((s, tx) => s + tx.points, 0);
 }
 
-/** Puntos que vencen el 31 de octubre: los de 2025 que quedan después de los canjes (primero se usan los más viejos). */
+/** Puntos que vencen al final de este mes: los ganados hace un año que quedan después de los canjes de la demo (primero se usan los más viejos). */
 export function expiringPoints(member: Member, ledger: LedgerTx[]) {
   const sessionRedeemed = memberLedger(ledger, member.id)
     .filter((tx) => tx.session && tx.kind === 'redeem')
@@ -284,50 +277,66 @@ export function expiringPoints(member: Member, ledger: LedgerTx[]) {
   return Math.max(0, member.expiringBase - sessionRedeemed);
 }
 
-/** Meses del año con compra (historial + compras registradas en la demo). */
+/** Meses (AAAA-MM) con compra: historial de ejemplo + compras del libro que no fueron reversadas. */
 export function purchaseMonths(member: Member, ledger: LedgerTx[]) {
   const set = new Set(member.historyMonths);
-  if (purchasesInMonth(ledger, member.id).length > 0) set.add(DEMO_MONTH);
+  const txs = memberLedger(ledger, member.id);
+  const rev = reversedIds(txs);
+  txs.forEach((tx) => {
+    if (tx.kind === 'earn' && !(tx.saleId && rev.has(tx.saleId))) set.add(monthKeyOf(tx.date));
+  });
   return set;
 }
 
-/** Racha: meses seguidos con compra que terminan en el mes actual (o en el anterior si aún no compra este mes). */
-export function streakOf(months: Set<number>, current = DEMO_MONTH) {
-  let m = months.has(current) ? current : current - 1;
+/** Racha: meses seguidos con compra que terminan en el mes de hoy (o en el anterior si aún no compra este mes). */
+export function streakOf(months: Set<string>, today: string) {
+  let back = months.has(monthKeyOf(today)) ? 0 : 1;
   let n = 0;
-  while (m >= 1 && months.has(m)) {
+  while (n < 120 && months.has(monthKeyAgo(today, back))) {
     n++;
-    m--;
+    back++;
   }
   return n;
 }
 
 /* --------------------------------- Misiones --------------------------------- */
 
-export function missionProgress(mission: Mission, member: Member, members: Member[], ledger: LedgerTx[]) {
+export function missionProgress(mission: Mission, member: Member, members: Member[], ledger: LedgerTx[], today: string) {
+  const month = monthKeyOf(today);
   let current = 0;
-  if (mission.type === 'purchasesMonth') current = purchasesInMonth(ledger, member.id).length;
-  if (mission.type === 'appPurchases') current = purchasesInMonth(ledger, member.id, DEMO_MONTH, ['app', 'delivery']).length;
+  if (mission.type === 'purchasesMonth') current = purchasesInMonth(ledger, member.id, month).length;
+  if (mission.type === 'appPurchases') current = purchasesInMonth(ledger, member.id, month, ['app', 'delivery']).length;
   if (mission.type === 'referrals') current = referralsOf(member, members, true);
   if (mission.type === 'profile') current = member.email && member.birthMonth ? 1 : 0;
   return { current: Math.min(current, mission.target), done: current >= mission.target };
 }
 
-export const claimKey = (memberId: string, missionId: string) => `${memberId}|${missionId}|${DEMO_YEAR}-${DEMO_MONTH}`;
+export const claimKey = (memberId: string, missionId: string, today: string) => `${memberId}|${missionId}|${monthKeyOf(today)}`;
 
 /* ------------------------- Horario de mensajes (Ley 2300) ------------------------- */
+
+export type Ley2300Result = { ok: true } | { ok: false; reason: 'sunday' | 'weekday' | 'saturday' | 'time' } | { ok: false; reason: 'holiday'; holiday: HolidayKey };
 
 /**
  * Ley 2300 de 2023: mensajes comerciales de lunes a viernes de 7:00 a. m. a
  * 7:00 p. m. y sábados de 8:00 a. m. a 3:00 p. m.; nunca domingos ni festivos
- * (la demo no revisa el calendario de festivos).
+ * (los festivos de Colombia se calculan para cada año).
  */
-export function ley2300Check(day: number, time: string): 'ok' | 'sunday' | 'weekday' | 'saturday' {
-  const [h, m] = time.split(':').map(Number);
-  const minutes = (h || 0) * 60 + (m || 0);
-  if (day === 0) return 'sunday';
-  if (day === 6) return minutes >= 8 * 60 && minutes <= 15 * 60 ? 'ok' : 'saturday';
-  return minutes >= 7 * 60 && minutes <= 19 * 60 ? 'ok' : 'weekday';
+export function ley2300Check(date: string, time: string): Ley2300Result {
+  const match = /^(\d{1,2}):(\d{2})$/.exec(time);
+  if (!match) return { ok: false, reason: 'time' };
+  const minutes = Number(match[1]) * 60 + Number(match[2]);
+  const day = weekdayOf(date);
+  if (day === 0) return { ok: false, reason: 'sunday' };
+  const holiday = holidayOf(date);
+  if (holiday) return { ok: false, reason: 'holiday', holiday };
+  if (day === 6) return minutes >= 8 * 60 && minutes <= 15 * 60 ? { ok: true } : { ok: false, reason: 'saturday' };
+  return minutes >= 7 * 60 && minutes <= 19 * 60 ? { ok: true } : { ok: false, reason: 'weekday' };
+}
+
+/** Primer día desde mañana en que se puede enviar a las 10:00 a. m. (no domingo ni festivo). */
+export function firstSendDate(dates: string[]) {
+  return dates.find((d) => ley2300Check(d, '10:00').ok) ?? dates[0];
 }
 
 /* --------------------------------- Segmentos --------------------------------- */
@@ -393,8 +402,8 @@ export function downloadText(filename: string, text: string, mime = 'text/csv;ch
 
 /* --------------------------------- Códigos --------------------------------- */
 
-/** Código de cupón legible y determinista: CV-2026-0007. */
-export const couponCode = (seq: number) => `CV-${DEMO_YEAR}-${String(seq).padStart(4, '0')}`;
+/** Código de cupón legible y determinista: CV-2026-0007 (año de hoy y consecutivo). */
+export const couponCode = (seq: number, today: string) => `CV-${today.slice(0, 4)}-${String(seq).padStart(4, '0')}`;
 
 /** Código de miembro para el pase: CV-0142-81 (últimos dígitos del celular y la cédula). */
 export function memberCode(m: Member) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -17,31 +17,51 @@ import {
   UserIcon,
   ArrowRightIcon,
 } from '@heroicons/react/24/outline';
-import { CATEGORIES, CHANNELS, CLUB, DEMO_TODAY, DEMO_WEEK, REWARDS, SEDES, type CategoryKey, type ChannelKey, type Member, type SedeKey } from './data';
-import { balanceOf, cedulaLabel, phoneLabel, quoteSale, tierFor, weekdayOf, yearPoints, type SaleLine } from './engine';
+import { CATEGORIES, CHANNELS, CLUB, REWARDS, SALE_DAYS_BACK, SEDES, type CategoryKey, type ChannelKey, type Member, type SedeKey } from './data';
+import { lastDays } from './dates';
+import { balanceOf, cedulaLabel, phoneLabel, quoteSale, tierFor, tierPoints, weekdayOf, type SaleLine } from './engine';
 import { isFrozen, nowTime, useLoyalty, type EnrollError, type Redeem, type Sale } from './store';
-import { Field, Modal, SectionTitle, TIER_THEME, inputCls, selectCls, useFmt, useToast } from './ui';
+import { Field, Modal, SectionTitle, TIER_THEME, focusRing, inputCls, selectCls, useFmt, useToast } from './ui';
 
 const digits = (s: string) => s.replace(/\D/g, '');
+
+/** Evento con el que «Primeros pasos» deja lista una compra en la Caja. */
+export const PREFILL_SALE_EVENT = 'ly:prefill-sale';
+export type PrefillSale = { lines: SaleLine[] };
 
 export default function CashierView({ onOpenMember }: { onOpenMember: () => void }) {
   const t = useTranslations('demoLoyalty');
   const f = useFmt();
   const notify = useToast();
   const store = useLoyalty();
-  const { state, activeMember } = store;
+  const { state, activeMember, today } = store;
 
   const [query, setQuery] = useState('');
   const [searched, setSearched] = useState<string | null>(null);
   const [enrollOpen, setEnrollOpen] = useState(false);
   const [sede, setSede] = useState<SedeKey>('chapinero');
-  const [date, setDate] = useState(DEMO_TODAY);
+  const [date, setDate] = useState(today);
   const [channel, setChannel] = useState<ChannelKey>('store');
   const [lines, setLines] = useState<SaleLine[]>([{ category: 'personalCare', amount: 185000 }]);
   const [redeemSel, setRedeemSel] = useState('');
   const [lastSale, setLastSale] = useState<{ sale: Sale; alerts: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [confirmReverse, setConfirmReverse] = useState<string | null>(null);
+
+  // «Primeros pasos» puede dejar lista una compra (por ejemplo, la que sube a Laura de nivel).
+  useEffect(() => {
+    const onPrefill = (e: Event) => {
+      const detail = (e as CustomEvent<PrefillSale>).detail;
+      if (!detail?.lines?.length) return;
+      setLines(detail.lines);
+      setDate(today);
+      setChannel('store');
+      setRedeemSel('');
+      setError(null);
+    };
+    window.addEventListener(PREFILL_SALE_EVENT, onPrefill);
+    return () => window.removeEventListener(PREFILL_SALE_EVENT, onPrefill);
+  }, [today]);
 
   const matches = useMemo(() => {
     if (searched === null) return [];
@@ -51,7 +71,7 @@ export default function CashierView({ onOpenMember }: { onOpenMember: () => void
   }, [searched, state.members]);
 
   const balance = balanceOf(state.ledger, activeMember.id);
-  const tier = tierFor(yearPoints(state.ledger, activeMember.id), state.rules.thresholds);
+  const tier = tierFor(tierPoints(state.ledger, activeMember.id, today), state.rules.thresholds);
   const coupons = state.coupons.filter((c) => c.memberId === activeMember.id && c.status === 'valid');
   const frozen = isFrozen(state, activeMember.id);
 
@@ -134,7 +154,7 @@ export default function CashierView({ onOpenMember }: { onOpenMember: () => void
                   </div>
                 ) : (
                   matches.map((m) => {
-                    const mt = tierFor(yearPoints(state.ledger, m.id), state.rules.thresholds);
+                    const mt = tierFor(tierPoints(state.ledger, m.id, today), state.rules.thresholds);
                     const active = m.id === activeMember.id;
                     return (
                       <button
@@ -142,7 +162,7 @@ export default function CashierView({ onOpenMember }: { onOpenMember: () => void
                         type="button"
                         onClick={() => selectMember(m)}
                         aria-pressed={active}
-                        className={`w-full text-left rounded-lg border p-3 transition-colors ${
+                        className={`w-full text-left rounded-lg border p-3 transition-colors ${focusRing} ${
                           active ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/40' : 'border-secondary-200 dark:border-secondary-800 hover:bg-secondary-50 dark:hover:bg-secondary-800'
                         }`}
                       >
@@ -212,8 +232,9 @@ export default function CashierView({ onOpenMember }: { onOpenMember: () => void
             </Field>
             <Field label={t('cashier.sale.day')} htmlFor="ly-day" hint={t('cashier.sale.dayHint')}>
               <select id="ly-day" value={date} onChange={(e) => setDate(e.target.value)} className={selectCls}>
-                {DEMO_WEEK.map((d) => (
+                {lastDays(today, SALE_DAYS_BACK).map((d, i) => (
                   <option key={d} value={d}>
+                    {i === 0 ? t('cashier.sale.today') : i === 1 ? t('cashier.sale.yesterday') : ''}
                     {f.dayLabel(d, weekdayOf(d))}
                   </option>
                 ))}
@@ -230,7 +251,7 @@ export default function CashierView({ onOpenMember }: { onOpenMember: () => void
                   type="button"
                   aria-pressed={channel === c}
                   onClick={() => setChannel(c)}
-                  className={`px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium transition whitespace-nowrap ${
+                  className={`px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium transition whitespace-nowrap ${focusRing} ${
                     channel === c ? 'bg-white dark:bg-secondary-900 text-primary-700 dark:text-primary-300 shadow-sm' : 'text-secondary-600 dark:text-secondary-400'
                   }`}
                 >
@@ -275,7 +296,7 @@ export default function CashierView({ onOpenMember }: { onOpenMember: () => void
                       onClick={() => setLines((ls) => ls.filter((_, j) => j !== i))}
                       aria-label={t('cashier.sale.removeLine')}
                       title={t('cashier.sale.removeLine')}
-                      className="p-2 rounded-lg border border-secondary-200 dark:border-secondary-700 text-secondary-500 hover:text-red-600"
+                      className={`p-2 rounded-lg border border-secondary-200 dark:border-secondary-700 text-secondary-500 hover:text-red-600 ${focusRing}`}
                     >
                       <TrashIcon className="h-4 w-4" />
                     </button>
@@ -360,7 +381,7 @@ export default function CashierView({ onOpenMember }: { onOpenMember: () => void
             </p>
           )}
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <Button onClick={submitSale} disabled={quote.gross <= 0}>
+            <Button id="ly-submit-sale" onClick={submitSale} disabled={quote.gross <= 0}>
               <ShoppingCartIcon className="h-5 w-5 mr-1" /> {t('cashier.sale.submit', { name: activeMember.name.split(' ')[0] })}
             </Button>
             <span className="text-xs text-secondary-500">{t('cashier.sale.rule', { base: f.money(state.rules.baseAmount) })}</span>
@@ -412,7 +433,7 @@ export default function CashierView({ onOpenMember }: { onOpenMember: () => void
                             size="sm"
                             variant="danger"
                             onClick={() => {
-                              store.reverseSale(s.id, s.date, nowTime());
+                              store.reverseSale(s.id, today, nowTime());
                               setConfirmReverse(null);
                               notify(t('cashier.history.reversedToast', { id: s.id }));
                             }}
@@ -441,7 +462,7 @@ export default function CashierView({ onOpenMember }: { onOpenMember: () => void
         <EnrollModal
           initial={digits(query)}
           sede={sede}
-          date={date}
+          date={today}
           onClose={() => setEnrollOpen(false)}
           onDone={(m) => {
             setEnrollOpen(false);
@@ -520,7 +541,7 @@ function EnrollModal({ initial, sede, date, onClose, onDone }: { initial: string
   const [referrer, setReferrer] = useState('');
   const [sedeSel, setSedeSel] = useState<SedeKey>(sede);
   const [consent, setConsent] = useState(false);
-  const [optIn, setOptIn] = useState(true);
+  const [optIn, setOptIn] = useState(false);
   const [errors, setErrors] = useState<EnrollError[]>([]);
 
   const err = (k: EnrollError) => (errors.includes(k) ? t(`cashier.enroll.errors.${k}`) : undefined);

@@ -5,6 +5,7 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { ArrowDownTrayIcon, LightBulbIcon, PresentationChartLineIcon } from '@heroicons/react/24/outline';
 import { ANALYTICS, REWARDS, TIERS, type Segment } from './data';
+import { monthKeyAgo } from './dates';
 import { cedulaLabel, downloadText, programCost, segmentSize, tierCounts, toCsv } from './engine';
 import { useSessionYearPoints } from './ConfigProgram';
 import { txLabel } from './MemberView';
@@ -15,7 +16,7 @@ export default function AnalyticsView({ onCreateCampaign }: { onCreateCampaign: 
   const t = useTranslations('demoLoyalty');
   const f = useFmt();
   const notify = useToast();
-  const { state } = useLoyalty();
+  const { state, today, markExported } = useLoyalty();
   const extra = useSessionYearPoints();
   const counts = tierCounts(state.rules.thresholds, extra);
   const total = TIERS.reduce((s, k) => s + counts[k], 0);
@@ -52,7 +53,8 @@ export default function AnalyticsView({ onCreateCampaign }: { onCreateCampaign: 
         tx.session ? t('export.fromDemo') : t('export.sample'),
       ]);
     });
-    downloadText('club-ceiba-verde-movimientos.csv', toCsv(rows, sep));
+    downloadText(`club-ceiba-verde-movimientos-${today}.csv`, toCsv(rows, sep));
+    markExported();
     notify(t('export.done', { n: f.num(state.ledger.length) }));
   };
 
@@ -119,7 +121,7 @@ export default function AnalyticsView({ onCreateCampaign }: { onCreateCampaign: 
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <CohortChart />
+        <CohortChart today={today} />
         <Card>
           <SectionTitle title={t('analytics.tiers.title')} subtitle={t('analytics.tiers.subtitle')} />
           <TierDonut counts={counts} total={total} />
@@ -155,7 +157,7 @@ export default function AnalyticsView({ onCreateCampaign }: { onCreateCampaign: 
         </div>
       </Card>
 
-      <Card>
+      <Card id="ly-segments">
         <SectionTitle icon={LightBulbIcon} title={t('analytics.segments.title')} subtitle={t('analytics.segments.subtitle')} />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
           {segments.map((s) => (
@@ -176,8 +178,10 @@ export default function AnalyticsView({ onCreateCampaign }: { onCreateCampaign: 
   );
 }
 
-function CohortChart() {
+function CohortChart({ today }: { today: string }) {
   const t = useTranslations('demoLoyalty');
+  const f = useFmt();
+  const rows = ANALYTICS.cohort.length;
   const colorFor = (v: number) => {
     if (v >= 80) return 'bg-primary-700 text-white';
     if (v >= 60) return 'bg-primary-500 text-white';
@@ -203,7 +207,7 @@ function CohortChart() {
           <tbody>
             {ANALYTICS.cohort.map((row, r) => (
               <tr key={r}>
-                <td className="text-secondary-600 dark:text-secondary-400 pr-2 py-0.5 whitespace-nowrap">{t(`months.${ANALYTICS.cohortStartMonth + r}`)} 2026</td>
+                <td className="text-secondary-600 dark:text-secondary-400 pr-2 py-0.5 whitespace-nowrap">{f.month(monthKeyAgo(today, rows - 1 - r))}</td>
                 {Array.from({ length: cols }, (_, c) => {
                   const v = row[c];
                   return (

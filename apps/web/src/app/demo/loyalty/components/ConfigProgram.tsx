@@ -18,8 +18,8 @@ import {
   ANALYTICS,
   CATEGORIES,
   CHANNELS,
-  DEMO_WEEK,
   DRAW_PARTICIPANTS,
+  SALE_DAYS_BACK,
   MISSION_TYPES,
   TIERS,
   type CategoryKey,
@@ -28,17 +28,18 @@ import {
   type Rules,
   type TierKey,
 } from './data';
-import { programCost, quoteSale, returnPct, thresholdsValid, tierCounts, weekdayOf, wouldDowngrade, yearPoints } from './engine';
+import { endOfMonth, lastDays } from './dates';
+import { programCost, quoteSale, returnPct, thresholdsValid, tierCounts, tierPoints, weekdayOf, wouldDowngrade } from './engine';
 import { missionTitle } from './MemberView';
 import { useLoyalty } from './store';
 import { Field, KpiBox, SampleTag, SectionTitle, TIER_THEME, Toggle, inputCls, selectCls, useFmt, useToast } from './ui';
 
 const digits = (s: string) => s.replace(/\D/g, '');
 
-/** Puntos del año de los miembros inscritos durante la demo (se suman a la base de ejemplo). */
+/** Puntos para el nivel de los miembros inscritos durante la demo (se suman a la base de ejemplo). */
 export function useSessionYearPoints() {
-  const { state } = useLoyalty();
-  return useMemo(() => state.members.filter((m) => m.session).map((m) => yearPoints(state.ledger, m.id)), [state.members, state.ledger]);
+  const { state, today } = useLoyalty();
+  return useMemo(() => state.members.filter((m) => m.session).map((m) => tierPoints(state.ledger, m.id, today)), [state.members, state.ledger, today]);
 }
 
 /* --------------------------------- Puntos --------------------------------- */
@@ -47,13 +48,15 @@ export function PointsConfig() {
   const t = useTranslations('demoLoyalty');
   const f = useFmt();
   const notify = useToast();
-  const { state, setRules, resetRules } = useLoyalty();
+  const { state, today, setRules, resetRules } = useLoyalty();
   const r = state.rules;
 
   const [simAmount, setSimAmount] = useState(185000);
   const [simCat, setSimCat] = useState<CategoryKey>('personalCare');
   const [simChannel, setSimChannel] = useState<ChannelKey>('store');
-  const [simDay, setSimDay] = useState('2026-10-06');
+  // Los días de la semana del simulador son los de los últimos 7 días (hoy primero).
+  const week = lastDays(today, SALE_DAYS_BACK);
+  const [simDay, setSimDay] = useState(today);
   const [sales, setSales] = useState(ANALYTICS.monthlyMemberSales);
   const [expired, setExpired] = useState(ANALYTICS.expiredPct);
 
@@ -192,6 +195,7 @@ export function PointsConfig() {
               ? t('config.points.dayRuleText', { mult: f.dec(r.dayRule.mult), category: t(`categories.${r.dayRule.category}`), day: f.weekdayPlural(r.dayRule.weekday) })
               : t('config.points.dayRuleOff')}
           </p>
+          <p className="mt-1 text-[11px] text-secondary-500 dark:text-secondary-400">{t('config.points.dayRuleHint')}</p>
         </div>
 
         <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -209,6 +213,15 @@ export function PointsConfig() {
               {[6, 12, 18, 24].map((m) => (
                 <option key={m} value={m}>
                   {t('config.points.expiryOption', { months: m })}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label={t('config.points.birthday')} htmlFor="cf-birthday" hint={t('config.points.birthdayHint')}>
+            <select id="cf-birthday" value={r.birthdayGift} onChange={(e) => setRules({ birthdayGift: Number(e.target.value) })} className={selectCls}>
+              {[0, 10000, 15000, 20000].map((v) => (
+                <option key={v} value={v}>
+                  {v === 0 ? t('config.points.birthdayNone') : t('config.points.birthdayOption', { amount: f.money(v) })}
                 </option>
               ))}
             </select>
@@ -244,9 +257,9 @@ export function PointsConfig() {
             </Field>
             <Field label={t('config.points.simDay')} htmlFor="sim-day">
               <select id="sim-day" value={simDay} onChange={(e) => setSimDay(e.target.value)} className={selectCls}>
-                {DEMO_WEEK.map((d) => (
+                {week.map((d, i) => (
                   <option key={d} value={d}>
-                    {f.weekday(weekdayOf(d))}
+                    {i === 0 ? t('config.points.simToday', { day: f.weekday(weekdayOf(d)) }) : f.weekday(weekdayOf(d))}
                   </option>
                 ))}
               </select>
@@ -596,13 +609,15 @@ export function SweepstakesConfig() {
   const t = useTranslations('demoLoyalty');
   const f = useFmt();
   const notify = useToast();
-  const { state, addDraw, runDraw } = useLoyalty();
+  const { state, today, addDraw, runDraw } = useLoyalty();
+  // Fechas posibles: el último día de este mes (si aún no llega) y de los dos meses siguientes.
+  const dateOptions = [0, 1, 2].map((n) => endOfMonth(today, n)).filter((d) => d > today);
   const [name, setName] = useState('');
   const [prize, setPrize] = useState('');
-  const [date, setDate] = useState('2026-11-27');
+  const [date, setDate] = useState(dateOptions[0]);
   const [cost, setCost] = useState(200);
 
-  const drawName = (d: (typeof state.draws)[number]) => (d.key ? t(`config.sweepstakes.items.${d.key}.name`) : d.name ?? '');
+  const drawName = (d: (typeof state.draws)[number]) => (d.key ? t(`config.sweepstakes.items.${d.key}.name`, { month: f.monthLong(d.date) }) : d.name ?? '');
   const drawPrize = (d: (typeof state.draws)[number]) => (d.key ? t(`config.sweepstakes.items.${d.key}.prize`) : d.prize ?? '');
 
   return (
@@ -627,6 +642,8 @@ export function SweepstakesConfig() {
                 <Badge variant="success" size="sm">
                   {t('config.sweepstakes.done')}
                 </Badge>
+              ) : d.participants === 0 ? (
+                <span className="text-xs text-secondary-500 dark:text-secondary-400 md:max-w-[14rem] md:text-right">{t('config.sweepstakes.noTickets')}</span>
               ) : (
                 <Button
                   size="sm"
@@ -666,7 +683,7 @@ export function SweepstakesConfig() {
           </Field>
           <Field label={t('config.sweepstakes.date')} htmlFor="sw-date">
             <select id="sw-date" value={date} onChange={(e) => setDate(e.target.value)} className={selectCls}>
-              {['2026-10-30', '2026-11-27', '2026-12-18'].map((d) => (
+              {dateOptions.map((d) => (
                 <option key={d} value={d}>
                   {f.date(d)}
                 </option>
