@@ -53,15 +53,28 @@ const METHOD_WEIGHTS: Record<PaymentMethodId, number> = { pse: 30, card: 27, neq
 /** Monto mínimo de ejemplo para pagar a cuotas con Addi. */
 export const ADDI_MIN = 150000;
 
-export type CarrierId = 'coordinadora' | 'servientrega' | 'interrapidisimo' | 'tcc';
+// Transportadoras FICTICIAS (los mismos nombres de ejemplo que usa la demo de
+// WMS): tarifas, tiempos y calificaciones son ilustrativos y no describen a
+// ninguna empresa real. En el proyecto se conectan las transportadoras que use
+// el cliente, por su API o por un agregador de envíos.
+export type CarrierId = 'andino' | 'condor' | 'ceiba' | 'macondo';
 export interface Carrier { id: CarrierId; prefix: string; base: number; extraDays: number; rating: number }
 // Tarifas ilustrativas en COP por paquete estándar (no son cotizaciones reales).
 export const CARRIERS: Carrier[] = [
-  { id: 'coordinadora',    prefix: 'COO', base: 11500, extraDays: 0, rating: 4.4 },
-  { id: 'servientrega',    prefix: 'SER', base: 12900, extraDays: 0, rating: 4.3 },
-  { id: 'interrapidisimo', prefix: 'INT', base: 9800,  extraDays: 1, rating: 4.2 },
-  { id: 'tcc',             prefix: 'TCC', base: 13900, extraDays: 1, rating: 4.1 },
+  { id: 'andino',  prefix: 'RAN', base: 11500, extraDays: 0, rating: 4.4 },
+  { id: 'condor',  prefix: 'CON', base: 12900, extraDays: 0, rating: 4.3 },
+  { id: 'ceiba',   prefix: 'CEI', base: 9800,  extraDays: 1, rating: 4.2 },
+  { id: 'macondo', prefix: 'MAC', base: 13900, extraDays: 1, rating: 4.1 },
 ];
+
+/** Transportadoras de la versión anterior de la demo (guardadas en el navegador) → ficticias. */
+export const LEGACY_CARRIERS: Record<string, CarrierId> = {
+  coordinadora: 'andino',
+  servientrega: 'condor',
+  interrapidisimo: 'ceiba',
+  tcc: 'macondo',
+};
+export const LEGACY_GUIDE_PREFIX: Record<string, string> = { COO: 'RAN', SER: 'CON', INT: 'CEI', TCC: 'MAC' };
 export const CARRIER_BY_ID: Record<CarrierId, Carrier> = Object.fromEntries(CARRIERS.map((c) => [c.id, c])) as Record<CarrierId, Carrier>;
 
 /** Tarifa de ejemplo: base de la transportadora + recargo si la ciudad no tiene bodega propia. */
@@ -324,27 +337,36 @@ export function generateSampleData(): SampleData {
   // Devoluciones de ejemplo sobre pedidos entregados.
   const delivered = orders.filter((o) => o.status === 'delivered');
   const pickReturn = (pred: (o: Order) => boolean, from: number) => delivered.slice(from).find(pred);
-  const isCat = (o: Order, cat: Product['category']) => o.lines.find((l) => products.find((p) => p.id === l.productId)?.category === cat);
-  const seeds: Array<{ order?: Order; cat: Product['category']; reason: ReturnReason; status: ReturnStatus }> = [
-    { order: pickReturn((o) => !!isCat(o, 'fashion'), 2), cat: 'fashion', reason: 'size', status: 'pending' },
-    { order: pickReturn((o) => !!isCat(o, 'tech'), 4), cat: 'tech', reason: 'warranty', status: 'pending' },
-    { order: pickReturn((o) => !!isCat(o, 'beauty'), 6), cat: 'beauty', reason: 'retracto', status: 'approved' },
-    { order: pickReturn((o) => !!isCat(o, 'sports'), 12), cat: 'sports', reason: 'notAsDescribed', status: 'rejected' },
+  // Cada motivo sobre un producto que tenga sentido: cambio de talla en calzado
+  // y chaquetas, garantía en tecnología, retracto en hogar (los productos de
+  // uso personal, como perfumes, no tienen retracto) y "no corresponde" en deportes.
+  const SIZED = [8, 9, 10, 17];
+  const lineWhere = (o: Order, pred: (p: Product) => boolean) =>
+    o.lines.find((l) => {
+      const p = products.find((x) => x.id === l.productId);
+      return !!p && pred(p);
+    });
+  const seeds: Array<{ pred: (p: Product) => boolean; from: number; reason: ReturnReason; status: ReturnStatus }> = [
+    { pred: (p) => SIZED.includes(p.id), from: 2, reason: 'size', status: 'pending' },
+    { pred: (p) => p.category === 'tech', from: 4, reason: 'warranty', status: 'pending' },
+    { pred: (p) => p.category === 'home', from: 10, reason: 'retracto', status: 'approved' },
+    { pred: (p) => p.category === 'sports' && !SIZED.includes(p.id), from: 12, reason: 'notAsDescribed', status: 'rejected' },
   ];
   const returns: ReturnRequest[] = [];
   seeds.forEach((s, i) => {
-    if (!s.order) return;
-    const line = isCat(s.order, s.cat)!;
+    const order = pickReturn((o) => !!lineWhere(o, s.pred), s.from);
+    if (!order) return;
+    const line = lineWhere(order, s.pred)!;
     returns.push({
       id: `DEV-${String(301 + i)}`,
-      orderId: s.order.id,
+      orderId: order.id,
       productId: line.productId,
       qty: 1,
       reason: s.reason,
       status: s.status,
       amount: line.unitPrice,
       restocked: s.status === 'approved' && s.reason !== 'warranty',
-      ageMin: Math.max(60, (s.order.ageMin ?? 0) - 2880),
+      ageMin: Math.max(60, (order.ageMin ?? 0) - 2880),
     });
   });
 

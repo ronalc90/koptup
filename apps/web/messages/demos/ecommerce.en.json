@@ -3,9 +3,21 @@
     "meta": {
       "title": "Online store",
       "seoTitle": "Online store demo: catalog, cart, simulated checkout and reports",
-      "seoDescription": "Try a sample online store for Colombia: catalog with search and favorites, cart with pricing rules and coupons, simulated payment by card, PSE, Nequi, Daviplata, cash on delivery and Addi, order and inventory panel, simulated shipping labels, returns and sales reports in COP exportable to CSV. Runs on sample data.",
+      "seoDescription": "Try a sample online store for Colombia: catalog with search and favorites, cart with pricing rules and coupons, simulated payment by card, PSE, Nequi, Daviplata, cash on delivery or installments, order and inventory panel, simulated shipping labels, returns and sales reports in COP exportable to CSV. Runs on sample data.",
       "breadcrumbHome": "Home",
       "breadcrumbDemos": "Demos"
+    },
+    "intro": {
+      "back": "Back to the demo catalog",
+      "guidedDemo": "Request a guided demo",
+      "quote": "Get a quote for your store",
+      "kicker": "Demo · E-commerce",
+      "subtitle": "A sample online store for Colombia seen end to end: the customer shops and pays (simulated payment) and the same order reaches the store admin, logistics and the reports.",
+      "forWhomLabel": "Who it is for:",
+      "forWhom": "brands, retailers and distributors that want to sell online with their catalog, inventory, payments and shipping connected.",
+      "startLabel": "Where to start:",
+      "start": "follow the 5-step walkthrough: shop, pay, prepare, ship and check the reports. Each step is checked off as soon as you do it.",
+      "startCta": "Start the walkthrough"
     },
     "viewSelector": "Demo views",
     "views": {
@@ -16,7 +28,7 @@
       "admin": "Reports"
     },
     "sampleData": "Sample data",
-    "sampleDataHint": "Sample store: products, customers, orders and figures are fictitious; payments, the invoice and shipping labels are simulated. What you do is saved only in this browser.",
+    "sampleDataHint": "Sample store: products, customers, orders, carriers and figures are fictitious; payments, the invoice and shipping labels are simulated. What you do is saved only in this browser.",
     "footerNote": "Demo with sample data. Orders, inventory and reports are calculated in your browser and saved only there (you can reset them). In your project we connect the payment gateway, the e-invoicing provider, carriers and your ERP.",
     "reset": {
       "button": "Reset",
@@ -27,6 +39,7 @@
     },
     "tour": {
       "title": "Suggested walkthrough",
+      "subtitle": "Each step is checked off as soon as you do it. Tap a step to go to its view.",
       "show": "Show suggested walkthrough ({done}/{total})",
       "hide": "Hide",
       "steps": {
@@ -37,7 +50,14 @@
         "reports": "See your order added up in the reports"
       },
       "here": "This step happens in this view: {step}.",
-      "doneHere": "You already completed this step."
+      "doneHere": "You already completed this step.",
+      "next": "Next step",
+      "stateDone": "done",
+      "stateNext": "next",
+      "statePending": "pending",
+      "complete": "Walkthrough complete! You saw how an order travels from the store to the reports. Want it with your products, your payment methods and your carriers?",
+      "startToast": "Step {n} of {total}: {step}.",
+      "startDone": "You already did the 5 walkthrough steps. You can repeat them or request a guided demo."
     },
     "common": {
       "close": "Close",
@@ -64,13 +84,13 @@
       "nequi": "Nequi",
       "daviplata": "Daviplata",
       "cod": "Cash on delivery",
-      "addi": "Addi (installments)"
+      "addi": "Installments"
     },
     "carriers": {
-      "coordinadora": "Coordinadora",
-      "servientrega": "Servientrega",
-      "interrapidisimo": "Interrapidísimo",
-      "tcc": "TCC"
+      "andino": "Rápido Andino",
+      "condor": "Envíos Cóndor",
+      "ceiba": "Mensajería Ceiba",
+      "macondo": "Carga Macondo"
     },
     "warehouses": {
       "bog": "Bogotá warehouse",
@@ -118,8 +138,8 @@
     },
     "hero": {
       "badge": "Sample store",
-      "title": "Your online store, end to end",
-      "subtitle": "Shop in the store, pay with a simulated payment and follow the order in the admin, in logistics and in the reports.",
+      "title": "Tech, fashion, home, coffee and more",
+      "subtitle": "We ship to 11 cities from our warehouses in Bogotá, Medellín and Cali. Pay by card, PSE, Nequi, Daviplata, cash on delivery or installments (in this demo, payment is simulated).",
       "freeShipping": "Free shipping from {amount}",
       "shippingFlat": "Flat-rate shipping",
       "pricesNote": "Prices in COP, VAT included",
@@ -135,6 +155,7 @@
       "tech": "Technology",
       "fashion": "Fashion",
       "home": "Home",
+      "coffee": "Coffee",
       "sports": "Sports",
       "beauty": "Beauty",
       "wines": "Wines",
@@ -279,7 +300,9 @@
         "walletPhone": "Mobile number registered in {wallet}",
         "walletHint": "In your real store you get a {wallet} notification to approve the payment. Here the approval is simulated.",
         "codHint": "You pay in cash when you receive the order. The order stays pending payment until delivery.",
-        "addiHint": "Installments: in your real store Addi reviews and approves the credit. Here it is simulated and applies to purchases from {min}.",
+        "addiHint": "Buy now, pay in installments: in your real store, the financing partner you choose reviews and approves the credit online. Here the approval is simulated and applies to purchases from {min}.",
+        "addiFrom": "from {min}",
+        "addiBelowMin": "Your purchase is {amount} and installments apply from {min}. Add products or choose another payment method.",
         "declined": "Payment declined by the simulated gateway (declined test card). Try another card or payment method.",
         "processing": "Processing simulated payment…",
         "stockChanged": "Stock changed: review your cart before paying."
@@ -544,7 +567,7 @@
       },
       "dispatch": {
         "title": "To dispatch ({n})",
-        "hint": "Orders already picked. {n, plural, =0 {No new orders waiting for confirmation.} one {# new order is waiting for confirmation in the admin.} other {# new orders are waiting for confirmation in the admin.}}",
+        "hint": "Orders already picked: yours come first, then oldest to newest. {n, plural, =0 {No new orders waiting for confirmation.} one {# new order is waiting for confirmation in the admin.} other {# new orders are waiting for confirmation in the admin.}}",
         "empty": "No picked orders. Move an order to preparing in the store admin.",
         "units": "{n, plural, one {# unit} other {# units}}",
         "from": "Ships from the {warehouse}"
@@ -555,8 +578,8 @@
         "empty": "No shipments on the way."
       },
       "carriers": {
-        "title": "National carriers",
-        "hint": "Sample rates for a standard parcel to Bogotá; they are not real quotes. Disabled carriers do not appear when creating labels.",
+        "title": "Sample carriers",
+        "hint": "Fictitious carriers with sample rates, times and ratings for a standard parcel to Bogotá (not real quotes). In your project we connect the carriers you use, through their API or a shipping aggregator. Disabled carriers do not appear when creating labels.",
         "carrier": "Carrier",
         "sla": "Delivery time",
         "cost": "Sample rate",

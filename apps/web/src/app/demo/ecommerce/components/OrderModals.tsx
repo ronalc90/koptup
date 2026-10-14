@@ -54,7 +54,7 @@ export function GuideModal({ orderId, onClose }: { orderId: string; onClose: () 
   const { state, shipOrder, notify } = useStore();
   const order = state.orders.find((o) => o.id === orderId);
   const enabled = CARRIERS.filter((c) => state.carriers[c.id]);
-  const [carrier, setCarrier] = useState<CarrierId>(enabled[0]?.id ?? 'coordinadora');
+  const [carrier, setCarrier] = useState<CarrierId>(enabled[0]?.id ?? CARRIERS[0].id);
   if (!order) return null;
   const city = CITY_BY_ID[order.cityId];
 

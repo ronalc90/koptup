@@ -306,11 +306,24 @@ export function downloadBlob(filename: string, content: BlobPart, mime: string) 
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-/** Fecha local "AAAA-MM-DD HH:mm" (solo en manejadores de eventos, nunca en el render). */
+const BOGOTA_STAMP = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'America/Bogota',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+});
+
+/**
+ * Fecha y hora de Colombia "AAAA-MM-DD HH:mm", sin importar la zona del
+ * navegador (la tienda es colombiana). Solo en manejadores de eventos (CSV,
+ * PDF), nunca en el render.
+ */
 export function localStamp(ms: number): string {
-  const d = new Date(ms);
-  const p = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+  const parts = Object.fromEntries(BOGOTA_STAMP.formatToParts(new Date(ms)).map((x) => [x.type, x.value]));
+  return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute}`;
 }
 
 export function cityLabel(cityId: string): string {

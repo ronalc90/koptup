@@ -90,6 +90,28 @@ export default function CheckoutView() {
   const [declined, setDeclined] = useState(false);
   const [order, setOrder] = useState<Order | null>(null);
   const [orderLines, setOrderLines] = useState<Array<{ name: string; qty: number; unitPrice: number }>>([]);
+  const methodRefs = useRef<Array<HTMLButtonElement | null>>([]);
+
+  function selectMethod(pm: PaymentMethodId) {
+    setMethod(pm);
+    setPayErrors([]);
+    setDeclined(false);
+  }
+
+  // Grupo de opciones de pago: flechas, Inicio y Fin cambian la opción elegida.
+  function onMethodKey(e: React.KeyboardEvent<HTMLButtonElement>, idx: number) {
+    const n = PAYMENT_METHODS.length;
+    const next =
+      e.key === 'ArrowRight' || e.key === 'ArrowDown' ? (idx + 1) % n
+        : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? (idx - 1 + n) % n
+          : e.key === 'Home' ? 0
+            : e.key === 'End' ? n - 1
+              : -1;
+    if (next < 0) return;
+    e.preventDefault();
+    selectMethod(PAYMENT_METHODS[next]);
+    methodRefs.current[next]?.focus();
+  }
 
   // Al cambiar de paso, vuelve al inicio del formulario (en móvil queda fuera de vista).
   const firstStep = useRef(true);
@@ -348,19 +370,23 @@ export default function CheckoutView() {
               </h2>
               <p className="mb-4 text-sm text-secondary-500">{t('checkout.payment.subtitle')}</p>
               <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3" role="radiogroup" aria-label={t('checkout.payment.title')}>
-                {PAYMENT_METHODS.map((pm) => {
+                {PAYMENT_METHODS.map((pm, idx) => {
                   const Icon = METHOD_ICONS[pm];
                   return (
                     <button
                       key={pm}
+                      ref={(el) => { methodRefs.current[idx] = el; }}
                       type="button"
                       role="radio"
                       aria-checked={method === pm}
-                      onClick={() => { setMethod(pm); setPayErrors([]); setDeclined(false); }}
+                      tabIndex={method === pm ? 0 : -1}
+                      onClick={() => selectMethod(pm)}
+                      onKeyDown={(e) => onMethodKey(e, idx)}
                       className={`flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all ${method === pm ? 'border-primary-600 bg-primary-50 dark:bg-primary-950' : 'border-secondary-200 hover:border-secondary-400 dark:border-secondary-700'}`}
                     >
-                      <Icon className="h-6 w-6 text-primary-600" />
+                      <Icon className="h-6 w-6 text-primary-600" aria-hidden="true" />
                       <span className="text-center text-xs font-medium text-secondary-900 dark:text-white">{t(`paymentMethods.${pm}`)}</span>
+                      {pm === 'addi' && <span className="text-center text-[11px] text-secondary-500 dark:text-secondary-400">{t('checkout.payment.addiFrom', { min: formatPrice(ADDI_MIN) })}</span>}
                     </button>
                   );
                 })}
@@ -406,9 +432,19 @@ export default function CheckoutView() {
               )}
               {method === 'cod' && <MethodNote>{t('checkout.payment.codHint')}</MethodNote>}
               {method === 'addi' && (
-                <MethodNote tone={payErrors.includes('addiMin') ? 'error' : 'info'}>
-                  {t('checkout.payment.addiHint', { min: formatPrice(ADDI_MIN) })}
-                </MethodNote>
+                <div className="space-y-2">
+                  <MethodNote>{t('checkout.payment.addiHint', { min: formatPrice(ADDI_MIN) })}</MethodNote>
+                  {pricing.net < ADDI_MIN && (
+                    // Antes de pagar es un aviso; al intentar pagar, un error que se anuncia.
+                    <div
+                      role={payErrors.includes('addiMin') ? 'alert' : undefined}
+                      className={`flex items-start gap-2 rounded-lg border p-3 text-sm ${payErrors.includes('addiMin') ? 'border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950/30 dark:text-red-200' : 'border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-100'}`}
+                    >
+                      <ExclamationTriangleIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
+                      <span>{t('checkout.payment.addiBelowMin', { amount: formatPrice(pricing.net), min: formatPrice(ADDI_MIN) })}</span>
+                    </div>
+                  )}
+                </div>
               )}
 
               {declined && (
