@@ -84,6 +84,7 @@ export type DemoErrorCode =
   | 'invalid_format'
   | 'file_too_large'
   | 'too_many_pages'
+  | 'too_much_text'
   | 'empty_document'
   | 'unreadable_document'
   | 'invalid_email'

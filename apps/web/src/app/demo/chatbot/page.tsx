@@ -6,8 +6,9 @@
  * Tres modos:
  *  - "Prueba el asistente" (Playground): tres empresas FICTICIAS con sus
  *    documentos (`components/sampleKnowledge.ts`). Con la primera pregunta,
- *    el navegador prepara un bot real en el backend con esos textos (o
- *    reutiliza el que ya indexó: ver `components/sampleBot.ts`); cada pregunta
+ *    el navegador pide al backend el bot de ejemplo compartido de esa empresa
+ *    (`POST /api/chatbot/sample-bots`: lo crea e indexa la primera vez y lo
+ *    reutiliza después; ver `components/sampleBot.ts`); cada pregunta
  *    va a `POST /api/chatbot/bots/:id/chat` (búsqueda BM25 top 5 → modelo de
  *    OpenAI o modo extractivo → citas). No hay respuestas prefabricadas,
  *    métricas aleatorias ni pasos simulados: todo lo que se muestra sale de la
@@ -85,6 +86,9 @@ import {
 const ONBOARDING_LS_KEY = 'koptup.demo.chatbot.tour.v2';
 const MODES: readonly ChatbotMode[] = ['playground', 'upload', 'builder'];
 const HISTORY_TURNS = 10;
+/** Reintentos de GET /models cuando el servidor responde 429 (pausa por muchas consultas). */
+const MODELS_RETRY_MS = 30_000;
+const MODELS_MAX_RETRIES = 3;
 
 /** No se pudo preparar el bot de la empresa (con el motivo, para el mensaje). */
 class PrepareError extends Error {
@@ -191,9 +195,13 @@ export default function ChatbotDemoPage() {
     }
   }, []);
 
-  // Modelos y estado de la IA: GET /api/chatbot/models.
+  // Modelos y estado de la IA: GET /api/chatbot/models. Si el servidor pide
+  // una pausa (429: muchas consultas desde la misma red) no se dice
+  // "Servidor no disponible": se avisa la pausa y se reintenta solo.
+  const [modelsAttempt, setModelsAttempt] = useState(0);
   useEffect(() => {
     let cancelled = false;
+    let retry: ReturnType<typeof setTimeout> | undefined;
     listModels()
       .then((data) => {
         if (cancelled) return;
@@ -204,13 +212,20 @@ export default function ChatbotDemoPage() {
           enabled.some((m) => m.id === current) ? current : (enabled.find((m) => m.recommended) ?? enabled[0])?.id ?? current,
         );
       })
-      .catch(() => {
-        if (!cancelled) setAiStatus('offline');
+      .catch((err) => {
+        if (cancelled) return;
+        if (err instanceof BotApiError && err.status === 429 && modelsAttempt < MODELS_MAX_RETRIES) {
+          setAiStatus('rateLimited');
+          retry = setTimeout(() => setModelsAttempt((n) => n + 1), MODELS_RETRY_MS);
+        } else {
+          setAiStatus(err instanceof BotApiError && err.status === 429 ? 'rateLimited' : 'offline');
+        }
       });
     return () => {
       cancelled = true;
+      if (retry) clearTimeout(retry);
     };
-  }, []);
+  }, [modelsAttempt]);
 
   // Al abrir la página o cambiar de empresa: ¿este navegador ya indexó esa
   // empresa? Solo se consulta (no se crea nada).
@@ -314,7 +329,11 @@ export default function ChatbotDemoPage() {
     (key: SampleCompanyKey) => {
       if (key === companyKey) return;
       setCompanyKey(key);
-      setArchived((prev) => [...prev, ...messagesRef.current.filter((m) => m.meta || m.feedback)]);
+      // Se copian YA las respuestas de la empresa anterior: el actualizador de
+      // setArchived corre en el siguiente render, cuando messagesRef ya apunta a
+      // la bienvenida de la nueva empresa (las métricas perdían esas respuestas).
+      const answered = messagesRef.current.filter((m) => m.meta || m.feedback);
+      setArchived((prev) => [...prev, ...answered]);
       setMessages([welcomeMessage(getSampleCompany(key, locale))]);
       askedRef.current = new Set();
       setOpenChunk(null);
@@ -581,7 +600,8 @@ export default function ChatbotDemoPage() {
               <div className="hidden w-72 shrink-0 flex-col overflow-hidden md:flex">{sidebar}</div>
             ) : null}
 
-            <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
+            {/* Columna central (no es <main>: el layout del sitio ya tiene el <main> de la página). */}
+            <div className="flex min-w-0 flex-1 flex-col overflow-hidden" data-chat-column>
               <div className="flex items-center justify-between gap-2 border-b border-secondary-200 bg-white/85 px-3 py-1.5 backdrop-blur dark:border-secondary-800 dark:bg-secondary-900/85">
                 {isDesktop ? (
                   <button
@@ -651,7 +671,7 @@ export default function ChatbotDemoPage() {
                   />
                 </DeviceFrame>
               </div>
-            </main>
+            </div>
 
             {showPipeline && isDesktop ? (
               <div className="hidden w-80 shrink-0 lg:flex">

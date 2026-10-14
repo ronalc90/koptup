@@ -24,7 +24,8 @@ import type { RemoteModelMeta } from './builder/api';
 
 /** Estado de la IA según `GET /api/chatbot/models`. */
 /** `degraded`: hay clave de IA, pero la última llamada al proveedor falló (modo extractivo). */
-export type AiStatus = 'checking' | 'generative' | 'degraded' | 'extractive' | 'offline';
+/** `rateLimited`: el servidor pidió una pausa (429) por muchas consultas desde la misma red. */
+export type AiStatus = 'checking' | 'generative' | 'degraded' | 'extractive' | 'offline' | 'rateLimited';
 
 interface TopBarProps {
   aiStatus: AiStatus;
@@ -109,6 +110,13 @@ export default function TopBar({
         return {
           label: t('models.extractiveMode'),
           tip: t('models.extractiveModeTooltip'),
+          Icon: ExclamationTriangleIcon,
+          cls: 'bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:ring-amber-800/40',
+        };
+      case 'rateLimited':
+        return {
+          label: t('models.rateLimited'),
+          tip: t('models.rateLimitedTooltip'),
           Icon: ExclamationTriangleIcon,
           cls: 'bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:ring-amber-800/40',
         };

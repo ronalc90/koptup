@@ -1123,6 +1123,8 @@
       "extractiveModeTooltip": "El servidor no tiene clave de OpenAI: el asistente muestra los fragmentos encontrados, con su cita, sin redactar una respuesta.",
       "offline": "Servidor no disponible",
       "offlineTooltip": "No pudimos conectar con el servidor de la demo: puede ser tu conexión o que el servidor no esté disponible. Inténtalo de nuevo en unos minutos.",
+      "rateLimited": "Pausa por muchas consultas",
+      "rateLimitedTooltip": "Desde tu red llegaron muchas consultas seguidas y el servidor pidió una pausa. La demo vuelve a intentarlo sola en unos segundos; si sigue así, espera un minuto y recarga la página.",
       "degraded": "IA sin respuesta: modo extractivo",
       "degradedTooltip": "El servidor tiene clave de OpenAI, pero la última llamada al proveedor falló. Se muestran los fragmentos encontrados, con su cita."
     },
@@ -1157,11 +1159,11 @@
       "items": {
         "ingest": {
           "title": "Carga de documentos",
-          "summary": "Texto, PDF, DOCX y TXT según el modo de la demo.",
+          "summary": "Texto, PDF, DOCX, TXT y páginas web, según el modo de la demo.",
           "items": [
             "Aquí: con la primera pregunta, los documentos de la empresa ficticia se envían como texto al servidor, que los indexa una sola vez y reutiliza ese índice con todos los visitantes.",
             "«Prueba con tu documento»: PDF (con número de página), DOCX y TXT de hasta 5 MB y 30 páginas.",
-            "«Configura el tuyo»: TXT, MD, CSV, PDF o DOCX de hasta 2 MB para tu bot."
+            "«Configura el tuyo»: TXT, MD, CSV, PDF o DOCX de hasta 2 MB, y páginas web públicas, para tu bot."
           ]
         },
         "chunking": {
@@ -1218,7 +1220,8 @@
       },
       "ctaTitle": "¿Lo quieres con los documentos de tu empresa?",
       "ctaBody": "Te mostramos la demo con tu caso en una sesión guiada y te proponemos el plan que encaja.",
-      "ctaButton": "Solicitar demo guiada"
+      "ctaButton": "Solicitar demo guiada",
+      "ctaQuote": "Cotizar el Piloto RAG"
     },
     "chat": {
       "title": "Conversación",
@@ -1256,7 +1259,7 @@
       "errorCapacity": "No pudimos preparar el asistente: la demo llegó a su capacidad de asistentes en este momento. Intenta de nuevo más tarde o prueba con tu documento.",
       "errorUnavailable": "El chatbot no está disponible en este momento. Intenta de nuevo en unos minutos.",
       "useUpload": "Probar con tu documento",
-      "privacyNote": "Las preguntas de este modo no se guardan: el servidor las usa solo para buscar y responder."
+      "privacyNote": "Las preguntas de este modo no se guardan: el servidor las usa para buscar en los documentos y, con la IA activa, las envía con los fragmentos encontrados a OpenAI para redactar la respuesta."
     },
     "pipeline": {
       "title": "Cómo se respondió",
@@ -1422,7 +1425,8 @@
         "hint": "TXT, MD, CSV, PDF o DOCX · máx. 2 MB por archivo",
         "pdfHint": "De los PDF se lee el texto seleccionable (un PDF escaneado no sirve). Las citas muestran el documento y el fragmento; para citar la página, usa «Prueba con tu documento».",
         "uploading": "Subiendo archivos…",
-        "empty": "Aún no hay documentos. Sube tus archivos o carga los de una empresa de ejemplo.",
+        "empty": "Aún no hay documentos. Sube tus archivos, agrega una página web o carga los de una empresa de ejemplo.",
+        "publicCount": "{count, plural, =0 {Este bot no tiene documentos.} one {Este bot tiene # documento (solo su dueño ve la lista).} other {Este bot tiene # documentos (solo su dueño ve la lista).}}",
         "remove": "Quitar documento",
         "uploaded": "{count, plural, one {# archivo subido} other {# archivos subidos}}",
         "uploadFailed": "No pudimos subir los archivos",
@@ -1433,8 +1437,32 @@
         "loadSample": "Cargar documentos de ejemplo",
         "loadSampleOf": "Documentos de {company}",
         "sampleLoaded": "Documentos de ejemplo cargados",
+        "sampleAlready": "Los documentos de {company} ya están cargados en este bot.",
         "unreadable": "{name}: no pudimos leer su texto. Si es un PDF escaneado, usa uno con texto seleccionable.",
-        "noneReadable": "No pudimos leer el texto de los archivos. Si son PDF escaneados, usa versiones con texto seleccionable."
+        "noneReadable": "No pudimos leer el texto de los archivos. Si son PDF escaneados, usa versiones con texto seleccionable.",
+        "urlLabel": "O agrega una página web pública",
+        "urlPh": "https://www.tuempresa.com/preguntas-frecuentes",
+        "urlAdd": "Agregar",
+        "urlAdding": "Leyendo…",
+        "urlHint": "Se lee el texto de la página (HTML o texto, hasta 2 MB) y se cita con el nombre del sitio. Solo páginas públicas: no se leen direcciones internas ni páginas que piden iniciar sesión.",
+        "urlAdded": "Página indexada: {host}",
+        "urlFailed": "No pudimos agregar la página. Inténtalo de nuevo.",
+        "tooManyDocs": "Cada bot admite máximo 50 documentos.",
+        "urlErrors": {
+          "invalid_url": "{url}: no es una dirección web válida. Escríbela completa, por ejemplo https://www.tuempresa.com/preguntas-frecuentes.",
+          "blocked_address": "{url}: por seguridad no leemos direcciones privadas o internas. Usa una página pública.",
+          "blocked_port": "{url}: solo leemos páginas en los puertos estándar de http y https.",
+          "dns_failed": "{url}: no encontramos ese dominio. Revisa la dirección.",
+          "timeout": "{url}: la página tardó demasiado en responder. Inténtalo de nuevo o usa otra.",
+          "too_large": "{url}: la página pesa más de 2 MB.",
+          "too_many_redirects": "{url}: la página redirige demasiadas veces.",
+          "unsupported_content_type": "{url}: no es una página HTML ni de texto (por ejemplo, un PDF o una imagen). Si es un PDF, súbelo como archivo.",
+          "empty_content": "{url}: la página casi no tiene texto para leer (puede que su contenido se cargue con JavaScript).",
+          "bot_capacity": "{url}: el bot llegó a su límite de fragmentos.",
+          "fetch_failed": "{url}: no pudimos descargar la página. Revisa que esté en línea.",
+          "http": "{url}: la página respondió con un error ({status}).",
+          "generic": "{url}: no pudimos leer la página."
+        }
       },
       "preview": {
         "title": "Vista previa",
@@ -1495,7 +1523,17 @@
         "clearAction": "Borrar",
         "cancel": "Cancelar"
       },
-      "storageNote": "Tu bot y sus documentos se guardan en el servidor; un bot sin uso durante 12 meses se borra. Lo que le pregunten por «Abrir chat» o por el widget en tu sitio queda en «Conversaciones» y se borra solo a los 30 días; las preguntas de la vista previa no se guardan."
+      "storageNote": "Tu bot y sus documentos se guardan en el servidor; un bot sin uso durante 12 meses se borra. Lo que le pregunten por «Abrir chat» o por el widget en tu sitio queda en «Conversaciones» y se borra solo a los 30 días; las preguntas de la vista previa no se guardan.",
+      "cta": {
+        "text": "¿Lo quieres con los documentos y el sitio de tu empresa?",
+        "plans": "Ver planes RAG",
+        "quotePilot": "Cotizar el Piloto RAG"
+      },
+      "readOnly": {
+        "title": "Este bot es de otro navegador.",
+        "body": "Puedes probarlo en la vista previa, pero solo su dueño (el navegador que lo creó) puede editarlo y ver sus documentos y conversaciones.",
+        "createOwn": "Crear mi propio bot"
+      }
     },
     "embedPage": {
       "loading": "Cargando el asistente…",
@@ -1522,7 +1560,7 @@
       "loading": "Verificando disponibilidad…",
       "warning": {
         "title": "No subas información confidencial en la demo",
-        "body": "Usa un documento público o de prueba. Lo procesamos solo en memoria y se borra automáticamente en 1 hora."
+        "body": "Usa un documento público o de prueba. Lo procesamos solo en memoria y se borra automáticamente en 1 hora; los fragmentos que responden cada pregunta se envían a OpenAI para redactar la respuesta."
       },
       "limits": "PDF, DOCX o TXT · máximo {maxMb} MB y {maxPages} páginas · {maxQuestions} preguntas por documento · {maxDocs} documentos al día",
       "form": {
@@ -1547,7 +1585,8 @@
       },
       "cta": {
         "schedule": "Agenda una demo con nosotros",
-        "sample": "Usar la demo con el documento de ejemplo"
+        "sample": "Usar la demo con el documento de ejemplo",
+        "plans": "Ver planes RAG"
       },
       "chat": {
         "pages": "{count, plural, one {# página} other {# páginas}}",
@@ -1581,6 +1620,7 @@
         "invalid_format": "Formato no permitido. Sube un archivo PDF, DOCX o TXT.",
         "file_too_large": "El archivo pesa más de {maxMb} MB. Sube uno más liviano.",
         "too_many_pages": "El documento tiene más de {maxPages} páginas. Sube uno más corto.",
+        "too_much_text": "El documento tiene demasiado texto para esta demo (más de 400.000 caracteres). Sube una versión más corta o solo las páginas que quieres consultar.",
         "empty_document": "No pudimos extraer texto del documento. Si es un PDF escaneado, prueba con uno que tenga texto seleccionable.",
         "unreadable_document": "No pudimos leer el documento. Revisa que no esté dañado ni protegido con contraseña.",
         "missing_file": "Elige un documento para subir.",

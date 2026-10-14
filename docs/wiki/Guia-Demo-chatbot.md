@@ -2,7 +2,7 @@
 
 > Ruta `/demo/chatbot` · Modo de acceso: **Abierta** · Tipo: **IA real** (búsqueda y respuesta en el servidor; las empresas y sus documentos son de ejemplo) · Plan del producto: [Sistemas RAG (producto principal)](Producto-chatbot-rag-ia.md)
 
-**Resumen.** Es la demo del producto principal de KopTup, pensada para empresas que quieren un asistente que responda con **sus propios documentos** (políticas, manuales, contratos). El asistente responde **solo con los documentos cargados**, cita la fuente de cada dato y dice «no encontré» cuando la respuesta no está. Tiene tres modos: **Prueba el asistente** (tres empresas ficticias, sin registro), **Prueba con tu documento** (tu PDF, DOCX o TXT, con email) y **Configura el tuyo** (tu propio bot con su widget y código para insertar). Sirve para que un gerente vea en 5 minutos qué es un sistema RAG y para que un desarrollador vea el pipeline real paso a paso.
+**Resumen.** Es la demo del producto principal de KopTup, pensada para empresas que quieren un asistente que responda con **sus propios documentos** (políticas, manuales, contratos). El asistente responde **solo con los documentos cargados**, cita la fuente de cada dato y dice «no encontré» cuando la respuesta no está. Tiene tres modos: **Prueba el asistente** (tres empresas ficticias, sin registro), **Prueba con tu documento** (tu PDF, DOCX o TXT, con email) y **Configura el tuyo** (tu propio bot con tus archivos o páginas web, su widget y el código para insertar). Sirve para que un gerente vea en 5 minutos qué es un sistema RAG y para que un desarrollador vea el pipeline real paso a paso.
 
 **Contenido:** [Recorrido sugerido](#recorrido-sugerido-demo-comercial-de-5-minutos) · [Pantallas y funciones](#pantallas-y-funciones) · [Qué es real y qué es simulado](#qué-es-real-y-qué-es-simulado) · [Acceso](#acceso) · [Limitaciones conocidas](#limitaciones-conocidas)
 
@@ -18,7 +18,7 @@
 
 ![Recorrido animado de la demo de chatbot](images/doc/demos/chatbot/recorrido.gif)
 
-*Los ocho momentos del recorrido, en orden.*
+*Los ocho momentos del recorrido, en orden: empresa de ejemplo, respuesta con citas, fragmento citado, documento completo, «no encontré», tu propio documento, el widget real y los documentos del bot.*
 
 La primera visita abre un recorrido de 5 pasos; se puede volver a ver con **Ver recorrido** (junto al título).
 
@@ -74,7 +74,7 @@ La primera visita abre un recorrido de 5 pasos; se puede volver a ver con **Ver 
 1. **Pregunta fuera de los documentos**: va marcada con borde punteado y la nota «no está en los documentos» (por ejemplo «¿Cuánto gana el gerente general?»).
 2. **No inventa**: debajo de la respuesta aparece «No está en los documentos: el asistente no inventa una respuesta».
 3. **Paso 2 en ámbar**: «Ningún fragmento coincide con las palabras de la pregunta»; el paso 5 dice «Respuesta «no encontré»: sin citas».
-4. **Métricas de esta sesión**: al pie de «Cómo se respondió». Muestra preguntas, con fuente, «no encontré», tiempo medio, tokens, costo (USD) y valoraciones. Se calculan en tu navegador con las respuestas reales de la pestaña, no se envían al servidor y se reinician al recargar.
+4. **Métricas de esta sesión**: al pie de «Cómo se respondió». Muestra preguntas, con fuente, «no encontré», tiempo medio, tokens, costo (USD) y valoraciones. Suman las respuestas de **todas las empresas** que probaste en la pestaña (al cambiar de empresa no se pierden), se calculan en tu navegador con las respuestas reales, no se envían al servidor y se reinician al recargar.
 
 ### Paso 5 · Llévalo a su caso (≈ 1 min 30 s)
 
@@ -84,10 +84,10 @@ La primera visita abre un recorrido de 5 pasos; se puede volver a ver con **Ver 
 
 1. **Prueba el asistente**: lo que acabas de mostrar.
 2. **Prueba con tu documento**: el prospecto sube su propio PDF, DOCX o TXT (ver [más abajo](#prueba-con-tu-documento)).
-3. **Configura el tuyo**: crea su bot, le sube documentos, lo prueba con el widget real y copia el código para su web (ver [más abajo](#configura-el-tuyo)).
+3. **Configura el tuyo**: crea su bot, le sube documentos o páginas web, lo prueba con el widget real y copia el código para su web (ver [más abajo](#configura-el-tuyo)).
 4. **Sistemas RAG para empresas**: lleva a la landing `/rag`.
 
-Para cerrar: el recuadro **«¿Lo quieres con los documentos de tu empresa?» → Solicitar demo guiada** (columna de documentos, abre `/solicitar-demo?demos=chatbot`) o el cierre de la página (Solicitar demo guiada, Solicitar cotización, Ver planes y precios).
+Para cerrar: el recuadro **«¿Lo quieres con los documentos de tu empresa?»** de la columna de documentos, con **Solicitar demo guiada** (abre `/solicitar-demo?demos=chatbot`) y **Cotizar el Piloto RAG** (abre `/contact` con el plan Piloto RAG ya elegido: «Estás cotizando Sistema RAG — Plan Piloto RAG»), el enlace **Ver planes RAG** (`/services#planes-rag`) o el cierre de la página (Solicitar demo guiada, Solicitar cotización, Ver planes y precios).
 
 ---
 
@@ -108,8 +108,8 @@ Para cerrar: el recuadro **«¿Lo quieres con los documentos de tu empresa?» �
 |---|---|---|
 | Documentos de la empresa | Clic en un documento | Se abre el visor con el texto completo (ficticio). |
 | Qué incluye hoy | Clic en una capacidad | Se abre un panel con el detalle de lo que existe en el código (ver captura abajo). |
-| Recuadro de demo guiada | «Solicitar demo guiada» | Abre `/solicitar-demo?demos=chatbot`. |
-| Conversación | Escribir y pulsar Enter, o elegir una pregunta sugerida | La pregunta va al servidor; la respuesta trae citas y fuentes. Mientras prepara el bot dice «Indexando los documentos de la empresa…». Debajo de la caja: «Las preguntas de este modo no se guardan». |
+| Recuadro de demo guiada | «Solicitar demo guiada» / «Cotizar el Piloto RAG» | Abre `/solicitar-demo?demos=chatbot` o `/contact?service=sistema-rag&plan=piloto` (el formulario llega con el plan elegido). |
+| Conversación | Escribir y pulsar Enter, o elegir una pregunta sugerida | La pregunta va al servidor; la respuesta trae citas y fuentes. Mientras prepara el bot dice «Indexando los documentos de la empresa…». Después de la primera pregunta, las sugeridas quedan en una fila sobre la conversación (también en el celular, deslizando de lado). Debajo de la caja: «Las preguntas de este modo no se guardan: el servidor las usa para buscar en los documentos y, con la IA activa, las envía con los fragmentos encontrados a OpenAI para redactar la respuesta». |
 | Respuesta | «Respuesta útil» / «Respuesta a mejorar» | Marca la respuesta y suma a las métricas de la sesión. El aviso dice «Anotado en las métricas de esta sesión. Tu valoración no se envía al servidor.»; al quitarla, «Valoración quitada…». |
 | Respuesta | «Volver a preguntar» | Reenvía la misma pregunta y reemplaza la respuesta. |
 | Cita o fuente | Clic | Abre «Fragmento citado» con documento, posición, puntaje BM25 y texto exacto. |
@@ -131,8 +131,11 @@ Cada error dice su causa real, en la columna de documentos y en la respuesta:
 
 - **Límite de creación (429)**: «Desde tu red se crearon muchos asistentes en la última hora y el servidor pausó la creación de nuevos. Intenta de nuevo más tarde (el límite se renueva cada hora) o prueba con tu documento», con los botones «Reintentar» y «Probar con tu documento». Con los bots de ejemplo compartidos solo puede pasar si esa empresa todavía no tiene su bot en el servidor.
 - **Demasiadas preguntas seguidas (429 del chat)**: pide esperar un minuto.
+- **Pausa al abrir la página (429 al consultar el estado de la IA)**: la barra dice «Pausa por muchas consultas» (no «Servidor no disponible») y la demo lo vuelve a intentar sola cada 30 segundos. Pasa cuando muchas personas usan la demo desde la misma red.
 - **Capacidad de la demo** o **servidor no disponible (503)**: lo dice así.
 - **Sin conexión**: solo cuando de verdad no hubo respuesta del servidor dice «Revisa tu conexión».
+
+**Comprobado** (revisión final, 14 de octubre de 2026, en español e inglés): el 429 real de creación con un servidor de prueba limitado a 1 bot por hora (mensaje en la columna y en la respuesta, y «Probar con tu documento» cambia de modo), «Guardar bot» con el mismo límite, el 429 del chat, el 503 y la red cortada (simulados), y «Reintentar» cuando el servidor vuelve. Sin clave de OpenAI, la barra dice «Modo extractivo (sin clave de IA)», los tres modelos aparecen con «requiere clave de API», la respuesta muestra los fragmentos con sus citas y los pasos 3 y 4 de «Cómo se respondió» quedan como «No aplica» y «Sin modelo».
 
 ### Prueba con tu documento
 
@@ -141,52 +144,63 @@ Cada error dice su causa real, en la columna de documentos y en la respuesta:
 *Formulario con un PDF de prueba de una empresa ficticia, el email y la autorización de datos.*
 
 - Pide **solo** el archivo (PDF, DOCX o TXT, hasta 5 MB y 30 páginas), el **email** y la casilla de **autorización de datos (Ley 1581 de 2012)** con enlace a la política de privacidad. Si falta algo lo dice («Elige un documento para subir.», «Escribe un email válido.», «…debes autorizar el tratamiento de tus datos personales»).
-- Muestra el aviso «No subas información confidencial en la demo» y los límites: 10 preguntas por documento y 3 documentos al día.
+- Muestra el aviso «No subas información confidencial en la demo» (el documento se procesa solo en memoria, se borra a la hora y los fragmentos que responden cada pregunta se envían a OpenAI) y los límites: 10 preguntas por documento y 3 documentos al día.
+- Cada rechazo dice su causa: formato no permitido, más de 5 MB, más de 30 páginas, **demasiado texto** (más de 400.000 caracteres, por ejemplo un PDF de 30 páginas con letra diminuta), PDF escaneado sin texto, documento dañado o con contraseña, o el **cupo de 3 documentos al día** (con «Agenda una demo con nosotros»). Los documentos rechazados no gastan el cupo.
 - Al subir, el servidor procesa el documento **solo en memoria** y lo borra a la hora. El email queda registrado como contacto con origen `demo-rag` (el mismo canal del formulario de contacto), para que el equipo comercial pueda escribirle.
 - Si la función está apagada o se acabó el cupo del mes, muestra «La prueba con tu documento no está disponible en este momento» (o «Alcanzamos el cupo de pruebas de este mes») con «Agenda una demo con nosotros» (`/solicitar-demo?demos=chatbot`) y «Usar la demo con el documento de ejemplo».
 
 ![Chat sobre el documento propio](images/doc/demos/chatbot/09-chat-con-tu-documento.jpg)
 
-*Chat sobre un PDF de 3 páginas: contador, aviso de borrado, botón para subir otro y fuente con la página.*
+*Chat sobre un PDF de 5 páginas (empresa ficticia): contador, aviso de borrado, botón para subir otro y fuente con la página.*
 
 1. **Contador** «Preguntas: 2/10».
 2. **Aviso de borrado**: «Tu documento se borra automáticamente en 1 hora (a las …)».
 3. **Subir otro documento**: borra el actual y vuelve al formulario.
 4. **Fuentes**: en PDF cita la página (`p. 2`); en DOCX y TXT, el fragmento (`fragmento 2`), con el extracto.
 
-Trae tres preguntas sugeridas («¿De qué trata el documento?», «¿Qué fechas o plazos menciona?», «¿Qué requisitos u obligaciones establece?»). Al llegar a 10 preguntas dice «Usaste las 10 preguntas de este documento», deshabilita la caja e invita a «Agenda una demo con nosotros». El chat tiene altura fija: el contador y la caja de preguntas quedan siempre a la vista.
+Trae tres preguntas sugeridas («¿De qué trata el documento?», «¿Qué fechas o plazos menciona?», «¿Qué requisitos u obligaciones establece?»). Al llegar a 10 preguntas dice «Usaste las 10 preguntas de este documento», deshabilita la caja e invita a «Agenda una demo con nosotros» o a «Ver planes RAG». El chat tiene altura fija: el contador y la caja de preguntas quedan siempre a la vista.
 
-**Comprobado de punta a punta** (14 de octubre de 2026): un PDF real de 3 páginas («Reglamento interno», empresa ficticia) citó la página 2 para la pregunta del crédito y llegó a 10/10 con la caja deshabilitada; un DOCX real citó «fragmento 2» con el texto de la garantía.
+**Comprobado de punta a punta** (revisión final, 14 de octubre de 2026, en español e inglés, 1440 y 390 px): un PDF real de 5 páginas («Manual del empleado», empresa ficticia) citó la página 4 para la pregunta del permiso por calamidad y la 5 para la del curso de alturas, y llegó a 10/10 con la caja deshabilitada; un DOCX real de 3 páginas y un TXT citaron «fragmento 3»; el 4.º documento del día mostró el aviso del cupo. Los errores de formato (.xlsx), tamaño (6 MB), email, autorización, PDF escaneado, 31 páginas y texto demasiado largo mostraron cada uno su mensaje. Con la función apagada se vio «La prueba con tu documento no está disponible en este momento» con sus dos salidas.
 
 ### Configura el tuyo
 
 ![Configura el tuyo: bot guardado y widget real](images/doc/demos/chatbot/10-configura-el-tuyo.jpg)
 
-*Bot «Asistente de Distribuidora Andina» (empresa ficticia) guardado, con el widget real abierto en el sitio de ejemplo.*
+*Bot «Asistente de Constructora Ejemplo Caribe» (empresa ficticia) guardado, con el widget real respondiendo en el sitio de ejemplo y, arriba, la salida a planes y cotización.*
 
-Arriba, la demo dice dónde queda cada cosa: «Tu bot y sus documentos se guardan en el servidor; un bot sin uso durante 12 meses se borra. Lo que le pregunten por «Abrir chat» o por el widget en tu sitio queda en «Conversaciones» y se borra solo a los 30 días; las preguntas de la vista previa no se guardan.»
+Arriba, la demo dice dónde queda cada cosa y ofrece la salida comercial («¿Lo quieres con los documentos y el sitio de tu empresa? Ver planes RAG · Cotizar el Piloto RAG»): «Tu bot y sus documentos se guardan en el servidor; un bot sin uso durante 12 meses se borra. Lo que le pregunten por «Abrir chat» o por el widget en tu sitio queda en «Conversaciones» y se borra solo a los 30 días; las preguntas de la vista previa no se guardan.»
 
 1. **Mis bots**: los bots que este navegador puede editar. El menú explica que se guardan en el servidor y que el navegador tiene la llave para editarlos (desde otro equipo no aparecen). Permite cargar uno, crear uno nuevo o eliminarlo (con confirmación dentro de la página).
 2. **Guardar bot**: crea o actualiza el bot en el servidor. Al lado aparecen el ID, «Copiar enlace del chat» y «Abrir chat» (página pública `/embed/chatbot/<id>`). Si el servidor no puede guardarlo, el aviso dice la causa real: límite de bots nuevos por hora desde tu red, capacidad de la demo, servidor no disponible o sin conexión.
 3. **Configuración**: nombre, bienvenida, color, posición del botón (4 esquinas), ícono, instrucciones y tono (Profesional, Amigable, Técnico, Cercano).
 4. **Vista previa**: el **widget real** (el mismo `widget.js` que se pega en otro sitio) conversando con el servidor. Tiene tres vistas: «Sitio web», «Celular» y «Enlace directo». Sin guardar, solo muestra la apariencia y pide guardar para conversar.
 5. **Código para tu sitio**: dos pestañas, «Botón flotante (script)» e «Iframe», con «Copiar» y la nota de CSP.
+6. **Planes y cotización**: «Ver planes RAG» (`/services#planes-rag`) y «Cotizar el Piloto RAG» (`/contact` con el plan elegido).
 
 ![Documentos y conversaciones del bot](images/doc/demos/chatbot/11-documentos-y-conversaciones.jpg)
 
-*Parte baja de «Configura el tuyo»: documentos del bot y su historial de conversaciones.*
+*Parte baja de «Configura el tuyo»: documentos del bot (tres archivos y la página example.com), el campo para agregar una página web y el historial de conversaciones.*
 
-1. **Documentos subidos**: TXT, MD, CSV, **PDF o DOCX** de hasta 2 MB (arrastrar o elegir); cada uno se puede quitar. Si el bot aún no existe, subir un archivo lo guarda primero. Si un archivo no se puede leer (por ejemplo, un PDF escaneado sin texto), lo dice con su nombre y sube los demás. Las citas del bot muestran el documento y el fragmento, no la página.
-2. **Cargar documentos de ejemplo**: sube los documentos de una de las tres empresas ficticias.
-3. **Conversaciones**: lo que le preguntan al bot por «Abrir chat» o por el widget en otro sitio (las preguntas de la vista previa no se guardan), con preguntas, «con fuente» y «no encontré»; «Actualizar», «Exportar CSV» y «Borrar historial» (pide confirmación; Escape la cancela). Cada pregunta se borra sola a los 30 días.
+1. **Documentos subidos**: TXT, MD, CSV, **PDF o DOCX** de hasta 2 MB (arrastrar o elegir) y **páginas web**; cada uno se puede quitar. Si el bot aún no existe, subir un archivo lo guarda primero. Si un archivo no se puede leer (por ejemplo, un PDF escaneado sin texto), lo dice con su nombre y sube los demás. Las citas del bot muestran el documento (o el nombre del sitio) y el fragmento, no la página.
+2. **O agrega una página web pública**: el servidor descarga la página (solo direcciones públicas por http o https, HTML o texto, hasta 2 MB), le quita el HTML y la indexa con el nombre del sitio. Si escribes la dirección sin `https://`, la demo lo agrega. Si no puede leerla, dice el motivo: dirección privada o interna, dominio que no existe, página que no responde o responde con error, más de 2 MB, no es HTML (por ejemplo, un PDF: se sube como archivo) o casi no tiene texto (páginas que se arman con JavaScript).
+3. **Cargar documentos de ejemplo**: sube los documentos de una de las tres empresas ficticias (si ya están en el bot, lo dice y no los duplica).
+4. **Conversaciones**: lo que le preguntan al bot por «Abrir chat» o por el widget en otro sitio (las preguntas de la vista previa no se guardan), con preguntas, «con fuente» y «no encontré»; «Actualizar», «Exportar CSV» y «Borrar historial» (pide confirmación; Escape la cancela). Cada pregunta se borra sola a los 30 días.
 
-**Comprobado de punta a punta** (14 de octubre de 2026): bot creado, un TXT, un PDF y un DOCX indexados (un PDF sin texto se informó), pregunta en la vista previa con el widget real (con fuentes, no quedó en el historial), pregunta por «Abrir chat» (sí quedó), CSV descargado, código copiado, historial borrado y bot eliminado del servidor.
+#### Si abres un bot de otro navegador
+
+![Bot de otro navegador en solo lectura](images/doc/demos/chatbot/16-solo-lectura.jpg)
+
+*El enlace `?mode=builder&botId=…` abierto en otro navegador: se ve el bot, pero en solo lectura.*
+
+La llave para editar un bot vive en el navegador que lo creó. Si alguien abre el enlace del Builder de un bot ajeno (o borró los datos del navegador), la demo lo dice con el aviso **«Este bot es de otro navegador»**: puede probarlo en la vista previa, pero la configuración, los documentos y «Guardar bot» quedan deshabilitados, la lista de documentos muestra cuántos tiene el bot («solo su dueño ve la lista») y «Conversaciones» explica que solo el dueño puede verlas. **Crear mi propio bot** empieza uno nuevo. El servidor rechaza igual cualquier cambio sin la llave.
+
+**Comprobado de punta a punta** (revisión final, 14 de octubre de 2026, en español e inglés, 1440 y 390 px): bot creado y personalizado (nombre, bienvenida, color, posición arriba a la izquierda, ícono y tono técnico; el servidor guardó cada campo); un PDF, un DOCX, un TXT, un MD y un CSV indexados y un PDF escaneado informado con su nombre; `https://example.com` indexada como página web y `http://127.0.0.1` rechazada por ser una dirección interna; pregunta en la vista previa con el widget real (con fuentes, no quedó en el historial); pregunta por «Abrir chat» y pregunta desde el **widget pegado en una página de prueba servida en otro puerto** (las dos quedaron en «Conversaciones»); CSV con las 2 preguntas; desde otro navegador, solo lectura y la API respondió 401 a editar y a leer conversaciones; historial borrado y bot eliminado del servidor (404).
 
 ### En el celular
 
 ![Demo de chatbot en un celular](images/doc/demos/chatbot/12-movil.jpg)
 
-*Vista en un teléfono de 390 px: la barra se apila y la conversación ocupa casi toda la pantalla al bajar.*
+*Vista en un teléfono de 390 px después de la primera pregunta: la conversación ocupa casi toda la pantalla y arriba quedan las preguntas sugeridas, que se deslizan de lado.*
 
 ![«Cómo se respondió» en el celular](images/doc/demos/chatbot/14-movil-como-se-respondio.jpg)
 
@@ -212,7 +226,7 @@ Arriba, la demo dice dónde queda cada cosa: «Tu bot y sus documentos se guarda
 | Preguntas de «Prueba el asistente» y de la vista previa | **No se guardan** | El servidor las usa para buscar y responder; no quedan en ningún historial. |
 | Vista «Celular» del modo de ejemplo | **Simulado** | Es un marco visual del tamaño de un teléfono. |
 | Prueba con tu documento | **Real** | API `/api/demo-rag`: el documento vive en memoria 1 hora; el email se registra como contacto. |
-| Configura el tuyo | **Real** | Bot propio guardado en MongoDB, documentos TXT/MD/CSV/PDF/DOCX, widget real (`/widget.js` + `/embed/chatbot/<id>`), historial real (30 días) y exportación CSV. |
+| Configura el tuyo | **Real** | Bot propio guardado en MongoDB, documentos TXT/MD/CSV/PDF/DOCX y páginas web públicas, widget real (`/widget.js` + `/embed/chatbot/<id>`), historial real (30 días) y exportación CSV. |
 
 ```mermaid
 sequenceDiagram
@@ -259,7 +273,8 @@ sequenceDiagram
 - **El chat insertado (`/embed/chatbot/<id>`) todavía muestra «No pudimos conectar con el servidor» ante cualquier error**, también si la causa es un límite de preguntas o el servidor caído. Corregirlo es de la pista de plataforma (la página está fuera de la carpeta de la demo; los textos ya existen en la demo).
 - **La valoración útil / a mejorar no se guarda en el servidor.** La demo lo dice en el aviso y en el tooltip; se pierde al recargar.
 - **Bots en la base de datos (MongoDB).** Sobreviven a reinicios y despliegues. Un bot de «Configura el tuyo» sin uso se borra a los 12 meses, con sus documentos y su historial, y desaparece de «Mis bots» con el aviso «ya no existe en el servidor». Los bots de ejemplo sin uso se borran a los 30 días y se vuelven a crear solos con la siguiente pregunta.
-- **«Mis bots» depende del navegador.** La propiedad del bot va en un token guardado en este navegador; desde otro equipo no se puede editar el bot ni ver sus conversaciones («Solo el dueño del bot puede ver sus conversaciones»). La demo lo explica en el menú.
-- **«Configura el tuyo» acepta archivos de hasta 2 MB y cita por fragmento.** PDF y DOCX se leen por su texto (un PDF escaneado no sirve); para citas por página está «Prueba con tu documento», que tiene sus propios límites: 3 documentos al día por IP, 10 preguntas por documento y borrado a la hora.
+- **«Mis bots» depende del navegador.** La propiedad del bot va en un token guardado en este navegador; desde otro equipo el bot se ve en **solo lectura** (aviso «Este bot es de otro navegador») y no se pueden editar su configuración ni sus documentos ni ver sus conversaciones. La demo lo explica en el menú y en el aviso.
+- **«Configura el tuyo» acepta archivos de hasta 2 MB y páginas web públicas, y cita por fragmento.** PDF y DOCX se leen por su texto (un PDF escaneado no sirve); de una página web se lee el HTML que entrega el servidor, así que una página que arma su contenido con JavaScript casi no trae texto. Para citas por página está «Prueba con tu documento», que tiene sus propios límites: 3 documentos al día por IP, 10 preguntas por documento y borrado a la hora.
+- **Sin clave de IA (modo extractivo), la frase «No encontré esa información en los documentos cargados.» llega en español** aunque la interfaz esté en inglés: la escribe el servidor. La etiqueta de la demo («Not in the documents…») sí sale en el idioma de la interfaz.
 - **Depende del servidor.** Si el backend no responde, la barra muestra «Servidor no disponible» y no se puede preparar el bot ni preguntar. En producción la demo solo funciona cuando el backend de Railway está arriba.
-- **Botones:** la sonda automática (14 de octubre de 2026) hizo clic en todos los elementos visibles de los tres modos, en escritorio, a 390 px, con el navegador en inglés y con el sitio en inglés, y **ninguno quedó sin efecto**: los únicos que marcó fueron la pestaña del modo que ya estaba abierto, los selectores nativos en el celular (se comprobaron a mano) y un ícono del bot que la sonda confundió al cambiar el orden de los botones tras guardar (también comprobado). Sin errores de consola ni de hidratación (24 cargas con el navegador en español e inglés).
+- **Botones:** en la revisión final (14 de octubre de 2026) la sonda automática hizo clic en todos los elementos visibles de los tres modos, en escritorio y a 390 px, con el navegador en español y en inglés y con el sitio en inglés (14 corridas), y **ninguno quedó sin efecto**: los únicos que marcó fueron la pestaña del modo que ya estaba abierto, los selectores nativos en el celular, y el ícono y la pestaña de código que ya estaban elegidos (comprobados a mano). Sin errores de página ni de hidratación (además, 96 cargas seguidas con el navegador y el sitio en español e inglés, en claro y oscuro). Los únicos registros de consola fueron respuestas 429 del límite de 60 consultas por minuto por red, provocadas por la propia sonda al recargar la página decenas de veces por minuto desde la misma máquina.

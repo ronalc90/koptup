@@ -2,12 +2,16 @@
 
 /**
  * ConfigPanel — columna izquierda del Builder: edita la configuración del bot
- * y gestiona sus documentos (subida real a `POST /api/chatbot/bots/:id/docs`).
+ * y gestiona sus documentos: archivos (`POST /api/chatbot/bots/:id/docs`) y
+ * páginas web públicas (`POST /api/chatbot/bots/:id/urls`).
+ *
+ * `readOnly`: el bot cargado es de otro navegador (el servidor no reconoce la
+ * llave): se ve su configuración pública, pero no se puede editar.
  */
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
-import { ArrowUpTrayIcon, DocumentIcon, TrashIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import { ArrowUpTrayIcon, DocumentIcon, GlobeAltIcon, TrashIcon, SparklesIcon } from '@heroicons/react/24/outline';
 
 import type { RemoteBotDoc } from './api';
 import type { BuilderToneKey, BuilderWidgetConfig, WidgetCornerPosition } from './widgetConfig';
@@ -21,8 +25,14 @@ interface ConfigPanelProps {
   onUpload: (files: File[]) => void;
   onRemoveDoc: (docId: string) => void;
   onLoadSample: (key: SampleCompanyKey) => void;
+  /** Indexa una página web pública. Devuelve true si se agregó (para limpiar el campo). */
+  onAddUrl: (url: string) => Promise<boolean>;
   sampleCompanies: SampleCompany[];
   uploading: boolean;
+  /** Bot de otro navegador: solo lectura. */
+  readOnly?: boolean;
+  /** Documentos del bot en la vista pública (sin la lista de nombres). */
+  publicDocsCount?: number;
 }
 
 const POSITION_I18N_KEY: Record<WidgetCornerPosition, string> = {
@@ -35,6 +45,9 @@ const POSITION_I18N_KEY: Record<WidgetCornerPosition, string> = {
 const inputClass =
   'mt-1 w-full rounded-md border border-secondary-300 bg-white px-2.5 py-1.5 text-sm text-secondary-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-secondary-700 dark:bg-secondary-800 dark:text-white';
 
+const urlInputClass =
+  'min-w-0 flex-1 rounded-md border border-secondary-300 bg-white px-2.5 py-1.5 text-xs text-secondary-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-secondary-700 dark:bg-secondary-800 dark:text-white';
+
 export default function ConfigPanel({
   config,
   onChange,
@@ -42,24 +55,39 @@ export default function ConfigPanel({
   onUpload,
   onRemoveDoc,
   onLoadSample,
+  onAddUrl,
   sampleCompanies,
   uploading,
+  readOnly = false,
+  publicDocsCount = 0,
 }: ConfigPanelProps) {
   const t = useTranslations('demoChatbot.builder');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [url, setUrl] = useState('');
+  const busy = uploading || readOnly;
 
   const handleDrop = useCallback(
     (event: React.DragEvent<HTMLDivElement>) => {
       event.preventDefault();
+      if (busy) return;
       const files = Array.from(event.dataTransfer.files ?? []);
       if (files.length > 0) onUpload(files);
     },
-    [onUpload],
+    [busy, onUpload],
   );
 
   const openPicker = useCallback(() => {
-    if (!uploading) fileInputRef.current?.click();
-  }, [uploading]);
+    if (!busy) fileInputRef.current?.click();
+  }, [busy]);
+
+  const submitUrl = useCallback(
+    async (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      if (busy || !url.trim()) return;
+      if (await onAddUrl(url.trim())) setUrl('');
+    },
+    [busy, onAddUrl, url],
+  );
 
   return (
     <div className="flex h-full flex-col gap-4 rounded-lg border border-secondary-200 bg-white p-4 shadow-sm dark:border-secondary-800 dark:bg-secondary-900">
@@ -67,6 +95,8 @@ export default function ConfigPanel({
         <h3 className="text-sm font-bold text-secondary-900 dark:text-white">{t('configTitle')}</h3>
       </header>
 
+      {/* Con un bot de otro navegador todo queda deshabilitado (el servidor no aceptaría los cambios). */}
+      <fieldset disabled={readOnly} className="flex flex-col gap-4 disabled:opacity-70">
       <fieldset className="space-y-3">
         <legend className="text-[11px] font-semibold uppercase tracking-widest text-secondary-500 dark:text-secondary-400">
           {t('sections.identity')}
@@ -208,7 +238,8 @@ export default function ConfigPanel({
           onDrop={handleDrop}
           onClick={openPicker}
           role="button"
-          tabIndex={0}
+          tabIndex={readOnly ? -1 : 0}
+          aria-disabled={busy ? 'true' : undefined}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
@@ -237,6 +268,34 @@ export default function ConfigPanel({
         </div>
         <p className="text-[10.5px] text-secondary-500 dark:text-secondary-400">{t('knowledge.pdfHint')}</p>
 
+        <form onSubmit={(e) => void submitUrl(e)} className="space-y-1">
+          <label className="block">
+            <span className="flex items-center gap-1 text-xs font-medium text-secondary-700 dark:text-secondary-300">
+              <GlobeAltIcon className="h-3.5 w-3.5" aria-hidden="true" />
+              {t('knowledge.urlLabel')}
+            </span>
+            <span className="mt-1 flex gap-1.5">
+              <input
+                type="url"
+                inputMode="url"
+                value={url}
+                maxLength={2048}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder={t('knowledge.urlPh')}
+                className={urlInputClass}
+              />
+              <button
+                type="submit"
+                disabled={busy || !url.trim()}
+                className="shrink-0 rounded-md border border-primary-600 px-2.5 py-1 text-xs font-semibold text-primary-700 transition hover:bg-primary-50 disabled:cursor-not-allowed disabled:opacity-50 dark:text-primary-200 dark:hover:bg-primary-950"
+              >
+                {uploading ? t('knowledge.urlAdding') : t('knowledge.urlAdd')}
+              </button>
+            </span>
+          </label>
+          <p className="text-[10.5px] leading-snug text-secondary-500 dark:text-secondary-400">{t('knowledge.urlHint')}</p>
+        </form>
+
         <div className="rounded-md border border-secondary-200 bg-secondary-50 px-2.5 py-2 dark:border-secondary-700 dark:bg-secondary-800/60">
           <p className="flex items-center gap-1 text-[11px] font-semibold text-secondary-700 dark:text-secondary-200">
             <SparklesIcon className="h-3.5 w-3.5 text-primary-500" aria-hidden="true" />
@@ -248,7 +307,7 @@ export default function ConfigPanel({
                 key={c.key}
                 type="button"
                 onClick={() => onLoadSample(c.key)}
-                disabled={uploading}
+                disabled={busy}
                 className="rounded-md border border-secondary-300 bg-white px-2 py-1 text-[11px] font-medium text-secondary-700 transition hover:border-primary-400 hover:bg-primary-50 disabled:opacity-50 dark:border-secondary-600 dark:bg-secondary-900 dark:text-secondary-200 dark:hover:bg-secondary-800"
               >
                 {t('knowledge.loadSampleOf', { company: c.name })}
@@ -257,7 +316,11 @@ export default function ConfigPanel({
           </div>
         </div>
 
-        {docs.length === 0 ? (
+        {readOnly ? (
+          <p className="text-[11px] italic text-secondary-500 dark:text-secondary-400">
+            {t('knowledge.publicCount', { count: publicDocsCount })}
+          </p>
+        ) : docs.length === 0 ? (
           <p className="text-[11px] italic text-secondary-500 dark:text-secondary-400">{t('knowledge.empty')}</p>
         ) : (
           <ul className="space-y-1">
@@ -285,6 +348,7 @@ export default function ConfigPanel({
             ))}
           </ul>
         )}
+      </fieldset>
       </fieldset>
     </div>
   );

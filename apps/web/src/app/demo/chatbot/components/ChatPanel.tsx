@@ -175,8 +175,10 @@ export default function ChatPanel({
           </div>
         </div>
         {hasQuestions ? (
-          <div className="hidden min-w-0 items-center gap-1 overflow-x-auto pb-0.5 md:flex">
-            <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-secondary-500 dark:text-secondary-400">
+          // También en el celular (fila con desplazamiento lateral): después de la primera
+          // pregunta es la forma de seguir probando sin subir hasta la barra superior.
+          <div role="group" className="flex min-w-0 items-center gap-1 overflow-x-auto pb-0.5" aria-label={t('chat.suggested')}>
+            <span className="hidden shrink-0 text-[10px] font-semibold uppercase tracking-wide text-secondary-500 dark:text-secondary-400 sm:inline">
               {t('chat.suggested')}
             </span>
             {suggestionButtons(true)}

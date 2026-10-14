@@ -14,6 +14,7 @@ import {
   SparklesIcon,
 } from '@heroicons/react/24/outline';
 import Tooltip from '../ui/Tooltip';
+import { RAG_PLANS_PATH } from '@/lib/rag-plans';
 import {
   DemoRagApiError,
   askDemoDocument,
@@ -400,6 +401,12 @@ export default function DocumentChat({ doc, limits, onReset, onUnavailable, onQu
                 >
                   {t('chat.newDocument')}
                 </button>
+                <Link
+                  href={RAG_PLANS_PATH}
+                  className="inline-flex items-center px-1 py-1.5 text-xs font-semibold text-primary-700 hover:underline dark:text-primary-300"
+                >
+                  {t('cta.plans')}
+                </Link>
               </div>
             </div>
           ) : null}

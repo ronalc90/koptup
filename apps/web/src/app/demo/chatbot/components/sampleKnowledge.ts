@@ -3,9 +3,9 @@
  *
  * Tres empresas FICTICIAS de Colombia (el nombre lleva "Ejemplo" para que no
  * se confunda con ninguna empresa real), cada una con sus documentos internos.
- * El Playground sube estos textos de verdad al backend
- * (`POST /api/chatbot/bots/:id/docs`) y las preguntas se responden con el
- * pipeline real: fragmentación por párrafos → búsqueda BM25 → modelo de
+ * El Playground envía estos textos de verdad al backend
+ * (`POST /api/chatbot/sample-bots`, bot de ejemplo compartido) y las
+ * preguntas se responden con el pipeline real: fragmentación por párrafos → búsqueda BM25 → modelo de
  * OpenAI (o modo extractivo si no hay clave) → citas.
  *
  * Cada párrafo empieza con el número y el nombre de la sección para que el

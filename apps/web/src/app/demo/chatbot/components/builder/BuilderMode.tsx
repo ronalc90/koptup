@@ -7,7 +7,9 @@
  *  - Guardar crea o actualiza el bot en el backend (`POST`/`PATCH /api/chatbot/bots`),
  *    con el token de dueño si el backend lo entrega (ver `api.ts`).
  *  - Los documentos (TXT, MD, CSV, PDF o DOCX) se suben a `POST /api/chatbot/bots/:id/docs` y se
- *    pueden borrar.
+ *    pueden borrar; las páginas web públicas se indexan con `POST …/urls`.
+ *  - Un bot de otro navegador (`?botId=` sin su llave) se muestra en solo
+ *    lectura: el servidor no aceptaría cambios ni muestra sus documentos.
  *  - La vista previa usa el widget real (`/widget.js` + `/embed/chatbot/<id>`).
  *  - El código para insertar solo ofrece lo que funciona (script e iframe).
  *  - "Conversaciones" lee el historial real del bot y lo exporta a CSV.
@@ -16,8 +18,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
-import { ArrowTopRightOnSquareIcon, LinkIcon } from '@heroicons/react/24/outline';
+import { ArrowTopRightOnSquareIcon, LinkIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
 import { SITE_URL } from '@/lib/site';
+import { RAG_PLANS_PATH, ragPlanContactHref } from '@/lib/rag-plans';
 
 import ConfigPanel from './ConfigPanel';
 import LivePreview from './LivePreview';
@@ -30,7 +34,9 @@ import {
   deleteBotDoc,
   fileToBase64,
   forgetBot,
+  docsCountOf,
   getBot,
+  ingestBotUrls,
   listOwnedBots,
   patchBot,
   rememberBot,
@@ -50,6 +56,7 @@ import {
 } from './widgetConfig';
 import { getSampleCompanies, getSampleCompany, type SampleCompanyKey, type SampleLocale } from '../sampleKnowledge';
 import { kbErrorReason, type KbErrorReason } from '../errors';
+import { normalizeUrl, urlErrorMessage } from './urlIngest';
 
 /** Mensaje de "Guardar bot" según la causa real (límite de creación, capacidad, servidor o red). */
 const SAVE_ERROR_KEY: Record<KbErrorReason, string> = {
@@ -108,6 +115,9 @@ export default function BuilderMode() {
   const [savedConfig, setSavedConfig] = useState<BuilderWidgetConfig | null>(null);
   const [botId, setBotId] = useState<string | null>(null);
   const [docs, setDocs] = useState<RemoteBotDoc[]>([]);
+  /** El bot cargado es de otro navegador: solo lectura (con su número de documentos). */
+  const [readOnly, setReadOnly] = useState(false);
+  const [publicDocsCount, setPublicDocsCount] = useState(0);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [nonce, setNonce] = useState(0);
@@ -123,6 +133,9 @@ export default function BuilderMode() {
     setSavedConfig(cfg);
     setBotId(remote.botId);
     setDocs(remote.docs ?? []);
+    // `owned: false`: el servidor no reconoce la llave de este navegador.
+    setReadOnly(remote.owned === false);
+    setPublicDocsCount(docsCountOf(remote));
     setNonce((n) => n + 1);
     syncUrl(remote.botId);
   }, []);
@@ -169,6 +182,7 @@ export default function BuilderMode() {
 
   /** Guarda el bot (crea o actualiza) y devuelve su id. */
   const save = useCallback(async (): Promise<string | null> => {
+    if (readOnly) return null;
     setSaving(true);
     const payload: Partial<RemoteBotConfig> = {
       name: config.botName.trim() || t('defaults.botName'),
@@ -187,6 +201,7 @@ export default function BuilderMode() {
       setConfig(cfg);
       setSavedConfig(cfg);
       setBotId(remote.botId);
+      setReadOnly(false);
       if (remote.docs) setDocs(remote.docs);
       setNonce((n) => n + 1);
       syncUrl(remote.botId);
@@ -199,7 +214,7 @@ export default function BuilderMode() {
     } finally {
       setSaving(false);
     }
-  }, [botId, config, locale, t]);
+  }, [botId, config, locale, readOnly, t]);
 
   const handleUpload = useCallback(
     async (files: File[]) => {
@@ -241,13 +256,20 @@ export default function BuilderMode() {
   const handleLoadSample = useCallback(
     async (key: SampleCompanyKey) => {
       const company = getSampleCompany(key, locale);
+      // No se suben dos veces los mismos documentos de ejemplo (duplicarían las citas).
+      const loaded = new Set(docs.map((d) => d.name));
+      const pending = company.docs.filter((d) => !loaded.has(d.fileName));
+      if (pending.length === 0) {
+        toast(t('knowledge.sampleAlready', { company: company.name }));
+        return;
+      }
       setUploading(true);
       try {
         const id = botId ?? (await save());
         if (!id) return;
         const result = await uploadBotDocs(
           id,
-          company.docs.map((d) => ({
+          pending.map((d) => ({
             name: d.fileName,
             size: new TextEncoder().encode(d.text).length,
             mime: 'text/plain',
@@ -263,7 +285,39 @@ export default function BuilderMode() {
         setUploading(false);
       }
     },
-    [botId, locale, save, t],
+    [botId, docs, locale, save, t],
+  );
+
+  /** Indexa una página web pública (el servidor la descarga con protección SSRF). */
+  const handleAddUrl = useCallback(
+    async (raw: string): Promise<boolean> => {
+      const url = normalizeUrl(raw);
+      if (!url) {
+        toast.error(t('knowledge.urlErrors.invalid_url', { url: raw }), { duration: 6000 });
+        return false;
+      }
+      setUploading(true);
+      try {
+        const id = botId ?? (await save());
+        if (!id) return false;
+        const result = await ingestBotUrls(id, [url]);
+        setDocs(result.docs);
+        for (const e of result.errors ?? []) {
+          const { key, status } = urlErrorMessage(e.reason);
+          toast.error(t(`knowledge.urlErrors.${key}`, { url: e.url, status: status ?? '' }), { duration: 7000 });
+        }
+        for (const a of result.added) toast.success(t('knowledge.urlAdded', { host: a.name }));
+        return result.added.length > 0;
+      } catch (err) {
+        if (err instanceof BotApiError && (err.status === 401 || err.status === 403)) toast.error(t('actions.notOwner'));
+        else if (err instanceof BotApiError && err.code === 'too_many_docs') toast.error(t('knowledge.tooManyDocs'));
+        else toast.error(t('knowledge.urlFailed'));
+        return false;
+      } finally {
+        setUploading(false);
+      }
+    },
+    [botId, save, t],
   );
 
   const handleRemoveDoc = useCallback(
@@ -286,6 +340,8 @@ export default function BuilderMode() {
     setSavedConfig(null);
     setBotId(null);
     setDocs([]);
+    setReadOnly(false);
+    setPublicDocsCount(0);
     syncUrl(null);
   }, [defaults]);
 
@@ -320,6 +376,16 @@ export default function BuilderMode() {
           <h2 className="text-base font-bold text-secondary-900 dark:text-white">{t('title')}</h2>
           <p className="text-xs text-secondary-500 dark:text-secondary-400">{t('subtitle')}</p>
           <p className="mt-1 max-w-3xl text-[11px] leading-snug text-secondary-500 dark:text-secondary-400">{t('storageNote')}</p>
+          <p className="mt-1 text-[11px] text-secondary-600 dark:text-secondary-300">
+            {t('cta.text')}{' '}
+            <Link href={RAG_PLANS_PATH} className="font-semibold text-primary-600 hover:underline dark:text-primary-400">
+              {t('cta.plans')}
+            </Link>
+            {' · '}
+            <Link href={ragPlanContactHref('piloto')} className="font-semibold text-primary-600 hover:underline dark:text-primary-400">
+              {t('cta.quotePilot')}
+            </Link>
+          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <MyBotsMenu
@@ -342,7 +408,7 @@ export default function BuilderMode() {
           <button
             type="button"
             onClick={() => void save()}
-            disabled={saving}
+            disabled={saving || readOnly}
             className="rounded-md bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-primary-700 disabled:opacity-60"
           >
             {saving ? t('actions.saving') : t('actions.save')}
@@ -371,6 +437,27 @@ export default function BuilderMode() {
         </div>
       </header>
 
+      {readOnly ? (
+        <div
+          role="status"
+          className="mx-4 mt-4 flex flex-col gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-100 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <p className="flex items-start gap-2">
+            <LockClosedIcon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+            <span>
+              <span className="font-semibold">{t('readOnly.title')}</span> {t('readOnly.body')}
+            </span>
+          </p>
+          <button
+            type="button"
+            onClick={handleCreateNew}
+            className="shrink-0 rounded-md bg-amber-600 px-3 py-1.5 font-semibold text-white hover:bg-amber-700"
+          >
+            {t('readOnly.createOwn')}
+          </button>
+        </div>
+      ) : null}
+
       <div className="grid flex-1 grid-cols-1 gap-4 p-4 lg:grid-cols-12">
         <section className="min-w-0 lg:col-span-4" aria-label={t('configTitle')}>
           <ConfigPanel
@@ -380,8 +467,11 @@ export default function BuilderMode() {
             onUpload={(files) => void handleUpload(files)}
             onRemoveDoc={(id) => void handleRemoveDoc(id)}
             onLoadSample={(key) => void handleLoadSample(key)}
+            onAddUrl={handleAddUrl}
             sampleCompanies={sampleCompanies}
             uploading={uploading}
+            readOnly={readOnly}
+            publicDocsCount={publicDocsCount}
           />
         </section>
 

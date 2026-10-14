@@ -8,6 +8,7 @@ const KNOWN_ERRORS: ReadonlySet<DemoErrorCode> = new Set<DemoErrorCode>([
   'invalid_format',
   'file_too_large',
   'too_many_pages',
+  'too_much_text',
   'empty_document',
   'unreadable_document',
   'missing_file',

@@ -13,6 +13,7 @@ import { INCLUDED_KEYS, type IncludedKey } from './data';
 import type { KbErrorReason } from './errors';
 import { splitParagraphs, type SampleCompany, type SampleDocument } from './sampleKnowledge';
 import InfoIcon from './ui/InfoIcon';
+import { RAG_PLANS_PATH, ragPlanContactHref } from '@/lib/rag-plans';
 
 /**
  * Estado del bot de la empresa en el servidor:
@@ -173,19 +174,27 @@ export default function Sidebar({
         </ul>
         <p className="mt-3 px-2 text-[10.5px] leading-relaxed text-secondary-500 dark:text-secondary-400">
           {t('included.future')}{' '}
-          <Link href="/services#planes-rag" className="font-semibold text-primary-600 hover:underline dark:text-primary-400">
+          <Link href={RAG_PLANS_PATH} className="font-semibold text-primary-600 hover:underline dark:text-primary-400">
             {t('included.futureLink')}
           </Link>
         </p>
         <div className="mx-2 mt-3 rounded-lg border border-primary-200 bg-primary-50/70 px-3 py-2.5 dark:border-primary-900/60 dark:bg-primary-950/30">
           <p className="text-[11px] font-semibold text-secondary-800 dark:text-secondary-100">{t('included.ctaTitle')}</p>
           <p className="mt-0.5 text-[10.5px] leading-snug text-secondary-600 dark:text-secondary-300">{t('included.ctaBody')}</p>
-          <Link
-            href="/solicitar-demo?demos=chatbot"
-            className="mt-2 inline-flex items-center gap-1 rounded-md bg-primary-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm transition hover:bg-primary-700"
-          >
-            {t('included.ctaButton')}
-          </Link>
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+            <Link
+              href="/solicitar-demo?demos=chatbot"
+              className="inline-flex items-center gap-1 rounded-md bg-primary-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm transition hover:bg-primary-700"
+            >
+              {t('included.ctaButton')}
+            </Link>
+            <Link
+              href={ragPlanContactHref('piloto')}
+              className="text-[11px] font-semibold text-primary-700 hover:underline dark:text-primary-300"
+            >
+              {t('included.ctaQuote')}
+            </Link>
+          </div>
         </div>
       </section>
     </aside>
