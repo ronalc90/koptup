@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import {
@@ -13,7 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { ApiError, auditoriaAPI, esErrorDeAcceso } from '../api';
+import { auditoriaAPI, esErrorDeAcceso, tipoDeError, type TipoError } from '../api';
 import type { DetalleFactura as Detalle } from '../tipos-auditoria';
 import {
   CLAVE_ESTADO_FACTURA,
@@ -36,7 +36,7 @@ import TarjetaGlosa, { type CambiosGlosa } from './TarjetaGlosa';
 interface Props {
   facturaId: string;
   onVolver: () => void;
-  onErrorAcceso: () => void;
+  onErrorAcceso: (error: unknown) => void;
   onCambioDatos: () => void;
 }
 
@@ -45,13 +45,25 @@ export default function DetalleFactura({ facturaId, onVolver, onErrorAcceso, onC
   const locale = useLocale();
   const [detalle, setDetalle] = useState<Detalle | null>(null);
   const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState<'network' | 'server' | 'notFound' | null>(null);
+  const [error, setError] = useState<TipoError | null>(null);
   const [ocupado, setOcupado] = useState<string | null>(null);
   const [confirmandoBorrado, setConfirmandoBorrado] = useState(false);
   const [eliminando, setEliminando] = useState(false);
   const [lectura, setLectura] = useState<LecturaGuardada | null>(null);
 
   const etiquetas = { prestador: t('entities.provider'), pagador: t('entities.payer'), nit: t('entities.nit') };
+  // Al pedir confirmación para eliminar, el foco pasa a «No» (la opción segura).
+  const botonNo = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (confirmandoBorrado) botonNo.current?.focus();
+  }, [confirmandoBorrado]);
+
+  /** Mensaje de una acción que falló: el motivo concreto si lo hay, o el genérico. */
+  const mensajeAccion = (e: unknown, generico: string) => {
+    const tipo = tipoDeError(e);
+    if (tipo === 'rateLimited' || tipo === 'unavailable' || tipo === 'network' || tipo === 'notFound') return t(`errors.${tipo}`);
+    return t(generico);
+  };
 
   const cargar = useCallback(
     async (silencioso = false) => {
@@ -62,9 +74,8 @@ export default function DetalleFactura({ facturaId, onVolver, onErrorAcceso, onC
         recordarDetalle(datos.factura, datos.glosas ?? []);
         setDetalle(datos);
       } catch (e) {
-        if (esErrorDeAcceso(e)) onErrorAcceso();
-        else if (e instanceof ApiError && e.status === 404) setError('notFound');
-        else setError(e instanceof ApiError && e.status === 0 ? 'network' : 'server');
+        if (esErrorDeAcceso(e)) onErrorAcceso(e);
+        else setError(tipoDeError(e));
       } finally {
         setCargando(false);
       }
@@ -86,8 +97,8 @@ export default function DetalleFactura({ facturaId, onVolver, onErrorAcceso, onC
       toast.success(t('denials.saved'));
       return true;
     } catch (e) {
-      if (esErrorDeAcceso(e)) onErrorAcceso();
-      else toast.error(t('errors.saveDecision'));
+      if (esErrorDeAcceso(e)) onErrorAcceso(e);
+      else toast.error(mensajeAccion(e, 'errors.saveDecision'));
       return false;
     } finally {
       setOcupado(null);
@@ -103,8 +114,8 @@ export default function DetalleFactura({ facturaId, onVolver, onErrorAcceso, onC
       onCambioDatos();
       onVolver();
     } catch (e) {
-      if (esErrorDeAcceso(e)) onErrorAcceso();
-      else toast.error(t('errors.delete'));
+      if (esErrorDeAcceso(e)) onErrorAcceso(e);
+      else toast.error(mensajeAccion(e, 'errors.delete'));
       setEliminando(false);
     }
   };
@@ -194,14 +205,20 @@ export default function DetalleFactura({ facturaId, onVolver, onErrorAcceso, onC
               </p>
             </div>
             {confirmandoBorrado ? (
-              <div className="flex flex-wrap items-center gap-2 rounded-lg bg-red-50 p-3 dark:bg-red-950" role="alert">
+              <div
+                className="flex flex-wrap items-center gap-2 rounded-lg bg-red-50 p-3 dark:bg-red-950"
+                role="alert"
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape' && !eliminando) setConfirmandoBorrado(false);
+                }}
+              >
                 <span className="text-sm text-red-800 dark:text-red-200">
                   {t('invoices.deleteQuestion', { number: factura.numeroFactura })}
                 </span>
                 <Button size="sm" variant="danger" onClick={eliminar} isLoading={eliminando} disabled={eliminando}>
                   {t('common.confirmDelete')}
                 </Button>
-                <Button size="sm" variant="ghost" onClick={() => setConfirmandoBorrado(false)} disabled={eliminando}>
+                <Button ref={botonNo} size="sm" variant="ghost" onClick={() => setConfirmandoBorrado(false)} disabled={eliminando}>
                   {t('common.keep')}
                 </Button>
               </div>

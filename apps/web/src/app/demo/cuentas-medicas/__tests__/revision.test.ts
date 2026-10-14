@@ -1,6 +1,6 @@
 import { diaColombia, resumirRevision } from '../lib/revision';
-import { anonimizarTexto, nombreEntidad } from '../lib/formato';
-import { digitoVerificacion, fechaFacturaEjemplo, formatearNIT, NIT_EJEMPLO } from '../lib/facturaEjemplo';
+import { anonimizarTexto, formatearFecha, nombreEntidad, zonaDeFecha } from '../lib/formato';
+import { digitoVerificacion, fechaFacturaEjemplo, formatearNIT, NIT_EJEMPLO, numeroFacturaEjemplo } from '../lib/facturaEjemplo';
 
 const etiquetas = { prestador: 'Prestador de ejemplo', pagador: 'Pagador de ejemplo', nit: 'NIT de ejemplo' };
 
@@ -59,6 +59,16 @@ describe('diaColombia', () => {
     expect(diaColombia(undefined)).toBe('');
     expect(diaColombia('no-es-fecha')).toBe('');
   });
+
+  it('respeta la fecha de la factura que el servidor guarda sin hora (medianoche UTC)', () => {
+    expect(zonaDeFecha('2026-10-02T00:00:00.000Z')).toBe('UTC');
+    expect(zonaDeFecha('2026-10-02T20:40:08.211Z')).toBe('America/Bogota');
+    expect(diaColombia('2026-10-02T00:00:00.000Z')).toBe('2026-10-02');
+    expect(formatearFecha('2026-10-02T00:00:00.000Z', 'es')).toMatch(/^2 .*oct.* 2026$/);
+    expect(formatearFecha('2026-10-02T00:00:00.000Z', 'en')).toBe('Oct 2, 2026');
+    // Auditada a las 9 p. m. de Colombia: ya es otro día en UTC, pero se muestra el de Colombia.
+    expect(formatearFecha('2026-10-03T02:00:00.000Z', 'en')).toBe('Oct 2, 2026');
+  });
 });
 
 describe('factura de ejemplo', () => {
@@ -67,6 +77,15 @@ describe('factura de ejemplo', () => {
     expect(digitoVerificacion('900156264')).toBe(2);
     expect(digitoVerificacion(NIT_EJEMPLO)).toBe(7);
     expect(formatearNIT(NIT_EJEMPLO)).toBe('901.234.567-7');
+  });
+
+  it('usa un número FEDL- de cinco cifras que cambia cada minuto', () => {
+    const a = numeroFacturaEjemplo(new Date('2026-10-14T15:00:00Z'));
+    const b = numeroFacturaEjemplo(new Date('2026-10-14T15:01:00Z'));
+    expect(a).toMatch(/^FEDL-\d{5}$/);
+    expect(b).toMatch(/^FEDL-\d{5}$/);
+    expect(a).not.toBe(b);
+    expect(numeroFacturaEjemplo(new Date('2026-10-14T15:00:59Z'))).toBe(a);
   });
 
   it('fecha la factura 12 días antes de hoy, en hora de Colombia', () => {

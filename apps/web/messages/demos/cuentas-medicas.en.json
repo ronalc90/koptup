@@ -2,7 +2,8 @@
   "demoMedicalAccounts": {
     "backToDemos": "Back to demos",
     "title": "Healthcare expert system",
-    "subtitle": "Medical claims auditing: AI reads the PDF invoice, the engine compares each CUPS code against a sample fee schedule and proposes denials. You, as the auditor, confirm, adjust or discard each one.",
+    "subtitle": "Medical claims auditing: AI reads the PDF invoice, the engine compares each CUPS code against a sample fee schedule and proposes denials (payment objections). You, as the auditor, confirm, adjust or discard each one.",
+    "audience": "Built for medical claims audit firms, healthcare providers (IPS) and payers (health insurers).",
     "ragLink": "Want an AI that answers from your protocols, regulations and fee schedules, citing the source? Discover RAG systems",
     "badges": {
       "sampleData": "Sample data",
@@ -24,13 +25,36 @@
       "close": "Close",
       "confirmDelete": "Yes, delete",
       "keep": "No",
-      "delete": "Delete"
+      "delete": "Delete",
+      "updated": "Data updated"
     },
     "access": {
-      "title": "Your access to this demo is not active",
-      "body": "This is a private demo: only people the KopTup team has given access can use it. If you had access, it may have expired or your session may have ended.",
       "login": "Log in",
-      "request": "Request access"
+      "request": "Request access",
+      "contact": "Contact us",
+      "allDemos": "See all demos",
+      "reasons": {
+        "sesion": {
+          "title": "Your session ended",
+          "body": "Log in again to continue with the demo. The invoices and decisions you saved are still on the server."
+        },
+        "expirado": {
+          "title": "Your access to this demo has expired",
+          "body": "The access the KopTup team gave you has ended. Request an extension from the request form and we will let you know by email."
+        },
+        "revocado": {
+          "title": "Your access to this demo was closed",
+          "body": "The KopTup team closed your account’s access to this demo. If you think this is a mistake, request access again and we will review it."
+        },
+        "sinAcceso": {
+          "title": "Your account does not have access to this demo",
+          "body": "This is a private demo: only people invited by the KopTup team can use it. Request access or log in with the account that received the invitation."
+        },
+        "desactivada": {
+          "title": "This demo is not available right now",
+          "body": "The KopTup team has temporarily disabled it. Browse the other demos or contact us if you want to see it."
+        }
+      }
     },
     "errors": {
       "network": "We could not reach the demo server. Please try again in a few minutes.",
@@ -38,7 +62,13 @@
       "notFound": "This invoice no longer exists: someone may have deleted it.",
       "saveDecision": "The decision could not be saved. Please try again.",
       "delete": "The invoice could not be deleted. Please try again.",
-      "report": "The file could not be generated. Please try again."
+      "report": "The file could not be generated. Please try again.",
+      "badRequest": "The server did not accept the request. Check the data and try again.",
+      "rateLimited": "You made many requests in a short time. Wait a few minutes and try again.",
+      "aiLimit": "You reached your account’s daily limit of AI audits. Try again tomorrow.",
+      "aiUnavailable": "AI is not available right now. Please try again in a few minutes.",
+      "aiBudget": "This demo reached its monthly AI quota. Contact us and we will show it to you in a guided demo.",
+      "unavailable": "The demo service is not available right now. Please try again in a few minutes."
     },
     "entities": {
       "provider": "Sample provider",
@@ -77,34 +107,33 @@
       "denialsCount": "{count, plural, one {# denial} other {# denials}}",
       "noDenials": "No denials yet.",
       "emptyTitle": "There are no invoices in this space yet",
-      "emptyBody": "Audit the sample invoice (fictitious data) in one click, or upload a test PDF.",
+      "emptyBody": "Start with step 1: audit the sample invoice or upload a test PDF.",
       "emptyCta": "Audit the sample invoice",
       "emptyUpload": "Upload a PDF",
-      "stepsTitle": "How this demo works",
-      "steps": {
+      "byStateHint": "The demo works out the status from the saved decisions: “Under review” while any denial is pending; “With denials” or “Accepted” once you decide them all.",
+      "byTypeHint": "Active denials (pending, confirmed or adjusted) with their current amount. Discarded denials are not counted.",
+      "start": {
+        "title": "Start here",
+        "intro": "A 3-step walkthrough, about 3 minutes. The sample invoice and the fee schedule are fictitious data.",
         "s1": {
-          "title": "You upload the invoice",
-          "desc": "A PDF with selectable text (not scanned)."
+          "title": "Audit an invoice",
+          "desc": "The sample invoice has fictitious data and two charges above the fee schedule. You can also upload a test PDF."
         },
         "s2": {
-          "title": "AI reads the data",
-          "desc": "Number, patient, ICD-10 diagnosis, authorization and the procedures table."
+          "title": "Decide each denial",
+          "desc": "In the invoice detail you confirm, adjust or discard each proposed denial, with a note."
         },
         "s3": {
-          "title": "The engine applies the fee schedule",
-          "desc": "It compares each CUPS code against the sample fee schedule and computes the difference."
+          "title": "Download the report",
+          "desc": "Once you decide them all, the invoice becomes “With denials” or “Accepted”. Download the PDF or CSV report from the detail."
         },
-        "s4": {
-          "title": "AI drafts a proposal",
-          "desc": "Amount to pay and rationale. It is a proposal: it does not decide for you."
-        },
-        "s5": {
-          "title": "You decide and download",
-          "desc": "You confirm, adjust or discard each denial; once you decide them all, the invoice becomes “With denials” or “Accepted”. You download the report as CSV or PDF."
-        }
+        "goPending": "{count, plural, one {Decide # pending denial} other {Decide # pending denials}}",
+        "goInvoices": "See invoices",
+        "afterAudit": "Available once you audit an invoice."
       },
-      "byStateHint": "The demo works out the status from the saved decisions: “Under review” while any denial is pending; “With denials” or “Accepted” once you decide them all.",
-      "byTypeHint": "Active denials (pending, confirmed or adjusted) with their current amount. Discarded denials are not counted."
+      "howNote": "What does the engine do with each invoice, and what does this demo not do?",
+      "howLink": "See “How it audits”",
+      "summaryTitle": "Demo space summary"
     },
     "upload": {
       "title": "Audit invoice",
@@ -129,7 +158,7 @@
         "tooMany": "You can upload up to 10 files.",
         "sample": "The sample invoice could not be generated.",
         "noInvoice": "The demo did not find a readable invoice in the files. Check that the PDF has selectable text (not scanned). The AI service may also be unavailable right now.",
-        "server": "The server could not process the files. Please try again in a few minutes."
+        "server": "The server could not process the files. Check that they are PDF invoices with selectable text (not scanned) and try again."
       },
       "resultTitle": "Invoice {number} audited",
       "resultProcedures": "Procedures read",
@@ -255,6 +284,8 @@
       "reopen": "Reopen",
       "newValue": "New denied amount (COP)",
       "note": "Auditor note",
+      "noteOptional": "Auditor note (optional)",
+      "noteMandatory": "Auditor note (required to discard)",
       "notePlaceholder": "E.g.: tariff agreed in amendment 2 of the contract",
       "noteRequired": "Write a note to discard the denial.",
       "save": "Save decision",
@@ -318,7 +349,10 @@
         "n7": "Read scanned PDFs (OCR).",
         "n8": "Keep data separate per client: this demo space is shared."
       },
-      "projectNote": "In your project we connect your contracts and fee schedules, the official catalogs and your rules, and process RIPS and supporting documents."
+      "projectNote": "In your project we connect your contracts and fee schedules, the official catalogs and your rules, and process RIPS and supporting documents.",
+      "guidedDemo": "Request a guided demo with your invoices and contracts →",
+      "tryTitle": "Try it with the sample invoice",
+      "tryBody": "Fictitious data: two procedures exceed the fee schedule and the engine proposes two denials for you to decide."
     },
     "report": {
       "listFileName": "demo-audit-invoices",

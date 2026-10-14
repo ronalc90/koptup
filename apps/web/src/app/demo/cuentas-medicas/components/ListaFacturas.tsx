@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import {
@@ -12,7 +12,7 @@ import {
 } from '@heroicons/react/24/outline';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { auditoriaAPI, esErrorDeAcceso } from '../api';
+import { auditoriaAPI, esErrorDeAcceso, tipoDeError, type TipoError } from '../api';
 import type { FiltrosFacturas } from '../tipos-auditoria';
 import {
   CLAVE_ESTADO_FACTURA,
@@ -32,14 +32,16 @@ const POR_PAGINA = 20;
 
 interface Props {
   version: number;
+  /** Cambia cuando la persona pide actualizar (pestaña abierta pulsada otra vez). */
+  recarga: number;
   filtros: FiltrosFacturas;
   onCambiarFiltros: (filtros: FiltrosFacturas) => void;
   onVerDetalle: (id: string) => void;
-  onErrorAcceso: () => void;
+  onErrorAcceso: (error: unknown) => void;
   onCambioDatos: () => void;
 }
 
-export default function ListaFacturas({ version, filtros, onCambiarFiltros, onVerDetalle, onErrorAcceso, onCambioDatos }: Props) {
+export default function ListaFacturas({ version, recarga, filtros, onCambiarFiltros, onVerDetalle, onErrorAcceso, onCambioDatos }: Props) {
   const t = useTranslations('demoMedicalAccounts');
   const locale = useLocale();
   const [facturas, setFacturas] = useState<FacturaRevisada[]>([]);
@@ -47,15 +49,20 @@ export default function ListaFacturas({ version, filtros, onCambiarFiltros, onVe
   const [mostradas, setMostradas] = useState(POR_PAGINA);
   const [cargando, setCargando] = useState(true);
   const [cargadoUnaVez, setCargadoUnaVez] = useState(false);
-  const [error, setError] = useState<'network' | 'server' | null>(null);
+  const [error, setError] = useState<TipoError | null>(null);
   const [busqueda, setBusqueda] = useState('');
   const [porEliminar, setPorEliminar] = useState<string | null>(null);
   const [eliminando, setEliminando] = useState(false);
   const [actualizadoEn, setActualizadoEn] = useState('');
+  // Al pedir confirmación para eliminar, el foco pasa a «No» (la opción segura).
+  const botonNo = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (porEliminar) botonNo.current?.focus();
+  }, [porEliminar]);
 
   const etiquetas = { prestador: t('entities.provider'), pagador: t('entities.payer'), nit: t('entities.nit') };
 
-  const cargar = useCallback(async () => {
+  const cargar = useCallback(async (manual = false) => {
     setCargando(true);
     setError(null);
     try {
@@ -71,17 +78,25 @@ export default function ListaFacturas({ version, filtros, onCambiarFiltros, onVe
           timeZone: 'America/Bogota',
         }),
       );
+      if (manual) toast.success(t('common.updated'), { id: 'cm-actualizado' });
     } catch (e) {
-      if (esErrorDeAcceso(e)) onErrorAcceso();
-      else setError(e instanceof Error && e.message === 'network' ? 'network' : 'server');
+      if (esErrorDeAcceso(e)) onErrorAcceso(e);
+      else setError(tipoDeError(e));
     } finally {
       setCargando(false);
     }
-  }, [locale, onErrorAcceso]);
+  }, [locale, onErrorAcceso, t]);
 
   useEffect(() => {
     cargar();
   }, [cargar, version]);
+
+  const recargaVista = useRef(recarga);
+  useEffect(() => {
+    if (recarga === recargaVista.current) return;
+    recargaVista.current = recarga;
+    cargar(true);
+  }, [cargar, recarga]);
 
   // Al cambiar un filtro se vuelve a la primera "página".
   useEffect(() => {
@@ -111,8 +126,11 @@ export default function ListaFacturas({ version, filtros, onCambiarFiltros, onVe
       setPorEliminar(null);
       onCambioDatos();
     } catch (e) {
-      if (esErrorDeAcceso(e)) onErrorAcceso();
-      else toast.error(t('errors.delete'));
+      if (esErrorDeAcceso(e)) onErrorAcceso(e);
+      else {
+        const tipo = tipoDeError(e);
+        toast.error(tipo === 'rateLimited' || tipo === 'unavailable' || tipo === 'network' ? t(`errors.${tipo}`) : t('errors.delete'));
+      }
     } finally {
       setEliminando(false);
     }
@@ -138,7 +156,7 @@ export default function ListaFacturas({ version, filtros, onCambiarFiltros, onVe
           )}
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" onClick={() => cargar()} disabled={cargando}>
+          <Button variant="outline" size="sm" onClick={() => cargar(true)} disabled={cargando}>
             <ArrowPathIcon className={`mr-1.5 h-4 w-4 ${cargando ? 'animate-spin' : ''}`} aria-hidden="true" />
             {t('common.refresh')}
           </Button>
@@ -163,7 +181,7 @@ export default function ListaFacturas({ version, filtros, onCambiarFiltros, onVe
               type="search"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              placeholder="FEDL-10432"
+              placeholder="FEDL-12345"
               className={`${claseCampo} pl-9`}
             />
           </span>
@@ -284,12 +302,18 @@ export default function ListaFacturas({ version, filtros, onCambiarFiltros, onVe
                   </div>
 
                   {porEliminar === f._id ? (
-                    <div className="flex flex-wrap items-center gap-2 rounded-lg bg-red-50 p-3 dark:bg-red-950" role="alert">
+                    <div
+                      className="flex flex-wrap items-center gap-2 rounded-lg bg-red-50 p-3 dark:bg-red-950"
+                      role="alert"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Escape' && !eliminando) setPorEliminar(null);
+                      }}
+                    >
                       <span className="text-sm text-red-800 dark:text-red-200">{t('invoices.deleteQuestion', { number: f.numeroFactura })}</span>
                       <Button size="sm" variant="danger" onClick={() => eliminar(item)} isLoading={eliminando} disabled={eliminando}>
                         {t('common.confirmDelete')}
                       </Button>
-                      <Button size="sm" variant="ghost" onClick={() => setPorEliminar(null)} disabled={eliminando}>
+                      <Button ref={botonNo} size="sm" variant="ghost" onClick={() => setPorEliminar(null)} disabled={eliminando}>
                         {t('common.keep')}
                       </Button>
                     </div>

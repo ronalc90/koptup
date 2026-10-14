@@ -1,4 +1,5 @@
 import type { Factura, Glosa } from '../tipos-auditoria';
+import { zonaDeFecha } from './formato';
 
 /**
  * Estado de cada factura según la revisión del auditor.
@@ -49,14 +50,17 @@ export function resumirRevision(
   return { estado, glosas: glosas.length, pendientes, valorGlosado, cerrada: pendientes === 0 };
 }
 
-/** Fecha 'AAAA-MM-DD' en hora de Colombia, para comparar con los filtros de fecha. */
+/**
+ * Fecha 'AAAA-MM-DD' en hora de Colombia (o la fecha tal cual si el servidor
+ * la guardó sin hora, ver `zonaDeFecha`), para comparar con los filtros.
+ */
 export function diaColombia(iso: string | undefined): string {
   if (!iso) return '';
   const fecha = new Date(iso);
   if (Number.isNaN(fecha.getTime())) return '';
   // en-CA formatea como AAAA-MM-DD.
   return new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Bogota',
+    timeZone: zonaDeFecha(iso),
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',

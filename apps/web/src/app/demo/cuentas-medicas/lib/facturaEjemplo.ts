@@ -10,7 +10,14 @@
  * dos glosas por diferencia de tarifa.
  */
 
-export const NOMBRE_FACTURA_EJEMPLO = 'FACTURA_EJEMPLO_FEDL-10432.pdf';
+/**
+ * Número de la factura de ejemplo: FEDL- y cinco cifras que cambian cada
+ * minuto, para que dos auditorías del ejemplo no choquen en el espacio
+ * compartido (el servidor le agregaría un sufijo largo al número repetido).
+ */
+export function numeroFacturaEjemplo(ahora: Date = new Date()): string {
+  return `FEDL-${10000 + (Math.floor(ahora.getTime() / 60000) % 90000)}`;
+}
 
 interface Fila {
   codigo: string;
@@ -71,6 +78,7 @@ function miles(valor: number): string {
 
 export async function generarFacturaEjemplo(): Promise<File> {
   const { jsPDF } = await import('jspdf');
+  const numero = numeroFacturaEjemplo();
   const doc = new jsPDF({ unit: 'mm', format: 'letter' });
   const margen = 15;
   let y = 16;
@@ -92,7 +100,7 @@ export async function generarFacturaEjemplo(): Promise<File> {
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.text('FACTURA ELECTRÓNICA DE VENTA No. FEDL-10432', margen, y);
+  doc.text(`FACTURA ELECTRÓNICA DE VENTA No. ${numero}`, margen, y);
   y += 7;
 
   doc.setFont('helvetica', 'normal');
@@ -147,5 +155,5 @@ export async function generarFacturaEjemplo(): Promise<File> {
   );
 
   const blob = doc.output('blob');
-  return new File([blob], NOMBRE_FACTURA_EJEMPLO, { type: 'application/pdf' });
+  return new File([blob], `FACTURA_EJEMPLO_${numero}.pdf`, { type: 'application/pdf' });
 }

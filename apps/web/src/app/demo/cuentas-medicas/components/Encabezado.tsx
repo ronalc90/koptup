@@ -8,6 +8,7 @@ import {
   BeakerIcon,
   LockClosedIcon,
   PlusIcon,
+  UserGroupIcon,
 } from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
 
@@ -54,6 +55,10 @@ export default function Encabezado({ vista, onCambiarVista, onAuditar, mostrarNa
           </div>
           <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">{t('title')}</h1>
           <p className="max-w-3xl text-gray-700 dark:text-gray-300">{t('subtitle')}</p>
+          <p className="mt-2 flex max-w-3xl items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
+            <UserGroupIcon className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+            {t('audience')}
+          </p>
           <Link
             href="/rag"
             className="mt-3 inline-flex items-center gap-1 rounded text-sm font-semibold text-primary-700 underline decoration-primary-300 underline-offset-4 hover:text-primary-800 hover:decoration-primary-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:text-primary-300"

@@ -13,7 +13,17 @@ export function formatearCOP(valor: number | undefined | null, locale: string): 
   }).format(Number(valor) || 0);
 }
 
-/** Fecha en hora de Colombia (fija, para que no dependa de la zona del navegador). */
+/**
+ * Zona con la que se lee una fecha del backend. Cuando el modelo lee la fecha
+ * de la factura, el servidor la guarda como fecha sin hora (medianoche UTC):
+ * leerla en hora de Colombia la correría al día anterior, así que se lee en
+ * UTC. Las demás (fecha de la auditoría, con hora) se leen en hora de Colombia.
+ */
+export function zonaDeFecha(iso: string): 'UTC' | 'America/Bogota' {
+  return /T00:00:00(?:\.0+)?(?:Z|\+00:00)$/.test(iso) ? 'UTC' : 'America/Bogota';
+}
+
+/** Fecha con zona fija (no depende de la zona del navegador: sin errores de hidratación). */
 export function formatearFecha(iso: string | undefined, locale: string): string {
   if (!iso) return '';
   const fecha = new Date(iso);
@@ -22,7 +32,7 @@ export function formatearFecha(iso: string | undefined, locale: string): string 
     year: 'numeric',
     month: 'short',
     day: 'numeric',
-    timeZone: 'America/Bogota',
+    timeZone: zonaDeFecha(iso),
   });
 }
 

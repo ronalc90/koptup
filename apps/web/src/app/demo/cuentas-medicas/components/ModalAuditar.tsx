@@ -13,7 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
 import { downloadBlob } from '@/lib/utils';
-import { ApiError, auditoriaAPI, esErrorDeAcceso } from '../api';
+import { auditoriaAPI, esErrorDeAcceso, tipoDeError } from '../api';
 import type { ResultadoProcesamiento } from '../tipos-auditoria';
 import { formatearCOP } from '../lib/formato';
 import { generarFacturaEjemplo } from '../lib/facturaEjemplo';
@@ -33,7 +33,7 @@ interface Props {
   onCerrar: () => void;
   onAuditada: (resultado: ResultadoProcesamiento) => void;
   onVerDetalle: (facturaId: string) => void;
-  onErrorAcceso: () => void;
+  onErrorAcceso: (error: unknown) => void;
 }
 
 type Estado = 'editando' | 'procesando' | 'listo' | 'error';
@@ -127,12 +127,13 @@ export default function ModalAuditar({ abierto, autoEjemplo, onCerrar, onAuditad
       } catch (e) {
         if (esErrorDeAcceso(e)) {
           reiniciar();
-          onErrorAcceso();
+          onErrorAcceso(e);
           return;
         }
+        const tipo = tipoDeError(e);
         let mensaje = t('upload.errors.server');
-        if (e instanceof ApiError && e.status === 400) mensaje = t('upload.errors.noInvoice');
-        if (e instanceof ApiError && e.status === 0) mensaje = t('errors.network');
+        if (tipo === 'badRequest') mensaje = t('upload.errors.noInvoice');
+        else if (tipo !== 'server' && tipo !== 'notFound') mensaje = t(`errors.${tipo}`);
         setMensajeError(mensaje);
         setEstado('error');
       }
@@ -152,6 +153,11 @@ export default function ModalAuditar({ abierto, autoEjemplo, onCerrar, onAuditad
       setGenerando(false);
     }
   }, [t]);
+
+  // Al cerrarse por cualquier vía, la próxima apertura puede volver a lanzar el ejemplo.
+  useEffect(() => {
+    if (!abierto) autoLanzado.current = false;
+  }, [abierto]);
 
   // "Auditar la factura de ejemplo" desde el tablero: genera la factura y la audita de una vez.
   useEffect(() => {

@@ -13,6 +13,7 @@ import extraccionDualService from '../services/extraccion-dual.service';
 import extraccionOptimizadaService from '../services/extraccion-optimizada.service';
 import extraccionEspecializadaService from '../services/extraccion-especializada.service';
 import auditorIAFinalService from '../services/auditor-ia-final.service';
+import { NO_PROCEDURES_MESSAGE } from '../services/expert-system.service';
 
 class AuditoriaMedicaController {
   /**
@@ -91,6 +92,17 @@ class AuditoriaMedicaController {
       }
 
       console.log(`   - Procedimientos encontrados: ${todosProcedimientos.length}`);
+
+      // Sin procedimientos no hay nada que auditar: se responde 400 antes de
+      // llamar al modelo y de guardar nada (antes quedaba una factura a medias
+      // en la base y la respuesta era un 500).
+      if (todosProcedimientos.length === 0) {
+        return res.status(400).json({
+          success: false,
+          code: 'no_procedures',
+          message: NO_PROCEDURES_MESSAGE,
+        });
+      }
       todosProcedimientos.forEach((proc: any, idx: number) => {
         console.log(`     ${idx + 1}. ${proc.codigoProcedimiento} - ${proc.nombreProcedimiento} (Cant: ${proc.cant}, Valor: $${proc.valorUnitario?.toLocaleString('es-CO')})`);
       });
