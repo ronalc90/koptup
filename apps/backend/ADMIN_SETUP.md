@@ -40,8 +40,11 @@ el panel, la decisión se respeta. El cambio queda en la bitácora con
 `detalle.origen: "ADMIN_EMAIL"`. Sin `ADMIN_EMAIL`, el arranque no modifica
 ningún rol.
 
-`ADMIN_EMAIL` también es el destino de los avisos al equipo por correo; sin
-ella esos avisos no se envían (no hay una dirección fija en el código).
+Los avisos de nuevos contactos por correo van a `NOTIFY_EMAIL`; si no está
+definida, se usa `ADMIN_EMAIL` como respaldo, y sin ninguna de las dos no se
+envían (no hay una dirección fija en el código). La configuración completa de
+los avisos por correo y WhatsApp está en
+[Doc-11 §4.5](../../docs/wiki/Doc-11-Operacion-y-Despliegue.md#45-configurar-los-avisos-al-dueño-paso-a-paso).
 
 ## Notas
 
