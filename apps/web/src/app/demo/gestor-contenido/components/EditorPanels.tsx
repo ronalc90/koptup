@@ -14,7 +14,7 @@ import { isL10n, stripHtml, textToHtml, wordCount } from '../lib/text';
 import { formatDateTime } from '../lib/time';
 import type { Entry, EntryContent, L10n } from '../lib/types';
 import { useFieldLabel } from './Fields';
-import { btn, inputCls, labelCls, Note, selectCls } from './ui';
+import { btn, inputCls, labelCls, Note, selectCls, useEntryTitle } from './ui';
 
 async function copyText(text: string): Promise<boolean> {
   try {
@@ -128,6 +128,7 @@ export function HistoryPanel({ entry }: { entry: Entry }) {
   const t = useTranslations('demoCms.history');
   const tAct = useTranslations('demoCms.activity');
   const { state, me, act, toast, contentLocale: locale } = useCms();
+  const entryTitle = useEntryTitle();
   const person = (id: string) => state.people.find((p) => p.id === id)?.name ?? id;
   const editable = canEdit(me.role, entry);
   const versions = [...entry.versions].reverse();
@@ -175,7 +176,7 @@ export function HistoryPanel({ entry }: { entry: Entry }) {
           <ul className="space-y-1">
             {activity.map((a) => (
               <li key={a.id} className="text-xs text-slate-600 dark:text-slate-300">
-                <span className="font-semibold">{person(a.by)}</span> {tAct(a.kind, { title: a.entryTitle ?? '', detail: a.detail ?? '' })} · {formatDateTime(a.at, locale)}
+                <span className="font-semibold">{person(a.by)}</span> {tAct(a.kind, { title: entryTitle(a.entryId, a.entryTitle), detail: a.detail ?? '' })} · {formatDateTime(a.at, locale)}
               </li>
             ))}
           </ul>
@@ -213,9 +214,15 @@ export function AiPanel({ entry, readOnly, onField, onBlockHtml }: { entry: Entr
   const [result, setResult] = useState<string | null>(null);
   const [options, setOptions] = useState<ai.AiVersion[] | null>(null);
   const [error, setError] = useState<ai.AiErrorCode | null>(null);
+  // Campo e idioma de los que salió la propuesta: si cambias el idioma del contenido o el
+  // campo, la propuesta no se muestra (ni se puede aplicar) en otro campo u otro idioma.
+  const [resultFor, setResultFor] = useState<string | null>(null);
   const target = targets.find((x) => x.key === key) ?? targets[0];
   const source = target?.text.trim() ?? '';
   const words = wordCount(source);
+  const current = `${target?.key ?? ''}|${locale}`;
+  const shownResult = resultFor === current ? result : null;
+  const shownOptions = resultFor === current ? options : null;
 
   const run = async (id: string, fn: () => Promise<string | ai.AiVersion[]>) => {
     if (!source) return;
@@ -223,6 +230,7 @@ export function AiPanel({ entry, readOnly, onField, onBlockHtml }: { entry: Entr
     setError(null);
     setResult(null);
     setOptions(null);
+    setResultFor(current);
     try {
       const r = await fn();
       if (typeof r === 'string') setResult(r);
@@ -303,15 +311,15 @@ export function AiPanel({ entry, readOnly, onField, onBlockHtml }: { entry: Entr
           <Note tone="warn">{t(`errors.${error}`)}</Note>
         </div>
       )}
-      {result !== null && (
+      {shownResult !== null && (
         <div className="rounded-lg border border-pink-200 dark:border-pink-900 p-3 space-y-2">
           <p className="text-xs font-semibold text-pink-700 dark:text-pink-300">{t('result')}</p>
-          <p className="text-sm text-slate-800 dark:text-slate-100 whitespace-pre-wrap">{result}</p>
+          <p className="text-sm text-slate-800 dark:text-slate-100 whitespace-pre-wrap">{shownResult}</p>
           <div className="flex flex-wrap gap-2">
-            <button type="button" className={btn.primary} onClick={() => apply(result)} disabled={readOnly}>
+            <button type="button" className={btn.primary} onClick={() => apply(shownResult)} disabled={readOnly}>
               {t('apply')}
             </button>
-            <button type="button" className={btn.outline} onClick={async () => toast((await copyText(result)) ? t('copied') : t('copyFailed'), 'info')}>
+            <button type="button" className={btn.outline} onClick={async () => toast((await copyText(shownResult)) ? t('copied') : t('copyFailed'), 'info')}>
               {t('copy')}
             </button>
             <button type="button" className={btn.outline} onClick={() => setResult(null)}>
@@ -320,9 +328,9 @@ export function AiPanel({ entry, readOnly, onField, onBlockHtml }: { entry: Entr
           </div>
         </div>
       )}
-      {options && (
+      {shownOptions && (
         <ul className="space-y-2">
-          {options.map((o, i) => (
+          {shownOptions.map((o, i) => (
             <li key={i} className="rounded-lg border border-pink-200 dark:border-pink-900 p-3 space-y-2">
               <p className="text-xs font-semibold text-pink-700 dark:text-pink-300">{t('option', { n: i + 1, tone: t(`tones.${o.tone === 'técnico' ? 'tecnico' : o.tone}`) })}</p>
               <p className="text-sm text-slate-800 dark:text-slate-100 whitespace-pre-wrap">{o.content}</p>

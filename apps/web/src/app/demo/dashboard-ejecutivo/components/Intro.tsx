@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import {
@@ -19,8 +19,6 @@ import { btn, Modal, NS, useFmt } from './ui';
 /** Salidas comerciales: demo guiada con esta demo ya elegida y cotización del producto del catálogo. */
 export const REQUEST_DEMO_HREF = '/solicitar-demo?demos=dashboard-ejecutivo';
 export const QUOTE_HREF = '/contact?service=bi-dashboard';
-
-const GUIDE_OPEN_KEY = 'demo:bi:guide-open:v1';
 
 const ctaCls =
   'inline-flex items-center gap-1.5 px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold border focus:outline-none focus-visible:ring-2 focus-visible:ring-white';
@@ -153,26 +151,8 @@ export default function Intro({ onPdf }: { onPdf: () => void }) {
  */
 function GettingStarted({ onPdf }: { onPdf: () => void }) {
   const t = useTranslations(`${NS}.guide`);
-  const { guide, setView, setSegment } = useDashboard();
-  const [open, setOpen] = useState(true);
-
-  useEffect(() => {
-    try {
-      if (window.localStorage.getItem(GUIDE_OPEN_KEY) === '0') setOpen(false);
-    } catch {
-      /* sin almacenamiento: queda abierto */
-    }
-  }, []);
-
-  const toggle = () => {
-    const next = !open;
-    setOpen(next);
-    try {
-      window.localStorage.setItem(GUIDE_OPEN_KEY, next ? '1' : '0');
-    } catch {
-      /* sin almacenamiento */
-    }
-  };
+  const { guide, setView, setSegment, guideOpen: open, setGuideOpen } = useDashboard();
+  const toggle = () => setGuideOpen(!open);
 
   const run = (step: GuideStep) => {
     if (step === 'period') {

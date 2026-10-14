@@ -15,6 +15,7 @@ import {
   DEFAULT_MISSIONS,
   FRAUD_RULES,
   REWARDS,
+  SEDES,
   defaultRules,
   sampleDraws,
   sampleLedger,
@@ -41,10 +42,12 @@ import {
   claimKey,
   couponCode,
   missionProgress,
+  pickDrawWinner,
   quoteSale,
   thresholdsValid,
   tierFor,
   tierPoints,
+  type LineQuote,
   type SaleLine,
 } from './engine';
 import { colombiaNow, monthKeyOf } from './dates';
@@ -70,6 +73,8 @@ export interface Sale {
   tierAfter: TierKey;
   balanceAfter: number;
   whatsapp: boolean;
+  /** Cálculo de puntos de cada línea, tal como se hizo al registrar la venta. */
+  calc?: LineQuote[];
 }
 
 export interface Coupon {
@@ -114,7 +119,8 @@ export interface LoyaltyState {
 export const STORAGE_KEY = 'koptup-demo-loyalty-v2';
 /** Versión anterior, con la semana fija de octubre de 2026: se descarta. */
 export const LEGACY_KEY = 'koptup-demo-loyalty-v1';
-const VERSION = 2;
+/** 3: boletas de sorteo en la app y compras de ejemplo de Jhon en el libro de puntos. */
+const VERSION = 3;
 
 export function initialState(today: string): LoyaltyState {
   const stock: Record<string, number> = {};
@@ -164,7 +170,9 @@ export function restoreState(saved: unknown, hadLegacy: boolean, today: string):
     Array.isArray(parsed.ledger) &&
     Array.isArray(parsed.members) &&
     Array.isArray(parsed.sales);
-  if (!valid) return { state: initialState(today), notice: hadLegacy ? 'updated' : null };
+  // Lo guardado con una versión anterior de la demo se vuelve a armar y se avisa.
+  const olderVersion = !!parsed && typeof parsed.v === 'number' && parsed.v !== VERSION;
+  if (!valid) return { state: initialState(today), notice: hadLegacy || olderVersion ? 'updated' : null };
   const anchor = parsed.anchor as string;
   if (anchor > today || monthKeyOf(anchor) !== monthKeyOf(today)) return { state: initialState(today), notice: 'newMonth' };
   const base = initialState(anchor);
@@ -208,6 +216,15 @@ export type SaleError = 'noLines' | 'insufficient' | 'couponInvalid' | 'frozen';
 
 export type RedeemError = 'insufficient' | 'outOfStock' | 'frozen';
 
+export type TicketError = 'insufficient' | 'frozen' | 'closed';
+
+/** Nombre corto para mostrar a un miembro de la demo como ganador: «Laura M. · Chapinero». */
+export function winnerLabel(m: Member) {
+  const [first, last] = m.name.split(/\s+/);
+  const sede = SEDES.find((x) => x.id === m.sede)?.name.split(' · ')[0] ?? '';
+  return `${last ? `${first} ${last[0]}.` : first}${sede ? ` · ${sede}` : ''}`;
+}
+
 /** Un miembro con una alerta antifraude en "puntos congelados" no puede canjear. */
 export function isFrozen(s: LoyaltyState, memberId: string) {
   return s.alerts.some((a) => a.memberId === memberId && a.status === 'frozen');
@@ -240,7 +257,10 @@ interface Ctx {
   addAlly: (a: Omit<Ally, 'id' | 'monthPoints'>) => void;
   removeAlly: (id: string) => void;
   addDraw: (d: Omit<Draw, 'id' | 'status' | 'participants'>) => void;
-  runDraw: (id: string, winner: string) => void;
+  /** Compra una boleta con puntos para un sorteo programado. */
+  buyTicket: (memberId: string, drawId: string, date: string, time: string) => { ok: true; tickets: number; balance: number } | { ok: false; error: TicketError };
+  /** Sortea ahora (simulado): elige al ganador entre los participantes de ejemplo y las boletas de la demo. */
+  runDraw: (id: string, rand: number) => { winner: string; memberId?: string } | null;
   markExported: () => void;
   reset: () => void;
 }
@@ -450,6 +470,7 @@ export function LoyaltyProvider({ children }: { children: ReactNode }) {
               tierAfter,
               balanceAfter: balanceOf(ledger, input.memberId),
               whatsapp: !!member?.whatsappOptIn,
+              calc: quote.lines,
             };
             const coupons = couponUsed
               ? s.coupons.map((c) => (c.code === couponUsed ? { ...c, status: 'used' as const, usedSaleId: saleId } : c))
@@ -582,8 +603,44 @@ export function LoyaltyProvider({ children }: { children: ReactNode }) {
       addAlly: (a) => update((s) => ({ ...s, seq: s.seq + 1, allies: [...s.allies, { ...a, id: `a${s.seq + 100}`, monthPoints: 0 }] })),
       removeAlly: (id) => update((s) => ({ ...s, allies: s.allies.filter((a) => a.id !== id) })),
 
-      addDraw: (d) => update((s) => ({ ...s, seq: s.seq + 1, draws: [{ ...d, id: `d${s.seq + 100}`, status: 'scheduled', participants: 0 }, ...s.draws] })),
-      runDraw: (id, winner) => update((s) => ({ ...s, draws: s.draws.map((d) => (d.id === id ? { ...d, status: 'done' as const, winner } : d)) })),
+      addDraw: (d) => update((s) => ({ ...s, seq: s.seq + 1, draws: [{ ...d, id: `d${s.seq + 100}`, status: 'scheduled', participants: 0, tickets: {} }, ...s.draws] })),
+
+      buyTicket: (memberId, drawId, date, time) =>
+        commit<ReturnType<Ctx['buyTicket']>>(
+          (s) => {
+            const draw = s.draws.find((d) => d.id === drawId);
+            if (!draw || draw.status !== 'scheduled' || draw.date < day) return { next: s, result: { ok: false as const, error: 'closed' as TicketError } };
+            if (isFrozen(s, memberId)) return { next: s, result: { ok: false as const, error: 'frozen' as TicketError } };
+            if (balanceOf(s.ledger, memberId) < draw.ticketCost) return { next: s, result: { ok: false as const, error: 'insufficient' as TicketError } };
+            const tx: LedgerTx = { id: txId(s, 1), memberId, date, time, kind: 'ticket', points: -draw.ticketCost, drawId, session: true };
+            const tickets = (draw.tickets?.[memberId] ?? 0) + 1;
+            const ledger = [...s.ledger, tx];
+            return {
+              next: {
+                ...s,
+                seq: s.seq + 2,
+                ledger,
+                draws: s.draws.map((d) => (d.id === drawId ? { ...d, tickets: { ...(d.tickets ?? {}), [memberId]: tickets } } : d)),
+              },
+              result: { ok: true as const, tickets, balance: balanceOf(ledger, memberId) },
+            };
+          },
+          { ok: false as const, error: 'closed' as TicketError },
+        ),
+
+      runDraw: (id, rand) =>
+        commit<ReturnType<Ctx['runDraw']>>((s) => {
+          const draw = s.draws.find((d) => d.id === id);
+          if (!draw || draw.status !== 'scheduled') return { next: s, result: null };
+          const pick = pickDrawWinner(draw, rand);
+          if (!pick) return { next: s, result: null };
+          const member = 'memberId' in pick ? s.members.find((m) => m.id === pick.memberId) : undefined;
+          const winner = 'sample' in pick ? pick.sample : member ? winnerLabel(member) : '';
+          return {
+            next: { ...s, draws: s.draws.map((d) => (d.id === id ? { ...d, status: 'done' as const, winner, date: day } : d)) },
+            result: { winner, memberId: member?.id },
+          };
+        }, null),
 
       markExported: () => update((s) => (s.tour.exported ? s : { ...s, tour: { ...s.tour, exported: true } })),
 

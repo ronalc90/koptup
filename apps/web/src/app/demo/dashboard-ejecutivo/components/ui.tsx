@@ -235,9 +235,9 @@ export function Modal({
 
 export function Toasts() {
   const { toasts } = useDashboard();
-  if (!toasts.length) return null;
+  // La región aria-live existe desde el inicio para que los lectores de pantalla anuncien cada aviso.
   return (
-    <div className="fixed bottom-4 right-4 left-4 sm:left-auto z-[220] flex flex-col gap-2 items-stretch sm:items-end" role="status" aria-live="polite">
+    <div className="pointer-events-none fixed bottom-4 right-4 left-4 sm:left-auto z-[220] flex flex-col gap-2 items-stretch sm:items-end" role="status" aria-live="polite">
       {toasts.map((t) => {
         const Icon = t.tone === 'error' ? ExclamationCircleIcon : t.tone === 'info' ? InformationCircleIcon : CheckCircleIcon;
         const cls = t.tone === 'error' ? 'bg-red-600' : t.tone === 'info' ? 'bg-slate-800' : 'bg-emerald-600';

@@ -14,8 +14,9 @@ type Snippet = 'next' | 'curl';
 export default function ApiView() {
   const t = useTranslations('demoCms.api');
   const tTypes = useTranslations('demoCms.types');
-  const { state, toast } = useCms();
-  const [q, setQ] = useState<ApiQuery>({ type: 'location', locale: 'es', preview: false });
+  const { state, toast, contentLocale } = useCms();
+  // Arranca en el idioma del contenido (el del sitio al abrir la demo).
+  const [q, setQ] = useState<ApiQuery>({ type: 'location', locale: contentLocale, preview: false });
   const [snippet, setSnippet] = useState<Snippet>('next');
   const json = listJson(state, q);
   const body = JSON.stringify(json, null, 2);
@@ -24,7 +25,7 @@ export default function ApiView() {
   const code =
     snippet === 'next'
       ? `// app/${q.type}/page.tsx (Next.js)\nexport default async function Page() {\n  const res = await fetch('${url}', {\n    next: { tags: ['cms:${q.type}'] }, // ${t('snippetComment')}\n  });\n  const { data } = await res.json();\n  return <EntryList items={data} />;\n}`
-      : `curl -s '${url}'${q.preview ? " \\\n  -H 'Authorization: Bearer <preview-token>'" : ''}`;
+      : `curl -s '${url}'${q.preview ? ` \\\n  -H 'Authorization: Bearer <${t('previewToken')}>'` : ''}`;
 
   const copy = async (text: string) => {
     try {

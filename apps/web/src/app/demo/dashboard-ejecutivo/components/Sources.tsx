@@ -25,6 +25,7 @@ const CONNECTORS = ['csv', 'sheets', 'postgres', 'siigo', 'sapb1', 'hubspot'] as
 export default function Sources() {
   const t = useTranslations(`${NS}.sources`);
   const ts = useTranslations(`${NS}.sectors`);
+  const tf = useTranslations(`${NS}.files`);
   const fmt = useFmt();
   const labels = useLabels();
   const { dataset, setUpload, company, ctx, notify, setView } = useDashboard();
@@ -105,7 +106,7 @@ export default function Sources() {
       rows.map((r) => [r.date, r.id, r.customer, r.city, labels.line(r.line), r.seller, Math.round(r.value), r.cost !== null ? Math.round(r.cost) : null]),
       fmt.loc,
     );
-    const file = `ventas-${slugify(dataset.source === 'sample' ? company.name : dataset.fileName ?? 'archivo')}.csv`;
+    const file = `${tf('sales')}-${slugify(dataset.source === 'sample' ? company.name : dataset.fileName ?? 'archivo')}.csv`;
     downloadText(csv, file, 'text/csv;charset=utf-8');
     notify(t('downloaded', { file, count: rows.length }));
   };

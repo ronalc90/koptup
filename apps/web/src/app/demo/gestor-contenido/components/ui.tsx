@@ -2,11 +2,41 @@
 
 import { useEffect, useRef, type KeyboardEvent, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { CheckCircleIcon, ExclamationTriangleIcon, InformationCircleIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import { hasUnpublishedChanges } from '../lib/models';
+import { hasUnpublishedChanges, titleOf } from '../lib/models';
+import { notifiedTargets } from '../lib/reducer';
 import { useCms } from '../lib/store';
 import type { Entry, Status, TypeId } from '../lib/types';
+
+/**
+ * Aviso al publicar: dice a qué canales se avisó de verdad (webhooks activados;
+ * el del asistente solo para preguntas frecuentes) o que no se avisó a ninguno.
+ * Se calcula antes de publicar con los webhooks del momento.
+ */
+export function usePublishNotice() {
+  const t = useTranslations('demoCms.editor');
+  const tTargets = useTranslations('demoCms.publishing.targets');
+  const uiLocale = useLocale();
+  const { state } = useCms();
+  return (entry: Pick<Entry, 'type'>) => {
+    const targets = notifiedTargets(state, entry).map((id) => tTargets(`${id}.name`));
+    if (targets.length === 0) return t('publishedNoHooks');
+    return t('publishedTo', { targets: new Intl.ListFormat(uiLocale === 'en' ? 'en' : 'es', { type: 'conjunction' }).format(targets) });
+  };
+}
+
+/**
+ * Título de una entrada para la actividad y las entregas: el actual, en el idioma
+ * del contenido; si la entrada ya no existe (se eliminó), el que se guardó.
+ */
+export function useEntryTitle() {
+  const { state, contentLocale } = useCms();
+  return (entryId: string | undefined, stored: string | undefined) => {
+    const e = entryId ? state.entries.find((x) => x.id === entryId) : undefined;
+    return (e && titleOf(e, e.content, contentLocale)) || stored || '';
+  };
+}
 
 /** "en 5 minutos", "en 3 horas", "en 2 días" (para publicaciones programadas). */
 export function useUntil() {

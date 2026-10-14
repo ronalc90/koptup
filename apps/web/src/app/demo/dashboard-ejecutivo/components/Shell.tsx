@@ -19,7 +19,7 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { formatNit } from '../lib/presets';
-import { useDashboard } from '../lib/store';
+import { scrollToContent, useDashboard } from '../lib/store';
 import { VIEWS, type ViewId } from '../lib/types';
 import Alerts from './Alerts';
 import Ask from './Ask';
@@ -151,7 +151,9 @@ function Search() {
       }
     }
     if (needle.length >= 3) {
-      for (const r of dataset.rows) {
+      // Facturas más recientes primero.
+      for (let i = dataset.rows.length - 1; i >= 0; i--) {
+        const r = dataset.rows[i];
         if (r.id.toLowerCase().includes(needle)) {
           out.push({ id: `i:${r.id}`, kind: 'invoice', label: r.id, hint: t('hintInvoice', { customer: r.customer, value: fmt.money(r.value), date: fmt.date(r.date) }), run: () => openInvoice(r.id) });
           if (out.filter((x) => x.kind === 'invoice').length >= 5) break;
@@ -181,34 +183,36 @@ function Search() {
   };
 
   return (
-    <div ref={boxRef} className="relative flex-1 min-w-0">
+    <div ref={boxRef} className="sm:relative flex-1 min-w-0">
       <label htmlFor="exec-search" className="sr-only">
         {t('label')}
       </label>
-      <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" aria-hidden="true" />
-      <input
-        id="exec-search"
-        type="search"
-        role="combobox"
-        aria-expanded={open && q.trim().length > 0}
-        aria-controls="exec-search-list"
-        aria-autocomplete="list"
-        aria-activedescendant={open && results[active] ? `sr-${active}` : undefined}
-        placeholder={t('placeholder')}
-        value={q}
-        onChange={(e) => {
-          setQ(e.target.value);
-          setOpen(true);
-          setActive(0);
-        }}
-        onFocus={() => setOpen(true)}
-        onKeyDown={onKey}
-        autoComplete="off"
-        className="w-full pl-10 pr-3 py-2 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
-        data-testid="exec-search-input"
-      />
+      <div className="relative">
+        <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" aria-hidden="true" />
+        <input
+          id="exec-search"
+          type="search"
+          role="combobox"
+          aria-expanded={open && q.trim().length > 0}
+          aria-controls="exec-search-list"
+          aria-autocomplete="list"
+          aria-activedescendant={open && results[active] ? `sr-${active}` : undefined}
+          placeholder={t('placeholder')}
+          value={q}
+          onChange={(e) => {
+            setQ(e.target.value);
+            setOpen(true);
+            setActive(0);
+          }}
+          onFocus={() => setOpen(true)}
+          onKeyDown={onKey}
+          autoComplete="off"
+          className="w-full pl-10 pr-3 py-2 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+          data-testid="exec-search-input"
+        />
+      </div>
       {open && q.trim().length > 0 && (
-        <div className="absolute top-full left-0 right-0 sm:right-auto sm:w-[28rem] mt-2 bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-slate-200 dark:border-slate-700 max-h-96 overflow-y-auto z-50" data-testid="exec-search-panel">
+        <div className="absolute top-full left-4 right-4 sm:left-0 sm:right-auto sm:w-[28rem] mt-2 bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-slate-200 dark:border-slate-700 max-h-96 overflow-y-auto z-50" data-testid="exec-search-panel">
           {results.length ? (
             <ul id="exec-search-list" role="listbox" aria-label={t('results')} className="p-2">
               {results.map((r, i) => (
@@ -261,7 +265,7 @@ function Bell() {
     };
   }, [open]);
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="sm:relative">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -277,7 +281,7 @@ function Bell() {
         )}
       </button>
       {open && (
-        <div className="absolute top-full right-0 mt-2 w-[calc(100vw-2rem)] max-w-sm bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-slate-200 dark:border-slate-700 z-50" data-testid="exec-notifications-panel">
+        <div className="absolute top-full left-4 right-4 sm:left-auto sm:right-0 mt-2 sm:w-96 bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-slate-200 dark:border-slate-700 z-50" data-testid="exec-notifications-panel">
           <div className="p-3 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
             <h3 className="text-sm font-semibold text-slate-900 dark:text-white">{t('title')}</h3>
             <button type="button" onClick={() => setOpen(false)} className="p-1 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300" aria-label={t('close')}>
@@ -349,11 +353,13 @@ export default function Shell() {
     };
   }, [mobileOpen]);
 
-  // Al cambiar de sección desde los primeros pasos o un aviso, baja hasta el bloque indicado.
+  // Al cambiar de sección: baja hasta el bloque indicado (primeros pasos, alertas) o al comienzo de la sección.
   useEffect(() => {
     if (!scrollTarget) return;
     const id = window.setTimeout(() => {
-      document.getElementById(scrollTarget)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const el = scrollTarget === 'exec-content' ? null : document.getElementById(scrollTarget);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      else scrollToContent();
       clearScrollTarget();
     }, 80);
     return () => window.clearTimeout(id);
@@ -419,7 +425,7 @@ export default function Shell() {
         )}
 
         <div className="flex-1 min-w-0">
-          <header className="bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 sticky top-16 md:top-20 z-40" data-testid="exec-toolbar">
+          <header id="exec-toolbar" className="bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 sticky top-16 md:top-20 z-40" data-testid="exec-toolbar">
             <div className="px-4 sm:px-6 pt-3 pb-2 flex items-center gap-2 sm:gap-3">
               <button
                 type="button"
@@ -490,7 +496,7 @@ export default function Shell() {
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white" data-testid="exec-view-title">
                 {tn(view)}
               </h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400">{t(`intro.${view}`, { period: fmt.periodIn(period) })}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">{t(`intro.${view === 'finanzas' && !sample ? 'finanzasUpload' : view}`, { period: fmt.periodIn(period) })}</p>
               <p className="md:hidden mt-1 text-xs text-slate-500 dark:text-slate-400">
                 {companyLine}
                 {companyLine ? ' · ' : ''}

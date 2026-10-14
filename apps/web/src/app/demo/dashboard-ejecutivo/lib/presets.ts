@@ -235,7 +235,7 @@ const servicios: Preset = {
   growth: 0.06,
   goalGrowth: 12,
   thresholds: { goalGap: 5, marginDrop: 1.5, overdueGrowth: 10, cashFloor: 150, riskDrop: 25 },
-  invoicePrefix: 'SETP',
+  invoicePrefix: 'FEMC',
   invoiceStart: 7_120,
   shocks: [
     { city: 'Medellín', lastMonths: 2, sales: 0.78 },

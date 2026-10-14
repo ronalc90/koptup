@@ -1,6 +1,7 @@
 /**
  * Datos de ejemplo: "Red de Clínicas Montaña Azul", una empresa ficticia con
- * seis sedes en Colombia. Personas, direcciones, teléfonos (+57 300 555 01xx)
+ * cinco sedes publicadas en cuatro ciudades de Colombia y una sexta (Cabecera,
+ * en Bucaramanga) recién creada y en revisión. Personas, direcciones, teléfonos (+57 300 555 01xx)
  * y dominios (.example, reservado para ejemplos) son inventados. Las fechas se
  * calculan desde el momento en que abres la demo.
  */
@@ -8,7 +9,7 @@ import { DEFAULT_TYPES } from './models';
 import { atBogota, iso } from './time';
 import type { AppState, Block, Entry, EntryContent, FieldValue, L10n, Media, Person, Status, TypeId, Webhook } from './types';
 
-export const STATE_VERSION = 4;
+export const STATE_VERSION = 5;
 
 export const COMPANY = {
   name: 'Red de Clínicas Montaña Azul',
@@ -99,7 +100,7 @@ function specs(): Spec[] {
       updatedDaysAgo: 21,
       publishedDaysAgo: 21,
       fields: {
-        title: L('Tu salud, cerca de ti en cinco ciudades', 'Your health, close to you in five cities'),
+        title: L('Tu salud, cerca de ti en cuatro ciudades', 'Your health, close to you in four cities'),
         summary: L(
           'Medicina general, laboratorio, ecografía, odontología y fisioterapia con cita el mismo día en la mayoría de sedes.',
           'General practice, lab tests, ultrasound, dentistry and physical therapy, with same-day appointments at most locations.',
@@ -116,10 +117,10 @@ function specs(): Spec[] {
         BTN(pi, 'Ver sedes y horarios', 'See locations and hours', '/sedes'),
       ],
       seo: {
-        title: L('Red de Clínicas Montaña Azul | Citas en cinco ciudades', 'Montaña Azul Clinics | Appointments in five cities'),
+        title: L('Red de Clínicas Montaña Azul | Citas en cuatro ciudades', 'Montaña Azul Clinics | Appointments in four cities'),
         description: L(
-          'Medicina general, laboratorio, ecografía, odontología y fisioterapia en Bogotá, Medellín, Cali, Barranquilla y Bucaramanga. Agenda en línea o por WhatsApp.',
-          'General practice, lab tests, ultrasound, dentistry and physical therapy in Bogotá, Medellín, Cali, Barranquilla and Bucaramanga. Book online or on WhatsApp.',
+          'Medicina general, laboratorio, ecografía, odontología y fisioterapia en Bogotá, Medellín, Cali y Barranquilla. Agenda en línea o por WhatsApp.',
+          'General practice, lab tests, ultrasound, dentistry and physical therapy in Bogotá, Medellín, Cali and Barranquilla. Book online or on WhatsApp.',
         ),
       },
     },
@@ -134,14 +135,14 @@ function specs(): Spec[] {
       publishedDaysAgo: 64,
       fields: {
         title: L('Quiénes somos', 'About us'),
-        summary: L('Una red de clínicas ambulatorias fundada en 2014 con sedes en cinco ciudades de Colombia.', 'A network of outpatient clinics founded in 2014 with locations in five Colombian cities.'),
+        summary: L('Una red de clínicas ambulatorias fundada en 2014 con sedes en cuatro ciudades de Colombia.', 'A network of outpatient clinics founded in 2014 with locations in four Colombian cities.'),
         heroImage: 'm-equipo',
       },
       blocks: [
         P(
           pn,
-          '<p>Empezamos con un consultorio en Chapinero y hoy atendemos en seis sedes. Nuestro equipo combina <strong>medicina general, ayudas diagnósticas y rehabilitación</strong> para que resuelvas lo que necesitas en un solo lugar.</p>',
-          '<p>We started with one office in Chapinero and today we serve patients at six locations. Our team combines <strong>general practice, diagnostic tests and rehabilitation</strong> so you can get what you need in one place.</p>',
+          '<p>Empezamos con un consultorio en Chapinero y hoy atendemos en cinco sedes. Nuestro equipo combina <strong>medicina general, ayudas diagnósticas y rehabilitación</strong> para que resuelvas lo que necesitas en un solo lugar.</p>',
+          '<p>We started with one office in Chapinero and today we serve patients at five locations. Our team combines <strong>general practice, diagnostic tests and rehabilitation</strong> so you can get what you need in one place.</p>',
         ),
         H(pn, 2, 'Cómo trabajamos', 'How we work'),
         P(
@@ -153,8 +154,8 @@ function specs(): Spec[] {
       seo: {
         title: L('Quiénes somos | Red de Clínicas Montaña Azul', 'About us | Montaña Azul Clinics'),
         description: L(
-          'Red de clínicas ambulatorias con seis sedes en Colombia: medicina general, laboratorio, ecografía, odontología y fisioterapia.',
-          'Outpatient clinic network with six locations in Colombia: general practice, lab tests, ultrasound, dentistry and physical therapy.',
+          'Red de clínicas ambulatorias con cinco sedes en Colombia: medicina general, laboratorio, ecografía, odontología y fisioterapia.',
+          'Outpatient clinic network with five locations in Colombia: general practice, lab tests, ultrasound, dentistry and physical therapy.',
         ),
       },
     },
@@ -668,8 +669,11 @@ function build(spec: Spec, nowMs: number): Entry {
   const scheduledAt = spec.scheduledInDays !== undefined ? iso(atBogota(nowMs, spec.scheduledInDays, 7, 0)) : null;
   const copy = () => JSON.parse(JSON.stringify(content)) as EntryContent;
   const versions: Entry['versions'] = [{ id: `${spec.id}-v1`, at: createdAt, by: spec.author, reason: 'created', content: copy() }];
+  // Lo aprobado o programado lo aprobó Edición (Andrés) media hora después del envío.
+  const approvedAt = spec.status === 'approved' || spec.status === 'scheduled' ? iso(Date.parse(updatedAt) + 30 * 60_000) : null;
   if (publishedAt) versions.push({ id: `${spec.id}-v2`, at: publishedAt, by: 'u-andres', reason: 'published', content: copy() });
   else if (spec.status !== 'draft') versions.push({ id: `${spec.id}-v2`, at: updatedAt, by: spec.author, reason: 'submitted', content: copy() });
+  if (approvedAt) versions.push({ id: `${spec.id}-v3`, at: approvedAt, by: 'u-andres', reason: 'approved', content: copy() });
   return {
     id: spec.id,
     type: spec.type,
@@ -678,10 +682,11 @@ function build(spec: Spec, nowMs: number): Entry {
     live: publishedAt ? copy() : null,
     authorId: spec.author,
     createdAt,
-    updatedAt: publishedAt && publishedAt > updatedAt ? publishedAt : updatedAt,
-    updatedBy: publishedAt ? 'u-andres' : spec.author,
+    updatedAt: approvedAt ?? (publishedAt && publishedAt > updatedAt ? publishedAt : updatedAt),
+    updatedBy: publishedAt || approvedAt ? 'u-andres' : spec.author,
     publishedAt,
     scheduledAt,
+    scheduledBy: scheduledAt ? 'u-andres' : null,
     reviewNote: null,
     versions,
   };
@@ -727,20 +732,47 @@ const V4_FIXES: [string, string][] = [
 const V4_FIXED_ENTRIES = new Set(['page-inicio', 'loc-chapinero']);
 
 /**
- * Estado guardado → estado actual. Conserva lo que la persona hizo con la
- * versión 3 (solo corrige los textos de ejemplo que no haya cambiado) y
+ * Textos de ejemplo corregidos en la versión 5: lo publicado hace semanas
+ * (inicio y «Quiénes somos») habla de cinco sedes en cuatro ciudades; la sexta
+ * sede, en Bucaramanga, es nueva y está en revisión (no se anuncia aún).
+ */
+const V5_FIXES: [string, string][] = [
+  ['Tu salud, cerca de ti en cinco ciudades', 'Tu salud, cerca de ti en cuatro ciudades'],
+  ['Your health, close to you in five cities', 'Your health, close to you in four cities'],
+  ['Citas en cinco ciudades', 'Citas en cuatro ciudades'],
+  ['Appointments in five cities', 'Appointments in four cities'],
+  ['en Bogotá, Medellín, Cali, Barranquilla y Bucaramanga.', 'en Bogotá, Medellín, Cali y Barranquilla.'],
+  ['in Bogotá, Medellín, Cali, Barranquilla and Bucaramanga.', 'in Bogotá, Medellín, Cali and Barranquilla.'],
+  ['con sedes en cinco ciudades de Colombia.', 'con sedes en cuatro ciudades de Colombia.'],
+  ['with locations in five Colombian cities.', 'with locations in four Colombian cities.'],
+  ['hoy atendemos en seis sedes', 'hoy atendemos en cinco sedes'],
+  ['today we serve patients at six locations', 'today we serve patients at five locations'],
+  ['con seis sedes en Colombia', 'con cinco sedes en Colombia'],
+  ['with six locations in Colombia', 'with five locations in Colombia'],
+];
+const V5_FIXED_ENTRIES = new Set(['page-inicio', 'page-nosotros']);
+
+function fixTexts(entries: Entry[], ids: Set<string>, fixes: [string, string][]): Entry[] {
+  return entries.map((e) => {
+    if (!ids.has(e.id)) return e;
+    let json = JSON.stringify(e);
+    for (const [from, to] of fixes) json = json.split(from).join(to);
+    return JSON.parse(json) as Entry;
+  });
+}
+
+/**
+ * Estado guardado → estado actual. Conserva lo que la persona hizo con las
+ * versiones 3 y 4 (solo corrige los textos de ejemplo que no haya cambiado) y
  * descarta cualquier otra cosa irreconocible (devuelve null: datos nuevos).
  */
 export function migrate(raw: unknown): AppState | null {
   const s = raw as AppState | null;
   if (!s || typeof s !== 'object' || !Array.isArray(s.entries)) return null;
   if (s.version === STATE_VERSION) return s;
-  if (s.version !== 3) return null;
-  const entries = s.entries.map((e) => {
-    if (!V4_FIXED_ENTRIES.has(e.id)) return e;
-    let json = JSON.stringify(e);
-    for (const [from, to] of V4_FIXES) json = json.split(from).join(to);
-    return JSON.parse(json) as Entry;
-  });
+  if (s.version !== 3 && s.version !== 4) return null;
+  let entries = s.entries;
+  if (s.version === 3) entries = fixTexts(entries, V4_FIXED_ENTRIES, V4_FIXES);
+  entries = fixTexts(entries, V5_FIXED_ENTRIES, V5_FIXES);
   return { ...s, version: STATE_VERSION, entries };
 }

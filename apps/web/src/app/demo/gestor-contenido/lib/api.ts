@@ -86,7 +86,8 @@ export function entryJson(state: Pick<AppState, 'types' | 'media' | 'entries'>, 
     locale,
     status: preview ? entry.status : 'published',
     publishedAt: entry.publishedAt,
-    updatedAt: entry.updatedAt,
+    // Lo publicado no cambia con el borrador: su última actualización es la publicación.
+    updatedAt: preview ? entry.updatedAt : (entry.publishedAt ?? entry.updatedAt),
     fields,
   };
   if (body) out.body = body;

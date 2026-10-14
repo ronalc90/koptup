@@ -46,7 +46,8 @@ interface AnswerRow {
   extra?: string;
   /** 0–1 para la barra. */
   bar?: number;
-  tone?: 'good' | 'bad';
+  /** good = cumple, warn = por debajo pero dentro del umbral de desvío, bad = fuera del umbral o negativo. */
+  tone?: 'good' | 'warn' | 'bad';
 }
 
 interface Answer {
@@ -142,7 +143,8 @@ export default function Ask() {
             value: fmt.compliance(c.compliance ?? 0),
             extra: `${fmt.moneyM(c.sales)} / ${fmt.moneyM(c.budget ?? 0)}`,
             bar: Math.min(1.2, c.compliance ?? 0) / 1.2,
-            tone: (c.compliance ?? 0) >= 1 ? ('good' as const) : ('bad' as const),
+            // Mismos colores que las barras por ciudad del Resumen: verde cumple, ámbar dentro del umbral, rojo fuera.
+            tone: (c.compliance ?? 0) >= 1 ? ('good' as const) : (c.compliance ?? 0) >= 1 - ctx.params.thresholds.goalGap / 100 ? ('warn' as const) : ('bad' as const),
           })),
           how: t('how.cityGoal', { goal: fmt.param(ctx.params.goalGrowth), prevYear: period.year - 1 }),
         };
@@ -263,12 +265,12 @@ export default function Ask() {
                   <li key={r.label} className="text-sm">
                     <div className="flex justify-between gap-2">
                       <span className="text-slate-700 dark:text-slate-200 truncate">{r.label}</span>
-                      <span className={`font-semibold whitespace-nowrap ${r.tone === 'bad' ? 'text-red-700 dark:text-red-400' : r.tone === 'good' ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-900 dark:text-white'}`}>{r.value}</span>
+                      <span className={`font-semibold whitespace-nowrap ${r.tone === 'bad' ? 'text-red-700 dark:text-red-400' : r.tone === 'warn' ? 'text-amber-700 dark:text-amber-400' : r.tone === 'good' ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-900 dark:text-white'}`}>{r.value}</span>
                     </div>
                     {r.extra && <div className="text-xs text-slate-500 dark:text-slate-400">{r.extra}</div>}
                     {r.bar !== undefined && (
                       <div className="h-1.5 mt-1 rounded-full bg-slate-100 dark:bg-slate-800">
-                        <div className={`h-1.5 rounded-full ${r.tone === 'bad' ? 'bg-red-500' : r.tone === 'good' ? 'bg-emerald-500' : 'bg-[#7c3aed] dark:bg-[#9085e9]'}`} style={{ width: `${Math.max(2, Math.min(100, r.bar * 100))}%` }} />
+                        <div className={`h-1.5 rounded-full ${r.tone === 'bad' ? 'bg-red-500' : r.tone === 'warn' ? 'bg-amber-500' : r.tone === 'good' ? 'bg-emerald-500' : 'bg-[#7c3aed] dark:bg-[#9085e9]'}`} style={{ width: `${Math.max(2, Math.min(100, r.bar * 100))}%` }} />
                       </div>
                     )}
                   </li>

@@ -88,6 +88,16 @@ export function defaultRules(today: string): Rules {
   };
 }
 
+/**
+ * Mezcla de ventas de ejemplo (participación de cada categoría y canal en las
+ * ventas a miembros). Sirve para estimar el multiplicador promedio con el que
+ * se calcula el costo del programa.
+ */
+export const SALES_MIX: { category: Record<CategoryKey, number>; channel: Record<ChannelKey, number> } = {
+  category: { personalCare: 0.3, otc: 0.2, dermo: 0.15, baby: 0.1, vitamins: 0.1, rx: 0.15 },
+  channel: { store: 0.7, app: 0.15, delivery: 0.15 },
+};
+
 /* ----------------------------- Recompensas ----------------------------- */
 
 export type RewardCat = 'vouchers' | 'products' | 'services' | 'donations';
@@ -232,7 +242,7 @@ export function sampleMembers(anchor: string): Member[] {
 
 /* ---------------------------- Libro de puntos ---------------------------- */
 
-export type TxKind = 'opening' | 'earn' | 'redeem' | 'welcome' | 'referral' | 'mission' | 'reversal' | 'summary';
+export type TxKind = 'opening' | 'earn' | 'redeem' | 'welcome' | 'referral' | 'mission' | 'reversal' | 'summary' | 'ticket';
 
 export interface LedgerTx {
   id: string;
@@ -249,6 +259,8 @@ export interface LedgerTx {
   sede?: SedeKey;
   rewardId?: string;
   missionId?: string;
+  /** Sorteo de una boleta comprada con puntos. */
+  drawId?: string;
   /** Texto libre (nombre de una misión creada o del referido). */
   label?: string;
   /** Movimiento hecho durante la demo. */
@@ -314,8 +326,21 @@ export function sampleLedger(anchor: string): LedgerTx[] {
     out.push({ id: id(), memberId, date: lastMonthEnd, kind: 'summary', points: earned });
     if (redeemed) out.push({ id: id(), memberId, date: lastMonthEnd, kind: 'redeem', points: -redeemed });
   });
+
+  // Las tres compras de Jhon de ayer que dispararon la alerta de ejemplo «Acumulación anómala» (f1).
+  const yesterday = addDays(anchor, -1);
+  JHON_ALERT_PURCHASES.forEach(([time, sede, category, amount]) => {
+    out.push({ id: id(), memberId: 'm-jhon', date: yesterday, time, kind: 'earn', points: amount / 1000, amount, category, channel: 'store', sede });
+  });
   return out;
 }
+
+/** Compras de ayer de Jhon (alerta f1): dos en Chapinero (Bogotá) y una en Laureles (Medellín) en 9 minutos. */
+export const JHON_ALERT_PURCHASES: [time: string, sede: SedeKey, category: CategoryKey, amount: number][] = [
+  ['10:02', 'chapinero', 'otc', 96000],
+  ['10:05', 'chapinero', 'vitamins', 88000],
+  ['10:11', 'laureles', 'otc', 102000],
+];
 
 /* ------------------------------- Misiones ------------------------------- */
 
@@ -464,11 +489,15 @@ export interface Draw {
   key?: string;
   name?: string;
   prize?: string;
+  /** Fecha programada; al sortear queda la fecha en que se sorteó. */
   date: string;
   ticketCost: number;
+  /** Participantes de ejemplo (sin contar los miembros de la demo). */
   participants: number;
   status: 'scheduled' | 'done';
   winner?: string;
+  /** Boletas compradas en la demo por cada miembro (id → cantidad). */
+  tickets?: Record<string, number>;
 }
 
 /** Sorteo de este mes (programado para el último día) y el del mes pasado (ya realizado). */

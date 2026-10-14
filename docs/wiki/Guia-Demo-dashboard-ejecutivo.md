@@ -96,8 +96,8 @@ Qué decir: «Ves hoy que a mediados de noviembre la caja queda por debajo de tu
 *Los cuatro clientes «En riesgo» de septiembre de 2026: tres de Cali y uno de Medellín.*
 
 1. **En riesgo (4)**: sus compras cayeron 25 % o más frente al mismo período del año anterior (el porcentaje se cambia en Configuración).
-2. **Tabla**: ventas del período, variación frente al año anterior, margen, saldo vencido y segmento: La Economía Paisa (−33,6 %), Red de Tiendas Barrio Amigo (−32,9 %), Casino Industrial Sabores del Cauca (−29,9 %) y Droguerías Botica Central (−37,6 %).
-3. **Exportar CSV**: descarga la lista filtrada.
+2. **Tabla**: ventas del período, variación frente al año anterior, margen, saldo vencido y segmento: La Economía Paisa (−33,6 %), Red de Tiendas Barrio Amigo (−32,9 %), Casino Industrial Sabores del Cauca (−29,9 %) y Droguerías Botica Central (−37,6 %). Con «Mayor caída frente al año anterior» la lista empieza por Droguerías Botica Central (−37,6 %); los clientes nuevos, que no tienen año anterior, quedan al final en cualquier orden.
+3. **Exportar CSV**: descarga la lista filtrada, en el orden en pantalla (en español con punto y coma y coma decimal, como lo abre Excel en español).
 
 Pulsa el nombre de **Red de Tiendas Barrio Amigo** para abrir su ficha:
 
@@ -117,7 +117,7 @@ Qué decir: «Antes de perder un cliente, el tablero te avisa que dejó de compr
 
 1. **Preguntas guiadas**: seis botones (clientes que compran menos, margen, ciudad más lejos de la meta, cartera vencida, caja en 8 semanas y proyección de los próximos 3 meses).
 2. **Campo de texto**: también puedes escribir la pregunta. La demo la compara con palabras clave (por ejemplo «sede» y «meta») y responde la pregunta guiada que más se parece. Si no reconoce nada, lo dice: «Esta demo solo responde las preguntas guiadas de arriba…».
-3. **Respuesta**: una frase con las cifras del período y una lista con barras (aquí, Cali 66 %, Medellín 99,9 %, Barranquilla 100,0 % y Bogotá 106 %).
+3. **Respuesta**: una frase con las cifras del período y una lista con barras con los mismos colores del Resumen (aquí, Cali 66 % en rojo, Medellín 99,9 % en ámbar porque está dentro del 5 % de desvío, Barranquilla 100,0 % y Bogotá 106 % en verde).
 4. **Cómo lo calculé**: la fórmula usada.
 
 Las respuestas se acumulan (hasta 10, la más reciente arriba) y **Borrar respuestas** las quita. La nota de la página aclara que no hay IA y que lo escrito no sale del navegador.
@@ -132,7 +132,7 @@ Abre **Alertas** en el menú lateral.
 
 *Las cinco alertas de septiembre de 2026, ordenadas por gravedad.*
 
-1. **Gravedad y título**: Crítica, Atención o Informativa. En el ejemplo: Cali bajo la meta y caja proyectada bajo el mínimo (críticas), ventas bajo la meta y caída del margen de lácteos (atención) y 4 clientes en riesgo (informativa).
+1. **Gravedad y título**: Crítica, Atención o Informativa. En el ejemplo: Cali bajo la meta y caja proyectada bajo el mínimo (críticas), ventas bajo la meta y caída del margen de lácteos (atención) y 4 clientes en riesgo (informativa: nombra a los tres primeros «y 1 más»).
 2. **Ver en …**: lleva a la vista donde está el detalle; la de caja baja hasta el flujo de caja y la de clientes abre Clientes con el filtro «En riesgo».
 3. **Editar umbrales**: abre Configuración.
 
@@ -193,7 +193,7 @@ Al completar los cinco primeros pasos aparece el cierre con **Solicitar demo gui
 | **Solicitar demo guiada** | Abre `/solicitar-demo?demos=dashboard-ejecutivo` (la demo ya elegida). |
 | **Cotizar tu tablero** | Abre `/contact?service=bi-dashboard` con el producto «Dashboard ejecutivo con IA» ya elegido. |
 | **Probar con tu CSV** | Abre Fuentes de datos y baja hasta «Prueba con tu CSV». |
-| **Restablecer demo** | Pide confirmación y vuelve a los datos de ejemplo, la empresa ficticia, metas y umbrales por defecto, el último mes y los primeros pasos sin marcar. |
+| **Restablecer demo** | Pide confirmación y vuelve a los datos de ejemplo, la empresa ficticia, metas y umbrales por defecto, el último mes y los primeros pasos sin marcar (y los vuelve a mostrar si estaban ocultos). |
 | **Corte de los datos** | «Último mes cerrado (septiembre de 2026)». |
 | **Cómo funciona esta demo** | Se despliega con cinco notas: de dónde salen las cifras, el corte, que no hay IA, qué es simulado y qué se guarda en el navegador. |
 | **Primeros pasos** | Cinco pasos con su botón; se marcan solos, el avance se recuerda en el navegador y el bloque se puede ocultar. |
@@ -202,9 +202,9 @@ Al completar los cinco primeros pasos aparece el cierre con **Solicitar demo gui
 
 | Elemento | Qué hace |
 |---|---|
-| **Menú lateral** | Resumen, Finanzas, Clientes, Preguntas guiadas, Alertas (con el número de alertas), Fuentes de datos y Configuración. La doble flecha lo contrae a solo íconos. Abajo, una nota recuerda que los datos son ficticios. En el celular se abre con el botón **Secciones**. |
-| **Buscador** | Busca secciones, clientes (por nombre, ciudad o vendedor) y, desde 3 caracteres, números de factura (hasta 5). Muestra hasta 10 resultados; se navega con las flechas y Enter. Un cliente abre su ficha; una factura, su detalle. |
-| **Campana** | Lista de alertas del período con su gravedad; cada una lleva a su vista. |
+| **Menú lateral** | Resumen, Finanzas, Clientes, Preguntas guiadas, Alertas (con el número de alertas), Fuentes de datos y Configuración. Al elegir una sección, la página baja hasta su título, justo debajo de la barra del tablero (no vuelve al encabezado de la demo). La doble flecha lo contrae a solo íconos. Abajo, una nota recuerda que los datos son ficticios. En el celular se abre con el botón **Secciones**. |
+| **Buscador** | Busca secciones, clientes (por nombre, ciudad o vendedor) y, desde 3 caracteres, números de factura (hasta 5, las más recientes primero). Muestra hasta 10 resultados; se navega con las flechas y Enter. Un cliente abre su ficha; una factura, su detalle. |
+| **Campana** | Lista de alertas del período con su gravedad; cada una lleva a su vista. Escape la cierra. |
 | **Informe PDF** | Genera y descarga el PDF del período. Mientras tanto dice «Generando…». |
 | **Período** | Los últimos 12 meses, sus trimestres y el año a la fecha. |
 | **Insignia** | «Datos de ejemplo» o «Tu archivo». |
@@ -226,7 +226,7 @@ La proyección usa «mismo mes del año anterior × crecimiento de los últimos 
 - **Flujo de caja a 13 semanas**: ver el [paso 3](#paso-3-la-caja-de-las-próximas-13-semanas-primer-paso-mira-la-caja-de-13-semanas). Las cuatro cifras se ponen en rojo con «Bajo la caja mínima» cuando quedan por debajo del mínimo, también la caja al corte.
 - **Movimientos relevantes**: cobros grandes, nómina, arriendo e IVA pagados en el período, con fecha y valor.
 
-Con un CSV propio, Finanzas solo muestra ventas, costo y utilidad bruta (si el archivo trae costo) y el botón para volver a los datos de ejemplo.
+Con un CSV propio, Finanzas solo muestra ventas, costo y utilidad bruta (si el archivo trae costo) y el botón para volver a los datos de ejemplo; el subtítulo lo dice («La cartera y el flujo de caja necesitan tu contabilidad»).
 
 ### Clientes
 
@@ -234,7 +234,7 @@ Ver el [paso 4](#paso-4-qué-clientes-están-comprando-menos-primer-paso-abre-un
 
 - **Segmentos**: Todos (18), Nuevo (2), Recurrente (12) y En riesgo (4) en septiembre de 2026. «Nuevo» es primera compra en los últimos 180 días; «En riesgo», compras que cayeron 25 % o más frente al mismo período del año anterior; «Recurrente», el resto.
 - **Buscador** (cliente, ciudad o vendedor), filtro por ciudad y orden (mayores ventas, mayor caída, mayor crecimiento, mayor margen, mayor saldo vencido o nombre). Los encabezados de la tabla también ordenan.
-- **Exportar CSV**: descarga la lista filtrada.
+- **Exportar CSV**: descarga la lista filtrada y ordenada (variación y margen con coma decimal en español).
 - **Ficha del cliente**: ventas del período, variación, margen, plazo y atraso promedio, ventas de los últimos 12 meses, hasta 12 facturas pendientes y las últimas 8 facturas del período, con **Exportar facturas del período**.
 
 ### Preguntas guiadas
@@ -296,15 +296,15 @@ La configuración se guarda solo en este navegador (sobrevive a recargar la pág
 
 *Las dos páginas A4 del informe de septiembre de 2026.*
 
-El PDF se arma en el navegador con las mismas cifras del tablero: encabezado con la empresa, el NIT, la ciudad y el corte; aviso de datos de ejemplo; los cuatro indicadores; resumen automático; estado de resultados; ventas por ciudad y por línea; principales clientes; cartera por edades; flujo de caja a 13 semanas (con la caja al corte, el punto más bajo y la caja mínima); alertas y «Cómo se calcularon las cifras». El archivo se llama, por ejemplo, `informe-ejecutivo-distribuidora-cumbre-andina-s-a-s-m-2026-09.pdf`.
+El PDF se arma en el navegador con las mismas cifras del tablero: encabezado con la empresa, el NIT, la ciudad y el corte; aviso de datos de ejemplo; los cuatro indicadores; resumen automático; estado de resultados; ventas por ciudad y por línea; principales clientes (con guion cuando no hay saldo vencido, igual que en la tabla de Clientes); cartera por edades; flujo de caja a 13 semanas (con la caja al corte, el punto más bajo y la caja mínima); alertas y «Cómo se calcularon las cifras». El archivo se llama, por ejemplo, `informe-ejecutivo-distribuidora-cumbre-andina-s-a-s-m-2026-09.pdf` (en inglés, `executive-report-…`; los CSV también cambian de nombre según el idioma: `cartera`/`receivables`, `clientes`/`customers`, `facturas`/`invoices`, `ventas`/`sales`).
 
 ### En el celular
 
 ![Vista móvil](images/doc/demos/dashboard-ejecutivo/13-movil.jpg)
 
-*A 390 px: el encabezado de la demo, la barra del tablero con el botón «Secciones» y el menú de secciones abierto.*
+*A 390 px: el encabezado de la demo, el Resumen elegido desde «Secciones», el menú de secciones abierto y las alertas de la campana.*
 
-El menú lateral se abre con **Secciones** (distinto del menú del sitio, el de las tres rayas arriba a la derecha); al abrirlo el foco entra al menú, Escape lo cierra y el foco vuelve al botón. La barra fija del tablero ocupa 141 px (búsqueda, campana, PDF, período, insignia y corte) y la empresa y la moneda pasan al subtítulo de cada sección. Los primeros pasos se ven en dos columnas, los indicadores se apilan y Clientes pasa de tabla a tarjetas. En la prueba, ninguna sección se desbordó a lo ancho, en claro ni en oscuro.
+El menú lateral se abre con **Secciones** (distinto del menú del sitio, el de las tres rayas arriba a la derecha); al abrirlo el foco entra al menú, Escape lo cierra y el foco vuelve al botón, y al elegir una sección la página baja hasta su título. La barra fija del tablero ocupa 141 px (búsqueda, campana, PDF, período, insignia y corte) y la empresa y la moneda pasan al subtítulo de cada sección. Las alertas de la campana y los resultados del buscador se abren a todo el ancho de la pantalla, debajo de la barra. Los primeros pasos se ven en dos columnas, los indicadores se apilan y Clientes pasa de tabla a tarjetas. En la prueba, ninguna sección se desbordó a lo ancho, en claro ni en oscuro.
 
 ---
 
@@ -312,7 +312,7 @@ El menú lateral se abre con **Secciones** (distinto del menú del sitio, el de 
 
 | Parte | Real o simulado | Detalle |
 |---|---|---|
-| Empresas, NIT, clientes, vendedores, facturas y gastos | **Datos de ejemplo** | Se generan con una semilla fija: con el mismo mes de corte siempre son los mismos. Los nombres son inventados. |
+| Empresas, NIT, clientes, vendedores, facturas y gastos | **Datos de ejemplo** | Se generan con una semilla fija: con el mismo mes de corte siempre son los mismos. Los nombres son inventados y los números de factura usan prefijos de ejemplo (FE, FEV y FEMC según el sector). |
 | Fechas | **Real (relativas a hoy)** | El corte es el último mes cerrado en Colombia, calculado en el servidor en cada visita; los datos se corren un mes cada mes. |
 | KPIs, estado de resultados, cartera, flujo de caja, segmentos y ranking | **Real (en el navegador)** | Se calculan con las facturas de ejemplo o con tu CSV, y cuadran entre vistas (hay pruebas automáticas que lo verifican). |
 | Proyección | **Real, estadística** | Método estacional o tendencia lineal con banda del 80 %. No usa IA. |

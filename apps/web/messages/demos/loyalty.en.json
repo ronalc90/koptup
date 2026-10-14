@@ -14,8 +14,8 @@
     "sampleHint": "{brand} (NIT {nit}), {club}, its stores, members, ID numbers, phone numbers, partners and all figures are made up.",
     "howItWorks": {
       "title": "What is real and what is simulated in this demo",
-      "real": "Calculated for real in your browser: the points for each purchase (base rule plus multipliers by category, day and channel), the balance as the sum of the points ledger, tiers, redemptions with coupons and checkout discounts, missions, referrals, fraud rules, allowed campaign hours (including Colombian public holidays), the cost simulator, the points liability and the CSV export.",
-      "simulated": "Simulated: sending WhatsApp, email or SMS (you see the preview, no message is sent), the Apple Wallet and Google Wallet pass (preview), sweepstakes, and the figures for the 29,200-member base (KPIs, cohorts, mission results, A/B tests and partners). Segments come from rules: there is no AI model in this demo. The WhatsApp and email buttons in “Invite friends” do open your app with the message ready.",
+      "real": "Calculated for real in your browser: the points for each purchase (base rule plus multipliers by category, day and channel), the balance as the sum of the points ledger, tiers, redemptions with coupons and checkout discounts, sweepstakes tickets, missions, referrals, fraud rules, allowed campaign hours (including Colombian public holidays), the cost simulator, the points liability and the CSV export.",
+      "simulated": "Simulated: sending WhatsApp, email or SMS (you see the preview, no message is sent), the Apple Wallet and Google Wallet pass (preview), the draw (the winner comes from your tickets and fictitious participants), and the figures for the 29,200-member base (KPIs, cohorts, mission results, A/B tests, partners and the sales mix behind the cost). Segments come from rules: there is no AI model in this demo. The WhatsApp and email buttons in “Invite friends” do open your app with the message ready.",
       "project": "In your project, the checkout connects to your POS or online store through an API, points live in a points ledger in your database, messages go out through WhatsApp Business with approved templates, the pass is issued for Apple Wallet and Google Wallet with your brand, and reports come from your real data.",
       "dates": "The demo works with today's date in Colombia: sample purchases, expirations and reports are built backwards from today, and what you record gets Colombia's date and time. Your changes are saved only in this browser."
     },
@@ -222,7 +222,8 @@
       "welcome": "Welcome bonus",
       "referral": "Referral: {name}",
       "mission": "Mission: {name}",
-      "reversal": "Reversal of sale {id}"
+      "reversal": "Reversal of sale {id}",
+      "ticket": "Ticket: {name}"
     },
     "export": {
       "button": "Export activity (CSV)",
@@ -246,7 +247,8 @@
         "referral": "Referral",
         "mission": "Mission",
         "reversal": "Reversal",
-        "summary": "Purchases (summary)"
+        "summary": "Purchases (summary)",
+        "ticket": "Sweepstakes ticket"
       }
     },
     "cashier": {
@@ -511,6 +513,21 @@
         "subtitle": "Purchase points in {month} (sample names)",
         "you": "You",
         "yourRank": "Your position: {rank} with {pts} points."
+      },
+      "draws": {
+        "title": "Club sweepstakes",
+        "subtitle": "Trade points for tickets to the open sweepstakes.",
+        "none": "No open sweepstakes. The business creates them in Settings › Sweepstakes.",
+        "line": "Prize: {prize} · drawn on {date} · {count, plural, one {# participant} other {{n} participants}}",
+        "mine": "{n, plural, =0 {No tickets yet} one {You have # ticket} other {You have # tickets}}",
+        "buy": "Buy ticket · {pts} pts",
+        "bought": "You bought a ticket for {pts} points (you have {n}). Balance: {balance}",
+        "errors": {
+          "insufficient": "You don’t have enough points for the ticket.",
+          "frozen": "Your points are frozen pending a review.",
+          "closed": "That sweepstake no longer takes tickets."
+        },
+        "note": "Tickets are paid with real points (they show in your activity). The draw is simulated: the business runs it in Settings › Sweepstakes and your tickets compete with the sample participants."
       }
     },
     "config": {
@@ -559,19 +576,20 @@
         "simDay": "Day",
         "simResult": "{base} × {mult}. Worth {value} in rewards ({pct}% of the purchase).",
         "costTitle": "How much does the program cost?",
-        "costSubtitle": "Monthly estimate with the base rule.",
+        "costSubtitle": "Monthly estimate with the current rules.",
         "costSales": "Monthly sales to members ($)",
         "costExpired": "% of points that expire unused",
         "costIssued": "Points issued per month",
         "costGross": "Value of those points",
         "costNet": "Estimated monthly cost",
-        "costNote": "Formula: sales ÷ base rule × point value × (1 − % expired). Multipliers and bonuses increase it depending on how much they are used.",
+        "costNote": "Formula: sales ÷ base rule × average multiplier × point value × (1 − % expired). The average multiplier comes from your multipliers and the day rule (1 day in 7) with a sample sales mix ({care}% Personal care, {dermo}% Dermocosmetics, {rx}% prescription…; {store}% in store). Welcome, mission and referral bonuses add on top.",
         "dayRuleHint": "In the demo it starts on today’s weekday so you can try it at checkout without changing the purchase date.",
         "simToday": "{day} (today)",
         "birthday": "Birthday gift",
         "birthdayHint": "Voucher in pesos that members claim in the app during their birthday month.",
         "birthdayNone": "No gift",
-        "birthdayOption": "{amount} voucher"
+        "birthdayOption": "{amount} voucher",
+        "costMult": "Average multiplier"
       },
       "tiers": {
         "title": "Tiers",
@@ -639,15 +657,15 @@
         "note": "It is a simulator to compare models: Checkout in this demo awards points."
       },
       "sweepstakes": {
-        "legal": "In Colombia, promotional sweepstakes need authorization from Coljuegos before being announced. In the demo the draw is simulated and the winner comes from a list of fictitious names.",
+        "legal": "In Colombia, promotional sweepstakes need Coljuegos authorization before they are announced. In the demo the draw is simulated: the winner comes from the tickets bought by demo members and a list of fictitious participants.",
         "title": "Sweepstakes",
-        "subtitle": "Members exchange points for tickets.",
-        "line": "Prize: {prize} · {date} · {cost} points per ticket · {n} participants",
+        "subtitle": "Members trade points for tickets in the app (Member app › Club sweepstakes).",
+        "line": "Prize: {prize} · {date} · {cost} points per ticket · {count, plural, one {# participant} other {{n} participants}}",
         "winner": "Winner: {name}",
         "done": "Drawn",
-        "run": "Draw (simulated)",
+        "run": "Draw now (simulated)",
         "drawn": "Simulated winner: {name}",
-        "note": "Participants and tickets are sample data.",
+        "note": "Sample participants are fictitious; “demo” tickets are the ones you buy in the app.",
         "newTitle": "New sweepstakes",
         "name": "Name",
         "namePh": "Year-end sweepstakes",
@@ -667,7 +685,10 @@
             "prize": "Dermocosmetic kit"
           }
         },
-        "noTickets": "No tickets yet: nobody enters new sweepstakes in the demo."
+        "noTickets": "No tickets yet: members buy them in Member app › Club sweepstakes.",
+        "lineDone": "Prize: {prize} · drawn on {date} · {cost} points per ticket · {count, plural, one {# participant} other {{n} participants}}",
+        "demoTickets": "{n, plural, one {# demo ticket} other {# demo tickets}} ({members, plural, one {# member} other {# members}})",
+        "drawnMember": "A demo member won: {name} (simulated)"
       },
       "campaigns": {
         "title": "Campaigns",
@@ -751,7 +772,10 @@
             "message": "Hi '{name}'. We have not seen you at {club} in a while: your next delivery order is free. Your balance: '{points}' points."
           }
         },
-        "nameHint": "Required to schedule it."
+        "nameHint": "Required to schedule it.",
+        "next": "Next send: {date}",
+        "skipped": "skips {date} (holiday)",
+        "recurringNote": "Recurring campaigns skip Sundays and Colombian holidays (Law 2300)."
       },
       "allies": {
         "title": "Partners (coalition)",
@@ -813,7 +837,7 @@
         },
         "samples": {
           "f1": {
-            "detail": "5 purchases in 10 minutes with the same phone at 2 stores in different cities.",
+            "detail": "3 purchases in 9 minutes with the same phone at stores in two cities (Bogotá and Medellín). The purchases are in Jhon’s activity.",
             "events": {
               "0": "{date} 10:02 · Chapinero · $96,000 · +96 pts",
               "1": "{date} 10:05 · Chapinero · $88,000 · +88 pts",
@@ -860,7 +884,13 @@
         "dismiss": "Dismiss alert",
         "dismissedToast": "Alert dismissed",
         "freeze": "Freeze points",
-        "frozenToast": "Points frozen: no redemptions until reviewed"
+        "frozenToast": "Points frozen: no redemptions until reviewed",
+        "release": "Release points",
+        "releasedToast": "Points released: the alert is dismissed",
+        "current": {
+          "frozen": "Status: points frozen (cannot redeem).",
+          "dismissed": "Status: alert dismissed."
+        }
       },
       "experiments": {
         "title": "A/B tests",
@@ -920,7 +950,7 @@
         "expiredSub": "Issued points that expire unused",
         "liability": "Points liability",
         "liabilitySub": "{pts} outstanding points × {value}",
-        "cost": "Estimated program cost: {cost} per month with member sales of {sales} (base rule; adjust it in Settings › Points)."
+        "cost": "Estimated program cost: {cost} per month with member sales of {sales} and an average multiplier of ×{mult} (using the rules in Settings › Points)."
       },
       "tiers": {
         "title": "Members by tier",
@@ -934,7 +964,7 @@
         "redemptions": "Redemptions",
         "points": "Points",
         "cost": "Cost",
-        "yours": "+{n} yours"
+        "yours": "{n, plural, one {+# yours} other {+# yours}}"
       },
       "segments": {
         "title": "Suggested segments",
@@ -974,7 +1004,7 @@
     },
     "notice": {
       "newMonth": "The month changed since your last visit: the demo went back to the sample data with today's date (missions, streaks and expirations depend on the month).",
-      "updated": "We updated the demo: it now works with today's date and went back to the sample data."
+      "updated": "We updated the demo: it went back to the sample data with today’s date."
     },
     "guide": {
       "title": "Getting started",
@@ -1003,7 +1033,7 @@
         },
         "s4": {
           "title": "Adjust a rule",
-          "text": "In Settings › Points raise the day rule to ×3 and see in the simulator how many points it gives and what the program costs.",
+          "text": "In Settings › Points raise the day rule to ×3 and see in the simulator how many points it gives and how much the program cost goes up.",
           "go": "Go to the rules"
         },
         "s5": {

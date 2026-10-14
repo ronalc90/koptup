@@ -3,7 +3,7 @@
  * vistas (Resumen, Finanzas, Clientes, cartera, flujo de caja), los datos de
  * ejemplo son determinísticos y el CSV del visitante se lee bien.
  */
-import { buildUploadDataset, guessMapping, parseAmount, parseCsv, toCsv } from '../lib/csv';
+import { buildUploadDataset, csvDecimal, guessMapping, parseAmount, parseCsv, toCsv } from '../lib/csv';
 import { buildSample as buildSampleAt } from '../lib/dataset';
 import { addMonths, lastClosedMonth, lastDay, normalizeDate } from '../lib/dates';
 import {
@@ -21,6 +21,7 @@ import {
   periodEnd,
   periodOptions,
   pnl,
+  sortCustomers,
   totals,
   trailingSeries,
   yearBefore,
@@ -236,6 +237,35 @@ describe('Tablero ejecutivo · las cifras cuadran entre vistas', () => {
     expect(fc.points.map((x) => x.month)).toEqual(['2026-10', '2026-11', '2026-12']);
     expect(forecast(buildIndex(buildSampleAt('servicios', '2027-02'))).points.map((x) => x.month)).toEqual(['2027-03', '2027-04', '2027-05']);
     for (const x of fc.points) expect(x.low < x.value && x.value < x.high).toBe(true);
+  });
+});
+
+describe('Tablero ejecutivo · lista de clientes y exportaciones', () => {
+  it('«Mayor caída» empieza por la mayor caída: los clientes sin año anterior van al final en cualquier orden', () => {
+    const ds = buildSample('comercio');
+    const ctx = buildContext(buildIndex(ds), findPeriod(ds, null), params('comercio'));
+    const withoutPrev = ctx.customers.filter((c) => c.yoy === null).length;
+    expect(withoutPrev).toBeGreaterThan(0);
+    for (const dir of ['asc', 'desc'] as const) {
+      const list = sortCustomers(ctx.customers, 'yoy', dir);
+      expect(list.slice(-withoutPrev).every((c) => c.yoy === null)).toBe(true);
+      const known = list.slice(0, list.length - withoutPrev).map((c) => c.yoy as number);
+      for (let i = 1; i < known.length; i++) expect(dir === 'asc' ? known[i] >= known[i - 1] : known[i] <= known[i - 1]).toBe(true);
+    }
+    const drop = sortCustomers(ctx.customers, 'yoy', 'asc')[0];
+    expect(drop.segment).toBe('riesgo');
+  });
+
+  it('los decimales del CSV usan coma en español (Excel en español) y punto en inglés', () => {
+    expect(csvDecimal(-33.62, 'es')).toBe('-33,6');
+    expect(csvDecimal(26.3, 'en')).toBe('26.3');
+    expect(csvDecimal(null, 'es')).toBeNull();
+    const csv = toCsv(['a', 'b'], [[csvDecimal(12.34, 'es'), 5]], 'es');
+    expect(csv).toContain('12,3;5');
+  });
+
+  it('los prefijos de factura de ejemplo no usan el prefijo del set de pruebas de la DIAN', () => {
+    for (const s of SECTORS) expect(PRESETS[s].invoicePrefix).not.toMatch(/^SETP/i);
   });
 });
 

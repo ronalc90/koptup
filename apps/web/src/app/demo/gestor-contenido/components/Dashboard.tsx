@@ -8,7 +8,7 @@ import { useCms } from '../lib/store';
 import { formatDateTime } from '../lib/time';
 import { STATUSES, TOUR_STEPS, type TourStep } from '../lib/types';
 import { CommercialLinks } from './Commercial';
-import { btn, card, STATUS_COLORS, TypeBadge, useUntil } from './ui';
+import { btn, card, STATUS_COLORS, TypeBadge, useEntryTitle, useUntil } from './ui';
 
 const TOUR_TARGET: Record<TourStep, { view?: 'models'; entry?: string }> = {
   model: { view: 'models' },
@@ -25,6 +25,7 @@ export default function Dashboard() {
   const tAct = useTranslations('demoCms.activity');
   const { state, me, go, openEntry, showEntries, contentLocale } = useCms();
   const until = useUntil();
+  const entryTitle = useEntryTitle();
   const locale = contentLocale;
   const counts = STATUSES.map((s) => ({ s, n: state.entries.filter((e) => e.status === s).length }));
   const scheduled = state.entries
@@ -154,7 +155,7 @@ export default function Dashboard() {
             <ul className="space-y-2">
               {state.activity.slice(0, 8).map((a) => (
                 <li key={a.id} className="text-sm text-slate-700 dark:text-slate-300">
-                  <span className="font-semibold text-slate-900 dark:text-white">{person(a.by)}</span> {tAct(a.kind, { title: a.entryTitle ?? '', detail: a.detail ?? '' })}
+                  <span className="font-semibold text-slate-900 dark:text-white">{person(a.by)}</span> {tAct(a.kind, { title: entryTitle(a.entryId, a.entryTitle), detail: a.detail ?? '' })}
                   <span className="block text-xs text-slate-500 dark:text-slate-400">{formatDateTime(a.at, locale)}</span>
                 </li>
               ))}

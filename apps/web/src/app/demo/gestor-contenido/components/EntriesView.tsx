@@ -116,10 +116,10 @@ export default function EntriesView() {
     const title = (e: Entry) => titleOf(e, e.content, contentLocale);
     return [...list].sort((a, b) => {
       if (sort === 'title') return title(a).localeCompare(title(b), contentLocale);
-      if (sort === 'type') return a.type.localeCompare(b.type) || title(a).localeCompare(title(b), contentLocale);
+      if (sort === 'type') return tTypes(`${a.type}.name`).localeCompare(tTypes(`${b.type}.name`), contentLocale) || title(a).localeCompare(title(b), contentLocale);
       return b.updatedAt.localeCompare(a.updatedAt);
     });
-  }, [state, q, type, status, author, lang, sort, contentLocale]);
+  }, [state, q, type, status, author, lang, sort, contentLocale, tTypes]);
 
   const filtersOn = q || type !== 'all' || status !== 'all' || author !== 'all' || lang !== 'all';
   const clear = () => {

@@ -12,6 +12,7 @@ import { btn, card, downloadText, Note, NS, SectionTitle, useFmt, useLabels } fr
 
 export default function Finance() {
   const t = useTranslations(`${NS}.finance`);
+  const tf = useTranslations(`${NS}.files`);
   const fmt = useFmt();
   const labels = useLabels();
   const { ctx, period, dataset, setUpload, openCustomer, company, notify } = useDashboard();
@@ -65,7 +66,7 @@ export default function Finance() {
       open.map((o) => [o.row.id, o.row.customer, o.row.date, o.row.due, Math.max(0, o.daysOverdue), t(`aging.buckets.${o.bucket}`), Math.round(o.row.value)]),
       fmt.loc,
     );
-    const file = `cartera-${slugify(company.name)}-${aging.asOf}.csv`;
+    const file = `${tf('receivables')}-${slugify(company.name)}-${aging.asOf}.csv`;
     downloadText(csv, file, 'text/csv;charset=utf-8');
     notify(t('exported', { file, count: open.length }));
   };

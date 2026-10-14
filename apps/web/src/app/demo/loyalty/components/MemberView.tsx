@@ -26,12 +26,13 @@ import {
   ChatBubbleLeftRightIcon,
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
-import { CLUB, LEADERBOARD_SAMPLE, REWARD_CATS, REWARDS, rewardById, type LedgerTx, type Member, type Mission, type Reward, type RewardCat } from './data';
+import { CLUB, LEADERBOARD_SAMPLE, REWARD_CATS, REWARDS, rewardById, type Draw, type LedgerTx, type Member, type Mission, type Reward, type RewardCat } from './data';
 import { endOfMonth, monthKeyAgo, monthKeyOf, partsOf } from './dates';
 import {
   balanceOf,
   barsFor,
   claimKey,
+  drawTickets,
   expiringPoints,
   memberCode,
   memberLedger,
@@ -84,6 +85,7 @@ export default function MemberView() {
         <div className="space-y-6 min-w-0">
           <WalletPass member={activeMember} />
           <MyCoupons member={activeMember} onOpen={setCoupon} />
+          <Sweepstakes member={activeMember} />
           <Referrals member={activeMember} />
           <StreakAndBadges member={activeMember} />
           <Leaderboard member={activeMember} />
@@ -236,7 +238,7 @@ function RewardsCatalog({ member, onCoupon }: { member: Member; onCoupon: (c: Co
         ))}
       </div>
 
-      <div className="grid grid-cols-1 min-[420px]:grid-cols-2 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
         {items.map((r) => {
           const stock = state.stock[r.id];
           const out = typeof stock === 'number' && stock <= 0;
@@ -450,7 +452,18 @@ function monthLabel(t: ReturnType<typeof useTranslations>, key: string) {
   return t('fmt.month', { m: t(`months.${m}`), y });
 }
 
-export function txLabel(t: ReturnType<typeof useTranslations>, tx: LedgerTx, money: (n: number) => string, missions: Mission[]) {
+/** Nombre de un sorteo: los de ejemplo se traducen; los creados en la demo llevan el nombre que les diste. */
+export function drawName(t: ReturnType<typeof useTranslations>, d: Draw) {
+  if (!d.key) return d.name ?? '';
+  const m = Number(d.date.split('-')[1]);
+  return t(`config.sweepstakes.items.${d.key}.name`, { month: t(`monthsLong.${m}`) });
+}
+
+export function drawPrize(t: ReturnType<typeof useTranslations>, d: Draw) {
+  return d.key ? t(`config.sweepstakes.items.${d.key}.prize`) : d.prize ?? '';
+}
+
+export function txLabel(t: ReturnType<typeof useTranslations>, tx: LedgerTx, money: (n: number) => string, missions: Mission[], draws: Draw[] = []) {
   switch (tx.kind) {
     case 'opening':
       return t('tx.opening');
@@ -472,6 +485,10 @@ export function txLabel(t: ReturnType<typeof useTranslations>, tx: LedgerTx, mon
     }
     case 'reversal':
       return t('tx.reversal', { id: (tx.saleId ?? '').replace('-canje', '') });
+    case 'ticket': {
+      const d = draws.find((x) => x.id === tx.drawId);
+      return t('tx.ticket', { name: d ? drawName(t, d) : '' });
+    }
     default:
       return '';
   }
@@ -496,7 +513,7 @@ function Movements({ member }: { member: Member }) {
           <li key={tx.id} className="py-2 flex items-center justify-between gap-3 text-sm">
             <div className="min-w-0">
               <p className="text-secondary-900 dark:text-white truncate">
-                {txLabel(t, tx, f.money, state.missions)}
+                {txLabel(t, tx, f.money, state.missions, state.draws)}
                 {tx.session && (
                   <Badge size="sm" variant="primary" className="ml-2">
                     {t('member.movements.new')}
@@ -545,7 +562,7 @@ function WalletPass({ member }: { member: Member }) {
         type="button"
         onClick={() => setFlipped((v) => !v)}
         aria-pressed={flipped}
-        aria-label={t('member.wallet.flip')}
+        aria-describedby="ly-wallet-tap"
         className={`mt-4 w-full aspect-[3/2] lg:aspect-[4/5] rounded-2xl bg-gradient-to-br ${theme.from} ${theme.to} text-white p-5 shadow-2xl ring-2 ${theme.ring} flex flex-col justify-between text-left transition-transform hover:scale-[1.02] focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-500`}
       >
         {!flipped ? (
@@ -578,7 +595,9 @@ function WalletPass({ member }: { member: Member }) {
           </>
         )}
       </button>
-      <p className="mt-2 text-[11px] text-center text-secondary-500">{t('member.wallet.tap')}</p>
+      <p id="ly-wallet-tap" className="mt-2 text-[11px] text-center text-secondary-500">
+        {t('member.wallet.tap')}
+      </p>
       <Button size="sm" variant="outline" className="mt-3 w-full text-xs" onClick={() => setPreview(true)}>
         <DevicePhoneMobileIcon className="h-4 w-4 mr-1" /> {t('member.wallet.add')}
       </Button>
@@ -608,6 +627,58 @@ function WalletPass({ member }: { member: Member }) {
           </div>
         </Modal>
       )}
+    </Card>
+  );
+}
+
+/* -------------------------------- Sorteos -------------------------------- */
+
+function Sweepstakes({ member }: { member: Member }) {
+  const t = useTranslations('demoLoyalty');
+  const f = useFmt();
+  const notify = useToast();
+  const { state, today, buyTicket } = useLoyalty();
+  const open = state.draws.filter((d) => d.status === 'scheduled' && d.date >= today);
+  const balance = balanceOf(state.ledger, member.id);
+  const frozen = isFrozen(state, member.id);
+  return (
+    <Card id="ly-draws">
+      <SectionTitle icon={TicketIcon} title={t('member.draws.title')} subtitle={t('member.draws.subtitle')} />
+      {open.length === 0 ? (
+        <p className="mt-3 text-sm text-secondary-500">{t('member.draws.none')}</p>
+      ) : (
+        <ul className="mt-3 space-y-3">
+          {open.map((d) => {
+            const mine = d.tickets?.[member.id] ?? 0;
+            const enough = balance >= d.ticketCost;
+            return (
+              <li key={d.id} className="rounded-lg border border-secondary-200 dark:border-secondary-800 p-3">
+                <p className="text-sm font-medium text-secondary-900 dark:text-white">{drawName(t, d)}</p>
+                <p className="text-xs text-secondary-500 dark:text-secondary-400 mt-0.5">
+                  {t('member.draws.line', { prize: drawPrize(t, d), date: f.date(d.date), count: d.participants + drawTickets(d).members, n: f.num(d.participants + drawTickets(d).members) })}
+                </p>
+                <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-xs text-secondary-700 dark:text-secondary-300">{t('member.draws.mine', { n: mine })}</span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="!py-1 text-xs"
+                    disabled={frozen || !enough}
+                    onClick={() => {
+                      const res = buyTicket(member.id, d.id, today, nowTime());
+                      if (res.ok) notify(t('member.draws.bought', { n: res.tickets, pts: f.num(d.ticketCost), balance: f.num(res.balance) }));
+                      else notify(t(`member.draws.errors.${res.error}`));
+                    }}
+                  >
+                    {frozen ? t('member.rewards.frozen') : enough ? t('member.draws.buy', { pts: f.num(d.ticketCost) }) : t('member.rewards.missing', { n: f.num(d.ticketCost - balance) })}
+                  </Button>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      <p className="mt-3 text-[11px] text-secondary-500 dark:text-secondary-400">{t('member.draws.note')}</p>
     </Card>
   );
 }
@@ -681,13 +752,13 @@ function Referrals({ member }: { member: Member }) {
           href={`https://wa.me/?text=${encodeURIComponent(message)}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-1.5 p-2 rounded-lg border border-secondary-200 dark:border-secondary-800 hover:bg-secondary-100 dark:hover:bg-secondary-800 text-xs text-secondary-700 dark:text-secondary-200"
+          className={`flex items-center justify-center gap-1.5 p-2 rounded-lg border border-secondary-200 dark:border-secondary-800 hover:bg-secondary-100 dark:hover:bg-secondary-800 text-xs text-secondary-700 dark:text-secondary-200 ${focusRing}`}
         >
           <ChatBubbleLeftRightIcon className="h-4 w-4" /> WhatsApp
         </a>
         <a
           href={`mailto:?subject=${encodeURIComponent(t('member.referrals.subject', { club: CLUB.club }))}&body=${encodeURIComponent(message)}`}
-          className="flex items-center justify-center gap-1.5 p-2 rounded-lg border border-secondary-200 dark:border-secondary-800 hover:bg-secondary-100 dark:hover:bg-secondary-800 text-xs text-secondary-700 dark:text-secondary-200"
+          className={`flex items-center justify-center gap-1.5 p-2 rounded-lg border border-secondary-200 dark:border-secondary-800 hover:bg-secondary-100 dark:hover:bg-secondary-800 text-xs text-secondary-700 dark:text-secondary-200 ${focusRing}`}
         >
           <EnvelopeIcon className="h-4 w-4" /> {t('member.referrals.email')}
         </a>

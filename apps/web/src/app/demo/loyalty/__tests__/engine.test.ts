@@ -4,9 +4,10 @@
  * misiones, racha, horario de la Ley 2300 con festivos, recuperación de lo
  * guardado y CSV.
  */
-import { DEFAULT_MISSIONS, POINTS_HISTOGRAM, defaultRules, sampleLedger, sampleMembers, type LedgerTx } from '../components/data';
-import { colombianHolidays, colombiaNow, easterSunday, endOfMonth, lastDays, monthDay, nextDays, weekdayOf } from '../components/dates';
+import { DEFAULT_MISSIONS, POINTS_HISTOGRAM, SAMPLE_ALERT_DAYS, defaultRules, sampleDraws, sampleLedger, sampleMembers, type LedgerTx } from '../components/data';
+import { addDays, colombianHolidays, colombiaNow, easterSunday, endOfMonth, lastDays, monthDay, nextDays, weekdayOf } from '../components/dates';
 import {
+  averageMultiplier,
   balanceOf,
   couponCode,
   countAtLeast,
@@ -14,6 +15,8 @@ import {
   ley2300Check,
   missionProgress,
   money,
+  nextRecurringSend,
+  pickDrawWinner,
   programCost,
   purchaseMonths,
   quoteSale,
@@ -115,6 +118,18 @@ describe('datos de ejemplo relativos a hoy', () => {
     expect(laura.since < anchor).toBe(true);
   });
 
+  it.each(ANCHORS)('con fecha %s: las compras de Jhon de la alerta de ejemplo están en su libro (ayer)', (anchor) => {
+    const ledger = sampleLedger(anchor);
+    const jhon = ledger.filter((tx) => tx.memberId === 'm-jhon' && tx.kind === 'earn');
+    expect(jhon.map((tx) => [tx.date, tx.time, tx.sede, tx.points])).toEqual([
+      [addDays(anchor, -SAMPLE_ALERT_DAYS.f1[0]), '10:02', 'chapinero', 96],
+      [addDays(anchor, -SAMPLE_ALERT_DAYS.f1[1]), '10:05', 'chapinero', 88],
+      [addDays(anchor, -SAMPLE_ALERT_DAYS.f1[2]), '10:11', 'laureles', 102],
+    ]);
+    expect(balanceOf(ledger, 'm-jhon')).toBe(880 + 2150 - 600 + 286);
+    expect(tierFor(tierPoints(ledger, 'm-jhon', anchor), defaultRules(anchor).thresholds)).toBe('silver');
+  });
+
   it('los demás miembros tienen saldos coherentes', () => {
     const ledger = sampleLedger('2026-10-14');
     expect(balanceOf(ledger, 'm-andres')).toBe(2160 + 5420 - 2600);
@@ -177,6 +192,17 @@ describe('Ley 2300 de 2023', () => {
     expect(ley2300Check('2026-10-13', '')).toEqual({ ok: false, reason: 'time' });
   });
 
+  it('las campañas que se repiten saltan domingos y festivos', () => {
+    // Lunes 9:00 desde el miércoles 28 de octubre de 2026: el lunes 2 de noviembre es festivo.
+    expect(nextRecurringSend({ day: 1, time: '09:00' }, '2026-10-28')).toEqual({ date: '2026-11-09', skipped: '2026-11-02' });
+    // De lunes a sábado desde el sábado 31 de octubre: domingo 1 y lunes 2 (festivo) se saltan.
+    expect(nextRecurringSend({ daily: true, day: 1, time: '09:30' }, '2026-10-31')).toEqual({ date: '2026-11-03', skipped: '2026-11-02' });
+    // Sábado 10:00 desde hoy: el próximo sábado, sin festivos de por medio.
+    expect(nextRecurringSend({ day: 6, time: '10:00' }, '2026-10-14')).toEqual({ date: '2026-10-17', skipped: undefined });
+    // Un sábado a las 16:00 nunca está permitido.
+    expect(nextRecurringSend({ day: 6, time: '16:00' }, '2026-10-14')).toBeNull();
+  });
+
   it('propone el primer día permitido: salta el domingo y el festivo', () => {
     // Sábado 7 de noviembre de 2026: mañana es domingo y el lunes 16 es festivo, pero el lunes 9 no.
     expect(firstSendDate(nextDays('2026-11-07', 14))).toBe('2026-11-09');
@@ -199,6 +225,12 @@ describe('lo guardado en el navegador', () => {
     expect(next.state.saleSeq).toBe(0);
   });
 
+  it('vuelve a armar lo guardado con la versión anterior de esta demo y lo avisa', () => {
+    const old = restoreState({ ...initialState('2026-10-02'), v: 2 }, false, '2026-10-14');
+    expect(old.notice).toBe('updated');
+    expect(old.state.anchor).toBe('2026-10-14');
+  });
+
   it('descarta la versión anterior con fechas fijas y lo avisa', () => {
     const legacy = restoreState({ v: 1, ledger: [], members: [] }, true, '2026-10-14');
     expect(legacy.notice).toBe('updated');
@@ -213,11 +245,52 @@ describe('formato y exportación', () => {
     expect(money(13120000, 'en')).toBe('$13,120,000');
   });
 
-  it('calcula el costo del programa con la regla base', () => {
-    expect(programCost(1_600_000_000, defaultRules('2026-10-14'), 18).net).toBeCloseTo(13_120_000, 2);
+  it('calcula el costo del programa con el multiplicador promedio de las reglas', () => {
+    const rules = defaultRules('2026-10-14');
+    // Categoría: 0,925 + 0,30 × (2 − 1) / 7 por la regla del día; canal: 0,70 + 0,15 × 1,5 + 0,15.
+    const mult = (0.925 + 0.3 / 7) * 1.075;
+    expect(averageMultiplier(rules)).toBeCloseTo(mult, 10);
+    expect(programCost(1_600_000_000, rules, 18).net).toBeCloseTo(1_600_000 * mult * 10 * 0.82, 2);
+    // Subir la regla del día a ×3 sube el costo; sin multiplicadores queda la regla base.
+    const triple = { ...rules, dayRule: { ...rules.dayRule, mult: 3 } };
+    expect(programCost(1_600_000_000, triple, 18).net).toBeGreaterThan(programCost(1_600_000_000, rules, 18).net);
+    const flat = {
+      ...rules,
+      dayRule: { ...rules.dayRule, enabled: false },
+      categoryMult: { personalCare: 1, otc: 1, dermo: 1, baby: 1, vitamins: 1, rx: 1 },
+      channelMult: { store: 1, app: 1, delivery: 1 },
+    };
+    expect(programCost(1_600_000_000, flat, 18).net).toBeCloseTo(13_120_000, 2);
   });
 
   it('escapa separadores en el CSV', () => {
     expect(toCsv([['a;b', 'c"d', 3]], ';')).toBe('"a;b";"c""d";3');
+  });
+});
+
+describe('sorteos', () => {
+  const [open] = sampleDraws('2026-10-14');
+
+  it('el sorteo de ejemplo de este mes se hace el último día y recibe boletas', () => {
+    expect(open.date).toBe('2026-10-31');
+    expect(open.status).toBe('scheduled');
+  });
+
+  it('sin participantes ni boletas no hay ganador', () => {
+    expect(pickDrawWinner({ ...open, participants: 0, tickets: {} }, 0.5)).toBeNull();
+  });
+
+  it('en un sorteo nuevo solo pueden ganar los miembros de la demo, según sus boletas', () => {
+    const d = { ...open, participants: 0, tickets: { 'm-laura': 3, 'm-jhon': 1 } };
+    expect(pickDrawWinner(d, 0)).toEqual({ memberId: 'm-laura' });
+    expect(pickDrawWinner(d, 0.74)).toEqual({ memberId: 'm-laura' });
+    expect(pickDrawWinner(d, 0.76)).toEqual({ memberId: 'm-jhon' });
+    expect(pickDrawWinner(d, 0.999)).toEqual({ memberId: 'm-jhon' });
+  });
+
+  it('las boletas de la demo compiten con los participantes de ejemplo', () => {
+    const d = { ...open, participants: 9, tickets: { 'm-laura': 1 } };
+    expect(pickDrawWinner(d, 0)).toHaveProperty('sample');
+    expect(pickDrawWinner(d, 0.95)).toEqual({ memberId: 'm-laura' });
   });
 });

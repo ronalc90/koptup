@@ -66,11 +66,12 @@ function entryTitle(state: AppState, e: Entry): string {
   return titleOf(e, e.content, 'es') || e.content.slug;
 }
 
-function log(state: AppState, kind: ActivityKind, now: string, e?: Entry, detail?: string): Activity[] {
+/** `by`: quién hizo la acción (por defecto, la persona activa; en lo automático, quien lo programó). */
+function log(state: AppState, kind: ActivityKind, now: string, e?: Entry, detail?: string, by: string = state.currentUserId): Activity[] {
   const item: Activity = {
     id: `act-${kind}-${e?.id ?? detail ?? 'x'}-${now}`,
     at: now,
-    by: state.currentUserId,
+    by,
     kind,
     entryId: e?.id,
     entryTitle: e ? entryTitle(state, e) : undefined,
@@ -88,22 +89,27 @@ function replaceEntry(state: AppState, e: Entry): AppState {
   return { ...state, entries: state.entries.map((x) => (x.id === e.id ? e : x)) };
 }
 
+/**
+ * Canales que reciben el aviso (webhook) cuando cambia una entrada publicada:
+ * los webhooks activados; el del asistente, solo para preguntas frecuentes.
+ */
+export function notifiedTargets(state: Pick<AppState, 'webhooks'>, e: Pick<Entry, 'type'>): WebhookTargetId[] {
+  return state.webhooks.filter((w) => w.enabled && (w.id !== 'assistant' || e.type === 'faq')).map((w) => w.id);
+}
+
 /** Entregas de webhook simuladas (sitio, app y asistente) para un cambio publicado. */
 function deliveries(state: AppState, e: Entry, event: WebhookEvent, now: string, auto: boolean): Delivery[] {
   const slug = (e.live ?? e.content).slug;
-  const isAssistantSource = e.type === 'faq';
   const out: Delivery[] = [];
-  for (const w of state.webhooks) {
-    if (!w.enabled) continue;
-    if (w.id === 'assistant' && !isAssistantSource) continue;
+  for (const target of notifiedTargets(state, e)) {
     out.push({
-      id: `dlv-${event}-${w.id}-${e.id}-${now}`,
+      id: `dlv-${event}-${target}-${e.id}-${now}`,
       at: now,
       event,
-      target: w.id,
+      target,
       entryId: e.id,
       entryTitle: entryTitle(state, e),
-      paths: w.id === 'site' ? revalidatePaths(e.type, slug) : [pathOf(e.type, slug)],
+      paths: target === 'site' ? revalidatePaths(e.type, slug) : [pathOf(e.type, slug)],
       auto,
       resent: false,
     });
@@ -139,17 +145,31 @@ export function wentThroughReview(state: Pick<AppState, 'seededAt'>, e: Pick<Ent
   return submitted >= 0 && since.slice(submitted + 1).some((v) => v.reason === 'approved');
 }
 
+/**
+ * A nombre de quién sale una publicación programada: quien la programó; si no
+ * se sabe (datos guardados por una versión anterior), quien la aprobó por
+ * última vez; y si tampoco, la primera persona con permiso de publicar (nunca
+ * alguien de Redacción, que no puede publicar).
+ */
+export function scheduledPublisher(state: Pick<AppState, 'people'>, e: Pick<Entry, 'scheduledBy' | 'versions'>): string {
+  if (e.scheduledBy) return e.scheduledBy;
+  const approved = [...e.versions].reverse().find((v) => v.reason === 'approved');
+  if (approved) return approved.by;
+  return state.people.find((p) => can(p.role, 'entry.publish'))?.id ?? state.people[0].id;
+}
+
 function publish(state: AppState, e: Entry, now: string, auto: boolean): AppState {
   if (blockingIssues(state, e).length > 0) return state;
   // Paso 4 del recorrido: solo cuando la entrada se envió, se aprobó y se publicó en esta visita.
   const tourPublish = !auto && wentThroughReview(state, e);
-  const by = auto ? (e.versions.find((v) => v.reason === 'approved')?.by ?? state.currentUserId) : state.currentUserId;
+  const by = auto ? scheduledPublisher(state, e) : state.currentUserId;
   const published: Entry = {
     ...e,
     status: 'published',
     live: clone(e.content),
     publishedAt: now,
     scheduledAt: null,
+    scheduledBy: null,
     reviewNote: null,
     updatedAt: now,
     updatedBy: by,
@@ -159,7 +179,7 @@ function publish(state: AppState, e: Entry, now: string, auto: boolean): AppStat
   return {
     ...next,
     deliveries: deliveries(next, published, 'entry.published', now, auto),
-    activity: log(next, auto ? 'autoPublished' : 'published', now, published),
+    activity: log(next, auto ? 'autoPublished' : 'published', now, published, undefined, by),
     tour: tourPublish ? { ...next.tour, publish: true } : next.tour,
   };
 }
@@ -235,6 +255,7 @@ export function reducer(state: AppState, action: Action): AppState {
         content: action.content,
         status: resets ? 'draft' : e.status,
         scheduledAt: resets ? null : e.scheduledAt,
+        scheduledBy: resets ? null : e.scheduledBy,
         updatedAt: action.now,
         updatedBy: state.currentUserId,
       };
@@ -290,7 +311,7 @@ export function reducer(state: AppState, action: Action): AppState {
       const e = find(state, action.id);
       if (!e || !can(role, 'entry.publish') || (e.status !== 'approved' && e.status !== 'scheduled')) return state;
       if (Date.parse(action.at) <= Date.parse(action.now)) return state;
-      const s: Entry = { ...e, status: 'scheduled', scheduledAt: action.at, updatedAt: action.now, updatedBy: state.currentUserId };
+      const s: Entry = { ...e, status: 'scheduled', scheduledAt: action.at, scheduledBy: state.currentUserId, updatedAt: action.now, updatedBy: state.currentUserId };
       const next = replaceEntry(state, s);
       return { ...next, activity: log(next, 'scheduled', action.now, s, action.at) };
     }
@@ -298,7 +319,7 @@ export function reducer(state: AppState, action: Action): AppState {
     case 'entry.unschedule': {
       const e = find(state, action.id);
       if (!e || e.status !== 'scheduled' || !can(role, 'entry.publish')) return state;
-      const s: Entry = { ...e, status: 'approved', scheduledAt: null, updatedAt: action.now, updatedBy: state.currentUserId };
+      const s: Entry = { ...e, status: 'approved', scheduledAt: null, scheduledBy: null, updatedAt: action.now, updatedBy: state.currentUserId };
       const next = replaceEntry(state, s);
       return { ...next, activity: log(next, 'unscheduled', action.now, s) };
     }
@@ -306,7 +327,7 @@ export function reducer(state: AppState, action: Action): AppState {
     case 'entry.unpublish': {
       const e = find(state, action.id);
       if (!e || !e.live || !can(role, 'entry.unpublish')) return state;
-      const s: Entry = { ...e, status: 'draft', live: null, publishedAt: null, scheduledAt: null, updatedAt: action.now, updatedBy: state.currentUserId };
+      const s: Entry = { ...e, status: 'draft', live: null, publishedAt: null, scheduledAt: null, scheduledBy: null, updatedAt: action.now, updatedBy: state.currentUserId };
       const withDeliveries = { ...state, deliveries: deliveries(state, e, 'entry.unpublished', action.now, false) };
       const next = replaceEntry(withDeliveries, s);
       return { ...next, activity: log(next, 'unpublished', action.now, s) };
@@ -316,7 +337,7 @@ export function reducer(state: AppState, action: Action): AppState {
       // Descarta los cambios sin publicar y vuelve a la versión publicada.
       const e = find(state, action.id);
       if (!e || !e.live || !canEdit(role, e) || sameContent(e.live, e.content)) return state;
-      const s: Entry = { ...e, content: clone(e.live), status: 'published', scheduledAt: null, reviewNote: null, updatedAt: action.now, updatedBy: state.currentUserId };
+      const s: Entry = { ...e, content: clone(e.live), status: 'published', scheduledAt: null, scheduledBy: null, reviewNote: null, updatedAt: action.now, updatedBy: state.currentUserId };
       s.versions = version(s, 'discarded', action.now, state.currentUserId);
       const next = replaceEntry(state, s);
       return { ...next, activity: log(next, 'discarded', action.now, s) };
@@ -332,6 +353,7 @@ export function reducer(state: AppState, action: Action): AppState {
         content: clone(v.content),
         status: resets ? 'draft' : e.status,
         scheduledAt: resets ? null : e.scheduledAt,
+        scheduledBy: resets ? null : e.scheduledBy,
         updatedAt: action.now,
         updatedBy: state.currentUserId,
       };
@@ -362,6 +384,7 @@ export function reducer(state: AppState, action: Action): AppState {
         updatedBy: state.currentUserId,
         publishedAt: null,
         scheduledAt: null,
+        scheduledBy: null,
         reviewNote: null,
         versions: [],
       };
@@ -376,22 +399,29 @@ export function reducer(state: AppState, action: Action): AppState {
     case 'entry.delete': {
       const e = find(state, action.id);
       if (!e || !canDelete(role, e, state.currentUserId)) return state;
-      // Las referencias a la entrada borrada se limpian en las demás entradas.
+      // Las referencias a la entrada borrada se quitan de las demás entradas, en el
+      // borrador y en la versión publicada (la API ya no puede entregar algo que no
+      // existe); así, quitar una referencia no deja «cambios sin publicar».
+      const withoutRef = (c: EntryContent): EntryContent | null => {
+        let changed = false;
+        const fields = { ...c.fields };
+        for (const [k, v] of Object.entries(fields)) {
+          if (v === e.id) {
+            fields[k] = null;
+            changed = true;
+          } else if (Array.isArray(v) && v.includes(e.id)) {
+            fields[k] = v.filter((id) => id !== e.id);
+            changed = true;
+          }
+        }
+        return changed ? { ...c, fields } : null;
+      };
       const entries = state.entries
         .filter((x) => x.id !== e.id)
         .map((x) => {
-          let changed = false;
-          const fields = { ...x.content.fields };
-          for (const [k, v] of Object.entries(fields)) {
-            if (v === e.id) {
-              fields[k] = null;
-              changed = true;
-            } else if (Array.isArray(v) && v.includes(e.id)) {
-              fields[k] = v.filter((id) => id !== e.id);
-              changed = true;
-            }
-          }
-          return changed ? { ...x, content: { ...x.content, fields } } : x;
+          const content = withoutRef(x.content);
+          const live = x.live ? withoutRef(x.live) : null;
+          return content || live ? { ...x, content: content ?? x.content, live: live ?? x.live } : x;
         });
       const base = e.live ? { ...state, deliveries: deliveries(state, e, 'entry.deleted', action.now, false) } : state;
       const next = { ...base, entries };
@@ -403,8 +433,19 @@ export function reducer(state: AppState, action: Action): AppState {
       if (due.length === 0) return state;
       return due.reduce<AppState>((s, e) => {
         const fresh = find(s, e.id);
+        if (!fresh) return s;
+        const at = e.scheduledAt ?? action.now;
+        // Si al llegar la hora le falta algo obligatorio (p. ej., Administración agregó un
+        // campo obligatorio después de programarla), no se publica: vuelve a «Aprobada»
+        // y queda en la actividad, en vez de quedarse programada con la hora vencida.
+        if (blockingIssues(s, fresh).length > 0) {
+          const by = scheduledPublisher(s, fresh);
+          const back: Entry = { ...fresh, status: 'approved', scheduledAt: null, scheduledBy: null };
+          const next = replaceEntry(s, back);
+          return { ...next, activity: log(next, 'scheduleFailed', at, back, undefined, by) };
+        }
         // Se publica con la fecha programada (así lo habría hecho el servidor aunque la pestaña estuviera cerrada).
-        return fresh ? publish(s, fresh, e.scheduledAt ?? action.now, true) : s;
+        return publish(s, fresh, at, true);
       }, state);
     }
 

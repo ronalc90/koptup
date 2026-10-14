@@ -14,8 +14,8 @@
     "sampleHint": "{brand} (NIT {nit}), {club}, sus sedes, miembros, cédulas, celulares, aliados y todas las cifras son inventados.",
     "howItWorks": {
       "title": "Qué es real y qué es simulado en esta demo",
-      "real": "Se calcula de verdad en tu navegador: los puntos de cada compra (regla base y multiplicadores por categoría, día y canal), el saldo como suma del libro de puntos, los niveles, los canjes con cupón y descuento en caja, las misiones, los referidos, las reglas antifraude, el horario permitido de las campañas (con los festivos de Colombia), el simulador de costo, el pasivo por puntos y la exportación CSV.",
-      "simulated": "Son simulados: el envío de WhatsApp, correo o SMS (ves la vista previa, no sale ningún mensaje), el pase de Apple Wallet y Google Wallet (vista previa), los sorteos y las cifras de la base de 29.200 miembros (indicadores, cohortes, resultados de misiones, pruebas A/B y aliados). Los segmentos salen de reglas: en esta demo no hay un modelo de IA. Los botones de WhatsApp y correo en «Invita amigos» sí abren tu aplicación con el mensaje listo.",
+      "real": "Se calcula de verdad en tu navegador: los puntos de cada compra (regla base y multiplicadores por categoría, día y canal), el saldo como suma del libro de puntos, los niveles, los canjes con cupón y descuento en caja, las boletas de los sorteos, las misiones, los referidos, las reglas antifraude, el horario permitido de las campañas (con los festivos de Colombia), el simulador de costo, el pasivo por puntos y la exportación CSV.",
+      "simulated": "Son simulados: el envío de WhatsApp, correo o SMS (ves la vista previa, no sale ningún mensaje), el pase de Apple Wallet y Google Wallet (vista previa), el sorteo (el ganador sale de tus boletas y de participantes ficticios) y las cifras de la base de 29.200 miembros (indicadores, cohortes, resultados de misiones, pruebas A/B, aliados y la mezcla de ventas del costo). Los segmentos salen de reglas: en esta demo no hay un modelo de IA. Los botones de WhatsApp y correo en «Invita amigos» sí abren tu aplicación con el mensaje listo.",
       "project": "En tu proyecto, la caja se conecta a tu POS o tienda en línea por API, los puntos quedan en un libro de puntos en tu base de datos, los mensajes salen por WhatsApp Business con plantillas aprobadas, el pase se emite para Apple Wallet y Google Wallet con tu marca y los reportes salen de tus datos reales.",
       "dates": "La demo trabaja con la fecha de hoy en Colombia: las compras de ejemplo, los vencimientos y los reportes se arman hacia atrás desde hoy, y lo que registras queda con la fecha y la hora de Colombia. Tus cambios se guardan solo en este navegador."
     },
@@ -222,7 +222,8 @@
       "welcome": "Bono de bienvenida",
       "referral": "Referido: {name}",
       "mission": "Misión: {name}",
-      "reversal": "Reverso de la venta {id}"
+      "reversal": "Reverso de la venta {id}",
+      "ticket": "Boleta: {name}"
     },
     "export": {
       "button": "Exportar movimientos (CSV)",
@@ -246,7 +247,8 @@
         "referral": "Referido",
         "mission": "Misión",
         "reversal": "Reverso",
-        "summary": "Compras (resumen)"
+        "summary": "Compras (resumen)",
+        "ticket": "Boleta de sorteo"
       }
     },
     "cashier": {
@@ -511,6 +513,21 @@
         "subtitle": "Puntos de compras en {month} (nombres de ejemplo)",
         "you": "Tú",
         "yourRank": "Tu posición: {rank} con {pts} puntos."
+      },
+      "draws": {
+        "title": "Sorteos del club",
+        "subtitle": "Cambia puntos por boletas para los sorteos abiertos.",
+        "none": "No hay sorteos abiertos. El comercio los crea en Configuración › Sorteos.",
+        "line": "Premio: {prize} · se sortea el {date} · {count, plural, one {# participante} other {{n} participantes}}",
+        "mine": "{n, plural, =0 {Aún no tienes boletas} one {Tienes # boleta} other {Tienes # boletas}}",
+        "buy": "Comprar boleta · {pts} pts",
+        "bought": "Compraste una boleta por {pts} puntos (tienes {n}). Saldo: {balance}",
+        "errors": {
+          "insufficient": "No te alcanzan los puntos para la boleta.",
+          "frozen": "Tus puntos están congelados por una revisión.",
+          "closed": "Ese sorteo ya no recibe boletas."
+        },
+        "note": "Las boletas se pagan con puntos de verdad (quedan en tus movimientos). El sorteo es simulado: lo hace el comercio en Configuración › Sorteos y tus boletas compiten con los participantes de ejemplo."
       }
     },
     "config": {
@@ -559,19 +576,20 @@
         "simDay": "Día",
         "simResult": "{base} × {mult}. Equivale a {value} en premios ({pct} % de la compra).",
         "costTitle": "¿Cuánto cuesta el programa?",
-        "costSubtitle": "Estimación mensual con la regla base.",
+        "costSubtitle": "Estimación mensual con las reglas actuales.",
         "costSales": "Ventas mensuales a miembros ($)",
         "costExpired": "% de puntos que vencen sin usarse",
         "costIssued": "Puntos emitidos al mes",
         "costGross": "Valor de esos puntos",
         "costNet": "Costo estimado al mes",
-        "costNote": "Fórmula: ventas ÷ regla base × valor del punto × (1 − % vencido). Los multiplicadores y bonos lo suben según cuánto se usen.",
+        "costNote": "Fórmula: ventas ÷ regla base × multiplicador promedio × valor del punto × (1 − % vencido). El multiplicador promedio sale de tus multiplicadores y de la regla del día (1 de cada 7 días) con una mezcla de ventas de ejemplo ({care} % Cuidado personal, {dermo} % Dermocosmética, {rx} % con fórmula…; {store} % en tienda). Los bonos de bienvenida, misiones y referidos se suman aparte.",
         "dayRuleHint": "En la demo arranca en el día de hoy para que la pruebes en la Caja sin cambiar la fecha de la compra.",
         "simToday": "{day} (hoy)",
         "birthday": "Regalo de cumpleaños",
         "birthdayHint": "Bono en pesos que el miembro reclama en la app en su mes de cumpleaños.",
         "birthdayNone": "Sin regalo",
-        "birthdayOption": "Bono de {amount}"
+        "birthdayOption": "Bono de {amount}",
+        "costMult": "Multiplicador promedio"
       },
       "tiers": {
         "title": "Niveles",
@@ -639,15 +657,15 @@
         "note": "Es un simulador para comparar modalidades: la Caja de esta demo acumula puntos."
       },
       "sweepstakes": {
-        "legal": "En Colombia, los sorteos promocionales necesitan autorización de Coljuegos antes de anunciarse. En la demo el sorteo es simulado y el ganador sale de una lista de nombres ficticios.",
+        "legal": "En Colombia, los sorteos promocionales necesitan autorización de Coljuegos antes de anunciarse. En la demo el sorteo es simulado: el ganador sale de las boletas que compren los miembros de la demo y de una lista de participantes ficticios.",
         "title": "Sorteos",
-        "subtitle": "Los miembros cambian puntos por boletas.",
-        "line": "Premio: {prize} · {date} · {cost} puntos por boleta · {n} participantes",
+        "subtitle": "Los miembros cambian puntos por boletas en la app (App del miembro › Sorteos del club).",
+        "line": "Premio: {prize} · {date} · {cost} puntos por boleta · {count, plural, one {# participante} other {{n} participantes}}",
         "winner": "Ganador: {name}",
         "done": "Realizado",
-        "run": "Sortear (simulado)",
+        "run": "Sortear ahora (simulado)",
         "drawn": "Ganador simulado: {name}",
-        "note": "Los participantes y las boletas son datos de ejemplo.",
+        "note": "Los participantes de ejemplo son ficticios; las boletas «de la demo» son las que compras en la app.",
         "newTitle": "Nuevo sorteo",
         "name": "Nombre",
         "namePh": "Sorteo de fin de año",
@@ -667,7 +685,10 @@
             "prize": "Kit dermocosmético"
           }
         },
-        "noTickets": "Sin boletas todavía: en la demo nadie participa en los sorteos nuevos."
+        "noTickets": "Sin boletas todavía: los miembros las compran en App del miembro › Sorteos del club.",
+        "lineDone": "Premio: {prize} · sorteado el {date} · {cost} puntos por boleta · {count, plural, one {# participante} other {{n} participantes}}",
+        "demoTickets": "{n, plural, one {# boleta} other {# boletas}} de la demo ({members, plural, one {# miembro} other {# miembros}})",
+        "drawnMember": "Ganó un miembro de la demo: {name} (simulado)"
       },
       "campaigns": {
         "title": "Campañas",
@@ -751,7 +772,10 @@
             "message": "Hola, '{nombre}'. Hace tiempo no te vemos en {club}: tu próximo pedido a domicilio va gratis. Tu saldo: '{puntos}' puntos."
           }
         },
-        "nameHint": "Obligatorio para programarla."
+        "nameHint": "Obligatorio para programarla.",
+        "next": "Próximo envío: {date}",
+        "skipped": "se salta el {date} (festivo)",
+        "recurringNote": "Las campañas que se repiten se saltan los domingos y los festivos de Colombia (Ley 2300)."
       },
       "allies": {
         "title": "Aliados (coalición)",
@@ -813,7 +837,7 @@
         },
         "samples": {
           "f1": {
-            "detail": "5 compras en 10 minutos con el mismo celular en 2 sedes de ciudades distintas.",
+            "detail": "3 compras en 9 minutos con el mismo celular en sedes de dos ciudades (Bogotá y Medellín). Las compras están en los movimientos de Jhon.",
             "events": {
               "0": "{date} 10:02 · Chapinero · $96.000 · +96 pts",
               "1": "{date} 10:05 · Chapinero · $88.000 · +88 pts",
@@ -860,7 +884,13 @@
         "dismiss": "Descartar alerta",
         "dismissedToast": "Alerta descartada",
         "freeze": "Congelar puntos",
-        "frozenToast": "Puntos congelados: no podrá canjear hasta que se revise"
+        "frozenToast": "Puntos congelados: no podrá canjear hasta que se revise",
+        "release": "Liberar puntos",
+        "releasedToast": "Puntos liberados: la alerta queda descartada",
+        "current": {
+          "frozen": "Estado: puntos congelados (no puede canjear).",
+          "dismissed": "Estado: alerta descartada."
+        }
       },
       "experiments": {
         "title": "Pruebas A/B",
@@ -920,7 +950,7 @@
         "expiredSub": "Emitidos que vencen sin usarse",
         "liability": "Pasivo por puntos",
         "liabilitySub": "{pts} puntos vigentes × {value}",
-        "cost": "Costo estimado del programa: {cost} al mes con ventas a miembros de {sales} (regla base; ajústalo en Configuración › Puntos)."
+        "cost": "Costo estimado del programa: {cost} al mes con ventas a miembros de {sales} y un multiplicador promedio de ×{mult} (con las reglas de Configuración › Puntos)."
       },
       "tiers": {
         "title": "Miembros por nivel",
@@ -934,7 +964,7 @@
         "redemptions": "Canjes",
         "points": "Puntos",
         "cost": "Costo",
-        "yours": "+{n} tuyos"
+        "yours": "{n, plural, one {+# tuyo} other {+# tuyos}}"
       },
       "segments": {
         "title": "Segmentos sugeridos",
@@ -974,7 +1004,7 @@
     },
     "notice": {
       "newMonth": "Cambió el mes desde tu última visita: la demo volvió a los datos de ejemplo con la fecha de hoy (las misiones, la racha y los vencimientos dependen del mes).",
-      "updated": "Actualizamos la demo: ahora trabaja con la fecha de hoy y volvió a los datos de ejemplo."
+      "updated": "Actualizamos la demo: volvió a los datos de ejemplo con la fecha de hoy."
     },
     "guide": {
       "title": "Primeros pasos",
@@ -1003,7 +1033,7 @@
         },
         "s4": {
           "title": "Ajusta una regla",
-          "text": "En Configuración › Puntos sube la regla del día a ×3 y mira en el simulador cuántos puntos da y cuánto cuesta el programa.",
+          "text": "En Configuración › Puntos sube la regla del día a ×3 y mira en el simulador cuántos puntos da y cuánto sube el costo del programa.",
           "go": "Ir a las reglas"
         },
         "s5": {
